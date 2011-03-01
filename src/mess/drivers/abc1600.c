@@ -10,6 +10,8 @@
 
     TODO:
 
+	- Unable to allocate bank for RAM/ROM area 46000-467FF (run out of banks)
+	
 	- memory access controller
 		- task register
 		- cause register (parity error)
@@ -88,9 +90,17 @@ enum
 //  install_memory_page -
 //-------------------------------------------------
 
-void abc1600_state::install_memory_page(offs_t start, offs_t virtual_address, bool wp, bool nonx)
+void abc1600_state::install_memory_page(int segment, int page)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	UINT16 page_data = PAGE_DATA(segment, page);
+
+	offs_t virtual_address = (page_data & 0x3ff) << 11;
+	bool wp = ((page_data & PAGE_WP) == 0);
+	bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
+
+	offs_t start = (segment * 0x8000) + (page * 0x800);
 	offs_t end = start + PAGE_SIZE - 1;
 
 	logerror("MAC physical %06x: virtual %06x %s %s\n", start, virtual_address, wp ? "WP":"", nonx ? "NONX":"");
@@ -148,22 +158,15 @@ void abc1600_state::install_memory_page(offs_t start, offs_t virtual_address, bo
 
 void abc1600_state::bankswitch()
 {
-	offs_t physical_address = 0;
-
+/*
 	for (int segment = 0; segment < 32; segment++)
 	{
-		for (int page = 0; page < 32; page++)
+		for (int page = 0; page < 16; page++)
 		{
-			UINT16 page_data = PAGE_DATA(segment, page);
-			offs_t virtual_address = (page_data & 0x3ff) << 11;
-			bool wp = ((page_data & PAGE_WP) == 0);
-			bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
-
-			install_memory_page(physical_address, virtual_address, wp, nonx);
-
-			physical_address += PAGE_SIZE;
+			install_memory_page(segment, page);
 		}
 	}
+*/
 }
 
 
@@ -173,6 +176,21 @@ void abc1600_state::bankswitch()
 
 READ8_MEMBER( abc1600_state::cause_r )
 {
+	/*
+	
+		bit		description
+		
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+	
+	*/
+
 	return 0;
 }
 
@@ -198,9 +216,11 @@ WRITE8_MEMBER( abc1600_state::task_w )
 	
 	*/
 
-	m_task = data;
-
-	bankswitch();
+	if (m_task != data)
+	{
+		m_task = data;
+		bankswitch();
+	}
 }
 
 
@@ -255,8 +275,14 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 
 	int segment = (offset >> 15) & 0x1f;
 	SEGMENT_DATA(segment) = data & 0x7f;
-
-	bankswitch();
+	
+	logerror("Task %u Segment %u : %02x\n", m_task & 0x0f, segment, data);
+/*
+	for (int page = 0; page < 16; page++)
+	{
+		install_memory_page(segment, page);
+	}
+*/
 }
 
 
@@ -296,7 +322,7 @@ READ8_MEMBER( abc1600_state::page_r )
 
 	int a0 = BIT(offset, 0);
 
-	return a0 ? (data >> 8) : (data & 0xff);
+	return a0 ? (data & 0xff) : (data >> 8);
 }
 
 
@@ -336,14 +362,16 @@ WRITE8_MEMBER( abc1600_state::page_w )
 
 	if (a0)
 	{
-		PAGE_DATA(segment, page) = (data << 8) | (PAGE_DATA(segment, page) & 0xff);
+		PAGE_DATA(segment, page) = (PAGE_DATA(segment, page) & 0xff00) | data;
 	}
 	else
 	{
-		PAGE_DATA(segment, page) = (PAGE_DATA(segment, page) & 0xff00) | data;
+		PAGE_DATA(segment, page) = (data << 8) | (PAGE_DATA(segment, page) & 0xff);
 	}
 
-	bankswitch();
+	logerror("Task %u Segment %u Page %u : %04x\n", m_task & 0x0f, segment, page, PAGE_DATA(segment, page));
+
+	install_memory_page(segment, page);
 }
 
 
@@ -678,17 +706,22 @@ WRITE8_MEMBER( abc1600_state::en_spec_contr_reg_w )
 
 static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
+	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
+	AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
+	AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
+	AM_RANGE(0x80007, 0x80007) AM_READWRITE(cause_r, task_w)
+ADDRESS_MAP_END
+
 /*
 
 	Supervisor Data map
 
-	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(page_r, page_w)
+	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
+	AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
 	AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
-	AM_RANGE(0x80004, 0x80004) AM_READ(cause_r)
-	AM_RANGE(0x80007, 0x80007) AM_WRITE(task_w)
+	AM_RANGE(0x80007, 0x80007) AM_READWRITE(cause_r, task_w)
 
-
-	Logical Address Map
+	Virtual Address Map
 	
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_MEMBER(m_video_ram)
@@ -696,6 +729,9 @@ static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
 	AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x1ff200, 0x1ff207) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
+	AM_RANGE(0x1ff300, 0x1ff300) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1ff400, 0x1ff400) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1ff500, 0x1ff500) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0x1ff600, 0x1ff607) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w) // A2,A1
 	AM_RANGE(0x1ff700, 0x1ff707) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w) // A2,A1
 	AM_RANGE(0x1ff800, 0x1ff800) AM_READ(iord0_w)
@@ -707,15 +743,7 @@ static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x1ffd00, 0x1ffd07) AM_WRITE(dmamap_w)
 	AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(en_spec_contr_reg_w)
 
-	*/
-
-/*
-	AM_RANGE(0x1ff000, 0x1ff000) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff000, 0x1ff000) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff000, 0x1ff000) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff000, 0x1ff003) AM_DEVREADWRITE(E050_C16PC_TAG, e050c16pc_r, e050c16pc_w)
 */
-ADDRESS_MAP_END
 
 
 
@@ -1057,6 +1085,17 @@ static ABC99_INTERFACE( abc99_intf )
 
 void abc1600_state::machine_start()
 {
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( abc1600 )
+//-------------------------------------------------
+
+void abc1600_state::machine_reset()
+{
+	m_task = 0;
+	bankswitch();
 }
 
 

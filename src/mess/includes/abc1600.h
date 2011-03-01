@@ -82,6 +82,7 @@ public:
 	required_device<device_t> m_floppy;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -123,7 +124,7 @@ public:
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
 
-	void install_memory_page(offs_t start, offs_t virtual_address, bool wp, bool nonx);
+	void install_memory_page(int segment, int page);
 	void bankswitch();
 	inline offs_t get_dma_address(int index, UINT16 offset);
 	inline UINT8 dma_mreq_r(int index, UINT16 offset);
