@@ -285,14 +285,14 @@ UINT8 abc1600_state::read_user_memory(offs_t offset)
 	int page = (offset >> 11) & 0x0f;
 	UINT16 page_data = PAGE_DATA(segment, page);
 
-	offs_t virtual_offset = (page_data & 0x3ff) << 11;
+	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 	//bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
 
 	//if (nonx) Bus Error
 
 	UINT8 data = 0;
 
-	if (offset < 0x180000)
+	if (virtual_offset < 0x1fe000)
 	{
 		data = read_ram(virtual_offset);
 	}
@@ -315,14 +315,14 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 	int page = (offset >> 11) & 0x0f;
 	UINT16 page_data = PAGE_DATA(segment, page);
 
-	offs_t virtual_offset = (page_data & 0x3ff) << 11;
+	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 	bool wp = ((page_data & PAGE_WP) == 0);
 	//bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
 
 	if (wp) return;
 	//if (nonx) BUS ERROR
 
-	if (virtual_offset < 0x180000)
+	if (virtual_offset < 0x1fe000)
 	{
 		write_ram(virtual_offset, data);
 	}
@@ -417,7 +417,7 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 
 READ8_MEMBER( abc1600_state::mac_r )
 {
-	bool supervisor = true;
+	bool supervisor = true; // FIXME
 
 	UINT8 data = 0;
 
@@ -440,7 +440,7 @@ READ8_MEMBER( abc1600_state::mac_r )
 
 WRITE8_MEMBER( abc1600_state::mac_w )
 {
-	bool supervisor = true;
+	bool supervisor = true; // FIXME
 
 	if (supervisor)
 	{
