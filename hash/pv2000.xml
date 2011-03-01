@@ -1,6 +1,16 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pv2000" description="Casio PV-2000 cartridges">
+
+<!--
+
+Undumped carts:
+
+ * Real Basic - 実数Basic
+ * GPB-111 - Exciting Jockey - Daishougai Keiba - 大障害競馬 [Cart number 11]
+
+-->
+
 	<software name="excitem2">
 		<description>Excite Mahjong 2</description>
 		<year>1983</year>
