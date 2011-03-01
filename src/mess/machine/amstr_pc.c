@@ -255,7 +255,7 @@ READ8_HANDLER( pc1640_port378_r )
  READ8_HANDLER( pc1640_port3d0_r )
 {
 	if (offset==0xa) pc1640.dipstate=0;
-	return vga_port_03d0_r(space, offset);
+	return space->read_byte(0x3d0+offset);
 }
 
  READ8_HANDLER( pc1640_port4278_r )
