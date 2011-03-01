@@ -1094,6 +1094,9 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc1600")
 MACHINE_CONFIG_END
 
 
