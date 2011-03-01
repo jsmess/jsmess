@@ -44,14 +44,15 @@ Address map:
   port 3.2: read, from /INT on tms5220c
   port 3.3: read, from /READY on tms5220c
   port 3.4: read, from the serial RTS line
-  port 3.5: write, to the serial CTS line
+  port 3.5: read/write, to the serial CTS line, inverted (effectively /CTS)
   port 3.6: write, /WR (general) and /WE (pin 27) for unpopulated 6164 SRAM
   port 3.7: write, /RD (general) and /OE (pin 22) for unpopulated 6164 SRAM
 
 */
-
 #define ADDRESS_MAP_MODERN
 #define CPU_CLOCK		XTAL_10_245MHz
+
+#define DEBUG_PORT3 1
 
 /* Core includes */
 #include "emu.h"
@@ -61,19 +62,50 @@ Address map:
 #include "machine/terminal.h"
 
 /* Devices */
-static WRITE8_DEVICE_HANDLER( pes_kbd_put )
+static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 {
-	//duart68681_rx_data(device->machine->device("duart68681"), 1, data);
-	// nothing, yet
-	// todo: attach to serial
+	pes_state *state = device->machine->driver_data<pes_state>();
+	fprintf(stderr,"keyboard input: %c, ", data);
+	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
+	if (((state->infifo_tail_ptr-1)&0x1F) == state->infifo_head_ptr)
+	{
+		logerror("infifo was full, write ignored!\n");
+		fprintf(stderr,"infifo was full, write ignored!\n");
+		return;
+	}
+	state->infifo[state->infifo_head_ptr] = data;
+	state->infifo_head_ptr++;
+	state->infifo_head_ptr&=0x1F;
+	fprintf(stderr,"kb input fifo fullness: %d\n",(state->infifo_head_ptr-state->infifo_tail_ptr)&0x1F);
+	cputag_set_input_line(device->machine, "maincpu", MCS51_RX_LINE, HOLD_LINE); // this doesn't do what it should :(
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
 {
-	DEVCB_HANDLER(pes_kbd_put)
+	DEVCB_HANDLER(pes_kbd_input)
 };
 
-/* Handlers */
+/* Helper Functions */
+static int data_to_i8031(device_t *device)
+{
+	pes_state *state = device->machine->driver_data<pes_state>();
+	UINT8 data;
+	data = state->infifo[state->infifo_tail_ptr];
+	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
+	if (state->infifo_tail_ptr != state->infifo_head_ptr) state->infifo_tail_ptr++; 
+	state->infifo_tail_ptr&=0x1F;
+	fprintf(stderr,"callback: input to i8031/pes from pc/terminal: %02X\n",data);
+	return data;
+}
+
+static void data_from_i8031(device_t *device, int data)
+{
+	pes_state *state = device->machine->driver_data<pes_state>();
+	terminal_write(state->m_terminal,0,data);
+	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
+}
+
+/* Port Handlers */
 WRITE8_MEMBER( pes_state::rsws_w )
 {
 	pes_state *state = machine->driver_data<pes_state>();
@@ -92,43 +124,86 @@ WRITE8_MEMBER( pes_state::port1_w )
 	
 }
 
-WRITE8_MEMBER( pes_state::port3_w )
-{
-	m_serial_cts = (data&0x20)>>5;
-	logerror("port3 write: control data written: %02X; CTS: %d\n", data, m_serial_cts);
-	// todo: poke serial handler
-}
-
-
 READ8_MEMBER( pes_state::port1_r )
 {
-	UINT8 temp = 0xFF;
+	UINT8 data = 0xFF;
 	pes_state *state = machine->driver_data<pes_state>();
-	temp = tms5220_status_r(state->m_speech, 0);
-	logerror("port1 read: tms5220 data read: 0x%02X\n", temp);
-	return temp;
+	data = tms5220_status_r(state->m_speech, 0);
+	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
+	return data;
+}
+
+#define P3_RXD (((state->m_port3_data)&(1<<0))>>0)
+#define P3_TXD (((state->m_port3_data)&(1<<1))>>1)
+#define P3_INT (((state->m_port3_data)&(1<<2))>>2)
+#define P3_RDY (((state->m_port3_data)&(1<<3))>>3)
+#define P3_RTS (((state->m_port3_data)&(1<<4))>>4)
+#define P3_CTS (((state->m_port3_data)&(1<<5))>>5)
+#define P3_WR (((state->m_port3_data)&(1<<6))>>6)
+#define P3_RD (((state->m_port3_data)&(1<<7))>>7)
+WRITE8_MEMBER( pes_state::port3_w )
+{
+	m_port3_state = data;
+	logerror("port3 write: control data written: %02X; ", data);
+	logerror("RXD: %d; ", (data&1));
+	logerror("TXD: %d; ", ((data&2)>>1));
+	logerror("/INT: %d; ", ((data&4)>>2));
+	logerror("/RDY: %d; ", ((data&8)>>3));
+	logerror("RTS: %d; ", ((data&0x10)>>4));
+	logerror("CTS: %d; ", ((data&0x20)>>5));
+	logerror("WR: %d; ", ((data&0x40)>>6));
+	logerror("RD: %d;\n", ((data&0x80)>>7));
+	// todo: poke serial handler here somehow?
 }
 
 READ8_MEMBER( pes_state::port3_r )
 {
-	UINT8 temp = 0xE3; // todo: actually return last written state?
+	UINT8 data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
 	pes_state *state = machine->driver_data<pes_state>();
-	temp |= (m_serial_rts<<4);
-	temp |= (tms5220_readyq_r(state->m_speech)<<3);
-	temp |= (tms5220_intq_r(state->m_speech)<<2);
-	logerror("port3 read: returning 0x%02X\n", temp);
-	return temp;
+	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared
+	if (state->infifo_tail_ptr != state->infifo_head_ptr)
+	{
+		data |= 0x10; // set RTS bit
+	}
+	data |= (tms5220_intq_r(state->m_speech)<<2);
+	data |= (tms5220_readyq_r(state->m_speech)<<3);
+	logerror("port3 read: returning 0x%02X: ", data);
+	logerror("RXD: %d; ", (data&1));
+	logerror("TXD: %d; ", ((data&2)>>1));
+	logerror("/INT: %d; ", ((data&4)>>2));
+	logerror("/RDY: %d; ", ((data&8)>>3));
+	logerror("RTS: %d; ", ((data&0x10)>>4));
+	logerror("CTS: %d; ", ((data&0x20)>>5));
+	logerror("WR: %d; ", ((data&0x40)>>6));
+	logerror("RD: %d;\n", ((data&0x80)>>7));
+	return data;
 }
 
 
 /* Reset */
 void pes_state::machine_reset()
 {
+	// clear fifos (TODO: memset would work better here...)
+	int i;
+	for (i=0; i<32; i++) infifo[i] = 0;
+	infifo_tail_ptr = infifo_head_ptr = 0;
 	m_wsstate = 1;
 	m_rsstate = 1;
-	m_serial_rts = 1;
-	m_serial_cts = 1;
-	devtag_reset(machine, "tms5220");
+
+	m_port3_state = 0; // reset the openbus state of port 3
+	
+	devtag_reset(machine, "tms5220"); // reset the 5220
+	fprintf(stderr,"machine_reset called\n");
+}
+
+/******************************************************************************
+ Driver Init
+******************************************************************************/
+DRIVER_INIT( pes )
+{
+	i8051_set_serial_tx_callback(machine->device("maincpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(machine->device("maincpu"), data_to_i8031);
+	fprintf(stderr,"driver_init called\n");
 }
 
 /******************************************************************************
@@ -165,7 +240,7 @@ static MACHINE_CONFIG_START( pes, pes_state )
 	
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_SOUND_ADD("tms5220", TMS5220C, 640000) /* 720Khz clock, 10khz output */
+    MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_FRAGMENT_ADD( generic_terminal )
@@ -189,4 +264,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME	PARENT	COMPAT	MACHINE		INPUT	INIT	COMPANY     FULLNAME            FLAGS */
-COMP( 1987, pes,	0,		0,		pes,		pes,	0,		"Pacific Educational Systems",	"VPU-01 Speech box",	GAME_NOT_WORKING )
+COMP( 1987, pes,	0,		0,		pes,		pes,	pes,	"Pacific Educational Systems",	"VPU-01 Speech box",	GAME_NOT_WORKING )
