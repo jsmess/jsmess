@@ -676,8 +676,6 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 
 	//printf("%d %d %08x %04x %d %04x\n",x,y,line_size,line_pattern,upd7220->figs.dir,upd7220->pitch);
 
-	return;
-
 	for(i = 0;i<line_size;i++)
 	{
 		line_step = (upd7220->figs.d1 * i);
@@ -1313,7 +1311,7 @@ static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, 
 	{
 		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff);
 
-		if((sx << 4) <= upd7220->aw * 8 - 1 && y <= upd7220->al - 1)
+		if((sx << 4) <= upd7220->aw * 16 - 1 && y <= upd7220->al - 1)
 			upd7220->display_func(device, bitmap, y, sx << 4, addr, data, upd7220->vram);
 
 		if (wd) addr += 2; else addr++;
@@ -1347,9 +1345,9 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 
 		for (y = 0; y < len; y++)
 		{
-			addr = (sad & 0x1ffff) + (y * upd7220->pitch); //TODO: sad needs to be & 0x3ffff
+			addr = (sad & 0x3ffff) + (y * upd7220->pitch); //TODO: sad needs to be & 0x3ffff
 
-			if (im || force_bitmap)
+			if ((im || force_bitmap) && upd7220->display_func)
 				draw_graphics_line(device, bitmap, addr, y + bsy, wd);
 			else
 			{
@@ -1358,7 +1356,8 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 			}
 		}
 
-		tsy += (y / upd7220->lr);
+		if(upd7220->lr)
+			tsy += (y / upd7220->lr);
 		bsy += y;
 	}
 }
