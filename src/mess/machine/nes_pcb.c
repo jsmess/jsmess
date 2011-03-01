@@ -83,6 +83,7 @@ static const nes_pcb pcb_list[] =
 	{ "NES-CNROM",        STD_CNROM },
 	/* CxROM boards by other manufacturer */
 	{ "BANDAI-CNROM",     STD_CNROM },
+	{ "BANDAI-74*161/32", STD_CNROM },
 	{ "KONAMI-CNROM",     STD_CNROM },
 	{ "NAMCOT-CNROM+WRAM", STD_CNROM },
 	{ "TAITO-CNROM",      STD_CNROM },

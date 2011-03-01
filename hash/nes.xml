@@ -312,7 +312,7 @@
 			<dataarea name="prg" size="2097152">
 				<rom name="ati-02 action 52" size="524288" crc="64e40c10" sha1="b5a53f844accb40c9584dc9105985eb5d8c6f604" offset="000000" />
 				<rom name="ati-03 action 52" size="524288" crc="69fdc534" sha1="0d505ecb691ce688e764affb684fbef596a68d2b" offset="0x080000" />
-                <rom value="0xff" length="524288" offset="0x180000" loadflag="fill" />
+				<rom value="0xff" length="524288" offset="0x180000" loadflag="fill" />
 				<rom name="ati-04 action 52" size="524288" crc="7e43e9e1" sha1="ee262a09266956a9421aaa14a946bf69627fdf73" offset="0x180000" />
 			</dataarea>
 			<dataarea name="chr" size="524288">
@@ -34800,7 +34800,7 @@
 
 <!-- The Demo Boy II was a display unit for the Game Boy ( see http://my.ais.net/~xtreme/SF/NES/demoboy/README.TXT ) containing a NES CPU + PPU + MMC5A.
 We should eventually add it to MESS as a separate driver with a NES CPU and a GB CPU! -->
-	<software name="demoboy2">
+	<software name="demoboy2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Demo Boy II</description>
 		<year>19??</year>
@@ -34815,6 +34815,9 @@ We should eventually add it to MESS as a separate driver with a NES CPU and a GB
 				<rom size="8192" offset="0x2000" loadflag="reload" />
 				<rom size="8192" offset="0x4000" loadflag="reload" />
 				<rom size="8192" offset="0x6000" loadflag="reload" />
+			</dataarea>
+			<!-- This has been added only to avoid crashes. Not sure how much RAM was present in the cart -->
+			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -63125,6 +63128,9 @@ that the real dumps might surface -->
 			<dataarea name="prg" size="4194304">
 				<rom name="dreamgear 75-in-1(unl)[!].prg" size="4194304" crc="9aabcb8f" sha1="aa9446b7777fa64503871225fcaf2a17aafd9af1" offset="00000" status="baddump" />
 			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -63137,6 +63143,9 @@ that the real dumps might surface -->
 			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
