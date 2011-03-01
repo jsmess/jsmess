@@ -6,7 +6,18 @@
 
         31/10/2010 Initial driver by Miodrag Milanovic
 
+        All commands must be entered in uppercase, and since the capslock
+        doesn't work, you need to hold the shift key down.
+
+        There is next to no error checking, for example the T command
+        is to set the time. Entering T by itself will set the time to
+        99:99:99, while G will cause a jump to 9999 and so forth. Also
+        the parameter must be right next to the command, spaces will cause
+        invalid input. Example M1234 will display a byte of memory at 1234,
+        while M 1234 will display memory at 9123.
+
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -16,45 +27,34 @@ class homez80_state : public driver_device
 {
 public:
 	homez80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu")
+	{ }
 
-	UINT8* video_ram;
-	int irq;
+	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER( homez80_keyboard_r );
+	UINT8* m_videoram;
+	UINT8* m_char_rom;
+	int m_irq;
 };
 
 
-
-const gfx_layout homez80_charlayout =
+READ8_MEMBER( homez80_state::homez80_keyboard_r )
 {
-	8, 8,				/* 8x8 characters */
-	256,				/* 256 characters */
-	1,				    /* 1 bits per pixel */
-	{0},				/* no bitplanes; 1 bit per pixel */
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8*8					/* size of one char */
-};
-static const char *const keynames[] = {
-							"LINE0",  "LINE1",  "LINE2",  "LINE3",
-							"LINE4",  "LINE5",  "LINE6",  "LINE7",
-							"LINE8",  "LINE9",  "LINE10", "LINE11",
-							"LINE12", "LINE13", "LINE14", "LINE15"
-};
-
-static READ8_HANDLER( homez80_keyboard_r )
-{
-	return input_port_read(space->machine, keynames[offset]);
+	char kbdrow[8];
+	sprintf(kbdrow,"LINE%d",offset);
+	return input_port_read(machine, kbdrow);
 }
 
-static ADDRESS_MAP_START(homez80_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(homez80_mem, ADDRESS_SPACE_PROGRAM, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE_MEMBER(homez80_state, video_ram) // Video RAM
+	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE(m_videoram) // Video RAM
 	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
-    AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
+	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( homez80_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( homez80_io, ADDRESS_SPACE_IO, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -209,69 +209,101 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(homez80)
 {
+	homez80_state *state = machine->driver_data<homez80_state>();
+	state->m_irq = 0;
 }
 
 static VIDEO_START( homez80 )
 {
+	homez80_state *state = machine->driver_data<homez80_state>();
+	state->m_char_rom = machine->region("chargen")->base();
 }
 
 static SCREEN_UPDATE( homez80 )
 {
 	homez80_state *state = screen->machine->driver_data<homez80_state>();
-    int x,y;
-	for(y = 0; y < 32; y++ )
+	UINT8 y,ra,chr,gfx,i;
+	UINT16 sy=0,ma=0,x;
+
+	for (y = 0; y < 32; y++)
 	{
-		for(x = 0; x < 32; x++ )
+		for (ra = 0; ra < 8; ra++)
 		{
-			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  state->video_ram[x + y*32] , 0, 0,0, x*8+44,y*8);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 44);
+
+			for (x = ma; x < ma+32; x++)
+			{
+				chr = state->m_videoram[x];
+
+				/* get pattern of pixels for that character scanline */
+				gfx = state->m_char_rom[ (chr<<3) | ra];
+
+				/* Display a scanline of a character (8 pixels) */
+				for (i = 0; i < 8; i++)
+					*p++ = BIT(gfx, 7-i);
+			}
 		}
+		ma+=32;
 	}
 	return 0;
 }
 
+
+const gfx_layout homez80_charlayout =
+{
+	8, 8,				/* 8x8 characters */
+	256,				/* 256 characters */
+	1,				    /* 1 bits per pixel */
+	{0},				/* no bitplanes; 1 bit per pixel */
+	{0, 1, 2, 3, 4, 5, 6, 7},
+	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
+	8*8					/* size of one char */
+};
+
 static GFXDECODE_START( homez80 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, homez80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, homez80_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 static INTERRUPT_GEN( homez80_interrupt )
 {
-	homez80_state *state = device->machine->driver_data<homez80_state>();
-	cpu_set_input_line(device, 0, (state->irq & 1) ? HOLD_LINE : CLEAR_LINE);
-	state->irq ^= 1;
+	homez80_state *state = device->machine->driver_data<homez80_state>();	
+	cpu_set_input_line(device, 0, (state->m_irq) ? HOLD_LINE : CLEAR_LINE);
+	state->m_irq ^= 1;
 }
 
 static MACHINE_CONFIG_START( homez80, homez80_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
-    MCFG_CPU_PROGRAM_MAP(homez80_mem)
-    MCFG_CPU_IO_MAP(homez80_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(homez80_mem)
+	MCFG_CPU_IO_MAP(homez80_io)
 	MCFG_CPU_PERIODIC_INT(homez80_interrupt, 50)
 
-    MCFG_MACHINE_RESET(homez80)
+	MCFG_MACHINE_RESET(homez80)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(344, 32 * 8)
-    MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32 * 8-1)
-    MCFG_SCREEN_UPDATE(homez80)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(344, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(homez80)
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE( homez80 )
 
-    MCFG_VIDEO_START(homez80)
+	MCFG_VIDEO_START(homez80)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( homez80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sysrom.bin",  0x0000, 0x1000, CRC(37ca7545) SHA1(3f597d7e45b1ab211d5bd4a99abb21915723c357))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD( "chargen.bin", 0x0000, 0x0800, CRC(93243be3) SHA1(718efc06c131843c15383e50af23f3a5cf44dd9b))
+	ROM_LOAD( "sysrom.bin",  0x0000, 0x1000, CRC(37ca7545) SHA1(3f597d7e45b1ab211d5bd4a99abb21915723c357) )
+
+	ROM_REGION(0x0800, "chargen",0)
+	ROM_LOAD( "chargen.bin", 0x0000, 0x0800, CRC(93243be3) SHA1(718efc06c131843c15383e50af23f3a5cf44dd9b) )
 ROM_END
 
 /* Driver */
