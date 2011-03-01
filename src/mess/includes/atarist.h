@@ -269,7 +269,7 @@ public:
 		  m_lmc1992(*this, LMC1992_TAG)
 	{ }
 
-	required_device<device_t> m_lmc1992;
+	optional_device<device_t> m_lmc1992;
 
 	void machine_start();
 
