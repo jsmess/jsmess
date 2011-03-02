@@ -417,11 +417,10 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 
 READ8_MEMBER( abc1600_state::mac_r )
 {
-	bool supervisor = m68k_is_in_supervisor_mode(m_maincpu);
-
+	UINT16 fc = m68k_get_fc(m_maincpu);
 	UINT8 data = 0;
 
-	if (supervisor)
+	if (fc == M68K_FC_SUPERVISOR_DATA || fc == M68K_FC_SUPERVISOR_PROGRAM)
 	{
 		data = read_supervisor_memory(offset);
 	}
@@ -440,9 +439,9 @@ READ8_MEMBER( abc1600_state::mac_r )
 
 WRITE8_MEMBER( abc1600_state::mac_w )
 {
-	bool supervisor = m68k_is_in_supervisor_mode(m_maincpu);
+	UINT16 fc = m68k_get_fc(m_maincpu);
 
-	if (supervisor)
+	if (fc == M68K_FC_SUPERVISOR_DATA || fc == M68K_FC_SUPERVISOR_PROGRAM)
 	{
 		write_supervisor_memory(offset, data);
 	}
