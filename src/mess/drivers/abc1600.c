@@ -10,8 +10,6 @@
 
     TODO:
 
-	- get supervisor bit from M68008
-	
 	- memory access controller
 		- task register
 		- cause register (parity error)
@@ -43,6 +41,19 @@
 //**************************************************************************
 
 // MAC
+#define A0			BIT(offset, 0)
+#define A1			BIT(offset, 1)
+#define A2			BIT(offset, 2)
+#define A7			BIT(offset, 7)
+#define A8			BIT(offset, 8)
+#define A17			BIT(offset, 17)
+#define A18			BIT(offset, 18)
+#define A19			BIT(offset, 19)
+
+#define A2_A1_A0	(offset & 0x07)
+#define A1_A2		((A1 << 1) | A2)
+#define A2_A1		((offset >> 1) & 0x03)
+
 #define SEGMENT_ADDRESS(_segment) \
 	(((m_task & 0x0f) << 5) | _segment)
 
@@ -55,23 +66,13 @@
 #define PAGE_DATA(_segment, _page) \
 	m_page_ram[PAGE_ADDRESS(_segment, _page)]
 
-#define PAGE_WP		0x4000
-#define PAGE_NONX	0x8000
+#define PAGE_WP		BIT(page_data, 14)
+#define PAGE_NONX	BIT(page_data, 15)
 
 
-// DMA
+// task register
 #define BOOTE		BIT(m_task, 6)
-#define A0			BIT(offset, 0)
-#define A1			BIT(offset, 1)
-#define A2			BIT(offset, 2)
-#define A7			BIT(offset, 7)
-#define A8			BIT(offset, 8)
-#define A17			BIT(offset, 17)
-#define A18			BIT(offset, 18)
-#define A19			BIT(offset, 19)
-#define A2_A1_A0	(offset & 0x07)
-#define A1_A2		((A1 << 1) | A2)
-#define A2_A1		((offset >> 1) & 0x03)
+#define READ_MAGIC	BIT(m_task, 7)
 
 
 // DMA map
@@ -286,9 +287,8 @@ UINT8 abc1600_state::read_user_memory(offs_t offset)
 	UINT16 page_data = PAGE_DATA(segment, page);
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-	//bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
 
-	//if (nonx) Bus Error
+	//if (PAGE_NONX) BUS ERROR
 
 	UINT8 data = 0;
 
@@ -316,11 +316,11 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 	UINT16 page_data = PAGE_DATA(segment, page);
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-	bool wp = ((page_data & PAGE_WP) == 0);
-	//bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
 
-	if (wp) return;
-	//if (nonx) BUS ERROR
+	logerror("user write to %06x: %02x\n", virtual_offset, data);
+
+	if (!PAGE_WP) return;
+	//if (PAGE_NONX) BUS ERROR
 
 	if (virtual_offset < 0x1fe000)
 	{
@@ -385,6 +385,8 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	logerror("supervisor write to %06x: %02x\n", offset, data);
 
 	if (!A19)
 	{
@@ -499,6 +501,8 @@ WRITE8_MEMBER( abc1600_state::task_w )
 	*/
 
 	m_task = data;
+
+	logerror("Task %u BOOTE %u READ_MAGIC %u\n", m_task & 0x0f, BOOTE, READ_MAGIC);
 }
 
 
@@ -1045,6 +1049,7 @@ static Z80DART_INTERFACE( dart_intf )
 
 	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_5) // shared with SCC
 };
+
 
 //-------------------------------------------------
 //  Z8536_INTERFACE( cio_intf )

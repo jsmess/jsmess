@@ -149,7 +149,7 @@ static const mc6845_interface crtc_intf =
 void abc1600_state::video_start()
 {
 	// allocate video RAM
-	m_video_ram = auto_alloc_array(machine, UINT8, 128*1024);
+	m_video_ram = auto_alloc_array(machine, UINT8, 512*1024);
 }
 
 
@@ -160,6 +160,23 @@ void abc1600_state::video_start()
 bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	mc6845_update(m_crtc, &bitmap, &cliprect);
+	
+	for (int y = 0; y < 1024; y++)
+	{
+		UINT32 addr = y * 64;
+
+		for (int sx = 0; sx < 48; sx++)
+		{
+			UINT16 data = m_video_ram[addr] << 8 | m_video_ram[addr + 1];
+
+			for (int x = 0; x < 16; x++)
+			{
+				*BITMAP_ADDR16(&bitmap, y, (sx * 16) + x) = BIT(data, x);
+			}
+
+			addr += 2;
+		}
+	}
 
 	return 0;
 }
@@ -171,11 +188,11 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 
 MACHINE_CONFIG_FRAGMENT( abc1600_video )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(1024, 768)
-    MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+    MCFG_SCREEN_SIZE(768, 1024)
+    MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 1024-1)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz/32, crtc_intf)
