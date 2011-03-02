@@ -61,6 +61,9 @@ public:
 
 	UINT8 fdc_2dd_ctrl;
 	UINT8 nmi_ff;
+
+	UINT8 vram_bank;
+	UINT8 vram_disp;
 };
 
 
@@ -98,15 +101,8 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 		int x,y;
 		UINT8 pen;
 		UINT32 count;
-		static UINT32 test_x;
 
 		count = 0;
-
-		if(debug_global_input_code_pressed_once(KEYCODE_Z))
-			test_x++;
-
-		if(debug_global_input_code_pressed_once(KEYCODE_X))
-			test_x--;
 
 		for(y=0;y<200;y++)
 		{
@@ -118,9 +114,9 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 					res_y = y;
 					UINT8 pen_b,pen_r,pen_g;
 
-					pen_b = (BITSWAP16(gvram[(count) + (0x00000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
-					pen_r = (BITSWAP16(gvram[(count) + (0x08000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
-					pen_g = (BITSWAP16(gvram[(count) + (0x10000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
+					pen_b = (BITSWAP16(gvram[(count) + (0x00000/2) + (vram_disp*0x18000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
+					pen_r = (BITSWAP16(gvram[(count) + (0x08000/2) + (vram_disp*0x18000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
+					pen_g = (BITSWAP16(gvram[(count) + (0x10000/2) + (vram_disp*0x18000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
 
 					pen = (pen_b) ? 1 : 0;
 					pen|= (pen_r) ? 2 : 0;
@@ -158,9 +154,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		if(res_x > 640 - 1 || res_y > 200 - 1) //TODO
 			continue;
 
-		pen = ((vram[address + 0x04000] >> (xi)) & 1) ? 1 : 0;
-		pen|= ((vram[address + 0x08000] >> (xi)) & 1) ? 2 : 0;
-		pen|= ((vram[address + 0x0c000] >> (xi)) & 1) ? 4 : 0;
+		pen = ((vram[address + (0x08000/2) + (state->vram_disp*0x20000/2)] >> (xi)) & 1) ? 1 : 0;
+		pen|= ((vram[address + (0x10000/2) + (state->vram_disp*0x20000/2)] >> (xi)) & 1) ? 2 : 0;
+		pen|= ((vram[address + (0x18000/2) + (state->vram_disp*0x20000/2)] >> (xi)) & 1) ? 4 : 0;
 
 		*BITMAP_ADDR16(bitmap, res_y, res_x) = pen + 8;
 	}
@@ -619,10 +615,10 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			case 0x02:
 				upd7220_w(space->machine->device("upd7220_btm"),(offset & 2) >> 1,data);
 				return;
-			case 0x04:
+			case 0x04: state->vram_disp = data & 1; return;
 			case 0x06:
-				//if(data)
-				//  printf("Warning: write to bitmap bank %02x\n",data);
+				state->vram_bank = data & 1;
+				upd7220_bank_w(space->machine->device("upd7220_btm"),0,(data & 1) << 2); //TODO: check me
 				return;
 			/* bitmap palette clut write */
 			case 0x08:
@@ -758,7 +754,7 @@ static READ16_HANDLER( pc9801_gvram_r )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	return state->gvram[offset];//upd7220_vram_r(space->machine->device("upd7220_btm"),offset+0x4000,mem_mask);
+	return state->gvram[offset + (state->vram_bank*0x18000/2)];//upd7220_vram_r(space->machine->device("upd7220_btm"),offset+0x4000,mem_mask);
 }
 
 static WRITE16_HANDLER( pc9801_gvram_w )
@@ -766,7 +762,7 @@ static WRITE16_HANDLER( pc9801_gvram_w )
 	//UINT16 write_vram;
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	COMBINE_DATA(&state->gvram[offset]); //TODO: needs to be passed to the GDC vram
+	COMBINE_DATA(&state->gvram[offset + (state->vram_bank*0x18000/2)]); //TODO: needs to be passed to the GDC vram
 
 	//upd7220_vram_w(space->machine->device("upd7220_btm"),offset+0x4000, state->gvram[offset],mem_mask);
 }
