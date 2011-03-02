@@ -640,7 +640,7 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 		
 	*/
 	
-	UINT8 data = input_port_read(machine, this, "DIP") << 5;
+	UINT8 data = input_port_read(this, "DIP") << 5;
 
 	return data;
 }
@@ -690,7 +690,7 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 	UINT8 data = 0;
 
 	// mouse buttons
-	data |= (input_port_read(machine, this, "MOUSEB") & 0x07) << 4;
+	data |= (input_port_read(this, "MOUSEB") & 0x07) << 4;
 
 	// serial input
 	data |= m_si << 7;
