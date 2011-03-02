@@ -54,7 +54,27 @@ enum
 
 READ8_MEMBER( abc1600_state::iord0_r )
 {
-	return 0;
+	/*
+
+		bit		description
+
+		0		0
+		1		SCREENPOS
+		2		
+		3		
+		4		
+		5		
+		6		VSYNC
+		7		BUSY
+
+	*/
+
+	UINT8 data = 0;
+
+	// vertical sync
+	data |= m_vs << 6;
+
+	return data;
 }
 
 
@@ -98,6 +118,11 @@ static MC6845_UPDATE_ROW( abc1600_update_row )
 {
 }
 
+WRITE_LINE_MEMBER( abc1600_state::vs_w )
+{
+	m_vs = state;
+}
+
 static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 {
 }
@@ -112,7 +137,7 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, vs_w),
 	crtc_update
 };
 

@@ -1226,6 +1226,16 @@ static ABC99_INTERFACE( abc99_intf )
 
 void abc1600_state::machine_start()
 {
+	// state saving
+	save_item(NAME(m_task));
+	save_item(NAME(m_segment_ram));
+	save_item(NAME(m_page_ram));
+	save_item(NAME(m_dmamap));
+	save_item(NAME(m_dmadis));
+	save_item(NAME(m_sysscc));
+	save_item(NAME(m_sysfs));
+	save_pointer(NAME(m_video_ram), 512*1024);
+	save_item(NAME(m_vs));
 }
 
 
