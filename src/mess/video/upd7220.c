@@ -653,18 +653,29 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 	}
 }
 
+static UINT16 check_pattern(upd7220_t *upd7220, UINT16 pattern)
+{
+	UINT16 res;
+
+	res = 0;
+
+	switch(upd7220->bitmap_mod & 3)
+	{
+		case 0: res = pattern; break; //replace
+		case 1: res = pattern ^ 0xffff; break; //complement
+		case 2: res = 0; break; //reset to zero
+		case 3: res |= 0xffff; break; //set to one
+	}
+
+	return res;
+}
+
 static void draw_pixel(upd7220_t *upd7220,int x,int y,UINT16 tile_data)
 {
 	UINT32 addr = (y * upd7220->pitch + (x >> 4)) & 0x3ffff;
 	int dad;
 
 	dad = x & 0xf;
-
-	if((upd7220->bitmap_mod & 3) == 2) //reset to zero
-		tile_data = 0;
-
-	if((upd7220->bitmap_mod & 2) == 0)
-		printf("Used bitmap modifier %02x\n",upd7220->bitmap_mod);
 
 	upd7220->vram[addr + upd7220->vram_bank] &= ~(0x8000 >> (15-dad));
 	upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x8000 >> (15-dad)));
@@ -682,7 +693,7 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 	UINT8 dot;
 
 	line_size = upd7220->figs.dc + 1;
-	line_pattern = (upd7220->ra[8]) | (upd7220->ra[9]<<8);
+	line_pattern = check_pattern(upd7220,(upd7220->ra[8]) | (upd7220->ra[9]<<8));
 
 	for(i = 0;i<line_size;i++)
 	{
