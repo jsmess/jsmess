@@ -843,8 +843,8 @@ ROM_START( einstei2 )
 	ROM_FILL(0x4000, 0x4000, 0xff)
 
 	/* character rom from 80 column card */
-	ROM_REGION(0x800, "gfx1", 0)
-	ROM_LOAD("charrom.rom", 0, 0x800, NO_DUMP)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("tk02-v1.00.rom", 0, 0x2000, CRC(ad3c4346) SHA1(cd57e630371b4d0314e3f15693753fb195c7257d))
 ROM_END
 
 ROM_START( einst256 )

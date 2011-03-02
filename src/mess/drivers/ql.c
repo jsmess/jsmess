@@ -79,6 +79,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/flopdrv.h"
+#include "imagedev/printer.h"
 #include "machine/ram.h"
 #include "devices/microdrv.h"
 #include "formats/basicdsk.h"
@@ -259,7 +260,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 {
 	UINT8	result = 0;
 	
-	//logerror("%s DiskIO:Read of %08X\n",machine->describe_context(),0x1c000+offset);
+	//logerror("%s DiskIO:Read of %08X\n",machine->describe_context(),disk_io_base+offset);
 		
 	switch (offset)
 	{
@@ -267,6 +268,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 		case 0x0001	: result=wd17xx_r(m_fdc, offset); break; 
 		case 0x0002	: result=wd17xx_r(m_fdc, offset); break;
 		case 0x0003	: result=wd17xx_r(m_fdc, offset); break;
+		default		: logerror("%s DiskIO undefined read : from %08X\n",machine->describe_context(),disk_io_base+offset); break;	
 	}
 	
 	return result;
@@ -274,7 +276,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 
 WRITE8_MEMBER( ql_state::disk_io_w )
 {
-	//logerror("%s DiskIO:Write %02X to %08X\n",machine->describe_context(),data,0x1c000+offset);
+	//logerror("%s DiskIO:Write %02X to %08X\n",machine->describe_context(),data,disk_io_base+offset);
 
 	switch (offset)
 	{
@@ -284,8 +286,11 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 		case 0x0003	: wd17xx_w(m_fdc, offset, data); break;
 		case 0x0004 : if(disk_type==DISK_TYPE_SANDY)
 						sandy_set_control(data);break;
+		case 0x0008 : if(disk_type==DISK_TYPE_SANDY)
+					    printer_char=data;
 		case 0x2000	: if(disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
+		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",machine->describe_context(),data,disk_io_base+offset); break;		
 	}
 }
 
@@ -328,7 +333,7 @@ void ql_state::trump_card_set_control(UINT8 data)
 
 void ql_state::sandy_set_control(UINT8 data)
 {
-	logerror("sandy_set_control:%02X\n",data);
+	//logerror("sandy_set_control:%02X\n",data);
 
 	if(data & SANDY_DRIVE0_MASK)
 		wd17xx_set_drive(m_fdc,0);
@@ -337,6 +342,15 @@ void ql_state::sandy_set_control(UINT8 data)
 		wd17xx_set_drive(m_fdc,1);	
 
 	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
+
+	if (printer_is_ready(m_printer))
+	{
+		if(data & SANDY_PRINTER_STROBE)
+			printer_output(m_printer,printer_char);
+			
+		if(data & SANDY_PRINTER_INTMASK) 
+			m_zx8302->extint_w(ASSERT_LINE);
+	}
 }	
 
 static READ_LINE_DEVICE_HANDLER( trump_card_dden_r )
@@ -902,6 +916,7 @@ void ql_state::machine_start()
 	state_save_register_global(machine, m_ipl);
 	state_save_register_global(machine, m_comdata);
 	state_save_register_global(machine, m_baudx4);
+	state_save_register_global(machine, printer_char);
 }
 
 void ql_state::machine_reset()
@@ -909,17 +924,9 @@ void ql_state::machine_reset()
 	address_space 	*program 	= cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	disk_type=input_port_read(machine,QL_CONFIG_PORT) & DISK_TYPE_MASK;
-
 	logerror("disktype=%d\n",disk_type);
 
-	// Unmap special trump card handlers if not trump card
-	if(disk_type!=DISK_TYPE_TRUMP)
-	{
-		logerror("Removing TrumpCardEmulation\n");
-		memory_unmap_readwrite(program,0x010000, 0x018000, 0, 0);
-		memory_install_rom(program, 0x0c000, 0x0ffff, 0, 0, &machine->region(M68008_TAG)->base()[CART_ROM_BASE]);
-		logerror("TrumpCardEmulation removed\n");
-	}
+	printer_char=0;
 
 	logerror("Configuring RAM\n");
 	// configure RAM
@@ -953,6 +960,7 @@ void ql_state::machine_reset()
 			memory_install_rom(program, 0x0c0000, 0x0c3fff, 0, 0, &machine->region(M68008_TAG)->base()[SANDY_ROM_BASE]);
 			program->install_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
 			program->install_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			disk_io_base=SANDY_IO_BASE;
 			break;
 		case DISK_TYPE_TRUMP :
 			logerror("Configuring TrumpCard\n");
@@ -960,6 +968,7 @@ void ql_state::machine_reset()
 			program->install_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate_create(ql_state, trump_card_rom_r, *this));
 			program->install_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
 			program->install_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			disk_io_base=TRUMP_IO_BASE;
 			break;
 	}
 }
@@ -1019,6 +1028,9 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
+	
+	// Parallel printer port on Sandy disk interface
+	MCFG_PRINTER_ADD(PRINTER_TAG)
 MACHINE_CONFIG_END
 
 

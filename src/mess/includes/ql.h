@@ -19,6 +19,8 @@
 #define ROMBANK_TAG	"rombank"
 #define RAMBANK_TAG	"rambank"
 
+#define PRINTER_TAG	"printer"
+
 #define X1 XTAL_15MHz
 #define X2 XTAL_32_768kHz
 #define X3 XTAL_4_436MHz
@@ -51,11 +53,13 @@
 #define SANDY_IO_LEN	0x00040
 #define SANDY_IO_END	(SANDY_IO_BASE+(SANDY_IO_LEN-1))
 
-#define SANDY_DRIVE0_MASK	0x02
-#define SANDY_DRIVE1_MASK	0x04
-#define SANDY_MOTOR_MASK	0x08
-#define SANDY_SIDE_SHIFT	0
-#define SANDY_SIDE_MASK		(1 << SANDY_SIDE_SHIFT)
+#define SANDY_DRIVE0_MASK		0x02
+#define SANDY_DRIVE1_MASK		0x04
+#define SANDY_MOTOR_MASK		0x08
+#define SANDY_SIDE_SHIFT		0
+#define SANDY_SIDE_MASK			(1 << SANDY_SIDE_SHIFT)
+#define SANDY_PRINTER_STROBE	0x20
+#define SANDY_PRINTER_INTMASK	0x40
 
 
 class ql_state : public driver_device
@@ -71,7 +75,8 @@ public:
 		  m_mdv1(*this, MDV_1),
 		  m_mdv2(*this, MDV_2),
 		  m_ram(*this, RAM_TAG),
-		  m_fdc(*this, WD1772_TAG)
+		  m_fdc(*this, WD1772_TAG),
+		  m_printer(*this, PRINTER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -83,6 +88,7 @@ public:
 	required_device<device_t> m_mdv2;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_fdc;
+	required_device<device_t> m_printer;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -122,7 +128,9 @@ public:
 	void trump_card_set_control(UINT8 data);
 	void sandy_set_control(UINT8 data);
 	
-	int disk_type;
+	int		disk_type;
+	int		disk_io_base;
+	UINT8	printer_char;
 };
 
 #endif
