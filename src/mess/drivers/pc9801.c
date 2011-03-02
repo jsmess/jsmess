@@ -75,7 +75,7 @@ void pc9801_state::video_start()
 	//pc9801_state *state = machine->driver_data<pc9801_state>();
 
 	tvram = auto_alloc_array(machine, UINT8, 0x4000);
-	gvram = auto_alloc_array(machine, UINT16, 0x18000);
+	gvram = auto_alloc_array(machine, UINT16, 0x30000);
 
 	// find memory regions
 	m_char_rom = machine->region("chargen")->base();
@@ -89,6 +89,52 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 	/* graphics */
 	upd7220_update(m_hgdc2, &bitmap, &cliprect);
+
+	/* TODO: for shared RAM writes, until we understand ... */
+	{
+		//pc9801_state *state = screen->machine->driver_data<pc9801_state>();
+		int xi;
+		int res_x,res_y;
+		int x,y;
+		UINT8 pen;
+		UINT32 count;
+		static UINT32 test_x;
+
+		count = 0;
+
+		if(debug_global_input_code_pressed_once(KEYCODE_Z))
+			test_x++;
+
+		if(debug_global_input_code_pressed_once(KEYCODE_X))
+			test_x--;
+
+		for(y=0;y<200;y++)
+		{
+			for(x=0;x<40;x++)
+			{
+				for(xi=0;xi<16;xi++)
+				{
+					res_x = x * 16 + xi;
+					res_y = y;
+					UINT8 pen_b,pen_r,pen_g;
+
+					pen_b = (BITSWAP16(gvram[(count) + (0x00000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
+					pen_r = (BITSWAP16(gvram[(count) + (0x08000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
+					pen_g = (BITSWAP16(gvram[(count) + (0x10000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
+
+					pen = (pen_b) ? 1 : 0;
+					pen|= (pen_r) ? 2 : 0;
+					pen|= (pen_g) ? 4 : 0;
+
+					if(pen)
+						*BITMAP_ADDR16(&bitmap, res_y, res_x) = pen + 8;
+				}
+
+				count++;
+			}
+		}
+	}
+
 	upd7220_update(m_hgdc1, &bitmap, &cliprect);
 
 	return 0;
@@ -96,19 +142,27 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
+	pc9801_state *state = device->machine->driver_data<pc9801_state>();
 	int xi;
+	int res_x,res_y;
 	UINT8 pen;
+
+	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
+		return;
 
 	for(xi=0;xi<16;xi++)
 	{
-		pen = ((vram[address + 0x04000] >> xi) & 1) ? 1 : 0;
-		pen|= ((vram[address + 0x08000] >> xi) & 1) ? 2 : 0;
-		pen|= ((vram[address + 0x0c000] >> xi) & 1) ? 4 : 0;
+		res_x = x + xi;
+		res_y = y;
 
-		if(x + xi > 640 - 1 || y > 200 - 1)
+		if(res_x > 640 - 1 || res_y > 200 - 1) //TODO
 			continue;
 
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen + 8;
+		pen = ((vram[address + 0x04000] >> (xi)) & 1) ? 1 : 0;
+		pen|= ((vram[address + 0x08000] >> (xi)) & 1) ? 2 : 0;
+		pen|= ((vram[address + 0x0c000] >> (xi)) & 1) ? 4 : 0;
+
+		*BITMAP_ADDR16(bitmap, res_y, res_x) = pen + 8;
 	}
 }
 
@@ -702,18 +756,19 @@ static WRITE16_HANDLER( pc9801_tvram_w )
 
 static READ16_HANDLER( pc9801_gvram_r )
 {
-	//pc9801_state *state = space->machine->driver_data<pc9801_state>();
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	return upd7220_vram_r(space->machine->device("upd7220_btm"),offset+0x4000,mem_mask);
+	return state->gvram[offset];//upd7220_vram_r(space->machine->device("upd7220_btm"),offset+0x4000,mem_mask);
 }
 
 static WRITE16_HANDLER( pc9801_gvram_w )
 {
+	//UINT16 write_vram;
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	COMBINE_DATA(&state->gvram[offset]);
+	COMBINE_DATA(&state->gvram[offset]); //TODO: needs to be passed to the GDC vram
 
-	upd7220_vram_w(space->machine->device("upd7220_btm"),offset+0x4000, state->gvram[offset],mem_mask);
+	//upd7220_vram_w(space->machine->device("upd7220_btm"),offset+0x4000, state->gvram[offset],mem_mask);
 }
 
 static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
@@ -754,7 +809,7 @@ static ADDRESS_MAP_START( upd7220_2_map, 0, 16 )
 ADDRESS_MAP_END
 
 /* keyboard code */
-/* TODO: key repeat, key modifiers, remove port impulse! */
+/* TODO: key repeat, remove port impulse! */
 static INPUT_CHANGED( key_stroke )
 {
 	pc9801_state *state = field->port->machine->driver_data<pc9801_state>();
@@ -766,6 +821,20 @@ static INPUT_CHANGED( key_stroke )
 	}
 
 	if(oldval && !newval)
+		state->keyb_press = 0;
+}
+
+/* for key modifiers */
+static INPUT_CHANGED( shift_stroke )
+{
+	pc9801_state *state = field->port->machine->driver_data<pc9801_state>();
+
+	if((newval && !oldval) || (oldval && !newval))
+	{
+		state->keyb_press = (UINT8)(FPTR)(param) & 0x7f;
+		pic8259_ir1_w(field->port->machine->device("pic8259_master"), 1);
+	}
+	else
 		state->keyb_press = 0;
 }
 
@@ -833,7 +902,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_START("KEY6") // 0x30 - 0x37
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CHAR(',') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x30)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CHAR('.') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x31)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x32)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") /*PORT_CODE(KEYCODE_SLASH)*/ PORT_CHAR('/') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x32)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("un 0-4") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x33)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_IMPULSE(1) PORT_CHAR(' ') PORT_CHANGED(key_stroke, 0x34)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("un 0-6") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x35)
@@ -911,7 +980,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 5-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x6f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("KEYE") // 0x70 - 0x77
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x70)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT) /*PORT_IMPULSE(1)*/ PORT_CHANGED(shift_stroke, 0x70)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x71)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xe3\x81\x8b\xe3\x81\xaa / KANA LOCK") PORT_TOGGLE PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x72)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 6-4") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x73) //PORT_CODE(KEYCODE_C) PORT_CHAR('C')
