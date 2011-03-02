@@ -1602,7 +1602,7 @@ const game_driver * const drivers[] =
 //  DRIVER( mephisto )  /* Mephisto  */
 	DRIVER( mm2 )       /* Mephisto 2 */
 	DRIVER( mm4 )       /* Mephisto 4       */
-	DRIVER( mm4tk )       /* Mephisto 4 Turbo Kit  */
+//	DRIVER( mm4tk )       /* Mephisto 4 Turbo Kit  */
 	DRIVER( mm5 )       /* Mephisto 5.1 ROM   */
 	DRIVER( mm5tk )       /* Mephisto 5.1 ROM Turbo Kit Speed   */
 	DRIVER( mm50 )      /* Mephisto 5.0 ROM    */
