@@ -417,7 +417,7 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 
 READ8_MEMBER( abc1600_state::mac_r )
 {
-	bool supervisor = true; // FIXME
+	bool supervisor = m68k_is_in_supervisor_mode(m_maincpu);
 
 	UINT8 data = 0;
 
@@ -440,7 +440,7 @@ READ8_MEMBER( abc1600_state::mac_r )
 
 WRITE8_MEMBER( abc1600_state::mac_w )
 {
-	bool supervisor = true; // FIXME
+	bool supervisor = m68k_is_in_supervisor_mode(m_maincpu);
 
 	if (supervisor)
 	{
