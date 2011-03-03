@@ -17,7 +17,6 @@
 	Anpanman no AIUEO-N !				?			BDE-10015	?
 	Anpanman to asobou! 1				?			BDE-10009	?
 	Anpanman to asobou! 2				?			BDE-70016	?
-	Atmark Adapter A				?			?		?
 	Atmark Town Ver. 2.0				?			BDB-022		?
 	B no Kaidan					?			?		?
 	Chibikko Club					?			BDS-20009	?
@@ -125,7 +124,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="atmtown" sha1="76acb73432ac4f71cbc982c129f94936b26d8778"/>
+				<disk name="atmtown" sha1="37e770e8824e5a990cb71143eb17cc55bbc97fb7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -137,7 +136,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundamc" sha1="b7b7989c4d837b316e65b275a43ae43fcb7e416d"/>
+				<disk name="gundamc" sha1="85510c817c27619464bbaba64a842459328e2e40"/>
 			</diskarea>
 		</part>
 	</software>
@@ -149,7 +148,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="franky" sha1="699b9d0dada0bf9a9c2ac5b56510a4b5a927a30e"/>
+				<disk name="franky" sha1="fbac6fcf5d43c68acbe1ba30288228f83268652b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -161,7 +160,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gakkono" sha1="e7e6b4cdc5e73bebc3ba9c837b910103e9fceef7"/>
+				<disk name="gakkono" sha1="0acb92329d2e0a632d2e51d0a182e2d5efd14e35"/>
 			</diskarea>
 		</part>
 	</software>
@@ -173,7 +172,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundamt" sha1="6e86a9e5d748b8e736746cdc58131a7141cf56a7"/>
+				<disk name="gundamt" sha1="11a2b1e31f373bd7c683fcb32bd46927c0ca4458"/>
 			</diskarea>
 		</part>
 	</software>
@@ -185,7 +184,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thomas" sha1="4163c5f5baa265b14e08fc09eb633f8d89346dc4"/>
+				<disk name="thomas" sha1="6b99e021257a4a784d1238d3f6a0e5386b955157"/>
 			</diskarea>
 		</part>
 	</software>
@@ -197,7 +196,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="internet" sha1="e720808537ae3081bd0434a7ebc808033dc94387"/>
+				<disk name="internet" sha1="387977e2643a255ead93536a63ed2748c35b263b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -209,7 +208,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="navcd" sha1="4bffb7ccadba49a40dff358ab8af088f7e0eddc1"/>
+				<disk name="navcd" sha1="3017223b57681b060fe2983274abeecb6d068b11"/>
 			</diskarea>
 		</part>
 	</software>
@@ -221,7 +220,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="netcd" sha1="d48ce56da5ef379249e4af5df27491138b81f812"/>
+				<disk name="netcd" sha1="864e1df2e6f5dd2d71600477687e6b5abd831b16"/>
 			</diskarea>
 		</part>
 	</software>
@@ -233,7 +232,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="catalog1" sha1="58b2a18b1b1d4dda9b8e1914652e54ceb422f952"/>
+				<disk name="catalog1" sha1="5d831463dc423bf119de14857cd5f06f6bf146a4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -245,7 +244,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="postcard" sha1="b95f3fc216d5879fc4ff4ccf0d3f3e98eacb3a57"/>
+				<disk name="postcard" sha1="72115d95908c778ba60c7cb7dd5cbc03779a8559"/>
 			</diskarea>
 		</part>
 	</software>
@@ -257,7 +256,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="suprmara" sha1="b924e19d622ffd7f18f4e179b4378cbf5930d014"/>
+				<disk name="suprmara" sha1="b5aed18581524caaf03c582869a9166bc1fdb2f3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -269,7 +268,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tunglue" sha1="df182ff36c395872aeb9fbc45580ed3c468ef389"/>
+				<disk name="tunglue" sha1="54585da0ce3774e621a50b47b2723ea529e889d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -281,7 +280,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tvworks" sha1="56eb1944b8853723bde9e1352833c08ea143cafe"/>
+				<disk name="tvworks" sha1="353d4c82e29fed3cab1ea8ce93107f6aa58bf6a0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -293,7 +292,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultraman" sha1="2ba048023f08d3cfd1de2ef18e11ca73a7db962f"/>
+				<disk name="ultraman" sha1="a47f7953f2cbeb9e0106aebf67cda9f6e25b18dd"/>
 			</diskarea>
 		</part>
 	</software>
