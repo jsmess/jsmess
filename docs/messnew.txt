@@ -6,6 +6,7 @@ New System Drivers Supported:
 - Ferguson Big Board [Miodrag Milanovic]
 - Sanyo MBC-550, MBC-555 (boots but no keyboard) [Phill Harvey-Smith]
 - Fujitsu FM-Towns II UX (not working) [bernhardh, Anna Wu, Barry Rodewald]
+- Fujitsu FM-Towns II HR (not working) [bernhardh, Anna Wu, Barry Rodewald]
 - Mikrosha-86RK [Miodrag Milanovic]
 - IBM PC 5155 [Lord Nightmare]
 
