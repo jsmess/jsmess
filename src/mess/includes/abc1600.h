@@ -152,6 +152,7 @@ public:
 	int m_dmadis;
 	int m_sysscc;
 	int m_sysfs;
+	UINT8 m_cause;
 
 	// video
 	UINT8 *m_video_ram;

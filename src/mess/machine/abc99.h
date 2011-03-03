@@ -121,6 +121,8 @@ private:
 	required_device<device_t> m_speaker;
 
 	int m_si;
+	int m_so;
+	int m_keydown;
 	int m_so_z2;
 	int m_so_z5;
 	int m_si_en;

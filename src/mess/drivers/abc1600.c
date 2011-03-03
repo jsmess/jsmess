@@ -10,6 +10,8 @@
 
     TODO:
 
+	- boot is stuck on polling the DART channel B control register Receive Character Available bit (RR0, D0)
+
 	- memory access controller
 		- task register
 		- cause register (parity error)
@@ -157,11 +159,14 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	}
 	else if (offset >= 0x1ff100 && offset < 0x1ff200)
 	{
-		if (A0) data = mc6845_register_r(m_crtc, 0);
+		if (A0) 
+			data = mc6845_register_r(m_crtc, 0);
+		else
+			data = mc6845_status_r(m_crtc, 0);
 	}
 	else if (offset >= 0x1ff200 && offset < 0x1ff300)
 	{
-		data = z80dart_ba_cd_r(m_dart, A2_A1);
+		data = z80dart_ba_cd_r(m_dart, A2_A1 ^ 0x03);
 	}
 	else if (offset >= 0x1ff300 && offset < 0x1ff400)
 	{
@@ -217,7 +222,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 	}
 	else if (offset >= 0x1ff200 && offset < 0x1ff300)
 	{
-		z80dart_ba_cd_w(m_dart, A2_A1, data);
+		z80dart_ba_cd_w(m_dart, A2_A1 ^ 0x03, data);
 	}
 	else if (offset >= 0x1ff300 && offset < 0x1ff400)
 	{
@@ -474,7 +479,10 @@ READ8_MEMBER( abc1600_state::cause_r )
 	//watchdog_reset_w()
 	
 	UINT8 data = 0x02;
-		
+	
+	// DMA status
+	data |= m_cause;
+
 	return data;
 }
 
@@ -659,6 +667,8 @@ inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
 	// A0 = DMA15, A1 = BA1, A2 = BA2
 	UINT8 dmamap_addr = index | BIT(offset, 15);
 	UINT8 dmamap = m_dmamap[dmamap_addr];
+	
+	m_cause = (dmamap & 0x1f) << 3;
 
 	return ((dmamap & 0x1f) << 16) | offset;
 }
@@ -1117,6 +1127,12 @@ WRITE8_MEMBER( abc1600_state::cio_pb_w )
 		PB7		
 		
 	*/
+
+	// printer baudrate
+	int prbr = BIT(data, 0);
+
+	z80dart_txca_w(m_dart, prbr);
+	z80dart_rxca_w(m_dart, prbr);
 }
 
 READ8_MEMBER( abc1600_state::cio_pc_r )

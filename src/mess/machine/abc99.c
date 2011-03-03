@@ -105,6 +105,19 @@ GENERIC_DEVICE_CONFIG_SETUP(abc99, "Luxor ABC 99")
 
 void abc99_device_config::device_config_complete()
 {
+	// inherit a copy of the static data
+	const abc99_interface *intf = reinterpret_cast<const abc99_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<abc99_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_txd_func, 0, sizeof(m_out_txd_func));
+		memset(&m_out_clock_func, 0, sizeof(m_out_clock_func));
+		memset(&m_out_keydown_func, 0, sizeof(m_out_keydown_func));
+	}
+
 	m_shortname = "abc99";
 }
 
@@ -453,7 +466,13 @@ inline void abc99_device::serial_input()
 
 inline void abc99_device::serial_output()
 {
-	devcb_call_write_line(&m_out_txd_func, m_so_z2 & m_so_z5);
+	int so = m_so_z2 & m_so_z5;
+	
+	if (m_so != so)
+	{
+		devcb_call_write_line(&m_out_txd_func, so);
+		m_so = so;
+	}
 }
 
 
@@ -474,7 +493,11 @@ inline void abc99_device::serial_clock()
 
 inline void abc99_device::key_down(int state)
 {
-	devcb_call_write_line(&m_out_keydown_func, state);
+	if (m_keydown != state)
+	{
+		devcb_call_write_line(&m_out_keydown_func, state);
+		m_keydown = state;
+	}
 }
 
 
@@ -502,6 +525,8 @@ abc99_device::abc99_device(running_machine &_machine, const abc99_device_config 
 	  m_mousecpu(*this, I8035_Z5_TAG),
 	  m_speaker(*this, SPEAKER_TAG),
 	  m_si(1),
+	  m_so(1),
+	  m_keydown(0),
 	  m_so_z2(1),
 	  m_so_z5(1),
       m_config(config)
@@ -517,7 +542,7 @@ void abc99_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz));
+	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz), 0, MCS48_ALE_CLOCK(XTAL_6MHz));
 
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 
@@ -604,15 +629,15 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	serial_output();
 
 	// key down
-	key_down(BIT(data, 1));
+	key_down(!BIT(data, 1));
+
+	// master T1
+	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
 	output_set_led_value(LED_INS, BIT(data, 3));
 	output_set_led_value(LED_ALT, BIT(data, 4));
 	output_set_led_value(LED_CAPS_LOCK, BIT(data, 5));
-
-	// master T1
-	m_t1_z5 = BIT(data, 2);
 
 	// speaker output
 	speaker_level_w(m_speaker, !BIT(data, 6));
@@ -774,7 +799,7 @@ WRITE_LINE_MEMBER( abc99_device::rxd_w )
 
 READ_LINE_MEMBER( abc99_device::txd_r )
 {
-	return m_so_z2 & m_so_z5;
+	return m_so;
 }
 
 
