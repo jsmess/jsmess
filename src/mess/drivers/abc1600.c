@@ -460,18 +460,22 @@ READ8_MEMBER( abc1600_state::cause_r )
 	
 		bit		description
 		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+		0		RSTBUT
+		1		1
+		2		DMAOK
+		3		X16
+		4		X17
+		5		X18
+		6		X19
+		7		X20
 	
 	*/
 
-	return 0;
+	//watchdog_reset_w()
+	
+	UINT8 data = 0x02;
+		
+	return data;
 }
 
 
