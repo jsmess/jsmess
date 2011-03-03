@@ -17,6 +17,13 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+enum
+{
+	PORT_C = 0,
+	PORT_B,
+	PORT_A,
+	CONTROL
+};
 
 
 //**************************************************************************
@@ -109,7 +116,27 @@ void z8536_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 READ8_MEMBER( z8536_device::read )
 {
-	return 0;
+	UINT8 data = 0;
+	
+	switch (offset & 0x03)
+	{
+	case PORT_C:
+		data = devcb_call_read8(&m_in_pc_func, 0) & 0x0f;
+		break;
+
+	case PORT_B:
+		data = devcb_call_read8(&m_in_pb_func, 0);
+		break;
+
+	case PORT_A:
+		data = devcb_call_read8(&m_in_pa_func, 0);
+		break;
+
+	case CONTROL:
+		break;
+	}
+	
+	return data;
 }
 
 
@@ -119,6 +146,23 @@ READ8_MEMBER( z8536_device::read )
 
 WRITE8_MEMBER( z8536_device::write )
 {
+	switch (offset & 0x03)
+	{
+	case PORT_C:
+		devcb_call_write8(&m_out_pc_func, 0, data & 0x0f);
+		break;
+
+	case PORT_B:
+		devcb_call_write8(&m_out_pb_func, 0, data);
+		break;
+
+	case PORT_A:
+		devcb_call_write8(&m_out_pa_func, 0, data);
+		break;
+
+	case CONTROL:
+		break;
+	}
 }
 
 

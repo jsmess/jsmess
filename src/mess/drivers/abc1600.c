@@ -317,8 +317,6 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 
-	logerror("user write to %06x: %02x\n", virtual_offset, data);
-
 	if (!PAGE_WP) return;
 	//if (PAGE_NONX) BUS ERROR
 
@@ -385,8 +383,6 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-
-	logerror("supervisor write to %06x: %02x\n", offset, data);
 
 	if (!A19)
 	{
@@ -901,6 +897,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( abc1600 )
+	// inputs defined in machine/abc99.c
 INPUT_PORTS_END
 
 
@@ -1151,7 +1148,7 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 		PC3		NVRAM CS
 		
 	*/
-	
+
 	int clock = BIT(data, 0);
 	int data_out = BIT(data, 1);
 	int rtc_cs = BIT(data, 2);
