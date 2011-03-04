@@ -9,7 +9,6 @@
 #include "includes/genpc.h"
 
 #include "machine/i8255a.h"
-#include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
@@ -79,45 +78,49 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	UINT8 result;
 	genpc_state *st = space->machine->driver_data<genpc_state>();
-	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16)
-		& 0x0F0000;
-
-	result = space->read_byte( page_offset + offset);
-	return result;
+	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16) & 0x0F0000;
+	return space->read_byte( page_offset + offset);
 }
 
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
 	genpc_state *st = space->machine->driver_data<genpc_state>();
-	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16)
-		& 0x0F0000;
+	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16) & 0x0F0000;
 
 	space->write_byte( page_offset + offset, data);
 }
 
 
-static READ8_DEVICE_HANDLER( pc_dma8237_fdc_dack_r )
+static READ8_DEVICE_HANDLER( pc_dma8237_1_dack_r )
+{
+	return 0;
+}
+
+static READ8_DEVICE_HANDLER( pc_dma8237_2_dack_r )
 {
 	return 0;//return pc_fdc_dack_r(device->machine);
 }
 
 
-static READ8_DEVICE_HANDLER( pc_dma8237_hdc_dack_r )
+static READ8_DEVICE_HANDLER( pc_dma8237_3_dack_r )
 {
 	return 0;//return pc_hdc_dack_r( device->machine );
 }
 
 
-static WRITE8_DEVICE_HANDLER( pc_dma8237_fdc_dack_w )
+static WRITE8_DEVICE_HANDLER( pc_dma8237_1_dack_w )
+{
+}
+
+static WRITE8_DEVICE_HANDLER( pc_dma8237_2_dack_w )
 {
 	//pc_fdc_dack_w( device->machine, data );
 }
 
 
-static WRITE8_DEVICE_HANDLER( pc_dma8237_hdc_dack_w )
+static WRITE8_DEVICE_HANDLER( pc_dma8237_3_dack_w )
 {
 	//pc_hdc_dack_w( device->machine, data );
 }
@@ -154,8 +157,8 @@ I8237_INTERFACE( genpc_dma8237_config )
 	DEVCB_LINE(pc_dma8237_out_eop),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(pc_dma8237_fdc_dack_r), DEVCB_HANDLER(pc_dma8237_hdc_dack_r) },
-	{ DEVCB_HANDLER(pc_dma8237_0_dack_w), DEVCB_NULL, DEVCB_HANDLER(pc_dma8237_fdc_dack_w), DEVCB_HANDLER(pc_dma8237_hdc_dack_w) },
+	{ DEVCB_NULL, 						  DEVCB_HANDLER(pc_dma8237_1_dack_r), DEVCB_HANDLER(pc_dma8237_2_dack_r), DEVCB_HANDLER(pc_dma8237_3_dack_r) },
+	{ DEVCB_HANDLER(pc_dma8237_0_dack_w), DEVCB_HANDLER(pc_dma8237_1_dack_w), DEVCB_HANDLER(pc_dma8237_2_dack_w), DEVCB_HANDLER(pc_dma8237_3_dack_w) },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
 };
 
@@ -243,73 +246,6 @@ const struct pit8253_config genpc_pit8253_config =
 			DEVCB_NULL,
 			DEVCB_LINE(genpc_pit8253_out2_changed)
 		}
-	}
-};
-
-/**********************************************************
- *
- * COM hardware
- *
- **********************************************************/
-
-/* called when a interrupt is set/cleared from com hardware */
-static INS8250_INTERRUPT( pc_com_interrupt_1 )
-{
-	genpc_state *st = device->machine->driver_data<genpc_state>();
-	pic8259_ir4_w(st->pic8259, state);
-}
-
-static INS8250_INTERRUPT( pc_com_interrupt_2 )
-{
-	genpc_state *st = device->machine->driver_data<genpc_state>();
-	pic8259_ir3_w(st->pic8259, state);
-}
-
-/* called when com registers read/written - used to update peripherals that
-are connected */
-static void pc_com_refresh_connected_common(device_t *device, int n, int data)
-{
-	/* mouse connected to this port? */
-	//if (input_port_read(device->machine, "DSW2") & (0x80>>n))
-		//pc_mouse_handshake_in(device,data);
-}
-
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_0 ) { pc_com_refresh_connected_common( device, 0, data ); }
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_1 ) { pc_com_refresh_connected_common( device, 1, data ); }
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_2 ) { pc_com_refresh_connected_common( device, 2, data ); }
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_3 ) { pc_com_refresh_connected_common( device, 3, data ); }
-
-/* PC interface to PC-com hardware. Done this way because PCW16 also
-uses PC-com hardware and doesn't have the same setup! */
-const ins8250_interface genpc_com_interface[4]=
-{
-	{
-		1843200,
-		pc_com_interrupt_1,
-		NULL,
-		pc_com_handshake_out_0,
-		NULL
-	},
-	{
-		1843200,
-		pc_com_interrupt_2,
-		NULL,
-		pc_com_handshake_out_1,
-		NULL
-	},
-	{
-		1843200,
-		pc_com_interrupt_1,
-		NULL,
-		pc_com_handshake_out_2,
-		NULL
-	},
-	{
-		1843200,
-		pc_com_interrupt_2,
-		NULL,
-		pc_com_handshake_out_3,
-		NULL
 	}
 };
 
@@ -573,6 +509,7 @@ MACHINE_START( genpc )
 	st->pic8259 = machine->device("pic8259");
 	st->dma8237 = machine->device("dma8237");
 	st->pit8253 = machine->device("pit8253");
+	st->isabus = machine->device<isa8_device>("isa");
 }
 
 

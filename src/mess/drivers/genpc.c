@@ -21,10 +21,12 @@
 
 #include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
-#include "video/pc_mda.h"
+#include "video/isa_mda.h"
 
 #include "machine/ram.h"
 #include "machine/isa.h"
+
+#include "machine/isa_com.h"
 
 #include "sound/speaker.h"
 
@@ -155,6 +157,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 		
 	MCFG_ISA8_BUS_ADD("isa","maincpu")
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "mda", ISA8_MDA)
+	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -191,6 +194,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	
 	MCFG_ISA8_BUS_ADD("isa","maincpu")
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "hercules", ISA8_HERCULES)
+	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

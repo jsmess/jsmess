@@ -1,7 +1,7 @@
 #pragma once
  
-#ifndef __PC_MDA_H__
-#define __PC_MDA_H__
+#ifndef __ISA_MDA_H__
+#define __ISA_MDA_H__
  
 #include "emu.h"
 #include "machine/isa.h"
@@ -122,4 +122,4 @@ public:
 // device type definition
 extern const device_type ISA8_HERCULES;
 
-#endif  /* __PC_MDA_H__ */
+#endif  /* __ISA_MDA_H__ */

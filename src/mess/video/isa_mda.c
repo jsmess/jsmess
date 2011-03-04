@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "pc_mda.h"
+#include "isa_mda.h"
 #include "video/mc6845.h"
 
 #define MDA_SCREEN_NAME	"mda_screen"

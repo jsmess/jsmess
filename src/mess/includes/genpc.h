@@ -10,6 +10,7 @@
 #include "machine/ins8250.h"
 #include "machine/i8255a.h"
 #include "machine/8237dma.h"
+#include "machine/isa.h"
 
 class genpc_state : public driver_device
 {
@@ -21,6 +22,7 @@ public:
 	device_t *pic8259;
 	device_t *dma8237;
 	device_t *pit8253;
+	isa8_device *isabus;
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 	UINT8	u73_q2;
@@ -46,7 +48,6 @@ public:
 extern const i8237_interface genpc_dma8237_config;
 extern const struct pit8253_config genpc_pit8253_config;
 extern const struct pic8259_interface genpc_pic8259_config;
-extern const ins8250_interface genpc_com_interface[4];
 extern const i8255a_interface genpc_ppi8255_interface;
 
 READ8_HANDLER( genpc_page_r );
