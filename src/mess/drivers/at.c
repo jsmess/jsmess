@@ -24,7 +24,6 @@
 #include "machine/pit8253.h"
 #include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
-#include "video/pc_mda.h"
 #include "video/pc_ega.h"
 
 #include "machine/pc_hdc.h"
