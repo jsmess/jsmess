@@ -156,7 +156,13 @@ public:
 
 	// video
 	UINT8 *m_video_ram;
-	int m_vs;
+	int m_vs;		// vertical sync
+	UINT16 m_sx;	// X size
+	UINT16 m_sy;	// Y size
+	UINT16 m_tx;	// X destination
+	UINT16 m_ty;	// Y destination
+	UINT16 m_fx;	// X source
+	UINT16 m_fy;	// Y source
 };
 
 

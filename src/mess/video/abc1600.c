@@ -10,7 +10,7 @@
 enum
 {
 	LDSX_HB = 0,
-	LSDX_LB,
+	LDSX_LB,
 	LDSY_HB,
 	LDSY_LB,
 	LDTX_HB,
@@ -84,6 +84,40 @@ READ8_MEMBER( abc1600_state::iord0_r )
 
 WRITE8_MEMBER( abc1600_state::iowr0_w )
 {
+	switch (offset & 0x07)
+	{
+	case LDSX_HB:
+		m_sx = (data << 8) | (m_sx & 0xff);
+		break;
+		
+	case LDSX_LB:
+		m_sx = (m_sx & 0xff00) | data;
+		break;
+		
+	case LDSY_HB:
+		m_sy = (data << 8) | (m_sy & 0xff);
+		break;
+		
+	case LDSY_LB:
+		m_sy = (m_sy & 0xff00) | data;
+		break;
+		
+	case LDTX_HB:
+		m_tx = (data << 8) | (m_tx & 0xff);
+		break;
+		
+	case LDTX_LB:
+		m_tx = (m_tx & 0xff00) | data;
+		break;
+
+	case LDTY_HB:
+		m_ty = (data << 8) | (m_ty & 0xff);
+		break;
+
+	case LDTY_LB:
+		m_ty = (m_ty & 0xff00) | data;
+		break;
+	}
 }
 
 
@@ -93,6 +127,30 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 
 WRITE8_MEMBER( abc1600_state::iowr1_w )
 {
+	switch (offset & 0x07)
+	{
+	case LDFX_HB:
+		m_fx = (data << 8) | (m_fx & 0xff);
+		break;
+		
+	case LDFX_LB:
+		m_fx = (m_fx & 0xff00) | data;
+		break;
+		
+	case LDFY_HB:
+		m_fy = (data << 8) | (m_fy & 0xff);
+		break;
+		
+	case LDFY_LB:
+		m_fy = (m_fy & 0xff00) | data;
+		break;
+		
+	case WRML:
+		break;
+		
+	case WRDL:
+		break;
+	}
 }
 
 
@@ -102,6 +160,37 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 WRITE8_MEMBER( abc1600_state::iowr2_w )
 {
+	switch (data & 0x07)
+	{
+	case WRMASK_STROBE_HB:
+		break;
+		
+	case WRMASK_STROBE_LB:
+		break;
+
+	case ENABLE_CLOCKS:
+		break;
+		
+	case FLAG_STROBE:
+		/*
+		
+			bit		description
+			
+			0		L/_P FLAG
+			1		BLANK FLAG
+			2		PIX POL
+			3		FRAME POL
+			4		HOLD FY
+			5		HOLD FX
+			6		COMP MOVE FLAG
+			7		REPLACE/SET & RESET
+		
+		*/
+		break;
+		
+	case ENDISP:
+		break;
+	}
 }
 
 
