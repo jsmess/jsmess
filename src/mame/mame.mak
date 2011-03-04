@@ -493,10 +493,10 @@ $(MAMEOBJ)/barcrest.a: \
 	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
-	$(DRIVERS)/bfm_sc1.o \
-	$(DRIVERS)/bfmsys85.o \
 	$(DRIVERS)/bfcobra.o \
+	$(DRIVERS)/bfm_sc1.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
+	$(DRIVERS)/bfmsys85.o \
 	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
 $(MAMEOBJ)/bmc.a: \
@@ -1224,8 +1224,8 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/macs.o \
 	$(DRIVERS)/seta.o $(VIDEO)/seta.o \
 	$(DRIVERS)/seta2.o $(VIDEO)/seta2.o \
-	$(DRIVERS)/speglsht.o \
 	$(DRIVERS)/speedatk.o $(VIDEO)/speedatk.o \
+	$(DRIVERS)/speglsht.o \
 	$(DRIVERS)/srmp2.o $(VIDEO)/srmp2.o \
 	$(DRIVERS)/srmp5.o \
 	$(DRIVERS)/srmp6.o \
@@ -1363,9 +1363,9 @@ $(MAMEOBJ)/taito.a: \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \
-	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
 	$(DRIVERS)/lockon.o $(VIDEO)/lockon.o \
 	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
+	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
 
 $(MAMEOBJ)/tch.a: \
 	$(DRIVERS)/kickgoal.o $(VIDEO)/kickgoal.o \
@@ -1613,6 +1613,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coinmvga.o \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
+	$(DRIVERS)/corona.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
@@ -1839,6 +1840,8 @@ $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 						$(LAYOUT)/crash.lh
 
 $(DRIVERS)/copsnrob.o:	$(LAYOUT)/copsnrob.lh
+
+$(DRIVERS)/corona.o:	$(LAYOUT)/re800.lh
 
 $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 

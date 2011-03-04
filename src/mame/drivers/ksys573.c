@@ -3093,13 +3093,6 @@ static MACHINE_CONFIG_DERIVED( konami573x, konami573 )
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( konami573xzi, konami573 )
-	MCFG_X76F041_ADD( "install_eeprom" )
-	MCFG_DS2401_ADD(  "install_id" )
-	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
-	MCFG_DS2401_ADD(  "game_id" )
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( konami573y, konami573 )
 	MCFG_X76F100_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
@@ -3155,13 +3148,6 @@ static MACHINE_CONFIG_DERIVED( pccard1x, pccard1 )
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pccard1xzi, pccard1 )
-	MCFG_X76F041_ADD( "install_eeprom" )
-	MCFG_DS2401_ADD(  "install_id" )
-	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
-	MCFG_DS2401_ADD(  "game_id" )
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( pccard1xi, pccard1 )
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
@@ -3172,9 +3158,11 @@ static MACHINE_CONFIG_DERIVED( pccard1yi, pccard1 )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pccard1zi, pccard1 )
-	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
+static MACHINE_CONFIG_DERIVED( pccard1dxzi, pccard1d )
+	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
+	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
+	MCFG_DS2401_ADD(  "game_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1dzi, pccard1d )
@@ -4792,6 +4780,7 @@ ROM_END
 
 ROM_START( gtrfrk3m )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
@@ -4814,6 +4803,7 @@ ROM_END
 
 ROM_START( gtfrk3ma )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
@@ -4833,6 +4823,7 @@ ROM_END
 
 ROM_START( gtfrk3mb )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0001014, "install_eeprom", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(61f35ee1) SHA1(0a2b66742364d76ec18647b2761590bd49229625) )
@@ -4846,6 +4837,7 @@ ROM_END
 
 ROM_START( gtrfrk4m )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a24jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(29e326fe) SHA1(41a600105b08accc9d7ebd2b8ae08c0863758aa0) )
@@ -5192,6 +5184,7 @@ ROM_END
 
 ROM_START( pcnfrk3m )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a23kaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(d71c4b5c) SHA1(3911c5dd933c30e6e44c8cf417bb4c284ecb4b80) )
@@ -5338,15 +5331,15 @@ GAME( 2000, pnchmna,  fghtmn,   punchmania,   punchmania,punchmania, ROT0, "Kona
 GAME( 2000, fghtmnk,  fghtmn,   punchmania,   punchmania,punchmania, ROT0, "Konami", "Fighting Mania (QG918 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* motor/artwork/network */
 GAME( 2000, fghtmnu,  fghtmn,   punchmania,   punchmania,punchmania, ROT0, "Konami", "Fighting Mania (QG918 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* motor/artwork/network */
 GAME( 2000, dsem,     sys573,   k573dxi,      ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.7 */
-GAME( 2000, gtrfrk3m, sys573,   pccard1xzi,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, gtfrk3ma, gtrfrk3m, pccard1xzi,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, gtfrk3mb, gtrfrk3m, pccard1zi,    gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtrfrk3m, sys573,   pccard1dxzi,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtfrk3ma, gtrfrk3m, pccard1dxzi,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtfrk3mb, gtrfrk3m, pccard1dzi,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, pnchmn2,  sys573,   punchmania2,  punchmania,punchmania, ROT0, "Konami", "Punch Mania 2: Hokuto No Ken (GQA09 JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* motor/artwork/network */
 GAME( 2000, salarymc, sys573,   konami573yi,  hyperbbc,  salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, ddr3mp,   sys573,   pccard2dxzi,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
-GAME( 2000, pcnfrk3m, sys573,   konami573xzi, drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, pcnfrk3m, sys573,   k573dxzi,     drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, drmn3m,   pcnfrk3m, k573dxzi,     drmn,      drmndigital,ROT0, "Konami", "DrumMania 3rd Mix (G*A23 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, gtrfrk4m, sys573,   pccard1xzi,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 4th Mix (G*A24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, gtrfrk4m, sys573,   pccard1dxzi,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 4th Mix (G*A24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4m,    sys573,   pccard2dxzi,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4mj,   ddr4m,    pccard2dxzi,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4ms,   sys573,   pccard2dxzi,  ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. ABA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */

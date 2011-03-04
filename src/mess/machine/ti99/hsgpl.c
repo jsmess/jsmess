@@ -630,7 +630,7 @@ static DEVICE_NVRAM( hsgpl )
 	{
 		logerror("hsgpl: device nvram load %s\n", astring_c(hsname));
 
-		emu_file nvfile(device->machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+		emu_file nvfile(device->machine->options().nvram_directory(), OPEN_FLAG_READ);
 		filerr = nvfile.open(astring_c(hsname));
 		if (filerr != FILERR_NONE)
 		{
@@ -661,7 +661,7 @@ static DEVICE_NVRAM( hsgpl )
 		{
 			card->flashrom[0] = NVVERSION;
 			
-			emu_file nvfile(device->machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			emu_file nvfile(device->machine->options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			filerr = nvfile.open(astring_c(hsname));
 			if (filerr != FILERR_NONE)
 			{

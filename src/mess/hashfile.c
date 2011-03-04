@@ -40,7 +40,7 @@ typedef void (*hashfile_error_func)(const char *message);
 ***************************************************************************/
 
 /* opens a hash file; if is_preload is non-zero, the entire file is preloaded */
-hash_file *hashfile_open(core_options &options, const char *sysname, int is_preload, hashfile_error_func error_proc);
+hash_file *hashfile_open(emu_options &options, const char *sysname, int is_preload, hashfile_error_func error_proc);
 
 /* closes a hash file and associated resources */
 void hashfile_close(hash_file *hashfile);
@@ -445,7 +445,7 @@ static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
     hashfile_open
 -------------------------------------------------*/
 
-hash_file *hashfile_open(core_options &options, const char *sysname, int is_preload,
+hash_file *hashfile_open(emu_options &options, const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
 {
 	hash_file *hashfile = NULL;
@@ -468,7 +468,7 @@ hash_file *hashfile_open(core_options &options, const char *sysname, int is_prel
 	hashfile->error_proc = error_proc;
 
 	/* open a file */
-	hashfile->file = global_alloc(emu_file(options, SEARCHPATH_HASH, OPEN_FLAG_READ));
+	hashfile->file = global_alloc(emu_file(options.hash_path(), OPEN_FLAG_READ));
 	filerr = hashfile->file->open(sysname, ".hsi");
 	if (filerr != FILERR_NONE)
 	{
@@ -575,7 +575,7 @@ const char *hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
     hashfile_verify
 -------------------------------------------------*/
 
-int hashfile_verify(core_options &options, const char *sysname, void (*my_error_proc)(const char *message))
+int hashfile_verify(emu_options &options, const char *sysname, void (*my_error_proc)(const char *message))
 {
 	hash_file *hashfile;
 

@@ -468,7 +468,7 @@ static void nc_common_open_stream_for_reading(running_machine *machine)
 
 	sprintf(filename,"%s.nv", machine->gamedrv->name);
 
-	state->file = global_alloc(emu_file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE));
+	state->file = global_alloc(emu_file(machine->options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->file->open(filename);
 }
 
@@ -479,7 +479,7 @@ static void nc_common_open_stream_for_writing(running_machine *machine)
 
 	sprintf(filename,"%s.nv", machine->gamedrv->name);
 	
-	state->file = global_alloc(emu_file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE));
+	state->file = global_alloc(emu_file(machine->options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->file->open(filename);
 }
 

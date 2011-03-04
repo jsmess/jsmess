@@ -1,5 +1,6 @@
 
 #include "emu.h"
+#include "emuopts.h"
 #include "ti85_ser.h"
 
 enum
@@ -888,7 +889,7 @@ static void ti85_receive_variables (device_t *device)
 				ti85serial->variable_number = 0;
 				ti85serial->status =  TI85_SEND_STOP;
 				sprintf (var_file_name, "%08d.85g", ti85serial->var_file_number);
-				emu_file var_file(device->machine->options(), NULL, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+				emu_file var_file(device->machine->options().memcard_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 				filerr = var_file.open(var_file_name);
 
 				if (filerr == FILERR_NONE)
@@ -1031,7 +1032,7 @@ static void ti85_receive_backup (device_t *device)
 					ti85serial->backup_file_data[0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x01] = (ti85_calculate_checksum(ti85serial->backup_file_data+0x37, 0x42+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x06-0x37)&0xff00)>>8;
 					sprintf (backup_file_name, "%08d.85b", ti85serial->backup_file_number);
 					
-					emu_file backup_file(device->machine->options(), NULL, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+					emu_file backup_file(device->machine->options().memcard_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 					filerr = backup_file.open(backup_file_name);
 					
 					if (filerr == FILERR_NONE)
@@ -1096,7 +1097,7 @@ static void ti85_receive_screen (device_t *device)
 				ti85_convert_stream_to_data (ti85serial->receive_buffer, 1030*8, ti85serial->receive_data);
 				sprintf (image_file_name, "%08d.85i", ti85serial->image_file_number);
 				
-				emu_file image_file(device->machine->options(), NULL, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+				emu_file image_file(device->machine->options().memcard_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 				filerr = image_file.open(image_file_name);
 				
 				if (filerr == FILERR_NONE)

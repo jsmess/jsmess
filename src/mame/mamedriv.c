@@ -8257,6 +8257,7 @@ Other Sun games
 	DRIVER( magicstk )	/* (c) 1995 */
 	DRIVER( hotminda )	/* (c) 1995 */
 	DRIVER( bigtwin )	/* (c) 1995 */
+	DRIVER( bigtwinb )	/* (c) 1995 */
 	DRIVER( wbeachvl )	/* (c) 1995 */
 	DRIVER( wbeachvl2 )	/* (c) 1995 */
 	DRIVER( excelsr )	/* (c) 1995 */
@@ -9964,22 +9965,30 @@ Other Sun games
 	DRIVER( caswin )	/* (c) 1985 */
 
 	/* Aristocrat Mk4 hardware */
+	DRIVER( gtroppo )	/* (c) 1986 Ainsworth Nominees P.L. */
+	DRIVER( clkwise )	/* (c) 1986 Ainsworth Nominees P.L. */
+	DRIVER( gldnpkr )	/* (c) 1986 Ainsworth Nominees P.L. */
 	DRIVER( 3bagflvt )	/* (c) 1994 */
 	DRIVER( 3bagflnz )	/* (c) 1994 */
-	DRIVER( blkrhino )	/* (c) 1996 */
-	DRIVER( coralr2 )	/* (c) 2002 */
 	DRIVER( eforest )	/* (c) 1994 */
 	DRIVER( eforesta )	/* (c) 1995 */
 	DRIVER( eforestb )	/* (c) 1996 */
+	DRIVER( cgold2 )	/* (c) 1995 */
+	DRIVER( blkrhino )	/* (c) 1996 */
 	DRIVER( goldenc )	/* (c) 1996 */
 	DRIVER( kgbird )	/* (c) 1996 */
 	DRIVER( kgbirda )	/* (c) 1996 */
-	DRIVER( phantomp )	/* (c) 1998 */
-	DRIVER( swtht2nz )	/* (c) 1998 */
 	DRIVER( topgear )	/* (c) 1996 */
 	DRIVER( wtigernz )	/* (c) 1996 */
-	DRIVER( autmoon )	/* (c) 1999 */
+	DRIVER( fhunter )	/* (c) 1996 */
+	DRIVER( fhuntera )	/* (c) 1996 */
+	DRIVER( arcwins )	/* (c) 1996 */
+	DRIVER( wildone )	/* (c) 1997 */
+	DRIVER( phantomp )	/* (c) 1998 */
+	DRIVER( swtht2nz )	/* (c) 1998 */
 	DRIVER( ffortune )	/* (c) 1998 */
+	DRIVER( autmoon )	/* (c) 1999 */
+	DRIVER( coralr2 )	/* (c) 2002 */
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( aristmk5 )	/* (c) 1995 */
@@ -10698,6 +10707,13 @@ Other Sun games
 	DRIVER( avtbingo )	/* (c) 1985 AVT */
 	DRIVER( avtnfl )	/* (c) 1989 AVT */
 
+	/* Corona hardware */
+	DRIVER( winner81 )	/* (c) 1981 Corona Co., Ltd. */
+	DRIVER( winner82 )	/* (c) 1982 Corona Co., Ltd. */
+	DRIVER( re800ea )	/* (c) 1991 Entretenimientos GEMINIS */
+	DRIVER( re800v1 )	/* (c) 1991 Entretenimientos GEMINIS */
+	DRIVER( re800v3 )	/* (c) 1992 Entretenimientos GEMINIS */
+	
 	DRIVER( dfruit )
 
 	// allied.c
@@ -12108,5 +12124,6 @@ Other Sun games
 	DRIVER( skijump )
 	DRIVER( spacecty )
 	DRIVER( strike )
+
 
 #endif	/* DRIVER_RECURSIVE */
