@@ -51,7 +51,6 @@ public:
 	UINT8 pal_clut[4];
 
 	UINT8 *tvram;
-	UINT16 *gvram;
 
 	UINT16 font_addr;
 	UINT8 font_line;
@@ -78,7 +77,6 @@ void pc9801_state::video_start()
 	//pc9801_state *state = machine->driver_data<pc9801_state>();
 
 	tvram = auto_alloc_array(machine, UINT8, 0x4000);
-	gvram = auto_alloc_array(machine, UINT16, 0x30000);
 
 	// find memory regions
 	m_char_rom = machine->region("chargen")->base();
@@ -94,6 +92,7 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	upd7220_update(m_hgdc2, &bitmap, &cliprect);
 
 	/* TODO: for shared RAM writes, until we understand ... */
+	#if 0
 	{
 		//pc9801_state *state = screen->machine->driver_data<pc9801_state>();
 		int xi;
@@ -130,6 +129,7 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 			}
 		}
 	}
+	#endif
 
 	upd7220_update(m_hgdc1, &bitmap, &cliprect);
 
@@ -146,7 +146,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	for(xi=0;xi<16;xi++)
+	for(xi=0;xi<8;xi++)
 	{
 		res_x = x + xi;
 		res_y = y;
@@ -154,9 +154,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		if(res_x > 640 - 1 || res_y > 200 - 1) //TODO
 			continue;
 
-		pen = ((vram[address + (0x08000/2) + (state->vram_disp*0x20000/2)] >> (xi)) & 1) ? 1 : 0;
-		pen|= ((vram[address + (0x10000/2) + (state->vram_disp*0x20000/2)] >> (xi)) & 1) ? 2 : 0;
-		pen|= ((vram[address + (0x18000/2) + (state->vram_disp*0x20000/2)] >> (xi)) & 1) ? 4 : 0;
+		pen = ((vram[address + (0x08000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
+		pen|= ((vram[address + (0x10000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
+		pen|= ((vram[address + (0x18000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
 
 		*BITMAP_ADDR16(bitmap, res_y, res_x) = pen + 8;
 	}
@@ -180,8 +180,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		tile_addr = addr+(x*(state->video_ff[WIDTH40_REG]+1));
 
-		tile = vram[tile_addr] & 0xff;
-		attr = (vram[tile_addr] & 0xff00) >> 8;
+		tile = vram[(tile_addr*2) & 0x1fff] & 0x00ff; //TODO: kanji
+		attr = (vram[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
 		secret = (attr & 1) ^ 1;
 		//blink = attr & 2;
@@ -723,54 +723,48 @@ static WRITE8_HANDLER( pc9801_fdc_2dd_w )
 
 
 /* TODO: banking? */
-static READ16_HANDLER( pc9801_tvram_r )
+static READ8_HANDLER( pc9801_tvram_r )
 {
-	//pc9801_state *state = space->machine->driver_data<pc9801_state>();
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 	UINT8 res;
 
-	if(offset & 0x1000)
-		res = upd7220_vram_r(space->machine->device("upd7220_chr"),((offset & 0x0fff) >> 0),0xffff) >> 8;
-	else
-		res = upd7220_vram_r(space->machine->device("upd7220_chr"),((offset & 0x0fff) >> 0),0xffff) & 0xff;
+	if((offset & 0x2000) && offset & 1)
+		return 0xff;
 
-	return res | ((offset & 0x1000) ? 0xff00 : 0x00);
+	//res = upd7220_vram_r(space->machine->device("upd7220_chr"),offset);
+	res = state->tvram[offset];
+
+	return res;
 }
 
-static WRITE16_HANDLER( pc9801_tvram_w )
-{
-	pc9801_state *state = space->machine->driver_data<pc9801_state>();
-	UINT16 write_vram;
-
-	if(offset < (0x3fe2/2) || state->video_ff[MEMSW_REG])
-		COMBINE_DATA(&state->tvram[offset]); //TODO: remove this?
-
-	write_vram = (state->tvram[(offset & 0x0fff)] & 0xff);
-	write_vram|= (state->tvram[(offset & 0x0fff) | 0x1000] << 8);
-
-	upd7220_vram_w(space->machine->device("upd7220_chr"),(offset & 0x0fff), write_vram,0xffff);
-}
-
-static READ16_HANDLER( pc9801_gvram_r )
+static WRITE8_HANDLER( pc9801_tvram_w )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	return state->gvram[offset + (state->vram_bank*0x18000/2)];//upd7220_vram_r(space->machine->device("upd7220_btm"),offset+0x4000,mem_mask);
+	if(offset < (0x3fe2) || state->video_ff[MEMSW_REG])
+		state->tvram[offset] = data;
+
+	upd7220_vram_w(space->machine->device("upd7220_chr"),offset,data); //TODO: check me
 }
 
-static WRITE16_HANDLER( pc9801_gvram_w )
+static READ8_HANDLER( pc9801_gvram_r )
 {
-	//UINT16 write_vram;
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	COMBINE_DATA(&state->gvram[offset + (state->vram_bank*0x18000/2)]); //TODO: needs to be passed to the GDC vram
+	return upd7220_vram_r(space->machine->device("upd7220_btm"),offset+0x8000+state->vram_bank*0x20000);
+}
 
-	//upd7220_vram_w(space->machine->device("upd7220_btm"),offset+0x4000, state->gvram[offset],mem_mask);
+static WRITE8_HANDLER( pc9801_gvram_w )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	upd7220_vram_w(space->machine->device("upd7220_btm"),offset+0x8000+state->vram_bank*0x20000, data);
 }
 
 static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
-	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(pc9801_tvram_r,pc9801_tvram_w) //TVRAM
-	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE(pc9801_gvram_r,pc9801_gvram_w) //bitmap VRAM
+	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE8(pc9801_tvram_r,pc9801_tvram_w,0xffff) //TVRAM
+	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(pc9801_gvram_r,pc9801_gvram_w,0xffff) //bitmap VRAM
 //  AM_RANGE(0xcc000, 0xcdfff) AM_ROM //sound BIOS
 	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
 //  AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
@@ -796,11 +790,11 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
 //  AM_RANGE(0x0188, 0x018b) ym2203 opn / <undefined>
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_1_map, 0, 16 )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_chr",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, 0, 16 )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_btm",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
@@ -1338,7 +1332,7 @@ static MACHINE_RESET(pc9801)
 		};
 
 		for(i=0;i<0x10;i++)
-			state->tvram[(0x3fe0/2)+i] = default_memsw_data[i];
+			state->tvram[(0x3fe0)+i*2] = default_memsw_data[i];
 	}
 
 	beep_set_frequency(machine->device("beeper"),2400);

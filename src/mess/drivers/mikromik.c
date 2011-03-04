@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( mm1m6_map, ADDRESS_SPACE_PROGRAM, 8, mm1_state )
 	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE_LEGACY(UPD7220_TAG, upd7220_r, upd7220_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mm1_upd7220_map, 0, 16, mm1_state )
+static ADDRESS_MAP_START( mm1_upd7220_map, 0, 8, mm1_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_LEGACY(UPD7220_TAG,upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
@@ -314,27 +314,22 @@ static const i8275_interface crtc_intf =
 	crtc_display_pixels
 };
 
+/* TODO */
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	int i;
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < 8; i++)
 	{
 		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
 	}
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
-{
-
-}
-
-
 static UPD7220_INTERFACE( hgdc_intf )
 {
 	SCREEN_TAG,
 	hgdc_display_pixels,
-	hgdc_draw_text,
+	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

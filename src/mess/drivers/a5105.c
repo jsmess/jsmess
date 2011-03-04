@@ -36,6 +36,7 @@ public:
 	UINT8 memsel[4];
 };
 
+/* TODO */
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	int xi,gfx;
@@ -43,7 +44,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	gfx = vram[address];
 
-	for(xi=0;xi<16;xi++)
+	for(xi=0;xi<8;xi++)
 	{
 		pen = ((gfx >> xi) & 1) ? 7 : 0;
 
@@ -61,8 +62,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (vram[addr+x] & 0xff);
-		color = ((vram[addr+x] & 0x0f00) >> 8);
+		tile = (vram[(addr+x)*2] & 0xff);
+		color = (vram[(addr+x)*2+1] & 0x0f);
 
 		for( yi = 0; yi < lr; yi++)
 		{
@@ -388,7 +389,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16 )
+static ADDRESS_MAP_START( upd7220_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 

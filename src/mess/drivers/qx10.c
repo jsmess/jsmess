@@ -115,11 +115,11 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		gfx[2] = 0;
 	}
 
-	for(xi=0;xi<16;xi++)
+	for(xi=0;xi<8;xi++)
 	{
-		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
-		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
-		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
+		pen = ((gfx[0] >> (7-xi)) & 1) ? 1 : 0;
+		pen|= ((gfx[1] >> (7-xi)) & 1) ? 2 : 0;
+		pen|= ((gfx[2] >> (7-xi)) & 1) ? 4 : 0;
 
 		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
 	}
@@ -138,8 +138,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (vram[addr+x] & 0xff);
-		attr = ((vram[addr+x] & 0xff00) >> 8);
+		tile = (vram[(addr+x)*2] & 0xff);
+		attr = (vram[(addr+x)*2+1] & 0xff);
 
 		color = (state->color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
@@ -968,7 +968,7 @@ static PALETTE_INIT( gdc )
 	// ...
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16 )
+static ADDRESS_MAP_START( upd7220_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 

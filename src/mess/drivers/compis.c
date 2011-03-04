@@ -98,7 +98,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	gfx = vram[address];
 
-	for(xi=0;xi<16;xi++)
+	for(xi=0;xi<8;xi++)
 	{
 		pen = ((gfx >> xi) & 1) ? 15 : 0;
 
@@ -351,7 +351,7 @@ static GFXDECODE_START( compis )
 	GFXDECODE_ENTRY( "bios", 0x0000, compis_charlayout, 1, 7 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16 )
+static ADDRESS_MAP_START( upd7220_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 

@@ -27,6 +27,7 @@
         - modify data
         - write data
 	- QX-10 diagnostic test crashes when it attempts to draw lines;
+	- compis2 SAD address for bitmap is 0x20000, for whatever reason (presumably missing banking)
 
     - honor visible area
     - wide mode (32-bit access)
@@ -200,7 +201,7 @@ struct _upd7220_t
 	emu_timer *hsync_timer;			/* horizontal sync timer */
 	emu_timer *blank_timer;			/* CRT blanking timer */
 
-	UINT16 vram[0x40000];
+	UINT8 vram[0x40000];
 	UINT32 vram_bank;
 
 	UINT8 bitmap_mod;
@@ -571,14 +572,14 @@ static void read_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 		switch(type)
 		{
 			case 0:
-				queue(upd7220, upd7220->vram[upd7220->ead] & 0xff, 0);
-				queue(upd7220, upd7220->vram[upd7220->ead] >> 8, 0);
+				queue(upd7220, upd7220->vram[upd7220->ead*2], 0);
+				queue(upd7220, upd7220->vram[upd7220->ead*2+1], 0);
 				break;
 			case 2:
-				queue(upd7220, upd7220->vram[upd7220->ead] & 0xff, 0);
+				queue(upd7220, upd7220->vram[upd7220->ead*2], 0);
 				break;
 			case 3:
-				queue(upd7220, upd7220->vram[upd7220->ead] >> 8, 0);
+				queue(upd7220, upd7220->vram[upd7220->ead*2+1], 0);
 				break;
 		}
 
@@ -631,21 +632,28 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 		switch(mod & 3)
 		{
 			case 0x00: //replace
-				switch(type)
-				{
-					case 0: upd7220->vram[upd7220->ead] = result; break;
-					case 2:	upd7220->vram[upd7220->ead] = result | (upd7220->vram[upd7220->ead] & 0xff00); break;
-					case 3: upd7220->vram[upd7220->ead] = result | (upd7220->vram[upd7220->ead] & 0x00ff); break;
-				}
+				if(type == 0 || type == 2)
+					upd7220->vram[upd7220->ead*2+0] = result & 0xff;
+				if(type == 0 || type == 3)
+					upd7220->vram[upd7220->ead*2+1] = result >> 8;
 				break;
 			case 0x01: //complement
-				upd7220->vram[upd7220->ead] ^= result;
+				if(type == 0 || type == 2)
+					upd7220->vram[upd7220->ead*2+0] ^= result & 0xff;
+				if(type == 0 || type == 3)
+					upd7220->vram[upd7220->ead*2+1] ^= result >> 8;
 				break;
 			case 0x02: //reset to zero
-				upd7220->vram[upd7220->ead] &= ~result;
+				if(type == 0 || type == 2)
+					upd7220->vram[upd7220->ead*2+0] &= ~result;
+				if(type == 0 || type == 3)
+					upd7220->vram[upd7220->ead*2+1] &= ~(result >> 8);
 				break;
 			case 0x03: //set to one
-				upd7220->vram[upd7220->ead] |= result;
+				if(type == 0 || type == 2)
+					upd7220->vram[upd7220->ead*2+0] |= result;
+				if(type == 0 || type == 3)
+					upd7220->vram[upd7220->ead*2+1] |= (result >> 8);
 				break;
 		}
 
@@ -672,13 +680,13 @@ static UINT16 check_pattern(upd7220_t *upd7220, UINT16 pattern)
 
 static void draw_pixel(upd7220_t *upd7220,int x,int y,UINT16 tile_data)
 {
-	UINT32 addr = (y * upd7220->pitch + (x >> 4)) & 0x3ffff;
+	UINT32 addr = (y * upd7220->pitch * 2 + (x >> 3)) & 0x3ffff;
 	int dad;
 
-	dad = x & 0xf;
+	dad = x & 0x7;
 
-	upd7220->vram[addr + upd7220->vram_bank] &= ~(0x8000 >> (15-dad));
-	upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x8000 >> (15-dad)));
+	upd7220->vram[addr + upd7220->vram_bank] &= ~(0x80 >> (dad));
+	upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x80 >> (dad)));
 }
 
 static void draw_line(upd7220_t *upd7220,int x,int y)
@@ -700,11 +708,18 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 		line_step = (upd7220->figs.d1 * i);
 		line_step/= (upd7220->figs.dc + 1);
 		line_step >>= 1;
-		dot = (line_pattern >> ((15-i+upd7220->dad) & 0xf)) & 1;
-		draw_pixel(upd7220,x + (line_step*line_x_step[upd7220->figs.dir]),y + (line_step*line_y_step[upd7220->figs.dir]),dot << ((x + line_step*line_x_step[upd7220->figs.dir]) & 0xf));
+		dot = ((line_pattern >> ((i+upd7220->dad) & 0xf)) & 1) << 7;
+		draw_pixel(upd7220,x + (line_step*line_x_step[upd7220->figs.dir]),y + (line_step*line_y_step[upd7220->figs.dir]),dot >> ((x + line_step*line_x_step[upd7220->figs.dir]) & 0x7));
 		x += line_x_dir[upd7220->figs.dir];
 		y += line_y_dir[upd7220->figs.dir];
 	}
+
+	/* TODO: check me*/
+	x += (line_step*line_x_step[upd7220->figs.dir]);
+	y += (line_step*line_y_step[upd7220->figs.dir]);
+
+	upd7220->ead = (x >> 4) + (y * upd7220->pitch);
+	upd7220->dad = x & 0x0f;
 }
 
 static void draw_rectangle(upd7220_t *upd7220,int x,int y)
@@ -735,7 +750,7 @@ static void draw_rectangle(upd7220_t *upd7220,int x,int y)
 		y++;
 	}
 
-	upd7220->ead = (x >> 4) + (y * upd7220->pitch);
+	upd7220->ead = (x >> 3) + (y * upd7220->pitch);
 	upd7220->dad = x & 0x0f;
 
 }
@@ -747,9 +762,8 @@ static void draw_rectangle(upd7220_t *upd7220,int x,int y)
 static void draw_char(upd7220_t *upd7220,int x,int y)
 {
 	int xi,yi;
-	UINT8 xsize,ysize;
+	int xsize,ysize;
 	UINT8 tile_data;
-	UINT16 bitmask,upper_byte;
 
 	/* snippet for character checking */
 	#if 0
@@ -763,17 +777,18 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 	}
 	#endif
 
+	/* TODO: D has presumably upper bits for ysize */
 	xsize = upd7220->figs.d;
 	ysize = upd7220->figs.dc + 1;
 
-	/* TODO: internal direction, slanted character, zooming, size stuff bigger than 8 */
+	/* TODO: internal direction, slanted character, zooming, size stuff bigger than 8, rewrite using draw_pixel function */
 	for(yi=0;yi<ysize;yi++)
 	{
 		switch(upd7220->figs.dir & 7)
 		{
-			case 0: tile_data = 0xff; printf("%d %d %d %d %d\n",upd7220->pitch,x,y,xsize,ysize); break; // TODO
-			case 2:	tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
-			case 6:	tile_data = BITSWAP8(upd7220->ra[((ysize-1-yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
+			case 0: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); printf("%d %d %d %d %d\n",upd7220->pitch,x,y,xsize,ysize); break; // TODO
+			case 2:	tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
+			case 6:	tile_data = BITSWAP8(upd7220->ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
 			default: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
 					 printf("%d %d %d\n",upd7220->figs.dir,xsize,ysize);
 					 break;
@@ -781,18 +796,14 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 
 		for(xi=0;xi<xsize;xi++)
 		{
-			UINT32 addr = ((y+yi) * upd7220->pitch) + ((x+xi) >> 4);
+			UINT32 addr = ((y+yi) * upd7220->pitch * 2) + ((x+xi) >> 3);
 
-			upper_byte = ((x+xi) & 8);
-
-			bitmask = (upper_byte) ? 0x8000 : 0x80;
-
-			upd7220->vram[addr + upd7220->vram_bank] &= ~(bitmask >> (xi));
-			upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data << upper_byte) & (bitmask >> (xi)));
+			upd7220->vram[addr + upd7220->vram_bank] &= ~(1 << (xi & 7));
+			upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (1 << (xi & 7)));
 		}
 	}
 
-	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs.dir]) >> 4) + ((y+8*y_dir_dot[upd7220->figs.dir]) * upd7220->pitch);
+	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs.dir]) >> 3) + ((y+8*y_dir_dot[upd7220->figs.dir]) * upd7220->pitch);
 	upd7220->dad = ((x+8*x_dir_dot[upd7220->figs.dir]) & 0xf);
 }
 
@@ -1327,12 +1338,12 @@ static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, 
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int sx;
 
-	for (sx = 0; sx < upd7220->aw * 2; sx++)
+	for (sx = 0; sx < upd7220->pitch * 2; sx++)
 	{
-		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff);
+		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff); //TODO: remove me
 
-		if((sx << 4) <= upd7220->aw * 16 - 1 && y <= upd7220->al - 1)
-			upd7220->display_func(device, bitmap, y, sx << 4, addr, data, upd7220->vram);
+		if((sx << 3) < upd7220->aw * 16 && y < upd7220->al)
+			upd7220->display_func(device, bitmap, y, sx << 3, addr, data, upd7220->vram);
 
 		if (wd) addr += 2; else addr++;
 	}
@@ -1365,12 +1376,18 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 
 		for (y = 0; y < len; y++)
 		{
-			addr = (sad & 0x3ffff) + (y * upd7220->pitch); //TODO: sad needs to be & 0x3ffff
+			if (im || force_bitmap)
+			{
+				addr = (sad & 0x3ffff) + (y * upd7220->pitch * 2);
 
-			if ((im || force_bitmap) && upd7220->display_func)
-				draw_graphics_line(device, bitmap, addr, y + bsy, wd);
+				if(upd7220->display_func)
+					draw_graphics_line(device, bitmap, addr, y + bsy, wd);
+			}
 			else
 			{
+				/* TODO: text params are more limited compared to graphics */
+				addr = (sad & 0x3ffff) + (y * upd7220->pitch);
+
 				if (upd7220->draw_text_func)
 					upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + tsy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,len + bsy - 1,upd7220->lr, upd7220->dc, upd7220->ead);
 			}
@@ -1425,18 +1442,18 @@ ROM_END
     ADDRESS_MAP( upd7220 )
 -------------------------------------------------*/
 
-READ16_DEVICE_HANDLER( upd7220_vram_r )
+READ8_DEVICE_HANDLER( upd7220_vram_r )
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	return upd7220->vram[offset];
 }
 
-WRITE16_DEVICE_HANDLER( upd7220_vram_w )
+WRITE8_DEVICE_HANDLER( upd7220_vram_w )
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
-	COMBINE_DATA(&upd7220->vram[offset]);
+	upd7220->vram[offset] = data;
 }
 
 /*-------------------------------------------------
@@ -1525,7 +1542,7 @@ DEVICE_GET_INFO( upd7220 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd7220_t);						break;
-		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 16;										break;
+		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 8;										break;
 		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 18;										break;
 		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = -1;										break;
 
@@ -1533,7 +1550,7 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(upd7220);				break;
 
 		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = NULL; 						break;
+		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map8 = NULL; 							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd7220);			break;
