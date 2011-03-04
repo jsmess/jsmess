@@ -490,7 +490,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		device_t *devconf = space->machine->device(MDA_MC6845_NAME);
+		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:

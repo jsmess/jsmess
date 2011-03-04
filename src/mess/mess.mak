@@ -1275,12 +1275,12 @@ $(MESSOBJ)/pitronic.a:			\
 
 $(MESSOBJ)/pc.a:				\
 	$(MESS_VIDEO)/pc_aga.o		\
-	$(MESS_MACHINE)/ibmpc.o		\
 	$(MESS_MACHINE)/tandy1t.o	\
 	$(MESS_MACHINE)/amstr_pc.o	\
 	$(MESS_MACHINE)/europc.o	\
 	$(MESS_MACHINE)/pc.o		\
 	$(MESS_DRIVERS)/pc.o		\
+	$(MESS_DRIVERS)/genpc.o		\
 	$(MESS_VIDEO)/pc_t1t.o		\
 
 $(MESSOBJ)/pcm.a:				\
