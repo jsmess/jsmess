@@ -1395,85 +1395,10 @@ static const gfx_layout pc_8_charlayout =
 	8*8					/* every char takes 8 bytes */
 };
 
-static const cassette_config ibm5150_cassette_config =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 static GFXDECODE_START( ibm5150 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 3, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
-
-static MACHINE_CONFIG_START( ibm5150, pc_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
-	MCFG_CPU_PROGRAM_MAP(pc8_map)
-	MCFG_CPU_IO_MAP(pc8_io)
-	MCFG_CPU_CONFIG(i86_address_mask)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
-
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
-
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
-
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
-
-	MCFG_I8255A_ADD( "ppi8255", ibm5150_ppi8255_interface )
-
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
-
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
-
-	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
-
-	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
-	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
-
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
-
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( pccga, pc_state )
@@ -1666,67 +1591,6 @@ static MACHINE_CONFIG_START( europc, pc_state )
 #endif
 
 	MCFG_NVRAM_HANDLER( europc_rtc )
-
-	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
-
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( ibm5160, pc_state )
-	/* basic machine hardware */
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3, pc_frame_interrupt)
-
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
-
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
-
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
-
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
-
-	MCFG_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
-
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
-
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
-
-	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -2138,6 +2002,14 @@ MACHINE_CONFIG_END
 static GFXDECODE_START( ibmpcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
+
+static const cassette_config ibm5150_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
+};
 
 static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	/* basic machine hardware */
@@ -3208,16 +3080,13 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,    0,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1982,	ibm5155,    ibm5150,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5155" , 0)
-COMP(  1985,	ibm5140,    ibm5150,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5140 Convertible" , GAME_NOT_WORKING)
-COMP(  1984,	dgone,      ibm5150,	0,	pccga,      pccga,	pccga,	"Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bw230,      ibm5150,	0,	pccga,	bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
-COMP(  1988,	europc,     ibm5150,	0,	europc,     europc,	europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+/*     YEAR     NAME        PARENT      COMPAT  	MACHINE     INPUT       INIT        COMPANY     FULLNAME */
+COMP(  1984,	dgone,      ibm5150,	0,	pccga,  	pccga,		pccga,	"Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1985,	bw230,      ibm5150,	0,	pccga,		bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
+COMP(  1988,	europc,     ibm5150,	0,	europc, 	europc,		europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr, 	tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
 COMP(  1985,	ibmpcjx,    ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
 
 // tandy 1000
@@ -3227,11 +3096,10 @@ COMP(  1987,	t1000tx,    ibm5150,	0,	t1000_286,  tandy1t,	t1000hx,    "Tandy Rad
 COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000 RL", 0)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,    ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,      ibm5150,	0,	pc200,	pc200,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,       ibm5150,	0,	pc200,	pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,	pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,	pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1988,	pc200,      ibm5150,	0,	pc200,		pc200,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
 COMP(  1986,	pc1512,     ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
 COMP(  198?,	pc1512v2,   ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
 COMP(  1987,	pc1640,     ibm5150,	0,	pc1640,     pc1640,	pc1640,	"Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
@@ -3243,11 +3111,11 @@ COMP ( 1987,	ec1841,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1
 COMP ( 1989,	ec1845,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1845" , GAME_NOT_WORKING)
 COMP ( 1989,	mk88,       ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "MK-88" , GAME_NOT_WORKING)
 COMP ( 1990,	poisk1,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Poisk-1" , GAME_NOT_WORKING)
-COMP ( 1991,	poisk2,     ibm5150,	0,	poisk2,	pccga,	pccga,	"<unknown>",  "Poisk-2" , GAME_NOT_WORKING)
-COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "Elektronika MC-1702" , GAME_NOT_WORKING)
-COMP ( 19??,	mc1502,     ibm5150,	0,	mc1502,	pccga,	pccga,	"<unknown>",  "Elektronika MC-1502" , GAME_NOT_WORKING)
+COMP ( 1991,	poisk2,     ibm5150,	0,	poisk2,		pccga,	pccga,	"<unknown>",  "Poisk-2" , GAME_NOT_WORKING)
+COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,		pccga,	pccga,	"<unknown>",  "Elektronika MC-1702" , GAME_NOT_WORKING)
+COMP ( 19??,	mc1502,     ibm5150,	0,	mc1502,		pccga,	pccga,	"<unknown>",  "Elektronika MC-1502" , GAME_NOT_WORKING)
 
-COMP(  1987,	zdsupers,   ibm5150,	0,	zenith,	pccga,	pccga,	"Zenith Data Systems",  "SuperSport" , 0)
+COMP(  1987,	zdsupers,   ibm5150,	0,	zenith,		pccga,	pccga,	"Zenith Data Systems",  "SuperSport" , 0)
 
-COMP ( 1983,	m24,        ibm5150,	0,	olivetti,pccga,	pccga,	"Olivetti",  "M24" , GAME_NOT_WORKING)
-COMP ( 1987,	m240,        ibm5150,	0,	olivetti,pccga,	pccga,	"Olivetti",  "M240" , GAME_NOT_WORKING)
+COMP ( 1983,	m24,        ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M24" , GAME_NOT_WORKING)
+COMP ( 1987,	m240,        ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M240" , GAME_NOT_WORKING)

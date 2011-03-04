@@ -11,7 +11,6 @@
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 #include "sound/speaker.h"
-#include "sound/saa1099.h"
 
 #include "machine/i8255a.h"
 #include "machine/ins8250.h"
@@ -28,7 +27,6 @@
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "audio/sblaster.h"
 #include "includes/pc_mouse.h"
 
 #include "machine/pcshare.h"
@@ -49,34 +47,6 @@
 #include "machine/ram.h"
 
 #include "machine/isa.h"
-
-#define ym3812_StdClock 3579545
-
-/*
-  adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
-  soundblaster: YM3812 also accessible at 0x228/9 (address jumperable)
-  soundblaster pro version 1: 2 YM3812 chips
-   at 0x388 both accessed,
-   at 0x220/1 left?, 0x222/3 right? (jumperable)
-  soundblaster pro version 2: 1 OPL3 chip
-
-  pro audio spectrum +: 2 OPL2
-  pro audio spectrum 16: 1 OPL3
- */
-#define ADLIB	/* YM3812/OPL2 Chip */
-/*
-  creative labs game blaster (CMS creative music system)
-  2 x saa1099 chips
-  also on sound blaster 1.0
-  option on sound blaster 1.5
-
-  jumperable? normally 0x220
-*/
-#define GAMEBLASTER
-
-
-// IO Expansion, only a little bit for ibm bios self tests
-//#define EXP_ON
 
 static ADDRESS_MAP_START( pc8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -108,9 +78,6 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE( pc_nmi_enable_w )
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
-#ifdef EXP_ON
-	AM_RANGE(0x0210, 0x0217) AM_READWRITE(pc_EXP_r,				pc_EXP_w)
-#endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc_rtc_r,				pc_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_r, ins8250_w)
@@ -119,41 +86,11 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE("lpt_1", pc_lpt_r, pc_lpt_w)
-#ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE("ym3812", ym3812_status_port_r,ym3812_control_port_w)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE("ym3812", ym3812_write_port_w)
-#endif
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
-
-
-static READ16_DEVICE_HANDLER( pc16_388_r )
-{
-	if ( ACCESSING_BITS_0_7 )
-	{
-		return 0xFF;
-	}
-	else
-	{
-		return ym3812_status_port_r( device, offset );
-	}
-}
-
-
-static WRITE16_DEVICE_HANDLER( pc16_388_w )
-{
-	if ( ACCESSING_BITS_0_7 )
-	{
-		ym3812_write_port_w( device, offset, data );
-	}
-	else
-	{
-		ym3812_control_port_w( device, offset, data );
-	}
-}
 
 
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
@@ -162,25 +99,17 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8( pc_nmi_enable_w, 0x00ff )
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
-#ifdef EXP_ON
-	AM_RANGE(0x0210, 0x0217) AM_READWRITE(pc_EXP_r,					pc_EXP_w)
-#endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
-	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
-#ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_DEVREADWRITE("ym3812", pc16_388_r, pc16_388_w )
-#endif
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffff)
@@ -429,17 +358,6 @@ INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
 
-#if defined(ADLIB)
-/* irq line not connected to pc on adlib cards (and compatibles) */
-static void pc_irqhandler(device_t *device, int linestate) {}
-
-static const ym3812_interface pc_ym3812_interface =
-{
-	pc_irqhandler
-};
-#endif
-
-
 static const pc_lpt_interface pc_lpt_config =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
@@ -496,8 +414,6 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)
 
@@ -523,17 +439,6 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -587,17 +492,6 @@ static MACHINE_CONFIG_START( pcherc, pc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -650,17 +544,6 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -713,17 +596,6 @@ static MACHINE_CONFIG_START( xtvga, pc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)

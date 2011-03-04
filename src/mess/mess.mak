@@ -1281,6 +1281,7 @@ $(MESSOBJ)/pc.a:				\
 	$(MESS_MACHINE)/pc.o		\
 	$(MESS_DRIVERS)/pc.o		\
 	$(MESS_DRIVERS)/genpc.o		\
+	$(MESS_DRIVERS)/ibmpc.o		\
 	$(MESS_VIDEO)/pc_t1t.o		\
 
 $(MESSOBJ)/pcm.a:				\
