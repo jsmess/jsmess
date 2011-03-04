@@ -169,6 +169,8 @@ Currently known: (probably exist for all the standard codepages)
 #include "machine/kb_keytro.h"
 #include "machine/ram.h"
 
+#include "machine/isa.h"
+
 #define ym3812_StdClock 3579545
 
 /*
@@ -1558,11 +1560,6 @@ static const gfx_layout pc_8_charlayout =
 	8*8					/* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pcmda )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 1, 1 )
-GFXDECODE_END
-
 static MACHINE_CONFIG_START( pcmda, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 4772720)
@@ -1588,9 +1585,10 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_mda )
-	MCFG_GFXDECODE(pcmda)
+	MCFG_PALETTE_LENGTH( 256 )
+		
+	MCFG_ISA8_BUS_ADD("isa","maincpu")
+	MCFG_ISA8_BUS_DEVICE("isa", 0, "mda", ISA8_MDA)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1629,10 +1627,6 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 MACHINE_CONFIG_END
 
 
-static GFXDECODE_START( pcherc )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
-GFXDECODE_END
-
 static MACHINE_CONFIG_START( pcherc, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 4772720)
@@ -1656,9 +1650,10 @@ static MACHINE_CONFIG_START( pcherc, pc_state )
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_hercules )
-	MCFG_GFXDECODE(pcherc)
+	MCFG_PALETTE_LENGTH( 256 )	
+	
+	MCFG_ISA8_BUS_ADD("isa","maincpu")
+	MCFG_ISA8_BUS_DEVICE("isa", 0, "hercules", ISA8_HERCULES)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2962,10 +2957,6 @@ ROM_START( pcmda )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 
@@ -2973,8 +2964,6 @@ ROM_START( pcherc )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
-	ROM_REGION(0x1000,"gfx1", 0)
-	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
 ROM_END
 
 
