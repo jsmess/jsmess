@@ -22,7 +22,6 @@
 
 #include "video/pc_vga.h"
 #include "video/pc_cga.h"
-#include "video/pc_mda.h"
 #include "video/pc_t1t.h"
 
 #include "machine/pit8253.h"

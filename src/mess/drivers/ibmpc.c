@@ -95,7 +95,6 @@ Currently known: (probably exist for all the standard codepages)
 #include "machine/pit8253.h"
 #include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
-#include "video/pc_mda.h"
 #include "video/pc_ega.h"
 
 #include "includes/pc_ide.h"

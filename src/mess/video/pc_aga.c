@@ -8,7 +8,6 @@
 #include "memconv.h"
 #include "video/pc_aga.h"
 #include "video/pc_cga.h"
-#include "video/pc_mda.h"
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
 #include "video/cgapal.h"
