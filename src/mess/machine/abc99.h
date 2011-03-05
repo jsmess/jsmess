@@ -106,7 +106,7 @@ private:
 	static const device_timer_id TIMER_MOUSE = 1;
 
 	inline void serial_input();
-	inline void serial_output();
+	inline void serial_output(int state);
 	inline void serial_clock();
 	inline void key_down(int state);
 	inline void scan_mouse();
@@ -125,8 +125,7 @@ private:
 	int m_si;
 	int m_so;
 	int m_keydown;
-	int m_so_z2;
-	int m_so_z5;
+	int m_si_z2;
 	int m_si_en;
 	int m_t1_z2;
 	int m_t1_z5;

@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( abc99_z2_io, ADDRESS_SPACE_IO, 8, abc99_device )
 	AM_RANGE(0x3d, 0x3d) AM_READ_PORT("X13") AM_WRITENOP
 	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("X14") AM_WRITENOP
 	AM_RANGE(0x3f, 0x3f) AM_READ_PORT("X15") AM_WRITENOP
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z2_bus_w)
+//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z2_bus_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z2_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVREAD(DEVICE_SELF_OWNER, abc99_device, z2_p2_r)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD(DEVICE_SELF_OWNER, abc99_device, z2_t0_r)
@@ -470,9 +470,7 @@ const input_port_token *abc99_device_config::input_ports() const
 
 inline void abc99_device::serial_input()
 {
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si_en | m_si) ? CLEAR_LINE : ASSERT_LINE);
-	
-	cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si & m_si_z2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -480,14 +478,17 @@ inline void abc99_device::serial_input()
 //  serial_output -
 //-------------------------------------------------
 
-inline void abc99_device::serial_output()
+inline void abc99_device::serial_output(int state)
 {
-	int so = m_so_z2 & m_so_z5;
-	
-	if (m_so != so)
+	if (m_so != state)
 	{
-		devcb_call_write_line(&m_out_txd_func, so);
-		m_so = so;
+		m_so = state;
+
+		// serial output to ABC99
+		devcb_call_write_line(&m_out_txd_func, m_so);
+		
+		// serial output to mouse CPU
+		cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, (m_so | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -541,10 +542,10 @@ abc99_device::abc99_device(running_machine &_machine, const abc99_device_config 
 	  m_mousecpu(*this, I8035_Z5_TAG),
 	  m_speaker(*this, SPEAKER_TAG),
 	  m_si(1),
+	  m_si_en(0),
 	  m_so(1),
 	  m_keydown(0),
-	  m_so_z2(1),
-	  m_so_z5(1),
+	  m_si_z2(1),
       m_config(config)
 {
 }
@@ -558,7 +559,7 @@ void abc99_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz), 0, MCS48_ALE_CLOCK(XTAL_6MHz));
+	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz/3), 0, MCS48_ALE_CLOCK(XTAL_6MHz/3));
 
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 
@@ -641,8 +642,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	*/
 
 	// serial output
-	m_so_z2 = BIT(data, 0);
-	serial_output();
+	serial_output(BIT(data, 0));
 
 	// key down
 	key_down(!BIT(data, 1));
@@ -756,21 +756,21 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 		P23		
 		P24		disable Z2 serial input
 		P25		Z2 RESET
-		P26		serial output
+		P26		serial output to Z2
 		P27		Z2 T1
 		
 	*/
 
-	// disable keyboard CPU serial input
+	// disable mouse CPU serial input
 	m_si_en = BIT(data, 4);
-	serial_input();
+	cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, (m_so | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
 
 	// keyboard CPU reset
-	cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 
 	// serial output
-	m_so_z5 = BIT(data, 6);
-	serial_output();
+	m_si_z2 = BIT(data, 6);
+	serial_input();
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);
