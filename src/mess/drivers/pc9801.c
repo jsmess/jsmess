@@ -90,47 +90,6 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 	/* graphics */
 	upd7220_update(m_hgdc2, &bitmap, &cliprect);
-
-	/* TODO: for shared RAM writes, until we understand ... */
-	#if 0
-	{
-		//pc9801_state *state = screen->machine->driver_data<pc9801_state>();
-		int xi;
-		int res_x,res_y;
-		int x,y;
-		UINT8 pen;
-		UINT32 count;
-
-		count = 0;
-
-		for(y=0;y<200;y++)
-		{
-			for(x=0;x<40;x++)
-			{
-				for(xi=0;xi<16;xi++)
-				{
-					res_x = x * 16 + xi;
-					res_y = y;
-					UINT8 pen_b,pen_r,pen_g;
-
-					pen_b = (BITSWAP16(gvram[(count) + (0x00000/2) + (vram_disp*0x18000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
-					pen_r = (BITSWAP16(gvram[(count) + (0x08000/2) + (vram_disp*0x18000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
-					pen_g = (BITSWAP16(gvram[(count) + (0x10000/2) + (vram_disp*0x18000/2)],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7) >> xi) & 1;
-
-					pen = (pen_b) ? 1 : 0;
-					pen|= (pen_r) ? 2 : 0;
-					pen|= (pen_g) ? 4 : 0;
-
-					if(pen)
-						*BITMAP_ADDR16(&bitmap, res_y, res_x) = pen + 8;
-				}
-
-				count++;
-			}
-		}
-	}
-	#endif
-
 	upd7220_update(m_hgdc1, &bitmap, &cliprect);
 
 	return 0;
