@@ -1243,7 +1243,7 @@ INLINE void serial_receive(mcs51_state_t *mcs51_state)
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
 
-	if(GET_ES && GET_REN) {
+	if (GET_REN) {
 		switch(mode) {
 			//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 			case 0:
@@ -1809,12 +1809,11 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 {
 	/* From the manual:
      *
-     * <cite>In operatiom all the interrupt tlags are latched into the
-     * interrupt control system during State 5 of every ma-
-     * chine cycle. The samples are polled during the follow-
-     * ing machine cycle.</cite>
+     * <cite>In operation all the interrupt flags are latched into the
+     * interrupt control system during State 5 of every machine cycle.
+     * The samples are polled during the following machine cycle.</cite>
      *
-     * ==> Since we do not emulate substates, this assumes that the signal is present
+     * ==> Since we do not emulate sub-states, this assumes that the signal is present
      * for at least one cycle (12 states)
      *
      */
