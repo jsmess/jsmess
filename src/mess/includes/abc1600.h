@@ -155,14 +155,20 @@ public:
 	UINT8 m_cause;
 
 	// video
-	UINT8 *m_video_ram;
-	int m_vs;		// vertical sync
-	UINT16 m_sx;	// X size
-	UINT16 m_sy;	// Y size
-	UINT16 m_tx;	// X destination
-	UINT16 m_ty;	// Y destination
-	UINT16 m_fx;	// X source
-	UINT16 m_fy;	// Y source
+	UINT8 *m_video_ram;			// video RAM
+	int m_endisp;				// enable display
+	int m_clocks_disabled;		// clocks disabled
+	int m_vs;					// vertical sync
+	UINT16 m_wrm;				// video memory address
+	UINT8 m_ms[16];				// 
+	UINT8 m_ds[16];				// 
+	UINT8 m_flag;				// flags
+	UINT16 m_sx;				// X size
+	UINT16 m_sy;				// Y size
+	UINT16 m_tx;				// X destination
+	UINT16 m_ty;				// Y destination
+	UINT16 m_fx;				// X source
+	UINT16 m_fy;				// Y source
 };
 
 

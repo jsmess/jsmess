@@ -1256,8 +1256,6 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
-	save_pointer(NAME(m_video_ram), 512*1024);
-	save_item(NAME(m_vs));
 }
 
 
@@ -1267,7 +1265,12 @@ void abc1600_state::machine_start()
 
 void abc1600_state::machine_reset()
 {
+	// clear task register
 	m_task = 0;
+
+	// disable display
+	m_clocks_disabled = 1;
+	m_endisp = 0;
 }
 
 
