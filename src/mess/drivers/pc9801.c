@@ -110,9 +110,6 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		res_x = x + xi;
 		res_y = y;
 
-		if(res_x > 640 - 1 || res_y > 200 - 1) //TODO
-			continue;
-
 		pen = ((vram[address + (0x08000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
 		pen|= ((vram[address + (0x10000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
 		pen|= ((vram[address + (0x18000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
@@ -126,9 +123,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	pc9801_state *state = device->machine->driver_data<pc9801_state>();
 	int xi,yi;
 	int x;
+	UINT16 char_size,interlace_on;
 
 	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
+
+	interlace_on = lr >= 16; /* TODO: check the proper condition (a bank signal I presume) */
+	char_size = (interlace_on) ? 16 : 8;
 
 	for(x=0;x<pitch;x++)
 	{
@@ -156,12 +157,12 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				int res_x,res_y;
 
 				res_x = (x*8+xi) * (state->video_ff[WIDTH40_REG]+1);
-				res_y = y*8+yi;
+				res_y = y*lr+yi;
 
-				if(res_x > 640 || res_y > 200) //TODO
+				if(res_x > 640 || res_y > char_size*25) //TODO
 					continue;
 
-				tile_data = secret ? 0 : (state->m_char_rom[tile*8+yi]);
+				tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 
 				if(reverse) { tile_data^=0xff; }
 				if(u_line && yi == 7) { tile_data = 0xff; }
@@ -170,7 +171,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(cursor_addr == tile_addr) //TODO: also, cursor_on doesn't work?
 					tile_data^=0xff;
 
-				if(yi >= 8)
+				if(yi >= char_size)
 					pen = 0;
 				else
 					pen = (tile_data >> (7-xi) & 1) ? color : 0;
@@ -270,6 +271,42 @@ static WRITE8_HANDLER( pc9801_00_w )
 	else // odd
 	{
 		i8237_w(space->machine->device("dma8237"), (offset & 0x1e) >> 1, data);
+	}
+}
+
+static READ8_HANDLER( pc9801_20_r )
+{
+	if((offset & 1) == 0)
+	{
+		if(offset == 0)
+			printf("Read to RTC port [%02x]\n",offset+0x20);
+		else
+			printf("Read to undefined port [%02x]\n",offset+0x20);
+
+		return 0xff;
+	}
+	else // odd
+	{
+		printf("Read to undefined port [%02x]\n",offset+0x20);
+		return 0xff;
+	}
+}
+
+static WRITE8_HANDLER( pc9801_20_w )
+{
+	if((offset & 1) == 0)
+	{
+		if(offset == 0)
+			printf("Write to RTC port [%02x] <- %02x\n",offset+0x20,data);
+		else
+			printf("Write to undefined port [%02x] <- %02x\n",offset+0x20,data);
+	}
+	else // odd
+	{
+		pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
+		state->dma_offset[0][((offset >> 1)+1) & 3] = data & 0x0f;
 	}
 }
 
@@ -733,7 +770,7 @@ ADDRESS_MAP_END
 /* first device is even offsets, second one is odd offsets */
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,pc9801_00_w,0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-//  AM_RANGE(0x0020, 0x0027) RTC / DMA registers (LS244)
+	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,pc9801_20_w,0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801_30_r,pc9801_30_w,0xffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,pc9801_40_w,0xffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0050, 0x0057) AM_READWRITE8(pc9801_50_r,pc9801_50_w,0xffff) // NMI FF / i8255 floppy port (2d?)
@@ -949,12 +986,56 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) //jumps to daa00 if off, presumably some card booting
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "Text width" )
 	PORT_DIPSETTING(    0x04, "40 chars/line" )
 	PORT_DIPSETTING(    0x00, "80 chars/line" )
 	PORT_DIPNAME( 0x08, 0x00, "Text height" )
 	PORT_DIPSETTING(    0x08, "20 lines/screen" )
 	PORT_DIPSETTING(    0x00, "25 lines/screen" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // error beep if OFF
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Interlace mode" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2dd BIOS" )
@@ -968,12 +1049,23 @@ INPUT_PORTS_END
 static const gfx_layout charset_8x8 =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	256,
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
+};
+
+static const gfx_layout charset_8x16 =
+{
+	8,16,
+	256,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16
 };
 
 static const gfx_layout charset_16x16 =
@@ -989,6 +1081,7 @@ static const gfx_layout charset_16x16 =
 
 static GFXDECODE_START( pc9801 )
 	GFXDECODE_ENTRY( "chargen", 0x00000, charset_8x8,     0x000, 0x01 )
+	GFXDECODE_ENTRY( "chargen", 0x00800, charset_8x16,     0x000, 0x01 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, charset_16x16,   0x000, 0x01 )
 GFXDECODE_END
 
@@ -1111,14 +1204,14 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { printf("%02x 3\n",state); set_d
 
 static READ8_DEVICE_HANDLER( test_r )
 {
-	//printf("DACK R\n");
+	printf("2dd DACK R\n");
 
 	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( test_w )
 {
-	//printf("DACK W\n");
+	printf("2dd DACK W\n");
 }
 
 static I8237_INTERFACE( dma8237_config )
@@ -1138,16 +1231,8 @@ static I8237_INTERFACE( dma8237_config )
 *
 ****************************************/
 
-static READ8_DEVICE_HANDLER( ppi_sys_porta_r )
-{
-	/*
-    ---- x--- lines 20 (1) / 25 (0)
-    ---- -x-- width 40 (1) / width 80 (0)
-    ---- ---x jumps to daa00 if off?
-    */
-
-	return 0xe3 | input_port_read(device->machine,"DSW1");
-}
+static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return input_port_read(device->machine,"DSW1"); }
+static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return input_port_read(device->machine,"DSW2"); }
 
 static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 {
@@ -1157,7 +1242,7 @@ static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 static I8255A_INTERFACE( ppi_system_intf )
 {
 	DEVCB_HANDLER(ppi_sys_porta_r),					/* Port A read */
-	DEVCB_NULL,					/* Port B read */
+	DEVCB_HANDLER(ppi_sys_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
 	DEVCB_NULL,					/* Port B write */
@@ -1405,11 +1490,9 @@ ROM_START( pc9801f )
 	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected thru a i8251 UART, needs decapping
 
 	/* note: ROM names of following two might be swapped */
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x1800, "chargen", 0 )
 	ROM_LOAD( "d23128c-17.bin", 0x00000, 0x00800, BAD_DUMP CRC(eea57180) SHA1(4aa037c684b72ad4521212928137d3369174eb1e) ) //original is a bad dump, this is taken from i386 model
-
-	ROM_REGION( 0x8000, "unk_gfx", 0)
-	ROM_LOAD("hn613128pac8.bin", 0x0000, 0x4000, NO_DUMP ) //bad dump, dunno what this is supposed to be (it's on the kanji board)
+	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) ) //bad dump, 8x16 charset? (it's on the kanji board)
 
 	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
