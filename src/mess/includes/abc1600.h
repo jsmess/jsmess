@@ -166,8 +166,8 @@ public:
 	int m_vs;					// vertical sync
 	UINT16 m_gmdi;				// video RAM data latch
 	UINT16 m_wrm;				// write mask latch
-	UINT8 m_ms[16];				// 
-	UINT8 m_ds[16];				// 
+	UINT8 m_ms[16];				// mover sequence control
+	UINT8 m_ds[16];				// display sequence control
 	UINT8 m_flag;				// flags
 	UINT16 m_sx;				// X size
 	UINT16 m_sy;				// Y size

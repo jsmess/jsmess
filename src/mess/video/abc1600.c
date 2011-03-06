@@ -2,7 +2,6 @@
 
     TODO:
 
-	- mc6845 row/column addressing mode
 	- position image based on vsync/hsync
 	- FRAME POL
 	- landscape/portrait mode
@@ -111,7 +110,7 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 
 		UINT8 gmdo = m_video_ram[addr];
 		UINT8 gmdi = m_gmdi & 0xff;
-		UINT8 mask = m_wrm & 0xff;
+		UINT8 mask = 0xff;//m_wrm & 0xff;
 
 		m_video_ram[addr] = (gmdi & mask) | (gmdo & (mask ^ 0xff));
 
@@ -134,7 +133,7 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 
 		UINT8 gmdo = m_video_ram[addr];
 		UINT8 gmdi = m_gmdi >> 8;
-		UINT8 mask = m_wrm >> 8;
+		UINT8 mask = 0xff;//m_wrm >> 8;
 
 		m_video_ram[addr] = (gmdi & mask) | (gmdo & (mask ^ 0xff));
 
@@ -258,11 +257,11 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			bit		description
 
 			0		MOVE CYK CLK
-			1		DISP CYK PRE FETCH / DISP CYC SEL
+			1		DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
 			2		DATA CLK
 			3		_DISP MEM WE
 			4		_CAS HB
-			5		DTACK CLK
+			5		DTACK CLK / BLANK TEST (+2 PIXCLK)
 			6		DISPREC CLK
 			7		_RAS HB
 
@@ -282,11 +281,11 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			bit		description
 
 			0		MOVE CYK CLK
-			1		DISP CYK PRE FETCH / DISP CYC SEL
+			1		DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
 			2		DATA CLK
 			3		_DISP MEM WE
 			4		_CAS HB
-			5		DTACK CLK
+			5		DTACK CLK / BLANK TEST (+2 PIXCLK)
 			6		DISPREC CLK
 			7		_RAS HB
 
@@ -391,45 +390,50 @@ inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 
 		CRTCA0		0
 		CRTCA1		0
-		CRTCA2		MA1
-		CRTCA3		MA2
-		CRTCA4		MA3
-		CRTCA5		MA4
+		CRTCA2		CC1/MA1
+		CRTCA3		CC2/MA2
+		CRTCA4		CC3/MA3
+		CRTCA5		CC4/MA4
 		CRTCA6		RA0
 		CRTCA7		RA1
 		CRTCA8		RA2
 		CRTCA9		RA3
-		CRTCA10		MA8
-		CRTCA11		MA9
-		CRTCA12		MA10
-		CRTCA13		MA11
-		CRTCA14		MA12
-		CRTCA15		MA13
+		CRTCA10		CR0/MA8
+		CRTCA11		CR1/MA9
+		CRTCA12		CR2/MA10
+		CRTCA13		CR3/MA11
+		CRTCA14		CR4/MA12
+		CRTCA15		CR5/MA13
 
 	*/
 
-	UINT16 new_ma = ma + (column * 2);
+	UINT8 cc = (ma & 0xff) + column;
+	UINT8 cr = ma >> 8;
 
-	return ((new_ma << 2) & 0xfc00) | (ra & 0x0f) << 6 | ((new_ma << 1) & 0x3c);
+	return (cr << 10) | ((ra & 0x0f) << 6) | ((cc << 1) & 0x3c);
 }
 
 void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-	for (int column = 0; column < x_count; column++)
+	int x = 0;
+
+	for (int column = 0; column < x_count; column += 2)
 	{
 		UINT16 dma = get_crtca(ma, ra, column);
-		UINT16 gmdo = (m_video_ram[dma] << 8) | m_video_ram[dma + 1];
 
-		//logerror("Y %u col %u DMA %04x:%04x\n", y, column, dma, gmdo);
-
-		for (int bit = 0; bit < 16; bit++)
+		// data is read out of video RAM in nibble mode by strobing CAS 4 times
+		for (int cas = 0; cas < 4; cas++)
 		{
-			int x = (column * 16) + bit;
-			int color = (BIT(gmdo, 15) ^ PIX_POL) & !BLANK;
-
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			UINT8 data = m_video_ram[dma + cas];
 			
-			gmdo <<= 1;
+			for (int bit = 0; bit < 8; bit++)
+			{
+				int color = (BIT(data, 7) ^ PIX_POL) & !BLANK;
+
+				*BITMAP_ADDR16(bitmap, y, x++) = color;
+			
+				data <<= 1;
+			}
 		}
 	}
 }
@@ -452,7 +456,7 @@ static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 static const mc6845_interface crtc_intf =
 {
 	SCREEN_TAG,
-	8,
+	32,
 	NULL,
 	abc1600_update_row,
 	NULL,
@@ -472,6 +476,7 @@ void abc1600_state::video_start()
 {
 	// allocate video RAM
 	m_video_ram = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	memset(m_video_ram, 0, VIDEORAM_SIZE);
 
 	// state saving
 	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
