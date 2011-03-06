@@ -21,6 +21,7 @@
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
+#include "machine/upd1990a.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
@@ -298,7 +299,16 @@ static WRITE8_HANDLER( pc9801_20_w )
 	if((offset & 1) == 0)
 	{
 		if(offset == 0)
-			printf("Write to RTC port [%02x] <- %02x\n",offset+0x20,data);
+		{
+			upd1990a_c0_w(space->machine->device("upd1990a"),      (data & 0x01) >> 0);
+			upd1990a_c1_w(space->machine->device("upd1990a"),      (data & 0x02) >> 1);
+			upd1990a_c2_w(space->machine->device("upd1990a"),      (data & 0x04) >> 2);
+			upd1990a_stb_w(space->machine->device("upd1990a"),     (data & 0x08) >> 3);
+			upd1990a_clk_w(space->machine->device("upd1990a"),     (data & 0x10) >> 4);
+			upd1990a_data_in_w(space->machine->device("upd1990a"), (data & 0x20) >> 5);
+			if(data & 0xc0)
+				printf("RTC write to undefined bits %02x\n",data & 0xc0);
+		}
 		else
 			printf("Write to undefined port [%02x] <- %02x\n",offset+0x20,data);
 	}
@@ -990,10 +1000,8 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // error beep if OFF
+	PORT_BIT(0x01, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_r)
+	PORT_DIPNAME( 0x02, 0x00, "DSW1" ) // error beep if OFF
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
@@ -1331,6 +1339,11 @@ static const floppy_config pc9801_floppy_config =
 	NULL
 };
 
+static UPD1990A_INTERFACE( pc9801_upd1990a_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 /****************************************
 *
@@ -1358,12 +1371,17 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
+static MACHINE_START(pc9801)
+{
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+
+	upd1990a_cs_w(machine->device("upd1990a"), 1);
+	upd1990a_oe_w(machine->device("upd1990a"), 1);
+}
 
 static MACHINE_RESET(pc9801)
 {
 	pc9801_state *state = machine->driver_data<pc9801_state>();
-
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
@@ -1432,6 +1450,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9801_io)
 	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
+	MCFG_MACHINE_START(pc9801)
 	MCFG_MACHINE_RESET(pc9801)
 
 	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
@@ -1441,6 +1460,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255A_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255A_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255A_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
 	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_config)

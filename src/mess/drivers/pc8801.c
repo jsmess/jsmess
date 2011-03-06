@@ -871,11 +871,7 @@ static READ8_HANDLER( pc8801_ctrl_r )
     ---- --x- monitor refresh rate DIP-SW
     ---- ---x (pbsy?)
     */
-	UINT8 cdo;
-
-	cdo = (upd1990a_data_out_r(space->machine->device("upd1990a")) & 1) << 4;
-
-	return input_port_read(space->machine, "CTRL") | cdo;
+	return input_port_read(space->machine, "CTRL");
 }
 
 static WRITE8_HANDLER( pc8801_ctrl_w )
@@ -1709,7 +1705,8 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPNAME( 0x08, 0x08, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_VBLANK )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CFG")		/* EXSWITCH */
