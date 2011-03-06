@@ -1,3 +1,15 @@
+/*
+
+    TODO:
+
+	- mc6845 row/column addressing mode
+	- position image based on vsync/hsync
+	- FRAME POL
+	- landscape/portrait mode
+	- mover
+
+*/
+
 #include "includes/abc1600.h"
 
 
@@ -6,7 +18,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define VIDEORAM_SIZE	128*1024
+#define VIDEORAM_SIZE	512*1024
 
 // flag register
 #define L_P			BIT(m_flag, 0)
@@ -62,6 +74,76 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
+//  video_ram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::video_ram_r )
+{
+	UINT32 addr = offset & 0x7ffff;
+	UINT8 data = m_video_ram[addr];
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  video_ram_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc1600_state::video_ram_w )
+{
+	UINT32 addr = offset & 0x7ffff;
+
+	if (offset & 0x01)
+	{
+		if (REPLACE)
+		{
+			// WRPORT_LB
+			m_wrm = (m_wrm & 0xff00) | data;
+			logerror("WRM LB %04x\n", m_wrm);
+		}
+		else
+		{
+			// DATAPORT_LB
+			m_gmdi = (m_gmdi & 0xff00) | data;
+			logerror("GMDI LB %04x\n", m_gmdi);
+		}
+
+		UINT8 gmdo = m_video_ram[addr];
+		UINT8 gmdi = m_gmdi & 0xff;
+		UINT8 mask = m_wrm & 0xff;
+
+		m_video_ram[addr] = (gmdi & mask) | (gmdo & (mask ^ 0xff));
+
+		logerror("Video RAM write LB to %05x : %02x\n", addr, m_video_ram[addr]);
+	}
+	else
+	{
+		if (REPLACE)
+		{
+			// WRPORT_HB
+			m_wrm = (data << 8) | (m_wrm & 0xff);
+			logerror("WRM HB %04x\n", m_wrm);
+		}
+		else
+		{
+			// DATAPORT_HB
+			m_gmdi = (data << 8) | (m_gmdi & 0xff);
+			logerror("GMDI HB %04x\n", m_gmdi);
+		}
+
+		UINT8 gmdo = m_video_ram[addr];
+		UINT8 gmdi = m_gmdi >> 8;
+		UINT8 mask = m_wrm >> 8;
+
+		m_video_ram[addr] = (gmdi & mask) | (gmdo & (mask ^ 0xff));
+
+		logerror("Video RAM write HB to %05x : %02x\n", addr, m_video_ram[addr]);
+	}
+}
+
+
+//-------------------------------------------------
 //  iord0_r -
 //-------------------------------------------------
 
@@ -101,34 +183,42 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	{
 	case LDSX_HB:
 		m_sx = (data << 8) | (m_sx & 0xff);
+		logerror("SX HB %04x\n", m_sx);
 		break;
 		
 	case LDSX_LB:
 		m_sx = (m_sx & 0xff00) | data;
+		logerror("SX LB %04x\n", m_sx);
 		break;
 		
 	case LDSY_HB:
 		m_sy = (data << 8) | (m_sy & 0xff);
+		logerror("SY HB %04x\n", m_sy);
 		break;
 		
 	case LDSY_LB:
 		m_sy = (m_sy & 0xff00) | data;
+		logerror("SY LB %04x\n", m_sy);
 		break;
 		
 	case LDTX_HB:
 		m_tx = (data << 8) | (m_tx & 0xff);
+		logerror("TX HB %04x\n", m_tx);
 		break;
 		
 	case LDTX_LB:
 		m_tx = (m_tx & 0xff00) | data;
+		logerror("TX LB %04x\n", m_tx);
 		break;
 
 	case LDTY_HB:
 		m_ty = (data << 8) | (m_ty & 0xff);
+		logerror("TY HB %04x\n", m_ty);
 		break;
 
 	case LDTY_LB:
 		m_ty = (m_ty & 0xff00) | data;
+		logerror("TY LB %04x\n", m_ty);
 		break;
 	}
 }
@@ -144,18 +234,22 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	{
 	case LDFX_HB:
 		m_fx = (data << 8) | (m_fx & 0xff);
+		logerror("FX HB %04x\n", m_fx);
 		break;
 		
 	case LDFX_LB:
 		m_fx = (m_fx & 0xff00) | data;
+		logerror("FX LB %04x\n", m_fx);
 		break;
 		
 	case LDFY_HB:
 		m_fy = (data << 8) | (m_fy & 0xff);
+		logerror("FY HB %04x\n", m_fy);
 		break;
 		
 	case LDFY_LB:
 		m_fy = (m_fy & 0xff00) | data;
+		logerror("FY LB %04x\n", m_fy);
 		break;
 		
 	case WRML:
@@ -215,17 +309,20 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 WRITE8_MEMBER( abc1600_state::iowr2_w )
 {
-	switch (data & 0x07)
+	switch (offset & 0x07)
 	{
 	case WRMASK_STROBE_HB:
 		if (REPLACE)
 		{
 			// DATAPORT_HB
+			m_gmdi = (data << 8) | (m_gmdi & 0xff);
+			logerror("GMDI HB %04x\n", m_gmdi);
 		}
 		else
 		{
 			// WRPORT_HB
 			m_wrm = (data << 8) | (m_wrm & 0xff);
+			logerror("WRM HB %04x\n", m_gmdi);
 		}
 		break;
 		
@@ -233,11 +330,14 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 		if (REPLACE)
 		{
 			// DATAPORT_LB
+			m_gmdi = (m_gmdi & 0xff00) | data;
+			logerror("GMDI LB %04x\n", m_gmdi);
 		}
 		else
 		{
 			// WRPORT_LB
 			m_wrm = (m_wrm & 0xff00) | data;
+			logerror("WRM LB %04x\n", m_gmdi);
 		}
 		break;
 
@@ -263,6 +363,7 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 		*/
 
 		m_flag = data;
+		logerror("FLAG %02x\n", m_flag);
 		break;
 		
 	case ENDISP:
@@ -282,10 +383,61 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
+inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
+{
+	/*
+		
+		bit			description
+
+		CRTCA0		0
+		CRTCA1		0
+		CRTCA2		MA1
+		CRTCA3		MA2
+		CRTCA4		MA3
+		CRTCA5		MA4
+		CRTCA6		RA0
+		CRTCA7		RA1
+		CRTCA8		RA2
+		CRTCA9		RA3
+		CRTCA10		MA8
+		CRTCA11		MA9
+		CRTCA12		MA10
+		CRTCA13		MA11
+		CRTCA14		MA12
+		CRTCA15		MA13
+
+	*/
+
+	UINT16 new_ma = ma + (column * 2);
+
+	return ((new_ma << 2) & 0xfc00) | (ra & 0x0f) << 6 | ((new_ma << 1) & 0x3c);
+}
+
+void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+{
+	for (int column = 0; column < x_count; column++)
+	{
+		UINT16 dma = get_crtca(ma, ra, column);
+		UINT16 gmdo = (m_video_ram[dma] << 8) | m_video_ram[dma + 1];
+
+		//logerror("Y %u col %u DMA %04x:%04x\n", y, column, dma, gmdo);
+
+		for (int bit = 0; bit < 16; bit++)
+		{
+			int x = (column * 16) + bit;
+			int color = (BIT(gmdo, 15) ^ PIX_POL) & !BLANK;
+
+			*BITMAP_ADDR16(bitmap, y, x) = color;
+			
+			gmdo <<= 1;
+		}
+	}
+}
+
 static MC6845_UPDATE_ROW( abc1600_update_row )
 {
-	// MA13-MA8, RA3-RA0, MA4-MA1, 0, 0
-	//UINT16 dma = ((ma << 2) & 0xfc00) | (ra & 0x0f) << 6 | ((ma << 1) & 0x1c);
+	abc1600_state *state = device->machine->driver_data<abc1600_state>();
+	state->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 }
 
 WRITE_LINE_MEMBER( abc1600_state::vs_w )
@@ -326,6 +478,7 @@ void abc1600_state::video_start()
 	save_item(NAME(m_endisp));
 	save_item(NAME(m_clocks_disabled));
 	save_item(NAME(m_vs));
+	save_item(NAME(m_gmdi));
 	save_item(NAME(m_wrm));
 	save_item(NAME(m_ms));
 	save_item(NAME(m_ds));
@@ -345,23 +498,13 @@ void abc1600_state::video_start()
 
 bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	mc6845_update(m_crtc, &bitmap, &cliprect);
-	
-	for (int y = 0; y < 1024; y++)
+	if (m_endisp)
 	{
-		UINT32 addr = y * 64;
-
-		for (int sx = 0; sx < 48; sx++)
-		{
-			UINT16 data = m_video_ram[addr] << 8 | m_video_ram[addr + 1];
-
-			for (int x = 0; x < 16; x++)
-			{
-				*BITMAP_ADDR16(&bitmap, y, (sx * 16) + x) = BIT(data, x);
-			}
-
-			addr += 2;
-		}
+		mc6845_update(m_crtc, &bitmap, &cliprect);
+	}
+	else
+	{
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
 	}
 
 	return 0;
@@ -380,6 +523,6 @@ MACHINE_CONFIG_FRAGMENT( abc1600_video )
     MCFG_SCREEN_SIZE(768, 1024)
     MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 1024-1)
     MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+    MCFG_PALETTE_INIT(monochrome_green)
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz/32, crtc_intf)
 MACHINE_CONFIG_END

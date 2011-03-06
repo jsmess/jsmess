@@ -115,6 +115,8 @@ public:
 	DECLARE_READ8_MEMBER( dma2_iorq_r );
 	DECLARE_WRITE8_MEMBER( dma2_iorq_w );
 
+	DECLARE_READ8_MEMBER( video_ram_r );
+	DECLARE_WRITE8_MEMBER( video_ram_w );
 	DECLARE_READ8_MEMBER( iord0_r );
 	DECLARE_WRITE8_MEMBER( iowr0_w );
 	DECLARE_WRITE8_MEMBER( iowr1_w );
@@ -142,6 +144,9 @@ public:
 	inline UINT8 dma_iorq_r(int index, UINT16 offset);
 	inline void dma_iorq_w(int index, UINT16 offset, UINT8 data);
 
+	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
+	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+
 	// memory access controller
 	UINT8 m_task;
 	UINT8 m_segment_ram[0x400];
@@ -159,7 +164,8 @@ public:
 	int m_endisp;				// enable display
 	int m_clocks_disabled;		// clocks disabled
 	int m_vs;					// vertical sync
-	UINT16 m_wrm;				// video memory address
+	UINT16 m_gmdi;				// video RAM data latch
+	UINT16 m_wrm;				// write mask latch
 	UINT8 m_ms[16];				// 
 	UINT8 m_ds[16];				// 
 	UINT8 m_flag;				// flags

@@ -111,7 +111,8 @@ UINT8 abc1600_state::read_ram(offs_t offset)
 	else if (offset < 0x180000)
 	{
 		// video RAM
-		data = m_video_ram[offset - 0x100000];
+		address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+		data = video_ram_r(*program, offset);
 	}
 	else
 	{
@@ -130,12 +131,15 @@ void abc1600_state::write_ram(offs_t offset, UINT8 data)
 {
 	if (offset < 0x100000)
 	{
+		// main RAM
 		UINT8 *ram = ram_get_ptr(m_ram);
 		ram[offset] = data;
 	}
 	else if (offset < 0x180000)
 	{
-		m_video_ram[offset - 0x100000] = data;
+		// video RAM
+		address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+		video_ram_w(*program, offset, data);
 	}
 	else
 	{
@@ -246,33 +250,33 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 	}
 	else if (offset >= 0x1ff800 && offset < 0x1ff900)
 	{
-		iowr0_w(*program, A2_A1_A0, data);
+		iowr0_w(*program, offset, data);
 	}
 	else if (offset >= 0x1ff900 && offset < 0x1ffa00)
 	{
-		iowr1_w(*program, A2_A1_A0, data);
+		iowr1_w(*program, offset, data);
 	}
 	else if (offset >= 0x1ffa00 && offset < 0x1ffb00)
 	{
-		iowr2_w(*program, A2_A1_A0, data);
+		iowr2_w(*program, offset, data);
 	}
 	else if (offset >= 0x1ffb00 && offset < 0x1ffc00)
 	{
 		if (!A7)
 		{
 			if (A0)
-				fw1_w(*program, 0, data);
+				fw1_w(*program, offset, data);
 			else
-				fw0_w(*program, 0, data);
+				fw0_w(*program, offset, data);
 		}
 	}
 	else if (offset >= 0x1ffd00 && offset < 0x1ffe00)
 	{
-		dmamap_w(*program, A2_A1_A0, data);
+		dmamap_w(*program, offset, data);
 	}
 	else if (offset >= 0x1ffe00 && offset < 0x1fff00)
 	{
-		en_spec_contr_reg_w(*program, 0, data);
+		en_spec_contr_reg_w(*program, offset, data);
 	}
 	else
 	{
