@@ -747,7 +747,7 @@ WRITE8_MEMBER( abc1600_state::dmamap_w )
 	
 	*/
 	
-	m_dmamap[offset] = data;
+	m_dmamap[offset & 7] = data;
 }
 
 
