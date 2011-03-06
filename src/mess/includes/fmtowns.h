@@ -85,6 +85,8 @@ class towns_state : public driver_device
 		  m_nvram(*this, "nvram") { }
 
 	UINT8 ftimer;
+	UINT16 freerun_timer;
+	emu_timer* towns_freerun_counter;
 	UINT8 nmi_mask;
 	UINT8 compat_mode;
 	UINT8 towns_system_port;

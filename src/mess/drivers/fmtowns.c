@@ -207,27 +207,30 @@ static void towns_init_serial_rom(running_machine* machine)
 static void towns_init_rtc(running_machine* machine)
 {
 	towns_state* state = machine->driver_data<towns_state>();
-	// for now, we'll just keep a static time stored here
+	system_time systm;
+
+	machine->base_datetime(systm);
+
 	// seconds
-	state->towns_rtc_reg[0] = 0;
-	state->towns_rtc_reg[1] = 3;
+	state->towns_rtc_reg[0] = systm.local_time.second % 10;
+	state->towns_rtc_reg[1] = systm.local_time.second / 10;
 	// minutes
-	state->towns_rtc_reg[2] = 2;
-	state->towns_rtc_reg[3] = 1;
+	state->towns_rtc_reg[2] = systm.local_time.minute % 10;
+	state->towns_rtc_reg[3] = systm.local_time.minute / 10;
 	// hours
-	state->towns_rtc_reg[4] = 8;
-	state->towns_rtc_reg[5] = 0;
+	state->towns_rtc_reg[4] = systm.local_time.hour % 10;
+	state->towns_rtc_reg[5] = systm.local_time.hour / 10;
 	// weekday
-	state->towns_rtc_reg[6] = 2;
+	state->towns_rtc_reg[6] = systm.local_time.weekday;
 	// day
-	state->towns_rtc_reg[7] = 1;
-	state->towns_rtc_reg[8] = 1;
+	state->towns_rtc_reg[7] = systm.local_time.mday % 10;
+	state->towns_rtc_reg[8] = systm.local_time.mday / 10;
 	// month
-	state->towns_rtc_reg[9] = 6;
-	state->towns_rtc_reg[10] = 0;
+	state->towns_rtc_reg[9] = systm.local_time.month % 10;
+	state->towns_rtc_reg[10] = systm.local_time.month / 10;
 	// year
-	state->towns_rtc_reg[11] = 9;
-	state->towns_rtc_reg[12] = 0;
+	state->towns_rtc_reg[11] = (systm.local_time.year - 2000) % 10;
+	state->towns_rtc_reg[12] = (systm.local_time.year - 2000) / 10;
 }
 
 static READ8_HANDLER(towns_system_r)
@@ -305,6 +308,12 @@ static WRITE8_HANDLER(towns_system_w)
 	}
 }
 
+static TIMER_CALLBACK(towns_freerun_inc)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	state->freerun_timer++;
+}
+
 static TIMER_CALLBACK(towns_wait_end)
 {
 	towns_state* state = machine->driver_data<towns_state>();
@@ -324,7 +333,7 @@ static WRITE8_HANDLER(towns_sys6c_w)
 	state->ftimer -= 0x54;
 	// halts the CPU for a period of time (exact length unknown)
 	cpu_set_input_line(state->maincpu,INPUT_LINE_HALT,ASSERT_LINE);
-	state->towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::zero);
+	state->towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::never);
 }
 
 static READ8_HANDLER(towns_dma1_r)
@@ -2310,6 +2319,7 @@ static DRIVER_INIT( towns )
 	state->towns_kb_timer = machine->scheduler().timer_alloc(FUNC(poll_keyboard));
 	state->towns_mouse_timer = machine->scheduler().timer_alloc(FUNC(towns_mouse_timeout));
 	state->towns_wait_timer = machine->scheduler().timer_alloc(FUNC(towns_wait_end));
+	state->towns_freerun_counter = machine->scheduler().timer_alloc(FUNC(towns_freerun_inc));
 
 	// CD-ROM init
 	state->towns_cd.read_timer = machine->scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine->device("dma_1"));
@@ -2363,6 +2373,8 @@ static MACHINE_RESET( towns )
 	state->towns_volume_select = 0;
 	state->towns_rtc_timer->adjust(attotime::zero,0,attotime::from_hz(1));
 	state->towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
+	/* Why does enabling this timer break the driver? */
+//	state->towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
 }
 
 static const struct pit8253_config towns_pit8253_config =
@@ -2619,7 +2631,7 @@ ROM_START( fmtownsa )
 	ROM_LOAD("fmt_sys_a.rom",  0x200000, 0x040000, CRC(92f3fa67) SHA1(be21404098b23465d24c4201a81c96ac01aff7ab) )
 ROM_END
 
-/* 16MHz 80386SX, 2MB RAM expandable up to 10MB (due to the limited 24-bit address space of the CPU) */
+/* 16MHz 80386SX, 2MB RAM expandable up to 10MB (due to the limited 24-bit address space of the CPU), dumped from a UX10 */
 ROM_START( fmtownsux )
   ROM_REGION32_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
@@ -2631,7 +2643,7 @@ ROM_START( fmtownsux )
     ROM_LOAD("mytownsux.rom",  0x00, 0x20, CRC(5cc7e6bc) SHA1(e245f8086df57ce6e48853f0e13525f738e5c4d8) )
 ROM_END
 
-/* 20MHz 80486SX, 4MB RAM expandable up to 28MB */
+/* 20MHz 80486SX, 4MB RAM expandable up to 28MB, dumped from an HR20 */
 ROM_START( fmtownshr )
   ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
@@ -2644,7 +2656,7 @@ ROM_START( fmtownshr )
 	ROM_LOAD("mytownshr.rom",  0x00, 0x20, CRC(c52f0e89) SHA1(634d3965606b18a99507f0a520553005661c41ff) )
 ROM_END
 
-/* 66MHz 80486DX2, 8MB RAM expandable up to 72MB */
+/* 66MHz 80486DX2, 8MB RAM expandable up to 72MB, dumped from an SJ26 */
 ROM_START( fmtownssj )
   ROM_REGION32_LE( 0x280000, "user", 0)
   // Assumed for now, only the serial ROM has been dumped successfully so far
