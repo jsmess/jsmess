@@ -130,22 +130,24 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 1:
-		memory_set_bank(space.machine, "bank2", data & 0x3f);
+		if (m_bank[5] & 0x08)
+			memory_set_bank(space.machine, "bank2", 0x40 + (data & 1));
+		else
+			memory_set_bank(space.machine, "bank2", data & 0x3f);
 		break;
 
 	case 2:
-		if ((m_bank[5] & 0x0f) == 0x0c)
-		{
+		if (m_bank[5] & 0x04)
 			memory_set_bank(space.machine, "bank3", 0x40 + (data & 1));
-		}
 		else
-		{
 			memory_set_bank(space.machine, "bank3", data & 0x3f);
-		}
 		break;
 
 	case 3:
-		memory_set_bank(space.machine, "bank4", data & 0x03);
+		if (m_bank[5] & 0x02)
+			memory_set_bank(space.machine, "bank4", 0x04 + (data & 0x03));
+		else
+			memory_set_bank(space.machine, "bank4", data & 0x03);
 		break;
 
 	case 4:
@@ -153,18 +155,34 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 5:
-		if (data == 0x0c)
+		if (input_port_read(space.machine, "CART_TYPE") == 0x01)
 		{
-			memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+			//cartridge memory is writable
+			if (data & 0x08)
+				memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank2");
+			else
+				memory_unmap_write(program, 0x4000, 0x7fff, 0, 0);
+
+			if (data & 0x04)
+				memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+			else
+				memory_unmap_write(program, 0x8000, 0xbfff, 0, 0);
+
+			memory_install_readwrite_bank(program, 0xc000, 0xdfff, 0, 0, "bank4");
 		}
 		else
 		{
-			memory_unmap_write(program, 0x8000, 0xbfff, 0, 0);
+			//cartridge memory is read-only
+			if (data & 0x02)
+				memory_unmap_write(program, 0xc000, 0xdfff, 0, 0);
+			else
+				memory_install_readwrite_bank(program, 0xc000, 0xdfff, 0, 0, "bank4");
+
+			memory_unmap_write(program, 0x4000, 0xbfff, 0, 0);
 		}
 		break;
 	case 6:
 		break;
-
 	}
 
 	m_bank[offset] = data;
@@ -241,6 +259,11 @@ ADDRESS_MAP_END
 
 /* Input ports */
 INPUT_PORTS_START( prestige )
+	PORT_START("CART_TYPE")
+	PORT_CONFNAME( 0x01, 0x01, "Cartridge Type" )
+	PORT_CONFSETTING( 0x00, "ROM" )
+	PORT_CONFSETTING( 0x01, "RAM" )
+
 	PORT_START("MOUSEX")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(0)
 
@@ -252,7 +275,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")	PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")	PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e")	PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'")	PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xca\xbb")	PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g")	PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")	PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")	PORT_CODE(KEYCODE_COMMA)
@@ -270,7 +293,7 @@ INPUT_PORTS_START( prestige )
 	PORT_START("LINE2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Up (KB)")	PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")	PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("~")	PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'")	PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t")	PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j")	PORT_CODE(KEYCODE_J)
@@ -280,7 +303,7 @@ INPUT_PORTS_START( prestige )
 	PORT_START("LINE3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Left (KB)")	PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")	PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inverted exclamation marks")	PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xa1")	PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y")	PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")	PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k")	PORT_CODE(KEYCODE_K)
@@ -303,7 +326,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i")	PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s")	PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n")	PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xb1")	PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b")	PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help")	PORT_CODE(KEYCODE_PGUP)
 
@@ -399,9 +422,11 @@ void prestige_state::machine_start()
 
 	memory_configure_bank(machine, "bank1", 0, 64, machine->region("maincpu")->base(), 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 64, machine->region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank2", 64, 2, machine->region("cart")->base(), 0x4000);
 	memory_configure_bank(machine, "bank3", 0, 64, machine->region("maincpu")->base(), 0x4000);
 	memory_configure_bank(machine, "bank3", 64, 2, machine->region("cart")->base(), 0x4000);
 	memory_configure_bank(machine, "bank4", 0, 4, ram, 0x2000);
+	memory_configure_bank(machine, "bank4", 4, 4, machine->region("cart")->base(), 0x2000);
 	memory_configure_bank(machine, "bank5", 0, 4, ram, 0x2000);
 
 	memory_set_bank(machine, "bank1", 0);
