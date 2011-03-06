@@ -103,9 +103,12 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
+	UINT8 interlace_on;
 
 	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
+
+	interlace_on = state->video_reg[2] == 0x10;
 
 	for(xi=0;xi<8;xi++)
 	{
@@ -116,7 +119,17 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		pen|= ((vram[address + (0x10000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
 		pen|= ((vram[address + (0x18000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
 
-		*BITMAP_ADDR16(bitmap, res_y, res_x) = pen + 8;
+		if(interlace_on)
+		{
+			if(res_y*2+0 < 400)
+				*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = pen + 8;
+			if(res_y*2+1 < 400)
+				*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = pen + 8;
+		}
+		else
+			*BITMAP_ADDR16(bitmap, res_y, res_x) = pen + 8;
+		//if(interlace_on)
+		//	*BITMAP_ADDR16(bitmap, res_y+1, res_x) = pen + 8;
 	}
 }
 
@@ -125,7 +138,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	pc9801_state *state = device->machine->driver_data<pc9801_state>();
 	int xi,yi;
 	int x;
-	UINT16 char_size,interlace_on;
+	UINT8 char_size,interlace_on;
 
 	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
