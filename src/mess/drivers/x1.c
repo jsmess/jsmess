@@ -685,9 +685,13 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 	// E9 02 - Play
 	// E9 03 - Fast Forward
 	// E9 04 - Rewind
-	// E9 05 - APSS(?) Fast Forward
-	// E9 06 - APSS(?) Rewind
+	// E9 05 - APSS Fast Forward
+	// E9 06 - APSS Rewind
 	// E9 0A - Record
+	/*
+	APSS is a Sharp invention and stands for Automatic Program Search System, it scans the tape for silent parts that are bigger than 4 seconds.
+	It's basically used for audio tapes in order to jump over the next/previous "track".
+	*/
 	state->cmt_current_cmd = cmd;
 
 	if(cassette_get_image(machine->device("cass")) == NULL) //avoid a crash if a disk game tries to access this
