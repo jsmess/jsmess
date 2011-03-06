@@ -123,10 +123,10 @@ private:
 	required_device<device_t> m_speaker;
 
 	int m_si;
+	int m_si_en;
 	int m_so;
 	int m_keydown;
 	int m_si_z2;
-	int m_si_en;
 	int m_t1_z2;
 	int m_t1_z5;
 	int m_led_en;
