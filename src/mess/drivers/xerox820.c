@@ -13,7 +13,7 @@
     - Xerox 820-II
     - Xerox 16/8
     - Big Board (+ Italian version MK-82)
-    - Big Board II (+ Italian version MK-83)
+    - Big Board II (+ Italian version MK-83) (see bigbord2.c)
     - Emerald Microware X120 board
     - type in Monitor v1.0 from manual
     - proper keyboard emulation (MCU?)
@@ -804,20 +804,20 @@ GFXDECODE_END
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( xerox820, xerox820_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
-    MCFG_CPU_PROGRAM_MAP(xerox820_mem)
-    MCFG_CPU_IO_MAP(xerox820_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
+	MCFG_CPU_PROGRAM_MAP(xerox820_mem)
+	MCFG_CPU_IO_MAP(xerox820_io)
 	MCFG_CPU_CONFIG(xerox820_daisy_chain)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	/* video hardware */
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
 	MCFG_GFXDECODE(xerox820)
 	MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick,attotime::from_hz(60))
@@ -838,20 +838,20 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
-    MCFG_CPU_IO_MAP(xerox820ii_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
+	MCFG_CPU_IO_MAP(xerox820ii_io)
 	MCFG_CPU_CONFIG(xerox820_daisy_chain)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	/* video hardware */
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
 	MCFG_GFXDECODE(xerox820ii)
 	MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, attotime::from_hz(60))
@@ -873,7 +873,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 4770000)
-    MCFG_CPU_PROGRAM_MAP(xerox168_mem)
+	MCFG_CPU_PROGRAM_MAP(xerox168_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -935,17 +935,12 @@ ROM_START( xerox168 )
 ROM_END
 
 ROM_START( bigboard )
-    ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_REGION( 0x1000, "monitor", 0 )
 	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "bigboard.u73", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
 ROM_END
 
-ROM_START( bigbord2 )
-    ROM_REGION( 0x1000, "monitor", 0 )
-	ROM_LOAD( "bigbrdii.bin", 0x0000, 0x1000, CRC(c588189e) SHA1(4133903171ee8b9fcf12cc72de843af782b4a645))
-	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
-ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
@@ -953,4 +948,3 @@ COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820"
 COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1983, bigbord2,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING | GAME_NO_SOUND)
