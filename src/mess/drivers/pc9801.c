@@ -23,6 +23,7 @@
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
 #include "sound/beep.h"
+#include "sound/2203intf.h"
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
 
@@ -560,7 +561,7 @@ static READ8_HANDLER( pc9801_sasi_r )
 {
 	if((offset & 1) == 0)
 	{
-		//printf("Read to undefined port [%02x]\n",offset+0xxx);
+		//printf("Read to SASI port [%02x]\n",offset+0x80);
 		return 0;
 	}
 	else // odd
@@ -574,7 +575,7 @@ static WRITE8_HANDLER( pc9801_sasi_w )
 {
 	if((offset & 1) == 0)
 	{
-		//printf("Write to undefined port [%02x] <- %02x\n",offset+0xxx,data);
+		//printf("Write to SASI port [%02x] <- %02x\n",offset+0x80,data);
 	}
 	else // odd
 	{
@@ -784,6 +785,28 @@ static WRITE8_HANDLER( pc9801_gvram_w )
 	upd7220_vram_w(space->machine->device("upd7220_btm"),offset+0x8000+state->vram_bank*0x20000, data);
 }
 
+static READ8_HANDLER( pc9801_opn_r )
+{
+	if((offset & 1) == 0)
+		return ym2203_r(space->machine->device("opn"),offset >> 1);
+	else // odd
+	{
+		printf("Read to undefined port [%02x]\n",offset+0x188);
+		return 0xff;
+	}
+}
+
+static WRITE8_HANDLER( pc9801_opn_w )
+{
+	if((offset & 1) == 0)
+		ym2203_w(space->machine->device("opn"),offset >> 1,data);
+	else // odd
+	{
+		printf("Write to undefined port [%02x] %02x\n",offset+0x188,data);
+	}
+}
+
+
 static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE8(pc9801_tvram_r,pc9801_tvram_w,0xffff) //TVRAM
@@ -810,7 +833,7 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
 //  AM_RANGE(0x0090, 0x0097) upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
-//  AM_RANGE(0x0188, 0x018b) ym2203 opn / <undefined>
+	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, 0, 8 )
@@ -1013,28 +1036,52 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("DSW1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_r)
-	PORT_DIPNAME( 0x02, 0x00, "DSW1" ) // error beep if OFF
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Display Type" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x00, "Normal Display" )
-	PORT_DIPSETTING(    0x08, "Hi-Res Display" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_r)
+	PORT_DIPNAME( 0x0002, 0x0000, "DSW1" ) // error beep if OFF
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Display Type" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0000, "Normal Display" )
+	PORT_DIPSETTING(      0x0008, "Hi-Res Display" )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, "DSWB" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) //uhm, this attempts to DMA something if off ...?
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW1:1") //jumps to daa00 if off, presumably some card booting
@@ -1216,10 +1263,10 @@ static void set_dma_channel(device_t *device, int channel, int state)
 	if (!state) drvstate->dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { printf("%02x 0\n",state); set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { printf("%02x 1\n",state); set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { printf("%02x 2\n",state); set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { printf("%02x 3\n",state); set_dma_channel(device, 3, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { /*printf("%02x 0\n",state);*/ set_dma_channel(device, 0, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { /*printf("%02x 1\n",state);*/ set_dma_channel(device, 1, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { /*printf("%02x 2\n",state);*/ set_dma_channel(device, 2, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { /*printf("%02x 3\n",state);*/ set_dma_channel(device, 3, state); }
 
 static READ8_DEVICE_HANDLER( test_r )
 {
@@ -1251,7 +1298,8 @@ static I8237_INTERFACE( dma8237_config )
 ****************************************/
 
 static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return input_port_read(device->machine,"DSW2"); }
-static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return input_port_read(device->machine,"DSW1"); }
+static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return input_port_read(device->machine,"DSW1") & 0xff; }
+static READ8_DEVICE_HANDLER( ppi_prn_portb_r ) { return input_port_read(device->machine,"DSW1") >> 8; }
 
 static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 {
@@ -1271,7 +1319,7 @@ static I8255A_INTERFACE( ppi_system_intf )
 static I8255A_INTERFACE( ppi_printer_intf )
 {
 	DEVCB_NULL,					/* Port A read */
-	DEVCB_NULL,					/* Port B read */
+	DEVCB_HANDLER(ppi_prn_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
 	DEVCB_NULL,					/* Port B write */
@@ -1495,8 +1543,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//  MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
