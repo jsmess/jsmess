@@ -871,8 +871,11 @@ static READ8_HANDLER( pc8801_ctrl_r )
     ---- --x- monitor refresh rate DIP-SW
     ---- ---x (pbsy?)
     */
+	UINT8 cdo;
 
-	return input_port_read(space->machine, "CTRL");
+	cdo = (upd1990a_data_out_r(space->machine->device("upd1990a")) & 1) << 4;
+
+	return input_port_read(space->machine, "CTRL") | cdo;
 }
 
 static WRITE8_HANDLER( pc8801_ctrl_w )
@@ -881,8 +884,12 @@ static WRITE8_HANDLER( pc8801_ctrl_w )
     x--- ---- SING (buzzer mirror?)
     -x-- ---- mouse latch (JOP1, routes on OPN sound port A)
     --x- ---- beeper
-    ---
+    ---- -x-- upd1990a clock bit
+    ---- --x- upd1990a strobe bit
     */
+
+	upd1990a_stb_w(space->machine->device("upd1990a"), (data & 2) >> 1);
+	upd1990a_clk_w(space->machine->device("upd1990a"), (data & 4) >> 2);
 
 	/* TODO: this might actually be two beepers */
 	if(((device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
@@ -1307,7 +1314,12 @@ static WRITE8_HANDLER( pc8801_baudrate_w )
 
 static WRITE8_HANDLER( pc8801_rtc_w )
 {
-	printf("RTC write %02x\n",data);
+	upd1990a_c0_w(space->machine->device("upd1990a"), (data & 1) >> 0);
+	upd1990a_c1_w(space->machine->device("upd1990a"), (data & 2) >> 1);
+	upd1990a_c2_w(space->machine->device("upd1990a"), (data & 4) >> 2);
+	upd1990a_data_in_w(space->machine->device("upd1990a"), (data & 8) >> 3);
+
+	/* TODO: remaining bits */
 }
 
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
@@ -1791,7 +1803,7 @@ GFXDECODE_END
 
 /* uPD1990A Interface */
 
-static UPD1990A_INTERFACE( pc88_upd1990a_intf )
+static UPD1990A_INTERFACE( pc8801_upd1990a_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1943,6 +1955,9 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 static MACHINE_START( pc8801 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
+
+	upd1990a_cs_w(machine->device("upd1990a"), 1);
+	upd1990a_oe_w(machine->device("upd1990a"), 1);
 }
 
 static MACHINE_RESET( pc8801 )
@@ -2114,7 +2129,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD("i8214", MASTER_CLOCK, pic_intf)
 	#endif
-	//MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc88_upd1990a_intf)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	//MCFG_CASSETTE_ADD("cassette", pc88_cassette_config)
 
