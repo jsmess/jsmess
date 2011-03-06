@@ -48,6 +48,7 @@ public:
 
 	UINT8 vrtc_irq_mask;
 	UINT8 video_ff[8];
+	UINT8 video_reg[6];
 	UINT8 pal_clut[4];
 
 	UINT8 *tvram;
@@ -128,7 +129,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	interlace_on = lr >= 16; /* TODO: check the proper condition (a bank signal I presume) */
+	interlace_on = state->video_reg[2] == 0x10; /* TODO: correct? */
 	char_size = (interlace_on) ? 16 : 8;
 
 	for(x=0;x<pitch;x++)
@@ -181,7 +182,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(state->video_ff[WIDTH40_REG])
 				{
-					if(res_x+1 > 640 || res_y > 200) //TODO
+					if(res_x+1 > 640 || res_y > char_size*25) //TODO
 						continue;
 
 					*BITMAP_ADDR16(bitmap, res_y, res_x+1) = pen;
@@ -516,9 +517,12 @@ static READ8_HANDLER( pc9801_70_r )
 
 static WRITE8_HANDLER( pc9801_70_w )
 {
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
 	if((offset & 1) == 0)
 	{
 		printf("Write to display register [%02x] %02x\n",offset+0x70,data);
+		state->video_reg[offset >> 1] = data;
 	}
 	else // odd
 	{
@@ -986,18 +990,18 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) //jumps to daa00 if off, presumably some card booting
+	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // error beep if OFF
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Text width" )
-	PORT_DIPSETTING(    0x04, "40 chars/line" )
-	PORT_DIPSETTING(    0x00, "80 chars/line" )
-	PORT_DIPNAME( 0x08, 0x00, "Text height" )
-	PORT_DIPSETTING(    0x08, "20 lines/screen" )
-	PORT_DIPSETTING(    0x00, "25 lines/screen" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Display Type" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, "Normal Display" )
+	PORT_DIPSETTING(    0x08, "Hi-Res Display" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1012,30 +1016,24 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
+	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW1:1") //jumps to daa00 if off, presumably some card booting
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // error beep if OFF
+	PORT_DIPNAME( 0x02, 0x02, "Terminal Mode" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Interlace mode" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Text width" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "40 chars/line" )
+	PORT_DIPSETTING(    0x00, "80 chars/line" )
+	PORT_DIPNAME( 0x08, 0x00, "Text height" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "20 lines/screen" )
+	PORT_DIPSETTING(    0x00, "25 lines/screen" )
+	PORT_DIPNAME( 0x10, 0x00, "Memory Switch Init" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) //Fix memory switch condition
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) ) //Initialize Memory Switch with the system default
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2dd BIOS" )
@@ -1231,8 +1229,8 @@ static I8237_INTERFACE( dma8237_config )
 *
 ****************************************/
 
-static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return input_port_read(device->machine,"DSW1"); }
-static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return input_port_read(device->machine,"DSW2"); }
+static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return input_port_read(device->machine,"DSW2"); }
+static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return input_port_read(device->machine,"DSW1"); }
 
 static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 {
