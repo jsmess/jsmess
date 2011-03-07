@@ -969,6 +969,7 @@ const game_driver * const drivers[] =
 	DRIVER( mc10 )	  /* MC-10  */
 	DRIVER( alice )	 /* Matra & Hachette Ordinateur Alice   */
 	DRIVER( alice32 ) /* Matra & Hachette Alice 32   */
+	DRIVER( alice90 ) /* Matra & Hachette Alice 90   */
 
 	/* EACA */
 	DRIVER( cgenie )	/* Colour Genie EG2000    */

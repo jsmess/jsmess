@@ -43,6 +43,7 @@ public:
 		  m_mc6847(*this, "mc6847"),
 		  m_ef9345(*this, "ef9345"),
 		  m_dac(*this, "dac"),
+		  m_ram(*this, RAM_TAG),
 		  m_cassette(*this, "cassette"),
 		  m_printer(*this, "printer")
 		{ }
@@ -51,10 +52,11 @@ public:
 	optional_device<device_t> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
 	required_device<device_t> m_dac;
+	required_device<device_t> m_ram;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_printer;
 
-	UINT8 *m_ram;
+	UINT8 *m_ram_base;
 	UINT32 m_ram_size;
 	UINT8 m_keyboard_strobe;
 	UINT8 m_port2;
@@ -192,10 +194,10 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 
 READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 {
-	mc6847_inv_w(m_mc6847, BIT(m_ram[offset], 6));
-	mc6847_as_w(m_mc6847, BIT(m_ram[offset], 7));
+	mc6847_inv_w(m_mc6847, BIT(m_ram_base[offset], 6));
+	mc6847_as_w(m_mc6847, BIT(m_ram_base[offset], 7));
 
-	return m_ram[offset];
+	return m_ram_base[offset];
 }
 
 bool mc10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -228,25 +230,25 @@ static DRIVER_INIT( mc10 )
 	mc10->m_keyboard_strobe = 0x00;
 
 	/* initialize memory */
-	mc10->m_ram = ram_get_ptr(machine->device(RAM_TAG));
-	mc10->m_ram_size = ram_get_size(machine->device(RAM_TAG));
+	mc10->m_ram_base = ram_get_ptr(mc10->m_ram);
+	mc10->m_ram_size = ram_get_size(mc10->m_ram);
 	mc10->m_pr_state = PRINTER_WAIT;
 
-	memory_set_bankptr(machine, "bank1", mc10->m_ram);
+	memory_set_bankptr(machine, "bank1", mc10->m_ram_base);
 
 	/* initialize memory expansion */
 	if (mc10->m_ram_size == 20*1024)
-		memory_set_bankptr(machine, "bank2", mc10->m_ram + 0x1000);
+		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x1000);
 	else if (mc10->m_ram_size == 24*1024)
-		memory_set_bankptr(machine, "bank2", mc10->m_ram + 0x2000);
-	else
+		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x2000);
+	else  if (mc10->m_ram_size != 32*1024)		//ensure that is not alice90
 		memory_nop_readwrite(prg, 0x5000, 0x8fff, 0, 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, mc10->m_keyboard_strobe);
 
 	//for alice32 force port4 DDR to 0xff at startup
-	if (!strcmp(machine->gamedrv->name, "alice32"))
+	if (!strcmp(machine->gamedrv->name, "alice32") || !strcmp(machine->gamedrv->name, "alice90"))
 		m6801_io_w(prg, 0x05, 0xff);
 }
 
@@ -274,6 +276,14 @@ static ADDRESS_MAP_START( alice32_mem, ADDRESS_SPACE_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0x3000, 0x4fff) AM_RAMBANK("bank1") /* 8k internal ram */
 	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
 	AM_RANGE(0x9000, 0xafff) AM_NOP /* unused */
+	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
+	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, alice32_bfff_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( alice90_mem, ADDRESS_SPACE_PROGRAM, 8 , mc10_state)
+	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
+	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")	/* 32k internal ram */
 	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, alice32_bfff_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
@@ -568,6 +578,15 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "alice32")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( alice90, alice32 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(alice90_mem)
+
+    MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+MACHINE_CONFIG_END
+
+
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -590,6 +609,8 @@ ROM_START( alice32 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
 ROM_END
 
+#define rom_alice90 rom_alice32
+
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
@@ -597,4 +618,5 @@ ROM_END
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY              FULLNAME  FLAGS */
 COMP( 1983, mc10,  0,      0,      mc10,    mc10,  mc10, "Tandy Radio Shack", "MC-10",  GAME_SUPPORTS_SAVE )
 COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10, "Matra & Hachette",  "Alice",  GAME_SUPPORTS_SAVE )
-COMP( 1984, alice32, mc10, 0,      alice32, alice, mc10, "Matra & Hachette",  "Alice 32",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1984, alice32,       0, 0,   alice32, alice, mc10, "Matra & Hachette",  "Alice 32",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,   alice90, alice, mc10, "Matra & Hachette",  "Alice 90",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
