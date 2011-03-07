@@ -165,6 +165,9 @@ READ8_MEMBER( abc1600_state::iord0_r )
 
 	UINT8 data = 0;
 
+	// monitor orientation (portrait/landscape)
+//	data |= 0x02;
+	
 	// vertical sync
 	data |= m_vs << 6;
 
@@ -379,6 +382,108 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 //**************************************************************************
 
 //-------------------------------------------------
+//  get_drmsk - 
+//-------------------------------------------------
+
+inline UINT16 abc1600_state::get_drmsk(UINT8 sh, int udx)
+{
+	/*
+		
+		bit		description
+		
+		A0		SH0
+		A1		SH1
+		A2		SH2
+		A3		SH3
+		A4		U/_D X
+		
+	*/
+	
+	UINT16 drmsk_addr = (udx << 4) | (sh & 0x0f);
+	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
+	UINT8 drmskh = m_drmsk_rom[drmsk_addr + 0x20];
+	UINT16 drmsk = (drmskh << 8) | drmskl;
+	
+	return drmsk;
+}
+
+
+//-------------------------------------------------
+//  get_shinf - 
+//-------------------------------------------------
+
+inline UINT8 abc1600_state::get_shinf(UINT8 xfrom, UINT8 xto, int udx)
+{
+	/*
+		
+		bit		description
+		
+		A0		XFROM0
+		A1		XFROM1
+		A2		XFROM2
+		A3		XFROM3
+		A4		XTO0
+		A5		XTO1
+		A6		XTO2
+		A7		XTO3
+		A8		U/_D X
+		
+	*/
+	
+	UINT16 shinf_addr = (udx << 8) | ((xto & 0x0f) << 4) | (xfrom & 0x0f);
+	
+	return m_shinf_rom[shinf_addr];
+}
+
+
+//-------------------------------------------------
+//  get_wrmsk - get mover write mask
+//-------------------------------------------------
+
+inline UINT16 abc1600_state::get_wrmsk(UINT8 xto, UINT8 xsize, int udx, int cmc, int wrms0, int wrms1)
+{
+	/*
+		
+		bit		description
+		
+		A0		XTO0
+		A1		XTO1
+		A2		XTO2
+		A3		XTO3
+		A4		XSIZE0
+		A5		XSIZE1
+		A6		XSIZE2
+		A7		XSIZE3
+		A8		U/_D X
+		A9		CMC
+		A10		WRMS0
+		A11		WRMS1
+		
+	*/
+	
+	UINT16 wrmsk_addr = (wrms1 << 11) | (wrms0 << 10) | (cmc << 9) | (udx << 8) | ((xsize & 0x0f) << 4) | (xto & 0x0f);
+	UINT8 wrmskl = m_wrmsk_rom[wrmsk_addr];
+	UINT8 wrmskh = m_wrmsk_rom[wrmsk_addr + 0x1000];
+	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
+	
+	return wrmsk;
+}
+
+
+//-------------------------------------------------
+//  mover - 
+//-------------------------------------------------
+
+void abc1600_state::mover()
+{
+/*	UINT16 xsize = m_sx & 0x3ff;
+	UINT16 ysize = m_sy & 0xfff;
+	int udx = BIT(m_sx, 11);
+	int udy = BIT(m_sx, 10);*/
+}
+
+
+//-------------------------------------------------
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
@@ -477,6 +582,11 @@ void abc1600_state::video_start()
 	// allocate video RAM
 	m_video_ram = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
 	memset(m_video_ram, 0, VIDEORAM_SIZE);
+	
+	// find memory regions
+	m_wrmsk_rom = machine->region("wrmsk")->base();
+	m_shinf_rom = machine->region("shinf")->base();
+	m_drmsk_rom = machine->region("drmsk")->base();
 
 	// state saving
 	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
@@ -511,6 +621,8 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	{
 		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
 	}
+
+	mover();
 
 	return 0;
 }

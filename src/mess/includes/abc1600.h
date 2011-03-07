@@ -144,8 +144,14 @@ public:
 	inline UINT8 dma_iorq_r(int index, UINT16 offset);
 	inline void dma_iorq_w(int index, UINT16 offset, UINT8 data);
 
+	inline UINT16 get_drmsk(UINT8 sh, int udx);
+	inline UINT8 get_shinf(UINT8 xfrom, UINT8 xto, int udx);
+	inline UINT16 get_wrmsk(UINT8 xto, UINT8 xsize, int udx, int cmc, int wrms0, int wrms1);
+	void mover();
+
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	
 
 	// memory access controller
 	UINT8 m_task;
@@ -160,6 +166,9 @@ public:
 	UINT8 m_cause;
 
 	// video
+	const UINT8 *m_wrmsk_rom;
+	const UINT8 *m_shinf_rom;
+	const UINT8 *m_drmsk_rom;
 	UINT8 *m_video_ram;			// video RAM
 	int m_endisp;				// enable display
 	int m_clocks_disabled;		// clocks disabled
