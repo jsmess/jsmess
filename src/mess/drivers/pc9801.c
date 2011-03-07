@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/i386/i386.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
@@ -129,8 +130,6 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		}
 		else
 			*BITMAP_ADDR16(bitmap, res_y, res_x) = pen + 8;
-		//if(interlace_on)
-		//	*BITMAP_ADDR16(bitmap, res_y+1, res_x) = pen + 8;
 	}
 }
 
@@ -834,6 +833,36 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
 	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
+ADDRESS_MAP_END
+
+static READ8_HANDLER( pc9801rs_ipl_r )
+{
+	UINT8 *ROM = space->machine->region("ipl")->base();
+
+	return ROM[(offset) & 0x1ffff];
+}
+
+static READ8_HANDLER( pc9801rs_memory_r )
+{
+	//offset &= 0xfffff;
+
+	if	   (offset >= 0x000e0000 && offset <= 0x000fffff) { pc9801rs_ipl_r(space,offset & 0x1ffff); }
+	else if(offset >= 0xfffe0000 && offset <= 0xffffffff) {	pc9801rs_ipl_r(space,offset & 0x1ffff); }
+
+	return 0xff;
+}
+
+
+static WRITE8_HANDLER( pc9801rs_memory_w )
+{
+
+}
+
+static ADDRESS_MAP_START( pc9801rs_map, ADDRESS_SPACE_PROGRAM, 32)
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc9801rs_io, ADDRESS_SPACE_IO, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, 0, 8 )
@@ -1550,6 +1579,36 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
+	MCFG_CPU_ADD("maincpu", I386, 16000000)
+	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
+	MCFG_CPU_IO_MAP(pc9801rs_io)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+
+	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
+	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(pc9801)
+	MCFG_GFXDECODE(pc9801)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+MACHINE_CONFIG_END
+
+
 ROM_START( pc9801f )
 	ROM_REGION( 0x18000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "urm01-02.bin", 0x00000, 0x4000, CRC(cde04615) SHA1(8f6fb587c0522af7a8131b45d13f8ae8fc60e8cd) )
@@ -1580,7 +1639,33 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
 
 	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
+ROM_END
 
+ROM_START( pc9801rs )
+	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios.rom", 0x08000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
+	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+
+	/* where shall we load this? */
+	ROM_REGION( 0x100000, "memory", 0 )
+	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
+	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
+	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
+	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
+	ROM_LOAD( "d8000.rom", 0xd8000, 0x8000, CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) )
+	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )	// contains n-88 basic (86) v2.0
+	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
+	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
+
+	ROM_REGION( 0x50000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
+
+	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
+	ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
 ROM_END
 
 COMP( 1983, pc9801f,   0,       0,     pc9801,   pc9801,   0, "Nippon Electronic Company",   "PC-9801F",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1989, pc9801rs,  pc9801f, 0,     pc9801rs, pc9801,   0, "Nippon Electronic Company",   "PC-9801RS", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model

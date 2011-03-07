@@ -664,6 +664,7 @@ static READ8_HANDLER( rombios_r )
 	return ROM[offset+((state->rom_bank & 1)*0x20000)];
 }
 
+#if 0
 static WRITE8_HANDLER( pc9801_vrtc_mask_w )
 {
 	pc98_state *state = space->machine->driver_data<pc98_state>();
@@ -677,6 +678,7 @@ static WRITE8_HANDLER( pc9801_vrtc_mask_w )
 		printf("Write to undefined port [%02x] <- %02x\n",offset+0x64,data);
 	}
 }
+
 
 static READ8_HANDLER( pc9801_fdc_2dd_r )
 {
@@ -728,6 +730,7 @@ static WRITE8_HANDLER( pc9801_fdc_2dd_w )
 		printf("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data);
 	}
 }
+#endif
 
 static READ16_HANDLER( pc9801_tvram_r )
 {
@@ -744,6 +747,7 @@ static WRITE16_HANDLER( pc9801_tvram_w )
 		COMBINE_DATA(&state->tvram[offset]);
 }
 
+#if 0
 static WRITE8_HANDLER( pc9801_video_ff_w )
 {
 	pc98_state *state = space->machine->driver_data<pc98_state>();
@@ -774,6 +778,7 @@ static WRITE8_HANDLER( pc9801_video_ff_w )
 		printf("Write to undefined port [%02x] <- %02x\n",offset+0x68,data);
 	}
 }
+#endif
 
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
@@ -788,38 +793,6 @@ static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00800000, 0x00ffffff) AM_NOP
 
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_READ8(rombios_r,0xffffffff) AM_WRITE8(rom_bank_w,0xffffffff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports) / dma (odd ports)
-//  AM_RANGE(0x0020, 0x0020) rtc
-//  AM_RANGE(0x0022, 0x0022)
-	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff) // rs232c (even ports) / system ppi8255 (odd ports)
-	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff) // printer ppi8255 (even ports) / keyboard (odd ports)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) master (even ports)
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w,0xffffffff)
-	AM_RANGE(0x0068, 0x006f) AM_WRITE8(pc9801_video_ff_w,0xffffffff) //mode FF / <undefined>
-//  AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
-//  AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
-//  AM_RANGE(0x0070, 0x0070) crtc registers
-//  AM_RANGE(0x0072, 0x0072)
-//  AM_RANGE(0x0074, 0x0074)
-//  AM_RANGE(0x0076, 0x0076)
-//  AM_RANGE(0x0078, 0x0078)
-//  AM_RANGE(0x007a, 0x007a)
-//  AM_RANGE(0x007c, 0x007c) GRCG mode write
-//  AM_RANGE(0x007e, 0x007e) GRCG tile write
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(port_70_r,port_70_w,0xffffffff) // crtc regs (even ports) / pit8253 (odd ports)
-	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) slave (even ports)
-	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffffffff) //upd765a 2dd / <undefined>
-	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffffffff) //upd765a 2dd / <undefined>
-//  AM_RANGE(0x00e0, 0x00ef) DMA
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(port_f0_r,port_f0_w,0xffffffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
-	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(wram_sel_r,wram_sel_w,0xffffffff)
-	AM_RANGE(0x7fd8, 0x7fdf) AM_READ8(pc98_mouse_r,0xffffffff)
-
-//  (and many more...)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
@@ -1394,11 +1367,11 @@ static const floppy_config pc9801_floppy_config =
 };
 
 
-static MACHINE_CONFIG_START( pc9801, pc98_state )
+static MACHINE_CONFIG_START( pc9821, pc98_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 16000000) /* almost certainly i386, unknown clock */
+	MCFG_CPU_ADD("maincpu", I486, 16000000) /* almost certainly i386, unknown clock */
 	MCFG_CPU_PROGRAM_MAP(pc9801_mem)
-	MCFG_CPU_IO_MAP(pc9801_io)
+	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START(pc9801)
@@ -1430,40 +1403,10 @@ static MACHINE_CONFIG_START( pc9801, pc98_state )
 	MCFG_VIDEO_START(pc9801)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9821, pc9801 )
-
-	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
-	MCFG_CPU_PROGRAM_MAP(pc9801_mem)
-	MCFG_CPU_IO_MAP(pc9821_io)
-MACHINE_CONFIG_END
-
-
 /* ROM definition */
 
 
 /* I strongly suspect this dump comes from a later machine, like an i386-based one, but I could be wrong... */
-ROM_START( pc9801 )
-	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0x08000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
-	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-
-	/* where shall we load this? */
-	ROM_REGION( 0x100000, "memory", 0 )
-	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
-	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
-	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
-	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
-	ROM_LOAD( "d8000.rom", 0xd8000, 0x8000, CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) )
-	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )	// contains n-88 basic (86) v2.0
-	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
-	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
-
-	ROM_REGION( 0x50000, "gfx1", 0 )
-	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
-ROM_END
 
 ROM_START( pc9821 )
 	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
@@ -1502,7 +1445,6 @@ ROM_START( pc9821a )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY                        FULLNAME    FLAGS */
-COMP( 1989, pc9801,   0,       0,     pc9801,   pc9801,   0,      "Nippon Electronic Company",   "PC-9801RS",  GAME_NOT_WORKING | GAME_NO_SOUND) //TODO: not sure about the exact model
 COMP( 1994, pc9821,   0,       0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1994, pc9821ne, pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1994, pc9821a,  pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (v13)",  GAME_NOT_WORKING | GAME_NO_SOUND) //TODO: identify this
