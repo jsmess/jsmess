@@ -1405,6 +1405,25 @@ static const struct pit8253_config pit8253_config =
 	}
 };
 
+static const struct pit8253_config pc9801rs_pit8253_config =
+{
+	{
+		{
+			16000000/4,				/* heartbeat IRQ */
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
+		}, {
+			16000000/4,				/* dram refresh */
+			DEVCB_NULL,
+			DEVCB_NULL
+		}, {
+			16000000/4,				/* pio port c pin 4, and speaker polling enough */
+			DEVCB_NULL,
+			DEVCB_NULL
+		}
+	}
+};
+
 /****************************************
 *
 * I8237 DMA interface
@@ -1755,8 +1774,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_MACHINE_START(pc9801)
 	MCFG_MACHINE_RESET(pc9801rs)
 
-	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
-	MCFG_I8237_ADD( "dma8237", 5000000, dma8237_config ) //unknown clock
+	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
+	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255A_ADD( "ppi8255_sys", ppi_system_intf )
