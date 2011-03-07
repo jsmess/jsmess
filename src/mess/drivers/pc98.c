@@ -1501,14 +1501,8 @@ ROM_START( pc9821a )
 	ROM_LOAD( "font_a.rom", 0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 ROM_END
 
-static DRIVER_INIT( pc9801 )
-{
-	// ...
-}
-
-
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY                        FULLNAME    FLAGS */
-COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   pc9801, "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1993, pc9821ne, pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1993, pc9821a,  pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (v13)",  GAME_NOT_WORKING | GAME_NO_SOUND) //TODO: identify this
+COMP( 1989, pc9801,   0,       0,     pc9801,   pc9801,   0,      "Nippon Electronic Company",   "PC-9801RS",  GAME_NOT_WORKING | GAME_NO_SOUND) //TODO: not sure about the exact model
+COMP( 1994, pc9821,   0,       0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1994, pc9821ne, pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1994, pc9821a,  pc9821,  0,     pc9821,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (v13)",  GAME_NOT_WORKING | GAME_NO_SOUND) //TODO: identify this
