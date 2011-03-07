@@ -1212,9 +1212,9 @@ static int frameskip_level_count(running_machine *machine)
 
 	if (count < 0)
 	{
-		int frameskip_min = 0;
+		//int frameskip_min = 0;
 		int frameskip_max = 10;
-		options_get_range_int(&machine->options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
+		//options_get_range_int(&machine->options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
 		count = frameskip_max + 1;
 	}
 	return count;
@@ -1420,14 +1420,15 @@ static void prepare_menus(HWND wnd)
 
 static void set_speed(running_machine *machine, int speed)
 {
+	astring error_string;
 	if (speed != 0)
 	{
 		machine->video().set_speed_factor(speed);
-		options_set_int(&machine->options(), OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE);
+		machine->options().core_options::set_value(OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 
 	machine->video().set_throttled(speed != 0);
-	options_set_bool(&machine->options(), OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE);
+	machine->options().core_options::set_value(OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 
@@ -1663,6 +1664,7 @@ static int pause_for_command(UINT command)
 
 static int invoke_command(HWND wnd, UINT command)
 {
+	astring error_string;
 	int handled = 1;
 	int dev_command;
 	device_image_interface *img;
@@ -1791,7 +1793,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 		case ID_FRAMESKIP_AUTO:
 			window->machine->video().set_frameskip(-1);
-			options_set_bool(&window->machine->options(), OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE);
+			window->machine->options().core_options::set_value(OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE, error_string);
 			break;
 
 		case ID_HELP_ABOUT_NEWUI:
@@ -1831,8 +1833,8 @@ static int invoke_command(HWND wnd, UINT command)
 			{
 				// change frameskip
 				window->machine->video().set_frameskip(command - ID_FRAMESKIP_0);
-				options_set_bool(&window->machine->options(), OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE);
-				options_set_int(&window->machine->options(), OPTION_FRAMESKIP, command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE);
+				window->machine->options().core_options::set_value(OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE, error_string);
+				window->machine->options().core_options::set_value(OPTION_FRAMESKIP, (int)command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (IO_COUNT*DEVOPTION_MAX)))
 			{
