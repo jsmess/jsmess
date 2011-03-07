@@ -184,43 +184,151 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	switch (offset & 0x07)
 	{
 	case LDSX_HB:
-		m_sx = (data << 8) | (m_sx & 0xff);
-		logerror("SX HB %04x\n", m_sx);
+		/*
+
+			bit		description
+
+			0		XSIZE8
+			1		XSIZE9
+			2		U/D* Y
+			3		U/D* X
+			4		
+			5		
+			6		
+			7		
+
+		*/
+		m_xsize = ((data & 0x03) << 8) | (m_xsize & 0xff);
+		m_udy = BIT(data, 2);
+		m_udx = BIT(data, 3);
 		break;
 		
 	case LDSX_LB:
-		m_sx = (m_sx & 0xff00) | data;
-		logerror("SX LB %04x\n", m_sx);
+		/*
+
+			bit		description
+
+			0		XSIZE0
+			1		XSIZE1
+			2		XSIZE2
+			3		XSIZE3
+			4		XSIZE4
+			5		XSIZE5
+			6		XSIZE6
+			7		XSIZE7
+
+		*/
+		m_xsize = (m_xsize & 0x300) | data;
 		break;
 		
 	case LDSY_HB:
-		m_sy = (data << 8) | (m_sy & 0xff);
-		logerror("SY HB %04x\n", m_sy);
+		/*
+
+			bit		description
+
+			0		Y size 8
+			1		Y size 9
+			2		Y size 10
+			3		Y size 11
+			4		
+			5		
+			6		
+			7		
+
+		*/
+		m_ysize = ((data & 0x0f) << 8) | (m_ysize & 0xff);
 		break;
 		
 	case LDSY_LB:
-		m_sy = (m_sy & 0xff00) | data;
-		logerror("SY LB %04x\n", m_sy);
+		/*
+
+			bit		description
+
+			0		Y size 0
+			1		Y size 1
+			2		Y size 2
+			3		Y size 3
+			4		Y size 4
+			5		Y size 5
+			6		Y size 6
+			7		Y size 7
+
+		*/
+		m_ysize = (m_ysize & 0xf00) | data;
 		break;
 		
 	case LDTX_HB:
-		m_tx = (data << 8) | (m_tx & 0xff);
-		logerror("TX HB %04x\n", m_tx);
+		/*
+
+			bit		description
+
+			0		XTO8, MTA4
+			1		XTO9, MTA5
+			2		
+			3		
+			4		
+			5		
+			6		
+			7		
+
+		*/
 		break;
 		
 	case LDTX_LB:
-		m_tx = (m_tx & 0xff00) | data;
-		logerror("TX LB %04x\n", m_tx);
+		/*
+
+			bit		description
+
+			0		XTO0
+			1		XTO1
+			2		XTO2
+			3		XTO3
+			4		XTO4, MTA0
+			5		XTO5, MTA1
+			6		XTO6, MTA2
+			7		XTO7, MTA3
+
+		*/
+		m_xto = (m_xto & 0x300) | data;
+		m_mta = (m_mta & 0x3fff0) | (data >> 4);
 		break;
 
 	case LDTY_HB:
-		m_ty = (data << 8) | (m_ty & 0xff);
-		logerror("TY HB %04x\n", m_ty);
+		/*
+
+			bit		description
+
+			0		YTO8, MTA14
+			1		YTO9, MTA15
+			2		YTO10, MTA16
+			3		YTO11, MTA17
+			4		
+			5		
+			6		
+			7		
+
+		*/
+		m_yto = (data << 8) | (m_yto & 0xff);
+		m_mta = ((data & 0x0f) << 14) | (m_mta & 0x3fff);
 		break;
 
 	case LDTY_LB:
-		m_ty = (m_ty & 0xff00) | data;
-		logerror("TY LB %04x\n", m_ty);
+		/*
+
+			bit		description
+
+			0		YTO0, MTA6
+			1		YTO1, MTA7
+			2		YTO2, MTA8
+			3		YTO3, MTA9
+			4		YTO4, MTA10
+			5		YTO5, MTA11
+			6		YTO6, MTA12
+			7		YTO7, MTA13
+
+		*/
+		m_yto = (m_yto & 0xf00) | data;
+		m_mta = (m_mta & 0x3c03f) | (data << 6);
 		break;
 	}
 }
@@ -235,23 +343,79 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	switch (offset & 0x07)
 	{
 	case LDFX_HB:
-		m_fx = (data << 8) | (m_fx & 0xff);
-		logerror("FX HB %04x\n", m_fx);
+		/*
+
+			bit		description
+
+			0		XFROM8, MFA4
+			1		XFROM9, MFA5
+			2		
+			3		
+			4		
+			5		
+			6		
+			7		
+
+		*/
+
+		m_xfrom = ((data & 0x03) << 8) | (m_xfrom & 0xff);
+		m_mfa = (m_mfa & 0x3ffcf) | ((data & 0x03) << 4);
 		break;
 		
 	case LDFX_LB:
-		m_fx = (m_fx & 0xff00) | data;
-		logerror("FX LB %04x\n", m_fx);
+		/*
+
+			bit		description
+
+			0		XFROM0
+			1		XFROM1
+			2		XFROM2
+			3		XFROM3
+			4		XFROM4, MFA0
+			5		XFROM5, MFA1
+			6		XFROM6, MFA2
+			7		XFROM7, MFA3
+
+		*/
+
+		m_xfrom = (m_xfrom & 0x300) | data;
+		m_mfa = (m_mfa & 0x3fff0) | (data >> 4);
 		break;
 		
 	case LDFY_HB:
-		m_fy = (data << 8) | (m_fy & 0xff);
-		logerror("FY HB %04x\n", m_fy);
+		/*
+
+			bit		description
+
+			0		MFA14
+			1		MFA15
+			2		MFA16
+			3		MFA17
+			4		
+			5		
+			6		
+			7		
+
+		*/
+		m_mfa = ((data & 0x0f) << 14) | (m_mfa & 0x3fff);
 		break;
 		
 	case LDFY_LB:
-		m_fy = (m_fy & 0xff00) | data;
-		logerror("FY LB %04x\n", m_fy);
+		/*
+
+			bit		description
+
+			0		MFA6
+			1		MFA7
+			2		MFA8
+			3		MFA9
+			4		MFA10
+			5		MFA11
+			6		MFA12
+			7		MFA13
+
+		*/
+		m_mfa = (m_mfa & 0x3c03f) | (data << 6);
 		break;
 		
 	case WRML:
@@ -385,7 +549,7 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 //  get_drmsk - 
 //-------------------------------------------------
 
-inline UINT16 abc1600_state::get_drmsk(UINT8 sh, int udx)
+inline UINT16 abc1600_state::get_drmsk()
 {
 	/*
 		
@@ -395,11 +559,11 @@ inline UINT16 abc1600_state::get_drmsk(UINT8 sh, int udx)
 		A1		SH1
 		A2		SH2
 		A3		SH3
-		A4		U/_D X
+		A4		U/D* X
 		
 	*/
 	
-	UINT16 drmsk_addr = (udx << 4) | (sh & 0x0f);
+	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
 	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
 	UINT8 drmskh = m_drmsk_rom[drmsk_addr + 0x20];
 	UINT16 drmsk = (drmskh << 8) | drmskl;
@@ -412,7 +576,7 @@ inline UINT16 abc1600_state::get_drmsk(UINT8 sh, int udx)
 //  get_shinf - 
 //-------------------------------------------------
 
-inline UINT8 abc1600_state::get_shinf(UINT8 xfrom, UINT8 xto, int udx)
+inline void abc1600_state::get_shinf()
 {
 	/*
 		
@@ -426,13 +590,15 @@ inline UINT8 abc1600_state::get_shinf(UINT8 xfrom, UINT8 xto, int udx)
 		A5		XTO1
 		A6		XTO2
 		A7		XTO3
-		A8		U/_D X
+		A8		U/D* X
 		
 	*/
 	
-	UINT16 shinf_addr = (udx << 8) | ((xto & 0x0f) << 4) | (xfrom & 0x0f);
-	
-	return m_shinf_rom[shinf_addr];
+	UINT16 shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
+	UINT8 shinf = m_shinf_rom[shinf_addr];
+
+	m_sh = shinf & 0x0f;
+	m_hold_iv_cyk = BIT(shinf, 5);
 }
 
 
@@ -440,7 +606,7 @@ inline UINT8 abc1600_state::get_shinf(UINT8 xfrom, UINT8 xto, int udx)
 //  get_wrmsk - get mover write mask
 //-------------------------------------------------
 
-inline UINT16 abc1600_state::get_wrmsk(UINT8 xto, UINT8 xsize, int udx, int cmc, int wrms0, int wrms1)
+inline UINT16 abc1600_state::get_wrmsk()
 {
 	/*
 		
@@ -454,14 +620,14 @@ inline UINT16 abc1600_state::get_wrmsk(UINT8 xto, UINT8 xsize, int udx, int cmc,
 		A5		XSIZE1
 		A6		XSIZE2
 		A7		XSIZE3
-		A8		U/_D X
+		A8		U/D* X
 		A9		CMC
 		A10		WRMS0
 		A11		WRMS1
 		
 	*/
 	
-	UINT16 wrmsk_addr = (wrms1 << 11) | (wrms0 << 10) | (cmc << 9) | (udx << 8) | ((xsize & 0x0f) << 4) | (xto & 0x0f);
+	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | (!m_cmc << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
 	UINT8 wrmskl = m_wrmsk_rom[wrmsk_addr];
 	UINT8 wrmskh = m_wrmsk_rom[wrmsk_addr + 0x1000];
 	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
@@ -476,10 +642,6 @@ inline UINT16 abc1600_state::get_wrmsk(UINT8 xto, UINT8 xsize, int udx, int cmc,
 
 void abc1600_state::mover()
 {
-/*	UINT16 xsize = m_sx & 0x3ff;
-	UINT16 ysize = m_sy & 0xfff;
-	int udx = BIT(m_sx, 11);
-	int udy = BIT(m_sx, 10);*/
 }
 
 
@@ -598,12 +760,21 @@ void abc1600_state::video_start()
 	save_item(NAME(m_ms));
 	save_item(NAME(m_ds));
 	save_item(NAME(m_flag));
-	save_item(NAME(m_sx));
-	save_item(NAME(m_sy));
-	save_item(NAME(m_tx));
-	save_item(NAME(m_ty));
-	save_item(NAME(m_fx));
-	save_item(NAME(m_fy));
+	save_item(NAME(m_xsize));
+	save_item(NAME(m_ysize));
+	save_item(NAME(m_udx));
+	save_item(NAME(m_udy));
+	save_item(NAME(m_xfrom));
+	save_item(NAME(m_xto));
+	save_item(NAME(m_yto));
+	save_item(NAME(m_mfa));
+	save_item(NAME(m_mta));
+	save_item(NAME(m_sh));
+	save_item(NAME(m_hold_iv_cyk));
+	save_item(NAME(m_wrms0));
+	save_item(NAME(m_wrms1));
+	save_item(NAME(m_rmc));
+	save_item(NAME(m_cmc));
 }
 
 

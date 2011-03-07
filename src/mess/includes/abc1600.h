@@ -144,15 +144,14 @@ public:
 	inline UINT8 dma_iorq_r(int index, UINT16 offset);
 	inline void dma_iorq_w(int index, UINT16 offset, UINT8 data);
 
-	inline UINT16 get_drmsk(UINT8 sh, int udx);
-	inline UINT8 get_shinf(UINT8 xfrom, UINT8 xto, int udx);
-	inline UINT16 get_wrmsk(UINT8 xto, UINT8 xsize, int udx, int cmc, int wrms0, int wrms1);
+	inline UINT16 get_drmsk();
+	inline void get_shinf();
+	inline UINT16 get_wrmsk();
 	void mover();
 
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 	
-
 	// memory access controller
 	UINT8 m_task;
 	UINT8 m_segment_ram[0x400];
@@ -178,12 +177,21 @@ public:
 	UINT8 m_ms[16];				// mover sequence control
 	UINT8 m_ds[16];				// display sequence control
 	UINT8 m_flag;				// flags
-	UINT16 m_sx;				// X size
-	UINT16 m_sy;				// Y size
-	UINT16 m_tx;				// X destination
-	UINT16 m_ty;				// Y destination
-	UINT16 m_fx;				// X source
-	UINT16 m_fy;				// Y source
+	UINT16 m_xsize;				// X size
+	UINT16 m_ysize;				// Y size
+	int m_udx;					// up/down X
+	int m_udy;					// up/down Y
+	UINT16 m_xfrom;				// X from
+	UINT16 m_xto;				// X to
+	UINT16 m_yto;				// Y to
+	UINT32 m_mfa;				// mover from address
+	UINT32 m_mta;				// mover to address
+	UINT8 m_sh;					// 
+	int m_hold_iv_cyk;			// 
+	int m_wrms0;				// 
+	int m_wrms1;				// 
+	int m_rmc;					// row match count
+	int m_cmc;					// column match count
 };
 
 
