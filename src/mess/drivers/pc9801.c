@@ -12,6 +12,12 @@
     - proper 8251 uart hook-up on keyboard
     - boot is too slow right now, might be due of the floppy / HDD devices
 
+    TODO (PC-9801RS):
+    - protected mode work RAM, also add a RAM size configuration;
+    - floppy disk hook-up;
+    - extra features;
+    - keyboard shift doesn't work for whatever reason;
+
 ****************************************************************************************************/
 
 #include "emu.h"
@@ -69,7 +75,9 @@ public:
 	UINT8 vram_disp;
 
 	/* PC9801RS specific */
-	UINT8 gate_a20;
+	UINT8 gate_a20; //A20 line
+	UINT8 por; 		//Power-On Reset
+	UINT8 rom_bank;
 };
 
 
@@ -860,13 +868,15 @@ static WRITE8_HANDLER( pc9801rs_wram_w )
 
 static READ8_HANDLER( pc9801rs_ipl_r )
 {
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 	UINT8 *ROM = space->machine->region("ipl")->base();
 
-	return ROM[(offset & 0x1ffff)+0x20000];
+	return ROM[(offset & 0x1ffff)+(state->rom_bank*0x20000)];
 }
 
 static READ8_HANDLER( pc9801rs_knjram_r )
 {
+
 	UINT8 *KNJRAM = space->machine->region("kanji")->base();
 
 	return KNJRAM[offset];
@@ -884,6 +894,19 @@ static WRITE8_HANDLER( pc9801rs_bank_w )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
+	if(offset == 1)
+	{
+		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
+		{
+			if((data & 0xed) == 0x00)
+			{
+				state->rom_bank = (data & 2) >> 1;
+				return;
+			}
+		}
+
+		printf("Unknown EMS ROM setting %02x\n",data);
+	}
 	if(offset == 3)
 	{
 		if((data & 0xf0) == 0x20)
@@ -911,10 +934,7 @@ static WRITE8_HANDLER( pc9801rs_f0_w )
 
 	if(offset == 0x00)
 	{
-		//static UINT8 x;
-
-		//state->soft_reset = 0x00;
-
+		state->por = 0x00;
 		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
@@ -930,6 +950,15 @@ static WRITE8_HANDLER( pc9801rs_f0_w )
 	}
 }
 
+static READ8_HANDLER( pc9801rs_30_r )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if(offset == 5)
+		return (pc9801_30_r(space,offset) & ~0xa0) | state->por; //ppi bug?
+
+	return pc9801_30_r(space,offset);
+}
 
 static READ8_HANDLER( pc9801rs_memory_r )
 {
@@ -945,7 +974,8 @@ static READ8_HANDLER( pc9801rs_memory_r )
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff) { return pc9801rs_ipl_r(space,offset & 0x1ffff); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff) {	return pc9801rs_ipl_r(space,offset & 0x1ffff); }
 
-	return 0xff;
+	//printf("%08x\n",offset);
+	return 0x00;
 }
 
 
@@ -960,6 +990,8 @@ static WRITE8_HANDLER( pc9801rs_memory_w )
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff) { pc9801_tvram_w(space,offset-0xa0000,data); }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff) { pc9801rs_knjram_w(space,offset & 0xfff,data); }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff) { pc9801_gvram_w(space,offset-0xa8000,data); }
+	//else
+	//	printf("%08x %08x\n",offset,data);
 
 }
 
@@ -968,16 +1000,17 @@ static ADDRESS_MAP_START( pc9801rs_map, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,  pc9801_00_w,      0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,  pc9801_00_w,       0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
-	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801_30_r,  pc9801_30_w,      0xffffffff) //i8251 RS232c / i8255 system port
-	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,  pc9801_40_w,      0xffffffff) //i8255 printer port / i8251 keyboard
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,  pc9801_60_w,      0xffffffff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                  pc9801_video_ff_w,0xffffffff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,  pc9801_70_w,      0xffffffff) //display registers / i8253 pit
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,  pc9801_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,pc9801rs_f0_w,    0xffffffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(                  pc9801rs_bank_w,  0xffffffff) //ROM/RAM bank
+	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,pc9801_30_w,       0xffffffff) //i8251 RS232c / i8255 system port
+	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,  pc9801_40_w,       0xffffffff) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,  pc9801_60_w,       0xffffffff) //upd7220 character ports / <undefined>
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                  pc9801_vrtc_mask_w,0xffffffff)
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                  pc9801_video_ff_w, 0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,  pc9801_70_w,       0xffffffff) //display registers / i8253 pit
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,  pc9801_a0_w,       0xffffffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,pc9801rs_f0_w,     0xffffffff)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8(                  pc9801rs_bank_w,   0xffffffff) //ROM/RAM bank
 
 ADDRESS_MAP_END
 
@@ -1636,6 +1669,8 @@ static MACHINE_RESET(pc9801rs)
 	MACHINE_RESET_CALL(pc9801);
 
 	state->gate_a20 = 0;
+	state->por = 0xa0;
+	state->rom_bank = 0;
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)
@@ -1711,6 +1746,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I386, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
+	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START(pc9801)
 	MCFG_MACHINE_RESET(pc9801rs)
@@ -1782,8 +1818,8 @@ ROM_END
 
 ROM_START( pc9801rs )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0x08000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
-	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 
 	ROM_REGION( 0xa0000, "wram", ROMREGION_ERASE00 )
 
