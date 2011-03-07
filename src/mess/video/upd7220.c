@@ -971,24 +971,32 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_CCHAR: /* cursor & character characteristics */
-		if (upd7220->param_ptr == 4)
+		if(upd7220->param_ptr == 2)
 		{
 			upd7220->lr = (upd7220->pr[1] & 0x1f) + 1;
 			upd7220->dc = BIT(upd7220->pr[1], 7);
+		}
+
+		if(upd7220->param_ptr == 3)
+		{
 			upd7220->ctop = upd7220->pr[2] & 0x1f;
 			upd7220->sc = BIT(upd7220->pr[2], 5);
+		}
+
+		if(upd7220->param_ptr == 4)
+		{
 			upd7220->br = ((upd7220->pr[3] & 0x07) << 2) | (upd7220->pr[2] >> 6);
 			upd7220->cbot = upd7220->pr[3] >> 3;
+		}
 
-			if (LOG)
-			{
-				logerror("uPD7220 '%s' LR: %u\n", device->tag(), upd7220->lr);
-				logerror("uPD7220 '%s' DC: %u\n", device->tag(), upd7220->dc);
-				logerror("uPD7220 '%s' CTOP: %u\n", device->tag(), upd7220->ctop);
-				logerror("uPD7220 '%s' SC: %u\n", device->tag(), upd7220->sc);
-				logerror("uPD7220 '%s' BR: %u\n", device->tag(), upd7220->br);
-				logerror("uPD7220 '%s' CBOT: %u\n", device->tag(), upd7220->cbot);
-			}
+		if (0)
+		{
+			logerror("uPD7220 '%s' LR: %u\n", device->tag(), upd7220->lr);
+			logerror("uPD7220 '%s' DC: %u\n", device->tag(), upd7220->dc);
+			logerror("uPD7220 '%s' CTOP: %u\n", device->tag(), upd7220->ctop);
+			logerror("uPD7220 '%s' SC: %u\n", device->tag(), upd7220->sc);
+			logerror("uPD7220 '%s' BR: %u\n", device->tag(), upd7220->br);
+			logerror("uPD7220 '%s' CBOT: %u\n", device->tag(), upd7220->cbot);
 		}
 		break;
 

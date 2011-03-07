@@ -194,7 +194,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(u_line && yi == 7) { tile_data = 0xff; }
 				if(v_line)	{ tile_data|=8; }
 
-				if(cursor_addr == tile_addr) //TODO: also, cursor_on doesn't work?
+				if(cursor_on && cursor_addr == tile_addr) //TODO: also, cursor_on doesn't work?
 					tile_data^=0xff;
 
 				if(yi >= char_size)
