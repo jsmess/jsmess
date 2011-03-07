@@ -1285,9 +1285,13 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2dd BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
+INPUT_PORTS_END
 
-	PORT_START("VBLANK")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
+static INPUT_PORTS_START( pc9801rs )
+	PORT_INCLUDE( pc9801 )
+
+	PORT_MODIFY("ROM_LOAD")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout charset_8x8 =
@@ -1847,4 +1851,4 @@ ROM_START( pc9801rs )
 ROM_END
 
 COMP( 1983, pc9801f,   0,       0,     pc9801,   pc9801,   0, "Nippon Electronic Company",   "PC-9801F",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1989, pc9801rs,  pc9801f, 0,     pc9801rs, pc9801,   0, "Nippon Electronic Company",   "PC-9801RS", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1989, pc9801rs,  pc9801f, 0,     pc9801rs, pc9801rs, 0, "Nippon Electronic Company",   "PC-9801RS", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model

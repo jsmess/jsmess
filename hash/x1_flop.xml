@@ -1499,8 +1499,8 @@
 	</software>
 
 	<software name="dslayer">
-	<!-- also found as login_ds.d88 -->
-		<description>Dragon Slayer</description>
+	<!-- also found as login_ds.d88, harder version, original is undumped -->
+		<description>Dragon Slayer (Login Version)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
