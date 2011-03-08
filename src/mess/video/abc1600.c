@@ -17,7 +17,9 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define VIDEORAM_SIZE	512*1024
+#define LOG 1
+
+#define VIDEORAM_SIZE	256*1024
 
 // flag register
 #define L_P			BIT(m_flag, 0)
@@ -73,13 +75,34 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
+//  write_videoram -
+//-------------------------------------------------
+
+inline void abc1600_state::write_videoram(UINT32 offset, UINT16 data, UINT16 mask)
+{
+	UINT16 old_data = m_video_ram[offset];
+
+	m_video_ram[offset] = (data & mask) | (old_data & (mask ^ 0xffff));
+}
+
+
+//-------------------------------------------------
 //  video_ram_r -
 //-------------------------------------------------
 
 READ8_MEMBER( abc1600_state::video_ram_r )
 {
-	UINT32 addr = offset & 0x7ffff;
-	UINT8 data = m_video_ram[addr];
+	UINT32 addr = (offset & 0x7fffe) >> 1;
+	UINT8 data = 0;
+	
+	if (offset & 0x01)
+	{
+		data = m_video_ram[addr] & 0xff;
+	}
+	else
+	{
+		data = m_video_ram[addr] >> 8;
+	}
 
 	return data;
 }
@@ -91,7 +114,7 @@ READ8_MEMBER( abc1600_state::video_ram_r )
 
 WRITE8_MEMBER( abc1600_state::video_ram_w )
 {
-	UINT32 addr = offset & 0x7ffff;
+	UINT32 addr = (offset & 0x7fffe) >> 1;
 
 	if (offset & 0x01)
 	{
@@ -99,22 +122,19 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 		{
 			// WRPORT_LB
 			m_wrm = (m_wrm & 0xff00) | data;
-			logerror("WRM LB %04x\n", m_wrm);
+			if (LOG) logerror("WRM LB %02x -> %04x\n", data, m_wrm);
 		}
 		else
 		{
 			// DATAPORT_LB
 			m_gmdi = (m_gmdi & 0xff00) | data;
-			logerror("GMDI LB %04x\n", m_gmdi);
+			if (LOG) logerror("GMDI LB %02x -> %04x\n", data, m_gmdi);
 		}
 
-		UINT8 gmdo = m_video_ram[addr];
-		UINT8 gmdi = m_gmdi & 0xff;
-		UINT8 mask = 0xff;//m_wrm & 0xff;
+//		m_wrm = 0xffff;
+		write_videoram(addr, m_gmdi, m_wrm & 0x00ff);
 
-		m_video_ram[addr] = (gmdi & mask) | (gmdo & (mask ^ 0xff));
-
-		logerror("Video RAM write LB to %05x : %02x\n", addr, m_video_ram[addr]);
+		if (LOG) logerror("Video RAM write LB to %05x : %04x\n", addr, m_video_ram[addr]);
 	}
 	else
 	{
@@ -122,22 +142,19 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 		{
 			// WRPORT_HB
 			m_wrm = (data << 8) | (m_wrm & 0xff);
-			logerror("WRM HB %04x\n", m_wrm);
+			if (LOG) logerror("WRM HB %02x -> %04x\n", data, m_wrm);
 		}
 		else
 		{
 			// DATAPORT_HB
 			m_gmdi = (data << 8) | (m_gmdi & 0xff);
-			logerror("GMDI HB %04x\n", m_gmdi);
+			if (LOG) logerror("GMDI HB %02x -> %04x\n", data, m_gmdi);
 		}
 
-		UINT8 gmdo = m_video_ram[addr];
-		UINT8 gmdi = m_gmdi >> 8;
-		UINT8 mask = 0xff;//m_wrm >> 8;
+//		m_wrm = 0xffff;
+		write_videoram(addr, m_gmdi, m_wrm & 0xff00);
 
-		m_video_ram[addr] = (gmdi & mask) | (gmdo & (mask ^ 0xff));
-
-		logerror("Video RAM write HB to %05x : %02x\n", addr, m_video_ram[addr]);
+		if (LOG) logerror("Video RAM write HB to %05x : %04x\n", addr, m_video_ram[addr]);
 	}
 }
 
@@ -358,6 +375,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 		*/
 
+		logerror("FX HB %02x\n", data);
 		m_xfrom = ((data & 0x03) << 8) | (m_xfrom & 0xff);
 		m_mfa = (m_mfa & 0x3ffcf) | ((data & 0x03) << 4);
 		break;
@@ -378,6 +396,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 		*/
 
+		logerror("FX LB %02x\n", data);
 		m_xfrom = (m_xfrom & 0x300) | data;
 		m_mfa = (m_mfa & 0x3fff0) | (data >> 4);
 		break;
@@ -397,6 +416,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			7		
 
 		*/
+		logerror("FY HB %02x\n", data);
 		m_mfa = ((data & 0x0f) << 14) | (m_mfa & 0x3fff);
 		break;
 		
@@ -415,7 +435,10 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			7		MFA13
 
 		*/
+		logerror("FY LB %02x\n", data);
 		m_mfa = (m_mfa & 0x3c03f) | (data << 6);
+		
+		mover();
 		break;
 		
 	case WRML:
@@ -434,7 +457,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 		*/
 
-		logerror("MS %u : %02x\n", (offset >> 4) & 0x0f, data);
+		if (LOG) logerror("MS %u : %02x\n", (offset >> 4) & 0x0f, data);
 
 		if (!m_clocks_disabled)
 		{
@@ -458,7 +481,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 		*/
 
-		logerror("WS %u : %02x\n", (offset >> 4) & 0x0f, data);
+		if (LOG) logerror("WS %u : %02x\n", (offset >> 4) & 0x0f, data);
 
 		if (!m_clocks_disabled)
 		{
@@ -482,13 +505,13 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 		{
 			// DATAPORT_HB
 			m_gmdi = (data << 8) | (m_gmdi & 0xff);
-			logerror("GMDI HB %04x\n", m_gmdi);
+			if (LOG) logerror("GMDI HB %04x\n", m_gmdi);
 		}
 		else
 		{
 			// WRPORT_HB
 			m_wrm = (data << 8) | (m_wrm & 0xff);
-			logerror("WRM HB %04x\n", m_gmdi);
+			if (LOG) logerror("WRM HB %04x\n", m_gmdi);
 		}
 		break;
 		
@@ -497,18 +520,18 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 		{
 			// DATAPORT_LB
 			m_gmdi = (m_gmdi & 0xff00) | data;
-			logerror("GMDI LB %04x\n", m_gmdi);
+			if (LOG) logerror("GMDI LB %04x\n", m_gmdi);
 		}
 		else
 		{
 			// WRPORT_LB
 			m_wrm = (m_wrm & 0xff00) | data;
-			logerror("WRM LB %04x\n", m_gmdi);
+			if (LOG) logerror("WRM LB %04x\n", m_gmdi);
 		}
 		break;
 
 	case ENABLE_CLOCKS:
-		logerror("ENABLE CLOCKS\n");
+		if (LOG) logerror("ENABLE CLOCKS\n");
 		m_clocks_disabled = 0;
 		break;
 		
@@ -529,11 +552,11 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 		*/
 
 		m_flag = data;
-		logerror("FLAG %02x\n", m_flag);
+		if (LOG) logerror("FLAG %02x\n", m_flag);
 		break;
 		
 	case ENDISP:
-		logerror("ENDISP\n");
+		if (LOG) logerror("ENDISP\n");
 		m_endisp = 1;
 		break;
 	}
@@ -642,6 +665,17 @@ inline UINT16 abc1600_state::get_wrmsk()
 
 void abc1600_state::mover()
 {
+	if (LOG) logerror("XFROM %u XSIZE %u YSIZE %u XTO %u YTO %u MFA %05x MTA %05x U/D*X %u U/D*Y %u\n", m_xfrom, m_xsize, m_ysize, m_xto, m_yto, m_mfa, m_mta, m_udx, m_udy);
+/*
+	for (int y = 0; y < m_ysize; y++)
+	{
+		for (int x = 0; x < m_xsize; x++)
+		{
+			int color = *BITMAP_ADDR16(m_bitmap, (m_mfa >> 6) + y, m_xfrom + x);
+			*BITMAP_ADDR16(m_bitmap, m_yto + y, m_xto + x) = color;
+		}
+	}
+*/
 }
 
 
@@ -687,15 +721,15 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const re
 	for (int column = 0; column < x_count; column += 2)
 	{
 		UINT16 dma = get_crtca(ma, ra, column);
-
+		
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
 		for (int cas = 0; cas < 4; cas++)
 		{
-			UINT8 data = m_video_ram[dma + cas];
-			
-			for (int bit = 0; bit < 8; bit++)
+			UINT16 data = m_video_ram[dma + cas];
+		
+			for (int bit = 0; bit < 16; bit++)
 			{
-				int color = (BIT(data, 7) ^ PIX_POL) & !BLANK;
+				int color = (BIT(data, 15) ^ PIX_POL) & !BLANK;
 
 				*BITMAP_ADDR16(bitmap, y, x++) = color;
 			
@@ -723,7 +757,7 @@ static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 static const mc6845_interface crtc_intf =
 {
 	SCREEN_TAG,
-	32,
+	64,
 	NULL,
 	abc1600_update_row,
 	NULL,
@@ -742,7 +776,7 @@ static const mc6845_interface crtc_intf =
 void abc1600_state::video_start()
 {
 	// allocate video RAM
-	m_video_ram = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
 	memset(m_video_ram, 0, VIDEORAM_SIZE);
 	
 	// find memory regions
@@ -792,8 +826,6 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	{
 		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
 	}
-
-	mover();
 
 	return 0;
 }

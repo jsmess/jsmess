@@ -149,6 +149,7 @@ public:
 	inline UINT16 get_wrmsk();
 	void mover();
 
+	inline void write_videoram(UINT32 offset, UINT16 data, UINT16 mask);
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 	
@@ -165,10 +166,10 @@ public:
 	UINT8 m_cause;
 
 	// video
-	const UINT8 *m_wrmsk_rom;
-	const UINT8 *m_shinf_rom;
-	const UINT8 *m_drmsk_rom;
-	UINT8 *m_video_ram;			// video RAM
+	const UINT8 *m_wrmsk_rom;	// write mask ROM
+	const UINT8 *m_shinf_rom;	// shifter info ROM
+	const UINT8 *m_drmsk_rom;	// data read mask ROM
+	UINT16 *m_video_ram;		// video RAM
 	int m_endisp;				// enable display
 	int m_clocks_disabled;		// clocks disabled
 	int m_vs;					// vertical sync
