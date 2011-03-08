@@ -4,22 +4,24 @@
 *  Part number VPU-1 V1
 *  By Kevin 'kevtris' Horton and Jonathan Gevaryahu AKA Lord Nightmare
 *
-*  RE work done by Kevin 'kevtris' Horton and Jonathan Gevaryahu
+*  RE work done by Kevin Horton and Jonathan Gevaryahu
 *
 *  DONE:
 *  compiles correctly
 *  rom loads correctly
 *  interface with tms5220 is done
 *  rts and cts bits are stored in struct
+*  serial is attached to terminal
 *
 *  TODO:
-*  figure out how to attach serial/terminal to the 80c31
+*  serial receive clear should happen after delay of one cpu cycle, not ASSERT and then CLEAR immediately after
+*  figure out how to attach serial to external socket
 *
 ***********************************************************************
 This is almost as simple as hardware gets from the digital side:
 Hardware consists of:
 10.245Mhz xtal
-8031 cpu
+80c31 cpu/mcu
 27c64 rom (holds less than 256 bytes of code)
 unpopulated 6164 sram, which isn't used
 TSP5220C speech chip (aka tms5220c)
@@ -52,7 +54,9 @@ Address map:
 #define ADDRESS_MAP_MODERN
 #define CPU_CLOCK		XTAL_10_245MHz
 
-#define DEBUG_PORT3 1
+#undef DEBUG_FIFO
+#undef DEBUG_SERIAL_CB
+#undef DEBUG_PORTS
 
 /* Core includes */
 #include "emu.h"
@@ -65,19 +69,27 @@ Address map:
 static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 {
 	pes_state *state = device->machine->driver_data<pes_state>();
+#ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
+#endif
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
 	if (((state->infifo_tail_ptr-1)&0x1F) == state->infifo_head_ptr)
 	{
 		logerror("infifo was full, write ignored!\n");
+#ifdef DEBUG_FIFO
 		fprintf(stderr,"infifo was full, write ignored!\n");
+#endif
 		return;
 	}
 	state->infifo[state->infifo_head_ptr] = data;
 	state->infifo_head_ptr++;
 	state->infifo_head_ptr&=0x1F;
+#ifdef DEBUG_FIFO
 	fprintf(stderr,"kb input fifo fullness: %d\n",(state->infifo_head_ptr-state->infifo_tail_ptr)&0x1F);
-	cputag_set_input_line(device->machine, "maincpu", MCS51_RX_LINE, HOLD_LINE); // this doesn't do what it should :(
+#endif
+	// todo: following two should be set so clear happens after one cpu cycle
+	cputag_set_input_line(device->machine, "maincpu", MCS51_RX_LINE, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", MCS51_RX_LINE, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
@@ -94,7 +106,9 @@ static int data_to_i8031(device_t *device)
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
 	if (state->infifo_tail_ptr != state->infifo_head_ptr) state->infifo_tail_ptr++; 
 	state->infifo_tail_ptr&=0x1F;
+#ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: input to i8031/pes from pc/terminal: %02X\n",data);
+#endif
 	return data;
 }
 
@@ -102,7 +116,9 @@ static void data_from_i8031(device_t *device, int data)
 {
 	pes_state *state = device->machine->driver_data<pes_state>();
 	terminal_write(state->m_terminal,0,data);
+#ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
+#endif
 }
 
 /* Port Handlers */
@@ -111,7 +127,9 @@ WRITE8_MEMBER( pes_state::rsws_w )
 	pes_state *state = machine->driver_data<pes_state>();
 	m_wsstate = data&0x1; // /ws is bit 0
 	m_rsstate = (data&0x2)>>1; // /rs is bit 1
+#ifdef DEBUG_PORTS
 	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", m_rsstate, m_wsstate);
+#endif
 	tms5220_rsq_w(state->m_speech, m_rsstate);
 	tms5220_wsq_w(state->m_speech, m_wsstate);
 }
@@ -119,7 +137,9 @@ WRITE8_MEMBER( pes_state::rsws_w )
 WRITE8_MEMBER( pes_state::port1_w )
 {
 	pes_state *state = machine->driver_data<pes_state>();
+#ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
+#endif
 	tms5220_data_w(state->m_speech, 0, data);
 	
 }
@@ -129,11 +149,13 @@ READ8_MEMBER( pes_state::port1_r )
 	UINT8 data = 0xFF;
 	pes_state *state = machine->driver_data<pes_state>();
 	data = tms5220_status_r(state->m_speech, 0);
+#ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
+#endif
 	return data;
 }
 
-#define P3_RXD (((state->m_port3_data)&(1<<0))>>0)
+/*#define P3_RXD (((state->m_port3_data)&(1<<0))>>0)
 #define P3_TXD (((state->m_port3_data)&(1<<1))>>1)
 #define P3_INT (((state->m_port3_data)&(1<<2))>>2)
 #define P3_RDY (((state->m_port3_data)&(1<<3))>>3)
@@ -141,9 +163,11 @@ READ8_MEMBER( pes_state::port1_r )
 #define P3_CTS (((state->m_port3_data)&(1<<5))>>5)
 #define P3_WR (((state->m_port3_data)&(1<<6))>>6)
 #define P3_RD (((state->m_port3_data)&(1<<7))>>7)
+*/
 WRITE8_MEMBER( pes_state::port3_w )
 {
 	m_port3_state = data;
+#ifdef DEBUG_PORTS
 	logerror("port3 write: control data written: %02X; ", data);
 	logerror("RXD: %d; ", (data&1));
 	logerror("TXD: %d; ", ((data&2)>>1));
@@ -153,6 +177,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 	logerror("CTS: %d; ", ((data&0x20)>>5));
 	logerror("WR: %d; ", ((data&0x40)>>6));
 	logerror("RD: %d;\n", ((data&0x80)>>7));
+#endif
 	// todo: poke serial handler here somehow?
 }
 
@@ -167,6 +192,7 @@ READ8_MEMBER( pes_state::port3_r )
 	}
 	data |= (tms5220_intq_r(state->m_speech)<<2);
 	data |= (tms5220_readyq_r(state->m_speech)<<3);
+#ifdef DEBUG_PORTS
 	logerror("port3 read: returning 0x%02X: ", data);
 	logerror("RXD: %d; ", (data&1));
 	logerror("TXD: %d; ", ((data&2)>>1));
@@ -176,6 +202,7 @@ READ8_MEMBER( pes_state::port3_r )
 	logerror("CTS: %d; ", ((data&0x20)>>5));
 	logerror("WR: %d; ", ((data&0x40)>>6));
 	logerror("RD: %d;\n", ((data&0x80)>>7));
+#endif
 	return data;
 }
 
@@ -191,19 +218,22 @@ void pes_state::machine_reset()
 	m_rsstate = 1;
 
 	m_port3_state = 0; // reset the openbus state of port 3
-	
+	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
 	devtag_reset(machine, "tms5220"); // reset the 5220
-	fprintf(stderr,"machine_reset called\n");
 }
 
 /******************************************************************************
- Driver Init
+ Driver Init and Timer Callbacks
 ******************************************************************************/
+/*static TIMER_CALLBACK( serial_read_cb )
+{
+	machine->scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+}*/
+
 DRIVER_INIT( pes )
 {
 	i8051_set_serial_tx_callback(machine->device("maincpu"), data_from_i8031);
 	i8051_set_serial_rx_callback(machine->device("maincpu"), data_to_i8031);
-	fprintf(stderr,"driver_init called\n");
 }
 
 /******************************************************************************
