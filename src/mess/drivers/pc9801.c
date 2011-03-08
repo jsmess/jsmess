@@ -1394,11 +1394,11 @@ static const struct pit8253_config pit8253_config =
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			1996800,				/* dram refresh */
+			1996800,				/* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1996800,				/* pio port c pin 4, and speaker polling enough */
+			1996800,				/* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -1413,11 +1413,11 @@ static const struct pit8253_config pc9801rs_pit8253_config =
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			16000000/4,				/* dram refresh */
+			16000000/4,				/* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			16000000/4,				/* pio port c pin 4, and speaker polling enough */
+			16000000/4,				/* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
