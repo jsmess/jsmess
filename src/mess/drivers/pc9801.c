@@ -78,6 +78,7 @@ public:
 	UINT8 gate_a20; //A20 line
 	UINT8 por; 		//Power-On Reset
 	UINT8 rom_bank;
+	UINT8 fdc_ctrl;
 };
 
 
@@ -194,7 +195,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(u_line && yi == 7) { tile_data = 0xff; }
 				if(v_line)	{ tile_data|=8; }
 
-				if(cursor_on && cursor_addr == tile_addr) //TODO: also, cursor_on doesn't work?
+				if(cursor_on && cursor_addr == tile_addr)
 					tile_data^=0xff;
 
 				if(yi >= char_size)
@@ -995,22 +996,118 @@ static WRITE8_HANDLER( pc9801rs_memory_w )
 
 }
 
+static READ8_HANDLER( pc9810rs_fdc_ctrl_r )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	return (state->fdc_ctrl & 3) | 8;
+}
+
+static WRITE8_HANDLER( pc9810rs_fdc_ctrl_w )
+{
+	/*
+	---- x--- ready line?
+	---- --x- select type (1) 2hd (0) 2dd
+	---- ---x select irq
+	*/
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	state->fdc_ctrl = data;
+	if(data & 0xfc)
+		printf("FDC ctrl called with %02x\n",data);
+}
+
+static READ8_HANDLER( pc9801rs_2hd_r )
+{
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 0:	return upd765_status_r(space->machine->device("upd765_2hd"),0);
+			case 2: return upd765_data_r(space->machine->device("upd765_2hd"),0);
+			case 4: return 0x40; //2hd flag
+		}
+	}
+
+	printf("Read to undefined port [%02x]\n",offset+0x90);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc9801rs_2hd_w )
+{
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 2: upd765_data_w(space->machine->device("upd765_2hd"),0,data); return;
+			case 4: printf("%02x FDC ctrl\n",data); return;
+		}
+	}
+
+	printf("Write to undefined port [%02x] %02x\n",offset+0x90,data);
+}
+
+static READ8_HANDLER( pc9801rs_2dd_r )
+{
+//	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+//	if(state->fdc_ctrl & 1)
+//		return 0xff;
+
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 0:	return upd765_status_r(space->machine->device("upd765_2hd"),0);
+			case 2: return upd765_data_r(space->machine->device("upd765_2hd"),0);
+			case 4: return 0x70; //2dd flag
+		}
+	}
+
+	printf("Read to undefined port [%02x]\n",offset+0x90);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc9801rs_2dd_w )
+{
+//	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+//	if(state->fdc_ctrl & 1)
+//		return;
+
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 2: upd765_data_w(space->machine->device("upd765_2hd"),0,data); return;
+			case 4: printf("%02x FDC ctrl\n",data); return;
+		}
+	}
+
+	printf("Write to undefined port [%02x] %02x\n",offset+0x90,data);
+}
+
 static ADDRESS_MAP_START( pc9801rs_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,  pc9801_00_w,       0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
-	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,pc9801_30_w,       0xffffffff) //i8251 RS232c / i8255 system port
-	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,  pc9801_40_w,       0xffffffff) //i8255 printer port / i8251 keyboard
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,  pc9801_60_w,       0xffffffff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                  pc9801_vrtc_mask_w,0xffffffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                  pc9801_video_ff_w, 0xffffffff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,  pc9801_70_w,       0xffffffff) //display registers / i8253 pit
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,  pc9801_a0_w,       0xffffffff) //upd7220 bitmap ports / display registers
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,pc9801rs_f0_w,     0xffffffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(                  pc9801rs_bank_w,   0xffffffff) //ROM/RAM bank
+	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
+	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                        pc9801_vrtc_mask_w, 0xffffffff)
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801_video_ff_w,  0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers / i8253 pit
+	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
+	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
+	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8(                        pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 
 ADDRESS_MAP_END
 
@@ -1589,6 +1686,27 @@ static const struct upd765_interface upd765_2dd_intf =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
+static WRITE_LINE_DEVICE_HANDLER( pc9801rs_fdc_irq )
+{
+	pc9801_state *drvstate = device->machine->driver_data<pc9801_state>();
+
+	/* 0xffaf8 */
+
+	if(drvstate->fdc_ctrl & 1)
+		pic8259_ir3_w(device->machine->device("pic8259_slave"), state);
+	else
+		pic8259_ir2_w(device->machine->device("pic8259_slave"), state);
+}
+
+static const struct upd765_interface pc9801rs_upd765_intf =
+{
+	DEVCB_LINE(pc9801rs_fdc_irq),
+	DEVCB_LINE(fdc_2dd_drq), //DRQ, TODO
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
+
 static const floppy_config pc9801_floppy_config =
 {
 	DEVCB_NULL,
@@ -1694,6 +1812,7 @@ static MACHINE_RESET(pc9801rs)
 	state->gate_a20 = 0;
 	state->por = 0xa0;
 	state->rom_bank = 0;
+	state->fdc_ctrl = 3;
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)
@@ -1782,6 +1901,10 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255A_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255A_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+
+	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
+	//"upd765_2dd"
+	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
