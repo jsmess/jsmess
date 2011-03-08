@@ -12,22 +12,22 @@
     TODO:
 
     - implement FIFO as ring buffer
-    - drawing modes
-        - character
-        - mixed
     - commands
-        - FIGS
-        - FIGD
-        - GCHRD
-        - RDAT, needs a larger FIFO (seen in A5105 when it scrolls up)
         - DMAR
         - DMAW
+    - incomplete / unimplemented FIGD / GCHRD draw modes
+        - Arc
+        - FIGD character
+		- slanted character
+    	- GCHRD character (needs rewrite)
     - read-modify-write cycle
         - read data
         - modify data
         - write data
-	- QX-10 diagnostic test crashes when it attempts to draw lines;
-	- compis2 SAD address for bitmap is 0x20000, for whatever reason (presumably missing banking)
+	- QX-10 diagnostic test has positioning bugs with the bitmap display test;
+	- QX-10 diagnostic test misses the zooming factor (external pin);
+	- compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
+	- A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up;
 
     - honor visible area
     - wide mode (32-bit access)
@@ -725,32 +725,56 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 static void draw_rectangle(upd7220_t *upd7220,int x,int y)
 {
 	int i;
+	const int rect_x_dir[8] = { 0, 1, 0,-1, 1, 1,-1,-1 };
+	const int rect_y_dir[8] = { 1, 0,-1, 0, 1,-1,-1, 1 };
+	UINT8 rect_type,rect_dir;
+	UINT16 line_pattern;
+	UINT8 dot;
 
-	printf("%d %d %02x %08x\n",x,y,upd7220->figs.dir,upd7220->ead);
+	printf("uPD7220 rectangle check: %d %d %02x %08x\n",x,y,upd7220->figs.dir,upd7220->ead);
 
-	/* TODO: direction */
+	line_pattern = check_pattern(upd7220,(upd7220->ra[8]) | (upd7220->ra[9]<<8));
+	rect_type = (upd7220->figs.dir & 1) << 2;
+	rect_dir = rect_type | (((upd7220->figs.dir >> 1) + 0) & 3);
+
 	for(i = 0;i < upd7220->figs.d;i++)
 	{
-		draw_pixel(upd7220,x,y,1 << (x & 0xf));
-		x++;
-	}
-	for(i = 0;i < upd7220->figs.d2;i++)
-	{
-		draw_pixel(upd7220,x,y,1 << (x & 0xf));
-		y--;
-	}
-	for(i = 0;i < upd7220->figs.d;i++)
-	{
-		draw_pixel(upd7220,x,y,1 << (x & 0xf));
-		x--;
-	}
-	for(i = 0;i < upd7220->figs.d2;i++)
-	{
-		draw_pixel(upd7220,x,y,1 << (x & 0xf));
-		y++;
+		dot = ((line_pattern >> ((i+upd7220->dad) & 0xf)) & 1) << 7;
+		draw_pixel(upd7220,x,y,dot >> (x & 0x7));
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
 	}
 
-	upd7220->ead = (x >> 3) + (y * upd7220->pitch);
+	rect_dir = rect_type | (((upd7220->figs.dir >> 1) + 1) & 3);
+
+	for(i = 0;i < upd7220->figs.d2;i++)
+	{
+		dot = ((line_pattern >> ((i+upd7220->dad) & 0xf)) & 1) << 7;
+		draw_pixel(upd7220,x,y,dot >> (x & 0x7));
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
+	}
+
+	rect_dir = rect_type | (((upd7220->figs.dir >> 1) + 2) & 3);
+
+	for(i = 0;i < upd7220->figs.d;i++)
+	{
+		dot = ((line_pattern >> ((i+upd7220->dad) & 0xf)) & 1) << 7;
+		draw_pixel(upd7220,x,y,dot >> (x & 0x7));
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
+	}
+
+	rect_dir = rect_type | (((upd7220->figs.dir >> 1) + 3) & 3);
+
+	for(i = 0;i < upd7220->figs.d2;i++)
+	{
+		draw_pixel(upd7220,x,y,0x80 >> (x & 0x7));
+		x+=rect_x_dir[rect_dir];
+		y+=rect_y_dir[rect_dir];
+	}
+
+	upd7220->ead = (x >> 4) + (y * upd7220->pitch);
 	upd7220->dad = x & 0x0f;
 
 }
@@ -803,7 +827,7 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 		}
 	}
 
-	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs.dir]) >> 3) + ((y+8*y_dir_dot[upd7220->figs.dir]) * upd7220->pitch);
+	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs.dir]) >> 4) + ((y+8*y_dir_dot[upd7220->figs.dir]) * upd7220->pitch);
 	upd7220->dad = ((x+8*x_dir_dot[upd7220->figs.dir]) & 0xf);
 }
 
