@@ -36,6 +36,7 @@ public:
 	UINT8 vram_bank;
 	UINT8 pen_clut[8];
 	UINT8 bw_mode;
+	UINT16 knj_addr;
 };
 
 #define mc6845_h_char_total 	(state->crtc_vreg[0])
@@ -275,6 +276,21 @@ static WRITE8_HANDLER( pal_w )
 static READ8_HANDLER( ay8912_0_r ) { return ay8910_r(space->machine->device("aysnd"),0); }
 static READ8_HANDLER( ay8912_1_r ) { return ay8910_r(space->machine->device("aysnd"),1); }
 
+static READ8_HANDLER( multi8_kanji_r )
+{
+	multi8_state *state = space->machine->driver_data<multi8_state>();
+	UINT8 *knj_rom = space->machine->region("kanji")->base();
+
+	return knj_rom[(state->knj_addr << 1) | (offset & 1)];
+}
+
+static WRITE8_HANDLER( multi8_kanji_w )
+{
+	multi8_state *state = space->machine->driver_data<multi8_state>();
+
+	state->knj_addr = (offset == 0) ? (state->knj_addr & 0xff00) | (data & 0xff) : (state->knj_addr & 0x00ff) | (data << 8);
+}
+
 static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -296,7 +312,7 @@ static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 //  AM_RANGE(0x2c, 0x2d) //i8259
 	AM_RANGE(0x30, 0x37) AM_READWRITE(pal_r,pal_w)
-//  AM_RANGE(0x40, 0x41) //kanji regs
+	AM_RANGE(0x40, 0x41) AM_READWRITE(multi8_kanji_r,multi8_kanji_w) //kanji regs
 //  AM_RANGE(0x70, 0x74) //upd765a fdc
 //  AM_RANGE(0x78, 0x78) //memory banking
 ADDRESS_MAP_END
@@ -518,8 +534,13 @@ static PALETTE_INIT( multi8 )
 static READ8_DEVICE_HANDLER( porta_r )
 {
 	int vsync = (input_port_read(device->machine, "VBLANK") & 0x1) << 5;
+	/*
+	-x-- ---- kanji rom is present (0) yes
+	--x- ---- vsync
+	---- --x- fdc rom is present (0) yes
+	*/
 
-	return ~0x60 | vsync;
+	return 0x9f | vsync | 0x00;
 }
 
 
