@@ -8,6 +8,7 @@
     - dunno how to trigger the text color mode in BASIC, I just modify
       $f0b1 to 1 for now
     - bitmap B/W mode is untested
+    - keyboard
 
 ****************************************************************************/
 
@@ -30,24 +31,51 @@ public:
 	UINT8 keyb_press_flag;
 	UINT8 shift_press_flag;
 	UINT8 display_reg;
-	UINT16 cursor_addr;
-	UINT16 cursor_raster;
+	UINT8 crtc_vreg[0x100],crtc_index;
+
 	UINT8 vram_bank;
 	UINT8 pen_clut[8];
 	UINT8 bw_mode;
-	int addr_latch;
 };
 
-
+#define mc6845_h_char_total 	(state->crtc_vreg[0])
+#define mc6845_h_display 		(state->crtc_vreg[1])
+#define mc6845_h_sync_pos		(state->crtc_vreg[2])
+#define mc6845_sync_width		(state->crtc_vreg[3])
+#define mc6845_v_char_total		(state->crtc_vreg[4])
+#define mc6845_v_total_adj 		(state->crtc_vreg[5])
+#define mc6845_v_display		(state->crtc_vreg[6])
+#define mc6845_v_sync_pos		(state->crtc_vreg[7])
+#define mc6845_mode_ctrl		(state->crtc_vreg[8])
+#define mc6845_tile_height 		(state->crtc_vreg[9]+1)
+#define mc6845_cursor_y_start 	(state->crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(state->crtc_vreg[0x0b])
+#define mc6845_start_addr  		(((state->crtc_vreg[0x0c]<<8) & 0x3f00) | (state->crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->crtc_vreg[0x0e]<<8) & 0x3f00) | (state->crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr  	(((state->crtc_vreg[0x10]<<8) & 0x3f00) | (state->crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->crtc_vreg[0x12]<<8) & 0x3f00) | (state->crtc_vreg[0x13] & 0xff))
 
 static VIDEO_START( multi8 )
 {
 	multi8_state *state = machine->driver_data<multi8_state>();
 	state->keyb_press = state->keyb_press_flag = state->shift_press_flag = state->display_reg = 0;
-	state->cursor_addr = state->cursor_raster = 0;
 	for (state->bw_mode = 0; state->bw_mode < 8; state->bw_mode++) state->pen_clut[state->bw_mode]=0;
 	state->vram_bank = 8;
 	state->bw_mode = 0;
+}
+
+static void multi8_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width)
+{
+	if((x)>machine->primary_screen->visible_area().max_x || (y)>machine->primary_screen->visible_area().max_y)
+		return;
+
+	if(width)
+	{
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[pen];
+	}
+	else
+		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pen];
 }
 
 static SCREEN_UPDATE( multi8 )
@@ -61,11 +89,11 @@ static SCREEN_UPDATE( multi8 )
 
 	count = 0x0000;
 
-	x_width = (state->display_reg & 0x40) ? 640 : 320;
+	x_width = (state->display_reg & 0x40) ? 80 : 40;
 
 	for(y=0;y<200;y++)
 	{
-		for(x=0;x<x_width;x+=8)
+		for(x=0;x<80;x++)
 		{
 			for(xi=0;xi<8;xi++)
 			{
@@ -86,13 +114,12 @@ static SCREEN_UPDATE( multi8 )
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[state->pen_clut[color]];
+				multi8_draw_pixel(screen->machine,bitmap, y, x*8+xi,state->pen_clut[color],0);
 			}
 			count++;
 		}
 	}
 
-	x_width = (state->display_reg & 0x40) ? 80 : 40;
 	count = 0xc000;
 
 	for(y=0;y<25;y++)
@@ -115,19 +142,19 @@ static SCREEN_UPDATE( multi8 )
 						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+						multi8_draw_pixel(screen->machine,bitmap, y*mc6845_tile_height+yi, x*8+xi,pen,(state->display_reg & 0x40) == 0x00);
 				}
 			}
 
 			//drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
-			if(state->cursor_addr+0xc000 == count)
+			if(mc6845_cursor_addr+0xc000 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->cursor_raster & 0x60)
+				switch(mc6845_cursor_y_start & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -137,12 +164,11 @@ static SCREEN_UPDATE( multi8 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->cursor_raster & 7));yc++)
+					for(yc=0;yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
-						{
-							*BITMAP_ADDR16(bitmap, y*8+yc, x*8+xc) = screen->machine->pens[0x7];
-						}
+							multi8_draw_pixel(screen->machine,bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(state->display_reg & 0x40) == 0x00);
+
 					}
 				}
 			}
@@ -158,19 +184,13 @@ static WRITE8_HANDLER( multi8_6845_w )
 	multi8_state *state = space->machine->driver_data<multi8_state>();
 	if(offset == 0)
 	{
-		state->addr_latch = data;
-		//mc6845_address_w(space->machine->device("crtc"), 0,data);
+		state->crtc_index = data;
+		mc6845_address_w(space->machine->device("crtc"), 0,data);
 	}
 	else
 	{
-		if(state->addr_latch == 0x0a)
-			state->cursor_raster = data;
-		if(state->addr_latch == 0x0e)
-			state->cursor_addr = ((data<<8) & 0x3f00) | (state->cursor_addr & 0xff);
-		else if(state->addr_latch == 0x0f)
-			state->cursor_addr = (state->cursor_addr & 0x3f00) | (data & 0xff);
-
-		//mc6845_register_w(space->machine->device("crtc"), 0,data);
+		state->crtc_vreg[state->crtc_index] = data;
+		mc6845_register_w(space->machine->device("crtc"), 0,data);
 	}
 }
 
@@ -187,9 +207,9 @@ static READ8_HANDLER( key_input_r )
 static READ8_HANDLER( key_status_r )
 {
 	multi8_state *state = space->machine->driver_data<multi8_state>();
-	if(state->mcu_init == 0){				return 1; }
-	if(state->mcu_init == 1){ state->mcu_init++;	return 1; }
-	if(state->mcu_init == 2){ state->mcu_init++;	return 0; }
+	if(state->mcu_init == 0){                       return 1; }
+	if(state->mcu_init == 1){ state->mcu_init++;    return 1; }
+	if(state->mcu_init == 2){ state->mcu_init++;    return 0; }
 
 	return state->keyb_press_flag | (state->shift_press_flag << 7);
 }
@@ -504,22 +524,6 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 
 //  printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
 
-	{
-		if((state->display_reg & 0x40) != (data & 0x40))
-		{
-			rectangle visarea = device->machine->primary_screen->visible_area();
-			int x_width;
-
-			x_width = (data & 0x40) ? 640 : 320;
-
-			visarea.min_x = visarea.min_y = 0;
-			visarea.max_y = (200) - 1;
-			visarea.max_x = (x_width) - 1;
-
-			device->machine->primary_screen->configure(640, 200, visarea, device->machine->primary_screen->frame_period().attoseconds);
-		}
-	}
-
 	state->display_reg = data;
 }
 
@@ -620,6 +624,9 @@ ROM_START( multi8 )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom",  0x0000, 0x0800, CRC(08f9ed0e) SHA1(57480510fb30af1372df5a44b23066ca61c6f0d9))
+
+	ROM_REGION( 0x0100, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "kbd.rom",  0x0000, 0x0100, NO_DUMP )
 
 	ROM_REGION( 0x1000, "fdc_bios", 0 )
 	ROM_LOAD( "disk.rom",  0x0000, 0x1000, NO_DUMP )
