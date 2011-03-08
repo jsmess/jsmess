@@ -75,14 +75,24 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
+//  read_videoram -
+//-------------------------------------------------
+
+inline UINT16 abc1600_state::read_videoram(UINT32 offset)
+{
+	return m_video_ram[offset & 0x3ffff];
+}
+
+
+//-------------------------------------------------
 //  write_videoram -
 //-------------------------------------------------
 
 inline void abc1600_state::write_videoram(UINT32 offset, UINT16 data, UINT16 mask)
 {
-	UINT16 old_data = m_video_ram[offset];
+	UINT16 old_data = m_video_ram[offset & 0x3ffff];
 
-	m_video_ram[offset] = (data & mask) | (old_data & (mask ^ 0xffff));
+	m_video_ram[offset & 0x3ffff] = (data & mask) | (old_data & (mask ^ 0xffff));
 }
 
 
@@ -569,33 +579,6 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_drmsk - 
-//-------------------------------------------------
-
-inline UINT16 abc1600_state::get_drmsk()
-{
-	/*
-		
-		bit		description
-		
-		A0		SH0
-		A1		SH1
-		A2		SH2
-		A3		SH3
-		A4		U/D* X
-		
-	*/
-	
-	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
-	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
-	UINT8 drmskh = m_drmsk_rom[drmsk_addr + 0x20];
-	UINT16 drmsk = (drmskh << 8) | drmskl;
-	
-	return drmsk;
-}
-
-
-//-------------------------------------------------
 //  get_shinf - 
 //-------------------------------------------------
 
@@ -622,6 +605,33 @@ inline void abc1600_state::get_shinf()
 
 	m_sh = shinf & 0x0f;
 	m_hold_iv_cyk = BIT(shinf, 5);
+}
+
+
+//-------------------------------------------------
+//  get_drmsk - 
+//-------------------------------------------------
+
+inline UINT16 abc1600_state::get_drmsk()
+{
+	/*
+		
+		bit		description
+		
+		A0		SH0
+		A1		SH1
+		A2		SH2
+		A3		SH3
+		A4		U/D* X
+		
+	*/
+	
+	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
+	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
+	UINT8 drmskh = m_drmsk_rom[drmsk_addr + 0x20];
+	UINT16 drmsk = (drmskh << 8) | drmskl;
+	
+	return drmsk;
 }
 
 
@@ -655,7 +665,7 @@ inline UINT16 abc1600_state::get_wrmsk()
 	UINT8 wrmskh = m_wrmsk_rom[wrmsk_addr + 0x1000];
 	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
 	
-	return wrmsk;
+	return wrmsk ^ 0xffff;
 }
 
 
@@ -665,8 +675,16 @@ inline UINT16 abc1600_state::get_wrmsk()
 
 inline UINT16 abc1600_state::barrel_shift(UINT16 gmdr)
 {
-	// 8x 74F350 4-bit shifter
-	return gmdr;
+	UINT16 rot = gmdr;
+
+	for (int sh = 0; sh < m_sh; sh++)
+	{
+		int msb = BIT(rot, 15);
+		rot <<= 1;
+		rot |= msb;
+	}
+
+	return rot;
 }
 
 
@@ -676,9 +694,17 @@ inline UINT16 abc1600_state::barrel_shift(UINT16 gmdr)
 
 inline UINT16 abc1600_state::word_mixer(UINT16 rot)
 {
-//	UINT16 drmsk = get_drmsk();
+	UINT16 drmsk = get_drmsk();
+	UINT16 gmdi = (rot & drmsk) | (m_mdor & (drmsk ^ 0xffff));
 
-	return rot;
+	if (COMP_MOVE)
+	{
+		gmdi ^= 0xffff;
+	}
+	
+	m_mdor = rot;
+
+	return gmdi;
 }
 
 
@@ -690,33 +716,49 @@ void abc1600_state::mover()
 {
 	if (LOG) logerror("XFROM %u XSIZE %u YSIZE %u XTO %u YTO %u MFA %05x MTA %05x U/D*X %u U/D*Y %u\n", m_xfrom, m_xsize, m_ysize, m_xto, m_yto, m_mfa, m_mta, m_udx, m_udy);
 
-	UINT8 mfa_x = m_mfa & 0x3f;
+	int m_amm = 1;
+
+	UINT8 mfa_x;
 	UINT16 mfa_y = m_mfa >> 6;
-	UINT8 mta_x = m_mta & 0x3f;
+	UINT8 mta_x;
 	UINT16 mta_y = m_mta >> 6;
-	
-	int mta_x_end = ((m_xto >> 4) + (m_xsize >> 4)) & 0x3f;
+
+	int mta_x_end = ((m_xto + m_xsize) >> 4) & 0x3f;
 	int mta_y_end = (m_yto + m_ysize) & 0xfff;
 	
 	m_rmc = 1;
+	get_shinf();
 	
 	do
 	{
+		mfa_x = m_mfa & 0x3f;
+		mta_x = m_mta & 0x3f;
 		m_cmc = 1;
+		m_wrms0 = 0;
+
+		if (m_hold_iv_cyk)
+		{
+			// read one word in advance
+			UINT16 gmdr = read_videoram((mfa_y << 6) | mfa_x);
+			UINT16 rot = barrel_shift(gmdr);
+			UINT16 gmdi = word_mixer(rot);
+
+			if (!HOLD_FX)
+			{
+				mfa_x += m_udx ? 1 : -1;
+				mfa_x &= 0x3f;
+			}
+		}
 		
 		do
 		{
-//			m_wrms0 = (xcount == m_xsize);
-//			m_wrms1 = (xcount == 1);
+			if (mta_x == mta_x_end) m_cmc = 0;
+			m_wrms1 = m_cmc & m_amm;
 			
-			//logerror("fx %u fy %u tx %u ty %u wrms0 %u wrms1 %u\n", mfa_x, mfa_y, mta_x, mta_y, m_wrms0, m_wrms1);
-			
-			UINT16 gmdr = m_video_ram[(mfa_y << 6) | mfa_x];
-			get_shinf();
+			UINT16 gmdr = read_videoram((mfa_y << 6) | mfa_x);
 			UINT16 rot = barrel_shift(gmdr);
 			UINT16 gmdi = word_mixer(rot);
 			UINT16 mask = get_wrmsk();
-			mask=0xffff;
 			
 			write_videoram((mta_y << 6) | mta_x, gmdi, mask);
 		
@@ -729,10 +771,7 @@ void abc1600_state::mover()
 			mta_x += m_udx ? 1 : -1;
 			mta_x &= 0x3f;
 			
-			if (mta_x == mta_x_end)
-			{
-				m_cmc = 0;
-			}
+			m_wrms0 = 1;
 		}
 		while (m_cmc);
 		
@@ -743,23 +782,12 @@ void abc1600_state::mover()
 		
 		mta_y += m_udy ? 1 : -1;
 		
-		if (mta_y == mta_y_end)
-		{
-			m_rmc = 0;
-		}
+		if (mta_y == mta_y_end) m_rmc = 0;
 	} 
 	while (m_rmc);
-	
-	/*
-	for (int y = 0; y < m_ysize; y++)
-	{
-		for (int x = 0; x < m_xsize; x++)
-		{
-			int color = *BITMAP_ADDR16(m_bitmap, (m_mfa >> 6) + y, m_xfrom + x);
-			*BITMAP_ADDR16(m_bitmap, m_yto + y, m_xto + x) = color;
-		}
-	}
-*/
+
+	m_mfa = (mfa_y << 6) | mfa_x;
+	m_mta = (mta_y << 6) | mta_x;
 }
 
 
@@ -841,7 +869,7 @@ static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 static const mc6845_interface crtc_intf =
 {
 	SCREEN_TAG,
-	64,
+	32,
 	NULL,
 	abc1600_update_row,
 	NULL,
@@ -887,6 +915,7 @@ void abc1600_state::video_start()
 	save_item(NAME(m_mfa));
 	save_item(NAME(m_mta));
 	save_item(NAME(m_sh));
+	save_item(NAME(m_mdor));
 	save_item(NAME(m_hold_iv_cyk));
 	save_item(NAME(m_wrms0));
 	save_item(NAME(m_wrms1));

@@ -151,6 +151,7 @@ public:
 	inline UINT16 word_mixer(UINT16 rot);
 	void mover();
 
+	inline UINT16 read_videoram(UINT32 offset);
 	inline void write_videoram(UINT32 offset, UINT16 data, UINT16 mask);
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
@@ -190,6 +191,7 @@ public:
 	UINT32 m_mfa;				// mover from address
 	UINT32 m_mta;				// mover to address
 	UINT8 m_sh;					// 
+	UINT16 m_mdor;				// 
 	int m_hold_iv_cyk;			// 
 	int m_wrms0;				// 
 	int m_wrms1;				// 
