@@ -660,13 +660,97 @@ inline UINT16 abc1600_state::get_wrmsk()
 
 
 //-------------------------------------------------
+//  barrel_shift - 
+//-------------------------------------------------
+
+inline UINT16 abc1600_state::barrel_shift(UINT16 gmdr)
+{
+	// 8x 74F350 4-bit shifter
+	return gmdr;
+}
+
+
+//-------------------------------------------------
+//  word_mixer - 
+//-------------------------------------------------
+
+inline UINT16 abc1600_state::word_mixer(UINT16 rot)
+{
+//	UINT16 drmsk = get_drmsk();
+
+	return rot;
+}
+
+
+//-------------------------------------------------
 //  mover - 
 //-------------------------------------------------
 
 void abc1600_state::mover()
 {
 	if (LOG) logerror("XFROM %u XSIZE %u YSIZE %u XTO %u YTO %u MFA %05x MTA %05x U/D*X %u U/D*Y %u\n", m_xfrom, m_xsize, m_ysize, m_xto, m_yto, m_mfa, m_mta, m_udx, m_udy);
-/*
+
+	UINT8 mfa_x = m_mfa & 0x3f;
+	UINT16 mfa_y = m_mfa >> 6;
+	UINT8 mta_x = m_mta & 0x3f;
+	UINT16 mta_y = m_mta >> 6;
+	
+	int mta_x_end = ((m_xto >> 4) + (m_xsize >> 4)) & 0x3f;
+	int mta_y_end = (m_yto + m_ysize) & 0xfff;
+	
+	m_rmc = 1;
+	
+	do
+	{
+		m_cmc = 1;
+		
+		do
+		{
+//			m_wrms0 = (xcount == m_xsize);
+//			m_wrms1 = (xcount == 1);
+			
+			//logerror("fx %u fy %u tx %u ty %u wrms0 %u wrms1 %u\n", mfa_x, mfa_y, mta_x, mta_y, m_wrms0, m_wrms1);
+			
+			UINT16 gmdr = m_video_ram[(mfa_y << 6) | mfa_x];
+			get_shinf();
+			UINT16 rot = barrel_shift(gmdr);
+			UINT16 gmdi = word_mixer(rot);
+			UINT16 mask = get_wrmsk();
+			mask=0xffff;
+			
+			write_videoram((mta_y << 6) | mta_x, gmdi, mask);
+		
+			if (!HOLD_FX)
+			{
+				mfa_x += m_udx ? 1 : -1;
+				mfa_x &= 0x3f;
+			}
+			
+			mta_x += m_udx ? 1 : -1;
+			mta_x &= 0x3f;
+			
+			if (mta_x == mta_x_end)
+			{
+				m_cmc = 0;
+			}
+		}
+		while (m_cmc);
+		
+		if (!HOLD_FY)
+		{
+			mfa_y += m_udy ? 1 : -1;
+		}
+		
+		mta_y += m_udy ? 1 : -1;
+		
+		if (mta_y == mta_y_end)
+		{
+			m_rmc = 0;
+		}
+	} 
+	while (m_rmc);
+	
+	/*
 	for (int y = 0; y < m_ysize; y++)
 	{
 		for (int x = 0; x < m_xsize; x++)
@@ -777,7 +861,6 @@ void abc1600_state::video_start()
 {
 	// allocate video RAM
 	m_video_ram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
-	memset(m_video_ram, 0, VIDEORAM_SIZE);
 	
 	// find memory regions
 	m_wrmsk_rom = machine->region("wrmsk")->base();

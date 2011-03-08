@@ -147,6 +147,8 @@ public:
 	inline UINT16 get_drmsk();
 	inline void get_shinf();
 	inline UINT16 get_wrmsk();
+	inline UINT16 barrel_shift(UINT16 gmdr);
+	inline UINT16 word_mixer(UINT16 rot);
 	void mover();
 
 	inline void write_videoram(UINT32 offset, UINT16 data, UINT16 mask);
