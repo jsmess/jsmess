@@ -116,6 +116,7 @@
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "sound/cdda.h"
+#include "sound/speaker.h"
 #include "imagedev/chd_cd.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -664,6 +665,28 @@ static WRITE8_HANDLER(towns_keyboard_w)
  *  On write:   bits 2-0: Timer mask set
  *              bit 7: Timer 0 output reset
  */
+static UINT8 towns_speaker_get_spk(running_machine* machine)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	return state->towns_spkrdata & state->towns_speaker_input;
+}
+
+
+static void towns_speaker_set_spkrdata(running_machine *machine, UINT8 data)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	state->towns_spkrdata = data ? 1 : 0;
+	speaker_level_w( state->speaker, towns_speaker_get_spk(machine) );
+}
+
+
+static void towns_speaker_set_input(running_machine *machine, UINT8 data)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	state->towns_speaker_input = data ? 1 : 0;
+	speaker_level_w( state->speaker, towns_speaker_get_spk(machine) );
+}
+
 static READ8_HANDLER(towns_port60_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
@@ -690,7 +713,9 @@ static WRITE8_HANDLER(towns_port60_w)
 		towns_pic_irq(dev,0);
 	}
 	state->towns_timer_mask = data & 0x07;
-	// bit 2 = sound (beeper?)
+
+	towns_speaker_set_spkrdata(space->machine,data & 0x04);
+
 	//logerror("PIT: wrote 0x%02x to port 0x60\n",data);
 }
 
@@ -1962,6 +1987,11 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 	}
 }
 
+static WRITE_LINE_DEVICE_HANDLER( towns_pit_out2_changed )
+{
+	towns_speaker_set_input(device->machine,state);
+}
+
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
@@ -2349,6 +2379,7 @@ static MACHINE_RESET( towns )
 	state->messram = machine->device(RAM_TAG);
 	state->cdrom = machine->device("cdrom");
 	state->cdda = machine->device("cdda");
+	state->speaker = machine->device("speaker");
 	state->scsi = machine->device<fmscsi_device>("scsi");
 	state->hd0 = machine->device("harddisk0");
 	state->hd1 = machine->device("harddisk1");
@@ -2393,7 +2424,7 @@ static const struct pit8253_config towns_pit8253_config =
 		{
 			307200,
 			DEVCB_NULL,
-			DEVCB_NULL
+			DEVCB_LINE(towns_pit_out2_changed)
 		}
 	}
 };
@@ -2532,6 +2563,8 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MCFG_SOUND_CONFIG(rf5c68_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MCFG_SOUND_ADD("cdda",CDDA,0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker",SPEAKER_SOUND,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
     MCFG_PIT8253_ADD("pit",towns_pit8253_config)

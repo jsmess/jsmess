@@ -126,6 +126,9 @@ class towns_state : public driver_device
 	UINT8 towns_volume_select;
 	UINT8 towns_scsi_control;
 	UINT8 towns_scsi_status;
+	UINT8 towns_spkrdata;
+	UINT8 towns_speaker_input;
+
 	emu_timer* towns_wait_timer;
 	struct towns_cdrom_controller towns_cd;
 	struct towns_video_controller video;
@@ -142,6 +145,7 @@ class towns_state : public driver_device
 	device_t* messram;
 	device_t* cdrom;
 	device_t* cdda;
+	device_t* speaker;
 	class fmscsi_device* scsi;
 	device_t* hd0;
 	device_t* hd1;
