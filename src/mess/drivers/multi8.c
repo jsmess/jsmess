@@ -272,6 +272,9 @@ static WRITE8_HANDLER( pal_w )
 	}
 }
 
+static READ8_HANDLER( ay8912_0_r ) { return ay8910_r(space->machine->device("aysnd"),0); }
+static READ8_HANDLER( ay8912_1_r ) { return ay8910_r(space->machine->device("aysnd"),1); }
+
 static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -284,9 +287,9 @@ static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ymsnd", ym2203_w)
-//  AM_RANGE(0x18, 0x18) //opn read 0
-	AM_RANGE(0x1a, 0x1a) AM_DEVREAD("ymsnd", ym2203_r)
+	AM_RANGE(0x18, 0x19) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x18, 0x18) AM_READ(ay8912_0_r)
+	AM_RANGE(0x1a, 0x1a) AM_READ(ay8912_1_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
 //  AM_RANGE(0x20, 0x21) //sio, cmt
 //  AM_RANGE(0x24, 0x27) //pit
@@ -463,22 +466,31 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	}
 }
 
-/* F4 Character Displayer */
 static const gfx_layout multi8_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
+
+static const gfx_layout multi8_kanjilayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	16*16
 };
 
 static GFXDECODE_START( multi8 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "kanji",   0x0000, multi8_kanjilayout, 0, 1 )
 GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
@@ -551,7 +563,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 
 static WRITE8_DEVICE_HANDLER( ym2203_porta_w )
 {
-	beep_set_state(device->machine->device("beeper"),!(data & 0x08));
+	beep_set_state(device->machine->device("beeper"),(data & 0x08));
 }
 
 static const ym2203_interface ym2203_config =
@@ -607,7 +619,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) //unknown clock / divider
+	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -623,7 +635,10 @@ ROM_START( multi8 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(2131a3a8) SHA1(0f5a565ecfbf79237badbf9011dcb374abe74a57))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "font.rom",  0x0000, 0x0800, CRC(08f9ed0e) SHA1(57480510fb30af1372df5a44b23066ca61c6f0d9))
+	ROM_LOAD( "font.rom",  0x0000, 0x0800, BAD_DUMP CRC(08f9ed0e) SHA1(57480510fb30af1372df5a44b23066ca61c6f0d9))
+
+	ROM_REGION( 0x20000, "kanji", 0 )
+	ROM_LOAD( "kanji.rom",  0x0000, 0x20000, BAD_DUMP CRC(c3cb3ff9) SHA1(7173cc5053a281d73cfecfacd31442e21ee7474a))
 
 	ROM_REGION( 0x0100, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "kbd.rom",  0x0000, 0x0100, NO_DUMP )
