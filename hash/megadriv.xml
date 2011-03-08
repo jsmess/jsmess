@@ -92,6 +92,11 @@
 Known undumped pirates
 
   * Tec Toy Mega Drive 3 (with 86 built in games)
+  * Chinese Checkers (by RealTec)
+  * Shizen Mahjong / Competition Mahjong (by Sachen) ?
+  * Thunderbolt II - 雷電伝説II
+  * Magic 7 Block - 百変七巧板
+  * Chinese Battle Chess (?) - 戦　棊 
 
 -->
 
@@ -994,6 +999,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<!-- Old scrambled/interleaved dumps -->
 
+	<software name="13mahjan">
+    <!-- Alt. Title: 十三張麻將　98’美少女篇 -->
+		<description>13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)</description>
+		<year>1998</year>
+		<publisher>BBD</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="655872">
+				<rom name="13 mahjong 98 (unl).bin" size="655872" crc="15546e71" sha1="90f1f8fba4531de810ecd4c9125faddc109d7cfd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="16ton">
 		<description>16 Ton (Jpn, SegaNet)</description>
 		<year>1991</year>
@@ -1853,8 +1870,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="aqrenk">
 		<description>Aq Renkan Awa (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1995</year>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="aq renkan awa (chi) (unl).bin" size="1048576" crc="2c6cbd77" sha1="fcd1c7fcfb9027ae7baad9c67847ef5f1090991a" offset="000000" loadflag="load16_word_swap" />
@@ -4045,10 +4062,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="chaoji">
+	<software name="cjfuweng">
 		<description>Chao Ji Da Fu Weng (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Gametec?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="chao ji da fu weng (chi) (unl).bin" size="1048576" crc="2e2ea687" sha1="be1a66bd1f75f5b1b37b8ae18e6334c36291e63d" offset="000000" loadflag="load16_word_swap" />
@@ -11075,7 +11092,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="longch">
+	<software name="long">
 		<description>Long (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -11180,8 +11197,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="maqiao">
 		<description>Ma Qiao E Mo Ta - Devilish Mahjong Tower (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1994</year>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ma qiao e mo ta - devilish mahjong tower (chi) (unl).bin" size="1048576" crc="12e35994" sha1="84e8bf546283c73396e40c4cfa05986ebeb123bb" offset="000000" loadflag="load16_word_swap" />
@@ -16255,6 +16272,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="qpoker">
+		<description>Queen of Poker Club (Tw)</description>
+		<year>199?</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1049088">
+				<rom name="poker club (sachen).bin" size="1049088" crc="5e54f61d" sha1="423b819de611a6f58f05c74fce3da2e2afa64fed" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rbi93">
 		<description>R.B.I. Baseball '93 (USA)</description>
 		<year>1993</year>
@@ -17746,8 +17774,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="shijie">
 		<description>Shi Jie Zhi Bang Zheng Ba Zhan - World Pro Baseball 94 (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1994</year>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="shi jie zhi bang zheng ba zhan - world pro baseball 94 (chi) (unl).bin" size="2097152" crc="72dd884f" sha1="d05c770312feec38c45b910ad09204b87961c01a" offset="000000" loadflag="load16_word_swap" />
@@ -18047,8 +18075,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="shuihu">
 		<description>Shui Hu - Feng Yun Zhuan (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1999</year>
+		<publisher>Never Ending Soft Team</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="shui hu - feng yun zhuan (chi) (unl).bin" size="2097152" crc="3e9e010c" sha1="7ac1b7a9e36dde9a03b3d0861b473ac9e1324175" offset="000000" loadflag="load16_word_swap" />
@@ -18056,10 +18084,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shuihu1">
+	<software name="shuihuzh">
 		<description>Shui Hu Zhuan (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1996</year>
+		<publisher>Chuanpu Technologies</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="shui hu zhuan (chi) (unl).bin" size="2097152" crc="61e458c3" sha1="f58c522bd0629833d3943ef4091c3c349c134879" offset="000000" loadflag="load16_word_swap" />
@@ -20905,8 +20933,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="taiwan">
 		<description>Taiwan Daheng (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1994</year>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="taiwan daheng (chi) (unl).bin" size="1048576" crc="baf20f81" sha1="88726c11e5ed7927830bf5ae0b83d85dfff4a2a4" offset="000000" loadflag="load16_word_swap" />
@@ -22088,7 +22116,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="tunshi1" cloneof="tunshi">
 		<description>Tun Shi Tian Di III (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>SKOB</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tun shi tian di iii (chi) (unl).bin" size="2097152" crc="b23c4166" sha1="534bf8f951ee30d47df18202246245b998c0eced" offset="000000" loadflag="load16_word_swap" />
@@ -24835,7 +24863,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="xinqig1" cloneof="xinqig">
 		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
 		<year>1996</year>
-		<publisher>C&amp;E Inc.</publisher>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="BEGGAR" />
 			<dataarea name="rom" size="4194304">
@@ -24847,7 +24875,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="xinqig">
 		<description>Xin Qi Gai Wang Zi (Chi)</description>
 		<year>1996</year>
-		<publisher>C&amp;E Inc.</publisher>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="BEGGAR" />
 			<dataarea name="rom" size="4194304">
@@ -24858,8 +24886,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="yasech">
 		<description>Ya Se Chuan Shuo (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1995</year>
+		<publisher>Chuanpu Technologies</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="ya se chuan shuo (chi) (unl).bin" size="2097152" crc="095b9a15" sha1="8fe0806427e123717ba20478ab1410c25fa942e6" offset="000000" loadflag="load16_word_swap" />
@@ -25051,8 +25079,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<software name="zhuogu">
 		<description>Zhuo Gui Da Shi - Ghost Hunter (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1994</year>
+		<publisher>Shenchi Technology</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="zhuo gui da shi - ghost hunter (chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b" offset="000000" loadflag="load16_word_swap" />

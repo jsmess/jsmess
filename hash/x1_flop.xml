@@ -358,6 +358,27 @@
 		</part>
 	</software>
 
+	<software name="screamer">
+		<description>The Screamer</description>
+		<year>19??</year>
+		<publisher>Magical Zoo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="414992">
+				<rom name="the screamer system.d88" size="415792" crc="ee7c9ddb" sha1="4f42b5ac6eaa60290841038029ea5b6a9db96e99" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="414992">
+				<rom name="the screamer data 1.d88" size="415840" crc="5ed7c4cf" sha1="7764365c5603923c62c967b9a865d6cef8a1f796" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="414992">
+				<rom name="the screamer data 2.d88" size="415840" crc="098b403d" sha1="fe0a943724e6df673dff18eceb1018817bd24e07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spchange">
 		<description>Spare Change</description>
 		<year>1983</year>

@@ -29698,6 +29698,17 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="speedyup1" cloneof="speedy">
+		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Earlier Prototype)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="speedy.sfc" size="1048576" crc="9dde5cea" sha1="07b2527c58e3ea07a61c52948b771d5750536454" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="speedyup" cloneof="speedy">
 		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Prototype)</description>
 		<year>1995</year>

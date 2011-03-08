@@ -76,7 +76,7 @@
 	</software>
 	
 	<software name="browserb">
-		<description>@World Browser (Beta) (USA)</description>
+		<description>@World Browser (USA, Prototype)</description>
 		<!-- Serial: 41458 -->
 		<year>1997</year>
 		<publisher>Apple</publisher>
@@ -184,7 +184,7 @@
 	</software>
 
 	<software name="atmtown">
-		<description>Atmark Town (Ver 1.0) (Jpn)</description>
+		<description>Atmark Town (Jpn, Ver. 1.0)</description>
 		<!-- Serial: BDB-005 (Disk 6 vol.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -195,8 +195,8 @@
 		</part>
 	</software>
 	
-	<software name="atmtowna">
-		<description>Atmark Town (Ver. 1.0) (Jpn) (Alt)</description>
+	<software name="atmtowna" cloneof="atmtown">
+		<description>Atmark Town (Jpn, Ver. 1.0, Alt)</description>
 		<!-- Serial: BDB-005 (Disk 6 vol.1.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -208,7 +208,7 @@
 	</software>
 	
 	<software name="atmtown2">
-		<description>Atmark Town (Ver 2.0) (Jpn)</description>
+		<description>Atmark Town (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-022 -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -268,7 +268,7 @@
 	</software>
 	
 	<software name="egworldp">
-		<description>EGWord Pure (Ver. 1.0) (Jpn)</description>
+		<description>EGWord Pure (Jpn, Ver. 1.0)</description>
 		<!-- Serial: BDE-10021 -->
 		<year>1996</year>
 		<publisher>?</publisher>
@@ -291,8 +291,8 @@
 		</part>
 	</software>
 	
-	<software name="frankya">
-		<description>Franky Online (Jpn) (Alt)</description>
+	<software name="frankya" cloneof="franky">
+		<description>Franky Online (Jpn, Alt)</description>
 		<!-- Serial: BDB-006 (Disk 6 vol.1.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -375,14 +375,14 @@
 		</part>
 	</software>
 	
-	<software name="gundmta">
-		<description>Gundam Tactics: Mobility Fleet0079 (Jpn) (Alt)</description>
+	<software name="gundamta" cloneof="gundamt">
+		<description>Gundam Tactics: Mobility Fleet0079 (Jpn, Alt)</description>
 		<!-- Serial: BDE-10008 -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundmta" sha1="6495e1f9bb17099b21c83dfd5d28b2d47a1de097"/>
+				<disk name="gundamta" sha1="6495e1f9bb17099b21c83dfd5d28b2d47a1de097"/>
 			</diskarea>
 		</part>
 	</software>
@@ -436,7 +436,7 @@
 	</software>
 	
 	<software name="interkt2">
-		<description>Internet Kit (Ver. 2.0) (Jpn)</description>
+		<description>Internet Kit (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-012 (Disk 6 vol.1.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -629,7 +629,7 @@
 	</software>
 	
 	<software name="navcd11">
-		<description>Pippin Navigator CD (Ver 1.1) (Jpn)</description>
+		<description>Pippin Navigator CD (Jpn, Ver. 1.1)</description>
 		<!-- Serial: BDB-008 (Disk 4 vol.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -653,7 +653,7 @@
 	</software>
 	
 	<software name="netcd2">
-		<description>Pippin Network CD (Ver. 2.0) (Jpn)</description>
+		<description>Pippin Network CD (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-011 (Disk 4 vol.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -665,7 +665,7 @@
 	</software>
 	
 	<software name="netcd21">
-		<description>Pippin Network CD (Ver. 2.1) (Jpn)</description>
+		<description>Pippin Network CD (Jpn, Ver. 2.1)</description>
 		<!-- Serial: BDB-014 (Disk 6 vol.1.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -700,8 +700,8 @@
 		</part>
 	</software>
 	
-	<software name="cataloga">
-		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Jpn) (Alt)</description>
+	<software name="cataloga" cloneof="catalog">
+		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Jpn, Alt)</description>
 		<!-- Serial: BDB-007 (Disk 4 vol.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -713,7 +713,7 @@
 	</software>
 
 	<software name="postcard">
-		<description>Post de Card Light (Ver 3.0) (Jpn)</description>
+		<description>Post de Card Light (Jpn, Ver. 3.0)</description>
 		<!-- Serial: BDE-10028 -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -820,26 +820,26 @@
 		</part>
 	</software>
 
-	<software name="suprmar">
+	<software name="supermar">
 		<description>Super Marathon (USA)</description>
 		<!-- Serial: 41028C -->
 		<year>?</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="suprmar" sha1="b5aed18581524caaf03c582869a9166bc1fdb2f3"/>
+				<disk name="supermar" sha1="b5aed18581524caaf03c582869a9166bc1fdb2f3"/>
 			</diskarea>
 		</part>
 	</software>
 	
-	<software name="suprmara">
-		<description>Super Marathon (USA) (Alt)</description>
+	<software name="supermara" cloneof="supermar">
+		<description>Super Marathon (USA, Alt)</description>
 		<!-- Serial: 41028C -->
 		<year>?</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="suprmara" sha1="f9833a88b0b0ea094be099df3357652dc06d7243"/>
+				<disk name="supermara" sha1="f9833a88b0b0ea094be099df3357652dc06d7243"/>
 			</diskarea>
 		</part>
 	</software>
@@ -893,7 +893,7 @@
 	</software>
 
 	<software name="tvworks">
-		<description>TV Works - Word Paint Mail (Ver 1.0) (Jpn)</description>
+		<description>TV Works - Word Paint Mail (Jpn, Ver. 1.0)</description>
 		<!-- Serial: BDB-003 (Disk 6 vol.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -905,7 +905,7 @@
 	</software>
 	
 	<software name="tvwrks2">
-		<description>TV Works (Ver. 2.0) (Jpn)</description>
+		<description>TV Works (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-009 (Disk 4 vol.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -917,7 +917,7 @@
 	</software>
 	
 	<software name="tvwrks21">
-		<description>TV Works (Ver. 2.1) (Jpn)</description>
+		<description>TV Works (Jpn, Ver. 2.1)</description>
 		<!-- Serial: BDB-013 (Disk 6 vol.1.1) -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -929,7 +929,7 @@
 	</software>
 	
 	<software name="tvwrks3">
-		<description>TV Works (Ver. 3.0) (USA)</description>
+		<description>TV Works (USA, Ver. 3.0)</description>
 		<!-- Serial: 61528 -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -941,7 +941,7 @@
 	</software>
 	
 	<software name="tvwrksp">
-		<description>TV Works (Ver. POP) (Jpn)</description>
+		<description>TV Works (Jpn, Ver. POP)</description>
 		<!-- Serial: BDB-020 -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
@@ -964,14 +964,14 @@
 		</part>
 	</software>
 	
-	<software name="ultramaa">
-		<description>Ultraman: The Digital Board Game (Jpn) (Alt)</description>
+	<software name="ultramana" cloneof="ultraman">
+		<description>Ultraman: The Digital Board Game (Jpn, Alt)</description>
 		<!-- Serial: BDE-70002 -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultramaa" sha1="4e0b449d2e534a3ea5f1f1a7b33be086a64ee1b7"/>
+				<disk name="ultramana" sha1="4e0b449d2e534a3ea5f1f1a7b33be086a64ee1b7"/>
 			</diskarea>
 		</part>
 	</software>

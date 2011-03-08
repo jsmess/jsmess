@@ -10526,6 +10526,17 @@ undumped GBC protos
 		</part>
 	</software>
 
+	<software name="powrpfbmf" cloneof="powrpfbm">
+		<description>The Powerpuff Girls - L'Affreux Mojo Jojo (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="powerpuff girls, the - l'affreux mojo jojo (france).bin" size="2097152" crc="256d166f" sha1="1b5037f53fb77dd2c9c359052d46e5362c6a9801" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="powrpfbmua" cloneof="powrpfbm">
 		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev. A)</description>
 		<year>19??</year>
