@@ -229,7 +229,7 @@ A・E
 		</part>
 	</software>
 
-	<software name="sos2">
+	<software name="sos20" cloneof="sos22">
 	<!-- Alternate Title S-OS Sword-->
 		<description>S-OS Monitor v2.0</description>
 		<year>198?</year>
@@ -242,7 +242,7 @@ A・E
 		</part>
 	</software>
 
-	<software name="sos2">
+	<software name="sos22">
 	<!-- Alternate Title S-OS Sword-->
 		<description>S-OS Monitor v2.2</description>
 		<year>198?</year>
