@@ -116,6 +116,15 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( intack_w );
 
+	DECLARE_WRITE_LINE_MEMBER( pb0_w );
+	DECLARE_WRITE_LINE_MEMBER( pb1_w );
+	DECLARE_WRITE_LINE_MEMBER( pb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pb3_w );
+	DECLARE_WRITE_LINE_MEMBER( pb4_w );
+	DECLARE_WRITE_LINE_MEMBER( pb5_w );
+	DECLARE_WRITE_LINE_MEMBER( pb6_w );
+	DECLARE_WRITE_LINE_MEMBER( pb7_w );
+
 protected:
     // device-level overrides
     virtual void device_start();

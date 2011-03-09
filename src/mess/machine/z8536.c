@@ -173,3 +173,17 @@ WRITE8_MEMBER( z8536_device::write )
 WRITE_LINE_MEMBER( z8536_device::intack_w )
 {
 }
+
+
+//-------------------------------------------------
+//  pb0_w - port B bit 0 write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( z8536_device::pb0_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb1_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb2_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb3_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb4_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb5_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb6_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb7_w ) { }
