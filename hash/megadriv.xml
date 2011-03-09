@@ -1005,8 +1005,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1998</year>
 		<publisher>BBD</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="655872">
-				<rom name="13 mahjong 98 (unl).bin" size="655872" crc="15546e71" sha1="90f1f8fba4531de810ecd4c9125faddc109d7cfd" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="655360">
+				<rom name="13 mahjong 98 (unl).bin" size="655360" crc="68b372f6" sha1="af19eb952bff78178ae3d31ed48b3fc5c7010dea" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16277,8 +16277,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1049088">
-				<rom name="poker club (sachen).bin" size="1049088" crc="5e54f61d" sha1="423b819de611a6f58f05c74fce3da2e2afa64fed" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1048576">
+				<rom name="poker club (sachen).bin" size="1048576" crc="ae28d9eb" sha1="600c9b234f2559b6d101a111f7033088bd701a5d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
