@@ -258,27 +258,6 @@ public:
 };
 
 
-/*----------- defined in machine/pdp1.c -----------*/
-
-extern pdp1_reset_param_t pdp1_reset_param;
-
-MACHINE_START( pdp1 );
-MACHINE_RESET( pdp1 );
-
-DEVICE_START( pdp1_tape );
-DEVICE_IMAGE_LOAD( pdp1_tape );
-DEVICE_IMAGE_UNLOAD( pdp1_tape );
-
-DEVICE_IMAGE_LOAD(pdp1_typewriter);
-DEVICE_IMAGE_UNLOAD(pdp1_typewriter);
-
-DEVICE_IMAGE_LOAD(pdp1_drum);
-DEVICE_IMAGE_UNLOAD(pdp1_drum);
-
-INTERRUPT_GEN( pdp1_interrupt );
-
-void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
-
 
 /*----------- defined in video/pdp1.c -----------*/
 

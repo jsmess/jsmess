@@ -345,7 +345,7 @@ static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
 	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SNGL_INST));
 	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SNGL_INST));
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_SS), 6);
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+2*8, cpu_get_reg(machine->device("maincpu"), PDP1_SS), 6);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+16, cpu_get_reg(machine->device("maincpu"), PDP1_SS), 6);
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_pf_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_PF), 6);
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ir_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_IR), 5);
 }

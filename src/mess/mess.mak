@@ -1305,7 +1305,6 @@ $(MESSOBJ)/pcshare.a:			\
 
 $(MESSOBJ)/pdp1.a:				\
 	$(MESS_VIDEO)/pdp1.o		\
-	$(MESS_MACHINE)/pdp1.o		\
 	$(MESS_DRIVERS)/pdp1.o		\
 
 $(MESSOBJ)/pel.a:				\
