@@ -739,9 +739,9 @@ void abc1600_state::mover()
 		if (m_hold_iv_cyk)
 		{
 			// read one word in advance
-//			UINT16 gmdr = read_videoram((mfa_y << 6) | mfa_x);
-//			UINT16 rot = barrel_shift(gmdr);
-//			UINT16 gmdi = word_mixer(rot);
+			UINT16 gmdr = read_videoram((mfa_y << 6) | mfa_x);
+			UINT16 rot = barrel_shift(gmdr);
+			word_mixer(rot);
 
 			if (!HOLD_FX)
 			{
