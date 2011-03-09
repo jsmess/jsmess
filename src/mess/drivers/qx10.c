@@ -592,6 +592,8 @@ static WRITE8_HANDLER( upd7201_w )
 		//printf("RS-232c W %02x\n",data);
 		if(data == 0x01) //cheap, but needed for working inputs in "The QX-10 Diagnostic"
 			state->rs232c.rx = 0x04;
+		else if(data == 0x00)
+			state->rs232c.rx = 0xfe;
 		else
 			state->rs232c.rx = 0xff;
 	}

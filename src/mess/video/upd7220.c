@@ -385,6 +385,15 @@ static TIMER_CALLBACK( hsync_tick )
 	device_t *device = (device_t *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
+	if (param)
+	{
+		upd7220->sr |= UPD7220_SR_HBLANK_ACTIVE;
+	}
+	else
+	{
+		upd7220->sr &= ~UPD7220_SR_HBLANK_ACTIVE;
+	}
+
 	devcb_call_write_line(&upd7220->out_hsync_func, param);
 
 	update_hsync_timer(upd7220, param);
@@ -708,7 +717,7 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 		line_step = (upd7220->figs.d1 * i);
 		line_step/= (upd7220->figs.dc + 1);
 		line_step >>= 1;
-		dot = ((line_pattern >> ((i+upd7220->dad) & 0xf)) & 1) << 7;
+		dot = ((line_pattern >> (i & 0xf)) & 1) << 7;
 		draw_pixel(upd7220,x + (line_step*line_x_step[upd7220->figs.dir]),y + (line_step*line_y_step[upd7220->figs.dir]),dot >> ((x + line_step*line_x_step[upd7220->figs.dir]) & 0x7));
 		x += line_x_dir[upd7220->figs.dir];
 		y += line_y_dir[upd7220->figs.dir];
@@ -1145,7 +1154,14 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		if(upd7220->figs.figure_type == 1)
+		if(upd7220->figs.figure_type == 0)
+		{
+			UINT16 line_pattern = check_pattern(upd7220,(upd7220->ra[8]) | (upd7220->ra[9]<<8));
+			UINT8 dot = ((line_pattern >> (0 & 0xf)) & 1) << 7;
+
+			draw_pixel(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch),dot);
+		}
+		else if(upd7220->figs.figure_type == 1)
 			draw_line(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
 		else if(upd7220->figs.figure_type == 8)
 			draw_rectangle(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
