@@ -225,7 +225,7 @@ static UPD7220_INTERFACE( hgdc_1_intf )
 	NULL,
 	hgdc_draw_text,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("upd7220_btm", upd7220_ext_sync_w),
 	DEVCB_NULL
 };
 
@@ -603,11 +603,6 @@ static READ8_HANDLER( pc9801_a0_r )
 		switch(offset & 0xe)
 		{
 			case 0x00:
-				UINT8 v_sync;
-
-				v_sync = upd7220_r(space->machine->device("upd7220_chr"),(offset & 2) >> 1) & 0x20; //TODO: support it into the core
-
-				return (upd7220_r(space->machine->device("upd7220_btm"),(offset & 2) >> 1) & 0xdf) | v_sync;
 			case 0x02:
 				return upd7220_r(space->machine->device("upd7220_btm"),(offset & 2) >> 1);
 			/* bitmap palette clut read */
