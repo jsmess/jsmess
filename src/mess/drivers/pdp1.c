@@ -1810,6 +1810,8 @@ INTERRUPT_GEN( pdp1_interrupt )
 
 static DEVICE_START(pdp1_readtape) {}
 static DEVICE_START(pdp1_punchtape) {}
+static DEVICE_START(pdp1_typewriter) {}
+static DEVICE_START(pdp1_drum) {}
 
 
 static DEVICE_GET_INFO(pdp1_readtape)
@@ -1866,6 +1868,7 @@ static DEVICE_GET_INFO(pdp1_printer)
 		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
 		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
 
+		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(pdp1_typewriter); break;
 		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(pdp1_typewriter); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(pdp1_typewriter); break;
 
@@ -1887,6 +1890,7 @@ static DEVICE_GET_INFO(pdp1_cylinder)
 		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
 		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
 
+		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(pdp1_drum); break;
 		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(pdp1_drum); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(pdp1_drum); break;
 
@@ -1925,8 +1929,8 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_CRT_ADD( "crt", pdp1_crt_interface )
 	MCFG_DEVICE_ADD("readt", PDP1_READTAPE, 0)
 	MCFG_DEVICE_ADD("punch", PDP1_PUNCHTAPE, 0)
-	//MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
-	//MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
+	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
+	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
 
 	MCFG_GFXDECODE(pdp1)
 	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
