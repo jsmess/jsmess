@@ -877,7 +877,7 @@ static READ8_HANDLER( pc8801_ctrl_r )
 static WRITE8_HANDLER( pc8801_ctrl_w )
 {
 	/*
-    x--- ---- SING (buzzer mirror?)
+    x--- ---- SING (buzzer mask?)
     -x-- ---- mouse latch (JOP1, routes on OPN sound port A)
     --x- ---- beeper
     ---- -x-- upd1990a clock bit
@@ -887,17 +887,14 @@ static WRITE8_HANDLER( pc8801_ctrl_w )
 	upd1990a_stb_w(space->machine->device("upd1990a"), (data & 2) >> 1);
 	upd1990a_clk_w(space->machine->device("upd1990a"), (data & 4) >> 2);
 
-	/* TODO: this might actually be two beepers */
 	if(((device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
-		beep_set_state(space->machine->device("beeper"),1);
-
-	if(((device_ctrl_data & 0x80) == 0x00) && ((data & 0x80) == 0x80))
 		beep_set_state(space->machine->device("beeper"),1);
 
 	if(((device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		beep_set_state(space->machine->device("beeper"),0);
 
-	if(((device_ctrl_data & 0x80) == 0x80) && ((data & 0x80) == 0x00))
+	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
+	if(device_ctrl_data & 0x80)
 		beep_set_state(space->machine->device("beeper"),0);
 
 	device_ctrl_data = data;
