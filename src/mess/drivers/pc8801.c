@@ -33,7 +33,9 @@
     - Blue Moon Story: moans with a kanji msg;.
     - Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
+	- Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
+    - Hang-On: typical busted attributes for a N-BASIC game
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -47,7 +49,11 @@
     - Burning Point
     - Burunet
     - Castle Excellent (sets sector 0xf4?)
+    - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Jark (needs PC-8801MC)
+    - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
+    - Space Harrier
+    - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
     games that needs to NOT have write-protect floppies (BTANBs):
@@ -335,7 +341,7 @@ static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int 
 
 	for(i=0;i<fifo_size;i++)
 	{
-		/* TODO: DMA timing bug? N-BASIC attributes doesn't work here without +2 here ... */
+		/* TODO: DMA timing bug? N-BASIC attributes doesn't work without +2 here ... */
 		if(x < vram[address])
 		{
 			return vram[address+1];
