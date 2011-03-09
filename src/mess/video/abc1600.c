@@ -579,6 +579,136 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 //**************************************************************************
 
 //-------------------------------------------------
+//  clock_mfa_x - 
+//-------------------------------------------------
+
+inline void abc1600_state::clock_mfa_x()
+{
+	UINT16 mfa_y = m_mfa >> 6;
+	UINT8 mfa_x = m_mfa & 0x3f;
+	
+	if (!HOLD_FX)
+	{
+		mfa_x += m_udx ? 1 : -1;
+		mfa_x &= 0x3f;
+	}
+
+	m_mfa = (mfa_y << 6) | mfa_x;
+}
+
+
+//-------------------------------------------------
+//  clock_mfa_y - 
+//-------------------------------------------------
+
+inline void abc1600_state::clock_mfa_y()
+{
+	UINT16 mfa_y = m_mfa >> 6;
+	UINT8 mfa_x = m_mfa & 0x3f;
+
+	if (!HOLD_FY)
+	{
+		mfa_y += m_udy ? 1 : -1;
+		mfa_y &= 0xfff;
+	}
+
+	m_mfa = (mfa_y << 6) | mfa_x;
+}
+
+
+//-------------------------------------------------
+//  clock_mta_x - 
+//-------------------------------------------------
+
+inline void abc1600_state::clock_mta_x()
+{
+	UINT16 mta_y = m_mta >> 6;
+	UINT8 mta_x = m_mta & 0x3f;
+
+	mta_x += m_udx ? 1 : -1;
+	mta_x &= 0x3f;
+
+	m_mta = (mta_y << 6) | mta_x;
+}
+
+
+//-------------------------------------------------
+//  clock_mta_y - 
+//-------------------------------------------------
+
+inline void abc1600_state::clock_mta_y()
+{
+	UINT16 mta_y = m_mta >> 6;
+	UINT8 mta_x = m_mta & 0x3f;
+
+	mta_y += m_udy ? 1 : -1;
+	mta_y &= 0xfff;
+
+	m_mta = (mta_y << 6) | mta_x;
+}
+
+
+//-------------------------------------------------
+//  load_mfa_x - 
+//-------------------------------------------------
+
+inline void abc1600_state::load_mfa_x()
+{
+	UINT16 mfa_y = m_mfa >> 6;
+	UINT8 mfa_x = m_xfrom >> 4;
+
+	m_mfa = (mfa_y << 6) | mfa_x;
+}
+
+
+//-------------------------------------------------
+//  load_mta_x - 
+//-------------------------------------------------
+
+inline void abc1600_state::load_mta_x()
+{
+	UINT16 mta_y = m_mta >> 6;
+	UINT8 mta_x = m_xto >> 4;
+
+	m_mta = (mta_y << 6) | mta_x;
+}
+
+
+//-------------------------------------------------
+//  compare_mta_x - 
+//-------------------------------------------------
+
+inline void abc1600_state::compare_mta_x()
+{
+	UINT8 mta_x_end = ((m_xto + m_xsize) >> 4) & 0x3f;
+	UINT8 mta_x = m_mta & 0x3f;
+	
+	if (mta_x == mta_x_end)
+	{
+		m_cmc = 0;
+	}
+
+	m_wrms1 = m_cmc & m_amm;
+}
+
+
+//-------------------------------------------------
+//  compare_mta_y - 
+//-------------------------------------------------
+
+inline void abc1600_state::compare_mta_y()
+{
+	int mta_y_end = (m_yto + m_ysize) & 0xfff;
+	UINT16 mta_y = m_mta >> 6;
+	
+	if (mta_y == mta_y_end)
+	{
+		m_rmc = 0;
+	}
+}
+
+
+//-------------------------------------------------
 //  get_shinf - 
 //-------------------------------------------------
 
@@ -604,7 +734,7 @@ inline void abc1600_state::get_shinf()
 	UINT8 shinf = m_shinf_rom[shinf_addr];
 
 	m_sh = shinf & 0x0f;
-	m_hold_iv_cyk = BIT(shinf, 5);
+	m_hold_1w_cyk = BIT(shinf, 5);
 }
 
 
@@ -716,78 +846,54 @@ void abc1600_state::mover()
 {
 	if (LOG) logerror("XFROM %u XSIZE %u YSIZE %u XTO %u YTO %u MFA %05x MTA %05x U/D*X %u U/D*Y %u\n", m_xfrom, m_xsize, m_ysize, m_xto, m_yto, m_mfa, m_mta, m_udx, m_udy);
 
-	int m_amm = 1;
+	m_amm = 1;
 
-	UINT8 mfa_x;
-	UINT16 mfa_y = m_mfa >> 6;
-	UINT8 mta_x;
-	UINT16 mta_y = m_mta >> 6;
-
-	int mta_x_end = ((m_xto + m_xsize) >> 4) & 0x3f;
-	int mta_y_end = (m_yto + m_ysize) & 0xfff;
-	
 	m_rmc = 1;
 	get_shinf();
 	
 	do
 	{
-		mfa_x = m_mfa & 0x3f;
-		mta_x = m_mta & 0x3f;
+		compare_mta_y();
+
+		load_mfa_x();
+		load_mta_x();
 		m_cmc = 1;
 		m_wrms0 = 0;
 
-		if (m_hold_iv_cyk)
+		if (m_hold_1w_cyk)
 		{
 			// read one word in advance
-			UINT16 gmdr = read_videoram((mfa_y << 6) | mfa_x);
+			UINT16 gmdr = read_videoram(m_mfa);
 			UINT16 rot = barrel_shift(gmdr);
 			word_mixer(rot);
-
-			if (!HOLD_FX)
-			{
-				mfa_x += m_udx ? 1 : -1;
-				mfa_x &= 0x3f;
-			}
+			
+			clock_mfa_x();
 		}
 		
 		do
 		{
-			if (mta_x == mta_x_end) m_cmc = 0;
-			m_wrms1 = m_cmc & m_amm;
+			compare_mta_x();
 			
-			UINT16 gmdr = read_videoram((mfa_y << 6) | mfa_x);
+			UINT16 gmdr = read_videoram(m_mfa);
 			UINT16 rot = barrel_shift(gmdr);
 			UINT16 gmdi = word_mixer(rot);
 			UINT16 mask = get_wrmsk();
 			
-			write_videoram((mta_y << 6) | mta_x, gmdi, mask);
+			write_videoram(m_mta, gmdi, mask);
 		
-			if (!HOLD_FX)
-			{
-				mfa_x += m_udx ? 1 : -1;
-				mfa_x &= 0x3f;
-			}
-			
-			mta_x += m_udx ? 1 : -1;
-			mta_x &= 0x3f;
+			clock_mfa_x();
+			clock_mta_x();
 			
 			m_wrms0 = 1;
 		}
 		while (m_cmc);
 		
-		if (!HOLD_FY)
-		{
-			mfa_y += m_udy ? 1 : -1;
-		}
-		
-		mta_y += m_udy ? 1 : -1;
-		
-		if (mta_y == mta_y_end) m_rmc = 0;
+		clock_mfa_y();
+		clock_mta_y();
 	} 
 	while (m_rmc);
 
-	m_mfa = (mfa_y << 6) | mfa_x;
-	m_mta = (mta_y << 6) | mta_x;
+	m_amm = 0;
 }
 
 
@@ -916,7 +1022,7 @@ void abc1600_state::video_start()
 	save_item(NAME(m_mta));
 	save_item(NAME(m_sh));
 	save_item(NAME(m_mdor));
-	save_item(NAME(m_hold_iv_cyk));
+	save_item(NAME(m_hold_1w_cyk));
 	save_item(NAME(m_wrms0));
 	save_item(NAME(m_wrms1));
 	save_item(NAME(m_rmc));

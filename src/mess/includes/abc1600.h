@@ -149,6 +149,14 @@ public:
 	inline UINT16 get_wrmsk();
 	inline UINT16 barrel_shift(UINT16 gmdr);
 	inline UINT16 word_mixer(UINT16 rot);
+	inline void clock_mfa_x();
+	inline void clock_mfa_y();
+	inline void clock_mta_x();
+	inline void clock_mta_y();
+	inline void load_mfa_x();
+	inline void load_mta_x();
+	inline void compare_mta_x();
+	inline void compare_mta_y();
 	void mover();
 
 	inline UINT16 read_videoram(UINT32 offset);
@@ -192,11 +200,12 @@ public:
 	UINT32 m_mta;				// mover to address
 	UINT8 m_sh;					// 
 	UINT16 m_mdor;				// 
-	int m_hold_iv_cyk;			// 
+	int m_hold_1w_cyk;			// 
 	int m_wrms0;				// 
 	int m_wrms1;				// 
 	int m_rmc;					// row match count
 	int m_cmc;					// column match count
+	int m_amm;					// active mover mask
 };
 
 
