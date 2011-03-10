@@ -2,10 +2,9 @@
 
     TODO:
 
-	- position image based on vsync/hsync
 	- FRAME POL
 	- landscape/portrait mode
-	- mover
+	- position image based on vsync/hsync
 
 */
 
@@ -17,7 +16,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 #define VIDEORAM_SIZE	256*1024
 
@@ -225,6 +224,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		
 
 		*/
+		
 		m_xsize = ((data & 0x03) << 8) | (m_xsize & 0xff);
 		m_udy = BIT(data, 2);
 		m_udx = BIT(data, 3);
@@ -245,6 +245,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		XSIZE7
 
 		*/
+		
 		m_xsize = (m_xsize & 0x300) | data;
 		break;
 		
@@ -263,6 +264,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		
 
 		*/
+		
 		m_ysize = ((data & 0x0f) << 8) | (m_ysize & 0xff);
 		break;
 		
@@ -281,6 +283,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		Y size 7
 
 		*/
+		
 		m_ysize = (m_ysize & 0xf00) | data;
 		break;
 		
@@ -299,6 +302,9 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		
 
 		*/
+		
+		m_xto = ((data & 0x03) << 8) | (m_xto & 0xff);
+		m_mta = (m_mta & 0x3ffcf) | ((data & 0x03) << 4);
 		break;
 		
 	case LDTX_LB:
@@ -316,6 +322,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		XTO7, MTA3
 
 		*/
+		
 		m_xto = (m_xto & 0x300) | data;
 		m_mta = (m_mta & 0x3fff0) | (data >> 4);
 		break;
@@ -335,6 +342,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		
 
 		*/
+		
 		m_yto = (data << 8) | (m_yto & 0xff);
 		m_mta = ((data & 0x0f) << 14) | (m_mta & 0x3fff);
 		break;
@@ -354,6 +362,7 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 			7		YTO7, MTA13
 
 		*/
+		
 		m_yto = (m_yto & 0xf00) | data;
 		m_mta = (m_mta & 0x3c03f) | (data << 6);
 		break;
@@ -385,7 +394,6 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 		*/
 
-		logerror("FX HB %02x\n", data);
 		m_xfrom = ((data & 0x03) << 8) | (m_xfrom & 0xff);
 		m_mfa = (m_mfa & 0x3ffcf) | ((data & 0x03) << 4);
 		break;
@@ -406,7 +414,6 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 
 		*/
 
-		logerror("FX LB %02x\n", data);
 		m_xfrom = (m_xfrom & 0x300) | data;
 		m_mfa = (m_mfa & 0x3fff0) | (data >> 4);
 		break;
@@ -426,7 +433,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			7		
 
 		*/
-		logerror("FY HB %02x\n", data);
+
 		m_mfa = ((data & 0x0f) << 14) | (m_mfa & 0x3fff);
 		break;
 		
@@ -445,7 +452,7 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			7		MFA13
 
 		*/
-		logerror("FY LB %02x\n", data);
+
 		m_mfa = (m_mfa & 0x3c03f) | (data << 6);
 		
 		mover();

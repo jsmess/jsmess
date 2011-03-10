@@ -10,25 +10,9 @@
 
     TODO:
 
-	- boot is stuck on polling the DART channel B control register Receive Character Available bit (RR0, D0)
-
-	- memory access controller
-		- task register
-		- cause register (parity error)
-		- segment RAM
-		- page RAM
-		- bankswitching
-		- DMA
-	- video
-		- CRTC
-		- bitmap layer
-		- "mover" (blitter)
-		- monitor portrait/landscape mode
     - CIO (interrupt controller)
 		- RTC
 		- NVRAM
-    - DART
-		- keyboard
     - floppy
     - hard disk (Xebec S1410)
 
@@ -41,6 +25,8 @@
 //**************************************************************************
 //  CONSTANTS / MACROS
 //**************************************************************************
+
+#define LOG 0
 
 // MAC
 #define A0			BIT(offset, 0)
@@ -116,7 +102,7 @@ UINT8 abc1600_state::read_ram(offs_t offset)
 	}
 	else
 	{
-		logerror("Unmapped read from virtual memory %06x\n", offset);
+		if (LOG) logerror("Unmapped read from virtual memory %06x\n", offset);
 	}
 
 	return data;
@@ -143,7 +129,7 @@ void abc1600_state::write_ram(offs_t offset, UINT8 data)
 	}
 	else
 	{
-		logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
+		if (LOG) logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
 	}
 }
 
@@ -198,7 +184,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	}
 	else
 	{
-		logerror("Unmapped read from virtual memory %06x\n", offset);
+		if (LOG) logerror("Unmapped read from virtual memory %06x\n", offset);
 	}
 
 	return data;
@@ -280,7 +266,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 	}
 	else
 	{
-		logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
+		if (LOG) logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
 	}
 }
 
@@ -514,7 +500,7 @@ WRITE8_MEMBER( abc1600_state::task_w )
 
 	m_task = data;
 
-	logerror("Task %u BOOTE %u READ_MAGIC %u\n", m_task & 0x0f, BOOTE, READ_MAGIC);
+	if (LOG) logerror("Task %u BOOTE %u READ_MAGIC %u\n", m_task & 0x0f, BOOTE, READ_MAGIC);
 }
 
 
@@ -570,7 +556,7 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	SEGMENT_DATA(segment) = data & 0x7f;
 	
-	logerror("Task %u Segment %u : %02x\n", m_task & 0x0f, segment, data);
+	if (LOG) logerror("Task %u Segment %u : %02x\n", m_task & 0x0f, segment, data);
 }
 
 
@@ -654,7 +640,7 @@ WRITE8_MEMBER( abc1600_state::page_w )
 		PAGE_DATA(segment, page) = (data << 8) | (PAGE_DATA(segment, page) & 0xff);
 	}
 
-	logerror("Task %u Segment %u Page %u : %04x\n", m_task & 0x0f, segment, page, PAGE_DATA(segment, page));
+	if (LOG) logerror("Task %u Segment %u Page %u : %04x\n", m_task & 0x0f, segment, page, PAGE_DATA(segment, page));
 }
 
 
@@ -1296,9 +1282,9 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_FRAGMENT_ADD(abc1600_video)
 
 	// devices
-	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, 4000000, dma0_intf)
-	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, 4000000, dma1_intf)
-	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, 4000000, dma2_intf)
+	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, XTAL_64MHz/16, dma0_intf)
+	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, XTAL_64MHz/16, dma1_intf)
+	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
 	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16)
 	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
