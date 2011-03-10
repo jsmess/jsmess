@@ -1203,7 +1203,6 @@ $(MESSOBJ)/nec.a:				\
 	$(MESS_DRIVERS)/pc8801.o	\
 	$(MESS_DRIVERS)/pc88va.o	\
 	$(MESS_DRIVERS)/pc9801.o	\
-	$(MESS_DRIVERS)/pc98.o		\
 	$(MESS_DRIVERS)/tk80bs.o	\
 
 $(MESSOBJ)/netronic.a:			\
