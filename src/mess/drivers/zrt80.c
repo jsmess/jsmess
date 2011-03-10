@@ -202,7 +202,7 @@ static SCREEN_UPDATE( zrt80 )
 static MC6845_UPDATE_ROW( zrt80_update_row )
 {
 	zrt80_state *state = device->machine->driver_data<zrt80_state>();
-	UINT8 chr,gfx,inv;
+	UINT8 chr,gfx,inv,i;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8 polarity = input_port_read(device->machine, "DIPSW1") & 4 ? 0xff : 0;
@@ -223,14 +223,8 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 		gfx = state->FNT[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */
-		*p++ = ( gfx & 0x80 ) ? 1 : 0;
-		*p++ = ( gfx & 0x40 ) ? 1 : 0;
-		*p++ = ( gfx & 0x20 ) ? 1 : 0;
-		*p++ = ( gfx & 0x10 ) ? 1 : 0;
-		*p++ = ( gfx & 0x08 ) ? 1 : 0;
-		*p++ = ( gfx & 0x04 ) ? 1 : 0;
-		*p++ = ( gfx & 0x02 ) ? 1 : 0;
-		*p++ = ( gfx & 0x01 ) ? 1 : 0;
+		for (i = 0; i < 8; i++)
+			*p++ = BIT(gfx, 7-i);
 	}
 }
 
