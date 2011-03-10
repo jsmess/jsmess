@@ -33,6 +33,7 @@
 #include "sound/2203intf.h"
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
+#include "machine/ram.h"
 
 class pc9801_state : public driver_device
 {
@@ -79,6 +80,7 @@ public:
 	UINT8 por; 		//Power-On Reset
 	UINT8 rom_bank;
 	UINT8 fdc_ctrl;
+	UINT32 ram_size;
 };
 
 
@@ -862,6 +864,20 @@ static WRITE8_HANDLER( pc9801rs_wram_w )
 	WRAM[offset] = data;
 }
 
+static READ8_HANDLER( pc9801rs_ex_wram_r )
+{
+	UINT8 *EX_WRAM = space->machine->region("ex_wram")->base();
+
+	return EX_WRAM[offset];
+}
+
+static WRITE8_HANDLER( pc9801rs_ex_wram_w )
+{
+	UINT8 *EX_WRAM = space->machine->region("ex_wram")->base();
+
+	EX_WRAM[offset] = data;
+}
+
 static READ8_HANDLER( pc9801rs_ipl_r )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
@@ -956,6 +972,7 @@ static READ8_HANDLER( pc9801rs_30_r )
 	return pc9801_30_r(space,offset);
 }
 
+
 static READ8_HANDLER( pc9801rs_memory_r )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
@@ -963,12 +980,13 @@ static READ8_HANDLER( pc9801rs_memory_r )
 	if(state->gate_a20 == 0)
 		offset &= 0xfffff;
 
-	if	   (offset >= 0x00000000 && offset <= 0x0009ffff) { return pc9801rs_wram_r(space,offset); }
-	else if(offset >= 0x000a0000 && offset <= 0x000a3fff) { return pc9801_tvram_r(space,offset-0xa0000); }
-	else if(offset >= 0x000a4000 && offset <= 0x000a4fff) { return pc9801rs_knjram_r(space,offset & 0xfff); }
-	else if(offset >= 0x000a8000 && offset <= 0x000bffff) { return pc9801_gvram_r(space,offset-0xa8000); }
-	else if(offset >= 0x000e0000 && offset <= 0x000fffff) { return pc9801rs_ipl_r(space,offset & 0x1ffff); }
-	else if(offset >= 0xfffe0000 && offset <= 0xffffffff) {	return pc9801rs_ipl_r(space,offset & 0x1ffff); }
+	if	   (offset >= 0x00000000 && offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
+	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
+	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
+	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
+	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
+	else if(offset >= 0x00100000 && offset <= 0x00100000+state->ram_size-1) { return pc9801rs_ex_wram_r(space,offset-0x00100000); }
+	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
 	//printf("%08x\n",offset);
 	return 0x00;
@@ -982,10 +1000,11 @@ static WRITE8_HANDLER( pc9801rs_memory_w )
 	if(state->gate_a20 == 0)
 		offset &= 0xfffff;
 
-	if	   (offset >= 0x00000000 && offset <= 0x0009ffff) { pc9801rs_wram_w(space,offset,data); }
-	else if(offset >= 0x000a0000 && offset <= 0x000a3fff) { pc9801_tvram_w(space,offset-0xa0000,data); }
-	else if(offset >= 0x000a4000 && offset <= 0x000a4fff) { pc9801rs_knjram_w(space,offset & 0xfff,data); }
-	else if(offset >= 0x000a8000 && offset <= 0x000bffff) { pc9801_gvram_w(space,offset-0xa8000,data); }
+	if	   (offset >= 0x00000000 && offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
+	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
+	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
+	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
+	else if(offset >= 0x00100000 && offset <= 0x00100000+state->ram_size-1) { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	//else
 	//	printf("%08x %08x\n",offset,data);
 
@@ -1808,6 +1827,10 @@ static MACHINE_RESET(pc9801rs)
 	state->por = 0xa0;
 	state->rom_bank = 0;
 	state->fdc_ctrl = 3;
+
+	state->ram_size = ram_get_size(machine->device(RAM_TAG)) - 0xa0000;
+
+	printf("%08x\n",state->ram_size);
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)
@@ -1901,6 +1924,10 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	//"upd765_2dd"
 	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_config)
 
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("1664K,3712K,7808K")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1962,7 +1989,9 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 
-	ROM_REGION( 0xa0000, "wram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
 
 	//ROM_REGION( 0x1000, "kanji", ROMREGION_ERASE00 )
 
