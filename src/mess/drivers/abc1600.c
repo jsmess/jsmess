@@ -1163,6 +1163,8 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 	int data_out = BIT(data, 1);
 	int rtc_cs = BIT(data, 2);
 	int nvram_cs = BIT(data, 3);
+
+	logerror("CLK %u DATA %u RTC %u NVRAM %u\n", clock, data_out, rtc_cs, nvram_cs);
 	
 	e0516_cs_w(m_rtc, rtc_cs);
 	e0516_dio_w(m_rtc, data_out);

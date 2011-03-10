@@ -89,8 +89,18 @@ protected:
 	virtual void nvram_write(emu_file &file);
 
 private:
+	inline UINT16 read(offs_t offset);
+	inline void write(offs_t offset, UINT16 data);
+	inline void erase(offs_t offset);
+
 	UINT16 m_register[16];
 	
+	int m_bits;
+	int m_state;
+	UINT8 m_command;
+	UINT8 m_address;
+	UINT16 m_data;
+	bool m_ewen;
 	int m_cs;
 	int m_sk;
 	int m_do;

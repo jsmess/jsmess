@@ -17,19 +17,38 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+#define LOG 1
+
 #define RAM_SIZE 32
 
 
 // instructions
 enum
 {
+	OTHER = 0,
+	WRITE,			// write register A3A2A1A0
+	READ,			// read register  A3A2A1A0
+	ERASE			// erase register A3A2A1A0
+};
+
+// other instructions
+enum
+{
 	EWDS = 0,		// erase/write disable
 	WRAL,			// write all registers
 	ERAL,			// erase all registers
 	EWEN,			// erase/write enable
-	WRITE = 7,		// write register A3A2A1A0
-	READ,			// read register A3A2A1A0
-	ERASE			// erase register A3A2A1A0
+};
+
+// states
+enum
+{
+	STATE_IDLE = 0,
+	STATE_COMMAND,
+	STATE_ADDRESS,
+	STATE_DATA_IN,
+	STATE_DATA_OUT,
+	STATE_ERASE
 };
 
 
@@ -80,6 +99,47 @@ device_t *nmc9306_device_config::alloc_device(running_machine &machine) const
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  nmc9306_device - constructor
+//-------------------------------------------------
+
+inline UINT16 nmc9306_device::read(offs_t offset)
+{
+	return m_register[offset];
+}
+
+
+//-------------------------------------------------
+//  nmc9306_device - constructor
+//-------------------------------------------------
+
+inline void nmc9306_device::write(offs_t offset, UINT16 data)
+{
+	if (m_ewen)
+	{
+		m_register[offset] &= data;
+	}
+}
+
+
+//-------------------------------------------------
+//  nmc9306_device - constructor
+//-------------------------------------------------
+
+inline void nmc9306_device::erase(offs_t offset)
+{
+	if (m_ewen)
+	{
+		m_register[offset] = 0xffff;
+	}
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -90,6 +150,8 @@ device_t *nmc9306_device_config::alloc_device(running_machine &machine) const
 nmc9306_device::nmc9306_device(running_machine &_machine, const nmc9306_device_config &config)
     : device_t(_machine, config),
 	  device_nvram_interface(_machine, config, *this),
+	  m_state(STATE_IDLE),
+	  m_ewen(false),
       m_config(config)
 {
 }
@@ -153,6 +215,115 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 {
 	m_sk = state;
+	
+	if (!m_cs) return;
+	
+	if (m_sk)
+	{
+		switch (m_state)
+		{
+		case STATE_IDLE:
+			if (m_di)
+			{
+				// start bit received
+				m_state = STATE_COMMAND;
+				m_bits = 0;
+			}
+			break;
+			
+		case STATE_COMMAND:
+			m_command <<= 1;
+			m_command |= m_di;
+			m_bits++;
+			
+			if (m_bits == 4)
+			{
+				m_state = STATE_ADDRESS;
+				m_bits = 0;
+			}
+			break;
+			
+		case STATE_ADDRESS:
+			m_address <<= 1;
+			m_address |= m_di;
+			m_bits++;
+			
+			if (m_bits == 4)
+			{
+				switch ((m_command >> 2) & 0x03)
+				{
+				case OTHER:
+					switch (m_command & 0x03)
+					{
+					case EWDS:
+						if (LOG) logerror("NMC9306 '%s' EWDS\n", tag());
+						m_ewen = false;
+						m_state = STATE_IDLE;
+						break;
+						
+					case WRAL:
+						if (LOG) logerror("NMC9306 '%s' WRAL\n", tag());
+						break;
+						
+					case ERAL:
+						if (LOG) logerror("NMC9306 '%s' ERAL\n", tag());
+						break;
+
+					case EWEN:
+						if (LOG) logerror("NMC9306 '%s' EWEN\n", tag());
+						m_ewen = true;
+						m_state = STATE_IDLE;
+						break;
+					}
+					break;
+
+				case WRITE:
+					if (LOG) logerror("NMC9306 '%s' WRITE %u\n", tag(), m_address & 0x0f);
+					m_state = STATE_DATA_IN;
+					break;
+					
+				case READ:
+					if (LOG) logerror("NMC9306 '%s' READ %u\n", tag(), m_address & 0x0f);
+					m_data = read(m_address & 0x0f);
+					m_state = STATE_DATA_OUT;
+					break;
+					
+				case ERASE:
+					if (LOG) logerror("NMC9306 '%s' ERASE %u\n", tag(), m_address & 0x0f);
+					erase(m_address & 0x0f);
+					m_state = STATE_ERASE;
+					break;
+				}
+				
+				m_bits = 0;
+			}
+			break;
+			
+		case STATE_DATA_IN:
+			m_data <<= 1;
+			m_data |= m_di;
+			m_bits++;
+			
+			if (m_bits == 16)
+			{
+				write(m_address & 0x0f, m_data);
+				
+				m_state = STATE_IDLE;
+			}
+			break;
+			
+		case STATE_DATA_OUT:
+			m_do = BIT(m_data, 15);
+			m_data <<= 1;
+			m_bits++;
+			
+			if (m_bits == 16)
+			{
+				m_state = STATE_IDLE;
+			}
+			break;
+		}
+	}
 }
 
 

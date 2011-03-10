@@ -124,13 +124,31 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pb5_w );
 	DECLARE_WRITE_LINE_MEMBER( pb6_w );
 	DECLARE_WRITE_LINE_MEMBER( pb7_w );
+	DECLARE_WRITE_LINE_MEMBER( pc0_w );
+	DECLARE_WRITE_LINE_MEMBER( pc1_w );
+	DECLARE_WRITE_LINE_MEMBER( pc2_w );
+	DECLARE_WRITE_LINE_MEMBER( pc3_w );
 
 protected:
     // device-level overrides
     virtual void device_start();
+    virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	static const device_timer_id TIMER_1 = 0;
+	static const device_timer_id TIMER_2 = 1;
+	static const device_timer_id TIMER_3 = 2;
+
+	inline UINT8 read_register(offs_t offset);
+	inline UINT8 read_register(offs_t offset, UINT8 mask);
+	inline void write_register(offs_t offset, UINT8 data);
+	inline void write_register(offs_t offset, UINT8 data, UINT8 mask);
+	
+	inline void count(device_timer_id id);
+	inline void trigger(device_timer_id id);
+	inline void gate(device_timer_id id);
+	
 	devcb_resolved_write_line		m_out_int_func;
 	
 	devcb_resolved_read8			m_in_pa_func;
@@ -141,6 +159,13 @@ private:
 	
 	devcb_resolved_read8			m_in_pc_func;
 	devcb_resolved_write8			m_out_pc_func;
+
+	int m_state;
+	UINT8 m_register[48];
+	UINT8 m_pointer;
+
+	// timers
+	emu_timer *m_timer[3];
 
 	const z8536_device_config &m_config;
 };
