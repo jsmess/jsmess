@@ -89,7 +89,7 @@ SCREEN_EOF( super80m )
 SCREEN_UPDATE( super80 )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
@@ -113,14 +113,8 @@ SCREEN_UPDATE( super80 )
 				gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = BIT( gfx, 7 ) ? 1 : 0;
-				*p++ = BIT( gfx, 6 ) ? 1 : 0;
-				*p++ = BIT( gfx, 5 ) ? 1 : 0;
-				*p++ = BIT( gfx, 4 ) ? 1 : 0;
-				*p++ = BIT( gfx, 3 ) ? 1 : 0;
-				*p++ = BIT( gfx, 2 ) ? 1 : 0;
-				*p++ = BIT( gfx, 1 ) ? 1 : 0;
-				*p++ = BIT( gfx, 0 ) ? 1 : 0;
+				for (i = 0; i < 8; i++)
+					*p++ = BIT(gfx, 7-i);
 			}
 		}
 		ma+=32;
@@ -131,7 +125,7 @@ SCREEN_UPDATE( super80 )
 SCREEN_UPDATE( super80d )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
@@ -155,14 +149,8 @@ SCREEN_UPDATE( super80d )
 				gfx = state->FNT[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = BIT( gfx, 7 ) ? 1 : 0;
-				*p++ = BIT( gfx, 6 ) ? 1 : 0;
-				*p++ = BIT( gfx, 5 ) ? 1 : 0;
-				*p++ = BIT( gfx, 4 ) ? 1 : 0;
-				*p++ = BIT( gfx, 3 ) ? 1 : 0;
-				*p++ = BIT( gfx, 2 ) ? 1 : 0;
-				*p++ = BIT( gfx, 1 ) ? 1 : 0;
-				*p++ = BIT( gfx, 0 ) ? 1 : 0;
+				for (i = 0; i < 8; i++)
+					*p++ = BIT(gfx, 7-i);
 			}
 		}
 		ma+=32;
@@ -173,7 +161,7 @@ SCREEN_UPDATE( super80d )
 SCREEN_UPDATE( super80e )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
@@ -197,14 +185,8 @@ SCREEN_UPDATE( super80e )
 				gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = BIT( gfx, 7 ) ? 1 : 0;
-				*p++ = BIT( gfx, 6 ) ? 1 : 0;
-				*p++ = BIT( gfx, 5 ) ? 1 : 0;
-				*p++ = BIT( gfx, 4 ) ? 1 : 0;
-				*p++ = BIT( gfx, 3 ) ? 1 : 0;
-				*p++ = BIT( gfx, 2 ) ? 1 : 0;
-				*p++ = BIT( gfx, 1 ) ? 1 : 0;
-				*p++ = BIT( gfx, 0 ) ? 1 : 0;
+				for (i = 0; i < 8; i++)
+					*p++ = BIT(gfx, 7-i);
 			}
 		}
 		ma+=32;
@@ -215,7 +197,7 @@ SCREEN_UPDATE( super80e )
 SCREEN_UPDATE( super80m )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 col, bg=0, fg=0, options=input_port_read(screen->machine, "CONFIG");
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
@@ -261,14 +243,8 @@ SCREEN_UPDATE( super80m )
 					gfx = state->FNT[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = BIT( gfx, 7 ) ? fg : bg;
-				*p++ = BIT( gfx, 6 ) ? fg : bg;
-				*p++ = BIT( gfx, 5 ) ? fg : bg;
-				*p++ = BIT( gfx, 4 ) ? fg : bg;
-				*p++ = BIT( gfx, 3 ) ? fg : bg;
-				*p++ = BIT( gfx, 2 ) ? fg : bg;
-				*p++ = BIT( gfx, 1 ) ? fg : bg;
-				*p++ = BIT( gfx, 0 ) ? fg : bg;
+				for (i = 0; i < 8; i++)
+					*p++ = BIT(gfx, 7-i) ? fg : bg;
 			}
 		}
 		ma+=32;
@@ -397,7 +373,7 @@ SCREEN_UPDATE( super80v )
 MC6845_UPDATE_ROW( super80v_update_row )
 {
 	super80_state *state = device->machine->driver_data<super80_state>();
-	UINT8 chr,col,gfx,fg,bg=0;
+	UINT8 chr,col,gfx,fg,bg=0,i;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -437,13 +413,8 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		gfx = state->m_pcgram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (7 pixels) */
-		*p++ = BIT( gfx, 7 ) ? fg : bg;
-		*p++ = BIT( gfx, 6 ) ? fg : bg;
-		*p++ = BIT( gfx, 5 ) ? fg : bg;
-		*p++ = BIT( gfx, 4 ) ? fg : bg;
-		*p++ = BIT( gfx, 3 ) ? fg : bg;
-		*p++ = BIT( gfx, 2 ) ? fg : bg;
-		*p++ = BIT( gfx, 1 ) ? fg : bg;
+		for (i = 0; i < 7; i++)
+			*p++ = BIT(gfx, 7-i) ? fg : bg;
 	}
 }
 

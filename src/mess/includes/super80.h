@@ -53,6 +53,7 @@ public:
 	READ8_MEMBER( super80_read_ff );
 	WRITE8_MEMBER( pio_port_a_w );
 	//READ8_MEMBER( pio_port_b_r );
+	virtual void machine_reset();
 	UINT8 m_shared;
 	UINT8 m_keylatch;
 	UINT8 m_cass_data[4];

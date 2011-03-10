@@ -196,10 +196,9 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
-MACHINE_RESET( super80 )
+void super80_state::machine_reset()
 {
-	super80_state *state = machine->driver_data<super80_state>();
-	state->m_shared=0xff;
+	m_shared=0xff;
 	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
 	memory_set_bank(machine, "boot", 1);
 }

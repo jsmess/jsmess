@@ -648,8 +648,6 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CPU_IO_MAP(super80_io)
 	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MCFG_MACHINE_RESET( super80 )
-
 	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -718,8 +716,6 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CPU_PROGRAM_MAP(super80v_map)
 	MCFG_CPU_IO_MAP(super80v_io)
 	MCFG_CPU_CONFIG(super80_daisy_chain)
-
-	MCFG_MACHINE_RESET( super80 )
 
 	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
 
