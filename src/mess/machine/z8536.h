@@ -163,6 +163,9 @@ private:
 	int m_state;
 	UINT8 m_register[48];
 	UINT8 m_pointer;
+	UINT8 m_input[3];
+	UINT8 m_output[3];
+	UINT8 m_buffer[3];
 
 	// timers
 	emu_timer *m_timer[3];

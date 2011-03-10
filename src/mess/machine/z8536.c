@@ -170,7 +170,7 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 		break;
 		
 	case PORT_C_DATA:
-		data = devcb_call_read8(&m_in_pc_func, 0) & 0x0f;
+		data = 0xf0 | (devcb_call_read8(&m_in_pc_func, 0) & 0x0f);
 		break;
 		
 	default:
@@ -219,7 +219,13 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		break;
 		
 	case PORT_C_DATA:
-		devcb_call_write8(&m_out_pc_func, 0, data & 0x0f);
+		{
+		UINT8 mask = (data & 0xf0) | (data >> 4);
+
+		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
+		
+		devcb_call_write8(&m_out_pc_func, 0, m_output[PORT_C]);
+		}
 		break;
 		
 	default:
@@ -355,37 +361,40 @@ void z8536_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 READ8_MEMBER( z8536_device::read )
 {
 	UINT8 data = 0;
-	
-	switch (offset & 0x03)
+
+	if (m_state == STATE_RESET)
 	{
-	case PORT_C:
-		data = read_register(PORT_C_DATA);
-		break;
-
-	case PORT_B:
-		data = read_register(PORT_B_DATA);
-		break;
-
-	case PORT_A:
-		data = read_register(PORT_A_DATA);
-		break;
-
-	case CONTROL:
-		switch (m_state)
+		// read RESET bit
+		data = read_register(m_pointer, 0x01);
+	}
+	else
+	{
+		switch (offset & 0x03)
 		{
-		case STATE_RESET:
-			// read RESET bit
-			data = read_register(m_pointer, 0x01);
+		case PORT_C:
+			data = read_register(PORT_C_DATA);
 			break;
 
-		case STATE_1:
-			m_state = STATE_0;
-			// fallthru
-		case STATE_0:
-			data = read_register(m_pointer);
+		case PORT_B:
+			data = read_register(PORT_B_DATA);
+			break;
+
+		case PORT_A:
+			data = read_register(PORT_A_DATA);
+			break;
+
+		case CONTROL:
+			switch (m_state)
+			{
+			case STATE_1:
+				m_state = STATE_0;
+				// fallthru
+			case STATE_0:
+				data = read_register(m_pointer);
+				break;
+			}
 			break;
 		}
-		break;
 	}
 	
 	return data;
@@ -398,38 +407,41 @@ READ8_MEMBER( z8536_device::read )
 
 WRITE8_MEMBER( z8536_device::write )
 {
-	switch (offset & 0x03)
+	if (m_state == STATE_RESET)
 	{
-	case PORT_C:
-		write_register(PORT_C_DATA, data);
-		break;
-
-	case PORT_B:
-		write_register(PORT_B_DATA, data);
-		break;
-
-	case PORT_A:
-		write_register(PORT_A_DATA, data);
-		break;
-
-	case CONTROL:
-		switch (m_state)
+		// write RESET bit
+		write_register(m_pointer, data, 0x01);
+	}
+	else
+	{
+		switch (offset & 0x03)
 		{
-		case STATE_RESET:
-			// write RESET bit
-			write_register(m_pointer, data, 0x01);
-			break;
-			
-		case STATE_0:
-			m_pointer = data;
-			m_state = STATE_1;
+		case PORT_C:
+			write_register(PORT_C_DATA, data);
 			break;
 
-		case STATE_1:
-			write_register(m_pointer, data);
-			m_state = STATE_0;
+		case PORT_B:
+			write_register(PORT_B_DATA, data);
+			break;
+
+		case PORT_A:
+			write_register(PORT_A_DATA, data);
+			break;
+
+		case CONTROL:
+			switch (m_state)
+			{
+			case STATE_0:
+				m_pointer = data;
+				m_state = STATE_1;
+				break;
+
+			case STATE_1:
+				write_register(m_pointer, data);
+				m_state = STATE_0;
+			}
+			break;
 		}
-		break;
 	}
 }
 
