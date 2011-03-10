@@ -105,8 +105,8 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->color_mode)
 	{
 		gfx[0] = vram[address + 0x00000];
-		gfx[1] = vram[address + 0x08000];
-		gfx[2] = vram[address + 0x10000];
+		gfx[1] = vram[address + 0x10000];
+		gfx[2] = vram[address + 0x20000];
 	}
 	else
 	{
@@ -618,8 +618,8 @@ static WRITE8_HANDLER( vram_bank_w )
 			printf("%02x\n",data);
 
 		if(data & 1) 	  { upd7220_bank_w(space->machine->device("upd7220"),0,0); } // B
-		else if(data & 2) { upd7220_bank_w(space->machine->device("upd7220"),0,1); } // G
-		else if(data & 4) { upd7220_bank_w(space->machine->device("upd7220"),0,2); } // R
+		else if(data & 2) { upd7220_bank_w(space->machine->device("upd7220"),0,2); } // G
+		else if(data & 4) { upd7220_bank_w(space->machine->device("upd7220"),0,4); } // R
 	}
 }
 
