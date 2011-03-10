@@ -1158,7 +1158,6 @@ $(MESSOBJ)/microkey.a:			\
 $(MESSOBJ)/mit.a:				\
 	$(MESS_VIDEO)/crt.o			\
 	$(MESS_DRIVERS)/tx0.o		\
-	$(MESS_MACHINE)/tx0.o		\
 	$(MESS_VIDEO)/tx0.o			\
 
 $(MESSOBJ)/mits.a:				\
