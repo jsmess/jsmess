@@ -12,6 +12,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/abc77.h"
+#include "machine/abc99.h"
 #include "machine/abc830.h"
 #include "machine/abcbus.h"
 #include "machine/e0516.h"

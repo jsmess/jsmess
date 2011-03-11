@@ -10,6 +10,8 @@ New System Drivers Supported:
 - Mikrosha-86RK [Miodrag Milanovic]
 - IBM PC 5155 [Lord Nightmare]
 
+
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - ZRT80 terminal [Robbbert]
@@ -33,8 +35,13 @@ Skeleton drivers:
 - Commodore PC 30 III
 
 
+
 System Driver Changes:
 ----------------------
+- [ABC802] Connected ABC99 keyboard. [Curt Coder]
+
+- [ABC806] Connected ABC99 keyboard. [Curt Coder]
+
 - [AC1] Added cassette support. [Robbbert]
 
 - [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
