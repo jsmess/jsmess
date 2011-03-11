@@ -1248,6 +1248,7 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
+	save_item(NAME(m_cause));
 }
 
 

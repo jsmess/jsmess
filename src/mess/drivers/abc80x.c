@@ -1552,9 +1552,6 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc806_video)
 
-	// sound hardware
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	// peripheral hardware
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
