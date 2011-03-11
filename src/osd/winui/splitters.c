@@ -29,6 +29,7 @@
 #include <commctrl.h>
 
 // MAME/MAMEUI headers
+#include <stdlib.h>
 #include "splitters.h"
 #include "mui_opts.h"
 #include "resource.h"

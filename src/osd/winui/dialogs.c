@@ -33,6 +33,7 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <stdlib.h>
 
 // standard C headers
 #include <string.h>

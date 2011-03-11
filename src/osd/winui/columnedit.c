@@ -28,6 +28,7 @@
 #include <commdlg.h>
 
 // MAME/MAMEUI headers
+#include <stdlib.h>
 #include "resource.h"
 #include "mui_opts.h"
 #include "winui.h"

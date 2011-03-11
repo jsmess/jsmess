@@ -9,6 +9,7 @@
 #include <tchar.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <stdlib.h>
 
 #include "dialog.h"
 #include "emu.h"
