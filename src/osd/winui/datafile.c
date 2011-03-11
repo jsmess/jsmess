@@ -340,7 +340,7 @@ static void ParseClose(void)
 static UINT8 ParseOpen(const char *pszFilename)
 {
         /* Open file up in binary mode */        
-		fp =global_alloc(emu_file(MameUIGlobal().ini_path(), OPEN_FLAG_READ));
+		fp =global_alloc(emu_file("", OPEN_FLAG_READ));
 		fp->open(pszFilename);
 
         /* If this is NULL, return FALSE. We can't open it */
