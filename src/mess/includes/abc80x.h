@@ -3,10 +3,25 @@
 #ifndef __ABC800__
 #define __ABC800__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "cpu/mcs48/mcs48.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
 #include "machine/abc77.h"
+#include "machine/abc830.h"
+#include "machine/abcbus.h"
+#include "machine/e0516.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/ram.h"
+#include "video/mc6845.h"
+#include "video/saa5050.h"
+#include "sound/discrete.h"
+
 
 
 //**************************************************************************
@@ -203,7 +218,7 @@ public:
 	{ }
 
 	required_device<device_t> m_crtc;
-	required_device<device_t> m_rtc;
+	required_device<e0516_device> m_rtc;
 	optional_device<device_t> abc77;
 
 	virtual void machine_start();

@@ -8,16 +8,11 @@
 
     TODO:
 
-    - check compatibility with new MC6845
     - HRU II PROM reading
 
 */
 
-#include "emu.h"
 #include "includes/abc80x.h"
-#include "machine/z80dart.h"
-#include "machine/e0516.h"
-#include "video/mc6845.h"
 
 
 
@@ -149,7 +144,7 @@ READ8_MEMBER( abc806_state::cli_r )
 	UINT16 hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
 	UINT8 data = m_hru2_prom[hru2_addr] & 0x0f;
 
-	data |= e0516_dio_r(m_rtc) << 7;
+	data |= m_rtc->dio_r() << 7;
 
 	return data;
 }
@@ -211,15 +206,15 @@ WRITE8_MEMBER( abc806_state::sto_w )
 		break;
 	case 5:
 		// RTC chip select
-		e0516_cs_w(m_rtc, !level);
+		m_rtc->cs_w(!level);
 		break;
 	case 6:
 		// RTC clock
-		e0516_clk_w(m_rtc, level);
+		m_rtc->clk_w(level);
 		break;
 	case 7:
 		// RTC data in, PROT DIN
-		e0516_dio_w(m_rtc, level);
+		m_rtc->dio_w(level);
 		break;
 	}
 }

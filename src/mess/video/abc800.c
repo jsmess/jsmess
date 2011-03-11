@@ -9,16 +9,11 @@
     TODO:
 
     - convert SAA5050 to C++ device and fix its memory interface
-    - check compatibility with new MC6845
     - ABC800C video: http://www.qsl.net/zl1vfo/teletext.htm
 
 */
 
-#include "emu.h"
 #include "includes/abc80x.h"
-#include "machine/z80dart.h"
-#include "video/mc6845.h"
-#include "video/saa5050.h"
 
 
 

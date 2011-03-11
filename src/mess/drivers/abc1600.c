@@ -1141,7 +1141,7 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 	UINT8 data = 0;
 
 	// data in	
-	data |= (e0516_dio_r(m_rtc) | m_nvram->do_r()) << 1;
+	data |= (m_rtc->dio_r() | m_nvram->do_r()) << 1;
 	
 	return 0;
 }
@@ -1166,9 +1166,9 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 
 	logerror("CLK %u DATA %u RTC %u NVRAM %u\n", clock, data_out, rtc_cs, nvram_cs);
 	
-	e0516_cs_w(m_rtc, rtc_cs);
-	e0516_dio_w(m_rtc, data_out);
-	e0516_clk_w(m_rtc, clock);
+	m_rtc->cs_w(rtc_cs);
+	m_rtc->dio_w(data_out);
+	m_rtc->clk_w(clock);
 	
 	m_nvram->cs_w(nvram_cs);
 	m_nvram->di_w(data_out);

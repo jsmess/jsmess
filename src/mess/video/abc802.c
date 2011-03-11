@@ -4,18 +4,7 @@
  *
  ****************************************************************************/
 
-/*
-
-    TODO:
-
-    - check compatibility with new MC6845
-
-*/
-
-#include "emu.h"
 #include "includes/abc80x.h"
-#include "machine/z80dart.h"
-#include "video/mc6845.h"
 
 
 

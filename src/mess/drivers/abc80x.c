@@ -230,28 +230,12 @@ XR22-050-3B Pinout
     - ABC800 keyboard: T1 clock frequency, caps lock led, keydown
     - ABC802/806 ABC77 keyboard
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
+	- connect ABC99 keyboard to ABC802/806 until ABC77 is dumped
 
 */
 
-#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/abc80x.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "cpu/mcs48/mcs48.h"
-#include "imagedev/cassette.h"
-#include "imagedev/printer.h"
-#include "machine/ram.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "machine/abcbus.h"
-#include "machine/e0516.h"
-#include "machine/abc77.h"
-#include "machine/abc830.h"
-#include "video/mc6845.h"
-#include "video/saa5050.h"
-#include "sound/discrete.h"
 
 
 
@@ -1607,9 +1591,9 @@ void abc806_state::machine_reset()
 	m_40 = 0;
 	m_hru2_a8 = 0;
 	m_txoff = 0;
-	e0516_cs_w(m_rtc, 1);
-	e0516_clk_w(m_rtc, 1);
-	e0516_dio_w(m_rtc, 1);
+	m_rtc->cs_w(1);
+	m_rtc->clk_w(1);
+	m_rtc->dio_w(1);
 
 	m_dart->ri_w(0, 1);
 

@@ -1,258 +1,263 @@
+/**********************************************************************
+
+    E05-16 Real Time Clock emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 #include "emu.h"
 #include "e0516.h"
+#include "machine/devhelpr.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 1
+
+
+// states
 enum
 {
-	E0516_REGISTER_SECOND = 0,
-	E0516_REGISTER_MINUTE,
-	E0516_REGISTER_HOUR,
-	E0516_REGISTER_DAY,
-	E0516_REGISTER_MONTH,
-	E0516_REGISTER_DAY_OF_WEEK,
-	E0516_REGISTER_YEAR,
-	E0516_REGISTER_ALL
+	STATE_ADDRESS = 0,
+	STATE_DATA
 };
 
-typedef struct _e0516_t e0516_t;
-struct _e0516_t
+
+// registers
+enum
 {
-	int cs;							/* chip select */
-	int data_latch;					/* data latch */
-	int reg_latch;					/* register latch */
-	int read_write;					/* read/write data */
-	int state;						/* state */
-	int bits;						/* number of bits transferred */
-	int dio;						/* data pin */
-
-	UINT8 reg[8];					/* registers */
-
-	/* timers */
-	emu_timer *clock_timer;		/* clock timer */
+	SECOND = 0,
+	MINUTE,
+	HOUR,
+	DAY,
+	MONTH,
+	DAY_OF_WEEK,
+	YEAR,
+	ALL
 };
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
 
-INLINE e0516_t *get_safe_token(device_t *device)
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type E0516 = e0516_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(e0516, "E05-16")
+
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  e0516_device - constructor
+//-------------------------------------------------
+
+e0516_device::e0516_device(running_machine &_machine, const e0516_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
 {
-	assert(device != NULL);
-	assert(device->type() == E0516);
-
-	return (e0516_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( clock_tick )
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-static TIMER_CALLBACK( clock_tick )
+void e0516_device::device_start()
 {
-	device_t *device = (device_t *)ptr;
-	e0516_t *e0516 = get_safe_token(device);
+	// allocate timers
+	m_timer = timer_alloc();
+	m_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	
+	// state saving
+	save_item(NAME(m_cs));
+	save_item(NAME(m_clk));
+	save_item(NAME(m_data_latch));
+	save_item(NAME(m_reg_latch));
+	save_item(NAME(m_read_write));
+	save_item(NAME(m_state));
+	save_item(NAME(m_bits));
+	save_item(NAME(m_dio));
+	save_item(NAME(m_register));
+}
 
-	e0516->reg[E0516_REGISTER_SECOND]++;
 
-	if (e0516->reg[E0516_REGISTER_SECOND] == 60)
+//-------------------------------------------------
+//  device_start - device-specific reset
+//-------------------------------------------------
+
+void e0516_device::device_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void e0516_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_register[SECOND]++;
+
+	if (m_register[SECOND] == 60)
 	{
-		e0516->reg[E0516_REGISTER_SECOND] = 0;
-		e0516->reg[E0516_REGISTER_MINUTE]++;
+		m_register[SECOND] = 0;
+		m_register[MINUTE]++;
 	}
 
-	if (e0516->reg[E0516_REGISTER_MINUTE] == 60)
+	if (m_register[MINUTE] == 60)
 	{
-		e0516->reg[E0516_REGISTER_MINUTE] = 0;
-		e0516->reg[E0516_REGISTER_HOUR]++;
+		m_register[MINUTE] = 0;
+		m_register[HOUR]++;
 	}
 
-	if (e0516->reg[E0516_REGISTER_HOUR] == 24)
+	if (m_register[HOUR] == 24)
 	{
-		e0516->reg[E0516_REGISTER_HOUR] = 0;
-		e0516->reg[E0516_REGISTER_DAY]++;
-		e0516->reg[E0516_REGISTER_DAY_OF_WEEK]++;
+		m_register[HOUR] = 0;
+		m_register[DAY]++;
+		m_register[DAY_OF_WEEK]++;
 	}
 
-	if (e0516->reg[E0516_REGISTER_DAY_OF_WEEK] == 8)
+	if (m_register[DAY_OF_WEEK] == 8)
 	{
-		e0516->reg[E0516_REGISTER_DAY_OF_WEEK] = 1;
+		m_register[DAY_OF_WEEK] = 1;
 	}
 
-	if (e0516->reg[E0516_REGISTER_DAY] == 32)
+	if (m_register[DAY] == 32)
 	{
-		e0516->reg[E0516_REGISTER_DAY] = 1;
-		e0516->reg[E0516_REGISTER_MONTH]++;
+		m_register[DAY] = 1;
+		m_register[MONTH]++;
 	}
 
-	if (e0516->reg[E0516_REGISTER_MONTH] == 13)
+	if (m_register[MONTH] == 13)
 	{
-		e0516->reg[E0516_REGISTER_MONTH] = 1;
-		e0516->reg[E0516_REGISTER_YEAR]++;
+		m_register[MONTH] = 1;
+		m_register[YEAR]++;
 	}
 }
 
-/*-------------------------------------------------
-    e0516_dio_r - data out
--------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( e0516_dio_r )
+//-------------------------------------------------
+//  cs_w - chip select input
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( e0516_device::cs_w )
 {
-	e0516_t *e0516 = get_safe_token(device);
-
-	return e0516->dio;
-}
-
-/*-------------------------------------------------
-    e0516_dio_w - data in
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER( e0516_dio_w )
-{
-	e0516_t *e0516 = get_safe_token(device);
-
-	e0516->dio = state;
-}
-
-/*-------------------------------------------------
-    e0516_clk_w - clock in
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER( e0516_clk_w )
-{
-	e0516_t *e0516 = get_safe_token(device);
-
-	if (e0516->cs == 1) return;
-
-	if (state == 0)
+	m_cs = state;
+	
+	if (m_cs)
 	{
-		e0516->bits++;
+		m_data_latch = 0;
+		m_reg_latch = 0;
+		m_bits = 0;
+		m_state = STATE_ADDRESS;
+	}
+}
 
-		if (e0516->state == 0)
+
+//-------------------------------------------------
+//  clk_w - serial clock input
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( e0516_device::clk_w )
+{
+	m_clk = state;
+	
+	if (m_cs || m_clk) return;
+
+	m_bits++;
+
+	if (m_state == STATE_ADDRESS)
+	{
+		if (LOG) logerror("E05-16 '%s' Command Bit %u\n", tag(), m_dio);
+
+		// command
+		m_reg_latch |= m_dio << 3;
+		m_reg_latch >>= 1;
+
+		if (m_bits == 4)
 		{
-			// command
+			m_state = STATE_DATA;
+			m_bits = 0;
 
-			e0516->reg_latch |= e0516->dio << 3;
-			e0516->reg_latch >>= 1;
-
-			if (e0516->bits == 4)
+			if (BIT(m_reg_latch, 0))
 			{
-				e0516->state = 1;
-				e0516->bits = 0;
-
-				if (BIT(e0516->reg_latch, 0))
-				{
-					// load register value to data latch
-					e0516->data_latch = e0516->reg[e0516->reg_latch >> 1];
-				}
+				// load register value to data latch
+				m_data_latch = m_register[m_reg_latch >> 1];
 			}
+		}
+	}
+	else
+	{
+		// data
+		if (BIT(m_reg_latch, 0))
+		{
+			// read
+			if (LOG) logerror("E05-16 '%s' Data Bit OUT %u\n", tag(), m_dio);
+			
+			m_dio = BIT(m_data_latch, 0);
+			m_data_latch >>= 1;
 		}
 		else
 		{
-			// data
+			// write
+			if (LOG) logerror("E05-16 '%s' Data Bit IN %u\n", tag(), m_dio);
 
-			if (BIT(e0516->reg_latch, 0))
+			m_data_latch |= m_dio << 7;
+			m_data_latch >>= 1;
+		}
+
+		if (m_bits == 8)
+		{
+			m_state = STATE_ADDRESS;
+			m_bits = 0;
+
+			if (!BIT(m_reg_latch, 0))
 			{
-				// read
-
-				e0516->dio = BIT(e0516->data_latch, 0);
-				e0516->data_latch >>= 1;
-			}
-			else
-			{
-				// write
-
-				e0516->data_latch |= e0516->dio << 7;
-				e0516->data_latch >>= 1;
-			}
-
-			if (e0516->bits == 8)
-			{
-				e0516->state = 0;
-				e0516->bits = 0;
-
-				if (!BIT(e0516->reg_latch, 0))
-				{
-					// write latched data to register
-					e0516->reg[e0516->reg_latch >> 1] = e0516->data_latch;
-				}
+				// write latched data to register
+				m_register[m_reg_latch >> 1] = m_data_latch;
 			}
 		}
 	}
 }
 
-/*-------------------------------------------------
-    e0516_clk_w - chip select
--------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( e0516_cs_w )
+//-------------------------------------------------
+//  dio_w - serial data input
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( e0516_device::dio_w )
 {
-	e0516_t *e0516 = get_safe_token(device);
-
-	e0516->cs = state;
-
-	if (state == 1)
-	{
-		e0516->data_latch = 0;
-		e0516->reg_latch = 0;
-		e0516->bits = 0;
-		e0516->state = 0;
-	}
+	m_dio = state;
 }
 
-/*-------------------------------------------------
-    DEVICE_START( e0516 )
--------------------------------------------------*/
 
-static DEVICE_START( e0516 )
+//-------------------------------------------------
+//  do_r - serial data output
+//-------------------------------------------------
+
+READ_LINE_MEMBER( e0516_device::dio_r )
 {
-	e0516_t *e0516 = get_safe_token(device);
-
-	/* create the timers */
-	e0516->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
-	e0516->clock_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 32768));
-
-	/* register for state saving */
-	device->save_item(NAME(e0516->cs));
-	device->save_item(NAME(e0516->data_latch));
-	device->save_item(NAME(e0516->reg_latch));
-	device->save_item(NAME(e0516->read_write));
-	device->save_item(NAME(e0516->state));
-	device->save_item(NAME(e0516->bits));
-	device->save_item(NAME(e0516->dio));
-	device->save_item(NAME(e0516->reg));
+	return m_dio;
 }
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( e0516 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( e0516 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(e0516_t);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(e0516);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "E05-16");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "E05-16");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(E0516 , e0516);
