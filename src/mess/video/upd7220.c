@@ -67,7 +67,8 @@ enum
 	COMMAND_CURD,
 	COMMAND_LPRD,
 	COMMAND_DMAR,
-	COMMAND_DMAW
+	COMMAND_DMAW,
+	COMMAND_5A
 };
 
 enum
@@ -103,6 +104,7 @@ enum
 #define UPD7220_COMMAND_LPRD			0xc0
 #define UPD7220_COMMAND_DMAR			0xa4 // & 0xe4
 #define UPD7220_COMMAND_DMAW			0x24 // & 0xe4
+#define UPD7220_COMMAND_5A				0x5a
 
 #define UPD7220_SR_DATA_READY			0x01
 #define UPD7220_SR_FIFO_FULL			0x02
@@ -862,6 +864,7 @@ static int translate_command(UINT8 data)
 	case UPD7220_COMMAND_GCHRD:	command = COMMAND_GCHRD; break;
 	case UPD7220_COMMAND_CURD:	command = COMMAND_CURD;  break;
 	case UPD7220_COMMAND_LPRD:	command = COMMAND_LPRD;	 break;
+	case UPD7220_COMMAND_5A:	command = COMMAND_5A;    break;
 	default:
 		switch (data & 0xfe)
 		{
@@ -914,6 +917,11 @@ static void process_fifo(device_t *device)
 	{
 	case COMMAND_INVALID:
 		printf("uPD7220 '%s' Invalid Command Byte %02x\n", device->tag(), upd7220->cr);
+		break;
+
+	case COMMAND_5A:
+		if (upd7220->param_ptr == 4)
+			printf("uPD7220 '%s' Undocumented Command 0x5A Executed %02x %02x %02x\n", device->tag(),upd7220->pr[1],upd7220->pr[2],upd7220->pr[3] );
 		break;
 
 	case COMMAND_RESET: /* reset */
@@ -1310,7 +1318,7 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_ext_sync_w )
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
-	if (LOG) logerror("uPD7220 '%s' External Synchronization: %u\n", device->tag(), state);
+	//if (LOG) logerror("uPD7220 '%s' External Synchronization: %u\n", device->tag(), state);
 
 	if (state)
 	{
