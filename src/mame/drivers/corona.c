@@ -1,7 +1,7 @@
 /**************************************************************************
 
   Winners Circle.
-  1980-81-82, Corona Co., LTD.
+  1980-81-82, Corona Co, LTD.
 
   Driver written by Roberto Fresca.
   Based on roul driver from Roberto Zandona' & Angelo Salese.
@@ -9,11 +9,13 @@
 
   Games running in this hardware:
 
-  * Winners Circle (81),       1981, Corona Co., LTD.
-  * Winners Circle (82),       1982, Corona Co., LTD.
-  * Ruleta RE-800 (earlier),   1991, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RE-800 (v1.0),      1991, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RE-800 (v3.0),      1992, Entretenimientos GEMINIS & GENATRON.
+  * Winners Circle (81, 28*28 PCB),      1981, Corona Co, LTD.
+  * Winners Circle (81, 18*22 PCB),      1981, Corona Co, LTD.
+  * Winners Circle (82),                 1982, Corona Co, LTD.
+  * Ruleta RE-800 (earlier),             1991, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RE-800 (v1.0),                1991, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RE-800 (v3.0),                1992, Entretenimientos GEMINIS & GENATRON.
+  * Lucky Roulette (6-players, Spanish), 198?, unknown manufacturer.
 
 
   Special thanks to Rob Ragon for his invaluable cooperation.
@@ -24,10 +26,10 @@
   ----------
 
   Winners Circle.
-  4-players horse race game.
+  4-players horse racing game.
 
-  Very rare game, due to massive conversions to any kind of roulette soft.
-  
+  Very rare game, due to massive conversions to any kind of roulette games.
+
   ------
 
   This game is a milestone. If you ask any old operator about the gambling
@@ -41,7 +43,7 @@
   --------------
 
 
-  * Winners Circle:
+  * Winners Circle 81 (28*28 pins PCB):
 
   1x Z80 @ 3 MHz. (main CPU)
   1x Z80 @ 2.4 MHz. (sound CPU)
@@ -58,6 +60,33 @@
   1x 82s123 (Color bipolar PROM)
 
   1x Xtal @ 24 MHz. (main)
+  1x Xtal @ 20 MHz. (video)
+
+
+  * Winners Circle 82 (18*22 pins PCB):
+
+  1x Z80 @ 2.6 MHz. (main CPU)
+  1x Z80 @ 2.6 MHz. (sound CPU)
+
+  1x AY-3-8910 @ 2 MHz? (need clk confirmation).
+  1x empty socket (maybe an AY replacement?)
+    wih the following pinouts:
+	(28 pins)
+	Vcc +5v @ Pin 19
+	GND @ pins 6 & 16
+	Analog Channels @ Pins 1 y 5
+	Clock @ pin 15
+
+  16x 8116 (16K x 1bit). DRAM Video (should be set as 32 KB).
+  1x 6116 (NVRAM)
+  2x 2114 (Sound DRAM)
+
+  4x 2732 (Main program ROMs).
+  1x 2716 (Sound program ROM).
+
+  1x 82s123 (Color bipolar PROM)
+
+  1x Xtal @ 18.432 MHz. (main)
   1x Xtal @ 20 MHz. (video)
 
 
@@ -262,23 +291,27 @@
 
   TODO:
 
-  - Inputs/Outputs for Winners Circle.
-  - Check the sound CPU connection in Winners Circle sets.
+  - See why the "rainbow timer" for gamble the earnings is nearly twice
+    the slow against the real thing.
+  - Check the sound CPU and AY clocks in Winners Circle sets.
 
 
 **************************************************************************/
 
-#define WC_MAIN_XTAL		(XTAL_24MHz)	/* Main for Winners Circle boards */
-#define RE_MAIN_XTAL		(XTAL_16MHz)	/* Main for roulette boards */
-#define VIDEO_XTAL			(XTAL_20MHz)	/* Video circuitry Xtal (all) */
-#define AY_CLK				(1000000)		/* AY-3-8912 clock, measured */
+#define WC81_MAIN_XTAL		(XTAL_24MHz)		/* Main crystal for Winners Circle 28*28 pins PCB's */
+#define WC82_MAIN_XTAL		(XTAL_18_432MHz)	/* Main crystal for Winners Circle 18*22 pins PCB's */
+#define RE_MAIN_XTAL		(XTAL_16MHz)		/* Main for roulette boards */
+#define VIDEO_XTAL			(XTAL_20MHz)		/* Video circuitry crystal (all) */
+#define AY_CLK1				(1000000)			/* AY-3-8912 clock for WC81 (28*28 PCB), measured */
+#define AY_CLK2				(2000000)			/* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "re800.lh"
 #include "machine/nvram.h"
+#include "re800.lh"
+#include "luckyrlt.lh"
 
 #define VIDEOBUF_SIZE 512*512
 
@@ -410,6 +443,17 @@ static SCREEN_UPDATE(winner)
 	return 0;
 }
 
+static SCREEN_UPDATE(luckyrlt)
+{
+	int x, y;
+
+	for (y = 0; y < 256; y++)
+		for (x = 0; x < 256; x++)
+			*BITMAP_ADDR16(bitmap, 255 - y, x) = videobuf[y * 512 + x];
+
+	return 0;
+}
+
 
 /*******************************************
 *           Read & Write Handlers          *
@@ -435,11 +479,6 @@ static WRITE8_HANDLER( ball_w )
 	output_set_lamp_value(data, 1);
 	output_set_lamp_value(lamp_old, 0);
 	lamp_old = lamp;
-}
-
-static READ8_HANDLER( test_r )
-{
-	return space->machine->rand() & 0xff;
 }
 
 
@@ -477,6 +516,38 @@ static WRITE8_HANDLER( mux_port_w )
 
 	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
 	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
+
+//	logerror("muxsel: %02x \n", input_selector);
+}
+
+static WRITE8_HANDLER( wc_meters_w )
+{
+/*  - bits -
+    7654 3210
+    ---- ---x   Credits In counter pulse.
+    ---- --x-   Credits In counter pulse, inserted through coin3 only (lower 4 lines of IN3).
+    ---- -x--   Credits Out counter pulse.
+    -xxx x---   Unknown (directly connected to the higher 4 lines of IN3).
+    x--- ----   Unknown.
+
+   Data is written inverted.
+
+*/
+	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x01);	/* Credits In */
+	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
+	coin_counter_w(space->machine, 2, (data ^ 0xff) & 0x04);	/* Credits Out */
+
+//	popmessage("meters: %02x", (data ^ 0xff));
+}
+
+static WRITE8_DEVICE_HANDLER(ay_port_a_out)
+{
+	logerror("AY port A write: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(ay_port_b_out)
+{
+	logerror("AY port B write: %02X\n", data);
 }
 
 
@@ -500,6 +571,7 @@ static WRITE8_HANDLER( mux_port_w )
 		   DF (01)
            71 (FF/00)
 		   D8 (00....) --> snd_latch?
+           EF: meters.
 
   Reads: E8/E9....EA/EB/EC/ED/EE
 
@@ -508,8 +580,7 @@ static WRITE8_HANDLER( mux_port_w )
 */
 static ADDRESS_MAP_START( winner81_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM // (nvram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb800, 0xb8ff) AM_RAM // copied from 8000 (0x10 bytes, repeated)
 ADDRESS_MAP_END
 
@@ -522,17 +593,17 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
 	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITENOP
+	AM_RANGE(0xd8, 0xd8) AM_WRITENOP			/* dunno, but is writting 0's very often */
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
 
-	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("DSW2")
-
-	AM_RANGE(0xea, 0xea) AM_READ_PORT("IN0")
-	AM_RANGE(0xeb, 0xeb) AM_READ_PORT("IN1")
-	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN2")
-	AM_RANGE(0xed, 0xed) AM_READ_PORT("IN3")
-	AM_RANGE(0xee, 0xee) AM_READ_PORT("IN4")
+	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("IN0")	/* credits for players A, B, C, D */
+	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("IN3")
+	AM_RANGE(0xea, 0xea) AM_READ_PORT("IN1")	/* left & right for all players */
+	AM_RANGE(0xeb, 0xeb) AM_READ_PORT("IN2")	/* bet for all players */
+	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN4")
+	AM_RANGE(0xed, 0xed) AM_READ_PORT("DSW1")	/* DIP switches bank 1 */
+	AM_RANGE(0xee, 0xee) AM_READ_PORT("DSW2")
+	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)	/* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(  winner81_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -551,17 +622,23 @@ ADDRESS_MAP_END
   Blitter F0-F4
   Status: F5
 
-  Reads:  F9 (maybe DIP, since was polled at beginning)
-          F8-FA-F8-FB-FF-FA (F8/FB/FF/FA)
+  Reads:
+         F8 ---> DIP switches bank 1.
+		 F9 ---> Controls for players A & B.
+		 FA ---> Credits for players A, B, C, D.
+		 FB ---> Single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters.
+		 FD ---> Controls for players C & D.
+		 FF ---> Unknown.
 
-  Writes: FE (writes 01, 02 and 03 during attract) Seems snd_latch or traffic lights.
-          after FE write, poll FD constantly...
+  Writes:
+		 FC ---> Meters.
+         FE ---> Sound Latch (writes 01, 02 and 03 during attract)...
 */
 
 static ADDRESS_MAP_START( winner82_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram) 801a comm
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_cpu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -573,31 +650,31 @@ static ADDRESS_MAP_START( winner82_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
 
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW1")
-
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0")
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN2")
-	AM_RANGE(0xfd, 0xfd) AM_READ(test_r)	/* dunno WTF is, but after the snd latch is polled constantly */
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")	/* coinage DIP SW */
+	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0")	/* controls for players A & B */
+	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")	/* credits for players A, B, C, D */
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")	/* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(wc_meters_w)
+	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN2")	/* controls for players C & D */
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-	AM_RANGE(0xff, 0xff) AM_READ_PORT("IN3")
-//	AM_RANGE(0xee, 0xee) AM_READ_PORT("IN4")
+	AM_RANGE(0xff, 0xff) AM_READ_PORT("DSW2")	/* no idea */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_WRITENOP	/* socket for another ay, inited but never played */
 ADDRESS_MAP_END
 
 /* Ruleta RE-800
 
-  Blitter: F0-F5
+  Blitter: F0-F4
   Status:  F5
   Ball:    FF
 
@@ -656,68 +733,127 @@ static ADDRESS_MAP_START( re800_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+/* Lucky Roulette
+
+  Blitter: F0-F4
+  Status:  F5
+  Ball:    F9
+
+  F8       R    DIP switches?
+  FA       R    DIP switches?
+
+  FC        W   mux selector & meters
+  FD       R    muxed port
+
+  FE        W   snd_latch...
+
+  Port:
+  0 - bet
+  1 - right
+  2 - down
+  3 - left
+  4 - up
+  5 - credits out
+  6 - credits in
+  7 - lock (inverted... seems a DIP switch)
+
+*/
+
+static ADDRESS_MAP_START( luckyrlt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( luckyrlt_cpu_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
+	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
+	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
+	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( luckyrlt_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( luckyrlt_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+ADDRESS_MAP_END
+
+
 /*********************************
 *         Input Ports            *
 *********************************/
 
-static INPUT_PORTS_START( winner )
+static INPUT_PORTS_START( winner81 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Player 2 - Coin 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Player 1 - Coin 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Player 4 - Coin 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player 3 - Coin 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("Player 2 - Coin 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Player 1 - Coin 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("Player 4 - Coin 2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("Player 3 - Coin 2")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Player 2 - Right")	/* B right */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Player 1 - Right")	/* A right */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)     PORT_NAME("Player 4 - Right")	/* D right */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)     PORT_NAME("Player 3 - Right")	/* C right */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Player 2 - Left")	/* B left */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("Player 1 - Left")	/* A left */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)     PORT_NAME("Player 4 - Left")	/* D left */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)     PORT_NAME("Player 3 - Left")	/* C left */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)    PORT_NAME("Player 2 - Bet")		/* B bet */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player 1 - Bet")		/* A bet */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)        PORT_NAME("Player 4 - Bet")		/* D bet */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)        PORT_NAME("Player 3 - Bet")		/* C bet */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN2-8")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Player 2 - Credits Out")	/* B manual credits out */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Player 1 - Credits Out")	/* A manual credits out */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Player 4 - Credits Out")	/* D manual credits out */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("Player 3 - Credits Out")	/* C manual credits out */
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN4-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN4-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x01, "x2" )
+	PORT_DIPSETTING(    0x02, "x5" )
+	PORT_DIPSETTING(    0x03, "x10" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -765,63 +901,62 @@ static INPUT_PORTS_START( winner )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( winner82 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_START("IN0")	/* players A & B controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player A - Bet/Triple")   /* A: bet/triple */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)        PORT_NAME("Player A - Credits Out")  /* A: credits out */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)     PORT_NAME("Player A - Cursor Left")	/* A: cursor left */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)    PORT_NAME("Player A - Cursor Right")	/* A: cursor right */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)    PORT_NAME("Player B - Bet/Triple")	/* B: bet/triple */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)        PORT_NAME("Player B - Credits Out")	/* B: credits out */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)    PORT_NAME("Player B - Cursor Left")	/* B: cursor left */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)    PORT_NAME("Player B - Cursor Right")	/* B: cursor right */
 
 	PORT_START("IN1")	/* credits */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Player B - Coin 2")	/* 10 credits / pulse */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Player A - Coin 2")	/* 10 credits / pulse */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("Player D - Coin 2")	/* 10 credits / pulse */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Player C - Coin 2")	/* 10 credits / pulse */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Player B - Coin 1")	/* 1 credit / pulse */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("Player A - Coin 1")	/* 1 credit / pulse */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("Player D - Coin 1")	/* 1 credit / pulse */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Player C - Coin 1")	/* 1 credit / pulse */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("Player B - Coin 2")	/* 10 credits / pulse */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Player A - Coin 2")	/* 10 credits / pulse */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("Player D - Coin 2")	/* 10 credits / pulse */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("Player C - Coin 2")	/* 10 credits / pulse */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Player B - Coin 1")	/* 1 credit / pulse */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Player A - Coin 1")	/* 1 credit / pulse */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Player D - Coin 1")	/* 1 credit / pulse */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player C - Coin 1")	/* 1 credit / pulse */
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_START("IN2")	/* players C & D controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Player C - Bet/Triple")	 /* C: bet/triple */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("Player C - Credits Out")	 /* C: credits out */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("Player C - Cursor Right") /* C: cursor right */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("Player C - Cursor Left")  /* C: cursor left */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player D - Bet/Triple")	 /* D: bet/triple */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Player D - Credits Out")	 /* D: credits out */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Player D - Cursor Right") /* D: cursor right */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Player D - Cursor Left")	 /* D: cursor left */
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Player B - Coin 3")	/* always 1 credit, lockable through DIP switch */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("Player A - Coin 3")	/* always 1 credit, lockable through DIP switch */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Player D - Coin 3")	/* always 1 credit, lockable through DIP switch */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Player C - Coin 3")	/* always 1 credit, lockable through DIP switch */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")	/* bit 3 in meters */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")	/* bit 4 in meters */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")	/* bit 5 in meters */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O) PORT_NAME("IN3-8")	/* bit 6 in meters */
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("IN4-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)     PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "x10" )
+	PORT_DIPSETTING(    0x01, "x5" )
+	PORT_DIPSETTING(    0x02, "x2" )
+	PORT_DIPSETTING(    0x03, "x1" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -837,9 +972,9 @@ static INPUT_PORTS_START( winner82 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Coin 3 Lockout" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
@@ -1066,6 +1201,146 @@ static INPUT_PORTS_START( re800v3 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( luckyrlt )
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player 1 - Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)    PORT_NAME("Player 1 - Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)     PORT_NAME("Player 1 - Down")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)     PORT_NAME("Player 1 - Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)       PORT_NAME("Player 1 - Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)        PORT_NAME("Player 1 - Credits Out")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1)        PORT_NAME("Player 1 - Credits In")
+	PORT_DIPNAME( 0x80, 0x00, "Player 1 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Player 2 - Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Player 2 - Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Player 2 - Down")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Player 2 - Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Player 2 - Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)     PORT_NAME("Player 2 - Credits Out")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2)     PORT_NAME("Player 2 - Credits In")
+	PORT_DIPNAME( 0x80, 0x00, "Player 2 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Player 3 - Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Player 3 - Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player 3 - Down")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Player 3 - Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Player 3 - Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Player 3 - Credits Out")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player 3 - Credits In")
+	PORT_DIPNAME( 0x80, 0x00, "Player 3 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN0-4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Player 4 - Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Player 4 - Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("Player 4 - Down")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("Player 4 - Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Player 4 - Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Player 4 - Credits Out")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Player 4 - Credits In")
+	PORT_DIPNAME( 0x80, 0x00, "Player 4 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN0-5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("Player 5 - Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("Player 5 - Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Player 5 - Down")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("Player 5 - Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Player 5 - Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Player 5 - Credits Out")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Player 5 - Credits In")
+	PORT_DIPNAME( 0x80, 0x00, "Player 5 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN0-6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Player 6 - Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGDN)  PORT_NAME("Player 6 - Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_END)   PORT_NAME("Player 6 - Down")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DEL)   PORT_NAME("Player 6 - Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)  PORT_NAME("Player 6 - Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)     PORT_NAME("Player 6 - Credits Out")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6)     PORT_NAME("Player 6 - Credits In")
+	PORT_DIPNAME( 0x80, 0x00, "Player 6 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Bookkeeping" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+/*******************************************
+*             Sound Interface              *
+*******************************************/
+static const ay8910_interface aysnd_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(ay_port_a_out),	/* Port A write */
+	DEVCB_HANDLER(ay_port_b_out)	/* Port B write */
+};
+
 
 /*******************************************
 *             Machine Drivers              *
@@ -1073,17 +1348,17 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( winner81, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC_MAIN_XTAL/8)	/* measured */
+	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
 	MCFG_CPU_IO_MAP(winner81_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
+	MCFG_CPU_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
 	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,120) //unknown timing
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PALETTE_INIT(winner)
 
@@ -1101,23 +1376,23 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)	/* measured */
+	MCFG_SOUND_CONFIG(aysnd_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( winner82, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC_MAIN_XTAL/8)	/* measured */
+	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
 	MCFG_CPU_IO_MAP(winner82_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
+	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,120) //unknown timing
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PALETTE_INIT(winner)
 
@@ -1135,21 +1410,21 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)	/* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( re800, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
+	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
 	MCFG_CPU_IO_MAP(re800_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
+	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
 	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,120) //unknown timing
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1169,7 +1444,41 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( luckyrlt, driver_device )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
+	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
+	MCFG_CPU_IO_MAP(luckyrlt_cpu_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
+	MCFG_CPU_PROGRAM_MAP(luckyrlt_sound_map)
+	MCFG_CPU_IO_MAP(luckyrlt_sound_cpu_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_PALETTE_INIT(winner)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(luckyrlt)
+
+	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_VIDEO_START(winner)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1201,7 +1510,7 @@ MACHINE_CONFIG_END
 ***************************************************/
 
 ROM_START(winner81)
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* from the 28*28 pins PCB */
 	ROM_LOAD("1_2732_c61e.bin",	0x0000, 0x1000, CRC(841cdbd1) SHA1(87caeec0a80460c72408ceae28480fe2f3ba3052) )
 	ROM_LOAD("2_2732_eafa.bin",	0x1000, 0x1000, CRC(216f71d2) SHA1(913454bc78487c099c854e35d594454077266590) )
 	ROM_LOAD("3_2732_121e.bin",	0x2000, 0x1000, CRC(b5849762) SHA1(f62ea11ae5834dd84081d8716798c2ac0b879a35) )
@@ -1215,20 +1524,31 @@ ROM_START(winner81)
 	ROM_LOAD( "corona_82s123.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+ROM_START(winner81b)
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* from the 18*22 pins PCB, more close to winner82 */
+	ROM_LOAD("winner_27128_a145.bin",	0x0000, 0x4000, CRC(a9737c8f) SHA1(d1e3b3979d3ef1aa2d8c32d5d56c30165c949e50) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* identical halves */
+	ROM_LOAD("son_2732_8ccc.bin",	0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "corona_82s123.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
 ROM_START(winner82)
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 18*22 pins PCB?? */
 	ROM_LOAD("p1.32.bin",	0x0000, 0x1000, CRC(5eb58841) SHA1(160ba8a19b0926aab6f47497e625449d35efea2a) )
 	ROM_LOAD("p2.32.bin",	0x1000, 0x1000, CRC(52567aeb) SHA1(b4723aff00a18f3cb9ee5c3071ed671f920458cf) )
 	ROM_LOAD("p3.32.bin",	0x2000, 0x1000, CRC(1ae24244) SHA1(a10fba097b18607b1bc10d8720a020c1e01e75c3) )
 	ROM_LOAD("p4.32.bin",	0x3000, 0x1000, CRC(15631824) SHA1(24d5607b186dc880609dd076012d0bc29d7581ba) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* need confirmation if it's the same */
-	ROM_LOAD("son_2716_4070.bin",	0x0000, 0x0800, BAD_DUMP CRC(547068a8) SHA1(fe0e1272feb0196b14554d7c3cb043212508bfbc) )
-	ROM_RELOAD(                     0x0800, 0x0800 ) //reads here during horse race
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* identical halves */
+	ROM_LOAD("son_2732_8ccc.bin",	0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "corona_82s123.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
+
 
 /***************************************************
 
@@ -1254,7 +1574,7 @@ ROM_START(re800ea)
 	ROM_RELOAD(                     0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
 ROM_START(re800v1)
@@ -1266,7 +1586,7 @@ ROM_START(re800v1)
 	ROM_RELOAD(             0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
 ROM_START(re800v3)
@@ -1281,14 +1601,36 @@ ROM_START(re800v3)
 	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+/******************************
+  Lucky Roulette
+  6-players spanish roulette.
+
+  Unknown manufacturer.
+
+******************************/
+
+ROM_START(luckyrlt)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rulaxx.256",	0x0000, 0x8000, CRC(2dd903b7) SHA1(112c335d089f922b9c2bccc3b39e439a12e01725) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD("sonrulxx.16",	0x0000, 0x0800, CRC(37943210) SHA1(50cbc91fa52c02553552701393a11c2749d7ad2e) )
+	ROM_RELOAD(             0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "promrulxx.123",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
 
 /******************************************
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                              FLAGS                                             LAYOUT      */
-GAME(  1981, winner81, 0,        winner81, winner,   0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (81)",                 GAME_NOT_WORKING )
-GAME(  1982, winner82, 0,        winner82, winner82, 0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (82)",                 GAME_NOT_WORKING )
-GAMEL( 1991, re800ea,  0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 1991, re800v1,  0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 1991, re800v3,  0,        re800,    re800v3,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                              FLAGS                   LAYOUT      */
+GAME(  1981, winner81,  winner82, winner81, winner81, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",      GAME_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",      0 )
+GAME(  1982, winner82,  0,        winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                 0 )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", 0,                      layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                0,                      layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 198?, luckyrlt,  0,        luckyrlt, luckyrlt, 0,        ROT90,  "<unknown>",                "Lucky Roulette (6-players, Spanish)", 0,                      layout_luckyrlt )

@@ -22,6 +22,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
+#include "machine/nvram.h"
 #include "includes/nb1413m3.h"		// needed for mahjong input controller
 #include "sound/3812intf.h"
 #include "sound/dac.h"
@@ -36,19 +37,6 @@ Notes:
 #define DAC_WRITE	dac_w
 #endif
 
-
-static NVRAM_HANDLER( nbmj9195 )
-{
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	if (read_or_write)
-		file->write(state->nvram, state->nvram_size);
-	else {
-		if (file)
-			file->read(state->nvram, state->nvram_size);
-		else
-			memset(state->nvram, 0, state->nvram_size);
-	}
-}
 
 static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
@@ -721,7 +709,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sailorws_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(nbmj9195_state, nvram) AM_SIZE_MEMBER(nbmj9195_state, nvram_size)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -733,7 +721,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( koinomp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(nbmj9195_state, nvram) AM_SIZE_MEMBER(nbmj9195_state, nvram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3199,7 +3187,7 @@ static MACHINE_CONFIG_DERIVED( janbari, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(patimono_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3210,7 +3198,7 @@ static MACHINE_CONFIG_DERIVED( mmehyou, NBMJDRV1 )
 	MCFG_CPU_PROGRAM_MAP(koinomp_map)
 	MCFG_CPU_IO_MAP(mmehyou_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3221,7 +3209,7 @@ static MACHINE_CONFIG_DERIVED( ultramhm, NBMJDRV1 )
 	MCFG_CPU_PROGRAM_MAP(koinomp_map)
 	MCFG_CPU_IO_MAP(koinomp_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3263,7 +3251,7 @@ static MACHINE_CONFIG_DERIVED( pachiten, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pachiten_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3279,7 +3267,7 @@ static MACHINE_CONFIG_DERIVED( sailorwr, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sailorwr_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3961,24 +3949,24 @@ ROM_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY, FULLNAME, FLAGS
-GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195, ROT0,   "Nichibutsu/Yubis", "Mahjong Uranai Densetsu (Japan)", 0 )
+GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195, ROT0,   "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", 0 )
 GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", 0 )
 GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", 0 )
-GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195, ROT0,   "Nichibutsu/Yubis/AV Japan", "Mahjong Janjan Baribari (Japan)", 0 )
-GAME( 1992, mjanbari, janbari,  janbari,  mjanbari, nbmj9195, ROT0,   "Nichibutsu/Yubis/AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", 0 )
-GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195, ROT0,   "Nichibutsu/Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", 0 )
+GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", 0 )
+GAME( 1992, mjanbari, janbari,  janbari,  mjanbari, nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", 0 )
+GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", 0 )
 GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195, ROT0,   "Apple", "Ultra Maru-hi Mahjong (Japan)", 0 )
 GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195, ROT0,   "Fujic", "Mahjong Gal 10-renpatsu (Japan)", 0 )
 GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195, ROT0,   "Fujic", "Mahjong Ren-ai Club (Japan)", 0 )
-GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195, ROT0,   "Nichibutsu/AV Japan", "Mahjong La Man (Japan)", 0 )
+GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195, ROT0,   "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", 0 )
 GAME( 1993, mkeibaou, 0,        mkeibaou, mkeibaou, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Keibaou (Japan)", 0 )
-GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195, ROT0,   "Nichibutsu/Miki Syouji/AV Japan", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", 0 )
+GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195, ROT0,   "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", 0 )
 GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", 0 )
 GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", 0 )
 GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", 0 )
 GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", 0 )
 GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195, ROT180, "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", 0 )
-GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195, ROT180, "Nichibutsu/Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", 0 )
+GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195, ROT180, "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", 0 )
 GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", 0 )
 GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", 0 )
 GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195, ROT0,   "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", 0 )
@@ -3986,10 +3974,10 @@ GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195, ROT0,   "Sphinx", 
 GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal,   nbmj9195, ROT0,   "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", 0 )
 GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", 0 )
 GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", 0 )
-GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195, ROT0,   "Nichibutsu/Kawakusu", "Mahjong Circuit no Mehyou (Japan)", 0 )
+GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", 0 )
 GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", 0 )
 GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", 0 )
 
-GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195, ROT0,   "Sphinx/AV Japan", "Mahjong Scout Man (Japan)", 0 )
-GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195, ROT0,   "Sphinx/AV Japan", "Imekura Mahjong (Japan)", 0 )
-GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195, ROT0,   "Fujic/AV Japan", "Mahjong Erotica Golf (Japan)", 0 )
+GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", 0 )
+GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Imekura Mahjong (Japan)", 0 )
+GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195, ROT0,   "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", 0 )

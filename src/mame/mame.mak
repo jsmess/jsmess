@@ -756,7 +756,7 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/skyfox.o $(VIDEO)/skyfox.o \
 	$(DRIVERS)/stepstag.o \
 	$(DRIVERS)/tetrisp2.o $(VIDEO)/tetrisp2.o \
-	$(MACHINE)/ms32crpt.o \
+	$(MACHINE)/jalcrpt.o \
 	$(VIDEO)/jalblend.o \
 
 $(MAMEOBJ)/jpm.a: \
@@ -911,7 +911,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/midtunit.o $(MACHINE)/midtunit.o $(VIDEO)/midtunit.o \
 	$(DRIVERS)/midvunit.o $(VIDEO)/midvunit.o \
 	$(DRIVERS)/midwunit.o $(MACHINE)/midwunit.o \
-	$(DRIVERS)/midxunit.o \
+	$(DRIVERS)/midxunit.o $(MACHINE)/midxunit.o \
 	$(DRIVERS)/midyunit.o $(MACHINE)/midyunit.o $(VIDEO)/midyunit.o \
 	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o $(VIDEO)/midzeus2.o \
 	$(DRIVERS)/omegrace.o \
@@ -1424,7 +1424,7 @@ $(MAMEOBJ)/toaplan.a: \
 	$(DRIVERS)/slapfght.o $(MACHINE)/slapfght.o $(VIDEO)/slapfght.o \
 	$(DRIVERS)/snowbros.o $(VIDEO)/kan_pand.o $(VIDEO)/kan_panb.o \
 	$(DRIVERS)/toaplan1.o $(MACHINE)/toaplan1.o $(VIDEO)/toaplan1.o \
-	$(DRIVERS)/toaplan2.o $(AUDIO)/toaplan2.o $(VIDEO)/toaplan2.o $(VIDEO)/gp9001.o \
+	$(DRIVERS)/toaplan2.o $(VIDEO)/toaplan2.o $(VIDEO)/gp9001.o \
 	$(DRIVERS)/twincobr.o $(MACHINE)/twincobr.o $(VIDEO)/twincobr.o \
 	$(DRIVERS)/wardner.o \
 
@@ -1841,7 +1841,8 @@ $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 
 $(DRIVERS)/copsnrob.o:	$(LAYOUT)/copsnrob.lh
 
-$(DRIVERS)/corona.o:	$(LAYOUT)/re800.lh
+$(DRIVERS)/corona.o:	$(LAYOUT)/re800.lh \
+						$(LAYOUT)/luckyrlt.lh
 
 $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 

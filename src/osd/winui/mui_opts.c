@@ -2805,7 +2805,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 
 		astring *basename;
 		astring *srcname;
-		machine_config config(*driver);
+		machine_config config(*driver,opts);
 
 		// parse "vector.ini" for vector games 
 		if (isDriverVector(&config))

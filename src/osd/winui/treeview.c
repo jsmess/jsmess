@@ -918,7 +918,7 @@ void CreateCPUFolders(int parent_index)
 
 	for (i = 0; drivers[i] != NULL; i++)
 	{
-		machine_config config(*drivers[i]);
+		machine_config config(*drivers[i],MameUIGlobal());
 
 		// enumerate through all devices
 		for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
@@ -978,7 +978,7 @@ void CreateSoundFolders(int parent_index)
 
 	for (i = 0; drivers[i] != NULL; i++)
 	{
-		machine_config config(*drivers[i]);
+		machine_config config(*drivers[i],MameUIGlobal());
 
 		// enumerate through all devices
 		
@@ -1228,7 +1228,7 @@ void CreateDumpingFolders(int parent_index)
 		bBadDump = FALSE;
 		bNoDump = FALSE;
 		/* Allocate machine config */
-		machine_config config(*gamedrv);
+		machine_config config(*gamedrv,MameUIGlobal());
 		
 		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 		{

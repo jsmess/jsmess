@@ -3,9 +3,18 @@
 //  swconfig.c
 //
 //============================================================
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <shellapi.h>
 
+// standard C headers
+#include <assert.h>
+#include <stdio.h>
+#include <tchar.h>
+#include "emu.h"
 #include "swconfig.h"
-
+#include "mui_opts.h"
 //============================================================
 //  IMPLEMENTATION
 //============================================================
@@ -20,7 +29,9 @@ software_config *software_config_alloc(int driver_index) //, hashfile_error_func
 	memset(config,0,sizeof(software_config));
 
 	// allocate the machine config
-	config->mconfig = global_alloc(machine_config(*drivers[driver_index]));
+	windows_options pCurrentOpts;
+	load_options(pCurrentOpts, OPTIONS_GLOBAL, driver_index); 
+	config->mconfig = global_alloc(machine_config(*drivers[driver_index],pCurrentOpts));
 
 	// allocate the hash file
 	driver = drivers[driver_index];

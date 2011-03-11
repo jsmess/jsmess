@@ -5,6 +5,7 @@
 #include "emu.h"
 #include "image.h"
 #include "msuiutil.h"
+#include "mui_opts.h"
 
 BOOL DriverIsComputer(int driver_index)
 {
@@ -27,7 +28,7 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 	const device_config_image_interface *device;
 
 	// allocate the machine config
-	machine_config config(*gamedrv);
+	machine_config config(*gamedrv,MameUIGlobal());
 
 	for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
 	{

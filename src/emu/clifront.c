@@ -373,7 +373,7 @@ static void display_help(void)
 
 void cli_info_listxml(emu_options &options, const char *gamename)
 {
-	print_mame_xml(stdout, drivers, gamename);
+	print_mame_xml(stdout, drivers, gamename, options);
 }
 
 
@@ -524,7 +524,7 @@ void cli_info_listcrc(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 			const rom_entry *region, *rom;
 			const rom_source *source;
 
@@ -562,7 +562,7 @@ void cli_info_listroms(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			/* print the header */
 			if (count > 0)
@@ -626,7 +626,7 @@ void cli_info_listsamples(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 			const device_config_sound_interface *sound = NULL;
 
 			/* find samples interfaces */
@@ -664,7 +664,7 @@ void cli_info_listdevices(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			if (count != 0)
 				printf("\n");
@@ -800,7 +800,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )
 		{
 			/* allocate the machine config */
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 			{
@@ -882,7 +882,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )
 		{
 			/* allocate the machine config */
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 			{
@@ -1068,49 +1068,43 @@ static void info_listsoftware(emu_options &options, const char *gamename)
     softlist_match_roms - scan for a matching
     software ROM by hash
 -------------------------------------------------*/
-static void softlist_match_roms(emu_options &options, const hash_collection &hashes, int length, int *found)
+void softlist_match_roms(machine_config &config, const hash_collection &hashes, int length, int *found)
 {
-	/* iterate over drivers */
-	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
+	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		machine_config config(*drivers[drvindex]);
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
-		for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+		for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
-
-			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			if ( swlist->list_name[i] )
 			{
-				if ( swlist->list_name[i] )
+				software_list *list = software_list_open( config.options(), swlist->list_name[i], FALSE, NULL );
+
+				for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 				{
-					software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
-
-					for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
+					for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
 					{
-						for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
+						for ( const rom_entry *region = part->romdata; region != NULL; region = rom_next_region(region) )
 						{
-							for ( const rom_entry *region = part->romdata; region != NULL; region = rom_next_region(region) )
+							for ( const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom) )
 							{
-								for ( const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom) )
+								hash_collection romhashes(ROM_GETHASHDATA(rom));
+								if ( hashes == romhashes )
 								{
-									hash_collection romhashes(ROM_GETHASHDATA(rom));
-									if ( hashes == romhashes )
-									{
-										bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
+									bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
 
-										/* output information about the match */
-										if (*found != 0)
-											mame_printf_info("                    ");
-										mame_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlist->list_name[i], swinfo->shortname, swinfo->longname);
-										(*found)++;
-									}
+									/* output information about the match */
+									if (*found != 0)
+										mame_printf_info("                    ");
+									mame_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlist->list_name[i], swinfo->shortname, swinfo->longname);
+									(*found)++;
 								}
 							}
 						}
 					}
-
-					software_list_close( list );
 				}
+
+				software_list_close( list );
 			}
 		}
 	}
@@ -1140,7 +1134,7 @@ static void info_listmedia(emu_options &options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			/* allocate the machine config */
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			driver_name = drivers[drvindex]->name;
 
@@ -1507,8 +1501,7 @@ static void identify_data(emu_options &options, const char *name, const UINT8 *d
 		status->matches++;
 
 	/* free any temporary JED data */
-	if (tempjed != NULL)
-		global_free(tempjed);
+	global_free(tempjed);
 }
 
 
@@ -1518,19 +1511,15 @@ static void identify_data(emu_options &options, const char *name, const UINT8 *d
 
 static void match_roms(emu_options &options, const hash_collection &hashes, int length, int *found)
 {
-	int drvindex;
-
 	/* iterate over drivers */
-	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
+	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 	{
-		machine_config config(*drivers[drvindex]);
-		const rom_entry *region, *rom;
-		const rom_source *source;
+		machine_config config(*drivers[drvindex], options);
 
 		/* iterate over sources, regions and files within the region */
-		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
-			for (region = rom_first_region(*source); region; region = rom_next_region(region))
-				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
+			for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
+				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					hash_collection romhashes(ROM_GETHASHDATA(rom));
 					if (!romhashes.flag(hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
@@ -1544,7 +1533,8 @@ static void match_roms(emu_options &options, const hash_collection &hashes, int 
 						(*found)++;
 					}
 				}
-	}
 
-	softlist_match_roms( options, hashes, length, found );
+		// also check any softlists
+		softlist_match_roms( config, hashes, length, found );
+	}
 }

@@ -399,7 +399,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 		else
 		if ((gamedrv != NULL) || g_propSheets[i].bOnDefaultPage)
 		{
-			machine_config config(*gamedrv);
+			machine_config config(*gamedrv,pCurrentOpts);
 
 			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(&config, gamedrv))
 			{
@@ -599,7 +599,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 static char *GameInfoCPU(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config config(*drivers[nIndex]);
+	machine_config config(*drivers[nIndex],pCurrentOpts);
 	const device_config_execute_interface *cpu;
 
 	ZeroMemory(buf, sizeof(buf));
@@ -637,7 +637,7 @@ static char *GameInfoSound(UINT nIndex)
 
 	buf[0] = 0;
 	
-	machine_config config(*drivers[nIndex]);
+	machine_config config(*drivers[nIndex],pCurrentOpts);
 	
 	/* iterate over sound chips */
 	const device_config_sound_interface *sound = NULL;
@@ -696,7 +696,7 @@ static char *GameInfoSound(UINT nIndex)
 static char *GameInfoScreen(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config config(*drivers[nIndex]);
+	machine_config config(*drivers[nIndex],pCurrentOpts);
 	memset(buf, '\0', 1024);
 
 	if (isDriverVector(&config))
@@ -737,7 +737,7 @@ static char *GameInfoScreen(UINT nIndex)
 static char *GameInfoColors(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config config(*drivers[nIndex]);
+	machine_config config(*drivers[nIndex],pCurrentOpts);
 
 	ZeroMemory(buf, sizeof(buf));
 	sprintf(buf, "%d colors ", config.m_total_colors);
@@ -2416,7 +2416,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	{		
 		const device_config_sound_interface *sound;
 		if ( nIndex > -1 ) {
-			machine_config config(*drivers[nIndex]);
+			machine_config config(*drivers[nIndex],pCurrentOpts);
 		
 			for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 			{

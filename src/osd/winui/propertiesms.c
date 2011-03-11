@@ -402,7 +402,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, windows_
 	(void)ComboBox_ResetContent(control);
 
 	// allocate the machine config
-	machine_config cfg(*gamedrv);
+	machine_config cfg(*gamedrv,*opts);
 
 	// identify how many options that we have
 	device = cfg.m_devicelist.first(RAM);

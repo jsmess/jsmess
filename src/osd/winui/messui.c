@@ -445,7 +445,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	SoftwareList_SetDriver(hwndSoftwareList, s_config);
 
 	/* allocate the machine config */
-	machine_config config(*drivers[drvindex]);
+	machine_config config(*drivers[drvindex],MameUIGlobal());
 
 	windows_options options;
 	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
@@ -507,7 +507,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 		return TRUE;
 	}
 	// allocate the machine config
-	machine_config config(*drivers[drvindex]);
+	machine_config config(*drivers[drvindex],MameUIGlobal());
 
 	for (bool gotone = config.m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
@@ -918,7 +918,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 	drvindex = Picker_GetSelectedItem(hwndList);
 
 	// allocate the machine config
-	machine_config config(*drivers[drvindex]);
+	machine_config config(*drivers[drvindex],MameUIGlobal());
 
 	SetupImageTypes(&config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	cfd_res = CommonFileImageDialog(last_directory, cfd, filename, &config, imagetypes);

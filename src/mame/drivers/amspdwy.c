@@ -282,6 +282,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_MACHINE_START(amspdwy)
 	MCFG_MACHINE_RESET(amspdwy)
 
@@ -400,5 +401,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", GAME_SUPPORTS_SAVE )

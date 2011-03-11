@@ -1,15 +1,10 @@
 /* video/namcofl.c */
 
 #include "emu.h"
-#include "includes/namconb1.h"
 #include "includes/namcoic.h"
 #include "includes/namcos2.h"
 #include "includes/namcofl.h"
 
-//UINT32 *namcofl_spritebank32;
-//UINT32 *namcofl_tilebank32;
-
-static UINT32 namcofl_sprbank;
 
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
@@ -110,19 +105,21 @@ SCREEN_UPDATE( namcofl )
 
 WRITE32_HANDLER(namcofl_spritebank_w)
 {
-	COMBINE_DATA(&namcofl_sprbank);
+	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	COMBINE_DATA(&state->sprbank);
 }
 
-static int FLobjcode2tile( int code )
+static int FLobjcode2tile( running_machine *machine, int code )
 {
-	if ((code & 0x2000) && (namcofl_sprbank & 2)) { code += 0x4000; }
+	namcofl_state *state = machine->driver_data<namcofl_state>();
+	if ((code & 0x2000) && (state->sprbank & 2)) { code += 0x4000; }
 
 	return code;
 }
 
 VIDEO_START( namcofl )
 {
-	namco_tilemap_init( machine, NAMCONB1_TILEGFX, machine->region(NAMCONB1_TILEMASKREGION)->base(), TilemapCB );
-	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
-	namco_roz_init(machine,NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
+	namco_tilemap_init( machine, NAMCOFL_TILEGFX, machine->region(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
+	namco_obj_init(machine,NAMCOFL_SPRITEGFX,0x0,FLobjcode2tile);
+	namco_roz_init(machine,NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

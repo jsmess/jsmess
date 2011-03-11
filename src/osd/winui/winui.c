@@ -4831,7 +4831,7 @@ static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nCo
 
 		case COLUMN_TYPE:
 			{
-				machine_config config(*drivers[nItem]);
+				machine_config config(*drivers[nItem],MameUIGlobal());
 				/* Vector/Raster */
 				if (isDriverVector(&config))
 					s = TEXT("Vector");
@@ -5278,8 +5278,8 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 
 	case COLUMN_TYPE:
 		{
-			machine_config config1(*drivers[index1]);
-			machine_config config2(*drivers[index2]);
+			machine_config config1(*drivers[index1],MameUIGlobal());
+			machine_config config2(*drivers[index2],MameUIGlobal());
 			
 			value = isDriverVector(&config1) - isDriverVector(&config2);
 		}
