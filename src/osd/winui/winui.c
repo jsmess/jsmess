@@ -54,7 +54,6 @@
 #include "winutf8.h"
 #include "strconv.h"
 #include "window.h"
-#include "winmain.h"
 
 #include "resource.h"
 #include "resource.hm"
@@ -311,7 +310,7 @@ static BOOL             FolderCheck(void);
 static void             ToggleScreenShot(void);
 static void             ToggleSoftware(void);
 static void             AdjustMetrics(void);
-//static void             EnablePlayOptions(int nIndex, core_options *o);
+//static void             EnablePlayOptions(int nIndex, windows_options *o);
 
 /* Icon routines */
 static DWORD            GetShellLargeIconSize(void);
@@ -876,36 +875,36 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	double elapsedtime;
 	DWORD dwExitCode = 0;
 	int i;
-	core_options *mame_opts;
-
+	windows_options mame_opts;
+	astring error_string;
 	// set up MAME options
-	mame_opts = mame_options_init(mame_win_options);
-
+//	mame_opts = mame_options_init(mame_win_options);
+	
 	// Tell mame were to get the INIs
-	options_set_string(mame_opts, OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE);
+	mame_opts.set_value(OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE,error_string);
 
 	// add image specific device options
-	image_add_device_options(mame_opts, drivers[nGameIndex]);
+	mame_opts.set_system_name(drivers[nGameIndex]->name);
 
 	// set any specified play options
 	if (playopts != NULL)
 	{
 		if (playopts->record != NULL)
-			options_set_string(mame_opts, OPTION_RECORD, playopts->record, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(OPTION_RECORD, playopts->record, OPTION_PRIORITY_CMDLINE,error_string);
 		if (playopts->playback != NULL)
-			options_set_string(mame_opts, OPTION_PLAYBACK, playopts->playback, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(OPTION_PLAYBACK, playopts->playback, OPTION_PRIORITY_CMDLINE,error_string);
 		if (playopts->state != NULL)
-			options_set_string(mame_opts, OPTION_STATE, playopts->state, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(OPTION_STATE, playopts->state, OPTION_PRIORITY_CMDLINE,error_string);
 		if (playopts->wavwrite != NULL)
-			options_set_string(mame_opts, OPTION_WAVWRITE, playopts->wavwrite, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(OPTION_WAVWRITE, playopts->wavwrite, OPTION_PRIORITY_CMDLINE,error_string);
 		if (playopts->mngwrite != NULL)
-			options_set_string(mame_opts, OPTION_MNGWRITE, playopts->mngwrite, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(OPTION_MNGWRITE, playopts->mngwrite, OPTION_PRIORITY_CMDLINE,error_string);
 		if (playopts->aviwrite != NULL)
-			options_set_string(mame_opts, OPTION_AVIWRITE, playopts->aviwrite, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(OPTION_AVIWRITE, playopts->aviwrite, OPTION_PRIORITY_CMDLINE,error_string);
 	}
 
 	if (g_szSelectedSoftware[0] && g_szSelectedDevice[0]) {
-			options_set_string(mame_opts, g_szSelectedDevice, g_szSelectedSoftware, OPTION_PRIORITY_CMDLINE);
+			mame_opts.set_value(g_szSelectedDevice, g_szSelectedSoftware, OPTION_PRIORITY_CMDLINE,error_string);
 			// Add params and clear so next start of driver is without parameters			
 			g_szSelectedSoftware[0] = 0;
 			g_szSelectedDevice[0] = 0;
@@ -919,11 +918,11 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 		Picker_ClearIdle(GetDlgItem(hMain, s_nPickers[i]));
 
 	// run the emulation
-	options_set_string(mame_opts, OPTION_GAMENAME, drivers[nGameIndex]->name, OPTION_PRIORITY_CMDLINE);
+	//mame_opts.set_value(OPTION_SYSTEMNAME, drivers[nGameIndex]->name, OPTION_PRIORITY_CMDLINE,error_string);
 	// Time the game run.
 	time(&start);
 	windows_osd_interface osd;
-	mame_execute(osd, mame_opts);
+	mame_execute(mame_opts, osd);
 	// Calc the duration
 	time(&end);
 	elapsedtime = end - start;
@@ -5586,7 +5585,7 @@ static void MamePlayBackGame()
 		if (path[strlen(path)-1] == '\\')
 			path[strlen(path)-1] = 0; // take off trailing back slash
 
-		emu_file pPlayBack(*MameUIGlobal(), SEARCHPATH_INPUTLOG, OPEN_FLAG_READ);
+		emu_file pPlayBack(MameUIGlobal().input_directory(), OPEN_FLAG_READ);
 		fileerr = pPlayBack.open(fname);
 		if (fileerr != FILERR_NONE)
 		{
@@ -5687,7 +5686,7 @@ static void MameLoadState()
 			state_fname = fname;
 		}
 #endif // MESS
-		emu_file pSaveState(*MameUIGlobal(), SEARCHPATH_STATE, OPEN_FLAG_READ);
+		emu_file pSaveState(MameUIGlobal().state_directory(), OPEN_FLAG_READ);
 		file_error fileerr = pSaveState.open(state_fname);
 		if (fileerr != FILERR_NONE)
 		{

@@ -1424,11 +1424,11 @@ static void set_speed(running_machine *machine, int speed)
 	if (speed != 0)
 	{
 		machine->video().set_speed_factor(speed);
-		machine->options().core_options::set_value(OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE, error_string);
+		machine->options().emu_options::set_value(OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 
 	machine->video().set_throttled(speed != 0);
-	machine->options().core_options::set_value(OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE, error_string);
+	machine->options().emu_options::set_value(OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 
@@ -1793,7 +1793,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 		case ID_FRAMESKIP_AUTO:
 			window->machine->video().set_frameskip(-1);
-			window->machine->options().core_options::set_value(OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE, error_string);
+			window->machine->options().emu_options::set_value(OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE, error_string);
 			break;
 
 		case ID_HELP_ABOUT_NEWUI:
@@ -1833,8 +1833,8 @@ static int invoke_command(HWND wnd, UINT command)
 			{
 				// change frameskip
 				window->machine->video().set_frameskip(command - ID_FRAMESKIP_0);
-				window->machine->options().core_options::set_value(OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE, error_string);
-				window->machine->options().core_options::set_value(OPTION_FRAMESKIP, (int)command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE, error_string);
+				window->machine->options().emu_options::set_value(OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE, error_string);
+				window->machine->options().emu_options::set_value(OPTION_FRAMESKIP, (int)command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (IO_COUNT*DEVOPTION_MAX)))
 			{

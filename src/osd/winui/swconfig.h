@@ -29,7 +29,7 @@ struct _software_config
 //  PROTOTYPES
 //============================================================
 
-software_config *software_config_alloc(int driver_index, core_options *opts); //, hashfile_error_func error_proc);
+software_config *software_config_alloc(int driver_index); //, hashfile_error_func error_proc);
 void software_config_free(software_config *config);
 
 #endif // __SWCONFIG_H__

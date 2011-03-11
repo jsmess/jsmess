@@ -17,6 +17,7 @@
 #include <ctype.h>
 
 #include "emu.h"
+#include "mui_opts.h"
 #include "unzip.h"
 #include "strconv.h"
 #include "picker.h"
@@ -25,7 +26,6 @@
 #include "winui.h"
 #include "optionsms.h"
 #include "resourcems.h"
-#include "mui_opts.h"
 #include "softwarepicker.h"
 #include "mui_util.h"
 #include "hash.h"

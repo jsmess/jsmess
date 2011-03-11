@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "image.h"
-#include "options.h"
 
 enum
 {
@@ -18,8 +17,8 @@ enum
 	MESS_COLUMN_MAX
 };
 
-void MessSetupSettings(core_options *settings);
-void MessSetupGameOptions(core_options *opts, int driver_index);
+void MessSetupSettings(winui_options &settings);
+void MessSetupGameOptions(windows_options &opts, int driver_index);
 
 void SetMessColumnWidths(int widths[]);
 void GetMessColumnWidths(int widths[]);

@@ -14,6 +14,7 @@
 #include <tchar.h>
 
 #include "emu.h"
+#include "mui_opts.h"
 #include "devview.h"
 #include "optionsms.h"
 #include "strconv.h"

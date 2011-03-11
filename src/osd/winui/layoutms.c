@@ -28,6 +28,7 @@
 #include "screenshot.h"
 #include "winui.h"
 #include "properties.h"
+#include "optionsms.h"
 
 #include "msuiutil.h"
 #include "resourcems.h"

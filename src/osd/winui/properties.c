@@ -136,7 +136,6 @@ b) Exit the dialog.
 #include "winui.h"
 #include "datamap.h"
 #include "help.h"
-#include "winmain.h"
 #include "strconv.h"
 #include "winutf8.h"
 #include "sound/samples.h"
@@ -180,10 +179,10 @@ static void InitializeD3DVersionUI(HWND hwnd);
 static void InitializeVideoUI(HWND hwnd);
 static void InitializeBIOSUI(HWND hwnd);
 static void InitializeControllerMappingUI(HWND hwnd);
-static void UpdateOptions(HWND hDlg, datamap *map, core_options *opts);
-static void UpdateProperties(HWND hDlg, datamap *map, core_options *opts);
-static void PropToOptions(HWND hWnd, core_options *o);
-static void OptionsToProp(HWND hWnd, core_options *o);
+static void UpdateOptions(HWND hDlg, datamap *map, windows_options &opts);
+static void UpdateProperties(HWND hDlg, datamap *map, windows_options &opts);
+static void PropToOptions(HWND hWnd, windows_options &o);
+static void OptionsToProp(HWND hWnd, windows_options &o);
 static void SetPropEnabledControls(HWND hWnd);
 static BOOL SelectEffect(HWND hWnd);
 static BOOL ResetEffect(HWND hWnd);
@@ -208,9 +207,9 @@ static HBRUSH hBkBrush;
 #define MAX_SCREENS					4
 #endif
 
-static core_options *pOrigOpts, *pDefaultOpts;
+static windows_options pOrigOpts, pDefaultOpts;
 static BOOL orig_uses_defaults;
-static core_options *pCurrentOpts = NULL;
+static windows_options pCurrentOpts;
 static datamap *properties_datamap;
 
 static int  g_nGame            = 0;
@@ -428,17 +427,17 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	PROPSHEETPAGE   *pspage;
 
 	// clear globals
-	pCurrentOpts = NULL;
+	//pCurrentOpts = NULL;
 
 	g_nGame = GLOBAL_OPTIONS;
 
 	/* Get default options to populate property sheets */
-	pCurrentOpts = load_options(OPTIONS_GLOBAL, g_nGame); //GetDefaultOptions(-1, FALSE);
-	pDefaultOpts = load_options(OPTIONS_GLOBAL, g_nGame);
+	load_options(pCurrentOpts, OPTIONS_GLOBAL, g_nGame); //GetDefaultOptions(-1, FALSE);
+	load_options(pDefaultOpts, OPTIONS_GLOBAL, g_nGame);
 	g_bUseDefaults = FALSE;
 	/* Stash the result for comparing later */
-	pOrigOpts = CreateGameOptions(OPTIONS_TYPE_GLOBAL);
-	options_copy(pOrigOpts, pCurrentOpts);
+	CreateGameOptions(pOrigOpts, OPTIONS_TYPE_GLOBAL);
+	pOrigOpts = pCurrentOpts;
 	orig_uses_defaults = FALSE;
 	g_bReset = FALSE;
 	g_nPropertyMode = OPTIONS_GLOBAL;
@@ -494,7 +493,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	// Initialize the options
 
 	// Load the current options, this will pickup the highest priority option set.
-	pCurrentOpts = load_options(opt_type, game_num);
+	load_options(pCurrentOpts, opt_type, game_num);
 
 	// Load the default options, pickup the next lower options set than the current level.
 	if (opt_type > OPTIONS_GLOBAL)
@@ -507,11 +506,11 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 		}
 
 	}
-	pDefaultOpts = load_options(default_type, game_num);
+	load_options(pDefaultOpts, default_type, game_num);
 
 	// Copy current_options to original options
-	pOrigOpts = CreateGameOptions(OPTIONS_TYPE_GLOBAL);
-	options_copy(pOrigOpts, pCurrentOpts);
+	CreateGameOptions(pOrigOpts, OPTIONS_TYPE_GLOBAL);
+	//options_copy(pOrigOpts, pCurrentOpts);
 
 	// Copy icon to use for the property pages
 	g_hIcon = CopyIcon(hIcon);
@@ -524,7 +523,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	g_nPropertyMode = opt_type;
 
 	// Evaluate if the current set uses the Default set
-	g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
+	g_bUseDefaults = pCurrentOpts == pDefaultOpts;
 	g_bReset = FALSE;
 	BuildDataMap();
 
@@ -1047,8 +1046,8 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 		UpdateProperties(hDlg, properties_datamap, pCurrentOpts);
 
-		g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
-		g_bReset = options_equal(pCurrentOpts, pOrigOpts) ? FALSE : TRUE;
+		g_bUseDefaults = pCurrentOpts == pDefaultOpts;
+		g_bReset = (pCurrentOpts == pOrigOpts) ? FALSE : TRUE;
 
 		if (g_nGame == GLOBAL_OPTIONS)
 			ShowWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), SW_HIDE);
@@ -1143,10 +1142,10 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				if (wNotifyCode != BN_CLICKED)
 					break;
 
-				options_copy(pCurrentOpts, pOrigOpts);
+				//options_copy(pCurrentOpts, pOrigOpts);
 				UpdateProperties(hDlg, properties_datamap, pCurrentOpts);
 
-				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
+				g_bUseDefaults = pCurrentOpts == pDefaultOpts;
 				g_bReset = FALSE;
 				PropSheet_UnChanged(GetParent(hDlg), hDlg);
 				EnableWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), (g_bUseDefaults) ? FALSE : TRUE);
@@ -1154,13 +1153,13 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 			case IDC_USE_DEFAULT:
 				// Copy the pDefaultOpts into pCurrentOpts
-				options_copy(pCurrentOpts, pDefaultOpts);
+				//options_copy(pCurrentOpts, pDefaultOpts);
 				// repopulate the controls with the new data
 				UpdateProperties(hDlg, properties_datamap, pCurrentOpts);
 				
-				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
+				g_bUseDefaults = pCurrentOpts == pDefaultOpts;
 				// This evaluates properly
-				g_bReset = options_equal(pCurrentOpts, pOrigOpts) ? FALSE : TRUE;
+				g_bReset = (pCurrentOpts == pOrigOpts) ? FALSE : TRUE;
 				// Enable/Dispable the Reset to Defaults button
 				EnableWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), (g_bUseDefaults) ? FALSE : TRUE);
 				// Tell the dialog to enable/disable the apply button.
@@ -1236,13 +1235,13 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				UpdateOptions(hDlg, properties_datamap, pCurrentOpts);
 				// enable the apply button
 				PropSheet_Changed(GetParent(hDlg), hDlg);
-				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
-				g_bReset = options_equal(pCurrentOpts, pOrigOpts) ? FALSE : TRUE;
+				g_bUseDefaults = pCurrentOpts == pDefaultOpts;
+				g_bReset = (pCurrentOpts == pOrigOpts) ? FALSE : TRUE;
 				EnableWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), (g_bUseDefaults) ? FALSE : TRUE);
 			}
 
 			// If we are closing, pCurrentOpts may be null
-			if (NULL != pCurrentOpts)
+/*			if (NULL != pCurrentOpts)
 			{
 				// make sure everything's copied over, to determine what's changed
 				UpdateOptions(hDlg, properties_datamap, pCurrentOpts);
@@ -1250,7 +1249,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				// redraw it, it might be a new color now
 				if (GetDlgItem(hDlg,wID))
 					InvalidateRect(GetDlgItem(hDlg,wID),NULL,FALSE);
-			}
+			}*/
 		}
 		break;
 
@@ -1266,8 +1265,8 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			case PSN_SETACTIVE:
 				/* Initialize the controls. */
 				UpdateProperties(hDlg, properties_datamap, pCurrentOpts);
-				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
-				g_bReset = options_equal(pCurrentOpts, pOrigOpts) ? FALSE : TRUE;
+				g_bUseDefaults = pCurrentOpts == pDefaultOpts;
+				g_bReset = (pCurrentOpts == pOrigOpts) ? FALSE : TRUE;
 
 				// Sync RESET TO DEFAULTS buttons.
 				EnableWindow(GetDlgItem(hDlg, IDC_USE_DEFAULT), (g_bUseDefaults) ? FALSE : TRUE);
@@ -1276,24 +1275,24 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			case PSN_APPLY:
 				// Handle more than one PSN_APPLY, since this proc handles more tha one
 				// property sheet and can be called multiple times when it's time to exit,
-				// and we may have already freed the core_options.
+				// and we may have already freed the windows_options.
 				if (bClosing)
 				{
-					if (NULL == pCurrentOpts)
-						return TRUE;
+					//if (NULL == pCurrentOpts)
+//						return TRUE;
 				}
 
 				// Read the datamap
 				UpdateOptions(hDlg, properties_datamap, pCurrentOpts);
 
 				// Copy current options to orignal options.
-				options_copy(pOrigOpts, pCurrentOpts);
+				//options_copy(pOrigOpts, pCurrentOpts);
 				
 				// Repopulate the controls?  WTF?  We just read them, they should be fine.
 				UpdateProperties(hDlg, properties_datamap, pCurrentOpts);
 
 				// Determine button states.
-				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
+				g_bUseDefaults = pCurrentOpts == pDefaultOpts;
 				g_bReset = FALSE;
 
 				orig_uses_defaults = g_bUseDefaults;
@@ -1303,19 +1302,20 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				EnableWindow(GetDlgItem(hDlg, IDC_PROP_RESET), g_bReset);
 
 				// Save or remove the current options
-				save_options((OPTIONS_TYPE)g_nPropertyMode, (g_bUseDefaults) ? NULL : pCurrentOpts, g_nGame);
+				//save_options((OPTIONS_TYPE)g_nPropertyMode, (g_bUseDefaults) ? NULL : pCurrentOpts, g_nGame);
+				save_options((OPTIONS_TYPE)g_nPropertyMode, pCurrentOpts, g_nGame);
 
 				// Disable apply button
 				PropSheet_UnChanged(GetParent(hDlg), hDlg);
 				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, PSNRET_NOERROR);
 
-				// If we a closing, free the core_options
+				// If we a closing, free the windows_options
 				if (bClosing)
 				{
-					if (pCurrentOpts) options_free(pCurrentOpts);
-					if (pOrigOpts)    options_free(pOrigOpts);
-					if (pDefaultOpts) options_free(pDefaultOpts);
-					pCurrentOpts = pOrigOpts = pDefaultOpts = NULL;
+					//if (pCurrentOpts) options_free(pCurrentOpts);
+					//if (pOrigOpts)    options_free(pOrigOpts);
+					//if (pDefaultOpts) options_free(pDefaultOpts);
+					//pCurrentOpts = pOrigOpts = pDefaultOpts = NULL;
 				}
 				return TRUE;
 
@@ -1323,7 +1323,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				/* Save Changes to the options here. */
 				UpdateOptions(hDlg, properties_datamap, pCurrentOpts);
 				// Determine button states.
-				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
+				g_bUseDefaults = pCurrentOpts == pDefaultOpts;
 
 				ResetDataMap(hDlg);
 				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
@@ -1331,7 +1331,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 			case PSN_RESET:
 				// Reset to the original values. Disregard changes
-				options_copy(pCurrentOpts, pOrigOpts);
+				//options_copy(pCurrentOpts, pOrigOpts);
 				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
 				break;
 
@@ -1358,11 +1358,12 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 }
 
 /* Read controls that are not handled in the DataMap */
-static void PropToOptions(HWND hWnd, core_options *o)
+static void PropToOptions(HWND hWnd, windows_options &o)
 {
 	HWND hCtrl;
 	HWND hCtrl2;
 	HWND hCtrl3;
+	astring error_string;
 
 	// It appears these are here to clear the global struct we are removing!
 	// FIXME
@@ -1380,7 +1381,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 
 		if (Button_GetCheck(hCtrl3))
 		{
-			options_set_string(o, aspect_option, "auto", OPTION_PRIORITY_CMDLINE);
+			o.set_value(aspect_option, "auto", OPTION_PRIORITY_CMDLINE,error_string);
 		}
 		else
 		{
@@ -1402,7 +1403,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			}
 
 			snprintf(buffer2, sizeof(buffer2), "%d:%d", n, d);
-			options_set_string(o, aspect_option, buffer2, OPTION_PRIORITY_CMDLINE);
+			o.set_value(aspect_option, buffer2, OPTION_PRIORITY_CMDLINE,error_string);
 		}
 	}
 	/* aspect ratio */
@@ -1413,7 +1414,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 	{
 		if (Button_GetCheck(hCtrl3))
 		{
-			options_set_string(o, OPTION_SNAPSIZE, "auto", OPTION_PRIORITY_CMDLINE);
+			o.set_value(OPTION_SNAPSIZE, "auto", OPTION_PRIORITY_CMDLINE,error_string);
 		}
 		else
 		{
@@ -1435,13 +1436,13 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			}
 
 			snprintf(buffer2, sizeof(buffer2), "%dx%d", width, height);
-			options_set_string(o, OPTION_SNAPSIZE, buffer2, OPTION_PRIORITY_CMDLINE);
+			o.set_value(OPTION_SNAPSIZE, buffer2, OPTION_PRIORITY_CMDLINE,error_string);
 		}
 	}
 }
 
 /* Update options from the dialog */
-static void UpdateOptions(HWND hDlg, datamap *map, core_options *opts)
+static void UpdateOptions(HWND hDlg, datamap *map, windows_options &opts)
 {
 	/* These are always called together, so make one conveniece function. */
 	datamap_read_all_controls(map, hDlg, opts);
@@ -1449,7 +1450,7 @@ static void UpdateOptions(HWND hDlg, datamap *map, core_options *opts)
 }
 
 /* Update the dialog from the options */
-static void UpdateProperties(HWND hDlg, datamap *map, core_options *opts)
+static void UpdateProperties(HWND hDlg, datamap *map, windows_options &opts)
 {
 	/* These are always called together, so make one conviniece function. */
 	datamap_populate_all_controls(map, hDlg, opts);
@@ -1458,7 +1459,7 @@ static void UpdateProperties(HWND hDlg, datamap *map, core_options *opts)
 }
 
 /* Populate controls that are not handled in the DataMap */
-static void OptionsToProp(HWND hWnd, core_options* o)
+static void OptionsToProp(HWND hWnd, windows_options& o)
 {
 	HWND hCtrl;
 	HWND hCtrl2;
@@ -1497,7 +1498,7 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		for( i=0; i< iCount; i++ )
 		{
 			cBuffer = (const char*)ComboBox_GetItemData( hCtrl, i );
-			if (strcmp(cBuffer, options_get_string(pCurrentOpts, OPTION_BIOS) ) == 0)
+			if (strcmp(cBuffer, pCurrentOpts.value(OPTION_BIOS) ) == 0)
 			{
 				(void)ComboBox_SetCurSel(hCtrl, i);
 				break;
@@ -1512,7 +1513,7 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 	{
 		char aspect_option[32];
 		snprintf(aspect_option, ARRAY_LENGTH(aspect_option), "aspect%d", GetSelectedScreen(hWnd));
-		if( strcmp(options_get_string(o, aspect_option), "auto") == 0)
+		if( strcmp(o.value(aspect_option), "auto") == 0)
 		{
 			Button_SetCheck(hCtrl, TRUE);
 			g_bAutoAspect[GetSelectedScreen(hWnd)] = TRUE;
@@ -1534,9 +1535,9 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 
 		n = 0;
 		d = 0;
-		if (options_get_string(o, aspect_option))
+		if (o.value(aspect_option))
 		{
-			if (sscanf(options_get_string(o, aspect_option), "%d:%d", &n, &d) == 2 && n != 0 && d != 0)
+			if (sscanf(o.value(aspect_option), "%d:%d", &n, &d) == 2 && n != 0 && d != 0)
 			{
 				_stprintf(buf, TEXT("%d"), n);
 				Edit_SetText(hCtrl, buf);
@@ -1557,17 +1558,18 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 	}
 	hCtrl = GetDlgItem(hWnd, IDC_EFFECT);
 	if (hCtrl) {
-		const char* effect = options_get_string(o, OPTION_EFFECT);
+		const char* effect = o.value(OPTION_EFFECT);
 		if (effect == NULL) {
 			effect = "none";
-			options_set_string(o, OPTION_EFFECT, effect, OPTION_PRIORITY_CMDLINE);
+			astring error_string;
+			o.set_value(OPTION_EFFECT, effect, OPTION_PRIORITY_CMDLINE,error_string);
 		}
 		win_set_window_text_utf8(hCtrl, effect);
 	}
 	hCtrl = GetDlgItem(hWnd, IDC_SNAPSIZE);
 	if (hCtrl)
 	{
-		if( strcmp(options_get_string(o, OPTION_SNAPSIZE), "auto") == 0)
+		if( strcmp(o.value(OPTION_SNAPSIZE), "auto") == 0)
 		{
 			Button_SetCheck(hCtrl, TRUE);
 			g_bAutoSnapSize = TRUE;
@@ -1585,9 +1587,9 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 	{
 		n = 0;
 		d = 0;
-		if (options_get_string(o, OPTION_SNAPSIZE))
+		if (o.value(OPTION_SNAPSIZE))
 		{
-			if (sscanf(options_get_string(o, OPTION_SNAPSIZE), "%dx%d", &width, &height) == 2 && width != 0 && height != 0)
+			if (sscanf(o.value(OPTION_SNAPSIZE), "%dx%d", &width, &height) == 2 && width != 0 && height != 0)
 			{
 				_stprintf(buf, TEXT("%d"), width);
 				Edit_SetText(hCtrl, buf);
@@ -1623,11 +1625,11 @@ static void SetPropEnabledControls(HWND hWnd)
 
 	nIndex = g_nGame;
 	
-	d3d = !mame_stricmp(options_get_string(pCurrentOpts, WINOPTION_VIDEO), "d3d");
-	ddraw = !mame_stricmp(options_get_string(pCurrentOpts, WINOPTION_VIDEO), "ddraw");
+	d3d = !mame_stricmp(pCurrentOpts.value(WINOPTION_VIDEO), "d3d");
+	ddraw = !mame_stricmp(pCurrentOpts.value(WINOPTION_VIDEO), "ddraw");
 	gdi = !d3d && !ddraw;
 
-	in_window = options_get_bool(pCurrentOpts, WINOPTION_WINDOW);
+	in_window = pCurrentOpts.bool_value(WINOPTION_WINDOW);
 	Button_SetCheck(GetDlgItem(hWnd, IDC_ASPECT), g_bAutoAspect[GetSelectedScreen(hWnd)] );
 
 	EnableWindow(GetDlgItem(hWnd, IDC_WAITVSYNC), !gdi);
@@ -1767,32 +1769,34 @@ static void SetPropEnabledControls(HWND hWnd)
 //  CONTROL HELPER FUNCTIONS FOR DATA EXCHANGE
 //============================================================
 
-static BOOL RotateReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL RotateReadControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int selected_index = ComboBox_GetCurSel(control);
 	int original_selection = 0;
 
 	// Figure out what the original selection value is
-	if (options_get_bool(opts, OPTION_ROR) && !options_get_bool(opts, OPTION_ROL))
+	if (opts->bool_value(OPTION_ROR) && !opts->bool_value(OPTION_ROL))
 		original_selection = 1;
-	else if (!options_get_bool(opts, OPTION_ROR) && options_get_bool(opts, OPTION_ROL))
+	else if (!opts->bool_value(OPTION_ROR) && opts->bool_value(OPTION_ROL))
 		original_selection = 2;
-	else if (!options_get_bool(opts, OPTION_ROTATE))
+	else if (!opts->bool_value(OPTION_ROTATE))
 		original_selection = 3;
-	else if (options_get_bool(opts, OPTION_AUTOROR))
+	else if (opts->bool_value(OPTION_AUTOROR))
 		original_selection = 4;
-	else if (options_get_bool(opts, OPTION_AUTOROL))
+	else if (opts->bool_value(OPTION_AUTOROL))
 		original_selection = 5;
 
 	// Any work to do?  If so, make the changes and return TRUE.
 	if (selected_index != original_selection)
 	{
 		// Set the options based on the new selection.
-		options_set_bool(opts, OPTION_ROR,		selected_index == 1, OPTION_PRIORITY_CMDLINE);
-		options_set_bool(opts, OPTION_ROL,		selected_index == 2, OPTION_PRIORITY_CMDLINE);
-		options_set_bool(opts, OPTION_ROTATE,	selected_index != 3, OPTION_PRIORITY_CMDLINE);
-		options_set_bool(opts, OPTION_AUTOROR,	selected_index == 4, OPTION_PRIORITY_CMDLINE);
-		options_set_bool(opts, OPTION_AUTOROL,	selected_index == 5, OPTION_PRIORITY_CMDLINE);
+		astring error_string;
+		opts->set_value(OPTION_ROR,		selected_index == 1, OPTION_PRIORITY_CMDLINE,error_string);
+		opts->set_value(OPTION_ROL,		selected_index == 2, OPTION_PRIORITY_CMDLINE,error_string);
+		opts->set_value(OPTION_ROTATE,	selected_index != 3, OPTION_PRIORITY_CMDLINE,error_string);
+		opts->set_value(OPTION_AUTOROR,	selected_index == 4, OPTION_PRIORITY_CMDLINE,error_string);
+		opts->set_value(OPTION_AUTOROL,	selected_index == 5, OPTION_PRIORITY_CMDLINE,error_string);
+		assert(!error_string);
 		return TRUE;
 	}
 
@@ -1802,18 +1806,18 @@ static BOOL RotateReadControl(datamap *map, HWND dialog, HWND control, core_opti
 
 
 
-static BOOL RotatePopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL RotatePopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int selected_index = 0;
-	if (options_get_bool(opts, OPTION_ROR) && !options_get_bool(opts, OPTION_ROL))
+	if (opts->bool_value(OPTION_ROR) && !opts->bool_value(OPTION_ROL))
 		selected_index = 1;
-	else if (!options_get_bool(opts, OPTION_ROR) && options_get_bool(opts, OPTION_ROL))
+	else if (!opts->bool_value(OPTION_ROR) && opts->bool_value(OPTION_ROL))
 		selected_index = 2;
-	else if (!options_get_bool(opts, OPTION_ROTATE))
+	else if (!opts->bool_value(OPTION_ROTATE))
 		selected_index = 3;
-	else if (options_get_bool(opts, OPTION_AUTOROR))
+	else if (opts->bool_value(OPTION_AUTOROR))
 		selected_index = 4;
-	else if (options_get_bool(opts, OPTION_AUTOROL))
+	else if (opts->bool_value(OPTION_AUTOROL))
 		selected_index = 5;
 
 	(void)ComboBox_SetCurSel(control, selected_index);
@@ -1822,27 +1826,29 @@ static BOOL RotatePopulateControl(datamap *map, HWND dialog, HWND control, core_
 
 
 
-static BOOL ScreenReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL ScreenReadControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	char screen_option_name[32];
 	TCHAR *screen_option_value;
 	int selected_screen;
 	int screen_option_index;
 	char *op_val;
+	astring error_string;
 
 	selected_screen = GetSelectedScreen(dialog);
 	screen_option_index = ComboBox_GetCurSel(control);
 	screen_option_value = (TCHAR*) ComboBox_GetItemData(control, screen_option_index);
 	snprintf(screen_option_name, ARRAY_LENGTH(screen_option_name), "screen%d", selected_screen);
 	op_val = utf8_from_tstring(screen_option_value);
-	options_set_string(opts, screen_option_name, op_val, OPTION_PRIORITY_CMDLINE);
+	opts->set_value(screen_option_name, op_val, OPTION_PRIORITY_CMDLINE,error_string);
+	assert(!error_string);
 	osd_free(op_val);
 	return FALSE;
 }
 
 
 
-static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	//int iMonitors;
 	DISPLAY_DEVICE dd;
@@ -1870,7 +1876,7 @@ static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 			(void)ComboBox_SetItemData(control, i+1, (void*)win_tstring_strdup(dd.DeviceName));
 
 			snprintf(screen_option, ARRAY_LENGTH(screen_option), "screen%d", GetSelectedScreen(dialog));
-			t_option = tstring_from_utf8(options_get_string(opts, screen_option));
+			t_option = tstring_from_utf8(opts->value(screen_option));
 			if( !t_option )
 				return FALSE;
 			if (_tcscmp(t_option, dd.DeviceName) == 0)
@@ -1889,7 +1895,7 @@ static void ViewSetOptionName(datamap *map, HWND dialog, HWND control, char *buf
 	snprintf(buffer, buffer_size, "view%d", GetSelectedScreen(dialog));
 }
 
-static BOOL ViewPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL ViewPopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int i;
 	int selected_index = 0;
@@ -1898,7 +1904,7 @@ static BOOL ViewPopulateControl(datamap *map, HWND dialog, HWND control, core_op
 
 	// determine the view option value
 	snprintf(view_option, ARRAY_LENGTH(view_option), "view%d", GetSelectedScreen(dialog));
-	view = options_get_string(opts, view_option);
+	view = opts->value(view_option);
 
 	(void)ComboBox_ResetContent(control);
 	for (i = 0; i < NUMVIEW; i++)
@@ -1913,14 +1919,14 @@ static BOOL ViewPopulateControl(datamap *map, HWND dialog, HWND control, core_op
 	return FALSE;
 }
 
-static BOOL SnapViewPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL SnapViewPopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int i;
 	int selected_index = 0;
 	const char *snapview;
 
 	// determine the snapview option value
-	snapview = options_get_string(opts, OPTION_SNAPVIEW);
+	snapview = opts->value(OPTION_SNAPVIEW);
 
 	(void)ComboBox_ResetContent(control);
 	for (i = 0; i < NUMSNAPVIEW; i++)
@@ -1935,21 +1941,23 @@ static BOOL SnapViewPopulateControl(datamap *map, HWND dialog, HWND control, cor
 	return FALSE;
 }
 
-static BOOL DefaultInputReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL DefaultInputReadControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	TCHAR *input_option_value;	
 	int input_option_index;
 	char *op_val;
+	astring error_string;
 
 	input_option_index = ComboBox_GetCurSel(control);
 	input_option_value = (TCHAR*) ComboBox_GetItemData(control, input_option_index);	
 	op_val = utf8_from_tstring(input_option_value);
-	options_set_string(opts, OPTION_CTRLR, op_val, OPTION_PRIORITY_CMDLINE);
+	opts->set_value(OPTION_CTRLR, op_val, OPTION_PRIORITY_CMDLINE,error_string);
+	assert(!error_string);
 	osd_free(op_val);
 	return FALSE;
 }
 
-static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
@@ -1964,7 +1972,7 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	TCHAR* t_ctrldir;
 
 	// determine the ctrlr option
-	ctrlr_option = options_get_string(opts, OPTION_CTRLR);
+	ctrlr_option = opts->value(OPTION_CTRLR);
 	if( ctrlr_option != NULL )
 	{
 		t_buf = tstring_from_utf8(ctrlr_option);
@@ -2046,13 +2054,14 @@ static void ResolutionSetOptionName(datamap *map, HWND dialog, HWND control, cha
 }
 
 
-static BOOL ResolutionReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL ResolutionReadControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	HWND refresh_control = GetDlgItem(dialog, IDC_REFRESH);
 	HWND sizes_control = GetDlgItem(dialog, IDC_SIZES);
 	int refresh_index, refresh_value, width, height;
 	char option_value[256];
 	TCHAR buffer[256];
+	astring error_string;
 
 	if (refresh_control && sizes_control)
 	{
@@ -2066,15 +2075,16 @@ static BOOL ResolutionReadControl(datamap *map, HWND dialog, HWND control, core_
 		else
 		{
 			snprintf(option_value, ARRAY_LENGTH(option_value), "auto");
-		}
-		options_set_string(opts, option_name, option_value, OPTION_PRIORITY_CMDLINE);
+		}		
+		opts->set_value(option_name, option_value, OPTION_PRIORITY_CMDLINE,error_string);
+		assert(!error_string);
 	}
 	return FALSE;
 }
 
 
 
-static BOOL ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, core_options *opts, const char *option_name)
+static BOOL ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, windows_options *opts, const char *option_name)
 {
 	HWND sizes_control = GetDlgItem(dialog, IDC_SIZES);
 	HWND refresh_control = GetDlgItem(dialog, IDC_REFRESH);
@@ -2094,7 +2104,7 @@ static BOOL ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 	if (sizes_control && refresh_control)
 	{
 		// determine the resolution
-		option_value = options_get_string(opts, option_name);
+		option_value = opts->value(option_name);
 		if (sscanf(option_value, "%dx%d@%d", &width, &height, &refresh) != 3)
 		{
 			width = 0;
@@ -2116,7 +2126,7 @@ static BOOL ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 
 		// determine which screen we're using
 		snprintf(screen_option, ARRAY_LENGTH(screen_option), "screen%d", GetSelectedScreen(dialog));
-		screen = options_get_string(opts, screen_option);
+		screen = opts->value(screen_option);
 		t_screen = tstring_from_utf8(screen);
 
 		// retrieve screen information
@@ -2180,11 +2190,13 @@ static void ResetDataMap(HWND hWnd)
 
 	snprintf(screen_option, ARRAY_LENGTH(screen_option), "screen%d", GetSelectedScreen(hWnd));
 
-	if (options_get_string(pCurrentOpts, screen_option) == NULL 
-		|| (mame_stricmp(options_get_string(pCurrentOpts, screen_option), "") == 0 )
-		|| (mame_stricmp(options_get_string(pCurrentOpts, screen_option), "auto") == 0 ) )
+	if (pCurrentOpts.value(screen_option) == NULL 
+		|| (mame_stricmp(pCurrentOpts.value(screen_option), "") == 0 )
+		|| (mame_stricmp(pCurrentOpts.value(screen_option), "auto") == 0 ) )
 	{
-		options_set_string(pCurrentOpts, screen_option, "auto", OPTION_PRIORITY_CMDLINE);
+		astring error_string;
+		pCurrentOpts.set_value(screen_option, "auto", OPTION_PRIORITY_CMDLINE,error_string);
+		assert(!error_string);
 	}
 }
 
@@ -2579,7 +2591,7 @@ static void UpdateSelectScreenUI(HWND hwnd)
 		if ((curSel < 0) || (curSel >= NUMSELECTSCREEN))
 			curSel = 0;
 		(void)ComboBox_ResetContent(hCtrl);
-		for (i = 0; i < NUMSELECTSCREEN && i < options_get_int(pCurrentOpts, WINOPTION_NUMSCREENS) ; i++)
+		for (i = 0; i < NUMSELECTSCREEN && i < pCurrentOpts.int_value(WINOPTION_NUMSCREENS) ; i++)
 		{
 			(void)ComboBox_InsertString(hCtrl, i, g_ComboBoxSelectScreen[i].m_pText);
 			(void)ComboBox_SetItemData( hCtrl, i, g_ComboBoxSelectScreen[i].m_pData);
@@ -2778,10 +2790,12 @@ static BOOL SelectEffect(HWND hWnd)
 		}
 		buff[l] = '\0';
 
-		if (strcmp(buff, options_get_string(pCurrentOpts, OPTION_EFFECT)))
+		if (strcmp(buff, pCurrentOpts.value(OPTION_EFFECT)))
 		{
 			HWND control = GetDlgItem(hWnd, IDC_EFFECT);
-			options_set_string(pCurrentOpts, OPTION_EFFECT, buff, OPTION_PRIORITY_CMDLINE);
+			astring error_string;
+			pCurrentOpts.set_value(OPTION_EFFECT, buff, OPTION_PRIORITY_CMDLINE,error_string);
+			assert(!error_string);
 			win_set_window_text_utf8(control, buff);
 			// datamap_populate_control(properties_datamap, hWnd, pCurrentOpts, IDC_EFFECT);
 			changed = TRUE;
@@ -2795,10 +2809,12 @@ static BOOL ResetEffect(HWND hWnd)
 	BOOL changed = FALSE;
 	const char *new_value = "none";
 
-	if (strcmp(new_value, options_get_string(pCurrentOpts, OPTION_EFFECT)))
+	if (strcmp(new_value, pCurrentOpts.value(OPTION_EFFECT)))
 	{
 		HWND control = GetDlgItem(hWnd, IDC_EFFECT);
-		options_set_string(pCurrentOpts, OPTION_EFFECT, new_value, OPTION_PRIORITY_CMDLINE);
+		astring error_string;
+		pCurrentOpts.set_value(OPTION_EFFECT, new_value, OPTION_PRIORITY_CMDLINE,error_string);
+		assert(!error_string);
 		win_set_window_text_utf8(control, new_value);
 		// datamap_populate_control(properties_datamap, hWnd, pCurrentOpts, IDC_EFFECT);
 		changed = TRUE;
@@ -2814,10 +2830,11 @@ static BOOL SelectJoystickMap(HWND hWnd)
 	*filename = 0;
 	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_JOYMAP_FILES))
 	{
-		if (strcmp(filename, options_get_string(pCurrentOpts, OPTION_JOYSTICK_MAP)))
+		if (strcmp(filename, pCurrentOpts.value(OPTION_JOYSTICK_MAP)))
 		{
 			HWND control = GetDlgItem(hWnd, IDC_JOYSTICKMAP);
-			options_set_string(pCurrentOpts, OPTION_JOYSTICK_MAP, filename, OPTION_PRIORITY_CMDLINE);
+			astring error_string;
+			pCurrentOpts.set_value(OPTION_JOYSTICK_MAP, filename, OPTION_PRIORITY_CMDLINE,error_string);
 			win_set_window_text_utf8(control, filename);
 			changed = TRUE;
 		}
@@ -2830,10 +2847,12 @@ static BOOL ResetJoystickMap(HWND hWnd)
 	BOOL changed = FALSE;
 	const char *new_value = "auto";
 
-	if (strcmp(new_value, options_get_string(pCurrentOpts, OPTION_JOYSTICK_MAP)))
+	if (strcmp(new_value, pCurrentOpts.value(OPTION_JOYSTICK_MAP)))
 	{
 		HWND control = GetDlgItem(hWnd, IDC_JOYSTICKMAP);
-		options_set_string(pCurrentOpts, OPTION_JOYSTICK_MAP, new_value, OPTION_PRIORITY_CMDLINE);
+		astring error_string;
+		pCurrentOpts.set_value(OPTION_JOYSTICK_MAP, new_value, OPTION_PRIORITY_CMDLINE,error_string);
+		assert(!error_string);
 		win_set_window_text_utf8(control, new_value);
 		changed = TRUE;
 	}
@@ -2848,10 +2867,12 @@ static BOOL SelectDebugscript(HWND hWnd)
 	*filename = 0;
 	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_DEBUGSCRIPT_FILES))
 	{
-		if (strcmp(filename, options_get_string(pCurrentOpts, OPTION_DEBUGSCRIPT)))
+		if (strcmp(filename, pCurrentOpts.value(OPTION_DEBUGSCRIPT)))
 		{
 			HWND control = GetDlgItem(hWnd, IDC_DEBUGSCRIPT);
-			options_set_string(pCurrentOpts, OPTION_DEBUGSCRIPT, filename, OPTION_PRIORITY_CMDLINE);
+			astring error_string;
+			pCurrentOpts.set_value(OPTION_DEBUGSCRIPT, filename, OPTION_PRIORITY_CMDLINE,error_string);
+			assert(!error_string);
 			win_set_window_text_utf8(control, filename);
 			changed = TRUE;
 		}
@@ -2864,10 +2885,12 @@ static BOOL ResetDebugscript(HWND hWnd)
 	BOOL changed = FALSE;
 	const char *new_value = "";
 
-	if (strcmp(new_value, options_get_string(pCurrentOpts, OPTION_DEBUGSCRIPT)))
+	if (strcmp(new_value, pCurrentOpts.value(OPTION_DEBUGSCRIPT)))
 	{
 		HWND control = GetDlgItem(hWnd, IDC_DEBUGSCRIPT);
-		options_set_string(pCurrentOpts, OPTION_DEBUGSCRIPT, new_value, OPTION_PRIORITY_CMDLINE);
+		astring error_string;
+		pCurrentOpts.set_value(OPTION_DEBUGSCRIPT, new_value, OPTION_PRIORITY_CMDLINE,error_string);
+		assert(!error_string);
 		win_set_window_text_utf8(control, new_value);
 		changed = TRUE;
 	}

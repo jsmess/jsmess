@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "mui_opts.h"
 #include "image.h"
 #include "screenshot.h"
 #include "datamap.h"
@@ -23,7 +24,6 @@
 #include "winui.h"
 #include "directories.h"
 #include "mui_util.h"
-#include "mui_opts.h"
 #include "resourcems.h"
 #include "propertiesms.h"
 #include "optionsms.h"
@@ -276,7 +276,7 @@ BOOL MessPropertiesCommand(HWND hWnd, WORD wNotifyCode, WORD wID, BOOL *changed)
 //  DATAMAP HANDLERS
 //============================================================
 
-static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int directory_count;
     LV_ITEM lvi;
@@ -323,7 +323,7 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 
 
 
-static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int driver_index, pos, new_pos, current_item;
 	const char *dir_list;
@@ -385,7 +385,7 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 
 
 
-static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, windows_options *opts, const char *option_name)
 {
 	int i, current_index, driver_index;
 	const game_driver *gamedrv;
@@ -415,7 +415,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		ram_config *config = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
 
 		// identify the current amount of RAM
-		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);
+		this_ram_string = opts->value(OPTION_RAMSIZE);
 		current_ram = (this_ram_string != NULL) ? ram_parse_string(this_ram_string) : 0;
 		if (current_ram == 0)
 			current_ram = ram_parse_string(config->default_size);

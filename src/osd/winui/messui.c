@@ -416,7 +416,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	// allocate the machine config, if necessary
 	if (drvindex >= 0)
 	{
-		s_config = software_config_alloc(drvindex, MameUIGlobal());
+		s_config = software_config_alloc(drvindex);
 	}
 
 	// locate key widgets
@@ -447,7 +447,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	/* allocate the machine config */
 	machine_config config(*drivers[drvindex]);
 
-	core_options *options = mame_options_init(NULL);
+	windows_options options;
 	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
@@ -456,7 +456,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 		{
 			if (swlist->list_name[i])
 			{
-				software_list *list = software_list_open(*options, swlist->list_name[i], FALSE, NULL);
+				software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
 
 				if (list)
 				{

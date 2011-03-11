@@ -6,12 +6,11 @@
 
 #include "swconfig.h"
 
-
 //============================================================
 //  IMPLEMENTATION
 //============================================================
 
-software_config *software_config_alloc(int driver_index, core_options *opts) //, hashfile_error_func error_proc)
+software_config *software_config_alloc(int driver_index) //, hashfile_error_func error_proc)
 {
 	const game_driver *driver;
 	software_config *config;
