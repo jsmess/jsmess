@@ -248,7 +248,7 @@ const options_entry winui_options::s_option_entries[] =
 	{ MUIOPTION_CURRENT_TAB,				"0",        OPTION_STRING,                 NULL },
 	{ MUIOPTION_SHOW_TOOLBAR,				"1",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_SHOW_STATUS_BAR,			"1",        OPTION_BOOLEAN,    NULL },
-	{ MUIOPTION_HIDE_FOLDERS,				"",         OPTION_BOOLEAN,                 NULL },
+	{ MUIOPTION_HIDE_FOLDERS,				"",         OPTION_STRING,                 NULL },
 #ifdef MESS
 	{ MUIOPTION_SHOW_FOLDER_SECTION,		"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_SHOW_TABS,					"0",        OPTION_BOOLEAN,    NULL },
