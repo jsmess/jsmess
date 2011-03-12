@@ -78,7 +78,6 @@ public:
 		int int_state;
 		
 		required_device<device_t> m_upd765;
-		required_device<isa8_device> m_isa;
 };
  
  

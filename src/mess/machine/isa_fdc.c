@@ -113,8 +113,7 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
         m_config(config),
-		m_upd765(*this, "upd765"),
-		m_isa(*this->owner(), config.m_isa_tag)
+		m_upd765(*this, "upd765")
 {
 }
  
@@ -124,7 +123,6 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
  
 void isa8_fdc_device::device_start()
 {        
-	m_isa->add_isa_card(this, m_config.m_isa_num);
 	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, pc_fdc_r, pc_fdc_w );	
 }
 
@@ -177,36 +175,6 @@ static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 	/* send irq */
 	fdc->m_isa->set_irq_line(6, state);
 }
-
-
-static READ8_DEVICE_HANDLER(pc_fdc_dack_r)
-{
-	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
-	/* what is output if dack is not acknowledged? */
-	int data = 0x0ff;
-
-	/* if dma is not enabled, dacks are not acknowledged */
-	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
-	{
-		data = upd765_dack_r(fdc->m_upd765, 0);
-	}
-
-	return data;
-}
-
-
-
-static WRITE8_DEVICE_HANDLER(pc_fdc_dack_w)
-{
-	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
-	/* if dma is not enabled, dacks are not issued */
-	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
-	{
-		/* dma acknowledge - and send byte to fdc */
-		upd765_dack_w(fdc->m_upd765, 0,data);
-	}
-}
-
 
 
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq )
@@ -416,11 +384,26 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 
 UINT8 isa8_fdc_device::dack_r(int line)
 {
-	return pc_fdc_dack_r(this,0);	
+	/* what is output if dack is not acknowledged? */
+	int data = 0x0ff;
+
+	/* if dma is not enabled, dacks are not acknowledged */
+	if ((digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
+	{
+		data = upd765_dack_r(m_upd765, 0);
+	}
+
+	return data;
 }
+
 void isa8_fdc_device::dack_w(int line,UINT8 data)
 {
-	pc_fdc_dack_w( this, 0, data );
+	/* if dma is not enabled, dacks are not issued */
+	if ((digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
+	{
+		/* dma acknowledge - and send byte to fdc */
+		upd765_dack_w(m_upd765, 0,data);
+	}	
 }
 void isa8_fdc_device::eop_w(int state)
 {

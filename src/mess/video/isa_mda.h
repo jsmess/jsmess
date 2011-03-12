@@ -56,7 +56,6 @@ protected:
 private:
         // internal state
         const isa8_mda_device_config &m_config;
-		required_device<isa8_device> m_isa;
 public:
 		int  framecnt;
 

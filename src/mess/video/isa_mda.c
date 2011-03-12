@@ -179,8 +179,7 @@ const rom_entry *isa8_mda_device_config::rom_region() const
 isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_device_config &config) :
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config),
-		m_isa(*this->owner(), config.m_isa_tag)
+        m_config(config)
 {
 }
  
@@ -190,7 +189,6 @@ isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_devic
  
 void isa8_mda_device::device_start()
 {        
-	m_isa->add_isa_card(this, m_config.m_isa_num);
 	videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, pc_MDA_r, pc_MDA_w );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);	

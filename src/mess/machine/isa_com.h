@@ -51,8 +51,6 @@ protected:
 private:
         // internal state
         const isa8_com_device_config &m_config;
-public:
-		required_device<isa8_device> m_isa;
 };
  
  

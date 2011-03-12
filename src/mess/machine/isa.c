@@ -229,6 +229,7 @@ device_isa8_card_interface::device_isa8_card_interface(running_machine &machine,
 	: device_interface(machine, config, device),
 	  m_isa8_card_config(dynamic_cast<const device_config_isa8_card_interface &>(config))
 {
+	m_isa = machine.device<isa8_device>(m_isa8_card_config.m_isa_tag);
 }
 
 
@@ -238,6 +239,11 @@ device_isa8_card_interface::device_isa8_card_interface(running_machine &machine,
 
 device_isa8_card_interface::~device_isa8_card_interface()
 {
+}
+
+void device_isa8_card_interface::interface_pre_start()
+{    
+	m_isa->add_isa_card(this, m_isa8_card_config.m_isa_num);
 }
 
 UINT8 device_isa8_card_interface::dack_r(int line)

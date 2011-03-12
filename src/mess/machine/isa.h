@@ -135,6 +135,10 @@ public:
 	virtual void dack_w(int line,UINT8 data);
 	virtual void eop_w(int state);
 	virtual bool have_dack(int line);
+	
+	// interface-level overrides
+	virtual void interface_pre_start();	
+	isa8_device *m_isa;
 protected:
 
 	// configuration
