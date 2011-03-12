@@ -45586,7 +45586,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- [NJ024] 圣斗士之时空斗士 ~ Sheng Dou Shi Zhi Shikong Dou Shi (Saint Saiya - Time Warrior) --> 
 <!-- [NJ025] 农场小精灵 ~ Nong Chang Xiao Jing Ling --> 
 <!-- [NJ026] 倚天屠龙记 ~ Yi Tian Tu Long Ji (Heavenly Sword &amp; Dragon Saber) --> 
-<!-- [NJ027] ??? --> 
+<!-- [NJ027] 逐鹿三国 ~ Zhu Lu San Guo --> 
 <!-- [NJ028] 水浒3 ~ Shuihu 3 --> 
 
 	<software name="qgdz">
@@ -45799,7 +45799,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ043] ?? --> 
+<!-- [NJ043] 三国群侠传 ~ San Guo Qun Xia Chuan --> 
 <!-- [NJ044] 剑侠情缘 ~ Jian Xia Qing Yuan --> 
 <!-- [NJ045] 轩辕剑 ~ Xuanyuan Jian --> 
 
@@ -45872,12 +45872,12 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ050] ?? --> 
-<!-- [NJ051] ?? --> 
-<!-- [NJ052] ?? --> 
-<!-- [NJ053] ?? --> 
+<!-- [NJ050] 红楼梦 ~ Hong Lou Meng (Dream of Red House?) --> 
+<!-- [NJ051] 乱世三国 ~ Luan Shi San Guo --> 
+<!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)--> 
+<!-- [NJ053] 换装人 ~ Huan Zhuang Ren [or NJ040?] --> 
 <!-- [NJ054] 原始人 ~ Yuan Shi Ren [or NJ038?] --> 
-<!-- [NJ055] ?? --> 
+<!-- [NJ055] 原始人2 ~ Yuan Shi Ren 2 [or NJ039?] --> 
 
 	<software name="zeldac">
 		<!-- Serial: NJ056 - Release Date:  - Alternative Title: 塞尔达-神奇的帽子 ~ The Legend Of Zelda: The Minish Cap -->
@@ -45914,7 +45914,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="hxcs">
-		<!-- Serial: NJ058 - Release Date:  - Alternative Title: 幻想传说 ~ Tales of Phantasia -->
+		<!-- Serial: NJ058 (or NJ048?) - Release Date:  - Alternative Title: 幻想传说 ~ Tales of Phantasia -->
 		<description>Huan Xiang Chuan Shuo (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -45949,7 +45949,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ061] ?? --> 
+<!-- [NJ061] 黄飞鸿 ~ Huang Fei Hong --> 
 <!-- [NJ062] 石器时代 ~ Shi Qui Shi Dai --> 
 
 	<software name="ffant7">
@@ -45972,7 +45972,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ064] ?? --> 
+<!-- [NJ064] 数独 ~ Shu Du (Sudoku?) --> 
 
 	<software name="zyjztsz">
 		<!-- Serial: NJ065 - Release Date:  - Alternative Title: 最游记之唐三藏 -->
@@ -46006,7 +46006,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ067] ?? --> 
+<!-- [NJ067] 霍元甲 ~ Huo Yuan Jia --> 
 
 	<software name="xunqinji">
 		<!-- Serial: NJ068 - Release Date:  - Alternative Title: 寻秦记 -->
@@ -46042,11 +46042,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ070] ?? --> 
-<!-- [NJ071] ?? --> 
+<!-- [NJ070] 傲剑江湖 ~ Ao Jian Jiang Hu --> 
+<!-- [NJ071] 新月剑痕 ~ Xin Yue Jian Hen --> 
 
 	<software name="fengyind" supported="no">
-		<!-- Serial: NJ072 - Release Date:  - Alternative Title: 封印岛 ~ Link's Awakening -->
+		<!-- Serial: NJ072 - Release Date:  - Alternative Title: (塞尔达) 封印岛 ~ (Zelda) Link's Awakening -->
 		<description>Feng Yin Dao (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -46144,7 +46144,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ078] ?? --> 
+<!-- [NJ078] 毁灭之神 ~ Hui Mie Zhi Shen --> 
 
 	<software name="mojiebz">
 		<!-- Serial: NJ079 - Release Date:  - Alternative Title: 魔界霸主 (title screen hack of NJ0??) -->
@@ -46197,12 +46197,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
  		</part>
 	</software>
 
-<!-- [NJ082] ?? --> 
+<!-- [NJ082] (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng --> 
 <!-- [NJ083] 三国志-刘备传 ~ San Guo Zhi - Liu Bei Chuan --> 
 
-
 	<software name="sseiyac2">
-		<!-- Serial: NJ084 - Release Date: - Alternative Title: 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2 - Beiou Tuji Pian (Saint Seiya 2) -->
+		<!-- Serial: NJ084 - Release Date: - Alternative Title: 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2 - Beiou Tuji Pian (Saint Seiya 2 - Nordic chapter) -->
 		<description>Saint Seiya - Beiou Tuji Pian (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -46218,16 +46217,16 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
  		</part>
 	</software>
 
-<!-- [NJ085] ?? --> 
+<!-- [NJ085] 闪闪的红星! ~ Shan Shan de Hong Xing! --> 
 <!-- [NJ086] 拳皇R1-最强格斗王 ~ Quan Huang R1 - Zui Qiang Gedou Wang (KOF R1) --> 
 <!-- [NJ087] 拳皇R2-大蛇四天王 ~ Quan Huang R2 - Dashe Sitian Wang (KOF R2) --> 
 <!-- [NJ088] 宠物高达战记 ~ Chong Wu Gao Da Zhan Ji --> 
-<!-- [NJ089] ?? --> 
+<!-- [NJ089] 笑傲江湖群侠记 ~ Xiao Ao Jian Ghu Xia Ji --> 
 <!-- [NJ090] 勇者传说 ~ Yong Zhe Chuan Shuo --> 
 <!-- [NJ091] 仙剑问情 ~ Xian Jian Wen Qing --> 
-<!-- [NJ092] ?? --> 
-<!-- [NJ093] ?? --> 
-<!-- [NJ094] ?? --> 
+<!-- [NJ092] 游戏宝贝 ~ You Xi Bao Bei --> 
+<!-- [NJ093] 鹿鼎记 ~ Lu Ding Ji --> 
+<!-- [NJ094] 王者无双 ~ Whang Zhe Wu Shuang --> 
 
 	<software name="dballc">
 		<!-- Serial: NJ095 - Release Date: - Alternative Title: 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) -->
@@ -46246,7 +46245,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
  		</part>
 	</software>
 	
-<!-- [NJ096] ?? --> 
+<!-- [NJ096] 武侠天地 ~ Wu Xia Tian Di --> 
 <!-- [NJ097] 魔兽世界-恶魔猎人 ~ Mo Shou Shi Jie - Emo Lie Ren (World of Warcraft - Demon Hunter) --> 
 
 	<software name="zzhx4">
@@ -46283,9 +46282,12 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+<!-- [NJ100] ?? -->
+<!-- [NJ101] ?? -->
+<!-- [NJ102] 魔道劫 ~ Mo Dao Jie -->
 
 	<software name="xscq" supported="no">
-		<!-- Serial: NJ0?? - Release Date:  - Alternative Title:  -->
+		<!-- Serial: NJ0?? - Release Date:  - Alternative Title: 香帅传奇 -->
 		<description>Xiang Shuai Chuan Qi (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -46300,9 +46302,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ0??] 数独 ~ Shu Du -->
-<!-- [NJ0??] 宠物宝宝 ~ Chong Wu Bao Bao [also listed as NJ031] -->
-<!-- [NJ0??] 红楼梦 ~ Hong Lou Meng [also listed as NJ031] -->
+<!-- [NJ0XX] 方世玉 ~ Fang Shi Yu -->
+<!-- [NJ0XX] 东方不败 ~ Dong Fang Bu Bai -->
+<!-- [NJ0XX] 机器人大战 ~ Ji Qi Ren Da Zhan -->
+
 
 <!-- Union Bond -->
 
@@ -51774,8 +51777,8 @@ from the NEStopia source, hence they would require confirmation. -->
 	<software name="sanguo4" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>San Guo Zhi 4 - Chi Bi Feng Yun (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Future Media</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="FUTUREMEDIA" />
 			<dataarea name="chr" size="262144">
@@ -51783,6 +51786,22 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="san guo zhi 4 - chi bi feng yun (ch).prg" size="262144" crc="6715e890" sha1="55cafec17a29346258f128b17f0cc74607bb1a32" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanguoxb">
+		<!-- Serial:  - Release Date:  - Alternative Title: 三国志雄霸天下 -->
+		<description>San Guo Zhi - Xiong Ba Tian Xia (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HENGGEDIANZI-XJZB" />
+			<dataarea name="prg" size="524288">
+				<rom name="san guo zhi - xiong ba tian xia (china) (unl).prg" size="524288" crc="94782fbd" sha1="7235f3f8f0ca37b7c1ee6923a6da272c08e0c817" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -59289,7 +59308,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sanguozh" supported="no">
+	<software name="sanguoa" cloneof="sangochu" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>San Guo Zhi (Asia, Decrypted)</description>
 		<year>19??</year>
@@ -61520,6 +61539,22 @@ be better to redump them properly. -->
 				<dipvalue name="63-in-1" value="2"/>
 				<dipvalue name="118-in-1" value="3"/>
 			</dipswitch>
+		</part>
+	</software>
+
+	<software name="mc_50">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>50 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<dataarea name="chr" size="32768">
+				<rom name="50 in 1 [p1].chr" size="32768" crc="c843a96d" sha1="48cf4780b69dc3b0b747c6d42e0b8192e94214d0" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="50 in 1 [p1].prg" size="65536" crc="71a00978" sha1="2ba1eeaeb5fc727ce5863ffd595452daf39d8cc8" offset="00000" status="baddump" />
+			</dataarea>
 		</part>
 	</software>
 

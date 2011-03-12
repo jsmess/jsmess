@@ -51,6 +51,27 @@
 		</part>
 	</software>
 
+	<software name="algarna">
+		<description>Algarna</description>
+		<year>1989</year>
+		<publisher>M.N.M. Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="algarna_p.d88" size="348576" crc="6072e867" sha1="e42fbd030528620fd08d84ac6fb603de2c714384" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="algarna_a.d88" size="348848" crc="e7abfb9e" sha1="96d5fa047b9b888aa236917c87499012e60dae05" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="algarna_b.d88" size="348848" crc="d9f19f8e" sha1="1ff08969231ec4479a24fa814f64c29588bafa86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbreaker">
 		<description>Brain Breaker</description>
 		<year>1985</year>

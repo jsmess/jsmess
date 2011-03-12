@@ -55,6 +55,15 @@ TODO: split the content of the various chips
 	</software>
 
 	<!-- Id: 8006 -->
+	<!--
+		AA(Label on Chip):
+			MBM2732A-35
+			8226 C66
+
+		AB(Label on Chip):
+			MBM2732A-35
+			8226 C66
+	-->
 	<software name="autochas">
 		<description>Auto Chase</description>
 		<year>1981</year>
@@ -235,6 +244,16 @@ TODO: split the content of the various chips
 	</software>
 
 	<!-- Id: 8005 -->
+	<!--
+	2 Chips
+		PDA(Label on Chip):
+			??? (Sticker over info)
+
+		PDB(Label on Chip):
+			Toshiba
+			TMM2732D
+			(Rest of info under sticker)
+	-->
 	<software name="planetd1" cloneof="planetd">
 		<description>Planet Defender (8k Cart)</description>
 		<year>1981</year>
@@ -306,6 +325,16 @@ TODO: split the content of the various chips
 	</software>
 
 	<!-- Id: 8002 -->
+	<!--
+	2 Chips
+		TKA(Label on Chip):
+			MBM2732A-35
+			8224 C34
+
+		TKB(Label on Chip):
+			MBM2732a-30
+			8227 C78
+	-->
 	<software name="tankatk">
 		<description>Tank Attack (6k Cart)</description>
 		<year>1981</year>

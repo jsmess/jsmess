@@ -429,6 +429,108 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="hayashog">
+		<!-- Serial: SHVC-2M - Release Date: 1993-06-18 - Alt. Title: 早指し 二段 森田将棋 -->
+		<description>Hayazashi Nidan Morita Shougi (Jpn)</description>
+		<year>1993</year>
+		<publisher>Seta</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1DS0B-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 ST [ST011]" />
+			<feature name="u3" value="U3 HCU04" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="u4" value="U5 Ω" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-2m-0.u1" size="524288" crc="81e822ad" sha1="82b4bca58918a18707f932ec6afc0a12a3c4b872" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jlprime">
+		<!-- Serial: SHVC-JE - Release Date: 1993-08-06 - Alt. Title: Jリーグサッカープライムゴール -->
+		<description>J.League Soccer Prime Goal (Jpn, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-je-1.u1" size="1048576" crc="7538f598" sha1="b08aeb7fa70a40484da5683ef104264271964d58" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jlprimea" cloneof="jlprime">
+		<!-- Serial: SHVC-JE - Release Date: 1993-08-06 - Alt. Title: Jリーグサッカープライムゴール -->
+		<description>J.League Soccer Prime Goal (Jpn)</description>
+		<year>1993</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-je-0.u1" size="1048576" crc="b81828ec" sha1="a6e6ba3a2785f07c7c2c8076a8497c565570b272" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jlprime2">
+		<!-- Serial: SHVC-2H - Release Date: 1994-08-05 - Alt. Title: Jリーグサッカー プライムゴール2 -->
+		<description>J.League Soccer Prime Goal 2 (Jpn)</description>
+		<year>1994</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-11" />
+			<feature name="u1" value="U1 P1" />
+			<feature name="u2" value="U2 P2" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-2h-0.p0.u1" size="1048576" crc="3880dc58" sha1="be1cc6a81c10ed2fd89b376407cc7bcaaff23e81" offset="000000" />
+				<rom name="shvc-2h-0.p1.u2" size="524288" crc="147ba2e0" sha1="54ebbb549b824208d5217537ed899842934c255e" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jlprime3" cloneof="90minute">
+		<!-- Serial: SHVC-AJ3J - Release Date: 1995-08-04 - Alt. Title: Jリーグサッカープライムゴール3 -->
+		<description>J.League Soccer Prime Goal 3 (Jpn)</description>
+		<year>1995</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-aj3j-0.u1" size="2097152" crc="1499b746" sha1="4ffe84a8a2700e9c3bd09a5ae8abacc013050da0" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="livealiv">
 		<!-- Serial: SHVC-5V - Release Date: 1994-09-02 - Alt Title: ライブ・ア・ライブ -->
 		<description>Live A Live (Jpn)</description>
@@ -12716,18 +12818,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="hayashog" supported="no">
-		<!-- Serial: SHVC-2M - Release Date: 1993-06-18 - Alt. Title: 早指し 二段 森田将棋 -->
-		<description>Hayazashi Nidan Morita Shougi (Jpn)</description>
-		<year>1993</year>
-		<publisher>Seta</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="hayazashi nidan morita shougi (japan).sfc" size="524288" crc="81e822ad" sha1="82b4bca58918a18707f932ec6afc0a12a3c4b872" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hayasho2" supported="no">
 		<!-- Serial: SHVC-A2MJ - Release Date: 1995-05-26 - Alt. Title: 早指し 二段 森田将棋2 -->
 		<description>Hayazashi Nidan Morita Shougi 2 (Jpn)</description>
@@ -14507,56 +14597,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="j.league excite stage '96 (japan).sfc" size="2097152" crc="e044e0f1" sha1="ef52e8fd29bd4a6f0a80bda8203e5256188da8bd" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jlprime">
-		<!-- Serial: SHVC-JE - Release Date: 1993-08-06 - Alt. Title: Jリーグサッカープライムゴール -->
-		<description>J.League Soccer Prime Goal (Jpn, Rev. A)</description>
-		<year>1993</year>
-		<publisher>Namco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="j.league soccer prime goal (japan) (rev 1).sfc" size="1048576" crc="7538f598" sha1="b08aeb7fa70a40484da5683ef104264271964d58" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jlprimea" cloneof="jlprime">
-		<!-- Serial: SHVC-JE - Release Date: 1993-08-06 - Alt. Title: Jリーグサッカープライムゴール -->
-		<description>J.League Soccer Prime Goal (Jpn)</description>
-		<year>1993</year>
-		<publisher>Namco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="j.league soccer prime goal (japan).sfc" size="1048576" crc="b81828ec" sha1="a6e6ba3a2785f07c7c2c8076a8497c565570b272" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jlprime2">
-		<!-- Serial: SHVC-2H - Release Date: 1994-08-05 - Alt. Title: Jリーグサッカー プライムゴール2 -->
-		<description>J.League Soccer Prime Goal 2 (Jpn)</description>
-		<year>1994</year>
-		<publisher>Namco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="j.league soccer prime goal 2 (japan).sfc" size="1572864" crc="569db79d" sha1="7aef5b965dbcc90672b9c42783554e42bc027b7c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jlprime3" cloneof="90minute">
-		<!-- Serial: SHVC-AJ3J - Release Date: 1995-08-04 - Alt. Title: Jリーグサッカープライムゴール3 -->
-		<description>J.League Soccer Prime Goal 3 (Jpn)</description>
-		<year>1995</year>
-		<publisher>Namco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="j.league soccer prime goal 3 (japan).sfc" size="2097152" crc="1499b746" sha1="4ffe84a8a2700e9c3bd09a5ae8abacc013050da0" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
