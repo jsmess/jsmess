@@ -18,6 +18,7 @@ class isa8_mda_device_config :
 		public device_config_isa8_card_interface
 {
         friend class isa8_device;
+		friend class isa8_mda_device;
 		friend class isa8_hercules_device_config;
  
         // construction/destruction
@@ -55,7 +56,7 @@ protected:
 private:
         // internal state
         const isa8_mda_device_config &m_config;
-
+		required_device<isa8_device> m_isa;
 public:
 		int  framecnt;
 

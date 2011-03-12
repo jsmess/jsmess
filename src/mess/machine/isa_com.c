@@ -135,7 +135,8 @@ machine_config_constructor isa8_com_device_config::machine_config_additions() co
 isa8_com_device::isa8_com_device(running_machine &_machine, const isa8_com_device_config &config) :
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config)
+        m_config(config),
+		m_isa(*this->owner(), config.m_isa_tag)
 {
 }
  
@@ -145,21 +146,11 @@ isa8_com_device::isa8_com_device(running_machine &_machine, const isa8_com_devic
  
 void isa8_com_device::device_start()
 {        
-	int buswidth;
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			memory_install_readwrite8_device_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), subdevice("ins8250_0"), 0x03f8, 0x03ff, 0, 0, ins8250_r, ins8250_w );
-			memory_install_readwrite8_device_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), subdevice("ins8250_1"), 0x02f8, 0x02ff, 0, 0, ins8250_r, ins8250_w );
-			memory_install_readwrite8_device_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), subdevice("ins8250_2"), 0x03e8, 0x03ef, 0, 0, ins8250_r, ins8250_w );
-			memory_install_readwrite8_device_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), subdevice("ins8250_3"), 0x02e8, 0x02ef, 0, 0, ins8250_r, ins8250_w );
-			break;
-
-		default:
-			fatalerror("COM: Bus width %d not supported", buswidth);
-			break;
-	}
+	m_isa->add_isa_card(this, m_config.m_isa_num);
+	m_isa->install_device(subdevice("ins8250_0"), 0x03f8, 0x03ff, 0, 0, ins8250_r, ins8250_w );
+	m_isa->install_device(subdevice("ins8250_1"), 0x02f8, 0x02ff, 0, 0, ins8250_r, ins8250_w );
+	m_isa->install_device(subdevice("ins8250_2"), 0x03e8, 0x03ef, 0, 0, ins8250_r, ins8250_w );
+	m_isa->install_device(subdevice("ins8250_3"), 0x02e8, 0x02ef, 0, 0, ins8250_r, ins8250_w );
 }
 
 //-------------------------------------------------

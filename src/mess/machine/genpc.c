@@ -100,7 +100,8 @@ static READ8_DEVICE_HANDLER( pc_dma8237_1_dack_r )
 
 static READ8_DEVICE_HANDLER( pc_dma8237_2_dack_r )
 {
-	return 0;//return pc_fdc_dack_r(device->machine);
+	genpc_state *st = device->machine->driver_data<genpc_state>();
+	return st->isabus->dack_r(2);
 }
 
 
@@ -116,7 +117,8 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_1_dack_w )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_2_dack_w )
 {
-	//pc_fdc_dack_w( device->machine, data );
+	genpc_state *st = device->machine->driver_data<genpc_state>();
+	st->isabus->dack_w(2,data);
 }
 
 
@@ -136,7 +138,8 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_0_dack_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma8237_out_eop )
 {
-	//pc_fdc_set_tc_state( device->machine, state == ASSERT_LINE ? 0 : 1 );
+	genpc_state *st = device->machine->driver_data<genpc_state>();	
+	return st->isabus->eop_w(state == ASSERT_LINE ? 0 : 1 );
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)

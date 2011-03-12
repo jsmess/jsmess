@@ -179,7 +179,8 @@ const rom_entry *isa8_mda_device_config::rom_region() const
 isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_device_config &config) :
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config)
+        m_config(config),
+		m_isa(*this->owner(), config.m_isa_tag)
 {
 }
  
@@ -189,26 +190,11 @@ isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_devic
  
 void isa8_mda_device::device_start()
 {        
-	int buswidth;
-	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			memory_install_readwrite_bank(space, 0xb0000, 0xb0fff, 0, 0x07000, "bank_mda" );
-			memory_install_readwrite8_device_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), this, 0x3b0, 0x3bf, 0, 0, pc_MDA_r, pc_MDA_w );
-			break;
-
-		default:
-			fatalerror("MDA: Bus width %d not supported", buswidth);
-			break;
-	}
-
+	m_isa->add_isa_card(this, m_config.m_isa_num);
 	videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, pc_MDA_r, pc_MDA_w );
+	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);	
 	
-	memory_set_bankptr(machine,"bank_mda", videoram);
-
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
 		palette_set_color_rgb(machine, i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
@@ -643,25 +629,10 @@ isa8_hercules_device::isa8_hercules_device(running_machine &_machine, const isa8
  
 void isa8_hercules_device::device_start()
 {        
-	int buswidth;
-	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			memory_install_readwrite_bank(space, 0xb0000, 0xbffff, 0, 0, "bank_hercules" );
-			memory_install_readwrite8_device_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), this, 0x3b0, 0x3bf, 0, 0, hercules_r, hercules_w );
-			break;
-
-		default:
-			fatalerror("MDA: Bus width %d not supported", buswidth);
-			break;
-	}
-
 	videoram = auto_alloc_array(machine, UINT8, 0x10000);
-	
-	memory_set_bankptr(machine,"bank_hercules", videoram);
+
+	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, hercules_r, hercules_w );
+	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", videoram);
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)

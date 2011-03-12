@@ -1293,6 +1293,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_joy.o	\
 	$(MESS_MACHINE)/kb_keytro.o	\
 	$(MESS_MACHINE)/isa_com.o	\
+	$(MESS_MACHINE)/isa_fdc.o	\
 	$(MESS_VIDEO)/isa_mda.o		\
 	$(MESS_VIDEO)/pc_cga.o		\
 	$(MESS_VIDEO)/cgapal.o		\

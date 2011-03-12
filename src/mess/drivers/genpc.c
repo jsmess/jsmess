@@ -27,6 +27,7 @@
 #include "machine/isa.h"
 
 #include "machine/isa_com.h"
+#include "machine/isa_fdc.h"
 
 #include "sound/speaker.h"
 
@@ -155,9 +156,10 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 
 	MCFG_PALETTE_LENGTH( 256 )
 		
-	MCFG_ISA8_BUS_ADD("isa","maincpu")
+	MCFG_ISA8_BUS_ADD("isa","maincpu","dma8237","pic8259")
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "mda", ISA8_MDA)
 	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
+	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -192,9 +194,10 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 
 	MCFG_PALETTE_LENGTH( 256 )	
 	
-	MCFG_ISA8_BUS_ADD("isa","maincpu")
+	MCFG_ISA8_BUS_ADD("isa","maincpu","dma8237","pic8259")
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "hercules", ISA8_HERCULES)
 	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
+	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

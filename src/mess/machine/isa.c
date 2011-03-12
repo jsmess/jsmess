@@ -6,6 +6,9 @@
  
 #include "emu.h"
 #include "machine/isa.h"
+#include "machine/pic8259.h"
+#include "machine/8237dma.h"
+
  
  
 //**************************************************************************
@@ -51,6 +54,16 @@ void isa8_device_config::static_set_cputag(device_config *device, const char *ta
         isa8_device_config *isa = downcast<isa8_device_config *>(device);
         isa->m_cputag = tag;
 }
+void isa8_device_config::static_set_dmatag(device_config *device, const char *tag)
+{
+        isa8_device_config *isa = downcast<isa8_device_config *>(device);
+        isa->m_dmatag = tag;
+}
+void isa8_device_config::static_set_pictag(device_config *device, const char *tag)
+{
+        isa8_device_config *isa = downcast<isa8_device_config *>(device);
+        isa->m_pictag = tag;
+}
  
 //**************************************************************************
 //  LIVE DEVICE
@@ -62,8 +75,13 @@ void isa8_device_config::static_set_cputag(device_config *device, const char *ta
  
 isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &config) :
         device_t(_machine, config),
-        m_config(config)
+        m_config(config),
+		m_maincpu(NULL),
+		m_pic8259(NULL),
+		m_dma8237(NULL)
 {
+	for(int i=0;i<8;i++) 
+		m_isa_device[i] = NULL;
 }
  
 //-------------------------------------------------
@@ -72,16 +90,95 @@ isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &co
  
 void isa8_device::device_start()
 {        
-        device_t *cpu = m_machine.device(m_config.m_cputag);
-        m_space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	m_maincpu = m_machine.device(m_config.m_cputag);
+	m_pic8259 = m_machine.device(m_config.m_pictag);
+	m_dma8237 = m_machine.device(m_config.m_dmatag);
 }
  
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
- 
+  
 void isa8_device::device_reset()
 {
+}
+
+void isa8_device::add_isa_card(device_isa8_card_interface *card,int pos)
+{
+	m_isa_device[pos] = card;
+}
+
+void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
+{	
+	int buswidth = device_memory(m_maincpu)->space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_readwrite8_device_handler(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler );
+			break;
+
+		default:
+			fatalerror("ISA8: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+{
+	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	memory_install_readwrite_bank(space, start, end, mask, mirror, tag );
+	memory_set_bankptr(&m_machine, tag, data);
+}
+
+void isa8_device::set_irq_line(int irq, int state)
+{
+	switch (irq)
+	{
+		case 0: pic8259_ir0_w(m_pic8259, state); break;
+		case 1: pic8259_ir1_w(m_pic8259, state); break;
+		case 2: pic8259_ir2_w(m_pic8259, state); break;
+		case 3: pic8259_ir3_w(m_pic8259, state); break;
+		case 4: pic8259_ir4_w(m_pic8259, state); break;
+		case 5: pic8259_ir5_w(m_pic8259, state); break;
+		case 6: pic8259_ir6_w(m_pic8259, state); break;
+		case 7: pic8259_ir7_w(m_pic8259, state); break;
+	}
+}
+
+void isa8_device::set_dreq_line(int line, int state)
+{
+	switch (line)
+	{
+		case 0: i8237_dreq0_w(m_dma8237, state); break;
+		case 1: i8237_dreq1_w(m_dma8237, state); break;
+		case 2: i8237_dreq2_w(m_dma8237, state); break;
+		case 3: i8237_dreq3_w(m_dma8237, state); break;
+	}
+}
+
+UINT8 isa8_device::dack_r(int line) 
+{
+	UINT8 retVal = 0xff;
+	for(int i=0;i<8;i++) {
+		if (m_isa_device[i] != NULL && m_isa_device[i]->have_dack(line)) {
+			retVal = m_isa_device[i]->dack_r(line);
+		}		
+	}
+	return retVal;
+}
+void isa8_device::dack_w(int line,UINT8 data)
+{
+	for(int i=0;i<8;i++) {
+		if (m_isa_device[i] != NULL && m_isa_device[i]->have_dack(line)) {
+			m_isa_device[i]->dack_w(line,data);
+		}		
+	}
+}
+void isa8_device::eop_w(int state)
+{
+	for(int i=0;i<8;i++) {
+		if (m_isa_device[i] != NULL) m_isa_device[i]->eop_w(state);
+	}
 }
 
 
@@ -141,4 +238,20 @@ device_isa8_card_interface::device_isa8_card_interface(running_machine &machine,
 
 device_isa8_card_interface::~device_isa8_card_interface()
 {
+}
+
+UINT8 device_isa8_card_interface::dack_r(int line)
+{
+	return 0;
+}
+void device_isa8_card_interface::dack_w(int line,UINT8 data)
+{
+}
+void device_isa8_card_interface::eop_w(int state)
+{
+}
+
+bool device_isa8_card_interface::have_dack(int line)
+{
+	return FALSE;
 }
