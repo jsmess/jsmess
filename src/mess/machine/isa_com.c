@@ -12,14 +12,14 @@
 /* called when a interrupt is set/cleared from com hardware */
 static INS8250_INTERRUPT( pc_com_interrupt_1 )
 {
-	//genpc_state *st = device->machine->driver_data<genpc_state>();
-	//pic8259_ir4_w(st->pic8259, state);
+	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
+	com->m_isa->set_irq_line(4, state);
 }
 
 static INS8250_INTERRUPT( pc_com_interrupt_2 )
 {
-	//genpc_state *st = device->machine->driver_data<genpc_state>();
-	//pic8259_ir3_w(st->pic8259, state);
+	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
+	com->m_isa->set_irq_line(3, state);
 }
 
 /* called when com registers read/written - used to update peripherals that
