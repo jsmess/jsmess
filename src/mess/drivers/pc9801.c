@@ -1471,20 +1471,63 @@ static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
 
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
-	AM_RANGE(0x005c, 0x005f) AM_WRITENOP
+	AM_RANGE(0x005c, 0x005f) AM_NOP //ARTIC (serial card?)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                        pc9801_vrtc_mask_w, 0xffffffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9821_video_ff_w,  0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
+//	AM_RANGE(0x0080, 0x0083) SASI interface / <undefined>
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
+//	AM_RANGE(0x00b0, 0x00b3) PC9861k (serial port?)
+//	AM_RANGE(0x00b9, 0x00b9) PC9861k
+//	AM_RANGE(0x00bb, 0x00bb) PC9861k
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
+//	AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(                        pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
+//	AM_RANGE(0x0188, 0x018b) YM2203 OPN board / <undefined>
+//	AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
+//	AM_RANGE(0x0430, 0x0430) IDE bank register
+//	AM_RANGE(0x0432, 0x0432) IDE bank register (mirror)
+//	AM_RANGE(0x0439, 0x0439) ROM/RAM bank (NEC)
+//	AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8(                        pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
+//	AM_RANGE(0x04a0, 0x04af) EGC
 //	AM_RANGE(0x04be, 0x04be) FDC "RPM" register
+//	AM_RANGE(0x0642, 0x064f) IDE registers / <undefined>
+//	AM_RANGE(0x074c, 0x074f) IDE status (r) - IDE control registers (w) / <undefined>
+//	AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 //	AM_RANGE(0x09a0, 0x09a0) GDC extended register r/w
 //	AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
+//	AM_RANGE(0x0c07, 0x0c07) EPSON register w
+//	AM_RANGE(0x0c03, 0x0c03) EPSON register 0 r
+//	AM_RANGE(0x0c13, 0x0c14) EPSON register 1 r
+//	AM_RANGE(0x0c24, 0x0c24) cs4231 PCM board register control
+//	AM_RANGE(0x0c2b, 0x0c2b) cs4231 PCM board low byte control
+//	AM_RANGE(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
+//	AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
+//	AM_RANGE(0x0cfc, 0x0cff) PCI bus
+//	AM_RANGE(0x3fd8, 0x3fdf) <undefined> / pit mirror ports
+//	AM_RANGE(0x7fd8, 0x7fdf) <undefined> / mouse ppi8255 ports
+//	AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
+//	AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
+//	AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
+//	AM_RANGE(0xc4d0, 0xc4d3) MIDI port, option 1 / <undefined>
+//	AM_RANGE(0xc8d0, 0xc8d3) MIDI port, option 2 / <undefined>
+//	AM_RANGE(0xccd0, 0xccd3) MIDI port, option 3 / <undefined>
+//	AM_RANGE(0xd0d0, 0xd0d3) MIDI port, option 4 / <undefined>
+//	AM_RANGE(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
+//	AM_RANGE(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
+//	AM_RANGE(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
+//	AM_RANGE(0xe0d0, 0xe0d3) MIDI port, option 8 / <undefined>
+//	AM_RANGE(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
+//	AM_RANGE(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
+//	AM_RANGE(0xecd0, 0xecd3) MIDI port, option B / <undefined>
+//	AM_RANGE(0xf0d0, 0xf0d3) MIDI port, option C / <undefined>
+//	AM_RANGE(0xf4d0, 0xf4d3) MIDI port, option D / <undefined>
+//	AM_RANGE(0xf8d0, 0xf8d3) MIDI port, option E / <undefined>
+//	AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, 0, 8 )
