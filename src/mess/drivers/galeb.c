@@ -22,6 +22,13 @@ GFXDECODE_END
 
 static WRITE8_DEVICE_HANDLER( galeb_dac_data_w ) { dac_data_w(device, data); }
 
+static READ8_HANDLER( galeb_keyboard_r )
+{
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+
+	return input_port_read(space->machine, keynames[offset]);
+}
+
 /* Address maps */
 static ADDRESS_MAP_START(galeb_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
@@ -124,7 +131,6 @@ static MACHINE_CONFIG_START( galeb, galeb_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", M6502, 1000000)
     MCFG_CPU_PROGRAM_MAP(galeb_mem)
-    MCFG_MACHINE_RESET( galeb )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -164,4 +170,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY                 FULLNAME   FLAGS */
-COMP( 1981, galeb,     0,      0,	galeb,	galeb,	galeb, "PEL Varazdin", "Galeb",		 0)
+COMP( 1981, galeb,     0,      0,	galeb,	galeb,	0, "PEL Varazdin", "Galeb",		 0)

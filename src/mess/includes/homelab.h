@@ -16,12 +16,6 @@ public:
 
 };
 
-
-/*----------- defined in machine/homelab.c -----------*/
-
-extern DRIVER_INIT( homelab );
-
-
 /*----------- defined in video/homelab.c -----------*/
 
 extern VIDEO_START( homelab );

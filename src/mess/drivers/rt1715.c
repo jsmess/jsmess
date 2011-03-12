@@ -118,7 +118,6 @@ static WRITE8_HANDLER( rt1715_rom_disable )
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
 }
 
-
 /***************************************************************************
     VIDEO EMULATION
 ***************************************************************************/

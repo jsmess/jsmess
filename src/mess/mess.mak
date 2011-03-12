@@ -1046,7 +1046,6 @@ $(MESSOBJ)/homebrew.a:			\
 $(MESSOBJ)/homelab.a:			\
 	$(MESS_DRIVERS)/homelab.o	\
 	$(MESS_VIDEO)/homelab.o		\
-	$(MESS_MACHINE)/homelab.o	\
 
 $(MESSOBJ)/hp.a:				\
 	$(MESS_MACHINE)/hp48.o		\
@@ -1307,7 +1306,6 @@ $(MESSOBJ)/pdp1.a:				\
 
 $(MESSOBJ)/pel.a:				\
 	$(MESS_DRIVERS)/galeb.o		\
-	$(MESS_MACHINE)/galeb.o		\
 	$(MESS_VIDEO)/galeb.o		\
 	$(MESS_FORMATS)/orao_cas.o	\
 	$(MESS_DRIVERS)/orao.o		\

@@ -146,6 +146,9 @@ static GFXDECODE_START( homelab )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
+static DRIVER_INIT(homelab)
+{
+}
 
 /* Machine driver */
 static MACHINE_CONFIG_START( homelab, homelab_state )
@@ -225,7 +228,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT                 COMPANY                 FULLNAME   FLAGS */
+/*    YEAR  NAME   		PARENT  COMPAT  MACHINE 	 INPUT   	INIT      COMPANY                 FULLNAME   FLAGS */
 COMP( 1982, homelab2,   0	,	 0, 	homelab,	homelab,	homelab, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16",		 GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, homelab3,   homelab2,0, 	homelab3,	homelab,	homelab, "Jozsef and Endre Lukacs", "Homelab 3",		 GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1984, homelab4,   homelab2,0, 	homelab3,	homelab,	homelab, "Jozsef and Endre Lukacs", "Homelab 4",		 GAME_NOT_WORKING | GAME_NO_SOUND)

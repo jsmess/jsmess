@@ -17,14 +17,6 @@ public:
 	UINT8 *video_ram;
 };
 
-
-/*----------- defined in machine/galeb.c -----------*/
-
-extern DRIVER_INIT( galeb );
-extern MACHINE_RESET( galeb );
-extern READ8_HANDLER( galeb_keyboard_r );
-
-
 /*----------- defined in video/galeb.c -----------*/
 
 extern const gfx_layout galeb_charlayout;
