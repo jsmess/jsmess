@@ -291,6 +291,9 @@ public:
 		UINT8 pal_entry;
 		UINT8 r[16],g[16],b[16];
 	}analog16;
+
+	/* PC9821 specific */
+	UINT8 analog256,analog256e;
 };
 
 
@@ -1321,78 +1324,31 @@ static WRITE8_HANDLER( pc9801rs_video_ff_w )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
 
-	if((offset & 1) == 0)
+	if(offset == 2)
 	{
-		if(offset == 0)
+		if((data & 0xf8) == 0)
 		{
-			state->video_ff[(data & 0x0e) >> 1] = data & 1;
+			state->ex_video_ff[(data & 0x6) >> 1] = data & 1;
 
-			if(0)
+			if(1)
 			{
-				static const char *const video_ff_regnames[] =
+				static const char *const ex_video_ff_regnames[] =
 				{
-					"Attribute Select",	// 0
-					"Graphic",			// 1
-					"Column",			// 2
-					"Font Select",		// 3
-					"200 lines",		// 4
-					"KAC?",				// 5
-					"Memory Switch",	// 6
-					"Display ON"		// 7
+					"16 colors mode",	// 0
+					"<unknown>",		// 1
+					"EGC related",		// 2
+					"<unknown>"			// 3
 				};
 
-				printf("Write to video FF register %s -> %02x\n",video_ff_regnames[(data & 0x0e) >> 1],data & 1);
-			}
-		}
-		else
-		{
-			if((data & 0xf8) == 0)
-			{
-				state->ex_video_ff[(data & 0x6) >> 1] = data & 1;
-
-				if(1)
-				{
-					static const char *const ex_video_ff_regnames[] =
-					{
-						"16 colors mode",	// 0
-						"<unknown>",		// 1
-						"EGC related",		// 2
-						"<unknown>"			// 3
-					};
-
-					printf("Write to extend video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
-				}
+				printf("Write to extend video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
 			}
 			else
 				printf("Write to extend video FF register %02x\n",data);
 		}
-	}
-	else // odd
-	{
-		printf("Write to undefined port [%02x] <- %02x\n",offset+0x68,data);
-	}
-}
-
-static READ8_HANDLER( pc9801rs_a0_r )
-{
-	pc9801_state *state = space->machine->driver_data<pc9801_state>();
-
-	if((offset & 1) == 0 && offset & 8 && state->ex_video_ff[ANALOG_16]) //16 color mode
-	{
-		UINT8 res = 0;
-
-		switch(offset)
-		{
-			case 0x08: res = state->analog16.pal_entry & 0xf; break;
-			case 0x0a: res = state->analog16.g[state->analog16.pal_entry] & 0xf; break;
-			case 0x0c: res = state->analog16.r[state->analog16.pal_entry] & 0xf; break;
-			case 0x0e: res = state->analog16.b[state->analog16.pal_entry] & 0xf; break;
-		}
-
-		return res;
+		return;
 	}
 
-	return pc9801_a0_r(space,offset);
+	pc9801_video_ff_w(space,offset,data);
 }
 
 static WRITE8_HANDLER( pc9801rs_a0_w )
@@ -1433,7 +1389,7 @@ static ADDRESS_MAP_START( pc9801rs_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801rs_a0_r,      pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
@@ -1447,6 +1403,64 @@ ADDRESS_MAP_END
  *
  ************************************/
 
+static WRITE8_HANDLER( pc9821_video_ff_w )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if(offset == 2)
+	{
+		switch(data & 0xf8)	// pc-9821 specific extended registers
+		{
+			case 0x20: state->analog256 = data & 1; return;
+			case 0x68: state->analog256e = data & 1; return;
+		} // intentional fall-through
+	}
+
+	pc9801rs_video_ff_w(space,offset,data);
+}
+
+static READ8_HANDLER( pc9821_a0_r )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if((offset & 1) == 0 && offset & 8)
+	{
+		if(state->analog256)
+		{
+			printf("256 color mode [%02x] R\n",offset);
+			return 0;
+		}
+		else if(state->ex_video_ff[ANALOG_16]) //16 color mode, readback possible there
+		{
+			UINT8 res = 0;
+
+			switch(offset)
+			{
+				case 0x08: res = state->analog16.pal_entry & 0xf; break;
+				case 0x0a: res = state->analog16.g[state->analog16.pal_entry] & 0xf; break;
+				case 0x0c: res = state->analog16.r[state->analog16.pal_entry] & 0xf; break;
+				case 0x0e: res = state->analog16.b[state->analog16.pal_entry] & 0xf; break;
+			}
+
+			return res;
+		}
+	}
+
+	return pc9801_a0_r(space,offset);
+}
+
+static WRITE8_HANDLER( pc9821_a0_w )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if((offset & 1) == 0 && offset & 8 && state->analog256)
+	{
+		printf("256 color mode [%02x] %02x W\n",offset,data);
+		return;
+	}
+
+	pc9801rs_a0_w(space,offset,data);
+}
 
 static ADDRESS_MAP_START( pc9821_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
@@ -1460,10 +1474,10 @@ static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x005c, 0x005f) AM_WRITENOP
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                        pc9801_vrtc_mask_w, 0xffffffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9821_video_ff_w,  0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801rs_a0_r,      pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
