@@ -5,7 +5,7 @@
 
   To investigate:
   Frogger by Majesco (not Hasbro): was it BW or Color?
-  Shanghai Pocket by Sunsoft: are serial and release date correct or di they refer to the GBC version?
+  Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
   Soccer Mania: was it really released as Soccer Mania in Jpn too as nointro claims, or only as Soccer Boy?
   Taz-Mania by Sunsoft: was it really released in Europe too as nointro claims? if so, why THQ game has not been titled Taz-Mania 2 like in USA?
 
@@ -11918,7 +11918,7 @@
 		</part>
 	</software>
 
-    <!-- is this a clone of pinbalfn? -->
+	<!-- is this a clone of pinbalfn? -->
 	<software name="pinbaldx">
 		<!-- Serial: DMG-?? - Release Date:  -->
 		<description>Pinball Deluxe (Euro)</description>
@@ -14989,7 +14989,7 @@
 		</part>
 	</software>
 
-    <!-- is this really a clone of the 1994 release?? -->
+	<!-- is this really a clone of the 1994 release?? -->
 	<software name="spaceinvj" cloneof="spaceinv">
 		<!-- Serial: DMG-SPA - Release Date: 1990-03-30 - Alt. Title: スペースインベーダー - Notes: Also release by NP in 2000-03 -->
 		<description>Space Invaders (Jpn)</description>
@@ -15157,7 +15157,7 @@
 		</part>
 	</software>
 
-    <!-- how is this related to Splitz?? -->
+	<!-- how is this related to Splitz?? -->
 	<software name="uchiiwai">
 		<!-- Serial: DMG-?? - Release Date: - Alt. Title:  -->
 		<description>Uchiiwai - Kyoudaijingi no Puzzle Game (Jpn)</description>
@@ -16262,7 +16262,7 @@
 		</part>
 	</software>
 
-    <!-- is this a clone of goal too, or a real sequel to Jaleco J.Cup Soccer? -->
+	<!-- is this a clone of goal too, or a real sequel to Jaleco J.Cup Soccer? -->
 	<software name="acestrik">
 		<!-- Serial: DMG-JRJ - Release Date: 1994-02-18 - Alt. Title: 武田修宏のエースストライカー -->
 		<description>Takeda Nobuhiro no Ace Striker (Jpn)</description>
@@ -18735,9 +18735,9 @@
 
 <!-- Sachen carts -->
 
-    <!-- This should contain Virus Attack, Electron World, Dice, Trouble Zone, but it currently does not work -->
+	<!-- This should contain Virus Attack, Electron World, Dice, Trouble Zone, but it currently does not work -->
 	<software name="4in1" supported="no">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<!-- Serial: 4B-002 - Release Date: - Alt. Title:  -->
 		<description>4 in 1 (Euro, 4B-002)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -18748,10 +18748,9 @@
 		</part>
 	</software>
 
-    <!-- Below we list the ripped games from Sachen multicarts (I assumed they come from a 4-in-1 cart, but they could come as well from a 8-in-1 cart). 
-         They should be removed as soon as the carts are properly dumped and emulated -->
+	<!-- Below we list the ripped games from Sachen multicarts (I assumed they come from a 4-in-1 cart, but they could come as well from a 8-in-1 cart). 
+		They should be removed as soon as the carts are properly dumped and emulated -->
 	<software name="srider">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Street Rider (ripped from 4-in-1 4B-001)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18763,7 +18762,6 @@
 	</software>
 
 	<software name="vexblock">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Vex Block (ripped from 4-in-1 4B-001)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18775,7 +18773,6 @@
 	</software>
 
 	<software name="trapturn">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Trap &amp; Turn (ripped from 4-in-1 4B-001)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18787,7 +18784,6 @@
 	</software>
 
 	<software name="duckadv">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Duck Adventures (ripped from 4-in-1 4B-001)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18799,7 +18795,6 @@
 	</software>
 
 	<software name="azone">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Arctic Zone (ripped from 4-in-1 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18811,7 +18806,6 @@
 	</software>
 
 	<software name="mtower">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Magical Tower (ripped from 4-in-1 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18823,7 +18817,6 @@
 	</software>
 
 	<software name="railway">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Railway (ripped from 4-in-1 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18835,7 +18828,6 @@
 	</software>
 
 	<software name="wormvis">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Worm Visitor (ripped from 4-in-1 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18847,7 +18839,6 @@
 	</software>
 
 	<software name="bombdisp">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Bomb Disposer (ripped from 4-in-1 4B-006)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18859,7 +18850,6 @@
 	</software>
 
 	<software name="aforce">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>A-Force (ripped from 4-in-1 4B-006)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18871,7 +18861,6 @@
 	</software>
 
 	<software name="bftale">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Black Forest Tale (ripped from 4-in-1 4B-006)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18883,7 +18872,6 @@
 	</software>
 
 	<software name="2ndspace">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>2nd Space (ripped from 4-in-1 4B-006)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18895,7 +18883,6 @@
 	</software>
 
 	<software name="antsoldr">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Ant Soldier (ripped from 4-in-1 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18907,7 +18894,6 @@
 	</software>
 
 	<software name="danlaser">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Dan Laser (ripped from 4-in-1 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18919,7 +18905,6 @@
 	</software>
 
 	<software name="skyace">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Sky Ace (ripped from 4-in-1 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18931,7 +18916,6 @@
 	</software>
 
 	<software name="zooblock">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Zoo Block (ripped from 4-in-1 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18943,7 +18927,6 @@
 	</software>
 
 	<software name="captkk">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Captain Knick-Knack (ripped from 4-in-1 4B-008)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18954,10 +18937,9 @@
 		</part>
 	</software>
 
-    <!-- Flea War is missing -->
+	<!-- Flea War is missing -->
 
 	<software name="expbrick">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Explosive Brick '94 (ripped from 4-in-1 4B-008)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18969,7 +18951,6 @@
 	</software>
 
 	<software name="magmaze">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Magic Maze (ripped from 4-in-1 4B-008)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18981,7 +18962,6 @@
 	</software>
 
 	<software name="zipball">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Zipball (ripped from 4-in-1 4B-009)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -18992,10 +18972,9 @@
 		</part>
 	</software>
 
-    <!-- Gorilla is missing -->
+	<!-- Gorilla is missing -->
 
 	<software name="crazybur">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Crazy Burger (ripped from 4-in-1 4B-009)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -19007,7 +18986,6 @@
 	</software>
 
 	<software name="deep">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Deep - Final Mission (ripped from 4-in-1 4B-009)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -19055,7 +19033,7 @@
 			</dataarea>
 		</part>
 	</software>
-    
+
 <!-- GOWIN games -->
 <!--
   Other games (which could coincide with some of the games below without serial)
@@ -19075,7 +19053,7 @@
 
 	<software name="firedrag">
 		<!-- Serial: GS-06 - Release Date:  -->
-		<description>Fire Dragon (Chi)</description>
+		<description>Fire Dragon (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -19087,7 +19065,7 @@
 
 	<software name="magicbal">
 		<!-- Serial: GS-02 - Release Date:  -->
-		<description>Magic Ball (Chi)</description>
+		<description>Magic Ball (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -19099,7 +19077,7 @@
 
 	<software name="mitudelu">
 		<!-- Serial: GS- - Release Date: - Alt. Title:  -->
-		<description>Mi Tu De Lu (Chi)</description>
+		<description>Mi Tu De Lu (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -19111,7 +19089,7 @@
 
 	<software name="yehrude">
 		<!-- Serial: GS-03 - Release Date:  -->
-		<description>Prince YehRude (Chi)</description>
+		<description>Prince YehRude (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -19123,7 +19101,7 @@
 
 	<software name="rainbwpr">
 		<!-- Serial: GS-05 - Release Date:  -->
-		<description>Rainbow Prince (Chi)</description>
+		<description>Rainbow Prince (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -19135,7 +19113,7 @@
 
 	<software name="tigerdrg">
 		<!-- Serial: GS- - Release Date: - Alt. Title:  -->
-		<description>Tiger A Dragon (Chi)</description>
+		<description>Tiger A Dragon (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
