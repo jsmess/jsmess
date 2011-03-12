@@ -16,6 +16,7 @@
     - floppy disk hook-up;
     - POR mechanism isn't fully understood;
     - extra features;
+	- clean-up duplicating code;
 
 	TODO (PC-9821):
 	- "set the software dip-switch" warning;
@@ -285,6 +286,11 @@ public:
 	UINT8 rom_bank;
 	UINT8 fdc_ctrl;
 	UINT32 ram_size;
+	UINT8 ex_video_ff[4];
+	struct {
+		UINT8 pal_entry;
+		UINT8 r[16],g[16],b[16];
+	}analog16;
 };
 
 
@@ -293,6 +299,7 @@ public:
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 
+#define ANALOG_16 0
 
 void pc9801_state::video_start()
 {
@@ -812,15 +819,18 @@ static READ8_HANDLER( pc9801_a0_r )
 			case 0x02:
 				return upd7220_r(space->machine->device("upd7220_btm"),(offset & 2) >> 1);
 			/* bitmap palette clut read */
+			case 0x04:
+				return state->vram_disp & 1;
+			case 0x06:
+				return state->vram_bank & 1;
 			case 0x08:
 			case 0x0a:
 			case 0x0c:
 			case 0x0e:
 				return state->pal_clut[(offset & 0x6) >> 1];
-			default:
-				printf("Read to undefined port [%02x]\n",offset+0xa0);
-				return 0xff;
 		}
+
+		return 0xff; //code unreachable
 	}
 	else // odd
 	{
@@ -1307,6 +1317,108 @@ static WRITE8_HANDLER( pc9801rs_2dd_w )
 	printf("Write to undefined port [%02x] %02x\n",offset+0x90,data);
 }
 
+static WRITE8_HANDLER( pc9801rs_video_ff_w )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if((offset & 1) == 0)
+	{
+		if(offset == 0)
+		{
+			state->video_ff[(data & 0x0e) >> 1] = data & 1;
+
+			if(0)
+			{
+				static const char *const video_ff_regnames[] =
+				{
+					"Attribute Select",	// 0
+					"Graphic",			// 1
+					"Column",			// 2
+					"Font Select",		// 3
+					"200 lines",		// 4
+					"KAC?",				// 5
+					"Memory Switch",	// 6
+					"Display ON"		// 7
+				};
+
+				printf("Write to video FF register %s -> %02x\n",video_ff_regnames[(data & 0x0e) >> 1],data & 1);
+			}
+		}
+		else
+		{
+			if((data & 0xf8) == 0)
+			{
+				state->ex_video_ff[(data & 0x6) >> 1] = data & 1;
+
+				if(1)
+				{
+					static const char *const ex_video_ff_regnames[] =
+					{
+						"16 colors mode",	// 0
+						"<unknown>",		// 1
+						"EGC related",		// 2
+						"<unknown>"			// 3
+					};
+
+					printf("Write to extend video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
+				}
+			}
+			else
+				printf("Write to extend video FF register %02x\n",data);
+		}
+	}
+	else // odd
+	{
+		printf("Write to undefined port [%02x] <- %02x\n",offset+0x68,data);
+	}
+}
+
+static READ8_HANDLER( pc9801rs_a0_r )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if((offset & 1) == 0 && offset & 8 && state->ex_video_ff[ANALOG_16]) //16 color mode
+	{
+		UINT8 res = 0;
+
+		switch(offset)
+		{
+			case 0x08: res = state->analog16.pal_entry & 0xf; break;
+			case 0x0a: res = state->analog16.g[state->analog16.pal_entry] & 0xf; break;
+			case 0x0c: res = state->analog16.r[state->analog16.pal_entry] & 0xf; break;
+			case 0x0e: res = state->analog16.b[state->analog16.pal_entry] & 0xf; break;
+		}
+
+		return res;
+	}
+
+	return pc9801_a0_r(space,offset);
+}
+
+static WRITE8_HANDLER( pc9801rs_a0_w )
+{
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
+	if((offset & 1) == 0 && offset & 8 && state->ex_video_ff[ANALOG_16])
+	{
+		switch(offset)
+		{
+			case 0x08: state->analog16.pal_entry = data & 0xf; break;
+			case 0x0a: state->analog16.g[state->analog16.pal_entry] = data & 0xf; break;
+			case 0x0c: state->analog16.r[state->analog16.pal_entry] = data & 0xf; break;
+			case 0x0e: state->analog16.b[state->analog16.pal_entry] = data & 0xf; break;
+		}
+
+		palette_set_color_rgb(space->machine, (state->analog16.pal_entry)+0x10,
+											  pal4bit(state->analog16.r[state->analog16.pal_entry]),
+											  pal4bit(state->analog16.g[state->analog16.pal_entry]),
+											  pal4bit(state->analog16.b[state->analog16.pal_entry]));
+		return;
+	}
+
+	pc9801_a0_w(space,offset,data);
+}
+
 static ADDRESS_MAP_START( pc9801rs_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
@@ -1318,10 +1430,10 @@ static ADDRESS_MAP_START( pc9801rs_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                        pc9801_vrtc_mask_w, 0xffffffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801_video_ff_w,  0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801rs_a0_r,      pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
@@ -1335,111 +1447,6 @@ ADDRESS_MAP_END
  *
  ************************************/
 
-static READ8_HANDLER( pc9821_a0_r )
-{
-	pc9801_state *state = space->machine->driver_data<pc9801_state>();
-
-	if((offset & 1) == 0)
-	{
-		switch(offset & 0xe)
-		{
-			case 0x00:
-			case 0x02:
-				return upd7220_r(space->machine->device("upd7220_btm"),(offset & 2) >> 1);
-			/* bitmap palette clut read */
-			case 0x08:
-			case 0x0a:
-			case 0x0c:
-			case 0x0e:
-				return state->pal_clut[(offset & 0x6) >> 1];
-			default:
-				printf("Read to undefined port [%02x]\n",offset+0xa0);
-				return 0xff;
-		}
-	}
-	else // odd
-	{
-		switch((offset & 0xe) + 1)
-		{
-			case 0x09://cg window font read
-			{
-				UINT8 *pcg = space->machine->region("pcg")->base();
-
-				return pcg[((state->font_addr & 0x7f7f) << 4) | state->font_lr | (state->font_line & 0x0f)];
-			}
-		}
-
-		printf("Read to undefined port [%02x]\n",offset+0xa0);
-		return 0xff;
-	}
-}
-
-static WRITE8_HANDLER( pc9821_a0_w )
-{
-	pc9801_state *state = space->machine->driver_data<pc9801_state>();
-
-	if((offset & 1) == 0)
-	{
-		switch(offset & 0xe)
-		{
-			case 0x00:
-			case 0x02:
-				upd7220_w(space->machine->device("upd7220_btm"),(offset & 2) >> 1,data);
-				return;
-			case 0x04: state->vram_disp = data & 1; return;
-			case 0x06:
-				state->vram_bank = data & 1;
-				upd7220_bank_w(space->machine->device("upd7220_btm"),0,(data & 1) << 2); //TODO: check me
-				return;
-			/* bitmap palette clut write */
-			case 0x08:
-			case 0x0a:
-			case 0x0c:
-			case 0x0e:
-			{
-				UINT8 pal_entry;
-
-				state->pal_clut[(offset & 0x6) >> 1] = data;
-
-				/* can't be more twisted I presume ... :-/ */
-				pal_entry = (((offset & 4) >> 1) | ((offset & 2) << 1)) >> 1;
-				pal_entry ^= 3;
-
-				palette_set_color_rgb(space->machine, (pal_entry)|4|8, pal1bit((data & 0x2) >> 1), pal1bit((data & 4) >> 2), pal1bit((data & 1) >> 0));
-				palette_set_color_rgb(space->machine, (pal_entry)|8, pal1bit((data & 0x20) >> 5), pal1bit((data & 0x40) >> 6), pal1bit((data & 0x10) >> 4));
-				return;
-			}
-			default:
-				printf("Write to undefined port [%02x] <- %02x\n",offset+0xa0,data);
-				return;
-		}
-	}
-	else // odd
-	{
-		switch((offset & 0xe) + 1)
-		{
-			case 0x01:
-				state->font_addr = (data << 8) | (state->font_addr & 0xff);
-				return;
-			case 0x03:
-				state->font_addr = (data & 0xff) | (state->font_addr & 0xff00);
-				return;
-			case 0x05:
-				state->font_line = data & 0x1f;
-				state->font_lr = data & 0x20 ? 0x000 : 0x800;
-				return;
-			case 0x09: //cg window font write
-			{
-				UINT8 *pcg = space->machine->region("pcg")->base();
-
-				pcg[((state->font_addr & 0x7f7f) << 4) | state->font_lr | state->font_line] = data;
-				return;
-			}
-		}
-
-		printf("Write to undefined port [%02x] <- %02x\n",offset+0xa0,data);
-	}
-}
 
 static ADDRESS_MAP_START( pc9821_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
@@ -1453,10 +1460,10 @@ static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x005c, 0x005f) AM_WRITENOP
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(                        pc9801_vrtc_mask_w, 0xffffffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801_video_ff_w,  0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8(                        pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801rs_a0_r,      pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
@@ -2092,6 +2099,8 @@ static PALETTE_INIT( pc9801 )
 
 	for(i=0;i<8;i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	for(i=8;i<machine->total_colors();i++)
+		palette_set_color_rgb(machine, i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -2124,6 +2133,7 @@ static MACHINE_RESET(pc9801)
 		static const UINT8 default_memsw_data[0x10] =
 		{
 			0xe1, 0x48, 0xe1, 0x05, 0xe1, 0x04, 0xe1, 0x00, 0xe1, 0x01, 0xe1, 0x00, 0xe1, 0x00, 0xe1, 0x00
+//			0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff
 		};
 
 		for(i=0;i<0x10;i++)
@@ -2283,7 +2293,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16+16)
 	MCFG_PALETTE_INIT(pc9801)
 	MCFG_GFXDECODE(pc9801)
 
@@ -2332,7 +2342,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16+16+256)
 	MCFG_PALETTE_INIT(pc9801)
 	MCFG_GFXDECODE(pc9801)
 
