@@ -2,9 +2,16 @@
 
 <!--
 
-undumped GBC protos
+Undumped GBC protos
 
   - Jet Force Gemini
+
+
+Undumped Pirates:
+  -  Sachen EB-001 Beast Fighter
+  -  Sachen EB-002 Jurassic Boy 2
+  -  Sachen EB-003 Thunder Blast Man (AKA Rocman X)
+  -  Sachen EB-004 Street Hero
 
 -->
 
@@ -4224,9 +4231,10 @@ undumped GBC protos
 	</software>
 
 	<software name="gwatch2">
+		<!-- Serial: DMG-AGIE - Release Date:  -->
 		<description>Game &amp; Watch Gallery 2 (Euro, USA)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="game &amp; watch gallery 2 (usa, europe).bin" size="1048576" crc="969c8961" sha1="ce81d3260e8c5e1dd241caf6de315eb3e63dbc15" offset="000000" />

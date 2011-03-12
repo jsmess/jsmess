@@ -8,22 +8,15 @@
   Shanghai Pocket by Sunsoft: are serial and release date correct or di they refer to the GBC version?
   Soccer Mania: was it really released as Soccer Mania in Jpn too as nointro claims, or only as Soccer Boy?
   Taz-Mania by Sunsoft: was it really released in Europe too as nointro claims? if so, why THQ game has not been titled Taz-Mania 2 like in USA?
-  
+
+  Undumped pirate carts:
+  - 4B-003: Sachen 4-in-1 version 3 (Taiwan's Mahjong, Japan's Mahjong, Hong Kong's Mahjong, Store Tris)
+  - 4B-004: Sachen 4-in-1 version 4 (Pile Wonder, Snake Roy, Suleiman's Treasure, Puppet Knight)
+  - GOWIN carts (see below the list of known games)
+
 -->
 
 <softwarelist name="gameboy" description="Nintendo Game Boy cartridges">
-
-	<software name="4in1">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
-		<description>4 in 1 (Euro, 4B-002)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="65536">
-				<rom name="4 in 1 (europe) (4b-002) (unl).bin" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="3choume">
 		<!-- Serial: DMG-WQJ - Release Date: 1994-08-05 - Alt. Title: 3丁目のタマ タマ＆フレンズ 3丁目お化けパニック！！ -->
@@ -18739,6 +18732,419 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Sachen carts -->
+
+    <!-- This should contain Virus Attack, Electron World, Dice, Trouble Zone, but it currently does not work -->
+	<software name="4in1" supported="no">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>4 in 1 (Euro, 4B-002)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="4 in 1 (europe) (4b-002) (unl).bin" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Below we list the ripped games from Sachen multicarts (I assumed they come from a 4-in-1 cart, but they could come as well from a 8-in-1 cart). 
+         They should be removed as soon as the carts are properly dumped and emulated -->
+	<software name="srider">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Street Rider (ripped from 4-in-1 4B-001)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="street rider (unl).bin" size="32768" crc="7751e066" sha1="b545cc60952176841590db7350479af8ec9d650e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vexblock">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Vex Block (ripped from 4-in-1 4B-001)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="vex block (unl).bin" size="32768" crc="642aee97" sha1="869a81dbb555b2f815da5abb75304c70ce27b41c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trapturn">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Trap &amp; Turn (ripped from 4-in-1 4B-001)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="trap &amp; turn (unl).bin" size="32768" crc="1c2fc6bf" sha1="822ab29560118eaa65586bbbef4ab7d64cbc9fae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duckadv">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Duck Adventures (ripped from 4-in-1 4B-001)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="duck adventures (unl).bin" size="131072" crc="d25f3b3c" sha1="eae872c3f3e0d29dd18bc5c82f248e09af7a5888" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="azone">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Arctic Zone (ripped from 4-in-1 4B-005)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="arctic zone (unl).bin" size="32768" crc="eefe1001" sha1="0c1bf2e1aa03d9b856abc2f6d0f5ac8ced4c44e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtower">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Magical Tower (ripped from 4-in-1 4B-005)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="magical tower (unl).bin" size="65536" crc="f157ae9e" sha1="c240182aef0ce365df3a61f0e0c417b7ea906200" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="railway">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Railway (ripped from 4-in-1 4B-005)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="railway (unl).bin" size="65536" crc="a19ca3c1" sha1="6706d1da551ace91cedeb8a14f932c8e49ec87e6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wormvis">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Worm Visitor (ripped from 4-in-1 4B-005)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="worm visitor (unl).bin" size="65536" crc="66130a7a" sha1="96819e9941ffa1bb8118df8ff4b57709a9c597e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombdisp">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Bomb Disposer (ripped from 4-in-1 4B-006)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bomb disposer (unl).bin" size="32768" crc="c2a85d91" sha1="f39beb0cddceab0067cb468edca60cacd5ee5a37" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aforce">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>A-Force (ripped from 4-in-1 4B-006)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="a-force (unl).bin" size="65536" crc="776d03dc" sha1="b8fe29112be8108cf087a5a90f347c736ad38a39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bftale">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Black Forest Tale (ripped from 4-in-1 4B-006)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="black forest tale (unl).bin" size="65536" crc="3d4e1779" sha1="f5b46d061498b37e0c6eb0513c63720db17b5e52" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2ndspace">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>2nd Space (ripped from 4-in-1 4B-006)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="2nd space (unl).bin" size="131072" crc="1d0f279c" sha1="9424aa6b2d12b3729d1bf0e8602632fd780f9090" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antsoldr">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Ant Soldier (ripped from 4-in-1 4B-007)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="ant soldier (unl).bin" size="131072" crc="b4a5936e" sha1="d81514eabcf08fdfd50921516300d0ce2b424bf8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="danlaser">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Dan Laser (ripped from 4-in-1 4B-007)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dan laser (unl).bin" size="32768" crc="aabc00f6" sha1="54ac969c8c3e36d9a24e7862cd1f81b3f23772f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyace">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Sky Ace (ripped from 4-in-1 4B-007)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="sky ace (unl).bin" size="65536" crc="395fe571" sha1="e62d74152d06ae817658cdcb20954fc32d33dc65" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zooblock">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Zoo Block (ripped from 4-in-1 4B-007)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zoo block (unl).bin" size="32768" crc="fc6f3bc2" sha1="2d6d85b8b6345b3e200f3dd30c2e28e5fea555da" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captkk">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Captain Knick-Knack (ripped from 4-in-1 4B-008)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="captain knick-knack (unl).bin" size="131072" crc="6b4fefb0" sha1="58942f42130c9536adbfe9994afcc7a4c36a3251" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Flea War is missing -->
+
+	<software name="expbrick">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Explosive Brick '94 (ripped from 4-in-1 4B-008)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="explosive brick 94 (unl).bin" size="32768" crc="e5541ff5" sha1="81bac46c005183313117d3e9145122db6a3e6227" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmaze">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Magic Maze (ripped from 4-in-1 4B-008)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="magic maze (unl).bin" size="32768" crc="b1acbd28" sha1="b44fd8a827dd3cffb4733c48d710d9a4e81b4314" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zipball">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Zipball (ripped from 4-in-1 4B-009)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="zip ball (unl).bin" size="65536" crc="7279b3c4" sha1="45b954ff03b819effee8433d7d9799d994ce4c79" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Gorilla is missing -->
+
+	<software name="crazybur">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Crazy Burger (ripped from 4-in-1 4B-009)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="crazy burger (unl).bin" size="65536" crc="cd6e3136" sha1="7c100be43ed57b4011bfa5dceab244da8f987305" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deep">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Deep - Final Mission (ripped from 4-in-1 4B-009)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="deep - final mission (unl).bin" size="65536" crc="44e97af9" sha1="70c90365f4aefe5e320f9459e63b2ba9bccbfa3c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Other Asian pirate carts -->
+
+	<software name="ffant4">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Final Fantasy 4 (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="final fantasy 4 (unl).bin" size="524288" crc="a6b6e233" sha1="0968289212c4ed0a4fb77d1b31e8eaf8663e6ed7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhzx">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Meng Huan Zhi Xing (Chi)</description>
+		<year>19??</year>
+		<publisher>SKOB</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="meng huan zhi xing (unl).bin" size="262144" crc="76fd8bc5" sha1="40bf296ee9d89a8c4e7bd8ca9f19cd4e449dfd6c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhzxa" cloneof="mhzx">
+		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<description>Meng Huan Zhi Xing (Chi, Alt)</description>
+		<year>19??</year>
+		<publisher>SKOB</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="meng huan zhi xing (alt) (unl).bin" size="262144" crc="e498d751" sha1="726158dc176c82cf02b8838a672a5206b72ae9d8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+    
+<!-- GOWIN games -->
+<!--
+  Other games (which could coincide with some of the games below without serial)
+  * GS-01 - ??
+  * GS-04 - Story of Lasama
+  * GS-07 - Lost Trip
+  * GS-08 - Binary Monsters
+  * GS-09 - ??
+  * GS-10 - Binary Monsters - Adventure of Hell
+  * GS-11 - Magic Lamp (2000)
+
+  * GS-?? - Binary Monsters 2 (2000)
+  * GS-?? - Binary Monsters 3
+  * GS-?? - Amazing Robot
+  * GS-?? - Crouching Tiger Hidden Dragon (99% this is Tiger A Dragon below)
+-->
+
+	<software name="firedrag">
+		<!-- Serial: GS-06 - Release Date:  -->
+		<description>Fire Dragon (Chi)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="fire dragon (unl).bin" size="65536" crc="275947f5" sha1="a76c8c75fda78516d9b2960717ef6d4eda5efaef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicbal">
+		<!-- Serial: GS-02 - Release Date:  -->
+		<description>Magic Ball (Chi)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="magic ball (unl).bin" size="131072" crc="0af9089e" sha1="72a58a7af014c8853eba333fc7ce8bf424532d20" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mitudelu">
+		<!-- Serial: GS- - Release Date: - Alt. Title:  -->
+		<description>Mi Tu De Lu (Chi)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="mi tu de lu (unl).bin" size="65536" crc="9039cbdb" sha1="20dba42f083ae1d7c9f384ac2b3130e0c0abc550" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yehrude">
+		<!-- Serial: GS-03 - Release Date:  -->
+		<description>Prince YehRude (Chi)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="prince yehrude (unl).bin" size="131072" crc="db8f4cf7" sha1="9afe8af53cac1d3520ff512d61c5e86ed700dc25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainbwpr">
+		<!-- Serial: GS-05 - Release Date:  -->
+		<description>Rainbow Prince (Chi)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="rainbow prince (unl).bin" size="131072" crc="10f447f0" sha1="2c82530e4c4a256d5c46f1dd34b7bd33d4c5b508" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tigerdrg">
+		<!-- Serial: GS- - Release Date: - Alt. Title:  -->
+		<description>Tiger A Dragon (Chi)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="tiger a dragon (unl).bin" size="2097152" crc="933513a6" sha1="d327c880e7ffb9db0422e09310031e58a32b8433" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Non game cartridges -->
 
