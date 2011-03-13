@@ -702,6 +702,7 @@ $(MESSOBJ)/at.a:				\
 	$(MESS_MACHINE)/at_keybc.o	\
 	$(MESS_MACHINE)/pc_ide.o	\
 	$(MESS_MACHINE)/ps2.o		\
+	$(MESS_MACHINE)/cs4031.o	\
 	$(MESS_MACHINE)/at.o		\
 	$(MESS_DRIVERS)/at.o		\
 

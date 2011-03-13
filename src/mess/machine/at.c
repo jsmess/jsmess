@@ -449,15 +449,19 @@ static void init_at_common(running_machine *machine)
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundblaster_config(&soundblaster);
 
-	/* MESS managed RAM */
-	memory_set_bankptr(machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)));
-
-	if (ram_get_size(machine->device(RAM_TAG)) > 0x0a0000)
+	// The CS4031 chipset does this itself
+	if (machine->device("cs4031") == NULL)
 	{
-		offs_t ram_limit = 0x100000 + ram_get_size(machine->device(RAM_TAG)) - 0x0a0000;
-		memory_install_read_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
-		memory_install_write_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0xa0000);
+		/* MESS managed RAM */
+		memory_set_bankptr(machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)));
+
+		if (ram_get_size(machine->device(RAM_TAG)) > 0x0a0000)
+		{
+			offs_t ram_limit = 0x100000 + ram_get_size(machine->device(RAM_TAG)) - 0x0a0000;
+			memory_install_read_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
+			memory_install_write_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
+			memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0xa0000);
+		}
 	}
 
 	/* FDC/HDC hardware */

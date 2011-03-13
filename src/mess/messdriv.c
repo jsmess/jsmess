@@ -668,6 +668,7 @@ const game_driver * const drivers[] =
 	DRIVER( neat )	  /* 1989 New Enhanced AT chipset, AMI BIOS    */
 	DRIVER( at386 )	 /* 19?? IBM AT 386   */
 	DRIVER( at486 )	 /* 19?? IBM AT 486   */
+	DRIVER( ct486 )		/* 1993? 486 with CS4031 */
 	DRIVER( ficpio2 )	/* 1995 FIC 486-PIO-2 */
 	DRIVER( at586 )	 /* 19?? AT 586   */
 	DRIVER( c386sx16 )	/* 1990 Commodore 386SX-16 */

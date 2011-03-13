@@ -20,7 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/i82371ab.h"
 #include "machine/i82439tx.h"
-
+#include "machine/cs4031.h"
 #include "machine/pit8253.h"
 #include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
@@ -100,6 +100,12 @@ static ADDRESS_MAP_START( at386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00ff0000, 0x00ffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
+
+// memory is mostly handled by the chipset
+static ADDRESS_MAP_START( ct486_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( at586_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
@@ -215,6 +221,60 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
+
+static READ32_HANDLER( ct486_chipset_r )
+{
+	at_state *state = space->machine->driver_data<at_state>();
+
+	if (ACCESSING_BITS_0_7)
+		return pic8259_r(state->pic8259_master, 0);
+
+	if (ACCESSING_BITS_8_15)
+		return pic8259_r(state->pic8259_master, 1) << 8;
+
+	if (ACCESSING_BITS_24_31)
+		return downcast<cs4031_device *>(space->machine->device("cs4031"))->data_r(*space, 0, 0) << 24;
+
+	return 0xffffffff;
+}
+
+static WRITE32_HANDLER( ct486_chipset_w )
+{
+	at_state *state = space->machine->driver_data<at_state>();
+
+	if (ACCESSING_BITS_0_7)
+		pic8259_w(state->pic8259_master, 0, data);
+
+	if (ACCESSING_BITS_8_15)
+		pic8259_w(state->pic8259_master, 1, data >> 8);
+
+	if (ACCESSING_BITS_16_23)
+		downcast<cs4031_device *>(space->machine->device("cs4031"))->address_w(*space, 0, data >> 16, 0);
+
+	if (ACCESSING_BITS_24_31)
+		downcast<cs4031_device *>(space->machine->device("cs4031"))->data_w(*space, 0, data >> 24, 0);
+}
+
+static ADDRESS_MAP_START( ct486_io, ADDRESS_SPACE_IO, 32 )
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE(ct486_chipset_r, ct486_chipset_w)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
+	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8_MODERN("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
+	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
+	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
@@ -853,6 +913,21 @@ static MACHINE_CONFIG_DERIVED( at486, at386 )
 	MCFG_CPU_IO_MAP(at386_io)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( ct486, at386 )
+	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
+	MCFG_CPU_PROGRAM_MAP(ct486_map)
+	MCFG_CPU_IO_MAP(ct486_io)
+
+	MCFG_CS4031_ADD("cs4031", "maincpu", "isa", "bios")
+
+	MCFG_DEVICE_REMOVE(RAM_TAG)
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( at586, at386 )
 
 	MCFG_CPU_REPLACE("maincpu", PENTIUM, 60000000)
@@ -1250,6 +1325,17 @@ ROM_START( at486 )
 ROM_END
 
 
+// Unknown 486 board with Chips & Technologies CS4031 chipset
+ROM_START( ct486 )
+	ROM_REGION(0x100000, "isa", 0)
+	ROM_LOAD("et4000.bin",  0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+
+	ROM_REGION(0x100000, "bios", 0)
+	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
+ROM_END
+
+
 // FIC 486-PIO-2 (4 ISA, 4 PCI)
 // VIA VT82C505 + VT82C496G + VT82C406MV, NS311/312 or NS332 I/O
 ROM_START( ficpio2 )
@@ -1360,6 +1446,7 @@ COMP ( 1989, neat,     ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga,	at386,      "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga,  at386,      "FIC", "486-PIO-2", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at386,      "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga,  at386,      "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
