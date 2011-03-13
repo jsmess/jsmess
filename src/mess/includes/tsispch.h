@@ -28,8 +28,10 @@ public:
 	UINT8 infifo[32];			// input fifo
 	UINT8 infifo_tail_ptr;		// " tail
 	UINT8 infifo_head_ptr;		// " head
+	UINT8 statusLED;			// status led
 
 	virtual void machine_reset();
+	DECLARE_WRITE16_MEMBER(led_w);
 };
 
 

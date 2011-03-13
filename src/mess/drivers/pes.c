@@ -169,14 +169,14 @@ WRITE8_MEMBER( pes_state::port3_w )
 	m_port3_state = data;
 #ifdef DEBUG_PORTS
 	logerror("port3 write: control data written: %02X; ", data);
-	logerror("RXD: %d; ", (data&1));
-	logerror("TXD: %d; ", ((data&2)>>1));
-	logerror("/INT: %d; ", ((data&4)>>2));
-	logerror("/RDY: %d; ", ((data&8)>>3));
-	logerror("RTS: %d; ", ((data&0x10)>>4));
-	logerror("CTS: %d; ", ((data&0x20)>>5));
-	logerror("WR: %d; ", ((data&0x40)>>6));
-	logerror("RD: %d;\n", ((data&0x80)>>7));
+	logerror("RXD: %d; ", BIT(data,0));
+	logerror("TXD: %d; ", BIT(data,1));
+	logerror("/INT: %d; ", BIT(data,2));
+	logerror("/RDY: %d; ", BIT(data,3));
+	logerror("RTS: %d; ", BIT(data,4));
+	logerror("CTS: %d; ", BIT(data,5));
+	logerror("WR: %d; ", BIT(data,6));
+	logerror("RD: %d;\n", BIT(data,7));
 #endif
 	// todo: poke serial handler here somehow?
 }
@@ -194,14 +194,14 @@ READ8_MEMBER( pes_state::port3_r )
 	data |= (tms5220_readyq_r(state->m_speech)<<3);
 #ifdef DEBUG_PORTS
 	logerror("port3 read: returning 0x%02X: ", data);
-	logerror("RXD: %d; ", (data&1));
-	logerror("TXD: %d; ", ((data&2)>>1));
-	logerror("/INT: %d; ", ((data&4)>>2));
-	logerror("/RDY: %d; ", ((data&8)>>3));
-	logerror("RTS: %d; ", ((data&0x10)>>4));
-	logerror("CTS: %d; ", ((data&0x20)>>5));
-	logerror("WR: %d; ", ((data&0x40)>>6));
-	logerror("RD: %d;\n", ((data&0x80)>>7));
+	logerror("RXD: %d; ", BIT(data,0));
+	logerror("TXD: %d; ", BIT(data,1));
+	logerror("/INT: %d; ", BIT(data,2));
+	logerror("/RDY: %d; ", BIT(data,3));
+	logerror("RTS: %d; ", BIT(data,4));
+	logerror("CTS: %d; ", BIT(data,5));
+	logerror("WR: %d; ", BIT(data,6));
+	logerror("RD: %d;\n", BIT(data,7));
 #endif
 	return data;
 }

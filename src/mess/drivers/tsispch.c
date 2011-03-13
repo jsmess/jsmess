@@ -13,6 +13,7 @@
 *  Successful compile
 *  Successful run
 *  Correctly Interleave 8086 CPU roms
+*  Debug LEDs hooked to popmessage
 *
 *  TODO:
 *  Correct memory maps and io maps
@@ -21,6 +22,9 @@
 *  Add dipswitches and jumpers
 *  Hook terminal to serial UARTS
 *  Everything else 
+*
+*  Notes:
+*  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -35,6 +39,19 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
 	DEVCB_NULL // for now...
 };
+
+WRITE16_MEMBER( tsispch_state::led_w )
+{
+	tsispch_state *state = machine->driver_data<tsispch_state>();
+	UINT16 data2 = data >> 8;
+	state->statusLED = data2&0xFF;
+	//fprintf(stderr,"0x03400 LED write: %02X\n", data);
+	//popmessage("LED status: %02X\n", data2&0xFF);
+#ifdef VERBOSE
+	logerror("8086: LED status: %02X\n", data2&0xFF);
+#endif
+	popmessage("LED status: %x %x %x %x %x %x %x %x\n", BIT(data2,7), BIT(data2,6), BIT(data2,5), BIT(data2,4), BIT(data2,3), BIT(data2,2), BIT(data2,1), BIT(data2,0));
+}
 
 /* Reset */
 void tsispch_state::machine_reset()
@@ -52,6 +69,8 @@ DRIVER_INIT( prose2k )
 	UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
 	fprintf(stderr,"driver init\n");
     // unpack 24 bit data into 32 bit space
+	// TODO: unpack such that it can actually RUN as upd7725 code; this requires
+	//       some minor shifting
         for (int i = 0; i < 0x600; i+= 3)
         {
             *dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
@@ -65,8 +84,11 @@ DRIVER_INIT( prose2k )
 
 static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x02BFF) AM_RAM // guess based on startup test
-	//AM_RANGE(0x03400, 0x03401) //??
+	AM_RANGE(0x00000, 0x02BFF) AM_RAM // unverified; tested on startup test
+	AM_RANGE(0x02C00, 0x02FFF) AM_RAM // unverified; 2F32-2F92 may be special ram for talking to the DSP?
+	//AM_RANGE(0x03200, 0x03201) // UART 1
+	//AM_RANGE(0x03202, 0x03203) // UART 2
+	AM_RANGE(0x03400, 0x03401) AM_WRITE(led_w) // write is the 8 debug leds; reading here may be dipswitches?
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // correct
 ADDRESS_MAP_END
 
@@ -130,6 +152,20 @@ ROM_START( prose2k )
 	ROM_REGION( 0x400, "dspdata", 0)
 	ROM_LOAD( "dsp_data.bin", 0x0000, 0x0400, CRC(F4E4DD16) SHA1(6E184747DB2F26E45D0E02907105FF192E51BABA))
 
+	// mapping proms:
+	// L - always low; H - always high
+	// U77: unknown; input is ?; output bits 0bLLLLzyxH
+	//      x - unknown
+	//      y - unknown
+	//      z - unknown
+	//
+	// U79: unknown; input is ?; output bits 0bLLLLyHHx
+	//      x - unknown
+	//      y - unknown 
+	//
+	// U81: maps ROMS to C0000-FFFFF: input is A15-A19; output bits: 0bHyxHHHHH
+	//      x - to /CE of roms 2 and 3
+	//      y - to /CE of roms 0 and 1
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "u77.bin", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412))
 	ROM_LOAD( "u79.bin", 0x0020, 0x0020, CRC(A165B090) SHA1(BFC413C79915C68906033741318C070AD5DD0F6B))
