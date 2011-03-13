@@ -138,6 +138,22 @@ static const kb_keytronic_interface pc_keytronic_intf =
 	DEVCB_MEMORY_HANDLER("maincpu", IO, genpc_kb_set_data_signal),
 };
 
+static const isabus_interface isabus_intf =
+{
+	// interrupts
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir3_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir4_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir5_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir6_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir7_w),
+
+	// dma request
+	DEVCB_DEVICE_LINE("dma8237", i8237_dreq1_w),
+	DEVCB_DEVICE_LINE("dma8237", i8237_dreq2_w),
+	DEVCB_DEVICE_LINE("dma8237", i8237_dreq3_w)
+};
+
 static MACHINE_CONFIG_START( pcmda, genpc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 4772720)
@@ -157,7 +173,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 
 	MCFG_PALETTE_LENGTH( 256 )
 		
-	MCFG_ISA8_BUS_ADD("isa","maincpu","dma8237","pic8259")
+	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "mda", ISA8_MDA)
 	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
@@ -196,7 +212,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 
 	MCFG_PALETTE_LENGTH( 256 )	
 	
-	MCFG_ISA8_BUS_ADD("isa","maincpu","dma8237","pic8259")
+	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "hercules", ISA8_HERCULES)
 	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
@@ -235,6 +251,8 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
+
+	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

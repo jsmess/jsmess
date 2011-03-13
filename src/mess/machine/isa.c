@@ -6,9 +6,6 @@
  
 #include "emu.h"
 #include "machine/isa.h"
-#include "machine/pic8259.h"
-#include "machine/8237dma.h"
-
  
  
 //**************************************************************************
@@ -37,7 +34,7 @@ isa8_device_config::isa8_device_config(const machine_config &mconfig, const char
  
 device_config *isa8_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-        return global_alloc(isa8_device_config(mconfig, tag, owner, clock));
+	return global_alloc(isa8_device_config(mconfig, tag, owner, clock));
 }
  
 //-------------------------------------------------
@@ -46,24 +43,45 @@ device_config *isa8_device_config::static_alloc_device_config(const machine_conf
  
 device_t *isa8_device_config::alloc_device(running_machine &machine) const
 {
-        return auto_alloc(&machine, isa8_device(machine, *this));
+	return auto_alloc(&machine, isa8_device(machine, *this));
 }
  
 void isa8_device_config::static_set_cputag(device_config *device, const char *tag)
 {
-        isa8_device_config *isa = downcast<isa8_device_config *>(device);
-        isa->m_cputag = tag;
+	isa8_device_config *isa = downcast<isa8_device_config *>(device);
+	isa->m_cputag = tag;
 }
-void isa8_device_config::static_set_dmatag(device_config *device, const char *tag)
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void isa8_device_config::device_config_complete()
 {
-        isa8_device_config *isa = downcast<isa8_device_config *>(device);
-        isa->m_dmatag = tag;
+	// inherit a copy of the static data
+	const isabus_interface *intf = reinterpret_cast<const isabus_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<isabus_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_out_irq2_func, 0, sizeof(m_out_irq2_func));
+    	memset(&m_out_irq3_func, 0, sizeof(m_out_irq3_func));
+    	memset(&m_out_irq4_func, 0, sizeof(m_out_irq4_func));
+    	memset(&m_out_irq5_func, 0, sizeof(m_out_irq5_func));
+    	memset(&m_out_irq6_func, 0, sizeof(m_out_irq6_func));
+    	memset(&m_out_irq7_func, 0, sizeof(m_out_irq7_func));
+    	memset(&m_out_drq1_func, 0, sizeof(m_out_drq1_func));
+    	memset(&m_out_drq2_func, 0, sizeof(m_out_drq2_func));
+    	memset(&m_out_drq3_func, 0, sizeof(m_out_drq3_func));
+	}
 }
-void isa8_device_config::static_set_pictag(device_config *device, const char *tag)
-{
-        isa8_device_config *isa = downcast<isa8_device_config *>(device);
-        isa->m_pictag = tag;
-}
+
  
 //**************************************************************************
 //  LIVE DEVICE
@@ -76,11 +94,9 @@ void isa8_device_config::static_set_pictag(device_config *device, const char *ta
 isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &config) :
         device_t(_machine, config),
         m_config(config),
-		m_maincpu(NULL),
-		m_pic8259(NULL),
-		m_dma8237(NULL)
+		m_maincpu(NULL)
 {
-	for(int i=0;i<8;i++) 
+	for(int i = 0; i < 8; i++)
 		m_isa_device[i] = NULL;
 }
  
@@ -89,10 +105,19 @@ isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &co
 //-------------------------------------------------
  
 void isa8_device::device_start()
-{        
+{
 	m_maincpu = m_machine.device(m_config.m_cputag);
-	m_pic8259 = m_machine.device(m_config.m_pictag);
-	m_dma8237 = m_machine.device(m_config.m_dmatag);
+
+	// resolve callbacks
+	devcb_resolve_write_line(&m_out_irq2_func, &m_config.m_out_irq2_func, this);
+	devcb_resolve_write_line(&m_out_irq3_func, &m_config.m_out_irq3_func, this);
+	devcb_resolve_write_line(&m_out_irq4_func, &m_config.m_out_irq4_func, this);
+	devcb_resolve_write_line(&m_out_irq5_func, &m_config.m_out_irq5_func, this);
+	devcb_resolve_write_line(&m_out_irq6_func, &m_config.m_out_irq6_func, this);
+	devcb_resolve_write_line(&m_out_irq7_func, &m_config.m_out_irq7_func, this);
+	devcb_resolve_write_line(&m_out_drq1_func, &m_config.m_out_drq1_func, this);
+	devcb_resolve_write_line(&m_out_drq2_func, &m_config.m_out_drq2_func, this);
+	devcb_resolve_write_line(&m_out_drq3_func, &m_config.m_out_drq3_func, this);
 }
  
 //-------------------------------------------------
@@ -139,33 +164,18 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	memory_set_bankptr(&m_machine, tag, machine->region(dev->subtag(tempstring, region))->base());
 }
 
+// interrupt request from isa card
+WRITE_LINE_MEMBER( isa8_device::irq2_w ) { devcb_call_write_line(&m_out_irq2_func, state); }
+WRITE_LINE_MEMBER( isa8_device::irq3_w ) { devcb_call_write_line(&m_out_irq3_func, state); }
+WRITE_LINE_MEMBER( isa8_device::irq4_w ) { devcb_call_write_line(&m_out_irq4_func, state); }
+WRITE_LINE_MEMBER( isa8_device::irq5_w ) { devcb_call_write_line(&m_out_irq5_func, state); }
+WRITE_LINE_MEMBER( isa8_device::irq6_w ) { devcb_call_write_line(&m_out_irq6_func, state); }
+WRITE_LINE_MEMBER( isa8_device::irq7_w ) { devcb_call_write_line(&m_out_irq7_func, state); }
 
-
-void isa8_device::set_irq_line(int irq, int state)
-{
-	switch (irq)
-	{
-		case 0: pic8259_ir0_w(m_pic8259, state); break;
-		case 1: pic8259_ir1_w(m_pic8259, state); break;
-		case 2: pic8259_ir2_w(m_pic8259, state); break;
-		case 3: pic8259_ir3_w(m_pic8259, state); break;
-		case 4: pic8259_ir4_w(m_pic8259, state); break;
-		case 5: pic8259_ir5_w(m_pic8259, state); break;
-		case 6: pic8259_ir6_w(m_pic8259, state); break;
-		case 7: pic8259_ir7_w(m_pic8259, state); break;
-	}
-}
-
-void isa8_device::set_dreq_line(int line, int state)
-{
-	switch (line)
-	{
-		case 0: i8237_dreq0_w(m_dma8237, state); break;
-		case 1: i8237_dreq1_w(m_dma8237, state); break;
-		case 2: i8237_dreq2_w(m_dma8237, state); break;
-		case 3: i8237_dreq3_w(m_dma8237, state); break;
-	}
-}
+// dma request from isa card
+WRITE_LINE_MEMBER( isa8_device::drq1_w ) { devcb_call_write_line(&m_out_drq1_func, state); }
+WRITE_LINE_MEMBER( isa8_device::drq2_w ) { devcb_call_write_line(&m_out_drq2_func, state); }
+WRITE_LINE_MEMBER( isa8_device::drq3_w ) { devcb_call_write_line(&m_out_drq3_func, state); }
 
 UINT8 isa8_device::dack_r(int line) 
 {
@@ -177,6 +187,7 @@ UINT8 isa8_device::dack_r(int line)
 	}
 	return retVal;
 }
+
 void isa8_device::dack_w(int line,UINT8 data)
 {
 	for(int i=0;i<8;i++) {
@@ -185,6 +196,7 @@ void isa8_device::dack_w(int line,UINT8 data)
 		}		
 	}
 }
+
 void isa8_device::eop_w(int state)
 {
 	for(int i=0;i<8;i++) {

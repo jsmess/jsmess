@@ -266,13 +266,12 @@ hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 
 void isa8_hdc_device::pc_hdc_result(int set_error_info)
 {
-	int irq;
-
-	/* dip switch selected INT 5 or 2 */
-	irq = (dip & 0x40) ? 5 : 2;
-
 	if ( ( hdc_control & 0x02 )) {
-		m_isa->set_irq_line(irq, 1);
+		// dip switch selected IRQ 5 or 2
+		if (BIT(dip, 6))
+			m_isa->irq5_w(1);
+		else
+			m_isa->irq2_w(1);
 	}
 
 	if (LOG_HDC_STATUS)
@@ -378,9 +377,9 @@ int isa8_hdc_device::pc_hdc_dack_r()
         }
 	}
 
-	if ( ! no_dma() )
+	if (!no_dma())
 	{
-		m_isa->set_dreq_line(3,( hdcdma_read || hdcdma_size ) ? 1 : 0 );
+		m_isa->drq3_w((hdcdma_read || hdcdma_size ) ? 1 : 0);
 	}
 
 	return result;
@@ -419,9 +418,9 @@ void isa8_hdc_device::pc_hdc_dack_w(int data)
         hdcdma_dst = hdcdma_data;
     }
 
-	if ( ! no_dma() )
+	if (!no_dma())
 	{
-		m_isa->set_dreq_line(3,( hdcdma_write || hdcdma_size ) ? 1 : 0 );
+		m_isa->drq3_w((hdcdma_write || hdcdma_size ) ? 1 : 0);
 	}
 }
 
@@ -450,7 +449,7 @@ void isa8_hdc_device::execute_read()
 	}
 	else
 	{
-		m_isa->set_dreq_line(3, 1);
+		m_isa->drq3_w(1);
 	}
 }
 
@@ -480,7 +479,7 @@ void isa8_hdc_device::execute_write()
 	}
 	else
 	{
-		m_isa->set_dreq_line(3, 1);
+		m_isa->drq3_w(1);
 	}
 }
 
@@ -739,17 +738,19 @@ void isa8_hdc_device::pc_hdc_select_w(int data)
 
 
 
-void isa8_hdc_device::pc_hdc_control_w( int data)
+void isa8_hdc_device::pc_hdc_control_w(int data)
 {
-	int irq = (dip & 0x40) ? 5 : 2;
-
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), data);
+		logerror("%s: pc_hdc_control_w(): control write %d\n", machine->describe_context(), data);
 
 	hdc_control = data;
 
-	if ( ! ( hdc_control & 0x02 )) {		
-		m_isa->set_irq_line(irq, 0);
+	if (!(hdc_control & 0x02))
+	{
+		if (BIT(dip, 6))
+			m_isa->irq5_w(0);
+		else
+			m_isa->irq2_w(0);
 	}
 }
 

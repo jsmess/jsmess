@@ -13,13 +13,13 @@
 static INS8250_INTERRUPT( pc_com_interrupt_1 )
 {
 	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
-	com->m_isa->set_irq_line(4, state);
+	com->m_isa->irq4_w(state);
 }
 
 static INS8250_INTERRUPT( pc_com_interrupt_2 )
 {
 	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
-	com->m_isa->set_irq_line(3, state);
+	com->m_isa->irq3_w(state);
 }
 
 /* called when com registers read/written - used to update peripherals that

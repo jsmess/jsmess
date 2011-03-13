@@ -172,8 +172,8 @@ static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)==0)
 		return;
 
-	/* send irq */
-	fdc->m_isa->set_irq_line(6, state);
+	// not masked, send interrupt request
+	fdc->m_isa->irq6_w(state);
 }
 
 
@@ -186,7 +186,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq )
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)==0)
 		return;
 
-	fdc->m_isa->set_dreq_line(2,state);
+	// not masked, send dma request
+	fdc->m_isa->drq2_w(state);
 }
 
 
