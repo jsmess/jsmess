@@ -1735,6 +1735,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/dm7000.o	\
 	$(MESS_DRIVERS)/dolphin.o	\
 	$(MESS_DRIVERS)/dual68.o	\
+	$(MESS_DRIVERS)/eacc.o		\
 	$(MESS_DRIVERS)/elwro800.o	\
 	$(MESS_DRIVERS)/eti660.o	\
 	$(MESS_DRIVERS)/fk1.o		\
@@ -1855,6 +1856,7 @@ $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/dolphin.o:	$(MESS_LAYOUT)/dolphin.lh
 $(MESS_DRIVERS)/e01.o:		$(MESS_LAYOUT)/e01.lh
+$(MESS_DRIVERS)/eacc.o:		$(MESS_LAYOUT)/eacc.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/et3400.o:	$(MESS_LAYOUT)/et3400.lh
