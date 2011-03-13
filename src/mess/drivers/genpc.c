@@ -28,6 +28,7 @@
 
 #include "machine/isa_com.h"
 #include "machine/isa_fdc.h"
+#include "machine/isa_hdc.h"
 
 #include "sound/speaker.h"
 
@@ -160,6 +161,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "mda", ISA8_MDA)
 	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
+	MCFG_ISA8_BUS_DEVICE("isa", 3, "hdc", ISA8_HDC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -198,6 +200,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("isa", 0, "hercules", ISA8_HERCULES)
 	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
+	MCFG_ISA8_BUS_DEVICE("isa", 3, "hdc", ISA8_HDC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -284,14 +287,12 @@ MACHINE_CONFIG_END
 
 ROM_START( pcmda )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 ROM_END
 
 
 ROM_START( pcherc )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 ROM_END
 

@@ -130,6 +130,17 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 	memory_set_bankptr(&m_machine, tag, data);
 }
 
+void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
+{
+	astring tempstring;
+	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);	
+	memory_install_read_bank(space, start, end, mask, mirror, tag);
+	memory_unmap_write(space, start, end, mask, mirror);		
+	memory_set_bankptr(&m_machine, tag, machine->region(dev->subtag(tempstring, region))->base());
+}
+
+
+
 void isa8_device::set_irq_line(int irq, int state)
 {
 	switch (irq)

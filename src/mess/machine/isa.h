@@ -69,7 +69,8 @@ public:
 		void add_isa_card(device_isa8_card_interface *card,int pos);
 		void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler);
 		void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
-
+		void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
+		
 		void set_irq_line(int irq, int state);
 		void set_dreq_line(int line, int state);
 		

@@ -54,13 +54,13 @@ WRITE8_HANDLER(genpc_page_w)
 	switch(offset % 4)
 	{
 	case 1:
-		st->dma_offset[0][2] = data;
+		st->dma_offset[2] = data;
 		break;
 	case 2:
-		st->dma_offset[0][3] = data;
+		st->dma_offset[3] = data;
 		break;
 	case 3:
-		st->dma_offset[0][0] = st->dma_offset[0][1] = data;
+		st->dma_offset[0] = st->dma_offset[1] = data;
 		break;
 	}
 }
@@ -79,7 +79,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 static READ8_HANDLER( pc_dma_read_byte )
 {
 	genpc_state *st = space->machine->driver_data<genpc_state>();
-	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16) & 0x0F0000;
+	offs_t page_offset = (((offs_t) st->dma_offset[st->dma_channel]) << 16) & 0x0F0000;
 	return space->read_byte( page_offset + offset);
 }
 
@@ -87,7 +87,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
 	genpc_state *st = space->machine->driver_data<genpc_state>();
-	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16) & 0x0F0000;
+	offs_t page_offset = (((offs_t) st->dma_offset[st->dma_channel]) << 16) & 0x0F0000;
 
 	space->write_byte( page_offset + offset, data);
 }
@@ -95,7 +95,8 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static READ8_DEVICE_HANDLER( pc_dma8237_1_dack_r )
 {
-	return 0;
+	genpc_state *st = device->machine->driver_data<genpc_state>();
+	return st->isabus->dack_r(1);
 }
 
 static READ8_DEVICE_HANDLER( pc_dma8237_2_dack_r )
@@ -107,12 +108,15 @@ static READ8_DEVICE_HANDLER( pc_dma8237_2_dack_r )
 
 static READ8_DEVICE_HANDLER( pc_dma8237_3_dack_r )
 {
-	return 0;//return pc_hdc_dack_r( device->machine );
+	genpc_state *st = device->machine->driver_data<genpc_state>();
+	return st->isabus->dack_r(3);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_1_dack_w )
 {
+	genpc_state *st = device->machine->driver_data<genpc_state>();
+	st->isabus->dack_w(1,data);
 }
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_2_dack_w )
@@ -124,7 +128,8 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_2_dack_w )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_3_dack_w )
 {
-	//pc_hdc_dack_w( device->machine, data );
+	genpc_state *st = device->machine->driver_data<genpc_state>();
+	st->isabus->dack_w(3,data);
 }
 
 

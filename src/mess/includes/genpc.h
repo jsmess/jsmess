@@ -28,7 +28,7 @@ public:
 	UINT8	u73_q2;
 	UINT8	out1;
 	int dma_channel;
-	UINT8 dma_offset[2][4];
+	UINT8 dma_offset[4];
 	UINT8 pc_spkrdata;
 	UINT8 pc_input;
 
