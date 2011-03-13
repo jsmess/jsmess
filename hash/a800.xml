@@ -580,28 +580,29 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="asmedit">
-		<description>Assembler Editor Computing Language</description>
+	<software name="editasm">
+		<description>Editor Assembler Computing Language</description>
 		<!-- Serial: CXL4003 -->
 		<year>1979</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="assembler editor computing language.rom" size="8192" crc="7dd6196c" sha1="42cb5fc35c76fde8cdf0c67db96a1c8a97af57ee" offset="0" />
+				<rom name="editor assembler computing language.rom" size="8192" crc="7dd6196c" sha1="42cb5fc35c76fde8cdf0c67db96a1c8a97af57ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="asmedtg" cloneof="asmedit">
-		<description>Assembler Editor Computing Language (GER)</description>
-		<!-- Serial: RXG4003 -->
-		<year>1982</year>
+	<software name="asmedt" cloneof="editasm">
+		<description>Assembler Editor Computing Language</description>
+		<!-- Serial: CXL4003 or RXG4003 (GER) -->
+		<!-- This is a later version of the "Editor Assembler", release name changed to "Assembler Editor". -->
+		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="assembler editor computing language (ger).rom" size="8192" crc="ee72eeea" sha1="b9f0efedd8486d8034b25c5eedac4946bc70aa8d" offset="0" />
+				<rom name="assembler editor computing language.rom" size="8192" crc="ee72eeea" sha1="b9f0efedd8486d8034b25c5eedac4946bc70aa8d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1325,6 +1326,20 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
 				<rom name="computer chess.rom" size="8192" crc="5ce06e94" sha1="94ee63b7d0e65209575f576e78ba320f04c3eb20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cprompt">
+		<description>Compu=Prompt</description>
+		<!-- Serial: 25078 -->
+		<!-- The world's first computer-controlled teleprompter, this particular ROM was used by KUED of Salt Lake City, Utah -->
+		<year>1987</year>
+		<publisher>Compu=Prompt, Inc.</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="compu=prompt.rom" size="8192" crc="58ccf059" sha1="e749d8fb1f48ce61eb191382aa0a2ffdc03ad57e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
