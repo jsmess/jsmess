@@ -451,6 +451,9 @@ static void recompute_parameters(device_t *device)
 	int horiz_pix_total = (upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp) * 8;
 	int vert_pix_total = upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp;
 
+	//printf("%d %d %d %d\n",upd7220->hs,upd7220->hbp,upd7220->aw,upd7220->hfp);
+	//printf("%d %d\n",upd7220->aw * 8,upd7220->pitch * 8);
+
 	if(horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
 		return;
 
@@ -812,16 +815,16 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 	}
 	#endif
 
-	/* TODO: D has presumably upper bits for ysize */
-	xsize = upd7220->figs.d;
-	ysize = upd7220->figs.dc + 1;
+	xsize = upd7220->figs.d & 0x3ff;
+	/* Guess: D has presumably upper bits for ysize, QX-10 relies on this (TODO: check this on any real HW) */
+	ysize = ((upd7220->figs.d & 0x400) + upd7220->figs.dc) + 1;
 
-	/* TODO: internal direction, slanted character, zooming, size stuff bigger than 8, rewrite using draw_pixel function */
+	/* TODO: internal direction, zooming, size stuff bigger than 8, rewrite using draw_pixel function */
 	for(yi=0;yi<ysize;yi++)
 	{
 		switch(upd7220->figs.dir & 7)
 		{
-			case 0: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); printf("%d %d %d %d %d\n",upd7220->pitch,x,y,xsize,ysize); break; // TODO
+			case 0: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break; // TODO
 			case 2:	tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
 			case 6:	tile_data = BITSWAP8(upd7220->ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
 			default: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
@@ -833,8 +836,8 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 		{
 			UINT32 addr = ((y+yi) * upd7220->pitch * 2) + ((x+xi) >> 3);
 
-			upd7220->vram[addr + upd7220->vram_bank] &= ~(1 << (xi & 7));
-			upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (1 << (xi & 7)));
+			upd7220->vram[(addr + upd7220->vram_bank) & 0x3ffff] &= ~(1 << (xi & 7));
+			upd7220->vram[(addr + upd7220->vram_bank) & 0x3ffff] |= ((tile_data) & (1 << (xi & 7)));
 		}
 	}
 
