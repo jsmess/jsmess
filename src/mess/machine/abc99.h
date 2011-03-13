@@ -130,6 +130,7 @@ private:
 	int m_t1_z2;
 	int m_t1_z5;
 	int m_led_en;
+	int m_reset;
 
     const abc99_device_config &m_config;
 };

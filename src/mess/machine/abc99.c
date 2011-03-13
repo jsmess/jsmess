@@ -567,6 +567,17 @@ void abc99_device::device_start()
     devcb_resolve_write_line(&m_out_txd_func, &m_config.m_out_txd_func, this);
     devcb_resolve_write_line(&m_out_clock_func, &m_config.m_out_clock_func, this);
     devcb_resolve_write_line(&m_out_keydown_func, &m_config.m_out_keydown_func, this);
+
+	// state saving
+	save_item(NAME(m_si));
+	save_item(NAME(m_si_en));
+	save_item(NAME(m_so));
+	save_item(NAME(m_keydown));
+	save_item(NAME(m_si_z2));
+	save_item(NAME(m_t1_z2));
+	save_item(NAME(m_t1_z5));
+	save_item(NAME(m_led_en));
+	save_item(NAME(m_reset));
 }
 
 
@@ -762,15 +773,25 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 	*/
 
 	// disable mouse CPU serial input
-	m_si_en = BIT(data, 4);
-	cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, (m_so | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_si_en != BIT(data, 4))
+	{
+		m_si_en = BIT(data, 4);
+		cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, (m_so | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+	}
 
 	// keyboard CPU reset
-	cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_reset != BIT(data, 5))
+	{
+		m_reset = BIT(data, 5);
+		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
+	}
 
 	// serial output
-	m_si_z2 = BIT(data, 6);
-	serial_input();
+	if (m_si_z2 != BIT(data, 6))
+	{
+		m_si_z2 = BIT(data, 6);
+		serial_input();
+	}
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);
@@ -803,9 +824,12 @@ READ8_MEMBER( abc99_device::z5_t1_r )
 
 WRITE_LINE_MEMBER( abc99_device::rxd_w )
 {
-	m_si = state;
+	if (m_si != state)
+	{
+		m_si = state;
 
-	serial_input();
+		serial_input();
+	}
 }
 
 

@@ -163,6 +163,17 @@ nmc9306_device::nmc9306_device(running_machine &_machine, const nmc9306_device_c
 
 void nmc9306_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_bits));
+	save_item(NAME(m_state));
+	save_item(NAME(m_command));
+	save_item(NAME(m_address));
+	save_item(NAME(m_data));
+	save_item(NAME(m_ewen));
+	save_item(NAME(m_cs));
+	save_item(NAME(m_sk));
+	save_item(NAME(m_do));
+	save_item(NAME(m_di));
 }
 
 

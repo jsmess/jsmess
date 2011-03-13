@@ -105,7 +105,6 @@ private:
 	int m_sk;
 	int m_do;
 	int m_di;
-	int m_a;
 
 	const nmc9306_device_config &m_config;
 };
