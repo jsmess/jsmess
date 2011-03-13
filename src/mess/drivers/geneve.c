@@ -235,6 +235,12 @@ static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0800, 0x0fff) AM_DEVWRITE("geneve_board", geneve_cru_w)
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( gm_changed )
+{
+	device_t *board = field->port->machine->device("geneve_board");
+	set_gm_switches(board, (UINT8)((UINT64)param&0x03), newval);
+}
+
 /*
     Input ports, used by machine code for keyboard and joystick emulation.
 */
@@ -327,6 +333,14 @@ static INPUT_PORTS_START(geneve)
 	PORT_CONFNAME( 0x01, 0x00, "V9938 RAM size" )
 		PORT_CONFSETTING(	0x00, "128 KiB" )
 		PORT_CONFSETTING(	0x01, "192 KiB" )
+
+	PORT_START( "GENMODDIPS" )
+	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED( gm_changed, (void *)1)
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
+	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED( gm_changed, (void *)2)
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
 
 	PORT_START( "DRVSPD" )
 	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -546,7 +560,7 @@ ROM_START(geneve)
 	/*CPU memory space*/
 	ROM_REGION(0xc000, "maincpu", 0)
 	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
-	ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
+	ROM_LOAD_OPTIONAL("genbt098.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
 ROM_END
 

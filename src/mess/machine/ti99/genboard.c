@@ -40,7 +40,7 @@
     1 0111 00.. .... .... .... p-box address block 0xxx, 2xxx
     1 0111 010. .... .... .... p-box address block 4xxx (DSR)
     1 0111 011. .... .... .... p-box address block 6xxx
-    1 0111 100. .... .... .... p-box address block 8xxx
+    1 0111 100. .... .... .... p-box address block 8xxx (Speech at 0x9000)
     1 0111 101. .... .... .... p-box address block axxx
     1 0111 11.. .... .... .... p-box address block cxxx, exxx
 
@@ -55,9 +55,9 @@
 
     The TI console (or more precise, the Flex Cable Interface) sets the AMA/B/C
     lines to 1. Most cards actually check for AMA/B/C=1. However, this decoding
-    was forgotten in some designs which cause the card memory to be mirrored. The
-    usual DSR space at 0x4000-0x5fff which would be reachable via page 0xba is then
-    mirrored on a number of other pages:
+    was forgotten in third party cards which cause the card address space
+    to be mirrored. The usual DSR space at 4000-5fff which would be reachable
+    via page 0xba is then mirrored on a number of other pages:
 
     10 xxx 010x = 82, 8a, 92, 9a, a2, aa, b2, ba
 
@@ -70,8 +70,7 @@
     to detect AMD=0, AME=1. Otherwise these cards, although completely decoding the
     19-bit address, would reappear at 512 KiB distances.
 
-    For the page numbers we get
-
+    For the page numbers we get:
     Standard:
     00-3f are internal (DRAM)
     40-7f are internal expansion, never used
@@ -84,6 +83,13 @@
     80-bf are the P-Box address space (expect Memex at that location)
     c0-ef are the P-Box address space (expect Memex at that location)
     f0-ff are internal (EPROM)
+
+    Genmod's double switch box is also emulated. There are two switches:
+    - Turbo mode: Activates or deactivates the wait state logic on the Geneve
+      board. This switch may be changed at any time.
+    - TI mode: Selects between the on-board memory, which is obviously required
+      for the GPL interpreter, and the external Memex memory. This switch
+      triggers a reset when changed.
 
     Michael Zapf, February 2011
 ***************************************************************************/
@@ -137,6 +143,8 @@ typedef struct _genboard_state
 	int		zero_wait;
 
 	int		genmod;
+	int 	turbo;
+	int		timode;
 
 	/* GROM simulation */
 	int		grom_address;
@@ -230,6 +238,22 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 	}
 }
 
+void set_gm_switches(device_t *board, int number, int value)
+{
+	if (number==1)
+	{
+		// Turbo switch. May be changed at any time.
+		logerror("Genmod: Setting turbo flag to %d\n", value);
+		((genboard_state*)board)->turbo = value;
+	}
+	else
+	{
+		// TIMode switch. Causes reset when changed.
+		logerror("Genmod: Setting timode flag to %d\n", value);
+		((genboard_state*)board)->timode = value;
+		board->machine->schedule_hard_reset();
+	}
+}
 /****************************************************************************
     GROM simulation. The Geneve board simulated GROM circuits within its gate
     array.
@@ -424,7 +448,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		physaddr = 0x1e0000; // points to boot eprom
 	}
 	else
-	{ // mf_mapmode=0 (bit 11)
+	{
 		if (!board->geneve_mode && page==3)
 		{
 			// Cartridge paging in TI mode
@@ -482,7 +506,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		// Route everything else to the P-Box
 		//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
 		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
-		// Add a wait state (if not GenMod)
+		// Add a wait state
 		cpu_adjust_icount(board->cpu, -4);
 		physaddr = (physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
 		ti99_peb_data_rz(board->peribox, physaddr, &value);
@@ -490,6 +514,18 @@ READ8_DEVICE_HANDLER( geneve_r )
 	}
 	else
 	{
+		// GenMod mode
+		if (!board->turbo)
+		{
+			cpu_adjust_icount(board->cpu, -4);
+		}
+		if ((board->timode) && ((physaddr & 0x180000)==0x000000))
+		{
+			// DRAM. One wait state.
+			value = board->dram[physaddr & 0x07ffff];
+			return value;
+		}
+
 		if ((physaddr & 0x1e0000)==0x1e0000)
 		{
 			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
@@ -676,6 +712,18 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 	}
 	else
 	{
+		// GenMod mode
+		if (!board->turbo)
+		{
+			cpu_adjust_icount(board->cpu, -4);
+		}
+		if ((board->timode) && ((physaddr & 0x180000)==0x000000))
+		{
+			// DRAM. One wait state.
+			board->dram[physaddr & 0x07ffff] = data;
+			return;
+		}
+
 		if ((physaddr & 0x1e0000)==0x1e0000)
 		{
 			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
@@ -1388,6 +1436,8 @@ static DEVICE_RESET( genboard )
 			fatalerror("GenMod boot rom missing.\n");
 		}
 		board->genmod = TRUE;
+		board->turbo = input_port_read(device->machine, "GENMODDIPS") & GM_TURBO;
+		board->timode = input_port_read(device->machine, "GENMODDIPS") & GM_TIM;
 	}
 
 	switch (input_port_read(device->machine, "SRAM"))
