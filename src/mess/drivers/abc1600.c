@@ -10,6 +10,7 @@
 
     TODO:
 
+	- mf(2,0) -> No number
     - CIO (interrupt controller)
 		- RTC
 		- NVRAM
@@ -143,7 +144,11 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 data = 0;
 	
-	if (offset >= 0x1ff000 && offset < 0x1ff100)
+	if (offset >= 0x1fe000 && offset < 0x1ff000)
+	{
+		// BUS0I, BUS0X, BUS1, BUS2
+	}
+	else if (offset >= 0x1ff000 && offset < 0x1ff100)
 	{
 		data = wd17xx_r(m_fdc, A2_A1);
 	}
@@ -199,7 +204,11 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
-	if (offset >= 0x1ff000 && offset < 0x1ff100)
+	if (offset >= 0x1fe000 && offset < 0x1ff000)
+	{
+		// BUS0I, BUS0X, BUS1, BUS2
+	}
+	else if (offset >= 0x1ff000 && offset < 0x1ff100)
 	{
 		wd17xx_w(m_fdc, A2_A1, data);
 	}
@@ -262,7 +271,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 	}
 	else if (offset >= 0x1ffe00 && offset < 0x1fff00)
 	{
-		en_spec_contr_reg_w(*program, offset, data);
+		spec_contr_reg_w(*program, offset, data);
 	}
 	else
 	{
@@ -763,10 +772,12 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 	
 	*/
 
+	logerror("FW0 %02x\n", data);
+
 	// drive select
 	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-//	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
-//	if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
+	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+	if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
 	
 	// floppy motor
 	floppy_mon_w(m_floppy, !BIT(data, 3));
@@ -794,6 +805,8 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 	
 	*/
 	
+	logerror("FW1 %02x\n", data);
+
 	// FDC master reset
 	wd17xx_mr_w(m_fdc, BIT(data, 0));
 	
@@ -803,28 +816,32 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 
 
 //-------------------------------------------------
-//  en_spec_contr_reg_w -
+//  spec_contr_reg_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_state::en_spec_contr_reg_w )
+WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 {
 	int state = BIT(data, 3);
 	
 	switch (data & 0x07)
 	{
 	case 0: // CS7
+		m_cs7 = state;
 		break;
 	
 	case 1:
 		break;
 	
 	case 2: // _BTCE
+		m_btce = state;
 		break;
 	
 	case 3: // _ATCE
+		m_atce = state;
 		break;
 	
 	case 4: // PARTST
+		m_partst = state;
 		break;
 	
 	case 5: // _DMADIS
@@ -886,7 +903,7 @@ ADDRESS_MAP_END
 	AM_RANGE(0x1ffb00, 0x1ffb00) AM_WRITE(fw0_w)
 	AM_RANGE(0x1ffb01, 0x1ffb01) AM_WRITE(fw1_w)
 	AM_RANGE(0x1ffd00, 0x1ffd07) AM_WRITE(dmamap_w)
-	AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(en_spec_contr_reg_w)
+	AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(spec_contr_reg_w)
 
 */
 
@@ -1213,7 +1230,7 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w), 
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, drq_w),
-	{ FLOPPY_0, NULL, NULL, NULL }
+	{ NULL, NULL, FLOPPY_0, NULL }
 };
 
 
@@ -1249,6 +1266,10 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
 	save_item(NAME(m_cause));
+	save_item(NAME(m_partst));
+	save_item(NAME(m_cs7));
+	save_item(NAME(m_atce));
+	save_item(NAME(m_btce));
 }
 
 
@@ -1258,6 +1279,18 @@ void abc1600_state::machine_start()
 
 void abc1600_state::machine_reset()
 {
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	// clear special control register
+	for (int i = 0; i < 8; i++)
+	{
+		spec_contr_reg_w(*program, i, 0);
+	}
+
+	// clear floppy registers
+	fw0_w(*program, 0, 0);
+	fw1_w(*program, 0, 0);
+
 	// clear task register
 	m_task = 0;
 

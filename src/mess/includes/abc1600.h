@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER( page_w );
 	DECLARE_WRITE8_MEMBER( fw0_w );
 	DECLARE_WRITE8_MEMBER( fw1_w );
-	DECLARE_WRITE8_MEMBER( en_spec_contr_reg_w );
+	DECLARE_WRITE8_MEMBER( spec_contr_reg_w );
 
 	DECLARE_WRITE8_MEMBER( dmamap_w );
 	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
@@ -176,6 +176,12 @@ public:
 	int m_sysscc;
 	int m_sysfs;
 	UINT8 m_cause;
+	int m_partst;				// parity test
+
+	// peripherals
+	int m_cs7;					// card select address bit 7
+	int m_atce;					// V.24 channel A external clock enable
+	int m_btce;					// V.24 channel B external clock enable
 
 	// video
 	const UINT8 *m_wrmsk_rom;	// write mask ROM
