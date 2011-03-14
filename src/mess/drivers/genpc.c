@@ -233,9 +233,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pccga, genpc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  I8088, 4772720)				
-	MCFG_CPU_PROGRAM_MAP(pc8_map)	
-	MCFG_CPU_IO_MAP(pc8_io)	
+	MCFG_CPU_ADD("maincpu",  I8086, 4772720)				
+	MCFG_CPU_PROGRAM_MAP(pc16_map)	
+	MCFG_CPU_IO_MAP(pc16_io)		
 	MCFG_CPU_CONFIG(i86_address_mask)
 	
 	MCFG_MACHINE_START(genpc)
@@ -253,6 +253,9 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
 	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
+	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
+	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
+	MCFG_ISA8_BUS_DEVICE("isa", 3, "hdc", ISA8_HDC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -286,6 +289,10 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 
 	MCFG_I8255A_ADD( "ppi8255", genpc_ppi8255_interface )
 
+	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
+	MCFG_ISA8_BUS_DEVICE("isa", 1, "com", ISA8_COM)
+	MCFG_ISA8_BUS_DEVICE("isa", 2, "fdc", ISA8_FDC)
+	MCFG_ISA8_BUS_DEVICE("isa", 3, "hdc", ISA8_HDC)
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 

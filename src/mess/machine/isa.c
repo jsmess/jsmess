@@ -133,15 +133,20 @@ void isa8_device::add_isa_card(device_isa8_card_interface *card,int pos)
 	m_isa_device[pos] = card;
 }
 
+#define memory_install_readwrite8_device_handler_mask(space, device, start, end, mask, mirror, rhandler, whandler, unitmask) \
+	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
+
 void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
 {	
 	int buswidth = device_memory(m_maincpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_device_handler(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler );
+			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0);			
 			break;
-
+		case 16:
+			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
+			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported", buswidth);
 			break;
