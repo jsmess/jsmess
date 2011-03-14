@@ -30,12 +30,19 @@ static SCREEN_UPDATE( mz2000 )
 static ADDRESS_MAP_START(mz2000_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
+	// RAM is 0x10000
+	// TVRAM is 0x1000
+	// GVRAM is 0x4000
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mz2000_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
+//	AM_RANGE(0xe0, 0xe3) i8255 <cassette, display and sound control>
+//	AM_RANGE(0xe4, 0xe7) i8253
+//	AM_RANGE(0xe8, 0xeb) z80pio <keyboard, bankswitch, CRTC
+//	AM_RANGE(0xf0, 0xf3) clear 8253?
+//	AM_RANGE(0xf4, 0xf7) CRTC
 ADDRESS_MAP_END
 
 
