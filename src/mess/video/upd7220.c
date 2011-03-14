@@ -684,7 +684,7 @@ static UINT16 check_pattern(upd7220_t *upd7220, UINT16 pattern)
 	switch(upd7220->bitmap_mod & 3)
 	{
 		case 0: res = pattern; break; //replace
-		case 1: res = pattern ^ 0xffff; break; //complement
+		case 1: res = pattern; break; //complement
 		case 2: res = 0; break; //reset to zero
 		case 3: res |= 0xffff; break; //set to one
 	}
@@ -699,8 +699,15 @@ static void draw_pixel(upd7220_t *upd7220,int x,int y,UINT16 tile_data)
 
 	dad = x & 0x7;
 
-	upd7220->vram[addr + upd7220->vram_bank] &= ~(0x80 >> (dad));
-	upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x80 >> (dad)));
+	if((upd7220->bitmap_mod & 3) == 1)
+	{
+		upd7220->vram[addr + upd7220->vram_bank] ^= ((tile_data) & (0x80 >> (dad)));
+	}
+	else
+	{
+		upd7220->vram[addr + upd7220->vram_bank] &= ~(0x80 >> (dad));
+		upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x80 >> (dad)));
+	}
 }
 
 static void draw_line(upd7220_t *upd7220,int x,int y)
