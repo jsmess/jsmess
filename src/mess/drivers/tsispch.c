@@ -81,15 +81,32 @@ DRIVER_INIT( prose2k )
 /******************************************************************************
  Address Maps
 ******************************************************************************/
-
+/* The address map of the prose 2020 is controlled by 2 proms, see the rom section
+   for details on those.
+   (x = ignored; * = selects address within this range; s = selects one of a pair of chips)
+   A19 A18 A17 A16  A15 A14 A13 A12  A11 A10 A9 A8  A7 A6 A5 A4  A3 A2 A1 A0
+     0   0   x   x    0   x   0   *    *   *  *  *   *  *  *  *   *  *  *  s  6264*2 SRAM first half
+     0   0   x   x    0   x   1   0    *   *  *  *   *  *  *  *   *  *  *  s  6264*2 SRAM 3rd quarter
+     0   0   x   x    0   x   1   1    0   0  0  x   x  x  x  x   x  x  *  x  iP8251A @ U15
+     0   0   x   x    0   x   1   1    0   0  1  x   x  x  x  x   x  x  *  x  AMD P8259A PIC
+     0   0   x   x    0   x   1   1    0   1  0  ?   ?  ?  ?  ?   ?  ?  ?  ?  LEDS and dipswitches?
+     0   0   x   x    0   x   1   1    0   1  1  x   x  x  x  x   x  x  *  x  UPD77P20 data/status
+     0   0   x   x    0   x   1   1    1                                      Open bus?
+     0   0   x   x    1   x                                                   Open bus?
+     0   1                                                                    Open bus?
+     1   0                                                                    Open bus?
+     1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
+     1   1   1   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 0 and 1
+*/
 static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x02BFF) AM_RAM // unverified; tested on startup test
-	AM_RANGE(0x02C00, 0x02FFF) AM_RAM // unverified; 2F32-2F92 may be special ram for talking to the DSP?
-	//AM_RANGE(0x03200, 0x03201) // UART 1
-	//AM_RANGE(0x03202, 0x03203) // UART 2
-	AM_RANGE(0x03400, 0x03401) AM_WRITE(led_w) // write is the 8 debug leds; reading here may be dipswitches?
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM // correct
+	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
+	//AM_RANGE(0x03000, 0x03003) AM_MIRROR(0x341FD) // iP8251A@U15
+	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FD) // AMD P8259 PIC @ U5
+	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x34000) AM_WRITE(led_w) // write is 8 bits, but there are only 4 debug leds; other 4 bits may select a bank of dipswitches to be read here?
+	//AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FD) // UPD77P20 data reg r/w
+	//AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FD) // UPD77P20 status reg r
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(i8086_io, ADDRESS_SPACE_IO, 16, tsispch_state)
@@ -155,29 +172,42 @@ ROM_START( prose2k )
 	// mapping proms:
 	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
 	// L - always low; H - always high
-	// U77: unknown; input is ?
+	// U77: unknown (what does this do?); input is ?
 	//      output bits 0bLLLLzyxH
 	//      x - unknown
 	//      y - unknown
 	//      z - unknown
 	//
-	// U79: unknown; input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0
+	// U79: SRAM and peripheral mapping:
+	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0 (NEEDS VERIFY)
 	//      On the Prose 2000 board dumped, only bits 3 and 0 are used;
 	//      bits 7-4 are always low, bits 2 and 1 are always high.
 	//      SRAMS are only populated in U61 and U64.
-	//      This maps the SRAMS to <fill me in>
 	//      output bits 0bLLLLyHHx
 	//      3 - to /EN3 (pin 4) of 74S138N at U80
+	//          AND to EN1 (pin 6) of 74S138N at U78
+	//          i.e. one is activated when pin is high and other when pin is low
 	//          The 74S138N at U80:
-	//          inputs: S0 - A9; S1 - A10; S2 - A11
-	//          /Y0 - pin 11 of i8251 at U15
-	//          /Y1 - <wip>
+	//              /EN2 - pulled to GND
+	//              EN1 - pulled to VCC through resistor R5
+	//              inputs: S0 - A9; S1 - A10; S2 - A11
+	//              /Y0 - /CS (pin 11) of iP8251A at U15
+	//              /Y1 - /CS (pin 1) of AMD 8259A at U4
+	//              /Y2 - pins 1, 4, 9 (1A, 2A, 3A inputs) of 74HCT32 Quad OR gate at U58 <wip, involves LEDS?>
+	//              /Y3 - pin 26 (/CS) of UPD77P20 at U29
+	//              /Y4 thru /Y7 - seem unconnected SO FAR? <wip>
+	//          The 74S138N at U78: <wip>
+	//              /EN3 - ?
+	//              /EN2 - ?
+	//              inputs: ?
+	//              /Y3 - connects somewhere
+	//              <wip>
 	//      2 - to /CS1 on 6264 SRAMs at U63 and U66
 	//      1 - to /CS1 on 6264 SRAMs at U62 and U65
 	//      0 - to /CS1 on 6264 SRAMs at U61 and U64
 	//
 	// U81: maps ROMS: input is A19-A15 for I4,3,2,1,0
-	//      On the prose 2000 board dumped, only bits 6 and 5 are used,
+	//      On the Prose 2000 board dumped, only bits 6 and 5 are used,
 	//      the rest are always high; maps roms 0,1,2,3 to C0000-FFFFF.
 	//      The Prose 2000 board has empty unpopulated sockets for roms 4-15;
 	//      if present these would be driven by a different prom in this location.
