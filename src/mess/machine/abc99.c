@@ -470,7 +470,8 @@ const input_port_token *abc99_device_config::input_ports() const
 
 inline void abc99_device::serial_input()
 {
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si & m_si_z2) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -478,17 +479,15 @@ inline void abc99_device::serial_input()
 //  serial_output -
 //-------------------------------------------------
 
-inline void abc99_device::serial_output(int state)
+inline void abc99_device::serial_output()
 {
-	if (m_so != state)
+	int so = m_so_z2 & m_so_z5;
+	
+	if (m_so != so)
 	{
-		m_so = state;
+		m_so = so;
 
-		// serial output to ABC99
 		devcb_call_write_line(&m_out_txd_func, m_so);
-		
-		// serial output to mouse CPU
-		cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, (m_so | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -542,10 +541,11 @@ abc99_device::abc99_device(running_machine &_machine, const abc99_device_config 
 	  m_mousecpu(*this, I8035_Z5_TAG),
 	  m_speaker(*this, SPEAKER_TAG),
 	  m_si(1),
-	  m_si_en(0),
+	  m_si_en(1),
 	  m_so(1),
+	  m_so_z2(1),
+	  m_so_z5(1),
 	  m_keydown(0),
-	  m_si_z2(1),
       m_config(config)
 {
 }
@@ -572,8 +572,9 @@ void abc99_device::device_start()
 	save_item(NAME(m_si));
 	save_item(NAME(m_si_en));
 	save_item(NAME(m_so));
+	save_item(NAME(m_so_z2));
+	save_item(NAME(m_so_z5));
 	save_item(NAME(m_keydown));
-	save_item(NAME(m_si_z2));
 	save_item(NAME(m_t1_z2));
 	save_item(NAME(m_t1_z5));
 	save_item(NAME(m_led_en));
@@ -653,7 +654,13 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	*/
 
 	// serial output
-	serial_output(BIT(data, 0));
+	int so_z2 = BIT(data, 0);
+	
+	if (m_so_z2 != so_z2)
+	{
+		m_so_z2 = so_z2;
+		serial_output();
+	}
 
 	// key down
 	key_down(!BIT(data, 1));
@@ -668,6 +675,9 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 
 	// speaker output
 	speaker_level_w(m_speaker, !BIT(data, 6));
+	
+	// Z8 enable
+	m_led_en = BIT(data, 7);
 }
 
 
@@ -765,32 +775,38 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 		P21		
 		P22		
 		P23		
-		P24		disable Z2 serial input
+		P24		Z2 serial input enable
 		P25		Z2 RESET
-		P26		serial output to Z2
+		P26		serial output
 		P27		Z2 T1
 		
 	*/
 
-	// disable mouse CPU serial input
-	if (m_si_en != BIT(data, 4))
+	// serial input enable
+	int si_en = BIT(data, 4);
+	
+	if (m_si_en != si_en)
 	{
-		m_si_en = BIT(data, 4);
-		cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, (m_so | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+		m_si_en = si_en;
+		serial_input();
 	}
 
-	// keyboard CPU reset
-	if (m_reset != BIT(data, 5))
+	// Z2 reset
+	int reset = BIT(data, 5);
+	
+	if (m_reset != reset)
 	{
-		m_reset = BIT(data, 5);
+		m_reset = reset;
 		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// serial output
-	if (m_si_z2 != BIT(data, 6))
+	int so_z5 = BIT(data, 6);
+	
+	if (m_so_z5 != so_z5)
 	{
-		m_si_z2 = BIT(data, 6);
-		serial_input();
+		m_so_z5 = so_z5;
+		serial_output();
 	}
 
 	// keyboard CPU T1
