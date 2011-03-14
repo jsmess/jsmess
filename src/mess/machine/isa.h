@@ -148,7 +148,7 @@ private:
         // internal state
         const isa8_device_config &m_config;
 
-        device_t *m_maincpu;
+        required_device<device_t>   m_maincpu;
 
     	devcb_resolved_write_line	m_out_irq2_func;
     	devcb_resolved_write_line	m_out_irq3_func;
@@ -210,11 +210,6 @@ public:
 	virtual void dack_w(int line,UINT8 data);
 	virtual void eop_w(int state);
 	virtual bool have_dack(int line);
-	
-	// interface-level overrides
-	virtual void interface_pre_start();	
-	isa8_device *m_isa;
-
 protected:
 	// configuration
 	const device_config_isa8_card_interface &m_isa8_card_config;	// reference to our device_config_execute_interface	

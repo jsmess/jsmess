@@ -113,7 +113,8 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
         m_config(config),
-		m_upd765(*this, "upd765")
+		m_upd765(*this, "upd765"),
+		m_isa(*owner(),config.m_isa_tag)
 {
 }
  
@@ -123,6 +124,7 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
  
 void isa8_fdc_device::device_start()
 {        
+	m_isa->add_isa_card(this, m_config.m_isa_num);
 	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, pc_fdc_r, pc_fdc_w );	
 }
 

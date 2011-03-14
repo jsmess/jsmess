@@ -94,7 +94,7 @@ void isa8_device_config::device_config_complete()
 isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &config) :
         device_t(_machine, config),
         m_config(config),
-		m_maincpu(NULL)
+		m_maincpu(*(owner()->owner()), config.m_cputag)
 {
 	for(int i = 0; i < 8; i++)
 		m_isa_device[i] = NULL;
@@ -106,8 +106,6 @@ isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &co
  
 void isa8_device::device_start()
 {
-	m_maincpu = m_machine.device(m_config.m_cputag);
-
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_irq2_func, &m_config.m_out_irq2_func, this);
 	devcb_resolve_write_line(&m_out_irq3_func, &m_config.m_out_irq3_func, this);
@@ -257,7 +255,6 @@ device_isa8_card_interface::device_isa8_card_interface(running_machine &machine,
 	: device_interface(machine, config, device),
 	  m_isa8_card_config(dynamic_cast<const device_config_isa8_card_interface &>(config))
 {
-	m_isa = machine.device<isa8_device>(m_isa8_card_config.m_isa_tag);
 }
 
 
@@ -267,11 +264,6 @@ device_isa8_card_interface::device_isa8_card_interface(running_machine &machine,
 
 device_isa8_card_interface::~device_isa8_card_interface()
 {
-}
-
-void device_isa8_card_interface::interface_pre_start()
-{    
-	m_isa->add_isa_card(this, m_isa8_card_config.m_isa_num);
 }
 
 UINT8 device_isa8_card_interface::dack_r(int line)

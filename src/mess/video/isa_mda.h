@@ -56,7 +56,8 @@ protected:
 private:
         // internal state
         const isa8_mda_device_config &m_config;
-public:
+public:		
+		required_device<isa8_device> m_isa;
 		int  framecnt;
 
 		UINT8 mode_control;

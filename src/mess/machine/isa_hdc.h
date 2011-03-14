@@ -89,6 +89,8 @@ private:
 		
         // internal state
         const isa8_hdc_device_config &m_config;
+public:		
+		required_device<isa8_device> m_isa;
 public:
 		virtual UINT8 dack_r(int line);
 		virtual void dack_w(int line,UINT8 data);
