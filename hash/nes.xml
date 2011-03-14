@@ -219,7 +219,7 @@
 
 	<software name="720">
 		<!-- Serial: NES-72-USA - Release Date: 1989-11 -->
-		<description>720&#226;&#176; (USA)</description>
+		<description>720° (USA)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50537,6 +50537,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="toy story (unl)[!].prg" size="131072" crc="1ee21b0f" sha1="c9dc5e47cc22fe1c792ac194de033f8aa8e60a3e" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="venicebvp" cloneof="venicebv">
+		<description>Venice Beach Volleyball (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>American Video Entertainment</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="AVE-MB-91" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="venice beach volleyball (proto).prg" size="32768" crc="6f37e993" sha1="cb939fa2aa0cdad4e711bad4528cff091cc1d30e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="venice beach volleyball (proto).chr" size="32768" crc="dae7f6fa" sha1="07bfbf13be506dd898d333beb7ad1df0d7187642" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
