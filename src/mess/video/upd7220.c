@@ -783,7 +783,8 @@ static void draw_rectangle(upd7220_t *upd7220,int x,int y)
 
 	for(i = 0;i < upd7220->figs.d2;i++)
 	{
-		draw_pixel(upd7220,x,y,0x80 >> (x & 0x7));
+		dot = ((line_pattern >> ((i+upd7220->dad) & 0xf)) & 1) << 7;
+		draw_pixel(upd7220,x,y,dot >> (x & 0x7));
 		x+=rect_x_dir[rect_dir];
 		y+=rect_y_dir[rect_dir];
 	}
