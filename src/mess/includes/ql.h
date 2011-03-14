@@ -58,6 +58,8 @@
 #define SANDY_MOTOR_MASK		0x08
 #define SANDY_SIDE_SHIFT		0
 #define SANDY_SIDE_MASK			(1 << SANDY_SIDE_SHIFT)
+#define SANDY_DDEN_SHIFT		4
+#define SANDY_DDEN_MASK			(1 << SANDY_DDEN_SHIFT)
 #define SANDY_PRINTER_STROBE	0x20
 #define SANDY_PRINTER_INTMASK	0x40
 
@@ -130,6 +132,7 @@ public:
 	
 	int		disk_type;
 	int		disk_io_base;
+	UINT8	disk_io_byte;
 	UINT8	printer_char;
 };
 

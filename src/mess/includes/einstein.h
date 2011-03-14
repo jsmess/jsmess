@@ -35,6 +35,7 @@ public:
 	device_t *mc6845;
 	screen_device *crtc_screen;
 	UINT8 *crtc_ram;
+	UINT8	de;
 };
 
 /***************************************************************************

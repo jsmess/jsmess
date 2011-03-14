@@ -88,6 +88,10 @@
 #include "video/zx8301.h"
 #include "includes/ql.h"
 #include "machine/wd17xx.h"
+#include "debugger.h"
+
+#define LOG_DISK_WRITE	0
+#define LOG_DISK_READ	0
 
 //**************************************************************************
 //  INTELLIGENT PERIPHERAL CONTROLLER
@@ -259,8 +263,9 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 READ8_MEMBER( ql_state::disk_io_r )
 {
 	UINT8	result = 0;
-	
-	//logerror("%s DiskIO:Read of %08X\n",machine->describe_context(),disk_io_base+offset);
+
+	if(LOG_DISK_READ)
+		logerror("%s DiskIO:Read of %08X\n",machine->describe_context(),disk_io_base+offset);
 		
 	switch (offset)
 	{
@@ -276,7 +281,8 @@ READ8_MEMBER( ql_state::disk_io_r )
 
 WRITE8_MEMBER( ql_state::disk_io_w )
 {
-	//logerror("%s DiskIO:Write %02X to %08X\n",machine->describe_context(),data,disk_io_base+offset);
+	if(LOG_DISK_WRITE)
+		logerror("%s DiskIO:Write %02X to %08X\n",machine->describe_context(),data,disk_io_base+offset);
 
 	switch (offset)
 	{
@@ -335,6 +341,8 @@ void ql_state::sandy_set_control(UINT8 data)
 {
 	//logerror("sandy_set_control:%02X\n",data);
 
+	disk_io_byte=data;
+
 	if(data & SANDY_DRIVE0_MASK)
 		wd17xx_set_drive(m_fdc,0);
 		
@@ -342,6 +350,10 @@ void ql_state::sandy_set_control(UINT8 data)
 		wd17xx_set_drive(m_fdc,1);	
 
 	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
+	if (data & SANDY_SIDE_MASK)
+	{
+		logerror("Accessing side 1\n");
+	}
 
 	if (printer_is_ready(m_printer))
 	{
@@ -353,19 +365,22 @@ void ql_state::sandy_set_control(UINT8 data)
 	}
 }	
 
-static READ_LINE_DEVICE_HANDLER( trump_card_dden_r )
+static READ_LINE_DEVICE_HANDLER( disk_io_dden_r )
 {
-	//logerror("DiskIO:dden_read\n");
+	ql_state *state = device->machine->driver_data<ql_state>();
 	
-	return 1;
+	if(state->disk_type==DISK_TYPE_SANDY)
+		return ((state->disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
+	else
+		return 0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( trump_card_intrq_w )
+static WRITE_LINE_DEVICE_HANDLER( disk_io_intrq_w )
 {
 	//logerror("DiskIO:intrq = %d\n",state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( trump_card_drq_w )
+static WRITE_LINE_DEVICE_HANDLER( disk_io_drq_w )
 {
 	//logerror("DiskIO:drq = %d\n",state);
 }
@@ -381,8 +396,8 @@ static WRITE_LINE_DEVICE_HANDLER( trump_card_drq_w )
 
 static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP //AM_READ( cart_rom_r ) // 16K Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_ROM AM_WRITENOP //AM_READ( trump_card_rom_r ) // Trump card ROM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP 						// 16K Cartridge ROM
+	AM_RANGE(0x010000, 0x017fff) AM_UNMAP 									// Trump card ROM is mapped in here
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
@@ -392,7 +407,7 @@ static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
 	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP //AM_READ(disk_io_r) AM_WRITE(disk_io_w) // 16K Expansion I/O
+	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP 									// 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
 	AM_RANGE(0x040000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -865,9 +880,9 @@ static const floppy_config ql_floppy_config =
 
 wd17xx_interface ql_wd17xx_interface = 
 {
-	DEVCB_LINE(trump_card_dden_r),
-	DEVCB_LINE(trump_card_intrq_w),
-	DEVCB_LINE(trump_card_drq_w),
+	DEVCB_LINE(disk_io_dden_r),
+	DEVCB_LINE(disk_io_intrq_w),
+	DEVCB_LINE(disk_io_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -917,6 +932,7 @@ void ql_state::machine_start()
 	state_save_register_global(machine, m_comdata);
 	state_save_register_global(machine, m_baudx4);
 	state_save_register_global(machine, printer_char);
+	state_save_register_global(machine, disk_io_byte);
 }
 
 void ql_state::machine_reset()
@@ -927,6 +943,7 @@ void ql_state::machine_reset()
 	logerror("disktype=%d\n",disk_type);
 
 	printer_char=0;
+	disk_io_byte=0;
 
 	logerror("Configuring RAM\n");
 	// configure RAM

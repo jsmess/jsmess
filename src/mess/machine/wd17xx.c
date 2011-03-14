@@ -129,6 +129,10 @@
     - Copied multi-sector write code from r7263, for some reason this had been
       silently removed, but is required for the rmnimbus driver.
 
+	2011-Mar-08 Phill Harvey-Smith
+	- Triggering intrq now clears the DRQ bit in the status as well as the busy bit.
+	  Execution of the READ_DAM command now correctly sets w->command.
+
     TODO:
         - What happens if a track is read that doesn't have any id's on it?
          (e.g. unformatted disc)
@@ -467,6 +471,7 @@ static void	wd17xx_set_intrq(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	w->status &= ~STA_2_BUSY;
+	w->status &= ~STA_2_DRQ;
 
 	w->intrq = ASSERT_LINE;
 	devcb_call_write_line(&w->out_intrq_func, w->intrq);
@@ -1630,6 +1635,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 				logerror("wd17xx_command_w $%02X READ_DAM\n", data);
 
 			w->command_type = TYPE_III;
+			w->command = data & ~FDC_MASK_TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
 			w->status |= STA_2_BUSY;
 

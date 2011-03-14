@@ -44,6 +44,13 @@
     Kevin Thacker [MESS driver]
 
 
+	2011-Mar-14, Phill Harvey-Smith.
+		Having traced out the circuit of the TK02 80 coumn card, I have changed the 
+		emulation to match what the hardware does, the emulation was mostly correct,
+		just some minor issues with the addressing of the VRAM, and bit 0 of the 
+		status register is the latched output of the 6845 DE, and not vblank.
+		
+		Also added defines to stop the log being flooded with keyboard messages :)
 
  ******************************************************************************/
 
@@ -63,6 +70,9 @@
 #include "rendlay.h"
 #include "machine/ram.h"
 #include "includes/einstein.h"
+
+#define VERBOSE_KEYBOARD	0
+#define VERBOSE_DISK		0
 
 /***************************************************************************
     80 COLUMN DEVICE
@@ -85,6 +95,13 @@ static READ8_HANDLER( einstein_80col_ram_r )
 }
 
 /* TODO: Verify implementation */
+/* From traces of the TK02 board character ROM is addressed by the 6845 as follows 
+   bit 0..2 	ra0..ra2
+   bit 3..10	data 0..7 from VRAM
+   bit 11		ra3
+   bit 12		jumper M004, this could be used to select two different character 
+				sets.
+*/
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	einstein_state *einstein = device->machine->driver_data<einstein_state>();
@@ -95,7 +112,7 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 	for (i = 0, x = 0; i < x_count; i++, x += 8)
 	{
 		char_code = einstein->crtc_ram[(ma + i) & 0x07ff];
-		data_byte = data[(char_code << 3) + ra];
+		data_byte = data[(char_code << 3) + (ra & 0x07) + ((ra & 0x08) << 8)];
 
 		*BITMAP_ADDR16(bitmap, y, x + 0) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 7);
 		*BITMAP_ADDR16(bitmap, y, x + 1) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 6);
@@ -108,19 +125,24 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 	}
 }
 
-/* bit 0 - vsync state?
- * bit 1 - 0 = 40 column mode (color monitor), 1 = 80 column mode (b/w monitor)
- * bit 2 - 0 = 50Hz, 1 = 60Hz
+static WRITE_LINE_DEVICE_HANDLER( einstein_6845_de_changed )
+{
+	einstein_state *einstein = device->machine->driver_data<einstein_state>();
+	einstein->de=state;
+}
+
+/* bit 0 - latched display enabled (DE) from 6845
+ * bit 1 - Jumper M003 0 = 40 column mode (color monitor), 1 = 80 column mode (b/w monitor)
+ * bit 2 - Jumper M002 0 = 50Hz, 1 = 60Hz
+ * bit 3 - Jumper M001 0 = ???, 1=??? perminently wired high on both the boards I have seen - PHS.
  */
 static READ8_HANDLER( einstein_80col_state_r )
 {
 	einstein_state *einstein = space->machine->driver_data<einstein_state>();
 	UINT8 result = 0;
 
-	result |= einstein->crtc_screen->vblank() ? 1 : 0;
+	result |= einstein->de;
 	result |= input_port_read(space->machine, "80column_dips") & 0x06;
-
-	logerror("%s: einstein_80col_state_r %02x\n", space->machine->describe_context(), result);
 
 	return result;
 }
@@ -185,7 +207,8 @@ static WRITE8_HANDLER( einstein_keyboard_line_write )
 {
 	einstein_state *einstein = space->machine->driver_data<einstein_state>();
 
-	logerror("einstein_keyboard_line_write: %02x\n", data);
+	if (VERBOSE_KEYBOARD)
+		logerror("einstein_keyboard_line_write: %02x\n", data);
 
 	einstein->keyboard_line = data;
 
@@ -200,7 +223,8 @@ static READ8_HANDLER( einstein_keyboard_data_read )
 	/* re-scan the keyboard */
 	einstein_scan_keyboard(space->machine);
 
-	logerror("einstein_keyboard_data_read: %02x\n", einstein->keyboard_data);
+	if (VERBOSE_KEYBOARD)
+		logerror("einstein_keyboard_data_read: %02x\n", einstein->keyboard_data);
 
 	return einstein->keyboard_data;
 }
@@ -212,7 +236,8 @@ static READ8_HANDLER( einstein_keyboard_data_read )
 
 static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 {
-	logerror("%s: einstein_drsel_w %02x\n", device->machine->describe_context(), data);
+	if(VERBOSE_DISK)
+		logerror("%s: einstein_drsel_w %02x\n", device->machine->describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
@@ -306,7 +331,8 @@ static READ8_HANDLER( einstein_kybintmsk_r )
 	/* bit 5 to 7: graph, control and shift key */
 	data |= input_port_read(space->machine, "EXTRA");
 
-	logerror("%s: einstein_kybintmsk_r %02x\n", space->machine->describe_context(), data);
+	if(VERBOSE_KEYBOARD)
+		logerror("%s: einstein_kybintmsk_r %02x\n", space->machine->describe_context(), data);
 
 	return data;
 }
@@ -707,7 +733,7 @@ static const mc6845_interface einstein_crtc6845_interface =
 	NULL,
 	einstein_6845_update_row,
 	NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(einstein_6845_de_changed),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

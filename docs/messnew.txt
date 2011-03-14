@@ -4,7 +4,7 @@ New System Drivers Supported:
 -----------------------------
 - Victor Wondermega M2 (not working) [Justin Kerk]
 - Ferguson Big Board [Miodrag Milanovic]
-- Sanyo MBC-550, MBC-555 (boots but no keyboard) [Phill Harvey-Smith]
+- Sanyo MBC-550, MBC-555 (boots but partial keyboard) [Phill Harvey-Smith]
 - Fujitsu FM-Towns II UX (not working) [bernhardh, Anna Wu, Barry Rodewald]
 - Fujitsu FM-Towns II HR (not working) [bernhardh, Anna Wu, Barry Rodewald]
 - Mikrosha-86RK [Miodrag Milanovic]
@@ -55,6 +55,10 @@ System Driver Changes:
 
 - [BBC] Made the SAA505x implementation a device.  [Atari Ace]
 
+- [Einstein] Fixed addressing of character ROM for 80 column mode, added
+  dump of 80 column rom, fixed bit 0 of status register to reflect 6845
+  DE line. 80 Column interface is now usable. [Phill Harvey-Smith]
+
 - [GBA] Fixed EEPROM detection for "Banjo-Kazooie" and "Custom Robo GX".
   [Tim Schuerewegen]
 
@@ -95,7 +99,10 @@ System Driver Changes:
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
 
 - [QL]  Added support for Miracle Systems Trump Card disk and memory
-        interface [Phill Harvey-Smith]
+        interface 
+	Added support for Sandy SuperDisk disk interface
+	Fixed up WD177x so disks can be formatted (single sided only)
+        [Phill Harvey-Smith]
 
 - [SNES] uPD96050 DSP (aka Seta ST-010) is now emulated instead of
          simulated. [R. Belmont, byuu, Dr. Decapitator]
