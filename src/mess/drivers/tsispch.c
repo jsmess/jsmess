@@ -155,29 +155,41 @@ ROM_START( prose2k )
 	// mapping proms:
 	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
 	// L - always low; H - always high
-	// U77: unknown; input is ?; output bits 0bLLLLzyxH
+	// U77: unknown; input is ?
+	//      output bits 0bLLLLzyxH
 	//      x - unknown
 	//      y - unknown
 	//      z - unknown
 	//
-	// U79: unknown; input is ?; output bits 0bLLLLyHHx
-	//      x - unknown
-	//      y - unknown 
+	// U79: unknown; input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0
+	//      On the Prose 2000 board dumped, only bits 3 and 0 are used;
+	//      bits 7-4 are always low, bits 2 and 1 are always high.
+	//      SRAMS are only populated in U61 and U64.
+	//      This maps the SRAMS to <fill me in>
+	//      output bits 0bLLLLyHHx
+	//      3 - to /EN3 (pin 4) of 74S138N at U80
+	//          The 74S138N at U80:
+	//          inputs: S0 - A9; S1 - A10; S2 - A11
+	//          /Y0 - pin 11 of i8251 at U15
+	//          /Y1 - <wip>
+	//      2 - to /CS1 on 6264 SRAMs at U63 and U66
+	//      1 - to /CS1 on 6264 SRAMs at U62 and U65
+	//      0 - to /CS1 on 6264 SRAMs at U61 and U64
 	//
-	// U81: maps ROMS: input is A15-A19 for I0,1,2,3,4
+	// U81: maps ROMS: input is A19-A15 for I4,3,2,1,0
 	//      On the prose 2000 board dumped, only bits 6 and 5 are used,
-	//      The rest are always high; maps rom to C0000-FFFFF
-	//      The prose 2000 board has empty unpopulated sockets for roms 4-15
-	//      If present these would be driven by a different prom in this location
+	//      the rest are always high; maps roms 0,1,2,3 to C0000-FFFFF.
+	//      The Prose 2000 board has empty unpopulated sockets for roms 4-15;
+	//      if present these would be driven by a different prom in this location.
 	//      bit - function
-	//      7 - to /CE of roms 14 and 15
-	//      6 - to /CE of roms 0 and 1
-	//      5 - to /CE of roms 2 and 3
-	//      4 - to /CE of roms 4 and 5
-	//      3 - to /CE of roms 6 and 7
-	//      2 - to /CE of roms 8 and 9
-	//      1 - to /CE of roms 10 and 11
-	//      0 - to /CE of roms 12 and 13
+	//      7 - to /CE of ROMs 14(U28) and 15(U51)
+	//      6 - to /CE of ROMs 0(U21) and 1(U44)
+	//      5 - to /CE of ROMs 2(U22) and 3(U45)
+	//      4 - to /CE of ROMs 4(U23) and 5(U46)
+	//      3 - to /CE of ROMs 6(U24) and 7(U47)
+	//      2 - to /CE of ROMs 8(U25) and 9(U48)
+	//      1 - to /CE of ROMs 10(U26) and 11(U49)
+	//      0 - to /CE of ROMs 12(U27) and 13(U50)
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "am27s19.u77", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412))
 	ROM_LOAD( "am27s19.u79", 0x0020, 0x0020, CRC(A165B090) SHA1(BFC413C79915C68906033741318C070AD5DD0F6B))
