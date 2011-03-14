@@ -72,48 +72,59 @@ DRIVER_INIT( prose2k )
     // unpack 24 bit data into 32 bit space
 	// TODO: unpack such that it can actually RUN as upd7725 code; this requires
 	//       some shuffling:
-	// data format as-is in dspsrc:
-	// bit 7  6  5  4  3  2  1  0
-	// b1  15 16 17 18 19 20 21 22 >- needs to be flipped around
-	// b2  XX 8  9  10 11 12 13 14 >- needs to be flipped around and the zero moved to bit 4
+	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
+	// source                          dest
+	// bit 7  6  5  4  3  2  1  0      bit 7  6  5  4  3  2  1  0
+	// for OP/RT:
+	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
+	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 L  11 10 9  8
+	// b3  0  1  2  3  4  5  6  7  ->      7  6  5  4  3  2  1  0
+	// for JP:
+	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
+	// b2  L  8  9  10 11 12 13 14 ->      14 13 L  L  L  12 11 10
+	// b3  0  1  2  3  4  5  6  7  ->      9  8  7  6  5  4  X  X
+	// for LD:
+	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
+	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
+	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
 	UINT8 byte1;
 	UINT8 byte2;
 	UINT8 byte3;
         for (int i = 0; i < 0x600; i+= 3)
         {
-			byte1 = BIT(dspsrc[0+i],0)<<7;
-			byte1 |= BIT(dspsrc[0+i],1)<<6;
-			byte1 |= BIT(dspsrc[0+i],2)<<5;
-			byte1 |= BIT(dspsrc[0+i],3)<<4;
-			byte1 |= BIT(dspsrc[0+i],4)<<3;
-			byte1 |= BIT(dspsrc[0+i],5)<<2;
-			byte1 |= BIT(dspsrc[0+i],6)<<1;
-			byte1 |= BIT(dspsrc[0+i],7)<<0;
+			byte1 = BIT(dspsrc[0+i],0)<<7; // bit 22 goes to bit 23
+			byte1 |= BIT(dspsrc[0+i],1)<<6; // bit 21 goes to bit 22
+			byte1 |= BIT(dspsrc[0+i],2)<<5; // bit 20 goes to bit 21
+			byte1 |= BIT(dspsrc[0+i],3)<<4; // bit 19 goes to bit 20
+			byte1 |= BIT(dspsrc[0+i],4)<<3; // bit 18 goes to bit 19
+			byte1 |= BIT(dspsrc[0+i],5)<<2; // bit 17 goes to bit 18
+			byte1 |= BIT(dspsrc[0+i],6)<<1; // bit 16 goes to bit 17
+			byte1 |= BIT(dspsrc[0+i],7)<<0; // bit 15 goes to bit 16
 			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
 			if ((byte1&0x80) == 0x00)
 			{
-				byte2 = BIT(dspsrc[1+i],0)<<7;
-				byte2 |= BIT(dspsrc[1+i],1)<<6;
-				byte2 |= BIT(dspsrc[1+i],2)<<5;
-				byte2 |= BIT(dspsrc[1+i],7)<<4; // should be always 0
-				byte2 |= BIT(dspsrc[1+i],3)<<3;
-				byte2 |= BIT(dspsrc[1+i],4)<<2;
-				byte2 |= BIT(dspsrc[1+i],5)<<1;
-				byte2 |= BIT(dspsrc[1+i],6)<<0;
+				byte2 = BIT(dspsrc[1+i],0)<<7; // bit 14 goes to bit 15
+				byte2 |= BIT(dspsrc[1+i],1)<<6; // bit 13 goes to bit 14
+				byte2 |= BIT(dspsrc[1+i],2)<<5; // bit 12 goes to bit 13
+				byte2 |= BIT(dspsrc[1+i],7)<<4; // 0 goes to bit 12
+				byte2 |= BIT(dspsrc[1+i],3)<<3; // bit 11 goes to bit 11
+				byte2 |= BIT(dspsrc[1+i],4)<<2; // bit 10 goes to bit 10
+				byte2 |= BIT(dspsrc[1+i],5)<<1; // bit 9 goes to bit 9
+				byte2 |= BIT(dspsrc[1+i],6)<<0; // bit 8 goes to bit 8
 				
-				byte3 = BIT(dspsrc[2+i],0)<<7;
-				byte3 |= BIT(dspsrc[2+i],1)<<6;
-				byte3 |= BIT(dspsrc[2+i],2)<<5;
-				byte3 |= BIT(dspsrc[2+i],3)<<4;
-				byte3 |= BIT(dspsrc[2+i],4)<<3;
-				byte3 |= BIT(dspsrc[2+i],5)<<2;
-				byte3 |= BIT(dspsrc[2+i],6)<<1;
-				byte3 |= BIT(dspsrc[2+i],7)<<0;
+				byte3 = BIT(dspsrc[2+i],0)<<7; // bit 7 goes to bit 7
+				byte3 |= BIT(dspsrc[2+i],1)<<6; // bit 6 goes to bit 6
+				byte3 |= BIT(dspsrc[2+i],2)<<5; // bit 5 goes to bit 5
+				byte3 |= BIT(dspsrc[2+i],3)<<4; // bit 4 goes to bit 4
+				byte3 |= BIT(dspsrc[2+i],4)<<3; // bit 3 goes to bit 3
+				byte3 |= BIT(dspsrc[2+i],5)<<2; // bit 2 goes to bit 2
+				byte3 |= BIT(dspsrc[2+i],6)<<1; // bit 1 goes to bit 1
+				byte3 |= BIT(dspsrc[2+i],7)<<0; // bit 0 goes to bit 0
 			}
 			else if ((byte1&0xC0) == 0x80) // jp instruction
 			{
-				byte2 = BIT(dspsrc[1+i],0)<<7; // bit 15 goes to bit 15
-				byte2 |= BIT(dspsrc[1+i],1)<<6; // bit 14 goes to bit 14
+				byte2 = BIT(dspsrc[1+i],0)<<7; // bit 14 goes to bit 15
+				byte2 |= BIT(dspsrc[1+i],1)<<6; // bit 13 goes to bit 14
 				byte2 |= BIT(dspsrc[1+i],7)<<5; // 0 goes to bit 13
 				byte2 |= BIT(dspsrc[1+i],7)<<4; // 0 goes to bit 12
 				byte2 |= BIT(dspsrc[1+i],7)<<3; // 0 goes to bit 11
@@ -127,24 +138,24 @@ DRIVER_INIT( prose2k )
 				byte3 |= BIT(dspsrc[2+i],1)<<4; // bit 6 goes to bit 4
 				byte3 |= BIT(dspsrc[2+i],2)<<3; // bit 5 goes to bit 3
 				byte3 |= BIT(dspsrc[2+i],3)<<2; // bit 4 goes to bit 2
-				byte3 |= BIT(dspsrc[2+i],6)<<1;
-				byte3 |= BIT(dspsrc[2+i],7)<<0;
+				byte3 |= BIT(dspsrc[2+i],6)<<1; // bit 1/doesn't matter goes to bit 1
+				byte3 |= BIT(dspsrc[2+i],7)<<0; // bit 0/doesn't matter goes to bit 0
 			}
 			else // ld instruction
 			{
-				byte2 = BIT(dspsrc[1+i],0)<<7; // bit 15 goes to bit 15
-				byte2 |= BIT(dspsrc[1+i],1)<<6; // bit 14 goes to bit 14
-				byte2 |= BIT(dspsrc[1+i],2)<<5; // bit 13 goes to bit 13
-				byte2 |= BIT(dspsrc[1+i],3)<<4; // bit 12 goes to bit 12
-				byte2 |= BIT(dspsrc[1+i],4)<<3; // bit 11 goes to bit 11
-				byte2 |= BIT(dspsrc[1+i],5)<<2; // bit 10 goes to bit 10
-				byte2 |= BIT(dspsrc[1+i],6)<<1; // bit 9 goes to bit 9
-				byte2 |= BIT(dspsrc[2+i],0)<<0; // bit 8 goes to bit 8
+				byte2 = BIT(dspsrc[1+i],0)<<7; // bit 14 goes to bit 15
+				byte2 |= BIT(dspsrc[1+i],1)<<6; // bit 13 goes to bit 14
+				byte2 |= BIT(dspsrc[1+i],2)<<5; // bit 12 goes to bit 13
+				byte2 |= BIT(dspsrc[1+i],3)<<4; // bit 11 goes to bit 12
+				byte2 |= BIT(dspsrc[1+i],4)<<3; // bit 10 goes to bit 11
+				byte2 |= BIT(dspsrc[1+i],5)<<2; // bit 9 goes to bit 10
+				byte2 |= BIT(dspsrc[1+i],6)<<1; // bit 8 goes to bit 9
+				byte2 |= BIT(dspsrc[2+i],0)<<0; // bit 7 goes to bit 8
 				
-				byte3 = BIT(dspsrc[2+i],1)<<7;  // bit 7 goes to bit 7
-				byte3 |= BIT(dspsrc[2+i],2)<<6;  // bit 6 goes to bit 6
-				byte3 |= BIT(dspsrc[2+i],3)<<5;  // 0 goes to bit 5
-				byte3 |= BIT(dspsrc[2+i],3)<<4;  // 0 goes to bit 4
+				byte3 = BIT(dspsrc[2+i],1)<<7;  // bit 6 goes to bit 7
+				byte3 |= BIT(dspsrc[2+i],2)<<6;  // bit 5 goes to bit 6
+				byte3 |= BIT(dspsrc[2+i],3)<<5;  // bit 4/doesn't matter goes to bit 5
+				byte3 |= BIT(dspsrc[2+i],3)<<4;  // bit 4/doesn't matter goes to bit 4
 				byte3 |= BIT(dspsrc[2+i],4)<<3;  // bit 3 goes to bit 3
 				byte3 |= BIT(dspsrc[2+i],5)<<2;  // bit 2 goes to bit 2
 				byte3 |= BIT(dspsrc[2+i],6)<<1;  // bit 1 goes to bit 1
