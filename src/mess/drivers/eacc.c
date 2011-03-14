@@ -12,7 +12,7 @@
 *    may be obtained.
 *
 *    Memory Map
-*    0000-03FF internal ram
+*    0000-00FF internal ram
 *    4000-7FFF ROM
 *    8000-BFFF 6821
 *    C000-FFFF ROM (mirror)
@@ -22,8 +22,7 @@
 *
 *    ToDo:
 *    - Proper artwork
-*    - Change 5th digit to 8 discrete LEDs
-*    - Find out how to use it! It *seems* to work but need to check.
+*    - There are various problems probably due to typos when making the rom.
 *
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -72,8 +71,8 @@ static ADDRESS_MAP_START(eacc_mem, ADDRESS_SPACE_PROGRAM, 8, eacc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_MIRROR(0x8000)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x7fc) AM_DEVREADWRITE_LEGACY("pia", pia6821_r, pia6821_w)
+	AM_RANGE(0x6000, 0x67ff) AM_ROM AM_MIRROR(0x8000)
+	AM_RANGE(0x8004, 0x8007) AM_MIRROR(0x7fc) AM_DEVREADWRITE_LEGACY("pia", pia6821_r, pia6821_w)
 ADDRESS_MAP_END
 
 
@@ -83,27 +82,27 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START(eacc)
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 Fuel Cal") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2 Distance") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("5 START") PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("END") PORT_CODE(KEYCODE_END)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 Speed") PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 Distance Cal") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0 Time") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 Consumption") PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 Remaining") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 Fuel") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 Average") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -116,7 +115,6 @@ static TIMER_DEVICE_CALLBACK( eacc_cb1 )
 {
 	eacc_state *state = timer.machine->driver_data<eacc_state>();
 	state->m_cb1 ^= 1; // 15hz
-	//printf("%X ",state->m_cb1);
 }
 
 static TIMER_DEVICE_CALLBACK( eacc_nmi )
@@ -133,18 +131,17 @@ READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
 
 READ_LINE_MEMBER( eacc_state::eacc_distance_r )
 {
-	return 0; // needs random pulses
+	return machine->rand() & 1; // needs random pulses to simulate movement
 }
 
 READ_LINE_MEMBER( eacc_state::eacc_fuel_sensor_r )
 {
-	return 0; // needs random pulses
+	return machine->rand() & 1; // needs random pulses to simulate acceleration
 }
 
 WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
 {
 	m_cb2 = state;
-	//printf("%X ",m_cb2);
 }
 
 READ8_MEMBER( eacc_state::eacc_keyboard_r )
@@ -159,15 +156,25 @@ READ8_MEMBER( eacc_state::eacc_keyboard_r )
 		data |= input_port_read(machine, "X2");
 	if (BIT(m_multiplex, 6))
 		data |= input_port_read(machine, "X3");
-	//printf("%X ",data);
-	return data | m_multiplex;
+
+	return data;
 }
 
 void eacc_state::eacc_display()
 {
-	for (UINT8 i = 3; i < 8; i++)
+	UINT8 i;
+	char lednum[6];
+
+	for (i = 3; i < 7; i++)
 		if (BIT(m_multiplex, i))
-			output_set_digit_value(i-3, m_segment);
+			output_set_digit_value(i, m_segment);
+
+	if (BIT(m_multiplex, 7))
+		for (i = 0; i < 8; i++)
+		{
+			sprintf(lednum,"led%d",i);
+			output_set_value(lednum, BIT(m_segment, i)^1);
+		}
 }
 
 WRITE8_MEMBER( eacc_state::eacc_segment_w )
@@ -182,7 +189,6 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
     //d0 segment g
 
 	m_segment = BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3);
-	//printf("%X ",data);
 	eacc_display();
 }
 
