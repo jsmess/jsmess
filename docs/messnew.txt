@@ -9,6 +9,7 @@ New System Drivers Supported:
 - Fujitsu FM-Towns II HR (not working) [bernhardh, Anna Wu, Barry Rodewald]
 - Mikrosha-86RK [Miodrag Milanovic]
 - IBM PC 5155 [Lord Nightmare]
+- EA Car Computer (not working) [Robbbert]
 
 
 
@@ -89,7 +90,8 @@ System Driver Changes:
  
 - [M5] Added FD-5 floppy interface ROM, renamed driver to m5. [Curt Coder]
 
-- [PDP1] Made the CRT implementation a device.  [Atari Ace]
+- [PDP1] Made the CRT implementation a device.[Atari Ace]   Made papertape,
+  cylinder and printer into devices and added back in (not working) [Robbbert]
 
 - [PIPPIN] Added pre release rom
 
@@ -112,6 +114,9 @@ System Driver Changes:
 - [TI] Converted strata/733_asr/911_vdt to devices.  [Atari Ace]
 
 - [X68K] Refactored to use new MC68901 device. [Curt Coder]
+
+- [TX0] Made papertape, printer and magtape into devices and added
+  back in (not working) [Robbbert]
 
 
 
