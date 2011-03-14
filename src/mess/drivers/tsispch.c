@@ -153,6 +153,7 @@ ROM_START( prose2k )
 	ROM_LOAD( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(F4E4DD16) SHA1(6E184747DB2F26E45D0E02907105FF192E51BABA))
 
 	// mapping proms:
+	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
 	// L - always low; H - always high
 	// U77: unknown; input is ?; output bits 0bLLLLzyxH
 	//      x - unknown
@@ -163,9 +164,20 @@ ROM_START( prose2k )
 	//      x - unknown
 	//      y - unknown 
 	//
-	// U81: maps ROMS to C0000-FFFFF: input is A15-A19; output bits: 0bHyxHHHHH
-	//      x - to /CE of roms 2 and 3
-	//      y - to /CE of roms 0 and 1
+	// U81: maps ROMS: input is A15-A19 for I0,1,2,3,4
+	//      On the prose 2000 board dumped, only bits 6 and 5 are used,
+	//      The rest are always high; maps rom to C0000-FFFFF
+	//      The prose 2000 board has empty unpopulated sockets for roms 4-15
+	//      If present these would be driven by a different prom in this location
+	//      bit - function
+	//      7 - to /CE of roms 14 and 15
+	//      6 - to /CE of roms 0 and 1
+	//      5 - to /CE of roms 2 and 3
+	//      4 - to /CE of roms 4 and 5
+	//      3 - to /CE of roms 6 and 7
+	//      2 - to /CE of roms 8 and 9
+	//      1 - to /CE of roms 10 and 11
+	//      0 - to /CE of roms 12 and 13
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "am27s19.u77", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412))
 	ROM_LOAD( "am27s19.u79", 0x0020, 0x0020, CRC(A165B090) SHA1(BFC413C79915C68906033741318C070AD5DD0F6B))
@@ -178,4 +190,4 @@ ROM_START( prose2k )
 ******************************************************************************/
 
 /*    YEAR  NAME	PARENT	COMPAT	MACHINE		INPUT	INIT	COMPANY     FULLNAME            FLAGS */
-COMP( 1984?, prose2k,	0,		0,		prose2k,		prose2k,	prose2k,	"Telesensory Systems Inc/Speech Plus",	"Prose 2000/2020",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, prose2k,	0,		0,		prose2k,		prose2k,	prose2k,	"Telesensory Systems Inc/Speech Plus",	"Prose 2000/2020",	GAME_NOT_WORKING | GAME_NO_SOUND )
