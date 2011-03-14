@@ -1429,6 +1429,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_DRIVERS)/mz80.o		\
 	$(MESS_VIDEO)/mz80.o		\
 	$(MESS_MACHINE)/mz80.o		\
+	$(MESS_DRIVERS)/mz2000.o	\
 	$(MESS_DRIVERS)/x1.o		\
 	$(MESS_MACHINE)/x1.o		\
 	$(MESS_FORMATS)/x1_tap.o	\
@@ -1438,7 +1439,7 @@ $(MESSOBJ)/sharp.a:				\
 $(MESSOBJ)/sinclair.a:			\
 	$(MESS_VIDEO)/spectrum.o	\
 	$(MESS_VIDEO)/timex.o		\
-	$(MESS_VIDEO)/zx.o			\
+	$(MESS_VIDEO)/zx.o		\
 	$(MESS_DRIVERS)/zx.o		\
 	$(MESS_MACHINE)/zx.o		\
 	$(MESS_DRIVERS)/spectrum.o	\
