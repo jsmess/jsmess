@@ -13,19 +13,23 @@
 *  Successful compile
 *  Successful run
 *  Correctly Interleave 8086 CPU roms
-*  Debug LEDs hooked to popmessage
+*  Debug LEDs hooked to popmessage - this needs work
 *  Correctly load UPD7720 roms as UPD7725 data - done, this is utterly disgusting code.
+*  Attached i8251a uart at u15
 *
 *  TODO:
+*  Hook the terminal to the i8251a uart at u15
+*  Attach the other i8251a uart (assuming it is hooked to the hardware at all!)
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
 *  Correct memory maps and io maps - partly done
-*  Attach peripherals, timers and uarts
+*  Attach 8259 PIC and figure out where all the ints come from
 *  Add dipswitches and jumpers
-*  Hook terminal to serial UARTS
 *  Everything else 
 *
 *  Notes:
 *  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
+*  When switch s4-7 is switched on, the hardware says, over and over:
+*  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -34,6 +38,7 @@
 #include "includes/tsispch.h"
 #include "cpu/upd7725/upd7725.h"
 #include "cpu/i86/i86.h"
+#include "machine/msm8251.h"
 #include "machine/terminal.h"
 
 /*
@@ -42,10 +47,12 @@
 
 static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
-	DEVCB_NULL // for now...
+	DEVCB_NULL // should be connected to the input of the uart
 };
 
-WRITE16_MEMBER( tsispch_state::led_w )
+/* led/dipswitch stuff */
+
+WRITE16_MEMBER( tsispch_state::led_dsw_w )
 {
 	tsispch_state *state = machine->driver_data<tsispch_state>();
 	UINT16 data2 = data >> 8;
@@ -57,6 +64,9 @@ WRITE16_MEMBER( tsispch_state::led_w )
 #endif
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", BIT(data2,7), BIT(data2,6), BIT(data2,5), BIT(data2,4), BIT(data2,3), BIT(data2,2), BIT(data2,1), BIT(data2,0));
 }
+
+
+/* upd7720 stuff */
 
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
@@ -178,9 +188,10 @@ DRIVER_INIT( prose2k )
 static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
-	//AM_RANGE(0x03000, 0x03003) AM_MIRROR(0x341FC) // iP8251A@U15
+	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
+	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
 	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x34000) AM_WRITE(led_w) // write is 8 bits, but there are only 4 debug leds; other 4 bits may select a bank of dipswitches to be read here?
+	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x34000) AM_WRITE(led_dsw_w) // write is 8 bits, but there are only 4 debug leds; other 4 bits may select a bank of dipswitches to be read here?
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
 	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
@@ -218,6 +229,9 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* TODO: correct clock (may be correct, since theres a 24mhz xtal) and correct dsp type is UPD77P20 */
     MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
     MCFG_CPU_DATA_MAP(dsp_data_map)
+
+    /* uarts */
+    MCFG_MSM8251_ADD("i8251a_u15", default_msm8251_interface)
 
     /* sound hardware */
     //MCFG_SPEAKER_STANDARD_MONO("mono")

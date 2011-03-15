@@ -18,12 +18,14 @@ public:
 		: driver_device(machine, config),
 		  m_maincpu(*this, "maincpu"),
 		  m_dsp(*this, "dsp"),
-		  m_terminal(*this, TERMINAL_TAG)
+		  m_terminal(*this, TERMINAL_TAG),
+		  m_uart(*this, "i8251a_u15")
 		{ }
 		
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<device_t> m_terminal;
+	required_device<device_t> m_uart;
 
 	UINT8 infifo[32];			// input fifo
 	UINT8 infifo_tail_ptr;		// " tail
@@ -31,7 +33,7 @@ public:
 	UINT8 statusLED;			// status led
 
 	virtual void machine_reset();
-	DECLARE_WRITE16_MEMBER(led_w);
+	DECLARE_WRITE16_MEMBER(led_dsw_w);
 	DECLARE_READ16_MEMBER(dsp_data_r);
 	DECLARE_WRITE16_MEMBER(dsp_data_w);
 	DECLARE_READ16_MEMBER(dsp_status_r);
