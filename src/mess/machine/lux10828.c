@@ -157,9 +157,14 @@ void luxor_55_10828_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-//		memset(&m_out_txd_func, 0, sizeof(m_out_txd_func));
+		fatalerror("Interface not provided!");
 	}
 
+	m_drive_tag = intf->m_drive_tag;
+	m_sw1 = intf->m_sw1;
+	m_drive_type = intf->m_drive_type;
+	m_s1 = intf->m_s1;
+	
 	m_shortname = "lux10828";
 }
 
@@ -200,7 +205,7 @@ const rom_entry *luxor_55_10828_device_config::rom_region() const
 
 static ADDRESS_MAP_START( luxor_55_10828_mem, ADDRESS_SPACE_PROGRAM, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc830", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("luxor_55_10828:abc830", 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -436,8 +441,8 @@ luxor_55_10828_device::luxor_55_10828_device(running_machine &_machine, const lu
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
+	  m_image0(*machine->device(_config.m_drive_tag), FLOPPY_0),
+	  m_image1(*machine->device(_config.m_drive_tag), FLOPPY_1),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_fdc_drq(0),

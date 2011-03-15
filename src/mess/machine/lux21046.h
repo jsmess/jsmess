@@ -46,18 +46,19 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_LUXOR_55_21046_ADD(_bus_tag, _address, _drive_type) \
+#define MCFG_LUXOR_55_21046_ADD(_config) \
     MCFG_DEVICE_ADD(LUXOR_55_21046_TAG, LUXOR_55_21046, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(luxor_55_21046_interface, m_bus_tag, _bus_tag) \
-    MCFG_DEVICE_CONFIG_DATA32(luxor_55_21046_interface, m_sw1, 0x03) \
-    MCFG_DEVICE_CONFIG_DATA32(luxor_55_21046_interface, m_sw2, _drive_type) \
-    MCFG_DEVICE_CONFIG_DATA32(luxor_55_21046_interface, m_sw3, _address)
+	MCFG_DEVICE_CONFIG(_config)
+
+
+#define LUXOR_55_21046_INTERFACE(name) \
+	const luxor_55_21046_interface (name) =
 
 
 #define LUXOR_55_21046_ABCBUS(_tag) \
 	_tag, DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, cs_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, stat_r), \
 	DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, inp_r), DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, utp_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, c1_w), \
-	DEVCB_NULL, DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, luxor_55_21046_device, rst_w)
+	DEVCB_NULL, DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER(_tag, luxor_55_21046_device, rst_w)
 
 
 
@@ -69,7 +70,7 @@
 
 struct luxor_55_21046_interface
 {
-	const char *m_bus_tag;		// bus device
+	const char *m_drive_tag;	// drive tag
 	UINT8 m_sw1;				// single/double sided/density
 	UINT8 m_sw2;				// drive type
 	UINT8 m_sw3;				// ABC bus address
@@ -99,6 +100,12 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
+	
+private:
+	const char *m_drive_tag;	// drive tag
+	UINT8 m_sw1;				// DS/DD
+	UINT8 m_sw2;				// drive type
+	UINT8 m_sw3;				// ABC bus address
 };
 
 
@@ -150,10 +157,6 @@ private:
 	int m_dma_irq;				// DMA interrupt
 	int m_busy;					// busy bit
 	int m_force_busy;			// force busy bit
-
-	UINT8 m_sw1;				// DS/DD
-	UINT8 m_sw2;				// drive type
-	UINT8 m_sw3;				// ABC bus address
 
     const luxor_55_21046_device_config &m_config;
 };

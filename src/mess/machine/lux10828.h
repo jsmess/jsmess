@@ -31,23 +31,35 @@
 #define ADDRESS_ABC850			44
 
 
+#define DRIVE_TEAC_FD55F		0x01
+#define DRIVE_BASF_6138			0x02
+#define DRIVE_MICROPOLIS_1015F	0x03
+#define DRIVE_BASF_6118			0x04
+#define DRIVE_MICROPOLIS_1115F	0x05
+#define DRIVE_BASF_6106_08		0x08
+#define DRIVE_MPI_51			0x09
+#define DRIVE_BASF_6105			0x0e
+#define DRIVE_BASF_6106			0x0f
+
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_LUXOR_55_10828_ADD(_bus_tag, _address, _drive_type) \
+#define MCFG_LUXOR_55_10828_ADD(_config) \
     MCFG_DEVICE_ADD(LUXOR_55_10828_TAG, LUXOR_55_10828, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(luxor_55_10828_interface, m_bus_tag, _bus_tag) \
-    MCFG_DEVICE_CONFIG_DATA32(luxor_55_10828_interface, m_sw1, 0x03) \
-    MCFG_DEVICE_CONFIG_DATA32(luxor_55_10828_interface, m_drive_type, _drive_type) \
-    MCFG_DEVICE_CONFIG_DATA32(luxor_55_10828_interface, m_s1, _address)
+	MCFG_DEVICE_CONFIG(_config)
+
+
+#define LUXOR_55_10828_INTERFACE(name) \
+	const luxor_55_10828_interface (name) =
 
 
 #define LUXOR_55_10828_ABCBUS(_tag) \
 	_tag, DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, cs_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, stat_r), \
 	DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, inp_r), DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, utp_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, c1_w), \
-	DEVCB_NULL, DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, luxor_55_10828_device, rst_w)
+	DEVCB_NULL, DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER(_tag, luxor_55_10828_device, rst_w)
 
 
 
@@ -59,7 +71,7 @@
 
 struct luxor_55_10828_interface
 {
-	const char *m_bus_tag;		// bus device
+	const char *m_drive_tag;	// drive tag
 	UINT8 m_sw1;				// single/double sided/density
 	UINT8 m_drive_type;			// drive type
 	UINT8 m_s1;					// ABC bus address
@@ -89,6 +101,12 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
+	
+private:
+	const char *m_drive_tag;	// drive tag
+	UINT8 m_sw1;				// single/double sided/density
+	UINT8 m_drive_type;			// drive type
+	UINT8 m_s1;					// ABC bus address
 };
 
 
