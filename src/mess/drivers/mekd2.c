@@ -30,6 +30,7 @@
     - Proper artwork
 
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -46,102 +47,28 @@ class mekd2_state : public driver_device
 {
 public:
 	mekd2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_pia_s(*this, "pia_s"),
+	m_pia_u(*this, "pia_u"),
+	m_acia(*this, "acia")
+	{ }
 
-	UINT8 segment;
-	UINT8 digit;
-	UINT8 keydata;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pia_s;
+	required_device<device_t> m_pia_u;
+	required_device<device_t> m_acia;
+	DECLARE_READ_LINE_MEMBER( mekd2_key40_r );
+	DECLARE_READ8_MEMBER( mekd2_key_r );
+	DECLARE_WRITE_LINE_MEMBER( mekd2_nmi_w );
+	DECLARE_WRITE8_MEMBER( mekd2_digit_w );
+	DECLARE_WRITE8_MEMBER( mekd2_segment_w );
+	UINT8 m_segment;
+	UINT8 m_digit;
+	UINT8 m_keydata;
 };
 
 
-/***********************************************************
-
-    Trace hardware (what happens when N is pressed)
-
-************************************************************/
-
-static TIMER_CALLBACK( mekd2_trace )
-{
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( mekd2_nmi_w )
-{
-	if (state)
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	else
-		device->machine->scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
-}
-
-/***********************************************************
-
-    Keyboard
-
-************************************************************/
-
-static READ_LINE_DEVICE_HANDLER( mekd2_key40_r )
-{
-	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	return BIT(state->keydata, 6);
-}
-
-static READ8_DEVICE_HANDLER( mekd2_key_r )
-{
-	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	char kbdrow[4];
-	UINT8 i;
-	state->keydata = 0xff;
-
-	for (i = 0; i < 6; i++)
-	{
-		if (BIT(state->digit, i))
-		{
-			sprintf(kbdrow,"X%d",i);
-			state->keydata &= input_port_read(device->machine, kbdrow);
-		}
-	}
-
-	i = 0x80;
-	if (state->digit < 0x40)
-		i = BIT(state->keydata, 0) ? 0x80 : 0;
-	else
-	if (state->digit < 0x80)
-		i = BIT(state->keydata, 1) ? 0x80 : 0;
-	else
-	if (state->digit < 0xc0)
-		i = BIT(state->keydata, 2) ? 0x80 : 0;
-	else
-		i = BIT(state->keydata, 3) ? 0x80 : 0;
-
-	return i | state->segment;
-}
-
-/***********************************************************
-
-    LED display
-
-************************************************************/
-
-static WRITE8_DEVICE_HANDLER( mekd2_segment_w )
-{
-	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	state->segment = data & 0x7f;
-}
-
-static WRITE8_DEVICE_HANDLER( mekd2_digit_w )
-{
-	UINT8 i;
-	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	if (data < 0x3f)
-	{
-		for (i = 0; i < 6; i++)
-		{
-			if (BIT(data, i))
-				output_set_digit_value(i, ~state->segment & 0x7f);
-		}
-	}
-	state->digit = data;
-}
 
 /***********************************************************
 
@@ -149,12 +76,12 @@ static WRITE8_DEVICE_HANDLER( mekd2_digit_w )
 
 ************************************************************/
 
-static ADDRESS_MAP_START( mekd2_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( mekd2_mem , ADDRESS_SPACE_PROGRAM, 8, mekd2_state)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
-	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia_u", pia6821_r, pia6821_w)
-	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE_LEGACY("pia_u", pia6821_r, pia6821_w)
+	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE_LEGACY("acia", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE_LEGACY("acia", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE_LEGACY("pia_s", pia6821_r, pia6821_w)
 	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
 	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)	/* JBUG ROM */
 ADDRESS_MAP_END
@@ -229,21 +156,112 @@ INPUT_PORTS_END
 
 /***********************************************************
 
+    Trace hardware (what happens when N is pressed)
+
+************************************************************/
+
+static TIMER_CALLBACK( mekd2_trace )
+{
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
+{
+	if (state)
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	else
+		machine->scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
+}
+
+
+
+/***********************************************************
+
+    Keyboard
+
+************************************************************/
+
+READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
+{
+	return BIT(m_keydata, 6);
+}
+
+READ8_MEMBER( mekd2_state::mekd2_key_r )
+{
+	char kbdrow[4];
+	UINT8 i;
+	m_keydata = 0xff;
+
+	for (i = 0; i < 6; i++)
+	{
+		if (BIT(m_digit, i))
+		{
+			sprintf(kbdrow,"X%d",i);
+			m_keydata &= input_port_read(machine, kbdrow);
+		}
+	}
+
+	i = 0x80;
+	if (m_digit < 0x40)
+		i = BIT(m_keydata, 0) ? 0x80 : 0;
+	else
+	if (m_digit < 0x80)
+		i = BIT(m_keydata, 1) ? 0x80 : 0;
+	else
+	if (m_digit < 0xc0)
+		i = BIT(m_keydata, 2) ? 0x80 : 0;
+	else
+		i = BIT(m_keydata, 3) ? 0x80 : 0;
+
+	return i | m_segment;
+}
+
+
+
+/***********************************************************
+
+    LED display
+
+************************************************************/
+
+WRITE8_MEMBER( mekd2_state::mekd2_segment_w )
+{
+	m_segment = data & 0x7f;
+}
+
+WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
+{
+	UINT8 i;
+	if (data < 0x3f)
+	{
+		for (i = 0; i < 6; i++)
+		{
+			if (BIT(data, i))
+				output_set_digit_value(i, ~m_segment & 0x7f);
+		}
+	}
+	m_digit = data;
+}
+
+
+
+/***********************************************************
+
     Interfaces
 
 ************************************************************/
 
 static const pia6821_interface mekd2_s_mc6821_intf =
 {
-	DEVCB_HANDLER(mekd2_key_r),				/* port A input */
+	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_key_r),		/* port A input */
 	DEVCB_NULL,						/* port B input */
 	DEVCB_NULL,						/* CA1 input */
-	DEVCB_LINE(mekd2_key40_r),				/* CB1 input */
+	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_key40_r),	/* CB1 input */
 	DEVCB_NULL,						/* CA2 input */
 	DEVCB_NULL,						/* CB2 input */
-	DEVCB_HANDLER(mekd2_segment_w),				/* port A output */
-	DEVCB_HANDLER(mekd2_digit_w),				/* port B output */
-	DEVCB_LINE(mekd2_nmi_w),				/* CA2 output */
+	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_segment_w),	/* port A output */
+	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_digit_w),	/* port B output */
+	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_nmi_w),	/* CA2 output */
 	DEVCB_NULL,						/* CB2 output */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),	/* IRQA output */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI)		/* IRQB output */
