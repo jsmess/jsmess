@@ -9,6 +9,9 @@
 	TODO:
 	- keyboard hookup is copied from mz2500, but it's actually different;
 	- cassette interface;
+	- implement remaining video capabilities
+	- some softwares (namely the Art Magic one) hangs with a pit timer
+	  status bit, check out why;
 
 ****************************************************************************/
 
@@ -45,6 +48,8 @@ public:
 
 	UINT8 old_portc;
 	UINT8 width80;
+	UINT8 tvram_attr;
+	UINT8 gvram_mask;
 };
 
 static VIDEO_START( mz2000 )
@@ -55,9 +60,31 @@ static SCREEN_UPDATE( mz2000 )
 {
 	mz2000_state *state = screen->machine->driver_data<mz2000_state>();
 	UINT8 *tvram = screen->machine->region("tvram")->base();
+	UINT8 *gvram = screen->machine->region("gvram")->base();
 	UINT8 *gfx_data = screen->machine->region("chargen")->base();
 	int x,y,xi,yi;
 	UINT8 x_size;
+	UINT32 count;
+
+	count = 0;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<640;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int pen;
+				pen  = ((gvram[count+0x4000] >> (xi)) & 1) ? 1 : 0; //B
+				pen |= ((gvram[count+0x8000] >> (xi)) & 1) ? 2 : 0; //R
+				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
+				pen &= state->gvram_mask;
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen];
+			}
+			count++;
+		}
+	}
 
 	x_size = (state->width80+1)*40;
 
@@ -66,7 +93,7 @@ static SCREEN_UPDATE( mz2000 )
 		for(x=0;x<x_size;x++)
 		{
 			UINT8 tile = tvram[y*x_size+x];
-			UINT8 color = 7;
+			UINT8 color = state->tvram_attr & 7;
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -81,15 +108,18 @@ static SCREEN_UPDATE( mz2000 )
 					if(res_x > 640-1 || res_y > 200-1)
 						continue;
 
-					pen = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? color : 0;
+					pen = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? color : -1;
 
-					if(state->width80 == 0)
+					if(pen != -1)
 					{
-						*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine->pens[pen];
+						if(state->width80 == 0)
+						{
+							*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine->pens[pen];
+							*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine->pens[pen];
+						}
+						else
+							*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
 					}
-					else
-						*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
 				}
 			}
 		}
@@ -242,14 +272,26 @@ static WRITE8_HANDLER( timer_w )
 
 static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
 {
-	//mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	//mz2000_state *state = device->machine->driver_data<mz2000_state>();
 	return wd17xx_r(device, offset) ^ 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
 {
-	//mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	//mz2000_state *state = device->machine->driver_data<mz2000_state>();
 	wd17xx_w(device, offset, data ^ 0xff);
+}
+
+static WRITE8_HANDLER( mz2000_tvram_attr_w )
+{
+	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	state->tvram_attr = data;
+}
+
+static WRITE8_HANDLER( mz2000_gvram_mask_w )
+{
+	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	state->gvram_mask = data;
 }
 
 static ADDRESS_MAP_START(mz2000_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -267,6 +309,8 @@ static ADDRESS_MAP_START(mz2000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 //	AM_RANGE(0xf4, 0xf7) CRTC
+	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
 ADDRESS_MAP_END
 
@@ -632,6 +676,13 @@ static const struct pit8253_config mz2000_pit8253_intf =
 	}
 };
 
+static PALETTE_INIT( mz2000 )
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, i,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+}
 
 static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	/* basic machine hardware */
@@ -660,7 +711,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 
 	MCFG_GFXDECODE(mz2000)
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(mz2000)
 
 	MCFG_VIDEO_START(mz2000)
 	MCFG_SCREEN_UPDATE(mz2000)
@@ -691,7 +742,7 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
+	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 ROM_END
 
 
@@ -699,4 +750,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, mz2000,   mz80b,    0,   mz2000,   mz2000,  0, "Sharp",   "MZ-2000", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, mz2000,   mz80b,    0,   mz2000,   mz2000,  0, "Sharp",   "MZ-2000", GAME_NOT_WORKING )
