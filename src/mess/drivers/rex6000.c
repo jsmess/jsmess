@@ -152,7 +152,7 @@ READ8_MEMBER( rex6000_state::touchscreen_r )
 
 static ADDRESS_MAP_START(rex6000_mem, ADDRESS_SPACE_PROGRAM, 8, rex6000_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
+	AM_RANGE( 0x0000, 0x7fff ) AM_ROM	AM_REGION("flash", 0)
 	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xa000, 0xbfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM				//system RAM
@@ -186,7 +186,7 @@ INPUT_PORTS_START( rex6000 )
 	PORT_START("INPUT")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Home")	PORT_CODE(KEYCODE_ENTER)		PORT_CHANGED(trigger_irq, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Back")	PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHANGED(trigger_irq, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("OK")		PORT_CODE(KEYCODE_SPACE)		PORT_CHANGED(trigger_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Select")		PORT_CODE(KEYCODE_SPACE)		PORT_CHANGED(trigger_irq, 0)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Left")	PORT_CODE(KEYCODE_LEFT)			PORT_CHANGED(trigger_irq, 0)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Right")	PORT_CODE(KEYCODE_RIGHT)		PORT_CHANGED(trigger_irq, 0)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen")	PORT_CODE(MOUSECODE_BUTTON1)	PORT_CHANGED(trigger_irq, 0)
@@ -200,7 +200,7 @@ INPUT_PORTS_END
 
 void rex6000_state::machine_start()
 {
-	m_bank_base = (UINT8*)machine->region("maincpu")->base();
+	m_bank_base = (UINT8*)machine->region("flash")->base();
 
 	memory_set_bankptr(machine, "bank1", m_bank_base + 0x8000);
 	memory_set_bankptr(machine, "bank2", m_bank_base);
@@ -240,6 +240,54 @@ static PALETTE_INIT( rex6000 )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
+/* F4 Character Displayer */
+static const gfx_layout rex6000_bold_charlayout =
+{
+	16, 11,					/* 16 x 11 characters */
+	256,					/* 256 characters */
+	1,						/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },
+	/* y offsets */
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16 },
+	8*24			/* every char takes 24 bytes, first 2 bytes are used for the char size */
+};
+
+static const gfx_layout rex6000_tiny_charlayout =
+{
+	16, 9,					/* 16 x 9 characters */
+	256,					/* 256 characters */
+	1,						/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },
+	/* y offsets */
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16 },
+	8*20			/* every char takes 20 bytes, first 2 bytes ared use for the char size */
+};
+
+static const gfx_layout rex6000_graph_charlayout =
+{
+	16, 13,					/* 16 x 13 characters */
+	48,						/* 48 characters */
+	1,						/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },
+	/* y offsets */
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16 , 11*16 , 12*16 },
+	8*28			/* every char takes 28 bytes, first 2 bytes are used for the char size */
+};
+
+static GFXDECODE_START( rex6000 )
+	GFXDECODE_ENTRY( "flash", 0x0f0000, rex6000_bold_charlayout,  0, 0 )	//normal
+	GFXDECODE_ENTRY( "flash", 0x0f2000, rex6000_bold_charlayout,  0, 0 )	//bold
+	GFXDECODE_ENTRY( "flash", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )	//tiny
+	GFXDECODE_ENTRY( "flash", 0x0f6000, rex6000_graph_charlayout, 0, 0 )	//graphic
+GFXDECODE_END
+
+
 static const tc8521_interface rex6000_tc8521_interface =
 {
 	NULL
@@ -263,13 +311,14 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(rex6000)
+	MCFG_GFXDECODE(rex6000)
 
 	MCFG_TC8521_ADD("rtc", rex6000_tc8521_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rex6000 )
-    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE )
+    ROM_REGION( 0x400000, "flash", ROMREGION_ERASE )
 	ROM_LOAD( "rex6000.dat", 0x0000, 0x200000, CRC(b476f7e0) SHA1(46a56634576408a5b0dca80aea08513e856c3bb1))
 ROM_END
 
