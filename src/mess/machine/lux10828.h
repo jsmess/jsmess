@@ -71,7 +71,6 @@
 
 struct luxor_55_10828_interface
 {
-	const char *m_drive_tag;	// drive tag
 	UINT8 m_sw1;				// single/double sided/density
 	UINT8 m_drive_type;			// drive type
 	UINT8 m_s1;					// ABC bus address
@@ -103,7 +102,6 @@ protected:
     virtual void device_config_complete();
 	
 private:
-	const char *m_drive_tag;	// drive tag
 	UINT8 m_sw1;				// single/double sided/density
 	UINT8 m_drive_type;			// drive type
 	UINT8 m_s1;					// ABC bus address
@@ -150,8 +148,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_image0;
-	required_device<device_t> m_image1;
+	device_t *m_image0;
+	device_t *m_image1;
 
 	bool m_cs;				// card selected
 	UINT8 m_status;			// ABC BUS status

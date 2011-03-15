@@ -160,7 +160,6 @@ void luxor_55_10828_device_config::device_config_complete()
 		fatalerror("Interface not provided!");
 	}
 
-	m_drive_tag = intf->m_drive_tag;
 	m_sw1 = intf->m_sw1;
 	m_drive_type = intf->m_drive_type;
 	m_s1 = intf->m_s1;
@@ -441,8 +440,8 @@ luxor_55_10828_device::luxor_55_10828_device(running_machine &_machine, const lu
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
-	  m_image0(*machine->device(_config.m_drive_tag), FLOPPY_0),
-	  m_image1(*machine->device(_config.m_drive_tag), FLOPPY_1),
+	  m_image0(machine->device(FLOPPY_0)),
+	  m_image1(machine->device(FLOPPY_1)),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_fdc_drq(0),

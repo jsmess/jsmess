@@ -114,7 +114,6 @@ void luxor_55_21046_device_config::device_config_complete()
 		fatalerror("Interface not provided!");
 	}
 	
-	m_drive_tag = intf->m_drive_tag;
 	m_sw1 = intf->m_sw1;
 	m_sw2 = intf->m_sw2;
 	m_sw3 = intf->m_sw3;
@@ -400,8 +399,8 @@ luxor_55_21046_device::luxor_55_21046_device(running_machine &_machine, const lu
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),
-	  m_image0(*machine->device(_config.m_drive_tag), FLOPPY_0),
-	  m_image1(*machine->device(_config.m_drive_tag), FLOPPY_1),
+	  m_image0(machine->device(FLOPPY_0)),
+	  m_image1(machine->device(FLOPPY_1)),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_dma_irq(0),
@@ -429,10 +428,10 @@ void luxor_55_21046_device::device_start()
 	save_item(NAME(m_force_busy));
 
 	// patch out sector skew table
-	UINT8 *rom = subregion("conkort")->base();
+/*	UINT8 *rom = subregion("conkort")->base();
 
 	for (int i = 0; i < 16; i++)
-		rom[0x2dd3 + i] = i + 1;
+		rom[0x2dd3 + i] = i + 1;*/
 }
 
 

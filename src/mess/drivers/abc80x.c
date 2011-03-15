@@ -1251,7 +1251,7 @@ static const cassette_config abc800_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ LUXOR_55_21046_ABCBUS("luxor_55_21046") },
+	{ LUXOR_55_21046_ABCBUS(LUXOR_55_21046_TAG) },
 	{ NULL }
 };
 
@@ -1446,7 +1446,8 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MCFG_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
+	MCFG_ABC830_ADD()
+	MCFG_LUXOR_55_21046_ADD(abc830_fast_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1489,7 +1490,8 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MCFG_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
+	MCFG_ABC830_ADD()
+	MCFG_LUXOR_55_21046_ADD(abc830_fast_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1530,7 +1532,8 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MCFG_ABC834_ADD("luxor_55_21046", ABCBUS_TAG)
+	MCFG_ABC834_ADD()
+	MCFG_LUXOR_55_21046_ADD(abc834_fast_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1565,7 +1568,8 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MCFG_ABC832_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_TEAC_FD55F)
+	MCFG_ABC832_ADD()
+	MCFG_LUXOR_55_21046_ADD(abc832_fast_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1673,7 +1677,7 @@ ROM_START( abc800m )
 	ROM_LOAD_OPTIONAL( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
 	ROM_LOAD_OPTIONAL( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
 
-	ROM_REGION( 0x800, "abc852", 0 )
+	ROM_REGION( 0x1000, "abc852", 0 )
 	ROM_LOAD_OPTIONAL( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126 (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
 
 	ROM_REGION( 0x800, "abc856", 0 )

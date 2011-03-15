@@ -187,6 +187,7 @@ Notes:
 #include "imagedev/printer.h"
 #include "machine/abcbus.h"
 #include "machine/abc830.h"
+#include "machine/lux10828.h"
 #include "machine/rs232.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
@@ -465,8 +466,6 @@ static INPUT_PORTS_START( abc80 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_c_w)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_envelope_2_w)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_envelope_1_w)
-
-	PORT_INCLUDE(luxor_55_10828)
 INPUT_PORTS_END
 
 
@@ -642,7 +641,7 @@ static const cassette_config abc80_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ LUXOR_55_10828_ABCBUS("luxor_55_10828") },
+	{ LUXOR_55_10828_ABCBUS(LUXOR_55_10828_TAG) },
 	{ NULL }
 };
 
@@ -718,7 +717,8 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 
 	/* Luxor Conkort 55-10828 */
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MCFG_ABC830_PIO_ADD("luxor_55_10828", ABCBUS_TAG, DRIVE_MPI_51)
+	MCFG_ABC830_ADD()
+	MCFG_LUXOR_55_10828_ADD(abc830_slow_intf)
 
 	/* devices */
 	MCFG_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
