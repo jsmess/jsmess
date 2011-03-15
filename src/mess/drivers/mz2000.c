@@ -6,6 +6,10 @@
 
 	Basically a simpler version of Sharp MZ-2500
 
+	TODO:
+	- keyboard hookup is copied from mz2500, but it's actually different;
+	- cassette interface;
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -218,6 +222,18 @@ static WRITE8_HANDLER( timer_w )
 	pit8253_gate1_w(pit8253, 1);
 }
 
+static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
+{
+	//mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	return wd17xx_r(device, offset) ^ 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
+{
+	//mz2500_state *state = device->machine->driver_data<mz2500_state>();
+	wd17xx_w(device, offset, data ^ 0xff);
+}
+
 static ADDRESS_MAP_START(mz2000_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
@@ -226,7 +242,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mz2000_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", wd17xx_r, wd17xx_w)
+	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2000_wd17xx_r, mz2000_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
