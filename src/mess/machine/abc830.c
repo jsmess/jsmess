@@ -40,7 +40,7 @@ const floppy_config abc830_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSDD_40,
     FLOPPY_OPTIONS_NAME(abc830),
-    "floppy_5_25"
+    "abc830"
 };
 
 
@@ -66,7 +66,7 @@ const floppy_config abc832_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSQD,
     FLOPPY_OPTIONS_NAME(abc832),
-    "floppy_5_25"
+    "abc832"
 };
 
 
@@ -92,7 +92,7 @@ const floppy_config abc838_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_8_DSDD,
     FLOPPY_OPTIONS_NAME(abc838),
-    "floppy_8"
+    "abc838"
 };
 
 
