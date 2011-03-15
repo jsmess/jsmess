@@ -32,6 +32,10 @@ public:
 
 	virtual void machine_reset();
 	DECLARE_WRITE16_MEMBER(led_w);
+	DECLARE_READ16_MEMBER(dsp_data_r);
+	DECLARE_WRITE16_MEMBER(dsp_data_w);
+	DECLARE_READ16_MEMBER(dsp_status_r);
+	DECLARE_WRITE16_MEMBER(dsp_status_w);
 };
 
 

@@ -36,6 +36,10 @@
 #include "cpu/i86/i86.h"
 #include "machine/terminal.h"
 
+/*
+   Devices and handlers
+ */
+
 static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
 	DEVCB_NULL // for now...
@@ -54,6 +58,45 @@ WRITE16_MEMBER( tsispch_state::led_w )
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", BIT(data2,7), BIT(data2,6), BIT(data2,5), BIT(data2,4), BIT(data2,3), BIT(data2,2), BIT(data2,1), BIT(data2,0));
 }
 
+READ16_MEMBER( tsispch_state::dsp_data_r )
+{
+	upd7725_device *upd7725 = machine->device<upd7725_device>("dsp");
+#ifdef DEBUG_DSP
+	UINT8 temp;
+	temp = upd7725->snesdsp_read(true);
+	fprintf(stderr, "dsp data read: %02x\n", temp);
+	return temp;
+#else
+	return upd7725->snesdsp_read(true);
+#endif
+}
+
+WRITE16_MEMBER( tsispch_state::dsp_data_w )
+{
+	upd7725_device *upd7725 = machine->device<upd7725_device>("dsp");
+	upd7725->snesdsp_write(true, data);
+}
+
+READ16_MEMBER( tsispch_state::dsp_status_r )
+{
+	upd7725_device *upd7725 = machine->device<upd7725_device>("dsp");
+#ifdef DEBUG_DSP
+	UINT8 temp;
+	temp = upd7725->snesdsp_read(false);
+	fprintf(stderr, "dsp status read: %02x\n", temp);
+	return temp;
+#else
+	return upd7725->snesdsp_read(false);
+#endif
+}
+
+WRITE16_MEMBER( tsispch_state::dsp_status_w )
+{
+	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
+	upd7725_device *upd7725 = machine->device<upd7725_device>("dsp");
+	upd7725->snesdsp_write(false, data);
+}
+
 /* Reset */
 void tsispch_state::machine_reset()
 {
@@ -61,6 +104,9 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) infifo[i] = 0;
 	infifo_tail_ptr = infifo_head_ptr = 0;
+	// below seem to be unnecessary?
+	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
 	fprintf(stderr,"machine reset\n");
 }
 
@@ -122,7 +168,7 @@ DRIVER_INIT( prose2k )
      0   0   x   x    0   x   1   1    0   0  1  x   x  x  x  x   x  x  *  x  AMD P8259A PIC
      0   0   x   x    0   x   1   1    0   1  0  ?   ?  ?  ?  ?   ?  ?  ?  ?  LEDS and dipswitches?
      0   0   x   x    0   x   1   1    0   1  1  x   x  x  x  x   x  x  *  x  UPD77P20 data/status
-     0   0   x   x    0   x   1   1    1                                      Open bus?
+     0   0   x   x    0   x   1   1    1   x  x                               Open bus?
      0   0   x   x    1   x                                                   Open bus?
      0   1                                                                    Open bus?
      1   0                                                                    Open bus?
@@ -132,11 +178,11 @@ DRIVER_INIT( prose2k )
 static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
-	//AM_RANGE(0x03000, 0x03003) AM_MIRROR(0x341FD) // iP8251A@U15
-	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FD) // AMD P8259 PIC @ U5
+	//AM_RANGE(0x03000, 0x03003) AM_MIRROR(0x341FC) // iP8251A@U15
+	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x34000) AM_WRITE(led_w) // write is 8 bits, but there are only 4 debug leds; other 4 bits may select a bank of dipswitches to be read here?
-	//AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FD) // UPD77P20 data reg r/w
-	//AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FD) // UPD77P20 status reg r
+	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
+	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
 ADDRESS_MAP_END
 
@@ -165,11 +211,11 @@ INPUT_PORTS_END
 ******************************************************************************/
 static MACHINE_CONFIG_START( prose2k, tsispch_state )
     /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8086, 4772720) /* TODO: correct clock speed */
+    MCFG_CPU_ADD("maincpu", I8086, 4000000) /* TODO: correct clock speed? theres a 16mhz xtal... */
     MCFG_CPU_PROGRAM_MAP(i8086_mem)
     MCFG_CPU_IO_MAP(i8086_io)
 
-    MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* TODO: correct clock and correct dsp type is UPD77P20 */
+    MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* TODO: correct clock (may be correct, since theres a 24mhz xtal) and correct dsp type is UPD77P20 */
     MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
     MCFG_CPU_DATA_MAP(dsp_data_map)
 
@@ -203,18 +249,23 @@ ROM_START( prose2k )
 	// mapping proms:
 	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
 	// L - always low; H - always high
-	// U77: unknown (what does this do?); input is ?
+	// U77: unknown (what does this do?)
+	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0
 	//      output bits 0bLLLLzyxH
-	//      x - unknown
-	//      y - unknown
-	//      z - unknown
+	//      bit - function
+	//      7, 6, 5, 4 - seem unconnected?
+	//      3 - connection unknown, low in the RAM, ROM, and Peripheral memory areas
+	//      2 - connection unknown, low in the RAM and ROM memory areas
+	//      1 - unknown, always high
+	//      0 - unknown, always high
 	//
 	// U79: SRAM and peripheral mapping:
-	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0 (NEEDS VERIFY)
+	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0, same as U77
 	//      On the Prose 2000 board dumped, only bits 3 and 0 are used;
 	//      bits 7-4 are always low, bits 2 and 1 are always high.
 	//      SRAMS are only populated in U61 and U64.
 	//      output bits 0bLLLLyHHx
+	//      7,6,5,4 - seem unconnected?
 	//      3 - to /EN3 (pin 4) of 74S138N at U80
 	//          AND to EN1 (pin 6) of 74S138N at U78
 	//          i.e. one is activated when pin is high and other when pin is low
@@ -230,9 +281,12 @@ ROM_START( prose2k )
 	//          The 74S138N at U78: <wip>
 	//              /EN3 - ?
 	//              /EN2 - ?
-	//              inputs: ?
+	//              inputs: S0 - A18; S1 - A19; S2 - Pulled to GND
+	//              /Y0 - ?
+	//              /Y1 - ?
+	//              /Y2 - ?
 	//              /Y3 - connects somewhere
-	//              <wip>
+	//              /Y4-/Y7 - never used since S2 is pulled to GND
 	//      2 - to /CS1 on 6264 SRAMs at U63 and U66
 	//      1 - to /CS1 on 6264 SRAMs at U62 and U65
 	//      0 - to /CS1 on 6264 SRAMs at U61 and U64
