@@ -35,6 +35,7 @@ public:
  
 	// optional information overrides
 	virtual machine_config_constructor machine_config_additions() const;
+	virtual const input_port_token *input_ports() const;
 	
 	const char *m_cputag;
 };

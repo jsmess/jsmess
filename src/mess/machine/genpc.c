@@ -368,7 +368,7 @@ static READ8_DEVICE_HANDLER (genpc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(device->machine, "DSW0");
+		data = input_port_read(board, "DSW0");
 	}
 	else
 	{
@@ -392,13 +392,13 @@ static READ8_DEVICE_HANDLER ( genpc_ppi_portc_r )
 	if (board->ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((input_port_read(device->machine, "DSW0") >> 4) & 0x0f);
+		data = (data & 0xf0) | ((input_port_read(board, "DSW0") >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(device->machine, "DSW0") & 0x0f);
+		data = (data & 0xf0) | (input_port_read(board, "DSW0") & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -528,6 +528,41 @@ machine_config_constructor pc_motherboard_device_config::machine_config_addition
 {
 	return MACHINE_CONFIG_NAME( pc_motherboard_config );
 }
+
+
+static INPUT_PORTS_START( pc_motherboard )
+	PORT_START("DSW0") /* IN1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x40, "2" )
+	PORT_DIPSETTING(	0x80, "3" )
+	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter")
+	PORT_DIPSETTING(	0x00, "EGA/VGA" )
+	PORT_DIPSETTING(	0x10, "Color 40x25" )
+	PORT_DIPSETTING(	0x20, "Color 80x25" )
+	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
+	PORT_DIPSETTING(	0x00, "1 - 16/ 64/256K" )
+	PORT_DIPSETTING(	0x04, "2 - 32/128/512K" )
+	PORT_DIPSETTING(	0x08, "3 - 48/192/576K" )
+	PORT_DIPSETTING(	0x0c, "4 - 64/256/640K" )
+	PORT_DIPNAME( 0x02, 0x00, "8087 installed")
+	PORT_DIPSETTING(	0x00, DEF_STR(No) )
+	PORT_DIPSETTING(	0x02, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x01, 0x01, "Any floppy drive installed")
+	PORT_DIPSETTING(	0x00, DEF_STR(No) )
+	PORT_DIPSETTING(	0x01, DEF_STR(Yes) )
+INPUT_PORTS_END
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+const input_port_token *pc_motherboard_device_config::input_ports() const
+{
+	return INPUT_PORTS_NAME( pc_motherboard );
+}
+	
 
 void pc_motherboard_device_config::static_set_cputag(device_config *device, const char *tag)
 {
