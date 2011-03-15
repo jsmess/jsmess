@@ -512,12 +512,12 @@ static DRIVER_INIT( mephisto )
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
 
-CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       GAME_SUPPORTS_SAVE )
-CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer Turbo Kit + HG440",       GAME_SUPPORTS_SAVE )
-CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     GAME_SUPPORTS_SAVE )
-CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer Turbo Kit + HG550",       GAME_SUPPORTS_SAVE )
-CONS( 1990, mm50,       mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     GAME_SUPPORTS_SAVE )
-CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", GAME_SUPPORTS_SAVE )
-CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schach Computer",     GAME_SUPPORTS_SAVE )
+CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer Turbo Kit + HG440",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer Turbo Kit + HG550",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1990, mm50,       mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 
 // second design sold (same computer/program?)
