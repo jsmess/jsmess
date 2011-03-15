@@ -26,21 +26,32 @@
 
 
     TODO
-    - Cassette (it is extremely complex)
-    - Keyboard (it should work but doesn't)
-    - Replace graphical displays with modern artwork
+    - Cassette (it is extremely complex, with approx 10 chips)
+    - Proper artwork
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/dac.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "imagedev/cartslot.h"
-#include "includes/mekd2.h"
+#include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800
+
+class mekd2_state : public driver_device
+{
+public:
+	mekd2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 segment;
+	UINT8 digit;
+	UINT8 keydata;
+};
 
 
 /***********************************************************
@@ -71,7 +82,7 @@ static WRITE_LINE_DEVICE_HANDLER( mekd2_nmi_w )
 static READ_LINE_DEVICE_HANDLER( mekd2_key40_r )
 {
 	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	return (state->keydata & 0x40) ? 1 : 0;
+	return BIT(state->keydata, 6);
 }
 
 static READ8_DEVICE_HANDLER( mekd2_key_r )
@@ -82,24 +93,27 @@ static READ8_DEVICE_HANDLER( mekd2_key_r )
 	state->keydata = 0xff;
 
 	for (i = 0; i < 6; i++)
+	{
 		if (BIT(state->digit, i))
 		{
 			sprintf(kbdrow,"X%d",i);
 			state->keydata &= input_port_read(device->machine, kbdrow);
 		}
+	}
 
+	i = 0x80;
 	if (state->digit < 0x40)
-		i = (state->keydata & 1) ? 0x80 : 0;
+		i = BIT(state->keydata, 0) ? 0x80 : 0;
 	else
 	if (state->digit < 0x80)
-		i = (state->keydata & 2) ? 0x80 : 0;
+		i = BIT(state->keydata, 1) ? 0x80 : 0;
 	else
 	if (state->digit < 0xc0)
-		i = (state->keydata & 4) ? 0x80 : 0;
+		i = BIT(state->keydata, 2) ? 0x80 : 0;
 	else
-		i = (state->keydata & 8) ? 0x80 : 0;
+		i = BIT(state->keydata, 3) ? 0x80 : 0;
 
-	return i;
+	return i | state->segment;
 }
 
 /***********************************************************
@@ -111,22 +125,21 @@ static READ8_DEVICE_HANDLER( mekd2_key_r )
 static WRITE8_DEVICE_HANDLER( mekd2_segment_w )
 {
 	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	state->segment = ~data;
+	state->segment = data & 0x7f;
 }
 
 static WRITE8_DEVICE_HANDLER( mekd2_digit_w )
 {
 	UINT8 i;
 	mekd2_state *state = device->machine->driver_data<mekd2_state>();
-	UINT8 *videoram = state->videoram;
-
-	for (i = 0; i < 6; i++)
-		if (BIT(data, i))
+	if (data < 0x3f)
+	{
+		for (i = 0; i < 6; i++)
 		{
-			videoram[10 - i * 2] = state->segment;
-			videoram[11 - i * 2] = 14;
+			if (BIT(data, i))
+				output_set_digit_value(i, ~state->segment & 0x7f);
 		}
-
+	}
 	state->digit = data;
 }
 
@@ -156,7 +169,7 @@ ADDRESS_MAP_END
 
 Enter the 4 digit address then the command key:
 
-  - M : Examine and Change Memory
+  - M : Examine and Change Memory (example: E000M, then G to skip to next, H to exit)
   - E : Escape (abort) operation (H key in our emulation)
   - R : Examine Registers
   - G : Begin execution at specified address
@@ -213,51 +226,6 @@ static INPUT_PORTS_START( mekd2 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
 INPUT_PORTS_END
 
-/***********************************************************
-
-    GFX
-
-************************************************************/
-
-static const gfx_layout led_layout =
-{
-	18, 24, 	/* 16 x 24 LED 7segment displays */
-	128,		/* 128 codes */
-	1,			/* 1 bit per pixel */
-	{ 0 },		/* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  8, 9,10,11,12,13,14,15,
-	 16,17 },
-	{ 0*24, 1*24, 2*24, 3*24,
-	  4*24, 5*24, 6*24, 7*24,
-	  8*24, 9*24,10*24,11*24,
-	 12*24,13*24,14*24,15*24,
-	 16*24,17*24,18*24,19*24,
-	 20*24,21*24,22*24,23*24,
-	 24*24,25*24,26*24,27*24,
-	 28*24,29*24,30*24,31*24 },
-	24 * 24,	/* every LED code takes 32 times 18 (aligned 24) bit words */
-};
-
-static const gfx_layout key_layout =
-{
-	24, 18, 	/* 24 * 18 keyboard icons */
-	24, 		/* 24  codes */
-	2,			/* 2 bit per pixel */
-	{ 0, 1 },	/* two bitplanes */
-	{ 0*2, 1*2, 2*2, 3*2, 4*2, 5*2, 6*2, 7*2,
-	  8*2, 9*2,10*2,11*2,12*2,13*2,14*2,15*2,
-	 16*2,17*2,18*2,19*2,20*2,21*2,22*2,23*2 },
-	{ 0*24*2, 1*24*2, 2*24*2, 3*24*2, 4*24*2, 5*24*2, 6*24*2, 7*24*2,
-	  8*24*2, 9*24*2,10*24*2,11*24*2,12*24*2,13*24*2,14*24*2,15*24*2,
-	 16*24*2,17*24*2 },
-	18 * 24 * 2,	/* every icon takes 18 rows of 24 * 2 bits */
-};
-
-static GFXDECODE_START( mekd2 )
-	GFXDECODE_ENTRY( "gfx1", 0, led_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, key_layout, 16*2, 2 )
-GFXDECODE_END
 
 /***********************************************************
 
@@ -309,6 +277,31 @@ static ACIA6850_INTERFACE( mekd2_acia_intf )
 	DEVCB_NULL						/* out irq func */
 };
 
+static DEVICE_IMAGE_LOAD( mekd2_cart )
+{
+	static const char magic[] = "MEK6800D2";
+	char buff[9];
+	UINT16 addr, size;
+	UINT8 ident, *RAM = image.device().machine->region("maincpu")->base();
+
+	image.fread( buff, sizeof (buff));
+	if (memcmp(buff, magic, sizeof (buff)))
+	{
+		logerror( "mekd2_rom_load: magic '%s' not found\n", magic);
+		return IMAGE_INIT_FAIL;
+	}
+	image.fread( &addr, 2);
+	addr = LITTLE_ENDIANIZE_INT16(addr);
+	image.fread( &size, 2);
+	size = LITTLE_ENDIANIZE_INT16(size);
+	image.fread( &ident, 1);
+	logerror("mekd2_rom_load: $%04X $%04X $%02X\n", addr, size, ident);
+	while (size-- > 0)
+		image.fread( &RAM[addr++], 1);
+
+	return IMAGE_INIT_PASS;
+}
+
 /***********************************************************
 
     Machine
@@ -319,29 +312,17 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(600, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE( mekd2 )
-
-	MCFG_GFXDECODE( mekd2 )
-	MCFG_PALETTE_LENGTH(40)
-	MCFG_PALETTE_INIT( mekd2 )
-
-	MCFG_VIDEO_START( mekd2 )
+	MCFG_DEFAULT_LAYOUT(layout_mekd2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
+	/* Cartslot ?? does not come with one.. */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("d2")
 	MCFG_CARTSLOT_NOT_MANDATORY
@@ -362,10 +343,6 @@ MACHINE_CONFIG_END
 ROM_START(mekd2)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("jbug.rom", 0xe000, 0x0400, CRC(5ed08792) SHA1(b06e74652a4c4e67c4a12ddc191ffb8c07f3332e) )
-	ROM_REGION(128 * 24 * 3,"gfx1",ROMREGION_ERASEFF)
-		/* space filled with 7segement graphics by mekd2_init_driver */
-	ROM_REGION( 24 * 18 * 3 * 2,"gfx2",ROMREGION_ERASEFF)
-		/* space filled with key icons by mekd2_init_driver */
 ROM_END
 
 /***************************************************************************
@@ -375,4 +352,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY     FULLNAME */
-CONS( 1977, mekd2,	0,		0,		mekd2,	  mekd2,	mekd2,	"Motorola",	"MEK6800D2" , GAME_NOT_WORKING )
+CONS( 1977, mekd2,	0,	0,  mekd2,    mekd2,	0,	"Motorola", "MEK6800D2" , GAME_NOT_WORKING )
