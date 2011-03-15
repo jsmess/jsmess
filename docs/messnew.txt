@@ -90,6 +90,8 @@ System Driver Changes:
  
 - [M5] Added FD-5 floppy interface ROM, renamed driver to m5. [Curt Coder]
 
+- [MEKD2] Fixed keyboard. System is usable except for cassette. [Robbbert]
+
 - [PDP1] Made the CRT implementation a device.[Atari Ace]   Made papertape,
   cylinder and printer into devices and added back in (not working) [Robbbert]
 
