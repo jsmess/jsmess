@@ -1668,6 +1668,25 @@ ROM_START( abc800m )
 
 	ROM_REGION( 0x100, "uni800", 0 )
 	ROM_LOAD( ".800 1.2.bin", 0x0000, 0x0100, CRC(df4897f8) SHA1(0c641f4cf321f0003da3fbd435edb138a9b949b4) )
+
+	ROM_REGION( 0x800, "abc850", 0 )
+	ROM_LOAD_OPTIONAL( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
+	ROM_LOAD_OPTIONAL( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
+
+	ROM_REGION( 0x800, "abc852", 0 )
+	ROM_LOAD_OPTIONAL( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126 (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
+
+	ROM_REGION( 0x800, "abc856", 0 )
+	ROM_LOAD_OPTIONAL( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325 (http://stason.org/TULARC/pc/hard-drives-hdd/micropolis/1325-69MB-5-25-FH-MFM-ST506.html)
+
+	ROM_REGION( 0x1000, "myab", 0 ) // MyAB Turbo-Kontroller
+	ROM_LOAD_OPTIONAL( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
+	ROM_LOAD_OPTIONAL( "unidiskh.bin", 0x0000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
+	ROM_LOAD_OPTIONAL( "unidisk8.bin", 0x0000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
+
+	ROM_REGION( 0x800, "xebec", 0 )
+	ROM_LOAD_OPTIONAL( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST4038-1987-31MB-5-25-FH-MFM-ST412.html)
+	ROM_LOAD_OPTIONAL( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST225-21MB-5-25-HH-MFM-ST412.html)
 ROM_END
 
 

@@ -111,8 +111,11 @@ void luxor_55_21046_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-//		memset(&m_out_txd_func, 0, sizeof(m_out_txd_func));
 	}
+	
+	m_sw1 = intf->m_sw1;
+	m_sw2 = intf->m_sw2;
+	m_sw3 = intf->m_sw3;
 
 	m_shortname = "lux21046";
 }
@@ -397,6 +400,11 @@ luxor_55_21046_device::luxor_55_21046_device(running_machine &_machine, const lu
 	  m_fdc(*this, SAB1793_TAG),
 	  m_image0(*this, FLOPPY_0),
 	  m_image1(*this, FLOPPY_1),
+	  m_cs(false),
+	  m_fdc_irq(0),
+	  m_dma_irq(0),
+	  m_busy(0),
+	  m_force_busy(0),
       m_config(_config)
 {
 }
@@ -432,7 +440,7 @@ void luxor_55_21046_device::device_start()
 
 void luxor_55_21046_device::device_reset()
 {
-	m_cs = 0;
+	m_cs = false;
 
 	floppy_mon_w(m_image0, ASSERT_LINE);
 	floppy_mon_w(m_image1, ASSERT_LINE);

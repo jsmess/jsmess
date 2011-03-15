@@ -6,7 +6,6 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "machine/z80dma.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "formats/basicdsk.h"
@@ -15,6 +14,7 @@
 #include "machine/abcbus.h"
 #include "machine/devhelpr.h"
 #include "machine/wd17xx.h"
+#include "machine/z80dma.h"
 
 
 
@@ -25,10 +25,34 @@
 #define LUXOR_55_21046_TAG	"luxor_55_21046"
 
 
+#define ADDRESS_ABC832			44
+#define ADDRESS_ABC830			45
+#define ADDRESS_ABC838			46
+
+
+#define DRIVE_TEAC_FD55F		0x01
+#define DRIVE_BASF_6138			0x02
+#define DRIVE_MICROPOLIS_1015F	0x03
+#define DRIVE_BASF_6118			0x04
+#define DRIVE_MICROPOLIS_1115F	0x05
+#define DRIVE_BASF_6106_08		0x08
+#define DRIVE_MPI_51			0x09
+#define DRIVE_BASF_6105			0x0e
+#define DRIVE_BASF_6106			0x0f
+
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
+
+#define MCFG_LUXOR_55_21046_ADD(_bus_tag, _address, _drive_type) \
+    MCFG_DEVICE_ADD(LUXOR_55_21046_TAG, LUXOR_55_21046, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(luxor_55_21046_interface, m_bus_tag, _bus_tag) \
+    MCFG_DEVICE_CONFIG_DATA32(luxor_55_21046_interface, m_sw1, 0x03) \
+    MCFG_DEVICE_CONFIG_DATA32(luxor_55_21046_interface, m_sw2, _drive_type) \
+    MCFG_DEVICE_CONFIG_DATA32(luxor_55_21046_interface, m_sw3, _address)
+
 
 #define LUXOR_55_21046_ABCBUS(_tag) \
 	_tag, DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, cs_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_21046_device, stat_r), \
@@ -45,7 +69,10 @@
 
 struct luxor_55_21046_interface
 {
-	int dummy;
+	const char *m_bus_tag;		// bus device
+	UINT8 m_sw1;				// single/double sided/density
+	UINT8 m_sw2;				// drive type
+	UINT8 m_sw3;				// ABC bus address
 };
 
 
