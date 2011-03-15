@@ -211,7 +211,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		genpc,		"<generic>",  "PC (CGA)" , 0)
+COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		genpccga,	"<generic>",  "PC (CGA)" , 0)
 COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		genpc,    	"<generic>",  "PC (MDA)" , 0)
 COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      genpc,    	"<generic>",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      pcgen,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING)

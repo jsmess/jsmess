@@ -667,7 +667,17 @@ DRIVER_INIT( genpc )
 		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );
 }
 
-static READ8_HANDLER( input_port_0_r ) { return 0x08; }
+DRIVER_INIT( genpccga )
+{
+	DRIVER_INIT_CALL(genpc);
+	input_port_value mask =0x30;
+	const input_field_config *field = input_field_by_tag_and_mask(machine->m_portlist,"mb:DSW0",mask);
+	input_field_user_settings settings;
+	input_field_get_user_settings(field, &settings);
+	settings.value = 0x20;
+	input_field_set_user_settings(field, &settings);
+}
+static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); } 
 
 static const struct pc_vga_interface vga_interface =
 {
