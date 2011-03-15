@@ -206,6 +206,18 @@ static WRITE8_HANDLER( mz2000_fdc_w )
 	}
 }
 
+static WRITE8_HANDLER( timer_w )
+{
+	device_t *pit8253 = space->machine->device("pit");
+
+	pit8253_gate0_w(pit8253, 1);
+	pit8253_gate1_w(pit8253, 1);
+	pit8253_gate0_w(pit8253, 0);
+	pit8253_gate1_w(pit8253, 0);
+	pit8253_gate0_w(pit8253, 1);
+	pit8253_gate1_w(pit8253, 1);
+}
+
 static ADDRESS_MAP_START(mz2000_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
@@ -217,9 +229,9 @@ static ADDRESS_MAP_START(mz2000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", wd17xx_r, wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
-//	AM_RANGE(0xe4, 0xe7) i8253
+    AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
-//	AM_RANGE(0xf0, 0xf3) clear 8253, same as Sharp MZ-2500
+    AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 //	AM_RANGE(0xf4, 0xf7) CRTC
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
 ADDRESS_MAP_END
@@ -403,12 +415,14 @@ static READ8_DEVICE_HANDLER( mz2000_portb_r )
 	---- x--- end of tape reached
 	---- ---x "blank" control
 	*/
-	UINT8 tape_read_data = 0;
+	UINT8 res = 0xff ^ 0xe0;
 
-	if (cassette_input(device->machine->device("cassette")) > 0.03)
-		tape_read_data |= 0x40;
+	res |= (cassette_input(device->machine->device("cassette")) > 0.00) ? 0x40 : 0x00;
+	res |= ((cassette_get_state(device->machine->device("cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
 
-	return 0xbf | tape_read_data;
+	popmessage("%02x",res);
+
+	return res;
 }
 
 static READ8_DEVICE_HANDLER( mz2000_portc_r )
@@ -557,6 +571,36 @@ static const floppy_config mz2000_floppy_config =
 	NULL
 };
 
+/* PIT8253 Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( pit8253_clk0_irq )
+{
+	//mz2500_state *drvstate = device->machine->driver_data<mz2500_state>();
+	//cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+}
+
+static const struct pit8253_config mz2000_pit8253_intf =
+{
+	{
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk0_irq)
+		},
+		{
+			0,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			16, //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk1_w)
+		}
+	}
+};
+
+
 static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -567,6 +611,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 
 	MCFG_I8255A_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, mz2000_pio1_intf )
+	MCFG_PIT8253_ADD("pit", mz2000_pit8253_intf)
 
 	MCFG_MB8877_ADD("mb8877a",mz2000_mb8877a_interface)
 	MCFG_FLOPPY_4_DRIVES_ADD(mz2000_floppy_config)
@@ -606,6 +651,8 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
+	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
+	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 
