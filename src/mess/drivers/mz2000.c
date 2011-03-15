@@ -44,6 +44,7 @@ public:
 	UINT8 key_mux,pio_latchb;
 
 	UINT8 old_portc;
+	UINT8 width80;
 };
 
 static VIDEO_START( mz2000 )
@@ -52,15 +53,19 @@ static VIDEO_START( mz2000 )
 
 static SCREEN_UPDATE( mz2000 )
 {
+	mz2000_state *state = screen->machine->driver_data<mz2000_state>();
 	UINT8 *tvram = screen->machine->region("tvram")->base();
 	UINT8 *gfx_data = screen->machine->region("chargen")->base();
 	int x,y,xi,yi;
+	UINT8 x_size;
+
+	x_size = (state->width80+1)*40;
 
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<x_size;x++)
 		{
-			UINT8 tile = tvram[y*40+x];
+			UINT8 tile = tvram[y*x_size+x];
 			UINT8 color = 7;
 
 			for(yi=0;yi<8;yi++)
@@ -78,7 +83,13 @@ static SCREEN_UPDATE( mz2000 )
 
 					pen = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? color : 0;
 
-					*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
+					if(state->width80 == 0)
+					{
+						*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine->pens[pen];
+					}
+					else
+						*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
 				}
 			}
 		}
@@ -522,10 +533,8 @@ static WRITE8_DEVICE_HANDLER( mz2000_pio1_porta_w )
 	mz2000_state *state = device->machine->driver_data<mz2000_state>();
 	state->tvram_enable = ((data & 0xc0) == 0xc0);
 	state->gvram_enable = ((data & 0xc0) == 0x80);
-
+	state->width80 = ((data & 0x20) >> 5);
 	state->key_mux = data & 0x1f;
-
-	//printf("%02x PIO\n",data);
 }
 
 static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
@@ -647,7 +656,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	MCFG_GFXDECODE(mz2000)
 	MCFG_PALETTE_LENGTH(8)
@@ -682,8 +691,9 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
+	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
 ROM_END
+
 
 
 /* Driver */
