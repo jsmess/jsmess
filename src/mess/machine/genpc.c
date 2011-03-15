@@ -693,5 +693,11 @@ static const struct pc_vga_interface vga_interface =
 DRIVER_INIT( genpcvga )
 {
 	DRIVER_INIT_CALL(genpc);
+	input_port_value mask =0x30;
+	const input_field_config *field = input_field_by_tag_and_mask(machine->m_portlist,"mb:DSW0",mask);
+	input_field_user_settings settings;
+	input_field_get_user_settings(field, &settings);
+	settings.value = 0x00;
+	input_field_set_user_settings(field, &settings);	
 	pc_vga_init(machine, &vga_interface, NULL);
 }

@@ -66,6 +66,24 @@ static INPUT_PORTS_START( pccga )
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( xtvga )
+	PORT_START("IN0") /* IN0 */
+	PORT_DIPNAME( 0x08, 0x08, "VGA 1")
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "VGA 2")
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "VGA 3")
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "VGA 4")
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) ) 
+
+	PORT_INCLUDE( kb_keytronic_pc )
+INPUT_PORTS_END
+	
 static const unsigned i86_address_mask = 0x000fffff;
 
 static const kb_keytronic_interface pc_keytronic_intf =
@@ -214,4 +232,4 @@ ROM_END
 COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		genpccga,	"<generic>",  "PC (CGA)" , 0)
 COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		genpc,    	"<generic>",  "PC (MDA)" , 0)
 COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      genpc,    	"<generic>",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      pcgen,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING)
+COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      xtvga,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING)
