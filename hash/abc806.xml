@@ -3,7 +3,7 @@
 <softwarelist name="abc806" description="Luxor ABC 806 disk images">
 	<software name="graf806">
 		<description>Graf806</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="abc832">
 			<dataarea name="flop" size="199707">
@@ -14,7 +14,7 @@
 
 	<software name="cpm30">
 		<description>CP/M Plus v3.0 - MYAB BIOS v0.9</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="abc832">
 			<dataarea name="flop" size="297216">
@@ -25,7 +25,7 @@
 
 	<software name="cpmplus3">
 		<description>CP/M Plus v3.0</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="abc832">
 			<dataarea name="flop" size="502129">
@@ -36,8 +36,8 @@
 
 	<software name="ufd631">
 		<!-- 68 29251-51 -->
-		<description>Systemskiva v6.31 för UFD-DOS (Swedish)</description>
-		<year>19??</year>
+		<description>Systemskiva v6.31 för UFD-DOS (Sweden)</description>
+		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<part name="flop" interface="abc832">
 			<dataarea name="flop" size="140772">
