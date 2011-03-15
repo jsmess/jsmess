@@ -92,7 +92,36 @@ const device_type LUXOR_55_21046 = luxor_55_21046_device_config::static_alloc_de
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(luxor_55_21046, "Luxor 55 21046")
+//-------------------------------------------------
+//  luxor_55_21046_device_config - constructor
+//-------------------------------------------------
+
+luxor_55_21046_device_config::luxor_55_21046_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "Luxor 55 21046", tag, owner, clock),
+	  device_config_abcbus_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *luxor_55_21046_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(luxor_55_21046_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *luxor_55_21046_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, luxor_55_21046_device(machine, *this));
+}
 
 
 //-------------------------------------------------
@@ -396,6 +425,7 @@ const input_port_token *luxor_55_21046_device_config::input_ports() const
 
 luxor_55_21046_device::luxor_55_21046_device(running_machine &_machine, const luxor_55_21046_device_config &_config)
     : device_t(_machine, _config),
+	  device_abcbus_interface(_machine, _config, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),
@@ -450,21 +480,39 @@ void luxor_55_21046_device::device_reset()
 }
 
 
+
+//**************************************************************************
+//  ABC BUS INTERFACE
+//**************************************************************************
+
 //-------------------------------------------------
-//  cs_w - 
+//  abcbus_cs - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::cs_w )
+void luxor_55_21046_device::abcbus_cs(UINT8 data)
 {
 	m_cs = (data == m_config.m_sw3);
 }
 
 
 //-------------------------------------------------
-//  stat_r - 
+//  abcbus_rst - 
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::stat_r )
+void luxor_55_21046_device::abcbus_rst(int state)
+{
+	if (!state)
+	{
+		device_reset();
+	}
+}
+
+
+//-------------------------------------------------
+//  abcbus_stat - 
+//-------------------------------------------------
+
+UINT8 luxor_55_21046_device::abcbus_stat()
 {
 	UINT8 data = 0;
 
@@ -479,10 +527,10 @@ READ8_MEMBER( luxor_55_21046_device::stat_r )
 
 
 //-------------------------------------------------
-//  inp_r - 
+//  abcbus_inp - 
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::inp_r )
+UINT8 luxor_55_21046_device::abcbus_inp()
 {
 	UINT8 data = 0xff;
 
@@ -497,10 +545,10 @@ READ8_MEMBER( luxor_55_21046_device::inp_r )
 
 
 //-------------------------------------------------
-//  utp_w - 
+//  abcbus_utp - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::utp_w )
+void luxor_55_21046_device::abcbus_utp(UINT8 data)
 {
 	if (m_cs)
 	{
@@ -511,10 +559,10 @@ WRITE8_MEMBER( luxor_55_21046_device::utp_w )
 
 
 //-------------------------------------------------
-//  c1_w - 
+//  abcbus_c1 - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::c1_w )
+void luxor_55_21046_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
@@ -525,10 +573,10 @@ WRITE8_MEMBER( luxor_55_21046_device::c1_w )
 
 
 //-------------------------------------------------
-//  c3_w - 
+//  abcbus_c3 - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::c3_w )
+void luxor_55_21046_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
@@ -538,18 +586,10 @@ WRITE8_MEMBER( luxor_55_21046_device::c3_w )
 }
 
 
-//-------------------------------------------------
-//  rst_w - 
-//-------------------------------------------------
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::rst_w )
-{
-	if (!state)
-	{
-		device_reset();
-	}
-}
-
+//**************************************************************************
+//  IMPLEMENTATION
+//**************************************************************************
 
 //-------------------------------------------------
 //  3d_r - 

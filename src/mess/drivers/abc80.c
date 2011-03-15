@@ -433,14 +433,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc80_io, ADDRESS_SPACE_IO, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c1_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c2_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c3_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY(ABCBUS_TAG, abcbus_c4_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, inp_r, utp_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, stat_r, cs_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c2_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c3_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c4_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_PORT("SN76477")
-	AM_RANGE(0x07, 0x07) AM_DEVREAD_LEGACY(ABCBUS_TAG, abcbus_rst_r)
+	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_device, rst_r)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
@@ -641,7 +641,7 @@ static const cassette_config abc80_cassette_config =
 
 static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ LUXOR_55_10828_ABCBUS(LUXOR_55_10828_TAG) },
+	{ LUXOR_55_10828_TAG },
 	{ NULL }
 };
 
@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, attotime::from_usec(2500))
 
 	/* Luxor Conkort 55-10828 */
-	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
 	MCFG_ABC830_ADD()
 	MCFG_LUXOR_55_10828_ADD(abc830_slow_intf)
 

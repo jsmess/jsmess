@@ -7,292 +7,322 @@
 
 **********************************************************************/
 
-#include "emu.h"
 #include "abcbus.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
 
-#define LOG 0
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
-typedef struct _abcbus_daisy_state abcbus_daisy_state;
-struct _abcbus_daisy_state
+#define LOG 1
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type ABCBUS = abcbus_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_config_abcbus_interface - constructor
+//-------------------------------------------------
+
+device_config_abcbus_interface::device_config_abcbus_interface(const machine_config &mconfig, device_config &devconfig)
+	: device_config_interface(mconfig, devconfig)
 {
-	abcbus_daisy_state			*next;			/* next device */
-	device_t				*device;		/* associated device */
-
-	devcb_resolved_write8		out_cs_func;
-
-	devcb_resolved_read8		in_stat_func;
-
-	devcb_resolved_read8		in_inp_func;
-	devcb_resolved_write8		out_utp_func;
-
-	devcb_resolved_write8		out_c_func[4];
-
-	devcb_resolved_write_line	out_rst_func;
-};
-
-typedef struct _abcbus_t abcbus_t;
-struct _abcbus_t
-{
-	abcbus_daisy_state *daisy_state;
-
-	device_t *cpu;
-
-	int resin;
-	int irq;
-	int nmi;
-	int rdy;
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE abcbus_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ABCBUS);
-	return (abcbus_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const abcbus_daisy_chain *get_interface(device_t *device)
+
+//-------------------------------------------------
+//  ~device_config_abcbus_interface - destructor
+//-------------------------------------------------
+
+device_config_abcbus_interface::~device_config_abcbus_interface()
 {
-	assert(device != NULL);
-	assert(device->type() == ABCBUS);
-	return (const abcbus_daisy_chain *) device->baseconfig().static_config();
 }
 
-INLINE abcbus_config *get_safe_config(device_t *device)
+
+
+//**************************************************************************
+//  DEVICE INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_abcbus_interface - constructor
+//-------------------------------------------------
+
+device_abcbus_interface::device_abcbus_interface(running_machine &machine, const device_config &config, device_t &device)
+	: device_interface(machine, config, device),
+	  m_abcbus_config(dynamic_cast<const device_config_abcbus_interface &>(config))
 {
-	assert(device != NULL);
-	assert(device->type() == ABCBUS);
-	return (abcbus_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( abcbus_cs_w )
+//-------------------------------------------------
+//  ~device_abcbus_interface - destructor
+//-------------------------------------------------
+
+device_abcbus_interface::~device_abcbus_interface()
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	abcbus_daisy_state *daisy = abcbus->daisy_state;
+}
 
-	if (LOG) logerror("ABCBUS: '%s' CS %02x\n", device->tag(), data);
 
-	for ( ; daisy != NULL; daisy = daisy->next)
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(abcbus, "Luxor ABC bus")
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void abcbus_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const abcbus_config *intf = reinterpret_cast<const abcbus_config *>(static_config());
+	if (intf != NULL)
+		*static_cast<abcbus_config *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
 	{
-		devcb_call_write8(&daisy->out_cs_func, 0, data);
+		fatalerror("Daisy chain not provided!");
+	}
+	
+	m_daisy = intf;
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  abcbus_device - constructor
+//-------------------------------------------------
+
+abcbus_device::abcbus_device(running_machine &_machine, const abcbus_device_config &_config)
+    : device_t(_machine, _config),
+      m_config(_config)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void abcbus_device::device_start()
+{
+	const abcbus_config *daisy = m_config.m_daisy;
+	
+	// create a linked list of devices
+	daisy_entry **tailptr = &m_daisy_list;
+	for ( ; daisy->devname != NULL; daisy++)
+	{
+		// find the device
+		device_t *target = machine->device(daisy->devname);
+		if (target == NULL)
+			fatalerror("Unable to locate device '%s'", daisy->devname);
+
+		// make sure it has an interface
+		device_abcbus_interface *intf;
+		if (!target->interface(intf))
+			fatalerror("Device '%s' does not implement the abcbus interface!", daisy->devname);
+
+		// append to the end
+		*tailptr = auto_alloc(machine, daisy_entry(target));
+		tailptr = &(*tailptr)->m_next;
 	}
 }
 
-READ8_DEVICE_HANDLER( abcbus_rst_r )
+
+//-------------------------------------------------
+//  daisy_entry - constructor
+//-------------------------------------------------
+
+abcbus_device::daisy_entry::daisy_entry(device_t *device)
+	: m_next(NULL),
+	  m_device(device),
+	  m_interface(NULL)
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	abcbus_daisy_state *daisy = abcbus->daisy_state;
+	device->interface(m_interface);
+}
 
-	if (LOG) logerror("ABCBUS: '%s' RST\n", device->tag());
 
-	for ( ; daisy != NULL; daisy = daisy->next)
+//-------------------------------------------------
+//  cs_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_device::cs_w )
+{
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		devcb_call_write_line(&daisy->out_rst_func, 0);
-		devcb_call_write_line(&daisy->out_rst_func, 1);
+		daisy->m_interface->abcbus_cs(data);
 	}
+}
 
+
+//-------------------------------------------------
+//  rst_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( abcbus_device::rst_r )
+{
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	{
+		daisy->m_interface->abcbus_rst(0);
+		daisy->m_interface->abcbus_rst(1);
+	}
+	
 	return 0xff;
 }
 
-READ8_DEVICE_HANDLER( abcbus_inp_r )
+
+//-------------------------------------------------
+//  inp_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( abcbus_device::inp_r )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	abcbus_daisy_state *daisy = abcbus->daisy_state;
 	UINT8 data = 0xff;
 
-	for ( ; daisy != NULL; daisy = daisy->next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		data &= devcb_call_read8(&daisy->in_inp_func, 0);
+		data &= daisy->m_interface->abcbus_inp();
 	}
-
-	if (LOG) logerror("ABCBUS: '%s' INP %02x\n", device->tag(), data);
-
+	
 	return data;
 }
 
-WRITE8_DEVICE_HANDLER( abcbus_utp_w )
+
+//-------------------------------------------------
+//  utp_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_device::utp_w )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	abcbus_daisy_state *daisy = abcbus->daisy_state;
-
-	if (LOG) logerror("ABCBUS: '%s' UTP %02x\n", device->tag(), data);
-
-	for ( ; daisy != NULL; daisy = daisy->next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		devcb_call_write8(&daisy->out_utp_func, 0, data);
+		daisy->m_interface->abcbus_utp(data);
 	}
 }
 
-READ8_DEVICE_HANDLER( abcbus_stat_r )
+
+//-------------------------------------------------
+//  stat_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( abcbus_device::stat_r )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	abcbus_daisy_state *daisy = abcbus->daisy_state;
 	UINT8 data = 0xff;
 
-	for ( ; daisy != NULL; daisy = daisy->next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		data &= devcb_call_read8(&daisy->in_stat_func, 0);
+		data &= daisy->m_interface->abcbus_stat();
 	}
-
-	if (LOG) logerror("ABCBUS: '%s' STAT %02x\n", device->tag(), data);
-
+	
 	return data;
 }
 
-static void command_w(device_t *device, int index, UINT8 data)
+
+//-------------------------------------------------
+//  c1_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_device::c1_w )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	abcbus_daisy_state *daisy = abcbus->daisy_state;
-
-	if (LOG) logerror("ABCBUS: '%s' C%u %02x\n", device->tag(), index + 1, data);
-
-	for ( ; daisy != NULL; daisy = daisy->next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		devcb_call_write8(&daisy->out_c_func[index], 0, data);
+		daisy->m_interface->abcbus_c1(data);
 	}
 }
 
-WRITE8_DEVICE_HANDLER( abcbus_c1_w ) { command_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( abcbus_c2_w ) { command_w(device, 1, data); }
-WRITE8_DEVICE_HANDLER( abcbus_c3_w ) { command_w(device, 2, data); }
-WRITE8_DEVICE_HANDLER( abcbus_c4_w ) { command_w(device, 3, data); }
 
-WRITE_LINE_DEVICE_HANDLER( abcbus_resin_w )
+//-------------------------------------------------
+//  c2_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_device::c2_w )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-
-	if (abcbus->resin != state)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		if (LOG) logerror("ABCBUS: '%s' RESIN %u\n", device->tag(), state);
-
-		cpu_set_input_line(abcbus->cpu, INPUT_LINE_RESET, state);
-		abcbus->resin = state;
+		daisy->m_interface->abcbus_c2(data);
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( abcbus_int_w )
+
+//-------------------------------------------------
+//  c3_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_device::c3_w )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-
-	if (abcbus->irq != state)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		if (LOG) logerror("ABCBUS: '%s' INT %u\n", device->tag(), state);
-
-		cpu_set_input_line(abcbus->cpu, INPUT_LINE_IRQ0, state);
-		abcbus->irq = state;
+		daisy->m_interface->abcbus_c3(data);
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( abcbus_nmi_w )
+
+//-------------------------------------------------
+//  c4_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_device::c4_w )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-
-	if (abcbus->nmi != state)
+	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
-		if (LOG) logerror("ABCBUS: '%s' NMI %u\n", device->tag(), state);
-
-		cpu_set_input_line(abcbus->cpu, INPUT_LINE_NMI, state);
-		abcbus->nmi = state;
+		daisy->m_interface->abcbus_c4(data);
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( abcbus_rdy_w )
-{
-	abcbus_t *abcbus = get_safe_token(device);
 
-	if (abcbus->rdy != state)
-	{
-		if (LOG) logerror("ABCBUS: '%s' RDY %u\n", device->tag(), state);
-		abcbus->rdy = state;
-	}
+//-------------------------------------------------
+//  resin_w - 
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abcbus_device::resin_w )
+{
 }
 
-/*-------------------------------------------------
-    DEVICE_START( abcbus )
--------------------------------------------------*/
 
-static DEVICE_START( abcbus )
+//-------------------------------------------------
+//  int_w - 
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abcbus_device::int_w )
 {
-	abcbus_t *abcbus = get_safe_token(device);
-	const abcbus_daisy_chain *daisy = get_interface(device);
-	const abcbus_config *config = get_safe_config(device);
-
-	abcbus_daisy_state *head = NULL;
-	abcbus_daisy_state **tailptr = &head;
-
-	/* get CPU */
-	abcbus->cpu = device->machine->device(config->cpu_tag);
-
-	/* create a linked list of devices */
-	for ( ; daisy->tag != NULL; daisy++)
-	{
-		*tailptr = auto_alloc(device->machine, abcbus_daisy_state);
-
-		/* find device */
-		(*tailptr)->next = NULL;
-		(*tailptr)->device = device->machine->device(daisy->tag);
-
-		if ((*tailptr)->device == NULL)
-		{
-			fatalerror("Unable to locate device '%s'", daisy->tag);
-		}
-
-		/* resolve callbacks */
-		devcb_resolve_write8(&(*tailptr)->out_cs_func, &daisy->out_cs_func, device);
-		devcb_resolve_read8(&(*tailptr)->in_stat_func, &daisy->in_stat_func, device);
-		devcb_resolve_read8(&(*tailptr)->in_inp_func, &daisy->in_inp_func, device);
-		devcb_resolve_write8(&(*tailptr)->out_utp_func, &daisy->out_utp_func, device);
-		devcb_resolve_write8(&(*tailptr)->out_c_func[0], &daisy->out_c1_func, device);
-		devcb_resolve_write8(&(*tailptr)->out_c_func[1], &daisy->out_c2_func, device);
-		devcb_resolve_write8(&(*tailptr)->out_c_func[2], &daisy->out_c3_func, device);
-		devcb_resolve_write8(&(*tailptr)->out_c_func[3], &daisy->out_c4_func, device);
-		devcb_resolve_write_line(&(*tailptr)->out_rst_func, &daisy->out_rst_func, device);
-
-		tailptr = &(*tailptr)->next;
-	}
-
-	abcbus->daisy_state = head;
 }
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( abcbus )
--------------------------------------------------*/
 
-DEVICE_GET_INFO( abcbus )
+//-------------------------------------------------
+//  nmi_w - 
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abcbus_device::nmi_w )
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(abcbus_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(abcbus_config);							break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(abcbus);					break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							/* Nothing */												break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "ABC bus");									break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "ABC-80");									break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
-	}
 }
 
-DEFINE_LEGACY_DEVICE(ABCBUS, abcbus);
+
+//-------------------------------------------------
+//  rdy_w - 
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abcbus_device::rdy_w )
+{
+}

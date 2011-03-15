@@ -1,6 +1,22 @@
 /*
 
-Luxor ABC 830
+	Luxor ABC 830
+
+    Type                    Size        Tracks  Sides   Sectors/track   Sectors     Speed           Drives
+
+    ABC-830     Floppy      160 KB      40      1       16              640         250 Kbps        MPI 51, BASF 6106
+                Floppy      80 KB       40      1       8               320         250 Kbps        Scandia Metric FD2
+    ABC-832     Floppy      640 KB      80      2       16              2560        250 Kbps        Micropolis 1015, Micropolis 1115, BASF 6118
+    ABC-834     Floppy      640 KB      80      2       16              2560        250 Kbps        Teac FD 55 F
+    ABC-838     Floppy      1 MB        77      2       25              3978        500 Kbps        BASF 6104, BASF 6115
+    ABC-850     Floppy      640 KB      80      2       16              2560        250 Kbps        TEAC FD 55 F, BASF 6136
+                HDD         10 MB       320     4       32              40960       5 Mbps          Rodime 202, BASF 6186
+    ABC-852     Floppy      640 KB      80      2       16              2560        250 Kbps        TEAC FD 55 F, BASF 6136
+                HDD         20 MB       615     4       32              78720       5 Mbps          NEC 5126
+                Streamer    45 MB       9                                           90 Kbps         Archive 5945-C (tape: DC300XL 450ft)
+    ABC-856     Floppy      640 KB      80      2       16              2560        250 Kbps        TEAC FD 55 F
+                HDD         64 MB       1024    8       32              262144      5 Mbps          Micropolis 1325
+                Streamer    45 MB       9                                           90 Kbps         Archive 5945-C (tape: DC300XL 450ft)
 
 */
 

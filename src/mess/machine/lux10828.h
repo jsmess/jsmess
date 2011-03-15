@@ -56,12 +56,6 @@
 	const luxor_55_10828_interface (name) =
 
 
-#define LUXOR_55_10828_ABCBUS(_tag) \
-	_tag, DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, cs_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, stat_r), \
-	DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, inp_r), DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, utp_w), DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, c1_w), \
-	DEVCB_NULL, DEVCB_DEVICE_MEMBER(_tag, luxor_55_10828_device, c3_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER(_tag, luxor_55_10828_device, rst_w)
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -80,6 +74,7 @@ struct luxor_55_10828_interface
 // ======================> luxor_55_10828_device_config
 
 class luxor_55_10828_device_config :   public device_config,
+									   public device_config_abcbus_interface,
 									   public luxor_55_10828_interface
 {
     friend class luxor_55_10828_device;
@@ -110,7 +105,8 @@ private:
 
 // ======================> luxor_55_10828_device
 
-class luxor_55_10828_device :  public device_t
+class luxor_55_10828_device :  public device_t,
+							   public device_abcbus_interface 
 {
     friend class luxor_55_10828_device_config;
 
@@ -118,14 +114,6 @@ class luxor_55_10828_device :  public device_t
     luxor_55_10828_device(running_machine &_machine, const luxor_55_10828_device_config &_config);
 
 public:
-	DECLARE_WRITE8_MEMBER( cs_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_READ8_MEMBER( inp_r );
-	DECLARE_WRITE8_MEMBER( utp_w );
-	DECLARE_WRITE8_MEMBER( c1_w );
-	DECLARE_WRITE8_MEMBER( c3_w );
-	DECLARE_WRITE_LINE_MEMBER( rst_w );
-
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 	DECLARE_WRITE8_MEMBER( status_w );
 	DECLARE_READ8_MEMBER( fdc_r );
@@ -143,6 +131,15 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+	
+	// device_abcbus_interface overrides
+	virtual void abcbus_cs(UINT8 data);
+	virtual void abcbus_rst(int state);
+	virtual UINT8 abcbus_inp();
+	virtual void abcbus_utp(UINT8 data);
+	virtual UINT8 abcbus_stat();
+	virtual void abcbus_c1(UINT8 data);
+	virtual void abcbus_c3(UINT8 data);
 
 private:
 	required_device<cpu_device> m_maincpu;
