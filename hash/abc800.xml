@@ -24,7 +24,7 @@
 		</part>
 	</software>
 
-	<software name="kronstat.td0">
+	<software name="kronstat">
 		<description>Kronstat v2.1</description>
 		<year>19??</year>
 		<publisher>ABC-klubben</publisher>
@@ -68,7 +68,7 @@
 		</part>
 	</software>
 
-	<software name="sana23.td0">
+	<software name="sana23">
 		<!-- 68 20037-56 -->
 		<description>Sana 800 v2.3 (Finnish)</description>
 		<year>19??</year>
@@ -102,7 +102,7 @@
 		</part>
 	</software>
 
-	<software name="catnetl.td0">
+	<software name="catnetl">
 		<description>CatNet system disk</description>
 		<year>19??</year>
 		<publisher>Luxor</publisher>
