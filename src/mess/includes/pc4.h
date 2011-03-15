@@ -24,8 +24,6 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	virtual void machine_start();
 
-	DECLARE_WRITE8_MEMBER( clock_w );
-	DECLARE_READ8_MEMBER( clock_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER( bank_w );
 	DECLARE_READ8_MEMBER( kb_r );

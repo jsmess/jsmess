@@ -26,6 +26,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/pc4.h"
+#include "machine/tc8521.h"
 #include "sound/beep.h"
 #include "rendlay.h"
 
@@ -40,55 +41,6 @@ READ8_MEMBER( pc4_state::kb_r )
 			data &= input_port_read(machine, bitnames[line]);
 
 	return data;
-}
-
-
-READ8_MEMBER( pc4_state::clock_r )
-{
-	system_time systime;
-
-    //get the current date and time from the core
-	machine->current_datetime(systime);
-
-	switch(offset)
-	{
-		case 0x00:
-			return systime.local_time.second%10;
-		case 0x01:
-			return systime.local_time.second/10;
-		case 0x02:
-			return systime.local_time.minute%10;
-		case 0x03:
-			return systime.local_time.minute/10;
-		case 0x04:
-			return systime.local_time.hour%10;
-		case 0x05:
-			return systime.local_time.hour/10;
-		case 0x06:
-			return systime.local_time.weekday;
-		case 0x07:
-			return systime.local_time.mday%10;
-		case 0x08:
-			return systime.local_time.mday/10;
-		case 0x09:
-			return (systime.local_time.month+1)%10;
-		case 0x0a:
-			return systime.local_time.month/10;
-		case 0x0b:
-			return systime.local_time.year%10;
-		case 0x0c:
-			return (systime.local_time.year%100)/10;
-		case 0x0d:
-		case 0x0e:
-		case 0x0f:
-		default:
-			return 0;
-	}
-}
-
-WRITE8_MEMBER( pc4_state::clock_w )
-{
-	//TODO
 }
 
 WRITE8_MEMBER( pc4_state::bank_w )
@@ -110,7 +62,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc4_io, ADDRESS_SPACE_IO, 8, pc4_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_READWRITE(clock_r, clock_w)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE_LEGACY("rtc", tc8521_r, tc8521_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(beep_w)
 	AM_RANGE(0x1fff, 0x1fff) AM_WRITE(bank_w)
 
@@ -251,6 +203,11 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
+static const tc8521_interface pc4_tc8521_interface =
+{
+	NULL
+};
+
 static MACHINE_CONFIG_START( pc4, pc4_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -272,6 +229,8 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "beep", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+
+	MCFG_TC8521_ADD("rtc", pc4_tc8521_interface)
 MACHINE_CONFIG_END
 
 ROM_START( pc4 )
