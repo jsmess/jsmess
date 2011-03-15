@@ -2,7 +2,8 @@
 
 	Sharp MZ-2000
 
-	preliminary driver by Angelo Salese
+	driver by Angelo Salese
+	font conversion by Tomasz Slanina
 
 	Basically a simpler version of Sharp MZ-2500
 
@@ -657,19 +658,13 @@ static const floppy_config mz2000_floppy_config =
 
 /* PIT8253 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( pit8253_clk0_irq )
-{
-	//mz2500_state *drvstate = device->machine->driver_data<mz2500_state>();
-	//cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
-}
-
 static const struct pit8253_config mz2000_pit8253_intf =
 {
 	{
 		{
 			31250,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk0_irq)
+			DEVCB_NULL
 		},
 		{
 			0,
@@ -677,9 +672,9 @@ static const struct pit8253_config mz2000_pit8253_intf =
 			DEVCB_NULL
 		},
 		{
-			16, //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
+			16,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk1_w)
+			DEVCB_NULL
 		}
 	}
 };
@@ -756,9 +751,30 @@ ROM_START( mz2000 )
 	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
 
+ROM_START( mz2200 )
+	ROM_REGION( 0x10000, "ipl", 0 )
+	ROM_LOAD( "mz2200ipl.bin", 0x0000, 0x0800, CRC(476801e8) SHA1(6b1f0620945c5492475ea1694bd09a3fcf88549d) )
+
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
+	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
+	//ROM_CONTINUE( 0x0000, 0x7f80 )
+
+	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x1800, "chargen", 0 )
+//	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
+	/* these are hand-crafted roms, converted from bmps floating around the net */
+	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
+	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
+ROM_END
 
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
 COMP( 1982, mz2000,   mz80b,    0,   mz2000,   mz2000,  0, "Sharp",   "MZ-2000", GAME_NOT_WORKING )
+COMP( 1982, mz2200,   mz80b,    0,   mz2000,   mz2000,  0, "Sharp",   "MZ-2200", GAME_NOT_WORKING )
