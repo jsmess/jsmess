@@ -458,10 +458,10 @@ static MACHINE_RESET(mz2000)
 }
 
 
-static const gfx_layout mz2000_charlayout =
+static const gfx_layout mz2000_charlayout_8 =
 {
 	8, 8,
-	RGN_FRAC(1,1),
+	256,
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -469,8 +469,20 @@ static const gfx_layout mz2000_charlayout =
 	8*8
 };
 
+static const gfx_layout mz2000_charlayout_16 =
+{
+	8, 16,
+	256,
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	8*16
+};
+
 static GFXDECODE_START( mz2000 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, mz2000_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, mz2000_charlayout_8, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
 GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( mz2000_porta_r )
@@ -718,7 +730,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
 
@@ -737,8 +749,11 @@ ROM_START( mz2000 )
 
 	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
+	ROM_REGION( 0x1800, "chargen", 0 )
+//	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
+	/* these are hand-crafted roms, converted from bmps floating around the net */
+	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
+	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
 
 
