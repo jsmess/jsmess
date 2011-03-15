@@ -159,7 +159,10 @@ static READ8_HANDLER( mz2000_mem_r )
 		else if(page_mem >= 0xc && state->gvram_enable)
 			return mz2000_gvram_r(space,offset & 0x3fff);
 		else
-			return mz2000_wram_r(space,offset);
+		{
+			UINT16 wram_mask = (state->ipl_enable) ? 0x7fff : 0xffff;
+			return mz2000_wram_r(space,offset & wram_mask);
+		}
 	}
 
 	return 0xff;
@@ -182,7 +185,11 @@ static WRITE8_HANDLER( mz2000_mem_w )
 		else if(page_mem >= 0xc && state->gvram_enable)
 			mz2000_gvram_w(space,offset & 0x3fff,data);
 		else
-			mz2000_wram_w(space,offset,data);
+		{
+			UINT16 wram_mask = (state->ipl_enable) ? 0x7fff : 0xffff;
+
+			mz2000_wram_w(space,offset & wram_mask,data);
+		}
 	}
 }
 
@@ -485,15 +492,15 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
     */
 	printf("C W %02x\n",data);
 
+	if(((state->old_portc & 8) == 0) && data & 8)
+		state->ipl_enable = 1;
+
 	if(((state->old_portc & 2) == 0) && data & 2)
 	{
 		state->ipl_enable = 0;
 		/* correct? */
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
-
-	if(((state->old_portc & 8) == 0) && data & 8)
-		state->ipl_enable = 1;
 
 	beep_set_state(device->machine->device("beeper"),data & 0x04);
 
