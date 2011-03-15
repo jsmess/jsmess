@@ -10,8 +10,6 @@
 	TODO:
 	- cassette interface;
 	- implement remaining video capabilities
-	- some softwares (namely the Art Magic one) hangs with a pit timer
-	  status bit, check out why;
 
 ****************************************************************************/
 
@@ -658,6 +656,7 @@ static const floppy_config mz2000_floppy_config =
 
 /* PIT8253 Interface */
 
+/* TODO: clocks aren't known */
 static const struct pit8253_config mz2000_pit8253_intf =
 {
 	{
@@ -667,12 +666,12 @@ static const struct pit8253_config mz2000_pit8253_intf =
 			DEVCB_NULL
 		},
 		{
-			0,
+			31250, /* needed by "Art Magic" to boot */
 			DEVCB_NULL,
 			DEVCB_NULL
 		},
 		{
-			16,
+			31250,
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
