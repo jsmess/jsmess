@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( tdragon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
 //  AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM    /* Work RAM */
-//  AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprite RAM */
+//  AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM AM_BASE_SIZE_MEMBER(nmk16_state, spriteram, spriteram_size) /* Sprite RAM */
 //  AM_RANGE(0x0b9000, 0x0bdfff) AM_RAM AM_BASE(&nmk16_mcu_work_ram)   /* Work RAM */
 //  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)  /* Work RAM */
 //  AM_RANGE(0x0bf000, 0x0bffff) AM_RAM    /* Work RAM */
@@ -7132,8 +7132,8 @@ GAME( 1990, bioship,  0,        bioship,  bioship,  0,        ROT0,   "UPL (Amer
 GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",                          "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
 
 GAME( 1990, vandyke,    0,       vandyke,  vandyke, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
 
 GAME( 1991, blkheart, 0,        blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND  )

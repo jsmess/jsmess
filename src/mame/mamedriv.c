@@ -317,8 +317,8 @@ const game_driver * const drivers[] =
 	DRIVER( tazmani2 )	/* (c) 1982 Stern */
 	DRIVER( calipso )	/* (c) 1982 Tago */
 	DRIVER( anteater )	/* (c) 1982 Tago */
-	DRIVER( anteatg )	/* (c) 1983 TV-Tuning (F.E.G. license) */
-	DRIVER( anteatgb )	/* (c) 1983 Free Enterprise Games */
+	DRIVER( anteaterg )	/* (c) 1983 TV-Tuning (F.E.G. license) */
+	DRIVER( anteateruk )/* (c) 1983 Free Enterprise Games */
 	DRIVER( rescue )	/* (c) 1982 Stern */
 	DRIVER( aponow )	/* bootleg */
 	DRIVER( minefld )	/* (c) 1983 Stern */
@@ -415,6 +415,7 @@ const game_driver * const drivers[] =
 	DRIVER( cop01a )	/* (c) 1985 */
 	DRIVER( mightguy )	/* (c) 1986 */
 	DRIVER( terracre )	/* (c) 1985 */
+	DRIVER( terracreo )	/* (c) 1985 */
 	DRIVER( terracrea )	/* (c) 1985 */
 	DRIVER( terracren )	/* (c) 1985 */
 	DRIVER( amazon )	/* (c) 1986 */
@@ -7375,7 +7376,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( fitter )	/* (c) 1981 Taito */
 	DRIVER( fitterbl )	/* bootleg */
 	DRIVER( thepit )	/* (c) 1982 Zilec */
-	DRIVER( thepitu )	/* (c) 1982 Centuri (licensed) */
+	DRIVER( thepitu1 )	/* (c) 1982 Centuri (licensed) */
+	DRIVER( thepitu2 )	/* (c) 1982 Centuri (licensed) */
 	DRIVER( thepitj )	/* (c) 1982 Taito (licensed) */
 	DRIVER( thepitm )	/* bootleg */
 	DRIVER( dockman )	/* (c) 1982 Taito Corp. */
@@ -7438,6 +7440,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( empcity )	/* (c) 1986 Seibu Kaihatsu (bootleg?) */
 	DRIVER( empcityu )	/* (c) 1986 Taito (Romstar License) */
 	DRIVER( empcityj )	/* (c) 1986 Taito Corporation (Japan) */
+	DRIVER( empcityi )	/* (c) 1986 Seibu Kaihatsu (Eurobed license) */
 	DRIVER( stfight )	/* (c) 1986 Seibu Kaihatsu (Germany) (bootleg?) */
 	DRIVER( stfighta )	/* (c) 1986 Seibu Kaihatsu (bootleg?) */
 	DRIVER( darkmist )	/* (c) 1986 Taito */
@@ -8001,6 +8004,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( drgnunit )	/* (c) 1989 Athena / Seta + Romstar or Taito license (DSW) */
 	DRIVER( wits )		/* (c) 1989 Athena (Visco license) */
 	DRIVER( thunderl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) */
+	DRIVER( thunderlbl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) - bootleg with Tetris sound */
 	DRIVER( wiggie )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
 	DRIVER( superbar )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
 	DRIVER( jockeyc )	/* (c) 1990 [Seta] (Visco license) */
@@ -8141,6 +8145,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Sun Electronics / SunSoft games */
 	DRIVER( dai3wksi )	/* 1979.09 Dai San Wakusei (The Third Planet) */
 	DRIVER( speakres )	/* [Sun Electronics] */
+	DRIVER( speakresb )	/* bootleg */
 	DRIVER( stratvox )	/* [1980 Sun Electronics] Taito */
 	DRIVER( stratvoxb )	/* bootleg */
 	DRIVER( spacecho )	/* bootleg */
@@ -10723,7 +10728,8 @@ Other Sun games
 	DRIVER( re800ea )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v1 )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v3 )	/* (c) 1992 Entretenimientos GEMINIS */
-	DRIVER( luckyrlt )	/* (c) 198? unknown */
+	DRIVER( rcirulet )	/* (c) 199? Entretenimientos GEMINIS */
+	DRIVER( luckyrlt )	/* (c) 1990 unknown */
 
 	DRIVER( dfruit )
 

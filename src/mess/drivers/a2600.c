@@ -1632,7 +1632,7 @@ static void common_init(running_machine *machine)
 	a2600_state *state = machine->driver_data<a2600_state>();
 	screen_device *screen = machine->first_screen();
 	state->current_screen_height = screen->height();
-	state->extra_RAM = machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
+	state->extra_RAM = machine->region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
 	memset( state->riot_ram, 0x00, 0x80 );
 	state->current_reset_bank_counter = 0xFF;
 	state->dpc.oscillator = machine->scheduler().timer_alloc(FUNC(modeDPC_timer_callback));

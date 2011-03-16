@@ -1257,8 +1257,8 @@ void gb_video_reset( running_machine *machine, int mode )
 	if (machine->region("gfx1")->base())		machine->region_free("gfx1");
 	if (machine->region("gfx2")->base())		machine->region_free("gfx2");
 
-	state->lcd.gb_vram = machine->region_alloc("gfx1", vram_size, 0 );
-	state->lcd.gb_oam = machine->region_alloc("gfx2", 0x100, 0 );
+	state->lcd.gb_vram = machine->region_alloc("gfx1", vram_size, 1, ENDIANNESS_LITTLE );
+	state->lcd.gb_oam = machine->region_alloc("gfx2", 0x100, 1, ENDIANNESS_LITTLE );
 	memset( state->lcd.gb_vram->base(), 0, vram_size );
 
 	state->lcd.gb_vram_ptr = state->lcd.gb_vram->base();

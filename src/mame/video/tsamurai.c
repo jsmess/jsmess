@@ -6,12 +6,6 @@
 #include "includes/tsamurai.h"
 
 
-/*
-** variables
-*/
-
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -146,7 +140,7 @@ WRITE8_HANDLER( tsamurai_fg_colorram_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	tsamurai_state *state = machine->driver_data<tsamurai_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	gfx_element *gfx = machine->gfx[2];
 	const UINT8 *source = spriteram+32*4-4;
 	const UINT8 *finish = spriteram; /* ? */

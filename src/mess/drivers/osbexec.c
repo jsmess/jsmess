@@ -588,8 +588,8 @@ static DRIVER_INIT( osbexec )
 {
 	osbexec_state *state = machine->driver_data<osbexec_state>();
 
-	state->fontram_region = machine->region_alloc( "fontram", 0x1000, 0 );
-	state->vram_region = machine->region_alloc( "vram", 0x2000, 0 );
+	state->fontram_region = machine->region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
+	state->vram_region = machine->region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
 	state->vram = state->vram_region->base();
 	state->fontram = state->fontram_region->base();
 

@@ -377,7 +377,7 @@ static void svi318_80col_init(running_machine *machine)
 	svi318_state *state = machine->driver_data<svi318_state>();
 	/* 2K RAM, but allocating 4KB to make banking easier */
 	/* The upper 2KB will be set to FFs and will never be written to */
-	state->svi.svi806_ram = machine->region_alloc("gfx2", 0x1000, 0 );
+	state->svi.svi806_ram = machine->region_alloc("gfx2", 0x1000, 1, ENDIANNESS_LITTLE );
 	memset( state->svi.svi806_ram->base(), 0x00, 0x800 );
 	memset( state->svi.svi806_ram->base() + 0x800, 0xFF, 0x800 );
 	state->svi.svi806_gfx = machine->region("gfx1")->base();

@@ -2595,6 +2595,61 @@ static INPUT_PORTS_START( anteater )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( anteateruk )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, "A 1/1  B 1/5" )
+	PORT_DIPSETTING(    0x00, "A 2/1  B 1/3" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")	/* need for some PPI accesses */
+	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 /* verified from Z80 code */
 static INPUT_PORTS_START( calipso )
 	PORT_START("IN0")
@@ -5855,6 +5910,50 @@ ROM_START( anteater )
 ROM_END
 
 
+ROM_START( anteateruk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ant1.bin",     0x0000, 0x0400, CRC(69debc90) SHA1(2ad4c86a1cbaf86d0b76bb07b885f61bc6604009) )
+	ROM_CONTINUE(             0x4600, 0x0a00 )
+	ROM_CONTINUE(             0x6400, 0x1200 )
+	ROM_LOAD( "ant2.bin",     0x7600, 0x0500, CRC(ab352805) SHA1(858928f2b57c324a7942c13e0e6a7717a36f6ffc) )
+	ROM_CONTINUE(             0x8300, 0x1600 )
+	ROM_CONTINUE(             0xa300, 0x0500 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ra4-5c",       0x0000, 0x0800, CRC(87300b4f) SHA1(b81b685ac1d353ff1cd40b876a7478b87b85e7a9) )
+	ROM_LOAD( "ra4-5d",       0x0800, 0x0800, CRC(af4e5ffe) SHA1(62717a233cf9f58267af4a9e1c80479b373ab317) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "gfx_1.bin",    0x0000, 0x0800, CRC(1e2824b1) SHA1(9527937db618505181f4d5a22bc532977a767232) )
+	ROM_LOAD( "gfx_2.bin",    0x0800, 0x0800, CRC(784319b3) SHA1(0c3612a428d0906b07b35782cc0f84fda13aab73) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
+ROM_END
+
+
+ROM_START( anteaterg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg_2.bin",    0x0000, 0x0400, CRC(2ba793a8) SHA1(a97c96dcd55804d3b41856ece6477ec1c1e45892) )
+	ROM_CONTINUE(             0x4600, 0x0a00 )
+	ROM_CONTINUE(             0x6400, 0x1200 )
+	ROM_LOAD( "prg_1.bin",    0x7600, 0x0500, CRC(7a798af5) SHA1(b4c8672c92b207a7a334dd3b78e57537b7d99b71) )
+	ROM_CONTINUE(             0x8300, 0x1600 )
+	ROM_CONTINUE(             0xa300, 0x0500 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ra4-5c",       0x0000, 0x0800, CRC(87300b4f) SHA1(b81b685ac1d353ff1cd40b876a7478b87b85e7a9) )
+	ROM_LOAD( "ra4-5d",       0x0800, 0x0800, CRC(af4e5ffe) SHA1(62717a233cf9f58267af4a9e1c80479b373ab317) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "gfx_1.bin",    0x0000, 0x0800, CRC(1e2824b1) SHA1(9527937db618505181f4d5a22bc532977a767232) )
+	ROM_LOAD( "gfx_2.bin",    0x0800, 0x0800, CRC(784319b3) SHA1(0c3612a428d0906b07b35782cc0f84fda13aab73) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
+ROM_END
+
+
 ROM_START( calipso )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "calipso.2c",   0x0000, 0x1000, CRC(0fcb703c) SHA1(2bb096f114911973afdf3088c860c9566df06f60) )
@@ -6136,9 +6235,9 @@ GAME( 1980, kingballj,kingball, kingball, kingball, kingball, ROT90,  "Namco", "
 
 /* Frogger based hardware: 2nd Z80, AY-8910A, 2 8255 PPI for I/O, custom background */
 GAME( 1981, frogger,  0,        frogger,  frogger,  frogger,  ROT90,  "Konami", "Frogger", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggers1, frogger, frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggers2, frogger, frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggermc, frogger, froggrmc, froggrmc, froggrmc, ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers1,frogger,  frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers2,frogger,  frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggermc,frogger,  froggrmc, froggrmc, froggrmc, ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, froggers, frogger,  froggers, frogger,  froggers, ROT90,  "bootleg", "Frog", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
@@ -6157,7 +6256,7 @@ GAME( 1981, 600,      turtles,  turtles,  turtles,  turtles,  ROT90,  "Konami", 
 GAME( 1981, amidar,   0,        turtles,  amidar,   turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaru,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaro,  amidar,   turtles,  amidaro,  turtles,  ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* Simular to Amigo bootleg */
+GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
 GAME( 1982, amigo,    amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amigo", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidars,  amidar,   scramble, amidars,  scramble, ROT90,  "Konami", "Amidar (Scramble hardware)", GAME_SUPPORTS_SAVE )
 
@@ -6180,8 +6279,8 @@ GAME( 1981, atlantis2,atlantis, theend,   atlantis, atlantis, ROT90,  "Comsoft",
 GAME( 1982, scorpion, 0,		scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1982, scorpiona,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1982, scorpionb,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 19??, scorpionmc,scorpion, mooncrst, scorpnmc, scorpnmc, ROT90, "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
-GAME( 19??, aracnis,   scorpion, mooncrst, aracnis,  scorpnmc, ROT90, "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 19??, scorpionmc,scorpion,mooncrst, scorpnmc, scorpnmc, ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 19??, aracnis,   scorpion,mooncrst, aracnis,  scorpnmc, ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
@@ -6210,14 +6309,16 @@ GAME( 1981, armorcar2, armorcar, scobra,   armorcar2, scobra,   ROT90,  "Stern E
 GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern Electronics", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 
 /*
-    Anteater
+    Anteater (sold as conversion kit)
 
     CPU/Video Board: A969 (Has various wire mods)
     Sound Board:     A970
 */
-GAME( 1982, anteater,  0,        anteater, anteater,  anteater, ROT90,  "Tago Electronics", "Anteater", GAME_SUPPORTS_SAVE ) // sold as conversion kit
+GAME( 1982, anteater,  0,        anteater,  anteater,  anteater,  ROT90,  "Tago Electronics", "Anteater", GAME_SUPPORTS_SAVE )
+GAME( 1982, anteateruk,anteater, anteateruk,anteateruk,anteateruk,ROT90,  "Tago Electronics (Free Enterprise Games license", "The Anteater (UK)", GAME_SUPPORTS_SAVE ) // distributed in 1983
+GAME( 1982, anteaterg, anteater, anteaterg, anteateruk,anteateruk,ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, calipso,   0,        scobra,   calipso,   calipso,  ROT90,  "Tago Electronics", "Calipso",  GAME_SUPPORTS_SAVE ) // sold as conversion kit
+GAME( 1982, calipso,   0,        scobra,    calipso,   calipso,   ROT90,  "Tago Electronics", "Calipso",  GAME_SUPPORTS_SAVE )
 
 /*
     Lost Tomb
@@ -6268,7 +6369,7 @@ GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatr
 //GAME( 1984, mrkougar, 0,        theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougr2, mrkougar, theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar (earlier)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg Set 2)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, hotshock, 0,        theend  /*hotshock*/, hotshock, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
 //GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 //GAME( 1983, hunchbks, hunchbak, theend  /*hunchbks*/, hunchbks, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
@@ -6283,8 +6384,6 @@ GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatr
 //GAME( 1981, stratgys, stratgyx, scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
 //GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, anteatg,  anteater, scobra/*anteatg*/,  anteatg,  scramble_ppi, ROT90,  "TV-Tuning (F.E.G. license)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, anteatgb, anteater, scobra/*anteatgb*/, anteatgb, scramble_ppi, ROT90,  "Free Enterprise Games", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, rescue,   0,        scobra/*rescue*/,   rescue,   rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
 //GAME( 1982, aponow,   rescue,   scobra/*rescue*/,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
 //GAME( 1983, minefld,  0,        scobra/*minefld*/,  minefld,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )

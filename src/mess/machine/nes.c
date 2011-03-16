@@ -763,9 +763,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			/* Allocate them again with the proper size */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 0);
+			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
 			if (state->chr_chunks)
-				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 0);
+				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
 
 			state->rom = image.device().machine->region("maincpu")->base();
 			state->vrom = image.device().machine->region("gfx1")->base();
@@ -1249,7 +1249,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Allocate them again, and copy PRG/CHR from temp buffers */
 			/* Take care of PRG */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 0);
+			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
 			state->rom = image.device().machine->region("maincpu")->base();
 			memcpy(&state->rom[0x10000], &temp_prg[0x00000], state->prg_chunks * 0x4000);
 			/* If only a single 16K PRG chunk is present, mirror it! */
@@ -1259,7 +1259,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Take care of CHR ROM */
 			if (state->chr_chunks)
 			{
-				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 0);
+				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
 				state->vrom = image.device().machine->region("gfx1")->base();
 				memcpy(&state->vrom[0x00000], &temp_chr[0x00000], state->chr_chunks * 0x2000);
 			}
@@ -1267,7 +1267,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Take care of CHR RAM */
 			if (state->vram_chunks)
 			{
-				image.device().machine->region_alloc("gfx2", state->vram_chunks * 0x2000, 0);
+				image.device().machine->region_alloc("gfx2", state->vram_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
 				state->vram = image.device().machine->region("gfx2")->base();
 			}
 
@@ -1332,7 +1332,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		image.device().machine->region_free("gfx2");
 
 		/* Allocate them again with the proper size */
-		image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 0);
+		image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
 
 		// validate the xml fields
 		if (!prg_size)
@@ -1341,10 +1341,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
 
 		if (chr_size)
-			image.device().machine->region_alloc("gfx1", chr_size, 0);
+			image.device().machine->region_alloc("gfx1", chr_size, 1, ENDIANNESS_LITTLE);
 
 		if (vram_size)
-			image.device().machine->region_alloc("gfx2", vram_size, 0);
+			image.device().machine->region_alloc("gfx2", vram_size, 1, ENDIANNESS_LITTLE);
 
 		state->rom = image.device().machine->region("maincpu")->base();
 		state->vrom = image.device().machine->region("gfx1")->base();

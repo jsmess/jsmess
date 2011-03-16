@@ -1436,8 +1436,8 @@ static DEVICE_START( smsvdp )
 	smsvdp->pause_callback = intf->pause_callback;
 
 	/* Allocate video RAM */
-	smsvdp->VRAM = device->machine->region_alloc("vdp_vram", VRAM_SIZE, ROM_REQUIRED);
-	smsvdp->CRAM = device->machine->region_alloc("vdp_cram", MAX_CRAM_SIZE, ROM_REQUIRED);
+	smsvdp->VRAM = device->machine->region_alloc("vdp_vram", VRAM_SIZE, 1, ENDIANNESS_LITTLE);
+	smsvdp->CRAM = device->machine->region_alloc("vdp_cram", MAX_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
 	smsvdp->line_buffer = auto_alloc_array(device->machine, int, 256 * 5);
 
 	smsvdp->collision_buffer = auto_alloc_array(device->machine, UINT8, SMS_X_PIXELS);
