@@ -92,6 +92,13 @@ static const kb_keytronic_interface pc_keytronic_intf =
 	DEVCB_DEVICE_HANDLER("mb",genpc_kb_set_data_signal)
 };
 
+static DEVICE_INPUT_DEFAULTS_START(cga) 
+	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(vga) 
+	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( pcmda, genpc_state )
 	/* basic machine hardware */
@@ -150,6 +157,7 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_CPU_CONFIG(i86_address_mask)
 	
 	MCFG_PC_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 	
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -176,7 +184,8 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_CPU_CONFIG(i86_address_mask)
 	
 	MCFG_PC_MOTHERBOARD_ADD("mb","maincpu")
-	
+	MCFG_DEVICE_INPUT_DEFAULTS(vga)
+		
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
@@ -229,7 +238,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		genpccga,	"<generic>",  "PC (CGA)" , 0)
+COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		genpc,   	"<generic>",  "PC (CGA)" , 0)
 COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		genpc,    	"<generic>",  "PC (MDA)" , 0)
 COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      genpc,    	"<generic>",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      xtvga,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING)

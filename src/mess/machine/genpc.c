@@ -566,8 +566,8 @@ const input_port_token *pc_motherboard_device_config::input_ports() const
 
 void pc_motherboard_device_config::static_set_cputag(device_config *device, const char *tag)
 {
-	pc_motherboard_device_config *isa = downcast<pc_motherboard_device_config *>(device);
-	isa->m_cputag = tag;
+	pc_motherboard_device_config *board = downcast<pc_motherboard_device_config *>(device);
+	board->m_cputag = tag;
 }
  
 //**************************************************************************
@@ -667,16 +667,6 @@ DRIVER_INIT( genpc )
 		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );
 }
 
-DRIVER_INIT( genpccga )
-{
-	DRIVER_INIT_CALL(genpc);
-	input_port_value mask =0x30;
-	const input_field_config *field = input_field_by_tag_and_mask(machine->m_portlist,"mb:DSW0",mask);
-	input_field_user_settings settings;
-	input_field_get_user_settings(field, &settings);
-	settings.value = 0x20;
-	input_field_set_user_settings(field, &settings);
-}
 static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); } 
 
 static const struct pc_vga_interface vga_interface =
@@ -693,11 +683,5 @@ static const struct pc_vga_interface vga_interface =
 DRIVER_INIT( genpcvga )
 {
 	DRIVER_INIT_CALL(genpc);
-	input_port_value mask =0x30;
-	const input_field_config *field = input_field_by_tag_and_mask(machine->m_portlist,"mb:DSW0",mask);
-	input_field_user_settings settings;
-	input_field_get_user_settings(field, &settings);
-	settings.value = 0x00;
-	input_field_set_user_settings(field, &settings);	
 	pc_vga_init(machine, &vga_interface, NULL);
 }

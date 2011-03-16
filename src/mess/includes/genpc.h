@@ -107,7 +107,6 @@ WRITE8_DEVICE_HANDLER( genpc_kb_set_clock_signal );
 WRITE8_DEVICE_HANDLER( genpc_kb_set_data_signal );
 
 DRIVER_INIT( genpc );
-DRIVER_INIT( genpccga );
 DRIVER_INIT( genpcvga );
 
 #endif /* GENPC_H_ */
