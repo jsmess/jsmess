@@ -820,6 +820,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_FORMATS)/cbm_snqk.o	\
 
 $(MESSOBJ)/cccp.a:				\
+	$(MESS_DRIVERS)/argo.o		\
 	$(MESS_VIDEO)/lviv.o		\
 	$(MESS_DRIVERS)/lviv.o		\
 	$(MESS_MACHINE)/lviv.o		\

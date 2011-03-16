@@ -1879,5 +1879,6 @@ const game_driver * const drivers[] =
 	DRIVER( sacstate )
 	DRIVER( prose2k )
 	DRIVER( eacc )
+	DRIVER( argo )
 
 #endif /* DRIVER_RECURSIVE */
