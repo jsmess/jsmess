@@ -18,8 +18,10 @@ public:
 };
 
 
-static READ8_HANDLER( okean240_rand_r ) { return space->machine->rand(); } // so we can start booting
-
+static READ8_HANDLER( okean240_rand_r )
+{
+	return 0;  // return space->machine->rand(); // so we can start booting
+}
 
 static ADDRESS_MAP_START(okean240_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -148,5 +150,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, okean240,  0,       0,	okean240,	okean240, okean240,  "<unknown>",   "Okean-240",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, okean240,  0,       0,	okean240,	okean240, okean240,  "<unknown>",   "Okean-240", GAME_NOT_WORKING | GAME_NO_SOUND)
 
