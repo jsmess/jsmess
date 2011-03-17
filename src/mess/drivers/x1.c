@@ -408,7 +408,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap)
 						}
 						else if(state->scrn_reg.v400_mode) //PCG
 						{
-							tile_offset = ((tile*8)+(((yi & 7)+dy*2) >> (height+1)));
+							tile_offset = ((tile*8)+(((yi & 0xf)+dy*2) >> (height+1)));
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
@@ -1337,6 +1337,7 @@ static WRITE8_HANDLER( x1_scrn_w )
 	state->scrn_reg.gfx_bank = (data & 0x10)>>4;
 	state->scrn_reg.disp_bank = (data & 0x08)>>3;
 	state->scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
+
 	if(data & 0x84)
 		printf("SCRN = %02x\n",data & 0x84);
 	if((data & 0x03) == 1)
