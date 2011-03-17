@@ -33,7 +33,8 @@ public:
 	UINT8 statusLED;			// status led
 
 	virtual void machine_reset();
-	DECLARE_WRITE16_MEMBER(led_dsw_w);
+	DECLARE_READ8_MEMBER(dsw_r);
+	DECLARE_WRITE8_MEMBER(led_dsw_w);
 	DECLARE_READ16_MEMBER(dsp_data_r);
 	DECLARE_WRITE16_MEMBER(dsp_data_w);
 	DECLARE_READ16_MEMBER(dsp_status_r);

@@ -13,9 +13,10 @@
 *  Successful compile
 *  Successful run
 *  Correctly Interleave 8086 CPU roms
-*  Debug LEDs hooked to popmessage - this needs work
+*  Debug LEDs hooked to popmessage
 *  Correctly load UPD7720 roms as UPD7725 data - done, this is utterly disgusting code.
 *  Attached i8251a uart at u15
+*  Added dipswitch array S4
 *
 *  TODO:
 *  Hook the terminal to the i8251a uart at u15
@@ -23,8 +24,8 @@
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
 *  Correct memory maps and io maps - partly done
 *  Attach 8259 PIC and figure out where all the ints come from
-*  Add dipswitches and jumpers
-*  Everything else 
+*  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
+*  Everything else
 *
 *  Notes:
 *  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
@@ -52,17 +53,39 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 
 /* led/dipswitch stuff */
 
-WRITE16_MEMBER( tsispch_state::led_dsw_w )
+READ8_MEMBER( tsispch_state::dsw_r )
 {
+	UINT8 data;
+	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
+	 * The switches are, for normal operation on my unit:
+	 * ON ON OFF OFF OFF OFF OFF OFF
+	 * which makes this register read 0xFC
+	 * When s4-7 is turned on, it reads 0xBC
+	 */
+	data = input_port_read(space.machine, "s4");
+	return data;
+}
+
+WRITE8_MEMBER( tsispch_state::led_dsw_w )
+{
+	/* These are the 4 debug leds on the pcb inside the case.
+	   They are called on the silkscreen, unimaginatively, '6','5','4',and '3', and
+	   are connected to bits 6, 5, 4, and 3 of this register.
+	   Bit 6 also connects to the 'talking' LED on the front panel.
+	   When 0 is written to a bit, the led turns on.
+	   When the unit is idle, leds 5 and 3 are on. (bits 6 and 4 are set)
+	   Bit 7 doesn't seem to be used so far. it may be a reset line for something.
+	   Bits 0,1,2 may be a startup test status counter;
+	     when the unit starts up, they have 1, 2, 3 writen to them sequentiall
+	     as each test passes; note that tests 1 and 2 (ram tests and rom test?)
+	     both pass while test 3 fails... assuming this is indeed a counter.
+	*/
 	tsispch_state *state = machine->driver_data<tsispch_state>();
-	UINT16 data2 = data >> 8;
-	state->statusLED = data2&0xFF;
-	//fprintf(stderr,"0x03400 LED write: %02X\n", data);
-	//popmessage("LED status: %02X\n", data2&0xFF);
+	state->statusLED = data;
 #ifdef VERBOSE
-	logerror("8086: LED status: %02X\n", data2&0xFF);
+	logerror("8086: LED status: %02X\n", data);
 #endif
-	popmessage("LED status: %x %x %x %x %x %x %x %x\n", BIT(data2,7), BIT(data2,6), BIT(data2,5), BIT(data2,4), BIT(data2,3), BIT(data2,2), BIT(data2,1), BIT(data2,0));
+	popmessage("LED status: (%x) %x %x %x %x (%x %x %x)\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 }
 
 
@@ -191,7 +214,8 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
 	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
 	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x34000) AM_WRITE(led_dsw_w) // write is 8 bits, but there are only 4 debug leds; other 4 bits may select a bank of dipswitches to be read here?
+	AM_RANGE(0x03400, 0x03401) /*AM_MIRROR(0x341FE)*/ AM_READ8(dsw_r, 0x00FF)
+	AM_RANGE(0x03400, 0x03401) /*AM_MIRROR(0x341FE)*/ AM_WRITE8(led_dsw_w, 0xFF00) // write to the 4 leds, plus 4 other mystery bits
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
 	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
@@ -215,6 +239,31 @@ ADDRESS_MAP_END
  Input Ports
 ******************************************************************************/
 static INPUT_PORTS_START( prose2k )
+PORT_START("s4") // dipswitch array s4
+	PORT_DIPNAME( 0x01, 0x00, "S4-1") PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "S4-2") PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "S4-3") PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "S4-4") PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "S4-5") PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "S4-6") PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Self Test") PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "S4-8") PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /******************************************************************************
