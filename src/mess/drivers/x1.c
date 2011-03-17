@@ -27,9 +27,11 @@
 		- specific x1turboz features?
 
     per-game/program specific TODO:
+    - Lupin 3 / Take the A-Train: they all fails to load the basic now, they where working at some point but now they just resets themselves at startup;
     - Hydlide 2 / 3: can't get the user disk to work properly
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
     - "newtype": trips a z80dma error;
+	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Ys 2: crashes after the disclaimer screen;
     - Ys 3: missing user disk, to hack it (and play with x1turboz features):
@@ -317,7 +319,11 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap)
 		---- x--- reverse color
 		---- -xxx color pen
 
-		TODO: kanji vram in x1turbo
+		x--- ---- select Kanji ROM
+		-x-- ---- Kanji side (0=left, 1=right)
+		--x- ---- Underline
+		---x ---- Kanji ROM select (0=level 1, 1=level 2) (TODO: implement this)
+		---- xxxx Kanji upper 4 bits
 	*/
 
 	x1_state *state = machine->driver_data<x1_state>();
@@ -344,6 +350,23 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap)
 			int height = (state->avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x40)>>6;
 			int pcg_bank = (state->avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x20)>>5;
 			UINT8 *gfx_data = machine->region(pcg_bank ? "pcg" : "cgrom")->base();
+			int	knj_enable = 0;
+			int knj_side = 0;
+			int knj_bank = 0;
+			int knj_uline = 0;
+			if(state->is_turbo)
+			{
+				knj_enable = (state->kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x80)>>7;
+				knj_side = (state->kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x40)>>6;
+				knj_uline = (state->kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x20)>>5;
+				//knj_lv2 = (state->kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x10)>>4;
+				knj_bank = (state->kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f)>>0;
+				if(knj_enable)
+				{
+					gfx_data = machine->region("kanji")->base();
+					tile = ((tile + (knj_bank << 8)) << 1) + (knj_side & 1);
+				}
+			}
 
 			{
 				int pen[3],pen_mask,pcg_pen,xi,yi,dy;
@@ -362,23 +385,37 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap)
 					for(xi=0;xi<8;xi++)
 					{
 						/* TODO: clean this up! */
-						if(state->scrn_reg.v400_mode && pcg_bank == 0) //ank
+						if(knj_enable) //kanji select
 						{
-							tile_offset = ((tile*16)+((yi+dy*2) >> height));
+							tile_offset = tile * 16 + (((yi & 0x1f)+dy) >> state->scrn_reg.v400_mode);
+							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
+							pen[1] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 2)>>1;
+							pen[2] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 4)>>2;
+
+							if(yi == mc6845_tile_height-1 && knj_uline)
+							{
+								pen[0] = (pen_mask & 1)>>0;
+								pen[1] = (pen_mask & 2)>>1;
+								pen[2] = (pen_mask & 4)>>2;
+							}
+						}
+						else if(state->scrn_reg.v400_mode && pcg_bank == 0) //ank
+						{
+							tile_offset = ((tile*16)+(((yi & 0xf)+dy*2) >> height));
 							pen[0] = gfx_data[tile_offset+0x0000+0x1800]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x1000+0x1800]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x2000+0x1800]>>(7-xi) & (pen_mask & 4)>>2;
 						}
 						else if(state->scrn_reg.v400_mode) //PCG
 						{
-							tile_offset = ((tile*8)+((yi+dy*2) >> (height+1)));
+							tile_offset = ((tile*8)+(((yi & 7)+dy*2) >> (height+1)));
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
 						}
 						else
 						{
-							tile_offset = ((tile*8)+((yi+dy) >> height));
+							tile_offset = ((tile*8)+(((yi & 7)+dy) >> height));
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
@@ -1686,7 +1723,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->avram[offset & 0x7ff] = data; }
 	else if(offset >= 0x3000 && offset <= 0x37ff)	{ state->tvram[offset & 0x7ff] = state->pcg_write_addr = data; }
-	else if(offset >= 0x3800 && offset <= 0x3fff)	{ if(data) { printf("Write to Kanji VRAM %04x %02x\n",offset,data); } state->kvram[offset & 0x7ff] = state->pcg_write_addr = data; }
+	else if(offset >= 0x3800 && offset <= 0x3fff)	{ if(data & 0x10) { printf("Write to Kanji lv 2 VRAM %04x %02x\n",offset,data); } state->kvram[offset & 0x7ff] = state->pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -2396,8 +2433,7 @@ static MACHINE_RESET( x1 )
 		gfx_element_mark_dirty(machine->gfx[1], i);
 	}
 
-	/* X1 Turbo specific */
-	state->scrn_reg.blackclip = 0;
+	state->is_turbo = 0;
 
 	state->io_bank_mode = 0;
 	state->pcg_index[0] = state->pcg_index[1] = state->pcg_index[2] = 0;
@@ -2420,11 +2456,20 @@ static MACHINE_RESET( x1 )
 	state->sub_val[4] = 0;
 	state->sub_obf = (state->sub_cmd_length) ? 0x00 : 0x20;
 
+	state->rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+
 	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
 	for(i=0;i<0x10;i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+}
 
-	state->rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+static MACHINE_RESET( x1turbo )
+{
+	x1_state *state = machine->driver_data<x1_state>();
+	MACHINE_RESET_CALL( x1 );
+	state->is_turbo = 1;
+
+	state->scrn_reg.blackclip = 0;
 }
 
 static MACHINE_START( x1 )
@@ -2541,6 +2586,8 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(x1turbo_io)
 	MCFG_CPU_CONFIG(x1turbo_daisy)
+
+	MCFG_MACHINE_RESET(x1turbo)
 
 	MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
 	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )

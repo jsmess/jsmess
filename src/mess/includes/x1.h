@@ -131,6 +131,7 @@ public:
 	UINT16 gate_array_ma;
 	UINT8 gate_array_ra;
 	UINT8 gate_array_de;
+	UINT8 is_turbo;
 };
 
 
