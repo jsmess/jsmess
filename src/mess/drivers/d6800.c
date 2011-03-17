@@ -27,7 +27,16 @@
     TODO:
     - Cassette
     - CPU should freeze while screen is being drawn
-    - Keyboard (should work but it doesn't)
+    - Keyboard (should work but it doesn't, due to inadequate PIA emulation)
+
+    Current situation:
+    - It starts, displays initial screen
+    - It checks the status bits looking for a keypress
+    - When a key is pressed, it gets into a loop at C2E8-C2EB, waiting for
+      a memory location to change. This means it needs an interrupt to kick
+      in, from a keypress.
+    - The pia only looks for an interrupt when it gets polled, which is
+      not the case here, so the emulation hangs.
 */
 
 #define ADDRESS_MAP_MODERN
@@ -65,8 +74,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( d6800_rtc_pulse );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	UINT8 m_keylatch;
-	UINT8 m_keydown;
-	UINT8 m_screen;
+	UINT8 m_screen_on;
 	UINT8 m_rtc;
 	UINT8 *m_videoram;
 };
@@ -122,7 +130,7 @@ INPUT_PORTS_END
 static SCREEN_UPDATE( d6800 )
 {
 	d6800_state *state = screen->machine->driver_data<d6800_state>();
-	UINT8 x,y,gfx=0;
+	UINT8 x,y,gfx=0,i;
 
 	for (y = 0; y < 32; y++)
 	{
@@ -130,17 +138,11 @@ static SCREEN_UPDATE( d6800 )
 
 		for (x = 0; x < 8; x++)
 		{
-			if (state->m_screen)
+			if (state->m_screen_on)
 				gfx = state->m_videoram[ x | (y<<3)];
 
-			*p++ = ( gfx & 0x80 ) ? 1 : 0;
-			*p++ = ( gfx & 0x40 ) ? 1 : 0;
-			*p++ = ( gfx & 0x20 ) ? 1 : 0;
-			*p++ = ( gfx & 0x10 ) ? 1 : 0;
-			*p++ = ( gfx & 0x08 ) ? 1 : 0;
-			*p++ = ( gfx & 0x04 ) ? 1 : 0;
-			*p++ = ( gfx & 0x02 ) ? 1 : 0;
-			*p++ = ( gfx & 0x01 ) ? 1 : 0;
+			for (i = 0; i < 8; i++)
+				*p++ = BIT(gfx, 7-i);
 		}
 	}
 	return 0;
@@ -163,7 +165,12 @@ READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
-	return m_keydown;
+	UINT8 data = input_port_read(machine, "LINE0")
+	           & input_port_read(machine, "LINE1")
+	           & input_port_read(machine, "LINE2")
+	           & input_port_read(machine, "LINE3");
+
+	return (data==0xff) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
@@ -173,7 +180,7 @@ READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 {
-	m_screen = state;
+	m_screen_on = state;
 }
 
 READ8_MEMBER( d6800_state::d6800_cassette_r )
@@ -196,21 +203,19 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
     bit 0 of the PIA. Bit 6 drives the speaker.
     */
 
-	speaker_level_w(m_speaker, (data & 0x40) ? 0 : 1);
+	speaker_level_w(m_speaker, BIT(data, 6));
 }
 
 READ8_MEMBER( d6800_state::d6800_keyboard_r )
 {
-	UINT8 data = 0xff;
+	UINT8 data = 15;
 
 	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine, "LINE0");
 	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine, "LINE1");
 	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine, "LINE2");
 	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine, "LINE3");
 
-	m_keydown = (data==0xff) ? 0 : 1;
-
-	return data;
+	return data | m_keylatch;
 }
 
 WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
