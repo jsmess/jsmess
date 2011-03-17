@@ -1237,10 +1237,14 @@ static int upd765_sector_count_complete(device_t *device)
         */
 
 		/* if just read last sector and on side 1 - finish */
-		if ((upd765_just_read_last_sector_on_track(device)) &&
-			(fdc->side==1))
+		if (upd765_just_read_last_sector_on_track(device))
 		{
-			return 1;
+			if (floppy_get_heads_per_disk(flopimg_get_image(current_image(device)))==1) {
+				return 1;
+			} else {
+				if (fdc->side==1) 
+					return 1;
+			}
 		}
 
 		/* if not on second side then we haven't finished yet */
