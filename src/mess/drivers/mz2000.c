@@ -48,6 +48,10 @@ public:
 	UINT8 width80;
 	UINT8 tvram_attr;
 	UINT8 gvram_mask;
+
+	UINT8 color_mode;
+	UINT8 has_fdc;
+	UINT8 hi_mode;
 };
 
 static VIDEO_START( mz2000 )
@@ -78,7 +82,8 @@ static SCREEN_UPDATE( mz2000 )
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= state->gvram_mask;
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen];
+				*BITMAP_ADDR16(bitmap, y*2+0, x+xi) = screen->machine->pens[pen];
+				*BITMAP_ADDR16(bitmap, y*2+1, x+xi) = screen->machine->pens[pen];
 			}
 			count++;
 		}
@@ -93,30 +98,54 @@ static SCREEN_UPDATE( mz2000 )
 			UINT8 tile = tvram[y*x_size+x];
 			UINT8 color = state->tvram_attr & 7;
 
-			for(yi=0;yi<8;yi++)
+			for(yi=0;yi<8*(state->hi_mode+1);yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
 					int pen;
 					int res_x,res_y;
+					UINT16 tile_offset;
 
 					res_x = x * 8 + xi;
-					res_y = y * 8 + yi;
+					res_y = y * (8 *(state->hi_mode+1)) + yi;
 
-					if(res_x > 640-1 || res_y > 200-1)
+					if(res_x > 640-1 || res_y > (200*(state->hi_mode+1))-1)
 						continue;
 
-					pen = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? color : -1;
+					tile_offset = tile*(8*(state->hi_mode+1))+yi + (state->hi_mode * 0x800);
 
+					pen = ((gfx_data[tile_offset] >> (7-xi)) & 1) ? color : -1;
+
+					/* TODO: clean this up */
 					if(pen != -1)
 					{
-						if(state->width80 == 0)
+						if(state->hi_mode)
 						{
-							*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine->pens[pen];
-							*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine->pens[pen];
+							if(state->width80 == 0)
+							{
+								*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine->pens[pen];
+							}
+							else
+							{
+								*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
+							}
 						}
 						else
-							*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
+						{
+							if(state->width80 == 0)
+							{
+								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+0) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+1) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+0) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+1) = screen->machine->pens[pen];
+							}
+							else
+							{
+								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = screen->machine->pens[pen];
+							}
+						}
 					}
 				}
 			}
@@ -239,6 +268,24 @@ static WRITE8_HANDLER( mz2000_gvram_bank_w )
 	state->gvram_bank = data & 3;
 }
 
+static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
+{
+	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+
+	if(state->has_fdc)
+		return wd17xx_r(device, offset) ^ 0xff;
+
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
+{
+	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+
+	if(state->has_fdc)
+		wd17xx_w(device, offset, data ^ 0xff);
+}
+
 static WRITE8_HANDLER( mz2000_fdc_w )
 {
 	device_t* dev = space->machine->device("mb8877a");
@@ -266,18 +313,6 @@ static WRITE8_HANDLER( timer_w )
 	pit8253_gate1_w(pit8253, 0);
 	pit8253_gate0_w(pit8253, 1);
 	pit8253_gate1_w(pit8253, 1);
-}
-
-static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
-{
-	//mz2000_state *state = device->machine->driver_data<mz2000_state>();
-	return wd17xx_r(device, offset) ^ 0xff;
-}
-
-static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
-{
-	//mz2000_state *state = device->machine->driver_data<mz2000_state>();
-	wd17xx_w(device, offset, data ^ 0xff);
 }
 
 static WRITE8_HANDLER( mz2000_tvram_attr_w )
@@ -441,6 +476,17 @@ static INPUT_PORTS_START( mz2000 )
 
 	PORT_START("UNUSED")
 	PORT_BIT(0xff,IP_ACTIVE_LOW,IPT_UNUSED )
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Video Board" )
+	PORT_CONFSETTING( 0x00, "Monochrome" )
+	PORT_CONFSETTING( 0x01, "Color" )
+	PORT_CONFNAME( 0x02, 0x02, "Floppy Device" )
+	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
+	PORT_CONFSETTING( 0x02, DEF_STR( Yes ) )
+	PORT_CONFNAME( 0x04, 0x04, "High Resolution" )
+	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
+	PORT_CONFSETTING( 0x04, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -454,6 +500,24 @@ static MACHINE_RESET(mz2000)
 
 	beep_set_frequency(machine->device("beeper"),4096);
 	beep_set_state(machine->device("beeper"),0);
+
+	state->color_mode = input_port_read(machine,"CONFIG") & 1;
+	state->has_fdc = (input_port_read(machine,"CONFIG") & 2) >> 1;
+	state->hi_mode = (input_port_read(machine,"CONFIG") & 4) >> 2;
+
+	{
+		int i;
+		int r,g,b;
+
+		for(i=0;i<8;i++)
+		{
+			r = (state->color_mode) ? (i & 2)>>1 : 0;
+			g = (state->color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
+			b = (state->color_mode) ? (i & 1)>>0 : 0;
+
+			palette_set_color_rgb(machine, i,pal1bit(r),pal1bit(g),pal1bit(b));
+		}
+	}
 }
 
 
@@ -678,14 +742,6 @@ static const struct pit8253_config mz2000_pit8253_intf =
 	}
 };
 
-static PALETTE_INIT( mz2000 )
-{
-	int i;
-
-	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, i,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
-}
-
 static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -709,11 +765,10 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_GFXDECODE(mz2000)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(mz2000)
 
 	MCFG_VIDEO_START(mz2000)
 	MCFG_SCREEN_UPDATE(mz2000)
