@@ -20,6 +20,7 @@
 *
 *  TODO:
 *  Hook the terminal to the i8251a uart at u15
+*  Attach the upd7720 serial output to the DAC; this requires fixing the upd7725 core!
 *  Attach the other i8251a uart (assuming it is hooked to the hardware at all!)
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
 *  Correct memory maps and io maps - partly done
@@ -207,7 +208,7 @@ DRIVER_INIT( prose2k )
      0   0   x   x    0   x   1   1    0   1  0  x   x  x  x  x   x  x  x  *  LEDS and dipswitches?
      0   0   x   x    0   x   1   1    0   1  1  x   x  x  x  x   x  x  *  x  UPD77P20 data/status
      0   0   x   x    0   x   1   1    1   x  x                               Open bus, verified (returns 0x00EA)
-     0   0   x   x    1   x                                                   Open bus, verified (returns 0xFA,B,C,FFF)
+     0   0   x   x    1   x                                                   Open bus? (or maybe status?) (returns 0xFA,B,C,FFF)
      0   1                                                                    Open bus, verfiied (returns 0x00EA)
      1   0                                                                    Open bus, verified (returns 0x00EA)
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
@@ -216,9 +217,9 @@ DRIVER_INIT( prose2k )
 static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
-	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
-	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
-	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5
+	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
+	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
+	//AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(led_w, 0xFF00) // verified, write to the 4 leds, plus 4 other mystery bits
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
@@ -228,9 +229,9 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
 ADDRESS_MAP_END
 
+// Technically the IO line of the i8086 is completely ignored (it is running in 8086 MIN mode,I believe, which may ignore IO)
 static ADDRESS_MAP_START(i8086_io, ADDRESS_SPACE_IO, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x990, 0x991) AM_NOP // wrong; to force correct compile
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp_prg_map, ADDRESS_SPACE_PROGRAM, 32, tsispch_state)
@@ -291,7 +292,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 
     /* sound hardware */
     //MCFG_SPEAKER_STANDARD_MONO("mono")
-    //MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works */
+    //MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be fun to connect up */
     //MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
     MCFG_FRAGMENT_ADD( generic_terminal )
@@ -312,7 +313,7 @@ ROM_START( prose2k )
 	// TSI/Speech plus DSP firmware v3.12 8/9/88, NEC UPD77P20
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
 	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9E46425A) SHA1(80A915D731F5B6863AEEB448261149FF15E5B786))
-	ROM_REGION( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into
+	ROM_REGION( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
 	ROM_REGION( 0x400, "dspdata", 0)
 	ROM_LOAD( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(F4E4DD16) SHA1(6E184747DB2F26E45D0E02907105FF192E51BABA))
 
