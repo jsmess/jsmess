@@ -51,8 +51,13 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 	DEVCB_NULL // should be connected to the input of the uart
 };
 
-/* led/dipswitch stuff */
+/* open bus handler(s?) */
+/*READ16_MEMBER( tsispch_state::fixed_00ea_r )
+{
+	return 0x00ea; // does exactly what it says on the tin
+}*/
 
+/* led/dipswitch stuff */
 READ8_MEMBER( tsispch_state::dsw_r )
 {
 	UINT8 data;
@@ -66,7 +71,7 @@ READ8_MEMBER( tsispch_state::dsw_r )
 	return data;
 }
 
-WRITE8_MEMBER( tsispch_state::led_dsw_w )
+WRITE8_MEMBER( tsispch_state::led_w )
 {
 	/* These are the 4 debug leds on the pcb inside the case.
 	   They are called on the silkscreen, unimaginatively, '6','5','4',and '3', and
@@ -199,12 +204,12 @@ DRIVER_INIT( prose2k )
      0   0   x   x    0   x   1   0    *   *  *  *   *  *  *  *   *  *  *  s  6264*2 SRAM 3rd quarter
      0   0   x   x    0   x   1   1    0   0  0  x   x  x  x  x   x  x  *  x  iP8251A @ U15
      0   0   x   x    0   x   1   1    0   0  1  x   x  x  x  x   x  x  *  x  AMD P8259A PIC
-     0   0   x   x    0   x   1   1    0   1  0  ?   ?  ?  ?  ?   ?  ?  ?  ?  LEDS and dipswitches?
+     0   0   x   x    0   x   1   1    0   1  0  x   x  x  x  x   x  x  x  *  LEDS and dipswitches?
      0   0   x   x    0   x   1   1    0   1  1  x   x  x  x  x   x  x  *  x  UPD77P20 data/status
-     0   0   x   x    0   x   1   1    1   x  x                               Open bus?
-     0   0   x   x    1   x                                                   Open bus?
-     0   1                                                                    Open bus?
-     1   0                                                                    Open bus?
+     0   0   x   x    0   x   1   1    1   x  x                               Open bus, verified (returns 0x00EA)
+     0   0   x   x    1   x                                                   Open bus, verified (returns 0xFA,B,C,FFF)
+     0   1                                                                    Open bus, verfiied (returns 0x00EA)
+     1   0                                                                    Open bus, verified (returns 0x00EA)
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
      1   1   1   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 0 and 1
 */
@@ -214,10 +219,12 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
 	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
 	//AM_RANGE(0x03202, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5
-	AM_RANGE(0x03400, 0x03401) /*AM_MIRROR(0x341FE)*/ AM_READ8(dsw_r, 0x00FF)
-	AM_RANGE(0x03400, 0x03401) /*AM_MIRROR(0x341FE)*/ AM_WRITE8(led_dsw_w, 0xFF00) // write to the 4 leds, plus 4 other mystery bits
+	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
+	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(led_w, 0xFF00) // verified, write to the 4 leds, plus 4 other mystery bits
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
 	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
+	//AM_RANGE(0x03800, 0x03801) AM_MIRROR(0x347FE) AM_READ(fixed_00ea_r) // open bus, verified
+	//AM_RANGE(0x80000, 0xBFFFF) AM_READ(fixed_00ea_r) // open bus, verified
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
 ADDRESS_MAP_END
 
