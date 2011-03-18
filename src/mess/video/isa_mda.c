@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "isa_mda.h"
 #include "video/mc6845.h"
+#include "machine/pc_lpt.h"
 
 #define MDA_SCREEN_NAME	"mda_screen"
 #define MDA_MC6845_NAME	"mc6845_mda"
@@ -92,6 +93,17 @@ static const mc6845_interface mc6845_mda_intf =
 	NULL
 };
 
+static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
+{
+	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
+	mda->m_isa->irq7_w(state);
+}
+static const pc_lpt_interface pc_lpt_config =
+{
+	DEVCB_LINE(pc_cpu_line)
+};
+
+
 MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -101,6 +113,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
 	MCFG_GFXDECODE(pcmda)
+	
+	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)	
 MACHINE_CONFIG_END
 
 ROM_START( mda )
@@ -464,6 +478,7 @@ static READ8_DEVICE_HANDLER(mda_status_r)
 WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 {
 	device_t *devconf = device->subdevice(MDA_MC6845_NAME);
+	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -475,6 +490,9 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 		case 8:
 			mda_mode_control_w(device, offset, data);
 			break;
+		case 12: case 13:  case 14:
+			pc_lpt_w(lpt, offset - 12, data);
+			break;			
 	}
 }
 
@@ -482,6 +500,7 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 {
 	int data = 0xff;
 	device_t *devconf = device->subdevice(MDA_MC6845_NAME);
+	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -493,7 +512,10 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 		case 10:
 			data = mda_status_r(device, offset);
 			break;
-		/* 12, 13, 14  are the LPT1 ports */
+		/* 12, 13, 14  are the LPT ports */
+		case 12: case 13:  case 14:
+			data = pc_lpt_r(lpt, offset - 12);
+			break;
     }
 	return data;
 }
@@ -544,6 +566,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
 
 	MCFG_GFXDECODE(pcherc)
+
+	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)	
 MACHINE_CONFIG_END
 
 ROM_START( hercules )
@@ -742,6 +766,7 @@ static WRITE8_DEVICE_HANDLER(hercules_config_w)
 static WRITE8_DEVICE_HANDLER ( hercules_w )
 {
 	device_t *devconf = device->subdevice(HERCULES_MC6845_NAME);
+	device_t *lpt = device->subdevice("lpt");	
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
@@ -753,6 +778,9 @@ static WRITE8_DEVICE_HANDLER ( hercules_w )
 	case 8:
 		hercules_mode_control_w(devconf, offset, data);
 		break;
+	case 12: case 13:  case 14:
+		pc_lpt_w(lpt, offset - 12, data);
+		break;					
 	case 15:
 		hercules_config_w(device, offset, data);
 		break;
@@ -782,6 +810,7 @@ static READ8_DEVICE_HANDLER ( hercules_r )
 {
 	int data = 0xff;
 	device_t *devconf = device->subdevice(HERCULES_MC6845_NAME);
+	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
@@ -793,7 +822,10 @@ static READ8_DEVICE_HANDLER ( hercules_r )
 	case 10:
 		data = hercules_status_r(device, offset);
 		break;
-		/* 12, 13, 14  are the LPT1 ports */
+	/* 12, 13, 14  are the LPT ports */
+	case 12: case 13:  case 14:
+		data = pc_lpt_r(lpt, offset - 12);
+		break;		
 	}
 	return data;
 }
