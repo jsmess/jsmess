@@ -109,7 +109,34 @@ public:
 		
 		// interface to the keyboard
 		DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-		DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );		
+		DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+
+		DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
+		DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+		DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+
+		DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
+		DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+		
+		DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
+		DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
+		DECLARE_READ8_MEMBER( pc_dma_read_byte );
+		DECLARE_WRITE8_MEMBER( pc_dma_write_byte );
+		DECLARE_READ8_MEMBER( pc_dma8237_1_dack_r );
+		DECLARE_READ8_MEMBER( pc_dma8237_2_dack_r );
+		DECLARE_READ8_MEMBER( pc_dma8237_3_dack_r );
+		DECLARE_WRITE8_MEMBER( pc_dma8237_1_dack_w );
+		DECLARE_WRITE8_MEMBER( pc_dma8237_2_dack_w );
+		DECLARE_WRITE8_MEMBER( pc_dma8237_3_dack_w );
+		DECLARE_WRITE8_MEMBER( pc_dma8237_0_dack_w );
+		DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
+		DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
+		DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
+		DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+
+		DECLARE_WRITE_LINE_MEMBER( pc_cpu_line );
+		DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+		
 };
  
  
