@@ -27,6 +27,14 @@
 
 #include "machine/kb_keytro.h"
 
+class genpc_state : public driver_device
+{
+public:
+	genpc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
 static ADDRESS_MAP_START( pc8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
@@ -86,10 +94,35 @@ INPUT_PORTS_END
 	
 static const unsigned i86_address_mask = 0x000fffff;
 
+
+static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); } 
+
+static const struct pc_vga_interface vga_interface =
+{
+	NULL,
+	NULL,
+
+	input_port_0_r,
+
+	ADDRESS_SPACE_IO,
+	0x0000
+};
+
+DRIVER_INIT( genpcvga )
+{
+	pc_vga_init(machine, &vga_interface, NULL);
+}
+
 static const kb_keytronic_interface pc_keytronic_intf =
 {
-	DEVCB_DEVICE_HANDLER("mb",genpc_kb_set_clock_signal),	
-	DEVCB_DEVICE_HANDLER("mb",genpc_kb_set_data_signal)
+	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),	
+	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_data_w)
+};
+
+static const motherboard_interface pc_keytronic_keyboard_intf =
+{
+	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_clock_w),
+	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
 };
 
 static DEVICE_INPUT_DEFAULTS_START(cga) 
@@ -106,7 +139,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 
-	MCFG_PC_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 0, "mda", ISA8_MDA)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
@@ -131,7 +164,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 	
-	MCFG_PC_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 0, "hercules", ISA8_HERCULES)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
@@ -156,7 +189,7 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_CPU_IO_MAP(pc16_io)		
 	MCFG_CPU_CONFIG(i86_address_mask)
 	
-	MCFG_PC_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 	
 	/* video hardware */
@@ -183,7 +216,7 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_CPU_IO_MAP(pc16_io)	
 	MCFG_CPU_CONFIG(i86_address_mask)
 	
-	MCFG_PC_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
 		
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
@@ -238,7 +271,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		genpc,   	"<generic>",  "PC (CGA)" , 0)
-COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		genpc,    	"<generic>",  "PC (MDA)" , 0)
-COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      genpc,    	"<generic>",  "PC (Hercules)" , 0)
+COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,   		"<generic>",  "PC (CGA)" , 0)
+COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,    		"<generic>",  "PC (MDA)" , 0)
+COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,    		"<generic>",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      xtvga,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING)

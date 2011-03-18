@@ -12,17 +12,8 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
-
-#include "machine/pit8253.h"
-#include "machine/pckeybrd.h"
 #include "sound/speaker.h"
-
-#include "machine/kb_keytro.h"
 #include "machine/ram.h"
-
-#include "video/pc_vga_mess.h"
-
-#include "memconv.h"
 
 #define VERBOSE_PIO 0	/* PIO (keyboard controller) */
 
@@ -43,15 +34,15 @@
  *
  *************************************************************************/
 
-READ8_DEVICE_HANDLER(genpc_page_r)
+READ8_DEVICE_HANDLER(pc_page_r)
 {
 	return 0xFF;
 }
 
 
-WRITE8_DEVICE_HANDLER(genpc_page_w)
+WRITE8_DEVICE_HANDLER(pc_page_w)
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device);
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device);
 	switch(offset % 4)
 	{
 	case 1:
@@ -69,7 +60,7 @@ WRITE8_DEVICE_HANDLER(genpc_page_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	pc_motherboard_device	*board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device	*board  = downcast<ibm5160_mb_device *>(device->owner());
 	cpu_set_input_line(board->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
@@ -79,7 +70,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_DEVICE_HANDLER( pc_dma_read_byte )
 {	
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	address_space *space = board->maincpu->space(AS_PROGRAM);
 	offs_t page_offset = (((offs_t) board->dma_offset[board->dma_channel]) << 16) & 0x0F0000;
 	return space->read_byte( page_offset + offset);
@@ -88,7 +79,7 @@ static READ8_DEVICE_HANDLER( pc_dma_read_byte )
 
 static WRITE8_DEVICE_HANDLER( pc_dma_write_byte )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	address_space *space = board->maincpu->space(AS_PROGRAM);
 	offs_t page_offset = (((offs_t) board->dma_offset[board->dma_channel]) << 16) & 0x0F0000;
 
@@ -98,47 +89,47 @@ static WRITE8_DEVICE_HANDLER( pc_dma_write_byte )
 
 static READ8_DEVICE_HANDLER( pc_dma8237_1_dack_r )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	return board->isabus->dack_r(1);
 }
 
 static READ8_DEVICE_HANDLER( pc_dma8237_2_dack_r )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	return board->isabus->dack_r(2);
 }
 
 
 static READ8_DEVICE_HANDLER( pc_dma8237_3_dack_r )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	return board->isabus->dack_r(3);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_1_dack_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->isabus->dack_w(1,data);
 }
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_2_dack_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->isabus->dack_w(2,data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_3_dack_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->isabus->dack_w(3,data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_0_dack_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->u73_q2 = 0;
 	i8237_dreq0_w( board->dma8237, board->u73_q2 );
 }
@@ -146,13 +137,13 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_0_dack_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma8237_out_eop )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());	
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());	
 	return board->isabus->eop_w(state == ASSERT_LINE ? 0 : 1 );
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 
 	if (!state) board->dma_channel = channel;
 }
@@ -162,7 +153,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, stat
 static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
 static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
 
-I8237_INTERFACE( genpc_dma8237_config )
+I8237_INTERFACE( pc_dma8237_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_LINE(pc_dma8237_out_eop),
@@ -181,10 +172,10 @@ I8237_INTERFACE( genpc_dma8237_config )
  *************************************************************/
 static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
-const struct pic8259_interface genpc_pic8259_config =
+const struct pic8259_interface pc_pic8259_config =
 {
 	DEVCB_LINE(pc_cpu_line)
 };
@@ -197,7 +188,7 @@ const struct pic8259_interface genpc_pic8259_config =
  *************************************************************************/
 static WRITE_LINE_DEVICE_HANDLER(pc_speaker_set_spkrdata)
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->pc_spkrdata = state ? 1 : 0;
 	speaker_level_w( board->speaker, board->pc_spkrdata & board->pc_input );
 }
@@ -209,9 +200,9 @@ static WRITE_LINE_DEVICE_HANDLER(pc_speaker_set_spkrdata)
  *
  *************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( genpc_pit8253_out1_changed )
+static WRITE_LINE_DEVICE_HANDLER( pc_pit8253_out1_changed )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	/* Trigger DMA channel #0 */
 	if ( board->out1 == 0 && state == 1 && board->u73_q2 == 0 )
 	{
@@ -222,15 +213,15 @@ static WRITE_LINE_DEVICE_HANDLER( genpc_pit8253_out1_changed )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( genpc_pit8253_out2_changed )
+static WRITE_LINE_DEVICE_HANDLER( pc_pit8253_out2_changed )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	board->pc_input = state ? 1 : 0;
 	speaker_level_w( board->speaker, board->pc_spkrdata & board->pc_input );	
 }
 
 
-const struct pit8253_config genpc_pit8253_config =
+const struct pit8253_config pc_pit8253_config =
 {
 	{
 		{
@@ -240,11 +231,11 @@ const struct pit8253_config genpc_pit8253_config =
 		}, {
 			XTAL_14_31818MHz/12,				/* dram refresh */
 			DEVCB_NULL,
-			DEVCB_LINE(genpc_pit8253_out1_changed)
+			DEVCB_LINE(pc_pit8253_out1_changed)
 		}, {
 			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(genpc_pit8253_out2_changed)
+			DEVCB_LINE(pc_pit8253_out2_changed)
 		}
 	}
 };
@@ -305,56 +296,49 @@ const struct pit8253_config genpc_pit8253_config =
  *       ON  ON  - one disk drive
  *
  **********************************************************/
-
-WRITE8_DEVICE_HANDLER( genpc_kb_set_clock_signal )
+WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device);
-	device_t *keyboard = device->machine->device("keyboard");
-
-	if ( board->ppi_clock_signal != data )
+	if ( ppi_clock_signal != state )
 	{
-		if ( board->ppi_keyb_clock && board->ppi_shift_enable )
+		if ( ppi_keyb_clock && ppi_shift_enable )
 		{
-			board->ppi_clock_signal = data;
-			if ( ! board->ppi_keyboard_clear )
+			ppi_clock_signal = state;
+			if ( ! ppi_keyboard_clear )
 			{
 				/* Data is clocked in on a high->low transition */
-				if ( ! data )
+				if ( ! state )
 				{
-					UINT8	trigger_irq = board->ppi_shift_register & 0x01;
+					UINT8	trigger_irq = ppi_shift_register & 0x01;
 
-					board->ppi_shift_register = ( board->ppi_shift_register >> 1 ) | ( board->ppi_data_signal << 7 );
+					ppi_shift_register = ( ppi_shift_register >> 1 ) | ( ppi_data_signal << 7 );
 					if ( trigger_irq )
 					{
-						pic8259_ir1_w(board->pic8259, 1);
-						board->ppi_shift_enable = 0;
-						board->ppi_clock_signal = 0;
-						kb_keytronic_clock_w(keyboard, board->ppi_clock_signal);
+						pic8259_ir1_w(pic8259, 1);
+						ppi_shift_enable = 0;
+						ppi_clock_signal = 0;
+						devcb_call_write_line(&m_kb_set_clock_signal_func, ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
 
-	kb_keytronic_clock_w(keyboard, board->ppi_clock_signal);
+	devcb_call_write_line(&m_kb_set_clock_signal_func,ppi_clock_signal);
 }
 
 
-WRITE8_DEVICE_HANDLER( genpc_kb_set_data_signal )
+WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_data_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device);
-	device_t *keyboard = device->machine->device("keyboard");
+	ppi_data_signal = state;
 
-	board->ppi_data_signal = data;
-
-	kb_keytronic_data_w(keyboard, board->ppi_data_signal);
+	devcb_call_write_line(&m_kb_set_data_signal_func,ppi_data_signal);
 }
 
-static READ8_DEVICE_HANDLER (genpc_ppi_porta_r)
+static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 {
 	int data = 0xFF;
 	running_machine *machine = device->machine;
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 
 	/* KB port A */
 	if (board->ppi_keyboard_clear)
@@ -379,9 +363,9 @@ static READ8_DEVICE_HANDLER (genpc_ppi_porta_r)
 }
 
 
-static READ8_DEVICE_HANDLER ( genpc_ppi_portc_r )
+static READ8_DEVICE_HANDLER ( pc_ppi_portc_r )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 	int timer2_output = pit8253_get_output( board->pit8253, 2 );
 	int data=0xff;
 	running_machine *machine = device->machine;
@@ -412,10 +396,9 @@ static READ8_DEVICE_HANDLER ( genpc_ppi_portc_r )
 }
 
 
-static WRITE8_DEVICE_HANDLER( genpc_ppi_portb_w )
+static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 {
-	pc_motherboard_device *board  = downcast<pc_motherboard_device *>(device->owner());
-	device_t *keyboard = device->machine->device("keyboard");
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device->owner());
 
 	/* PPI controller port B*/
 	board->ppi_portb = data;
@@ -426,7 +409,7 @@ static WRITE8_DEVICE_HANDLER( genpc_ppi_portb_w )
 	pc_speaker_set_spkrdata( device, data & 0x02 );
 
 	board->ppi_clock_signal = ( board->ppi_keyb_clock ) ? 1 : 0;
-	kb_keytronic_clock_w(keyboard, board->ppi_clock_signal);
+	devcb_call_write_line(&board->m_kb_set_clock_signal_func,board->ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( board->ppi_keyboard_clear )
@@ -438,13 +421,13 @@ static WRITE8_DEVICE_HANDLER( genpc_ppi_portb_w )
 }
 
 
-I8255A_INTERFACE( genpc_ppi8255_interface )
+I8255A_INTERFACE( pc_ppi8255_interface )
 {
-	DEVCB_HANDLER(genpc_ppi_porta_r),
+	DEVCB_HANDLER(pc_ppi_porta_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(genpc_ppi_portc_r),
+	DEVCB_HANDLER(pc_ppi_portc_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(genpc_ppi_portb_w),
+	DEVCB_HANDLER(pc_ppi_portb_w),
 	DEVCB_NULL
 };
 
@@ -464,24 +447,36 @@ static const isabus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("dma8237", i8237_dreq3_w)
 };
 
+/**********************************************************
+ *
+ * NMI handling
+ *
+ **********************************************************/
+
+static WRITE8_DEVICE_HANDLER( nmi_enable_w )
+{
+	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device);
+
+	board->nmi_enabled = data & 0x80;
+}
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
  
-const device_type PC_MOTHERBOARD = pc_motherboard_device_config::static_alloc_device_config;
+const device_type IBM5160_MOTHERBOARD = ibm5160_mb_device_config::static_alloc_device_config;
  
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( pc_motherboard_config )
-	MCFG_PIT8253_ADD( "pit8253", genpc_pit8253_config )
+static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
+	MCFG_PIT8253_ADD( "pit8253", pc_pit8253_config )
 
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, genpc_dma8237_config )
+	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, pc_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", genpc_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", pc_pic8259_config )
 
-	MCFG_I8255A_ADD( "ppi8255", genpc_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 		
 	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
 	/* sound hardware */
@@ -492,11 +487,11 @@ MACHINE_CONFIG_END
 
  
 //-------------------------------------------------
-//  pc_motherboard_device_config - constructor
+//  ibm5160_mb_device_config - constructor
 //-------------------------------------------------
  
-pc_motherboard_device_config::pc_motherboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "PC_MOTHERBOARD", tag, owner, clock)
+ibm5160_mb_device_config::ibm5160_mb_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+        : device_config(mconfig, static_alloc_device_config, "IBM5160_MOTHERBOARD", tag, owner, clock)
 {
 }
  
@@ -505,18 +500,18 @@ pc_motherboard_device_config::pc_motherboard_device_config(const machine_config 
 //  configuration object
 //-------------------------------------------------
  
-device_config *pc_motherboard_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+device_config *ibm5160_mb_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	return global_alloc(pc_motherboard_device_config(mconfig, tag, owner, clock));
+	return global_alloc(ibm5160_mb_device_config(mconfig, tag, owner, clock));
 }
  
 //-------------------------------------------------
 //  alloc_device - allocate a new device object
 //-------------------------------------------------
  
-device_t *pc_motherboard_device_config::alloc_device(running_machine &machine) const
+device_t *ibm5160_mb_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, pc_motherboard_device(machine, *this));
+	return auto_alloc(&machine, ibm5160_mb_device(machine, *this));
 }
 
 //-------------------------------------------------
@@ -524,13 +519,13 @@ device_t *pc_motherboard_device_config::alloc_device(running_machine &machine) c
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor pc_motherboard_device_config::machine_config_additions() const
+machine_config_constructor ibm5160_mb_device_config::machine_config_additions() const
 {
-	return MACHINE_CONFIG_NAME( pc_motherboard_config );
+	return MACHINE_CONFIG_NAME( ibm5160_mb_config );
 }
 
 
-static INPUT_PORTS_START( pc_motherboard )
+static INPUT_PORTS_START( ibm5160_mb )
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
@@ -558,27 +553,27 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *pc_motherboard_device_config::input_ports() const
+const input_port_token *ibm5160_mb_device_config::input_ports() const
 {
-	return INPUT_PORTS_NAME( pc_motherboard );
+	return INPUT_PORTS_NAME( ibm5160_mb );
 }
 	
 
-void pc_motherboard_device_config::static_set_cputag(device_config *device, const char *tag)
+void ibm5160_mb_device_config::static_set_cputag(device_config *device, const char *tag)
 {
-	pc_motherboard_device_config *board = downcast<pc_motherboard_device_config *>(device);
+	ibm5160_mb_device_config *board = downcast<ibm5160_mb_device_config *>(device);
 	board->m_cputag = tag;
 }
- 
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
  
 //-------------------------------------------------
-//  pc_motherboard_device - constructor
+//  ibm5160_mb_device - constructor
 //-------------------------------------------------
  
-pc_motherboard_device::pc_motherboard_device(running_machine &_machine, const pc_motherboard_device_config &config) :
+ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb_device_config &config) :
         device_t(_machine, config),
         m_config(config),
 		maincpu(*(owner()), config.m_cputag),
@@ -591,10 +586,10 @@ pc_motherboard_device::pc_motherboard_device(running_machine &_machine, const pc
 {
 }
  
- #define memory_install_readwrite8_device_handler_mask(space, device, start, end, mask, mirror, rhandler, whandler, unitmask) \
+#define memory_install_readwrite8_device_handler_mask(space, device, start, end, mask, mirror, rhandler, whandler, unitmask) \
 	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
 
-void pc_motherboard_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
+void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
 {	
 	int buswidth = device_memory(maincpu)->space_config(ADDRESS_SPACE_IO)->m_databus_width;
 	switch(buswidth)
@@ -606,8 +601,52 @@ void pc_motherboard_device::install_device(device_t *dev, offs_t start, offs_t e
 			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
 			break;
 		default:
-			fatalerror("PC_MOTHERBOARD: Bus width %d not supported", buswidth);
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
 			break;
+	}
+}
+
+#define memory_install_write8_device_handler_mask(space, device, start, end, mask, mirror, whandler, unitmask) \
+	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler, unitmask)
+
+void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler)
+{	
+	int buswidth = device_memory(maincpu)->space_config(ADDRESS_SPACE_IO)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_write8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, whandler, 0);			
+			break;
+		case 16:
+			memory_install_write8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, whandler, 0xffff);			
+			break;
+		default:
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ibm5160_mb_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const motherboard_interface *intf = reinterpret_cast<const motherboard_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<motherboard_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_kb_set_clock_signal_func, 0, sizeof(m_kb_set_clock_signal_func));
+    	memset(&m_kb_set_data_signal_func, 0, sizeof(m_kb_set_data_signal_func));
 	}
 }
 
@@ -615,16 +654,24 @@ void pc_motherboard_device::install_device(device_t *dev, offs_t start, offs_t e
 //  device_start - device-specific startup
 //-------------------------------------------------
  
-void pc_motherboard_device::device_start()
+void ibm5160_mb_device::device_start()
 {
+	// resolve callbacks
+	devcb_resolve_write_line(&m_kb_set_clock_signal_func, &m_config.m_kb_set_clock_signal_func, this);
+	devcb_resolve_write_line(&m_kb_set_data_signal_func,  &m_config.m_kb_set_data_signal_func,  this);
+
 	install_device(dma8237, 0x0000, 0x000f, 0, 0, i8237_r, i8237_w );	
 	install_device(pic8259, 0x0020, 0x0021, 0, 0, pic8259_r, pic8259_w );	
 	install_device(pit8253, 0x0040, 0x0043, 0, 0, pit8253_r, pit8253_w );	
 	install_device(ppi8255, 0x0060, 0x0063, 0, 0, i8255a_r, i8255a_w );	
-	install_device(this,    0x0080, 0x0087, 0, 0, genpc_page_r, genpc_page_w );	
+	install_device(this,    0x0080, 0x0087, 0, 0, pc_page_r, pc_page_w );	
+	install_device_write(this,    0x00a0, 0x00a0, 0, 0, nmi_enable_w);	
+	/* MESS managed RAM */
+	if ( ram_get_ptr(machine->device(RAM_TAG)) )
+		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );	
 }
  
-IRQ_CALLBACK(pc_motherboard_device::pc_irq_callback)
+IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
 {
 	device_t *pic = device->machine->device("mb:pic8259");
 	return pic8259_acknowledge( pic );	
@@ -635,7 +682,7 @@ IRQ_CALLBACK(pc_motherboard_device::pc_irq_callback)
 //  device_reset - device-specific reset
 //-------------------------------------------------
   
-void pc_motherboard_device::device_reset()
+void ibm5160_mb_device::device_reset()
 {
 	cpu_set_irq_callback(maincpu, pc_irq_callback);
 
@@ -654,34 +701,6 @@ void pc_motherboard_device::device_reset()
 	ppi_data_signal = 0;
 	ppi_shift_register = 0;
 	ppi_shift_enable = 0;
-	
+	nmi_enabled = 0;
 	speaker_level_w( speaker, 0 );
-}
-
-/********************************************************************************************/
-
-DRIVER_INIT( genpc )
-{
-	/* MESS managed RAM */
-	if ( ram_get_ptr(machine->device(RAM_TAG)) )
-		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );
-}
-
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); } 
-
-static const struct pc_vga_interface vga_interface =
-{
-	NULL,
-	NULL,
-
-	input_port_0_r,
-
-	ADDRESS_SPACE_IO,
-	0x0000
-};
-
-DRIVER_INIT( genpcvga )
-{
-	DRIVER_INIT_CALL(genpc);
-	pc_vga_init(machine, &vga_interface, NULL);
 }

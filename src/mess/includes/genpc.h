@@ -12,18 +12,28 @@
 #include "machine/8237dma.h"
 #include "machine/isa.h"
 
-#define MCFG_PC_MOTHERBOARD_ADD(_tag, _cputag) \
-    MCFG_DEVICE_ADD(_tag, PC_MOTHERBOARD, 0) \
-    pc_motherboard_device_config::static_set_cputag(device, _cputag); \
- 	
-// ======================> pc_motherboard_device_config
- 
-class pc_motherboard_device_config : public device_config
+#define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag, _config) \
+    MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
+    ibm5160_mb_device_config::static_set_cputag(device, _cputag); \
+
+// ======================> isabus_interface
+
+struct motherboard_interface
 {
-	friend class pc_motherboard_device;
+    devcb_write_line	m_kb_set_clock_signal_func;
+    devcb_write_line	m_kb_set_data_signal_func;
+};
+	
+// ======================> ibm5160_mb_device_config
+ 
+class ibm5160_mb_device_config : public device_config,
+								 public motherboard_interface
+{
+	friend class ibm5160_mb_device;
  
 	// construction/destruction
-	pc_motherboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	ibm5160_mb_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
  
 public:
 	// allocators
@@ -38,25 +48,30 @@ public:
 	virtual const input_port_token *input_ports() const;
 	
 	const char *m_cputag;
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();				
 };
  
  
-// ======================> pc_motherboard_device
-class pc_motherboard_device : public device_t
+// ======================> ibm5160_mb_device
+class ibm5160_mb_device : public device_t
 {
-        friend class pc_motherboard_device_config;
+        friend class ibm5160_mb_device_config;
  
         // construction/destruction
-        pc_motherboard_device(running_machine &_machine, const pc_motherboard_device_config &config);
+        ibm5160_mb_device(running_machine &_machine, const ibm5160_mb_device_config &config);
 
 protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
 		void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler);
+		void install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler);
 private:
         // internal state
-        const pc_motherboard_device_config &m_config;
+        const ibm5160_mb_device_config &m_config;
 public:
         required_device<cpu_device>  maincpu;
 		required_device<device_t>  pic8259;
@@ -65,6 +80,10 @@ public:
 		required_device<device_t>  ppi8255;
 		required_device<device_t>  speaker;
 		required_device<isa8_device>  isabus;
+		
+    	devcb_resolved_write_line	m_kb_set_clock_signal_func;
+    	devcb_resolved_write_line	m_kb_set_data_signal_func;
+		
 		/* U73 is an LS74 - dual flip flop */
 		/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 		UINT8	u73_q2;
@@ -73,6 +92,8 @@ public:
 		UINT8 dma_offset[4];
 		UINT8 pc_spkrdata;
 		UINT8 pc_input;
+		
+		UINT8 nmi_enabled;
 
 		int						ppi_portc_switch_high;
 		int						ppi_speaker;
@@ -85,28 +106,14 @@ public:
 		UINT8					ppi_shift_enable;
 		
 		static IRQ_CALLBACK(pc_irq_callback);
+		
+		// interface to the keyboard
+		DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+		DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );		
 };
  
  
 // device type definition
-extern const device_type PC_MOTHERBOARD;
-
-
-
-class genpc_state : public driver_device
-{
-public:
-	genpc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
-};
-
-/*----------- defined in machine/genpc.c -----------*/
-
-WRITE8_DEVICE_HANDLER( genpc_kb_set_clock_signal );
-WRITE8_DEVICE_HANDLER( genpc_kb_set_data_signal );
-
-DRIVER_INIT( genpc );
-DRIVER_INIT( genpcvga );
+extern const device_type IBM5160_MOTHERBOARD;
 
 #endif /* GENPC_H_ */
