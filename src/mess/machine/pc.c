@@ -601,177 +601,6 @@ static void pcjr_keyb_init(running_machine *machine)
  *
  **********************************************************/
 
-static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
-{
-	int data = 0xFF;
-	running_machine *machine = device->machine;
-	pc_state *st = device->machine->driver_data<pc_state>();
-
-	/* KB port A */
-	if (st->ppi_keyboard_clear)
-	{
-		/*   0  0 - no floppy drives
-         *   1  Not used
-         * 2-3  The number of memory banks on the system board
-         * 4-5  Display mode
-         *      11 = monochrome
-         *      10 - color 80x25
-         *      01 - color 40x25
-         * 6-7  The number of floppy disk drives
-         */
-		data = input_port_read(device->machine, "DSW0") & 0xF3;
-		switch ( ram_get_size(machine->device(RAM_TAG)) )
-		{
-		case 16 * 1024:
-			data |= 0x00;
-			break;
-		case 32 * 1024:	/* Need to verify if this is correct */
-			data |= 0x04;
-			break;
-		case 48 * 1024:	/* Need to verify if this is correct */
-			data |= 0x08;
-			break;
-		default:
-			data |= 0x0C;
-			break;
-		}
-	}
-	else
-	{
-		data = st->ppi_shift_register;
-	}
-    PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
-    return data;
-}
-
-
-static READ8_DEVICE_HANDLER (ibm5150_ppi_portb_r )
-{
-	int data;
-	running_machine *machine = device->machine;
-
-	data = 0xff;
-	PIO_LOG(1,"PIO_B_r",("$%02x\n", data));
-	return data;
-}
-
-
-static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
-{
-	pc_state *st = device->machine->driver_data<pc_state>();
-	int timer2_output = pit8253_get_output( st->pit8253, 2 );
-	int data=0xff;
-	running_machine *machine = device->machine;
-
-	data&=~0x80; // no parity error
-	data&=~0x40; // no error on expansion board
-	/* KB port C: equipment flags */
-	if (st->ppi_portc_switch_high)
-	{
-		/* read hi nibble of SW2 */
-		data = data & 0xf0;
-
-		switch ( ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 )
-		{
-		case 64 * 1024:		data |= 0x00; break;
-		case 128 * 1024:	data |= 0x02; break;
-		case 192 * 1024:	data |= 0x04; break;
-		case 256 * 1024:	data |= 0x06; break;
-		case 320 * 1024:	data |= 0x08; break;
-		case 384 * 1024:	data |= 0x0A; break;
-		case 448 * 1024:	data |= 0x0C; break;
-		case 512 * 1024:	data |= 0x0E; break;
-		case 576 * 1024:	data |= 0x01; break;
-		case 640 * 1024:	data |= 0x03; break;
-		case 704 * 1024:	data |= 0x05; break;
-		case 768 * 1024:	data |= 0x07; break;
-		case 832 * 1024:	data |= 0x09; break;
-		case 896 * 1024:	data |= 0x0B; break;
-		case 960 * 1024:	data |= 0x0D; break;
-		}
-		if ( ram_get_size(machine->device(RAM_TAG)) > 960 * 1024 )
-			data |= 0x0D;
-
-		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
-	}
-	else
-	{
-		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(device->machine, "DSW0") & 0x0f);
-		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
-	}
-
-	if ( ! ( st->ppi_portb & 0x08 ) )
-	{
-		double tap_val = cassette_input( device->machine->device("cassette") );
-
-		if ( tap_val < 0 )
-		{
-			data &= ~0x10;
-		}
-		else
-		{
-			data |= 0x10;
-		}
-	}
-	else
-	{
-		if ( st->ppi_portb & 0x01 )
-		{
-			data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
-		}
-	}
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
-
-	return data;
-}
-
-
-static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
-{
-	running_machine *machine = device->machine;
-
-	/* KB controller port A */
-	PIO_LOG(1,"PIO_A_w",("$%02x\n", data));
-}
-
-
-static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
-{
-	pc_state *st = device->machine->driver_data<pc_state>();
-	device_t *keyboard = device->machine->device("keyboard");
-
-	/* KB controller port B */
-	st->ppi_portb = data;
-	st->ppi_portc_switch_high = data & 0x08;
-	st->ppi_keyboard_clear = data & 0x80;
-	st->ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(st->pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
-
-	cassette_change_state( device->machine->device("cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-
-	st->ppi_clock_signal = ( st->ppi_keyb_clock ) ? 1 : 0;
-	kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
-
-	/* If PB7 is set clear the shift register and reset the IRQ line */
-	if ( st->ppi_keyboard_clear )
-	{
-		pic8259_ir1_w(st->pic8259, 0);
-		st->ppi_shift_register = 0;
-		st->ppi_shift_enable = 1;
-	}
-}
-
-
-static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
-{
-	running_machine *machine = device->machine;
-
-	/* KB controller port C */
-	PIO_LOG(1,"PIO_C_w",("$%02x\n", data));
-}
-
 
 WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 {
@@ -816,20 +645,6 @@ WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 
 	kb_keytronic_data_w(keyboard, st->ppi_data_signal);
 }
-
-
-/* IBM PC has a 8255 which is connected to keyboard and other
-status information */
-I8255A_INTERFACE( ibm5150_ppi8255_interface )
-{
-	DEVCB_HANDLER(ibm5150_ppi_porta_r),
-	DEVCB_HANDLER(ibm5150_ppi_portb_r),
-	DEVCB_HANDLER(ibm5150_ppi_portc_r),
-	DEVCB_HANDLER(ibm5150_ppi_porta_w),
-	DEVCB_HANDLER(ibm5150_ppi_portb_w),
-	DEVCB_HANDLER(ibm5150_ppi_portc_w)
-};
-
 
 static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
@@ -923,11 +738,11 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 I8255A_INTERFACE( ibm5160_ppi8255_interface )
 {
 	DEVCB_HANDLER(ibm5160_ppi_porta_r),
-	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_NULL,
 	DEVCB_HANDLER(ibm5160_ppi_portc_r),
-	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(ibm5160_ppi_portb_w),
-	DEVCB_HANDLER(ibm5150_ppi_portc_w)
+	DEVCB_NULL
 };
 
 
@@ -980,11 +795,11 @@ static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 I8255A_INTERFACE( pc_ppi8255_interface )
 {
 	DEVCB_HANDLER(pc_ppi_porta_r),
-	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_NULL,
 	DEVCB_HANDLER(ibm5160_ppi_portc_r),
-	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(pc_ppi_portb_w),
-	DEVCB_HANDLER(ibm5150_ppi_portc_w)
+	DEVCB_NULL
 };
 
 
@@ -1067,11 +882,11 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 I8255A_INTERFACE( pcjr_ppi8255_interface )
 {
 	DEVCB_HANDLER(pcjr_ppi_porta_r),
-	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_NULL,
 	DEVCB_HANDLER(pcjr_ppi_portc_r),
-	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(pcjr_ppi_portb_w),
-	DEVCB_HANDLER(ibm5150_ppi_portc_w)
+	DEVCB_NULL
 };
 
 

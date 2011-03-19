@@ -84,71 +84,22 @@ Currently known: (probably exist for all the standard codepages)
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "sound/speaker.h"
-#include "sound/saa1099.h"
-
-#include "machine/i8255a.h"
-#include "machine/ins8250.h"
-#include "machine/mc146818.h"
-#include "machine/pic8259.h"
-
-#include "machine/pit8253.h"
-#include "video/pc_vga_mess.h"
-#include "video/pc_cga.h"
-#include "video/pc_ega.h"
-
-#include "includes/pc_ide.h"
-#include "machine/pc_fdc.h"
-#include "machine/pc_joy.h"
-#include "machine/pckeybrd.h"
-#include "machine/pc_lpt.h"
-#include "audio/sblaster.h"
-#include "includes/pc_mouse.h"
-
-#include "machine/pcshare.h"
-#include "includes/pc.h"
-
-#include "machine/pc_hdc.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/harddriv.h"
-#include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
-#include "formats/pc_dsk.h"
-
-#include "machine/8237dma.h"
-#include "sound/sn76496.h"
-#include "sound/3812intf.h"
-
-#include "machine/kb_keytro.h"
 #include "machine/ram.h"
+#include "machine/isa.h"
+#include "machine/isa_com.h"
+#include "machine/isa_fdc.h"
+#include "machine/isa_hdc.h"
+#include "machine/kb_keytro.h"
+#include "video/pc_cga.h"
+#include "includes/genpc.h"
 
-#define ym3812_StdClock 3579545
+class ibmpc_state : public driver_device
+{
+public:
+	ibmpc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-/*
-  adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
-  soundblaster: YM3812 also accessible at 0x228/9 (address jumperable)
-  soundblaster pro version 1: 2 YM3812 chips
-   at 0x388 both accessed,
-   at 0x220/1 left?, 0x222/3 right? (jumperable)
-  soundblaster pro version 2: 1 OPL3 chip
-
-  pro audio spectrum +: 2 OPL2
-  pro audio spectrum 16: 1 OPL3
- */
-#define ADLIB	/* YM3812/OPL2 Chip */
-/*
-  creative labs game blaster (CMS creative music system)
-  2 x saa1099 chips
-  also on sound blaster 1.0
-  option on sound blaster 1.5
-
-  jumperable? normally 0x220
-*/
-#define GAMEBLASTER
-
-
-// IO Expansion, only a little bit for ibm bios self tests
-//#define EXP_ON
+};
 
 static ADDRESS_MAP_START( pc8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -162,255 +113,54 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", i8237_r, i8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE( pc_nmi_enable_w )
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
-#ifdef EXP_ON
-	AM_RANGE(0x0210, 0x0217) AM_READWRITE(pc_EXP_r,				pc_EXP_w)
-#endif
-	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc_rtc_r,				pc_rtc_w)
-	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_r, ins8250_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,			pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
-	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
-	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE("lpt_1", pc_lpt_r, pc_lpt_w)
-#ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE("ym3812", ym3812_status_port_r,ym3812_control_port_w)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE("ym3812", ym3812_write_port_w)
-#endif
-	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_r, ins8250_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ibm5150 )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
-	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
-
-	PORT_START("DSW0") /* IN1 */
-	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x40, "2" )
-	PORT_DIPSETTING(	0x80, "3" )
-	PORT_DIPSETTING(	0xc0, "4" )
-	PORT_DIPNAME( 0x30, 0x20, "Graphics adapter")
-	PORT_DIPSETTING(	0x00, "EGA/VGA" )
-	PORT_DIPSETTING(	0x10, "Color 40x25" )
-	PORT_DIPSETTING(	0x20, "Color 80x25" )
-	PORT_DIPSETTING(	0x30, "Monochrome" )
-	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
-	PORT_DIPSETTING(	0x00, "1 - 16  64 256K" )
-	PORT_DIPSETTING(	0x04, "2 - 32 128 512K" )
-	PORT_DIPSETTING(	0x08, "3 - 48 192 576K" )
-	PORT_DIPSETTING(	0x0c, "4 - 64 256 640K" )
-	PORT_DIPNAME( 0x02, 0x00, "80387 installed")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-
-	PORT_START("DSW1") /* IN2 */
-	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "COM3: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "COM4: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "LPT2: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-
-	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
-	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
-	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
-
 	PORT_INCLUDE( kb_keytronic_pc )		/* IN4 - IN11 */
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
-	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+//	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
+//	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
 
-#if defined(ADLIB)
-/* irq line not connected to pc on adlib cards (and compatibles) */
-static void pc_irqhandler(device_t *device, int linestate) {}
-
-static const ym3812_interface pc_ym3812_interface =
-{
-	pc_irqhandler
-};
-#endif
-
-
-static const pc_lpt_interface pc_lpt_config =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
-};
-
-static const floppy_config ibmpc_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(pc),
-	NULL
-};
-
 static const kb_keytronic_interface pc_keytronic_intf =
 {
-	DEVCB_MEMORY_HANDLER("maincpu", IO, ibm5150_kb_set_clock_signal),
-	DEVCB_MEMORY_HANDLER("maincpu", IO, ibm5150_kb_set_data_signal),
+	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),	
+	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_data_w)
 };
 
-
-#define MCFG_CPU_PC(mem, port, type, clock, vblankfunc)	\
-	MCFG_CPU_ADD("maincpu", type, clock)				\
-	MCFG_CPU_PROGRAM_MAP(mem##_map)	\
-	MCFG_CPU_IO_MAP(port##_io)	\
-	MCFG_CPU_VBLANK_INT_HACK(vblankfunc, 4)					\
-	MCFG_CPU_CONFIG(i86_address_mask)
-
-
-/* F4 Character Displayer */
-static const gfx_layout pc_16_charlayout =
+static const motherboard_interface pc_keytronic_keyboard_intf =
 {
-	8, 16,					/* 8 x 16 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8					/* every char takes 2 x 8 bytes */
+	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_clock_w),
+	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
 };
 
-static const gfx_layout pc_8_charlayout =
-{
-	8, 8,					/* 8 x 8 characters */
-	512,					/* 512 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
+static DEVICE_INPUT_DEFAULTS_START(cga) 
+	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
+DEVICE_INPUT_DEFAULTS_END
 
-static const cassette_config ibm5150_cassette_config =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-static GFXDECODE_START( ibm5150 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 3, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 3, 1 )
-GFXDECODE_END
-
-static MACHINE_CONFIG_START( ibm5150, pc_state )
+static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
-
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
-
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
-
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
-
-	MCFG_I8255A_ADD( "ppi8255", ibm5150_ppi8255_interface )
-
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
-
+	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_DEVICE_INPUT_DEFAULTS(cga)
+	
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
+    MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
-	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
-	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
-
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
-
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	//MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -418,64 +168,26 @@ static MACHINE_CONFIG_START( ibm5150, pc_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ibm5160, pc_state )
+static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
-
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
-
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
-
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
-
-	MCFG_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
-
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
-
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_DEVICE_INPUT_DEFAULTS(cga)
+	
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
+    MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
-
-	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
-
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-
+	
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -688,9 +400,9 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,    0,			0,		ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1982,	ibm5155,    ibm5150,	0,		ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5155" , 0)
-COMP(  1985,	ibm5140,    ibm5150,	0,		ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5140 Convertible" , GAME_NOT_WORKING)
+COMP(  1981,	ibm5150,    0,			0,		ibm5150,    ibm5150,	0,    "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1982,	ibm5155,    ibm5150,	0,		ibm5150,    ibm5150,	0,    "International Business Machines",  "IBM PC 5155" , 0)
+COMP(  1985,	ibm5140,    ibm5150,	0,		ibm5150,    ibm5150,	0,    "International Business Machines",  "IBM PC 5140 Convertible" , GAME_NOT_WORKING)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,    ibm5150,	0,		ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1982,	ibm5160,    ibm5150,	0,		ibm5160,    ibm5150,	0,    "International Business Machines",  "IBM XT 5160" , 0)

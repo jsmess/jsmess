@@ -31,7 +31,8 @@ class ibm5160_mb_device_config : public device_config,
 								 public motherboard_interface
 {
 	friend class ibm5160_mb_device;
- 
+
+protected:	
 	// construction/destruction
 	ibm5160_mb_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
  
@@ -60,10 +61,10 @@ class ibm5160_mb_device : public device_t
 {
         friend class ibm5160_mb_device_config;
  
+protected:
         // construction/destruction
         ibm5160_mb_device(running_machine &_machine, const ibm5160_mb_device_config &config);
 
-protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
@@ -111,9 +112,9 @@ public:
 		DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 		DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
 
-		DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-		DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-		DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+		virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
+		virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+		virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
 
 		DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
 		DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
@@ -142,5 +143,56 @@ public:
  
 // device type definition
 extern const device_type IBM5160_MOTHERBOARD;
+
+
+#define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag, _config) \
+    MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
+    ibm5150_mb_device_config::static_set_cputag(device, _cputag); \
+
+// ======================> ibm5150_mb_device_config
+ 
+class ibm5150_mb_device_config : public ibm5160_mb_device_config
+{
+	friend class ibm5150_mb_device;
+	friend class ibm5160_mb_device_config;
+ 
+	// construction/destruction
+	ibm5150_mb_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+ 
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+  
+	// optional information overrides
+	virtual machine_config_constructor machine_config_additions() const;
+};
+ 
+ 
+// ======================> ibm5150_mb_device
+class ibm5150_mb_device : public ibm5160_mb_device
+{
+        friend class ibm5160_mb_device;
+		friend class ibm5150_mb_device_config;
+ 
+        // construction/destruction
+        ibm5150_mb_device(running_machine &_machine, const ibm5150_mb_device_config &config);
+
+protected:
+        // device-level overrides
+        virtual void device_start();
+        virtual void device_reset();
+		
+		required_device<device_t>	m_cassette;
+public:
+		virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
+		virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+		virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );		
+};
+ 
+ 
+// device type definition
+extern const device_type IBM5150_MOTHERBOARD;
 
 #endif /* GENPC_H_ */

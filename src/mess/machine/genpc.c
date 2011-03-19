@@ -14,6 +14,7 @@
 #include "machine/8237dma.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+#include "imagedev/cassette.h"
 
 #define VERBOSE_PIO 0	/* PIO (keyboard controller) */
 
@@ -646,7 +647,7 @@ void ibm5160_mb_device::device_start()
 	install_device(pit8253, 0x0040, 0x0043, 0, 0, pit8253_r, pit8253_w );	
 	install_device(ppi8255, 0x0060, 0x0063, 0, 0, i8255a_r, i8255a_w );	
 	install_device(this,    0x0080, 0x0087, 0, 0, pc_page_r, pc_page_w );	
-	install_device_write(this,    0x00a0, 0x00a0, 0, 0, nmi_enable_w);	
+	install_device_write(this,    0x00a0, 0x00a1, 0, 0, nmi_enable_w);	
 	/* MESS managed RAM */
 	if ( ram_get_ptr(machine->device(RAM_TAG)) )
 		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );	
@@ -684,4 +685,225 @@ void ibm5160_mb_device::device_reset()
 	ppi_shift_enable = 0;
 	nmi_enabled = 0;
 	speaker_level_w( speaker, 0 );
+}
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+ 
+const device_type IBM5150_MOTHERBOARD = ibm5150_mb_device_config::static_alloc_device_config;
+ 
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+static const cassette_config ibm5150_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
+};
+
+static MACHINE_CONFIG_FRAGMENT( ibm5150_mb_config )
+	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
+	
+	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
+MACHINE_CONFIG_END
+
+ 
+//-------------------------------------------------
+//  ibm5150_mb_device_config - constructor
+//-------------------------------------------------
+ 
+ibm5150_mb_device_config::ibm5150_mb_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+        : ibm5160_mb_device_config(mconfig, tag, owner, clock)
+{
+}
+ 
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+ 
+device_config *ibm5150_mb_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(ibm5150_mb_device_config(mconfig, tag, owner, clock));
+}
+ 
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+ 
+device_t *ibm5150_mb_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, ibm5150_mb_device(machine, *this));
+}
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor ibm5150_mb_device_config::machine_config_additions() const
+{
+	return MACHINE_CONFIG_NAME( ibm5150_mb_config );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+ 
+//-------------------------------------------------
+//  ibm5150_mb_device - constructor
+//-------------------------------------------------
+ 
+ibm5150_mb_device::ibm5150_mb_device(running_machine &_machine, const ibm5150_mb_device_config &config) :
+        ibm5160_mb_device(_machine, config),
+		m_cassette(*this, "cassette")
+{
+}
+ 
+void ibm5150_mb_device::device_start()
+{
+	ibm5160_mb_device::device_start();
+}
+void ibm5150_mb_device::device_reset()
+{
+	ibm5160_mb_device::device_reset();
+}
+
+READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
+{
+	int data = 0xFF;
+	/* KB port A */
+	if (ppi_keyboard_clear)
+	{
+		/*   0  0 - no floppy drives
+         *   1  Not used
+         * 2-3  The number of memory banks on the system board
+         * 4-5  Display mode
+         *      11 = monochrome
+         *      10 - color 80x25
+         *      01 - color 40x25
+         * 6-7  The number of floppy disk drives
+         */
+		data = input_port_read(this, "DSW0") & 0xF3;
+		switch ( ram_get_size(machine->device(RAM_TAG)) )
+		{
+		case 16 * 1024:
+			data |= 0x00;
+			break;
+		case 32 * 1024:	/* Need to verify if this is correct */
+			data |= 0x04;
+			break;
+		case 48 * 1024:	/* Need to verify if this is correct */
+			data |= 0x08;
+			break;
+		default:
+			data |= 0x0C;
+			break;
+		}
+	}
+	else
+	{
+		data = ppi_shift_register;
+	}
+    PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+    return data;
+}
+
+
+READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
+{
+	int timer2_output = pit8253_get_output( pit8253, 2 );
+	int data=0xff;
+
+	data&=~0x80; // no parity error
+	data&=~0x40; // no error on expansion board
+	/* KB port C: equipment flags */
+	if (ppi_portc_switch_high)
+	{
+		/* read hi nibble of SW2 */
+		data = data & 0xf0;
+
+		switch ( ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 )
+		{
+		case 64 * 1024:		data |= 0x00; break;
+		case 128 * 1024:	data |= 0x02; break;
+		case 192 * 1024:	data |= 0x04; break;
+		case 256 * 1024:	data |= 0x06; break;
+		case 320 * 1024:	data |= 0x08; break;
+		case 384 * 1024:	data |= 0x0A; break;
+		case 448 * 1024:	data |= 0x0C; break;
+		case 512 * 1024:	data |= 0x0E; break;
+		case 576 * 1024:	data |= 0x01; break;
+		case 640 * 1024:	data |= 0x03; break;
+		case 704 * 1024:	data |= 0x05; break;
+		case 768 * 1024:	data |= 0x07; break;
+		case 832 * 1024:	data |= 0x09; break;
+		case 896 * 1024:	data |= 0x0B; break;
+		case 960 * 1024:	data |= 0x0D; break;
+		}
+		if ( ram_get_size(machine->device(RAM_TAG)) > 960 * 1024 )
+			data |= 0x0D;
+
+		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
+	}
+	else
+	{
+		/* read lo nibble of S2 */
+		data = (data & 0xf0) | (input_port_read(this, "DSW0") & 0x0f);
+		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
+	}
+
+	if ( ! ( ppi_portb & 0x08 ) )
+	{
+		double tap_val = cassette_input(m_cassette);
+
+		if ( tap_val < 0 )
+		{
+			data &= ~0x10;
+		}
+		else
+		{
+			data |= 0x10;
+		}
+	}
+	else
+	{
+		if ( ppi_portb & 0x01 )
+		{
+			data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+		}
+	}
+	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+
+	return data;
+}
+
+
+WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
+{
+	/* KB controller port B */
+	ppi_portb = data;
+	ppi_portc_switch_high = data & 0x08;
+	ppi_keyboard_clear = data & 0x80;
+	ppi_keyb_clock = data & 0x40;
+	pit8253_gate2_w(pit8253, BIT(data, 0));
+	pc_speaker_set_spkrdata( data & 0x02 );
+
+	cassette_change_state( m_cassette, ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+
+	ppi_clock_signal = ( ppi_keyb_clock ) ? 1 : 0;
+		devcb_call_write_line(&m_kb_set_clock_signal_func,ppi_clock_signal);
+
+
+	/* If PB7 is set clear the shift register and reset the IRQ line */
+	if ( ppi_keyboard_clear )
+	{
+		pic8259_ir1_w(pic8259, 0);
+		ppi_shift_register = 0;
+		ppi_shift_enable = 1;
+	}
 }
