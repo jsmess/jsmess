@@ -196,7 +196,6 @@ MACHINE_CONFIG_END
 
 ROM_START( ibm5150 )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 //  ROM_LOAD("600963.u12", 0xc8000, 0x02000, CRC(f3daf85f) SHA1(3bd29538832d3084cbddeec92593988772755283))  /* Tandon/Western Digital Fixed Disk Adapter 600963-001__TYPE_5.U12.2764.bin - Meant for an IBM PC or XT which lacked bios support for HDDs */
 
 	/* Xebec 1210 and 1220 Z80-based ST409/ST412 MFM controllers */
@@ -242,7 +241,6 @@ ROM_START( ibm5150 )
 ROM_END
 ROM_START( ibm5155 )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
     ROM_LOAD("5000027.u19", 0xf0000, 0x8000, CRC(fc982309) SHA1(2aa781a698a21c332398d9bc8503d4f580df0a05))
 	ROM_LOAD("1501512.u18", 0xf8000, 0x8000, CRC(79522c3d) SHA1(6bac726d8d033491d52507278aa388ec04cf8b7e))
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
@@ -251,7 +249,6 @@ ROM_START( ibm5155 )
 ROM_END
 ROM_START( ibm5140 )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("7396917.bin", 0xf0000, 0x08000, CRC(95c35652) SHA1(2bdac30715dba114fbe0895b8b4723f8dc26a90d))
 	ROM_LOAD("7396918.bin", 0xf8000, 0x08000, CRC(1b4202b0) SHA1(4797ff853ba1675860f293b6368832d05e2f3ea9))
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
@@ -261,7 +258,6 @@ ROM_END
 #ifdef UNUSED_DEFINITION
 ROM_START( ibmpca )
 	ROM_REGION(0x100000,"maincpu",0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("basicc11.f6", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
 	ROM_LOAD("basicc11.f8", 0xf8000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
 	ROM_LOAD("basicc11.fa", 0xfa000, 0x2000, CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74))
@@ -277,7 +273,6 @@ ROM_END
 
 ROM_START( ibm5160 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 //  ROM_LOAD("600963.u12", 0xc8000, 0x02000, CRC(f3daf85f) SHA1(3bd29538832d3084cbddeec92593988772755283))  /* Tandon/Western Digital Fixed Disk Adapter 600963-001__TYPE_5.U12.2764.bin */
 
 	/* PC/3270 has a 3270 keyboard controller card, plus a rom on that card to tell the pc how to run it.
