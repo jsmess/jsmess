@@ -384,41 +384,55 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap)
 				{
 					for(xi=0;xi<8;xi++)
 					{
-						/* TODO: clean this up! */
 						if(knj_enable) //kanji select
 						{
-							tile_offset = tile * 16 + (((yi & 0x1f)+dy) >> state->scrn_reg.v400_mode);
+							tile_offset  = tile * 16;
+							tile_offset += (yi+dy*(state->scrn_reg.v400_mode+1)) >> (height+state->scrn_reg.v400_mode);
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 4)>>2;
 
-							if(yi == mc6845_tile_height-1 && knj_uline)
+							if(yi == mc6845_tile_height-1 && knj_uline) //underlined attribute
 							{
 								pen[0] = (pen_mask & 1)>>0;
 								pen[1] = (pen_mask & 2)>>1;
 								pen[2] = (pen_mask & 4)>>2;
 							}
+
+							if((yi >= 16 && state->scrn_reg.v400_mode == 0) || (yi >= 32 && state->scrn_reg.v400_mode == 1))
+								pen[0] = pen[1] = pen[2] = 0;
 						}
-						else if(state->scrn_reg.v400_mode && pcg_bank == 0) //ank
+						else if(pcg_bank) // PCG
 						{
-							tile_offset = ((tile*16)+(((yi & 0xf)+dy*2) >> height));
-							pen[0] = gfx_data[tile_offset+0x0000+0x1800]>>(7-xi) & (pen_mask & 1)>>0;
-							pen[1] = gfx_data[tile_offset+0x1000+0x1800]>>(7-xi) & (pen_mask & 2)>>1;
-							pen[2] = gfx_data[tile_offset+0x2000+0x1800]>>(7-xi) & (pen_mask & 4)>>2;
-						}
-						else if(state->scrn_reg.v400_mode) //PCG
-						{
-							tile_offset = ((tile*8)+(((yi & 0xf)+dy*2) >> (height+1)));
+							tile_offset  = tile * 8;
+							tile_offset += (yi+dy*(state->scrn_reg.v400_mode+1)) >> (height+state->scrn_reg.v400_mode);
+
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+
+							if((yi >= 8 && state->scrn_reg.v400_mode == 0) || (yi >= 16 && state->scrn_reg.v400_mode == 1))
+								pen[0] = pen[1] = pen[2] = 0;
 						}
 						else
 						{
-							tile_offset = ((tile*8)+(((yi & 7)+dy) >> height));
-							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
-							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
-							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+							tile_offset  = tile * (8*(state->scrn_reg.ank_sel+1));
+							tile_offset += (yi+dy*(state->scrn_reg.v400_mode+1)) >> (height+state->scrn_reg.v400_mode);
+
+							pen[0] = gfx_data[tile_offset+state->scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 1)>>0;
+							pen[1] = gfx_data[tile_offset+state->scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 2)>>1;
+							pen[2] = gfx_data[tile_offset+state->scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 4)>>2;
+
+							if(state->scrn_reg.ank_sel)
+							{
+								if((yi >= 16 && state->scrn_reg.v400_mode == 0) || (yi >= 32 && state->scrn_reg.v400_mode == 1))
+									pen[0] = pen[1] = pen[2] = 0;
+							}
+							else
+							{
+								if((yi >=  8 && state->scrn_reg.v400_mode == 0) || (yi >= 16 && state->scrn_reg.v400_mode == 1))
+									pen[0] = pen[1] = pen[2] = 0;
+							}
 						}
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
@@ -1336,9 +1350,10 @@ static WRITE8_HANDLER( x1_scrn_w )
 	state->scrn_reg.pcg_mode = (data & 0x20)>>5;
 	state->scrn_reg.gfx_bank = (data & 0x10)>>4;
 	state->scrn_reg.disp_bank = (data & 0x08)>>3;
+	state->scrn_reg.ank_sel = (data & 0x04)>>2;
 	state->scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
 
-	if(data & 0x84)
+	if(data & 0x80)
 		printf("SCRN = %02x\n",data & 0x84);
 	if((data & 0x03) == 1)
 		printf("SCRN sets true 400 lines mode\n");
@@ -2330,11 +2345,6 @@ static const cassette_config x1_cassette_config =
  *
  *************************************/
 
-static INTERRUPT_GEN( x1_vbl )
-{
-	//...
-}
-
 #ifdef UNUSED_FUNCTION
 static IRQ_CALLBACK(x1_irq_callback)
 {
@@ -2369,6 +2379,9 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 	if(state->key_irq_vector)
 	{
+		//if(key1 == 0 && key2 == 0 && key3 == 0 && key4 == 0 && f_key == 0)
+		//	return;
+
 		if((key1 != state->old_key1) || (key2 != state->old_key2) || (key3 != state->old_key3) || (key4 != state->old_key4) || (f_key != state->old_fkey))
 		{
 			// generate keyboard IRQ
@@ -2427,11 +2440,7 @@ static MACHINE_RESET( x1 )
 	for(i=0;i<0x1800;i++)
 	{
 		PCG_RAM[i] = 0;
-	}
-
-	for(i=0;i<0x0400;i++)
-	{
-		gfx_element_mark_dirty(machine->gfx[1], i);
+		gfx_element_mark_dirty(machine->gfx[1], i >> 3);
 	}
 
 	state->is_turbo = 0;
@@ -2498,7 +2507,7 @@ static PALETTE_INIT(x1)
 {
 	int i;
 
-	for(i=0;i<0x10;i++)
+	for(i=0;i<(0x10+0x1000);i++)
 		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
 }
 
@@ -2528,7 +2537,6 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
 	MCFG_CPU_IO_MAP(x1_io)
-	MCFG_CPU_VBLANK_INT("screen", x1_vbl)
 	MCFG_CPU_CONFIG(x1_daisy)
 
 	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
@@ -2621,13 +2629,9 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, BAD_DUMP CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
 
-	ROM_REGION(0x4d600, "cgrom", 0)
+	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1",  0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_RELOAD(            	0x00800, 0x00800)
-	ROM_RELOAD(            	0x01000, 0x00800)
-	ROM_COPY("font", 	0x1000, 0x01800, 0x1000 )
-	ROM_COPY("font", 	0x1000, 0x02800, 0x1000 )
-	ROM_COPY("font", 	0x1000, 0x03800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2651,13 +2655,9 @@ ROM_START( x1twin )
 	ROM_REGION(0x1000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank16.rom", 0x0000, 0x1000, CRC(8f9fb213) SHA1(4f06d20c997a79ee6af954b69498147789bf1847) )
 
-	ROM_REGION(0x4d600, "cgrom", 0)
+	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("ank8.rom", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_RELOAD(            	0x00800, 0x00800)
-	ROM_RELOAD(            	0x01000, 0x00800)
-	ROM_COPY("font", 	0x0000, 0x01800, 0x1000 )
-	ROM_COPY("font", 	0x0000, 0x02800, 0x1000 )
-	ROM_COPY("font", 	0x0000, 0x03800, 0x1000 )
+	ROM_COPY("font", 	 0x00000, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2687,11 +2687,7 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x4800, "cgrom", 0)
 	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
-	ROM_RELOAD(            	0x00800, 0x00800)
-	ROM_RELOAD(            	0x01000, 0x00800)
-	ROM_COPY("font", 	0x1000, 0x01800, 0x1000 )
-	ROM_COPY("font", 	0x1000, 0x02800, 0x1000 )
-	ROM_COPY("font", 	0x1000, 0x03800, 0x1000 )
+	ROM_COPY("font", 	         0x01000, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2721,11 +2717,7 @@ ROM_START( x1turbo40 )
 
 	ROM_REGION(0x4800, "cgrom", 0)
 	ROM_LOAD("fnt0808_turbo.x1",0x00000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
-	ROM_RELOAD(            		0x00800, 0x0800 )
-	ROM_RELOAD(            		0x01000, 0x0800 )
-	ROM_COPY("font", 	0x1000, 0x01800, 0x1000 )
-	ROM_COPY("font", 	0x1000, 0x02800, 0x1000 )
-	ROM_COPY("font", 	0x1000, 0x03800, 0x1000 )
+	ROM_COPY("font", 	        0x01000, 0x0800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 

@@ -54,6 +54,7 @@ typedef struct
 	UINT8 disp_bank;
 	UINT8 pcg_mode;
 	UINT8 v400_mode;
+	UINT8 ank_sel;
 
 	UINT8 pri;
 	UINT8 blackclip; // x1 turbo specific
