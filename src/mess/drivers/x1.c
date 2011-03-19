@@ -1558,6 +1558,43 @@ static WRITE8_HANDLER( x1_emm_w )
 	}
 }
 
+/*
+	CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
+	TODO: still not quite right
+*/
+static READ8_HANDLER( x1turbo_bank_r )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+
+	printf("BANK access read\n");
+	return state->ex_bank & 0x3f;
+}
+
+static WRITE8_HANDLER( x1turbo_bank_w )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *RAM = space->machine->region("maincpu")->base();
+	/*
+	--x- ---- BML5: latch bit (doesn't have any real function)
+	---x ---- BMCS: select bank RAM, active low
+	---- xxxx BMNO: Bank memory ID
+	*/
+
+	state->ex_bank = data & 0x3f;
+	printf("BANK access write %02x\n",data);
+
+	if(data & 0x10)
+	{
+		RAM = space->machine->region("maincpu")->base();
+		memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]);
+	}
+	else
+	{
+		RAM = space->machine->region("maincpu")->base();
+		memory_set_bankptr(space->machine, "bank1", &RAM[(data & 1)*0x10000]);
+	}
+}
+
 /*************************************
  *
  *  Memory maps
@@ -1653,7 +1690,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset == 0x0801)						{ printf("Color image board read\n"); return 0xff; } // *
 	else if(offset == 0x0803)						{ printf("Color image board 2 read\n"); return 0xff; } // *
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board read %04x\n",offset); return 0xff; } // *
-	else if(offset == 0x0b00)						{ printf("Bank memory switch read\n"); return 0xff; }
+	else if(offset == 0x0b00)						{ return x1turbo_bank_r(space,0); }
 	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C read %04x\n",offset); return 0xff; } // *
 	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ return x1_emm_r(space,offset & 0xff); } // *
 	else if(offset == 0x0e03)                   	{ return x1_rom_r(space, 0); }
@@ -1701,7 +1738,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset == 0x0800)						{ printf("Color image board write %02x\n",data); } // *
 	else if(offset == 0x0802)						{ printf("Color image board 2 write %02x\n",data); } // *
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board write %04x %02x\n",offset,data); } // *
-	else if(offset == 0x0b00)						{ printf("Bank memory switch write %02x\n",data); }
+	else if(offset == 0x0b00)						{ x1turbo_bank_w(space,0,data); }
 	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C write %04x %02x\n",offset,data); } // *
 	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ x1_emm_w(space,offset & 0xff,data); } // *
 	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
@@ -2672,13 +2709,15 @@ ROM_START( x1twin )
 ROM_END
 
 ROM_START( x1turbo )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000+0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x10000*2, "bank_ram", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
@@ -2702,7 +2741,7 @@ ROM_START( x1turbo )
 ROM_END
 
 ROM_START( x1turbo40 )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000+0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.bin", 0x0000, 0x8000, CRC(112f80a2) SHA1(646cc3fb5d2d24ff4caa5167b0892a4196e9f843) )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
