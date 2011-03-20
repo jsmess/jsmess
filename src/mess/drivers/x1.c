@@ -7,7 +7,6 @@
     TODO:
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - x1turbo keyboard inputs are currently broken;
-    - Implement proper PCG index hooks by beam positions;
     - Hook-up remaining .tap image formats;
     - Implement .rom format support (needs an image for it);
     - Implement tape commands;
@@ -27,6 +26,8 @@
 		- specific x1turboz features?
 
     per-game/program specific TODO:
+    - Dragon Buster: it crashed to me once with a obj flag hang;
+    - Exoa II - Warroid: goes offsync with the PCG beam positions;
     - Lupin 3 / Take the A-Train: they all fails to load the basic now, they where working at some point but now they just resets themselves at startup;
     - Hydlide 2 / 3: can't get the user disk to work properly
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
@@ -38,7 +39,7 @@
       bp 81ca,pc += 2
     - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
     - Thexder: (x1turbo) Can't start a play, keyboard related issue?
-    - V.I.P.: can't get inputs to work at all there;
+    - V.I.P.: can't get inputs to work at all there (needs f keys to work properly, I know what to do ...);
 
     Notes:
     - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -54,6 +55,7 @@
       In theory, you can convert your tape / floppy games into ROM format easily, provided that you know what's the pinout of the
       cartridge slot and it doesn't exceed 64k (0x10000) of size.
     - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (btanb)
+    - Maidum: you need to load BOTH disk without write protection disabled, otherwise it refuses to run. (btanb)
 
 
 =================================================================================================
@@ -1106,63 +1108,52 @@ static UINT16 check_chr_addr(running_machine *machine)
 	return 0x3ff;
 }
 
+static UINT16 get_pcg_addr(running_machine *machine,UINT16 width,UINT8 y_char_size)
+{
+	int hbeam = machine->primary_screen->hpos() >> 3;
+	int vbeam = machine->primary_screen->vpos() / y_char_size;
+	int mask = (width <= 40) ? 0x3ff : 0x7ff;
+
+	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine->primary_screen->vpos() & 7,width);
+
+	return (hbeam + vbeam*width) & mask;
+}
+
 static READ8_HANDLER( x1_pcg_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	int addr;
-	int calc_pcg_offset;
+	int pcg_offset;
 	UINT8 res;
 	UINT8 *gfx_data;
 
 	addr = (offset & 0x300) >> 8;
 
-	//if(state->pcg_reset)
-	if(0) //TODO: temporary fix, the PCG needs a full rewrite anyway
+	if(addr == 0 && state->scrn_reg.pcg_mode) // Kanji ROM read, X1Turbo only
 	{
-		state->pcg_index_r[0] = state->pcg_index_r[1] = state->pcg_index_r[2] = state->bios_offset = 0;
-		state->pcg_reset = 0;
-	}
+		gfx_data = space->machine->region("kanji")->base();
+		pcg_offset = (state->tvram[check_chr_addr(space->machine)]+(state->kvram[check_chr_addr(space->machine)]<<8)) & 0xfff;
+		pcg_offset*=0x20;
+		pcg_offset+=(offset & 0x0f);
+		pcg_offset+=(state->kvram[check_chr_addr(space->machine)] & 0x40) >> 2; //left-right check
 
-	if(addr == 0)
-	{
-		if(state->scrn_reg.pcg_mode)
-		{
-			gfx_data = space->machine->region("kanji")->base();
-			calc_pcg_offset = (state->tvram[check_chr_addr(space->machine)]+(state->kvram[check_chr_addr(space->machine)]<<8)) & 0xfff;
-
-			state->kanji_offset = calc_pcg_offset*0x20;
-
-			res = gfx_data[0x0000+state->bios_offset+state->kanji_offset];
-
-			state->bios_offset++;
-			state->bios_offset&=0x1f;
-		}
-		else
-		{
-//          printf("%04x %04x %02x\n",state->pcg_write_addr*4*8,state->pcg_write_addr,state->bios_offset);
-			gfx_data = space->machine->region("kanji")->base();
-			if(state->bios_offset == 0)
-				state->kanji_offset = state->pcg_write_addr*4*8;//TODO: check me
-
-			res = gfx_data[0x0000+state->bios_offset+state->kanji_offset];
-
-			state->bios_offset++;
-			state->bios_offset&=0x1f;
-		}
-		return res;
+		res = gfx_data[pcg_offset];
 	}
 	else
 	{
-		gfx_data = space->machine->region("pcg")->base();
-		calc_pcg_offset = (state->pcg_index_r[addr-1]) | ((addr-1)*0x800);
-		res = gfx_data[0x0000+calc_pcg_offset+(state->pcg_write_addr*8)];
+		UINT8 y_char_size;
 
-		state->pcg_index_r[addr-1]++;
-		state->pcg_index_r[addr-1]&=0x7;
-		return res;
+		/* addr == 0 reads from the ANK rom */
+		gfx_data = space->machine->region((addr == 0) ? "cgrom" : "pcg")->base();
+		y_char_size = (mc6845_tile_height > 8) ? 8 : mc6845_tile_height;
+		if(y_char_size == 0) { y_char_size = 1; }
+		pcg_offset = state->tvram[get_pcg_addr(space->machine,mc6845_h_display,y_char_size)]*8;
+		pcg_offset+= space->machine->primary_screen->vpos() & (y_char_size-1);
+		if(addr) { pcg_offset+= ((addr-1)*0x800); }
+		res = gfx_data[pcg_offset];
 	}
 
-	return space->machine->rand();
+	return res;
 }
 
 static WRITE8_HANDLER( x1_pcg_w )
@@ -1173,25 +1164,17 @@ static WRITE8_HANDLER( x1_pcg_w )
 
 	addr = (offset & 0x300) >> 8;
 
-	//if(state->pcg_reset)
-	if(0) //TODO: temporary fix, the PCG needs a full rewrite anyway
-	{
-		state->pcg_index[0] = state->pcg_index[1] = state->pcg_index[2] = 0;
-		state->pcg_reset = 0;
-	}
-
 	if(addr == 0)
 	{
 		/* NOP */
-		logerror("Warning: write to the BIOS PCG area! %04x %02x\n",offset,data);
+		logerror("Warning: write to the ANK area! %04x %02x\n",offset,data);
 	}
 	else
 	{
-		if(state->scrn_reg.pcg_mode)
+		if(state->scrn_reg.pcg_mode) // Hi-Speed Mode, X1Turbo only
 		{
-			state->used_pcg_addr = state->tvram[check_pcg_addr(space->machine)]*8;
-			state->pcg_index[addr-1] = (offset & 0xe) >> 1;
-			pcg_offset = (state->pcg_index[addr-1]+state->used_pcg_addr) & 0x7ff;
+			pcg_offset = state->tvram[check_pcg_addr(space->machine)]*8;
+			pcg_offset+= (offset & 0xe) >> 1;
 			pcg_offset+=((addr-1)*0x800);
 			PCG_RAM[pcg_offset] = data;
 
@@ -1199,31 +1182,22 @@ static WRITE8_HANDLER( x1_pcg_w )
 
     		gfx_element_mark_dirty(space->machine->gfx[1], pcg_offset >> 3);
 		}
-		else
+		else // Compatible Mode
 		{
-			/* TODO: understand what 1942, Herzog and friends wants there */
-			#if 0
-			printf("%04x %02x %04x\n",state->gate_array_ma,state->gate_array_ra,mc6845_start_addr);
-			state->used_pcg_addr = (state->gate_array_ma+0x500);
-			if(state->gate_array_ma >= 0x7ff)
-				state->used_pcg_addr = state->tvram[0x7ff]<<3;
-			else
-				state->used_pcg_addr = state->tvram[state->used_pcg_addr]<<3;
-			pcg_offset = state->used_pcg_addr;
-			pcg_offset|= state->gate_array_ra & (mc6845_tile_height-1);
-			#else
-			state->used_pcg_addr = state->pcg_write_addr*8;
-			pcg_offset = (state->pcg_index[addr-1]+state->used_pcg_addr) & 0x7ff;
-			#endif
-			pcg_offset+=((addr-1)*0x800);
+			UINT8 y_char_size;
+
+			/* TODO: Brain Breaker doesn't work with this arrangement in high resolution mode, check out why */
+			y_char_size = mc6845_tile_height > 8 ? mc6845_tile_height-8 : mc6845_tile_height;
+			if(y_char_size == 0) { y_char_size = 1; }
+			pcg_offset = state->tvram[get_pcg_addr(space->machine,mc6845_h_display,y_char_size)]*8;
+			pcg_offset+= space->machine->primary_screen->vpos() & (y_char_size-1);
+			pcg_offset+= ((addr-1)*0x800);
+
 			PCG_RAM[pcg_offset] = data;
 
 			pcg_offset &= 0x7ff;
 
-    		gfx_element_mark_dirty(space->machine->gfx[1], pcg_offset >> 3);
-
-			state->pcg_index[addr-1]++;
-			state->pcg_index[addr-1]&=7;
+			gfx_element_mark_dirty(space->machine->gfx[1], pcg_offset >> 3);
 		}
 	}
 }
@@ -1354,7 +1328,7 @@ static WRITE8_HANDLER( x1_scrn_w )
 	state->scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
 
 	if(data & 0x80)
-		printf("SCRN = %02x\n",data & 0x84);
+		printf("SCRN = %02x\n",data & 0x80);
 	if((data & 0x03) == 1)
 		printf("SCRN sets true 400 lines mode\n");
 }
