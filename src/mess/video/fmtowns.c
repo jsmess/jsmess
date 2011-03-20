@@ -961,6 +961,7 @@ static void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap
 	}
 
 	off += line * linesize;
+	off &= ~0x01;
 
 	if(hzoom == 1)
 	{
@@ -1681,7 +1682,7 @@ static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 a
 	int a,b;
 
 	// all characters are 16 pixels high
-	vram_addr = (x * 16) * linesize;
+	vram_addr = (x * 4) + (y * (linesize * 16));
 
 	if((attr & 0xc0) == 0)
 		rom_addr = 0x3d800 + (ascii * 128);
@@ -1740,9 +1741,11 @@ static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 a
 				temp |= ((colour & 0x0f) << 4);
 			if(data & (1<<(b+1)))
 				temp |= (colour & 0x0f);
+			//state->towns_gfxvram[0x40000+vram_addr+(b/2)] = temp;
 		}
 
 		vram_addr += linesize;
+		vram_addr &= 0x3ffff;
 	}
 }
 
