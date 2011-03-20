@@ -28,6 +28,7 @@ public:
 
 	UINT8 m_bank[4];
 	UINT8 m_lcd_base[2];
+	UINT8 m_touchscreen[0x10];
 	UINT8 m_lcd_enabled;
 	UINT8 m_lcd_cmd;
 
@@ -49,6 +50,7 @@ public:
 	DECLARE_READ8_MEMBER( irq_r );
 	DECLARE_WRITE8_MEMBER( irq_w );
 	DECLARE_READ8_MEMBER( touchscreen_r );
+	DECLARE_WRITE8_MEMBER( touchscreen_w );
 };
 
 READ8_MEMBER( rex6000_state::bankswitch_r )
@@ -155,22 +157,34 @@ READ8_MEMBER( rex6000_state::touchscreen_r )
 {
 	UINT16 x = input_port_read(space.machine, "PENX");
 	UINT16 y = input_port_read(space.machine, "PENY");
+	UINT16 battery = input_port_read(space.machine, "BATTERY");
 
 	switch (offset)
 	{
-		case 0:
+		case 0x08:
 			return ((input_port_read(space.machine, "INPUT") & 0x40) ? 0x20 : 0x00) | 0X10;
-		case 1:
-			return (y>>0) & 0xff;
-		case 2:
-			return (y>>8) & 0xff;
-		case 3:
+		case 0x09:
+			if (m_touchscreen[4] & 0x80)
+				return (battery>>0) & 0xff;
+			else
+				return (y>>0) & 0xff;
+		case 0x0a:
+			if (m_touchscreen[4] & 0x80)
+				return (battery>>8) & 0xff;
+			else
+				return (y>>8) & 0xff;
+		case 0x0b:
 			return (x>>0) & 0xff;
-		case 4:
+		case 0x0c:
 			return (x>>8) & 0xff;
 	}
 
-	return 0;
+	return m_touchscreen[offset&0x0f];
+}
+
+WRITE8_MEMBER( rex6000_state::touchscreen_w )
+{
+	m_touchscreen[offset&0x0f] = data;
 }
 
 static ADDRESS_MAP_START(rex6000_mem, ADDRESS_SPACE_PROGRAM, 8, rex6000_state)
@@ -192,7 +206,7 @@ static ADDRESS_MAP_START( rex6000_io, ADDRESS_SPACE_IO, 8, rex6000_state)
 	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE_LEGACY("rtc", tc8521_r, tc8521_w)
 	AM_RANGE( 0x40, 0x47 ) AM_NOP	//SIO
 	AM_RANGE( 0x50, 0x51 ) AM_READWRITE(lcd_io_r, lcd_io_w)
-	AM_RANGE( 0x68, 0x6c ) AM_READ(touchscreen_r)
+	AM_RANGE( 0x60, 0x6f ) AM_READWRITE(touchscreen_r, touchscreen_w)
 	//AM_RANGE( 0x00, 0xff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -207,6 +221,11 @@ static INPUT_CHANGED( trigger_irq )
 
 /* Input ports */
 INPUT_PORTS_START( rex6000 )
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x03ff, 0x03ff, "Battery Status" )
+	PORT_CONFSETTING( 0x03ff, "Good" )
+	PORT_CONFSETTING( 0x0000, "Poor" )
+
 	PORT_START("INPUT")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Home")	PORT_CODE(KEYCODE_ENTER)		PORT_CHANGED(trigger_irq, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Back")	PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHANGED(trigger_irq, 0)
