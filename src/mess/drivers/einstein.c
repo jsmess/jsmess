@@ -433,7 +433,7 @@ static MACHINE_RESET( einstein )
 	TMS9928A_reset();
 
 	/* a reset causes the fire int, adc int, keyboard int mask
-    to be set to 1, which causes all these to be DISABLED */
+	to be set to 1, which causes all these to be DISABLED */
 	einstein->interrupt = 0;
 	einstein->interrupt_mask = 0;
 
@@ -467,6 +467,7 @@ static MACHINE_RESET( einstein2 )
 	palette_set_color(machine, TMS9928A_PALETTE_SIZE, RGB_BLACK);
 	palette_set_color(machine, TMS9928A_PALETTE_SIZE + 1, MAKE_RGB(0, 224, 0));
 }
+
 static MACHINE_START( einstein2 )
 {
 	einstein_state *einstein = machine->driver_data<einstein_state>();
@@ -752,6 +753,27 @@ static const floppy_config einstein_floppy_config =
 	"floppy_5_25"
 };
 
+
+/* F4 Character Displayer */
+static const gfx_layout einstei2_charlayout =
+{
+	8, 10,					/* 8 x 10 characters */
+	256,					/* 256*2 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0x800*8, 0x801*8 },
+	8*8
+};
+
+static GFXDECODE_START( einstei2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, einstei2_charlayout, 16, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, einstei2_charlayout, 16, 1 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
@@ -763,7 +785,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_MACHINE_RESET(einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
-    driver. So we update at 50Hz and hope this is good enough. */
+	driver. So we update at 50Hz and hope this is good enough. */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
@@ -777,7 +799,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_DEVICE_ADD("adc_daisy", EINSTEIN_ADC_DAISY, 0)
 	MCFG_DEVICE_ADD("fire_daisy", EINSTEIN_FIRE_DAISY, 0)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_FRAGMENT_ADD(tms9928a)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -817,7 +839,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_MACHINE_START(einstein2)
 	MCFG_MACHINE_RESET(einstein2)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("80column", RASTER)
@@ -827,12 +849,12 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE(einstein2)
+	MCFG_GFXDECODE(einstei2)
 
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_X002 / 4, einstein_crtc6845_interface)
-
 MACHINE_CONFIG_END
 
 
