@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/upd7220.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 
 class a5105_state : public driver_device
@@ -20,13 +22,16 @@ class a5105_state : public driver_device
 public:
 	a5105_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  m_hgdc(*this, "upd7220")
+		  m_hgdc(*this, "upd7220"),
+		  m_cass(*this, "cassette")
 		{ }
 
 	required_device<device_t> m_hgdc;
+	required_device<device_t> m_cass;
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	device_t *cassette;
 	UINT8 *m_char_rom;
 
 
@@ -149,12 +154,37 @@ static WRITE8_HANDLER( key_mux_w )
 	state->key_mux = data;
 }
 
+static WRITE8_HANDLER( a5105_ab_w )
+{
+	a5105_state *state = space->machine->driver_data<a5105_state>();
 /*port $ab
 		---- 100x tape motor, active low
 		---- 101x tape data
 		---- 110x led (color green)
 		---- 111x key click, active high
 */
+	switch (data & 6)
+	{
+	case 0:
+		if (BIT(data, 0))
+			cassette_change_state(state->m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		else
+			cassette_change_state(state->m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		break;
+
+	case 2:
+		cassette_output(state->m_cass, BIT(data, 0) ? -1.0 : +1.0);
+		break;
+
+	case 4:
+		//led
+		break;
+
+	case 6:
+		//keyclick - a beeper?
+		break;
+	}
+}
 
 static READ8_HANDLER( a5105_memsel_r )
 {
@@ -197,7 +227,7 @@ static ADDRESS_MAP_START( a5105_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xa8, 0xa8) AM_READWRITE(a5105_memsel_r,a5105_memsel_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(key_r)
 	AM_RANGE(0xaa, 0xaa) AM_READWRITE(key_mux_r,key_mux_w)
-//	AM_RANGE(0xab, 0xab) misc output, see above
+	AM_RANGE(0xab, 0xab) AM_WRITE(a5105_ab_w) //misc output, see above
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -323,7 +353,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(a5105)
 {
-
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	a5105_ab_w(space, 0, 9); // turn motor off
 }
 
 
@@ -409,12 +440,16 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
+	MCFG_GFXDECODE(a5105)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(gdc)
 
-	MCFG_GFXDECODE(a5105)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_CONFIG_END
 
 /* ROM definition */
