@@ -1102,7 +1102,7 @@ ROM_START( ibm5162 ) //MB p/n 62x1168
 	/* Mainboard PROMS */
 	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD("1501814.82s123.u72", 0x0000, 0x0800, NO_DUMP) /* N82S123AN 8623 // SK-U 1501814 */
-	ROM_LOAD("68x7594.82s147.u90", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8629 // VCT 68X7594 (warning, this is an educated guess because it is REALLY hard to read on http://www.yesterpc.com/Hardware/ISA%20motherboard/IBM%20XT286/slideshow/IMG_3608.JPG due to that damn watermark and EXTREME crappy jpeg artifacting. The only letters I'm really sure of are ...7.94 */
+	ROM_LOAD("59x7594.82s147.u90", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8629 // VCT 59X7594
 ROM_END
 
 
