@@ -2,9 +2,6 @@
 
     PC-9801 (c) 1981 NEC
 
-    fork / rewrite from pc98.c, contents of that file will be moved to here once that things gets
-    consolidated there.
-
     preliminary driver by Angelo Salese
 
     TODO:
