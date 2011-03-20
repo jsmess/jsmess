@@ -17,6 +17,7 @@
 *  Correctly load UPD7720 roms as UPD7725 data - done, this is utterly disgusting code.
 *  Attached i8251a uart at u15
 *  Added dipswitch array S4
+*  Attached 8259 PIC - done, but int sources are not hooked up yet, also not sure if callback is done properly
 *
 *  TODO:
 *  Hook the terminal to the i8251a uart at u15
@@ -24,7 +25,7 @@
 *  Attach the other i8251a uart (assuming it is hooked to the hardware at all!)
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
 *  Correct memory maps and io maps - partly done
-*  Attach 8259 PIC and figure out where all the ints come from
+*  8259 PIC: figure out where all the ints come from
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
 *  Everything else
 *
@@ -41,6 +42,7 @@
 #include "cpu/upd7725/upd7725.h"
 #include "cpu/i86/i86.h"
 #include "machine/msm8251.h"
+#include "machine/pic8259.h"
 #include "machine/terminal.h"
 
 /*
@@ -58,7 +60,29 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 	return 0x00ea; // does exactly what it says on the tin
 }*/
 
-/* led/dipswitch stuff */
+/*****************************************************************************
+ PIC 8259 stuff
+*****************************************************************************/
+static WRITE_LINE_DEVICE_HANDLER( pic8259_set_int_line )
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+}
+
+static const struct pic8259_interface pic8259_config =
+{
+	DEVCB_LINE(pic8259_set_int_line)
+};
+
+static IRQ_CALLBACK(irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge(device->machine->device("pic8259"));
+	return r;
+}
+
+/*****************************************************************************
+ LED/dipswitch stuff
+*****************************************************************************/
 READ8_MEMBER( tsispch_state::dsw_r )
 {
 	UINT8 data;
@@ -94,9 +118,9 @@ WRITE8_MEMBER( tsispch_state::led_w )
 	popmessage("LED status: (%x) %x %x %x %x (%x %x %x)\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 }
 
-
-/* upd7720 stuff */
-
+/*****************************************************************************
+ UPD77P20 stuff
+*****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
 	upd7725_device *upd7725 = machine->device<upd7725_device>("dsp");
@@ -136,13 +160,16 @@ WRITE16_MEMBER( tsispch_state::dsp_status_w )
 	upd7725->snesdsp_write(false, data);
 }
 
-/* Reset */
+/*****************************************************************************
+ Reset and Driver Init
+*****************************************************************************/
 void tsispch_state::machine_reset()
 {
 	// clear fifos (TODO: memset would work better here...)
 	int i;
 	for (i=0; i<32; i++) infifo[i] = 0;
 	infifo_tail_ptr = infifo_head_ptr = 0;
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 	// below seem to be unnecessary?
 	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
@@ -219,7 +246,7 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
 	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
 	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
-	//AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
+	AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0x00FF) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(led_w, 0xFF00) // verified, write to the 4 leds, plus 4 other mystery bits
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
@@ -286,6 +313,9 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* TODO: correct clock (may be correct, since theres a 24mhz xtal) and correct dsp type is UPD77P20 */
     MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
     MCFG_CPU_DATA_MAP(dsp_data_map)
+
+    /* PIC 8259 */
+    MCFG_PIC8259_ADD("pic8259", pic8259_config)
 
     /* uarts */
     MCFG_MSM8251_ADD("i8251a_u15", default_msm8251_interface)

@@ -19,13 +19,15 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_dsp(*this, "dsp"),
 		  m_terminal(*this, TERMINAL_TAG),
-		  m_uart(*this, "i8251a_u15")
+		  m_uart(*this, "i8251a_u15"),
+		  m_pic(*this, "pic8259")
 		{ }
 		
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_uart;
+	required_device<device_t> m_pic;
 
 	UINT8 infifo[32];			// input fifo
 	UINT8 infifo_tail_ptr;		// " tail
