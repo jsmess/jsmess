@@ -66,6 +66,7 @@
       * with 0x2000 ROM size you can load 2d and 2hd floppies;
     - Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
       This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
+	- password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
 
     Bankswitch Notes:
     - 0x31 - graphic banking

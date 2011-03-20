@@ -990,7 +990,7 @@
 	<software name="1942">
 		<description>1942</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ASCII</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="1942.d88" size="348848" crc="f9b366f2" sha1="4b67e7041c1a06e2e2452e63960b8860b1813f5a" offset="0" />
@@ -1001,7 +1001,7 @@
 	<software name="ametruck">
 		<description>American Truck</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Telenet Japan</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="american truck.d88" size="348848" crc="b6e33150" sha1="f4cc9c33eb8a984120fc6978c11bb0c546db337c" offset="0" />
