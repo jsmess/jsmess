@@ -6,10 +6,11 @@
 
     TODO:
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
-    - x1turbo keyboard inputs are currently broken;
+    - Fix the 0xe80/0xe83 kanji ROM readback;
+    - Fixe the 0xb00 RAM banking;
+ 	- x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
     - Hook-up remaining .tap image formats;
-    - Implement .rom format support (needs an image for it);
-    - Implement tape commands;
+    - Implement APSS tape commands;
     - Sort out / redump the BIOS gfx roms;
     - X1Turbo: Implement SIO.
     - X1Twin: Hook-up the PC Engine part (actually needs his own driver?);
@@ -28,9 +29,9 @@
     per-game/program specific TODO:
     - Dragon Buster: it crashed to me once with a obj flag hang;
     - Exoa II - Warroid: goes offsync with the PCG beam positions;
-    - Lupin 3 / Take the A-Train: they all fails to load the basic now, they where working at some point but now they just resets themselves at startup;
-    - Hydlide 2 / 3: can't get the user disk to work properly
-    - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
+    - Lupin 3 / Take the A-Train / Makai et al (basically anything that uses cz-8fb02 basic): uses x1turbo bankswitch memory RAM, doesn't load due of it;
+    - Hydlide 3: can't get the user disk to work properly
+    - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
     - "newtype": trips a z80dma error;
 	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
@@ -39,7 +40,8 @@
       bp 81ca,pc += 2
     - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
     - Thexder: (x1turbo) Can't start a play, keyboard related issue?
-    - V.I.P.: can't get inputs to work at all there (needs f keys to work properly, I know what to do ...);
+	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
+	- Luna City: text gfxs looks doubled in y-axis
 
     Notes:
     - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -1441,7 +1443,8 @@ static WRITE8_HANDLER( x1turbo_gfxpal_w )
 
 
 /*
- *  FIXME: this is still wrong, the only game that uses this function so far is Hyper Olympics '84 disk version. Perhaps it's the source ROM that isn't correct ...
+ *  FIXME: this is still wrong, the only games that uses this function so far are Hyper Olympics '84 disk version and Might & Magic.
+ *  Perhaps it's the source ROM that isn't correct ...
  */
 static READ8_HANDLER( x1_kanji_r )
 {
@@ -1645,7 +1648,7 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->avram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->tvram[offset & 0x7ff] = state->pcg_write_addr = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->tvram[offset & 0x7ff] = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1752,8 +1755,8 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->avram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3000 && offset <= 0x37ff)	{ state->tvram[offset & 0x7ff] = state->pcg_write_addr = data; }
-	else if(offset >= 0x3800 && offset <= 0x3fff)	{ if(data & 0x10) { printf("Write to Kanji lv 2 VRAM %04x %02x\n",offset,data); } state->kvram[offset & 0x7ff] = state->pcg_write_addr = data; }
+	else if(offset >= 0x3000 && offset <= 0x37ff)	{ state->tvram[offset & 0x7ff] = data; }
+	else if(offset >= 0x3800 && offset <= 0x3fff)	{ state->kvram[offset & 0x7ff] = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1881,30 +1884,6 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_HANDLER(x1_portc_w)						/* Port C write */
 };
 
-static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
-{
-	x1_state *drvstate = device->machine->driver_data<x1_state>();
-	//drvstate->vsync = (state & 1) ? 0x04 : 0x00;
-
-	if(state & 1 && drvstate->pcg_reset_occurred == 0) { drvstate->pcg_reset = drvstate->pcg_reset_occurred = 1; }
-	if(!(state & 1))                        		   { drvstate->pcg_reset_occurred = 0; }
-
-	//printf("%d %02x\n",device->machine->primary_screen->vpos(),drvstate->vsync);
-}
-
-static WRITE_LINE_DEVICE_HANDLER(de_changed)
-{
-	x1_state *drvstate = device->machine->driver_data<x1_state>();
-
-	if ( ! drvstate->gate_array_de && state )
-	{
-		drvstate->gate_array_ma = mc6845_get_ma(device->machine->device("crtc"));
-		drvstate->gate_array_ra = mc6845_get_ra(device->machine->device("crtc"));
-	}
-
-	drvstate->gate_array_de = state ? 1 : 0;
-}
-
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
@@ -1912,10 +1891,10 @@ static const mc6845_interface mc6845_intf =
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
 	NULL,		/* after pixel update callback */
-	DEVCB_LINE(de_changed),	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_LINE(vsync_changed),	/* VSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
 	NULL		/* update address callback */
 };
 
@@ -2046,7 +2025,7 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x18 etb
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x19 cancel
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(27)
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1c ???
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1d fs
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1e gs
@@ -2465,8 +2444,6 @@ static MACHINE_RESET( x1 )
 	state->is_turbo = 0;
 
 	state->io_bank_mode = 0;
-	state->pcg_index[0] = state->pcg_index[1] = state->pcg_index[2] = 0;
-	state->pcg_index_r[0] = state->pcg_index_r[1] = state->pcg_index_r[2] = state->bios_offset = 0;
 
 	//cpu_set_irq_callback(machine->device("maincpu"), x1_irq_callback);
 
