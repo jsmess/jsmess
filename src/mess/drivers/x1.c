@@ -1828,26 +1828,31 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
     ---- --x- "cmt read"
     ---- ---x "cmt test" (active low) <- actually this is "Sub CPU detected BREAK"
     */
-	UINT8 dat = 0;
-	state->vdisp = (device->machine->primary_screen->vpos() < 200) ? 0x80 : 0x00;
-	dat = (input_port_read(device->machine, "SYSTEM") & 0x10) | state->sub_obf | state->vsync | state->vdisp;
+	UINT8 res = 0;
+	int vblank_line = mc6845_v_display * mc6845_tile_height;
+	state->vdisp = (device->machine->primary_screen->vpos() < vblank_line) ? 0x80 : 0x00;
+	state->vsync = (device->machine->primary_screen->vpos() < vblank_line) ? 0x00 : 0x04;
+
+	res = (input_port_read(device->machine, "SYSTEM") & 0x10) | state->sub_obf | state->vsync | state->vdisp;
+
+	//popmessage("%d",vblank_line);
 
 	if(cassette_input(device->machine->device("cass")) > 0.03)
-		dat |= 0x02;
+		res |= 0x02;
 
 //  if(cassette_get_state(device->machine->device("cass")) & CASSETTE_MOTOR_DISABLED)
-//      dat &= ~0x02;  // is zero if not playing
+//      res &= ~0x02;  // is zero if not playing
 
 	// CMT test bit is set low when the CMT Stop command is issued, and becomes
 	// high again when this bit is read.
-	dat |= 0x01;
+	res |= 0x01;
 	if(state->cmt_test != 0)
 	{
 		state->cmt_test = 0;
-		dat &= ~0x01;
+		res &= ~0x01;
 	}
 
-	return dat;
+	return res;
 }
 
 /* I/O system port */
@@ -1902,7 +1907,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 {
 	x1_state *drvstate = device->machine->driver_data<x1_state>();
-	drvstate->vsync = (state & 1) ? 0x04 : 0x00;
+	//drvstate->vsync = (state & 1) ? 0x04 : 0x00;
 
 	if(state & 1 && drvstate->pcg_reset_occurred == 0) { drvstate->pcg_reset = drvstate->pcg_reset_occurred = 1; }
 	if(!(state & 1))                        		   { drvstate->pcg_reset_occurred = 0; }
