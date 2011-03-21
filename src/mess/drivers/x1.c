@@ -2,7 +2,8 @@
 
     Sharp X1 (c) 1983 Sharp Corporation
 
-    driver by Angelo Salese & Barry Rodewald
+    driver by Angelo Salese & Barry Rodewald,
+    special thanks to Dirk Best for various wd17xx fixes
 
     TODO:
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
@@ -27,24 +28,29 @@
 		- specific x1turboz features?
 
     per-game/program specific TODO:
+    - Lupin 3 / Take the A-Train / Makai et al (basically anything that uses cz-8fb02 basic): uses x1turbo bankswitch memory RAM, doesn't load due of it;
+
     - Dragon Buster: it crashed to me once with a obj flag hang;
     - Exoa II - Warroid: goes offsync with the PCG beam positions;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
-    - Lupin 3 / Take the A-Train / Makai et al (basically anything that uses cz-8fb02 basic): uses x1turbo bankswitch memory RAM, doesn't load due of it;
-    - Hydlide 3: can't get the user disk to work properly
-    - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
-    - "newtype": trips a z80dma error;
-	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
-    - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
-    - Ys 2: crashes after the disclaimer screen;
-    - Ys 3: missing user disk, to hack it (and play with x1turboz features):
-      bp 81ca,pc += 2
-    - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
-    - Thexder: (x1turbo) Can't start a play, keyboard related issue?
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
-	- Luna City: text gfxs looks doubled in y-axis
+    - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
+    - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
+ 	- Luna City: text gfxs looks doubled in y-axis
+	- "newtype": trips a z80dma assert, worked around for now;
+	- X1C Demo: goes offsync with the PCG beam positions at some point;
+	- X1F Demo ("New X1 Demo"): needs partial updates to work properly;
+	- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
 	- Shiver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
-	- New X1 Demo: needs partial updates to work properly;
+	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
+	- Super Billiards (X1 Pack 14): has a slight PCG timing bug;
+    - Thexder: (x1turbo) Can't start a play, keyboard related issue?
+	- Trivia-Q: dunno what to do on the selection screen, missing inputs?
+    - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
+    - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
+    - Ys 2: crashes after the disclaimer screen;
+    - Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
+    - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
 
     Notes:
     - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
