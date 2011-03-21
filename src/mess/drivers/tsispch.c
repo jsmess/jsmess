@@ -17,7 +17,12 @@
 *  Correctly load UPD7720 roms as UPD7725 data - done, this is utterly disgusting code.
 *  Attached i8251a uart at u15
 *  Added dipswitch array S4
-*  Attached 8259 PIC - done, IR2 hooked to 8251 rxrdy, others missing
+*  Attached 8259 PIC
+   * IR0 = upd7720 p0 pin masked by something, not hooked up yet
+   * IR1 = i8251 rxrdy
+   * IR2 = i8251 txempty
+   * IR3 = i8251 txrdy
+   * IR4,5,6,7 unknown so far, not hooked up yet
 *  Hooked the terminal to the i8251a uart at u15
 *
 *  TODO:
@@ -25,7 +30,7 @@
 *  Attach the other i8251a uart (assuming it is hooked to the hardware at all!)
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
 *  Correct memory maps and io maps - partly done
-*  8259 PIC: figure out where the other ints come from
+*  8259 PIC: figure out where IR4-7 come from
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
 *  Everything else
 *
@@ -52,6 +57,11 @@
 #include "machine/pic8259.h"
 #include "machine/terminal.h"
 
+// defines
+#undef VERBOSE
+#undef DEBUG_DSP
+#undef DEBUG_DSP_W
+
 /*
    Devices and handlers
  */
@@ -61,17 +71,17 @@
 *****************************************************************************/
 static WRITE_LINE_DEVICE_HANDLER( i8251_rxrdy_int )
 {
-	pic8259_ir2_w(device->machine->device("pic8259"), state);
+	pic8259_ir1_w(device->machine->device("pic8259"), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( i8251_txempty_int )
 {
-	pic8259_ir3_w(device->machine->device("pic8259"), state);
+	pic8259_ir2_w(device->machine->device("pic8259"), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
 {
-	pic8259_ir4_w(device->machine->device("pic8259"), state);
+	pic8259_ir3_w(device->machine->device("pic8259"), state);
 }
 
 const msm8251_interface msm8251_config =
@@ -171,6 +181,9 @@ READ16_MEMBER( tsispch_state::dsp_data_r )
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
 	upd7725_device *upd7725 = machine->device<upd7725_device>("dsp");
+#ifdef DEBUG_DSP_W
+	fprintf(stderr, "dsp data write: %02x\n", data);
+#endif
 	upd7725->snesdsp_write(true, data);
 }
 
