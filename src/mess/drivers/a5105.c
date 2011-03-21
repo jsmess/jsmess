@@ -15,6 +15,7 @@
 #include "video/upd7220.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "sound/beep.h"
 
 
 class a5105_state : public driver_device
@@ -22,12 +23,14 @@ class a5105_state : public driver_device
 public:
 	a5105_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  m_hgdc(*this, "upd7220"),
-		  m_cass(*this, "cassette")
+		m_hgdc(*this, "upd7220"),
+		m_cass(*this, "cassette"),
+  		m_beep(*this, "beep")
 		{ }
 
 	required_device<device_t> m_hgdc;
 	required_device<device_t> m_cass;
+	required_device<device_t> m_beep;
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -181,7 +184,7 @@ static WRITE8_HANDLER( a5105_ab_w )
 		break;
 
 	case 6:
-		//keyclick - a beeper?
+		beep_set_state(state->m_beep, BIT(data, 0));
 		break;
 	}
 }
@@ -353,8 +356,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(a5105)
 {
+	a5105_state *state = machine->driver_data<a5105_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
+	beep_set_frequency(state->m_beep, 500);
 }
 
 
@@ -444,10 +449,14 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(gdc)
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
+	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_CONFIG_END
