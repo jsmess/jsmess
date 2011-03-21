@@ -2,12 +2,36 @@
 
         PC/M by Miodrag Milanovic
 
+        http://www.li-pro.net/pcm.phtml  (in German)
+
         12/05/2009 Preliminary driver.
 
         14/02/2011 Added keyboard (from terminal).
 
-        Commands haven't been checked out yet, but an
-        example is the following sequence: (press return at end of each line)
+        Commands:
+        1 select memory bank 1
+        2 select memory bank 2
+        B
+        C start cp/m from the inbuilt CCP
+        D Debugger
+        Fx Format disk A or B
+        G  Jump to address
+        I List files on tape
+        L filename.typ  Load file from tape
+        R read from disk
+        S filename aaaa / bbbb save a file to tape
+        V verify
+        W write to disk
+        X
+        Z set tape baud (1200, 2400, 3600 (default), 4800)
+	filename   start running this .COM file
+
+        Therefore if you enter random input, it will lock up while trying to
+        load up a file of that name. Filenames on disk and tape are of the
+        standard 8.3 format. Wildcards (* ?) are permitted.
+
+        Here is an example of starting the debugger, executing a command in
+        it, then exiting back to the monitor.
 
         D
         U
@@ -17,7 +41,14 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "imagedev/cassette.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 #include "machine/terminal.h"
 
 
@@ -50,6 +81,24 @@ READ8_MEMBER( pcm_state::pcm_84_r )
 	return ret;
 }
 
+/* PIO connections as far as i could decipher
+
+PortA is input and connects to the keyboard
+PortB is mostly output and connects to a series of LEDs,
+      but also carries the cassette control & data lines.
+
+A0-A6 ascii codes from the keyboard
+A7 strobe, high while a key is pressed
+B0 power indicator LED
+B1 Run/Stop LED
+B2 Sound on/off LED
+B3 n/c
+B4 High=Save, Low=Load LED
+B5 Motor On LED
+B6 Save data
+B7 Load data
+There is also a HALT LED, connected directly to the processor.
+*/
 
 static ADDRESS_MAP_START(pcm_mem, ADDRESS_SPACE_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -62,6 +111,15 @@ static ADDRESS_MAP_START( pcm_io, ADDRESS_SPACE_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x84) AM_READ(pcm_84_r)
+	//AM_RANGE(0x80, 0x83) // system CTC
+	//AM_RANGE(0x84, 0x87) // system PIO (data-a, data-b, ctrl-a, ctrl-b)
+	//AM_RANGE(0x88, 0x8B) // SIO (same order as above)
+	//AM_RANGE(0x8C, 0x8F) // User CTC
+	//AM_RANGE(0x90, 0x93) // user PIO (same order as above)
+	//AM_RANGE(0x94, 0x97) // bank select
+	//AM_RANGE(0x98, 0x9B) // NMI generator
+	//AM_RANGE(0x9C, 0x9F) // io ports available to the user
+	// disk controller?
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -114,6 +172,70 @@ static SCREEN_UPDATE( pcm )
 	return 0;
 }
 
+
+// someone please check this
+static const z80_daisy_config pcm_daisy_chain[] =
+{
+	{ "z80ctc_s" },		/* System ctc */
+	{ "z80pio_s" },		/* System pio */
+	{ "z80sio" },		/* sio */
+	{ "z80pio_u" },		/* User pio */
+	{ "z80ctc_u" },		/* User ctc */
+	{ NULL }
+};
+
+static Z80CTC_INTERFACE( ctc_u_intf )
+{
+	0,				/* timer disablers */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_NULL,			/* ZC/TO1 callback */
+	DEVCB_NULL			/* ZC/TO2 callback */
+};
+
+static Z80CTC_INTERFACE( ctc_s_intf )
+{
+	0,				/* timer disablers */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* ZC/TO0 callback - SIO channel A clock */
+	DEVCB_NULL,			/* ZC/TO1 callback - SIO channel B clock */
+	DEVCB_NULL			/* ZC/TO2 callback - speaker */
+};
+
+static Z80PIO_INTERFACE( pio_u_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* read port A */
+	DEVCB_NULL,			/* write port A */
+	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,			/* read port B */
+	DEVCB_NULL,			/* write port B */
+	DEVCB_NULL			/* portB ready active callback */
+};
+
+static Z80PIO_INTERFACE( pio_s_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* read port A */
+	DEVCB_NULL,			/* write port A */
+	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,			/* read port B */
+	DEVCB_NULL,			/* write port B */
+	DEVCB_NULL			/* portB ready active callback */
+};
+
+static const z80sio_interface sio_intf =
+{
+	0, //DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	0,			/* DTR changed handler */
+	0,			/* RTS changed handler */
+	0,			/* BREAK changed handler */
+	0,			/* transmit handler - which channel is this for? */
+	0			/* receive handler - which channel is this for? */
+};
+
+
+
 /* F4 Character Displayer */
 static const gfx_layout pcm_charlayout =
 {
@@ -137,6 +259,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz /4)
 	MCFG_CPU_PROGRAM_MAP(pcm_mem)
 	MCFG_CPU_IO_MAP(pcm_io)
+	MCFG_CPU_CONFIG(pcm_daisy_chain)
 
 	MCFG_MACHINE_RESET(pcm)
 
@@ -148,14 +271,27 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE(pcm)
-
 	MCFG_GFXDECODE(pcm)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(pcm)
 
+	/* Sound */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* Devices */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, pcm_terminal_intf)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
+	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
+	MCFG_Z80SIO_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
+	MCFG_Z80CTC_ADD( "z80ctc_u", 1379310.344828, ctc_u_intf ) // numbers need to be corrected
+	MCFG_Z80CTC_ADD( "z80ctc_s", 1379310.344828, ctc_s_intf ) // numbers need to be corrected
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -176,9 +312,11 @@ ROM_START( pcm )
 	ROMX_LOAD( "bios_v330.d15", 0x0800, 0x0800, CRC(4f8d5b40) SHA1(440b0be4cf45a5d450f9eb7684ceb809450585dc), ROM_BIOS(3))
 	ROMX_LOAD( "bios_v330.d16", 0x1000, 0x0800, CRC(93fd0d91) SHA1(c8f1bbb63eca3c93560622581ecbb588716aeb91), ROM_BIOS(3))
 	ROMX_LOAD( "bios_v330.d17", 0x1800, 0x0800, CRC(d8c7ce33) SHA1(9030d9a73ef1c12a31ac2cb9a593fb2a5097f24d), ROM_BIOS(3))
+
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "charrom.d113", 0x0000, 0x0800, CRC(5684b3c3) SHA1(418054aa70a0fd120611e32059eb2051d3b82b5a))
-	ROM_REGION(0x0800, "k7659",0)
+
+	ROM_REGION(0x0800, "k7659",0) // keyboard encoder
 	ROM_LOAD ("k7659n.d8", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
 ROM_END
 
