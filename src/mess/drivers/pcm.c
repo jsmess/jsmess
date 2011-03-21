@@ -58,12 +58,28 @@ public:
 	pcm_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
+	m_terminal(*this, TERMINAL_TAG),
+	m_pio_s(*this, "z80pio_s"),
+	m_pio_u(*this, "z80pio_u"),
+	m_sio(*this, "z80sio"),
+	m_ctc_s(*this, "z80ctc_s"),
+	m_ctc_u(*this, "z80ctc_u"),
+	m_speaker(*this, "speaker"),
+	m_cass(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
+	required_device<device_t> m_pio_s;
+	required_device<device_t> m_pio_u;
+	required_device<device_t> m_sio;
+	required_device<device_t> m_ctc_s;
+	required_device<device_t> m_ctc_u;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_cass;
 	DECLARE_READ8_MEMBER( pcm_84_r );
+	DECLARE_READ8_MEMBER( pcm_85_r );
+	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	DECLARE_WRITE8_MEMBER( pcm_kbd_put );
 	UINT8 *videoram;
 	UINT8 term_data;
@@ -79,6 +95,15 @@ READ8_MEMBER( pcm_state::pcm_84_r )
 		step++;
 	}
 	return ret;
+}
+
+READ8_MEMBER( pcm_state::pcm_85_r )
+{
+	return 0;
+}
+
+WRITE8_MEMBER( pcm_state::pcm_85_w )
+{
 }
 
 /* PIO connections as far as i could decipher
@@ -110,7 +135,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pcm_io, ADDRESS_SPACE_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x84, 0x84) AM_READ(pcm_84_r)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc_s", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80sio", z80sio_cd_ba_r, z80sio_cd_ba_w)
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY("z80ctc_u", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio_u", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	//AM_RANGE(0x84, 0x84) AM_READ(pcm_84_r)
 	//AM_RANGE(0x80, 0x83) // system CTC
 	//AM_RANGE(0x84, 0x87) // system PIO (data-a, data-b, ctrl-a, ctrl-b)
 	//AM_RANGE(0x88, 0x8B) // SIO (same order as above)
@@ -216,11 +246,11 @@ static Z80PIO_INTERFACE( pio_u_intf )
 static Z80PIO_INTERFACE( pio_s_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* read port A */
+	DEVCB_DRIVER_MEMBER(pcm_state, pcm_84_r),			/* read port A */
 	DEVCB_NULL,			/* write port A */
 	DEVCB_NULL,			/* portA ready active callback */
-	DEVCB_NULL,			/* read port B */
-	DEVCB_NULL,			/* write port B */
+	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_r),			/* read port B */
+	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_w),			/* write port B */
 	DEVCB_NULL			/* portB ready active callback */
 };
 
