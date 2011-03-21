@@ -29,6 +29,7 @@
     per-game/program specific TODO:
     - Dragon Buster: it crashed to me once with a obj flag hang;
     - Exoa II - Warroid: goes offsync with the PCG beam positions;
+    - The Goonies (x1 only): goes offsync with the PCG beam positions;
     - Lupin 3 / Take the A-Train / Makai et al (basically anything that uses cz-8fb02 basic): uses x1turbo bankswitch memory RAM, doesn't load due of it;
     - Hydlide 3: can't get the user disk to work properly
     - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
@@ -42,6 +43,8 @@
     - Thexder: (x1turbo) Can't start a play, keyboard related issue?
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
 	- Luna City: text gfxs looks doubled in y-axis
+	- Shiver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
+	- New X1 Demo: needs partial updates to work properly;
 
     Notes:
     - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -529,6 +532,9 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,int plane,
 					pri_mask_val = priority_mixer_pri(machine,color);
 					if(pri_mask_val & pri) continue;
 
+					if((color == 8 && state->scrn_reg.blackclip & 0x10) || (color == 9 && state->scrn_reg.blackclip & 0x20)) // bitmap color clip to black conditions
+						color = 0;
+
 					x1_draw_pixel(machine,bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
 				}
 			}
@@ -560,7 +566,7 @@ static SCREEN_EOF( x1 )
  *************************************/
 
 
-static UINT8 check_keyboard_press(running_machine *machine)
+static UINT16 check_keyboard_press(running_machine *machine)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
@@ -613,7 +619,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	{
 		if((f_key >> i) & 0x01)
 		{
-			return scancode + ((keymod & 0x02) ? 0 : 5);
+			return (scancode + ((keymod & 0x02) ? 0 : 5)) | 0x100;
 		}
 		scancode++;
 	}
@@ -641,7 +647,7 @@ static UINT8 check_keyboard_shift(running_machine *machine)
 	if(check_keyboard_press(machine) != 0)
 		val &= ~0x40;
 
-	if((check_keyboard_press(machine) & 0xf0) == 0x70)
+	if(check_keyboard_press(machine) & 0x100) //function keys
 		val &= ~0x80;
 
 	return val;
@@ -891,8 +897,8 @@ static WRITE8_HANDLER( sub_io_w )
 		//case 0xe5: //timer irq clear
 		//  break;
 		case 0xe6: //key data readout
-			state->sub_val[0] = check_keyboard_shift(space->machine);
-			state->sub_val[1] = check_keyboard_press(space->machine);
+			state->sub_val[0] = check_keyboard_shift(space->machine) & 0xff;
+			state->sub_val[1] = check_keyboard_press(space->machine) & 0xff;
 			state->sub_cmd_length = 2;
 			break;
 //      case 0xe7: // TV Control
@@ -1372,9 +1378,16 @@ static READ8_HANDLER( x1_blackclip_r )
 
 static WRITE8_HANDLER( x1_blackclip_w )
 {
+	/*
+	-x-- ---- replace blanking duration with black
+	--x- ---- replace bitmap palette 1 with black
+	---x ---- replace bitmap palette 0 with black
+	---- x--- enable text blackclip
+	---- -xxx palette color number for text black
+	*/
 	x1_state *state = space->machine->driver_data<x1_state>();
 	state->scrn_reg.blackclip = data;
-	if(data & 0xf0)
+	if(data & 0x40)
 		printf("Blackclip data access %02x\n",data);
 }
 
@@ -1812,6 +1825,8 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	int vblank_line = mc6845_v_display * mc6845_tile_height;
 	state->vdisp = (device->machine->primary_screen->vpos() < vblank_line) ? 0x80 : 0x00;
 	state->vsync = (device->machine->primary_screen->vpos() < vblank_line) ? 0x00 : 0x04;
+
+//	popmessage("%d",vblank_line);
 
 	res = (input_port_read(device->machine, "SYSTEM") & 0x10) | state->sub_obf | state->vsync | state->vdisp;
 
