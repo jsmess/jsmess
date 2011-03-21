@@ -37,6 +37,19 @@
         U
         E
 
+        In practice, the I and R commands produce an error, while all disk
+        commands are directed to tape. The F command lists the files on a
+        tape.
+
+        ToDo:
+        - Add bankswitching
+        - Add NMI generator
+        - Find out if there really is any floppy-disk feature - the schematic
+          has no mention of it.
+        - Check the screen - it only uses the first 16 lines.
+        - Add the 6 LEDs.
+        - Replace the terminal keyboard with an inbuilt one.
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -370,5 +383,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1988, pcm,	 0,       0,	 pcm,		pcm,	 0, 	 "Mugler/Mathes",   "PC/M", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, pcm,	 0,       0,	 pcm,		pcm,	 0, 	 "Mugler/Mathes",   "PC/M", 0)
 
