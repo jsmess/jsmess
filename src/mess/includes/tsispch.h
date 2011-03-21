@@ -35,7 +35,7 @@ public:
 	UINT8 statusLED;			// status led
 
 	virtual void machine_reset();
-	DECLARE_WRITE8_MEMBER(tsispch_rxd);
+	DECLARE_WRITE8_MEMBER(i8251_rxd);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ16_MEMBER(dsp_data_r);

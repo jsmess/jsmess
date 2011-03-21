@@ -33,7 +33,13 @@
 *  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
 *  When switch s4-7 is switched on, the hardware says, over and over:
 *  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
-
+<LordNLptp> ok i see what prose 2020 is doing
+<LordNLptp> its setting the pic8259 up in a simple mode: all ints are priority 0, all are masked off
+<LordNLptp> then it sets up the msm8251
+<LordNLptp> and then it unmasks one int (IR2) on the 8259 (mask = 0xFD) and expects that int to immediately fire
+<LordNLptp> on the emulation, it does NOT. so it reinits 8259, reinits 8251, and tries again
+(later note: may reinit the upd7720 as well)
+<LordNLptp> over and over and over
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -53,9 +59,19 @@
 /*****************************************************************************
  USART 8251 and Terminal stuff
 *****************************************************************************/
-static WRITE_LINE_DEVICE_HANDLER( tsispch_rxrdy )
+static WRITE_LINE_DEVICE_HANDLER( i8251_rxrdy_int )
 {
 	pic8259_ir2_w(device->machine->device("pic8259"), state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( i8251_txempty_int )
+{
+	pic8259_ir3_w(device->machine->device("pic8259"), state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
+{
+	pic8259_ir4_w(device->machine->device("pic8259"), state);
 }
 
 const msm8251_interface msm8251_config =
@@ -65,19 +81,19 @@ const msm8251_interface msm8251_config =
 	DEVCB_NULL, // in dsr
 	DEVCB_NULL, // out dtr
 	DEVCB_NULL, // out rts
-	DEVCB_LINE(tsispch_rxrdy), // out rxrdy
-	DEVCB_NULL, // out txrdy
-	DEVCB_NULL, // out txempty
+	DEVCB_LINE(i8251_rxrdy_int), // out rxrdy
+	DEVCB_LINE(i8251_txrdy_int), // out txrdy
+	DEVCB_LINE(i8251_txempty_int), // out txempty
 	DEVCB_NULL  // out syndet
 };
 
-WRITE8_MEMBER( tsispch_state::tsispch_rxd )
+WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
 	msm8251_receive_character(machine->device("pic8259"), data);
 }
 static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(tsispch_state, tsispch_rxd)
+	DEVCB_DRIVER_MEMBER(tsispch_state, i8251_rxd)
 };
 
 /*****************************************************************************
