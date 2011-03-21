@@ -24,11 +24,11 @@
         W write to disk
         X
         Z set tape baud (1200, 2400, 3600 (default), 4800)
-	filename   start running this .COM file
+        filename   start running this .COM file
 
         Therefore if you enter random input, it will lock up while trying to
         load up a file of that name. Filenames on disk and tape are of the
-        standard 8.3 format. Wildcards (* ?) are permitted.
+        standard 8.3 format. You must specify an extension.
 
         Here is an example of starting the debugger, executing a command in
         it, then exiting back to the monitor.
@@ -79,32 +79,21 @@ public:
 	required_device<device_t> m_cass;
 	DECLARE_READ8_MEMBER( pcm_84_r );
 	DECLARE_READ8_MEMBER( pcm_85_r );
+	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	DECLARE_WRITE8_MEMBER( pcm_kbd_put );
 	UINT8 *videoram;
 	UINT8 term_data;
 	UINT8 step;
+	UINT8 m_85;
 };
 
-READ8_MEMBER( pcm_state::pcm_84_r )
+
+WRITE_LINE_MEMBER( pcm_state::pcm_82_w )
 {
-	UINT8 ret = term_data;
-	if (step < 2)
-	{
-		ret |= 0x80;
-		step++;
-	}
-	return ret;
+	speaker_level_w(m_speaker, state);
 }
 
-READ8_MEMBER( pcm_state::pcm_85_r )
-{
-	return 0;
-}
-
-WRITE8_MEMBER( pcm_state::pcm_85_w )
-{
-}
 
 /* PIO connections as far as i could decipher
 
@@ -125,6 +114,40 @@ B7 Load data
 There is also a HALT LED, connected directly to the processor.
 */
 
+READ8_MEMBER( pcm_state::pcm_84_r )
+{
+	UINT8 ret = term_data;
+	if (step < 2)
+	{
+		ret |= 0x80;
+		step++;
+	}
+	return ret;
+}
+
+READ8_MEMBER( pcm_state::pcm_85_r )
+{
+	UINT8 data = m_85 & 0x7f;
+
+	if (cassette_input(m_cass) > 0.03)
+		data |= 0x80;
+
+	return data;
+}
+
+WRITE8_MEMBER( pcm_state::pcm_85_w )
+{
+	if (BIT(data, 5))
+		cassette_change_state(m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	else
+		cassette_change_state(m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	cassette_output(m_cass, BIT(data, 6) ? -1.0 : +1.0);
+	m_85 = data;
+}
+
+
+
 static ADDRESS_MAP_START(pcm_mem, ADDRESS_SPACE_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
@@ -135,17 +158,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pcm_io, ADDRESS_SPACE_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc_s", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80sio", z80sio_cd_ba_r, z80sio_cd_ba_w)
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY("z80ctc_u", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio_u", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	//AM_RANGE(0x84, 0x84) AM_READ(pcm_84_r)
-	//AM_RANGE(0x80, 0x83) // system CTC
-	//AM_RANGE(0x84, 0x87) // system PIO (data-a, data-b, ctrl-a, ctrl-b)
-	//AM_RANGE(0x88, 0x8B) // SIO (same order as above)
-	//AM_RANGE(0x8C, 0x8F) // User CTC
-	//AM_RANGE(0x90, 0x93) // user PIO (same order as above)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc_s", z80ctc_r, z80ctc_w) // system CTC
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_cd_ba_r, z80pio_cd_ba_w) // system PIO
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80sio", z80sio_cd_ba_r, z80sio_cd_ba_w) // SIO
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY("z80ctc_u", z80ctc_r, z80ctc_w) // user CTC
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio_u", z80pio_cd_ba_r, z80pio_cd_ba_w) // user PIO
 	//AM_RANGE(0x94, 0x97) // bank select
 	//AM_RANGE(0x98, 0x9B) // NMI generator
 	//AM_RANGE(0x9C, 0x9F) // io ports available to the user
@@ -229,7 +246,7 @@ static Z80CTC_INTERFACE( ctc_s_intf )
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
 	DEVCB_NULL,			/* ZC/TO0 callback - SIO channel A clock */
 	DEVCB_NULL,			/* ZC/TO1 callback - SIO channel B clock */
-	DEVCB_NULL			/* ZC/TO2 callback - speaker */
+	DEVCB_DRIVER_LINE_MEMBER(pcm_state, pcm_82_w) /* ZC/TO2 callback - speaker */
 };
 
 static Z80PIO_INTERFACE( pio_u_intf )
