@@ -767,7 +767,7 @@ void vixen_state::machine_start()
 
 void vixen_state::machine_reset()
 {
-	const address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank1");
 	memory_install_write_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank2");
@@ -870,7 +870,7 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 	{
 		if (state->m_reset)
 		{
-			const address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+			address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 			memory_install_read_bank(program, 0x0000, 0xefff, 0, 0, "bank1");
 			memory_install_write_bank(program, 0x0000, 0xefff, 0, 0, "bank2");

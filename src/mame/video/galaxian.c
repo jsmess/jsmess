@@ -245,8 +245,6 @@ galaxian_extend_sprite_info_func galaxian_extend_sprite_info_ptr;
 /* global tweaks */
 UINT8 galaxian_frogger_adjust;
 UINT8 galaxian_sfx_tilemap;
-UINT8 galaxian_sprite_clip_start;
-UINT8 galaxian_sprite_clip_end;
 
 
 
@@ -427,7 +425,6 @@ PALETTE_INIT( moonwar )
 {
 	PALETTE_INIT_CALL(galaxian);
 
-
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
 	bullet_color[7] = MAKE_RGB(0xef,0xef,0x97);
 }
@@ -600,13 +597,11 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	rectangle clip = *cliprect;
 	int sprnum;
-	int clip_ofs = (flipscreen_x ? 16 : 0);
 
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
-	/* according to the schematics, it should be the first 16 pixels; however, */
-	/* some bootlegs demonstrate that this can be shifted to other positions. */
-	clip.min_x = MAX(clip.min_x, (galaxian_sprite_clip_start - clip_ofs) * GALAXIAN_XSCALE);
-	clip.max_x = MIN(clip.max_x, (galaxian_sprite_clip_end - clip_ofs + 1) * GALAXIAN_XSCALE - 1);
+	/* according to the schematics, it should be the first 16 pixels */
+	clip.min_x = MAX(clip.min_x, (!flipscreen_x) * 16 * GALAXIAN_XSCALE);
+	clip.max_x = MIN(clip.max_x, (256 - flipscreen_x * 16) * GALAXIAN_XSCALE - 1);
 
 	/* The line buffer is only written if it contains a '0' currently; */
 	/* it is cleared during the visible area, and populated during HBLANK */
@@ -623,7 +618,7 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 		UINT8 flipx = base[1] & 0x40;
 		UINT8 flipy = base[1] & 0x80;
 		UINT8 color = base[2] & 7;
-		UINT8 sx = base[3];
+		UINT8 sx = base[3] + 1;
 
 		/* extend the sprite information */
 		if (galaxian_extend_sprite_info_ptr != NULL)
@@ -632,7 +627,7 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 		/* apply flipscreen in X direction */
 		if (flipscreen_x)
 		{
-			sx = 242 - sx; // + 8 - HOFS
+			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
@@ -1239,16 +1234,16 @@ void theend_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectan
 
 /*************************************
  *
- *  Generic extensions
+ *  Video extensions
  *
  *************************************/
 
+/*** generic ***/
 void upper_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	/* tiles are in the upper half of a larger ROM */
 	*code += 0x100;
 }
-
 
 void upper_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
 {
@@ -1257,13 +1252,7 @@ void upper_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *fl
 }
 
 
-
-/*************************************
- *
- *  Frogger extensions
- *
- *************************************/
-
+/*** Frogger ***/
 void frogger_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	*color = ((*color >> 1) & 0x03) | ((*color << 2) & 0x04);
@@ -1275,13 +1264,7 @@ void frogger_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 }
 
 
-
-/*************************************
- *
- *  Ghostmuncher Galaxian extensions
- *
- *************************************/
-
+/*** Ghostmuncher Galaxian ***/
 void gmgalax_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	*code |= gfxbank[0] << 9;
@@ -1295,13 +1278,7 @@ void gmgalax_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 }
 
 
-
-/*************************************
- *
- *  Pisces extensions
- *
- *************************************/
-
+/*** Pisces ***/
 void pisces_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	*code |= gfxbank[0] << 8;
@@ -1313,13 +1290,7 @@ void pisces_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *f
 }
 
 
-
-/*************************************
- *
- *  Batman Part 2 extensions
- *
- *************************************/
-
+/*** Batman Part 2 ***/
 void batman2_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	if (*code & 0x80)
@@ -1327,13 +1298,7 @@ void batman2_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 }
 
 
-
-/*************************************
- *
- *  Moon Cresta extensions
- *
- *************************************/
-
+/*** Moon Cresta ***/
 void mooncrst_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	if (gfxbank[2] && (*code & 0xc0) == 0x80)
@@ -1347,13 +1312,7 @@ void mooncrst_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 
 }
 
 
-
-/*************************************
- *
- *  Moon Quasar extensions
- *
- *************************************/
-
+/*** Moon Quasar ***/
 void moonqsr_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	*code |= (attrib & 0x20) << 3;
@@ -1365,13 +1324,7 @@ void moonqsr_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 }
 
 
-
-/*************************************
- *
- *  Moon Shuttle extensions
- *
- *************************************/
-
+/*** Moon Shuttle ***/
 void mshuttle_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	*code |= (attrib & 0x30) << 4;
@@ -1383,12 +1336,7 @@ void mshuttle_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 
 }
 
 
-/*************************************
- *
- *  Calipso extensions
- *
- *************************************/
-
+/*** Calipso ***/
 void calipso_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
 {
 	/* same as the others, but no sprite flipping, but instead the bits are used
@@ -1399,12 +1347,8 @@ void calipso_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 	*flipy = 0;
 }
 
-/*************************************
- *
- *  Jumpbug extensions
- *
- *************************************/
 
+/*** Jumpbug ***/
 void jumpbug_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	if ((*code & 0xc0) == 0x80 && (gfxbank[2] & 0x01))

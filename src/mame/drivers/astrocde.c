@@ -104,6 +104,7 @@
     DIP locations verified for:
     - seawolf2 (manual)
     - wow (manual)
+    - spacezap (manual)
     - gorf (manual)
     - robby (manual)
     - profpac (manual)
@@ -119,6 +120,7 @@
 #include "sound/samples.h"
 #include "sound/astrocde.h"
 #include "sound/ay8910.h"
+
 #include "tenpindx.lh"
 #include "gorf.lh"
 
@@ -833,9 +835,17 @@ static INPUT_PORTS_START( ebases )
 INPUT_PORTS_END
 
 
+static INPUT_CHANGED( spacezap_monitor )
+{
+	if (newval)
+		astrocade_video_config &= ~AC_MONITOR_BW;
+	else
+		astrocade_video_config |= AC_MONITOR_BW;
+}
+
 static INPUT_PORTS_START( spacezap )
 	PORT_START("P1HANDLE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// manual says this dip is unused on cocktail cabs
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
@@ -844,19 +854,19 @@ static INPUT_PORTS_START( spacezap )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Aim Up")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Aim Down")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Aim Left")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Aim Right")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "JU:1" )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P3HANDLE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Aim Up") PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Aim Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Aim Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Aim Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("JU:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
@@ -877,6 +887,13 @@ static INPUT_PORTS_START( spacezap )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
+
+	PORT_START("FAKE")
+	/* Dedicated cabinets had a B/W monitor and color overlay,
+	   some (unofficial/repaired?) cabinets had a color monitor. */
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED(spacezap_monitor, 0)
+	PORT_CONFSETTING(    0x00, "B/W" )
+	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END
 
 
@@ -1728,7 +1745,7 @@ static DRIVER_INIT( ebases )
 
 static DRIVER_INIT( spacezap )
 {
-	astrocade_video_config = AC_SOUND_PRESENT;
+	astrocade_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
 }
 

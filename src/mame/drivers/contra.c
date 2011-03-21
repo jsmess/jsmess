@@ -17,6 +17,7 @@ Dip locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "video/konicdev.h"
@@ -24,10 +25,16 @@ Dip locations and factory settings verified with manual
 #include "includes/contra.h"
 
 
+static INTERRUPT_GEN( contra_interrupt )
+{
+	contra_state *state = device->machine->driver_data<contra_state>();
+	if (k007121_ctrlram_r(state->k007121_1, 7) & 0x02)
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+}
+
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
-	if ((data & 0x0f) < 12)	/* for safety */
-		memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
@@ -174,7 +181,7 @@ static MACHINE_START( contra )
 	contra_state *state = machine->driver_data<contra_state>();
 	UINT8 *ROM = machine->region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 
 	state->audiocpu = machine->device("audiocpu");
 	state->k007121_1 = machine->device("k007121_1");
@@ -184,14 +191,14 @@ static MACHINE_START( contra )
 static MACHINE_CONFIG_START( contra, contra_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
+	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
 	MCFG_CPU_PROGRAM_MAP(contra_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", contra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/12) /* 2000000? */
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START(contra)
 
@@ -223,7 +230,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( contra )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633m03.18a",   0x20000, 0x08000, CRC(d045e1da) SHA1(ec781e98a6efb14861223250c6239b06ec98ed0b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
@@ -250,7 +257,7 @@ ROM_START( contra )
 ROM_END
 
 ROM_START( contra1 )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633e03.18a",   0x20000, 0x08000, CRC(7fc0d8cf) SHA1(cf1cf15646a4e5dc72671e957bc51ca44d30995c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
@@ -277,7 +284,7 @@ ROM_START( contra1 )
 ROM_END
 
 ROM_START( contrab )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633m03.18a",   0x20000, 0x08000, CRC(d045e1da) SHA1(ec781e98a6efb14861223250c6239b06ec98ed0b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
@@ -316,7 +323,7 @@ ROM_START( contrab )
 ROM_END
 
 ROM_START( contraj )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633n03.18a",   0x20000, 0x08000, CRC(fedab568) SHA1(7fd4546335bdeef7f8326d4cbde7fa36d74e5cfc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633k02.17a",   0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) )
@@ -343,7 +350,7 @@ ROM_START( contraj )
 ROM_END
 
 ROM_START( contrajb )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "g-2.18a",      0x20000, 0x08000, CRC(bdb9196d) SHA1(fad170e8fda94c9c9d7b82433daa30b80af12efc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633k02.17a",   0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) )
@@ -382,7 +389,7 @@ ROM_START( contrajb )
 ROM_END
 
 ROM_START( gryzor )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "g2.18a",       0x20000, 0x08000, CRC(92ca77bd) SHA1(3a56f51a617edff9f2a60df0141dff040881b82a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "g3.17a",       0x10000, 0x10000, CRC(bbd9e95e) SHA1(fd5de1bcc485de7b8fc2e321351c2e3ddd25d053) )
@@ -409,7 +416,7 @@ ROM_START( gryzor )
 ROM_END
 
 ROM_START( gryzora )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633j03.18a",   0x20000, 0x08000, CRC(20919162) SHA1(2f375166428ee03f6e8ac0372a373bb8ab35e64c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633j02.17a",   0x10000, 0x10000, CRC(b5922f9a) SHA1(441a23dc99a908ec2c09c855e73070dbab8c5ae2) )

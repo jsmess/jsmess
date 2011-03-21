@@ -5523,6 +5523,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mastkin )	/* (c) 1988 Du Tech */
 	DRIVER( rocnrope )	/* GX364 (c) 1983 */
 	DRIVER( rocnropek )	/* GX364 (c) 1983 + Kosuka */
+	DRIVER( ropeman )	/* (c) 1983 bootleg */
 	DRIVER( circusc )	/* GX380 (c) 1984 */
 	DRIVER( circusc2 )	/* GX380 (c) 1984 */
 	DRIVER( circusc3 )	/* GX380 (c) 1984 */
@@ -7880,6 +7881,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* SH-4 hardware */
 	DRIVER( atvtrack )	/* (c) 2002 - Ref 020419 */
+	DRIVER( atvtracka )	/* (c) 2002 - Ref 020419 */
 
 	/*
     Remaining Gaelco Games:
@@ -7895,7 +7897,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Kaneko games */
 	DRIVER( hvyunit )	/* (c) 1988 Kaneko */
 	DRIVER( hvyunitj )	/* (c) 1988 Kaneko */
-	DRIVER( hvyunito )	/* (c) 1988 Kaneko */
+	DRIVER( hvyunitjo )	/* (c) 1988 Kaneko */
+	DRIVER( hvyunitu )	/* (c) 1988 Kaneko */
 	DRIVER( djboy )		/* (c) 1989 Kaneko */
 	DRIVER( djboyj )	/* (c) 1989 Kaneko */
 	DRIVER( djboya )	/* (c) 1989 Kaneko */
