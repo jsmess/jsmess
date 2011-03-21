@@ -17,15 +17,15 @@
 *  Correctly load UPD7720 roms as UPD7725 data - done, this is utterly disgusting code.
 *  Attached i8251a uart at u15
 *  Added dipswitch array S4
-*  Attached 8259 PIC - done, but int sources are not hooked up yet, also not sure if callback is done properly
+*  Attached 8259 PIC - done, IR2 hooked to 8251 rxrdy, others missing
+*  Hooked the terminal to the i8251a uart at u15
 *
 *  TODO:
-*  Hook the terminal to the i8251a uart at u15
 *  Attach the upd7720 serial output to the DAC; this requires fixing the upd7725 core!
 *  Attach the other i8251a uart (assuming it is hooked to the hardware at all!)
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
 *  Correct memory maps and io maps - partly done
-*  8259 PIC: figure out where all the ints come from
+*  8259 PIC: figure out where the other ints come from
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
 *  Everything else
 *
@@ -33,6 +33,7 @@
 *  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
 *  When switch s4-7 is switched on, the hardware says, over and over:
 *  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
+
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -49,16 +50,35 @@
    Devices and handlers
  */
 
-static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
+/*****************************************************************************
+ USART 8251 and Terminal stuff
+*****************************************************************************/
+static WRITE_LINE_DEVICE_HANDLER( tsispch_rxrdy )
 {
-	DEVCB_NULL // should be connected to the input of the uart
+	pic8259_ir2_w(device->machine->device("pic8259"), state);
+}
+
+const msm8251_interface msm8251_config =
+{
+	DEVCB_NULL, // in rxd, serial
+	DEVCB_NULL, // out txd, serial
+	DEVCB_NULL, // in dsr
+	DEVCB_NULL, // out dtr
+	DEVCB_NULL, // out rts
+	DEVCB_LINE(tsispch_rxrdy), // out rxrdy
+	DEVCB_NULL, // out txrdy
+	DEVCB_NULL, // out txempty
+	DEVCB_NULL  // out syndet
 };
 
-/* open bus handler(s?) */
-/*READ16_MEMBER( tsispch_state::fixed_00ea_r )
+WRITE8_MEMBER( tsispch_state::tsispch_rxd )
 {
-	return 0x00ea; // does exactly what it says on the tin
-}*/
+	msm8251_receive_character(machine->device("pic8259"), data);
+}
+static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(tsispch_state, tsispch_rxd)
+};
 
 /*****************************************************************************
  PIC 8259 stuff
@@ -75,9 +95,7 @@ static const struct pic8259_interface pic8259_config =
 
 static IRQ_CALLBACK(irq_callback)
 {
-	int r = 0;
-	r = pic8259_acknowledge(device->machine->device("pic8259"));
-	return r;
+	return pic8259_acknowledge(device->machine->device("pic8259"));
 }
 
 /*****************************************************************************
@@ -251,8 +269,6 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(led_w, 0xFF00) // verified, write to the 4 leds, plus 4 other mystery bits
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
 	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
-	//AM_RANGE(0x03800, 0x03801) AM_MIRROR(0x347FE) AM_READ(fixed_00ea_r) // open bus, verified
-	//AM_RANGE(0x80000, 0xBFFFF) AM_READ(fixed_00ea_r) // open bus, verified
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
 ADDRESS_MAP_END
 
@@ -318,7 +334,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     MCFG_PIC8259_ADD("pic8259", pic8259_config)
 
     /* uarts */
-    MCFG_MSM8251_ADD("i8251a_u15", default_msm8251_interface)
+    MCFG_MSM8251_ADD("i8251a_u15", msm8251_config)
 
     /* sound hardware */
     //MCFG_SPEAKER_STANDARD_MONO("mono")
