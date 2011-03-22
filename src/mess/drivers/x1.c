@@ -2775,8 +2775,8 @@ static DRIVER_INIT( kanji )
 
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT       INIT   COMPANY   FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1,         0,    "Sharp",  "X1 (CZ-800C)",         0)
-COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,         kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING)
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   GAME_NOT_WORKING) //model 40
+COMP( 1982, x1,        0,      0,       x1,      x1,         0,    "Sharp",  "X1 (CZ-800C)",         0 )
+COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,         kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )
+COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING ) //model 10
+COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   0 )                //model 40
 // x1turboz  /* 1986 Sharp X1 TurboZ  */
