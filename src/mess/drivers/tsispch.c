@@ -61,7 +61,7 @@
 *    D312E: this is some unknown conditional code, usually goes to D314E
 *      if BP is not 1, go to D314E and don't update leds (usually taken?)
 *      if BP is 1 and SI is 0, delay for 8*65536 cycles. no delay if si!=0
-*      write 0x0C (0 [0 0 0 1] 1 0 0) to LEDS (meaning what exactly?)
+*      write 0x0C (0 [0 0 0 1] 1 0 0) to LEDS
 *    D314E: floodfill 0000-2BFF with 0x55 (rep at D315C)
 *      check if bp was 1 and jump to D318F if it was
 *      write 0x14 (0 [0 0 1 0] 1 0 0) to LEDS
@@ -76,7 +76,7 @@
 *        D3414: write 0x08 (0 [0 0 0 1] 0 0 0) to LEDS
 *    D5E14: initialize PIC8259
 *    <more stuff, wip>
-*    D338A: 0x12  0 0 0 1 0 0 1 0  = 010 (test 2 passed)
+*    D338A: write 0x12 0 [0 0 1 0] 0 1 0 to LEDS
 *
 *  F44B4: general in-operation LED status write
 ******************************************************************************/
