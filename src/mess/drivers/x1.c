@@ -31,19 +31,17 @@
     - Lupin 3 / Take the A-Train / Makai et al (basically anything that uses cz-8fb02 basic): uses x1turbo bankswitch memory RAM, doesn't load due of it;
 
     - Dragon Buster: it crashed to me once with a obj flag hang;
-    - Exoa II - Warroid: goes offsync with the PCG beam positions;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
     - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
     - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
  	- Luna City: text gfxs looks doubled in y-axis
 	- "newtype": trips a z80dma assert, worked around for now;
-	- X1C Demo: goes offsync with the PCG beam positions at some point;
 	- X1F Demo ("New X1 Demo"): needs partial updates to work properly;
 	- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
 	- Shiver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
 	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
-	- Super Billiards (X1 Pack 14): has a slight PCG timing bug;
+	- Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
     - Thexder: (x1turbo) Can't start a play, keyboard related issue?
 	- Trivia-Q: dunno what to do on the selection screen, missing inputs?
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
@@ -1127,13 +1125,14 @@ static UINT16 check_chr_addr(running_machine *machine)
 
 static UINT16 get_pcg_addr(running_machine *machine,UINT16 width,UINT8 y_char_size)
 {
+	x1_state *state = machine->driver_data<x1_state>();
 	int hbeam = machine->primary_screen->hpos() >> 3;
 	int vbeam = machine->primary_screen->vpos() / y_char_size;
-	int mask = (width <= 40) ? 0x3ff : 0x7ff;
+	UINT16 pcg_offset = ((hbeam + vbeam*width) + mc6845_start_addr) & 0x7ff;
 
 	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine->primary_screen->vpos() & 7,width);
 
-	return (hbeam + vbeam*width) & mask;
+	return pcg_offset;
 }
 
 static READ8_HANDLER( x1_pcg_r )
@@ -2778,5 +2777,5 @@ static DRIVER_INIT( kanji )
 COMP( 1982, x1,        0,      0,       x1,      x1,         0,    "Sharp",  "X1 (CZ-800C)",         0 )
 COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,         kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING ) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   0 )                //model 40
+COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   0 ) //model 40
 // x1turboz  /* 1986 Sharp X1 TurboZ  */
