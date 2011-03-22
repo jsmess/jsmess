@@ -2202,6 +2202,11 @@ READ8_DEVICE_HANDLER(upd765_dack_r)
 	return upd765_data_r(device, offset);
 }
 
+static TIMER_CALLBACK( interrupt_callback )
+{
+	device_t* device = (device_t*)ptr;
+	upd765_set_int(device, 1);
+}
 
 void upd765_reset(device_t *device, int offset)
 {
@@ -2257,7 +2262,7 @@ void upd765_reset(device_t *device, int offset)
 			fdc->upd765_status[0] |= 0x08;
 		}
 
-		upd765_set_int(device, 1);
+		device->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(interrupt_callback),0,device);
 	}
 }
 
