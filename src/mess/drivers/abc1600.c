@@ -11,6 +11,7 @@
     TODO:
 
 	- mf(2,0) -> No number
+	- watchdog
     - CIO (interrupt controller)
 		- RTC
 		- NVRAM
@@ -1148,19 +1149,19 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 		
 		bit		description
 		
-		PC0		
+		PC0		1
 		PC1		DATA IN
-		PC2		
-		PC3		
+		PC2		1
+		PC3		1
 		
 	*/
 
-	UINT8 data = 0;
+	UINT8 data = 0x0d;
 
 	// data in	
 	data |= (m_rtc->dio_r() | m_nvram->do_r()) << 1;
 	
-	return 0;
+	return data;
 }
 
 WRITE8_MEMBER( abc1600_state::cio_pc_w )
@@ -1383,4 +1384,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, 0,    "Luxor", "ABC 1600", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, 0,    "Luxor", "ABC 1600", GAME_NOT_WORKING )
