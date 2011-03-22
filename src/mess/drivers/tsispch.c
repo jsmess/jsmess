@@ -38,13 +38,47 @@
 *  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
 *  When switch s4-7 is switched on, the hardware says, over and over:
 *  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
-<LordNLptp> ok i see what prose 2020 is doing
-<LordNLptp> its setting the pic8259 up in a simple mode: all ints are priority 0, all are masked off
-<LordNLptp> then it sets up the msm8251
-<LordNLptp> and then it unmasks one int (IR2) on the 8259 (mask = 0xFD) and expects that int to immediately fire
-<LordNLptp> on the emulation, it does NOT. so it reinits 8259, reinits 8251, and tries again
-(later note: may reinit the upd7720 as well)
-<LordNLptp> over and over and over
+*  LEDS: bits 6,5,4,3 are debug leds on the board, and are placed in square
+*    brackets to note this.
+*  "led 7" may actually be the mask for interrupt for upd7720 to ip1
+*  Bootup notes:
+*    D3109: checks if 0x80 (S4-8) is set: if set, continue, else jump to D3123
+*    D3123: write 0x1C (0 [0 0 1 1] 1 0 0) to LEDS
+*    then jump to D32B0
+*      D32B0: memory test routine:
+*        This routine flood-fills memory from 0000-2FFF with 0xFF,
+*        then, bytewise starting from 0000, shifts the value progresively
+*        right by one, writes it and checks that it still matches,
+*        i.e. read 0xFF, write 0x7f, read 0x7f, write 0x3f... etc.
+*        Loop at D32E4.
+*      D32E6: similar to D32B0, but rotates in 1 bits to 16 bit words,
+*        though only the low byte is written, and only fills the 2BFF
+*        down to 0000 region. (seems rather redundant, actually)
+*        Loop at D3301.
+*      D3311: write 0x0A (0 [0 0 0 1] 0 1 0) to LEDS
+*      then jump to D3330
+*      D3330: jump back to D312E
+*    D312E: this is some unknown conditional code, usually goes to D314E
+*      if BP is not 1, go to D314E and don't update leds (usually taken?)
+*      if BP is 1 and SI is 0, delay for 8*65536 cycles. no delay if si!=0
+*      write 0x0C (0 [0 0 0 1] 1 0 0) to LEDS (meaning what exactly?)
+*    D314E: floodfill 0000-2BFF with 0x55 (rep at D315C)
+*      check if bp was 1 and jump to D318F if it was
+*      write 0x14 (0 [0 0 1 0] 1 0 0) to LEDS
+*      call E3987: initialize UPD7720, return
+*    D33D2: checksum the roms in 5? passes, loop at D33DA, test at D33E6 (which passes)
+*      if test DID fail: write 0x10 (0 [0 0 1 0] 0 0 0) to LEDS
+*        more stuff
+*        write 0xFF to leds
+*        more stuff
+*        set up word table? not sure what its doing here...
+*      if test does NOT fail (and it doesn't):
+*        D3414: write 0x08 (0 [0 0 0 1] 0 0 0) to LEDS
+*    D5E14: initialize PIC8259
+*    <more stuff, wip>
+*    D338A: 0x12  0 0 0 1 0 0 1 0  = 010 (test 2 passed)
+*
+*  F44B4: general in-operation LED status write
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
