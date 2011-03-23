@@ -94,6 +94,8 @@ the Neogeo Pocket.
 
 ******************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/tlcs900/tlcs900.h"
 #include "cpu/z80/z80.h"
@@ -123,8 +125,11 @@ public:
 	ngp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 io_reg[0x40];
-	UINT8 old_to3;
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	UINT8 m_io_reg[0x40];
+	UINT8 m_old_to3;
 	emu_timer* seconds_timer;
 
 	struct {
@@ -135,14 +140,31 @@ public:
 		UINT8	org_data[16];
 		int		state;
 		UINT8	command[2];
-	} flash_chip[2];
+	} m_flash_chip[2];
 
-	device_t *tlcs900;
-	device_t *z80;
-	device_t *t6w28;
-	device_t *dac_l;
-	device_t *dac_r;
-	device_t *k1ge;
+	device_t *m_tlcs900;
+	device_t *m_z80;
+	device_t *m_t6w28;
+	device_t *m_dac_l;
+	device_t *m_dac_r;
+	device_t *m_k1ge;
+
+	DECLARE_READ8_MEMBER( ngp_io_r );
+	DECLARE_WRITE8_MEMBER( ngp_io_w );
+
+	void flash_w( int which, offs_t offset, UINT8 data );
+	DECLARE_WRITE8_MEMBER( flash0_w );
+	DECLARE_WRITE8_MEMBER( flash1_w );
+
+	DECLARE_READ8_MEMBER( ngp_z80_comm_r );
+	DECLARE_WRITE8_MEMBER( ngp_z80_comm_w );
+	DECLARE_WRITE8_MEMBER( ngp_z80_signal_main_w );
+
+	DECLARE_WRITE8_MEMBER( ngp_z80_clear_irq );
+
+	DECLARE_WRITE8_MEMBER( ngp_vblank_pin_w );
+	DECLARE_WRITE8_MEMBER( ngp_hblank_pin_w );
+	DECLARE_WRITE8_MEMBER( ngp_tlcs900_to3 );
 };
 
 
@@ -150,49 +172,48 @@ static TIMER_CALLBACK( ngp_seconds_callback )
 {
 	ngp_state *state = machine->driver_data<ngp_state>();
 
-	state->io_reg[0x16] += 1;
-	if ( ( state->io_reg[0x16] & 0x0f ) == 0x0a )
+	state->m_io_reg[0x16] += 1;
+	if ( ( state->m_io_reg[0x16] & 0x0f ) == 0x0a )
 	{
-		state->io_reg[0x16] += 0x06;
+		state->m_io_reg[0x16] += 0x06;
 	}
 
-	if ( state->io_reg[0x16] >= 0x60 )
+	if ( state->m_io_reg[0x16] >= 0x60 )
 	{
-		state->io_reg[0x16] = 0;
-		state->io_reg[0x15] += 1;
-		if ( ( state->io_reg[0x15] & 0x0f ) == 0x0a ) {
-			state->io_reg[0x15] += 0x06;
+		state->m_io_reg[0x16] = 0;
+		state->m_io_reg[0x15] += 1;
+		if ( ( state->m_io_reg[0x15] & 0x0f ) == 0x0a ) {
+			state->m_io_reg[0x15] += 0x06;
 		}
 
-		if ( state->io_reg[0x15] >= 0x60 )
+		if ( state->m_io_reg[0x15] >= 0x60 )
 		{
-			state->io_reg[0x15] = 0;
-			state->io_reg[0x14] += 1;
-			if ( ( state->io_reg[0x14] & 0x0f ) == 0x0a ) {
-				state->io_reg[0x14] += 0x06;
+			state->m_io_reg[0x15] = 0;
+			state->m_io_reg[0x14] += 1;
+			if ( ( state->m_io_reg[0x14] & 0x0f ) == 0x0a ) {
+				state->m_io_reg[0x14] += 0x06;
 			}
 
-			if ( state->io_reg[0x14] == 0x24 )
+			if ( state->m_io_reg[0x14] == 0x24 )
 			{
-				state->io_reg[0x14] = 0;
+				state->m_io_reg[0x14] = 0;
 			}
 		}
 	}
 }
 
 
-static READ8_HANDLER( ngp_io_r )
+READ8_MEMBER( ngp_state::ngp_io_r )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-	UINT8 data = state->io_reg[offset];
+	UINT8 data = m_io_reg[offset];
 
 	switch( offset )
 	{
 	case 0x30:	/* Read controls */
-		data = input_port_read(space->machine, "Controls" );
+		data = input_port_read( &m_machine, "Controls" );
 		break;
 	case 0x31:
-		data = input_port_read( space->machine, "Power" ) & 0x01;
+		data = input_port_read( &m_machine, "Power" ) & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
@@ -201,25 +222,23 @@ static READ8_HANDLER( ngp_io_r )
 }
 
 
-static WRITE8_HANDLER( ngp_io_w )
+WRITE8_MEMBER( ngp_state::ngp_io_w )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
 	switch( offset )
 	{
 	case 0x20:		/* t6w28 "right" */
 	case 0x21:		/* t6w28 "left" */
-		if ( state->io_reg[0x38] == 0x55 && state->io_reg[0x39] == 0xAA )
+		if ( m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA )
 		{
-			t6w28_w( state->t6w28, 0, data );
+			t6w28_w( m_t6w28, 0, data );
 		}
 		break;
 
 	case 0x22:		/* DAC right */
-		dac_w( state->dac_r, 0, data );
+		dac_w( m_dac_r, 0, data );
 		break;
 	case 0x23:		/* DAC left */
-		dac_w( state->dac_l, 0, data );
+		dac_w( m_dac_l, 0, data );
 		break;
 
 	/* Internal eeprom related? */
@@ -240,124 +259,124 @@ static WRITE8_HANDLER( ngp_io_w )
 		switch( data )
 		{
 		case 0x55:		/* Enable Z80 */
-			cpu_resume( state->z80, SUSPEND_REASON_HALT );
-			state->z80->reset();
-			cpu_set_input_line( state->z80, 0, CLEAR_LINE );
+			cpu_resume( m_z80, SUSPEND_REASON_HALT );
+			m_z80->reset();
+			cpu_set_input_line( m_z80, 0, CLEAR_LINE );
 			break;
 		case 0xAA:		/* Disable Z80 */
-			cpu_suspend( state->z80, SUSPEND_REASON_HALT, 1 );
+			cpu_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
 			break;
 		}
 		break;
 
 	case 0x3a:	/* Trigger Z80 NMI */
-		cpu_set_input_line( state->z80, INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line( m_z80, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 	}
-	state->io_reg[offset] = data;
+	m_io_reg[offset] = data;
 }
 
 
-static void flash_w( ngp_state *state, int which, offs_t offset, UINT8 data )
+void ngp_state::flash_w( int which, offs_t offset, UINT8 data )
 {
-	if ( ! state->flash_chip[which].present )
+	if ( ! m_flash_chip[which].present )
 		return;
 
-	switch( state->flash_chip[which].state )
+	switch( m_flash_chip[which].state )
 	{
 	case F_READ:
 		if ( offset == 0x5555 && data == 0xaa )
-			state->flash_chip[which].state = F_PROG1;
-		state->flash_chip[which].command[0] = 0;
+			m_flash_chip[which].state = F_PROG1;
+		m_flash_chip[which].command[0] = 0;
 		break;
 	case F_PROG1:
 		if ( offset == 0x2aaa && data == 0x55 )
-			state->flash_chip[which].state = F_PROG2;
+			m_flash_chip[which].state = F_PROG2;
 		else
-			state->flash_chip[which].state = F_READ;
+			m_flash_chip[which].state = F_READ;
 		break;
 	case F_PROG2:
 		if ( data == 0x30 )
 		{
-			if ( state->flash_chip[which].command[0] == 0x80 )
+			if ( m_flash_chip[which].command[0] == 0x80 )
 			{
 				int	size = 0x10000;
-				UINT8 *block = state->flash_chip[which].data;
+				UINT8 *block = m_flash_chip[which].data;
 
-				state->flash_chip[which].state = F_AUTO_BLOCK_ERASE;
-				switch( state->flash_chip[which].device_id )
+				m_flash_chip[which].state = F_AUTO_BLOCK_ERASE;
+				switch( m_flash_chip[which].device_id )
 				{
 				case 0xab:
 					if ( offset < 0x70000 )
-						block = state->flash_chip[which].data + ( offset & 0x70000 );
+						block = m_flash_chip[which].data + ( offset & 0x70000 );
 					else
 					{
 						if ( offset & 0x8000 )
 						{
 							if ( offset & 0x4000 )
 							{
-								block = state->flash_chip[which].data + ( offset & 0x7c000 );
+								block = m_flash_chip[which].data + ( offset & 0x7c000 );
 								size = 0x4000;
 							}
 							else
 							{
-								block = state->flash_chip[which].data + ( offset & 0x7e000 );
+								block = m_flash_chip[which].data + ( offset & 0x7e000 );
 								size = 0x2000;
 							}
 						}
 						else
 						{
-							block = state->flash_chip[which].data + ( offset & 0x78000 );
+							block = m_flash_chip[which].data + ( offset & 0x78000 );
 							size = 0x8000;
 						}
 					}
 					break;
 				case 0x2c:
 					if ( offset < 0xf0000 )
-						block = state->flash_chip[which].data + ( offset & 0xf0000 );
+						block = m_flash_chip[which].data + ( offset & 0xf0000 );
 					else
 					{
 						if ( offset & 0x8000 )
 						{
 							if ( offset & 0x4000 )
 							{
-								block = state->flash_chip[which].data + ( offset & 0xfc000 );
+								block = m_flash_chip[which].data + ( offset & 0xfc000 );
 								size = 0x4000;
 							}
 							else
 							{
-								block = state->flash_chip[which].data + ( offset & 0xfe000 );
+								block = m_flash_chip[which].data + ( offset & 0xfe000 );
 								size = 0x2000;
 							}
 						}
 						else
 						{
-							block = state->flash_chip[which].data + ( offset & 0xf8000 );
+							block = m_flash_chip[which].data + ( offset & 0xf8000 );
 							size = 0x8000;
 						}
 					}
 					break;
 				case 0x2f:
 					if ( offset < 0x1f0000 )
-						block = state->flash_chip[which].data + ( offset & 0x1f0000 );
+						block = m_flash_chip[which].data + ( offset & 0x1f0000 );
 					else
 					{
 						if ( offset & 0x8000 )
 						{
 							if ( offset & 0x4000 )
 							{
-								block = state->flash_chip[which].data + ( offset & 0x1fc000 );
+								block = m_flash_chip[which].data + ( offset & 0x1fc000 );
 								size = 0x4000;
 							}
 							else
 							{
-								block = state->flash_chip[which].data + ( offset & 0x1fe000 );
+								block = m_flash_chip[which].data + ( offset & 0x1fe000 );
 								size = 0x2000;
 							}
 						}
 						else
 						{
-							block = state->flash_chip[which].data + ( offset & 0x1f8000 );
+							block = m_flash_chip[which].data + ( offset & 0x1f8000 );
 							size = 0x8000;
 						}
 					}
@@ -366,130 +385,126 @@ static void flash_w( ngp_state *state, int which, offs_t offset, UINT8 data )
 				memset( block, 0xFF, size );
 			}
 			else
-				state->flash_chip[which].state = F_READ;
+				m_flash_chip[which].state = F_READ;
 		}
 		else if ( offset == 0x5555 )
 		{
 			switch( data )
 			{
 			case 0x80:
-				state->flash_chip[which].command[0] = 0x80;
-				state->flash_chip[which].state = F_COMMAND;
+				m_flash_chip[which].command[0] = 0x80;
+				m_flash_chip[which].state = F_COMMAND;
 				break;
 			case 0x90:
-				state->flash_chip[which].data[0x1fc000] = state->flash_chip[which].manufacturer_id;
-				state->flash_chip[which].data[0xfc000] = state->flash_chip[which].manufacturer_id;
-				state->flash_chip[which].data[0x7c000] = state->flash_chip[which].manufacturer_id;
-				state->flash_chip[which].data[0] = state->flash_chip[which].manufacturer_id;
-				state->flash_chip[which].data[0x1fc001] = state->flash_chip[which].device_id;
-				state->flash_chip[which].data[0xfc001] = state->flash_chip[which].device_id;
-				state->flash_chip[which].data[0x7c001] = state->flash_chip[which].device_id;
-				state->flash_chip[which].data[1] = state->flash_chip[which].device_id;
-				state->flash_chip[which].data[0x1fc002] = 0x02;
-				state->flash_chip[which].data[0xfc002] = 0x02;
-				state->flash_chip[which].data[0x7c002] = 0x02;
-				state->flash_chip[which].data[2] = 0x02;
-				state->flash_chip[which].data[0x1fc003] = 0x80;
-				state->flash_chip[which].data[0xfc003] = 0x80;
-				state->flash_chip[which].data[0x7c003] = 0x80;
-				state->flash_chip[which].data[3] = 0x80;
-				state->flash_chip[which].state = F_ID_READ;
+				m_flash_chip[which].data[0x1fc000] = m_flash_chip[which].manufacturer_id;
+				m_flash_chip[which].data[0xfc000] = m_flash_chip[which].manufacturer_id;
+				m_flash_chip[which].data[0x7c000] = m_flash_chip[which].manufacturer_id;
+				m_flash_chip[which].data[0] = m_flash_chip[which].manufacturer_id;
+				m_flash_chip[which].data[0x1fc001] = m_flash_chip[which].device_id;
+				m_flash_chip[which].data[0xfc001] = m_flash_chip[which].device_id;
+				m_flash_chip[which].data[0x7c001] = m_flash_chip[which].device_id;
+				m_flash_chip[which].data[1] = m_flash_chip[which].device_id;
+				m_flash_chip[which].data[0x1fc002] = 0x02;
+				m_flash_chip[which].data[0xfc002] = 0x02;
+				m_flash_chip[which].data[0x7c002] = 0x02;
+				m_flash_chip[which].data[2] = 0x02;
+				m_flash_chip[which].data[0x1fc003] = 0x80;
+				m_flash_chip[which].data[0xfc003] = 0x80;
+				m_flash_chip[which].data[0x7c003] = 0x80;
+				m_flash_chip[which].data[3] = 0x80;
+				m_flash_chip[which].state = F_ID_READ;
 				break;
 			case 0x9a:
-				if ( state->flash_chip[which].command[0] == 0x9a )
-					state->flash_chip[which].state = F_BLOCK_PROTECT;
+				if ( m_flash_chip[which].command[0] == 0x9a )
+					m_flash_chip[which].state = F_BLOCK_PROTECT;
 				else
 				{
-					state->flash_chip[which].command[0] = 0x9a;
-					state->flash_chip[which].state = F_COMMAND;
+					m_flash_chip[which].command[0] = 0x9a;
+					m_flash_chip[which].state = F_COMMAND;
 				}
 				break;
 			case 0xa0:
-				state->flash_chip[which].state = F_AUTO_PROGRAM;
+				m_flash_chip[which].state = F_AUTO_PROGRAM;
 				break;
 			case 0xf0:
 			default:
-				state->flash_chip[which].state = F_READ;
+				m_flash_chip[which].state = F_READ;
 				break;
 			}
 		}
 		else
-			state->flash_chip[which].state = F_READ;
+			m_flash_chip[which].state = F_READ;
 		break;
 	case F_COMMAND:
 		if ( offset == 0x5555 && data == 0xaa )
-			state->flash_chip[which].state = F_PROG1;
+			m_flash_chip[which].state = F_PROG1;
 		else
-			state->flash_chip[which].state = F_READ;
+			m_flash_chip[which].state = F_READ;
 		break;
 	case F_ID_READ:
 		if ( offset == 0x5555 && data == 0xaa )
-			state->flash_chip[which].state = F_PROG1;
+			m_flash_chip[which].state = F_PROG1;
 		else
-			state->flash_chip[which].state = F_READ;
-		state->flash_chip[which].command[0] = 0;
+			m_flash_chip[which].state = F_READ;
+		m_flash_chip[which].command[0] = 0;
 		break;
 	case F_AUTO_PROGRAM:
 		/* Only 1 -> 0 changes can be programmed */
-		state->flash_chip[which].data[offset] = state->flash_chip[which].data[offset] & data;
-		state->flash_chip[which].state = F_READ;
+		m_flash_chip[which].data[offset] = m_flash_chip[which].data[offset] & data;
+		m_flash_chip[which].state = F_READ;
 		break;
 	case F_AUTO_CHIP_ERASE:
-		state->flash_chip[which].state = F_READ;
+		m_flash_chip[which].state = F_READ;
 		break;
 	case F_AUTO_BLOCK_ERASE:
-		state->flash_chip[which].state = F_READ;
+		m_flash_chip[which].state = F_READ;
 		break;
 	case F_BLOCK_PROTECT:
-		state->flash_chip[which].state = F_READ;
+		m_flash_chip[which].state = F_READ;
 		break;
 	}
 
-	if ( state->flash_chip[which].state == F_READ )
+	if ( m_flash_chip[which].state == F_READ )
 	{
 		/* Exit command/back to normal operation*/
-		state->flash_chip[which].data[0] = state->flash_chip[which].org_data[0];
-		state->flash_chip[which].data[1] = state->flash_chip[which].org_data[1];
-		state->flash_chip[which].data[2] = state->flash_chip[which].org_data[2];
-		state->flash_chip[which].data[3] = state->flash_chip[which].org_data[3];
-		state->flash_chip[which].data[0x7c000] = state->flash_chip[which].org_data[4];
-		state->flash_chip[which].data[0x7c001] = state->flash_chip[which].org_data[5];
-		state->flash_chip[which].data[0x7c002] = state->flash_chip[which].org_data[6];
-		state->flash_chip[which].data[0x7c003] = state->flash_chip[which].org_data[7];
-		state->flash_chip[which].data[0xfc000] = state->flash_chip[which].org_data[8];
-		state->flash_chip[which].data[0xfc001] = state->flash_chip[which].org_data[9];
-		state->flash_chip[which].data[0xfc002] = state->flash_chip[which].org_data[10];
-		state->flash_chip[which].data[0xfc003] = state->flash_chip[which].org_data[11];
-		state->flash_chip[which].data[0x1fc000] = state->flash_chip[which].org_data[12];
-		state->flash_chip[which].data[0x1fc001] = state->flash_chip[which].org_data[13];
-		state->flash_chip[which].data[0x1fc002] = state->flash_chip[which].org_data[14];
-		state->flash_chip[which].data[0x1fc003] = state->flash_chip[which].org_data[15];
-		state->flash_chip[which].command[0] = 0;
+		m_flash_chip[which].data[0] = m_flash_chip[which].org_data[0];
+		m_flash_chip[which].data[1] = m_flash_chip[which].org_data[1];
+		m_flash_chip[which].data[2] = m_flash_chip[which].org_data[2];
+		m_flash_chip[which].data[3] = m_flash_chip[which].org_data[3];
+		m_flash_chip[which].data[0x7c000] = m_flash_chip[which].org_data[4];
+		m_flash_chip[which].data[0x7c001] = m_flash_chip[which].org_data[5];
+		m_flash_chip[which].data[0x7c002] = m_flash_chip[which].org_data[6];
+		m_flash_chip[which].data[0x7c003] = m_flash_chip[which].org_data[7];
+		m_flash_chip[which].data[0xfc000] = m_flash_chip[which].org_data[8];
+		m_flash_chip[which].data[0xfc001] = m_flash_chip[which].org_data[9];
+		m_flash_chip[which].data[0xfc002] = m_flash_chip[which].org_data[10];
+		m_flash_chip[which].data[0xfc003] = m_flash_chip[which].org_data[11];
+		m_flash_chip[which].data[0x1fc000] = m_flash_chip[which].org_data[12];
+		m_flash_chip[which].data[0x1fc001] = m_flash_chip[which].org_data[13];
+		m_flash_chip[which].data[0x1fc002] = m_flash_chip[which].org_data[14];
+		m_flash_chip[which].data[0x1fc003] = m_flash_chip[which].org_data[15];
+		m_flash_chip[which].command[0] = 0;
 	}
 }
 
 
-static WRITE8_HANDLER( flash0_w )
+WRITE8_MEMBER( ngp_state::flash0_w )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
-	flash_w( state, 0, offset, data );
+	flash_w( 0, offset, data );
 }
 
 
-static WRITE8_HANDLER( flash1_w )
+WRITE8_MEMBER( ngp_state::flash1_w )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
-	flash_w( state, 1, offset, data );
+	flash_w( 1, offset, data );
 }
 
 
-static ADDRESS_MAP_START( ngp_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ngp_mem, ADDRESS_SPACE_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x000080, 0x0000bf )	AM_READWRITE(ngp_io_r, ngp_io_w)							/* ngp/c specific i/o */
 	AM_RANGE( 0x004000, 0x006fff )	AM_RAM														/* work ram */
 	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE("share1")									/* shared with sound cpu */
-	AM_RANGE( 0x008000, 0x0087ff )	AM_DEVREADWRITE("k1ge", k1ge_r, k1ge_w)						/* video registers */
+	AM_RANGE( 0x008000, 0x0087ff )	AM_DEVREADWRITE_LEGACY("k1ge", k1ge_r, k1ge_w)						/* video registers */
 	AM_RANGE( 0x008800, 0x00bfff )	AM_RAM AM_REGION("vram", 0x800 )							/* Video RAM area */
 	AM_RANGE( 0x200000, 0x3fffff )	AM_ROM AM_WRITE(flash0_w) AM_REGION("cart", 0)				/* cart area #1 */
 	AM_RANGE( 0x800000, 0x9fffff )	AM_ROM AM_WRITE(flash1_w) AM_REGION("cart", 0x200000)		/* cart area #2 */
@@ -497,50 +512,42 @@ static ADDRESS_MAP_START( ngp_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( ngp_z80_comm_r )
+READ8_MEMBER( ngp_state::ngp_z80_comm_r )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
-	return state->io_reg[0x3c];
+	return m_io_reg[0x3c];
 }
 
 
-static WRITE8_HANDLER( ngp_z80_comm_w )
+WRITE8_MEMBER( ngp_state::ngp_z80_comm_w )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
-	state->io_reg[0x3c] = data;
+	m_io_reg[0x3c] = data;
 }
 
 
-static WRITE8_HANDLER( ngp_z80_signal_main_w )
+WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
-	cpu_set_input_line( state->tlcs900, TLCS900_INT5, ASSERT_LINE );
+	cpu_set_input_line( m_tlcs900, TLCS900_INT5, ASSERT_LINE );
 }
 
 
-static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE( "t6w28", t6w28_w )					/* sound chip (right, left) */
+	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY( "t6w28", t6w28_w )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
 	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( ngp_z80_clear_irq )
+WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 {
-	ngp_state *state = space->machine->driver_data<ngp_state>();
-
-	cpu_set_input_line( state->z80, 0, CLEAR_LINE );
+	cpu_set_input_line( m_z80, 0, CLEAR_LINE );
 
 	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
-	cpu_set_input_line( state->tlcs900, TLCS900_INT5, CLEAR_LINE );
+	cpu_set_input_line( m_tlcs900, TLCS900_INT5, CLEAR_LINE );
 }
 
 
-static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8, ngp_state )
 	AM_RANGE( 0x0000, 0xffff )	AM_WRITE( ngp_z80_clear_irq )
 ADDRESS_MAP_END
 
@@ -549,9 +556,9 @@ static INPUT_CHANGED( power_callback )
 {
 	ngp_state *state = field->port->machine->driver_data<ngp_state>();
 
-	if ( state->io_reg[0x33] & 0x04 )
+	if ( state->m_io_reg[0x33] & 0x04 )
 	{
-		cpu_set_input_line( state->tlcs900, TLCS900_NMI,
+		cpu_set_input_line( state->m_tlcs900, TLCS900_NMI,
 			(input_port_read(field->port->machine, "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
@@ -573,56 +580,46 @@ static INPUT_PORTS_START( ngp )
 INPUT_PORTS_END
 
 
-static WRITE8_DEVICE_HANDLER( ngp_vblank_pin_w )
+WRITE8_MEMBER( ngp_state::ngp_vblank_pin_w )
 {
-	ngp_state *state = device->machine->driver_data<ngp_state>();
-
-	cpu_set_input_line( state->tlcs900, TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( m_tlcs900, TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-static WRITE8_DEVICE_HANDLER( ngp_hblank_pin_w )
+WRITE8_MEMBER( ngp_state::ngp_hblank_pin_w )
 {
-	ngp_state *state = device->machine->driver_data<ngp_state>();
-
-	cpu_set_input_line( state->tlcs900, TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( m_tlcs900, TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-static WRITE8_DEVICE_HANDLER( ngp_tlcs900_to3 )
+WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 {
-	ngp_state *state = device->machine->driver_data<ngp_state>();
+	if ( data && ! m_old_to3 )
+		cpu_set_input_line( m_z80, 0, ASSERT_LINE );
 
-	if ( data && ! state->old_to3 )
-		cpu_set_input_line( state->z80, 0, ASSERT_LINE );
-
-	state->old_to3 = data;
+	m_old_to3 = data;
 }
 
 
-static MACHINE_START( ngp )
+void ngp_state::machine_start()
 {
-	ngp_state *state = machine->driver_data<ngp_state>();
-
-	state->seconds_timer = machine->scheduler().timer_alloc(FUNC(ngp_seconds_callback));
-	state->seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
+	seconds_timer = machine->scheduler().timer_alloc(FUNC(ngp_seconds_callback));
+	seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
 }
 
 
-static MACHINE_RESET( ngp )
+void ngp_state::machine_reset()
 {
-	ngp_state *state = machine->driver_data<ngp_state>();
+	m_old_to3 = 0;
+	m_tlcs900 = machine->device( "maincpu" );
+	m_z80 = machine->device( "soundcpu" );
+	m_t6w28 = machine->device( "t6w28" );
+	m_dac_l = machine->device( "dac_l" );
+	m_dac_r = machine->device( "dac_r" );
+	m_k1ge = machine->device( "k1ge" );
 
-	state->old_to3 = 0;
-	state->tlcs900 = machine->device( "maincpu" );
-	state->z80 = machine->device( "soundcpu" );
-	state->t6w28 = machine->device( "t6w28" );
-	state->dac_l = machine->device( "dac_l" );
-	state->dac_r = machine->device( "dac_r" );
-	state->k1ge = machine->device( "k1ge" );
-
-	cpu_suspend( state->z80, SUSPEND_REASON_HALT, 1 );
-	cpu_set_input_line( state->z80, 0, CLEAR_LINE );
+	cpu_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
+	cpu_set_input_line( m_z80, 0, CLEAR_LINE );
 }
 
 
@@ -630,7 +627,7 @@ static SCREEN_UPDATE( ngp )
 {
 	ngp_state *state = screen->machine->driver_data<ngp_state>();
 
-	k1ge_update( state->k1ge, bitmap, cliprect );
+	k1ge_update( state->m_k1ge, bitmap, cliprect );
 	return 0;
 }
 
@@ -640,13 +637,13 @@ static DEVICE_START( ngp_cart )
 	ngp_state *state = device->machine->driver_data<ngp_state>();
 	UINT8 *cart = device->machine->region("cart")->base();
 
-	state->flash_chip[0].present = 0;
-	state->flash_chip[0].state = F_READ;
-	state->flash_chip[0].data = cart;
+	state->m_flash_chip[0].present = 0;
+	state->m_flash_chip[0].state = F_READ;
+	state->m_flash_chip[0].data = cart;
 
-	state->flash_chip[1].present = 0;
-	state->flash_chip[1].state = F_READ;
-	state->flash_chip[1].data = cart + 0x200000;
+	state->m_flash_chip[1].present = 0;
+	state->m_flash_chip[1].state = F_READ;
+	state->m_flash_chip[1].data = cart + 0x200000;
 }
 
 
@@ -677,63 +674,63 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 		memcpy(image.device().machine->region("cart")->base(), image.get_software_region("rom"), filesize);
 	}
 
-	state->flash_chip[0].manufacturer_id = 0x98;
+	state->m_flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{
 	case 0x80000:
-		state->flash_chip[0].device_id = 0xab;
+		state->m_flash_chip[0].device_id = 0xab;
 		break;
 	case 0x100000:
-		state->flash_chip[0].device_id = 0x2c;
+		state->m_flash_chip[0].device_id = 0x2c;
 		break;
 	case 0x200000:
-		state->flash_chip[0].device_id = 0x2f;
+		state->m_flash_chip[0].device_id = 0x2f;
 		break;
 	case 0x400000:
-		state->flash_chip[0].device_id = 0x2f;
-		state->flash_chip[1].manufacturer_id = 0x98;
-		state->flash_chip[1].device_id = 0x2f;
-		state->flash_chip[1].present = 0;
-		state->flash_chip[1].state = F_READ;
+		state->m_flash_chip[0].device_id = 0x2f;
+		state->m_flash_chip[1].manufacturer_id = 0x98;
+		state->m_flash_chip[1].device_id = 0x2f;
+		state->m_flash_chip[1].present = 0;
+		state->m_flash_chip[1].state = F_READ;
 		break;
 	}
 
-	state->flash_chip[0].org_data[0] = state->flash_chip[0].data[0];
-	state->flash_chip[0].org_data[1] = state->flash_chip[0].data[1];
-	state->flash_chip[0].org_data[2] = state->flash_chip[0].data[2];
-	state->flash_chip[0].org_data[3] = state->flash_chip[0].data[3];
-	state->flash_chip[0].org_data[4] = state->flash_chip[0].data[0x7c000];
-	state->flash_chip[0].org_data[5] = state->flash_chip[0].data[0x7c001];
-	state->flash_chip[0].org_data[6] = state->flash_chip[0].data[0x7c002];
-	state->flash_chip[0].org_data[7] = state->flash_chip[0].data[0x7c003];
-	state->flash_chip[0].org_data[8] = state->flash_chip[0].data[0xfc000];
-	state->flash_chip[0].org_data[9] = state->flash_chip[0].data[0xfc001];
-	state->flash_chip[0].org_data[10] = state->flash_chip[0].data[0xfc002];
-	state->flash_chip[0].org_data[11] = state->flash_chip[0].data[0xfc003];
-	state->flash_chip[0].org_data[12] = state->flash_chip[0].data[0x1fc000];
-	state->flash_chip[0].org_data[13] = state->flash_chip[0].data[0x1fc001];
-	state->flash_chip[0].org_data[14] = state->flash_chip[0].data[0x1fc002];
-	state->flash_chip[0].org_data[15] = state->flash_chip[0].data[0x1fc003];
+	state->m_flash_chip[0].org_data[0] = state->m_flash_chip[0].data[0];
+	state->m_flash_chip[0].org_data[1] = state->m_flash_chip[0].data[1];
+	state->m_flash_chip[0].org_data[2] = state->m_flash_chip[0].data[2];
+	state->m_flash_chip[0].org_data[3] = state->m_flash_chip[0].data[3];
+	state->m_flash_chip[0].org_data[4] = state->m_flash_chip[0].data[0x7c000];
+	state->m_flash_chip[0].org_data[5] = state->m_flash_chip[0].data[0x7c001];
+	state->m_flash_chip[0].org_data[6] = state->m_flash_chip[0].data[0x7c002];
+	state->m_flash_chip[0].org_data[7] = state->m_flash_chip[0].data[0x7c003];
+	state->m_flash_chip[0].org_data[8] = state->m_flash_chip[0].data[0xfc000];
+	state->m_flash_chip[0].org_data[9] = state->m_flash_chip[0].data[0xfc001];
+	state->m_flash_chip[0].org_data[10] = state->m_flash_chip[0].data[0xfc002];
+	state->m_flash_chip[0].org_data[11] = state->m_flash_chip[0].data[0xfc003];
+	state->m_flash_chip[0].org_data[12] = state->m_flash_chip[0].data[0x1fc000];
+	state->m_flash_chip[0].org_data[13] = state->m_flash_chip[0].data[0x1fc001];
+	state->m_flash_chip[0].org_data[14] = state->m_flash_chip[0].data[0x1fc002];
+	state->m_flash_chip[0].org_data[15] = state->m_flash_chip[0].data[0x1fc003];
 
-	state->flash_chip[1].org_data[0] = state->flash_chip[1].data[0];
-	state->flash_chip[1].org_data[1] = state->flash_chip[1].data[1];
-	state->flash_chip[1].org_data[2] = state->flash_chip[1].data[2];
-	state->flash_chip[1].org_data[3] = state->flash_chip[1].data[3];
-	state->flash_chip[1].org_data[4] = state->flash_chip[1].data[0x7c000];
-	state->flash_chip[1].org_data[5] = state->flash_chip[1].data[0x7c001];
-	state->flash_chip[1].org_data[6] = state->flash_chip[1].data[0x7c002];
-	state->flash_chip[1].org_data[7] = state->flash_chip[1].data[0x7c003];
-	state->flash_chip[1].org_data[8] = state->flash_chip[1].data[0xfc000];
-	state->flash_chip[1].org_data[9] = state->flash_chip[1].data[0xfc001];
-	state->flash_chip[1].org_data[10] = state->flash_chip[1].data[0xfc002];
-	state->flash_chip[1].org_data[11] = state->flash_chip[1].data[0xfc003];
-	state->flash_chip[1].org_data[12] = state->flash_chip[1].data[0x1fc000];
-	state->flash_chip[1].org_data[13] = state->flash_chip[1].data[0x1fc001];
-	state->flash_chip[1].org_data[14] = state->flash_chip[1].data[0x1fc002];
-	state->flash_chip[1].org_data[15] = state->flash_chip[1].data[0x1fc003];
+	state->m_flash_chip[1].org_data[0] = state->m_flash_chip[1].data[0];
+	state->m_flash_chip[1].org_data[1] = state->m_flash_chip[1].data[1];
+	state->m_flash_chip[1].org_data[2] = state->m_flash_chip[1].data[2];
+	state->m_flash_chip[1].org_data[3] = state->m_flash_chip[1].data[3];
+	state->m_flash_chip[1].org_data[4] = state->m_flash_chip[1].data[0x7c000];
+	state->m_flash_chip[1].org_data[5] = state->m_flash_chip[1].data[0x7c001];
+	state->m_flash_chip[1].org_data[6] = state->m_flash_chip[1].data[0x7c002];
+	state->m_flash_chip[1].org_data[7] = state->m_flash_chip[1].data[0x7c003];
+	state->m_flash_chip[1].org_data[8] = state->m_flash_chip[1].data[0xfc000];
+	state->m_flash_chip[1].org_data[9] = state->m_flash_chip[1].data[0xfc001];
+	state->m_flash_chip[1].org_data[10] = state->m_flash_chip[1].data[0xfc002];
+	state->m_flash_chip[1].org_data[11] = state->m_flash_chip[1].data[0xfc003];
+	state->m_flash_chip[1].org_data[12] = state->m_flash_chip[1].data[0x1fc000];
+	state->m_flash_chip[1].org_data[13] = state->m_flash_chip[1].data[0x1fc001];
+	state->m_flash_chip[1].org_data[14] = state->m_flash_chip[1].data[0x1fc002];
+	state->m_flash_chip[1].org_data[15] = state->m_flash_chip[1].data[0x1fc003];
 
-	state->flash_chip[0].present = 1;
-	state->flash_chip[0].state = F_READ;
+	state->m_flash_chip[0].present = 1;
+	state->m_flash_chip[0].state = F_READ;
 
 	return IMAGE_INIT_PASS;
 }
@@ -743,11 +740,11 @@ static DEVICE_IMAGE_UNLOAD( ngp_cart )
 {
 	ngp_state *state = image.device().machine->driver_data<ngp_state>();
 
-	state->flash_chip[0].present = 0;
-	state->flash_chip[0].state = F_READ;
+	state->m_flash_chip[0].present = 0;
+	state->m_flash_chip[0].state = F_READ;
 
-	state->flash_chip[1].present = 0;
-	state->flash_chip[1].state = F_READ;
+	state->m_flash_chip[1].present = 0;
+	state->m_flash_chip[1].state = F_READ;
 }
 
 
@@ -755,15 +752,15 @@ static const k1ge_interface ngp_k1ge_interface =
 {
 	"screen",
 	"vram",
-	DEVCB_HANDLER( ngp_vblank_pin_w ),
-	DEVCB_HANDLER( ngp_hblank_pin_w )
+	DEVCB_DRIVER_MEMBER( ngp_state, ngp_vblank_pin_w ),
+	DEVCB_DRIVER_MEMBER( ngp_state, ngp_hblank_pin_w )
 };
 
 
 static const tlcs900_interface ngp_tlcs900_interface =
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER( ngp_tlcs900_to3 )
+	DEVCB_DRIVER_MEMBER( ngp_state, ngp_tlcs900_to3 )
 };
 
 
@@ -783,10 +780,6 @@ static MACHINE_CONFIG_START( ngp_common, ngp_state )
 	MCFG_SCREEN_UPDATE( ngp )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_MACHINE_START( ngp )
-	MCFG_MACHINE_RESET( ngp )
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
