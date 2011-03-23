@@ -2997,11 +2997,11 @@
 		</part>
 	</software>
 
-
+	<!-- This is just a data disk, system disks are undumped -->
 	<software name="proyak88">
 		<description>Mr. Pro Yakyu '88</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>Xtalsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mr. pro yakyuu 88.d88" size="348848" crc="74c034a4" sha1="571c5cc7307c13821b7a3df337676b020e637fbf" offset="0" />
