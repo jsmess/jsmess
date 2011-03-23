@@ -147,7 +147,7 @@ const msm8251_interface msm8251_config =
 
 WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
-	msm8251_receive_character(machine->device("pic8259"), data);
+	msm8251_receive_character(machine->device("i8251a_u15"), data);
 }
 static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
