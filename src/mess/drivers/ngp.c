@@ -210,10 +210,10 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 	switch( offset )
 	{
 	case 0x30:	/* Read controls */
-		data = input_port_read( &m_machine, "Controls" );
+		data = input_port_read( machine, "Controls" );
 		break;
 	case 0x31:
-		data = input_port_read( &m_machine, "Power" ) & 0x01;
+		data = input_port_read( machine, "Power" ) & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
