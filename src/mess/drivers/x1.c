@@ -37,7 +37,7 @@
     - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
  	- Luna City: text gfxs looks doubled in y-axis
 	- "newtype": trips a z80dma assert, worked around for now;
-	- X1F Demo ("New X1 Demo"): needs partial updates to work properly;
+	- X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
 	- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
 	- Shiver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
 	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
