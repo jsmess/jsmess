@@ -693,15 +693,16 @@ VIDEO_START( pc_aga )
 	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 	int buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	memory_install_readwrite_bank(space, 0xb0000, 0xbffff, 0, 0, "bank11" );
 	switch(buswidth)
 	{
 		case 8:
+			memory_install_readwrite8_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram_r, pc200_videoram_w );
 			memory_install_readwrite8_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r, pc_aga_mda_w );
 			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r, pc_aga_cga_w );
 			break;
 
 		case 16:
+			memory_install_readwrite16_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r, pc200_videoram16le_w );
 			memory_install_readwrite16_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r, pc16le_aga_mda_w );
 			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r, pc16le_aga_cga_w );
 			break;
@@ -716,9 +717,10 @@ VIDEO_START( pc_aga )
 	aga.mda_chr_gen = machine->region("gfx1")->base() + 0x1000;
 	aga.cga_chr_gen = machine->region("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
-	memory_set_bankptr(machine,"bank11", aga.videoram);
 }
 
+READ16_HANDLER( pc_aga_videoram16le_r )	{ return read16le_with_read8_handler(pc_aga_videoram_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc_aga_videoram16le_w )	{ write16le_with_write8_handler(pc_aga_videoram_w, space, offset, data, mem_mask); }
 
 VIDEO_START( pc200 )
 {
@@ -728,13 +730,13 @@ VIDEO_START( pc200 )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram_r, pc200_videoram_w );
+			memory_install_readwrite8_handler(space,   0xb0000, 0xbffff, 0, 0, pc_aga_videoram_r, pc_aga_videoram_w );
 			memory_install_readwrite8_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r, pc_aga_mda_w );
 			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc200_cga_r,  pc200_cga_w );
 			break;
 
 		case 16:
-			memory_install_readwrite16_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r, pc200_videoram16le_w );
+			memory_install_readwrite16_handler(space,   0xb0000, 0xbffff, 0, 0, pc_aga_videoram16le_r, pc_aga_videoram16le_w );
 			memory_install_readwrite16_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r, pc16le_aga_mda_w );
 			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r, pc200_cga16le_w );
 			break;
