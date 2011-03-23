@@ -24,6 +24,7 @@
    * IR3 = i8251 txrdy
    * IR4,5,6,7 unknown so far, not hooked up yet
 *  Hooked the terminal to the i8251a uart at u15
+*  Hooked up upd7720 reset line
 *
 *  TODO:
 *  Attach the upd7720 serial output to the DAC; this requires fixing the upd7725 core!
@@ -38,12 +39,25 @@
 *  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
 *  When switch s4-7 is switched on, the hardware says, over and over:
 *  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
-*  LEDS: bits 6,5,4,3 are debug leds on the board, and are placed in square
-*    brackets to note this.
-*  "led 7" may actually be the mask for interrupt for upd7720 to ip1
+*
+*  0x03400: the peripheral register
+*    the low 8 bits are Sw4
+*    the high 8 bits:
+*                    LEDS 6    5    4    3
+*    write of 0100 - LEDS on,  on,  on,  on (7720 mask int changed? needs further test)
+*    write of 0200 - LEDS off, on,  on,  on (led 6 control)
+*    write of 0400 - LEDS on,  off, on,  on (led 5 control)
+*    write of 0800 - LEDS on,  on,  off, on (led 4 control)
+*    write of 1000 - LEDS on,  on,  on,  off(led 3 control)
+*    write of 2000 - LEDS on,  on,  on,  on (?)
+*    write of 4000 - LEDS on,  on,  on,  on (changes upd7720 RESET line status from high to low)
+*    write of 8000 - LEDS on,  on,  on,  on (?)
+*
+*    When the unit is idle, leds 5 and 3 are on and upd7720 reset is low (write of 0b?1?0101?.
+*
 *  Bootup notes:
 *    D3109: checks if 0x80 (S4-8) is set: if set, continue, else jump to D3123
-*    D3123: write 0x1C (0 [0 0 1 1] 1 0 0) to LEDS
+*    D3123: write 0x1C (0 0 0 [1 1 1 0] 0) to 3401
 *    then jump to D32B0
 *      D32B0: memory test routine:
 *        This routine flood-fills memory from 0000-2FFF with 0xFF,
@@ -55,28 +69,28 @@
 *        though only the low byte is written, and only fills the 2BFF
 *        down to 0000 region. (seems rather redundant, actually)
 *        Loop at D3301.
-*      D3311: write 0x0A (0 [0 0 0 1] 0 1 0) to LEDS
+*      D3311: write 0x0A (0 0 0 [0 1 0 1] 0) to 3401
 *      then jump to D3330
 *      D3330: jump back to D312E
 *    D312E: this is some unknown conditional code, usually goes to D314E
 *      if BP is not 1, go to D314E and don't update leds (usually taken?)
 *      if BP is 1 and SI is 0, delay for 8*65536 cycles. no delay if si!=0
-*      write 0x0C (0 [0 0 0 1] 1 0 0) to LEDS
+*      write 0x0C (0 0 0 [0 1 1 0] 0) to 3401
 *    D314E: floodfill 0000-2BFF with 0x55 (rep at D315C)
 *      check if bp was 1 and jump to D318F if it was
-*      write 0x14 (0 [0 0 1 0] 1 0 0) to LEDS
+*      write 0x14 (0 0 0 [1 0 1 0] 0) to 3401
 *      call E3987: initialize UPD7720, return
 *    D33D2: checksum the roms in 5? passes, loop at D33DA, test at D33E6 (which passes)
-*      if test DID fail: write 0x10 (0 [0 0 1 0] 0 0 0) to LEDS
+*      if test DID fail: write 0x10 (0 0 0 [1 0 0 0] 0) to 3401
 *        more stuff
-*        write 0xFF to leds
+*        write 0xFF to 3401
 *        more stuff
 *        set up word table? not sure what its doing here...
 *      if test does NOT fail (and it doesn't):
-*        D3414: write 0x08 (0 [0 0 0 1] 0 0 0) to LEDS
+*        D3414: write 0x08 (0 0 0 [0 1 0 0] 0) to 3400
 *    D5E14: initialize PIC8259
 *    <more stuff, wip>
-*    D338A: write 0x12 0 [0 0 1 0] 0 1 0 to LEDS
+*    D338A: write 0x12 0 0 0 [1 0 0 1] 0 to 3401
 *
 *  F44B4: general in-operation LED status write
 ******************************************************************************/
@@ -92,7 +106,7 @@
 #include "machine/terminal.h"
 
 // defines
-#undef VERBOSE
+#define DEBUG_PARAM 1
 #undef DEBUG_DSP
 #undef DEBUG_DSP_W
 
@@ -174,26 +188,23 @@ READ8_MEMBER( tsispch_state::dsw_r )
 	return data;
 }
 
-WRITE8_MEMBER( tsispch_state::led_w )
+WRITE8_MEMBER( tsispch_state::peripheral_w )
 {
 	/* These are the 4 debug leds on the pcb inside the case.
-	   They are called on the silkscreen, unimaginatively, '6','5','4',and '3', and
-	   are connected to bits 6, 5, 4, and 3 of this register.
-	   Bit 6 also connects to the 'talking' LED on the front panel.
+	   They are called on the silkscreen, '6','5','4',and '3', and
+	   are connected to bits 1, 2, 3, and 4 of this register.
+	   Bit 4 also connects to the 'talking' LED on the front panel.
 	   When 0 is written to a bit, the led turns on.
-	   When the unit is idle, leds 5 and 3 are on. (bits 6 and 4 are set)
-	   Bit 7 doesn't seem to be used so far. it may be a reset line for something.
-	   Bits 0,1,2 may be a startup test status counter;
-	     when the unit starts up, they have 1, 2, 3 writen to them sequentiall
-	     as each test passes; note that tests 1 and 2 (ram tests and rom test?)
-	     both pass while test 3 fails... assuming this is indeed a counter.
+	   See notes at beginning of file for more info.
 	*/
 	tsispch_state *state = machine->driver_data<tsispch_state>();
-	state->statusLED = data;
-#ifdef VERBOSE
-	logerror("8086: LED status: %02X\n", data);
+	state->paramReg = data;
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
+#ifdef DEBUG_PARAM
+	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
+	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 #endif
-	popmessage("LED status: (%x) %x %x %x %x (%x %x %x)\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
+	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,1), 1-BIT(data,2), 1-BIT(data,3), 1-BIT(data,4));
 }
 
 /*****************************************************************************
@@ -251,9 +262,6 @@ void tsispch_state::machine_reset()
 	for (i=0; i<32; i++) infifo[i] = 0;
 	infifo_tail_ptr = infifo_head_ptr = 0;
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
-	// below seem to be unnecessary?
-	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
-	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
 	fprintf(stderr,"machine reset\n");
 }
 
@@ -300,6 +308,9 @@ DRIVER_INIT( prose2k )
             *dspprg = byte1t<<24 | byte23t<<8;
             dspprg++;
         }
+    tsispch_state *state = machine->driver_data<tsispch_state>();
+    state->paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
+    cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
 /******************************************************************************
@@ -329,7 +340,7 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
 	AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0x00FF) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(led_w, 0xFF00) // verified, write to the 4 leds, plus 4 other mystery bits
+	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(peripheral_w, 0xFF00) // verified, write to the 4 leds, plus 4 control bits
 	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
 	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified

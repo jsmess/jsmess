@@ -32,12 +32,12 @@ public:
 	UINT8 infifo[32];			// input fifo
 	UINT8 infifo_tail_ptr;		// " tail
 	UINT8 infifo_head_ptr;		// " head
-	UINT8 statusLED;			// status led
+	UINT8 paramReg;			// status leds and resets and etc
 
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(i8251_rxd);
 	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(peripheral_w);
 	DECLARE_READ16_MEMBER(dsp_data_r);
 	DECLARE_WRITE16_MEMBER(dsp_data_w);
 	DECLARE_READ16_MEMBER(dsp_status_r);
