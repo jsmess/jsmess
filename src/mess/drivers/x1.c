@@ -509,6 +509,7 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,int plane,
 	int pen_r,pen_g,pen_b,color;
 	int pri_mask_val;
 	UINT8 x_size,y_size;
+	int gfx_offset;
 
 	x_size = mc6845_h_display;
 	y_size = mc6845_v_display;
@@ -519,6 +520,8 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,int plane,
 	if(x_size != 80 && x_size != 40 && y_size != 25)
 		popmessage("%d %d",x_size,y_size);
 
+	//popmessage("%04x %02x",mc6845_start_addr,mc6845_tile_height);
+
 	for (y=0;y<y_size;y++)
 	{
 		for(x=0;x<x_size;x++)
@@ -527,9 +530,11 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,int plane,
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					pen_b = (state->gfx_bitmap_ram[(((x+(y*x_size)+(yi >> state->scrn_reg.v400_mode)*0x800)+mc6845_start_addr) & 0x3fff)+0x0000+plane*0xc000]>>(7-xi)) & 1;
-					pen_r = (state->gfx_bitmap_ram[(((x+(y*x_size)+(yi >> state->scrn_reg.v400_mode)*0x800)+mc6845_start_addr) & 0x3fff)+0x4000+plane*0xc000]>>(7-xi)) & 1;
-					pen_g = (state->gfx_bitmap_ram[(((x+(y*x_size)+(yi >> state->scrn_reg.v400_mode)*0x800)+mc6845_start_addr) & 0x3fff)+0x8000+plane*0xc000]>>(7-xi)) & 1;
+					gfx_offset = ((x+(y*x_size)) + mc6845_start_addr) & 0x7ff;
+					gfx_offset+= ((yi >> state->scrn_reg.v400_mode) * 0x800) & 0x3fff;
+					pen_b = (state->gfx_bitmap_ram[gfx_offset+0x0000+plane*0xc000]>>(7-xi)) & 1;
+					pen_r = (state->gfx_bitmap_ram[gfx_offset+0x4000+plane*0xc000]>>(7-xi)) & 1;
+					pen_g = (state->gfx_bitmap_ram[gfx_offset+0x8000+plane*0xc000]>>(7-xi)) & 1;
 
 					color =  (pen_g<<2 | pen_r<<1 | pen_b<<0) | 8;
 
