@@ -6,8 +6,6 @@
   To investigate:
   Frogger by Majesco (not Hasbro): was it BW or Color?
   Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
-  Soccer Mania: was it really released as Soccer Mania in Jpn too as nointro claims, or only as Soccer Boy?
-  Taz-Mania by Sunsoft: was it really released in Europe too as nointro claims? if so, why THQ game has not been titled Taz-Mania 2 like in USA?
 
   Undumped pirate carts:
   - 4B-003: Sachen 4-in-1 version 3 (Taiwan's Mahjong, Japan's Mahjong, Hong Kong's Mahjong, Store Tris)
@@ -4553,6 +4551,18 @@
 	</software>
 
 	<software name="fifa98">
+		<!-- Serial: DMG-? - Release Date:  - Notes: SGB enhanced -->
+		<description>FIFA Road to the World Cup '98 (Euro, Rev. A)</description>
+		<year>1997</year>
+		<publisher>THQ</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="fifa road to the world cup '98 (europe) (rev a).bin" size="524288" crc="8dc0d46c" sha1="8dc3ab8f020e4377af1e1f636396cc3881268a1f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa98a" cloneof="fifa98">
 		<!-- Serial: DMG-? - Release Date:  - Notes: SGB enhanced -->
 		<description>FIFA Road to the World Cup '98 (Euro)</description>
 		<year>1997</year>
@@ -16359,9 +16369,9 @@
 		</part>
 	</software>
 
-	<software name="tazmania">
+	<software name="tazdevl">
 		<!-- Serial: DMG-?? - Release Date:  -->
-		<description>Taz-Mania (USA)</description>
+		<description>Tasmanian Devil - Island Chase (Euro) ~ Taz-Mania (USA)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -16371,7 +16381,7 @@
 		</part>
 	</software>
 
-	<software name="tazmani2">
+	<software name="tazmania">
 		<!-- Serial: DMG-? - Release Date:  -->
 		<description>Taz-Mania (Euro)</description>
 		<year>1997</year>
@@ -16383,7 +16393,7 @@
 		</part>
 	</software>
 
-	<software name="tazmani2u" cloneof="tazmani2">
+	<software name="tazmani2u" cloneof="tazmania">
 		<!-- Serial: DMG-? - Release Date:  -->
 		<description>Taz-Mania 2 (USA)</description>
 		<year>1997</year>

@@ -43583,7 +43583,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mjtrapz">
-		<!-- Serial: TC-010? - Release Date:  - Alternative Title:  -->
+		<!-- Serial: TC-010? - Release Date:  - Alternative Title: 四川麻將 制服篇 -->
 		<description>Mahjong Trap - Si Cuan Ma Que - Zhi Fu Pian (Tw)</description>
 		<!-- Shisen Mahjong - Seifuku Hen (Sachen) in GoodNES, check title -->
 		<year>1990</year>
@@ -44057,10 +44057,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	<!-- TC-031 is unknown. Possibly "Bridge", an unreleased proto -->
 
 	<software name="chuugokt" supported="no">
-		<!-- Serial: TC-032 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: TC-032 - Release Date:  - Alternative Title: 中國大亨 -->
 		<description>Chuugoku Taitei (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SOMERITEAM-SL-12" />
 			<dataarea name="chr" size="131072">
@@ -44217,10 +44217,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="tai16mj">
-		<!-- Serial: SA-001 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-001 - Release Date:  - Alternative Title: 台灣麻將 -->
 		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SA-0036" />
 			<feature name="mirroring" value="horizontal" />
@@ -44233,11 +44233,26 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="tai16mjb" cloneof="tai16mj">
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia, Alt 2)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-SA-0036" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="16384">
+				<rom name="taiwan mahjong - tai wan ma que 16 (asia) (alt2) (unl).chr" size="16384" crc="c0274997" sha1="bff4d235ccca5962381512980f21c7ce9759868d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="taiwan mahjong - tai wan ma que 16 (asia) (alt2) (unl).prg" size="32768" crc="bf70dfa0" sha1="456dde117bb4653664be7c70e92cde56b97681e0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tai16mja" cloneof="tai16mj">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia, Alt)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -44425,7 +44440,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mjworld">
-		<!-- Serial: SA-008 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-008 - Release Date:  - Alternative Title: 麻雀世界 -->
 		<description>The Mahjong World - Ma Que Shi Jie (Tw, FC cart)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
@@ -44442,7 +44457,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mjworlda" cloneof="mjworld">
-		<!-- Serial: SA-008 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-008 - Release Date:  - Alternative Title: 麻雀世界 -->
 		<description>The Mahjong World - Ma Que Shi Jie (Tw, NES cart)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
@@ -44582,7 +44597,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="chessac">
-		<!-- Serial: SA-015 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-015 - Release Date:  - Alternative Title: 象棋學園 -->
 		<description>Chess Academy (Tw, FC cart)</description>
 		<year>1991</year>
 		<publisher>Sachen</publisher>
@@ -44636,10 +44651,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="pokermj">
-		<!-- Serial: SA-018 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-018 - Release Date:  - Alternative Title: 撲克麻雀 -->
 		<description>Poker Mahjong - Pu Ke Mao Que (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SACHEN-8259A" />
 			<dataarea name="chr" size="32768">
@@ -44771,7 +44786,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<!-- Serial: SA-025 - Release Date:  - Alternative Title:  -->
 		<description>Taiwan Mahjong 2 (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
 			<feature name="mirroring" value="horizontal" />
