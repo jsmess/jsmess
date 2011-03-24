@@ -34,7 +34,6 @@
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
     - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
-    - Legend of Kage / Gandhara: has serious graphic artifacts, pcg doesn't scroll properly, dma bugs?
  	- Luna City: text gfxs looks doubled in y-axis
 	- "newtype": trips a z80dma assert, worked around for now;
 	- X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
