@@ -347,11 +347,11 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 
 	if (!A19)
 	{
-		if (!A18 & !A17 & !BOOTE)
+		if (!BOOTE && (offset < 0x4000))
 		{
 			// _BOOTCE
 			UINT8 *rom = machine->region(MC68008P8_TAG)->base();
-			data = rom[offset & 0x3fff];
+			data = rom[offset];
 		}
 		else
 		{
