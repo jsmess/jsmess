@@ -983,14 +983,20 @@ static WRITE8_HANDLER( x1_rom_w )
 
 static WRITE8_HANDLER( rom_bank_0_w )
 {
+	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *ROM = space->machine->region("maincpu")->base();
+
+	state->ram_bank = 0x10;
 
 	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
 }
 
 static WRITE8_HANDLER( rom_bank_1_w )
 {
+	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *ROM = space->machine->region("maincpu")->base();
+
+	state->ram_bank = 0x00;
 
 	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 }
@@ -1832,12 +1838,13 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
     */
 	UINT8 res = 0;
 	int vblank_line = mc6845_v_display * mc6845_tile_height;
+	int vsync_line = mc6845_v_sync_pos * mc6845_tile_height;
 	state->vdisp = (device->machine->primary_screen->vpos() < vblank_line) ? 0x80 : 0x00;
-	state->vsync = (device->machine->primary_screen->vpos() < vblank_line) ? 0x00 : 0x04;
+	state->vsync = (device->machine->primary_screen->vpos() < vsync_line) ? 0x00 : 0x04;
 
-//	popmessage("%d",vblank_line);
+//	popmessage("%d",vsync_line);
 
-	res = (input_port_read(device->machine, "SYSTEM") & 0x10) | state->sub_obf | state->vsync | state->vdisp;
+	res = state->ram_bank | state->sub_obf | state->vsync | state->vdisp;
 
 	//popmessage("%d",vblank_line);
 
@@ -1967,11 +1974,6 @@ static INPUT_PORTS_START( x1 )
 	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x10, 0x10, "unk" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IOSYS") //TODO: implement front-panel DIP-SW here
@@ -2491,6 +2493,8 @@ static MACHINE_RESET( x1 )
 	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
 	for(i=0;i<0x10;i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+
+	state->ram_bank = 0;
 }
 
 static MACHINE_RESET( x1turbo )

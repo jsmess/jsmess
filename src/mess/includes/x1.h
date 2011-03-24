@@ -130,6 +130,7 @@ public:
 	UINT8 crtc_vreg[0x100],crtc_index;
 	UINT8 is_turbo;
 	UINT8 ex_bank;
+	UINT8 ram_bank;
 };
 
 
