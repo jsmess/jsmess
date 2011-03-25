@@ -10,31 +10,7 @@
 
     TODO:
 
-	- DMA starts before first floppy DRQ
-
-		Z80DMA '5g' Write 79
-		Z80DMA '5g' Write 30
-		Z80DMA '5g' Write 44
-		Z80DMA '5g' Write 00
-		Z80DMA '5g' Write 01
-		Z80DMA '5g' Write 54
-		Z80DMA '5g' Write 0d
-		Z80DMA '5g' Write 68
-		Z80DMA '5g' Write 0d
-		Z80DMA '5g' Write 80
-		Z80DMA '5g' Write cd
-		Z80DMA '5g' Write 06
-		Z80DMA '5g' Write 10
-		Z80DMA '5g' Write 92
-		Z80DMA '5g' Write cf
-		Z80DMA '5g' Load A: 4430 B: 1006 N: 100
-		Z80DMA '5g' Write 87
-		Z80DMA '5g' Enable DMA
-		Z80DMA '5g' B src: 1006 i/o -> data: 00
-		Z80DMA '5g' A dst: 4430 mem
-		Z80DMA '5g' B src: 1006 i/o -> data: 00
-		Z80DMA '5g' A dst: 4431 mem
-
+	- sector not boot
     - floppy
 	- watchdog
     - CIO (interrupt controller)
@@ -907,7 +883,7 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 
 WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 {
-	int state = BIT(data, 3);
+	int state = !BIT(data, 3);
 	
 	switch (data & 0x07)
 	{
@@ -940,7 +916,15 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 	
 	case 7: // SYSFS
 		m_sysfs = state;
-		if (m_sysfs) z80dma_rdy_w(m_dma0, wd17xx_drq_r(m_fdc));
+		
+		if (m_sysfs)
+		{
+			z80dma_rdy_w(m_dma0, !wd17xx_drq_r(m_fdc));
+		}
+		else
+		{
+			z80dma_rdy_w(m_dma0, 1);
+		}
 		break;
 	}
 }
@@ -1308,7 +1292,14 @@ static const floppy_config abc1600_floppy_config =
 
 WRITE_LINE_MEMBER( abc1600_state::drq_w )
 {
-	if (m_sysfs) z80dma_rdy_w(m_dma0, state);
+	if (m_sysfs)
+	{
+		z80dma_rdy_w(m_dma0, !state);
+	}
+	else
+	{
+		z80dma_rdy_w(m_dma0, 1);
+	}
 }
 
 static const wd17xx_interface fdc_intf =
@@ -1370,7 +1361,7 @@ void abc1600_state::machine_reset()
 	// clear special control register
 	for (int i = 0; i < 8; i++)
 	{
-		spec_contr_reg_w(*program, i, 0);
+		spec_contr_reg_w(*program, 0, i);
 	}
 
 	// clear floppy registers
