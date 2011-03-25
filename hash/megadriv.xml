@@ -968,7 +968,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 <!-- This board contains no SRAM, despite the header reporting 16k of battery -->
-	<software name="espnfp" cloneof="espnf">
+	<software name="espnnflp" cloneof="espnnfl">
 		<description>ESPN Sunday Night NFL (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -3113,7 +3113,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="billwa">
+	<software name="billwlsh">
 		<description>Bill Walsh College Football (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -3127,7 +3127,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="billwa95">
+	<software name="billwl95">
 		<description>Bill Walsh College Football 95 (USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -3513,7 +3513,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bramst">
+	<software name="dracula">
 		<description>Bram Stoker's Dracula (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -3524,7 +3524,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bramstu" cloneof="bramst">
+	<software name="draculau" cloneof="dracula">
 		<description>Bram Stoker's Dracula (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -7082,7 +7082,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="espnba">
+	<software name="espnbb">
 		<description>ESPN Baseball Tonight (USA)</description>
 		<year>1995</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -7135,7 +7135,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="espnf">
+	<software name="espnnfl">
 		<description>ESPN Sunday Night NFL (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>

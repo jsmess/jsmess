@@ -1088,7 +1088,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Serial: T-93018-50 -->
-	<software name="bramst">
+	<software name="dracula">
 		<description>Bram Stoker's Dracula (Euro)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -1100,7 +1100,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Serial: T-93018 -->
-	<software name="bramstu" cloneof="bramst">
+	<software name="draculau" cloneof="dracula">
 		<description>Bram Stoker's Dracula (USA)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
