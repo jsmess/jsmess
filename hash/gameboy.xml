@@ -4,8 +4,8 @@
 <!-- 
 
   To investigate:
-  Frogger by Majesco (not Hasbro): was it BW or Color?
-  Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
+  - Frogger by Majesco (not Hasbro): was it BW or Color?
+  - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
 
   Undumped pirate carts:
   - 4B-003: Sachen 4-in-1 version 3 (Taiwan's Mahjong, Japan's Mahjong, Hong Kong's Mahjong, Store Tris)
@@ -5271,7 +5271,7 @@
 	</software>
 
 	<software name="gbkiss">
-		<!-- Serial: DMG-? - Release Date: - Alt. Title:  -->
+		<!-- Serial: DMG-AKAJ-JPN - Release Date: - Alt. Title:  -->
 		<description>GBKiss Mini Games (Jpn)</description>
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>
@@ -14328,10 +14328,10 @@
 	</software>
 
 	<software name="shanghaija" cloneof="shanghai">
-		<!-- Serial: DMG-?? - Release Date: ?? - Alt. Title: ?? -->
+		<!-- Serial: DMG-ZZJ - Release Date: ?? - Alt. Title: ?? -->
 		<description>Shanghai (Jpn, Activision)</description>
-		<year>1994?</year>
-		<publisher>HAL</publisher>
+		<year>1994</year>
+		<publisher>Activison</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="shanghai (japan) (activision).bin" size="32768" crc="6aa684eb" sha1="2569352ea796864fcd769cc9b25c6497516134c6" offset="000000" />
@@ -19008,8 +19008,44 @@
 
 <!-- Other Asian pirate carts -->
 
+	<software name="sml4" cloneof="crayon4">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Super Mario Land 4 (Chi)</description>
+		<year>1997?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super mario land 4 (unl).bin" size="131072" crc="d9f3eb9f" sha1="f0da6eced7492bf51ae5575522cca58726c34feb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic3db">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Sonic 3D Blast 5 (Chi)</description>
+		<year>1998</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sonic 3d blast 5 (unl).bin" size="262144" crc="5fed0068" sha1="1eb403ee2550106cbb2e3e1d0715b7c9bc07d6be" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic6" cloneof="speedy">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Sonic 6</description>
+		<year>1998?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic 6 (unl).bin" size="524288" crc="aa4e9379" sha1="5f70ee1a1265536c6ed3657bfd5e54516add287d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ffant4">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
 		<description>Final Fantasy 4 (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19021,7 +19057,7 @@
 	</software>
 
 	<software name="mhzx">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
 		<description>Meng Huan Zhi Xing (Chi)</description>
 		<year>19??</year>
 		<publisher>SKOB</publisher>
@@ -19033,7 +19069,7 @@
 	</software>
 
 	<software name="mhzxa" cloneof="mhzx">
-		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
 		<description>Meng Huan Zhi Xing (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>SKOB</publisher>

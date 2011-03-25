@@ -11,7 +11,7 @@ Compiled by K1W1
   - Eastern Front (1941) - Atari (RX8039)
 
   Missing Cartridge
-     - Xenophobe (Prototype)
+     - Xenophobe (Prototype) - Atari (1989)
 
   XE Demo Cartridge (CA400201) contained 4 Games
   - One on One (Same as the retail cartridge)
@@ -347,8 +347,8 @@ Compiled by K1W1
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="lode runner (atari)(1987)(rx8082).rom" size="131072" crc="7790f474" sha1="200811d33105e5e01a779454562ebb5799806bb1" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="lode runner (atari)(1987)(rx8082).rom" size="65536" crc="b9a89bbd" sha1="9c59cf69f1c248fb673a3712ec7e35b1a0c42523" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -473,4 +473,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
+		<software name="xeno">
+		<description>Xenophobe (Reproduction)</description>
+		<!-- Serial: N/A -->
+		<year>2010</year>
+		<publisher>Video 61 / Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="xenophobe (repro).bin" size="131072" crc="68466666" sha1="109271ce4333b6a7d3030ea5c82a5e63eb4a99df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+									
 </softwarelist>

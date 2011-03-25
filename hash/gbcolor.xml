@@ -176,10 +176,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="smurfs">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: ??? - Release Date:  - Notes: GBC only -->
 		<description>The Adventures of the Smurfs (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="adventures of the smurfs, the (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="d0d3dfed" sha1="7919c5e6aa8d040b1f7953345b376d999cf22b18" offset="000000" />
@@ -415,11 +415,11 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="anpfiff">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+	<software name="anpfiff" cloneof="pmang2k1">
+		<!-- Serial: ??? - Release Date:  - Notes: GBC only -->
 		<description>Anpfiff - Der RTL Fussball-Manager (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>THQ</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="anpfiff - der rtl fussball-manager (germany).bin" size="1048576" crc="b54d264a" sha1="4c5bd67eee82a36cf695db12169bc4393225faa0" offset="000000" />
@@ -716,7 +716,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="atvrackja" cloneof="atvrackj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -728,7 +728,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="atvrackj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -795,18 +795,6 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="austin powers - welcome to my underground lair! (usa).bin" size="4194304" crc="aba42b78" sha1="69b5106a124bde38184875c0dd08de437360bc14" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="avebuzz">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
-		<description>Les Aventures de Buzz l'Eclair (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="aventures de buzz l'eclair, les (france).bin" size="524288" crc="841674b0" sha1="4c4c51883b6c73627ca9b04bb0b24e6bab072f29" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1412,7 +1400,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="bibitina">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Bibi und Tina - Fohlen "Felix" in Gefahr (Ger)</description>
 		<year>2002</year>
 		<publisher>Kiddinx</publisher>
@@ -1544,10 +1532,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="bobbobet">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Bob et Bobette - Les Dompteurs du Temps (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="bob et bobette - les dompteurs du temps (europe) (fr,nl).bin" size="524288" crc="a4c6523d" sha1="2b4b8c3a4a74fdf7acc4138125fea5d8f5a9a093" offset="000000" />
@@ -1640,10 +1628,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="bombmmxa">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only, this was the prize for a draw contest -->
 		<description>Bomberman Max - Ain Version (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="bomberman max - ain version (japan).bin" size="2097152" crc="545e0da2" sha1="7416d9430a8163cd2f953c990ef8ad325725e53a" offset="000000" />
@@ -1738,8 +1726,8 @@ Undumped Pirates:
 	<software name="bombmsel">
 		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
 		<description>Bomberman Selection (Kor)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996?</year>
+		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bomberman selection (korea).bin" size="1048576" crc="af2b426e" sha1="52451464a9f4dd5faefe4594954cbce03bff0d05" offset="000000" />
@@ -1952,13 +1940,37 @@ Undumped Pirates:
 	</software>
 
 	<software name="buzzlght">
-		<!-- Serial: CGB-BUZE / CGB-BUZP - Release Date:  - Notes: GBC only -->
+		<!-- Serial: CGB-BUZE / CGB-BUZP? - Release Date:  - Notes: GBC only -->
 		<description>Buzz Lightyear of Star Command (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="buzz lightyear of star command (usa, europe).bin" size="524288" crc="84e29b87" sha1="314dacd9a5d60769105f2cde60a245074cb51c15" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buzzlghtf" cloneof="buzzlght">
+		<!-- Serial: CGB-BUZP? - Release Date:  - Notes: GBC only -->
+		<description>Les Aventures de Buzz l'Eclair (Fra)</description>
+		<year>2000</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="aventures de buzz l'eclair, les (france).bin" size="524288" crc="841674b0" sha1="4c4c51883b6c73627ca9b04bb0b24e6bab072f29" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buzzlghtg" cloneof="buzzlght">
+		<!-- Serial: CGB-BUZP? - Release Date:  - Notes: GBC only -->
+		<description>Captain Buzz Lightyear - Star Command (Ger)</description>
+		<year>2000</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="captain buzz lightyear - star command (germany).bin" size="524288" crc="f06d296c" sha1="376bcd39491fe275a3773716ffaf0259e4852340" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1999,23 +2011,11 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="buzzlghtg" cloneof="buzzlght">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
-		<description>Captain Buzz Lightyear - Star Command (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="captain buzz lightyear - star command (germany).bin" size="524288" crc="f06d296c" sha1="376bcd39491fe275a3773716ffaf0259e4852340" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cardshrk">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Card Sharks (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Bonsai Entertainment</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="card sharks (usa) (proto).bin" size="262144" crc="e2b2dcfe" sha1="f5e1850efa9ac1df8a879815d4193a1157408ca3" offset="000000" />
@@ -4206,8 +4206,8 @@ Undumped Pirates:
 
 	<software name="f1racingp" cloneof="f1racing">
 		<description>F1 Racing Championship (Euro, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="f1 racing championship (europe) (en,fr,de,es,it) (beta).bin" size="4194304" crc="fc537719" sha1="3c10fe93521a604f1e312253328cd977236eae07" offset="000000" />
@@ -4324,10 +4324,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="fixfoxi">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: ??? - Release Date:  - Notes: GBC only -->
 		<description>Fix &amp; Foxi - Episode 1 Lupo (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Ravensburger Interactive</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="fix &amp; foxi - episode 1 lupo (europe) (en,fr,de).bin" size="1048576" crc="5dfc61e8" sha1="6d14bf255eb042e7185da32137f679f4e2c24ce5" offset="000000" />
@@ -4348,7 +4348,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="flintbbu" cloneof="flintbb">
-		<!-- Serial: CGB-BFSE - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BFSE - Release Date:  - Notes: GBC only -->
 		<description>The Flintstones - Burgertime in Bedrock (USA)</description>
 		<year>2001</year>
 		<publisher>Electro Source</publisher>
@@ -4396,7 +4396,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="fortboya">
-		<!-- Serial: CGB-BYDP - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BYDP - Release Date:  - Notes: GBC only -->
 		<description>Fort Boyard (Euro)</description>
 		<year>2001</year>
 		<publisher>Microids</publisher>
@@ -4528,7 +4528,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="fullhang">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Full Time Soccer &amp; Hang Time Basketball (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -4540,13 +4540,26 @@ Undumped Pirates:
 	</software>
 
 	<software name="fulltime">
-		<!-- Serial: ?? - Release Date:  - Alt. Title:  -->
+		<!-- Serial: ?? - Release Date:  -->
 		<description>Full Time Soccer (Euro)</description>
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="full time soccer (europe) (unl).bin" size="262144" crc="b99beda2" sha1="a2b1268df08b583d033999b894638dadf32e37f4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has been hacked to run on MBC01 mapper -->
+	<software name="fulltimeh" cloneof="fulltime">
+		<!-- Serial: ?? - Release Date:  -->
+		<description>Full Time Soccer (Euro, Hacked)</description>
+		<year>2000</year>
+		<publisher>Rocket Games</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="full time soccer (hacked) (unl).bin" size="262144" crc="655476f9" sha1="0d6c5f931223ea393a3f6bc1ecd1a18c1f889273" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4578,8 +4591,8 @@ Undumped Pirates:
 	<software name="gakkyama">
 		<!-- Serial: DMG-AYMJ - Release Date: 1999-05-29 - Alt. Title: 学級王ヤマザキ ゲームボーイ版 -->
 		<description>Gakkyuu Ou Yamazaki (Jpn, Rev. A)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Koei</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="gakkyuu ou yamazaki (japan) (rev a).bin" size="1048576" crc="ef2cfd99" sha1="3a2718efa3d1cac7345fbbcddb7c3f666fc6c70c" offset="000000" />
@@ -4639,7 +4652,7 @@ Undumped Pirates:
 		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
 		<description>Game Boy Color Promotional Demo (Euro, USA)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="game boy color promotional demo (usa, europe).bin" size="524288" crc="f5e9aa8c" sha1="bcbc9ede4a06e52e5dea809e20e0b34901b6ae91" offset="000000" />
@@ -4794,8 +4807,8 @@ Undumped Pirates:
 	<software name="gbmemory">
 		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
 		<description>GB Memory Multi Menu (Jpn, NP)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>20??</year>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="gb memory multi menu (japan) (np).bin" size="131072" crc="ec823cc1" sha1="0781eaecb7fd25c068e396b5eb02c6231baf6ea3" offset="000000" />
@@ -4804,10 +4817,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="happyhip">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Das Geheimnis der Happy Hippo-Insel (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="geheimnis der happy hippo-insel, das (germany).bin" size="1048576" crc="25b480c3" sha1="f2ab35743f477a98007665f2a5686ab4da2b9049" offset="000000" />
@@ -5533,7 +5546,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="hangtime">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Hang Time Basketball (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -6793,7 +6806,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="kikathom">
-		<!-- Serial: CGB-BBWJ - Release Date: 2001-10-12 - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BBWJ - Release Date: 2001-10-12 - Alt. Title: きかんしゃトーマス ソドーとうのなかまたち - Notes: GBC only -->
 		<description>Kikansha Thomas - Sodor-tou no Nakama-tachi (Jpn)</description>
 		<year>2001</year>
 		<publisher>Tamsoft</publisher>
@@ -8244,7 +8257,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="mariofam">
-		<!-- Serial: GBC-?? - Release Date: 2001-09-17 - Alt. Title: ジャガーミシン刺しゅう専用ソフト MARIO FAMILY - Notes: GBC only -->
+		<!-- Serial: CGB-BJMJ-JPN - Release Date: 2001-09-17 - Alt. Title: ジャガーミシン刺しゅう専用ソフト MARIO FAMILY - Notes: GBC only, bundled with Jaguar Sewing Machine (Nuotto Expansion)? -->
 		<description>Mario Family (Jpn)</description>
 		<year>2001</year>
 		<publisher>Jaguar</publisher>
@@ -8678,8 +8691,8 @@ Undumped Pirates:
 	<software name="lastbib2">
 		<!-- Serial: DMG-A2LJ - Release Date: 1999-04-16 - Alt. Title: 女神転生外伝ラストバイブルII - Notes: SGB enhanced, also released by NP in 2000-03 -->
 		<description>Megami Tensei Gaiden - Last Bible II (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Atlus</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="megami tensei gaiden - last bible ii (japan).bin" size="1048576" crc="9caa00b5" sha1="84df9508bdd8b24dfb19a74744fec492fffee56d" offset="000000" />
@@ -9084,7 +9097,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="mobiltrn">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Mobile Trainer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9540,8 +9553,8 @@ Undumped Pirates:
 	</software>
 
 	<software name="muppets">
-		<!-- Serial: ?? - Release Date:  - Notes: GBC only -->
-		<description>The Muppets (Euro, AP9P)</description>
+		<!-- Serial: DMG-AP9P-EUR - Release Date:  - Alt. Title: Jim Henson's Puppets (Cart) - Notes: GBC only -->
+		<description>The Muppets (Euro, Black Cart)</description>
 		<year>2000</year>
 		<publisher>Take-Two Interactive</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -9564,7 +9577,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="muppetsu" cloneof="muppets">
-		<!-- Serial: CGB-BMUE - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BMUE - Release Date:  - Notes: GBC only -->
 		<description>The Muppets (USA)</description>
 		<year>2000</year>
 		<publisher>Take-Two Interactive</publisher>
@@ -10248,10 +10261,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="moorhun">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Die Original Moorhuhn Jagd (Ger)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Ravensburger Interactive</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="original moorhuhn jagd, die (germany).bin" size="1048576" crc="714ec204" sha1="d4f3fe5bdeed4bbf40d3f1eb6eab7a69676c6138" offset="000000" />
@@ -10284,7 +10297,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="ottifant">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Ottifanten - Kommando Stoertebeker (Ger)</description>
 		<year>2001</year>
 		<publisher>JoWooD Entertainment</publisher>
@@ -10392,7 +10405,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="painter">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Painter (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -10692,7 +10705,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="pockhana">
-		<!-- Serial: CGB-A6PJ - Release Date: 1999-06-11 - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-A6PJ - Release Date: 1999-06-11 - Alt. Title: ポケット花札 - Notes: GBC only -->
 		<description>Pocket Hanafuda (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
@@ -10826,8 +10839,8 @@ Undumped Pirates:
 	<software name="pocknaka">
 		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
 		<description>Pocket no Naka no Oukoku (Jpn, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Hector</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket no naka no oukoku (japan) (proto).bin" size="2097152" crc="1eed33c6" sha1="b91750cc805beb753e3c61a99c256d9cc006d3b8" offset="000000" />
@@ -10896,7 +10909,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="pocksmrt">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Pocket Smash Out &amp; Race Time (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -10908,7 +10921,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="pocksm">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Pocket Smash Out (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -11184,7 +11197,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="pokepinbu" cloneof="pokepinb">
-		<!-- Serial: DMG-VPHE-USA - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: DMG-VPHE-USA - Release Date:  - Notes: GBC only -->
 		<description>Pokémon Pinball (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -11208,7 +11221,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="pokepuzlu" cloneof="pokepuzl">
-		<!-- Serial: CGB-BPNE - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BPNE - Release Date:  - Notes: GBC only -->
 		<description>Pokémon Puzzle Challenge (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -11760,10 +11773,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="pumucklp">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Pumuckl's Abenteuer bei den Piraten (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="pumuckl's abenteuer bei den piraten (germany).bin" size="1048576" crc="f55cdb79" sha1="1f90e982ead050796722d98f94e31a836945f84d" offset="000000" />
@@ -11772,10 +11785,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="pumucklg">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Pumuckl's Abenteuer im Geisterschloss (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="pumuckl's abenteuer im geisterschloss (germany).bin" size="1048576" crc="87fcec24" sha1="0fe14ef81b11c854f080e804c5d3cb14601b2794" offset="000000" />
@@ -12000,7 +12013,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="racetime">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Race Time (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -12011,8 +12024,21 @@ Undumped Pirates:
 		</part>
 	</software>
 
+<!-- This has been hacked to run on MBC01 mapper -->
+	<software name="racetimeh" cloneof="racetime">
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
+		<description>Race Time (Euro, Hacked)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="race time (hacked) (unl).bin" size="262144" crc="8a5fa98c" sha1="8d8d6c3f5545edbd50813a22fb666c106ceb140b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="radikal">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Radikal Bikers (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12036,10 +12062,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="rakuxcs">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BELJ-JPN - Release Date:  - Alt. Title: らくらくカットしゅう - Notes: GBC only, for use with Jaguar Sewing Machine (Nuotto Expansion) Model EM-2000 -->
 		<description>Raku x Raku - Cut Shuu (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Natsume</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="raku x raku - cut shuu (japan).bin" size="2097152" crc="430cfcf3" sha1="b51a62358c37539021bc980c1699825596b118ef" offset="000000" />
@@ -12048,10 +12074,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="rakuxmis">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: DMG-BRAJ-JPN - Release Date:  - Alt. Title:  - Notes: For use with Jaguar Sewing Machine (Nuotto Expansion) -->
 		<description>Raku x Raku - Mishin (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Natsume</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="raku x raku - mishin (japan).bin" size="1048576" crc="0ba0711b" sha1="58bf5df55d2bab8877f7ec43110339ebe1a5d4c5" offset="000000" />
@@ -12060,10 +12086,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="rakuxmoj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BEMJ-JPN - Release Date:  - Alt. Title: らくらく文字 - Notes: GBC only, for use with Jaguar Sewing Machine (Nuotto Expansion) Model EM-2000 -->
 		<description>Raku x Raku - Moji (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Natsume</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="raku x raku - moji (japan).bin" size="2097152" crc="abe58a8b" sha1="d9502543c6cd05c7e06a3b89286eec155aff83a0" offset="000000" />
@@ -12445,8 +12471,8 @@ Undumped Pirates:
 	<software name="robopspc">
 		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
 		<description>Robot Poncots - Comic Bom Bom Special Version (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999?</year>
+		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="robot poncots - comic bom bom special version (japan).bin" size="1048576" crc="4aa209cd" sha1="79d1eda07e792497506ff1494e5222db2a52702f" offset="000000" />
@@ -12707,10 +12733,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="rugtotanf" cloneof="rugtotan">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BAGP? - Release Date:  - Notes: GBC only -->
 		<description>Les Razmoket - 100% Angelica (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>THQ</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="razmoket, les - 100% angelica (france).bin" size="1048576" crc="1d66cb29" sha1="a04285ae27def1e0b808561099cc2cb86ba94f07" offset="000000" />
@@ -12743,7 +12769,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="rugparisa" cloneof="rugparis">
-		<!-- Serial: CGB-BRPE / CGB-BRPP? - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BRPE / CGB-BRPP? - Release Date:  - Notes: GBC only -->
 		<description>Rugrats in Paris - The Movie (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
@@ -12755,10 +12781,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="rugparisf" cloneof="rugparis">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BRPP? - Release Date:  - Notes: GBC only -->
 		<description>Les Razmoket à Paris - Le Film (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>THQ</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="razmoket a paris, les - le film (france).bin" size="1048576" crc="094494e9" sha1="ed9ec61de28dc1a83f0e98e8d651399cb45bd387" offset="000000" />
@@ -13283,10 +13309,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="smurfsni">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-ASNE? - Release Date:  - Notes: GBC only -->
 		<description>The Smurfs Nightmare (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="smurfs nightmare, the (europe) (en,fr,de,es).bin" size="1048576" crc="6f97b043" sha1="fe9f70d6ff58174f533a08b556358d916eda8a1e" offset="000000" />
@@ -13319,7 +13345,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="snoopytn">
-		<!-- Serial: CGB-BS9P? - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BS9P? - Release Date:  - Notes: GBC only -->
 		<description>Snoopy Tennis (Euro)</description>
 		<year>2001</year>
 		<publisher>Infogrames</publisher>
@@ -13487,7 +13513,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="sinkj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Space Invasion &amp; Karate Joe (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -13499,7 +13525,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="sinpntr">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Space Invasion &amp; Painter (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -13511,7 +13537,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="sinvasn">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Space Invasion (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -13655,7 +13681,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="spongebb">
-		<!-- Serial: CGB-BQPE / CGB-BQPP - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BQPE / CGB-BQPP - Release Date:  - Notes: GBC only -->
 		<description>SpongeBob SquarePants - Legend of the Lost Spatula (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
@@ -13859,7 +13885,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="sbreako">
-		<!-- Serial: DMG-AOTE - Release Date:  -->
+		<!-- Serial: DMG-AOTP? - Release Date:  -->
 		<description>Super Breakout! (Euro)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
@@ -13871,10 +13897,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="sbreakou" cloneof="sbreako">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: DMG-AOTE - Release Date:  -->
 		<description>Super Breakout! (USA)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Majesco</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="super breakout! (usa).bin" size="1048576" crc="52f51cb5" sha1="8c795b6d8ebc3a796821a6b2879f3e5cebf9215c" offset="000000" />
@@ -14243,7 +14269,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="tophant">
-		<!-- Serial: DMG-AN6J - Release Date: 2000-11-10 - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: DMG-AN6J - Release Date: 2000-11-10 - Alt. Title: テイルズオブファンタジア なりきりダンジョン - Notes: SGB enhanced -->
 		<description>Tales of Phantasia - Narikiri Dungeon (Jpn)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
@@ -14315,7 +14341,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="taxi2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: ??? - Release Date:  -->
 		<description>Taxi 2 (Fra)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14591,7 +14617,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="titi">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: ??? - Release Date:  - Notes: GBC only -->
 		<description>Titi - Le Tour du Monde en 80 Chats (Fra)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14627,7 +14653,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="tnnofc">
-		<!-- Serial: DMG-AFCE - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: DMG-AFCE - Release Date:  -->
 		<description>TNN Outdoors Fishing Champ (USA)</description>
 		<year>1999</year>
 		<publisher>ASC Games</publisher>
@@ -15012,8 +15038,8 @@ Undumped Pirates:
 	<software name="tgrally2">
 		<!-- Serial: ?? - Release Date:  - Notes: GBC only -->
 		<description>Top Gear Rally 2 (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Kemco</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="top gear rally 2 (europe).bin" size="1048576" crc="017773cd" sha1="5a0ac4ace1d5c2b6dfc0bdd20d6f88f319493558" offset="000000" />
@@ -15118,7 +15144,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="toystrac">
-		<!-- Serial: CGB-BT5E - Release Date:  - Notes: GBC only -->
+		<!-- Serial: CGB-BT5P? - Release Date:  - Notes: GBC only -->
 		<description>Toy Story Racer (Euro)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
@@ -15130,10 +15156,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="toystracu" cloneof="toystrac">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-BT5E - Release Date:  - Notes: GBC only -->
 		<description>Toy Story Racer (USA)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Activision</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="toy story racer (usa).bin" size="2097152" crc="d911dd97" sha1="5deb31321a86b260aa84cab5e45a3fa36ce5efbd" offset="000000" />
@@ -15370,7 +15396,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="tyrian2k">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Tyrian 2000 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15886,10 +15912,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="wizardem">
-		<!-- Serial:  - Release Date:  - Alt. Title:  - Notes: GBC only -->
+		<!-- Serial: CGB-AEWJ - Release Date: 1999-10-29 - Alt. Title: ウィザードリィ エンパイア - Notes: GBC only -->
 		<description>Wizardry Empire (Jpn, Rev. A)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Starfish</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="wizardry empire (japan) (rev a).bin" size="1048576" crc="fa82620f" sha1="f5f4e8bead0fe45075141133a530a0eb116ea78c" offset="000000" />
@@ -16614,14 +16640,29 @@ Undumped Pirates:
 
 -->
 
+<!-- This version should be the real dump, protected as the original cart -->
 	<software name="leinujs">
-		<!-- Serial: GS-?? - Release Date:  -->
+		<!-- Serial: GS-?? - Release Date:  - Alt. Title: 雷弩機神 -->
 		<description>Lei Nu Ji Shen (Tw)</description>
 		<year>2000</year>
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="lei nu ji shen (unl).bin" size="262144" crc="c4d6f8bf" sha1="032fdf629131c06a3309fdb216bb940efc2d8d22" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped 
+     the real card, so it can be removed once we properly emulate the parent -->
+	<software name="leinujsh" cloneof="leinujs">
+		<!-- Serial: GS-?? - Release Date:  - Alt. Title: 雷弩機神 -->
+		<description>Lei Nu Ji Shen (Tw, Hacked)</description>
+		<year>2000</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="lei nu ji shen (unl).bin" size="524288" crc="0e88967c" sha1="cc67777bb5c911d0a0f6faff4ce0a9c4bcc693e6" offset="000000" />
+				<rom name="lei nu ji shen (unl) (hacked).bin" size="524288" crc="0e88967c" sha1="cc67777bb5c911d0a0f6faff4ce0a9c4bcc693e6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16689,6 +16730,68 @@ Undumped Pirates:
   * ST-0502092C 勇者斗恶龙/Dragon Quest
   * ST-0504093C 口袋宝贝-珍珠/Poketmon-pearl 
 -->
+
+	<software name="hpotter">
+		<!-- probably developed by BDD -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Harry Potter (Chi)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="harry potter (unl).bin" size="1048576" crc="5bebe333" sha1="dfd0693315da697240b510776695162880a75a82" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceage">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Ice Age (Chi)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="ice age (unl).bin" size="2097152" crc="7ca57891" sha1="1bebc84f0fbfa731f33343c56032c8fe5803e4ae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceage2">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Ice Age II (Chi)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="ice age ii (unl).bin" size="2097152" crc="b149f421" sha1="39060bd6fa872738ae126b64f123a1242d06680a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zhwsj">
+		<!-- Serial:  - Release Date:  - Alt. Title: 最終幻想 無盡沙加 (Final Fantasy Endless Saga), Crystal Age (Official English Name by Sintax) -->
+		<description>Zuizhong Huanxiang - Wujin Sha Jia (Chi)</description>
+		<year>2002?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="saishuu gensou (unl).bin" size="2097152" crc="44484cfc" sha1="4dbbfce9cc1b57c53bc3a51344720a85e008988e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zzqb">
+		<!-- Serial:  - Release Date:  - Alt. Title: 重裝機兵 , Metal Max (Official English Name by Sintax) -->
+		<description>Zhong Zhuan Qi Bing (Chi)</description>
+		<year>2003?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="zhong zhuan qi bing (unl).bin" size="2097152" crc="7175f80a" sha1="bd326d3a83928bb2972623b0e590ab0f11ee8638" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Other Asian Pirate dumps -->
 
@@ -16851,13 +16954,12 @@ Undumped Pirates:
 		</part>
 	</software>
 
-
 <!-- This is a title hack of an undumped 'Harry Potter 3: 神奇の光輪' -->
 	<software name="hpot3">
 		<!-- Serial:  - Release Date:  - Alt. Title:  -->
 		<description>Harry Potter 3 2003 (Chi)</description>
 		<year>2003?</year>
-		<publisher>Vast Fame?</publisher>
+		<publisher>V.Fame?</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="harry potter 3 (chi).bin" size="1048576" crc="4ea2c869" sha1="739c0e5dc0efd4ddb912236a6f630c3d6987d064" offset="000000" />
@@ -16865,18 +16967,504 @@ Undumped Pirates:
 		</part>
 	</software>
 
-<!-- FIXME: description is based on the box / cart label. Add proper description -->
-	<software name="firembas">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
-		<description>Fire Emblem Akaneia Senki (Chi)</description>
+	<software name="skxs">
+		<!-- Serial:  - Release Date:  - Alt. Title: 時空星獸 -->
+		<description>Shi Kong Xing Shou (Chi, Ripped from 12 in 1 multicart)</description>
+		<year>2001</year>
+		<publisher>V.Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shi kong xing shou (multicart rip) (unl) [c].bin" size="2097152" crc="ec970863" sha1="bc43036da01bb1aef4daa9e7316907193285011f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shjmlwc">
+		<!-- Serial:  - Release Date:  - Alt. Title: 聖火降魔錄外傳 - 光與暗的輪迴 (Title), 聖火降魔錄 (Box) -->
+		<description>Sheng Huo Jiang Mo Lu Wai Chuan - Guang Yu An De Lun Hui (Chi)</description>
 		<year>20??</year>
 		<publisher>SKOB</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="fire emblem akaneia senki (chi).bin" size="2097152" crc="808f19d7" sha1="62620a2cb01fe93388adc42da0b7cbaf53c11ba8" offset="000000" />
+				<rom name="fire emblem akaneia senki (unl).bin" size="2097152" crc="808f19d7" sha1="62620a2cb01fe93388adc42da0b7cbaf53c11ba8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="xgmyha" cloneof="shjmlwc">
+		<!-- Serial:  - Release Date:  - Alt. Title: 新光明与黑暗 -->
+		<description>Xin Guang Ming Yu Hei An (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shining force (unl).bin" size="2097152" crc="1066ec96" sha1="394709afedc0632c09fee33785b0c4f00a45d3e6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mszb3" cloneof="shjmlwc">
+		<!-- Serial:  - Release Date:  - Alt. Title: Warcraft 3 (Box? Catalog?) -->
+		<description>Mo Shou Zheng Ba 3 - Hun Luan Zhi Jie (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mo shou zheng ba 3 - hun luan zhi jie (unl).bin" size="2097152" crc="d40a87e7" sha1="4161e627ef984407eac3c18a1d9dccc68b0dc0e2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shuihuss">
+		<!-- Serial:  - Release Date:  - Alt. Title: 水滸神獸 -->
+		<description>Shui Hu Shen Shou (Chi)</description>
+		<year>2001</year>
+		<publisher>V.Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shui hu shen shou (unl).bin" size="2097152" crc="60a745b7" sha1="91216f379fb4bc00959a85a7eb5a88bbd3a01f42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shuihussa" cloneof="shuihuss">
+		<!-- Serial:  - Release Date:  - Alt. Title: 水滸神獸 -->
+		<description>Shui Hu Shen Shou (Chi, Alt)</description>
+		<year>2001</year>
+		<publisher>V.Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shui hu shen shou (unl) (alt).bin" size="2097152" crc="22a564fd" sha1="d1e5bdda06d347cc1ec596b42aecea2903dcc2f5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Title hack of the above, with VF logo removed -->
+	<software name="shuihuz" cloneof="shuihuss">
+		<!-- Serial:  - Release Date:  - Alt. Title: 水滸傳 -->
+		<description>Shui Hu Zhuan (Chi)</description>
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shui hu shen shou (unl) (newer).bin" size="2097152" crc="bf354758" sha1="020304c8c63a7ea1e8043a3a77b99b94978bfa4b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a title hack of an undumped game by SKPB: 'King of Fighter R-2' -->
+	<software name="kof2003">
+		<!-- Serial:  - Release Date:  - Alt. Title: 格斗至尊2003 -->
+		<description>Ge Dou Zhi Zun 2003 (Chi)</description>
+		<year>2003?</year>
+		<publisher>SKOB?</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="king of fighters 2003 (unl).bin" size="1048576" crc="f7630d88" sha1="f43c4055f69a1ff6b325494b5b34c8043914cd9d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srobotf1">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Super Robot Taisen Final Vol.1 (Chi)</description>
+		<year>20??</year>
+		<publisher>SKOB</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="super robot taisen final vol.1 (unl).bin" size="1048576" crc="cbb7159f" sha1="7a892748cb3a462d175cedda0bcd935ecca35cde" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srobotf1a" cloneof="srobotf1">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Super Robot Taisen Final Vol.1 (Chi, Alt)</description>
+		<year>20??</year>
+		<publisher>SKOB</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="super robot taisen final vol.1 (unl) (alt).bin" size="1048576" crc="b6fca9f2" sha1="a2d975087d68cc1644006fc12a52a26e72f542dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3guoastj">
+		<!-- Serial:  - Release Date:  - Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi - Lie Chuan) (Box) -->
+		<description>San Guo Zhi - Ao Shi Tian Jia (Chi)</description>
+		<year>20??</year>
+		<publisher>V.Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="san guo zhi - ao shi tian jia (unl).bin" size="2097152" crc="6e3fde3a" sha1="a1d3de40a8d98488072f2c49b53bb58e7a69ba33" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3guoastja" cloneof="3guoastj">
+		<!-- Serial:  - Release Date:  - Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi - Lie Chuan) (Box) -->
+		<description>San Guo Zhi - Ao Shi Tian Jia (Chi, Alt)</description>
+		<year>20??</year>
+		<publisher>V.Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="san guo zhi - ao shi tian jia (unl) (alt).bin" size="2097152" crc="daaf8a92" sha1="684edb0f22f36ce9df2a9eba2a5b89ba7d37fab8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has the 1st half identical to the second, but it's slightly different from the dumps above... -->
+	<software name="3guoastjb" cloneof="3guoastj">
+		<!-- Serial:  - Release Date:  - Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi - Lie Chuan) (Box) -->
+		<description>San Guo Zhi - Ao Shi Tian Jia (Chi, Alt Bad?)</description>
+		<year>20??</year>
+		<publisher>V.Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="san guo zhi - ao shi tian jia (unl) (bad maybe).bin" size="2097152" crc="5c30be34" sha1="7bb4b81d67be72d66faeadf86126b1a278172b07" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a title hack of an undumped Sintax game: 真三國無雙 (Zhen San Guo Wu Shuang) whose 'official' english title is True Three Kingdoms -->
+	<software name="cbzz">
+		<!-- Serial:  - Release Date:  - Alt. Title: 吞食天地 赤壁之戰 (Devouring of Heaven and Earth: The Battle of Red Cliffs) -->
+		<description>Tun Shi Tian Di - Chi Bi Zhi Zhan (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="san goku shi - act c (unl).bin" size="2097152" crc="02747bcf" sha1="77b70e5635c45f569e78a5fd947d6f7df23a2463" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smmftu">
+		<!-- Serial:  - Release Date:  - Alt. Title: 十面埋伏 屠龍篇 (House of Flying Daggers: Dragon Slayer Chapter) -->
+		<description>Shi Mian Mai Fu - Tu Long Pian (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="dragonslayer chapter (unl).bin" size="1048576" crc="a8f20133" sha1="8844b0c133de2242f451c8c3a7733f6c198590d4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smmftian">
+		<!-- Serial:  - Release Date:  - Alt. Title: 十面埋伏 天龍篇 (House of Flying Daggers: Sky Dragon Chapter) -->
+		<description>Shi Mian Mai Fu - Tian Long Pian (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sky dragon (unl).bin" size="1048576" crc="5843817e" sha1="1e6827cb1579a496eea27d6e792e14a15af3d297" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk01" supported="no">
+		<description>Unknown RPG - Digimon? Zelda? (Chi, Encrypted?)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="zelda shi kong zhi zhang (encrypted) (unl).bin" size="2097152" crc="e47308dd" sha1="8a047b442b56d92b636043e5b237c163b45f33c5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokedmnda" cloneof="telefngp">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Pocket Monsters Diamond (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monster diamond (unl).bin" size="2097152" crc="4b2b8b57" sha1="9a2b381a134bb7ed1b566bb6f94596b57e690a4e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokedmnd" cloneof="telefngp">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Pokémon Diamond (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon diamond (unl).bin" size="2097152" crc="41e3723c" sha1="47391ca3d68c41a627e1bb5cf987425ce391abf0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yxcs" supported="no">
+		<!-- Serial:  - Release Date:  - Alt. Title: 英雄传说 (Legend of Heroes)  -->
+		<description>Ying Xiong Chuan Shuo (Chi)</description>
+		<year>20??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="legend of heroes (unl).bin" size="1048576" crc="0dd2b42b" sha1="b62bff46fb8d5962598445bd113370dd0717f170" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sqsd" supported="no">
+		<!-- Serial:  - Release Date:  - Alt. Title: 石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King)  -->
+		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="stone age (unl).bin" size="4194304" crc="e7d9d377" sha1="f88f605960c1573aa8bc5fafab19014b0d987729" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z3guows2">
+		<!-- Serial:  - Release Date:  - Alt. Title: 真三國無雙2  -->
+		<description>Shin Sangoku Musou 2 - Zhen San Guo Wu Shuang 2 (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shin san guo shi 2 (unl).bin" size="2097152" crc="33f56c90" sha1="a5111c11cf70c65341b373f484650caae3c4d29f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dquest4">
+		<!-- Serial:  - Release Date:  - Alt. Title: 勇者斗恶龙4  -->
+		<description>Dragon Quest 4 - Yongzhe Dou E Long 4 (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="dragon quest 4 (unl).bin" size="4194304" crc="bd651350" sha1="120b18c4f53051db70b90e92c60b100cc13024c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="pikangtm" cloneof="smurfsni">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>The Pikachu Nightmare (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pocket monsters go! go! - the pikachu nightmare (chi).bin" size="1048576" crc="202b413b" sha1="5056a38a4584192df0cee8d1dd7198fc6983c3fe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokegogo" cloneof="smurfsni">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Pocket Monsters GO!GO! GO! (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pocket monsters go!go!go! (chi).bin" size="524288" crc="dd13f234" sha1="8e687d6b2439db522b238361bc2d7458296c9b62" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These are basically the same game as Sonic 3D Blast 5, always by Yong Yong (see gameboy.xml) -->
+	<software name="sonicad7">
+		<!-- Serial:  - Release Date:  - Alt. Title: Sonic 7, Sonic Adventure 7 -->
+		<description>Sonic Adventure (Chi)</description>
+		<year>1999</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic adventure 7 (unl).bin" size="524288" crc="dec1260e" sha1="d3ea57e8df8f8d3a80581eaf8e807e359c9059df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeadv">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Pokémon Adventure (Chi)</description>
+		<year>2000</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pokemon adventure (unl).bin" size="524288" crc="8edb9eb7" sha1="f86884a85cc560b91340a4c53a37cc8026699ddc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong5">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Donkey Kong 5 (Chi, Bad?)</description>
+		<year>2000</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="donkey kong 5 (bad).bin" size="262144" crc="e097ce67" sha1="e9670cac5a943f75e0e0a3ffd31f1eb6d94d7008" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version should be the real dump, protected as the original cart -->
+	<software name="digimn2">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 2 (Chi)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 2 (unl).bin" size="1048576" crc="aabbec08" sha1="b88393318c35fcd63b9bbe8ccd0ce89d971b6163" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped 
+     the real card, so it can be removed once we properly emulate the parent -->
+	<software name="digimn2h" cloneof="digimn2">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 2 (Chi, Hacked)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 2 (unl) (hacked).bin" size="1048576" crc="153ae99f" sha1="b78ba8f8f2b297a5a2847cbde27900531cfff584" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimn3c">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 3 Crystal (Chi)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="digimon 3 (unl).bin" size="2097152" crc="63948092" sha1="8c934603d38b8181acdb815ebc2e6aad8e9cf6d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version should be the real dump, protected as the original cart -->
+	<software name="digimn4">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 02 4 (Chi)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 4 (unl).bin" size="1048576" crc="2ee18ab2" sha1="839f0880749735ba2113e437f8efede171b7474d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version bypasses the protection, but I think it's been hacked by whoever dumped 
+     the real card, so it can be removed once we properly emulate the parent -->
+	<software name="digimn4h" cloneof="digimn4">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 02 4 (Chi, Hacked)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 4 (unl) (hacked).bin" size="1048576" crc="6f67dfc6" sha1="5c5d1675188a5f618f9babf2b3848942ce08c659" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digijade" cloneof="digimn4">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 02 Jade (Chi)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 02 jade (unl).bin" size="1048576" crc="c64818eb" sha1="314cf9deaf5c42905d412315fe701524ebd9e9ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimn5">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 02 5 (Chi)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 5 (unl).bin" size="1048576" crc="5ba9f8b5" sha1="c441fcbdb343e0c3c76803aa55ceb728158a8948" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimn5c" cloneof="digimn5">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Digimon 02 5 Crystal (Chi)</description>
+		<year>20??</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="digimon 5 crystal (unl).bin" size="1048576" crc="5666e0f6" sha1="1206d684361f7cf25e2dbaadaa034f0121012c0f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- TO BE VERIFIED: all of these files have the same first half and *very* similar second half (~99%). Hard to say which is good though -->
+<!-- Once sorted out what is good and what not, the entry should be moved among the Sintax games above! -->
+	<software name="mslug2k1">
+		<!-- probably developed by BDD -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Metal Slug 2001 (Chi)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="metal slug 2001 (unl).bin" size="1048576" crc="8ef044b2" sha1="793c3f810b0075310457cd8f2e74ad1388b14d04" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslug2k1a" cloneof="mslug2k1">
+		<!-- probably developed by BDD -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Metal Slug 2001 (Chi, Alt 1)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="metal slug 2001 (unl) (a1).bin" size="1048576" crc="424cea4a" sha1="d8ea5abeb33e19ddfea3102f009e45ba9293ce76" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslug2k1b" cloneof="mslug2k1">
+		<!-- probably developed by BDD -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Metal Slug 2001 (Chi, Alt 2)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="metal slug 2001 (unl) (a2).bin" size="1048576" crc="bf0028d9" sha1="99f536400bb99892b736f66305e1b11d8229c668" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslug2k1c" cloneof="mslug2k1">
+		<!-- probably developed by BDD -->
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Metal Slug 2001 (Chi, Alt 3)</description>
+		<year>20??</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="metal slug 2001 (unl) (a3).bin" size="1048576" crc="a658d85e" sha1="3b5e765dbda9b355a6ea9ab7920d31f4169fa1d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 
 <!-- Non game cartridges -->

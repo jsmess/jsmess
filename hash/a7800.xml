@@ -3,26 +3,14 @@
 
 <!-- 
 
-Unlicensed Undumped Releases: -
+Unlicensed Undumped Releases
 
-  - Asteroids Deluxe
   - Beef Drop
   - B*nQ
   - Combat 1990
-  - Hangly-Man
-  - Jr Pac-Man
   - Kessel Attack
-  - Ms Pac-Attack
-  - Pac-Man Collection
-  - Pac-Man
-  - Pac-Man Plus
-  - Pac-Pollux
-  - Santa Simon
-  - Space Duel
-  - Space Invaders
-  - Star Wars
   - Super Pacman
-  - Wasp
+  
 
 -->
 	<softwarelist name="a7800" description="Atari 7800 cartridges">		
@@ -126,6 +114,32 @@ Unlicensed Undumped Releases: -
 			<feature name="pcb_type" value="TYPE-0" />
 			<dataarea name="rom" size="16384">
 				<rom name="astroids.bin" size="16384" crc="dfb93f40" sha1="d96ec4e043fcdacab367d8a69d29904b3b2896f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrodlx" cloneof="asteroid">
+		<description>Asteroids Deluxe (NTSC)</description>
+		<!-- Serial:  -->
+		<year>2007</year>
+		<publisher>Atari Interactive, Inc.</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="asteroids deluxe (ntsc).bin" size="32768" crc="56239d62" sha1="514fb53dcd8c47251fcbe5047bb2d9d13ccf6aef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrodlxp" cloneof="asteroid">
+		<description>Asteroids Deluxe (PAL)</description>
+		<!-- Serial:  -->
+		<year>2007</year>
+		<publisher>Atari Interactive, Inc.</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="asteroids deluxe (pal).bin" size="32768" crc="ab72ea89" sha1="341c7be2823e69e95a61567cb79042c140278c4c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -757,7 +771,19 @@ Unlicensed Undumped Releases: -
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="hanglymn">
+		<description>Hangly-Man (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="hangly-man.bin" size="16384" crc="8560a801" sha1="f8654387ff648abbe1e6d8f49b8f8b33f803b917" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="hattricku" cloneof="hattrick">
 		<description>Hat Trick (NTSC, Prototype)</description>
 		<!-- Serial: CX7829 -->
@@ -874,6 +900,18 @@ Unlicensed Undumped Releases: -
 		</part>
 	</software>
 
+	<software name="jrpacman">
+		<description>Jr. Pac-Man (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="jr pac-man (ntsc).bin" size="32768" crc="0198aed4" sha1="f6d51d9c0eaf03c47e1e2d3774fd16c3ba3a59e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="joustu" cloneof="joust">
 		<description>Joust (NTSC)</description>
 		<!-- Serial: CX7806 -->
@@ -900,6 +938,7 @@ Unlicensed Undumped Releases: -
 		</part>
 	</software>
 
+	
 	<software name="karatekau" cloneof="karateka">
 		<description>Karateka (NTSC, Prototype)</description>
 		<!-- Serial: CX7822 -->
@@ -1136,6 +1175,18 @@ Unlicensed Undumped Releases: -
 		</part>
 	</software>
 
+	<software name="mspacatk" cloneof="mspacman">
+		<description>Miss Pac-Attack (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="miss pac-attack.bin" size="16384" crc="b4557dd7" sha1="446660edd243da39602d1b673ff13a84239b66d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mspacmanu" cloneof="mspacman">
 		<description>Ms. Pac-Man (NTSC)</description>
 		<!-- Serial: CX7807 -->
@@ -1161,7 +1212,7 @@ Unlicensed Undumped Releases: -
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="ninjaglfu" cloneof="ninjaglf">
 		<description>Ninja Golf (NTSC)</description>
 		<!-- Serial: CX7870 -->
@@ -1223,6 +1274,78 @@ Unlicensed Undumped Releases: -
 			<feature name="pcb_type" value="TYPE-0" />
 			<dataarea name="rom" size="32768">
 				<rom name="peterose.bin" size="32768" crc="f33d4dfa" sha1="ffb4fbed8d8f28ea71668542b7ebd019955c5a11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pac-Man (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pacman.bin" size="16384" crc="d5d08d7e" sha1="f427806eae13e3c4ab8afdbe366ab1ec219d0047" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrapac" cloneof="pacman">
+		<description>Ultra Pac-Man (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ultra pac-man.bin" size="32768" crc="4baeac35" sha1="63a98f74ada1ce08ee0137e437395cc17b67a4d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacollu" cloneof="pacman">
+		<description>Pac-Man Collection! (NTSC)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>Self Published</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pac-man collection (ntsc).bin" size="32768" crc="553ea894" sha1="3b579d8827898a94b16225632a9870d22224b6bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paccoll" cloneof="pacman">
+		<description>Pac-Man Collection! (PAL)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>Self Published</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pac-man collection (pal).bin" size="32768" crc="74517c71" sha1="ed0414e4b7c5ac10b0d7a5e19ee9c8e9ee61442f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacplus" cloneof="pacman">
+		<description>Pac-Man Plus (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pac-man plus.bin" size="16384" crc="e2dc056e" sha1="7dd18c8c7e82c813531f80ef2fe981c340f41c20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacpolux" cloneof="pacman">
+		<description>Pac-Pollux (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pac-pollux.bin" size="16384" crc="1b3dd167" sha1="2f079cd0fb6d92fd5261fe567ae0a6407a722f44" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1370,6 +1493,18 @@ Unlicensed Undumped Releases: -
 		</part>
 	</software>
 
+	<software name="santasim">
+		<description>Santa Simon (NTSC)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>Atari Age</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="santa simon.bin" size="49152" crc="30d641ff" sha1="610e08f226c66b15ff699b02c736ce5ce7a8a862" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scrapdogu" cloneof="scrapdog">
 		<description>Scrapyard Dog (NTSC)</description>
 		<!-- Serial: CX7879 -->
@@ -1433,6 +1568,66 @@ Unlicensed Undumped Releases: -
 			<feature name="pcb_type" value="TYPE-6" />
 			<dataarea name="rom" size="131072">
 				<rom name="sirius.bin" size="131072" crc="65ae616e" sha1="cd9f6dea96f102262065d7472e73121b67f9e244" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacduelu" cloneof="spacduel">
+		<description>Space Duel (NTSC)</description>
+		<!-- Serial:  -->
+		<year>2007</year>
+		<publisher>Atari Interactive</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="space duel (ntsc).bin" size="32768" crc="ef2d2560" sha1="199d06cf7f54bb0a1fa328d3cff955f4bcf90450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacduel">
+		<description>Space Duel (PAL)</description>
+		<!-- Serial:  -->
+		<year>2007</year>
+		<publisher>Atari Interactive</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="space duel (pal).bin" size="32768" crc="0e6a8443" sha1="03d3c7e6255fc6f1b8bbf6dc3ccdbaf51b7eabf7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinvu" cloneof="spaceinv">
+		<description>Space Invader (NTSC)</description>
+		<!-- Serial:  -->
+		<year>2008</year>
+		<publisher>Self Published</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="spaceinvaders (ntsc).bin" size="16384" crc="9c3086eb" sha1="167c06a5d9364f3359bb531d5533f4ff49283d47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
+		<description>Space Invader (PAL)</description>
+		<!-- Serial:  -->
+		<year>2008</year>
+		<publisher>Self Published</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="spaceinvaders (pal).bin" size="16384" crc="90d7aad3" sha1="0b17368b9f3328f41d29ca4f0d04ab25e1aad55e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars 7800 (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>2007</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="star wars 7800.bin" size="32768" crc="8678f1c0" sha1="9ac24aa0563be93d72bcf83c52a8acdbbfc63729" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1602,6 +1797,30 @@ Unlicensed Undumped Releases: -
 			<feature name="pcb_type" value="TYPE-6" />
 			<dataarea name="rom" size="65536">
 				<rom name="twrtpleu.bin" size="65536" crc="0f87fd7b" sha1="56e1b795e80382edb376e4536d1dee539d4ac548" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warbirds">
+		<description>War Birds (NTSC, Homebrew)</description>
+		<!-- Serial:  -->
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="warbirds.bin" size="49152" crc="5c527238" sha1="4fd41bee6c3e1d3a3aaaf4ea96dc1db46750381d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wasp">
+		<description>Wasp (NTSC)</description>
+		<!-- Serial:  -->
+		<year>2009</year>
+		<publisher>Mark Ball</publisher>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="wasp v1.05.bin" size="32768" crc="ae1117dd" sha1="be65bdc225aca4a8bb9a18653da7de78aaac3f80" offset="0" />
 			</dataarea>
 		</part>
 	</software>

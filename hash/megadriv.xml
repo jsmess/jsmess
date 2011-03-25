@@ -51,7 +51,6 @@
     ROAD RASH								JAPAN
     ROAD RASH								USA/PAL		needs proper dump
     ROBOCOP VERSUS THE TERMINATOR			JAPAN
-    SAN SAN									JAPAN
     SHINING FORCE							PAL
     SIDE POCKET								JAPAN/USA	conflict in current info
     SMURFS									PAL			we have Rev A, Rev 0 needed
@@ -17396,6 +17395,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="san guo zhi v (chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sansan">
+		<!-- Serial: T-147013 - Release Date:  - Alt. Title: サンサン - Notes: for use with Modem and online service -->
+		<description>San San (Jpn)</description>
+		<year>1994</year>
+		<publisher>San San Co.</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="san san (japan).bin" size="1048576" crc="5b85deed" sha1="e882c3af57884862bafc764226c88c287752e9d6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
