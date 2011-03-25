@@ -179,6 +179,16 @@
 #include "machine/nvram.h"
 #include "includes/funworld.h"
 
+
+class _4roses_state : public funworld_state
+{
+public:
+	_4roses_state(running_machine &machine, const driver_device_config_base &config)
+		: funworld_state(machine, config) { }
+
+};
+
+
 /**********************
 * Read/Write Handlers *
 **********************/
@@ -191,8 +201,8 @@
 
 static ADDRESS_MAP_START( 4roses_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	// AM_SHARE("nvram")
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&funworld_videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&funworld_colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -370,7 +380,7 @@ static const mc6845_interface mc6845_intf =
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( 4roses, driver_device )
+static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(4roses_map)

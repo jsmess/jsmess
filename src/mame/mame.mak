@@ -589,6 +589,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/madalien.o $(AUDIO)/madalien.o $(VIDEO)/madalien.o \
 	$(DRIVERS)/madmotor.o $(VIDEO)/madmotor.o \
 	$(DRIVERS)/metlclsh.o $(VIDEO)/metlclsh.o \
+	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/pcktgal.o $(VIDEO)/pcktgal.o \
 	$(DRIVERS)/pktgaldx.o $(VIDEO)/pktgaldx.o \
 	$(DRIVERS)/pokechmp.o $(VIDEO)/pokechmp.o \
@@ -608,6 +609,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(MACHINE)/decocrpt.o \
 	$(MACHINE)/decoprot.o \
 	$(VIDEO)/deco16ic.o \
+	$(VIDEO)/decospr.o \
 
 $(MAMEOBJ)/dooyong.a: \
 	$(DRIVERS)/dooyong.o $(VIDEO)/dooyong.o \
@@ -776,6 +778,7 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/kaneko16.o $(MACHINE)/kaneko16.o $(VIDEO)/kaneko16.o \
 	$(DRIVERS)/sandscrp.o \
 	$(DRIVERS)/suprnova.o $(VIDEO)/suprnova.o \
+	$(VIDEO)/sknsspr.o \
 
 $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/88games.o $(VIDEO)/88games.o \
@@ -1686,7 +1689,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/mil4000.o \
 	$(DRIVERS)/miniboy7.o \
-	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
 	$(DRIVERS)/mole.o \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
