@@ -10,12 +10,36 @@
 
     TODO:
 
-	- mf(2,0) -> No number
+	- DMA starts before first floppy DRQ
+
+		Z80DMA '5g' Write 79
+		Z80DMA '5g' Write 30
+		Z80DMA '5g' Write 44
+		Z80DMA '5g' Write 00
+		Z80DMA '5g' Write 01
+		Z80DMA '5g' Write 54
+		Z80DMA '5g' Write 0d
+		Z80DMA '5g' Write 68
+		Z80DMA '5g' Write 0d
+		Z80DMA '5g' Write 80
+		Z80DMA '5g' Write cd
+		Z80DMA '5g' Write 06
+		Z80DMA '5g' Write 10
+		Z80DMA '5g' Write 92
+		Z80DMA '5g' Write cf
+		Z80DMA '5g' Load A: 4430 B: 1006 N: 100
+		Z80DMA '5g' Write 87
+		Z80DMA '5g' Enable DMA
+		Z80DMA '5g' B src: 1006 i/o -> data: 00
+		Z80DMA '5g' A dst: 4430 mem
+		Z80DMA '5g' B src: 1006 i/o -> data: 00
+		Z80DMA '5g' A dst: 4431 mem
+
+    - floppy
 	- watchdog
     - CIO (interrupt controller)
 		- RTC
 		- NVRAM
-    - floppy
     - hard disk (Xebec S1410)
 
 */
@@ -36,10 +60,13 @@
 #define A2			BIT(offset, 2)
 #define A7			BIT(offset, 7)
 #define A8			BIT(offset, 8)
+#define X11			BIT(offset, 11)
+#define X12			BIT(offset, 12)
 #define A17			BIT(offset, 17)
 #define A18			BIT(offset, 18)
 #define A19			BIT(offset, 19)
 
+#define A10_A9_A8	((offset >> 8) & 0x07)
 #define A2_A1_A0	(offset & 0x07)
 #define A1_A2		((A1 << 1) | A2)
 #define A2_A1		((offset >> 1) & 0x03)
@@ -68,12 +95,45 @@
 // DMA map
 enum
 {
-	DMAMAP_R2_LO = 0,
+	DMAMAP_R2_LO = 2,
 	DMAMAP_R2_HI,
 	DMAMAP_R1_LO,
 	DMAMAP_R1_HI,
 	DMAMAP_R0_LO,
 	DMAMAP_R0_HI
+};
+
+
+// internal I/O registers
+enum
+{
+	FLP = 0,
+	CRT,
+	DRT,
+	DMA0,
+	DMA1,
+	DMA2,
+	SCC,
+	CIO
+};
+
+
+// internal I/O registers
+enum
+{
+	IORD0 = 0
+};
+
+
+// internal I/O registers
+enum
+{
+	IOWR0 = 0,
+	IOWR1,
+	IOWR2,
+	FW,
+	DMAMAP = 5,
+	SPEC_CONTR_REG = 7
 };
 
 
@@ -145,52 +205,65 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 data = 0;
 	
-	if (offset >= 0x1fe000 && offset < 0x1ff000)
+	if (X12)
 	{
-		// BUS0I, BUS0X, BUS1, BUS2
-	}
-	else if (offset >= 0x1ff000 && offset < 0x1ff100)
-	{
-		data = wd17xx_r(m_fdc, A2_A1);
-	}
-	else if (offset >= 0x1ff100 && offset < 0x1ff200)
-	{
-		if (A0) 
-			data = mc6845_register_r(m_crtc, 0);
+		if (X11)
+		{
+			switch (A10_A9_A8)
+			{
+			case IORD0:
+				data = iord0_r(*program, offset);
+				break;
+			
+			default:
+				logerror("Unmapped read from virtual I/O %06x\n", offset);
+			}
+		}
 		else
-			data = mc6845_status_r(m_crtc, 0);
-	}
-	else if (offset >= 0x1ff200 && offset < 0x1ff300)
-	{
-		data = z80dart_ba_cd_r(m_dart, A2_A1 ^ 0x03);
-	}
-	else if (offset >= 0x1ff300 && offset < 0x1ff400)
-	{
-		data = m_dma0->read();
-	}
-	else if (offset >= 0x1ff400 && offset < 0x1ff500)
-	{
-		data = m_dma1->read();
-	}
-	else if (offset >= 0x1ff500 && offset < 0x1ff600)
-	{
-		data = m_dma2->read();
-	}
-	else if (offset >= 0x1ff600 && offset < 0x1ff700)
-	{
-		data = scc8530_r(m_scc, A1_A2);
-	}
-	else if (offset >= 0x1ff700 && offset < 0x1ff800)
-	{
-		data = m_cio->read(*program, A2_A1);
-	}
-	else if (offset >= 0x1ff800 && offset < 0x1ff900)
-	{
-		data = iord0_r(*program, offset);
+		{
+			switch (A10_A9_A8)
+			{
+			case FLP:
+				data = wd17xx_r(m_fdc, A2_A1);
+				break;
+
+			case CRT:
+				if (A0) 
+					data = mc6845_register_r(m_crtc, 0);
+				else
+					data = mc6845_status_r(m_crtc, 0);
+				break;
+
+			case DRT:
+				data = z80dart_ba_cd_r(m_dart, A2_A1 ^ 0x03);
+				break;
+
+			case DMA0:
+				data = m_dma0->read();
+				break;
+
+			case DMA1:
+				data = m_dma1->read();
+				break;
+
+			case DMA2:
+				data = m_dma2->read();
+				break;
+
+			case SCC:
+				data = scc8530_r(m_scc, A1_A2);
+				break;
+
+			case CIO:
+				data = m_cio->read(*program, A2_A1);
+				break;
+			}
+		}
 	}
 	else
 	{
-		if (LOG) logerror("Unmapped read from virtual memory %06x\n", offset);
+		// BUS0I, BUS0X, BUS1, BUS2
+		logerror("Unmapped read from virtual I/O %06x\n", offset);
 	}
 
 	return data;
@@ -205,78 +278,90 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
-	if (offset >= 0x1fe000 && offset < 0x1ff000)
+	if (X12)
 	{
-		// BUS0I, BUS0X, BUS1, BUS2
-	}
-	else if (offset >= 0x1ff000 && offset < 0x1ff100)
-	{
-		wd17xx_w(m_fdc, A2_A1, data);
-	}
-	else if (offset >= 0x1ff100 && offset < 0x1ff200)
-	{
-		if (A0)
-			mc6845_register_w(m_crtc, 0, data);
-		else
-			mc6845_address_w(m_crtc, 0, data);
-	}
-	else if (offset >= 0x1ff200 && offset < 0x1ff300)
-	{
-		z80dart_ba_cd_w(m_dart, A2_A1 ^ 0x03, data);
-	}
-	else if (offset >= 0x1ff300 && offset < 0x1ff400)
-	{
-		m_dma0->write(data);
-	}
-	else if (offset >= 0x1ff400 && offset < 0x1ff500)
-	{
-		m_dma1->write(data);
-	}
-	else if (offset >= 0x1ff500 && offset < 0x1ff600)
-	{
-		m_dma2->write(data);
-	}
-	else if (offset >= 0x1ff600 && offset < 0x1ff700)
-	{
-		scc8530_w(m_scc, A1_A2, data);
-	}
-	else if (offset >= 0x1ff700 && offset < 0x1ff800)
-	{
-		m_cio->write(*program, A2_A1, data);
-	}
-	else if (offset >= 0x1ff800 && offset < 0x1ff900)
-	{
-		iowr0_w(*program, offset, data);
-	}
-	else if (offset >= 0x1ff900 && offset < 0x1ffa00)
-	{
-		iowr1_w(*program, offset, data);
-	}
-	else if (offset >= 0x1ffa00 && offset < 0x1ffb00)
-	{
-		iowr2_w(*program, offset, data);
-	}
-	else if (offset >= 0x1ffb00 && offset < 0x1ffc00)
-	{
-		if (!A7)
+		if (X11)
 		{
-			if (A0)
-				fw1_w(*program, offset, data);
-			else
-				fw0_w(*program, offset, data);
+			switch (A10_A9_A8)
+			{
+			case IOWR0:
+				iowr0_w(*program, offset, data);
+				break;
+
+			case IOWR1:
+				iowr1_w(*program, offset, data);
+				break;
+
+			case IOWR2:
+				iowr2_w(*program, offset, data);
+				break;
+
+			case FW:
+				if (!A7)
+				{
+					if (A0)
+						fw1_w(*program, offset, data);
+					else
+						fw0_w(*program, offset, data);
+				}
+				else
+				{
+					logerror("Unmapped write to virtual I/O %06x : %02x\n", offset, data);
+				}
+				break;
+
+			case DMAMAP:
+				dmamap_w(*program, offset, data);
+				break;
+
+			case SPEC_CONTR_REG:
+				spec_contr_reg_w(*program, offset, data);
+				break;
+
+			default:
+				logerror("Unmapped write to virtual I/O %06x : %02x\n", offset, data);
+			}
 		}
-	}
-	else if (offset >= 0x1ffd00 && offset < 0x1ffe00)
-	{
-		dmamap_w(*program, offset, data);
-	}
-	else if (offset >= 0x1ffe00 && offset < 0x1fff00)
-	{
-		spec_contr_reg_w(*program, offset, data);
-	}
-	else
-	{
-		if (LOG) logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
+		else
+		{
+			switch (A10_A9_A8)
+			{
+			case FLP:
+				wd17xx_w(m_fdc, A2_A1, data);
+				break;
+
+			case CRT:
+				if (A0)
+					mc6845_register_w(m_crtc, 0, data);
+				else
+					mc6845_address_w(m_crtc, 0, data);
+				break;
+
+			case DRT:
+				z80dart_ba_cd_w(m_dart, A2_A1 ^ 0x03, data);
+				break;
+
+			case DMA0:
+				m_dma0->write(data);
+				break;
+
+			case DMA1:
+				m_dma1->write(data);
+				break;
+
+			case DMA2:
+				m_dma2->write(data);
+				break;
+
+			case SCC:
+				scc8530_w(m_scc, A1_A2, data);
+				break;
+
+			case CIO:
+				m_cio->write(*program, A2_A1, data);
+				break;
+			}
+		}
 	}
 }
 
@@ -1231,7 +1316,7 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w), 
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, drq_w),
-	{ NULL, NULL, FLOPPY_0, NULL }
+	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
 
