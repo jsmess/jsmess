@@ -28,23 +28,22 @@
 		- specific x1turboz features?
 
     per-game/program specific TODO:
-    - Lupin 3 / Take the A-Train / Makai et al (basically anything that uses cz-8fb02 basic): uses x1turbo bankswitch memory RAM, doesn't load due of it;
-
     - Dragon Buster: it crashed to me once with a obj flag hang;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
     - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
- 	- Luna City: text gfxs looks doubled in y-axis
+    - Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
 	- "newtype": trips a z80dma assert, worked around for now;
-	- X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
 	- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
 	- Shiver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
 	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
 	- Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
+    - Take the A-Train: returns to basic prompt if you try to start a play, missing disk perhaps?
     - Thexder: (x1turbo) Can't start a play, keyboard related issue?
 	- Trivia-Q: dunno what to do on the selection screen, missing inputs?
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
+	- X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
     - Ys 2: crashes after the disclaimer screen;
     - Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
     - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
@@ -389,6 +388,9 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap)
 
 				if(height && y)
 					dy = check_prev_height(machine,x,y,x_size);
+
+				/* guess: assume that Kanji VRAM doesn't double the vertical size */
+				if(knj_enable) { height = 0; }
 
 				for(yi=0;yi<mc6845_tile_height;yi++)
 				{
@@ -984,30 +986,14 @@ static WRITE8_HANDLER( x1_rom_w )
 static WRITE8_HANDLER( rom_bank_0_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
-
 	state->ram_bank = 0x10;
-
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
 }
 
 static WRITE8_HANDLER( rom_bank_1_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
-
 	state->ram_bank = 0x00;
-
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 }
-
-static WRITE8_HANDLER( rom_data_w )
-{
-	UINT8 *ROM = space->machine->region("maincpu")->base();
-
-	ROM[0x10000+offset] = data;
-}
-
 
 /*************************************
  *
@@ -1574,14 +1560,14 @@ static READ8_HANDLER( x1turbo_bank_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 
-	printf("BANK access read\n");
+//	printf("BANK access read\n");
 	return state->ex_bank & 0x3f;
 }
 
 static WRITE8_HANDLER( x1turbo_bank_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	//UINT8 *RAM = space->machine->region("maincpu")->base();
 	/*
 	--x- ---- BML5: latch bit (doesn't have any real function)
 	---x ---- BMCS: select bank RAM, active low
@@ -1589,18 +1575,58 @@ static WRITE8_HANDLER( x1turbo_bank_w )
 	*/
 
 	state->ex_bank = data & 0x3f;
-	printf("BANK access write %02x\n",data);
+//	printf("BANK access write %02x\n",data);
+}
 
-	if(data & 0x10)
+/* TODO: waitstate penalties */
+static READ8_HANDLER( x1_mem_r )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *wram = space->machine->region("wram")->base();
+
+	if((offset & 0x8000) == 0 && (state->ram_bank == 0))
 	{
-		RAM = space->machine->region("maincpu")->base();
-		memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]);
+		UINT8 *ipl = space->machine->region("ipl")->base();
+		return ipl[offset]; //ROM
+	}
+
+	return wram[offset]; //RAM
+}
+
+static WRITE8_HANDLER( x1_mem_w )
+{
+	//x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *wram = space->machine->region("wram")->base();
+
+	wram[offset] = data; //RAM
+}
+
+static READ8_HANDLER( x1turbo_mem_r )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+
+	if((state->ex_bank & 0x10) == 0)
+	{
+		UINT8 *wram = space->machine->region("wram")->base();
+
+		return wram[offset+((state->ex_bank & 0xf)*0x10000)];
+	}
+
+	return x1_mem_r(space,offset);
+}
+
+static WRITE8_HANDLER( x1turbo_mem_w )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+
+	if((state->ex_bank & 0x10) == 0)
+	{
+		UINT8 *wram = space->machine->region("wram")->base();
+
+		wram[offset+((state->ex_bank & 0xf)*0x10000)] = data; //RAM
 	}
 	else
-	{
-		RAM = space->machine->region("maincpu")->base();
-		memory_set_bankptr(space->machine, "bank1", &RAM[(data & 1)*0x10000]);
-	}
+		x1_mem_w(space,offset,data);
 }
 
 /*************************************
@@ -1792,11 +1818,14 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	}
 }
 
-
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1") AM_WRITE(rom_data_w)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( x1turbo_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_mem_r,x1turbo_mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
@@ -1951,12 +1980,13 @@ static Z80DMA_INTERFACE( x1_dma )
 
 static INPUT_CHANGED( ipl_reset )
 {
-	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	//address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	x1_state *state = field->port->machine->driver_data<x1_state>();
 
 	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 
+	state->ram_bank = 0x00;
+	if(state->is_turbo) { state->ex_bank = 0x10; }
 	//anything else?
 }
 
@@ -2453,11 +2483,9 @@ static TIMER_CALLBACK(x1_rtc_increment)
 static MACHINE_RESET( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	//UINT8 *ROM = machine->region("maincpu")->base();
 	UINT8 *PCG_RAM = machine->region("pcg")->base();
 	int i;
-
-	memory_set_bankptr(machine, "bank1", &ROM[0x00000]);
 
 	memset(state->gfx_bitmap_ram,0x00,0xc000*2);
 
@@ -2502,6 +2530,7 @@ static MACHINE_RESET( x1turbo )
 	x1_state *state = machine->driver_data<x1_state>();
 	MACHINE_RESET_CALL( x1 );
 	state->is_turbo = 1;
+	state->ex_bank = 0x10;
 
 	state->scrn_reg.blackclip = 0;
 }
@@ -2617,6 +2646,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
 	MCFG_CPU_IO_MAP(x1turbo_io)
 	MCFG_CPU_CONFIG(x1turbo_daisy)
 
@@ -2640,8 +2670,12 @@ MACHINE_CONFIG_END
  *************************************/
 
  ROM_START( x1 )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d) )
+
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2666,8 +2700,12 @@ MACHINE_CONFIG_END
 ROM_END
 
 ROM_START( x1twin )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a) )
+
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2696,8 +2734,12 @@ ROM_START( x1twin )
 ROM_END
 
 ROM_START( x1turbo )
-	ROM_REGION( 0x20000+0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
+
+	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2728,8 +2770,12 @@ ROM_START( x1turbo )
 ROM_END
 
 ROM_START( x1turbo40 )
-	ROM_REGION( 0x20000+0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.bin", 0x0000, 0x8000, CRC(112f80a2) SHA1(646cc3fb5d2d24ff4caa5167b0892a4196e9f843) )
+
+	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
