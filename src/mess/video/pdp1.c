@@ -313,13 +313,13 @@ static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
 {
 	/* column 1: registers, test word, test address */
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+2*8, y_panel_pc_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_PC), 16);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+2*8, y_panel_ma_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_MA), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_pc_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_PC), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_ma_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_MA), 16);
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_mb_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_MB), 18);
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_ac_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_AC), 18);
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_io_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_IO), 18);
 	pdp1_draw_switch(machine, bitmap, x_panel_col1_offset, y_panel_ta_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_EXTEND_SW));
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+2*8, y_panel_ta_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_TA), 16);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+16, y_panel_ta_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_TA), 16);
 	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset, y_panel_tw_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_TW), 18);
 
 	/* column 2: 1-bit indicators */
