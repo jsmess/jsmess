@@ -9565,8 +9565,8 @@ Undumped Pirates:
 	</software>
 
 	<software name="muppetsa" cloneof="muppets">
-		<!-- Serial: ?? - Release Date:  - Notes: GBC only -->
-		<description>The Muppets (Euro, AX9P)</description>
+		<!-- Serial: DMG-AX9P-??? - Release Date:  - Notes: GBC only -->
+		<description>The Muppets (Euro, Transparent Cart)</description>
 		<year>2000</year>
 		<publisher>Take-Two Interactive</publisher>
 		<part name="cart" interface="gameboy_cart">
