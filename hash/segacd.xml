@@ -264,7 +264,7 @@
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 
-		<!-- Note, this is the Tosec dump, the Redump set had no Disc 1-->
+		<!-- Note, this is the TOSEC dump, the Redump set had no Disc 1-->
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -1133,7 +1133,7 @@
 	</software>
 
 	<software name="eyebehol">
-		<!-- Serial: 4655 -->
+		<!-- Serial: 4655 - Alt. Title: Advanced Dungeons &amp; Dragons - Eye of the Beholder (Box) -->
 		<description>Eye of the Beholder (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2482,7 +2482,7 @@
 	</software>
 
 	<software name="animals">
-		<!-- Serial:  -->
+		<!-- Serial: T-87015 -->
 		<description>The San Diego Zoo Presents... The Animals! (USA)</description>
 		<year>1992</year>
 		<publisher>Software Toolworks</publisher>
@@ -3002,8 +3002,8 @@
 	</software>
 
 	<software name="swchess">
-		<!-- Serial:  -->
-		<description>Star Wars Chess (USA)</description>
+		<!-- Serial: T-87035 -->
+		<description>The Software Toolworks' Star Wars Chess (USA)</description>
 		<year>1993</year>
 		<publisher>Software Toolworks</publisher>
 		<part name="cdrom" interface="scd_cdrom">

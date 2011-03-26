@@ -10929,6 +10929,30 @@
 		</part>
 	</software>
 
+	<software name="firemblmjp1" cloneof="firemblm">
+		<description>Fire Emblem - Rekka no Ken (Jpn, Prototype 0219)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="16777216">
+				<rom name="fe7_0219.srl" size="16777216" crc="8146a270" sha1="3b987bd15a3958901f38686c54a6250ab3398703" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firemblmjp2" cloneof="firemblm">
+		<description>Fire Emblem - Rekka no Ken (Jpn, Prototype 0206)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="16777216">
+				<rom name="fe7_0206.srl" size="16777216" crc="b40d6854" sha1="a408d29a9b80829a0864f531e04213f585192ced" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firemblmu" cloneof="firemblm">
 		<description>Fire Emblem (USA, Aus)</description>
 		<year>2003</year>
@@ -31185,6 +31209,40 @@
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="turok evolution (usa).bin" size="8388608" crc="4edac27a" sha1="f7b9bf3c3509581fa5ecba92897fbbdf5221bb39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These were dumped by drx... Are more info available? -->
+	<software name="turok">
+		<description>Turok Dinosaur Hunter (Prototype)</description>
+		<year>200?</year>
+		<publisher>Acclaim</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4830098">
+				<rom name="turok advance (proto).bin" size="4830098" crc="378d6da7" sha1="f5271fa4ebd4765e773b3f50ac07a302f4dc962f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turoka" cloneof="turok">
+		<description>Turok Dinosaur Hunter (Prototype, Brighter)</description>
+		<year>200?</year>
+		<publisher>Acclaim</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4830066">
+				<rom name="turok advance (proto - bright).bin" size="4830066" crc="9ef46f34" sha1="0ac2516af0ee72136d104e159482353e3e228c7f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokb" cloneof="turok">
+		<description>Turok Dinosaur Hunter (Prototype, Earlier)</description>
+		<year>200?</year>
+		<publisher>Acclaim</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="3690631">
+				<rom name="turok advance (proto - logo).bin" size="3690631" crc="401e10ea" sha1="74baebef55a8d7a8801ef8a0a657c4e00d5cf003" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

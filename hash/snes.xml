@@ -1089,7 +1089,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="themparkj" cloneof="thempark">
+	<software name="themeprkj" cloneof="themeprk">
 		<!-- Serial: SHVC-ATQJ-JPN - Release Date: 1995-12-15 - Alt. Title: テーマパーク -->
 		<description>Theme Park (Jpn)</description>
 		<year>1995</year>
@@ -37157,7 +37157,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="thempark">
+	<software name="themeprk">
 		<description>Theme Park (Euro)</description>
 		<year>1996</year>
 		<publisher>Ocean</publisher>

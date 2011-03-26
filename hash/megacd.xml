@@ -4,16 +4,14 @@
 
 <!--
   MegaCD currently won't recognize discs, so compatibility is unknown..
-  
-
-  
 -->
-  
-  
+
+
 <!--- Images below are from the REDUMP set (unless otherwise noted) -->
-	<software name="spidkp">
-		<description>The Amazing Spider-Man Vs. The Kingpin, (Euro)</description>
-		<year>19??</year>
+	<software name="spidvskp">
+		<!-- Serial: 4412 -->
+		<description>The Amazing Spider-Man Vs. The Kingpin (Euro)</description>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -21,21 +19,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="batmanrea" cloneof="batmanre">
-		<description>Batman Returns (Euro, Alt)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="batman returns (europe) (alt)" sha1="f555bac913565f8f2408df6e8016dad1641a88cf"/>
-			</diskarea>
-		</part>
-	</software>
-  
-	<software name="batmanre">
+
+	<software name="batmanrt">
+		<!-- Serial: 4401 -->
 		<description>Batman Returns (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -43,31 +31,47 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="btlcorps">
-		<description>Battlecorps (Euro)</description>
-		<year>19??</year>
+
+	<software name="batmanrta" cloneof="batmanrt">
+		<!-- Serial: 4401 -->
+		<description>Batman Returns (Euro, Alt)</description>
+		<year>1993</year>
 		<publisher>Sega</publisher>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="batman returns (europe) (alt)" sha1="f555bac913565f8f2408df6e8016dad1641a88cf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="btlcorps">
+		<!-- Serial: T-115045-50 -->
+		<description>Battlecorps (Euro)</description>
+		<year>1994</year>
+		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="battlecorps (europe) (en,fr,de,es)" sha1="1e648d7aec08b46b362cdd9f34a0fff4c7061e94"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="bcracers">
+		<!-- Serial: T-115075-50 -->
 		<description>BC Racers (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bc racers (europe) (en,fr,de)" sha1="70846d7b219407714d2760345ecc9f819c4afbe3"/>
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="blackh">
+		<!-- Serial: 4405 -->
 		<description>Blackhole Assault (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -75,10 +79,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="cobracom">
+		<!-- Serial: 4402 -->
 		<description>Cobra Command (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -86,21 +91,23 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="corpse">
+		<!-- Serial:T-162055-50  -->
 		<description>Corpse Killer (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Digital Pictures</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="corpse killer (europe)" sha1="dabe064bf2cc0a43dd162d3cf2da09af53f2515f"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="dracunl">
+		<!-- Serial: 4420 -->
 		<description>Dracula Unleashed (Euro)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -115,30 +122,33 @@
 	</software>
 
 	<software name="dune">
+		<!-- Serial: T-70035-50 -->
 		<description>Dune (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dune (europe) (en,fr,de,es,it,ar)" sha1="50a9cec0b1bcd0b240837032b3f2d0547dd5b4b2"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ejimse">
+		<!-- Serial: T-125045-50 -->
 		<description>Earthworm Jim - Special Edition (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="earthworm jim - special edition (europe)" sha1="8b6e9751f9ea0308ce9b1f31bde1139fac9c5943"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ecco2">
+		<!-- Serial: 4441 -->
 		<description>Ecco - The Tides of Time (Euro)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -146,10 +156,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ecco">
+		<!-- Serial: 4408 -->
 		<description>Ecco the Dolphin (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -157,21 +168,23 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="espnbb">
+		<!-- Serial: T-93115-50 -->
 		<description>ESPN Baseball Tonight (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="espn baseball tonight (europe)" sha1="7cc9125369e1743239573a1b297e00106dade115"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="fahrenhe">
+		<!-- Serial: 4438-50 -->
 		<description>Fahrenheit (Euro)</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -179,10 +192,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ffightcd">
+		<!-- Serial: 4410 -->
 		<description>Final Fight CD (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -190,11 +204,12 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="groundze">
+
+	<software name="gztexas">
+		<!-- Serial: T-93145-50 -->
 		<description>Ground Zero Texas (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1993</year>
+		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ground zero texas (europe) (disc 1)" sha1="499cbb316915b5c006277f5591eff36dacbb7f52"/>
@@ -207,9 +222,10 @@
 		</part>
 	</software>
 
-	<software name="xj220">
+	<software name="jagxj220">
+		<!-- Serial: 4602 -->
 		<description>Jaguar XJ220 (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -217,10 +233,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="jpark">
+		<!-- Serial: 4783 -->
 		<description>Jurassic Park (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -228,54 +245,59 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="le2">
+		<!-- Serial: T-95025-50 -->
 		<description>Lethal Enforcers II - Gun Fighters (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Konami</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lethal enforcers ii - gun fighters (europe)" sha1="e2e9d2555ed76026fecc127337abd073fa3206e0"/>
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="mickeyma">
+
+	<software name="mmania">
+		<!-- Serial: T-93305-50 -->
 		<description>Mickey Mania (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mickeyma mania (europe)" sha1="d2f59f10d53cb71ccd1622c81d12c12c431ac710"/>
+				<disk name="mickey mania (europe)" sha1="d2f59f10d53cb71ccd1622c81d12c12c431ac710"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="mk">
+		<!-- Serial: T-81025-50 -->
 		<description>Mortal Kombat (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Arena</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mortal kombat (europe)" sha1="6d5b3ec89f993737ff0febbb4ee49fbbca151bdc"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="nbajam">
+		<!-- Serial: T-81035-50 -->
 		<description>NBA Jam (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Acclaim Entertainment</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="nba jam (europe)" sha1="f837d3aff74dbc304b8714365a5abe562c448211"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ntrap">
+		<!-- Serial: 4903 -->
 		<description>Night Trap (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -290,8 +312,9 @@
 	</software>
 
 	<software name="ppersia">
+		<!-- Serial: 4652 -->
 		<description>Prince of Persia (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -299,10 +322,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="roadaven">
+		<!-- Serial: 4603 -->
 		<description>Road Avenger (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -310,10 +334,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="sac">
+		<!-- Serial: 4127 -->
 		<description>Sega Classics Arcade Collection (Euro)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -321,19 +346,21 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="sshrk">
+
+	<software name="sshark">
+		<!-- Serial: T-93015-50 -->
 		<description>Sewer Shark (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1992</year>
+		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sewer shark (europe)" sha1="158fbd44790f66c5ed7af626876a62f1c7c20934"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="beast2">
+		<!-- Serial:  -->
 		<description>Shadow of the Beast II (Euro)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
@@ -343,10 +370,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="sherlk">
+
+	<software name="holmes">
+		<!-- Serial: 4650 -->
 		<description>Sherlock Holmes - Consulting Detective Vol. I (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -354,10 +382,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="silpheed">
+		<!-- Serial: 4423 -->
 		<description>Silpheed (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -367,10 +396,11 @@
 	</software>
 
 <!-- why only 2 discs? -->
-	<software name="slamca" cloneof="slamc">
+	<software name="slamcitya" cloneof="slamcity">
+		<!-- Serial: T-162035-50 -->
 		<description>Slam City with Scottie Pippen (Euro, Alt)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Digital Pictures</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (europe) (disc 1)" sha1="6dbbbac0e2a17b7a453132b4e2387d8fd71328bd"/>
@@ -384,19 +414,21 @@
 	</software>
 
 	<software name="smurfs">
+		<!-- Serial: T-151015-50 -->
 		<description>The Smurfs (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="smurfs, the (europe) (en,fr,de,es,it)" sha1="ada0f992b04984aa20da0336e5e4ddf435c7c8f6"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="solfeace">
+		<!-- Serial: 4130 -->
 		<description>Sol-Feace (Euro)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -404,10 +436,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="soniccd">
+		<!-- Serial: 4407 -->
 		<description>Sonic CD (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -415,10 +448,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="soulstar">
+		<!-- Serial: T-115035-50 -->
 		<description>SoulStar (Euro)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -426,43 +460,47 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="spaceadv">
+
+	<software name="cobra">
+		<!-- Serial: T-143015-50 -->
 		<description>The Space Adventure - Cobra: The Legendary Bandit (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1995</year>
+		<publisher>Hudson Soft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="space adventure, the - cobra - the legendary bandit (europe)" sha1="c71b0e00967f6f8cbaf04320597ee352eea9d801"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="swra">
+		<!-- Serial: T-60075-50 -->
 		<description>Star Wars - Rebel Assault (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1994</year>
+		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="star wars - rebel assault (europe)" sha1="2027d03f068c90d8f01da0c53a27be7d1d75013a"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="thunderh">
+		<!-- Serial: T-115015-50 -->
 		<description>Thunderhawk (Euro)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1993</year>
+		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (europe) (en,fr,de,es)" sha1="904664afa73921a86355e3130b7169c763d15181"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="timegal">
+		<!-- Serial: 4417 -->
 		<description>Time Gal (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -470,10 +508,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="tcataly">
+		<!-- Serial: 4429 -->
 		<description>Tomcat Alley (Euro)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -481,10 +520,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="tcatalyg" cloneof="tcataly">
+		<!-- Serial: 4429-18 -->
 		<description>Tomcat Alley (Ger)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -492,10 +532,11 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="wolfchld">
+		<!-- Serial: 4404 -->
 		<description>Wolfchild (Euro)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -504,9 +545,10 @@
 		</part>
 	</software>
 
-<!-- Tosec image below -->
+<!-- TOSEC image below -->
 
-	<software name="advbat">
+	<software name="advbatr">
+		<!-- Serial: 4432 -->
 		<description>The Adventures of Batman and Robin (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -516,8 +558,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="aburner3">
+		<!-- Serial: 4415 -->
 		<description>After Burner III (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -527,7 +570,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="spidkpa" cloneof="spidkp">
 		<description>The Amazing Spider-man vs. The Kingpin (Euro)</description>
@@ -540,8 +583,9 @@
 		</part>
 	</software>
 -->
-  
-	<software name="batmanreb" cloneof="batmanre">
+
+	<software name="batmanrtb" cloneof="batmanrt">
+		<!-- Serial: 4401 -->
 		<description>Batman Returns (Euro) [MK-4401P-00084 3]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -551,8 +595,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="batmanrec" cloneof="batmanre">
+
+	<software name="batmanrtc" cloneof="batmanrt">
+		<!-- Serial: 4401 -->
 		<description>Batman Returns (Euro) [MK-4401P-00084 4]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -562,7 +607,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="btlcorpsa" cloneof="btlcorps">
 		<description>Battlecorps (Euro, Alt)</description>
@@ -575,7 +620,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="bcracersa" cloneof="bcracers">
 		<description>BC Racers (Euro, Alt)</description>
@@ -588,7 +633,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="beast2a" cloneof="beast2">
 		<description>Beast II (Euro)</description>
@@ -601,8 +646,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="billwlsh">
+		<!-- Serial: T-50025-05 -->
 		<description>Bill Walsh College Football (Euro)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -612,7 +658,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="blackha" cloneof="blackh">
 		<description>Blackhole Assault (Euro, Alt)</description>
@@ -625,30 +671,33 @@
 		</part>
 	</software>
 -->
-  
-	<software name="bloodsho">
+
+	<software name="bloodsht">
+		<!-- Serial: T-88045-50 -->
 		<description>Bloodshot (Euro)</description>
-		<year>19??</year>
-		<publisher>Acclaim</publisher>
+		<year>1994</year>
+		<publisher>Domark</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bloodshot (1995)(acclaim)(pal)(m4)[!][aka battle frenzy]" sha1="cdebd573c3bd6c4cfc1f0b007cd7d449e203b915"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="brutal">
+		<!-- Serial: T-83015-50 -->
 		<description>Brutal - Paws of Fury (Euro)</description>
 		<year>1994</year>
-		<publisher>Gametek</publisher>
+		<publisher>GameTek</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="brutal - paws of fury (1994)(gametek)(pal)(m3)[!]" sha1="5106898fb8513617eb64e6da5a1f9ba6ad036ce3"/>
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="crock">
+
+	<software name="chuckrck">
+		<!-- Serial: T-93045-50 -->
 		<description>Chuck Rock (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -658,19 +707,21 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="crock2">
+
+	<software name="chukrck2">
+		<!-- Serial: T-115025-50 -->
 		<description>Chuck Rock II - Son of Chuck (Euro)</description>
 		<year>1993</year>
-		<publisher>Core</publisher>
+		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="chuck rock ii - son of chuck (1993)(core)(pal)[!]" sha1="56cb62d98ca55005f20e8ec6d4aef6ff2431ca6c"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="cobracoma" cloneof="cobracom">
+		<!-- Serial: 4402 -->
 		<description>Cobra Command (Euro) [MK-4402P-00032 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -680,8 +731,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="cobracomb" cloneof="cobracom">
+		<!-- Serial: 4402 -->
 		<description>Cobra Command (Euro) [MK-4402P-00032-R1M]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -691,7 +743,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="corpsea" cloneof="corpse">
 		<description>Corpse Killer (Euro)</description>
@@ -704,8 +756,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="dblswtch">
+		<!-- Serial: 4419 -->
 		<description>Double Switch (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -715,7 +768,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="dracunla" cloneof ="dracunl">
 		<description>Dracula Unleashed (Euro)</description>
@@ -734,8 +787,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="dlair">
+		<!-- Serial: 4436 -->
 		<description>Dragon's Lair (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -758,10 +812,11 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="dexplore">
+		<!-- Serial: T-143025-50 -->
 		<description>Dungeon Explorer (Euro)</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -769,8 +824,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="dmaster2">
+		<!-- Serial: T-60085-50 -->
 		<description>Dungeon Master II - Skullkeep v1.0 (Euro)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -780,7 +836,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="ejimsea" cloneof="ejimse">
 		<description>Earthworm Jim - Special Edition (Euro)</description>
@@ -793,7 +849,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="ecco2">
 		<description>Ecco - The Tides of Time (Euro)</description>
@@ -806,8 +862,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="eccoa" cloneof="ecco">
+		<!-- Serial: 4408 -->
 		<description>Ecco the Dolphin (Euro) [I-2647 A]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -817,8 +874,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="eccob" cloneof="ecco">
+		<!-- Serial: 4408 -->
 		<description>Ecco the Dolphin (Euro) [MK-4408P-00135 1]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -828,7 +886,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="espnbba" cloneof="espnbb">
 		<description>ESPN Baseball Tonight (Euro, Alt)</description>
@@ -841,8 +899,9 @@
 		</part>
 	</software>
 -->
-  
-	<software name="eternal">
+
+	<software name="eternalc">
+		<!-- Serial: 4427 -->
 		<description>Eternal Champions - Challenge From the Dark Side (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -852,8 +911,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="eyebehol">
+		<!-- Serial: 4655 - Alt. Title: Advanced Dungeons &amp; Dragons - Eye of the Beholder (Box) -->
 		<description>Eye of the Beholder (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -863,8 +923,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="fahrenhef" cloneof="fahrenhe">
+		<!-- Serial: 4438-09 -->
 		<description>Fahrenheit (Fra)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -874,8 +935,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="fatfursp">
+		<!-- Serial: T-60165-50 -->
 		<description>Fatal Fury Special (Euro)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
@@ -885,8 +947,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="fifa">
+		<!-- Serial: T-50055-50 -->
 		<description>FIFA International Soccer - Championship Edition (Euro)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -896,7 +959,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="ffightcda" cloneof="ffightcd">
 		<description>Final Fight CD (Euro)</description>
@@ -909,8 +972,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="flink">
+		<!-- Serial: T-113055-50 -->
 		<description>Flink (Euro)</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
@@ -920,8 +984,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="f1btl">
+		<!-- Serial: 4608 -->
 		<description>Formula One World Championship - Beyond the Limit (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -931,9 +996,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
-	<software name="groundzea" cloneof="groundze">
+	<software name="gztexasa" cloneof="gztexas">
 		<description>Ground Zero Texas (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -950,8 +1015,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="hook">
+		<!-- Serial: T-93055-50 -->
 		<description>Hook (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -961,7 +1027,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="xj220a" cloneof="xj220">
 		<description>Jaguar XJ220 (Euro)</description>
@@ -974,8 +1040,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="jparkg" cloneof="jpark">
+		<!-- Serial: 4411-18 -->
 		<description>Jurassic Park (Ger)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -985,7 +1052,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="jparka" cloneof="jpark">
 		<description>Jurassic Park (Euro, Alt)</description>
@@ -998,8 +1065,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="keio">
+		<!-- Serial: T-60185-50 -->
 		<description>Keio Flying Squadron (Euro)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -1009,8 +1077,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="lethalen">
+		<!-- Serial: T-95015-50 -->
 		<description>Lethal Enforcers (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -1020,7 +1089,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="le2a" cloneof="le2">
 		<description>Lethal Enforcers II - Gun Fighters (Euro, Alt)</description>
@@ -1033,19 +1102,21 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="lordthun">
+		<!-- Serial: T-143035-50 -->
 		<description>Lords of Thunder (Euro)</description>
 		<year>1995</year>
-		<publisher>Virgin Interactive</publisher>
+		<publisher>Hudson Soft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lords of thunder (1995)(virgin)(pal)[!]" sha1="39f971ef22f5c580bfb15e5ec5bd3335d7bb72de"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="marko">
+		<!-- Serial: T-88025-50 -->
 		<description>Marko's Magic Football (Euro)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
@@ -1055,7 +1126,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="mickeymaa" cloneof="mickeyma">
 		<description>Mickey Mania (Euro, Alt)</description>
@@ -1063,13 +1134,14 @@
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mickeyma mania (1994)(disney software - sony imagesoft)(pal)[!]" sha1="b2e91b0938ec20092ca99dc208d9b15273644bef"/>
+				<disk name="mickey mania (1994)(disney software - sony imagesoft)(pal)[!]" sha1="b2e91b0938ec20092ca99dc208d9b15273644bef"/>
 			</diskarea>
 		</part>
 	</software>
 -->
-  
+
 	<software name="micro">
+		<!-- Serial: T-113015-50 -->
 		<description>Microcosm (Euro) [T-113015-50 14]</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
@@ -1079,8 +1151,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="microa" cloneof="micro">
+		<!-- Serial: T-113015-50 -->
 		<description>Microcosm (Euro) [T-113015-50 24]</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
@@ -1090,8 +1163,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="midnight">
+		<!-- Serial: 4439 -->
 		<description>Midnight Raiders (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1101,8 +1175,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="mmpower">
+
+	<software name="mmpr">
+		<!-- Serial:  -->
 		<description>Mighty Morphin Power Rangers (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1112,7 +1187,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="mka" cloneof="mk">
 		<description>Mortal Kombat (Euro, Alt)</description>
@@ -1125,7 +1200,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="nbajama" cloneof="nbajam">
 		<description>NBA Jam (Euro, Alt)</description>
@@ -1138,8 +1213,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="nhl94">
+		<!-- Serial: T-50015-50 -->
 		<description>NHL Hockey '94 (Euro)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -1149,7 +1225,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="ntrapa" cloneof="ntrap">
 		<description>Night Trap (Euro)</description>
@@ -1160,7 +1236,7 @@
 				<disk name="night trap (1993)(sega)(pal)(disc 1 of 2)[!]" sha1="78c67b96498d1cafa4154983617fa110d653a99b"/>
 			</diskarea>
 		</part>
-    
+
 		<part name="cdrom2" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="night trap (1993)(sega)(pal)(disc 2 of 2)[!]" sha1="9a3f1009b06e5ef409d2b9028447383c8dd51d70"/>
@@ -1168,8 +1244,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="ntrapfr" cloneof="ntrap">
+		<!-- Serial: 4903-09 -->
 		<description>Night Trap (Fra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1184,8 +1261,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ntrap32" cloneof="ntrap">
+		<!-- Serial: T-16202F-50 -->
 		<description>Night Trap (Euro, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
@@ -1202,6 +1280,7 @@
 	</software>
 
 	<software name="novastm">
+		<!-- Serial: T-113065-50 -->
 		<description>Novastorm (Euro)</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
@@ -1211,8 +1290,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="pitfall">
+		<!-- Serial: T-130025-50 -->
 		<description>Pitfall - The Mayan Adventure (Euro)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
@@ -1222,9 +1302,10 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="powermon">
-		<description>PowerMonger (Euro)</description>
+		<!-- Serial: T-50035-50 -->
+		<description>Power Monger (Euro)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -1233,7 +1314,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="ppersiaa" cloneof="ppersia">
 		<description>Prince of Persia (Euro)</description>
@@ -1246,8 +1327,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="prizefig">
+		<!-- Serial: 4206 -->
 		<description>Prize Fighter (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1265,6 +1347,7 @@
 	</software>
 
 	<software name="puggsy">
+		<!-- Serial: T-113035-50 -->
 		<description>Puggsy (Euro)</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
@@ -1274,7 +1357,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="roadavena" cloneof="roadaven">
 		<description>Road Avenger (Euro, Alt)</description>
@@ -1287,8 +1370,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="roboales">
+		<!-- Serial: 4416 -->
 		<description>Robo Aleste (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1298,8 +1382,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="samsho">
+		<!-- Serial: T-60175-50 -->
 		<description>Samurai Shodown (Euro)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
@@ -1309,18 +1394,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="sacb" cloneof="sac">
-		<description>Sega Classics Arcade Collection - Limited Edition (Euro) [6105411P-00036A-R1M]</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sega classics arcade collection - limited edition (1992)(sega)(pal)[!][compilation][6105411p-00036a-r1m]" sha1="daacecf0e7a02836e2b53be5650819c32fd940bb"/>
-			</diskarea>
-		</part>
-	</software>
+
 	<software name="saca" cloneof="sac">
+		<!-- Serial: 4127 -->
 		<description>Sega Classics Arcade Collection - Limited Edition (Euro) [610-5411P-00036A 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1330,8 +1406,21 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="sensi">
+
+	<software name="sacb" cloneof="sac">
+		<!-- Serial: 4127 -->
+		<description>Sega Classics Arcade Collection - Limited Edition (Euro) [6105411P-00036A-R1M]</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cdrom" interface="scd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sega classics arcade collection - limited edition (1992)(sega)(pal)[!][compilation][6105411p-00036a-r1m]" sha1="daacecf0e7a02836e2b53be5650819c32fd940bb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sensible">
+		<!-- Serial: T-93185-50 -->
 		<description>Sensible Soccer (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -1341,9 +1430,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
-	<software name="sshrka" cloneof="sshrk">
+	<software name="ssharka" cloneof="sshark">
 		<description>Sewer Shark (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -1354,9 +1443,9 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
-	<software name="sherlka" cloneof="sherlk">
+	<software name="holmesa" cloneof="holmes">
 		<description>Sherlock Holmes - Consulting Detective (Euro, Alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1367,8 +1456,9 @@
 		</part>
 	</software>
 -->
-  
-	<software name="sherlk2">
+
+	<software name="holmes2">
+		<!-- Serial: 4653 -->
 		<description>Sherlock Holmes - Consulting Detective Vol. II v1.0 (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1383,8 +1473,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="sforce">
+
+	<software name="shinfrce">
+		<!-- Serial: 4656 -->
 		<description>Shining Force CD (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1394,7 +1485,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="silpheeda" cloneof="silpheed">
 		<description>Silpheed (Euro)</description>
@@ -1407,8 +1498,9 @@
 		</part>
 	</software>
 -->
-  
-	<software name="slamc">
+
+	<software name="slamcity">
+		<!-- Serial: T-162035-50 -->
 		<description>Slam City with Scottie Pippen (Euro)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
@@ -1433,8 +1525,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="slamc32" cloneof="slamc">
+
+	<software name="slamcity32" cloneof="slamcity">
+		<!-- Serial: T-16204F-50 -->
 		<description>Slam City with Scottie Pippen (Euro, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
@@ -1459,7 +1552,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="smurfsa" cloneof="smurfs">
 		<description>The Smurfs (Euro, Alt)</description>
@@ -1472,8 +1565,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="snatcher">
+		<!-- Serial: T-95035-05 -->
 		<description>Snatcher (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -1483,8 +1577,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="swchess">
+		<!-- Serial: T-158025-50 -->
 		<description>The Software Toolworks' Star Wars Chess (Euro)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
@@ -1494,8 +1589,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="solfeacea" cloneof="solfeace">
+		<!-- Serial: 4130 -->
 		<description>Sol-Feace (Euro) [MK-4130P-00033 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1505,8 +1601,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="solfeaceb" cloneof="solfeace">
+		<!-- Serial: 4130 -->
 		<description>Sol-Feace (Euro) [MK-4130P-00033-R1M]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1516,7 +1613,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="soniccda" cloneof="soniccd">
 		<description>Sonic CD (Euro, Alt)</description>
@@ -1529,7 +1626,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="soulstara" cloneof="soulstar">
 		<description>SoulStar (Euro, Alt)</description>
@@ -1542,10 +1639,10 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="spaceadva" cloneof="spaceadv">
-		<description>The Space Adventure (Euro)</description>
+		<description>The Space Adventure - Cobra (Euro)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -1555,7 +1652,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="swraa" cloneof="swra">
 		<description>Star Wars - Rebel Assault (Euro)</description>
@@ -1568,8 +1665,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="starblad">
+		<!-- Serial: 4284 -->
 		<description>StarBlade (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1579,8 +1677,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="supremew">
+		<!-- Serial: T-162045-50 -->
 		<description>Supreme Warrior - Ying Heung (Euro)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
@@ -1597,6 +1696,7 @@
 	</software>
 
 	<software name="supremew32" cloneof="supremew">
+		<!-- Serial: T-16203F-50 -->
 		<description>Supreme Warrior - Ying Heung (Euro, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
@@ -1613,6 +1713,7 @@
 	</software>
  
 	<software name="surgical">
+		<!-- Serial: 4435 -->
 		<description>Surgical Strike (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1622,8 +1723,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="syndicat">
+		<!-- Serial: T-88065-50 -->
 		<description>Syndicate (Euro)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
@@ -1633,8 +1735,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="term">
+
+	<software name="termintr">
+		<!-- Serial: T-70015-50 -->
 		<description>The Terminator (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
@@ -1644,8 +1747,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="themepar">
+
+	<software name="themeprk">
+		<!-- Serial: T-88055-50 -->
 		<description>Theme Park (Euro)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
@@ -1655,29 +1759,31 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="thunderb" cloneof="thunderh">
+		<!-- Serial: T-115015-50 -->
 		<description>Thunderhawk (Euro) [SEGAT115015RE R4C]</description>
 		<year>1993</year>
-		<publisher>Core</publisher>
+		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (1993)(core)(pal)(m4)[!][segat115015re r4c]" sha1="eb2891baf1df4a55124eef0cbe9ebed6b96c4cac"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="thunderha" cloneof="thunderh">
+		<!-- Serial: T-115015-50 -->
 		<description>Thunderhawk (Euro) [SEGAT115015RE R5C]</description>
 		<year>1993</year>
-		<publisher>Core</publisher>
+		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (1993)(core)(pal)(m4)[!][segat115015re r5c]" sha1="dd4cfe52d595a38109b20c03b21e869b1be54f3a"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="timegala" cloneof="timegal">
 		<description>Time Gal (Euro)</description>
@@ -1690,7 +1796,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="tcatalyga" cloneof="tcataly">
 		<description>Tomcat Alley (Ger, Alt)</description>
@@ -1703,8 +1809,9 @@
 		</part>
 	</software>
 -->
-  
+
 	<software name="tcatalysp" cloneof="tcataly">
+		<!-- Serial: 4429-?? -->
 		<description>Tomcat Alley (Spa)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1714,8 +1821,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="tcatalyfr" cloneof="tcataly">
+		<!-- Serial: 4429-?? -->
 		<description>Tomcat Alley (Fra)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1725,7 +1833,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="tcatalya" cloneof="tcataly">
 		<description>Tomcat Alley (Euro)</description>
@@ -1738,7 +1846,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="wolfchlda" cloneof="wolfchld">
 		<description>Wolfchild (Euro)</description>
@@ -1751,8 +1859,9 @@
 		</part>
 	</software>
 -->
-  
-	<software name="wonderdo">
+
+	<software name="wonderdg">
+		<!-- Serial: 4428 -->
 		<description>Wonder Dog (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1762,8 +1871,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="wc94">
+		<!-- Serial: T-79025-50 -->
 		<description>World Cup USA 94 (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -1773,8 +1883,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ragecage">
+		<!-- Serial: T-81015-50 -->
 		<description>WWF Rage in the Cage (Euro)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
@@ -1784,8 +1895,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="mystmans">
+		<!-- Serial: 4430 -->
 		<description>Yumemi Mystery Mansion (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1795,24 +1907,26 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!-- Other images -->
 
 	<software name="timecop">
+		<!-- Serial:  -->
 		<description>Time Cop (Euro, Prototype)</description>
 		<year>19??</year>
-		<publisher>Sega</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="time cop (pal, beta, complete)" sha1="85fff8d11f87ea866677289e3e031221208bab17"/>
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="timecope" cloneof="timecop">
-		<description>Timecop (Euro, Early Prototype)</description>
+		<!-- Serial:  -->
+		<description>Time Cop (Euro, Early Prototype)</description>
 		<year>19??</year>
-		<publisher>Sega</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="timecop (early beta) (e)" sha1="bba88d58fc155d03eba31af562246163712c482c"/>
@@ -1820,7 +1934,7 @@
 		</part>
 	</software>
 
-	<software name="btlcorpsssdemo" cloneof="btlcorps">
+	<software name="btlcorpsssd" cloneof="btlcorps">
 		<description>Battlecorps and SoulStar (Euro, Demo) [Mega Power - Issue 14]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
@@ -1830,8 +1944,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="btlcorpsdemo" cloneof="btlcorps">
+
+	<software name="btlcorpsd" cloneof="btlcorps">
 		<description>Battlecorps (Euro, Demo) [Mega Power - Issue 11, Sega Pro CD - Issue 50]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
@@ -1841,7 +1955,8 @@
 			</diskarea>
 		</part>
 	</software>
-	<software name="bcracersdemo" cloneof="bcracers">
+
+	<software name="bcracersd" cloneof="bcracers">
 		<description>BC Racers (Euro, Demo) [Mega Power - Issue 18]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
@@ -1851,8 +1966,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="bcracersdemoa" cloneof="bcracers">
+
+	<software name="bcracersda" cloneof="bcracers">
 		<description>BC Racers (Euro, Demo) [Sega Pro CD - Issue 41]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
@@ -1862,8 +1977,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="fatfurspdemo" cloneof="fatfursp">
+
+	<software name="fatfurspd" cloneof="fatfursp">
 		<description>Fatal Fury Special (Euro, Demo) [Sega Pro CD - Issue 46]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
@@ -1873,7 +1988,8 @@
 			</diskarea>
 		</part>
 	</software>
-	<software name="fifademo" cloneof="fifa">
+
+	<software name="fifad" cloneof="fifa">
 		<description>FIFA International Soccer - CE (Euro, Demo) [Mega Power - Issue 13]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -1883,8 +1999,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="fifademoa" cloneof="fifa">
+
+	<software name="fifada" cloneof="fifa">
 		<description>FIFA International Soccer - CE (Euro, Demo) [Sega Pro CD - Issue 43]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -1894,7 +2010,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="flashbkd"> <!-- no full version -->
 		<description>Flashback - The Quest for Identity (Euro, Demo) [Sega Pro CD - Issue 42]</description>
 		<year>1994</year>
@@ -1905,8 +2021,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="inxs">
+		<!-- Serial: 4902 -->
 		<description>INXS (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -1916,8 +2033,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="keiodemo" cloneof="keio">
+
+	<software name="keiod" cloneof="keio">
 		<description>Keio Flying Squadron (Euro, Demo) [Sega Pro CD - Issue 03]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -1927,8 +2044,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="kidssite">
+		<!-- Serial: T-162015-50 -->
 		<description>Kids on Site (Euro)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
@@ -1938,8 +2056,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="kriskros">
+		<!-- Serial: T-93025-50 -->
 		<description>Kris Kross (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -1949,7 +2068,8 @@
 			</diskarea>
 		</part>
 	</software>
-	<software name="lawndemo"> <!-- no full version -->
+
+	<software name="lawnmowr"> <!-- no full version -->
 		<description>The Lawnmower Man (Euro, Demo) [Mega Power - Issue 16]</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -1959,8 +2079,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="le2demo" cloneof="le2">
+
+	<software name="le2d" cloneof="le2">
 		<description>Lethal Enforcers II - Gun Fighters (Euro, Demo) [Mega Power - Issue 19]</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -1970,30 +2090,30 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="mickeymademo" cloneof="mickeyma">
+
+	<software name="mmaniad" cloneof="mmania">
 		<description>Mickey Mania (Euro, Demo) [MegaSEGA]</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mickeyma mania (demo) (1994)(disney software - sony imagesoft)(pal)[!][megasega]" sha1="7883b3815621057c28f7ba3eb72a6af6c503aeaf"/>
+				<disk name="mickey mania (demo) (1994)(disney software - sony imagesoft)(pal)[!][megasega]" sha1="7883b3815621057c28f7ba3eb72a6af6c503aeaf"/>
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="mickeymademoa" cloneof="mickeyma">
+
+	<software name="mmaniada" cloneof="mmania">
 		<description>Mickey Mania (Euro, Demo) [Mega Power - Issue 17, Sega Pro CD - Issue 40]</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mickeyma mania (demo) (1994)(pal)[!][mega power - issue 17, sega pro cd - issue 40]" sha1="ca60d28874c383a7ce6f9c4dcac433c55cbc83dd"/>
+				<disk name="mickey mania (demo) (1994)(pal)[!][mega power - issue 17, sega pro cd - issue 40]" sha1="ca60d28874c383a7ce6f9c4dcac433c55cbc83dd"/>
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="psygdemo">
+
+	<software name="psygnosd">
 		<description>Microcosm, Puggsy and Wiz 'N' Liz (Euro, Demo) [Mega Power - Issue 06]</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
@@ -2003,8 +2123,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="novastmdemo" cloneof="novastm">
+
+	<software name="novastmd" cloneof="novastm">
 		<description>Novastorm (Euro, Demo) [Sega Pro CD - Issue 02]</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
@@ -2014,8 +2134,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="pitfalldemo" cloneof="pitfall">
+
+	<software name="pitfalld" cloneof="pitfall">
 		<description>Pitfall - The Mayan Adventure (Euro, Demo) [Sega Pro CD - Issue 41]</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
@@ -2025,8 +2145,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="ccmusic">
+		<!-- Serial:  -->
 		<description>Power Factory featuring C+C Music Factory (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -2036,8 +2157,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="samshodemo" cloneof="samsho">
+
+	<software name="samshod" cloneof="samsho">
 		<description>Samurai Shodown (Euro, Demo) [Sega Pro CD - Issue 47]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
@@ -2047,8 +2168,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="animals">
+		<!-- Serial: T-158015-50 -->
 		<description>The San Diego Zoo Presents The Animals! - A Multimedia Experience (Euro)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
@@ -2058,8 +2180,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="sensidemo" cloneof="sensi">
+
+	<software name="sensibled" cloneof="sensible">
 		<description>Sensible Soccer v1.08 (Euro, Demo) [Mega Power - Issue 12, Sega Pro CD - Issue 44]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2069,8 +2191,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="slamcdemo" cloneof="slamc">
+
+	<software name="slamcityd" cloneof="slamcity">
 		<description>Slam City with Scottie Pippen (Euro, Demo)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
@@ -2080,8 +2202,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="soulstardemo" cloneof="soulstar">
+
+	<software name="soulstard" cloneof="soulstar">
 		<description>SoulStar (Euro, Demo) [Mega Power - Issue 10, Sega Pro CD - Issue 49]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
@@ -2091,8 +2213,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="swrademo" cloneof="swra">
+
+	<software name="swrad" cloneof="swra">
+		<!-- Serial:  -->
 		<description>Star Wars - Rebel Assault (Euro, Demo) [Mega Power - Issue 15]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -2102,8 +2225,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="swrademoa" cloneof="swra">
+
+	<software name="swrada" cloneof="swra">
+		<!-- Serial:  -->
 		<description>Star Wars - Rebel Assault (Euro, Demo) [Sega Pro CD - Issue 01]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -2113,8 +2237,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="thunderhdemo" cloneof="thunderh">
+
+	<software name="thunderhd" cloneof="thunderh">
+		<!-- Serial:  -->
 		<description>Thunderhawk (Euro, Demo) [Mega Power - Issue 04]</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
@@ -2124,8 +2249,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="thunderhdemoa" cloneof="thunderh">
+
+	<software name="thunderhda" cloneof="thunderh">
+		<!-- Serial:  -->
 		<description>Thunderhawk (Euro, Demo)</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
@@ -2135,8 +2261,9 @@
 			</diskarea>
 		</part>
 	</software>
-  
-	<software name="timecopdemo" cloneof="timecop">
+
+	<software name="timecopd" cloneof="timecop">
+		<!-- Serial:  -->
 		<description>TimeCop (Euro, Demo) [Sega Pro CD - Issue 45]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>

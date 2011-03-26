@@ -50,7 +50,6 @@
     PINK GOES TO HOLLYWOOD					PAL
     ROAD RASH								JAPAN
     ROAD RASH								USA/PAL		needs proper dump
-    ROBOCOP VERSUS THE TERMINATOR			JAPAN
     SHINING FORCE							PAL
     SIDE POCKET								JAPAN/USA	conflict in current info
     SMURFS									PAL			we have Rev A, Rev 0 needed
@@ -17001,13 +17000,15 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="robotermk" cloneof="roboterm">
-		<description>RoboCop versus The Terminator (Kor)</description>
+<!-- This has been dumped from a Korean cart, but the checksum matches the one posted by Xacrow for his Japanese (hoarded) dump -->
+<!-- Ideally, we would like to have a redump from a Japanese cart too, but for the moment we label this as Jpn, Kor (99% it is) -->
+	<software name="robotermj" cloneof="roboterm">
+		<description>RoboCop versus The Terminator (Jpn, Kor)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="robocop versus the terminator (kor).bin" size="2097152" crc="d444e1f0" sha1="23f5d494e69a737f2026b5c54984d0d8a98f2cb0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="robocop versus the terminator (jpn, kor).bin" size="2097152" crc="d444e1f0" sha1="23f5d494e69a737f2026b5c54984d0d8a98f2cb0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
