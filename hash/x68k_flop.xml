@@ -2,6 +2,44 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="x68k_flop" description="Sharp X68k disk images">
 
+	<software name="akumajou">
+		<description>Akumajou Dracula</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 1.xdf" size="1261568" crc="d2aaadc9" sha1="17d072669916ecdc40c171d6e20b1f7e9d218489" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 2.xdf" size="1261568" crc="6831b09b" sha1="2de753f6f579af6a6954d0df0c29694cdcff9992" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliensyn">
+		<description>Alien Syndrome (Set 1)</description>
+		<year>1992</year>
+		<publisher>Sega-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 1.xdf" size="1261568" crc="b4bc11e8" sha1="c42a8535ee1687f665baa7d6db1de3ecc9c96c73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliensyna" cloneof="aliensyn">
+		<description>Alien Syndrome (Set 2)</description>
+		<year>1992</year>
+		<publisher>Sega-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 1.xdf" size="1261568" crc="d93369da" sha1="83166698f3abbbd8141f2c2d9360fb67188c3720" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="codezero">
 		<description>Code Zero</description>
 		<year>199?</year>
@@ -18,7 +56,6 @@
 		</part>
 	</software>
 
-
 	<software name="dragonsl">
 		<description>Dragon Slayer</description>
 		<year>198?</year>
@@ -30,8 +67,48 @@
 		</part>
 	</software>
 
+	<software name="drgnbstr">
+		<description>Video Game Anthology Vol 07 - Dragon Buster</description>
+		<year>1993</year>
+		<publisher>Namco-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 0.xdf" size="1261568" crc="e974aba0" sha1="74809cded0e6ea2077d28199b8cb61d12223d707" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="magshot">
+		<description>Magical Shot</description>
+		<year>199?</year>
+		<publisher>MNM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 0.xdf" size="1261568" crc="9a89bf42" sha1="6ba2dd47f1a56145d7455c7e00dd7c8155c29770" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="pacmania">
+		<description>Pac-Mania (Set 1)</description>
+		<year>1989</year>
+		<publisher>Namco-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pac-mania (1989) (namco-sps) [xdf].xdf" size="1261568" crc="39392e1b" sha1="53d055274285ba28d64d4fce63482e5a9dde4725" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="pacmaniaa" cloneof="pacmania">
+		<description>Pac-Mania (Set 2)</description>
+		<year>1989</year>
+		<publisher>Namco-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pac-mania (1989) (namco-sps) [xdf] [a].xdf" size="1261568" crc="e53be485" sha1="6b0a75a1fa2c254b986b63ade6e9e806fe8bea23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
