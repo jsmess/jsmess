@@ -2697,6 +2697,18 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
+	<software name="f1racingb" cloneof="f1racing">
+		<!-- Serial:  - Release Date:  -->
+		<description>F1 Racing Championship (Bra)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft?</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="f1 racing championship (brazil).bin" size="16777216" crc="7ad98002" sha1="4fb7619af8d48b6dd8d8057ad9f6567b9e84f446" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="famista">
 		<!-- Serial: NUS-NFSJ - Release Date: 1997-11-28 - Alt. Title: ファミスタ64 -->
 		<description>Famista 64 (Jpn)</description>
@@ -3813,7 +3825,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="itoishig">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NIBJ - Release Date: 2000-03-31 - Alt. Title: 糸井重里のバス釣りNo.1 決定版！ -->
 		<description>Itoi Shigesato no Bass Tsuri No. 1 Kettei Ban! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -5819,7 +5831,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="nbazon98j" cloneof="nbapro98">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NBAJ (RZ010-J1) - Release Date: 1998-01-29 - Alt. Title: NBA イン ザ ゾーン '98 -->
 		<description>NBA in the Zone '98 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -5855,7 +5867,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="nbazone2" cloneof="nbapro99">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NB2J (RZ023-J1) - Release Date: 1999-06-03 - Alt. Title: NBA イン ザ ゾーン 2 -->
 		<description>NBA in the Zone 2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -6023,7 +6035,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="evangeln">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NEVJ - Release Date: 1999-06-25 - Alt. Title: 新世紀エヴァンゲリオン -->
 		<description>Neon Genesis Evangelion (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -6299,7 +6311,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="nintamar">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NHBJ - Release Date: 2000-04-21 - Alt. Title: 忍たま乱太郎64 ゲームギャラリー -->
 		<description>Nintama Rantarou 64 Game Gallery (Jpn)</description>
 		<year>2000</year>
 		<publisher>Culture Brain</publisher>
@@ -6311,7 +6323,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="smashbroj" cloneof="smashbro">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NALJ - Release Date: 1999-01-15 - Alt. Title: ニンテンドウオールスター！ 大乱闘スマッシュブラザーズ -->
 		<description>Nintendo All-Star! Dairantou Smash Brothers (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -6359,7 +6371,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="nustsu64">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NUTJ - Release Date: 1998-11-27 - Alt. Title: ぬし釣り64 -->
 		<description>Nushi Tsuri 64 (Jpn, Rev. A)</description>
 		<year>1998</year>
 		<publisher>Pack In Soft</publisher>
@@ -6371,7 +6383,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="nustsu64a" cloneof="nustsu64">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NUTJ - Release Date: 1998-11-27 - Alt. Title: ぬし釣り64 -->
 		<description>Nushi Tsuri 64 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Pack In Soft</publisher>
@@ -6383,7 +6395,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="nusts64s">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NUMJ - Release Date: 2000-05-26 - Alt. Title: ぬし釣り64 −潮風にのって− -->
 		<description>Nushi Tsuri 64 - Shiokaze ni Notte (Jpn)</description>
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -6441,7 +6453,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="ogrebatlj" cloneof="ogrebatl">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NOBJ - Release Date: 1999-07-14 - Alt. Title: オウガバトル 64 -->
 		<description>Ogre Battle 64 - Person of Lordly Caliber (Jpn, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -6489,7 +6501,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="olymph98j" cloneof="olymph98">
-		<!-- Serial:  - Release Date: - Alt. Title:   -->
+		<!-- Serial: 1998-07-16 - Release Date:  - Alt. Title: オリンピックホッケーナガノ -->
 		<description>Olympic Hockey Nagano '98 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -6513,7 +6525,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="onegai">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NOMJ - Release Date: 1999-04-09 - Alt. Title: おねがいモンスター -->
 		<description>Onegai Monsters (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
@@ -6537,7 +6549,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pachinko">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPCJ - Release Date: 1998-05-29 - Alt. Title: パチンコ365日 -->
 		<description>Pachinko 365 Nichi (Jpn)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>
@@ -6597,7 +6609,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="parlrpro">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPPJ - Release Date: 1999-01-29 - Alt. Title: Parlor! PRO 64 パチンコ実機シミュレーション -->
 		<description>Parlor! Pro 64 - Pachinko Jikki Simulation Game (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nihon Telenet</publisher>
@@ -6609,7 +6621,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pdultram">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NUBJ - Release Date: 1999-07-16 - Alt. Title: PDウルトラマンバトルコレクション64 -->
 		<description>PD Ultraman Battle Collection 64 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -6657,7 +6669,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pdarkj" cloneof="pdark">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPDJ - Release Date: 2000-10-21 - Alt. Title: パーフェクトダーク -->
 		<description>Perfect Dark (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -6717,7 +6729,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pikachu" cloneof="heypika">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPGJ - Release Date: 1998-12-12 - Alt. Title: ピカチュウげんきでちゅう -->
 		<description>Pikachuu Genki de Chuu (Jpn)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -6741,7 +6753,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pilotwinj" cloneof="pilotwin">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPWJ - Release Date: 1996-06-23 - Alt. Title: パイロットウイングス64 -->
 		<description>Pilotwings 64 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -6765,7 +6777,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pokesnapj" cloneof="pokesnap">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPFJ - Release Date: 1999-03-21 - Alt. Title: ポケモンスナップ -->
 		<description>Pocket Monsters Snap (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -6777,7 +6789,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pokestdj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-CPSJ - Release Date: 1998-08-01 - Alt. Title: ポケモンスタジアム -->
 		<description>Pocket Monsters Stadium (Jpn)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -6789,7 +6801,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pokestd2j" cloneof="pokestad">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-CP2J - Release Date: 1999-04-30 - Alt. Title: ポケモンスタジアム2 -->
 		<description>Pocket Monsters Stadium 2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -6801,7 +6813,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pokestdk" cloneof="pokestd2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NP3J - Release Date: 2000-12-14 - Alt. Title: ポケモンスタジアム 金銀 クリスタルバージョン対応 -->
 		<description>Pocket Monsters Stadium Kin Gin (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -6814,7 +6826,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokepuzl">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Puzzle League (Euro)</description>
+		<description>Pokémon Puzzle League (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6826,7 +6838,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokepuzlf" cloneof="pokepuzl">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Puzzle League (Fra)</description>
+		<description>Pokémon Puzzle League (Fra)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6838,7 +6850,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokepuzlg" cloneof="pokepuzl">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Puzzle League (Ger)</description>
+		<description>Pokémon Puzzle League (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6850,7 +6862,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokepuzlu" cloneof="pokepuzl">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Puzzle League (USA)</description>
+		<description>Pokémon Puzzle League (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6862,7 +6874,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnapa" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (Aus)</description>
+		<description>Pokémon Snap (Aus)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6874,7 +6886,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (Euro)</description>
+		<description>Pokémon Snap (Euro)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6886,7 +6898,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnapf" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (Fra)</description>
+		<description>Pokémon Snap (Fra)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6898,7 +6910,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnapg" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (Ger)</description>
+		<description>Pokémon Snap (Ger)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6910,7 +6922,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnapi" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (Ita)</description>
+		<description>Pokémon Snap (Ita)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6922,7 +6934,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnaps" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (Spa)</description>
+		<description>Pokémon Snap (Spa)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6934,7 +6946,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnapu" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap (USA)</description>
+		<description>Pokémon Snap (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6946,7 +6958,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokesnapus" cloneof="pokesnap">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Snap Station (USA, Promo)</description>
+		<description>Pokémon Snap Station (USA, Promo)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6958,7 +6970,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (Euro, Rev. A)</description>
+		<description>Pokémon Stadium (Euro, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6970,7 +6982,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestad1" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (Euro)</description>
+		<description>Pokémon Stadium (Euro)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6982,7 +6994,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestadf" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (Fra)</description>
+		<description>Pokémon Stadium (Fra)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -6994,7 +7006,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestadg" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (Ger)</description>
+		<description>Pokémon Stadium (Ger)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7006,7 +7018,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestadi" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (Ita)</description>
+		<description>Pokémon Stadium (Ita)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7018,7 +7030,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestads" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (Spa)</description>
+		<description>Pokémon Stadium (Spa)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7030,7 +7042,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestadu" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (USA, Rev. A)</description>
+		<description>Pokémon Stadium (USA, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7042,7 +7054,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestadu1" cloneof="pokestad">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium (USA)</description>
+		<description>Pokémon Stadium (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7054,7 +7066,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestd2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium 2 (Euro)</description>
+		<description>Pokémon Stadium 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7066,7 +7078,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestd2f" cloneof="pokestd2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium 2 (Fra)</description>
+		<description>Pokémon Stadium 2 (Fra)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7078,7 +7090,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestd2g" cloneof="pokestd2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium 2 (Ger)</description>
+		<description>Pokémon Stadium 2 (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7090,7 +7102,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestd2i" cloneof="pokestd2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium 2 (Ita)</description>
+		<description>Pokémon Stadium 2 (Ita)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7102,7 +7114,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestd2s" cloneof="pokestd2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium 2 (Spa)</description>
+		<description>Pokémon Stadium 2 (Spa)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7114,7 +7126,7 @@ There appear to exist some undumped N64 protos
 
 	<software name="pokestd2u" cloneof="pokestd2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Pokemon Stadium 2 (USA)</description>
+		<description>Pokémon Stadium 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -7137,7 +7149,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pwleague">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPLJ - Release Date: 1997-08-08 - Alt. Title: パワーリーグ64 -->
 		<description>Power League 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -7197,7 +7209,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="mjkiwame">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NKMJ - Release Date: 1997-11-21 - Alt. Title: プロ麻雀 極64 -->
 		<description>Pro Mahjong Kiwame 64 (Jpn, Rev. A)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
@@ -7209,7 +7221,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="mjkiwame1" cloneof="mjkiwame">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NKMJ - Release Date: 1997-11-21 - Alt. Title: プロ麻雀 極64 -->
 		<description>Pro Mahjong Kiwame 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
@@ -7221,7 +7233,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="mjtsuwa">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NNRJ - Release Date: 1999-11-05 - Alt. Title: プロ麻雀 兵 64 -->
 		<description>Pro Mahjong Tsuwamono 64 - Jansou Battle ni Chousen (Jpn)</description>
 		<year>1999</year>
 		<publisher>Culture Brain</publisher>
@@ -7233,7 +7245,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="puyopuy4">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPTJ - Release Date: 1999-12-03 - Alt. Title: ぷよぷよ〜ん パーティー -->
 		<description>Puyo Puyo 4 - Puyo Puyon Party (Jpn)</description>
 		<year>1999</year>
 		<publisher>Compile</publisher>
@@ -7245,7 +7257,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="puyopsun">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPYJ - Release Date: 1997-10-31 - Alt. Title: ぷよぷよSUN64 -->
 		<description>Puyo Puyo Sun 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Compile</publisher>
@@ -7257,7 +7269,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="pbobble" cloneof="bam3dx">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPBJ - Release Date: 1999-03-05 - Alt. Title: パズルボブル64 -->
 		<description>Puzzle Bobble 64 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Taito Corporation</publisher>
@@ -7353,7 +7365,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="rakugaj" cloneof="rakuga">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NKRJ (RZ018-J1) - Release Date: 1998-07-23 - Alt. Title: らくがきっず -->
 		<description>Rakuga Kids (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -7365,10 +7377,10 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="rally99" cloneof="rallychl">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NRAJ - Release Date: 1999-08-06 - Alt. Title: ラリー'99 -->
 		<description>Rally '99 (Jpn)</description>
 		<year>1999</year>
-		<publisher>Europress Software</publisher>
+		<publisher>Imagineer</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="rally '99 (japan).bin" size="8388608" crc="a1c36245" sha1="920113a96dfb15e3e8ed991c42e28734efa26599" offset="000000" />
@@ -7653,7 +7665,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="robotpon">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NR7J - Release Date: 1999-12-24 - Alt. Title: ロボットポンコッツ64 七つの海のカラメル -->
 		<description>Robot Ponkottsu 64 - 7tsu no Umi no Caramel (Jpn)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -7724,7 +7736,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="rockmand" cloneof="megaman">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NRHJ - Release Date: 2000-11-22 - Alt. Title: ロックマンDASH 鋼の冒険心 -->
 		<description>Rockman Dash - Hagane no Boukenshin (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
@@ -7880,7 +7892,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="saikyou">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSHJ - Release Date: 1996-06-23 - Alt. Title: 最強羽生将棋 -->
 		<description>Saikyou Habu Shougi (Jpn)</description>
 		<year>1996</year>
 		<publisher>Seta Corporation</publisher>
@@ -7964,7 +7976,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="sdhiryuu">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NDCJ - Release Date: 1999-01-29 - Alt. Title: SD飛龍の拳伝説 -->
 		<description>SD Hiryuu no Ken Densetsu (Jpn)</description>
 		<year>1999</year>
 		<publisher>Culture Brain</publisher>
@@ -8072,7 +8084,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="shadgatej" cloneof="shadgate">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSGJ - Release Date: 1999-08-13 - Alt. Title: シャドウゲイト64 -->
 		<description>Shadowgate 64 - Trials of the Four Towers (Jpn)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -8096,7 +8108,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="shinprow">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NTOJ - Release Date: 1998-01-04 - Alt. Title: 新日本プロレスリング 闘魂炎導 BRAVE SPIRITS -->
 		<description>Shin Nihon Pro Wrestling Toukon Road - Brave Spirits (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -8108,7 +8120,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="shinprw2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NT3J - Release Date: 1998-12-26 - Alt. Title: 新日本プロレス 闘魂炎導2 the next generation -->
 		<description>Shin Nihon Pro Wrestling Toukon Road 2 - The Next Generation (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -8120,7 +8132,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="simcit2k">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NS2J - Release Date: 1998-01-30 - Alt. Title: シムシティ2000 -->
 		<description>Sim City 2000 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
@@ -8132,7 +8144,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="snobokidj" cloneof="snobokid">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSKJ - Release Date: 1997-12-12 - Alt. Title: スノボキッズ -->
 		<description>Snobo Kids (Jpn)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
@@ -8144,7 +8156,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="snowsped" cloneof="bigmount">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSNJ - Release Date: 1998-12-26 - Alt. Title: スノースピーダー -->
 		<description>Snow Speeder (Jpn)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
@@ -8204,7 +8216,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="sonicwing" cloneof="aerofgt">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSAJ - Release Date: 1998-03-19 - Alt. Title: ソニックウイングス アサルト -->
 		<description>Sonic Wings Assault (Jpn)</description>
 		<year>1998</year>
 		<publisher>Video System</publisher>
@@ -8312,7 +8324,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="spacedyn" cloneof="darkrift">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NDKJ - Release Date: 1998-03-27 - Alt. Title: スペースダイナマイツ -->
 		<description>Space Dynamites (Jpn)</description>
 		<year>1998</year>
 		<publisher>Vic Tokai</publisher>
@@ -8383,7 +8395,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="starfoxj" cloneof="lylatwar">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NFXJ - Release Date: 1997-04-27 - Alt. Title: スターフォックス64 -->
 		<description>Star Fox 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -8419,7 +8431,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="starsoldj" cloneof="starsold">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NS6J - Release Date: 1998-07-10 - Alt. Title: スターソルジャー バニシングアース -->
 		<description>Star Soldier - Vanishing Earth (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -8443,7 +8455,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="startwin" cloneof="jetforce">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NJFJ - Release Date: 1999-12-01 - Alt. Title: スターツインズ -->
 		<description>Star Twins (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -8551,7 +8563,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="swshutsu" cloneof="swrogue">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NRSJ - Release Date: 1999-08-27 - Alt. Title: スター・ウォーズ ［出撃！ローグ中隊］ -->
 		<description>Star Wars - Shutsugeki! Rogue Chuutai (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -8563,7 +8575,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="swteiko" cloneof="swshadow">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSWJ - Release Date: 1997-06-14 - Alt. Title: スター・ウォーズ 帝国の影 -->
 		<description>Star Wars - Teikoku no Kage (Jpn)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -8611,7 +8623,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="swracerj" cloneof="swracer">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NEPJ - Release Date: 1999-07-21 - Alt. Title: スター・ウォーズ エピソード1 レーサー -->
 		<description>Star Wars Episode I - Racer (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -8717,7 +8729,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="sbdaman">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NB6J - Release Date: 1998-07-24 - Alt. Title: スーパービーダマン バトルフェニックス64 -->
 		<description>Super B-Daman - Battle Phoenix 64 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -8729,7 +8741,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="supbowlj" cloneof="supbowl">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NBWJ - Release Date: 1999-03-26 - Alt. Title: スーパーボウリング -->
 		<description>Super Bowling (Jpn)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
@@ -8765,7 +8777,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="sm64j" cloneof="sm64">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSMJ - Release Date: 1996-06-23 - Alt. Title: スーパーマリオ64 -->
 		<description>Super Mario 64 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -8777,7 +8789,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="sm64jse" cloneof="sm64">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: 1997-07-18 - Release Date:  - Alt. Title: スーパーマリオ64 (振動パック対応バージョン) -->
 		<description>Super Mario 64 (Jpn, Rev. A, Shindou Edition)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -8801,7 +8813,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="srobospi">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NSSJ - Release Date: 1998-07-17 - Alt. Title: スーパーロボットスピリッツ -->
 		<description>Super Robot Spirits (Jpn)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
@@ -8813,7 +8825,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="srobot64">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NS4J - Release Date: 1999-10-29 - Alt. Title: スーパーロボット大戦64 -->
 		<description>Super Robot Taisen 64 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
@@ -8861,7 +8873,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="ssrace64" cloneof="lamborg">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NLCJ - Release Date: 1998-05-29 - Alt. Title: スーパースピードレース64 -->
 		<description>Super Speed Race 64 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Titus</publisher>
@@ -8921,7 +8933,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="puzldama">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NPZJ (RZ022-J1) - Release Date: 1998-03-26 - Alt. Title: 進め！対戦ぱずるだま 闘魂！まるたま町 -->
 		<description>Susume! Taisen Puzzle Dama - Toukon! Marutama Chou (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -9038,7 +9050,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="tetris64" cloneof="ntetris">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NT6J - Release Date: 1998-11-13 - Alt. Title: テトリス64 -->
 		<description>Tetris 64 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>
@@ -9300,7 +9312,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="tghj" cloneof="tgh">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NGBJ - Release Date: 2000-03-17 - Alt. Title: トップギア・ハイパーバイク -->
 		<description>Top Gear Hyper-Bike (Jpn)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
@@ -9336,7 +9348,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="tgoverdrj" cloneof="tgoverdr">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NRCJ - Release Date: 1999-03-19 - Alt. Title: トップギア オーバードライブ -->
 		<description>Top Gear Overdrive (Jpn)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -9372,7 +9384,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="tgrallyj" cloneof="tgrally">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NTRJ - Release Date: 1997-12-05 - Alt. Title: トップギア・ラリー -->
 		<description>Top Gear Rally (Jpn)</description>
 		<year>1997</year>
 		<publisher>Kemco</publisher>
@@ -9408,7 +9420,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="tgrally2j" cloneof="tgrally2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NL2J - Release Date: 2000-02-04 - Alt. Title: トップギア・ラリー2 -->
 		<description>Top Gear Rally 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
@@ -9492,7 +9504,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="beastwarj" cloneof="beastwar">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NTBJ - Release Date: 1999-10-01 - Alt. Title: トランスフォーマー ビーストウォーズ メタルス 64 -->
 		<description>Transformers - Beast Wars Metals 64 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Takara</publisher>
@@ -9528,7 +9540,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="tsumibat">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NGUJ - Release Date: 2000-11-21 - Alt. Title: 罪と罰～地球の継承者～ -->
 		<description>Tsumi to Batsu - Hoshi no Keishousha (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -9813,7 +9825,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="utchan">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NIRJ - Release Date: 1997-12-19 - Alt. Title: ウッチャンナンチャンの炎のチャレンジャー 電流イライラ棒 -->
 		<description>Utchan Nanchan no Hono no Challenger - Denryuu Ira Ira Bou (Jpn)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -9837,7 +9849,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="vrally99j" cloneof="vrally99">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NVYJ - Release Date: 1999-10-14 - Alt. Title: V-RALLY EDITION 99 -->
 		<description>V-Rally Edition 99 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Spike</publisher>
@@ -9933,10 +9945,10 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="vkiller" cloneof="turok2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NT2J - Release Date: 1999-06-18 - Alt. Title: バイオレンスキラーTUROK NEW GENERATION -->
 		<description>Violence Killer - Turok New Generation (Jpn)</description>
 		<year>1999</year>
-		<publisher>Acclaim Entertainment</publisher>
+		<publisher>Media Factory</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="violence killer - turok new generation (japan).bin" size="33554432" crc="65785622" sha1="873b8520fc44db2b3910dd5f11b9aec63f17645c" offset="000000" />
@@ -9993,7 +10005,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="vprowrs2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NA2J - Release Date: 2000-01-28 - Alt. Title: バーチャルプロレス2 〜王道継承〜 -->
 		<description>Virtual Pro Wrestling 2 - Oudou Keishou (Jpn)</description>
 		<year>2000</year>
 		<publisher>Asmik Ace Entertainment</publisher>
@@ -10005,7 +10017,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="vprowres">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NVPJ - Release Date: 1997-12-19 - Alt. Title: バーチャル・プロレスリング64 -->
 		<description>Virtual Pro Wrestling 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Asmik Ace Entertainment</publisher>
@@ -10101,7 +10113,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="waveracej" cloneof="waverace">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWRJ - Release Date: 1996-09-27 - Alt. Title: ウエーブレース64 -->
 		<description>Wave Race 64 (Jpn, Rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -10113,7 +10125,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="waveracej1" cloneof="waverace">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWRJ - Release Date: 1997-07-18 - Alt. Title: ウエーブレース64 (振動パック対応バージョン) -->
 		<description>Wave Race 64 (Jpn, Rev. B, Shindou Edition)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -10125,7 +10137,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="waveracej2" cloneof="waverace">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWRJ - Release Date: 1996-09-27 - Alt. Title: ウエーブレース64 -->
 		<description>Wave Race 64 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -10197,7 +10209,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="wg3dhj" cloneof="wg3dh">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWGJ - Release Date: 1998-02-28 - Alt. Title: ウェイン・グレツキー・3Dホッケー -->
 		<description>Wayne Gretzky's 3D Hockey (Jpn)</description>
 		<year>1998</year>
 		<publisher>GameBank</publisher>
@@ -10365,7 +10377,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="wetrixj" cloneof="wetrix">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWTJ - Release Date: 1998-11-27 - Alt. Title: ウェットリス -->
 		<description>Wetrix (Jpn)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
@@ -10401,7 +10413,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="wildchop" cloneof="chopatck">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWCJ - Release Date: 1997-11-28 - Alt. Title: ワイルドチョッパーズ -->
 		<description>Wild Choppers (Jpn)</description>
 		<year>1997</year>
 		<publisher>Seta Corporation</publisher>
@@ -10413,7 +10425,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="winbackj" cloneof="winback">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWDJ - Release Date: 1999-09-23 - Alt. Title: ウィン バック -->
 		<description>WinBack (Jpn, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
@@ -10425,7 +10437,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="winbackj1" cloneof="winback">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWDJ - Release Date: 1999-09-23 - Alt. Title: ウィン バック -->
 		<description>WinBack (Jpn)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
@@ -10473,7 +10485,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="wondproj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NJ2J - Release Date: 1996-11-22 - Alt. Title: ワンダープロジェクト ジェイツーコルロの森のジョゼット -->
 		<description>Wonder Project J2 - Koruro no Mori no Jozet (Jpn)</description>
 		<year>1996</year>
 		<publisher>Enix</publisher>
@@ -10677,9 +10689,9 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="wmania2kj" cloneof="wmania2k">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NWXJ - Release Date: 2000-09-15 - Alt. Title: WWF レッスルマニア2000 -->
 		<description>WWF WrestleMania 2000 (Jpn)</description>
-		<year>1999</year>
+		<year>2000</year>
 		<publisher>Asmik Ace Entertainment</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
@@ -10725,7 +10737,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="yakouch2">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NYKJ - Release Date: 1999-10-22 - Alt. Title: 夜光虫II 殺人航路 -->
 		<description>Yakouchuu II - Satsujin Kouro (Jpn)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
@@ -10737,7 +10749,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="yoshistoj" cloneof="yoshisto">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NYSJ - Release Date: 1997-12-21 - Alt. Title: ヨッシーストーリー -->
 		<description>Yoshi Story (Jpn)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -10773,7 +10785,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="yukeyuke" cloneof="mischief">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NTMJ - Release Date: 1997-06-27 - Alt. Title: ゆけゆけ！！トラブルメーカーズ -->
 		<description>Yuke Yuke!! Trouble Makers (Jpn)</description>
 		<year>1997</year>
 		<publisher>Enix</publisher>
@@ -10785,7 +10797,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="zeldamajj" cloneof="zeldamaj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NZSJ - Release Date: 2000-04-27 - Alt. Title: ゼルダの伝説 ムジュラの仮面 -->
 		<description>Zelda no Densetsu - Mujura no Kamen (Jpn, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -10797,7 +10809,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="zeldamajj1" cloneof="zeldamaj">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NZSJ - Release Date: 2000-04-27 - Alt. Title: ゼルダの伝説 ムジュラの仮面 -->
 		<description>Zelda no Densetsu - Mujura no Kamen (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -10809,7 +10821,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="zeldaootj" cloneof="zeldaoot">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-CZLJ - Release Date: 1998-11-21 - Alt. Title: ゼルダの伝説 時のオカリナ -->
 		<description>Zelda no Densetsu - Toki no Ocarina (Jpn, Rev. B)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -10821,7 +10833,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="zeldaootj1" cloneof="zeldaoot">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-CZLJ - Release Date: 1998-11-21 - Alt. Title: ゼルダの伝説 時のオカリナ -->
 		<description>Zelda no Densetsu - Toki no Ocarina (Jpn, Rev. A)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -10833,7 +10845,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="zeldaootj2" cloneof="zeldaoot">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-CZLJ - Release Date: 1998-11-21 - Alt. Title: ゼルダの伝説 時のオカリナ -->
 		<description>Zelda no Densetsu - Toki no Ocarina (Jpn)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -10845,7 +10857,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="zool">
-		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<!-- Serial: NUS-NMZJ - Release Date: 1999-06-11 - Alt. Title: ズール 魔獣使い伝説 -->
 		<description>Zool - Majuu Tsukai Densetsu (Jpn)</description>
 		<year>1999</year>
 		<publisher>Imagineer</publisher>
