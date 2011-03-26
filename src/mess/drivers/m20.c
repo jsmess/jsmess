@@ -12,6 +12,25 @@ APB notes:
 
 0xfc903 checks for the string TEST at 0x3f4-0x3f6, does an int 0xfe if so, unknown purpose
 
+Error codes:
+Triangle 	Test CPU registers and instructions
+Triangle 	Test system RAM
+4 vertical lines 	Test CPU call and trap instructions
+Diamond 	Initialize screen and printer drivers
+EC0 	8255 parallel interface IC test failed
+EC1 	6845 CRT controller IC test failed
+EC2 	1797 floppy disk controller chip failed
+EC3 	8253 timer IC failed
+EC4 	8251 keyboard interface failed
+EC5 	8251 keyboard test failed
+EC6 	8259 PIC IC test failed
+EK0 	Keyboard did not respond
+Ek1 	Keyboard responds, but self test failed
+ED1 	Disk drive 1 test failed
+ED0 	Disk drive 0 test failed
+E10 	Non-vectored interrupt error
+E11 	Vectored interrupt error
+
 */
 
 #include "emu.h"
