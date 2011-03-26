@@ -50,6 +50,7 @@ public:
 	UINT8 irq_mask;
 	UINT8 keyb_direct;
 	UINT8 pal_mode;
+	UINT8 keyb_cmd;
 };
 
 
@@ -390,20 +391,48 @@ static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
 	drvstate->fdc_drq_flag = state;
 }
 
-
 static READ8_HANDLER( key_r )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
-	UINT8 res;
+	/*
+	-x-- ---- shift key
+	---- -x-- MCU data ready
+	---- ---x handshake bit?
+	*/
 
-	if(offset == 1) //keyboard status
-		return (0x3c) | state->keyb_press_flag; //bit 6 or 7 is probably key repeat
+	switch(state->keyb_cmd)
+	{
+		case 0x00: //poll keyboard input
+		{
+			if(offset == 0)
+				state->keyb_press_flag = 0;
 
-	state->keyb_press_flag = 0;
-	res = state->keyb_press;
-//  state->keyb_press = 0xff;
+			return (offset == 0) ? state->keyb_press : ((state->keyb_press_flag << 2) | (state->keyb_press_flag));
+		}
+		break;
+		default:
+		{
+			if(offset == 1)
+				printf("Unknown keyboard command %02x read-back\n",state->keyb_cmd);
 
-	return res;
+			return (offset == 0) ? 0x00 : (space->machine->rand() & 0x5);
+		}
+	}
+
+	return 0x00;
+}
+
+/* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */
+static WRITE8_HANDLER( key_w )
+{
+	smc777_state *state = space->machine->driver_data<smc777_state>();
+
+	if(offset == 1) //keyboard command
+		state->keyb_cmd = data;
+	else
+	{
+		// keyboard command param
+	}
 }
 
 static WRITE8_HANDLER( border_col_w )
@@ -627,7 +656,7 @@ static WRITE8_HANDLER( smc777_io_w )
 	else if(low_offs >= 0x08 && low_offs <= 0x0f) { smc777_attr_w(space,offset & 0xff07,data); }
 	else if(low_offs >= 0x10 && low_offs <= 0x17) { smc777_pcg_w(space,offset & 0xff07,data); }
 	else if(low_offs >= 0x18 && low_offs <= 0x19) { smc777_6845_w(space,low_offs & 1,data); }
-	else if(low_offs == 0x1a || low_offs == 0x1b) { logerror("Keyboard write %02x [%02x]\n",data,low_offs & 1); }
+	else if(low_offs == 0x1a || low_offs == 0x1b) { key_w(space,low_offs & 1,data); }
 	else if(low_offs == 0x1c)					  { system_output_w(space,0,data); }
 	else if(low_offs == 0x1d)					  { logerror("Printer status / strobe write %02x\n",data); }
 	else if(low_offs == 0x1e || low_offs == 0x1f) { logerror("RS-232C irq control [%02x] %02x\n",low_offs & 1,data); }
