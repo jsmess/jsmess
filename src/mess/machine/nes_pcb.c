@@ -11972,6 +11972,7 @@ void pcb_handlers_setup( running_machine *machine )
 {
 	nes_state *state = machine->driver_data<nes_state>();
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
+	device_t *ppu = machine->device("ppu");
 
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
@@ -11984,7 +11985,7 @@ void pcb_handlers_setup( running_machine *machine )
 		state->mmc_read_low = intf->mmc_l.read;
 		state->mmc_read_mid = intf->mmc_m.read;	// in progress
 		state->mmc_read = intf->mmc_h.read;	// in progress
-		ppu_latch = intf->mmc_ppu_latch;
+		ppu2c0x_set_latch(ppu, intf->mmc_ppu_latch);
 	}
 	else
 	{
@@ -11995,7 +11996,7 @@ void pcb_handlers_setup( running_machine *machine )
 		state->mmc_read_low = NULL;
 		state->mmc_read_mid = NULL;	// in progress
 		state->mmc_read = NULL;	// in progress
-		ppu_latch = NULL;
+		ppu2c0x_set_latch(ppu, NULL);
 	}
 
 	state->mmc3_prg_cb = prg8_x;
