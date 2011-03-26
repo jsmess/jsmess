@@ -16,6 +16,7 @@
 #include "machine/z80ctc.h"
 #include "machine/i8255a.h"
 #include "machine/z80pio.h"
+#include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
@@ -554,6 +555,35 @@ static void pasopia_nmi_trap(running_machine *machine)
 	}
 }
 
+static READ8_HANDLER( pasopia7_fdc_r )
+{
+	switch(offset)
+	{
+		case 4: return upd765_status_r(space->machine->device("upd765"),0);
+		case 5: return upd765_data_r(space->machine->device("upd765"),0);
+		//case 6: bit 7 interrupt bit
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pasopia7_fdc_w )
+{
+	switch(offset)
+	{
+		case 0: upd765_tc_w(space->machine->device("upd765"), 0); break;
+		case 2: upd765_tc_w(space->machine->device("upd765"), 1); break;
+		case 5: return upd765_data_w(space->machine->device("upd765"),0,data);
+		case 6:
+		upd765_reset_w(space->machine->device("upd765"),data & 0x80);
+		floppy_mon_w(floppy_get_device(space->machine, 0), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 0x40), 0);
+		break;
+
+	}
+}
+
+
 static READ8_HANDLER( pasopia7_io_r )
 {
 	pasopia_state *state = space->machine->driver_data<pasopia_state>();
@@ -589,7 +619,7 @@ static READ8_HANDLER( pasopia7_io_r )
 //  else if(io_port == 0x3a)                    { SN1 }
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
-//  else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
+	else if(io_port >= 0xe0 && io_port <= 0xe6) { return pasopia7_fdc_r(space,offset & 7); }
 	else
 	{
 		logerror("(PC=%06x) Read i/o address %02x\n",cpu_get_pc(space->cpu),io_port);
@@ -631,7 +661,7 @@ static WRITE8_HANDLER( pasopia7_io_w )
 	else if(io_port == 0x3a)					{ sn76496_w(space->machine->device("sn1"), 0, data); }
 	else if(io_port == 0x3b)					{ sn76496_w(space->machine->device("sn2"), 0, data); }
 	else if(io_port == 0x3c)					{ pasopia7_memory_ctrl_w(space,0, data); }
-//  else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
+	else if(io_port >= 0xe0 && io_port <= 0xe6) { pasopia7_fdc_w(space,offset & 7,data); }
 	else
 	{
 		logerror("(PC=%06x) Write i/o address %02x = %02x\n",cpu_get_pc(space->cpu),offset,data);
@@ -740,6 +770,7 @@ static const z80_daisy_config p7_daisy[] =
 {
 	{ "ctc" },
 	{ "z80pio_0" },
+//	{ "upd765" }, /* TODO */
 	{ NULL }
 };
 
@@ -924,6 +955,27 @@ static PALETTE_INIT( pasopia7 )
 		palette_set_color_rgb(machine, i+0x020, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
+static const struct upd765_interface pasopia7_upd765_interface =
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL, //DRQ, TODO
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+static const floppy_config pasopia7_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_OPTIONS_NAME(default),
+	NULL
+};
+
 static MACHINE_CONFIG_START( paso7, pasopia_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -940,6 +992,9 @@ static MACHINE_CONFIG_START( paso7, pasopia_state )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
+
+	MCFG_UPD765A_ADD("upd765", pasopia7_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_config)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
