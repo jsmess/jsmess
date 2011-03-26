@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="x68k_flop" description="Sharp X68k disk images">
+
+	<software name="codezero">
+		<description>Code Zero</description>
+		<year>199?</year>
+		<publisher>Enix</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk1.xdf" size="1261568" crc="990f6c48" sha1="4ac259d4e52adcb6f6c75ae5478a395ec6e75534" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk2.xdf" size="1261568" crc="5c56d54c" sha1="472b3d91410887771ec1f6368ce2e6553ecca512" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="dragonsl">
+		<description>Dragon Slayer</description>
+		<year>198?</year>
+		<publisher>Nihon Falcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 1.xdf" size="1261568" crc="5be0d7ed" sha1="ea40cad2f143e62434e49d38e315d24e45266712" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+
+
+</softwarelist>

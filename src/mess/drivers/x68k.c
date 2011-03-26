@@ -2505,7 +2505,7 @@ static const floppy_config x68k_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(x68k),
-	NULL
+	"floppy_5_25"
 };
 
 static const SCSIConfigTable x68k_scsi_devtable =
@@ -2776,6 +2776,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 
 	MCFG_UPD72065_ADD("upd72065", fdc_interface)
 	MCFG_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
