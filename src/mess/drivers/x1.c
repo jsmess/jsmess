@@ -31,7 +31,8 @@
     - Dragon Buster: it crashed to me once with a obj flag hang;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
-    - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
+ 	- Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
+ 	- Hydlide 3: can't get the user disk to work properly, could be a bad dump;
     - Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
 	- Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
 	- "newtype": trips a z80dma assert, worked around for now;
@@ -64,6 +65,8 @@
     - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (btanb)
     - Maidum: you need to load BOTH disk without write protection disabled, otherwise it refuses to run. (btanb)
 	- Marvelous: needs write protection disabled (btanb)
+	- Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
+	  Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
 
 =================================================================================================
 
@@ -621,7 +624,7 @@ static UINT16 check_keyboard_press(running_machine *machine)
 	{
 		if((pad >> i) & 0x01)
 		{
-			return scancode;
+			return scancode | 0x100;
 		}
 		scancode++;
 	}
