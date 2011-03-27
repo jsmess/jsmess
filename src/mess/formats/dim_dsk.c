@@ -14,7 +14,14 @@
 
 FLOPPY_IDENTIFY(dim_dsk_identify)
 {
-	*vote = 100;
+	UINT8 dim_header[16];
+
+	floppy_image_read(floppy, (UINT8*)dim_header,0xab,16);
+
+	if(strncmp((const char*)dim_header,"DIFC HEADER",11) == 0)
+		*vote = 100;
+	else
+		*vote = 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
