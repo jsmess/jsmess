@@ -1464,17 +1464,31 @@ static WRITE8_HANDLER( x1turbo_gfxpal_w )
 
 
 /*
- *  FIXME: this is still wrong, the only games that uses this function so far are Hyper Olympics '84 disk version and Might & Magic.
- *  Perhaps it's the source ROM that isn't correct ...
+ *  FIXME: bit-wise this doesn't make any sense, I guess that it uses the lv 2 kanji roms
+ *         Test cases for this port so far are Hyper Olympics '84 disk version and Might & Magic.
  */
+static UINT16 jis_convert(int kanji_addr)
+{
+	if(kanji_addr >= 0x0e00 && kanji_addr <= 0x0e9f) { kanji_addr -= 0x0e00; kanji_addr &= 0x0ff; return ((0x0e0) + (kanji_addr >> 3)) << 4; } // numbers
+	if(kanji_addr >= 0x0f00 && kanji_addr <= 0x109f) { kanji_addr -= 0x0f00; kanji_addr &= 0x1ff; return ((0x4c0) + (kanji_addr >> 3)) << 4; } // lower case chars
+	if(kanji_addr >= 0x1100 && kanji_addr <= 0x129f) { kanji_addr -= 0x1100; kanji_addr &= 0x1ff; return ((0x2c0) + (kanji_addr >> 3)) << 4; } // upper case chars
+	if(kanji_addr >= 0x0100 && kanji_addr <= 0x01ff) { kanji_addr -= 0x0100; kanji_addr &= 0x0ff; return ((0x040) + (kanji_addr >> 3)) << 4; } // grammar symbols
+	if(kanji_addr >= 0x0500 && kanji_addr <= 0x06ff) { kanji_addr -= 0x0500; kanji_addr &= 0x1ff; return ((0x240) + (kanji_addr >> 3)) << 4; } // math symbols
+	if(kanji_addr >= 0x0300 && kanji_addr <= 0x04ff) { kanji_addr -= 0x0300; kanji_addr &= 0x1ff; return ((0x440) + (kanji_addr >> 3)) << 4; } // parentesis
+
+	if(kanji_addr != 0x0720 && kanji_addr != 0x0730)
+		printf("%08x\n",kanji_addr);
+
+	return 0x0000;
+}
+
 static READ8_HANDLER( x1_kanji_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *kanji_rom = space->machine->region("kanji")->base();
 	UINT8 res;
 
-	//res = 0;
-	res = kanji_rom[state->kanji_addr*2+offset];
+	res = kanji_rom[jis_convert(state->kanji_addr & 0xfff0)+(offset*0x10)+(state->kanji_addr & 0xf)];
 
 	if(offset == 1)
 		state->kanji_addr_latch++;
@@ -1490,7 +1504,10 @@ static WRITE8_HANDLER( x1_kanji_w )
 	switch(offset)
 	{
 		case 0: state->kanji_addr_latch = (data & 0xff)|(state->kanji_addr_latch&0xff00); break;
-		case 1: state->kanji_addr_latch = (data<<8)|(state->kanji_addr_latch&0x00ff); break;
+		case 1: state->kanji_addr_latch = (data<<8)|(state->kanji_addr_latch&0x00ff);
+			//if(state->kanji_addr_latch != 0x720 && state->kanji_addr_latch != 0x730)
+			//	printf("%08x\n",state->kanji_addr_latch);
+			break;
 		case 2:
 		{
 			/* 0 -> selects Expanded EEPROM */
