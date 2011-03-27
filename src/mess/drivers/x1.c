@@ -33,13 +33,13 @@
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
     - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
     - Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
+	- Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
 	- "newtype": trips a z80dma assert, worked around for now;
 	- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
-	- Shiver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
+	- Shilver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
 	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
 	- Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
     - Take the A-Train: returns to basic prompt if you try to start a play, missing disk perhaps?
-    - Thexder: (x1turbo) Can't start a play, keyboard related issue?
 	- Trivia-Q: dunno what to do on the selection screen, missing inputs?
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
@@ -857,10 +857,14 @@ static WRITE8_HANDLER( sub_io_w )
 	{
 		state->key_irq_vector = data;
 		logerror("Key vector set to 0x%02x\n",data);
+		data = 0;
 	}
 
 	if(state->sub_cmd == 0xe9)
+	{
 		cmt_command(space->machine,data);
+		data = 0;
+	}
 
 	if((data & 0xf0) == 0xd0) //reads here tv recording timer data. (Timer set (0xd0) / Timer readout (0xd8))
 	{
