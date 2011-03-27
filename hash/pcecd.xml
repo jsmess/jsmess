@@ -4462,10 +4462,8 @@
 
 	<software name="tadaimas" cloneof="tadaima">
 		<description>Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
-		<publisher>NEC</publisher>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tadaima yuusha boshuuchuu - sample disc (scd)(jpn)" sha1="3b8de4f1d459da9801a8c30fd5f671ade7fd2f87"/>

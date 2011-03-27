@@ -6882,13 +6882,13 @@
 		<publisher>Namco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3312" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcotdiipr" size="32768" crc="bffcf247" sha1="823877dfec03fd47bdc4d61f44f595ab2eb00021" offset="00000" />
 			</dataarea> <!-- real label: namcotdⅱpr -->
 			<dataarea name="chr" size="8192">
 				<rom name="diic" size="8192" crc="a221a698" sha1="06225f64d24efad78a7979ec01144208f1f0a207" offset="00000" />
 			</dataarea> <!-- real label: dⅱc -->
-			<feature name="mirroring" value="vertical" />
 		</part>
 	</software>
 
@@ -8668,13 +8668,13 @@
 		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="elevatoraction.prg" size="32768" crc="a6de7024" sha1="2070d3241f5f29de74b004c9a6237cec17951f9a" offset="00000" />
 			</dataarea> <!-- real label: elevatoraction -->
 			<dataarea name="chr" size="8192">
 				<rom name="elevatoraction.chr" size="8192" crc="fac01d0f" sha1="f4c30bb45e92398088baabab04bc5650066781fc" offset="00000" />
 			</dataarea> <!-- real label: elevatoraction -->
-			<feature name="mirroring" value="horizontal" />
 		</part>
 	</software>
 
@@ -16063,6 +16063,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-NROM-128" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="kin.0.prg" size="16384" crc="281160ae" sha1="3e123166c0368c4505b18905349b96ea79324732" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -16070,7 +16071,6 @@
 			<dataarea name="chr" size="8192">
 				<rom name="kin.0.chr" size="8192" crc="fdc5c38e" sha1="d3e82ff241f2df7654674a3ab750aac988b1172a" offset="00000" />
 			</dataarea> <!-- real label: kin -->
-			<feature name="mirroring" value="vertical" />
 		</part>
 	</software>
 
@@ -16081,6 +16081,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-NROM-128" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="kin.1.prg" size="16384" crc="f5563f2e" sha1="26fbf1b5470defcb7fe3bdfce59a781ebb237be8" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -16088,7 +16089,6 @@
 			<dataarea name="chr" size="8192">
 				<rom name="kin.1.chr" size="8192" crc="fdc5c38e" sha1="d3e82ff241f2df7654674a3ab750aac988b1172a" offset="00000" />
 			</dataarea> <!-- real label: kin -->
-			<feature name="mirroring" value="vertical" />
 		</part>
 	</software>
 
@@ -21568,13 +21568,13 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-NROM-256" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="obq.prg" size="32768" crc="6756763b" sha1="38bb342ea88c20d9bfd42485f20913e18ef54020" offset="00000" />
 			</dataarea> <!-- real label: obq -->
 			<dataarea name="chr" size="8192">
 				<rom name="obq.chr" size="8192" crc="7bcf6de9" sha1="7c7798569f517f8a2ba5329919311e15e673c51e" offset="00000" />
 			</dataarea> <!-- real label: obq -->
-			<feature name="mirroring" value="vertical" />
 		</part>
 	</software>
 
@@ -34463,6 +34463,7 @@
 		<publisher>Irem</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="if-01 p" size="16384" crc="e16bb5fe" sha1="eb95c633aa05d7a4b735ba75c5d0ed294c2b2e30" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -34470,7 +34471,6 @@
 			<dataarea name="chr" size="8192">
 				<rom name="if-01 c" size="8192" crc="45abd80e" sha1="d5da7acffa42556aa763c8dd352499cfc25dda68" offset="00000" />
 			</dataarea> <!-- Alt label: irem zr-64 -->
-			<feature name="mirroring" value="horizontal" />
 		</part>
 	</software>
 

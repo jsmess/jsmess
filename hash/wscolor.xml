@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="wswan" description="Bandai Wonderswan Color cartridges">
+<softwarelist name="wscolor" description="Bandai Wonderswan Color cartridges">
 	<software name="anotherh">
         <!-- Alt title: アナザヘヴン ～memory of those days～ -->
 		<!-- WSC -->
