@@ -29,6 +29,7 @@
 
     per-game/program specific TODO:
     - Dragon Buster: it crashed to me once with a obj flag hang;
+	- Chack'n Pop: game is too fast, presumably missing wait states;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
  	- Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?

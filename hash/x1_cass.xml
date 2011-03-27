@@ -1,5 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- list of games that requires basic disk/tape loaded first (use load cmd then run):
+	2001 An Adventure story (2001nen)
+	Extra Pinball
+	Hover Attack
+	Nobunaga no Yabou
+	Perfect Mahjong
+	Poibos
+	Rowdy Ball
+	Spartan X
+	Star Fleet
+	Super Golf
+	Zenon (zennon, made by Dempa)
+-->
 <softwarelist name="x1_cass" description="Sharp X1 tape images">
 
 	<software name="3biki">
