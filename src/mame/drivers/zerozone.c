@@ -59,11 +59,11 @@ static WRITE16_HANDLER( zerozone_sound_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, offset, data >> 8);
-		cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08000f) AM_READ(zerozone_input_r)
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(zerozone_sound_w)
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM		/* Never read from */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)

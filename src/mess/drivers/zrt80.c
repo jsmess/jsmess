@@ -74,7 +74,7 @@ WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 	beep_set_state(m_beep, 1);
 }
 
-static ADDRESS_MAP_START(zrt80_mem, ADDRESS_SPACE_PROGRAM, 8, zrt80_state)
+static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // Z25 - Main firmware
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START(zrt80_mem, ADDRESS_SPACE_PROGRAM, 8, zrt80_state)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zrt80_io, ADDRESS_SPACE_IO, 8, zrt80_state)
+static ADDRESS_MAP_START( zrt80_io, AS_IO, 8, zrt80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )

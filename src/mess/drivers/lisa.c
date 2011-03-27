@@ -23,11 +23,11 @@
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START(lisa_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(lisa_map, AS_PROGRAM, 16)
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)			/* no fixed map, we use an MMU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lisa_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE_MEMBER(lisa_state, fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
@@ -36,7 +36,7 @@ static ADDRESS_MAP_START(lisa_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lisa210_fdc_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE_MEMBER(lisa_state, fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_NOP										/* nothing, or RAM wrap-around ??? */

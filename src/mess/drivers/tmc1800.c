@@ -201,15 +201,15 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	switch (ram_get_size(device->machine->device(RAM_TAG)))
 	{
 	case 4 * 1024:
-		memory_install_readwrite_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
+		memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, "bank1");
+		memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, "bank1");
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank1");
 		break;
 	}
 
@@ -220,13 +220,13 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	switch (bank)
 	{
 	case TMC2000_BANK_MONITOR:
-		memory_install_read_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
-		memory_unmap_write(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00 );
+		memory_install_read_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
+		memory_unmap_write(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00 );
 		break;
 
 	case TMC2000_BANK_COLORRAM: // write-only
-		memory_install_write_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
-		memory_unmap_read(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00);
+		memory_install_write_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
+		memory_unmap_read(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00);
 		break;
 	}
 
@@ -241,7 +241,7 @@ static WRITE8_DEVICE_HANDLER( nano_bankswitch_w )
 
 	memory_set_bank(device->machine, "bank1", OSCNANO_BANK_RAM);
 
-	memory_install_readwrite_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
+	memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
 
 	/* write to CDP1864 tone latch */
 
@@ -266,36 +266,36 @@ static WRITE8_DEVICE_HANDLER( tmc1800_cdp1861_dispoff_w )
 
 // Telmac 1800
 
-static ADDRESS_MAP_START( tmc1800_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmc1800_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc1800_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tmc1800_io_map, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, tmc1800_cdp1861_dispon_r, tmc1800_cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
 ADDRESS_MAP_END
 
 // OSCOM 1000B
 
-static ADDRESS_MAP_START( osc1000b_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( osc1000b_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( osc1000b_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( osc1000b_io_map, AS_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
 ADDRESS_MAP_END
 
 // Telmac 2000
 
-static ADDRESS_MAP_START( tmc2000_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmc2000_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc2000_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tmc2000_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tmc2000_keylatch_w)
@@ -304,12 +304,12 @@ ADDRESS_MAP_END
 
 // OSCOM Nano
 
-static ADDRESS_MAP_START( nano_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nano_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0x83ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nano_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nano_io_map, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(nano_keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, nano_bankswitch_w)
@@ -708,13 +708,13 @@ static MACHINE_RESET( tmc2000 )
 
 	/* enable monitor mirror at 0x0000 */
 	memory_set_bank(machine, "bank1", TMC2000_BANK_ROM);
-	memory_install_readwrite_bank(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, "bank1");
-	memory_unmap_write(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00);
+	memory_install_readwrite_bank(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, "bank1");
+	memory_unmap_write(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00);
 
 	/* enable monitor */
 	memory_set_bank(machine, "bank2", TMC2000_BANK_MONITOR);
-	memory_install_readwrite_bank(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
-	memory_unmap_write(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00);
+	memory_install_readwrite_bank(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
+	memory_unmap_write(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00);
 }
 
 // OSCOM Nano
@@ -749,7 +749,7 @@ static MACHINE_RESET( nano )
 
 	/* enable ROM */
 	memory_set_bank(machine, "bank1", OSCNANO_BANK_ROM);
-	memory_install_readwrite_bank(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, "bank1");
+	memory_install_readwrite_bank(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, "bank1");
 }
 
 /* Machine Drivers */

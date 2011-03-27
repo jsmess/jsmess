@@ -85,16 +85,16 @@ WRITE8_MEMBER(nixieclock_state::relays_w)
 	dac_data_w(m_dac, (data & 1) ? 0x80 : 0x40); //tick - tock
 }
 
-static ADDRESS_MAP_START(4004clk_rom, ADDRESS_SPACE_PROGRAM, 8, nixieclock_state)
+static ADDRESS_MAP_START(4004clk_rom, AS_PROGRAM, 8, nixieclock_state)
 	AM_RANGE(0x0000, 0x0FFF) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(4004clk_mem, ADDRESS_SPACE_DATA, 8, nixieclock_state)
+static ADDRESS_MAP_START(4004clk_mem, AS_DATA, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007F) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 4004clk_io, ADDRESS_SPACE_IO, 8, nixieclock_state)
+static ADDRESS_MAP_START( 4004clk_io, AS_IO, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0e) AM_WRITE(nixie_w)
 	AM_RANGE(0x00, 0x00) AM_READ(data_r)

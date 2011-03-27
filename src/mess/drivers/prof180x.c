@@ -158,12 +158,12 @@ READ8_MEMBER( prof180x_state::status_r )
 
 /* Address Maps */
 
-static ADDRESS_MAP_START( prof180x_mem, ADDRESS_SPACE_PROGRAM, 8, prof180x_state )
+static ADDRESS_MAP_START( prof180x_mem, AS_PROGRAM, 8, prof180x_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_READ_BANK("bank0_r") AM_WRITE_BANK("bank0_w")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prof180x_io , ADDRESS_SPACE_IO, 8, prof180x_state )
+static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0x09, 0x09) AM_MASK(0xff00) AM_READ(status_r)
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FDC9268_TAG, upd765_dack_r, upd765_dack_w)

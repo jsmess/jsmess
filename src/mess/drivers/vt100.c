@@ -40,7 +40,7 @@ public:
 
 
 
-static ADDRESS_MAP_START(vt100_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
     AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_BASE_MEMBER(vt100_state, ram) // Screen and scratch RAM
@@ -52,13 +52,13 @@ static ADDRESS_MAP_START(vt100_mem, ADDRESS_SPACE_PROGRAM, 8)
     // 0xc000, 0xffff is unassigned
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(vt180_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
 	AM_RANGE( 0x2000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vt180_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( vt180_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -156,7 +156,7 @@ static WRITE8_HANDLER(vt100_nvr_latch_w)
 {
 }
 
-static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( vt100_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	// 0x00, 0x01 PUSART  (Intel 8251)
 	// AM_RANGE (0x00, 0x01)
@@ -341,7 +341,7 @@ static MACHINE_RESET(vt100)
 
 	state->key_scan = 0;
 
-	cpu_set_irq_callback(machine->device("maincpu"), vt100_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), vt100_irq_callback);
 }
 
 static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )
@@ -367,7 +367,7 @@ static INTERRUPT_GEN( vt100_vertical_interrupt )
 {
 	vt100_state *state = device->machine->driver_data<vt100_state>();
 	state->vertical_int = 1;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 /* F4 Character Displayer */

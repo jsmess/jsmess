@@ -668,17 +668,17 @@ static void stv_SMPC_w8(address_space *space, int offset, UINT8 data)
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cputag_set_clock(machine, "maincpu", MASTER_CLOCK_352/2);
-				cputag_set_clock(machine, "slave", MASTER_CLOCK_352/2);
-				cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_352/5);
+				machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cputag_set_clock(machine, "maincpu", MASTER_CLOCK_320/2);
-				cputag_set_clock(machine, "slave", MASTER_CLOCK_320/2);
-				cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_320/5);
+				machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
@@ -1907,7 +1907,7 @@ static NVRAM_HANDLER(saturn)
 	}
 }
 
-static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(satram_r, satram_w)
@@ -1937,7 +1937,7 @@ static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
@@ -2276,9 +2276,9 @@ static MACHINE_RESET( saturn )
 	memset(stv_workram_l, 0, 0x100000);
 	memset(stv_workram_h, 0, 0x100000);
 
-	cputag_set_clock(machine, "maincpu", MASTER_CLOCK_320/2);
-	cputag_set_clock(machine, "slave", MASTER_CLOCK_320/2);
-	cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_320/5);
+	machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
 

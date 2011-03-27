@@ -111,7 +111,7 @@ static WRITE8_HANDLER( lynx48k_bank_w )
 static WRITE8_HANDLER( lynx128k_bank_w )
 {
 	/* get address space */
-	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *base = mem->machine->region("maincpu")->base();
 
 	/* Set read banks */
@@ -173,17 +173,17 @@ static WRITE8_HANDLER( lynx128k_bank_w )
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
 }
 
-static ADDRESS_MAP_START( lynx48k_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( lynx48k_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x5fff) AM_ROM
 	AM_RANGE(0x6000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx128k_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( lynx128k_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx48k_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( lynx48k_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(lynx48k_bank_w)
 	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP		/* to be emulated */
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( lynx48k_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx128k_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( lynx128k_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_READ(wd179x_r) // uses a 1793
 //  AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_WRITE(wd179x_w)
@@ -311,7 +311,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( lynx128k )
 {
-	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	memory_install_read_bank (mem, 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_install_read_bank (mem, 0x2000, 0x3fff, 0, 0, "bank2");
 	memory_install_read_bank (mem, 0x4000, 0x5fff, 0, 0, "bank3");

@@ -636,7 +636,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
               |               |               |               |               |
 */
 
-static ADDRESS_MAP_START(m68k_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
     AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
@@ -651,15 +651,15 @@ static ADDRESS_MAP_START(m68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 // do we even need this below?
-static ADDRESS_MAP_START(m68k_io, ADDRESS_SPACE_IO, 16)
+static ADDRESS_MAP_START(m68k_io, AS_IO, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tms32010_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(tms32010_mem, AS_PROGRAM, 16)
     AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tms32010_io, ADDRESS_SPACE_IO, 16)
+static ADDRESS_MAP_START(tms32010_io, AS_IO, 16)
     AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
     AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
     AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status

@@ -174,7 +174,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 WRITE8_HANDLER ( lviv_io_w )
 {
 	lviv_state *state = space->machine->driver_data<lviv_state>();
-	address_space *cpuspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpuspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	if (state->startup_mem_map)
 	{
 		UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
@@ -235,7 +235,7 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 MACHINE_RESET( lviv )
 {
 	lviv_state *state = machine->driver_data<lviv_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem;
 
 	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, *machine));

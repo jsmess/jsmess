@@ -957,7 +957,7 @@ static void command_verify_memory(running_machine *machine)
 				break;
 			}
 		} else {
-			address_space *space = cputag_get_address_space(machine, cpu_name, ADDRESS_SPACE_PROGRAM);
+			address_space *space = machine->device(cpu_name)->memory().space(AS_PROGRAM);
 
 			if (verify_data[i] != space->read_byte(offset))
 			{

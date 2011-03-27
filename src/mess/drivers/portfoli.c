@@ -127,7 +127,7 @@ void portfolio_state::check_interrupt()
 {
 	int level = (m_ip & m_ie) ? ASSERT_LINE : CLEAR_LINE;
 
-	cpu_set_input_line(m_maincpu, INPUT_LINE_INT0, level);
+	device_set_input_line(m_maincpu, INPUT_LINE_INT0, level);
 }
 
 //-------------------------------------------------
@@ -451,7 +451,7 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 
 WRITE8_MEMBER( portfolio_state::ncc1_w )
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (BIT(data, 0))
 	{
@@ -501,7 +501,7 @@ READ8_MEMBER( portfolio_state::pid_r )
 //  ADDRESS_MAP( portfolio_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_mem, ADDRESS_SPACE_PROGRAM, 8, portfolio_state )
+static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
 	AM_RANGE(0x00000, 0x1efff) AM_RAM AM_SHARE("nvram1")
 	AM_RANGE(0x1f000, 0x9efff) AM_RAM // expansion
 	AM_RANGE(0xb0000, 0xb0fff) AM_MIRROR(0xf000) AM_RAM AM_SHARE("nvram2") // video RAM
@@ -513,7 +513,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_io, ADDRESS_SPACE_IO, 8, portfolio_state )
+static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r)
 	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, data_r, data_w)
 	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, status_r, control_w)
@@ -778,10 +778,10 @@ static DEVICE_IMAGE_LOAD( portfolio_cart )
 
 void portfolio_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* set CPU interrupt vector callback */
-	cpu_set_irq_callback(m_maincpu, portfolio_int_ack);
+	device_set_irq_callback(m_maincpu, portfolio_int_ack);
 
 	/* memory expansions */
 	switch (ram_get_size(machine->device(RAM_TAG)))
@@ -816,7 +816,7 @@ void portfolio_state::machine_start()
 
 void portfolio_state::machine_reset()
 {
-	address_space *io = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO);
+	address_space *io = m_maincpu->memory().space(AS_IO);
 
 	// peripherals
 	m_pid = input_port_read(&m_machine, "PERIPHERAL");

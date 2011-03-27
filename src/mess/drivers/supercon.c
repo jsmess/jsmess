@@ -573,7 +573,7 @@ static MACHINE_RESET( supercon )
 
 /* Address maps */
 
-static ADDRESS_MAP_START(supercon_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(supercon_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(supercon_state, ram )
 	AM_RANGE( 0x2000, 0x7fff) AM_ROM
     AM_RANGE( 0x8000, 0xffff) AM_ROM
@@ -591,7 +591,7 @@ static ADDRESS_MAP_START(supercon_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 ADDRESS_MAP_END
 
-/*static ADDRESS_MAP_START(supercon_io, ADDRESS_SPACE_IO, 8)
+/*static ADDRESS_MAP_START(supercon_io, AS_IO, 8)
 
 
 ADDRESS_MAP_END

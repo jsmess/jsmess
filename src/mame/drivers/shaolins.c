@@ -18,16 +18,16 @@ static INTERRUPT_GEN( shaolins_interrupt )
 {
 	shaolins_state *state = device->machine->driver_data<shaolins_state>();
 
-	if (cpu_getiloops(device) == 0) cpu_set_input_line(device, 0, HOLD_LINE);
+	if (cpu_getiloops(device) == 0) device_set_input_line(device, 0, HOLD_LINE);
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (state->nmi_enable & 0x02) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->nmi_enable & 0x02) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 
 
-static ADDRESS_MAP_START( shaolins_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)

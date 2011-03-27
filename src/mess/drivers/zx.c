@@ -49,24 +49,24 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( zx80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( zx80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0x2000)
 	AM_RANGE(0xc000, 0xffff) AM_RAM_READ(zx_ram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx80_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( zx80_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx80_io_r, zx80_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx81_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( zx81_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx81_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8300_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8300_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8300_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pow3000_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pow3000_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pow3000_io_r, zx81_io_w)
 ADDRESS_MAP_END
 

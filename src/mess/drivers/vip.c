@@ -260,7 +260,7 @@ WRITE8_MEMBER( vip_state::keylatch_w )
 WRITE8_MEMBER( vip_state::bankswitch_w )
 {
 	/* enable RAM */
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 
 	switch (ram_get_size(m_ram))
@@ -299,12 +299,12 @@ WRITE8_MEMBER( vip_state::dispoff_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8, vip_state )
+static ADDRESS_MAP_START( vip_map, AS_PROGRAM, 8, vip_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_MIRROR(0xfe00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8, vip_state )
+static ADDRESS_MAP_START( vip_io_map, AS_IO, 8, vip_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_READWRITE(dispon_r, dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
@@ -507,11 +507,11 @@ static COSMAC_SC_WRITE( vip_sc_w )
 	switch (input_port_read(device->machine, "SOUND"))
 	{
 	case SOUND_VP550:
-		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls cpu_set_input_line on it!
+		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls device_set_input_line on it!
 		break;
 
 	case SOUND_VP551:
-		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls cpu_set_input_line on it!
+		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls device_set_input_line on it!
 		break;
 	}
 }
@@ -626,8 +626,8 @@ void vip_state::machine_start()
 
 void vip_state::machine_reset()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	address_space *io = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *io = m_maincpu->memory().space(AS_IO);
 
 	/* reset auxiliary chips */
 	m_vdc->reset();

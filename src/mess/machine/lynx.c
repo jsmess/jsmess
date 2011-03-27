@@ -737,7 +737,7 @@ static void lynx_blitter(running_machine *machine)
 	int i; int o;int colors;
 
 	state->blitter.memory_accesses = 0;
-	state->blitter.mem = (UINT8*)cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(0x0000);
+	state->blitter.mem = (UINT8*)machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0x0000);
 
 	state->blitter.xoff   = GET_WORD(state->suzy.data, 0x04);
 	state->blitter.yoff   = GET_WORD(state->suzy.data, 0x06);
@@ -1759,7 +1759,7 @@ WRITE8_HANDLER( lynx_memory_config_w )
 static void lynx_reset(running_machine &machine)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	lynx_memory_config_w(cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+	lynx_memory_config_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 
 	cputag_set_input_line(&machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 
@@ -1791,7 +1791,7 @@ static void lynx_reset(running_machine &machine)
 static STATE_POSTLOAD( lynx_postload )
 {
 	lynx_state *state = machine->driver_data<lynx_state>();
-	lynx_memory_config_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, state->memory_config);
+	lynx_memory_config_w( machine->device("maincpu")->memory().space(AS_PROGRAM), 0, state->memory_config);
 }
 
 MACHINE_START( lynx )

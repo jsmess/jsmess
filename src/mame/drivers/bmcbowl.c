@@ -324,7 +324,7 @@ static NVRAM_HANDLER( bmcbowl )
 
 }
 
-static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x090000, 0x090001) AM_WRITE(bmc_RAMDAC_offset_w)
@@ -491,9 +491,9 @@ static MACHINE_RESET( bmcbowl )
 static INTERRUPT_GEN( bmc_interrupt )
 {
 	if (cpu_getiloops(device))
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )

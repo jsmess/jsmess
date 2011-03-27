@@ -222,7 +222,7 @@ static WRITE32_HANDLER( ms32_sound_w )
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(space->cpu, attotime::from_usec(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )
@@ -352,7 +352,7 @@ static WRITE32_HANDLER( pip_w )
 }
 
 
-static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32 )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
 	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8 (ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
@@ -420,7 +420,7 @@ static WRITE32_HANDLER( ms32_irq5_guess_w )
 	irq_raise(space->machine, 5);
 }
 
-static ADDRESS_MAP_START( f1superb_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
 
 	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
@@ -1303,7 +1303,7 @@ static IRQ_CALLBACK(irq_callback)
 	for(i=15; i>=0 && !(state->irqreq & (1<<i)); i--);
 	state->irqreq &= ~(1<<i);
 	if(!state->irqreq)
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		device_set_input_line(device, 0, CLEAR_LINE);
 	return i;
 }
 
@@ -1312,7 +1312,7 @@ static void irq_init(running_machine *machine)
 	ms32_state *state = machine->driver_data<ms32_state>();
 	state->irqreq = 0;
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)
@@ -1379,7 +1379,7 @@ static WRITE8_HANDLER( to_main_w )
 	irq_raise(space->machine, 1);
 }
 
-static ADDRESS_MAP_START( ms32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_r,ymf271_w)
 	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)

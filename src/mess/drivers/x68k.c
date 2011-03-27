@@ -1965,7 +1965,7 @@ static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
 	// TODO
 }
 
-static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
@@ -2002,7 +2002,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68kxvi_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
@@ -2040,7 +2040,7 @@ static ADDRESS_MAP_START(x68kxvi_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
@@ -2605,7 +2605,7 @@ static MACHINE_RESET( x68000 )
 
 static MACHINE_START( x68000 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->spriteram = (UINT16*)machine->region("user1")->base();
@@ -2636,7 +2636,7 @@ static MACHINE_START( x68000 )
 
 static MACHINE_START( x68030 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->spriteram = (UINT16*)machine->region("user1")->base();
@@ -2691,7 +2691,7 @@ static DRIVER_INIT( x68000 )
 
 	mfp_init(machine);
 
-	cpu_set_irq_callback(machine->device("maincpu"), x68k_int_ack);
+	device_set_irq_callback(machine->device("maincpu"), x68k_int_ack);
 
 	// init keyboard
 	state->keyboard.delay = 500;  // 3*100+200

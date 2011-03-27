@@ -222,7 +222,7 @@ static INTERRUPT_GEN(lethalen_interrupt)
 	lethal_state *state = device->machine->driver_data<lethal_state>();
 
 	if (k056832_is_irq_enabled(state->k056832, 0))
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( sound_cmd_w )
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 static WRITE8_HANDLER( sound_irq_w )
 {
 	lethal_state *state = space->machine->driver_data<lethal_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -244,7 +244,7 @@ static READ8_HANDLER( sound_status_r )
 static void sound_nmi( device_t *device )
 {
 	lethal_state *state = device->machine->driver_data<lethal_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )
@@ -472,7 +472,7 @@ static READ8_HANDLER( gunsaux_r )
 	return res;
 }
 
-static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM				// work RAM
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_w)
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( le_sound, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_r, k054539_w)

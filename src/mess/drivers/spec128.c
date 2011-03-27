@@ -234,7 +234,7 @@ static  READ8_HANDLER ( spectrum_128_ula_r )
 	return vpos<193 ? state->screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
-static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (spectrum_128_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")

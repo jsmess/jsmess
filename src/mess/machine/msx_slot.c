@@ -31,7 +31,7 @@
 static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 {
 	msx_state *state = machine->driver_data<msx_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 1:
@@ -396,9 +396,9 @@ MSX_SLOT_MAP(konami_scc)
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		if (state->cart.scc.active ) {
-			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9800, 0x9fff, 0, 0,konami_scc_bank5);
+			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9800, 0x9fff, 0, 0,konami_scc_bank5);
 		} else {
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9800, 0x9fff, 0, 0,"bank7");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9800, 0x9fff, 0, 0,"bank7");
 		}
 		break;
 	case 3:
@@ -410,7 +410,7 @@ MSX_SLOT_MAP(konami_scc)
 MSX_SLOT_WRITE(konami_scc)
 {
 	msx_state *drvstate = machine->driver_data<msx_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	if (addr >= 0x5000 && addr < 0x5800)
 	{
 		state->banks[0] = val & state->bank_mask;
@@ -1300,7 +1300,7 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 MSX_SLOT_MAP(diskrom)
 {
 	msx_state *drvstate = machine->driver_data<msx_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 0:
@@ -1428,7 +1428,7 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 MSX_SLOT_MAP(diskrom2)
 {
 	msx_state *drvstate = machine->driver_data<msx_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 0:
@@ -1704,7 +1704,7 @@ MSX_SLOT_MAP(fmpac)
 MSX_SLOT_WRITE(fmpac)
 {
 	msx_state *drvstate = machine->driver_data<msx_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i, data;
 
 	if (addr >= 0x4000 && addr < 0x6000 && state->cart.fmpac.sram_support)
@@ -2267,7 +2267,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 MSX_SLOT_MAP(soundcartridge)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 0:
@@ -2302,7 +2302,7 @@ MSX_SLOT_MAP(soundcartridge)
 MSX_SLOT_WRITE(soundcartridge)
 {
 	msx_state *drvstate = machine->driver_data<msx_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	if (addr < 0x4000)

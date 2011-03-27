@@ -166,7 +166,7 @@ INLINE const ppu2c0x_interface *get_interface( device_t *device )
 
 /* default address map */
 // make this INTERNAL, default should just be enough to avoid compile errors, print error messages!
-static ADDRESS_MAP_START( ppu2c0x, 0, 8 )
+static ADDRESS_MAP_START( ppu2c0x, AS_0, 8 )
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(ppu2c0x_palette_read, ppu2c0x_palette_write)
 ADDRESS_MAP_END
 
@@ -1197,7 +1197,7 @@ void ppu2c0x_spriteram_dma( address_space *space, device_t *device, const UINT8 
 	}
 
 	// should last 513 CPU cycles.
-	cpu_adjust_icount(space->cpu, -513);
+	device_adjust_icount(space->cpu, -513);
 }
 
 /*************************************
@@ -1287,7 +1287,7 @@ static DEVICE_START( ppu2c0x )
 	const ppu2c0x_interface *intf = get_interface(device);
 
 	memset(ppu2c0x, 0, sizeof(*ppu2c0x));
-	ppu2c0x->space = device_get_space(device, 0);
+	ppu2c0x->space = device->memory().space();
 	ppu2c0x->scanlines_per_frame = (device->type() != PPU_2C07) ? PPU_NTSC_SCANLINES_PER_FRAME : PPU_PAL_SCANLINES_PER_FRAME;
 
 	/* usually, no security value... */

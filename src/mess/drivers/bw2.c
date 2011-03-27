@@ -66,7 +66,7 @@ void bw2_state::bankswitch(UINT8 data)
 
     */
 
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	int max_ram_bank = 0;
 
@@ -148,7 +148,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
     */
 
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	int max_ram_bank = BANK_RAM1;
 
@@ -215,7 +215,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
 WRITE8_MEMBER( bw2_state::ramcard_bank_w )
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	UINT8 ramcard_bank = data & 0x0f;
 	UINT32 bank_offset = ramcard_bank * 0x8000;
@@ -241,12 +241,12 @@ WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 	{
 		if (cpu_get_reg(m_maincpu, Z80_HALT))
 		{
-			cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, HOLD_LINE);
+			device_set_input_line(m_maincpu, INPUT_LINE_NMI, HOLD_LINE);
 		}
 	}
 	else
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -309,13 +309,13 @@ WRITE8_MEMBER( bw2_state::fdc_w )
 	};
 }
 
-static ADDRESS_MAP_START( bw2_mem, ADDRESS_SPACE_PROGRAM, 8, bw2_state )
+static ADDRESS_MAP_START( bw2_mem, AS_PROGRAM, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8, bw2_state )
+static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w )
@@ -757,7 +757,7 @@ void bw2_state::machine_start()
 
 void bw2_state::machine_reset()
 {
-	address_space *io = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO);
+	address_space *io = machine->device(Z80_TAG)->memory().space(AS_IO);
 
 	if (get_ramdisk_size() > 0)
 	{
@@ -768,7 +768,7 @@ void bw2_state::machine_reset()
 		memory_configure_bank(machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram, 0);
 		memory_configure_bank(machine, "bank1", BANK_RAM6, 1, m_work_ram + 0x18000, 0);
 
-		io->install_handler(0x30, 0x30, 0, 0x0f, write8_delegate_create(bw2_state, ramcard_bank_w, *this), 0);
+		io->install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate_create(bw2_state, ramcard_bank_w, *this), 0);
 	}
 	else
 	{

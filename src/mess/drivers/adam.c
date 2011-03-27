@@ -249,7 +249,7 @@ enum
 
 void adam_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 
 	switch (m_mioc & 0x03)
@@ -1166,7 +1166,7 @@ static TIMER_DEVICE_CALLBACK( paddle_tick )
 
     if (state->m_joy_status0 || state->m_joy_status1)
 	{
-		cpu_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 }
 
@@ -1220,7 +1220,7 @@ READ8_MEMBER( adam_state::input2_r )
 //  ADDRESS_MAP( adam_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+static ADDRESS_MAP_START( adam_mem, AS_PROGRAM, 8, adam_state )
 ADDRESS_MAP_END
 
 
@@ -1228,7 +1228,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( adam_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_io, ADDRESS_SPACE_IO, 8, adam_state )
+static ADDRESS_MAP_START( adam_io, AS_IO, 8, adam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x1e, 0x1e) Optional Auto Dialer
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READWRITE(adamnet_r, adamnet_w)
@@ -1254,7 +1254,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( master6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( master6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+static ADDRESS_MAP_START( master6801_mem, AS_PROGRAM, 8, adam_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_MAIN_TAG, 0)
@@ -1265,7 +1265,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( master6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( master6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+static ADDRESS_MAP_START( master6801_io, AS_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(master6801_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(master6801_p2_r, master6801_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(master6801_p3_r, master6801_p3_w)
@@ -1277,7 +1277,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( kb6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( kb6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+static ADDRESS_MAP_START( kb6801_mem, AS_PROGRAM, 8, adam_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_KB_TAG, 0)
@@ -1288,7 +1288,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( kb6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( kb6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+static ADDRESS_MAP_START( kb6801_io, AS_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(kb6801_p1_r)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(kb6801_p2_r, kb6801_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(kb6801_p3_r, kb6801_p3_w)
@@ -1300,7 +1300,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ddp6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ddp6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+static ADDRESS_MAP_START( ddp6801_mem, AS_PROGRAM, 8, adam_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
@@ -1312,7 +1312,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ddp6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ddp6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+static ADDRESS_MAP_START( ddp6801_io, AS_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(ddp6801_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(ddp6801_p2_r, ddp6801_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_NOP // Multiplexed Address/Data
@@ -1324,7 +1324,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( printer6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( printer6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+static ADDRESS_MAP_START( printer6801_mem, AS_PROGRAM, 8, adam_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_PRN_TAG, 0)
@@ -1335,7 +1335,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( printer6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( printer6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+static ADDRESS_MAP_START( printer6801_io, AS_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(printer6801_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(printer6801_p2_r, printer6801_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READ(printer6801_p3_r)
@@ -1347,7 +1347,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fdc6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fdc6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+static ADDRESS_MAP_START( fdc6801_mem, AS_PROGRAM, 8, adam_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_FDC_TAG, 0)
@@ -1358,7 +1358,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fdc6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fdc6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+static ADDRESS_MAP_START( fdc6801_io, AS_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(fdc6801_p1_r, fdc6801_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(fdc6801_p2_r, fdc6801_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3)
@@ -1590,8 +1590,8 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 
 			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
 
-			cpu_set_input_line(m_netcpu, M6801_SC1_LINE, ASSERT_LINE);
-			cpu_set_input_line(m_netcpu, M6801_SC1_LINE, CLEAR_LINE);
+			device_set_input_line(m_netcpu, M6801_SC1_LINE, ASSERT_LINE);
+			device_set_input_line(m_netcpu, M6801_SC1_LINE, CLEAR_LINE);
 		}
 	}
 }

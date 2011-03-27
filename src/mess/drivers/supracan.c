@@ -1106,7 +1106,7 @@ static WRITE16_HANDLER( supracan_vram_w )
 }
 
 
-static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x3fffff ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
@@ -1140,11 +1140,11 @@ static READ8_HANDLER( supracan_6502_soundmem_r )
             {
                 if(state->sound_irq_enable_reg & state->sound_irq_source_reg)
                 {
-                    cpu_set_input_line(space->machine->device("soundcpu"), 0, ASSERT_LINE);
+                    device_set_input_line(space->machine->device("soundcpu"), 0, ASSERT_LINE);
                 }
                 else
                 {
-                    cpu_set_input_line(space->machine->device("soundcpu"), 0, CLEAR_LINE);
+                    device_set_input_line(space->machine->device("soundcpu"), 0, CLEAR_LINE);
                 }
             }
             break;
@@ -1154,7 +1154,7 @@ static READ8_HANDLER( supracan_6502_soundmem_r )
             if(!space->debugger_access()) verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
             if(!space->debugger_access())
             {
-                cpu_set_input_line(space->machine->device("soundcpu"), 0, CLEAR_LINE);
+                device_set_input_line(space->machine->device("soundcpu"), 0, CLEAR_LINE);
             }
             break;
         case 0x420:
@@ -1190,7 +1190,7 @@ static WRITE8_HANDLER( supracan_6502_soundmem_w )
             if(state->sound_cpu_68k_irq_reg &~ data)
             {
                 verboselog(state->hack_68k_to_6502_access ? "maincpu" : "soundcpu", space->machine, 0, "supracan_soundreg_w: sound_cpu_68k_irq_reg: %04x: Triggering M68k IRQ\n", data);
-                cpu_set_input_line(space->machine->device("maincpu"), 7, HOLD_LINE);
+                device_set_input_line(space->machine->device("maincpu"), 7, HOLD_LINE);
             }
             else
             {
@@ -1218,7 +1218,7 @@ static WRITE8_HANDLER( supracan_6502_soundmem_w )
     }
 }
 
-static ADDRESS_MAP_START( supracan_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( supracan_sound_mem, AS_PROGRAM, 8 )
     AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(supracan_6502_soundmem_r, supracan_6502_soundmem_w) AM_BASE_MEMBER(supracan_state, soundram)
 ADDRESS_MAP_END
 
@@ -1425,7 +1425,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 	switch ( offset )
 	{
         case 0x000a/2:  /* Sound cpu IRQ request. */
-            cpu_set_input_line(space->machine->device("soundcpu"), 0, ASSERT_LINE);
+            device_set_input_line(space->machine->device("soundcpu"), 0, ASSERT_LINE);
             break;
 		case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
 			if(data & 0x01)
@@ -1465,7 +1465,7 @@ static READ16_HANDLER( supracan_video_r )
             if(!space->debugger_access())
             {
                 //verboselog("maincpu", space->machine, 0, "read video IRQ flags (%04x)\n", data);
-                cpu_set_input_line(space->machine->device("maincpu"), 7, CLEAR_LINE);
+                device_set_input_line(space->machine->device("maincpu"), 7, CLEAR_LINE);
             }
 			break;
         case 0x02/2: // Current scanline
@@ -1501,7 +1501,7 @@ static TIMER_CALLBACK( supracan_line_on_callback )
 {
     supracan_state *state = machine->driver_data<supracan_state>();
 
-    cpu_set_input_line(machine->device("maincpu"), 5, HOLD_LINE);
+    device_set_input_line(machine->device("maincpu"), 5, HOLD_LINE);
 
     state->line_on_timer->adjust(attotime::never);
 }
@@ -1510,7 +1510,7 @@ static TIMER_CALLBACK( supracan_line_off_callback )
 {
     supracan_state *state = machine->driver_data<supracan_state>();
 
-    cpu_set_input_line(machine->device("maincpu"), 5, CLEAR_LINE);
+    device_set_input_line(machine->device("maincpu"), 5, CLEAR_LINE);
 
     state->line_on_timer->adjust(attotime::never);
 }
@@ -1544,7 +1544,7 @@ static TIMER_CALLBACK( supracan_video_callback )
         if(state->irq_mask & 1)
         {
             verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n\n");
-            cpu_set_input_line(machine->device("maincpu"), 7, HOLD_LINE);
+            device_set_input_line(machine->device("maincpu"), 7, HOLD_LINE);
         }
 		break;
     }
@@ -1730,7 +1730,7 @@ static WRITE16_HANDLER( supracan_video_w )
 #if 0
             if(!state->irq_mask && !state->hbl_mask)
             {
-                cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), 7, CLEAR_LINE);
+                device_set_input_line(devtag_get_device(space->machine, "maincpu"), 7, CLEAR_LINE);
             }
 #endif
             verboselog("maincpu", space->machine, 3, "irq_mask = %04x\n", data);
@@ -1884,7 +1884,7 @@ static INTERRUPT_GEN( supracan_irq )
 
     if(state->irq_mask)
     {
-        cpu_set_input_line(device, 7, HOLD_LINE);
+        device_set_input_line(device, 7, HOLD_LINE);
     }
 #endif
 }
@@ -1897,11 +1897,11 @@ static INTERRUPT_GEN( supracan_sound_irq )
 
     if(state->sound_irq_enable_reg & state->sound_irq_source_reg)
     {
-        cpu_set_input_line(device->machine->device("soundcpu"), 0, ASSERT_LINE);
+        device_set_input_line(device->machine->device("soundcpu"), 0, ASSERT_LINE);
     }
     else
     {
-        cpu_set_input_line(device->machine->device("soundcpu"), 0, CLEAR_LINE);
+        device_set_input_line(device->machine->device("soundcpu"), 0, CLEAR_LINE);
     }
 }
 

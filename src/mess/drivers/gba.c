@@ -100,8 +100,8 @@ static void gba_request_irq(running_machine *machine, UINT32 int_type)
 		// master enable?
 		if (state->IME & 1)
 		{
-			cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
-			cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+			device_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -156,7 +156,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	address_space *space = cpu_get_address_space(machine->device("maincpu"), ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	gba_state *state = machine->driver_data<gba_state>();
 
 	src = state->dma_src[ch];
@@ -1895,7 +1895,7 @@ static WRITE32_HANDLER( gba_io_w )
 					state->HALTCNT = data & 0x000000ff;
 
 					// either way, wait for an IRQ
-					cpu_spinuntil_int(machine->device("maincpu"));
+					device_spin_until_interrupt(machine->device("maincpu"));
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -1991,7 +1991,7 @@ static READ32_HANDLER(gba_10000000_r)
 	return data;
 }
 
-static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gbadvance_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
@@ -3089,13 +3089,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 		if (cart_size <= (16 * 1024 * 1024))
 		{
-			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
+			memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
+			memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
 		}
 		else
 		{
-			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+			memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
+			memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
 		}
 	}
 
@@ -3104,8 +3104,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->nvptr = (UINT8 *)&state->gba_sram;
 		state->nvsize = 0x10000;
 
-		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-		memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+		memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
+		memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
 	}
 
 	if (chip & GBA_CHIP_FLASH_1M)
@@ -3115,8 +3115,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->flash_size = 0x20000;
 		state->flash_mask = 0x1ffff/4;
 
-		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
-		memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
+		memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
+		memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
 	}
 
 	if ((chip & GBA_CHIP_FLASH) || (chip & GBA_CHIP_FLASH_512))
@@ -3126,8 +3126,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->flash_size = 0x10000;
 		state->flash_mask = 0xffff/4;
 
-		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
-		memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
+		memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
+		memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
 	}
 
 	if (chip & GBA_CHIP_RTC)
@@ -3239,7 +3239,7 @@ DIRECT_UPDATE_HANDLER( gba_direct )
 
 static DRIVER_INIT(gbadv)
 {
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(gba_direct, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(gba_direct, *machine));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */

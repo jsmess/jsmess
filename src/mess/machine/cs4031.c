@@ -160,7 +160,7 @@ void cs4031_device::device_start()
 		throw device_missing_dependencies();
 
 	device_t *cpu = m_machine.device(m_config.m_cputag);
-	m_space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	m_space = cpu->memory().space(AS_PROGRAM);
 	m_isa = m_machine.region(m_config.m_isatag)->base();
 	m_bios = m_machine.region(m_config.m_biostag)->base();
 

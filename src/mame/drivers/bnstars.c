@@ -1260,7 +1260,7 @@ static WRITE32_HANDLER( bnstars1_mahjong_select_w )
 //  printf("%08x\n",state->bnstars1_mahjong_select);
 }
 
-static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ( bnstars1_r )
@@ -1300,7 +1300,7 @@ static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( bnstars_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bnstars_z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 #endif
@@ -1313,7 +1313,7 @@ static IRQ_CALLBACK(irq_callback)
 	for(i=15; i>=0 && !(state->irqreq & (1<<i)); i--);
 	state->irqreq &= ~(1<<i);
 	if(!state->irqreq)
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		device_set_input_line(device, 0, CLEAR_LINE);
 	return i;
 }
 
@@ -1322,7 +1322,7 @@ static void irq_init(running_machine *machine)
 	bnstars_state *state = machine->driver_data<bnstars_state>();
 	state->irqreq = 0;
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)

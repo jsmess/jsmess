@@ -342,7 +342,7 @@ static WRITE8_HANDLER( skylncr_nmi_enable_w )
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
@@ -680,7 +680,7 @@ static const ay8910_interface ay8910_config =
 static INTERRUPT_GEN( skylncr_vblank_interrupt )
 {
 	skylncr_state *state = device->machine->driver_data<skylncr_state>();
-	if (state->nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->nmi_enable) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

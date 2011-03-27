@@ -28,14 +28,14 @@ public:
 	UINT8 irq_state;
 };
 
-static ADDRESS_MAP_START(sm1800_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE("i8275", i8275_dack_w)
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sm1800_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sm1800_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x3c, 0x3d ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)
 	AM_RANGE( 0x6c, 0x6f ) AM_DEVREADWRITE("i8255", i8255a_r, i8255a_w)
@@ -55,7 +55,7 @@ static IRQ_CALLBACK(sm1800_irq_callback)
 
 static MACHINE_RESET(sm1800)
 {
-	cpu_set_irq_callback(machine->device("maincpu"), sm1800_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), sm1800_irq_callback);
 }
 
 

@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(pecom64_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank2")
     AM_RANGE( 0x8000, 0xbfff ) AM_ROM  // ROM 1
@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(pecom64_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank4") // CDP1869 / ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pecom64_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pecom64_io, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(pecom_bank_w)
 	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r)
 	AM_RANGE(0x03, 0x07) AM_WRITE(pecom_cdp1869_w)

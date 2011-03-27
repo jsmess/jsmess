@@ -565,7 +565,7 @@ DRIVER_INIT( svi318 )
 		state->svi.svi318 = 1;
 	}
 
-	cpu_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
+	device_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
 
 	/* memory */
 	state->svi.empty_bank = auto_alloc_array(machine, UINT8, 0x8000);

@@ -24,12 +24,12 @@ static INTERRUPT_GEN( labyrunr_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (k007121_ctrlram_r(state->k007121, 7) & 0x02)
-			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (k007121_ctrlram_r(state->k007121, 7) & 0x01)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( labyrunr_bankswitch_w )
 	coin_counter_w(space->machine, 1, data & 0x10);
 }
 
-static ADDRESS_MAP_START( labyrunr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("k007121", k007121_ctrl_w)
 	AM_RANGE(0x0020, 0x005f) AM_RAM AM_BASE_MEMBER(labyrunr_state, scrollram)
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("ym1", ym2203_read_port_r, ym2203_write_port_w)

@@ -125,7 +125,7 @@ static void karnov_i8751_w( running_machine *machine, int data )
 
 //  if (!state->i8751_return && data != 0x300) logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
 
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
+	device_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;
 }
 
@@ -185,7 +185,7 @@ static void wndrplnt_i8751_w( running_machine *machine, int data )
 	if (data == 0x501) state->i8751_return = 0x6bf8;
 	if (data == 0x500) state->i8751_return = 0x4e75;
 
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
+	device_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;
 }
 
@@ -317,7 +317,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 
 	//  logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
 
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
+	device_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;
 }
 
@@ -335,7 +335,7 @@ static WRITE16_HANDLER( karnov_control_w )
 	switch (offset << 1)
 	{
 		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
+			device_set_input_line(state->maincpu, 6, CLEAR_LINE);
 
 			if (state->i8751_needs_ack)
 			{
@@ -343,7 +343,7 @@ static WRITE16_HANDLER( karnov_control_w )
 				if (state->i8751_coin_pending)
 				{
 					state->i8751_return = state->i8751_coin_pending;
-					cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
+					device_set_input_line(state->maincpu, 6, HOLD_LINE);
 					state->i8751_coin_pending = 0;
 				}
 				else if (state->i8751_command_queue)
@@ -362,7 +362,7 @@ static WRITE16_HANDLER( karnov_control_w )
 
 		case 2: /* SONREQ (Sound CPU byte) */
 			soundlatch_w(space, 0, data & 0xff);
-			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
@@ -396,7 +396,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			cpu_set_input_line(state->maincpu, 7, CLEAR_LINE);
+			device_set_input_line(state->maincpu, 7, CLEAR_LINE);
 			break;
 	}
 }
@@ -426,7 +426,7 @@ static READ16_HANDLER( karnov_control_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( karnov_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_BASE_MEMBER(karnov_state, ram)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( karnov_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( karnov_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)
@@ -745,20 +745,20 @@ static INTERRUPT_GEN( karnov_interrupt )
 		else
 		{
 			state->i8751_return = port | 0x8000;
-			cpu_set_input_line(device, 6, HOLD_LINE);
+			device_set_input_line(device, 6, HOLD_LINE);
 			state->i8751_needs_ack = 1;
 		}
 
 		state->latch = 0;
 	}
 
-	cpu_set_input_line(device, 7, HOLD_LINE);	/* VBL */
+	device_set_input_line(device, 7, HOLD_LINE);	/* VBL */
 }
 
 static void sound_irq( device_t *device, int linestate )
 {
 	karnov_state *state = device->machine->driver_data<karnov_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
+	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
 static const ym3526_interface ym3526_config =

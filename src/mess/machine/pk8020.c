@@ -234,7 +234,7 @@ static WRITE8_HANDLER(devices_w)
 
 static void pk8020_set_bank(running_machine *machine,UINT8 data)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
@@ -999,7 +999,7 @@ MACHINE_RESET( pk8020 )
 {
 	pk8020_state *state = machine->driver_data<pk8020_state>();
 	pk8020_set_bank(machine,0);
-	cpu_set_irq_callback(machine->device("maincpu"), pk8020_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), pk8020_irq_callback);
 
 	state->sound_gate = 0;
 	state->sound_level = 0;

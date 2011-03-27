@@ -121,7 +121,7 @@ static MACHINE_RESET( polyplay )
 
 static INTERRUPT_GEN( periodic_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x4e);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x4e);
 }
 
 
@@ -134,7 +134,7 @@ static INTERRUPT_GEN( coin_interrupt )
 	else
 	{
 		if (state->last == 0)    /* coin inserted */
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50);
 
 		state->last = 1;
 	}
@@ -142,7 +142,7 @@ static INTERRUPT_GEN( coin_interrupt )
 
 
 /* memory mapping */
-static ADDRESS_MAP_START( polyplay_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( polyplay_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 
 
 /* port mapping */
-static ADDRESS_MAP_START( polyplay_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( polyplay_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
 	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)

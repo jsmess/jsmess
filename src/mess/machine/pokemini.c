@@ -1419,7 +1419,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 static TIMER_CALLBACK( pokemini_prc_counter_callback )
 {
 	pokemini_state *state = machine->driver_data<pokemini_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 	state->prc.count++;
 
 	/* Check for overflow */

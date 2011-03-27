@@ -45,13 +45,13 @@ static READ8_HANDLER(microdec_terminal_r)
 	return retVal;
 }
 
-static ADDRESS_MAP_START(microdec_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(microdec_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( microdec_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( microdec_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE(microdec_terminal_r,microdec_terminal_w)

@@ -912,13 +912,13 @@ void fidelz80_state::machine_reset()
     Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(cc10_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
+static ADDRESS_MAP_START(cc10_z80_mem, AS_PROGRAM, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3000, 0x31ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vcc_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
+static ADDRESS_MAP_START(vcc_z80_mem, AS_PROGRAM, 8, fidelz80_state)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x0fff) AM_ROM // 4k rom
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // 4k rom
@@ -926,7 +926,7 @@ static ADDRESS_MAP_START(vcc_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(abc_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
+static ADDRESS_MAP_START(abc_z80_mem, AS_PROGRAM, 8, fidelz80_state)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 8k rom
@@ -935,20 +935,20 @@ static ADDRESS_MAP_START(abc_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
 	AM_RANGE(0xE000, 0xE000) AM_WRITE(abc_speech_w) AM_MIRROR(0x1FFF) // write to speech chip, halts cpu
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(fidel_z80_io, ADDRESS_SPACE_IO, 8, fidelz80_state)
+static ADDRESS_MAP_START(fidel_z80_io, AS_IO, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE_LEGACY("ppi8255", i8255a_r, i8255a_w) // 8255 i/o chip
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(abc_z80_io, ADDRESS_SPACE_IO, 8, fidelz80_state)
+static ADDRESS_MAP_START(abc_z80_io, AS_IO, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(mcu_data_r, mcu_data_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(mcu_status_r, mcu_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(abc_mcu_io, ADDRESS_SPACE_IO, 8, fidelz80_state)
+static ADDRESS_MAP_START(abc_mcu_io, AS_IO, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kp_matrix_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(exp_i8243_p2_r, exp_i8243_p2_w)
@@ -967,15 +967,15 @@ static INPUT_CHANGED( fidelz80_trigger_reset )
 {
 	fidelz80_state *state = field->port->machine->driver_data<fidelz80_state>();
 
-	cpu_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( abc_trigger_reset )
 {
 	fidelz80_state *state = field->port->machine->driver_data<fidelz80_state>();
 
-	cpu_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(state->m_i8041, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_i8041, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( fidelz80 )

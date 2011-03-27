@@ -275,7 +275,7 @@ INLINE void update_audio_squelch(laserdisc_state *ld)
     PR-8210 ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pr8210_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pr8210_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(pr8210_pia_r, pr8210_pia_w)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(pr8210_bus_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(pr8210_port1_w)
@@ -845,7 +845,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 
 	/* bit 6 when low triggers an IRQ on the MCU */
 	if (player->cpu != NULL)
-		cpu_set_input_line(player->cpu, MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(player->cpu, MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* standby LED is set accordingl to bit 4 */
 	output_set_value("pr8210_standby", (data & 0x10) != 0);
@@ -989,7 +989,7 @@ static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
     SIMUTREK ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( simutrek_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( simutrek_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(simutrek_data_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(simutrek_port2_r, simutrek_port2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(simutrek_t0_r)
@@ -1097,7 +1097,7 @@ static TIMER_CALLBACK( irq_off )
 {
 	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
-	cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
+	device_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 	if (LOG_SIMUTREK)
 		printf("%3d:**** Simutrek IRQ clear\n", ld->screen->vpos());
 }
@@ -1120,7 +1120,7 @@ static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 	{
 		if (LOG_SIMUTREK)
 			printf("%3d:VSYNC IRQ\n", ld->screen->vpos());
-		cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
+		device_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
 		ld->device->machine->scheduler().timer_set(ld->screen->scan_period(), FUNC(irq_off), 0, ld);
 	}
 }

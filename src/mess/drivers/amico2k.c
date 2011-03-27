@@ -41,7 +41,7 @@ static WRITE8_DEVICE_HANDLER( amico2k_i8255a_w )
 {
 }
 
-static ADDRESS_MAP_START(amico2k_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(amico2k_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 //  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM

@@ -128,7 +128,7 @@ WRITE8_HANDLER(vectrex_via_w)
 	case 9:
 		state->via_timer2 = (state->via_timer2 & 0x00ff) | (data << 8);
 
-		period = (attotime::from_hz(cputag_get_clock(space->machine, "maincpu")) * state->via_timer2);
+		period = (attotime::from_hz(space->machine->device("maincpu")->unscaled_clock()) * state->via_timer2);
 
 		if (state->reset_refresh)
 			state->refresh->adjust(period, 0, period);
@@ -251,7 +251,7 @@ static TIMER_CALLBACK(update_signal)
 
 	if (!state->ramp)
 	{
-		length = cputag_get_clock(machine, "maincpu") * INT_PER_CLOCK
+		length = machine->device("maincpu")->unscaled_clock() * INT_PER_CLOCK
 			* (machine->time() - state->vector_start_time).as_double();
 
 		state->x_int += length * (state->analog[A_X] + state->analog[A_ZR]);
@@ -365,7 +365,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 						+(double)(state->pen_y - state->y_int) * (state->pen_y - state->y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && state->analog[A_Z] * state->blank > 0)
-						state->lp_t->adjust(attotime::from_double(ab / a2 / (cputag_get_clock(device->machine, "maincpu") * INT_PER_CLOCK)));
+						state->lp_t->adjust(attotime::from_double(ab / a2 / (device->machine->device("maincpu")->unscaled_clock() * INT_PER_CLOCK)));
 				}
 			}
 		}

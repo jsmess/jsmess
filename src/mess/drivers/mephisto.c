@@ -160,7 +160,7 @@ static WRITE8_HANDLER ( write_led_mm2 )
 
 }
 
-static ADDRESS_MAP_START(rebel5_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(rebel5_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM						// AM_BASE_MEMBER(mephisto_state, ram)//
 	AM_RANGE( 0x5000, 0x5000) AM_WRITE( write_lcd )
 	AM_RANGE( 0x3000, 0x3007) AM_READ( read_keys )			// Rebel 5.0
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START(rebel5_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mephisto_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(mephisto_state, ram )//
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd )
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys )
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mm2_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mm2_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(mephisto_state, ram )
 	AM_RANGE( 0x2800, 0x2800) AM_WRITE( write_lcd )
 	AM_RANGE( 0x1800, 0x1807) AM_READ( read_keys )

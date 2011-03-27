@@ -177,7 +177,7 @@ const rom_entry *luxor_55_21046_device_config::rom_region() const
 //  ADDRESS_MAP( luxor_55_21046_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_21046_mem, ADDRESS_SPACE_PROGRAM, 8, luxor_55_21046_device )
+static ADDRESS_MAP_START( luxor_55_21046_mem, AS_PROGRAM, 8, luxor_55_21046_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("luxor_55_21046:conkort", 0x2000)
@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( luxor_55_21046_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_21046_io, ADDRESS_SPACE_IO, 8, luxor_55_21046_device )
+static ADDRESS_MAP_START( luxor_55_21046_io, AS_IO, 8, luxor_55_21046_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff0f) AM_DEVREAD(DEVICE_SELF_OWNER, luxor_55_21046_device, _3d_r)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff0f) AM_DEVWRITE(DEVICE_SELF_OWNER, luxor_55_21046_device, _4d_w)
@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_dma_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
-	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
 }
 
 static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
 	m_fdc_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
-	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
 }
 
 static const wd17xx_interface fdc_intf =
@@ -566,8 +566,8 @@ void luxor_55_21046_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -580,8 +580,8 @@ void luxor_55_21046_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 

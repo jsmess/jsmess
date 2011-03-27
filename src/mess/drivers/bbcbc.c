@@ -33,7 +33,7 @@ public:
 #define MAIN_CLOCK XTAL_4_433619MHz
 
 
-static ADDRESS_MAP_START( bbcbc_prg, ADDRESS_SPACE_PROGRAM, 8, bbcbc_state )
+static ADDRESS_MAP_START( bbcbc_prg, AS_PROGRAM, 8, bbcbc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xe02f) AM_RAM
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( bbcbc_prg, ADDRESS_SPACE_PROGRAM, 8, bbcbc_state )
 	AM_RANGE(0xe03c, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbcbc_io, ADDRESS_SPACE_IO, 8, bbcbc_state )
+static ADDRESS_MAP_START( bbcbc_io, AS_IO, 8, bbcbc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)

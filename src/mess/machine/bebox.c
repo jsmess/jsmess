@@ -202,7 +202,7 @@ READ64_HANDLER( bebox_crossproc_interrupts_r )
 	result = state->crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
-	if (space != cputag_get_address_space(space->machine, "ppc1", ADDRESS_SPACE_PROGRAM))
+	if (space != space->machine->device("ppc1")->memory().space(AS_PROGRAM))
 		result |= 0x02000000;
 	else
 		result &= ~0x02000000;
@@ -586,7 +586,7 @@ static WRITE64_HANDLER( bebox_video_w )
 
 static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	address_space *space = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("ppc1")->memory().space(AS_PROGRAM);
 
 	memory_nop_readwrite(space, 0xC00A0000, 0xC00BFFFF, 0, 0);
 
@@ -601,7 +601,7 @@ static const struct pc_vga_interface bebox_vga_interface =
 
 	NULL,
 
-	ADDRESS_SPACE_PROGRAM,
+	AS_PROGRAM,
 	0x80000000
 };
 
@@ -966,7 +966,7 @@ static WRITE64_HANDLER( scsi53c810_w )
 static UINT32 scsi53c810_fetch(running_machine *machine, UINT32 dsp)
 {
 	UINT32 result;
-	result = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM)->read_dword(dsp & 0x7FFFFFFF);
+	result = machine->device("ppc1")->memory().space(AS_PROGRAM)->read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 
@@ -1034,7 +1034,7 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (state->scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						address_space *space = cputag_get_address_space(device->machine, "ppc1", ADDRESS_SPACE_PROGRAM);
+						address_space *space = device->machine->device("ppc1")->memory().space(AS_PROGRAM);
 
 						addr = (state->scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						memory_install_read64_handler(space, addr, addr + 0xFF, 0, 0, scsi53c810_r);
@@ -1111,8 +1111,8 @@ MACHINE_START( bebox )
 
 DRIVER_INIT( bebox )
 {
-	address_space *space_0 = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
-	address_space *space_1 = cputag_get_address_space(machine, "ppc2", ADDRESS_SPACE_PROGRAM);
+	address_space *space_0 = machine->device("ppc1")->memory().space(AS_PROGRAM);
+	address_space *space_1 = machine->device("ppc2")->memory().space(AS_PROGRAM);
 	offs_t vram_begin;
 	offs_t vram_end;
 

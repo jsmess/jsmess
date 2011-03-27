@@ -328,7 +328,7 @@ static READ32_HANDLER(sdcard_r)
 	return 0xffff<<16;	// at 3e146b0 - indicate timeout & CRC error
 }
 
-static ADDRESS_MAP_START( gp2x_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gp2x_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00007fff) AM_ROM
 	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM	AM_BASE_MEMBER(gp2x_state, ram) // 64 MB of RAM
 	AM_RANGE(0x9c000000, 0x9c00001f) AM_READWRITE(nand_r, nand_w)

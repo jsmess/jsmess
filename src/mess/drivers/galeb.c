@@ -30,7 +30,7 @@ static READ8_HANDLER( galeb_keyboard_r )
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(galeb_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
     AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ ( galeb_keyboard_r )
     AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE("dac", galeb_dac_data_w )

@@ -36,7 +36,7 @@ WRITE8_MEMBER( comx35_state::cdp1869_w )
 
 /* CDP1869 */
 
-static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8 )
+static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8 )
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -71,10 +71,10 @@ static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
 
 	if (!driver_state->m_iden && !state)
 	{
-		cpu_set_input_line(driver_state->m_maincpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
+		device_set_input_line(driver_state->m_maincpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 	}
 
-	cpu_set_input_line(driver_state->m_maincpu, COSMAC_INPUT_LINE_EF1, state);
+	device_set_input_line(driver_state->m_maincpu, COSMAC_INPUT_LINE_EF1, state);
 }
 
 static CDP1869_INTERFACE( pal_cdp1869_intf )

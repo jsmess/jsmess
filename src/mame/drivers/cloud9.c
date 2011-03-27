@@ -128,7 +128,7 @@ static TIMER_CALLBACK( clock_irq )
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
 	{
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		state->irq_state = 1;
 	}
 
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( irq_ack_w )
 	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 	if (state->irq_state)
 	{
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 		state->irq_state = 0;
 	}
 }
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( nvram_store_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cloud9_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cloud9_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
 	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)

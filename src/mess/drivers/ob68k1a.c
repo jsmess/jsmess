@@ -116,7 +116,7 @@ WRITE8_MEMBER( ob68k1a_state::pia_w )
 //  ADDRESS_MAP( ob68k1a_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ob68k1a_mem, ADDRESS_SPACE_PROGRAM, 16, ob68k1a_state )
+static ADDRESS_MAP_START( ob68k1a_mem, AS_PROGRAM, 16, ob68k1a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)
@@ -282,7 +282,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 void ob68k1a_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	// configure RAM
 	switch (ram_get_size(m_ram))
@@ -305,7 +305,7 @@ void ob68k1a_state::machine_reset()
 //  com8116_str_w(m_dbrg, 0, 0x01);
 
 	// set reset vector
-	void *ram = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM)->get_write_ptr(0);
+	void *ram = m_maincpu->memory().space(AS_PROGRAM)->get_write_ptr(0);
 	UINT8 *rom = machine->region(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);

@@ -73,7 +73,7 @@ static void bankswitch(running_machine *machine, UINT8 data)
 
     */
 
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	device_t *messram = machine->device(RAM_TAG);
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
@@ -362,7 +362,7 @@ INTERRUPT_GEN( mtx_interrupt )
 
 SNAPSHOT_LOAD( mtx )
 {
-	address_space *program = cputag_get_address_space(image.device().machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = image.device().machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	UINT8 header[18];
 	UINT16 addr;

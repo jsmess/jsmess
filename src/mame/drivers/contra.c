@@ -29,7 +29,7 @@ static INTERRUPT_GEN( contra_interrupt )
 {
 	contra_state *state = device->machine->driver_data<contra_state>();
 	if (k007121_ctrlram_r(state->k007121_1, 7) & 0x02)
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_bankswitch_w )
@@ -40,7 +40,7 @@ static WRITE8_HANDLER( contra_bankswitch_w )
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
 	contra_state *state = space->machine->driver_data<contra_state>();
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_coin_counter_w )
@@ -59,7 +59,7 @@ static WRITE8_HANDLER( cpu_sound_command_w )
 
 
 
-static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("P1")
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP /* read triggers irq reset and latch read (in the hardware only). */

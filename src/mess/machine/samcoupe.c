@@ -140,7 +140,7 @@ void samcoupe_update_memory(address_space *space)
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
 	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
-	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (offset & 1)
 		state->hext = data;
@@ -242,8 +242,8 @@ MACHINE_START( samcoupe )
 
 MACHINE_RESET( samcoupe )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *spaceio = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine->device("maincpu")->memory().space(AS_IO);
 	samcoupe_state *state = machine->driver_data<samcoupe_state>();
 
 	/* initialize state */

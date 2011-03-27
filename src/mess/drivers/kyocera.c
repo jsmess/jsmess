@@ -118,7 +118,7 @@ READ8_MEMBER( pc8201_state::bank_r )
 
 void pc8201_state::bankswitch(UINT8 data)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
@@ -469,7 +469,7 @@ READ8_MEMBER( kc85_state::keyboard_r )
 
 void tandy200_state::bankswitch(UINT8 data)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
@@ -573,26 +573,26 @@ WRITE8_MEMBER( kc85_state::lcd_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( kc85_mem, ADDRESS_SPACE_PROGRAM, 8, kc85_state )
+static ADDRESS_MAP_START( kc85_mem, AS_PROGRAM, 8, kc85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8201_mem, ADDRESS_SPACE_PROGRAM, 8, pc8201_state )
+static ADDRESS_MAP_START( pc8201_mem, AS_PROGRAM, 8, pc8201_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8, tandy200_state )
+static ADDRESS_MAP_START( tandy200_mem, AS_PROGRAM, 8, tandy200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8, kc85_state )
+static ADDRESS_MAP_START( kc85_io, AS_IO, 8, kc85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
@@ -605,12 +605,12 @@ static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8, kc85_state )
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8, kc85_state )
+static ADDRESS_MAP_START( trsm100_io, AS_IO, 8, kc85_state )
 	AM_IMPORT_FROM(kc85_io)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8, pc8201_state )
+static ADDRESS_MAP_START( pc8201_io, AS_IO, 8, pc8201_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x03) AM_WRITE(romah_w)
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8, pc8201_state )
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE_BASE(kc85_state, lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8, tandy200_state )
+static ADDRESS_MAP_START( tandy200_io, AS_IO, 8, tandy200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE_LEGACY(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
@@ -1126,7 +1126,7 @@ static const msm8251_interface tandy200_msm8251_interface =
 
 void kc85_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize RTC */
 	upd1990a_cs_w(m_rtc, 1);
@@ -1193,7 +1193,7 @@ void pc8201_state::machine_start()
 
 void trsm100_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize RTC */
 	upd1990a_cs_w(m_rtc, 1);
@@ -1289,7 +1289,7 @@ static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
 	tandy200_state *state = timer.machine->driver_data<tandy200_state>();
 
-	cpu_set_input_line(state->m_maincpu, I8085_RST75_LINE, state->m_tp);
+	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, state->m_tp);
 
 	state->m_tp = !state->m_tp;
 }

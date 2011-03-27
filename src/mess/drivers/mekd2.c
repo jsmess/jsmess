@@ -76,7 +76,7 @@ public:
 
 ************************************************************/
 
-static ADDRESS_MAP_START( mekd2_mem , ADDRESS_SPACE_PROGRAM, 8, mekd2_state)
+static ADDRESS_MAP_START( mekd2_mem , AS_PROGRAM, 8, mekd2_state)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE_LEGACY("pia_u", pia6821_r, pia6821_w)
 	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE_LEGACY("acia", acia6850_stat_r, acia6850_ctrl_w)

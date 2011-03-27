@@ -43,7 +43,7 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8, victor9k_state )
+static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE_LEGACY(I8259A_TAG, pic8259_r, pic8259_w)
 	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE_LEGACY(I8253_TAG, pit8253_r, pit8253_w)
@@ -61,14 +61,14 @@ static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8, victor9k_state
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( floppy_io, ADDRESS_SPACE_IO, 8, victor9k_state )
+static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor9k_state )
 //  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
 //  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
 //  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
 //  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8, victor9k_state )
+static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, victor9k_state )
 //  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
 //  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
 //  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
@@ -99,7 +99,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
 	victor9k_state *state = device->machine->driver_data<victor9k_state>();
-	address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
 
 	if (BIT(ma, 13))
 	{
@@ -798,7 +798,7 @@ WRITE8_MEMBER( victor9k_state::via6_pb_w )
     */
 
 	/* motor speed controller reset */
-	cpu_set_input_line(m_fdc_cpu, INPUT_LINE_RESET, BIT(data, 2));
+	device_set_input_line(m_fdc_cpu, INPUT_LINE_RESET, BIT(data, 2));
 
 	/* stepper enable A */
 	m_se[0] = BIT(data, 6);
@@ -875,10 +875,10 @@ static IRQ_CALLBACK( victor9k_irq_callback )
 void victor9k_state::machine_start()
 {
 	/* set interrupt callback */
-	cpu_set_irq_callback(m_maincpu, victor9k_irq_callback);
+	device_set_irq_callback(m_maincpu, victor9k_irq_callback);
 
 	/* memory banking */
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 	int ram_size = ram_get_size(m_ram);
 

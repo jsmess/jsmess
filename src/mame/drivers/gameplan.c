@@ -141,7 +141,7 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
 	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
 	{
@@ -186,7 +186,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
 	gameplan_state *gameplan = device->machine->driver_data<gameplan_state>();
 
-	cpu_set_input_line(gameplan->audiocpu, 0, state);
+	device_set_input_line(gameplan->audiocpu, 0, state);
 	if (state == ASSERT_LINE)
 		device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
@@ -194,7 +194,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 
 static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	soundlatch_w(space, 0, data);
 }
 
@@ -215,7 +215,7 @@ static const riot6532_interface r6532_interface =
  *
  *************************************/
 
-static ADDRESS_MAP_START( gameplan_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gameplan_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/* VIA 1 */
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/* VIA 2 */
@@ -231,7 +231,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gameplan_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gameplan_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_address_w)
@@ -242,7 +242,7 @@ ADDRESS_MAP_END
 
 
 /* same as Gameplan, but larger ROM */
-static ADDRESS_MAP_START( leprechn_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( leprechn_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_address_w)

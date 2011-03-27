@@ -156,7 +156,7 @@ READ8_MEMBER( sg1000_state::joysel_r )
     ADDRESS_MAP( sg1000_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sg1000_map, ADDRESS_SPACE_PROGRAM, 8, sg1000_state )
+static ADDRESS_MAP_START( sg1000_map, AS_PROGRAM, 8, sg1000_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sg1000_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sg1000_io_map, ADDRESS_SPACE_IO, 8, sg1000_state )
+static ADDRESS_MAP_START( sg1000_io_map, AS_IO, 8, sg1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -181,7 +181,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( omv_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( omv_map, ADDRESS_SPACE_PROGRAM, 8, sg1000_state )
+static ADDRESS_MAP_START( omv_map, AS_PROGRAM, 8, sg1000_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
@@ -191,7 +191,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( omv_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( omv_io_map, ADDRESS_SPACE_IO, 8, sg1000_state )
+static ADDRESS_MAP_START( omv_io_map, AS_IO, 8, sg1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -208,7 +208,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sc3000_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sc3000_map, ADDRESS_SPACE_PROGRAM, 8, sg1000_state )
+static ADDRESS_MAP_START( sc3000_map, AS_PROGRAM, 8, sg1000_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sc3000_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8, sg1000_state )
+static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8, sg1000_state )
 ADDRESS_MAP_END
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
-static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8, sg1000_state )
+static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE_LEGACY(UPD9255_TAG, i8255a_r, i8255a_w)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
@@ -241,7 +241,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sf7000_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sf7000_map, ADDRESS_SPACE_PROGRAM, 8, sf7000_state )
+static ADDRESS_MAP_START( sf7000_map, AS_PROGRAM, 8, sf7000_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -250,7 +250,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sf7000_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8, sf7000_state )
+static ADDRESS_MAP_START( sf7000_io_map, AS_IO, 8, sf7000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -784,7 +784,7 @@ static const floppy_config sf7000_floppy_config =
 
 void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	switch (size)
 	{
@@ -805,9 +805,9 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	default:
 		if (IS_CARTRIDGE_TV_DRAW(ptr))
 		{
-			program->install_handler(0x6000, 0x6000, 0, 0, write8_delegate_create(sg1000_state, tvdraw_axis_w, *this), 0);
-			program->install_handler(0x8000, 0x8000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_status_r, *this), 0);
-			program->install_handler(0xa000, 0xa000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_data_r, *this), 0);
+			program->install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate_create(sg1000_state, tvdraw_axis_w, *this), 0);
+			program->install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_status_r, *this), 0);
+			program->install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_data_r, *this), 0);
 			memory_nop_write(program, 0xa000, 0xa000, 0, 0);
 		}
 		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
@@ -826,7 +826,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	running_machine *machine = image.device().machine;
 	sg1000_state *state = machine->driver_data<sg1000_state>();
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *ptr = machine->region(Z80_TAG)->base();
 	UINT32 size;
 
@@ -886,7 +886,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 
 void sc3000_state::install_cartridge(UINT8 *ptr, int size)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* include SG-1000 mapping */
 	sg1000_state::install_cartridge(ptr, size);

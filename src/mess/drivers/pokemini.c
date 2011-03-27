@@ -15,7 +15,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
 
-static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pokemini_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
 	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM AM_BASE_MEMBER(pokemini_state, ram)				/* VRAM/RAM */
 	AM_RANGE( 0x002000, 0x0020FF )  AM_DEVREADWRITE( "i2cmem", pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */

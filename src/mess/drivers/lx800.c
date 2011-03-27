@@ -138,7 +138,7 @@ static MACHINE_START( lx800 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lx800_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( lx800_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xffff) AM_RAM /* internal CPU RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lx800_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( lx800_io, AS_IO, 8 )
 	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(lx800_porta_r, lx800_porta_w)
 	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ_PORT("DIPSW1")
 	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READWRITE(lx800_portc_r, lx800_portc_w)

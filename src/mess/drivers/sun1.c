@@ -40,7 +40,7 @@ static WRITE16_HANDLER(sun1_upd7201_w)
 	if (offset==0) terminal_write(devconf,0,data >> 8);
 }
 
-static ADDRESS_MAP_START(sun1_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(sun1_state, ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)

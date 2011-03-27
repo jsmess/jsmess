@@ -446,12 +446,12 @@ static READ8_HANDLER( jingbell_magic_r )
 
 
 
-static ADDRESS_MAP_START( jingbell_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jingbell_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE( bg_scroll_w ) AM_BASE_MEMBER(igs009_state, bg_scroll )
@@ -668,7 +668,7 @@ static INTERRUPT_GEN( jingbell_interrupt )
 {
 	igs009_state *state = device->machine->driver_data<igs009_state>();
 	 if (state->nmi_enable & 0x80)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( jingbell, igs009_state )

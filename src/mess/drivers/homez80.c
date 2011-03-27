@@ -46,7 +46,7 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 	return input_port_read(machine, kbdrow);
 }
 
-static ADDRESS_MAP_START(homez80_mem, ADDRESS_SPACE_PROGRAM, 8, homez80_state)
+static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE(m_videoram) // Video RAM
@@ -54,7 +54,7 @@ static ADDRESS_MAP_START(homez80_mem, ADDRESS_SPACE_PROGRAM, 8, homez80_state)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( homez80_io, ADDRESS_SPACE_IO, 8, homez80_state)
+static ADDRESS_MAP_START( homez80_io, AS_IO, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -268,7 +268,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( homez80_interrupt )
 {
 	homez80_state *state = device->machine->driver_data<homez80_state>();	
-	cpu_set_input_line(device, 0, (state->m_irq) ? HOLD_LINE : CLEAR_LINE);
+	device_set_input_line(device, 0, (state->m_irq) ? HOLD_LINE : CLEAR_LINE);
 	state->m_irq ^= 1;
 }
 

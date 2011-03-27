@@ -95,7 +95,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 ****************************************************************************/
 
 /* CVSD readmem/writemem structures */
-static ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("cvsdpia", pia6821_r, pia6821_w)
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 
 /* NARC master readmem/writemem structures */
-static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(narc_master_talkback_w)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* NARC slave readmem/writemem structures */
-static ADDRESS_MAP_START( williams_narc_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 
 
 /* ADPCM readmem/writemem structures */
-static ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(adpcm_bank_select_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -387,15 +387,15 @@ static void init_audio_state(running_machine *machine)
 	williams_sound_int_state = 0;
 	if (sound_cpu != NULL)
 	{
-		cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
-		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
-		cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(sound_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+		device_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	if (soundalt_cpu != NULL)
 	{
-		cpu_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
-		cpu_set_input_line(soundalt_cpu, M6809_IRQ_LINE, CLEAR_LINE);
-		cpu_set_input_line(soundalt_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+		device_set_input_line(soundalt_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(soundalt_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -413,13 +413,13 @@ static void cvsd_ym2151_irq(device_t *device, int state)
 
 static WRITE_LINE_DEVICE_HANDLER( cvsd_irqa )
 {
-	cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( cvsd_irqb )
 {
-	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(sound_cpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -430,7 +430,7 @@ static WRITE_LINE_DEVICE_HANDLER( cvsd_irqb )
 
 static void adpcm_ym2151_irq(device_t *device, int state)
 {
-	cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -486,18 +486,18 @@ void williams_cvsd_data_w(running_machine *machine, int data)
 
 void williams_cvsd_reset_w(int state)
 {
-	address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 
 	/* going high halts the CPU */
 	if (state)
 	{
 		cvsd_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
-		cpu_set_input_line(space->cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(space->cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpu_set_input_line(space->cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(space->cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -520,7 +520,7 @@ static WRITE8_HANDLER( narc_slave_bank_select_w )
 
 static READ8_HANDLER( narc_command_r )
 {
-	cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
 	williams_sound_int_state = 0;
 	return soundlatch_r(space, 0);
 }
@@ -529,13 +529,13 @@ static READ8_HANDLER( narc_command_r )
 static WRITE8_HANDLER( narc_command2_w )
 {
 	soundlatch2_w(space, 0, data & 0xff);
-	cpu_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, ASSERT_LINE);
+	device_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( narc_command2_r )
 {
-	cpu_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	device_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
 	return soundlatch2_r(space, 0);
 }
 
@@ -581,13 +581,13 @@ static WRITE8_HANDLER( narc_slave_sync_w )
 
 void williams_narc_data_w(int data)
 {
-	address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(sound_cpu, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x200))
 	{
-		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
 	}
 }
@@ -598,18 +598,18 @@ void williams_narc_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 		narc_master_bank_select_w(space, 0, 0);
 		narc_slave_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
-		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(soundalt_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(soundalt_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
 	{
-		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
-		cpu_set_input_line(soundalt_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(soundalt_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
@@ -645,7 +645,7 @@ static TIMER_CALLBACK( clear_irq_state )
 
 static READ8_HANDLER( adpcm_command_r )
 {
-	cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
@@ -668,11 +668,11 @@ static WRITE8_HANDLER( adpcm_talkback_w )
 
 void williams_adpcm_data_w(int data)
 {
-	address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 	soundlatch_w(space, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
-		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
 		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	}
@@ -684,14 +684,14 @@ void williams_adpcm_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 		adpcm_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
-		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

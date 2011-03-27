@@ -202,13 +202,13 @@ static MACHINE_RESET( tec1 )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tec1_map, ADDRESS_SPACE_PROGRAM, 8, tec1_state )
+static ADDRESS_MAP_START( tec1_map, AS_PROGRAM, 8, tec1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tec1_io, ADDRESS_SPACE_IO, 8, tec1_state )
+static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)

@@ -466,7 +466,7 @@ static void c64_bankswitch( running_machine *machine, int reset )
 			memory_set_bankptr(machine, "bank2", state->memory + 0x8000);
 			memory_set_bankptr(machine, "bank3", state->memory + 0xa000);
 			memory_set_bankptr(machine, "bank4", state->romh);
-			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0);
+			memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xffff, 0, 0);
 	}
 	else
 	{
@@ -590,8 +590,8 @@ void c64_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
 	if (!state->ultimax)
 		c64_bankswitch(device->machine, 0);
 
-	state->memory[0x000] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(0);
-	state->memory[0x001] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(1);
+	state->memory[0x000] = device->memory().space(AS_PROGRAM)->read_byte(0);
+	state->memory[0x001] = device->memory().space(AS_PROGRAM)->read_byte(1);
 
 }
 
@@ -1563,7 +1563,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 static void setup_c64_custom_mappers(running_machine *machine)
 {
 	c64_state *state = machine->driver_data<c64_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	switch (state->cart.mapper)
 	{

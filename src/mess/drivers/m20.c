@@ -86,7 +86,7 @@ static SCREEN_UPDATE( m20 )
     return 0;
 }
 
-static ADDRESS_MAP_START(m20_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_REGION("maincpu",0x10000)
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu",0x10000) //mirror
@@ -97,7 +97,7 @@ static ADDRESS_MAP_START(m20_mem, ADDRESS_SPACE_PROGRAM, 16)
 //
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m20_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( m20_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x61, 0x61) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x63, 0x63) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( m20_io , ADDRESS_SPACE_IO, 8)
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(m20_apb_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(m20_apb_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x007ff ) AM_RAM
 	AM_RANGE( 0xf0000, 0xf7fff ) AM_RAM //mirrored?
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START(m20_apb_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m20_apb_io , ADDRESS_SPACE_IO, 16)
+static ADDRESS_MAP_START( m20_apb_io , AS_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	//0x4060 crtc address
 	//0x4062 crtc data

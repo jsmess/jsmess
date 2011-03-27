@@ -534,7 +534,7 @@ static WRITE64_HANDLER( vga_ega64_w ) { write64be_with_write8_handler(vga_ega_w,
 
 static void vga_cpu_interface(running_machine *machine)
 {
-	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
 	static int sequencer, gc;
 	read8_space_func read_handler;
 	write8_space_func write_handler;
@@ -1174,7 +1174,7 @@ void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_in
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
 	buswidth = downcast<legacy_cpu_device *>(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	spacevga =cpu_get_address_space(machine->firstcpu,vga.vga_intf.port_addressspace);
+	spacevga =machine->firstcpu->memory().space(vga.vga_intf.port_addressspace);
 	switch(buswidth)
 	{
 		case 8:

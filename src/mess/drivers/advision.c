@@ -27,19 +27,19 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( program_map, ADDRESS_SPACE_PROGRAM, 8, advision_state )
+static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, advision_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0400, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8, advision_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, advision_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(ext_ram_r, ext_ram_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(controller_r, bankswitch_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(av_control_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vsync_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8, advision_state )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, advision_state )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READ(sound_cmd_r)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(sound_g_w)
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(sound_d_w)

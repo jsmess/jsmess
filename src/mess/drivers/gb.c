@@ -454,7 +454,7 @@ static const lr35902_cpu_core mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HA
 static const lr35902_cpu_core cgb_cpu_reset = { NULL, 0, gb_timer_callback };
 static const lr35902_cpu_core megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 
-static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(gb_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")					/* BIOS or ROM */
 	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK("bank10")					/* ROM bank */
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")					/* BIOS or ROM */
 	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK("bank10")					/* ROM bank */
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")					/* 16k fixed ROM bank */
 	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK("bank10")					/* ROM bank */
@@ -519,7 +519,7 @@ static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaduck_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank10")						/* 16k switched ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* 16k switched ROM bank */

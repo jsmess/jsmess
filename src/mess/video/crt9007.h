@@ -53,7 +53,7 @@
 #define MCFG_CRT9007_ADD(_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, CRT9007, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
 
 #define CRT9007_INTERFACE(name) \
@@ -111,7 +111,7 @@ protected:
 	virtual void device_config_complete();
 
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
     // address space configurations
 	const address_space_config		m_space_config;

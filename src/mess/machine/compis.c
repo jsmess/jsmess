@@ -429,7 +429,7 @@ static IRQ_CALLBACK(int_callback)
 		logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine->time().as_double(), state->i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_input_line(device, 0, CLEAR_LINE);
+	device_set_input_line(device, 0, CLEAR_LINE);
 	state->i186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
@@ -1238,7 +1238,7 @@ WRITE16_HANDLER( compis_i186_internal_port_w )
 			/* we need to do this at a time when the I86 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			cpu_set_irq_callback(space->cpu, int_callback);
+			device_set_irq_callback(space->cpu, int_callback);
 			break;
 
 		case 0x60:
@@ -1298,14 +1298,14 @@ WRITE16_HANDLER( compis_i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
-				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
+				memory_install_read16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
+				memory_install_write16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
-				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
+				memory_install_read16_handler(space->machine->device("maincpu")->memory().space(AS_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
+				memory_install_write16_handler(space->machine->device("maincpu")->memory().space(AS_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;
@@ -1388,7 +1388,7 @@ DRIVER_INIT( compis )
 	compis_state *state = machine->driver_data<compis_state>();
 //	compis_init( &i82720_interface );
 
-	cpu_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
 	memset (&state->compis, 0, sizeof (state->compis) );
 }
 
@@ -1411,7 +1411,7 @@ MACHINE_RESET( compis )
 	compis_keyb_init(state);
 
 	/* OSP PIC 8259 */
-	cpu_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
 
 	state->devices.pic8259_master = machine->device("pic8259_master");
 	state->devices.pic8259_slave = machine->device("pic8259_slave");

@@ -1554,7 +1554,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 				latch_data = state->sound_fifo[state->fftail];
 				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				state->latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
+				soundlatch_w( device->memory().space(AS_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 
@@ -1564,16 +1564,16 @@ static INTERRUPT_GEN( halleys_interrupt )
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 1:
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 2:
-			state->mVectorType = 1; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			state->mVectorType = 1; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 
 		case 3:
-			state->mVectorType = 0; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			state->mVectorType = 0; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -1594,19 +1594,19 @@ static INTERRUPT_GEN( benberob_interrupt )
 				latch_data = state->sound_fifo[state->fftail];
 				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				state->latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
+				soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;
 
 		case 1:
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		case 2:
 		case 3:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!state->blitter_busy) cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->firq_level++;
+			if (!state->blitter_busy) device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->firq_level++;
 		break;
 	}
 }
@@ -1676,7 +1676,7 @@ static READ8_HANDLER( io_mirror_r )
 //**************************************************************************
 // Memory Maps
 
-static ADDRESS_MAP_START( halleys_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_BASE_MEMBER(halleys_state, blitter_ram) AM_SIZE_MEMBER(halleys_state, blitter_ramsize)
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)		// background tiles?(Ben Bero Beh only)
 	AM_RANGE(0x1000, 0xefff) AM_ROM
@@ -1702,7 +1702,7 @@ static ADDRESS_MAP_START( halleys_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_address_data_w)

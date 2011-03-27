@@ -977,7 +977,7 @@ static void MC146818_set(address_space *space)
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 {
 	bbc_state *state = device->machine->driver_data<bbc_state>();
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	//logerror("SYSTEM write porta %d\n",data);
 
 	state->via_system_porta = data;
@@ -998,7 +998,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 {
 	bbc_state *state = device->machine->driver_data<bbc_state>();
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int bit, value;
 	bit = data & 0x07;
 	value = (data >> 3) & 0x01;
@@ -1482,7 +1482,7 @@ static void	bbc_i8271_interrupt(device_t *device, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cpu_set_input_line(device->machine->device("maincpu"), INPUT_LINE_NMI,PULSE_LINE);
+			device_set_input_line(device->machine->device("maincpu"), INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
@@ -2147,7 +2147,7 @@ MACHINE_START( bbcbp )
 	bbc_state *state = machine->driver_data<bbc_state>();
 	state->mc6850_clock = 0;
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcbp_direct_handler, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcbp_direct_handler, *machine));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
 	memory_configure_bank(machine, "bank6", 0, 16, machine->region("user1")->base() + 0x3000, 1<<14);
@@ -2175,14 +2175,14 @@ MACHINE_START( bbcm )
 	bbc_state *state = machine->driver_data<bbc_state>();
 	state->mc6850_clock = 0;
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcm_direct_handler, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcm_direct_handler, *machine));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
 	memory_configure_bank(machine, "bank5", 0, 16, machine->region("user1")->base()+0x01000, 1<<14);
 
 	/* Set ROM/IO bank to point to rom */
 	memory_set_bankptr( machine, "bank8", machine->region("user1")->base()+0x43c00);
-	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xFC00, 0xFEFF, 0, 0, "bank8");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xFC00, 0xFEFF, 0, 0, "bank8");
 }
 
 MACHINE_RESET( bbcm )

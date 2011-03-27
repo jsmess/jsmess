@@ -1107,7 +1107,7 @@ static READ64_HANDLER(cpu_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( m2_main, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64 )
 	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x00010050, 0x00010057) AM_READ(irq_active_r)
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(unk4_r, unk4_w)
@@ -1152,7 +1152,7 @@ static INTERRUPT_GEN(m2)
         state->irq_active |= 0x8;
     }*/
 
-	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( m2, konamim2_state )

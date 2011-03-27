@@ -441,14 +441,14 @@ static WRITE8_HANDLER( cntsteer_background_w )
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
 	cntsteer_state *state = space->machine->driver_data<cntsteer_state>();
-	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
 	cntsteer_state *state = space->machine->driver_data<cntsteer_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
@@ -456,31 +456,31 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 	cntsteer_state *state = space->machine->driver_data<cntsteer_state>();
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(space->cpu), offset, data);
-//  if (offset == 0) cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset == 0) device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset == 1) cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset == 2) cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset == 1) device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset == 2) device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
 	cntsteer_state *state = space->machine->driver_data<cntsteer_state>();
-	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
 //  if (data)
-//  cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+//  device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x", data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )
 {
 	cntsteer_state *state = space->machine->driver_data<cntsteer_state>();
-	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
@@ -519,7 +519,7 @@ static READ8_HANDLER( cntsteer_adx_r )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( gekitsui_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, spriteram)
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( gekitsui_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekitsui_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, videoram2)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( gekitsui_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, spriteram)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, videoram)
@@ -552,7 +552,7 @@ static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, videoram2) AM_SHARE("share3")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("share3")
@@ -580,10 +580,10 @@ static INTERRUPT_GEN ( sound_interrupt )
 {
 	cntsteer_state *state = device->machine->driver_data<cntsteer_state>();
 	if (!state->nmimask)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 //  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
@@ -668,7 +668,7 @@ INPUT_PORTS_END
 static INPUT_CHANGED( coin_inserted )
 {
 	cntsteer_state *state = field->port->machine->driver_data<cntsteer_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( cntsteer )

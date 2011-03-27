@@ -48,16 +48,16 @@ metlclsh:
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
 	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
-	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
 	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -87,19 +87,19 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
 	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
 	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
-	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
 	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
@@ -107,7 +107,7 @@ static WRITE8_HANDLER( metlclsh_flipscreen_w )
 	flip_screen_set(space->machine, data & 1);
 }
 
-static ADDRESS_MAP_START( metlclsh_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)	// bg tiles bank
@@ -256,7 +256,7 @@ GFXDECODE_END
 static void metlclsh_irqhandler(device_t *device, int linestate)
 {
 	metlclsh_state *state = device->machine->driver_data<metlclsh_state>();
-	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, linestate);
+	device_set_input_line(state->maincpu, M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -270,7 +270,7 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 		return;
 	/* generate NMI on coin insertion */
 	if ((~input_port_read(device->machine, "IN2") & 0xc0) || (~input_port_read(device->machine, "DSW") & 0x40))
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_START( metlclsh )

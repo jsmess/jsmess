@@ -160,7 +160,7 @@ WRITE_LINE_DEVICE_HANDLER( c1581_iec_reset_w )
     ADDRESS_MAP( c1581_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c1581_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1581_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
@@ -171,7 +171,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c1563_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c1563_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1563_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
@@ -186,7 +186,7 @@ static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
 {
 	c1581_t *c1581 = get_safe_token(device->owner());
 
-	cpu_set_input_line(c1581->cpu, M6502_IRQ_LINE, state);
+	device_set_input_line(c1581->cpu, M6502_IRQ_LINE, state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )

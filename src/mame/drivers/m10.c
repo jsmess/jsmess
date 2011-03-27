@@ -132,7 +132,7 @@ static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
 	m10_state *state = device->machine->driver_data<m10_state>();
 	LOG(("ic8j1: %d %d\n", data, device->machine->primary_screen->vpos()));
-	cpu_set_input_line(state->maincpu, 0, !data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
@@ -493,7 +493,7 @@ static READ8_HANDLER( m11_a700_r )
 {
 	m10_state *state = space->machine->driver_data<m10_state>();
 	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
-	//cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	//device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
 	ttl74123_clear_w(state->ic8j1, 0, 1);
@@ -510,7 +510,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	m10_state *state = field->port->machine->driver_data<m10_state>();
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -519,35 +519,35 @@ static TIMER_CALLBACK( interrupt_callback )
 	m10_state *state = machine->driver_data<m10_state>();
 	if (param == 0)
 	{
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBSTART + 16), FUNC(interrupt_callback), 1);
 	}
 	if (param == 1)
 	{
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBSTART + 24), FUNC(interrupt_callback), 2);
 	}
 	if (param == -1)
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 }
 
 #if 0
 static INTERRUPT_GEN( m11_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	//device->machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 #endif
 
 static INTERRUPT_GEN( m15_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
 }
 
@@ -557,7 +557,7 @@ static INTERRUPT_GEN( m15_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, videoram, videoram_size)
@@ -571,7 +571,7 @@ static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, videoram, videoram_size)
@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m15_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, videoram, videoram_size)

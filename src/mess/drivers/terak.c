@@ -50,7 +50,7 @@ static WRITE16_HANDLER(terak_fdc_data_w)
 	logerror("terak_fdc_data_w %04x\n",data);
 }
 
-static ADDRESS_MAP_START(terak_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(terak_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000,  0xf5ff ) AM_RAM // RAM
 	

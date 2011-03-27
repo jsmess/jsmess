@@ -218,7 +218,7 @@ static DRIVER_INIT( aquarius )
 	/* install expansion memory if available */
 	if (ram_get_size(machine->device(RAM_TAG)) > 0x1000)
 	{
-		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 		memory_install_readwrite_bank(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 0x1000 - 1, 0, 0, "bank1");
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
@@ -230,7 +230,7 @@ static DRIVER_INIT( aquarius )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( aquarius_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( aquarius_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_BASE_MEMBER(aquarius_state, videoram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_BASE_MEMBER(aquarius_state, colorram)
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( aquarius_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READ(cartridge_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( aquarius_io, AS_IO, 8 )
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE("ay8910", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE("ay8910", ay8910_address_w)
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aquarius_qd_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( aquarius_qd_io, AS_IO, 8 )
 	AM_IMPORT_FROM(aquarius_io)
 	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
 ADDRESS_MAP_END

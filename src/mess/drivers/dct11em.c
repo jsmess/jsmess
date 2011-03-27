@@ -16,7 +16,7 @@ public:
 		: driver_device(machine, config) { }
 };
 
-static ADDRESS_MAP_START(dct11em_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(dct11em_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAM  // RAM
 	AM_RANGE( 0x2000, 0x2fff ) AM_RAM  // Optional RAM

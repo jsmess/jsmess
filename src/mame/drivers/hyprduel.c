@@ -51,7 +51,7 @@ static void update_irq_state( running_machine *machine )
 	hyprduel_state *state = machine->driver_data<hyprduel_state>();
 	int irq = state->requested_int & ~*state->irq_enable;
 
-	cpu_set_input_line(state->maincpu, 3, (irq & state->int_num) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 3, (irq & state->int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( vblank_end_callback )
@@ -69,7 +69,7 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 	{
 		state->requested_int |= 0x01;		/* vblank */
 		state->requested_int |= 0x20;
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 		/* the duration is a guess */
 		device->machine->scheduler().timer_set(attotime::from_usec(2500), FUNC(vblank_end_callback), 0x20);
 	}
@@ -111,7 +111,7 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 		case 0x01:
 			if (!state->subcpu_resetline)
 			{
-				cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+				device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 				state->subcpu_resetline = 1;
 			}
 			break;
@@ -119,15 +119,15 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 		case 0x00:
 			if (state->subcpu_resetline)
 			{
-				cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+				device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 				state->subcpu_resetline = 0;
 			}
-			cpu_spinuntil_int(space->cpu);
+			device_spin_until_interrupt(space->cpu);
 			break;
 
 		case 0x0c:
 		case 0x80:
-			cpu_set_input_line(state->subcpu, 2, HOLD_LINE);
+			device_set_input_line(state->subcpu, 2, HOLD_LINE);
 			break;
 	}
 }
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger1_w )
 	{
 		if (!state->cpu_trigger && !state->subcpu_resetline)
 		{
-			cpu_spinuntil_trigger(space->cpu, 1001);
+			device_spin_until_trigger(space->cpu, 1001);
 			state->cpu_trigger = 1001;
 		}
 	}
@@ -182,7 +182,7 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
 	{
 		if (!state->cpu_trigger && !state->subcpu_resetline)
 		{
-			cpu_spinuntil_trigger(space->cpu, 1002);
+			device_spin_until_trigger(space->cpu, 1002);
 			state->cpu_trigger = 1002;
 		}
 	}
@@ -192,7 +192,7 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
 static TIMER_CALLBACK( magerror_irq_callback )
 {
 	hyprduel_state *state = machine->driver_data<hyprduel_state>();
-	cpu_set_input_line(state->subcpu, 1, HOLD_LINE);
+	device_set_input_line(state->subcpu, 1, HOLD_LINE);
 }
 
 /***************************************************************************
@@ -423,7 +423,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hyprduel_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE_MEMBER(hyprduel_state, vram_0)		/* Layer 0 */
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE_MEMBER(hyprduel_state, vram_1)		/* Layer 1 */
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START( hyprduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(hyprduel_state, sharedram3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprduel_map2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("share1")						/* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff )
@@ -469,7 +469,7 @@ ADDRESS_MAP_END
 
 /* Magical Error - video is at 8x now */
 
-static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(hyprduel_subcpu_control_w)
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE_MEMBER(hyprduel_state, vram_0)		/* Layer 0 */
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(hyprduel_state, sharedram3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magerror_map2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( magerror_map2, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("share1")						/* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_NOP
@@ -624,7 +624,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int state )
 {
 	hyprduel_state *hyprduel = device->machine->driver_data<hyprduel_state>();
-	cpu_set_input_line(hyprduel->subcpu, 1, HOLD_LINE);
+	device_set_input_line(hyprduel->subcpu, 1, HOLD_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -812,10 +812,10 @@ static DRIVER_INIT( hyprduel )
 	state->int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc0040e, 0xc00411, 0, 0, hyprduel_cpusync_trigger1_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger1_r);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger2_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xfff34c, 0xfff34d, 0, 0, hyprduel_cpusync_trigger2_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0040e, 0xc00411, 0, 0, hyprduel_cpusync_trigger1_w);
+	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger1_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger2_w);
+	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0xfff34c, 0xfff34d, 0, 0, hyprduel_cpusync_trigger2_r);
 }
 
 static DRIVER_INIT( magerror )

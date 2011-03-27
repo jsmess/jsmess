@@ -131,14 +131,14 @@ static WRITE8_HANDLER( gmaster_port_w )
     }
 }
 
-static ADDRESS_MAP_START( gmaster_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gmaster_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	AM_RANGE(0x8000, 0xfeff) AM_ROM
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gmaster_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(gmaster_io, AS_IO, 8)
 	AM_RANGE(UPD7810_PORTA, UPD7810_PORTF) AM_READWRITE(gmaster_port_r, gmaster_port_w )
 ADDRESS_MAP_END
 

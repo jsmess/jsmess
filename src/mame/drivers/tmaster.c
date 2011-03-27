@@ -495,7 +495,7 @@ static READ16_HANDLER( tmaster_coins_r )
 	return input_port_read(space->machine, "COIN")|(space->machine->rand()&0x0800);
 }
 
-static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
 	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
@@ -719,7 +719,7 @@ static READ16_HANDLER( dummy_read_01 )
 	return 0x3;	// Pass the check at PC = 0xfae & a later one
 }
 
-static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16 )
 
 	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE_MEMBER(tmaster_state, galgames_ram )
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )
@@ -880,9 +880,9 @@ static INTERRUPT_GEN( tm3k_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
-		case 1:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		default:	cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 2, HOLD_LINE);	break;
+		case 1:		device_set_input_line(device, 3, HOLD_LINE);	break;
+		default:	device_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -937,9 +937,9 @@ static INTERRUPT_GEN( galgames_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 3, HOLD_LINE);	break;
 					// lev 2 triggered at the end of a blit
-		default:	cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		default:	device_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 

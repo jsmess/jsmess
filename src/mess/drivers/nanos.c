@@ -32,7 +32,7 @@ public:
 
 
 
-static ADDRESS_MAP_START(nanos_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(nanos_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
 	AM_RANGE( 0x1000, 0xffff ) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
@@ -121,7 +121,7 @@ static const z80_daisy_config nanos_daisy_chain[] =
 	{ "z80ctc_1" },
 	{ NULL }
 };
-static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( nanos_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* CPU card */
@@ -420,7 +420,7 @@ static MACHINE_START(nanos)
 
 static MACHINE_RESET(nanos)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank3");
 	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");

@@ -106,7 +106,7 @@ static INTERRUPT_GEN( jb_interrupt )
 	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
 
 	if (state->irq_enable)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( jb_interrupt_nmi )
@@ -114,7 +114,7 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -130,7 +130,7 @@ static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
 	vlm5030_rst(device, (data >> 2) & 1);
 }
 
-static ADDRESS_MAP_START( jailbrek_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_BASE_MEMBER(jailbrek_state, colorram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_BASE_MEMBER(jailbrek_state, videoram)
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(jailbrek_state, spriteram, spriteram_size)

@@ -112,7 +112,7 @@ DRIVER_INIT(llc2)
 
 MACHINE_RESET( llc2 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
@@ -130,7 +130,7 @@ MACHINE_RESET( llc2 )
 
 WRITE8_HANDLER( llc2_rom_disable_w )
 {
-	address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem_space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
 
 	memory_install_write_bank(mem_space, 0x0000, 0xbfff, 0, 0, "bank1");
@@ -150,7 +150,7 @@ WRITE8_HANDLER( llc2_rom_disable_w )
 WRITE8_HANDLER( llc2_basic_enable_w )
 {
 
-	address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem_space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	if (data & 0x02) {
 		memory_unmap_write(mem_space, 0x4000, 0x5fff, 0, 0);
 		memory_set_bankptr(space->machine, "bank2", space->machine->region("maincpu")->base() + 0x10000);

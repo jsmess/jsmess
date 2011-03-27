@@ -588,7 +588,7 @@ void x07_state::t6834_r (running_machine *machine)
 		m_regs_r[0]  = 0x40;
 		m_regs_r[1] = m_out.data[m_out.read];
 		m_regs_r[2] |= 0x01;
-		cpu_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
+		device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
 		m_rsta_clear->adjust(attotime::from_msec(50));
 	}
 }
@@ -657,7 +657,7 @@ void x07_state::t6834_w (running_machine *machine)
 				m_regs_r[0]  = 0x40;
 				m_regs_r[1] = m_out.data[m_out.read];
 				m_regs_r[2] |= 0x01;
-				cpu_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
+				device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
 				m_rsta_clear->adjust(attotime::from_msec(50));
 			}
 		}
@@ -843,7 +843,7 @@ void x07_state::kb_irq(running_machine *machine)
 		memcpy(m_t6834_ram + 0x400, m_t6834_ram + 0x401, 0xff);
 		m_kb_size--;
 		m_regs_r[2] |= 0x01;
-		cpu_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
+		device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
 		m_rsta_clear->adjust(attotime::from_msec(50));
 	}
 }
@@ -1094,7 +1094,7 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(x07_mem, ADDRESS_SPACE_PROGRAM, 8, x07_state)
+static ADDRESS_MAP_START(x07_mem, AS_PROGRAM, 8, x07_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x1fff) AM_NOP		//RAM installed at runtime
 	AM_RANGE(0x2000, 0x3fff) AM_NOP		//expansion RAM
@@ -1106,7 +1106,7 @@ static ADDRESS_MAP_START(x07_mem, ADDRESS_SPACE_PROGRAM, 8, x07_state)
 	AM_RANGE(0xb000, 0xffff) AM_ROM		//BASIC ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x07_io , ADDRESS_SPACE_IO, 8, x07_state)
+static ADDRESS_MAP_START( x07_io , AS_IO, 8, x07_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(x07_io_r, x07_io_w)
@@ -1151,7 +1151,7 @@ static INPUT_CHANGED( kb_break )
 			state->m_regs_r[0] = 0x80;
 			state->m_regs_r[1] = 0x05;
 			state->m_regs_r[2] |= 0x01;
-			cpu_set_input_line(state->m_maincpu, NSC800_RSTA, ASSERT_LINE );
+			device_set_input_line(state->m_maincpu, NSC800_RSTA, ASSERT_LINE );
 			state->m_rsta_clear->adjust(attotime::from_msec(50));
 		}
 	}
@@ -1294,7 +1294,7 @@ static TIMER_DEVICE_CALLBACK( blink_timer )
 static TIMER_CALLBACK( rsta_clear )
 {
 	x07_state *state = machine->driver_data<x07_state>();
-	cpu_set_input_line(state->m_maincpu, NSC800_RSTA, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, NSC800_RSTA, CLEAR_LINE);
 
 	if (state->m_kb_size)
 		state->kb_irq(machine);
@@ -1303,7 +1303,7 @@ static TIMER_CALLBACK( rsta_clear )
 static TIMER_CALLBACK( rstb_clear )
 {
 	x07_state *state = machine->driver_data<x07_state>();
-	cpu_set_input_line(state->m_maincpu, NSC800_RSTB, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, NSC800_RSTB, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( beep_stop )
@@ -1317,7 +1317,7 @@ static TIMER_CALLBACK( k7_irq )
 {
 	x07_state *state = machine->driver_data<x07_state>();
 
-	cpu_set_input_line(state->m_maincpu, NSC800_RSTB, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, NSC800_RSTB, ASSERT_LINE);
 
 	state->m_rstb_clear->adjust(attotime::from_usec(200));
 }
@@ -1385,7 +1385,7 @@ void x07_state::machine_start()
 	state_save_register_global(machine, m_cursor.on);
 
 	/* install RAM */
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	memory_install_ram(program, 0x0000, ram_get_size(m_ram) - 1, 0, 0, ram_get_ptr(m_ram));
 }
 

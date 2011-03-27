@@ -690,13 +690,13 @@ static INTERRUPT_GEN( mastboy_interrupt )
 	mastboy_state *state = device->machine->driver_data<mastboy_state>();
 	if ((state->irq0_ack & 1) == 1)
 	{
-		cpu_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 	}
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mastboy_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
@@ -739,7 +739,7 @@ static READ8_HANDLER( mastboy_nmi_read )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( mastboy_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mastboy_io_map, AS_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_READ(mastboy_port_38_read)
 	AM_RANGE(0x39, 0x39) AM_READ(mastboy_nmi_read)
 ADDRESS_MAP_END

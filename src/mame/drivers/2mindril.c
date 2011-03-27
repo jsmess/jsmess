@@ -242,7 +242,7 @@ static WRITE16_HANDLER( charram_w )
 	gfx_element_mark_dirty(space->machine->gfx[1], offset / 16);
 }
 
-static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM
@@ -408,14 +408,14 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( drill_interrupt )
 {
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
 static void irqhandler(device_t *device, int irq)
 {
 //  _2mindril_state *state = machine->driver_data<_2mindril_state>();
-//  cpu_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
+//  device_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

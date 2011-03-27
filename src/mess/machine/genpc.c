@@ -61,7 +61,7 @@ WRITE8_DEVICE_HANDLER(pc_page_w)
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
 {
-	cpu_set_input_line(maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( dma8237, state );
@@ -569,18 +569,18 @@ ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb
 }
  
 #define memory_install_readwrite8_device_handler_mask(space, device, start, end, mask, mirror, rhandler, whandler, unitmask) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
+	const_cast<address_space *>(space)->install_legacy_readwrite_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
 
 void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
 {	
-	int buswidth = device_memory(maincpu)->space_config(ADDRESS_SPACE_IO)->m_databus_width;
+	int buswidth = machine->firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0);			
+			memory_install_readwrite8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, rhandler, whandler, 0);			
 			break;
 		case 16:
-			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
+			memory_install_readwrite8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -589,18 +589,18 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 }
 
 #define memory_install_write8_device_handler_mask(space, device, start, end, mask, mirror, whandler, unitmask) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler, unitmask)
+	const_cast<address_space *>(space)->install_legacy_write_handler(*(device), start, end, mask, mirror, whandler, #whandler, unitmask)
 
 void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler)
 {	
-	int buswidth = device_memory(maincpu)->space_config(ADDRESS_SPACE_IO)->m_databus_width;
+	int buswidth = machine->firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_write8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, whandler, 0);			
+			memory_install_write8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, whandler, 0);			
 			break;
 		case 16:
-			memory_install_write8_device_handler_mask(cpu_get_address_space(maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, whandler, 0xffff);			
+			memory_install_write8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, whandler, 0xffff);			
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -666,7 +666,7 @@ IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
   
 void ibm5160_mb_device::device_reset()
 {
-	cpu_set_irq_callback(maincpu, pc_irq_callback);
+	device_set_irq_callback(maincpu, pc_irq_callback);
 
 	u73_q2 = 0;
 	out1 = 0;

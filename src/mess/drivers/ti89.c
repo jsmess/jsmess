@@ -187,7 +187,7 @@ static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
 }
 
 
-static ADDRESS_MAP_START(ti92_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
+static ADDRESS_MAP_START(ti92_mem, AS_PROGRAM, 16, ti68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x5fffff) AM_UNMAP	// ROM
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START(ti92_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ti89_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
+static ADDRESS_MAP_START(ti89_mem, AS_PROGRAM, 16, ti68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x3fffff) AM_READWRITE(flash_r, flash_w)
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START(ti89_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ti92p_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
+static ADDRESS_MAP_START(ti92p_mem, AS_PROGRAM, 16, ti68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x3fffff) AM_NOP
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START(ti92p_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(v200_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
+static ADDRESS_MAP_START(v200_mem, AS_PROGRAM, 16, ti68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x5fffff) AM_READWRITE(flash_r, flash_w)
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START(v200_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ti89t_mem, ADDRESS_SPACE_PROGRAM, 16, ti68k_state)
+static ADDRESS_MAP_START(ti89t_mem, AS_PROGRAM, 16, ti68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_MIRROR(0x200000) AM_SHARE("nvram")
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
@@ -447,17 +447,15 @@ void ti68k_state::machine_start()
 		m_hw_version = HW1;
 		m_initial_pc = ((rom[2]) << 16) | rom[3];
 
-		memory_unmap_read(m_maincpu->space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x5fffff, 0, 0);
+		memory_unmap_read(m_maincpu->space(AS_PROGRAM), 0x200000, 0x5fffff, 0, 0);
 
 		if (m_initial_pc > 0x400000)
 		{
-			m_maincpu->space(ADDRESS_SPACE_PROGRAM)->install_handler(0x400000, 0x5fffff, 0, 0, read16_delegate_create(ti68k_state, flash_r, *this));
-			m_maincpu->space(ADDRESS_SPACE_PROGRAM)->install_handler(0x400000, 0x5fffff, 0, 0, write16_delegate_create(ti68k_state, flash_w, *this));
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x400000, 0x5fffff, 0, 0, read16_delegate_create(ti68k_state, flash_r, *this),write16_delegate_create(ti68k_state, flash_w, *this));
 		}
         else
 		{
-			m_maincpu->space(ADDRESS_SPACE_PROGRAM)->install_handler(0x200000, 0x3fffff, 0, 0, read16_delegate_create(ti68k_state, flash_r, *this));
-			m_maincpu->space(ADDRESS_SPACE_PROGRAM)->install_handler(0x200000, 0x3fffff, 0, 0, write16_delegate_create(ti68k_state, flash_w, *this));
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x200000, 0x3fffff, 0, 0, read16_delegate_create(ti68k_state, flash_r, *this), write16_delegate_create(ti68k_state, flash_w, *this));
 		}
 	}
 
@@ -497,7 +495,7 @@ bool ti68k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width / 8; x++)
 			{
-				UINT8 s_byte= m_maincpu->space(ADDRESS_SPACE_PROGRAM)->read_byte(m_lcd_base + y * (width/8) + x);
+				UINT8 s_byte= m_maincpu->space(AS_PROGRAM)->read_byte(m_lcd_base + y * (width/8) + x);
 				for (b = 0; b<8; b++)
 					*BITMAP_ADDR16(&bitmap, y, x * 8 + (7 - b)) = BIT(s_byte, b);
 			}

@@ -518,7 +518,7 @@ DRIVER_INIT( microtan )
 	microtan_state *state = machine->driver_data<microtan_state>();
     UINT8 *dst = machine->region("gfx2")->base();
     int i;
-    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {

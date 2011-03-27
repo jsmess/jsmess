@@ -71,14 +71,14 @@ static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
 	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
 	state->status &= ~0x20;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
 	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
 	state->status &= ~0x10;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_START( xxmissio )
@@ -89,7 +89,7 @@ static MACHINE_START( xxmissio )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( map1, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map2, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( map2, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 

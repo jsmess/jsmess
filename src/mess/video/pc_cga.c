@@ -468,11 +468,11 @@ static int internal_pc_cga_video_start(running_machine *machine)
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
 
 	memory_install_readwrite_bank(space, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -507,12 +507,12 @@ static VIDEO_START( pc_cga )
 static VIDEO_START( pc_cga32k )
 {
 	int buswidth;
-	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
 
 
 	memory_install_readwrite_bank(space, 0xb8000, 0xbffff, 0, 0, "bank11" );
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -1330,8 +1330,8 @@ static WRITE8_HANDLER( pc_cga8_w )
 		break;
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
-		UINT8 buswidth = device_memory(space->machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-		address_space *space_prg = cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+		UINT8 buswidth = space->machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+		address_space *space_prg = space->machine->firstcpu->memory().space(AS_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
 			switch(buswidth)
@@ -1771,8 +1771,8 @@ static VIDEO_START( pc1512 )
 	cga.videoram_size = 0x10000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
 	
-	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
-	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *space = machine->firstcpu->memory().space( AS_PROGRAM );
+	address_space *io_space = machine->firstcpu->memory().space( AS_IO );
 
 	memory_install_read_bank( space, 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);

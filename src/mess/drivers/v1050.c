@@ -137,7 +137,7 @@ void v1050_state::set_interrupt(UINT8 mask, int state)
 
 void v1050_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	int bank = (m_bank >> 1) & 0x03;
 
@@ -353,7 +353,7 @@ WRITE8_MEMBER( v1050_state::dint_w )
 
 WRITE8_MEMBER( v1050_state::dvint_clr_w )
 {
-	cpu_set_input_line(m_subcpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	device_set_input_line(m_subcpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 /* i8049 Read/Write Handlers */
@@ -399,7 +399,7 @@ WRITE8_MEMBER( v1050_state::p2_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( v1050_mem, ADDRESS_SPACE_PROGRAM, 8, v1050_state )
+static ADDRESS_MAP_START( v1050_mem, AS_PROGRAM, 8, v1050_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( v1050_mem, ADDRESS_SPACE_PROGRAM, 8, v1050_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8, v1050_state )
+static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(I8255A_DISP_TAG, i8255a_r, i8255a_w)
@@ -428,7 +428,7 @@ static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8, v1050_state )
 //  AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(S1410_TAG, s1410_r, s1410_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8, v1050_state )
+static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY(H46505_TAG, mc6845_address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE_LEGACY(H46505_TAG, mc6845_register_r, mc6845_register_w)
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8, v1050_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( v1050_kbd_io, ADDRESS_SPACE_IO, 8, v1050_state )
+static ADDRESS_MAP_START( v1050_kbd_io, AS_IO, 8, v1050_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
 ADDRESS_MAP_END
@@ -718,7 +718,7 @@ static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
 {
 	if (state == ASSERT_LINE)
 	{
-		cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -865,7 +865,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 	if (!m_f_int_enb)
 	{
 		set_interrupt(INT_FLOPPY, 0);
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 	/* baud select */
@@ -1057,11 +1057,11 @@ WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
 {
 	if (m_f_int_enb)
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
 	}
 	else
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -1104,14 +1104,14 @@ static IRQ_CALLBACK( v1050_int_ack )
 
 	//logerror("Interrupt Acknowledge Vector: %02x\n", vector);
 
-	cpu_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	return vector;
 }
 
 void v1050_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize I8214 */
 	i8214_etlg_w(m_pic, 1);
@@ -1121,7 +1121,7 @@ void v1050_state::machine_start()
 	msm58321_cs1_w(m_rtc, 1);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(m_maincpu, v1050_int_ack);
+	device_set_irq_callback(m_maincpu, v1050_int_ack);
 
 	/* setup memory banking */
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));

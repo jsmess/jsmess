@@ -63,7 +63,7 @@ static INTERRUPT_GEN( timeplt_interrupt )
 	timeplt_state *state = device->machine->driver_data<timeplt_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( timeplt_nmi_enable_w )
 
 	state->nmi_enable = data & 1;
 	if (!state->nmi_enable)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -113,7 +113,7 @@ static READ8_HANDLER( psurge_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( timeplt_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE_MEMBER(timeplt_state, colorram)
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( timeplt_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( psurge_main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chkun_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chkun_main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM

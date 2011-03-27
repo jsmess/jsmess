@@ -119,7 +119,7 @@ static READ16_HANDLER( cat_something_r )
 	return 0x00ff;
 }
 
-static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // 256 KB ROM
 	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE_MEMBER(cat_state,sram) // SRAM powered by batery
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(swyft_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
 	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE_MEMBER(cat_state,video_ram)
@@ -277,7 +277,7 @@ static MACHINE_START(cat)
 static MACHINE_RESET(cat)
 {
 	cat_state *state = machine->driver_data<cat_state>();
-	cpu_set_irq_callback(machine->device("maincpu"), cat_int_ack);
+	device_set_irq_callback(machine->device("maincpu"), cat_int_ack);
 	state->keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 }
 
@@ -315,7 +315,7 @@ static SCREEN_UPDATE( cat )
 
 static TIMER_CALLBACK( swyft_reset )
 {
-	memset(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
+	memset(machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
 }
 
 static MACHINE_START(swyft)

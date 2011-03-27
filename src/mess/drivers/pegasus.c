@@ -79,7 +79,7 @@ public:
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
 	device_t *cpu = timer.machine->device( "maincpu" );
-	cpu_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
+	device_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
@@ -154,7 +154,7 @@ READ8_MEMBER( pegasus_state::pegasus_protection_r )
 	return data;
 }
 
-static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8, pegasus_state)
+static ADDRESS_MAP_START(pegasus_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8, pegasus_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pegasusm_mem, ADDRESS_SPACE_PROGRAM, 8, pegasus_state)
+static ADDRESS_MAP_START(pegasusm_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0xbdff) AM_RAM

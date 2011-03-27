@@ -120,8 +120,8 @@ static void gb_init_regs(running_machine *machine)
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
-	gb_io_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
+	gb_io_w( machine->device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
+	gb_io_w( machine->device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
 }
 
 static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
@@ -151,7 +151,7 @@ static void gb_rom8_6000( running_machine *machine, UINT8 *addr )
 static void gb_init(running_machine *machine)
 {
 	gb_state *state = machine->driver_data<gb_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Initialize the memory banks */
 	state->MBC1Mode = 0;

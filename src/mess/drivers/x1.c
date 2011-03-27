@@ -1825,22 +1825,22 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	}
 }
 
-static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1turbo_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( x1turbo_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_mem_r,x1turbo_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( x1_io , AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1turbo_io , ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( x1turbo_io , AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_io_r, x1turbo_io_w)
 ADDRESS_MAP_END
@@ -1987,7 +1987,7 @@ static Z80DMA_INTERFACE( x1_dma )
 
 static INPUT_CHANGED( ipl_reset )
 {
-	//address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	//address_space *space = field->port->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	x1_state *state = field->port->machine->driver_data<x1_state>();
 
 	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -2413,14 +2413,14 @@ static IRQ_CALLBACK(x1_irq_callback)
     {
         state->ctc_irq_flag = 0;
         if(state->key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-            cpu_set_input_line(device, 0, CLEAR_LINE);
+            device_set_input_line(device, 0, CLEAR_LINE);
         return state->irq_vector;
     }
     if(state->key_irq_flag != 0)
     {
         state->key_irq_flag = 0;
         if(state->ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-            cpu_set_input_line(device, 0, CLEAR_LINE);
+            device_set_input_line(device, 0, CLEAR_LINE);
         return state->key_irq_vector;
     }
     return state->irq_vector;
@@ -2430,7 +2430,7 @@ static IRQ_CALLBACK(x1_irq_callback)
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	x1_state *state = timer.machine->driver_data<x1_state>();
-	address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = timer.machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = input_port_read(timer.machine,"key1");
 	UINT32 key2 = input_port_read(timer.machine,"key2");
 	UINT32 key3 = input_port_read(timer.machine,"key3");
@@ -2505,7 +2505,7 @@ static MACHINE_RESET( x1 )
 
 	state->io_bank_mode = 0;
 
-	//cpu_set_irq_callback(machine->device("maincpu"), x1_irq_callback);
+	//device_set_irq_callback(machine->device("maincpu"), x1_irq_callback);
 
 	state->cmt_current_cmd = 0;
 	state->cmt_test = 0;

@@ -212,7 +212,7 @@ READ16_DEVICE_HANDLER( ti99_dmux_r )
 	}
 
 	// Takes three cycles
-	cpu_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine->device("maincpu"),-3);
 
 	for (int i=0; i < MAXDEV; i++)
 	{
@@ -231,7 +231,7 @@ READ16_DEVICE_HANDLER( ti99_dmux_r )
 	}
 
 	// Takes three cycles
-	cpu_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine->device("maincpu"),-3);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
 	return (hbyte<<8) | dmux->latch ;
@@ -298,7 +298,7 @@ WRITE16_DEVICE_HANDLER( ti99_dmux_w )
 	}
 
 	// Takes three cycles
-	cpu_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine->device("maincpu"),-3);
 
 	for (int i=0; i < MAXDEV; i++)
 	{
@@ -317,7 +317,7 @@ WRITE16_DEVICE_HANDLER( ti99_dmux_w )
 	}
 
 	// Takes three cycles
-	cpu_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine->device("maincpu"),-3);
 }
 
 /* CRU space is not involved in the dmux. */

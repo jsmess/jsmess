@@ -150,7 +150,7 @@ static SCREEN_UPDATE( rblaster )
 static WRITE8_HANDLER( rblaster_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	device_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 #endif
 
@@ -180,7 +180,7 @@ static READ8_HANDLER( test_r )
 	return space->machine->rand();
 }
 
-static ADDRESS_MAP_START( begas_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(test_r)
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( begas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)//_PORT("IN2")
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rblaster_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
@@ -245,11 +245,11 @@ static WRITE8_HANDLER( nmimask_w )
 static INTERRUPT_GEN ( sound_interrupt )
 {
 	deco_ld_state *state = device->machine->driver_data<deco_ld_state>();
-	if (!state->nmimask) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->nmimask) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static ADDRESS_MAP_START( rblaster_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)

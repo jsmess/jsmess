@@ -483,7 +483,7 @@ static WRITE32_HANDLER( s3c240x_clkpow_w )
 		// MPLLCON
 		case 0x04 / 4 :
 		{
-			cputag_set_clock( machine, "maincpu", s3c240x_get_fclk(state, MPLLCON) * CLOCK_MULTIPLIER);
+			machine->device("maincpu")->set_unscaled_clock(s3c240x_get_fclk(state, MPLLCON) * CLOCK_MULTIPLIER);
 		}
 		break;
 	}
@@ -506,11 +506,11 @@ static void s3c240x_check_pending_irq( running_machine *machine)
 		}
 		state->s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		state->s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		cpu_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -523,7 +523,7 @@ static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 		state->s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		state->s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		state->s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		cpu_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
@@ -730,7 +730,7 @@ static void s3c240x_dma_trigger( running_machine *machine, int dma)
 	gp32_state *state = machine->driver_data<gp32_state>();
 	UINT32 *regs = &state->s3c240x_dma_regs[dma<<3];
 	UINT32 curr_tc, curr_src, curr_dst;
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode;
 	static const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 	verboselog( machine, 5, "DMA %d trigger\n", dma);
@@ -1786,7 +1786,7 @@ static NVRAM_HANDLER( gp32 )
 	}
 }
 
-static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gp32_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE_MEMBER(gp32_state, s3c240x_ram)
 	AM_RANGE(0x14000000, 0x1400003b) AM_READWRITE(s3c240x_memcon_r, s3c240x_memcon_w)

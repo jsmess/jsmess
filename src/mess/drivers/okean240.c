@@ -23,7 +23,7 @@ static READ8_HANDLER( okean240_rand_r )
 	return 0;  // return space->machine->rand(); // so we can start booting
 }
 
-static ADDRESS_MAP_START(okean240_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0x3fff) AM_RAM
@@ -32,7 +32,7 @@ static ADDRESS_MAP_START(okean240_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( okean240_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( okean240_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READ(okean240_rand_r)

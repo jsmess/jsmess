@@ -499,13 +499,13 @@ static SCREEN_UPDATE( einstein2 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( einstein_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( einstein_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000, 0x0ffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 /* The I/O ports are decoded into 8 blocks using address lines A3 to A7 */
-static ADDRESS_MAP_START( einstein_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( einstein_io, AS_IO, 8 )
 	/* block 0, ay8910 psg */
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_r, ay8910_address_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE(IC_I030, ay8910_data_w)
@@ -533,7 +533,7 @@ static ADDRESS_MAP_START( einstein_io, ADDRESS_SPACE_IO, 8 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( einstein2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( einstein2_io, AS_IO, 8 )
 	AM_IMPORT_FROM(einstein_io)
 	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(einstein_80col_ram_r, einstein_80col_ram_w)
 	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_address_w)

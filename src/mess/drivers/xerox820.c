@@ -139,7 +139,7 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 
 void xerox820_state::bankswitch(int bank)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 
 	if (bank)
@@ -158,7 +158,7 @@ void xerox820_state::bankswitch(int bank)
 
 void xerox820ii_state::bankswitch(int bank)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 
 	if (bank)
@@ -234,13 +234,13 @@ WRITE8_MEMBER( xerox820ii_state::sync_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( xerox820_mem, ADDRESS_SPACE_PROGRAM, 8, xerox820_state )
+static ADDRESS_MAP_START( xerox820_mem, AS_PROGRAM, 8, xerox820_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox820_io, ADDRESS_SPACE_IO, 8, xerox820_state )
+static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE_LEGACY(COM8116_TAG, com8116_str_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
@@ -252,13 +252,13 @@ static ADDRESS_MAP_START( xerox820_io, ADDRESS_SPACE_IO, 8, xerox820_state )
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80KBPIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox820ii_mem, ADDRESS_SPACE_PROGRAM, 8, xerox820ii_state )
+static ADDRESS_MAP_START( xerox820ii_mem, AS_PROGRAM, 8, xerox820ii_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox820ii_io, ADDRESS_SPACE_IO, 8, xerox820ii_state )
+static ADDRESS_MAP_START( xerox820ii_io, AS_IO, 8, xerox820ii_state )
 	AM_IMPORT_FROM(xerox820_io)
 	AM_RANGE(0x28, 0x29) AM_MIRROR(0xff00) AM_WRITE(bell_w)
 	AM_RANGE(0x30, 0x31) AM_MIRROR(0xff00) AM_WRITE(slden_w)
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( xerox820ii_io, ADDRESS_SPACE_IO, 8, xerox820ii_state )
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0xff00) AM_WRITE(sync_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox168_mem, ADDRESS_SPACE_PROGRAM, 16, xerox820ii_state )
+static ADDRESS_MAP_START( xerox168_mem, AS_PROGRAM, 16, xerox820ii_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
@@ -573,9 +573,9 @@ WRITE_LINE_MEMBER( xerox820_state::intrq_w )
 	m_fdc_irq = state;
 
 	if (halt && state)
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( xerox820_state::drq_w )
@@ -585,9 +585,9 @@ WRITE_LINE_MEMBER( xerox820_state::drq_w )
 	m_fdc_drq = state;
 
 	if (halt && state)
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =

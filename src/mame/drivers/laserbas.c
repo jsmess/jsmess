@@ -106,7 +106,7 @@ static WRITE8_HANDLER(vrambank_w)
 		state->vrambank = data & 0x40;
 }
 
-static ADDRESS_MAP_START( laserbas_memory, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( laserbas_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laserbas_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( laserbas_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_WRITE(vrambank_w)
 	AM_RANGE(0x20, 0x20) AM_READ(read_unk) AM_WRITENOP//write = ram/rom bank ? at fc00-f800 ?
@@ -147,9 +147,9 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( laserbas_interrupt )
 {
 	if(device->machine->primary_screen->vblank())
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( laserbas )

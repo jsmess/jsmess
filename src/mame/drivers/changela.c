@@ -104,7 +104,7 @@ static WRITE8_HANDLER( changela_68705_ddr_c_w )
 }
 
 
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(changela_68705_port_a_r, changela_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(changela_68705_port_b_r, changela_68705_port_b_w)
@@ -219,7 +219,7 @@ static WRITE8_HANDLER( changela_coin_counter_w )
 }
 
 
-static ADDRESS_MAP_START( changela_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_MEMBER(changela_state, spriteram) /* OBJ0 RAM */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(changela_state, videoram)	/* OBJ1 RAM */
@@ -427,7 +427,7 @@ static INTERRUPT_GEN( chl_interrupt )
 
 //    device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
 
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 
 	/* it seems the V8 == Vblank and it is connected to the INT on the 68705 */
 	//so we should cause an INT on the MCU cpu here, as well.

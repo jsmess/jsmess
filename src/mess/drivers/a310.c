@@ -107,7 +107,7 @@ static DRIVER_INIT(a310)
 
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 
-	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x02000000, 0x02000000+(ram_size-1), 0, 0, a310_psy_wram_r, a310_psy_wram_w );
+	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x02000000, 0x02000000+(ram_size-1), 0, 0, a310_psy_wram_r, a310_psy_wram_w );
 
 	archimedes_driver_init(machine);
 }
@@ -125,7 +125,7 @@ static MACHINE_RESET( a310 )
 	archimedes_reset(machine);
 }
 
-static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 //  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)

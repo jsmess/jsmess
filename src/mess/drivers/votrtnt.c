@@ -96,7 +96,7 @@ WRITE8_MEMBER( votrtnt_state::votrtnt_votrax_w )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(6802_mem, ADDRESS_SPACE_PROGRAM, 8, votrtnt_state)
+static ADDRESS_MAP_START(6802_mem, AS_PROGRAM, 8, votrtnt_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x6fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0xc00)/* RAM, 2114*2 (0x400 bytes) mirrored 4x */
@@ -149,7 +149,7 @@ static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
 	votrtnt_state *state = timer.machine->driver_data<votrtnt_state>();
 	UINT8 status = votrax_status_r(state->m_votrax);
 	//printf("%X ",status);
-	cpu_set_input_line(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

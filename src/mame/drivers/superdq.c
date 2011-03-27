@@ -135,7 +135,7 @@ static INTERRUPT_GEN( superdq_vblank )
        toggles (680usec after the vblank). We could set up a
        timer to do that, but this works as well */
 	laserdisc_data_w(state->laserdisc, state->ld_out_latch);
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( superdq_videoram_w )
@@ -198,13 +198,13 @@ static WRITE8_HANDLER( superdq_ld_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( superdq_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( superdq_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_BASE_MEMBER(superdq_state,videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( superdq_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

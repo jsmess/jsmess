@@ -48,7 +48,7 @@ static TIMER_CALLBACK( handle_cassette_input )
 MACHINE_RESET( cgenie )
 {
 	cgenie_state *state = machine->driver_data<cgenie_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *ay8910 = machine->device("ay8910");
 	UINT8 *ROM = machine->region("maincpu")->base();
 
@@ -126,7 +126,7 @@ MACHINE_RESET( cgenie )
 MACHINE_START( cgenie )
 {
 	cgenie_state *state = machine->driver_data<cgenie_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *gfx = machine->region("gfx2")->base();
 	int i;
 
@@ -601,7 +601,7 @@ INTERRUPT_GEN( cgenie_frame_interrupt )
 		state->tv_mode = input_port_read(device->machine, "DSW0") & 0x10;
 		/* force setting of background color */
 		state->port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, state->port_ff ^ FF_BGD0);
+		cgenie_port_ff_w(device->machine->device("maincpu")->memory().space(AS_PROGRAM), 0, state->port_ff ^ FF_BGD0);
 	}
 }
 

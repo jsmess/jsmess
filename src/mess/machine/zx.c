@@ -49,7 +49,7 @@ READ8_HANDLER( zx_ram_r )
 
 DRIVER_INIT ( zx )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_read_bank(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
 	memory_install_write8_handler(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, zx_ram_w);
@@ -80,21 +80,21 @@ DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 MACHINE_RESET ( zx80 )
 {
 	zx_state *state = machine->driver_data<zx_state>();
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, *machine));
 	state->tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pow3000 )
 {
 	zx_state *state = machine->driver_data<zx_state>();
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pow3000_setdirect, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pow3000_setdirect, *machine));
 	state->tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pc8300 )
 {
 	zx_state *state = machine->driver_data<zx_state>();
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pc8300_setdirect, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pc8300_setdirect, *machine));
 	state->tape_bit = 0x80;
 }
 
@@ -432,7 +432,7 @@ WRITE8_HANDLER ( zx81_io_w )
 		zx_ula_bkgnd(space->machine, 1);
 		if (state->ula_frame_vsync == 2)
 		{
-			cpu_spinuntil_time(space->cpu,space->machine->primary_screen->time_until_pos(height - 1, 0));
+			device_spin_until_time(space->cpu,space->machine->primary_screen->time_until_pos(height - 1, 0));
 			state->ula_scanline_count = height - 1;
 			logerror ("S: %d B: %d\n", space->machine->primary_screen->vpos(), space->machine->primary_screen->hpos());
 		}

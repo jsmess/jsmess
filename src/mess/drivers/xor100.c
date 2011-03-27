@@ -58,7 +58,7 @@ enum
 
 void xor100_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int banks = ram_get_size(m_ram) / 0x10000;
 
 	switch (m_mode)
@@ -192,7 +192,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	if (!m_fdc_irq && !m_fdc_drq)
 	{
 		/* TODO: this is really connected to the Z80 _RDY line */
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	return !m_fdc_irq << 7;
@@ -255,13 +255,13 @@ WRITE8_MEMBER( xor100_state::fdc_dsel_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( xor100_mem, ADDRESS_SPACE_PROGRAM, 8, xor100_state )
+static ADDRESS_MAP_START( xor100_mem, AS_PROGRAM, 8, xor100_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE_BANK("bank1")
 	AM_RANGE(0x0000, 0xf7ff) AM_READ_BANK("bank2")
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8, xor100_state )
+static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY(I8251_A_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(I8251_A_TAG, msm8251_status_r, msm8251_control_w)
@@ -493,7 +493,7 @@ WRITE_LINE_MEMBER( xor100_state::fdc_irq_w )
 	if (state)
 	{
 		/* TODO: this is really connected to the Z80 _RDY line */
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -504,7 +504,7 @@ WRITE_LINE_MEMBER( xor100_state::fdc_drq_w )
 	if (state)
 	{
 		/* TODO: this is really connected to the Z80 _RDY line */
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 

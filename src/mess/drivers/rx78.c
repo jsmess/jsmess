@@ -245,7 +245,7 @@ static WRITE8_HANDLER( vdp_pri_mask_w )
 }
 
 
-static ADDRESS_MAP_START(rx78_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_ROM AM_REGION("cart_img", 0x0000)
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START(rx78_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xec00, 0xffff) AM_READWRITE(rx78_vram_r, rx78_vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( rx78_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
@@ -511,7 +511,7 @@ ROM_END
 static DRIVER_INIT( rx78 )
 {
 	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
-	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *prg = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(ram_size == 0x4000)
 		memory_unmap_readwrite(prg, 0x6000, 0xafff, 0, 0);

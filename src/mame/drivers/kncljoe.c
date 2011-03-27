@@ -40,11 +40,11 @@ static WRITE8_HANDLER( sound_cmd_w )
 	if ((data & 0x80) == 0)
 		soundlatch_w(space, 0, data & 0x7f);
 	else
-		cpu_set_input_line(state->soundcpu, 0, ASSERT_LINE);
+		device_set_input_line(state->soundcpu, 0, ASSERT_LINE);
 }
 
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_BASE_MEMBER(kncljoe_state, videoram)
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE_MEMBER(kncljoe_state, scrollregs)
@@ -100,7 +100,7 @@ static READ8_DEVICE_HANDLER( m6803_port2_r )
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
 	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
-	cpu_set_input_line(state->soundcpu, 0, CLEAR_LINE);
+	device_set_input_line(state->soundcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(unused_w)
@@ -108,14 +108,14 @@ static WRITE8_DEVICE_HANDLER(unused_w)
 	//unused - no MSM on the pcb
 }
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE("aysnd", m6803_port1_r, m6803_port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE("aysnd", m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
@@ -245,7 +245,7 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN (sound_nmi)
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( kncljoe )

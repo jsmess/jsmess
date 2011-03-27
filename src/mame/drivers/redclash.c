@@ -28,10 +28,10 @@ TODO:
 static WRITE8_HANDLER( irqack_w )
 {
 	ladybug_state *state = space->machine->driver_data<ladybug_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( zerohour_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( zerohour_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redclash_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
@@ -81,7 +81,7 @@ static INPUT_CHANGED( left_coin_inserted )
 	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	if(newval)
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
@@ -89,7 +89,7 @@ static INPUT_CHANGED( right_coin_inserted )
 	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	if(newval)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( redclash )

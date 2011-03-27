@@ -81,13 +81,13 @@ static WRITE8_HANDLER( memory_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( elf2_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( elf2_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( elf2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( elf2_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861_TAG, dispon_r)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(data_r, data_w)
@@ -164,7 +164,7 @@ static COSMAC_SC_WRITE( elf2_sc_w )
 	case COSMAC_STATE_CODE_S2_DMA:
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		/* clear DMAIN */
-		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+		device_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
 		break;
 
 	default:
@@ -258,7 +258,7 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 static MACHINE_START( elf2 )
 {
 	elf2_state *state = machine->driver_data<elf2_state>();
-	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->cdp1861 = machine->device(CDP1861_TAG);

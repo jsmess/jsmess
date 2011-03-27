@@ -16,7 +16,7 @@
 const device_type AT_KEYBOARD_CONTROLLER = at_keyboard_controller_device_config::static_alloc_device_config;
 
 // i/o map for the 8042
-static ADDRESS_MAP_START( at_keybc_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8 )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, p1_r)

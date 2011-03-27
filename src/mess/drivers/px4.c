@@ -499,7 +499,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 static WRITE8_HANDLER( px4_bankr_w )
 {
 	px4_state *px4 = space->machine->driver_data<px4_state>();
-	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (VERBOSE)
 		logerror("%s: px4_bankr_w (0x%02x)\n", space->machine->describe_context(), data);
@@ -1130,12 +1130,12 @@ static MACHINE_RESET( px4 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( px4_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( px4_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( px4_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* gapnit, 0x00-0x07 */
@@ -1164,7 +1164,7 @@ static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1a, 0x1f) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( px4p_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( px4p_io, AS_IO, 8 )
 	AM_IMPORT_FROM(px4_io)
 	AM_RANGE(0x90, 0x92) AM_WRITE(px4_ramdisk_address_w)
 	AM_RANGE(0x93, 0x93) AM_READWRITE(px4_ramdisk_data_r, px4_ramdisk_data_w)

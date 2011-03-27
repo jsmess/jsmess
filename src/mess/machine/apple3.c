@@ -327,14 +327,14 @@ static void apple3_update_memory(running_machine *machine)
 	apple3_state *state = machine->driver_data<apple3_state>();
 	UINT16 bank;
 	UINT8 page;
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", state->via_0_b, state->via_1_a);
 	}
 
-	cputag_set_clock(machine, "maincpu", (state->via_0_a & 0x80) ? 1000000 : 2000000);
+	machine->device("maincpu")->set_unscaled_clock((state->via_0_a & 0x80) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
 	if (!(state->via_0_a & 0x04))
@@ -449,8 +449,8 @@ static void apple3_update_memory(running_machine *machine)
 		device_t *via_0 = space->machine->device("via6522_0");
 		device_t *via_1 = space->machine->device("via6522_1");
 
-        space->install_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
-		space->install_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate_create(via6522_device, read, *via_1), write8_delegate_create(via6522_device, write, *via_1));
+        space->install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
+		space->install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate_create(via6522_device, read, *via_1), write8_delegate_create(via6522_device, write, *via_1));
 	}
 }
 
@@ -735,5 +735,5 @@ DRIVER_INIT( apple3 )
 	state->via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, *machine));
 }

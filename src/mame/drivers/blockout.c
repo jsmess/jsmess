@@ -78,7 +78,7 @@ static INTERRUPT_GEN( blockout_interrupt )
 	/* interrupt 6 is vblank */
 	/* interrupt 5 reads coin inputs - might have to be triggered only */
 	/* when a coin is inserted */
-	cpu_set_input_line(device, 6 - cpu_getiloops(device), HOLD_LINE);
+	device_set_input_line(device, 6 - cpu_getiloops(device), HOLD_LINE);
 }
 
 static WRITE16_HANDLER( blockout_sound_command_w )
@@ -88,7 +88,7 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -99,7 +99,7 @@ static WRITE16_HANDLER( blockout_sound_command_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -238,7 +238,7 @@ INPUT_PORTS_END
 static void blockout_irq_handler(device_t *device, int irq)
 {
 	blockout_state *state = device->machine->driver_data<blockout_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2151_interface ym2151_config =

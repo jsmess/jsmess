@@ -56,7 +56,7 @@
 */
 
 
-static ADDRESS_MAP_START(oric_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(oric_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(oric_state, ram )
     AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 /*
 The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
-static ADDRESS_MAP_START(telestrat_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x02ff) AM_RAM
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x031b) AM_READWRITE( oric_microdisc_r, oric_microdisc_w )

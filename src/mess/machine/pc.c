@@ -94,7 +94,7 @@ WRITE8_HANDLER(pc_page_w)
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
 	pc_state *st = device->machine->driver_data<pc_state>();
-	cpu_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -215,7 +215,7 @@ static emu_timer	*pc_int_delay_timer;
 
 static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 {
-    cpu_set_input_line(machine->firstcpu, 0, param ? ASSERT_LINE : CLEAR_LINE);
+    device_set_input_line(machine->firstcpu, 0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
@@ -226,7 +226,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->firstcpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(device->machine->firstcpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -527,7 +527,7 @@ static void pcjr_set_keyb_int(running_machine *machine, int state)
 			pcjr_keyb.latch = 1;
 			if ( nmi_enabled & 0x80 )
 			{
-				cpu_set_input_line( st->pit8253->machine->firstcpu, INPUT_LINE_NMI, PULSE_LINE );
+				device_set_input_line( st->pit8253->machine->firstcpu, INPUT_LINE_NMI, PULSE_LINE );
 			}
 		}
 	}
@@ -1088,7 +1088,7 @@ static const struct pc_vga_interface vga_interface =
 
 	input_port_0_r,
 
-	ADDRESS_SPACE_IO,
+	AS_IO,
 	0x0000
 };
 
@@ -1096,7 +1096,7 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( pc1640 )
 {
-	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *io_space = machine->firstcpu->memory().space( AS_IO );
 
 	memory_install_read16_handler(io_space, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
@@ -1134,7 +1134,7 @@ MACHINE_RESET( pc )
 	device_t *speaker = machine->device("speaker");
 	pc_state *st = machine->driver_data<pc_state>();
 	st->maincpu = machine->device("maincpu" );
-	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
+	device_set_irq_callback(st->maincpu, pc_irq_callback);
 
 	st->u73_q2 = 0;
 	st->out1 = 0;
@@ -1165,7 +1165,7 @@ MACHINE_START( pcjr )
 	pcjr_keyb.keyb_signal_timer = machine->scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
 	pc_int_delay_timer = machine->scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
 	st->maincpu = machine->device("maincpu" );
-	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
+	device_set_irq_callback(st->maincpu, pc_irq_callback);
 
 	st->pic8259 = machine->device("pic8259");
 	st->dma8237 = NULL;

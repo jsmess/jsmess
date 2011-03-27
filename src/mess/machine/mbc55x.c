@@ -435,7 +435,7 @@ WRITE8_HANDLER(mbc55x_kb_usart_w)
 static void set_ram_size(running_machine *machine)
 {
 	mbc55x_state	*state		= machine->driver_data<mbc55x_state>();
-    address_space	*space		= cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
+    address_space	*space		= machine->device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
     int 			ramsize 	= ram_get_size(machine->device(RAM_TAG));
 	int 			nobanks		= ramsize / RAM_BANK_SIZE;
 	char			bank[10];
@@ -484,7 +484,7 @@ MACHINE_RESET( mbc55x )
 {
 	set_ram_size(machine);
 	keyboard_reset(machine);
-	cpu_set_irq_callback(machine->device(MAINCPU_TAG), mbc55x_irq_callback);
+	device_set_irq_callback(machine->device(MAINCPU_TAG), mbc55x_irq_callback);
 }
 
 MACHINE_START( mbc55x )
@@ -531,7 +531,7 @@ static void mbc55x_debug(running_machine *machine, int ref, int params, const ch
 static int instruction_hook(device_t &device, offs_t curpc)
 {
 	mbc55x_state	*state = device.machine->driver_data<mbc55x_state>();
-    address_space	*space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
+    address_space	*space = device.memory().space(AS_PROGRAM);
     UINT8           *addr_ptr;
 
     addr_ptr = (UINT8*)space->get_read_ptr(curpc);

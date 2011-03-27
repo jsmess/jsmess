@@ -153,7 +153,7 @@ static WRITE8_HANDLER( xor_display_w )
 	state->xor_display = data;
 }
 
-static ADDRESS_MAP_START(bmjr_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(bmjr_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0

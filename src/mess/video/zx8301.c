@@ -43,7 +43,7 @@ const device_type ZX8301 = zx8301_device_config::static_alloc_device_config;
 
 
 // default address map
-static ADDRESS_MAP_START( zx8301, 0, 8 )
+static ADDRESS_MAP_START( zx8301, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -91,9 +91,9 @@ device_t *zx8301_device_config::alloc_device(running_machine &machine) const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *zx8301_device_config::memory_space_config(int spacenum) const
+const address_space_config *zx8301_device_config::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 
@@ -265,7 +265,7 @@ READ8_MEMBER( zx8301_device::data_r )
 
 	if (m_vda)
 	{
-		cpu_spinuntil_time(m_cpu, m_screen->time_until_pos(256, 0));
+		device_spin_until_time(m_cpu, m_screen->time_until_pos(256, 0));
 	}
 
 	return readbyte(offset);
@@ -282,7 +282,7 @@ WRITE8_MEMBER( zx8301_device::data_w )
 
 	if (m_vda)
 	{
-		cpu_spinuntil_time(m_cpu, m_screen->time_until_pos(256, 0));
+		device_spin_until_time(m_cpu, m_screen->time_until_pos(256, 0));
 	}
 
 	writebyte(offset, data);

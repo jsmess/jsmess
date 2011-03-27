@@ -16,7 +16,7 @@ static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
 	poly88_state *state = machine->driver_data<poly88_state>();
 	state->int_vector = 0xe7;
-	cpu_set_input_line(machine->device("maincpu"), 0, HOLD_LINE);
+	device_set_input_line(machine->device("maincpu"), 0, HOLD_LINE);
 }
 
 WRITE8_HANDLER(poly88_baud_rate_w)
@@ -221,7 +221,7 @@ DRIVER_INIT ( poly88 )
 MACHINE_RESET(poly88)
 {
 	poly88_state *state = machine->driver_data<poly88_state>();
-	cpu_set_irq_callback(machine->device("maincpu"), poly88_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), poly88_irq_callback);
 	state->intr = 0;
 	state->last_code = 0;
 
@@ -232,14 +232,14 @@ INTERRUPT_GEN( poly88_interrupt )
 {
 	poly88_state *state = device->machine->driver_data<poly88_state>();
 	state->int_vector = 0xf7;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )
 {
 	//poly88_state *drvstate = device->machine->driver_data<poly88_state>();
 	//drvstate->int_vector = 0xe7;
-	//cpu_set_input_line(device, 0, HOLD_LINE);
+	//device_set_input_line(device, 0, HOLD_LINE);
 }
 
 const msm8251_interface poly88_usart_interface=
@@ -271,7 +271,7 @@ WRITE8_HANDLER(poly88_intr_w)
 
 SNAPSHOT_LOAD( poly88 )
 {
-	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* data= auto_alloc_array(image.device().machine, UINT8, snapshot_size);
 	UINT16 recordNum;
 	UINT16 recordLen;

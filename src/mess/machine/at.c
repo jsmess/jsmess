@@ -210,7 +210,7 @@ WRITE8_HANDLER(at_page8_w)
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
 	at_state *st = device->machine->driver_data<at_state>();
-	cpu_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -446,7 +446,7 @@ WRITE8_HANDLER( at_portb_w )
 
 static void init_at_common(running_machine *machine)
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	soundblaster_config(&soundblaster);
 
 	// The CS4031 chipset does this itself
@@ -481,7 +481,7 @@ static const struct pc_vga_interface vga_interface =
 	NULL,
 	NULL,
 	input_port_0_r,
-	ADDRESS_SPACE_IO,
+	AS_IO,
 	0x0000
 };
 
@@ -558,7 +558,7 @@ static void pc_set_irq_line(running_machine *machine,int irq, int state)
 
 MACHINE_START( at )
 {
-	cpu_set_irq_callback(machine->device("maincpu"), at_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), at_irq_callback);
 	/* FDC/HDC hardware */
 	pc_fdc_init( machine, &fdc_interface );
 	pc_hdc_setup(machine, pc_set_irq_line);

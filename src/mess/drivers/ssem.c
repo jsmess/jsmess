@@ -51,7 +51,7 @@ INLINE UINT32 reverse(UINT32 v)
 * Address map                                        *
 \****************************************************/
 
-static ADDRESS_MAP_START( ssem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssem_map, AS_PROGRAM, 8 )
     AM_RANGE(0x00, 0x7f) AM_RAM AM_BASE_MEMBER(ssem_state, store)// Primary store
 ADDRESS_MAP_END
 

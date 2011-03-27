@@ -55,7 +55,7 @@ The source code there implies that *maybe* ff7e and ff7f are also open bus.
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( aim65_40_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( aim65_40_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0xa000, 0xff7f) AM_ROM
 	AM_RANGE(0xffa0, 0xffaf) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)

@@ -30,7 +30,7 @@ static READ8_HANDLER(keyboard_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(elekscmp_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(elekscmp_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x5ff) AM_ROM // ROM

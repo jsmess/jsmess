@@ -232,7 +232,7 @@ static WRITE16_HANDLER( disk_command_w )
     ADDRESS_MAP( cgc7900_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, chrom_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -301,7 +301,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( keyboard_io, AS_IO, 8 )
 /*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
     AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
     AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)

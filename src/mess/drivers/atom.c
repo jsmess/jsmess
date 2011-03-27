@@ -137,7 +137,7 @@ Hardware:   PPIA 8255
 static void bankswitch(running_machine *machine)
 {
 	atom_state *state = machine->driver_data<atom_state>();
-	address_space *program = cputag_get_address_space(machine, SY6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(SY6502_TAG)->memory().space(AS_PROGRAM);
 
 	UINT8 *eprom = machine->region("a000")->base() + (state->eprom << 12);
 
@@ -194,7 +194,7 @@ static WRITE8_HANDLER( eprom_w )
     ADDRESS_MAP( atom_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_r, i8271_w)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_data_r, i8271_data_w)
@@ -213,7 +213,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( atomeb_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atomeb_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atomeb_mem, AS_PROGRAM, 8 )
 	AM_IMPORT_FROM(atom_mem)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
 ADDRESS_MAP_END

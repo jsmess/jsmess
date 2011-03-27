@@ -67,7 +67,7 @@ static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 }
 
 
-static ADDRESS_MAP_START( xorworld_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
@@ -164,11 +164,11 @@ static INTERRUPT_GEN( xorworld_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		cpu_set_input_line(device, 6, HOLD_LINE);
+		device_set_input_line(device, 6, HOLD_LINE);
 	}
 }
 

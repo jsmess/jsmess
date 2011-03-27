@@ -392,7 +392,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( apexc_interrupt )
 {
 	apexc_state *state = device->machine->driver_data<apexc_state>();
-	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -843,7 +843,7 @@ static GFXDECODE_START( apexc )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START(apexc_mem_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32)
 #if 0
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	/* 1024 32-bit words (expandable to 8192) */
 	AM_RANGE(0x0400, 0x1fff) AM_NOP
@@ -853,7 +853,7 @@ static ADDRESS_MAP_START(apexc_mem_map, ADDRESS_SPACE_PROGRAM, 32)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(apexc_io_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_reader",tape_read)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape_puncher",tape_write)
 ADDRESS_MAP_END

@@ -194,7 +194,7 @@ static TIMER_CALLBACK( bit_tick )
 	{
 		int byte_ready = !(byte && c1571->soe);
 
-		cpu_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
+		device_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
 		c1571->via1->write_ca1(byte_ready);
 
 		c1571->byte = byte;
@@ -357,7 +357,7 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_reset_w )
     ADDRESS_MAP( c1570_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c1570_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1570_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
@@ -370,7 +370,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c1571_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c1571_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1571_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
@@ -383,7 +383,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c1571cr_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c1571cr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1571cr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE_MODERN(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE_MODERN(M6522_1_TAG, via6522_device, read, write)
@@ -404,7 +404,7 @@ static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
 
 	c1571->via0_irq = state;
 
-	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( via0_pa_r )
@@ -591,7 +591,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 
 	c1571->via1_irq = state;
 
-	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( yb_r )
@@ -720,7 +720,7 @@ static WRITE_LINE_DEVICE_HANDLER( soe_w )
 
 	c1571->soe = state;
 
-	cpu_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
+	device_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
 	c1571->via1->write_ca1(byte_ready);
 }
 
@@ -760,7 +760,7 @@ static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
 
 	c1571->cia_irq = state;
 
-	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )

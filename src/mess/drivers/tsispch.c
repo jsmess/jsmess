@@ -261,7 +261,7 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) infifo[i] = 0;
 	infifo_tail_ptr = infifo_head_ptr = 0;
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 	fprintf(stderr,"machine reset\n");
 }
 
@@ -333,7 +333,7 @@ DRIVER_INIT( prose2k )
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
      1   1   1   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 0 and 1
 */
-static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
+static ADDRESS_MAP_START(i8086_mem, AS_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
 	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
@@ -347,15 +347,15 @@ static ADDRESS_MAP_START(i8086_mem, ADDRESS_SPACE_PROGRAM, 16, tsispch_state)
 ADDRESS_MAP_END
 
 // Technically the IO line of the i8086 is completely ignored (it is running in 8086 MIN mode,I believe, which may ignore IO)
-static ADDRESS_MAP_START(i8086_io, ADDRESS_SPACE_IO, 16, tsispch_state)
+static ADDRESS_MAP_START(i8086_io, AS_IO, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dsp_prg_map, ADDRESS_SPACE_PROGRAM, 32, tsispch_state)
+static ADDRESS_MAP_START(dsp_prg_map, AS_PROGRAM, 32, tsispch_state)
     AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dsp_data_map, ADDRESS_SPACE_DATA, 16, tsispch_state)
+static ADDRESS_MAP_START(dsp_data_map, AS_DATA, 16, tsispch_state)
     AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 

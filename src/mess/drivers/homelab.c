@@ -31,7 +31,7 @@ static READ8_HANDLER (homelab_keyboard_r)
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(homelab2_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(homelab2_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // ROM 1
     AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // ROM 2
     AM_RANGE( 0x1000, 0x17ff ) AM_ROM  // ROM 3
@@ -44,7 +44,7 @@ static ADDRESS_MAP_START(homelab2_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_MIRROR(0x3c00) // Video RAM 1K
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(homelab3_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x3fff ) AM_ROM
     AM_RANGE( 0x4000, 0x7fff ) AM_RAM
     //AM_RANGE( 0xe000, 0xefff ) AM_RAM // Keyboard

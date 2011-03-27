@@ -54,7 +54,7 @@ To do:
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static SCREEN_EOF( dec8 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 
@@ -119,7 +119,7 @@ static TIMER_CALLBACK( dec8_i8751_timer_callback )
 	// The schematics show a clocked LS194 shift register (3A) is used to automatically
 	// clear the IRQ request.  The MCU does not clear it itself.
 	dec8_state *state = machine->driver_data<dec8_state>();
-	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
+	device_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dec8_i8751_w )
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( dec8_i8751_w )
 	{
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
+		device_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
 		space->machine->scheduler().timer_set(state->mcu->clocks_to_attotime(64), FUNC(dec8_i8751_timer_callback)); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
@@ -229,7 +229,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	{
 	case 0: /* High byte */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		device_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -258,7 +258,7 @@ static WRITE8_HANDLER( lastmisn_i8751_w )
 	{
 	case 0: /* High byte */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	{
 	case 0: /* High byte */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -360,7 +360,7 @@ static WRITE8_HANDLER( ghostb_bank_w )
 
 	memory_set_bank(space->machine, "bank1", data >> 4);
 
-	if ((data&1)==0) cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+	if ((data&1)==0) device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 	if (data & 2) state->nmi_enable =1; else state->nmi_enable = 0;
 	flip_screen_set(space->machine, data & 0x08);
 }
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( dec8_sound_w )
 {
 	dec8_state *state = space->machine->driver_data<dec8_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void csilver_adpcm_int( device_t *device )
@@ -389,7 +389,7 @@ static void csilver_adpcm_int( device_t *device )
 	dec8_state *state = device->machine->driver_data<dec8_state>();
 	state->toggle ^= 1;
 	if (state->toggle)
-		cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 
 	msm5205_data_w(device, state->msm5205next >> 4);
 	state->msm5205next <<= 4;
@@ -421,16 +421,16 @@ static WRITE8_HANDLER( oscar_int_w )
 	switch (offset)
 	{
 	case 0: /* IRQ2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 1: /* IRC 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* IRQ 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 3: /* IRC 2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	}
 }
@@ -446,18 +446,18 @@ static WRITE8_HANDLER( shackled_int_w )
 	switch (offset)
 	{
 	case 0: /* CPU 2 - IRQ acknowledge */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 1: /* CPU 1 - IRQ acknowledge */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	}
 #endif
@@ -471,10 +471,10 @@ static WRITE8_HANDLER( shackled_int_w )
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, HOLD_LINE);
 		return;
 	}
 }
@@ -487,7 +487,7 @@ static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine, data); 
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(dec8_pf1_data_r, dec8_pf1_data_w) AM_BASE_MEMBER(dec8_state, pf1_data)
@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meikyuh_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( meikyuh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srdarwin_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_BASE_MEMBER(dec8_state, videoram) AM_SIZE_GENERIC(spriteram)
@@ -557,7 +557,7 @@ static ADDRESS_MAP_START( srdarwin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gondo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
@@ -580,7 +580,7 @@ static ADDRESS_MAP_START( gondo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscar_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
@@ -603,7 +603,7 @@ static ADDRESS_MAP_START( oscar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscar_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( oscar_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
@@ -611,7 +611,7 @@ static ADDRESS_MAP_START( oscar_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmisn_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( lastmisn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmisn_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( lastmisn_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shackled_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -681,7 +681,7 @@ static ADDRESS_MAP_START( shackled_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shackled_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -706,7 +706,7 @@ static ADDRESS_MAP_START( shackled_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csilver_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( csilver_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csilver_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -747,7 +747,7 @@ static ADDRESS_MAP_START( csilver_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( garyoret_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
@@ -772,7 +772,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
-static ADDRESS_MAP_START( dec8_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_w)
@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( dec8_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
-static ADDRESS_MAP_START( oscar_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_w)
@@ -790,7 +790,7 @@ static ADDRESS_MAP_START( oscar_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Used by Last Mission, Shackled & Breywood */
-static ADDRESS_MAP_START( ym3526_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_w)
@@ -799,7 +799,7 @@ static ADDRESS_MAP_START( ym3526_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Captain Silver - same sound system as Pocket Gal */
-static ADDRESS_MAP_START( csilver_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_w)
@@ -864,10 +864,10 @@ static WRITE8_HANDLER( dec8_mcu_to_main_w )
 
 	// P2 - IRQ to main CPU
 	if (offset==2 && (data&4)==0)
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( dec8_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dec8_mcu_io_map, AS_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
 ADDRESS_MAP_END
 
@@ -1884,7 +1884,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	dec8_state *state = device->machine->driver_data<dec8_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate); /* M6502_IRQ_LINE */
+	device_set_input_line(state->audiocpu, 0, linestate); /* M6502_IRQ_LINE */
 }
 
 static const ym3526_interface ym3526_config =
@@ -1909,7 +1909,7 @@ static INTERRUPT_GEN( gondo_interrupt )
 {
 	dec8_state *state = device->machine->driver_data<dec8_state>();
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
 
 /* Coins generate NMI's */
@@ -1920,7 +1920,7 @@ static INTERRUPT_GEN( oscar_interrupt )
 	if (state->latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7)
 	{
 		state->latch = 0;
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -3417,7 +3417,7 @@ static DRIVER_INIT( dec8 )
 static DRIVER_INIT( deco222 )
 {
 	dec8_state *state = machine->driver_data<dec8_state>();
-	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;

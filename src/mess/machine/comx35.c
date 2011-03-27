@@ -361,7 +361,7 @@ void comx35_state::get_active_bank(UINT8 data)
 
 void comx35_state::set_active_bank()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int bank = m_bank;
 
 	switch (m_bank)
@@ -564,7 +564,7 @@ static STATE_POSTLOAD( comx35_state_save_postload )
 
 void comx35_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* opbase handling for DOS Card */
 	program->set_direct_update_handler(direct_update_delegate_create_static(comx35_opbase_handler, *machine));

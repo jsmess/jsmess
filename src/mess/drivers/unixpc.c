@@ -70,7 +70,7 @@ WRITE16_MEMBER( unixpc_state::romlmap_w )
 
 void unixpc_state::machine_reset()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	// force ROM into lower mem on reset
 	romlmap_w(*program, 0, 0, 0xffff);
@@ -153,7 +153,7 @@ bool unixpc_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( unixpc_mem, ADDRESS_SPACE_PROGRAM, 16, unixpc_state )
+static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE(m_mapram)
 	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_BASE(m_videoram)

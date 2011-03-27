@@ -176,14 +176,14 @@ static WRITE16_HANDLER( color_ram_word_w )
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
 	slapshot_state *state = machine->driver_data<slapshot_state>();
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
 	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
-	cpu_set_input_line(device, 5, HOLD_LINE);
+	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 
@@ -236,7 +236,7 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 
 	/* 4 writes a frame - one for each analogue port */
-	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
+	device_set_input_line(state->maincpu, 3, HOLD_LINE);
 }
 
 /*****************************************************
@@ -289,7 +289,7 @@ static READ16_HANDLER( slapshot_msb_sound_r )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( slapshot_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, spriteram, spriteram_size)	/* sprite ram */
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( slapshot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( opwolf3_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, spriteram, spriteram_size)	/* sprite ram */
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( opwolf3_z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( opwolf3_z80_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -493,7 +493,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	slapshot_state *state = device->machine->driver_data<slapshot_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

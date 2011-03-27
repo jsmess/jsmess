@@ -336,7 +336,7 @@ const pia6821_interface osborne1_video_pia_config =
 static TIMER_CALLBACK(osborne1_video_callback)
 {
 	osborne1_state *state = machine->driver_data<osborne1_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *speaker = space->machine->device("beep");
 	device_t *pia_1 = space->machine->device("pia_1");
 	int y = machine->primary_screen->vpos();
@@ -439,7 +439,7 @@ MACHINE_RESET( osborne1 )
 {
 	osborne1_state *state = machine->driver_data<osborne1_state>();
 	int drive;
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
 
@@ -566,7 +566,7 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 	osborne1_state *state = machine->driver_data<osborne1_state>();
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8 old_bankswitch = state->bankswitch;
-	address_space* space = cputag_get_address_space(device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = device().machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	osborne1_bankswitch_w( space, 0, 0 );
 	state->bankswitch = old_bankswitch;

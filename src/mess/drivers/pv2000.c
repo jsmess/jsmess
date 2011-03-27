@@ -168,7 +168,7 @@ static READ8_HANDLER(pv2000_keys_mod_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pv2000_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3FFF) AM_ROM
 
 	AM_RANGE(0x4000, 0x4000) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( pv2000_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pv2000_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	//theres also printer and tape I/O (TODO)
@@ -367,7 +367,7 @@ static MACHINE_RESET( pv2000 )
 	state->key_pressed = 0;
 	state->keyb_column = 0;
 
-	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
+	device_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&machine->region("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 

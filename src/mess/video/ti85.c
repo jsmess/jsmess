@@ -194,7 +194,7 @@ VIDEO_START( ti85 )
 SCREEN_UPDATE( ti85 )
 {
 	ti85_state *state = screen->machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;

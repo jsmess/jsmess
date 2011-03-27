@@ -32,13 +32,13 @@ static WRITE8_HANDLER( subirqtrigger_w )
 	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	/* bit 0 used but unknown */
 	if (data & 0x04)
-		cpu_set_input_line(state->subcpu, 0, ASSERT_LINE);
+		device_set_input_line(state->subcpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
 	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
-	cpu_set_input_line(state->subcpu, 0, CLEAR_LINE);
+	device_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dogfgt_soundlatch_w )
@@ -64,7 +64,7 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 
 
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(dogfgt_state, sharedram)
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_BASE_SIZE_MEMBER(dogfgt_state, spriteram, spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE_MEMBER(dogfgt_state, bgvideoram)
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irqack_w)

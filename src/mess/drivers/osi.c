@@ -458,7 +458,7 @@ static const pia6821_interface pia_dummy_intf =
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( osi600_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
@@ -468,7 +468,7 @@ static ADDRESS_MAP_START( osi600_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uk101_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( uk101_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c1p_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
@@ -495,7 +495,7 @@ static ADDRESS_MAP_START( c1p_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c1pmf_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w) // FDC
@@ -667,7 +667,7 @@ static MACHINE_START( osi600 )
 {
 	osi_state *state = machine->driver_data<osi_state>();
 
-	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);
@@ -697,7 +697,7 @@ static MACHINE_START( c1p )
 {
 	osi_state *state = machine->driver_data<osi_state>();
 
-	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);

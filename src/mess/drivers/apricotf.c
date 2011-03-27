@@ -153,7 +153,7 @@ static WRITE16_HANDLER( act_pal_w )
 	}
 }
 
-static ADDRESS_MAP_START(act_f1_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(act_f1_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE_MEMBER(act_state,scrollram)
 	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE_MEMBER(act_state,paletteram)
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( actf1_sys_w )
 	}
 }
 
-static ADDRESS_MAP_START( act_f1_io , ADDRESS_SPACE_IO, 16)
+static ADDRESS_MAP_START( act_f1_io , AS_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(actf1_sys_w,0x00ff)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8("ctc",z80ctc_r,z80ctc_w,0x00ff)
@@ -265,7 +265,7 @@ static const z80_daisy_config x1_daisy[] =
 static INTERRUPT_GEN( act_f1_irq )
 {
 	//if(input_code_pressed(device->machine, KEYCODE_C))
-	//  cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
+	//  device_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
 }
 
 static FLOPPY_OPTIONS_START( act )

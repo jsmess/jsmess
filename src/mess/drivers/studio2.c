@@ -228,38 +228,38 @@ WRITE8_MEMBER( studio2_state::dispon_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8, studio2_state )
+static ADDRESS_MAP_START( studio2_map, AS_PROGRAM, 8, studio2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_MIRROR(0xf400) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8, studio2_state )
+static ADDRESS_MAP_START( studio2_io_map, AS_IO, 8, studio2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8, studio2_state )
+static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, studio2_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
 	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_BASE(m_color_ram)
 	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_BASE(m_color_ram1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8, studio2_state )
+static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, studio2_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8, studio2_state )
+static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, studio2_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_BASE(m_color_ram)
 	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8, studio2_state )
+static ADDRESS_MAP_START( mpt02_io_map, AS_IO, 8, studio2_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)

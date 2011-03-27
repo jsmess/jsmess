@@ -137,7 +137,7 @@ static READ8Z_DEVICE_HANDLER( speech_rz )
 
 	if ((offset & adapter->select_mask)==adapter->select_value)
 	{
-		cpu_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
+		device_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 		*value = tms5220_status_r(adapter->vsp, offset) & 0xff;
 	}
 }
@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 
 	if ((offset & adapter->select_mask)==(adapter->select_value | 0x0400))
 	{
-		cpu_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
+		device_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 		/* RN: the stupid design of the tms5220 core means that ready is cleared */
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 			int cycles_to_ready = device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
-			cpu_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
+			device_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
 			device->machine->scheduler().timer_set(attotime::zero, FUNC(NULL));
 		}
 		tms5220_data_w(adapter->vsp, offset, data);

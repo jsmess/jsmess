@@ -108,7 +108,7 @@
 static INTERRUPT_GEN( capbowl_interrupt )
 {
 	if (input_port_read(device->machine, "SERVICE") & 1)						/* get status of the F2 key */
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
 
@@ -186,7 +186,7 @@ static WRITE8_HANDLER( track_reset_w )
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
 	capbowl_state *state = space->machine->driver_data<capbowl_state>();
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_w(space, offset, data);
 }
 
@@ -202,7 +202,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
 static void firqhandler( device_t *device, int irq )
 {
 	capbowl_state *state = device->machine->driver_data<capbowl_state>();
-	cpu_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -229,7 +229,7 @@ void capbowl_state::init_nvram(nvram_device &nvram, void *base, size_t size)
  *
  *************************************/
 
-static ADDRESS_MAP_START( capbowl_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( capbowl_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bowlrama_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
@@ -263,7 +263,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP				/* Not hooked up according to the schematics */

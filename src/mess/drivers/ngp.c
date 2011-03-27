@@ -259,18 +259,18 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		switch( data )
 		{
 		case 0x55:		/* Enable Z80 */
-			cpu_resume( m_z80, SUSPEND_REASON_HALT );
+			device_resume( m_z80, SUSPEND_REASON_HALT );
 			m_z80->reset();
-			cpu_set_input_line( m_z80, 0, CLEAR_LINE );
+			device_set_input_line( m_z80, 0, CLEAR_LINE );
 			break;
 		case 0xAA:		/* Disable Z80 */
-			cpu_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
+			device_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
 			break;
 		}
 		break;
 
 	case 0x3a:	/* Trigger Z80 NMI */
-		cpu_set_input_line( m_z80, INPUT_LINE_NMI, PULSE_LINE );
+		device_set_input_line( m_z80, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 	}
 	m_io_reg[offset] = data;
@@ -500,7 +500,7 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 }
 
 
-static ADDRESS_MAP_START( ngp_mem, ADDRESS_SPACE_PROGRAM, 8, ngp_state )
+static ADDRESS_MAP_START( ngp_mem, AS_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x000080, 0x0000bf )	AM_READWRITE(ngp_io_r, ngp_io_w)							/* ngp/c specific i/o */
 	AM_RANGE( 0x004000, 0x006fff )	AM_RAM														/* work ram */
 	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE("share1")									/* shared with sound cpu */
@@ -526,11 +526,11 @@ WRITE8_MEMBER( ngp_state::ngp_z80_comm_w )
 
 WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 {
-	cpu_set_input_line( m_tlcs900, TLCS900_INT5, ASSERT_LINE );
+	device_set_input_line( m_tlcs900, TLCS900_INT5, ASSERT_LINE );
 }
 
 
-static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8, ngp_state )
+static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
 	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY( "t6w28", t6w28_w )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
@@ -540,14 +540,14 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 {
-	cpu_set_input_line( m_z80, 0, CLEAR_LINE );
+	device_set_input_line( m_z80, 0, CLEAR_LINE );
 
 	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
-	cpu_set_input_line( m_tlcs900, TLCS900_INT5, CLEAR_LINE );
+	device_set_input_line( m_tlcs900, TLCS900_INT5, CLEAR_LINE );
 }
 
 
-static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8, ngp_state )
+static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
 	AM_RANGE( 0x0000, 0xffff )	AM_WRITE( ngp_z80_clear_irq )
 ADDRESS_MAP_END
 
@@ -558,7 +558,7 @@ static INPUT_CHANGED( power_callback )
 
 	if ( state->m_io_reg[0x33] & 0x04 )
 	{
-		cpu_set_input_line( state->m_tlcs900, TLCS900_NMI,
+		device_set_input_line( state->m_tlcs900, TLCS900_NMI,
 			(input_port_read(field->port->machine, "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
@@ -582,20 +582,20 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( ngp_state::ngp_vblank_pin_w )
 {
-	cpu_set_input_line( m_tlcs900, TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line( m_tlcs900, TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER( ngp_state::ngp_hblank_pin_w )
 {
-	cpu_set_input_line( m_tlcs900, TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line( m_tlcs900, TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 {
 	if ( data && ! m_old_to3 )
-		cpu_set_input_line( m_z80, 0, ASSERT_LINE );
+		device_set_input_line( m_z80, 0, ASSERT_LINE );
 
 	m_old_to3 = data;
 }
@@ -618,8 +618,8 @@ void ngp_state::machine_reset()
 	m_dac_r = machine->device( "dac_r" );
 	m_k1ge = machine->device( "k1ge" );
 
-	cpu_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
-	cpu_set_input_line( m_z80, 0, CLEAR_LINE );
+	device_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
+	device_set_input_line( m_z80, 0, CLEAR_LINE );
 }
 
 

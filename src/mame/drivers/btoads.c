@@ -50,7 +50,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	btoads_state *state = machine->driver_data<btoads_state>();
 	state->main_to_sound_data = param;
 	state->main_to_sound_ready = 1;
-	cpu_triggerint(machine->device("audiocpu"));
+	device_triggerint(machine->device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
 	machine->scheduler().timer_set(attotime::from_usec(50), FUNC(NULL));
@@ -119,7 +119,7 @@ static READ8_HANDLER( sound_data_ready_r )
 {
 	btoads_state *state = space->machine->driver_data<btoads_state>();
 	if (cpu_get_pc(space->cpu) == 0xd50 && !state->main_to_sound_ready)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	return state->main_to_sound_ready ? 0x00 : 0x80;
 }
 
@@ -173,7 +173,7 @@ static WRITE8_HANDLER( bsmt2000_port_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x20000000, 0x2000007f) AM_READ_PORT("P1")
 	AM_RANGE(0x20000080, 0x200000ff) AM_READ_PORT("P2")
@@ -209,12 +209,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(bsmt2000_port_w)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(sound_int_state_w)

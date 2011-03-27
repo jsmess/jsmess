@@ -237,7 +237,7 @@ WRITE8_MEMBER( m5_state::fd5_tc_w )
 //  ADDRESS_MAP( m5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m5_mem, ADDRESS_SPACE_PROGRAM, 8, m5_state )
+static ADDRESS_MAP_START( m5_mem, AS_PROGRAM, 8, m5_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
@@ -250,7 +250,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m5_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m5_io, ADDRESS_SPACE_IO, 8, m5_state )
+static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fd5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd5_mem, ADDRESS_SPACE_PROGRAM, 8, m5_state )
+static ADDRESS_MAP_START( fd5_mem, AS_PROGRAM, 8, m5_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -288,7 +288,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fd5_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd5_io, ADDRESS_SPACE_IO, 8, m5_state )
+static ADDRESS_MAP_START( fd5_io, AS_IO, 8, m5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
@@ -525,8 +525,8 @@ WRITE8_MEMBER( m5_state::ppi_pb_w )
 
 	if (data == 0xf0)
 	{
-		cpu_set_input_line(m_fd5cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(m_fd5cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_fd5cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(m_fd5cpu, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
@@ -620,7 +620,7 @@ static const z80_daisy_config m5_daisy_chain[] =
 
 void m5_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	// configure VDP
 	TMS9928A_configure(m_vdp_intf);

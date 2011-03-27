@@ -219,7 +219,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 {
 	microtan_state *state = machine->driver_data<microtan_state>();
     UINT8 *RAM = machine->region("maincpu")->base();
-    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
     via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
     via6522_device *via_1 = machine->device<via6522_device>("via6522_1");
     device_t *ay8910 = machine->device("ay8910.1");

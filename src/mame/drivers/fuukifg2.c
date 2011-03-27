@@ -70,13 +70,13 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-//      cpu_spinuntil_time(space->cpu, attotime::from_usec(50));   // Allow the other CPU to reply
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+//      device_spin_until_time(space->cpu, attotime::from_usec(50));   // Allow the other CPU to reply
 		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 	}
 }
 
-static ADDRESS_MAP_START( fuuki16_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE_MEMBER(fuuki16_state, vram_0)					// Layers
@@ -122,13 +122,13 @@ static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
 	oki->set_bank_base(((data & 6) >> 1) * 0x40000);
 }
 
-static ADDRESS_MAP_START( fuuki16_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fuuki16_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			// ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM			// RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")	// Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
 	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
@@ -377,7 +377,7 @@ GFXDECODE_END
 static void soundirq( device_t *device, int state )
 {
 	fuuki16_state *fuuki16 = device->machine->driver_data<fuuki16_state>();
-	cpu_set_input_line(fuuki16->audiocpu, 0, state);
+	device_set_input_line(fuuki16->audiocpu, 0, state);
 }
 
 static const ym3812_interface fuuki16_ym3812_intf =
@@ -400,7 +400,7 @@ static const ym3812_interface fuuki16_ym3812_intf =
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
-	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
+	device_set_input_line(state->maincpu, 1, HOLD_LINE);
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 }
 
@@ -408,7 +408,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
-	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
+	device_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
 	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 }
 
@@ -416,7 +416,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
-	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
+	device_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
 }

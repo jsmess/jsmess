@@ -80,7 +80,7 @@ static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
 
 	vic1112->via0_irq = state;
 
-	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
@@ -179,7 +179,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 
 	vic1112->via1_irq = state;
 
-	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( dio_r )
@@ -295,7 +295,7 @@ static DEVICE_START( vic1112 )
 {
 	vic1112_t *vic1112 = get_safe_token(device);
 	const vic1112_config *config = get_safe_config(device);
-	address_space *program = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = device->machine->firstcpu->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	vic1112->via0 = device->subdevice<via6522_device>(M6522_0_TAG);
@@ -307,8 +307,8 @@ static DEVICE_START( vic1112 )
 	vic1112->via1->set_unscaled_clock(device->machine->firstcpu->unscaled_clock());
 
 	/* map VIAs to memory */
-	program->install_handler(0x9800, 0x980f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via0), write8_delegate_create(via6522_device, write, *vic1112->via0));
-	program->install_handler(0x9810, 0x981f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via1), write8_delegate_create(via6522_device, write, *vic1112->via1));
+	program->install_readwrite_handler(0x9800, 0x980f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via0), write8_delegate_create(via6522_device, write, *vic1112->via0));
+	program->install_readwrite_handler(0x9810, 0x981f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via1), write8_delegate_create(via6522_device, write, *vic1112->via1));
 
 	/* map ROM to memory */
 	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, device->machine->region("vic1112:vic1112")->base());

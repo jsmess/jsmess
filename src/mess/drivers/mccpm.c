@@ -39,12 +39,12 @@ static READ8_HANDLER( mccpm_f0_r )
 	return ret;
 }
 
-static ADDRESS_MAP_START(mccpm_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mccpm_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(mccpm_state, ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mccpm_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( mccpm_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(mccpm_f0_r,mccpm_f0_w)

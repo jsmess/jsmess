@@ -43,7 +43,7 @@ static READ8_HANDLER (b2m_keyboard_r )
 static void b2m_set_bank(running_machine *machine,int bank)
 {
 	UINT8 *rom;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	memory_install_write_bank(space, 0x0000, 0x27ff, 0, 0, "bank1");
@@ -375,6 +375,6 @@ MACHINE_RESET(b2m)
 	state->b2m_side = 0;
 	state->b2m_drive = 0;
 
-	cpu_set_irq_callback(machine->device("maincpu"), b2m_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), b2m_irq_callback);
 	b2m_set_bank(machine, 7);
 }

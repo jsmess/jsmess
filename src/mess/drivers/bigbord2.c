@@ -175,7 +175,7 @@ static WRITE8_DEVICE_HANDLER( bigbord2_sio_w )
 #if 0
 void bigbord2_state::bankswitch(int bank)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 
 	if (bank)
@@ -253,7 +253,7 @@ WRITE8_MEMBER( bigbii_state::sync_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( bigbord2_mem, ADDRESS_SPACE_PROGRAM, 8, bigbord2_state )
+static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( bigbord2_mem, ADDRESS_SPACE_PROGRAM, 8, bigbord2_state
 	AM_RANGE(0x6800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigbord2_io, ADDRESS_SPACE_IO, 8, bigbord2_state )
+static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, bigbord2_sio_r, bigbord2_sio_w)
 	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -414,9 +414,9 @@ WRITE_LINE_MEMBER( bigbord2_state::intrq_w )
 	m_fdc_irq = state;
 
 	if (halt && state)
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( bigbord2_state::drq_w )
@@ -426,9 +426,9 @@ WRITE_LINE_MEMBER( bigbord2_state::drq_w )
 	m_fdc_drq = state;
 
 	if (halt && state)
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =

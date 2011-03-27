@@ -152,7 +152,7 @@ NOTES (2011-01-09)
 #include "includes/sorcerer.h"
 
 
-static ADDRESS_MAP_START( sorcerer_mem, ADDRESS_SPACE_PROGRAM, 8, sorcerer_state)
+static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 #if SORCERER_USING_DISKS
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( sorcerer_mem, ADDRESS_SPACE_PROGRAM, 8, sorcerer_state
 	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sorcerer_io, ADDRESS_SPACE_IO, 8, sorcerer_state)
+static ADDRESS_MAP_START( sorcerer_io, AS_IO, 8, sorcerer_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE( sorcerer_fc_r, sorcerer_fc_w )

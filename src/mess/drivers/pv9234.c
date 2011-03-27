@@ -26,7 +26,7 @@ static WRITE32_HANDLER( debug_w )
 	printf("%02x %c\n",data,data);
 }
 
-static ADDRESS_MAP_START(pv9234_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(pv9234_map, AS_PROGRAM, 32)
 	AM_RANGE(0x000080cc, 0x000080cf) AM_WRITE(debug_w)
 	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_BASE_MEMBER(pv9234_state, powervu_ram)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!

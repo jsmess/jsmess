@@ -151,7 +151,7 @@ static MACHINE_RESET( gizmondo )
     ADDRESS MAPS
 *******************************************************************************/
 
-static ADDRESS_MAP_START( gizmondo_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gizmondo_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000007ff) AM_ROM
 	AM_RANGE(0x00000800, 0x00000fff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_sec_1_r, diskonchip_g3_sec_1_w, 0xffffffff)
 	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_sec_2_r, diskonchip_g3_sec_2_w, 0xffffffff)

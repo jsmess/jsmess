@@ -213,7 +213,7 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
  * 0x0000-0xedff ram (dram bank 1?)
  * 0xe000-0xffff ram as bank 0
  */
-static ADDRESS_MAP_START(c128_z80_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(c128_z80_mem , AS_PROGRAM, 8)
 #if 1
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank10") AM_WRITE(c128_write_0000)
 	AM_RANGE(0x1000, 0xbfff) AM_READ_BANK("bank11") AM_WRITE(c128_write_1000)
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START(c128_z80_mem , ADDRESS_SPACE_PROGRAM, 8)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( c128_z80_io , AS_IO, 8)
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(c64_colorram_read, c64_colorram_write)
 	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2e", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 /*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c128_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( c128_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
 	AM_RANGE(0x0100, 0x01ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x0200, 0x03ff) AM_RAMBANK("bank3")

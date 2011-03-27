@@ -104,7 +104,7 @@ INLINE int vysnc_chain_counter_to_vpos( UINT16 counter )
 static TIMER_CALLBACK( interrupt_clear_callback )
 {
 	enigma2_state *state = machine->driver_data<enigma2_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -118,7 +118,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int vpos = machine->primary_screen->vpos();
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	cpu_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
+	device_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == INT_TRIGGER_COUNT_1)
@@ -387,7 +387,7 @@ static WRITE8_HANDLER( sound_data_w )
 	if (!(data & 0x04) && (state->last_sound_data & 0x04))
 		state->sound_latch = (state->sound_latch << 1) | (~data & 0x01);
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->last_sound_data = data;
 }
@@ -444,7 +444,7 @@ static const ay8910_interface ay8910_config =
 
 
 
-static ADDRESS_MAP_START( engima2_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( engima2_main_cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(enigma2_state, videoram)
@@ -460,7 +460,7 @@ static ADDRESS_MAP_START( engima2_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( engima2a_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( engima2a_main_cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(enigma2_state, videoram)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
@@ -469,7 +469,7 @@ static ADDRESS_MAP_START( engima2a_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( engima2a_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( engima2a_main_cpu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_NOP
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITENOP
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( engima2a_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( engima2_audio_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( engima2_audio_cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM

@@ -34,7 +34,7 @@ Philips P2000 1 Memory map
 
 
 /* port i/o functions */
-static ADDRESS_MAP_START( p2000t_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( p2000t_io , AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ(p2000t_port_000f_r)
 	AM_RANGE(0x10, 0x1f) AM_WRITE(p2000t_port_101f_w)
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( p2000t_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Memory w/r functions */
-static ADDRESS_MAP_START( p2000t_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( p2000t_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x57ff) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( p2000t_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xa000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( p2000m_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( p2000m_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(p2000t_state, videoram)

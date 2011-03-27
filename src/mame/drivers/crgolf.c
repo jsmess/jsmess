@@ -132,7 +132,7 @@ static TIMER_CALLBACK( main_to_sound_callback )
 {
 	crgolf_state *state = machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->main_to_sound_data = param;
 }
 
@@ -147,7 +147,7 @@ static READ8_HANDLER( main_to_sound_r )
 {
 	crgolf_state *state = space->machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->main_to_sound_data;
 }
 
@@ -163,7 +163,7 @@ static TIMER_CALLBACK( sound_to_main_callback )
 {
 	crgolf_state *state = machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->sound_to_main_data = param;
 }
 
@@ -178,7 +178,7 @@ static READ8_HANDLER( sound_to_main_r )
 {
 	crgolf_state *state = space->machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->sound_to_main_data;
 }
 
@@ -252,7 +252,7 @@ static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -600,7 +600,7 @@ ROM_END
 static DRIVER_INIT( crgolfhi )
 {
 	device_t *msm = machine->device("msm");
-	memory_install_write8_device_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write8_device_handler(machine->device("audiocpu")->memory().space(AS_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

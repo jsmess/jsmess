@@ -28,7 +28,7 @@ static INTERRUPT_GEN( pooyan_interrupt )
 	pooyan_state *state = device->machine->driver_data<pooyan_state>();
 
 	if (state->irq_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -38,7 +38,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	state->irq_enable = data & 1;
 	if (!state->irq_enable)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -48,7 +48,7 @@ static WRITE8_HANDLER( irq_enable_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_BASE_MEMBER(pooyan_state, colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_BASE_MEMBER(pooyan_state, videoram)

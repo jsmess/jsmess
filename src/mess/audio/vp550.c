@@ -96,7 +96,7 @@ WRITE_LINE_DEVICE_HANDLER( vp550_sc1_w )
 {
 	if (state)
 	{
-		cpu_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		device_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 
 		if (LOG) logerror("VP550 Clear Interrupt\n");
 	}
@@ -197,7 +197,7 @@ void vp551_install_write_handlers(device_t *device, address_space *program, int 
 
 static TIMER_DEVICE_CALLBACK( sync_tick )
 {
-	cpu_set_input_line(timer.machine->firstcpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
+	device_set_input_line(timer.machine->firstcpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 
 	if (LOG) logerror("VP550 Interrupt\n");
 }
@@ -282,7 +282,7 @@ static DEVICE_RESET( vp550 )
 	vp550->sync_timer->enable(0);
 
 	/* clear interrupt */
-	cpu_set_input_line(device->machine->firstcpu, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+	device_set_input_line(device->machine->firstcpu, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 }
 
 /*-------------------------------------------------

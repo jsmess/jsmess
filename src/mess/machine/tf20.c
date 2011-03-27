@@ -73,7 +73,7 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 static READ8_HANDLER( tf20_rom_disable )
 {
 	tf20_state *tf20 = get_safe_token(space->cpu->owner());
-	address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = space->cpu->memory().space(AS_PROGRAM);
 
 	/* switch in ram */
 	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, ram_get_ptr(tf20->ram));
@@ -199,12 +199,12 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( tf20_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tf20_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank21")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank22")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tf20_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tf20_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("3a", upd7201_ba_cd_r, upd7201_ba_cd_w)
@@ -327,9 +327,9 @@ static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
 	device_t *cpu = device->subdevice("tf20");
-	address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cpu->memory().space(AS_PROGRAM);
 
-	cpu_set_irq_callback(cpu, tf20_irq_ack);
+	device_set_irq_callback(cpu, tf20_irq_ack);
 
 	/* ram device */
 	tf20->ram = device->subdevice("ram");
@@ -351,7 +351,7 @@ static DEVICE_START( tf20 )
 static DEVICE_RESET( tf20 )
 {
 	device_t *cpu = device->subdevice("tf20");
-	address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = cpu->memory().space(AS_PROGRAM);
 
 	/* enable rom */
 	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());

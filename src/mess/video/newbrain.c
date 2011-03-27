@@ -21,7 +21,7 @@ static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const re
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
 
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	int y, sx;
 	int columns = (state->tvctl & NEWBRAIN_VIDEO_80L) ? 80 : 40;

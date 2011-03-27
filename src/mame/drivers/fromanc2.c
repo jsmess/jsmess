@@ -33,7 +33,7 @@
 
 static INTERRUPT_GEN( fromanc2_interrupt )
 {
-	cpu_set_input_line(device, 1, HOLD_LINE);
+	device_set_input_line(device, 1, HOLD_LINE);
 }
 
 
@@ -44,7 +44,7 @@ static WRITE16_HANDLER( fromanc2_sndcmd_w )
 	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
 	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	state->sndcpu_nmi_flag = 0;
 }
 
@@ -117,14 +117,14 @@ static WRITE16_HANDLER( fromanc2_subcpu_w )
 	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->datalatch1 = data;
 
-	cpu_set_input_line(state->subcpu, 0, HOLD_LINE);
+	device_set_input_line(state->subcpu, 0, HOLD_LINE);
 	state->subcpu_int_flag = 0;
 }
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
 	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 	state->subcpu_nmi_flag = 0;
 
 	return (state->datalatch_2h << 8) | state->datalatch_2l;
@@ -186,7 +186,7 @@ static WRITE8_HANDLER( fromanc2_subcpu_rombank_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( fromanc2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
 
 	AM_RANGE(0x802000, 0x802fff) AM_READNOP								// ???
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( fromanc2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM									// WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromancr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
 
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)		// VRAM BG (1P/2P)
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( fromancr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM									// WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc4_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// MAIN ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM								// DATA ROM
 
@@ -283,14 +283,14 @@ static ADDRESS_MAP_START( fromanc4_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fromanc2_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fromanc2_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")						// ROM(BANK) (is this comment correct?  It was in the split address maps in a RAM configuration...
 	AM_RANGE(0x8000, 0xbfff) AM_RAM								// RAM(WORK)
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")						// RAM(BANK)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_sub_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fromanc2_sub_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fromanc2_subcpu_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(fromanc2_maincpu_r_l, fromanc2_maincpu_w_l)	// to/from MAIN CPU
@@ -299,12 +299,12 @@ static ADDRESS_MAP_START( fromanc2_sub_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fromanc2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fromanc2_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_WRITENOP			// snd cmd (1P) / ?
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)							// snd cmd (2P)
@@ -498,7 +498,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	fromanc2_state *state = device->machine->driver_data<fromanc2_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

@@ -27,7 +27,7 @@ SNAPSHOT_LOAD( ace )
 {
 	cpu_device *cpu = image.device().machine->firstcpu;
 	UINT8 *RAM = image.device().machine->region(cpu->tag())->base();
-	address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu->memory().space(AS_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
 

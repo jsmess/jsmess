@@ -10,8 +10,8 @@
 
 static INTERRUPT_GEN( kopunch_interrupt )
 {
-	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-	cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
+	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
 }
 
 static READ8_HANDLER( kopunch_in_r )
@@ -42,7 +42,7 @@ static WRITE8_HANDLER( kopunch_coin_w )
 
 
 
-static ADDRESS_MAP_START( kopunch_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE_MEMBER(kopunch_state, videoram)
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( kopunch_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7100, 0x7aff) AM_RAM	// ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kopunch_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("P1")
 	AM_RANGE(0x31, 0x32) AM_READ(kopunch_in_r)
 	AM_RANGE(0x33, 0x33) AM_WRITENOP
@@ -74,7 +74,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		cpu_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
@@ -83,7 +83,7 @@ static INPUT_CHANGED( right_coin_inserted )
 
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		cpu_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( kopunch )

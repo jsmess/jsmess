@@ -107,18 +107,18 @@ static CDP1869_PCB_READ( draco_pcb_r )
 WRITE_LINE_MEMBER( cidelsa_state::prd_w )
 {
 	/* invert PRD signal */
-	cpu_set_input_line(m_maincpu, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(m_maincpu, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Page RAM */
 
-static ADDRESS_MAP_START( cidelsa_page_ram, 0, 8 )
+static ADDRESS_MAP_START( cidelsa_page_ram, AS_0, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_page_ram, 0, 8 )
+static ADDRESS_MAP_START( draco_page_ram, AS_0, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END

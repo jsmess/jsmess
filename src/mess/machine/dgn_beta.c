@@ -256,8 +256,8 @@ static const struct bank_info_entry bank_info[] =
 static void UpdateBanks(running_machine *machine, int first, int last)
 {
 	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
-	address_space *space_0 = cputag_get_address_space(machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
-	address_space *space_1 = cputag_get_address_space(machine, DMACPU_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *space_0 = machine->device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space *space_1 = machine->device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int		            Page;
 	UINT8		        *readbank;
 	write8_space_func	writebank;
@@ -704,7 +704,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			cpu_yield(device->machine->device(MAINCPU_TAG));
+			device_yield(device->machine->device(MAINCPU_TAG));
 
 		state->d_pia1_pa_last = data & 0x80;
 	}
@@ -743,7 +743,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			cpu_yield(device->machine->device(DMACPU_TAG));
+			device_yield(device->machine->device(DMACPU_TAG));
 	}
 }
 
@@ -790,8 +790,8 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		if(!NMI)
 		{
 			cputag_set_input_line(device->machine, DMACPU_TAG, INPUT_LINE_NMI, ASSERT_LINE);
-			logerror("cpu_yield()\n");
-			cpu_yield(device->machine->device(DMACPU_TAG));	/* Let DMA CPU run */
+			logerror("device_yield()\n");
+			device_yield(device->machine->device(DMACPU_TAG));	/* Let DMA CPU run */
 		}
 		else
 		{

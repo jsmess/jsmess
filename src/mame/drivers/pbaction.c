@@ -75,11 +75,11 @@ static WRITE8_HANDLER( pbaction_sh_command_w )
 {
 	pbaction_state *state = space->machine->driver_data<pbaction_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
 }
 
 
-static ADDRESS_MAP_START( pbaction_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(pbaction_state, work_ram)
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( pbaction_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbaction_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( pbaction_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pbaction_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pbaction_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -248,7 +248,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( pbaction_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
 }
 
 
@@ -484,7 +484,7 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
 }
 
 static DRIVER_INIT( pbactio4 )

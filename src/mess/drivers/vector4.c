@@ -50,7 +50,7 @@ READ8_MEMBER(vector4_state::vector4_02_r)
 	return retVal;
 }
 
-static ADDRESS_MAP_START(vector4_mem, ADDRESS_SPACE_PROGRAM, 8, vector4_state)
+static ADDRESS_MAP_START(vector4_mem, AS_PROGRAM, 8, vector4_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
@@ -59,7 +59,7 @@ static ADDRESS_MAP_START(vector4_mem, ADDRESS_SPACE_PROGRAM, 8, vector4_state)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vector4_io, ADDRESS_SPACE_IO, 8, vector4_state)
+static ADDRESS_MAP_START( vector4_io, AS_IO, 8, vector4_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(vector4_02_r,vector4_02_w)

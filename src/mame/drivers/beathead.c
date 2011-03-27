@@ -311,7 +311,7 @@ WRITE32_MEMBER( beathead_state::coin_count_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32, beathead_state)
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(m_ram_base)
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
@@ -469,7 +469,7 @@ READ32_MEMBER( beathead_state::speedup_r )
 {
 	int result = *m_speedup_data;
 	if ((cpu_get_previouspc(space.cpu) & 0xfffff) == 0x006f0 && result == cpu_get_reg(space.cpu, ASAP_R3))
-		cpu_spinuntil_int(space.cpu);
+		device_spin_until_interrupt(space.cpu);
 	return result;
 }
 
@@ -482,7 +482,7 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
 	{
 		UINT32 temp = (INT16)result + m_movie_speedup_data[4] * 262;
 		if (temp - (UINT32)cpu_get_reg(space.cpu, ASAP_R15) < (UINT32)cpu_get_reg(space.cpu, ASAP_R23))
-			cpu_spinuntil_int(space.cpu);
+			device_spin_until_interrupt(space.cpu);
 	}
 	return result;
 }
@@ -503,8 +503,8 @@ static DRIVER_INIT( beathead )
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	/* prepare the speedups */
-	state->m_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate_create(beathead_state, speedup_r, *state));
-	state->m_movie_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_handler(0x00000804, 0x00000807, 0, 0, read32_delegate_create(beathead_state, movie_speedup_r, *state));
+	state->m_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate_create(beathead_state, speedup_r, *state));
+	state->m_movie_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000804, 0x00000807, 0, 0, read32_delegate_create(beathead_state, movie_speedup_r, *state));
 }
 
 

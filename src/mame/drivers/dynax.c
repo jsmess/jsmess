@@ -103,7 +103,7 @@ void sprtmtch_update_irq( running_machine *machine )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x10 : 0) | ((state->blitter_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	device_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( dynax_vblank_ack_w )
@@ -144,7 +144,7 @@ void jantouki_update_irq(running_machine *machine)
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int irq = ((state->blitter_irq) ? 0x08 : 0) | ((state->blitter2_irq) ? 0x10 : 0) | ((state->vblank_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	device_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( jantouki_vblank_ack_w )
@@ -184,7 +184,7 @@ static void jantouki_sound_update_irq(running_machine *machine)
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int irq = ((state->sound_irq) ? 0x08 : 0) | ((state->soundlatch_irq) ? 0x10 : 0) | ((state->sound_vblank_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	device_set_input_line_and_vector(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
@@ -420,7 +420,7 @@ static void adpcm_int( device_t *device )
 	if (state->toggle)
 	{
 		if (state->resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -434,7 +434,7 @@ static void adpcm_int_cpu1( device_t *device )
 	if (state->toggle_cpu1)
 	{
 		if (state->resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);	// cpu1
+		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);	// cpu1
 	}
 }
 
@@ -470,26 +470,26 @@ static WRITE8_HANDLER( yarunara_layer_half2_w )
 	hnoridur_layer_half2_w(space, 0, data >> 1);
 }
 
-static ADDRESS_MAP_START( sprtmtch_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnoridur_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hnoridur_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcnpshnt_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcnpshnt_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nanajign_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nanajign_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -497,14 +497,14 @@ static ADDRESS_MAP_START( nanajign_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdialq2_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjdialq2_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0800, 0x0fff ) AM_RAM
 	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yarunara_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -512,14 +512,14 @@ static ADDRESS_MAP_START( yarunara_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w)	// Palette or RTC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantouki_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jantouki_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantouki_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jantouki_sound_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank2")
@@ -527,7 +527,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hanamai_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( hanamai_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hnoridur_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -640,14 +640,14 @@ static READ8_HANDLER( hjingi_keyboard_1_r )
 	return hanamai_keyboard_1_r(space, 0) | input_port_read(space->machine, "BET");
 }
 
-static ADDRESS_MAP_START( hjingi_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
 	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hjingi_io_map, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -795,7 +795,7 @@ static WRITE8_HANDLER( yarunara_blit_romregion_w )
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(space->cpu), data);
 }
 
-static ADDRESS_MAP_START( yarunara_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x01 ) AM_WRITE(yarunara_input_w)		// Controls
 	AM_RANGE( 0x02, 0x03 ) AM_READ(yarunara_input_r)		//
@@ -828,7 +828,7 @@ ADDRESS_MAP_END
 
 
 // Almost identical to hnoridur
-static ADDRESS_MAP_START( mcnpshnt_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -866,7 +866,7 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sprtmtch_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	// 2 x DSW
@@ -894,7 +894,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mjfriday_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
@@ -920,7 +920,7 @@ static ADDRESS_MAP_START( mjfriday_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nanajign_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE("msm", adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
@@ -988,7 +988,7 @@ static WRITE8_HANDLER( jantouki_rombank_w )
 	set_led_status(space->machine, 0, data & 0x10);	// maybe
 }
 
-static ADDRESS_MAP_START( jantouki_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE( 0x40, 0x41 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(jantouki_rombank_w)		// BANK ROM Select
@@ -1046,7 +1046,7 @@ static READ8_HANDLER( jantouki_soundlatch_status_r )
 	return (state->soundlatch_full) ? 0 : 0x80;
 }
 
-static ADDRESS_MAP_START( jantouki_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(jantouki_sound_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)	// VBlank IRQ Ack
@@ -1086,7 +1086,7 @@ static WRITE8_HANDLER( mjelctrn_blitter_ack_w )
 	state->blitter_irq = 0;
 }
 
-static ADDRESS_MAP_START( mjelctrn_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE("msm", adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
@@ -1235,7 +1235,7 @@ static READ8_HANDLER( unk_r )
 	return 0x78;
 }
 
-static ADDRESS_MAP_START( htengoku_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(htengoku_select_w)		// Controls
@@ -1527,7 +1527,7 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(space->cpu), data);
 }
 
-static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8 )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -1555,7 +1555,7 @@ static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)	// Blitter (inverted scroll values)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenkai_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tenkai_io_map, AS_IO, 8 )
 	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(tenkai_p3_r, tenkai_p3_w)
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(tenkai_p4_w)
 	AM_RANGE( T90_P5, T90_P5 ) AM_READ(tenkai_p5_r)
@@ -1700,13 +1700,13 @@ static WRITE8_HANDLER( gekisha_8000_w )
 }
 
 
-static ADDRESS_MAP_START( gekisha_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8 )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(gekisha_8000_r, gekisha_8000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekisha_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gekisha_io_map, AS_IO, 8 )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(gekisha_p4_w)
 ADDRESS_MAP_END
 
@@ -4761,7 +4761,7 @@ void mjelctrn_update_irq( running_machine *machine )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	state->blitter_irq = 1;
-	cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xfa);
+	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xfa);
 }
 
 static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
@@ -4771,7 +4771,7 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (!state->blitter_irq)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
 static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
@@ -4796,7 +4796,7 @@ void neruton_update_irq( running_machine *machine )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	state->blitter_irq = 1;
-	cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0x42);
+	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0x42);
 }
 
 static INTERRUPT_GEN( neruton_vblank_interrupt )
@@ -4809,8 +4809,8 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 
 	switch (cpu_getiloops(device))
 	{
-		case 0:  cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);	break;
-		default: cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x46);	break;
+		case 0:  device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);	break;
+		default: device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x46);	break;
 	}
 }
 
@@ -4836,7 +4836,7 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 	// there should be a vblank ack mechanism
 	if (state->blitter_irq)	return;
 
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
 }
 
 static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
@@ -4910,9 +4910,9 @@ static INTERRUPT_GEN( tenkai_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0: cpu_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;
-		case 1: cpu_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;
-		case 2: cpu_set_input_line(device, INPUT_LINE_IRQ2, HOLD_LINE);	break;
+		case 0: device_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;
+		case 1: device_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;
+		case 2: device_set_input_line(device, INPUT_LINE_IRQ2, HOLD_LINE);	break;
 	}
 }
 
@@ -6517,7 +6517,7 @@ ROM_END
 
 static DRIVER_INIT( mjreach )
 {
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
 }
 
 /***************************************************************************
@@ -6593,8 +6593,8 @@ ROM_START( tenkai )
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
 	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
-	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, NO_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
-	ROM_LOAD( "taicom01.15b", 0x080000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )	// either this was dumped half size, or the above rom was missing from the pcb
+	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from tenkaid
+	ROM_LOAD( "taicom01.15b", 0x080000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "taicom02.11b", 0x000000, 0x80000, CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) )
@@ -6786,12 +6786,12 @@ ROM_START( tenkaicb )
 	// it doesn't need the internal rom from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
-	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, NO_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
-	ROM_LOAD( "rom.u12",    0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
+	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from tenkaid
+	ROM_LOAD( "rom.u12",    0x80000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	// blitter data
-	ROM_LOAD( "taicom02.11b", 0x00000, 0x80000, NO_DUMP CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) )
-	ROM_LOAD( "rom.u13",      0x80000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
+	ROM_LOAD( "taicom02.11b", 0x00000, 0x80000, BAD_DUMP CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) ) // not dumped, rom taken from tenkai
+	ROM_LOAD( "rom.u13",      0x80000, 0x80000, BAD_DUMP CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) ) // either this was dumped half size, or the above rom was missing from the pcb
 ROM_END
 
 /***************************************************************************
@@ -6897,7 +6897,7 @@ ROM_START( tenkaie )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-a01.rom",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
+	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, BAD_DUMP CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) ) // not dumped, rom taken from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "lzc-01.rom", 0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )

@@ -135,14 +135,14 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	nyny_state *driver_state = device->machine->driver_data<nyny_state>();
 	int combined_state = pia6821_get_irq_a(driver_state->pia1) | pia6821_get_irq_b(driver_state->pia1) | pia6821_get_irq_b(driver_state->pia2);
 
-	cpu_set_input_line(driver_state->maincpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(driver_state->maincpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 {
 	nyny_state *driver_state = device->machine->driver_data<nyny_state>();
-	cpu_set_input_line(driver_state->maincpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(driver_state->maincpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -214,7 +214,7 @@ static WRITE8_DEVICE_HANDLER( pia_2_port_b_w )
 	state->star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0, data & 0xe0);
+	audio_2_command_w(state->maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
 }
 
 
@@ -449,7 +449,7 @@ static WRITE8_HANDLER( audio_1_command_w )
 	nyny_state *state = space->machine->driver_data<nyny_state>();
 
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, M6800_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -458,7 +458,7 @@ static WRITE8_HANDLER( audio_1_answer_w )
 	nyny_state *state = space->machine->driver_data<nyny_state>();
 
 	soundlatch3_w(space, 0, data);
-	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -504,7 +504,7 @@ static WRITE8_HANDLER( audio_2_command_w )
 	nyny_state *state = space->machine->driver_data<nyny_state>();
 
 	soundlatch2_w(space, 0, (data & 0x60) >> 5);
-	cpu_set_input_line(state->audiocpu2, M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->audiocpu2, M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -538,7 +538,7 @@ static WRITE8_HANDLER( nyny_pia_1_2_w )
 }
 
 
-static ADDRESS_MAP_START( nyny_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(nyny_state, videoram1)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(nyny_state, colorram1)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(nyny_state, videoram2)
@@ -556,7 +556,7 @@ static ADDRESS_MAP_START( nyny_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyny_audio_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP

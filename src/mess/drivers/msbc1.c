@@ -54,7 +54,7 @@ Notes:
 #include "machine/terminal.h"
 #include "includes/msbc1.h"
 
-static ADDRESS_MAP_START( msbc1_mem, ADDRESS_SPACE_PROGRAM, 16, msbc1_state )
+static ADDRESS_MAP_START( msbc1_mem, AS_PROGRAM, 16, msbc1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0xf80000, 0xf87fff) AM_ROM AM_REGION(MC68000R12_TAG, 0)
@@ -66,7 +66,7 @@ INPUT_PORTS_END
 
 void msbc1_state::machine_reset()
 {
-	void *ram = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM)->get_write_ptr(0);
+	void *ram = machine->firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(0);
 	UINT8 *rom = machine->region(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);

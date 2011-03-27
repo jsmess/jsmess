@@ -45,12 +45,12 @@ static READ8_HANDLER( qtsbc_43_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START(qtsbc_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(qtsbc_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE_MEMBER(qtsbc_state, ram) AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qtsbc_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( qtsbc_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(qtsbc_06_r,qtsbc_06_w)

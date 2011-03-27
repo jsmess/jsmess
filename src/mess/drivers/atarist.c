@@ -78,7 +78,7 @@ void st_state::toggle_dma_fifo()
 
 void st_state::flush_dma_fifo()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
 
@@ -102,7 +102,7 @@ void st_state::flush_dma_fifo()
 
 void st_state::fill_dma_fifo()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1175,7 +1175,7 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 //  ADDRESS_MAP( ikbd_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8, st_state )
+static ADDRESS_MAP_START( ikbd_map, AS_PROGRAM, 8, st_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_TAG, 0)
@@ -1186,7 +1186,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ikbd_io_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ikbd_io_map, ADDRESS_SPACE_IO, 8, st_state )
+static ADDRESS_MAP_START( ikbd_io_map, AS_IO, 8, st_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(ikbd_port1_r)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_WRITE(ikbd_port3_w)
@@ -1198,7 +1198,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16, st_state )
+static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
@@ -1240,7 +1240,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( megast_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16, megast_state )
+static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
@@ -1285,7 +1285,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ste_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16, ste_state )
+static ADDRESS_MAP_START( ste_map, AS_PROGRAM, 16, ste_state )
 	AM_IMPORT_FROM(st_map)
 /*  AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
     AM_RANGE(0xff8204, 0xff8209) AM_READWRITE8(shifter_counter_r, shifter_counter_w, 0x00ff)
@@ -1326,7 +1326,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( megaste_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16, megaste_state )
+static ADDRESS_MAP_START( megaste_map, AS_PROGRAM, 16, megaste_state )
 	AM_IMPORT_FROM(st_map)
 /*  AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(shifter_counter_r, shifter_counter_w)
     AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(shifter_base_low_r, shifter_base_low_w)
@@ -1363,7 +1363,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( stbook_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16, stbook_state )
+static ADDRESS_MAP_START( stbook_map, AS_PROGRAM, 16, stbook_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
 //  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
@@ -2204,7 +2204,7 @@ static IRQ_CALLBACK( atarist_int_ack )
 
 void st_state::configure_memory()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	switch (ram_get_size(m_ram))
 	{
@@ -2267,7 +2267,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	// set CPU interrupt callback
-	cpu_set_irq_callback(m_maincpu, atarist_int_ack);
+	device_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	// allocate timers
 	m_mouse_timer = machine->scheduler().timer_alloc(FUNC(st_mouse_tick));
@@ -2312,7 +2312,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(m_maincpu, atarist_int_ack);
+	device_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	/* allocate timers */
 	m_dmasound_timer = machine->scheduler().timer_alloc(FUNC(atariste_dmasound_tick));
@@ -2342,7 +2342,7 @@ void megaste_state::machine_start()
 void stbook_state::machine_start()
 {
 	/* configure RAM banking */
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	switch (ram_get_size(m_ram))
 	{
@@ -2352,7 +2352,7 @@ void stbook_state::machine_start()
 	}
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(m_maincpu, atarist_int_ack);
+	device_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	/* register for state saving */
 	ste_state::state_save();

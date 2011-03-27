@@ -59,7 +59,7 @@ VIDEO_START( dai )
 SCREEN_UPDATE( dai )
 {
 	dai_state *state = screen->machine->driver_data<dai_state>();
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i, j, k, l;
 
 	UINT8* char_rom = screen->machine->region("gfx1")->base();

@@ -838,7 +838,7 @@ static READ8_HANDLER( fm77av_boot_mode_r )
 static void fm7_update_psg(running_machine* machine)
 {
 	fm7_state *state = machine->driver_data<fm7_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(state->type == SYS_FM7)
 	{
@@ -1398,7 +1398,7 @@ static void fm77av_fmirq(device_t* device,int irq)
    FFF0 - FFFF: Interrupt vector table
 */
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
-static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
@@ -1437,7 +1437,7 @@ ADDRESS_MAP_END
    FFF0 - FFFF: Interrupt vector table
 */
 
-static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
@@ -1454,7 +1454,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000,0x1fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x2000,0x2fff) AM_RAMBANK("bank3")
@@ -1509,7 +1509,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
@@ -1700,8 +1700,8 @@ static DRIVER_INIT(fm7)
 	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
 	if(state->type != SYS_FM7)
 		state->fm77av_vsync_timer = machine->scheduler().timer_alloc(FUNC(fm77av_vsync));
-	cpu_set_irq_callback(machine->device("maincpu"),fm7_irq_ack);
-	cpu_set_irq_callback(machine->device("sub"),fm7_sub_irq_ack);
+	device_set_irq_callback(machine->device("maincpu"),fm7_irq_ack);
+	device_set_irq_callback(machine->device("sub"),fm7_sub_irq_ack);
 }
 
 static MACHINE_START(fm7)
@@ -1798,7 +1798,7 @@ static MACHINE_RESET(fm7)
 	}
 	if(state->type != SYS_FM7)  // set default RAM banks
 	{
-		fm7_mmr_refresh(cpu_get_address_space(machine->device("maincpu"),ADDRESS_SPACE_PROGRAM));
+		fm7_mmr_refresh(machine->device("maincpu")->memory().space(AS_PROGRAM));
 	}
 }
 

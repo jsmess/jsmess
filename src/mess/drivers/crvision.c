@@ -173,7 +173,7 @@ static WRITE8_DEVICE_HANDLER( centronics_ctrl_w )
     ADDRESS_MAP( crvision_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
@@ -193,7 +193,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( lasr2001_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( lasr2001_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lasr2001_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
@@ -930,7 +930,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	UINT8 *temp_copy;
 	running_machine *machine = image.device().machine;
 	UINT8 *mem = machine->region(M6502_TAG)->base();
-	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	if (image.software_entry() == NULL)
 	{

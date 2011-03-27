@@ -82,7 +82,7 @@
 static READ8_HANDLER( irq_clear_r )
 {
 	astrof_state *state = space->machine->driver_data<astrof_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -91,7 +91,7 @@ static READ8_HANDLER( irq_clear_r )
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
 	astrof_state *state = timer.machine->driver_data<astrof_state>();
-	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 
@@ -107,7 +107,7 @@ static INPUT_CHANGED( coin_inserted )
 	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 	coin_counter_w(field->port->machine, 0, newval);
 }
 
@@ -117,7 +117,7 @@ static INPUT_CHANGED( service_coin_inserted )
 	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* service coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -584,7 +584,7 @@ static MACHINE_RESET( abattle )
  *
  *************************************/
 
-static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( astrof_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
@@ -603,7 +603,7 @@ static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spfghmk2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spfghmk2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( spfghmk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tomahawk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tomahawk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(tomahawk_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
@@ -1308,8 +1308,8 @@ static DRIVER_INIT( abattle )
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
 
@@ -1322,8 +1322,8 @@ static DRIVER_INIT( afire )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
 }
 
 
@@ -1336,8 +1336,8 @@ static DRIVER_INIT( sstarbtl )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
 

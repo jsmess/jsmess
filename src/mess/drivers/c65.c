@@ -74,7 +74,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
  *
  *************************************/
 
-static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x07fff) AM_RAMBANK("bank11")
 	AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank12")
 	AM_RANGE(0x0a000, 0x0bfff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank13")

@@ -219,9 +219,9 @@ static INTERRUPT_GEN( cshooter_interrupt )
 {
 	//cshooter_state *state = device->machine->driver_data<cshooter_state>();
 	if(cpu_getiloops(device))
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
 	else
-      cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
+      device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
 //  if(state->mainram!=NULL)
 //      ar_coin_hack(device->machine);
@@ -282,7 +282,7 @@ static READ8_HANDLER(pal_r)
 	return space->machine->generic.paletteram.u8[offset];
 }
 
-static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
 	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( seibu_sound_comms_w )
 	seibu_main_word_w(space,offset,data,0x00ff);
 }
 
-static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
 //  AM_RANGE(0xb000, 0xb0ff) AM_RAM
@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_WRITENOP // AM_DEVWRITE("ym1", ym2203_w) ?
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?
@@ -697,7 +697,7 @@ static DRIVER_INIT( cshooter )
 
 static DRIVER_INIT( cshootere )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);

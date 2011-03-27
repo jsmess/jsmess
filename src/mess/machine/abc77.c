@@ -88,7 +88,7 @@ const rom_entry *abc77_device_config::rom_region() const
 //  ADDRESS_MAP( abc77_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc77_map, ADDRESS_SPACE_PROGRAM, 8, abc77_device )
+static ADDRESS_MAP_START( abc77_map, AS_PROGRAM, 8, abc77_device )
 	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("abc77:z16", 0)
 ADDRESS_MAP_END
 
@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc77_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc77_io, ADDRESS_SPACE_IO, 8, abc77_device )
+static ADDRESS_MAP_START( abc77_io, AS_IO, 8, abc77_device )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREAD(DEVICE_SELF_OWNER, abc77_device, p1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE(DEVICE_SELF_OWNER, abc77_device, p2_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD(DEVICE_SELF_OWNER, abc77_device, t1_r)
@@ -402,10 +402,10 @@ void abc77_device::device_reset()
 	int ea = BIT(input_port_read(this, "DSW"), 7);
 
 	// trigger reset
-	cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
 	m_reset_timer->adjust(attotime::from_msec(t));
 
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -422,7 +422,7 @@ void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		break;
 		
 	case TIMER_RESET:
-		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
 		break;
 	}
 }
@@ -513,7 +513,7 @@ READ8_MEMBER( abc77_device::t1_r )
 
 WRITE_LINE_MEMBER( abc77_device::rxd_w )
 {
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

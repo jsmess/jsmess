@@ -220,14 +220,14 @@ public:
     memory map
 */
 
-static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("geneve_board", geneve_r, geneve_w)
 ADDRESS_MAP_END
 
 /*
     CRU map
 */
-static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(cru_map, AS_IO, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("geneve_board", geneve_cru_r)
 

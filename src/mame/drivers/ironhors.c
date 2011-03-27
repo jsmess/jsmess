@@ -28,12 +28,12 @@ static INTERRUPT_GEN( ironhors_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (*state->interrupt_enable & 4)
-			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (*state->interrupt_enable & 1)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -41,7 +41,7 @@ static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
 	ironhors_state *state = space->machine->driver_data<ironhors_state>();
 
-	cpu_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
@@ -57,7 +57,7 @@ static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(ironhors_charbank_w)
 	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE_MEMBER(ironhors_state, interrupt_enable)
@@ -85,18 +85,18 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( slave_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	//20=31db
 
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( farwest_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( farwest_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
@@ -429,12 +429,12 @@ static INTERRUPT_GEN( farwest_interrupt )
 	if (cpu_getiloops(device) &1)
 	{
 		if (*state->interrupt_enable & 4)
-			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else //if (cpu_getiloops() % 2)
 	{
 		if (*state->interrupt_enable & 1)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -442,7 +442,7 @@ static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
 {
 	ironhors_state *state = device->machine->driver_data<ironhors_state>();
 
-	return soundlatch_r(cpu_get_address_space(state->soundcpu, ADDRESS_SPACE_PROGRAM), 0);
+	return soundlatch_r(state->soundcpu->memory().space(AS_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =

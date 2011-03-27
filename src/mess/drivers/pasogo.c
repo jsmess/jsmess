@@ -316,7 +316,7 @@ static WRITE8_HANDLER( ems_w )
 	}
 }
 
-static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pasogo_mem, AS_PROGRAM, 8 )
 //  AM_RANGE(0x00000, 0xfffff) AM_UNMAP AM_MASK(0xfffff)
 //  AM_RANGE( 0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	ADDRESS_MAP_GLOBAL_MASK(0xffFFF)
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pasogo_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(pasogo_io, AS_IO, 8)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
@@ -464,7 +464,7 @@ static IRQ_CALLBACK(pasogo_irq_callback)
 
 static MACHINE_RESET( pasogo )
 {
-	cpu_set_irq_callback(machine->device("maincpu"), pasogo_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;

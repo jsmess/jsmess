@@ -76,21 +76,21 @@ void get_ram_expansion_settings(address_space *space, int &ram_expansion_install
  *
  *************************************/
 
-static ADDRESS_MAP_START( astrocade_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( astrocade_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram) /* ASG */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( astrocade_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0x1f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
 static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write protect switch is changed
 {
 	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = field->port->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *expram = ram_get_ptr(field->port->machine->device("ram_tag"));
 
 	get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
@@ -313,7 +313,7 @@ static DRIVER_INIT( astrocde )
 MACHINE_RESET( astrocde )
 {
     int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
     UINT8 *expram = ram_get_ptr(machine->device("ram_tag"));
     memory_unmap_readwrite(space, 0x5000, 0xffff, 0, 0);  // unmap any previously installed expansion RAM
 

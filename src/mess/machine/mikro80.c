@@ -62,9 +62,9 @@ WRITE8_HANDLER (mikro80_8255_portc_w )
 {
 }
 
-static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset); }
-static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset); }
-static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(device->machine->device("maincpu")->memory().space(AS_PROGRAM), offset); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(device->machine->device("maincpu")->memory().space(AS_PROGRAM), offset); }
+static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(device->machine->device("maincpu")->memory().space(AS_PROGRAM), offset, data); }
 
 I8255A_INTERFACE( mikro80_ppi8255_interface )
 {

@@ -51,8 +51,8 @@ static UINT64 *dc_ram;
 static READ64_HANDLER( dcus_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0ba52a)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(2500));
-	//  cpu_spinuntil_int(space->cpu);
+		device_spin_until_time(space->cpu, attotime::from_usec(2500));
+	//  device_spinuntil_int(space->cpu);
 
 	return dc_ram[0x2303b0/8];
 }
@@ -60,8 +60,8 @@ static READ64_HANDLER( dcus_idle_skip_r )
 static READ64_HANDLER( dcjp_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0bac62)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(2500));
-	//  cpu_spinuntil_int(space->cpu);
+		device_spin_until_time(space->cpu, attotime::from_usec(2500));
+	//  device_spinuntil_int(space->cpu);
 
 	return dc_ram[0x2302f8/8];
 }
@@ -73,14 +73,14 @@ static DRIVER_INIT(dc)
 
 static DRIVER_INIT(dcus)
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2303b0, 0xc2303b7, 0, 0, dcus_idle_skip_r);
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc2303b0, 0xc2303b7, 0, 0, dcus_idle_skip_r);
 
 	DRIVER_INIT_CALL(dc);
 }
 
 static DRIVER_INIT(dcjp)
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2302f8, 0xc2302ff, 0, 0, dcjp_idle_skip_r);
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc2302f8, 0xc2302ff, 0, 0, dcjp_idle_skip_r);
 
 	DRIVER_INIT_CALL(dc);
 }
@@ -156,7 +156,7 @@ static WRITE64_HANDLER( dc_arm_w )
 	}
  }
 
-static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
@@ -195,11 +195,11 @@ static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_port, ADDRESS_SPACE_IO, 64 )
+static ADDRESS_MAP_START( dc_port, AS_IO, 64 )
 	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE( dc_pdtra_r, dc_pdtra_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&dc_sound_ram)		/* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END

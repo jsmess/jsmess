@@ -51,13 +51,13 @@ static READ8_HANDLER( kaypro2x_87 ) { return 0x7f; }	/* to bypass unemulated HD 
 
 ************************************************************/
 
-static ADDRESS_MAP_START( kaypro_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE_MEMBER(kaypro_state, videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kayproii_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kayproii_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( kayproii_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kaypro2x_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)

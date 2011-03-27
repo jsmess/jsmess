@@ -43,14 +43,14 @@ static READ8_HANDLER( pv1000_io_r );
 static WRITE8_HANDLER( pv1000_gfxram_w );
 
 
-static ADDRESS_MAP_START( pv1000, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE_MEMBER( d65010_state, ram )
 	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pv1000_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pv1000_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0xff )
 	AM_RANGE( 0xf8, 0xff ) AM_READWRITE( pv1000_io_r, pv1000_io_w )
 ADDRESS_MAP_END
@@ -310,7 +310,7 @@ static TIMER_CALLBACK( d65010_irq_on_cb )
 	int next_vpos = vpos + 12;
 
 	/* Set IRQ line and schedule release of IRQ line */
-	cpu_set_input_line( state->maincpu, 0, ASSERT_LINE );
+	device_set_input_line( state->maincpu, 0, ASSERT_LINE );
 	state->irq_off_timer->adjust( state->screen->time_until_pos(vpos, 380/2 ) );
 
 	/* Schedule next IRQ trigger */
@@ -326,7 +326,7 @@ static TIMER_CALLBACK( d65010_irq_off_cb )
 {
 	d65010_state *state = machine->driver_data<d65010_state>();
 
-	cpu_set_input_line( state->maincpu, 0, CLEAR_LINE );
+	device_set_input_line( state->maincpu, 0, CLEAR_LINE );
 }
 
 

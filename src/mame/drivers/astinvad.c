@@ -206,7 +206,7 @@ static SCREEN_UPDATE( spaceint )
 static TIMER_CALLBACK( kamikaze_int_off )
 {
 	astinvad_state *state = machine->driver_data<astinvad_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -214,7 +214,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 {
 	astinvad_state *state = machine->driver_data<astinvad_state>();
 	/* interrupts are asserted on every state change of the 128V line */
-	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 	param ^= 128;
 	state->int_timer->adjust(machine->primary_screen->time_until_pos(param), param);
 
@@ -277,7 +277,7 @@ static INPUT_CHANGED( spaceint_coin_inserted )
 {
 	astinvad_state *state = field->port->machine->driver_data<astinvad_state>();
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -394,7 +394,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( kamikaze_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
@@ -402,20 +402,20 @@ static ADDRESS_MAP_START( kamikaze_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spaceint_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_SIZE_MEMBER(astinvad_state, videoram, videoram_size)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kamikaze_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kamikaze_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spaceint_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spaceint_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

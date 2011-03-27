@@ -916,7 +916,7 @@ static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(machine->device("maincpu"), attotime::from_nsec(length * 1000 / 3500));
+	device_spin_until_time(machine->device("maincpu"), attotime::from_nsec(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -2071,7 +2071,7 @@ WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 
-static ADDRESS_MAP_START( megadriv_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
@@ -2354,7 +2354,7 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( megadriv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_r,ym2612_w)
 
@@ -2368,7 +2368,7 @@ static ADDRESS_MAP_START( megadriv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megadriv_z80_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0xff) AM_NOP
 ADDRESS_MAP_END
@@ -2377,7 +2377,7 @@ ADDRESS_MAP_END
 /************************************ Megadrive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there
-static ADDRESS_MAP_START( md_bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
@@ -2602,7 +2602,7 @@ static UINT16 dreq_src_addr[2],dreq_dst_addr[2],dreq_size;
 
 static READ16_HANDLER( _32x_dreq_common_r )
 {
-	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* _68kspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -2673,7 +2673,7 @@ static READ16_HANDLER( _32x_dreq_common_r )
 
 static WRITE16_HANDLER( _32x_dreq_common_w )
 {
-	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* _68kspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -2854,8 +2854,8 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 		if (data & 0x02)
 		{
-			cpu_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, CLEAR_LINE);
-			cpu_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+			device_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+			device_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 
 		if (data & 0x01)
@@ -2876,14 +2876,14 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 
 
-			memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
+			memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 		}
 		else
 		{
 			_32x_adapter_enabled = 0;
 
 			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, space->machine->region("gamecart")->base());
-			memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
+			memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 		}
 	}
 
@@ -2915,13 +2915,13 @@ static WRITE16_HANDLER( _32x_68k_a15102_w )
 
 		if (data&0x1)
 		{
-			if (sh2_master_cmdint_enable) cpu_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_master_cmdint_enable) device_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 			else printf("master cmdint when masked!\n");
 		}
 
 		if (data&0x2)
 		{
-			if (sh2_slave_cmdint_enable) cpu_set_input_line(_32x_slave_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_slave_cmdint_enable) device_set_input_line(_32x_slave_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 			else printf("slave cmdint when masked!\n");
 		}
 	}
@@ -3056,8 +3056,8 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 	if(pwm_timer_tick == pwm_tm_reg)
 	{
 		pwm_timer_tick = 0;
-		if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
-		if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(sh2_master_pwmint_enable) { device_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(sh2_slave_pwmint_enable) { device_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
 	_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)));
@@ -3241,7 +3241,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
 
-	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* _68kspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (space!= _68kspace)
 	{
@@ -3500,8 +3500,8 @@ static WRITE16_HANDLER( _32x_sh2_common_4006_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4014_w ){ cpu_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4014_w ){ device_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { device_set_input_line(_32x_slave_cpu, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4016
@@ -3516,8 +3516,8 @@ static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { sh2_slave_vint_pending = 0; _3
 // HINT (horizontal interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpu_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ device_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { device_set_input_line(_32x_slave_cpu, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401A
@@ -3525,16 +3525,16 @@ static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(_32x_slave_
 // Note: flag cleared here is a guess, according to After Burner behaviour
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ _32x_68k_a15102_reg &= ~1; cpu_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { _32x_68k_a15102_reg &= ~2; cpu_set_input_line(_32x_slave_cpu, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ _32x_68k_a15102_reg &= ~1; device_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { _32x_68k_a15102_reg &= ~2; device_set_input_line(_32x_slave_cpu, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401C
 // PINT (PWM timer interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpu_set_input_line(_32x_master_cpu,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ device_set_input_line(_32x_master_cpu,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { device_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401E
@@ -3731,7 +3731,7 @@ _32X_MAP_RAM_WRITEHANDLERS(paletteram) // _32x_sh2_paletteram_w
 // SH2 memory maps
 /**********************************************************************************************/
 
-static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
@@ -3760,7 +3760,7 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( sh2_slave_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
@@ -4580,7 +4580,7 @@ void CDC_End_Transfer(running_machine* machine)
 
 void CDC_Do_DMA(running_machine* machine, int rate)
 {
-	address_space* space = cputag_get_address_space(machine, "segacd_68k", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("segacd_68k")->memory().space(AS_PROGRAM);
 
 	UINT32 dstoffset, length;
 	UINT8 *dest;
@@ -5998,7 +5998,7 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	segacd_4meg_prgbank = 0;
 
@@ -6012,25 +6012,25 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_wordram_mapped = 1;
 
 
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x23ffff, 0, 0, segacd_main_dataram_part1_r, segacd_main_dataram_part1_w); // RAM shared with sub
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x23ffff, 0, 0, segacd_main_dataram_part1_r, segacd_main_dataram_part1_w); // RAM shared with sub
 
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
-	//memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12004, 0xa12005, 0, 0, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w);
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12006, 0xa12007, 0, 0, scd_a12006_hint_register_r, scd_a12006_hint_register_w); // where HINT points on main CPU
-	//memory_install_read16_handler     (cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r);
-
-
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200c, 0xa1200d, 0, 0, segacd_stopwatch_timer_r, segacd_stopwatch_timer_w); // starblad
-
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
-
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12010, 0xa1201f, 0, 0, segacd_comms_main_part1_r, segacd_comms_main_part1_w);
-	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12020, 0xa1202f, 0, 0, segacd_comms_main_part2_r, segacd_comms_main_part2_w);
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
+	//memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12004, 0xa12005, 0, 0, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w);
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12006, 0xa12007, 0, 0, scd_a12006_hint_register_r, scd_a12006_hint_register_w); // where HINT points on main CPU
+	//memory_install_read16_handler     (space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r);
 
 
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa1200c, 0xa1200d, 0, 0, segacd_stopwatch_timer_r, segacd_stopwatch_timer_w); // starblad
 
-	cpu_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
+
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12010, 0xa1201f, 0, 0, segacd_comms_main_part1_r, segacd_comms_main_part1_w);
+	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12020, 0xa1202f, 0, 0, segacd_comms_main_part2_r, segacd_comms_main_part2_w);
+
+
+
+	device_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
 
 	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
 
@@ -6094,8 +6094,8 @@ static TIMER_DEVICE_CALLBACK( scd_dma_timer_callback )
 
 static MACHINE_RESET( segacd )
 {
-	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	device_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
 
 	segacd_hint_register = 0xffff; // -1
 
@@ -6770,7 +6770,7 @@ READ16_HANDLER( segacd_font_converted_r )
 	return retdata;
 }
 
-static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
 
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
@@ -7116,12 +7116,12 @@ static READ16_HANDLER( svp_68k_cell2_r )
 	return ((UINT16 *)state->dram)[a1];
 }
 
-static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( svp_ssp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank3")
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( svp_ext_map, AS_IO, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
 	AM_RANGE(0*2, 0*2+1) AM_READWRITE(read_PM0, write_PM0)
 	AM_RANGE(1*2, 1*2+1) AM_READWRITE(read_PM1, write_PM1)
@@ -7146,7 +7146,7 @@ static UINT8 megadrive_io_read_data_port_svp(running_machine *machine, int portn
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 cpu_spinuntil_time(space->cpu, attotime::from_usec(100));
+	 device_spin_until_time(space->cpu, attotime::from_usec(100));
 	return 0x0425;
 }
 
@@ -7167,13 +7167,13 @@ static void svp_init(running_machine *machine)
 
 	/* SVP stuff */
 	state->dram = auto_alloc_array(machine, UINT8, 0x20000);
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, state->dram);
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
+	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x300000, 0x31ffff, 0, 0, state->dram);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "svp", ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
+	memory_install_read16_handler(machine->device("svp")->memory().space(AS_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
 
 	state->iram = auto_alloc_array(machine, UINT8, 0x800);
 	memory_set_bankptr(machine,  "bank3", state->iram);
@@ -9122,11 +9122,11 @@ static TIMER_DEVICE_CALLBACK( render_timer_callback )
 void _32x_check_irqs(running_machine* machine)
 {
 
-	if (sh2_master_vint_enable && sh2_master_vint_pending) cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-	else cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
+	if (sh2_master_vint_enable && sh2_master_vint_pending) device_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+	else device_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 
-	if (sh2_slave_vint_enable && sh2_slave_vint_pending) cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-	else cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
+	if (sh2_slave_vint_enable && sh2_slave_vint_pending) device_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+	else device_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 }
 
 
@@ -9213,8 +9213,8 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 				if(genesis_scanline_counter < 224 || sh2_hint_in_vbl)
 				{
-					if(sh2_master_hint_enable) { cpu_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
-					if(sh2_slave_hint_enable) { cpu_set_input_line(_32x_slave_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
+					if(sh2_master_hint_enable) { device_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
+					if(sh2_slave_hint_enable) { device_set_input_line(_32x_slave_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
 				}
 			}
 		}
@@ -9352,12 +9352,12 @@ MACHINE_RESET( megadriv )
 	/* if any of these extra CPUs exist, pause them until we actually turn them on */
 	if (_32x_master_cpu != NULL)
 	{
-		cpu_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	if (_32x_slave_cpu != NULL)
 	{
-		cpu_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	if (_segacd_68k_cpu != NULL )
@@ -9909,7 +9909,7 @@ static void megadriv_init_common(running_machine *machine)
 		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag() );
 	}
 
-	cpu_set_irq_callback(machine->device("maincpu"), genesis_int_callback);
+	device_set_irq_callback(machine->device("maincpu"), genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
@@ -10046,27 +10046,27 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const
 	device_t *ym = machine->device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 
-	memory_install_readwrite_bank(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_readwrite_bank(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
 
-	memory_install_ram(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, genz80.z80_prgram);
+	memory_install_ram(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, genz80.z80_prgram);
 
 
 	// not allowed??
-//  memory_install_readwrite_bank(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank1");
+//  memory_install_readwrite_bank(machine->device(tag)->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank1");
 
-	memory_install_readwrite8_device_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
-	memory_install_write8_handler    (cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_write8_handler    (cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_read8_handler     (cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
+	memory_install_readwrite8_device_handler(machine->device(tag)->memory().space(AS_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
+	memory_install_write8_handler    (machine->device(tag)->memory().space(AS_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_write8_handler    (machine->device(tag)->memory().space(AS_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_read8_handler     (machine->device(tag)->memory().space(AS_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
+	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
+	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
@@ -10096,24 +10096,24 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		memory_install_rom(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, machine->region("gamecart")->base());
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
+		memory_install_rom(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000000, 0x03fffff, 0, 0, machine->region("gamecart")->base());
+		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 	};
 
 
 	a15100_reg = 0x0000;
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15108, 0xa15113, 0, 0, _32x_dreq_common_r, _32x_dreq_common_w); // dreq src / dst / length /fifo
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15108, 0xa15113, 0, 0, _32x_dreq_common_r, _32x_dreq_common_w); // dreq src / dst / length /fifo
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1511a, 0xa1511b, 0, 0, _32x_68k_a1511a_r, _32x_68k_a1511a_w); // SEGA TV
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa1511a, 0xa1511b, 0, 0, _32x_68k_a1511a_r, _32x_68k_a1511a_w); // SEGA TV
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15130, 0xa1513f, 0, 0, _32x_pwm_r, _32x_68k_pwm_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15130, 0xa1513f, 0, 0, _32x_pwm_r, _32x_68k_pwm_w);
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
 
 
 	/* Interrupts are masked / disabled at first */

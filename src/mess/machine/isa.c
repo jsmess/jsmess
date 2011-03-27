@@ -132,18 +132,18 @@ void isa8_device::add_isa_card(device_isa8_card_interface *card,int pos)
 }
 
 #define memory_install_readwrite8_device_handler_mask(space, device, start, end, mask, mirror, rhandler, whandler, unitmask) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
+	const_cast<address_space *>(space)->install_legacy_readwrite_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
 
 void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
 {	
-	int buswidth = device_memory(m_maincpu)->space_config(AS_PROGRAM)->m_databus_width;
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0);			
+			memory_install_readwrite8_device_handler_mask(m_maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, rhandler, whandler, 0);			
 			break;
 		case 16:
-			memory_install_readwrite8_device_handler_mask(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
+			memory_install_readwrite8_device_handler_mask(m_maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
 			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported", buswidth);
@@ -153,7 +153,7 @@ void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t
 
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
-	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	memory_install_readwrite_bank(space, start, end, mask, mirror, tag );
 	memory_set_bankptr(&m_machine, tag, data);
 }
@@ -161,7 +161,7 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
 	astring tempstring;
-	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);	
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);	
 	memory_install_read_bank(space, start, end, mask, mirror, tag);
 	memory_unmap_write(space, start, end, mask, mirror);		
 	memory_set_bankptr(&m_machine, tag, machine->region(dev->subtag(tempstring, region))->base());

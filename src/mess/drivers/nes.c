@@ -42,7 +42,7 @@ static WRITE8_HANDLER(nes_vh_sprite_dma_w)
 	ppu2c0x_spriteram_dma(space, state->ppu, data);
 }
 
-static ADDRESS_MAP_START( nes_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)					/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)		/* PPU registers */
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nessound", nes_psg_r, nes_psg_w)		/* PSG primary registers */

@@ -161,14 +161,14 @@ WRITE8_MEMBER( pcm_state::pcm_85_w )
 
 
 
-static ADDRESS_MAP_START(pcm_mem, ADDRESS_SPACE_PROGRAM, 8, pcm_state)
+static ADDRESS_MAP_START(pcm_mem, AS_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
 	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(videoram) // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcm_io, ADDRESS_SPACE_IO, 8, pcm_state)
+static ADDRESS_MAP_START( pcm_io, AS_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc_s", z80ctc_r, z80ctc_w) // system CTC

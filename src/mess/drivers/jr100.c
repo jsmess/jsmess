@@ -77,7 +77,7 @@ static WRITE8_HANDLER( jr100_via_w )
 	via->write(*space,offset,data);
 }
 
-static ADDRESS_MAP_START(jr100_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(jr100_state, ram)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_MEMBER(jr100_state, pcg)

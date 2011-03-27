@@ -68,7 +68,7 @@ Trying to hook up these system to a H8_3002 immediately hits an invalid
 opcode and MESS dies. */
 
 // 512 kbyte ram + no memory mapped flash
-static ADDRESS_MAP_START( cybikov1_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16 )
 #if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 #endif
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 //  +-------------------------------------+
 
 // 256 kbyte ram + 256 kbyte memory mapped flash
-static ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16 )
 #if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 #endif
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 // 2048? kbyte ram + 512 kbyte memory mapped flash
-static ADDRESS_MAP_START( cybikoxt_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16 )
 #if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 #endif
@@ -122,15 +122,15 @@ ADDRESS_MAP_END
 // ADDRESS MAP - IO //
 //////////////////////
 
-static ADDRESS_MAP_START( cybikov1_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cybikov1_io, AS_IO, 8 )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov1_io_reg_r, cybikov1_io_reg_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikov2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cybikov2_io, AS_IO, 8 )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov2_io_reg_r, cybikov2_io_reg_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikoxt_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 8 )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikoxt_io_reg_r, cybikoxt_io_reg_w )
 ADDRESS_MAP_END
 

@@ -214,7 +214,7 @@ static WRITE8_HANDLER( unknown_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START( bfm_dm01_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM								// 8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(control_r, control_w)	// control reg
 	AM_RANGE(0x2800, 0x2800) AM_READWRITE(mux_r,mux_w)			// mux
@@ -238,7 +238,7 @@ void BFM_dm01_writedata(running_machine *machine, UINT8 data)
 
 INTERRUPT_GEN( bfm_dm01_vbl )
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE );
+	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////

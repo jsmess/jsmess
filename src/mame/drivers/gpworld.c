@@ -297,7 +297,7 @@ static WRITE8_HANDLER( palette_write )
 }
 
 /* PROGRAM MAP */
-static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
 	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, sprite_RAM)
 	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE_MEMBER(gpworld_state, palette_RAM)	/* The memory test reads at 0xc800 */
@@ -314,7 +314,7 @@ ADDRESS_MAP_END
 
 
 /* I/O MAP */
-static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mainport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_WRITE(misc_io_write)
 	AM_RANGE(0x80,0x80) AM_READ_PORT("IN0")
@@ -437,11 +437,11 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 	{
 		laserdisc_data_w(state->laserdisc,state->ldp_write_latch);
 		state->ldp_read_latch  = laserdisc_data_r(state->laserdisc);
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
 }
 

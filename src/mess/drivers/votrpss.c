@@ -85,7 +85,7 @@ public:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x3fff) AM_ROM /* main roms (in potted module) */
     AM_RANGE(0x4000, 0x7fff) AM_NOP	/* open bus/space for expansion rom (reads as 0xFF) */
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE(0xe000, 0xffff) AM_NOP	/* open bus (space for more personality rom, not normally used) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(z80_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_NOP /* temporary */
 	//AM_RANGE(0x00, 0x03) AM_READWRITE(8255ppi_r, 8255ppi_w) AM_MIRROR (0x3c)

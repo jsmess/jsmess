@@ -63,7 +63,7 @@ WRITE8_MEMBER( et3400_state::et3400_display_w )
 }
 
 
-static ADDRESS_MAP_START(et3400_mem, ADDRESS_SPACE_PROGRAM, 8, et3400_state)
+static ADDRESS_MAP_START(et3400_mem, AS_PROGRAM, 8, et3400_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x01ff ) AM_RAM
 	AM_RANGE( 0xc000, 0xc0ff ) AM_READ(et3400_keypad_r)

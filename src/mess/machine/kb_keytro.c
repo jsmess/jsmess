@@ -362,7 +362,7 @@ WRITE_LINE_DEVICE_HANDLER( kb_keytronic_clock_w )
 	kb_keytr_state *keytronic = get_safe_token(device);
 
 	keytronic->clock_signal = state;
-	cpu_set_input_line(keytronic->cpu, MCS51_INT0_LINE, keytronic->clock_signal);
+	device_set_input_line(keytronic->cpu, MCS51_INT0_LINE, keytronic->clock_signal);
 }
 
 /* Write handler which is called when the data signal may have changed */
@@ -371,7 +371,7 @@ WRITE_LINE_DEVICE_HANDLER( kb_keytronic_data_w )
 	kb_keytr_state *keytronic = get_safe_token(device);
 
 	keytronic->data_signal = state;
-	cpu_set_input_line(keytronic->cpu, MCS51_T0_LINE, keytronic->data_signal);
+	device_set_input_line(keytronic->cpu, MCS51_T0_LINE, keytronic->data_signal);
 }
 
 
@@ -561,11 +561,11 @@ static WRITE8_HANDLER( kb_keytronic_internal_data_w )
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( keytronic_program, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( keytronic_program, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keytronic_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( keytronic_io, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(kb_keytronic_internal_data_r, kb_keytronic_internal_data_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(kb_keytronic_p1_r, kb_keytronic_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(kb_keytronic_p2_r, kb_keytronic_p2_w)

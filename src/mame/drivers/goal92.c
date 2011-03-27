@@ -21,7 +21,7 @@ static WRITE16_HANDLER( goal92_sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
-		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -47,7 +47,7 @@ static READ16_HANDLER( goal92_inputs_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( goal92_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE_MEMBER(goal92_state, bg_data)
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( adpcm_data_w )
 	state->msm5205next = data;
 }
 
-static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", adpcm_control_w)
@@ -214,7 +214,7 @@ static void irqhandler( device_t *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
 	//goal92_state *state = device->machine->driver_data<goal92_state>();
-	//cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//device_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -235,7 +235,7 @@ static void goal92_adpcm_int( device_t *device )
 	state->adpcm_toggle^= 1;
 
 	if (state->adpcm_toggle)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =

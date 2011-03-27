@@ -215,13 +215,13 @@ READ8_HANDLER( mbee256_18_r )
 
 READ8_HANDLER( mbee256_speed_low_r )
 {
-	cputag_set_clock(space->machine, "maincpu", 3375000);
+	space->machine->device("maincpu")->set_unscaled_clock(3375000);
 	return 0xff;
 }
 
 READ8_HANDLER( mbee256_speed_high_r )
 {
-	cputag_set_clock(space->machine, "maincpu", 6750000);
+	space->machine->device("maincpu")->set_unscaled_clock(6750000);
 	return 0xff;
 }
 
@@ -254,7 +254,7 @@ READ8_HANDLER( mbee_07_r )	// read
 static TIMER_CALLBACK( mbee_rtc_irq )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mc146818_device *rtc = machine->device<mc146818_device>("rtc");
 	UINT8 data = rtc->read(*mem, 12);
 	if (data) state->clock_pulse = 0x80;
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( mbee_rtc_irq )
 
 WRITE8_HANDLER( mbee256_50_w )
 {
-	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	// primary low banks
 	memory_set_bank(space->machine, "boot", (data & 3) | ((data & 0x20) >> 3));
@@ -359,7 +359,7 @@ WRITE8_HANDLER( mbee256_50_w )
 
 WRITE8_HANDLER( mbee128_50_w )
 {
-	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	// primary low banks
 	memory_set_bank(space->machine, "boot", (data & 3));
@@ -561,7 +561,7 @@ MACHINE_RESET( mbee64 )
 
 MACHINE_RESET( mbee128 )
 {
-	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	machine_reset_common_disk(machine);
 	mbee128_50_w(mem,0,0); // set banks to default
 	memory_set_bank(machine, "boot", 4); // boot time
@@ -571,7 +571,7 @@ MACHINE_RESET( mbee256 )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
 	UINT8 i;
-	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	machine_reset_common_disk(machine);
 	state->rtc = machine->device<mc146818_device>("rtc");
 	for (i = 0; i < 15; i++) state->mbee256_was_pressed[i] = 0;
@@ -599,7 +599,7 @@ INTERRUPT_GEN( mbee_interrupt )
 #if 0
 	mbee_state *state = device->machine->driver_data<mbee_state>();
 
-	//address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	//address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
         busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
         The line below does what the interrupt should be doing. */
@@ -797,7 +797,7 @@ DRIVER_INIT( mbeett )
 Z80BIN_EXECUTE( mbee )
 {
 	device_t *cpu = machine->device("maincpu");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->write_word(0xa6, execute_address);			/* fix the EXEC command */
 
@@ -816,7 +816,7 @@ QUICKLOAD_LOAD( mbee )
 {
 	mbee_state *state = image.device().machine->driver_data<mbee_state>();
 	device_t *cpu = image.device().machine->device("maincpu");
-	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image.device().machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
 

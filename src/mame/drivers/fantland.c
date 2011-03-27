@@ -78,7 +78,7 @@ static WRITE8_HANDLER( fantland_soundlatch_w )
 {
 	fantland_state *state = space->machine->driver_data<fantland_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE16_HANDLER( fantland_soundlatch_16_w )
@@ -125,7 +125,7 @@ static WRITE16_HANDLER( spriteram2_16_w )
 		spriteram_2[2 * offset + 1] = data >> 8;
 }
 
-static ADDRESS_MAP_START( fantland_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fantland_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
                                 Galaxy Gunners
 ***************************************************************************/
 
-static ADDRESS_MAP_START( galaxygn_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( galaxygn_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
@@ -239,7 +239,7 @@ static READ8_HANDLER( borntofi_inputs_r )
 	return state->input_ret[offset];
 }
 
-static ADDRESS_MAP_START( borntofi_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( borntofi_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
@@ -266,7 +266,7 @@ ADDRESS_MAP_END
                            Wheels Runner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wheelrun_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
@@ -293,19 +293,19 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( fantland_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fantland_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x01fff ) AM_RAM
 	AM_RANGE( 0x80000, 0x9ffff ) AM_ROM
 	AM_RANGE( 0xc0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantland_sound_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ymsnd", ym2151_r, ym2151_w )
 	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE( "dac", dac_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galaxygn_sound_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ymsnd", ym2151_r, ym2151_w )
 ADDRESS_MAP_END
@@ -407,7 +407,7 @@ static void borntofi_adpcm_int_2(device_t *device) { borntofi_adpcm_int(device, 
 static void borntofi_adpcm_int_3(device_t *device) { borntofi_adpcm_int(device, 3); }
 
 
-static ADDRESS_MAP_START( borntofi_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
 	AM_RANGE( 0x04000, 0x04000 ) AM_READ(soundlatch_r)
 	AM_RANGE( 0x04000, 0x0401f ) AM_WRITE(borntofi_msm5205_w)
@@ -420,7 +420,7 @@ ADDRESS_MAP_END
                            Wheels Runner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_r, ym3526_w )
@@ -844,12 +844,12 @@ static INTERRUPT_GEN( fantland_irq )
 {
 	fantland_state *state = device->machine->driver_data<fantland_state>();
 	if (state->nmi_enable & 8)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( fantland_sound_irq )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80 / 4);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80 / 4);
 }
 
 static MACHINE_CONFIG_START( fantland, fantland_state )
@@ -898,7 +898,7 @@ MACHINE_CONFIG_END
 static void galaxygn_sound_irq( device_t *device, int line )
 {
 	fantland_state *state = device->machine->driver_data<fantland_state>();
-	cpu_set_input_line_and_vector(state->audio_cpu, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	device_set_input_line_and_vector(state->audio_cpu, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static const ym2151_interface galaxygn_ym2151_interface =
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_END
 static void wheelrun_ym3526_irqhandler( device_t *device, int state )
 {
 	fantland_state *driver = device->machine->driver_data<fantland_state>();
-	cpu_set_input_line(driver->audio_cpu, INPUT_LINE_IRQ0, state);
+	device_set_input_line(driver->audio_cpu, INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface wheelrun_ym3526_interface =

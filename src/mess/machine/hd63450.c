@@ -239,7 +239,7 @@ void hd63450_write(device_t* device, int offset, int data, UINT16 mem_mask)
 
 static void dma_transfer_start(device_t* device, int channel, int dir)
 {
-	address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->firstcpu->memory().space(AS_PROGRAM);
 	hd63450_t* dmac = get_safe_token(device);
 	dmac->in_progress[channel] = 1;
 	dmac->reg[channel].csr &= ~0xe0;
@@ -258,7 +258,7 @@ static void dma_transfer_start(device_t* device, int channel, int dir)
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
 		device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
-		cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->burst_clock[channel]);
 	}
 	else
@@ -316,7 +316,7 @@ static void dma_transfer_continue(device_t* device, int channel)
 
 void hd63450_single_transfer(device_t* device, int x)
 {
-	address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->firstcpu->memory().space(AS_PROGRAM);
 	int data;
 	int datasize = 1;
 	hd63450_t* dmac = get_safe_token(device);
@@ -440,7 +440,7 @@ void hd63450_single_transfer(device_t* device, int x)
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)
 				{
 					device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
-					cpu_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
+					device_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 				}
 
 				if(dmac->intf->dma_end)

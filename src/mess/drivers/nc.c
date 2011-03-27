@@ -322,7 +322,7 @@ static const char *const nc_bankhandler_w[]={
 static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 {
 	nc_state *state = machine->driver_data<nc_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int mem_type;
 	int mem_bank;
 	char bank1[10];
@@ -578,7 +578,7 @@ static void nc_common_init_machine(running_machine *machine)
 	state->uart_control = 0x0ff;
 }
 
-static ADDRESS_MAP_START(nc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START(nc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -1051,7 +1051,7 @@ static WRITE8_HANDLER(nc100_memory_card_wait_state_w)
 
 
 
-static ADDRESS_MAP_START(nc100_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(nc100_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
@@ -1510,7 +1510,7 @@ static WRITE8_HANDLER(nc200_poweroff_control_w)
 	nc200_video_set_backlight(space->machine, ((data ^ (1 << 2)) >> 2) & 0x01);
 }
 
-static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(nc200_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)

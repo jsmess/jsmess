@@ -49,8 +49,8 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     /*
     if (~state->cpu_control & 0x08)
     {
-        cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
-        cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+        device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+        device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
     }
     */
 
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
         CPU2's SWI will trigger an 6809 IRQ on the master by resetting 0x04
         Master will respond by setting the bit back again
     */
-    cpu_set_input_line(state->maincpu, M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
+    device_set_input_line(state->maincpu, M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
 
 	/*
     Slave function call (e.g. ROM test):
@@ -76,7 +76,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     FA96: 27 FA       BEQ   $FA92   ; Wait for bit to be set
     */
 
-	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
+	device_set_input_line(state->subcpu, M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
 
 static INTERRUPT_GEN( battlane_cpu1_interrupt )
@@ -86,8 +86,8 @@ static INTERRUPT_GEN( battlane_cpu1_interrupt )
 	/* See note in battlane_cpu_command_w */
 	if (~state->cpu_control & 0x08)
 	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -98,7 +98,7 @@ static INTERRUPT_GEN( battlane_cpu1_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( battlane_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE("share2") AM_BASE_MEMBER(battlane_state, tileram)
 	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE("share3") AM_BASE_MEMBER(battlane_state, spriteram)
@@ -259,7 +259,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	battlane_state *state = device->machine->driver_data<battlane_state>();
-	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =

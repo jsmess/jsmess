@@ -28,7 +28,7 @@ public:
 
 
 /* Address maps */
-static ADDRESS_MAP_START(apogee_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(apogee_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
     //AM_RANGE( 0xec00, 0xecff ) AM_RAM  // Timer

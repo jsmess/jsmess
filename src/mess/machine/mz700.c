@@ -114,7 +114,7 @@ MACHINE_START( mz700 )
 	mz->ppi = machine->device("ppi8255");
 
 	/* reset memory map to defaults */
-	mz700_bank_4_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+	mz700_bank_4_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 }
 
 
@@ -151,7 +151,7 @@ READ8_HANDLER( mz800_bank_0_r )
 {
 	mz_state *state = space->machine->driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in cgrom */
@@ -191,7 +191,7 @@ READ8_HANDLER( mz800_bank_0_r )
 
 WRITE8_HANDLER( mz700_bank_0_w )
 {
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
@@ -199,7 +199,7 @@ WRITE8_HANDLER( mz700_bank_0_w )
 
 WRITE8_HANDLER( mz800_bank_0_w )
 {
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x7fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
@@ -207,7 +207,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 
 READ8_HANDLER( mz800_bank_1_r )
 {
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in ram from 0x1000 to 0x1fff */
@@ -232,7 +232,7 @@ READ8_HANDLER( mz800_bank_1_r )
 
 WRITE8_HANDLER( mz700_bank_1_w )
 {
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -259,7 +259,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 
 WRITE8_HANDLER( mz700_bank_2_w )
 {
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_read_bank(spc, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_nop_write(spc, 0x0000, 0x0fff, 0, 0);
@@ -270,7 +270,7 @@ WRITE8_HANDLER( mz700_bank_3_w )
 {
 	mz_state *state = space->machine->driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -319,7 +319,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 {
 	mz_state *state = space->machine->driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -376,7 +376,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 WRITE8_HANDLER( mz700_bank_5_w )
 {
-	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *spc = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
@@ -658,7 +658,7 @@ WRITE8_HANDLER( mz800_display_mode_w )
 //  {
 //      logerror("mz800_display_mode_w: switching mode to %s\n", (BIT(data, 3) ? "mz700" : "mz800"));
 //      mz->mz700_mode = BIT(data, 3);
-//      mz700_bank_4_w(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+//      mz700_bank_4_w(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 //  }
 }
 

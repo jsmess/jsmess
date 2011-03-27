@@ -153,7 +153,7 @@ static TIMER_DEVICE_CALLBACK(pcw16_timer_callback)
 	}
 }
 
-static ADDRESS_MAP_START(pcw16_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START(pcw16_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -370,7 +370,7 @@ static  READ8_HANDLER(pcw16_no_mem_r)
 
 static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RAM_TYPE type)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (type) {
 	case PCW16_MEM_ROM:
@@ -1301,7 +1301,7 @@ static const ins8250_interface pcw16_com_interface[2]=
 
 
 
-static ADDRESS_MAP_START(pcw16_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(pcw16_io, AS_IO, 8)
 	/* super i/o chip */
 	AM_RANGE(0x01a, 0x01a) AM_WRITE(pcw16_superio_fdc_digital_output_register_w)
     AM_RANGE(0x01c, 0x01c) AM_READ(pcw16_superio_fdc_main_status_register_r)

@@ -144,7 +144,7 @@ static const UINT8 apple1_control_keymap[] =
 
 DRIVER_INIT( apple1 )
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
 	memory_install_readwrite_bank(space,0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
 	memory_set_bankptr(machine,"bank1", ram_get_ptr(machine->device(RAM_TAG)));
@@ -256,7 +256,7 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM)->write_byte(addr, *snapptr);
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr, *snapptr);
 
 
 	return IMAGE_INIT_PASS;

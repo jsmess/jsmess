@@ -1277,7 +1277,7 @@ static void mmc3_irq( device_t *device, int scanline, int vblank, int blanked )
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 	state->IRQ_clear = 0;
@@ -1807,7 +1807,7 @@ static void mmc5_irq( device_t *device, int scanline, int vblank, int blanked )
 	if (scanline == state->IRQ_count)
 	{
 		if (state->IRQ_enable)
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 
 		state->IRQ_status = 0xff;
 	}
@@ -2446,7 +2446,7 @@ static void jxrom_irq( device_t *device, int scanline, int vblank, int blanked )
 		if (state->IRQ_count <= 114)
 		{
 			state->IRQ_count = 0xffff;
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count -= 114;
@@ -2819,7 +2819,7 @@ static void bandai_lz_irq( device_t *device, int scanline, int vblank, int blank
 	{
 		if (state->IRQ_count <= 114)
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = (0xffff - 114 + state->IRQ_count);	// wrap around the 16 bits counter
 		}
 		state->IRQ_count -= 114;
@@ -3077,7 +3077,7 @@ static void h3001_irq( device_t *device, int scanline, int vblank, int blanked )
 		if (state->IRQ_count <= 114)
 		{
 			state->IRQ_enable = 0;
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -3160,7 +3160,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 		{
 			if ((state->IRQ_count & 0x000f) < 114)	// always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
 			{
-				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+				device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				state->IRQ_count = (state->IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (state->IRQ_count & 0x000f)); // sort of wrap around the counter
 			}
 			// decrements should not affect upper bits, so we don't do anything here (114 > 0x0f)
@@ -3169,7 +3169,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 		{
 			if ((state->IRQ_count & 0x00ff) < 114)
 			{
-				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+				device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				state->IRQ_count = (state->IRQ_count & ~0x00ff) | (0xff - 114 + (state->IRQ_count & 0x00ff));	// wrap around the 8 bits counter
 			}
 			else
@@ -3179,7 +3179,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 		{
 			if ((state->IRQ_count & 0x0fff)  < 114)
 			{
-				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+				device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				state->IRQ_count = (state->IRQ_count & ~0x0fff) | (0xfff - 114 + (state->IRQ_count & 0x0fff));	// wrap around the 12 bits counter
 			}
 			else
@@ -3187,7 +3187,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 		}
 		else if (state->IRQ_count < 114)
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = (0xffff - 114 + state->IRQ_count);	// wrap around the 16 bits counter
 		}
 		else
@@ -3571,7 +3571,7 @@ static void konami_irq( device_t *device, int scanline, int vblank, int blanked 
 	{
 		state->IRQ_count = state->IRQ_count_latch;
 		state->IRQ_enable = state->IRQ_enable_latch;
-		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -3840,7 +3840,7 @@ static void namcot_irq( device_t *device, int scanline, int vblank, int blanked 
 	{
 		if (state->IRQ_count >= (0x7fff - 114))
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = 0;
 		}
 		else
@@ -4013,7 +4013,7 @@ static void sunsoft3_irq( device_t *device, int scanline, int vblank, int blanke
 		{
 			state->IRQ_enable = 0;
 			state->IRQ_count = 0xffff;
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count -= 114;
@@ -4977,7 +4977,7 @@ static void futuremedia_irq( device_t *device, int scanline, int vblank, int bla
 		{
 			state->IRQ_count--;
 			if (!state->IRQ_count)
-				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+				device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -5358,7 +5358,7 @@ static void ks7032_irq( device_t *device, int scanline, int vblank, int blanked 
 		{
 			state->IRQ_enable = 0;
 			state->IRQ_count = state->IRQ_count_latch;
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count += 114;
@@ -5471,7 +5471,7 @@ static void mmc_fds_irq( device_t *device, int scanline, int vblank, int blanked
 	{
 		if (state->IRQ_count <= 114)
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 			state->IRQ_status |= 0x01;
 		}
@@ -7076,7 +7076,7 @@ static void tengen_800032_irq( device_t *device, int scanline, int vblank, int b
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 								 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
-						cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+						device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 					}
 				}
 			}
@@ -7103,7 +7103,7 @@ static void tengen_800032_irq( device_t *device, int scanline, int vblank, int b
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 							 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
-					cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+					device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				}
 			}
 		}
@@ -8767,7 +8767,7 @@ static void sc127_irq( device_t *device, int scanline, int vblank, int blanked )
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
 	}
@@ -8906,7 +8906,7 @@ static void smb2jb_irq( device_t *device, int scanline, int vblank, int blanked 
 		if (state->IRQ_count < 0x1000)
 		{
 			if ((0x1000 - state->IRQ_count) <= 114)
-				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+				device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			else
 				state->IRQ_count += 114;
 		}
@@ -9162,7 +9162,7 @@ static void btl_smb2a_irq( device_t *device, int scanline, int vblank, int blank
 		{
 			state->IRQ_count = (state->IRQ_count + 1) & 0xfff;
 			state->IRQ_enable = 0;
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count += 114;
@@ -9248,7 +9248,7 @@ static void btl_smb3_irq( device_t *device, int scanline, int vblank, int blanke
 	{
 		if ((0xffff - state->IRQ_count) < 114)
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
 
@@ -9327,7 +9327,7 @@ static void btl_dn_irq( device_t *device, int scanline, int vblank, int blanked 
 		state->IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 				 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
-		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -11169,7 +11169,7 @@ static void shjy3_irq( device_t *device, int scanline, int vblank, int blanked )
 		{
 			state->IRQ_count = state->IRQ_count_latch;
 			state->IRQ_enable = state->IRQ_enable | ((state->IRQ_enable & 0x01) << 1);
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count++;

@@ -154,7 +154,7 @@ const rom_entry *abc99_device_config::rom_region() const
 //  ADDRESS_MAP( abc99_z2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z2_mem, ADDRESS_SPACE_PROGRAM, 8, abc99_device )
+static ADDRESS_MAP_START( abc99_z2_mem, AS_PROGRAM, 8, abc99_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("abc99:z2", 0)
 ADDRESS_MAP_END
 
@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc99_z2_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z2_io, ADDRESS_SPACE_IO, 8, abc99_device )
+static ADDRESS_MAP_START( abc99_z2_io, AS_IO, 8, abc99_device )
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z2_led_w)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("X0") AM_WRITENOP
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("X1") AM_WRITENOP
@@ -192,7 +192,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc99_z5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z5_mem, ADDRESS_SPACE_PROGRAM, 8, abc99_device )
+static ADDRESS_MAP_START( abc99_z5_mem, AS_PROGRAM, 8, abc99_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("abc99:z5", 0)
 ADDRESS_MAP_END
 
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc99_z5_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z5_io, ADDRESS_SPACE_IO, 8, abc99_device )
+static ADDRESS_MAP_START( abc99_z5_io, AS_IO, 8, abc99_device )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREAD(DEVICE_SELF_OWNER, abc99_device, z5_p1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z5_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z5_t0_w)
@@ -250,7 +250,7 @@ INPUT_CHANGED( abc99_device::keyboard_reset )
 {
     abc99_device *keyboard = static_cast<abc99_device *>(field->port->machine->device(ABC99_TAG));
 
-	cpu_set_input_line(keyboard->m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(keyboard->m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -470,8 +470,8 @@ const input_port_token *abc99_device_config::input_ports() const
 
 inline void abc99_device::serial_input()
 {
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -589,8 +589,8 @@ void abc99_device::device_start()
 void abc99_device::device_reset()
 {
 	// set EA lines
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, ASSERT_LINE);
-	cpu_set_input_line(m_mousecpu, MCS48_INPUT_EA, ASSERT_LINE);
+	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ASSERT_LINE);
+	device_set_input_line(m_mousecpu, MCS48_INPUT_EA, ASSERT_LINE);
 }
 
 
@@ -797,7 +797,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 	if (m_reset != reset)
 	{
 		m_reset = reset;
-		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// serial output
@@ -865,5 +865,5 @@ READ_LINE_MEMBER( abc99_device::txd_r )
 
 WRITE_LINE_MEMBER( abc99_device::reset_w )
 {
-	cpu_set_input_line(m_mousecpu, INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_mousecpu, INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }

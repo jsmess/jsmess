@@ -87,7 +87,7 @@ VIDEO_START( a7800 )
 static void maria_draw_scanline(running_machine *machine)
 {
 	a7800_state *state = machine->driver_data<a7800_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
 	unsigned int dl;
@@ -322,7 +322,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	a7800_state *state = device->machine->driver_data<a7800_state>();
 	int frame_scanline;
 	UINT8 *ROM = device->machine->region("maincpu")->base();
-	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->maria_scanline++;
 
@@ -418,7 +418,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( state->maria_dli )
 	{
 		state->maria_dli = 0;
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }
@@ -483,7 +483,7 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			state->maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			cpu_spinuntil_trigger(space->machine->device("maincpu"), TRIGGER_HSYNC);
+			device_spin_until_trigger(space->machine->device("maincpu"), TRIGGER_HSYNC);
 			state->maria_wsync=1;
 			break;
 

@@ -126,7 +126,7 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 {
 	partner_state *state = machine->driver_data<partner_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch(state->win_mem_page) {
 		case 2 :
 				// FDD
@@ -144,7 +144,7 @@ static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 static void partner_bank_switch(running_machine *machine)
 {
 	partner_state *state = machine->driver_data<partner_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 

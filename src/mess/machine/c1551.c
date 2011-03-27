@@ -109,8 +109,8 @@ static TIMER_DEVICE_CALLBACK( irq_tick )
 {
 	c1551_t *c1551 = get_safe_token(timer.owner());
 
-	cpu_set_input_line(c1551->cpu, M6502_IRQ_LINE, ASSERT_LINE);
-	cpu_set_input_line(c1551->cpu, M6502_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(c1551->cpu, M6502_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(c1551->cpu, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /*-------------------------------------------------
@@ -334,7 +334,7 @@ static const m6502_interface m6510t_intf =
     ADDRESS_MAP( c1551_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c1551_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1551_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE(M6523_0_TAG, tpi6525_r, tpi6525_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1551:c1551", 0)
@@ -723,7 +723,7 @@ static DEVICE_START( c1551 )
 	c1551->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* map TPI1 to host CPU memory space */
-	address_space *program = cpu_get_address_space(device->machine->device(config->cpu_tag), ADDRESS_SPACE_PROGRAM);
+	address_space *program = device->machine->device(config->cpu_tag)->memory().space(AS_PROGRAM);
 	UINT32 start_address = c1551->address ? 0xfec0 : 0xfef0;
 
 	memory_install_readwrite8_device_handler(program, c1551->tpi1, start_address, start_address + 7, 0, 0, tpi6525_r, tpi6525_w);

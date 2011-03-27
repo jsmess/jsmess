@@ -115,13 +115,13 @@ static WRITE8_HANDLER( paddle_on_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( coleco_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( coleco_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coleco_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -132,13 +132,13 @@ static ADDRESS_MAP_START( coleco_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( czz50_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( czz50_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( czz50_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( czz50_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -249,7 +249,7 @@ static MACHINE_RESET( coleco )
 {
 	coleco_state *state = machine->driver_data<coleco_state>();
 	state->last_state = 0;
-	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
+	device_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&machine->region("maincpu")->base()[0x6000], 0xff, 0x400);	// initialize RAM
 }
 

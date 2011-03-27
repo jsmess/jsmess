@@ -28,7 +28,7 @@ public:
 
 static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
 				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
@@ -135,14 +135,14 @@ static READ8_HANDLER( tvc_port59_r )
 static WRITE8_HANDLER( tvc_port0_w )
 {
 }
-static ADDRESS_MAP_START(tvc_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(tvc_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tvc_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( tvc_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_port0_w)
@@ -382,7 +382,7 @@ static INTERRUPT_GEN( tvc_interrupt )
 {
 	tvc_state *state = device->machine->driver_data<tvc_state>();
 	state->flipflop  &= ~0x10;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( tvc, tvc_state )

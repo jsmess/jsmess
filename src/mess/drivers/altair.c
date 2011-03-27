@@ -66,14 +66,14 @@ READ8_MEMBER(altair_state::sio_key_status_r)
 	return (term_data!=0) ? 0x40 : 0x01;
 }
 
-static ADDRESS_MAP_START(altair_mem, ADDRESS_SPACE_PROGRAM, 8, altair_state)
+static ADDRESS_MAP_START(altair_mem, AS_PROGRAM, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_BASE(ram)
 	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
 	AM_RANGE( 0xff00, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(altair_io, ADDRESS_SPACE_IO, 8, altair_state)
+static ADDRESS_MAP_START(altair_io, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_READ(sio_key_status_r)

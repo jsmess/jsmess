@@ -236,15 +236,15 @@ static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 static READ16_HANDLER( main_irqiack_r )
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	cpu_set_input_line(space->machine->device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
-	//cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
+	device_set_input_line(space->machine->device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
+	//device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( sound_resetmain_r )
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
+	//device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -316,7 +316,7 @@ static WRITE16_DEVICE_HANDLER( vcombat_dac_w )
 	dac_signed_data_16_w(device, newval + 0x8000);
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 
 
 /* The first i860 - middle board */
-static ADDRESS_MAP_START( vid_0_map, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( vid_0_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)		/* Shared framebuffer - half of the bits lost to 32-bit bus */
 	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6")		/* M0<-P0 com 1 (0x440000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
@@ -362,7 +362,7 @@ ADDRESS_MAP_END
 
 
 /* The second i860 - top board */
-static ADDRESS_MAP_START( vid_1_map, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( vid_1_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v1_fb_w)		/* Half of the bits lost to 32-bit bus */
 	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8")		/* M0->P1 com 1 (0x540000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
@@ -373,7 +373,7 @@ ADDRESS_MAP_END
 
 
 /* Sound CPU */
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE("dac", vcombat_dac_w)
@@ -545,7 +545,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER(sound_update)
 {
 	/* Seems reasonable */
-	cpu_set_input_line(device->machine->device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device->machine->device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

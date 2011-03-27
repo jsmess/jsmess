@@ -19,7 +19,7 @@ SCREEN_UPDATE( homelab )
 {
 	int x,y,j,b;
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 25; y++ )
 	{
@@ -42,7 +42,7 @@ SCREEN_UPDATE( homelab3 )
 {
 	int x,y,j,b;
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 25; y++ )
 	{

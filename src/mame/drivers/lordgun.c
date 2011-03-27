@@ -267,7 +267,7 @@ static WRITE16_HANDLER( lordgun_soundlatch_w )
 	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, priority_ram)						// PRIORITY
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aliencha_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, priority_ram)						// PRIORITY
@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lordgun_soundmem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lordgun_soundmem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 //  popmessage("OKI %x", data);
 }
 
-static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8 )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( "ymsnd", ym3812_w )
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aliencha_soundio_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( aliencha_soundio_map, AS_IO, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// writes 03 then 07 at end of NMI
@@ -1022,7 +1022,7 @@ ROM_END
 ROM_START( alienchac )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000
 	// load the world version code in the top half, or it does not work. Are these program roms half size?
-	ROM_LOAD( "igsc0102.u81",     0x00000, 0x200000, NO_DUMP CRC(e3432be3) SHA1(d3597c885571d4a996afaaf29c78da123798371e) )
+	ROM_LOAD( "igsc0102.u81",     0x00000, 0x200000, BAD_DUMP CRC(e3432be3) SHA1(d3597c885571d4a996afaaf29c78da123798371e) )
 	ROM_LOAD16_BYTE( "hfh_p.u80", 0x00000, 0x080000, BAD_DUMP CRC(5175ebdc) SHA1(4a0bdda0f8291f895f888bfd45328b2b124b9051) )
 	ROM_LOAD16_BYTE( "hfh_p.u79", 0x00001, 0x080000, BAD_DUMP CRC(42ad978c) SHA1(eccb96e7170902b37989c8f207e1a821f29b2475) )
 

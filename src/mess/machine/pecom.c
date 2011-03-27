@@ -29,7 +29,7 @@ MACHINE_START( pecom )
 MACHINE_RESET( pecom )
 {
 	UINT8 *rom = machine->region(CDP1802_TAG)->base();
-	address_space *space = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	pecom_state *state = machine->driver_data<pecom_state>();
 
@@ -76,9 +76,9 @@ static WRITE8_HANDLER( pecom_cdp1869_pageram_w )
 WRITE8_HANDLER( pecom_bank_w )
 {
 //  pecom_state *state = space->machine->driver_data<pecom_state>();
-	address_space *space2 = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *space2 = space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *rom = space->machine->region(CDP1802_TAG)->base();
-	memory_install_write_bank(cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_install_write_bank(space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x0000);
 
 	if (data==2)

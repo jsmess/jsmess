@@ -487,7 +487,7 @@ static const UINT8 cc_ex[0x100] = {
 
 DRIVER_INIT( msx )
 {
-	cpu_set_input_line_vector (machine->device("maincpu"), 0, 0xff);
+	device_set_input_line_vector (machine->device("maincpu"), 0, 0xff);
 
 	msx_memory_init (machine);
 

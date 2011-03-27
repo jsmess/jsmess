@@ -166,7 +166,7 @@ static WRITE16_HANDLER( jackpool_io_w )
 	#endif
 }
 
-static ADDRESS_MAP_START( jackpool_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1200ff) AM_RAM
@@ -245,7 +245,7 @@ GFXDECODE_END
 /*irq 2 used for communication stuff.3 is just a rte*/
 static INTERRUPT_GEN( jackpool_interrupt )
 {
-	cpu_set_input_line(device, 1, HOLD_LINE);
+	device_set_input_line(device, 1, HOLD_LINE);
 }
 
 

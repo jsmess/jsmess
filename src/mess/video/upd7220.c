@@ -1402,7 +1402,7 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int sx;
 
 	for (sx = 0; sx < upd7220->pitch * 2; sx++)

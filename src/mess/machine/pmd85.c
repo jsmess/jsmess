@@ -28,7 +28,7 @@ enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 static void pmd851_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
@@ -73,7 +73,7 @@ static void pmd851_update_memory(running_machine *machine)
 static void pmd852a_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
@@ -149,7 +149,7 @@ static void pmd853_update_memory(running_machine *machine)
 static void alfa_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
@@ -183,7 +183,7 @@ static void alfa_update_memory(running_machine *machine)
 static void mato_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
@@ -209,7 +209,7 @@ static void mato_update_memory(running_machine *machine)
 static void c2717_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
@@ -976,5 +976,5 @@ MACHINE_RESET( pmd85 )
 
 	machine->scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, *machine));
 }

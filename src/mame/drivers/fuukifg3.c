@@ -228,7 +228,7 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 
 // Lines with empty comment are for debug only
 
-static ADDRESS_MAP_START( fuuki32_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM																// ROM
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																// Work RAM
@@ -285,14 +285,14 @@ static WRITE8_HANDLER( snd_z80_w )
 	state->shared_ram[offset] = data;
 }
 
-static ADDRESS_MAP_START( fuuki32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7ff0, 0x7fff) AM_READWRITE(snd_z80_r, snd_z80_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki32_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP
@@ -486,7 +486,7 @@ GFXDECODE_END
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
+	device_set_input_line(state->maincpu, 1, HOLD_LINE);
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 }
 
@@ -494,7 +494,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
+	device_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
 	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 }
 
@@ -502,7 +502,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
+	device_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
 }
@@ -539,7 +539,7 @@ static MACHINE_RESET( fuuki32 )
 static void irqhandler( device_t *device, int irq )
 {
 	fuuki32_state *state = device->machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface fuuki32_ymf278b_interface =

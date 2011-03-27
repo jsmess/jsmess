@@ -152,7 +152,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 static void prof80_bankswitch(running_machine *machine)
 {
 	prof80_state *state = machine->driver_data<prof80_state>();
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT8 *rom = machine->region(Z80_TAG)->base();
 	int bank;
@@ -597,10 +597,10 @@ static WRITE8_HANDLER( unio_ctrl_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( prof80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( prof80_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( prof80_io, AS_IO, 8 )
 //  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
 //  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 //  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
@@ -618,7 +618,7 @@ static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( prof80_grip_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( prof80_grip_io, AS_IO, 8 )
 //  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
 //  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 //  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
@@ -635,13 +635,13 @@ static ADDRESS_MAP_START( prof80_grip_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff01) AM_MASK(0xff00) AM_WRITE(par_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grip_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( grip_mem, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x4000, 0x47ff) AM_RAM
     AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( grip_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
 //  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
@@ -670,7 +670,7 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grip5_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( grip5_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
 //  AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)

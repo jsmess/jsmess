@@ -43,23 +43,23 @@ static void a800_setbank(running_machine *machine, int cart_mounted)
 
 	// take care of 0x0000-0x7fff: RAM or NOP
 	ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), 0x8000) - 1;
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, ram_top, 0, 0, "0000");
+	memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, ram_top, 0, 0, "0000");
 	memory_set_bankptr(machine, "0000", ram_get_ptr(machine->device(RAM_TAG)));
 
 	// take care of 0x8000-0x9fff: A800 -> either right slot or RAM or NOP, others -> RAM or NOP
 	// is there anything in the right slot?
 	if (cart_mounted & RIGHT_CARTSLOT_MOUNTED)
 	{
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
+		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
 		memory_set_bankptr(machine, "8000", machine->region("rslot")->base());
-		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
+		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x9fff, 0, 0);
 	}
 	else if (a800_cart_type != BBSB)
 	{
 		ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), 0xa000) - 1;
 		if (ram_top > 0x8000)
 		{
-			memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, ram_top, 0, 0, "8000");
+			memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, ram_top, 0, 0, "8000");
 			memory_set_bankptr(machine, "8000", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 		}
 	}
@@ -72,9 +72,9 @@ static void a800_setbank(running_machine *machine, int cart_mounted)
 		{
 			if (a800_cart_type == A800_16K)
 			{
-				memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
+				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
 				memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
-				memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
+				memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x9fff, 0, 0);
 
 				memcpy(machine->region("maincpu")->base() + 0x10000, machine->region("lslot")->base() + 0x2000, 0x2000);
 			}
@@ -87,44 +87,44 @@ static void a800_setbank(running_machine *machine, int cart_mounted)
 		{
 			memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
 			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x2000);
-			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
 		}
 		else if (a800_cart_type == BBSB)
 		{
 			// this requires separate banking in 0x8000 & 0x9000!
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, "8000");
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0x9fff, 0, 0, "9000");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x8fff, 0, 0, "8000");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9000, 0x9fff, 0, 0, "9000");
 			memory_set_bankptr(machine, "8000", machine->region("lslot")->base() + 0x0000);
 			memory_set_bankptr(machine, "9000", machine->region("lslot")->base() + 0x4000);
 			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x8000);
-			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		}
 		else if (a800_cart_type == OSS_034M)
 		{
 			// this requires separate banking in 0xa000 & 0xb000!
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xafff, 0, 0, "a000");
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xbfff, 0, 0, "b000");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xafff, 0, 0, "a000");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb000, 0xbfff, 0, 0, "b000");
 			memory_set_bankptr(machine, "b000", machine->region("lslot")->base() + 0x3000);
-			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		}
 		else if (a800_cart_type == OSS_M091)
 		{
 			// this requires separate banking in 0xa000 & 0xb000!
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xafff, 0, 0, "a000");
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xbfff, 0, 0, "b000");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xafff, 0, 0, "a000");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb000, 0xbfff, 0, 0, "b000");
 			memory_set_bankptr(machine, "b000", machine->region("lslot")->base());
-			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		}
 		else if (a800_cart_type == XEGS_32K)
 		{
 			memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
 			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x6000);
-			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
 		}
 		else
 		{
 			memory_set_bankptr(machine, "a000", machine->region("lslot")->base());
-			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		}
 	}
 }
@@ -354,29 +354,29 @@ static void a800_setup_mappers(running_machine *machine, int type)
 		case PHOENIX_8K:	// as normal 8k cart, but it can be disabled by writing to 0xd500-0xdfff
 			break;
 		case XEGS_32K:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd5ff, 0, 0, x32_bank_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd500, 0xd5ff, 0, 0, x32_bank_w);
 			break;
 		case OSS_034M:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd5ff, 0, 0, oss_034m_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd500, 0xd5ff, 0, 0, oss_034m_w);
 			break;
 		case OSS_M091:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd5ff, 0, 0, oss_m091_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd500, 0xd5ff, 0, 0, oss_m091_w);
 			break;
 		case BBSB:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, bbsb_bankl_w);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0x9fff, 0, 0, bbsb_bankh_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x8fff, 0, 0, bbsb_bankl_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9000, 0x9fff, 0, 0, bbsb_bankh_w);
 			break;
 		case WILLIAMS_64K:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd50f, 0, 0, w64_bank_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd500, 0xd50f, 0, 0, w64_bank_w);
 			break;
 		case DIAMOND_64K:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd5d0, 0xd5df, 0, 0, ex64_bank_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd5d0, 0xd5df, 0, 0, ex64_bank_w);
 			break;
 		case EXPRESS_64:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd570, 0xd57f, 0, 0, ex64_bank_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd570, 0xd57f, 0, 0, ex64_bank_w);
 			break;
 		case SPARTADOS_X:
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd5e0, 0xd5ef, 0, 0, ex64_bank_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd5e0, 0xd5ef, 0, 0, ex64_bank_w);
 			break;
 		default:
 			break;
@@ -659,7 +659,7 @@ static WRITE8_HANDLER( xegs_bankswitch )
 
 MACHINE_START( xegs )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *cart = space->machine->region("user1")->base();
 	UINT8 *cpu  = space->machine->region("maincpu")->base();
 

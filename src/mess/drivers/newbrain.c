@@ -86,7 +86,7 @@ static void newbrain_eim_bankswitch(running_machine *machine)
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
 
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	int bank;
 
 	for (bank = 1; bank < 9; bank++)
@@ -126,7 +126,7 @@ static void newbrain_a_bankswitch(running_machine *machine)
 {
 	newbrain_state *state = machine->driver_data<newbrain_state>();
 
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	int bank;
 
 	if (state->paging)
@@ -1088,7 +1088,7 @@ static ADC080X_INTERFACE( newbrain_adc0809_intf )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( newbrain_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( newbrain_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
@@ -1100,7 +1100,7 @@ static ADDRESS_MAP_START( newbrain_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newbrain_ei_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( newbrain_ei_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(clusr_r, clusr_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_WRITE(ei_enrg2_w)
@@ -1123,7 +1123,7 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(ei_paging_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newbrain_a_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( newbrain_a_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xffc0) AM_READWRITE(clusr_r, clusr_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xffc0) AM_WRITE(user_w)
@@ -1136,7 +1136,7 @@ static ADDRESS_MAP_START( newbrain_a_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(user_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newbrain_cop_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( newbrain_cop_io_map, AS_IO, 8 )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(newbrain_cop_l_r, newbrain_cop_l_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(newbrain_cop_g_r, newbrain_cop_g_w)
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(newbrain_cop_d_w)
@@ -1146,12 +1146,12 @@ static ADDRESS_MAP_START( newbrain_cop_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_CKO, COP400_PORT_CKO) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newbrain_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( newbrain_fdc_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newbrain_fdc_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( newbrain_fdc_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD(UPD765_TAG, upd765_status_r)

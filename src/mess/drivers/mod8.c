@@ -53,13 +53,13 @@ static READ8_HANDLER(tty_r)
 	return d;
 }
 
-static ADDRESS_MAP_START(mod8_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mod8_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000,0x6ff) AM_ROM
 	AM_RANGE(0x700,0xfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mod8_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( mod8_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00,0x00) AM_READ(tty_r)
 	AM_RANGE(0x0a,0x0a) AM_WRITE(out_w)
@@ -77,7 +77,7 @@ static IRQ_CALLBACK ( mod8_irq_callback )
 
 static MACHINE_RESET(mod8)
 {
-	cpu_set_irq_callback(machine->device("maincpu"), mod8_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), mod8_irq_callback);
 }
 
 static WRITE8_DEVICE_HANDLER( mod8_kbd_put )

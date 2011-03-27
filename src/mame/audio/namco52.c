@@ -135,7 +135,7 @@ static WRITE8_HANDLER( namco_52xx_O_w )
 static TIMER_CALLBACK( namco_52xx_irq_clear )
 {
 	namco_52xx_state *state = get_safe_token((device_t *)ptr);
-	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
+	device_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
 WRITE8_DEVICE_HANDLER( namco_52xx_write )
@@ -144,7 +144,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 
 	device->machine->scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
 
-	cpu_set_input_line(state->cpu, 0, ASSERT_LINE);
+	device_set_input_line(state->cpu, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
@@ -170,7 +170,7 @@ static TIMER_CALLBACK( external_clock_pulse )
     DEVICE INTERFACE
 ***************************************************************************/
 
-static ADDRESS_MAP_START( namco_52xx_map_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( namco_52xx_map_io, AS_IO, 8 )
 	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_52xx_K_r)
 	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_52xx_O_w)
 	AM_RANGE(MB88_PORTP,  MB88_PORTP)  AM_WRITE(namco_52xx_P_w)

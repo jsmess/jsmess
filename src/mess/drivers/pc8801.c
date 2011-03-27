@@ -863,7 +863,7 @@ static WRITE8_HANDLER( pc8801_mem_w )
 	}
 }
 
-static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8801_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8801_mem_r,pc8801_mem_w)
 ADDRESS_MAP_END
 
@@ -1322,7 +1322,7 @@ static WRITE8_HANDLER( pc8801_rtc_w )
 	/* TODO: remaining bits */
 }
 
-static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8801_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("KEY0")
@@ -1444,7 +1444,7 @@ static I8255A_INTERFACE( slave_fdd_intf )
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
-static ADDRESS_MAP_START( pc8801fdc_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1487,7 +1487,7 @@ static WRITE8_HANDLER( fdc_drive_mode_w )
 		printf("drive 1 sets up %s floppy format\n",data & 2 ? "2hd" : "2dd");
 }
 
-static ADDRESS_MAP_START( pc8801fdc_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
@@ -1948,14 +1948,14 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 	if(vrtc_irq_mask)
 	{
 		vrtc_irq_latch = 1;
-		cpu_set_input_line(device,0,HOLD_LINE);
+		device_set_input_line(device,0,HOLD_LINE);
 	}
 }
 #endif
 
 static MACHINE_START( pc8801 )
 {
-	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
 
 	upd1990a_cs_w(machine->device("upd1990a"), 1);
 	upd1990a_oe_w(machine->device("upd1990a"), 1);
@@ -1974,7 +1974,7 @@ static MACHINE_RESET( pc8801 )
 
 	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 
-	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
+	device_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 
 	{
 		txt_color = 2;
@@ -2042,8 +2042,8 @@ static MACHINE_RESET( pc8801_clock_speed )
 	has_clock_speed = 1;
 	clock_setting = input_port_read(machine, "CFG") & 0x80;
 
-	cputag_set_clock(machine, "maincpu", clock_setting ?  XTAL_4MHz : XTAL_8MHz);
-	cputag_set_clock(machine, "fdccpu", clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	machine->device("maincpu")->set_unscaled_clock(clock_setting ?  XTAL_4MHz : XTAL_8MHz);
+	machine->device("fdccpu")->set_unscaled_clock(clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
 	baudrate_val = 0;
 }
 

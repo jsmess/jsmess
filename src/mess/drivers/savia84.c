@@ -49,14 +49,14 @@ public:
 	UINT8 m_digit;
 };
 
-static ADDRESS_MAP_START(savia84_mem, ADDRESS_SPACE_PROGRAM, 8, savia84_state)
+static ADDRESS_MAP_START(savia84_mem, AS_PROGRAM, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the cPU
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x2000) AM_WRITENOP // see notes above
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( savia84_io , ADDRESS_SPACE_IO, 8, savia84_state)
+static ADDRESS_MAP_START( savia84_io , AS_IO, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ppi8255", i8255a_r, i8255a_w) // ports F8-FB

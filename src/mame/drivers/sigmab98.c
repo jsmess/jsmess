@@ -427,7 +427,7 @@ static WRITE8_HANDLER( c8_w )
 	show_outputs();
 }
 
-static ADDRESS_MAP_START( gegege_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( gegege_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gegege_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gegege_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE( 0x00, 0x01 ) AM_DEVWRITE( "ymz", ymz280b_w )
@@ -667,7 +667,7 @@ static READ8_HANDLER( sammymdl_coin_hopper_r )
 }
 
 static UINT8 *nvram;
-static ADDRESS_MAP_START( animalc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK( "rombank" )
 	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" ) AM_BASE( &nvram )
@@ -685,7 +685,7 @@ static ADDRESS_MAP_START( animalc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( animalc_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( animalc_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( animalc_rombank_r, animalc_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( animalc_rambank_r, animalc_rambank_w )
@@ -913,14 +913,14 @@ static WRITE8_HANDLER( haekaka_coin_w )
 	show_3_outputs();
 }
 
-static ADDRESS_MAP_START( haekaka_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( haekaka_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE( haekaka_b000_r, haekaka_b000_w )
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE( &nvram )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( haekaka_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( haekaka_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( haekaka_rombank_r, haekaka_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( haekaka_rambank_r, haekaka_rambank_w )
@@ -1144,7 +1144,7 @@ static READ8_HANDLER( itazuram_palette_r )
 	return space->machine->generic.paletteram.u8[offset];
 }
 
-static ADDRESS_MAP_START( itazuram_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x37ff ) AM_ROM
 	AM_RANGE( 0x3800, 0x47ff ) AM_READ_BANK( "rombank0" ) AM_WRITE_BANK( "sprbank0" )
 	AM_RANGE( 0x4800, 0x57ff ) AM_READ_BANK( "rombank1" ) AM_WRITE_BANK( "sprbank1" )
@@ -1159,7 +1159,7 @@ static ADDRESS_MAP_START( itazuram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itazuram_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( itazuram_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( itazuram_rombank_r, itazuram_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( itazuram_rambank_r, itazuram_rambank_w )
@@ -1180,7 +1180,7 @@ ADDRESS_MAP_END
                              Pye-nage Taikai
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pyenaget_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pyenaget_io, AS_IO, 8 )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_IMPORT_FROM( haekaka_io )
 ADDRESS_MAP_END
@@ -1368,14 +1368,14 @@ static WRITE8_HANDLER( tdoboon_c000_w )
 	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xc000, data, rombank);
 }
 
-static ADDRESS_MAP_START( tdoboon_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tdoboon_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
 	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE( tdoboon_c000_r, tdoboon_c000_w )
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE( &nvram )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tdoboon_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( tdoboon_rombank_r, tdoboon_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( tdoboon_rambank_r, tdoboon_rambank_w )
@@ -1545,7 +1545,7 @@ const eeprom_interface eeprom_intf =
 
 static INTERRUPT_GEN( gegege_vblank_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
 }
 
 static MACHINE_CONFIG_START( gegege, sigmab98_state )
@@ -1644,15 +1644,15 @@ static INTERRUPT_GEN( animalc )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// increment counter
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// increment counter
 			break;
 
 		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);	// read hopper state
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);	// read hopper state
 			break;
 
 		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1e);	// drive hopper motor
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1e);	// drive hopper motor
 			break;
 	}
 }
@@ -1673,15 +1673,15 @@ static INTERRUPT_GEN( haekaka )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x04);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x04);
 			break;
 
 		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1a);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1a);
 			break;
 
 		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);
 			break;
 	}
 }
@@ -1702,15 +1702,15 @@ static INTERRUPT_GEN( itazuram )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// sprites
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// sprites
 			break;
 
 		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	// copy palette
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	// copy palette
 			break;
 
 		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x16);	// hopper, i/o
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x16);	// hopper, i/o
 			break;
 	}
 }

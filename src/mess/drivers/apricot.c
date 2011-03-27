@@ -237,7 +237,7 @@ static DRIVER_INIT( apricot )
 {
 	apricot_state *apricot = machine->driver_data<apricot_state>();
 	device_t *maincpu = machine->device("maincpu");
-	address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *prg = maincpu->memory().space(AS_PROGRAM);
 
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
@@ -245,7 +245,7 @@ static DRIVER_INIT( apricot )
 	memory_unmap_readwrite(prg, 0x40000, 0xeffff, 0, 0);
 	memory_install_ram(prg, 0x00000, ram_size - 1, 0, 0, ram);
 
-	cpu_set_irq_callback(maincpu, apricot_irq_ack);
+	device_set_irq_callback(maincpu, apricot_irq_ack);
 
 	apricot->pic8259 = machine->device("ic31");
 	apricot->wd2793 = machine->device("ic68");
@@ -260,14 +260,14 @@ static DRIVER_INIT( apricot )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( apricot_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
 	AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_BASE_MEMBER(apricot_state, screen_buffer)
 	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( apricot_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( apricot_io, AS_IO, 16 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("ic68", wd17xx_r, wd17xx_w, 0x00ff)
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255a_r, i8255a_w, 0x00ff)

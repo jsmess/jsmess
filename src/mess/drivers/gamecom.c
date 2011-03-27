@@ -21,7 +21,7 @@ Todo:
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
 
-static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM
 	AM_RANGE( 0x0014, 0x0017 )  AM_READWRITE( gamecom_pio_r, gamecom_pio_w )        // buttons
 	AM_RANGE( 0x0018, 0x001F )  AM_RAM

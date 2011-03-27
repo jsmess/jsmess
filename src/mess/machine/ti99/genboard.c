@@ -357,7 +357,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 	if (board->peribox==NULL) return 0;
 
 	if (!board->zero_wait)
-		cpu_adjust_icount(board->cpu, -4);
+		device_adjust_icount(board->cpu, -4);
 
 	UINT32	physaddr;
 
@@ -473,7 +473,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		if ((physaddr & 0x180000)==0x000000)
 		{
 			// DRAM. One wait state.
-			cpu_adjust_icount(board->cpu, -4);
+			device_adjust_icount(board->cpu, -4);
 			value = board->dram[physaddr & 0x07ffff];
 			return value;
 		}
@@ -481,7 +481,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		if ((physaddr & 0x180000)==0x080000)
 		{
 			// On-board memory expansion for standard Geneve (never used)
-			cpu_adjust_icount(board->cpu, -4);
+			device_adjust_icount(board->cpu, -4);
 			return 0;
 		}
 
@@ -507,7 +507,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
 		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
 		// Add a wait state
-		cpu_adjust_icount(board->cpu, -4);
+		device_adjust_icount(board->cpu, -4);
 		physaddr = (physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
 		ti99_peb_data_rz(board->peribox, physaddr, &value);
 		return value;
@@ -517,7 +517,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		// GenMod mode
 		if (!board->turbo)
 		{
-			cpu_adjust_icount(board->cpu, -4);
+			device_adjust_icount(board->cpu, -4);
 		}
 		if ((board->timode) && ((physaddr & 0x180000)==0x000000))
 		{
@@ -549,7 +549,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 	if (board->peribox==NULL) return;
 
 	if (!board->zero_wait)
-		cpu_adjust_icount(board->cpu, -4);
+		device_adjust_icount(board->cpu, -4);
 
 	if (board->geneve_mode)
 	{
@@ -674,7 +674,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 		if ((physaddr & 0x180000)==0x000000)
 		{
 			// DRAM write. One wait state. (only for normal Geneve)
-			cpu_adjust_icount(board->cpu, -4);
+			device_adjust_icount(board->cpu, -4);
 			board->dram[physaddr & 0x07ffff] = data;
 			return;
 		}
@@ -704,7 +704,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 		}
 		// Route everything else to the P-Box
 		// Add a wait state
-		cpu_adjust_icount(board->cpu, -4);
+		device_adjust_icount(board->cpu, -4);
 
 		// only AMA, AMB, AMC are used; AMD and AME are not used
 		physaddr = (physaddr & 0x0007ffff);  // 19 bit address
@@ -715,7 +715,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 		// GenMod mode
 		if (!board->turbo)
 		{
-			cpu_adjust_icount(board->cpu, -4);
+			device_adjust_icount(board->cpu, -4);
 		}
 		if ((board->timode) && ((physaddr & 0x180000)==0x000000))
 		{

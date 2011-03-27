@@ -172,7 +172,7 @@ WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
 MACHINE_START( aim65 )
 {
 	device_t *ram = machine->device(RAM_TAG);
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Init RAM */
 	memory_install_ram(space, 0x0000, ram_get_size(ram) - 1, 0, 0, ram_get_ptr(ram));

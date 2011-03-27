@@ -124,7 +124,7 @@ static WRITE8_HANDLER( vram_w )
 	vram[offset] = data;
 }
 
-static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM
 	AM_RANGE( 0x40000, 0x4ffff) AM_RAM
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( compis_io, AS_IO, 16 )
 	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xff00)
 	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 /* TODO */
-static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( keyboard_io, AS_IO, 8 )
   AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP
   AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
   AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
@@ -351,7 +351,7 @@ static GFXDECODE_START( compis )
 	GFXDECODE_ENTRY( "bios", 0x0000, compis_charlayout, 1, 7 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( upd7220_map, 0, 8 )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 

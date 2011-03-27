@@ -196,14 +196,14 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 
 	/* install the handlers */
 	if (read_addr == NULL) {
-		memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0);
+		memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0);
 	} else {
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu",  ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0, bank_0);
+		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0, bank_0);
 	}
 	if (write_addr == NULL) {
-		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0);
+		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0);
 	} else {
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0, bank_1);
+		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0, bank_1);
 	}
 
 	/* and set the banks */
@@ -313,7 +313,7 @@ static MACHINE_RESET( z88 )
 	z88_refresh_memory_bank(machine, 3);
 }
 
-static ADDRESS_MAP_START(z88_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START(z88_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank7")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank8")
@@ -561,7 +561,7 @@ static  READ8_HANDLER(z88_port_r)
 			{
 				state->blink.z88_state = Z88_SNOOZE;
 				/* spin cycles until rtc timer */
-				cpu_spinuntil_trigger( space->machine->device("maincpu"), Z88_SNOOZE_TRIGGER);
+				device_spin_until_trigger( space->machine->device("maincpu"), Z88_SNOOZE_TRIGGER);
 
 				logerror("z88 entering snooze!\n");
 			}
@@ -631,7 +631,7 @@ static  READ8_HANDLER(z88_port_r)
 }
 
 
-static ADDRESS_MAP_START( z88_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( z88_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xFFFF)
 	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(z88_port_r, z88_port_w)
 ADDRESS_MAP_END

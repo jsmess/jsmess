@@ -53,14 +53,14 @@ static WRITE8_HANDLER( selz80_00_w )
 	output_set_digit_value(state->digit, state->segment);
 }
 
-static ADDRESS_MAP_START(selz80_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(selz80_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(selz80_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(selz80_io, AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(selz80_00_r,selz80_00_w)

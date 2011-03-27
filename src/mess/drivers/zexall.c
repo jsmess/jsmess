@@ -112,7 +112,7 @@ WRITE8_MEMBER( zexall_state::zexall_output_data_w )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8, zexall_state)
+static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, zexall_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xfffc) AM_RAM AM_BASE(main_ram)
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(zexall_output_ack_r,zexall_output_ack_w)
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8, zexall_state)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(zexall_output_data_r,zexall_output_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8, zexall_state)
+static ADDRESS_MAP_START(z80_io, AS_IO, 8, zexall_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0001, 0x0001) AM_NOP // really a disable/enable for some sort of interrupt timer on kev's hardware, which is completely irrelevant for the zexall test
 ADDRESS_MAP_END

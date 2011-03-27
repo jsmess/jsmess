@@ -470,9 +470,9 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		cputag_set_clock(machine, "maincpu", MASTER_CLOCK/16);
+		machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK/16);
 	else
-		cputag_set_clock(machine, "maincpu", MASTER_CLOCK/8);
+		machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
@@ -615,7 +615,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		cpu_adjust_icount(space->cpu, -1);
+		device_adjust_icount(space->cpu, -1);
 	}
 }
 
@@ -651,7 +651,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		cpu_adjust_icount(space->cpu, -1);
+		device_adjust_icount(space->cpu, -1);
 	}
 	return result;
 }
@@ -827,7 +827,7 @@ static READ8_HANDLER( missile_r )
  *************************************/
 
 /* complete memory map derived from schematics (implemented above) */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_BASE_MEMBER(missile_state, videoram)
 ADDRESS_MAP_END
 

@@ -197,7 +197,7 @@ static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
  */
 static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 {
-	address_space *cpu0space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *cpu0space = device->machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
@@ -290,7 +290,7 @@ DRIVER_INIT( sym1 )
 	/* wipe expansion memory banks that are not installed */
 	if (ram_get_size(machine->device(RAM_TAG)) < 4*1024)
 	{
-		memory_nop_readwrite(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
+		memory_nop_readwrite(machine->device( "maincpu")->memory().space( AS_PROGRAM ),
 			ram_get_size(machine->device(RAM_TAG)), 0x0fff, 0, 0);
 	}
 
@@ -304,8 +304,8 @@ MACHINE_RESET( sym1 )
 	sym1_state *state = machine->driver_data<sym1_state>();
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
        so that the CPU can find its reset vectors */
-	memory_install_read_bank(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
-	memory_nop_write(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0);
+	memory_install_read_bank(machine->device( "maincpu")->memory().space( AS_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
+	memory_nop_write(machine->device( "maincpu")->memory().space( AS_PROGRAM ),0xf800, 0xffff, 0, 0);
 	memory_set_bankptr(machine, "bank1", state->monitor + 0x800);
 	machine->device("maincpu")->reset();
 }

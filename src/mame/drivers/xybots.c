@@ -82,7 +82,7 @@ static READ16_HANDLER( special_port1_r )
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM	/* slapstic maps here */
@@ -360,7 +360,7 @@ ROM_START( xybots0 )
 	ROM_LOAD16_BYTE( "136054-0115.19b", 0x020001, 0x008000, CRC(7f116360) SHA1(d12c339ce973bd74be4a4ac9e9d293f6a6e358d6) )
 
 	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
-	ROM_LOAD( "136054-0116.2k",  0x010000, 0x004000, NO_DUMP CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
+	ROM_LOAD( "136054-0116.2k",  0x010000, 0x004000, BAD_DUMP CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) ) // not dumped from this pcb, rom taken from another set instead
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )

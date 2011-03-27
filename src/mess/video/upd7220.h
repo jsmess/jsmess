@@ -45,7 +45,7 @@ DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
 #define MCFG_UPD7220_ADD(_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, UPD7220, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
 #define UPD7220_INTERFACE(name) \
 	const upd7220_interface (name) =

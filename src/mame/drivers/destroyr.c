@@ -119,7 +119,7 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 
 	if (state->potmask[dial])
 	{
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
 	destroyr_state *state = space->machine->driver_data<destroyr_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -249,7 +249,7 @@ static READ8_HANDLER( destroyr_scanline_r )
 }
 
 
-static ADDRESS_MAP_START( destroyr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)

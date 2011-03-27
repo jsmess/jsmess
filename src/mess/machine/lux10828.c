@@ -231,7 +231,7 @@ const rom_entry *luxor_55_10828_device_config::rom_region() const
 //  ADDRESS_MAP( luxor_55_10828_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_10828_mem, ADDRESS_SPACE_PROGRAM, 8, luxor_55_10828_device )
+static ADDRESS_MAP_START( luxor_55_10828_mem, AS_PROGRAM, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("luxor_55_10828:abc830", 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
@@ -242,7 +242,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( luxor_55_10828_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_10828_io, ADDRESS_SPACE_IO, 8, luxor_55_10828_device )
+static ADDRESS_MAP_START( luxor_55_10828_io, AS_IO, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_DEVREADWRITE(DEVICE_SELF_OWNER, luxor_55_10828_device, fdc_r, fdc_w)
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	if (state)
 	{
 		// TODO: this is really connected to the Z80 WAIT line
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -378,7 +378,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 	if (state)
 	{
 		// TODO: this is really connected to the Z80 WAIT line
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -616,8 +616,8 @@ void luxor_55_10828_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-		cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -630,8 +630,8 @@ void luxor_55_10828_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
@@ -726,7 +726,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
 		// TODO: this is really connected to the Z80 WAIT line
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	switch (offset & 0x03)
@@ -752,7 +752,7 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 	{
 		logerror("WAIT\n");
 		// TODO: this is really connected to the Z80 WAIT line
-		cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	// FD1791 has inverted data lines

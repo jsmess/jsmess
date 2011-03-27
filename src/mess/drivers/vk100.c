@@ -61,14 +61,14 @@ public:
 };
 
 
-static ADDRESS_MAP_START(vk100_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x67ff ) AM_ROM
 	//AM_RANGE( 0x7000, 0x700f) AM_DEVREADWRITE(vk100_keyboard) AM_MIRROR(0x0ff0)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vk100_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( vk100_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	// Comments are from page 118 (5-14) of http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
 	//AM_RANGE (0x40, 0x40) AM_WRITE(X_low)  //LD X LO \_ 12 bits

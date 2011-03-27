@@ -35,20 +35,20 @@ static READ8_HANDLER( n8080_shift_r )
 	return state->shift_data >> (8 - state->shift_bits);
 }
 
-static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, videoram)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( helifire_main_cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(n8080_state, colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -397,7 +397,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	cpu_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xcf);
+	device_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
@@ -406,7 +406,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	cpu_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xd7);
+	device_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
@@ -420,7 +420,7 @@ static WRITE8_DEVICE_HANDLER( n8080_status_callback )
 	if (data & I8085_STATUS_INTA)
 	{
 		/* interrupt acknowledge */
-		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
+		device_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 

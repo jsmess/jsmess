@@ -131,14 +131,14 @@ static WRITE8_HANDLER ( cassette_w )
 }
 
 
-static ADDRESS_MAP_START( vg5k_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( vg5k_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_NOP /* messram expansion memory */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vg5k_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( vg5k_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 
@@ -359,7 +359,7 @@ static DRIVER_INIT( vg5k )
 
 
 	/* install expansion memory*/
-	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT16 ram_size = ram_get_size(machine->device(RAM_TAG));
 

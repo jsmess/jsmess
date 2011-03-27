@@ -108,13 +108,13 @@ static WRITE8_HANDLER( mk1_f8_w ) {
 	if ( ! ( state->f8[1] & 8 ) ) state->led[3] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
 }
 
-static ADDRESS_MAP_START( mk1_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mk1_mem, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x1800, 0x18ff ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mk1_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mk1_io, AS_IO, 8 )
 	AM_RANGE( 0x0, 0x1 ) AM_READWRITE( mk1_f8_r, mk1_f8_w )
 	AM_RANGE( 0xc, 0xf ) AM_DEVREADWRITE("f3853", f3853_r, f3853_w )
 ADDRESS_MAP_END
@@ -176,7 +176,7 @@ static MACHINE_START( mk1 )
 
 static void mk1_interrupt( device_t *device, UINT16 addr, int level )
 {
-	cpu_set_input_line_vector(device->machine->device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
+	device_set_input_line_vector(device->machine->device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
 
 	cputag_set_input_line(device->machine,"maincpu", F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
 }

@@ -280,7 +280,7 @@ static void orionz80_switch_bank(running_machine *machine)
 	orion_state *state = machine->driver_data<orion_state>();
 	UINT8 bank_select;
 	UINT8 segment_select;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	bank_select = (state->orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = state->orionz80_dispatcher & 0x03;
@@ -343,7 +343,7 @@ WRITE8_HANDLER ( orionz80_dispatcher_w )
 MACHINE_RESET ( orionz80 )
 {
 	orion_state *state = machine->driver_data<orion_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_install_write_bank(space, 0x4000, 0xefff, 0, 0, "bank2");
@@ -385,7 +385,7 @@ INTERRUPT_GEN( orionz80_interrupt )
 	orion_state *state = device->machine->driver_data<orion_state>();
 	if ((state->orionz80_dispatcher & 0x40)==0x40)
 	{
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -428,7 +428,7 @@ static WRITE8_HANDLER ( orionpro_memory_page_w );
 static void orionpro_bank_switch(running_machine *machine)
 {
 	orion_state *state = machine->driver_data<orion_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int page = state->orionpro_page & 7; // we have only 8 pages
 	int is128 = (state->orionpro_dispatcher & 0x80) ? 1 : 0;
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));

@@ -48,7 +48,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 
 INTERRUPT_GEN( galaxy_interrupt )
 {
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
@@ -124,8 +124,8 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			break;
 	}
 
-	cpu_set_input_line(cpu, INPUT_LINE_NMI, CLEAR_LINE);
-	cpu_set_input_line(cpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	device_set_input_line(cpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(cpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( galaxy )
@@ -156,7 +156,7 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT( galaxy )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	memory_install_readwrite_bank( space, 0x2800, 0x2800 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
@@ -173,7 +173,7 @@ DRIVER_INIT( galaxy )
 MACHINE_RESET( galaxy )
 {
 	galaxy_state *state = machine->driver_data<galaxy_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
 	if (input_port_read(machine, "ROM2")) {
@@ -186,7 +186,7 @@ MACHINE_RESET( galaxy )
 	if (input_port_read(machine, "ROM2"))
 		memory_set_bankptr(machine,"bank10", machine->region("maincpu")->base() + 0x1000);
 
-	cpu_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
 	state->interrupts_enabled = TRUE;
 }
 
@@ -199,9 +199,9 @@ MACHINE_RESET( galaxyp )
 {
 	galaxy_state *state = machine->driver_data<galaxy_state>();
 	UINT8 *ROM = machine->region("maincpu")->base();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	cpu_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;

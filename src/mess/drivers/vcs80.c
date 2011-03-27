@@ -44,12 +44,12 @@ static WRITE8_DEVICE_HANDLER( vcs80_z80pio_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vcs80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( vcs80_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_ROM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcs80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( vcs80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, vcs80_z80pio_r, vcs80_z80pio_w)
 ADDRESS_MAP_END
@@ -251,8 +251,8 @@ DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 
 static DRIVER_INIT( vcs80 )
 {
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
+	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
+	machine->device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
 }
 
 /* System Drivers */

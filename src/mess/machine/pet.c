@@ -206,7 +206,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
 	driver_state->pia0_irq = state;
 	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
+	device_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia0 =
@@ -293,7 +293,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
 	driver_state->pia1_irq = state;
 	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
+	device_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia1 =
@@ -427,7 +427,7 @@ static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 	driver_state->via_irq = state;
 	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
+	device_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
 }
 
 const via6522_interface pet_via =
@@ -701,12 +701,12 @@ static void pet_common_driver_init( running_machine *machine )
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank10");
+	memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", state->memory);
 
 	if (ram_get_size(machine->device(RAM_TAG)) < 0x8000)
 	{
-		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ram_get_size(machine->device(RAM_TAG)), 0x7FFF, 0, 0);
+		memory_nop_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), ram_get_size(machine->device(RAM_TAG)), 0x7FFF, 0, 0);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
@@ -795,13 +795,13 @@ MACHINE_RESET( pet )
 	{
 		if (input_port_read(machine, "CFG") & 0x08)
 		{
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, cbm8096_w);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff0, 0xfff0, 0, 0, cbm8096_w);
 		}
 		else
 		{
-			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0);
+			memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff0, 0xfff0, 0, 0);
 		}
-		cbm8096_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
+		cbm8096_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 	}
 
 //removed   cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
@@ -821,14 +821,14 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	{
 		if (input_port_read(device->machine, "CFG") & 0x04)
 		{
-			cpu_set_input_line(device, INPUT_LINE_HALT, 1);
-			cpu_set_input_line(device, INPUT_LINE_HALT, 0);
+			device_set_input_line(device, INPUT_LINE_HALT, 1);
+			device_set_input_line(device, INPUT_LINE_HALT, 0);
 			state->font |= 2;
 		}
 		else
 		{
-			cpu_set_input_line(device, INPUT_LINE_HALT, 0);
-			cpu_set_input_line(device, INPUT_LINE_HALT, 1);
+			device_set_input_line(device, INPUT_LINE_HALT, 0);
+			device_set_input_line(device, INPUT_LINE_HALT, 1);
 			state->font &= ~2;
 		}
 	}

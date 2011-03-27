@@ -55,12 +55,12 @@ static READ8_HANDLER( czk80_81_r )
 	return 1 | ((state->term_data) ? 2 : 0);
 }
 
-static ADDRESS_MAP_START(czk80_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(czk80_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(czk80_state, ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( czk80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( czk80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(czk80_80_r,czk80_80_w)
 	AM_RANGE(0x81, 0x81) AM_READ(czk80_81_r)

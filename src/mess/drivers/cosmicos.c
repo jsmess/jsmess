@@ -162,13 +162,13 @@ static WRITE8_HANDLER( display_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cosmicos_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cosmicos_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_REGION(CDP1802_TAG, 0)
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cosmicos_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cosmicos_io, AS_IO, 8 )
 //  AM_RANGE(0x00, 0x00)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1864_TAG, video_on_r)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(CDP1864_TAG, video_off_r, audio_latch_w)
@@ -283,7 +283,7 @@ static INPUT_CHANGED( clear_data )
 static void set_ram_mode(running_machine *machine)
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
-	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->ram_disable)
@@ -488,8 +488,8 @@ static COSMAC_SC_WRITE( cosmicos_sc_w )
 
 	if (sc1)
 	{
-		cpu_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
-		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+		device_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		device_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
 	}
 
 	driver_state->sc1 = sc1;
@@ -540,7 +540,7 @@ static COSMAC_INTERFACE( cosmicos_config )
 static MACHINE_START( cosmicos )
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
-	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->dm9368 = machine->device(DM9368_TAG);
@@ -681,7 +681,7 @@ DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 
 static DRIVER_INIT( cosmicos )
 {
-	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	program->set_direct_update_handler(direct_update_delegate_create_static(cosmicos_direct_update_handler, *machine));
 }

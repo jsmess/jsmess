@@ -711,7 +711,7 @@ static IRQ_CALLBACK(irq_callback)
 static void irq_init(running_machine *machine)
 {
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static INTERRUPT_GEN(model1_interrupt)
@@ -845,7 +845,7 @@ static READ16_HANDLER( snd_68k_ready_r )
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(space->cpu, attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -862,10 +862,10 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	// signal the 68000 that there's data waiting
 	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 	// give the 68k time to reply
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(space->cpu, attotime::from_usec(40));
 }
 
-static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
@@ -908,12 +908,12 @@ static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( model1_io, AS_IO, 16 )
 	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_tgp_copro_ram_r)
 	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_tgp_copro_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
@@ -956,7 +956,7 @@ static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_vr_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16 )
 	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
 	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
 ADDRESS_MAP_END
@@ -992,7 +992,7 @@ static WRITE16_HANDLER( m1_snd_68k_latch2_w )
 {
 }
 
-static ADDRESS_MAP_START( model1_snd, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE( m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
 	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE( m1_snd_v60_ready_r, m1_snd_68k_latch2_w )

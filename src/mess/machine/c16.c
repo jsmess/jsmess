@@ -389,7 +389,7 @@ void c16_interrupt( running_machine *machine, int level )
 	if (level != state->old_level)
 	{
 		DBG_LOG(machine, 3, "mos7501", ("irq %s\n", level ? "start" : "end"));
-		cpu_set_input_line(state->maincpu, M6510_IRQ_LINE, level);
+		device_set_input_line(state->maincpu, M6510_IRQ_LINE, level);
 		state->old_level = level;
 	}
 }
@@ -453,7 +453,7 @@ DRIVER_INIT( plus4sid )
 
 MACHINE_RESET( c16 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	c16_state *state = machine->driver_data<c16_state>();
 	UINT8 *ram = ram_get_ptr(state->messram);
 	UINT32 ram_size = ram_get_size(state->messram);
@@ -513,7 +513,7 @@ static WRITE8_HANDLER( c16_sidcart_64k )
 
 static TIMER_CALLBACK( c16_sidhack_tick )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	c16_state *state = space->machine->driver_data<c16_state>();
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x02)
@@ -533,7 +533,7 @@ static TIMER_CALLBACK( c16_sidhack_tick )
 static TIMER_CALLBACK( c16_sidcard_tick )
 {
 	c16_state *state = machine->driver_data<c16_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x01)
 		memory_install_readwrite8_device_handler(space, state->sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r, sid6581_w);

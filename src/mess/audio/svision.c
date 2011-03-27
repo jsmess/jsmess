@@ -95,7 +95,7 @@ WRITE8_DEVICE_HANDLER( svision_sounddma_w )
 			state->dma.size = (data ? data : 0x100) * 32;
 			break;
 		case 3:
-			state->dma.step = cputag_get_clock(device->machine, "maincpu") / (256.0 * device->machine->sample_rate * (1 + (data & 3)));
+			state->dma.step = device->machine->device("maincpu")->unscaled_clock() / (256.0 * device->machine->sample_rate * (1 + (data & 3)));
 			state->dma.right = data & 4;
 			state->dma.left = data & 8;
 			state->dma.ca14to16 = ((data & 0x70) >> 4) << 14;
@@ -119,7 +119,7 @@ WRITE8_DEVICE_HANDLER( svision_noise_w )
 	{
 		case 0:
 			state->noise.volume=data&0xf;
-			state->noise.step= cputag_get_clock(device->machine, "maincpu") / (256.0*device->machine->sample_rate*(1+(data>>4)));
+			state->noise.step= device->machine->device("maincpu")->unscaled_clock() / (256.0*device->machine->sample_rate*(1+(data>>4)));
 			break;
 		case 1:
 			state->noise.count = data + 1;
@@ -153,7 +153,7 @@ void svision_soundport_w(device_t *device, int which, int offset, int data)
 			if (size)
 			{
 				//  channel->size=(int)(device->machine->sample_rate*(size<<5)/4e6);
-				channel->size= (int) (device->machine->sample_rate * (size << 5) / cputag_get_clock(device->machine, "maincpu"));
+				channel->size= (int) (device->machine->sample_rate * (size << 5) / device->machine->device("maincpu")->unscaled_clock());
 			}
 			else
 			{
@@ -262,7 +262,7 @@ static STREAM_UPDATE( svision_update )
 			}
 			else
 			{
-				sample = cputag_get_address_space(device->machine,"maincpu", ADDRESS_SPACE_PROGRAM)->read_byte(addr);
+				sample = device->machine->device("maincpu")->memory().space(AS_PROGRAM)->read_byte(addr);
 			}
 			if (((unsigned)state->dma.pos) & 1)
 				s = (sample & 0xf);

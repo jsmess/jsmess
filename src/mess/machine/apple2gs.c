@@ -1133,7 +1133,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x36:	/* C036 - CYAREG */
 			state->cyareg = data & ~0x20;
-			cputag_set_clock(space->machine, "maincpu", (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
+			space->machine->device("maincpu")->set_unscaled_clock((data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
 		case 0x38:	/* C038 - SCCBREG */
@@ -1515,7 +1515,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 	else if ((address & 0x000F00) == 0x000000)	// accessing C0xx?
 	{
 		state->a2_cnxx_slot = -1;
-		result = apple2gs_c0xx_r(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), address);
+		result = apple2gs_c0xx_r(machine->device("maincpu")->memory().space(AS_PROGRAM), address);
 	}
 	else
 	{
@@ -1598,7 +1598,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		apple2gs_c0xx_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), address, data);
+		apple2gs_c0xx_w(machine->device("maincpu")->memory().space(AS_PROGRAM), address, data);
 	}
 	else
 	{
@@ -1689,7 +1689,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 static void apple2gs_setup_memory(running_machine *machine)
 {
 	apple2gs_state *state = machine->driver_data<apple2gs_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t begin, end;
 	apple2_memmap_config cfg;
 

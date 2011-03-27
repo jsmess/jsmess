@@ -344,7 +344,7 @@ WRITE8_MEMBER( bullet_state::segst_w )
 //  ADDRESS_MAP( bullet_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bullet_mem, ADDRESS_SPACE_PROGRAM, 8, bullet_state )
+static ADDRESS_MAP_START( bullet_mem, AS_PROGRAM, 8, bullet_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x0020, 0xbfff) AM_RAMBANK("bank3")
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( bullet_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bullet_io, ADDRESS_SPACE_IO, 8, bullet_state )
+static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)

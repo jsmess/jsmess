@@ -106,7 +106,7 @@ static void palm_spim_exchange( device_t *device )
 static MACHINE_START( palm )
 {
 	palm_state *state = machine->driver_data<palm_state>();
-    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
     memory_install_read_bank (space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
     memory_install_write_bank(space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
     memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
@@ -133,7 +133,7 @@ static MACHINE_RESET( palm )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(palm_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(palm_map, AS_PROGRAM, 16)
     AM_RANGE(0xc00000, 0xe07fff) AM_ROM AM_REGION("bios", 0)
     AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE(MC68328_TAG, mc68328_r, mc68328_w)
 ADDRESS_MAP_END

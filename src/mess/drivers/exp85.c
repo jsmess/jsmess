@@ -30,7 +30,7 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( exp85_mem, ADDRESS_SPACE_PROGRAM, 8, exp85_state )
+static ADDRESS_MAP_START( exp85_mem, AS_PROGRAM, 8, exp85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( exp85_mem, ADDRESS_SPACE_PROGRAM, 8, exp85_state )
 	AM_RANGE(0xf800, 0xf8ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exp85_io, ADDRESS_SPACE_IO, 8, exp85_state )
+static ADDRESS_MAP_START( exp85_io, AS_IO, 8, exp85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(I8355_TAG, i8355_device, io_r, io_w)
 	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
@@ -180,7 +180,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 void exp85_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x07ff, 0, 0, "bank1");

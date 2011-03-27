@@ -21,7 +21,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(mits680b_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mits680b_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAM // 1024 bytes RAM
 	AM_RANGE( 0xf000, 0xf003 ) AM_DEVREADWRITE("acia",  acia_6551_r, acia_6551_w )

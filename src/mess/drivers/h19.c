@@ -89,14 +89,14 @@ static WRITE8_HANDLER( h19_c0_w )
 	space->machine->scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
 }
 
-static ADDRESS_MAP_START(h19_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(h19_state, videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h19_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( h19_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1F) AM_READ_PORT("S401")

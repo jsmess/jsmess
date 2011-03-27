@@ -216,7 +216,7 @@ static WRITE8_DEVICE_HANDLER( pio_bc_w )
 //  ADDRESS_MAP( ace_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ace_mem, ADDRESS_SPACE_PROGRAM, 8, ace_state )
+static ADDRESS_MAP_START( ace_mem, AS_PROGRAM, 8, ace_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x2800, 0x2bff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_char_ram) AM_REGION(Z80_TAG, 0xfc00)
@@ -229,7 +229,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ace_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ace_io, ADDRESS_SPACE_IO, 8, ace_state )
+static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfffe) AM_MASK(0xff00) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pa_r, ppi_pa_w)
@@ -590,7 +590,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 void ace_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (ram_get_size(m_ram))

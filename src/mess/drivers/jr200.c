@@ -269,7 +269,7 @@ static WRITE8_HANDLER( jr200_border_col_w )
 
 static TIMER_CALLBACK(timer_d_callback)
 {
-	cpu_set_input_line(machine->firstcpu, 0, HOLD_LINE);
+	device_set_input_line(machine->firstcpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mn1271_io_r )
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( mn1271_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(jr200_mem, AS_PROGRAM, 8)
 /*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)

@@ -108,7 +108,7 @@ static WRITE8_HANDLER( rom_bank_w )
 
 static WRITE8_HANDLER( ram_bank_w )
 {
-	address_space *space_prg = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_prg = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = BIT(data,2);
 	memory_install_write_bank(space_prg, 0x0000, 0x3fff, 0, 0, "bank1");
 
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( ram_bank_w )
 	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG))+0x4000+bank*0x8000);
 }
 
-static ADDRESS_MAP_START(pce220_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pce220_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
@@ -172,7 +172,7 @@ static READ8_HANDLER( port1f_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pce220_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pce220_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READNOP //key matrix r
@@ -203,7 +203,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pce220)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x0000);
 }

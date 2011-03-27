@@ -933,15 +933,15 @@ WRITE16_HANDLER( pc_T1T16le_w )	{ write16le_with_write8_handler(pc_T1T_w, space,
 static VIDEO_START( pc_t1t )
 {
 	int buswidth;
-	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
 
 	pcjr.chr_gen = machine->region("gfx1")->base();
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
 	
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -964,7 +964,7 @@ static VIDEO_START( pc_t1t )
 static VIDEO_START( pc_pcjr )
 {
 	int buswidth;
-	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
 
 	pcjr.chr_gen = machine->region("gfx1")->base();
 	pcjr.update_row = NULL;
@@ -972,7 +972,7 @@ static VIDEO_START( pc_pcjr )
 	pcjr.mode_control = 0x08;
 	pcjr.chr_size = 8;
 	
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:

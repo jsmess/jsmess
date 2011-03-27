@@ -58,7 +58,7 @@ const device_type HD61830 = hd61830_device_config::static_alloc_device_config;
 
 
 // default address map
-static ADDRESS_MAP_START( hd61830, 0, 8 )
+static ADDRESS_MAP_START( hd61830, AS_0, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -114,9 +114,9 @@ device_t *hd61830_device_config::alloc_device(running_machine &machine) const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *hd61830_device_config::memory_space_config(int spacenum) const
+const address_space_config *hd61830_device_config::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 

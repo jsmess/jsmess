@@ -219,13 +219,13 @@ WRITE32_HANDLER( mboard_write_board_32 )
 WRITE8_HANDLER( mboard_write_LED_8 )
 {
 	write_LED(data);
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(7));
+	device_spin_until_time(space->cpu, attotime::from_usec(7));
 }
 
 WRITE16_HANDLER( mboard_write_LED_16 )
 {
 	 write_LED(data >> 8);
-	 cpu_spinuntil_time(space->cpu, attotime::from_usec(9));
+	 device_spin_until_time(space->cpu, attotime::from_usec(9));
 }
 
 WRITE32_HANDLER( mboard_write_LED_32 )
@@ -235,7 +235,7 @@ WRITE32_HANDLER( mboard_write_LED_32 )
 	if (offset) write_LED(data);
 	else write_LED(data >> 24);
 	logerror("write LED   32 o: %08x d: %08x\n",offset,data);
-//	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
+//	device_spin_until_time(space->cpu, ATTOTIME_IN_USEC(20));
 }
 
 

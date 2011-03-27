@@ -50,7 +50,7 @@ static TIMER_CALLBACK( pot_interrupt )
 	int mask = param;
 
 	if (state->pot_latch & mask)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	state->pot_state |= mask;
 }
@@ -61,7 +61,7 @@ static TIMER_CALLBACK( periodic_callback )
 	boxer_state *state = machine->driver_data<boxer_state>();
 	int scanline = param;
 
-	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 
 	if (scanline == 0)
 	{
@@ -254,14 +254,14 @@ static WRITE8_HANDLER( boxer_pot_w )
 
 	state->pot_latch = data & 0x3f;
 
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
 	boxer_state *state = space->machine->driver_data<boxer_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -289,7 +289,7 @@ static WRITE8_HANDLER( boxer_led_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( boxer_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE_MEMBER(boxer_state, tile_ram)

@@ -95,7 +95,7 @@ static void update_plunger( running_machine *machine )
 			state->time_released = machine->time();
 
 			if (!state->mask)
-				cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+				device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 			state->time_pushed = machine->time();
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( mgolf_wram_w )
 
 
 
-static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")

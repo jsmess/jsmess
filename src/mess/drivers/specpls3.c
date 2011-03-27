@@ -211,7 +211,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 void spectrum_plus3_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->port_7ffd_data & 8)
@@ -340,7 +340,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-static ADDRESS_MAP_START (spectrum_plus3_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)

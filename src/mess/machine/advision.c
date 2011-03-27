@@ -30,7 +30,7 @@ void advision_state::machine_start()
 	/* configure EA banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8048_TAG)->base(), 0);
-	memory_install_readwrite_bank(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
+	memory_install_readwrite_bank(m_maincpu->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
 	memory_set_bank(machine, "bank1", 0);
 
 	/* allocate external RAM */
@@ -40,11 +40,11 @@ void advision_state::machine_start()
 void advision_state::machine_reset()
 {
 	/* enable internal ROM */
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
+	device_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* reset sound CPU */
-	cpu_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_rambank = 0x300;
 	m_frame_start = 0;
@@ -58,7 +58,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 {
 	int ea = BIT(data, 2);
 
-	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 
 	memory_set_bank(machine, "bank1", ea);
 
@@ -79,7 +79,7 @@ READ8_MEMBER( advision_state::ext_ram_r )
 
 	if (m_video_bank == 0x06)
 	{
-		cpu_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	return data;

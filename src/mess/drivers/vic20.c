@@ -89,7 +89,7 @@ block of RAM instead of 8.
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vic20_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( vic20_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 //  AM_RANGE(0x0400, 0x07ff) RAM1
 //  AM_RANGE(0x0800, 0x0bff) RAM2
@@ -456,14 +456,14 @@ static IEEE488_DAISY( ieee488_daisy )
 
 static int vic20_dma_read_color( running_machine *machine, int offset )
 {
-	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	return program->read_byte(0x9400 | (offset & 0x3ff));
 }
 
 static int vic20_dma_read( running_machine *machine, int offset )
 {
-	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	return program->read_byte(MOS6560ADDR2VC20ADDR(offset));
 }
@@ -517,7 +517,7 @@ static const mos6560_interface vic20_6561_intf =
 static MACHINE_START( vic20 )
 {
 	vic20_state *state = machine->driver_data<vic20_state>();
-	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->via0 = machine->device<via6522_device>(M6522_0_TAG);
@@ -528,8 +528,8 @@ static MACHINE_START( vic20 )
 	state->mos6560 = machine->device(M6560_TAG);
 
 	/* set VIA clocks */
-	state->via0->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
-	state->via1->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
+	state->via0->set_unscaled_clock(machine->device(M6502_TAG)->unscaled_clock());
+	state->via1->set_unscaled_clock(machine->device(M6502_TAG)->unscaled_clock());
 
 	/* memory expansions */
 	switch (ram_get_size(machine->device(RAM_TAG)))
@@ -556,7 +556,7 @@ static MACHINE_START( vic20 )
 
 static DEVICE_IMAGE_LOAD( vic20_cart )
 {
-	address_space *program = cputag_get_address_space(image.device().machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = image.device().machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
 	const char *filetype = image.filetype();
 	UINT32 address = 0;
 	UINT32 size;

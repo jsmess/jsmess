@@ -220,7 +220,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START( apple2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8 )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 

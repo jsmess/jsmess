@@ -162,7 +162,7 @@ static READ8_HANDLER( samcoupe_lmpr_r )
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
 	state->lmpr = data;
@@ -177,7 +177,7 @@ static READ8_HANDLER( samcoupe_hmpr_r )
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
 	state->hmpr = data;
@@ -192,7 +192,7 @@ static READ8_HANDLER( samcoupe_vmpr_r )
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 
 	state->vmpr = data;
@@ -292,14 +292,14 @@ static WRITE8_DEVICE_HANDLER( samcoupe_lpt2_strobe_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( samcoupe_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( samcoupe_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( samcoupe_io, AS_IO, 8 )
 	AM_RANGE(0x0080, 0x0081) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
 	AM_RANGE(0x00e0, 0x00e7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
 	AM_RANGE(0x00e8, 0x00e8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt1", centronics_data_w)
@@ -340,7 +340,7 @@ void samcoupe_irq(device_t *device, UINT8 src)
 	samcoupe_state *state = device->machine->driver_data<samcoupe_state>();
 
 	/* assert irq and a timer to set it off again */
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(attotime::from_usec(20), FUNC(irq_off), src);
 
 	/* adjust STATUS register */

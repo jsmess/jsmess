@@ -515,12 +515,12 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 
 	if ((!state->game && state->exrom) || (charen && (loram || hiram)))
 	{
-		memory_install_read8_handler(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+		memory_install_read8_handler(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		state->write_io = 1;
 	}
 	else
 	{
-		memory_install_read_bank(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
+		memory_install_read_bank(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
 		state->write_io = 0;
 		if ((!charen && (loram || hiram)))
 			memory_set_bankptr(machine, "bank13", state->chargen);
@@ -701,17 +701,17 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 		else
 			state->ram_top = 0x10000;
 
-		memory_install_read8_handler(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
+		memory_install_read8_handler(machine->device("m8502")->memory().space(AS_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
 
 		if (MMU_IO_ON)
 		{
 			state->write_io = 1;
-			memory_install_read8_handler(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+			memory_install_read8_handler(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		}
 		else
 		{
 			state->write_io = 0;
-			memory_install_read_bank(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
+			memory_install_read_bank(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
 		}
 
 
@@ -1118,8 +1118,8 @@ void c128_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
 
 	c128_bankswitch_64(device->machine, 0);
 
-	state->memory[0x000] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(0);
-	state->memory[0x001] = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->read_byte(1);
+	state->memory[0x000] = device->memory().space(AS_PROGRAM)->read_byte(0);
+	state->memory[0x001] = device->memory().space(AS_PROGRAM)->read_byte(1);
 
 }
 

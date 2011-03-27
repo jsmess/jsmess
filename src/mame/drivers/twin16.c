@@ -231,7 +231,7 @@ static WRITE16_HANDLER( cuebrickj_nvram_bank_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", twin16_upd_reset_w)
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("upd", twin16_upd_busy_r)	// miaj writes 0 to it
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_BASE_MEMBER(twin16_state, sprite_gfx_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fround_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
@@ -692,13 +692,13 @@ static const k007232_interface k007232_config =
 static INTERRUPT_GEN( CPUA_interrupt )
 {
 	twin16_state *state = device->machine->driver_data<twin16_state>();
-	if (CPUA_IRQ_ENABLE) cpu_set_input_line(device, 5, HOLD_LINE);
+	if (CPUA_IRQ_ENABLE) device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( CPUB_interrupt )
 {
 	twin16_state *state = device->machine->driver_data<twin16_state>();
-	if (CPUB_IRQ_ENABLE) cpu_set_input_line(device, 5, HOLD_LINE);
+	if (CPUB_IRQ_ENABLE) device_set_input_line(device, 5, HOLD_LINE);
 }
 
 /* Machine Drivers */

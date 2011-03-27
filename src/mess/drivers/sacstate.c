@@ -49,13 +49,13 @@ static READ8_HANDLER(unknown_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(sacstate_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(sacstate_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000,0x7ff) AM_ROM
 	AM_RANGE(0x800,0xfff) AM_RAM	
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sacstate_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sacstate_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00,0x00) AM_READ(tty_r)
 	AM_RANGE(0x01,0x01) AM_READ(status_r)

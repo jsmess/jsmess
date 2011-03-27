@@ -2122,7 +2122,7 @@ static WRITE32_HANDLER( cps3_colourram_w )
 
 
 /* there are more unknown writes, but you get the idea */
-static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("user1", 0) // Bios ROM
 	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_BASE_MEMBER(cps3_state, mainram) // Main RAM
 
@@ -2231,7 +2231,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN(cps3_vbl_interrupt)
 {
-	cpu_set_input_line(device,12, ASSERT_LINE);
+	device_set_input_line(device,12, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(cps3_other_interrupt)
@@ -2239,7 +2239,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)
 	// what is the REAL source of IRQ10??
-	cpu_set_input_line(device,10, ASSERT_LINE);
+	device_set_input_line(device,10, ASSERT_LINE);
 }
 
 

@@ -729,7 +729,7 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 	hp48_state *state = machine->driver_data<hp48_state>();
 	int i;
 	int nce2_enable = 1;
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->io_addr = 0x100000;
 

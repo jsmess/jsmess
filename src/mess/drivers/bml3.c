@@ -289,7 +289,7 @@ static WRITE8_HANDLER( bml3_vram_w )
 	vram[offset+0x4000] = state->attr_latch;
 }
 
-static ADDRESS_MAP_START(bml3_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)

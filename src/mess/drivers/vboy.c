@@ -415,7 +415,7 @@ static READ16_HANDLER( vboy_bgmap_r )
 	return state->bgmap[offset];
 }
 
-static ADDRESS_MAP_START( vboy_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE_MEMBER(vboy_state,l_frame_0) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( vboy_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vboy_io, ADDRESS_SPACE_IO, 32 )
+static ADDRESS_MAP_START( vboy_io, AS_IO, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE_MEMBER(vboy_state,l_frame_0) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511

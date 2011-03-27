@@ -13,13 +13,13 @@
 #include "includes/z1013.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(z1013_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0xefff ) AM_RAM
     AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z1013_state, video_ram)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z1013_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z1013_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE( 0x08, 0x08 ) AM_WRITE(z1013_keyboard_w)

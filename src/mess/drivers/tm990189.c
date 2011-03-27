@@ -699,14 +699,14 @@ static const tms9902_interface tms9902_params =
 	xmit_callback			/* called when a character is transmitted */
 };
 
-static ADDRESS_MAP_START(tm990_189_memmap, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(tm990_189_memmap, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM									/* RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_ROM									/* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 	AM_RANGE(0x1000, 0x2fff) AM_NOP									/* reserved for expansion (RAM and/or tms9918 video controller) */
 	AM_RANGE(0x3000, 0x3fff) AM_ROM									/* main ROM - unibug or university basic */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tm990_189_v_memmap, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(tm990_189_v_memmap, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM									/* RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_ROM									/* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 
@@ -772,7 +772,7 @@ ADDRESS_MAP_END
            d
 */
 
-static ADDRESS_MAP_START(tm990_189_cru_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(tm990_189_cru_map, AS_IO, 8)
 	AM_RANGE(0x00, 0x3f) AM_DEVREAD("tms9901_0", tms9901_cru_r)		/* user I/O tms9901 */
 	AM_RANGE(0x40, 0x6f) AM_DEVREAD("tms9901_1", tms9901_cru_r)		/* system I/O tms9901 */
 	AM_RANGE(0x80, 0xcf) AM_DEVREAD("tms9902", tms9902_cru_r)		/* optional tms9902 */

@@ -326,7 +326,7 @@ static INPUT_PORTS_START( intvkbd )
 	PORT_INCLUDE( intv )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( intv_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x4800, 0x7fff) AM_ROM		/* Cartridges? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE( intvkbd_dualport16_w ) AM_BASE_MEMBER(intv_state, intvkbd_dualport_ram)	/* Dual-port RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH  /* Required because of probing */
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w )	/* Dual-port RAM */
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w )	/* Dual-port RAM */

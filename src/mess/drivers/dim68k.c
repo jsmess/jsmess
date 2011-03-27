@@ -163,7 +163,7 @@ WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
 {
 }
 
-static ADDRESS_MAP_START(dim68k_mem, ADDRESS_SPACE_PROGRAM, 16, dim68k_state)
+static ADDRESS_MAP_START(dim68k_mem, AS_PROGRAM, 16, dim68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(ram) // 16MB RAM / ROM at boot
 	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("bootrom", 0)

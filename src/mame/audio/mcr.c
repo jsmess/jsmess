@@ -288,14 +288,14 @@ static INTERRUPT_GEN( ssio_14024_clock )
 
 	/* if the low 5 bits clocked to 0, bit 6 has changed state */
 	if ((ssio_14024_count & 0x3f) == 0)
-		cpu_set_input_line(device, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(device, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpu_set_input_line(ssio_sound_cpu, 0, CLEAR_LINE);
+	device_set_input_line(ssio_sound_cpu, 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -373,7 +373,7 @@ void ssio_reset_w(running_machine *machine, int state)
 	{
 		int i;
 
-		cpu_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* latches also get reset */
 		for (i = 0; i < 4; i++)
@@ -383,7 +383,7 @@ void ssio_reset_w(running_machine *machine, int state)
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpu_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ8_HANDLER( ssio_input_port_r )
@@ -443,7 +443,7 @@ static const ay8910_interface ssio_ay8910_interface_2 =
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
@@ -509,7 +509,7 @@ static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 {
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
-	cpu_set_input_line(csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
@@ -558,14 +558,14 @@ READ8_HANDLER( csdeluxe_status_r )
 
 void csdeluxe_reset_w(running_machine *machine, int state)
 {
-	cpu_set_input_line(csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-static ADDRESS_MAP_START( csdeluxe_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( csdeluxe_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
@@ -647,7 +647,7 @@ static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 {
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
-	cpu_set_input_line(soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
@@ -677,14 +677,14 @@ READ8_HANDLER( soundsgood_status_r )
 void soundsgood_reset_w(running_machine *machine, int state)
 {
 //if (state) mame_printf_debug("SG Reset\n");
-	cpu_set_input_line(soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-static ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -751,7 +751,7 @@ static WRITE_LINE_DEVICE_HANDLER( turbocs_irq )
 {
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
-	cpu_set_input_line(turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
@@ -780,14 +780,14 @@ READ8_HANDLER( turbocs_status_r )
 
 void turbocs_reset_w(running_machine *machine, int state)
 {
-	cpu_set_input_line(turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("tcspia", pia6821_alt_r, pia6821_alt_w)
@@ -888,7 +888,7 @@ static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 	device_t *pia1 = device->machine->device("sntpia1");
 	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) | pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
-	cpu_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
@@ -908,7 +908,7 @@ WRITE8_HANDLER( squawkntalk_data_w )
 
 void squawkntalk_reset_w(running_machine *machine, int state)
 {
-	cpu_set_input_line(squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -917,7 +917,7 @@ void squawkntalk_reset_w(running_machine *machine, int state)
 /* address map verified from schematics */
 /* note that jumpers control the ROM sizes; if these are changed, use the alternate */
 /* address map below */
-static ADDRESS_MAP_START( squawkntalk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia0", pia6821_r, pia6821_w)
@@ -929,7 +929,7 @@ ADDRESS_MAP_END
 /* alternate address map if the ROM jumpers are changed to support a smaller */
 /* ROM size of 2k */
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START( squawkntalk_alt_map, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia0", pia6821_r, pia6821_w)

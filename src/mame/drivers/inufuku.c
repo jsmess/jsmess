@@ -92,7 +92,7 @@ static WRITE16_HANDLER( inufuku_soundcommand_w )
 
 		state->pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -127,7 +127,7 @@ static CUSTOM_INPUT( soundflag_r )
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( inufuku_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM			// main rom
 
 	AM_RANGE(0x100000, 0x100007) AM_WRITENOP	// ?
@@ -164,13 +164,13 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( inufuku_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( inufuku_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inufuku_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
@@ -299,7 +299,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	inufuku_state *state = device->machine->driver_data<inufuku_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

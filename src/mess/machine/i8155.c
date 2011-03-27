@@ -99,7 +99,7 @@ const device_type I8155 = i8155_device_config::static_alloc_device_config;
 
 
 // default address map
-static ADDRESS_MAP_START( i8155, 0, 8 )
+static ADDRESS_MAP_START( i8155, AS_0, 8 )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -147,9 +147,9 @@ device_t *i8155_device_config::alloc_device(running_machine &machine) const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *i8155_device_config::memory_space_config(int spacenum) const
+const address_space_config *i8155_device_config::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 

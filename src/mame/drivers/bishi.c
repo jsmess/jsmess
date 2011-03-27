@@ -118,11 +118,11 @@ static INTERRUPT_GEN(bishi_interrupt)
 		switch (cpu_getiloops(device))
 		{
 			case 0:
-				cpu_set_input_line(device, M68K_IRQ_3, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_3, HOLD_LINE);
 				break;
 
 			case 1:
-				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 				break;
 		}
 	}
@@ -149,7 +149,7 @@ static READ16_HANDLER( bishi_K056832_rom_r )
 	return k056832_bishi_rom_word_r(state->k056832, ouroffs, mem_mask);
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM						// Work RAM
 	AM_RANGE(0x800000, 0x800001) AM_READWRITE(control_r, control_w)
@@ -371,9 +371,9 @@ static void sound_irq_gen(device_t *device, int state)
 {
 	bishi_state *bishi = device->machine->driver_data<bishi_state>();
 	if (state)
-		cpu_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
+		device_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
 	else
-		cpu_set_input_line(bishi->maincpu, M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(bishi->maincpu, M68K_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =

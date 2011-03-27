@@ -87,13 +87,13 @@ static WRITE8_HANDLER( pc8001mk2_port31_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pc8001_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8001_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8001_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8001_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("KEY0")
@@ -140,14 +140,14 @@ static ADDRESS_MAP_START( pc8001_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8001mk2_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8001mk2_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8001mk2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8001mk2_io, AS_IO, 8 )
 	AM_IMPORT_FROM(pc8001_io)
 	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(pc8001mk2_port31_w)
@@ -440,7 +440,7 @@ static UPD1990A_INTERFACE( pc8001_upd1990a_intf )
 static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = machine->driver_data<pc8001_state>();
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	device_t *messram = machine->device(RAM_TAG);
 
 	/* look up devices */

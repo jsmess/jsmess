@@ -114,7 +114,7 @@ static void laser_machine_init(running_machine *machine, int bank_mask, int vide
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", state->laser_bank_mask, state->laser_video_bank, state->laser_video_bank * 0x04000);
 
 	for (i = 0; i < ARRAY_LENGTH(state->laser_bank); i++)
-		laser_bank_select_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), i, 0);
+		laser_bank_select_w(machine->device("maincpu")->memory().space(AS_PROGRAM), i, 0);
 }
 
 MACHINE_RESET( laser350 )
@@ -157,8 +157,8 @@ WRITE8_HANDLER( laser_bank_select_w )
         /* memory mapped I/O bank selected? */
 		if (data == 2)
 		{
-			memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_soft[offset]);
-			memory_install_write8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_soft[offset]);
+			memory_install_read8_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_soft[offset]);
+			memory_install_write8_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_soft[offset]);
 		}
 		else
 		{
@@ -171,14 +171,14 @@ WRITE8_HANDLER( laser_bank_select_w )
 				{
 					logerror("select bank #%d VIDEO!\n", offset+1);
 				}
-				memory_install_read_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_hard[offset]);
-				memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_hard[offset]);
+				memory_install_read_bank(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_hard[offset]);
+				memory_install_write_bank(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_hard[offset]);
 
 			}
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
-				memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0);
+				memory_nop_readwrite(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0);
 
 			}
 		}

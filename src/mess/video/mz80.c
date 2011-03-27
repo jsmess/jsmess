@@ -42,7 +42,7 @@ SCREEN_UPDATE( mz80k )
 {
 	mz80_state *state = screen->machine->driver_data<mz80_state>();
 	int x,y;
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	state->mz80k_vertical = state->mz80k_vertical ? 0 : 1;
 	state->mz80k_cursor_cnt++;
 	if (state->mz80k_cursor_cnt==64) state->mz80k_cursor_cnt = 0;

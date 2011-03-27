@@ -169,12 +169,12 @@ READ8_HANDLER (radio_cpu_state_r )
 
 READ8_HANDLER (radio_io_r )
 {
-	return cputag_get_address_space(space->machine,"maincpu", ADDRESS_SPACE_PROGRAM)->read_byte((offset << 8) + offset);
+	return space->machine->device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
 }
 
 WRITE8_HANDLER(radio_io_w )
 {
-	cputag_get_address_space(space->machine,"maincpu", ADDRESS_SPACE_PROGRAM)->write_byte((offset << 8) + offset,data);
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
 }
 
 MACHINE_RESET( radio86 )

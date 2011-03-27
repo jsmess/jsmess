@@ -95,13 +95,13 @@ static WRITE8_HANDLER(bob85_7seg_w)
 	output_set_digit_value(offset,BITSWAP8( data,3,2,1,0,7,6,5,4 ));
 }
 
-static ADDRESS_MAP_START( bob85_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x02ff) AM_ROM
 	AM_RANGE(0x0600, 0x09ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bob85_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bob85_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0a, 0x0a) AM_READ(bob85_keyboard_r)
 	AM_RANGE(0x0a, 0x0f) AM_WRITE(bob85_7seg_w)

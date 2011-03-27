@@ -129,7 +129,7 @@ static READ16_HANDLER( metro_irq_cause_r )
 static void update_irq_state( running_machine *machine )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
 	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*state->irq_enable;
@@ -145,7 +145,7 @@ static void update_irq_state( running_machine *machine )
 				irq_level[state->irq_levels[i] & 7] = 1;
 
 		for (i = 0; i < 8; i++)
-			cpu_set_input_line(state->maincpu, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(state->maincpu, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -153,7 +153,7 @@ static void update_irq_state( running_machine *machine )
             then reads the actual source by peeking a register (metro_irq_cause_r) */
 
 		int irq_state = (irq ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(state->maincpu, state->irq_line, irq_state);
+		device_set_input_line(state->maincpu, state->irq_line, irq_state);
 	}
 }
 
@@ -326,7 +326,7 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 static void ymf278b_interrupt( device_t *device, int active )
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
-	cpu_set_input_line(state->maincpu, 2, active);
+	device_set_input_line(state->maincpu, 2, active);
 }
 
 /***************************************************************************
@@ -340,7 +340,7 @@ static void ymf278b_interrupt( device_t *device, int active )
 static int metro_io_callback( device_t *device, int ioline, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
-	address_space *space = cpu_get_address_space(driver_state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = driver_state->maincpu->memory().space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	switch (ioline)
@@ -364,8 +364,8 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_int(space->cpu);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_spin_until_interrupt(space->cpu);
 		state->busy_sndcpu = 1;
 	}
 }
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 static void metro_sound_irq_handler( device_t *device, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
-	cpu_set_input_line(driver_state->audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(driver_state->audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -814,14 +814,14 @@ static WRITE16_HANDLER( metro_blitter_w )
 */
 
 
-static ADDRESS_MAP_START( metro_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM			/* External ROM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	/* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM			/* External RAM */
 	AM_RANGE(0xff00, 0xffff) AM_RAM			/* Internal RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( metro_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( metro_sound_io_map, AS_IO, 8 )
 	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
 	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(metro_portb_w)
 	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(metro_sound_rombank_w)
@@ -830,7 +830,7 @@ ADDRESS_MAP_END
 /*****************/
 
 
-static ADDRESS_MAP_START( daitorid_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( daitorid_sound_io_map, AS_IO, 8 )
 	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
 	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(daitorid_portb_w)
 	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(daitorid_sound_rombank_w)
@@ -872,7 +872,7 @@ static READ16_HANDLER( balcube_dsw_r )
 }
 
 
-static ADDRESS_MAP_START( balcube_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM											// RAM
 	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
@@ -907,7 +907,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( daitoa_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM 										// RAM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
@@ -941,7 +941,7 @@ ADDRESS_MAP_END
                                 Bang Bang Ball
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bangball_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM											// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_RAM											// RAM (bug in the ram test routine)
@@ -976,7 +976,7 @@ ADDRESS_MAP_END
                                 Battle Bubble
 ***************************************************************************/
 
-static ADDRESS_MAP_START( batlbubl_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM											// ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
 	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE_MEMBER(metro_state, vram_1)	// Layer 1
@@ -1012,7 +1012,7 @@ ADDRESS_MAP_END
                              Mouse Shooter GoGo
 ***************************************************************************/
 
-static ADDRESS_MAP_START( msgogo_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
 	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE_MEMBER(metro_state, vram_1)	// Layer 1
@@ -1045,7 +1045,7 @@ ADDRESS_MAP_END
                                 Daitoride
 ***************************************************************************/
 
-static ADDRESS_MAP_START( daitorid_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM											// RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1078,7 +1078,7 @@ ADDRESS_MAP_END
                                 Dharma Doujou
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dharma_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM											// RAM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1132,7 +1132,7 @@ KARATOUR_VRAM( 0 )
 KARATOUR_VRAM( 1 )
 KARATOUR_VRAM( 2 )
 
-static ADDRESS_MAP_START( karatour_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM											// RAM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w)			// From Sound CPU
@@ -1169,7 +1169,7 @@ ADDRESS_MAP_END
 
 /* same limited tilemap access as karatour */
 
-static ADDRESS_MAP_START( kokushi_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM										// ROM
 	AM_RANGE(0x7fc000, 0x7fffff) AM_RAM										// RAM
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)						// Banked ROM
@@ -1201,7 +1201,7 @@ ADDRESS_MAP_END
                                 Last Fortress
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastfort_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM											// RAM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1235,7 +1235,7 @@ ADDRESS_MAP_END
 /* the German version is halfway between lastfort and ladykill (karatour) memory maps */
 
 /* todo: clean up input reads etc. */
-static ADDRESS_MAP_START( lastforg_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w)			// From / To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN0")								// Inputs
@@ -1333,7 +1333,7 @@ static WRITE16_DEVICE_HANDLER( gakusai_eeprom_w )
 	}
 }
 
-static ADDRESS_MAP_START( gakusai_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM											// RAM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1370,7 +1370,7 @@ ADDRESS_MAP_END
                                 Mahjong Gakuensai 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( gakusai2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM											// RAM
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1439,7 +1439,7 @@ static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_reset_w )
 	}
 }
 
-static ADDRESS_MAP_START( dokyusp_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM											// RAM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1476,7 +1476,7 @@ ADDRESS_MAP_END
                             Mahjong Doukyuusei
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dokyusei_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM											// RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1516,7 +1516,7 @@ ADDRESS_MAP_END
                                 Pang Pom's
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pangpoms_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pangpoms_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM											// RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1552,7 +1552,7 @@ ADDRESS_MAP_END
                                 Poitto!
 ***************************************************************************/
 
-static ADDRESS_MAP_START( poitto_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM											// RAM
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1585,7 +1585,7 @@ ADDRESS_MAP_END
                                 Sky Alert
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyalert_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM											// ROM
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM											// RAM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1621,7 +1621,7 @@ ADDRESS_MAP_END
                                 Pururun
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pururun_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM											// RAM
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1654,7 +1654,7 @@ ADDRESS_MAP_END
                             Toride II Adauchi Gaiden
 ***************************************************************************/
 
-static ADDRESS_MAP_START( toride2g_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0x400000, 0x4cffff) AM_RAM											// RAM (4xc000-4xffff mirrored?)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1694,7 +1694,7 @@ static WRITE16_HANDLER( blzntrnd_sound_w )
 	metro_state *state = space->machine->driver_data<metro_state>();
 
 	soundlatch_w(space, offset, data >> 8);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
@@ -1709,7 +1709,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 static void blzntrnd_irqhandler(device_t *device, int irq)
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
@@ -1717,20 +1717,20 @@ static const ym2610_interface blzntrnd_ym2610_interface =
 	blzntrnd_irqhandler
 };
 
-static ADDRESS_MAP_START( blzntrnd_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blzntrnd_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( blzntrnd_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITENOP
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym2610_r,ym2610_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blzntrnd_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM											// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM 										// RAM
 //  AM_RANGE(0x300000, 0x300001) AM_READNOP                                             // Sound
@@ -1775,7 +1775,7 @@ static WRITE16_DEVICE_HANDLER( mouja_sound_rombank_w )
 		state->oki->set_bank_base(((data >> 3) & 0x07) * 0x40000);
 }
 
-static ADDRESS_MAP_START( mouja_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM											// RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE_MEMBER(metro_state, vram_0)	// Layer 0
@@ -1856,7 +1856,7 @@ static WRITE16_HANDLER( vram_2_clr_w )
 
 
 // H8/3007 CPU
-static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x430000, 0x433fff) AM_RAM
 	AM_RANGE(0x470000, 0x47dfff) AM_RAM
@@ -1905,7 +1905,7 @@ static WRITE8_HANDLER( puzzlet_portb_w )
 //  popmessage("PORTB %02x", data);
 }
 
-static ADDRESS_MAP_START( puzzlet_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( puzzlet_io_map, AS_IO, 8 )
 	AM_RANGE(H8_PORT_7,   H8_PORT_7) AM_READ_PORT("IN2")
 	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ_PORT("IN0")		// coin
 	AM_RANGE(H8_PORT_B,   H8_PORT_B) AM_READ_PORT("DSW0") AM_WRITE(puzzlet_portb_w)
@@ -3599,7 +3599,7 @@ static MACHINE_RESET( metro )
 	metro_state *state = machine->driver_data<metro_state>();
 
 	if (state->irq_line == -1)
-		cpu_set_irq_callback(machine->device("maincpu"), metro_irq_callback);
+		device_set_irq_callback(machine->device("maincpu"), metro_irq_callback);
 }
 
 
@@ -4550,7 +4550,7 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 
 		default:
 			// timer
-			cpu_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
+			device_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
@@ -6023,7 +6023,7 @@ static void metro_common( running_machine *machine )
 static DRIVER_INIT( metro )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	metro_common(machine);
 
@@ -6056,7 +6056,7 @@ static DRIVER_INIT( karatour )
 static DRIVER_INIT( daitorid )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	metro_common(machine);
 

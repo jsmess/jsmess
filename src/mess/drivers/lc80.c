@@ -31,7 +31,7 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( lc80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lc80_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0800, 0x0fff) AM_ROMBANK("bank2")
@@ -41,13 +41,13 @@ static ADDRESS_MAP_START( lc80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( sc80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc80_mem, AS_PROGRAM, 8 )
 	AM_IMPORT_FROM(lc80_mem)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( lc80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( lc80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
@@ -292,7 +292,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 static MACHINE_START( lc80 )
 {
 	lc80_state *state = machine->driver_data<lc80_state>();
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->z80pio2 = machine->device(Z80PIO2_TAG);

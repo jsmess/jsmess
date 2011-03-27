@@ -141,7 +141,7 @@ static IRQ_CALLBACK(jaguar_irq_callback)
 
 static MACHINE_RESET( jaguar )
 {
-	cpu_set_irq_callback(machine->device("maincpu"), jaguar_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), jaguar_irq_callback);
 
 	protection_check = 0;
 
@@ -447,7 +447,7 @@ static WRITE32_HANDLER( joystick_w )
  *************************************/
 
 
-static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000) AM_SHARE("share1") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size) AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
@@ -473,7 +473,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gpu_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("share1") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("share15") AM_REGION("maincpu", 0x800000)

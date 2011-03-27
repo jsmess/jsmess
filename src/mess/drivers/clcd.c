@@ -19,7 +19,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(clcd_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(clcd_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END

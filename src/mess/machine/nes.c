@@ -37,7 +37,7 @@ static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
 static void init_nes_core( running_machine *machine )
 {
 	nes_state *state = machine->driver_data<nes_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int prg_banks = (state->prg_chunks == 1) ? (2 * 2) : (state->prg_chunks * 2);
 	int i;
@@ -51,8 +51,8 @@ static void init_nes_core( running_machine *machine )
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
 	memory_install_readwrite_bank(space, 0x0000, 0x07ff, 0, 0x1800, "bank10");
 
-	memory_install_readwrite8_handler(device_get_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, nes_chr_r, nes_chr_w);
-	memory_install_readwrite8_handler(device_get_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
+	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0, 0x1fff, 0, 0, nes_chr_r, nes_chr_w);
+	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
 
 	memory_set_bankptr(machine, "bank10", state->rom);
 
@@ -178,7 +178,7 @@ static void init_nes_core( running_machine *machine )
 	}
 
 	if (state->pcb_id == WAIXING_SH2)
-		memory_install_read8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, waixing_sh2_chr_r);
+		memory_install_read8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0, 0x1fff, 0, 0, waixing_sh2_chr_r);
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -207,7 +207,7 @@ MACHINE_RESET( nes )
 static TIMER_CALLBACK( nes_irq_callback )
 {
 	nes_state *state = machine->driver_data<nes_state>();
-	cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	state->irq_timer->adjust(attotime::never);
 }
 
@@ -1534,13 +1534,13 @@ static void fds_irq( device_t *device, int scanline, int vblank, int blanked )
 	nes_state *state = device->machine->driver_data<nes_state>();
 
 	if (state->IRQ_enable_latch)
-		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 
 	if (state->IRQ_enable)
 	{
 		if (state->IRQ_count <= 114)
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 			state->fds_status0 |= 0x01;
 		}

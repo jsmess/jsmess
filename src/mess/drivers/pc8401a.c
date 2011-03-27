@@ -80,7 +80,7 @@ static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 
 static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 {
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	int rombank = data & 0x03;
 	int ram0000 = (data >> 2) & 0x03;
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( port71_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pc8401a_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8401a_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -364,12 +364,12 @@ static ADDRESS_MAP_START( pc8401a_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8401a_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8401a_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8500_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc8500_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("KEY0")

@@ -101,14 +101,14 @@ WRITE8_MEMBER( tmc600_state::keyboard_latch_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tmc600_map, ADDRESS_SPACE_PROGRAM, 8, tmc600_state )
+static ADDRESS_MAP_START( tmc600_map, AS_PROGRAM, 8, tmc600_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_RAM
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8, tmc600_state )
+static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(vismac_data_w)
@@ -249,7 +249,7 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void tmc600_state::machine_start()
 {
-	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (ram_get_size(m_ram))

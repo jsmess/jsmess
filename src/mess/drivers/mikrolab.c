@@ -49,14 +49,14 @@ READ8_MEMBER(mikrolab_state::keypad_r)
 	return data;
 }
 
-static ADDRESS_MAP_START(mikrolab_mem, ADDRESS_SPACE_PROGRAM, 8, mikrolab_state)
+static ADDRESS_MAP_START(mikrolab_mem, AS_PROGRAM, 8, mikrolab_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x05ff ) AM_ROM	// Monitor is up to 0x2ff
 	AM_RANGE( 0x8000, 0x83f7 ) AM_RAM
 	AM_RANGE( 0x83f8, 0x83ff ) AM_WRITE(digit_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mikrolab_io , ADDRESS_SPACE_IO, 8, mikrolab_state)
+static ADDRESS_MAP_START( mikrolab_io , AS_IO, 8, mikrolab_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0xf8, 0xf8 ) AM_READ(keypad_r)
 	AM_RANGE( 0xfa, 0xfa ) AM_WRITE(kp_matrix_w)

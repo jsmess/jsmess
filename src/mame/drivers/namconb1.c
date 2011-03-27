@@ -334,7 +334,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	int scanline = (device->machine->generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
 	if((!state->vblank_irq_active) && (state->namconb_cpureg[0x04] & 0xf0)) {
-		cpu_set_input_line(device, state->namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
+		device_set_input_line(device, state->namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
 		state->vblank_irq_active = 1;
 	}
 
@@ -352,15 +352,15 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 1)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 
@@ -407,7 +407,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 	int scanline = (device->machine->generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
 	if((!state->vblank_irq_active) && state->namconb_cpureg[0x00]) {
-		cpu_set_input_line(device, state->namconb_cpureg[0x00], ASSERT_LINE);
+		device_set_input_line(device, state->namconb_cpureg[0x00], ASSERT_LINE);
 		state->vblank_irq_active = 1;
 	}
 
@@ -854,7 +854,7 @@ static WRITE32_HANDLER(namconb_share_w)
 	COMBINE_DATA(state->namconb_shareram+offset*2);
 }
 
-static ADDRESS_MAP_START( namconb1_am, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
@@ -872,7 +872,7 @@ static ADDRESS_MAP_START( namconb1_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
@@ -913,11 +913,11 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		cpu_spinuntil_time(space->cpu, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(300));	// was 300
+		device_spin_until_time(space->cpu, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(300));	// was 300
 	}
 }
 
-static ADDRESS_MAP_START( namcoc75_am, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE_MEMBER(namconb1_state, namconb_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
@@ -1004,7 +1004,7 @@ static READ8_HANDLER(dac0_r)		// bit 6
 	return (input_port_read_safe(space->machine, "P3", 0xff)<<7)&0x80;
 }
 
-static ADDRESS_MAP_START( namcoc75_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8 )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
 	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
 	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)

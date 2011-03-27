@@ -218,7 +218,7 @@ static DEVICE_START( i82439tx )
 	device_t *cpu = device->machine->device(config->cputag);
 	assert(cpu != NULL);
 
-	i82439tx->space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	i82439tx->space = cpu->memory().space(AS_PROGRAM);
 
 	/* get rom region */
 	i82439tx->rom = device->machine->region(config->rom_region)->base();

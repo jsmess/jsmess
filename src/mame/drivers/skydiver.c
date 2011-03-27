@@ -158,7 +158,7 @@ static INTERRUPT_GEN( skydiver_interrupt )
 	discrete_sound_w(discrete, SKYDIVER_NOISE_DATA,  state->videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
 
 	if (state->nmion)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -187,7 +187,7 @@ static WRITE8_DEVICE_HANDLER( skydiver_whistle_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( skydiver_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(skydiver_wram_r, skydiver_wram_w)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM		/* RAM B1 */

@@ -25,7 +25,7 @@ Wave Mate Jupiter
 //  ADDRESS_MAP( jupiter_m6800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter_m6800_mem, ADDRESS_SPACE_PROGRAM, 8, jupiter2_state )
+static ADDRESS_MAP_START( jupiter_m6800_mem, AS_PROGRAM, 8, jupiter2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 //  AM_RANGE(0xc000, 0xcfff) Video RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(MCM6571AP_TAG, 0)
@@ -51,7 +51,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( jupiter_m6800_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter_m6800_io, ADDRESS_SPACE_IO, 8, jupiter2_state )
+static ADDRESS_MAP_START( jupiter_m6800_io, AS_IO, 8, jupiter2_state )
 ADDRESS_MAP_END
 
 
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( jupiter3_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter3_mem, ADDRESS_SPACE_PROGRAM, 8, jupiter3_state )
+static ADDRESS_MAP_START( jupiter3_mem, AS_PROGRAM, 8, jupiter3_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
 
@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( jupiter3_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter3_io, ADDRESS_SPACE_IO, 8, jupiter3_state )
+static ADDRESS_MAP_START( jupiter3_io, AS_IO, 8, jupiter3_state )
 ADDRESS_MAP_END
 
 

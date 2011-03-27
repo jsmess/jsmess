@@ -49,9 +49,9 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 	state->which = !state->which;
 
 	if (state->which)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
@@ -59,7 +59,7 @@ static INTERRUPT_GEN( mnchmobl_sound_irq )
 	munchmo_state *state = device->machine->driver_data<munchmo_state>();
 
 	if (!(state->sound_nmi_enable))
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE );
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_enable_w )
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( sound_nmi_enable_w )
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
 	munchmo_state *state = space->machine->driver_data<munchmo_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( sound_nmi_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_xpos)
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_data_w)

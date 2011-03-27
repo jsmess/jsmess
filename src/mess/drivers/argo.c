@@ -28,7 +28,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(argo_mem, ADDRESS_SPACE_PROGRAM, 8, argo_state)
+static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
@@ -36,7 +36,7 @@ static ADDRESS_MAP_START(argo_mem, ADDRESS_SPACE_PROGRAM, 8, argo_state)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(argo_io, ADDRESS_SPACE_PROGRAM, 8, argo_state)
+static ADDRESS_MAP_START(argo_io, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

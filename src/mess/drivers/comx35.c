@@ -30,7 +30,7 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8, comx35_state )
+static ADDRESS_MAP_START( comx35_map, AS_PROGRAM, 8, comx35_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_ROMBANK("bank2")
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8, comx35_state )
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( comx35_io_map, ADDRESS_SPACE_IO, 8, comx35_state )
+static ADDRESS_MAP_START( comx35_io_map, AS_IO, 8, comx35_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_WRITE(bank_select_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(io_r, io_w)
@@ -248,7 +248,7 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 
 			if (!state->m_iden)
 			{
-				cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
+				device_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
 			}
 		}
 		else
@@ -259,12 +259,12 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 
 	case COSMAC_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		device_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		// interrupt acknowledge clears the INT request
-		cpu_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		device_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 		break;
 	}
 }

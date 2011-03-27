@@ -75,7 +75,7 @@
 static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
 	avigo_state *state = machine->driver_data<avigo_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	char bank_1[10];
 	char bank_5[10];
 
@@ -285,7 +285,7 @@ static void avigo_refresh_memory(running_machine *machine)
 {
 	avigo_state *state = machine->driver_data<avigo_state>();
 	unsigned char *addr;
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (state->rom_bank_h)
 	{
@@ -434,7 +434,7 @@ static MACHINE_START( avigo )
 {
 }
 
-static ADDRESS_MAP_START( avigo_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -793,7 +793,7 @@ static  READ8_HANDLER(avigo_04_r)
 
 
 
-static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( avigo_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x000, 0x000) AM_READ( avigo_unmapped_r)

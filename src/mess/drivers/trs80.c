@@ -159,19 +159,19 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "formats/trs_cmd.h"
 
 
-static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( trs80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_MEMBER(trs80_state, videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trs80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( trs80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x377f) AM_ROM	// sys80,ht1080 needs up to 375F
 	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
 	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
@@ -187,12 +187,12 @@ static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( model1_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sys80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m4_eb_r, sys80_f8_w)
 	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m4_eb_w)
@@ -201,11 +201,11 @@ static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnw80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lnw80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnw80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( lnw80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9")
@@ -215,10 +215,10 @@ static ADDRESS_MAP_START( lnw80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( model3_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( model3_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model4_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( model4_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
 	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( model4_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model4p_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( model4p_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
 	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)

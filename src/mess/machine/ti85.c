@@ -72,7 +72,7 @@ static void update_ti85_memory (running_machine *machine)
 static void update_ti83p_memory (running_machine *machine)
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->ti8x_memory_page_1 & 0x40)
 	{
@@ -134,7 +134,7 @@ static void update_ti83p_memory (running_machine *machine)
 static void update_ti86_memory (running_machine *machine)
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->ti8x_memory_page_1 & 0x40)
 	{
@@ -167,7 +167,7 @@ static void update_ti86_memory (running_machine *machine)
 MACHINE_START( ti81 )
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
@@ -202,7 +202,7 @@ MACHINE_START( ti81 )
 MACHINE_START( ti82 )
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
@@ -244,7 +244,7 @@ MACHINE_START( ti82 )
 MACHINE_START( ti85 )
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
@@ -288,7 +288,7 @@ MACHINE_RESET( ti85 )
 MACHINE_START( ti83p )
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
@@ -341,7 +341,7 @@ MACHINE_START( ti83p )
 MACHINE_START( ti86 )
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
@@ -899,7 +899,7 @@ static void ti8x_snapshot_setup_registers (running_machine *machine, UINT8 * dat
 static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 {
 	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x8000 + 0x94;

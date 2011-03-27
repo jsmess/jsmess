@@ -159,7 +159,7 @@ static void bankswitch(running_machine *machine)
 {
 	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 	device_t *messram = machine->device(RAM_TAG);
 	UINT8 *rom = machine->region(Z80_TAG)->base();
 	UINT8 *ram = ram_get_ptr(messram);
@@ -406,12 +406,12 @@ static WRITE8_HANDLER( nmi_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(trs80m2_state, video_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(FD1791_TAG, wd17xx_r, wd17xx_w)
@@ -426,14 +426,14 @@ static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(nmi_r, nmi_w)
 ADDRESS_MAP_END
 
-//static ADDRESS_MAP_START( trs80m2_keyboard_io, ADDRESS_SPACE_IO, 8 )
+//static ADDRESS_MAP_START( trs80m2_keyboard_io, AS_IO, 8 )
 //  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_busy_r)
 //  AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_READ(keyboard_data_r)
 //  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_ctrl_w)
 //  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_latch_w)
 //ADDRESS_MAP_END
 
-//static ADDRESS_MAP_START( m68000_mem, ADDRESS_SPACE_PROGRAM, 16 )
+//static ADDRESS_MAP_START( m68000_mem, AS_PROGRAM, 16 )
 //ADDRESS_MAP_END
 
 /* Input Ports */

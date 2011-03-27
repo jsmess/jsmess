@@ -213,7 +213,7 @@ static const struct upd765_interface pyldin_upd765_interface =
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")
@@ -493,7 +493,7 @@ static INTERRUPT_GEN( pyl601_interrupt )
 {
 	pyl601_state *state = device->machine->driver_data<pyl601_state>();
 	state->tick50_mark = 0x80;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static FLOPPY_OPTIONS_START(pyldin)

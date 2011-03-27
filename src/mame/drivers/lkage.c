@@ -99,7 +99,7 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->pending_nmi = 1;
 }
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 	if (state->pending_nmi)
 	{
 		/* probably wrong but commands may go lost otherwise */
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }
@@ -134,7 +134,7 @@ static READ8_HANDLER(sound_status_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
@@ -164,11 +164,11 @@ static READ8_HANDLER( port_fetch_r )
 	return space->machine->region("user1")->base()[offset];
 }
 
-static ADDRESS_MAP_START( lkage_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lkage_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lkage_m68705_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lkage_68705_port_a_r,lkage_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lkage_68705_port_b_r,lkage_68705_port_b_w)
@@ -184,7 +184,7 @@ ADDRESS_MAP_END
 
 /* sound section is almost identical to Bubble Bobble, YM2203 instead of YM3526 */
 
-static ADDRESS_MAP_START( lkage_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lkage_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
@@ -481,7 +481,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	lkage_state *state = device->machine->driver_data<lkage_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -977,9 +977,9 @@ static DRIVER_INIT( lkage )
 static DRIVER_INIT( lkageb )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
 	state->sprite_dx=0;
 }
 

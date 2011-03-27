@@ -1185,7 +1185,7 @@ static WRITE32_HANDLER( hpc3_unkpbus0_w )
 	//COMBINE_DATA(&state->unkpbus0[offset]);
 }
 
-static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32 )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )	/* mirror of first 512k of main RAM */
 	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("share1") AM_BASE_MEMBER(ip22_state, mainram ) AM_RAM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE( newport_rex3_r, newport_rex3_w )
@@ -1260,7 +1260,7 @@ static void dump_chain(address_space *space, UINT32 ch_base)
 static void scsi_irq(running_machine *machine, int state)
 {
 	ip22_state *drvstate = machine->driver_data<ip22_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state)
 	{

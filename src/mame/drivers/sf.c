@@ -46,7 +46,7 @@ static WRITE16_HANDLER( soundcmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -189,7 +189,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 
 
-static ADDRESS_MAP_START( sf_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( sf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfus_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( sfus_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfjp_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( sfjp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
@@ -263,13 +263,13 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
-static ADDRESS_MAP_START( sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0000, 0xffff) AM_WRITENOP /* avoid cluttering up error.log */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound2_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("msm1", msm5205_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm2", msm5205_w)
@@ -790,7 +790,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	sf_state *state = device->machine->driver_data<sf_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

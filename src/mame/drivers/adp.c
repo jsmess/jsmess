@@ -179,7 +179,7 @@ public:
 static void duart_irq_handler( device_t *device, UINT8 vector )
 {
 	adp_state *state = device->machine->driver_data<adp_state>();
-	cpu_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
+	device_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
 };
 
 static void duart_tx( device_t *device, int channel, UINT8 data )
@@ -433,7 +433,7 @@ static READ8_DEVICE_HANDLER(t2_r)
 	return res;
 }
 
-static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w) // bad
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( backgamn_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10003f) AM_RAM
 	AM_RANGE(0x200000, 0x20003f) AM_RAM
@@ -499,7 +499,7 @@ static WRITE8_HANDLER( ramdac_io_w )
 	}
 }
 
-static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fstation_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//400000-40001f?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
@@ -614,7 +614,7 @@ INPUT_PORTS_END
 /*
 static INTERRUPT_GEN( adp_int )
 {
-    cpu_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    device_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 static const ay8910_interface ay8910_config =

@@ -202,7 +202,7 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
 	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
-	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 d;
 
 	ssystem3_playfield_write(device->machine, data&1, data&8);
@@ -235,7 +235,7 @@ static DRIVER_INIT( ssystem3 )
 	ssystem3_lcd_reset(machine);
 }
 
-static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( ssystem3_map , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03ff) AM_RAM
 				  /*
 67-de playfield ($40 means white, $80 black)

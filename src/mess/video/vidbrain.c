@@ -350,7 +350,7 @@ void vidbrain_state::video_start()
 
 bool vidbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (!(m_cmd & COMMAND_ENB))
 	{

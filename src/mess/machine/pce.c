@@ -308,7 +308,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	/* Check for Street fighter 2 */
 	if (size == PCE_ROM_MAXSIZE)
 	{
-		memory_install_write8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w);
+		memory_install_write8_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w);
 	}
 
 	/* Check for Populous */
@@ -316,7 +316,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	{
 		cartridge_ram = auto_alloc_array(image.device().machine, UINT8, 0x8000);
 		memory_set_bankptr(image.device().machine, "bank2", cartridge_ram);
-		memory_install_write8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w);
+		memory_install_write8_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w);
 	}
 
 	/* Check for CD system card */
@@ -331,8 +331,8 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		{
 			cartridge_ram = auto_alloc_array(image.device().machine, UINT8, 0x30000);
 			memory_set_bankptr(image.device().machine, "bank4", cartridge_ram);
-			memory_install_write8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w);
-			memory_install_readwrite8_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cd_acard_wram_r,pce_cd_acard_wram_w);
+			memory_install_write8_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w);
+			memory_install_readwrite8_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cd_acard_wram_r,pce_cd_acard_wram_w);
 		}
 	}
 	return 0;

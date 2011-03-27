@@ -209,7 +209,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 {
 	int port;
 	hsgpl_state *card = get_safe_token(device);
-	//activecpu_adjust_icount(-4);
+	//activedevice_adjust_icount(-4);
 
 	// 1001 10bb bbbb bba0
 	port = card->current_grom_port = (offset & 0x3fc) >> 2;
@@ -304,7 +304,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
 	int port;
 	hsgpl_state *card = get_safe_token(device);
 
-	//activecpu_adjust_icount(-4);
+	//activedevice_adjust_icount(-4);
 
 	// 1001 11bb bbbb bba0
 	port = card->current_grom_port = (offset & 0x3fc) >> 2;

@@ -251,7 +251,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	{
 		state->i8751_current_command = 0;
 		state->i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
-		cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
 		return;
 	}
 
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Signal main cpu task is complete */
-	cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
 	state->i8751_current_command=data;
 }
 
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( firetrap_sound_command_w )
 {
 	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
@@ -334,7 +334,7 @@ static void firetrap_adpcm_int( device_t *device )
 
 	state->adpcm_toggle ^= 1;
 	if (state->irq_enable && state->adpcm_toggle)
-		cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
-static ADDRESS_MAP_START( firetrap_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( firetrap_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( firetrap_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( firetrap_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf8ff) AM_ROM /* extra ROM in the bootleg with unprotection code */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
@@ -602,13 +602,13 @@ static INTERRUPT_GEN( firetrap )
 		if (state->coin_command_pending && !state->i8751_current_command)
 		{
 			state->i8751_return = state->coin_command_pending;
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);
 			state->coin_command_pending = 0;
 		}
 	}
 
 	if (state->nmi_enable && !cpu_getiloops(device))
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( bootleg )
@@ -616,7 +616,7 @@ static INTERRUPT_GEN( bootleg )
 	firetrap_state *state = device->machine->driver_data<firetrap_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

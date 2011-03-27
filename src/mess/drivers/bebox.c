@@ -51,7 +51,7 @@ static WRITE64_HANDLER( bebox_dma8237_1_w )
 }
 
 
-static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64 )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE( bebox_cpu0_imask_r, bebox_cpu0_imask_w )
 	AM_RANGE(0x7FFFF1F0, 0x7FFFF1F7) AM_READWRITE( bebox_cpu1_imask_r, bebox_cpu1_imask_w )
 	AM_RANGE(0x7FFFF2F0, 0x7FFFF2F7) AM_READ( bebox_interrupt_sources_r )
@@ -98,7 +98,7 @@ static READ64_HANDLER(bb_slave_64be_r)
 	return pci_64be_r(device, offset, mem_mask);
 }
 
-static ADDRESS_MAP_START( bebox_slave_mem, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64 )
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ(bb_slave_64be_r)
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVWRITE("pcibus", pci_64be_w )
 	AM_IMPORT_FROM(bebox_mem)

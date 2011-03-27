@@ -735,7 +735,7 @@ static WRITE32_DEVICE_HANDLER( rabbit_eeprom_write )
 	}
 }
 
-static ADDRESS_MAP_START( rabbit_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x000000, 0x000003) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?
@@ -957,7 +957,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 		return;
 	}
 
-	cpu_set_input_line(device, intlevel, HOLD_LINE);
+	device_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )

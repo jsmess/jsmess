@@ -247,7 +247,7 @@ INLINE void COPS_send_data_if_possible(running_machine *machine)
 {
 	lisa_state *state = machine->driver_data<lisa_state>();
 	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if ((! state->hold_COPS_data) && state->fifo_size && (! state->COPS_Ready))
 	{
@@ -338,7 +338,7 @@ static void scan_keyboard(running_machine *machine)
 						if (keycode == state->NMIcode)
 						{	/* generate NMI interrupt */
 							cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, PULSE_LINE);
-							cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							device_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
 						COPS_queue_data(machine, & keycode, 1);
@@ -437,7 +437,7 @@ static TIMER_CALLBACK(read_COPS_command)
 	lisa_state *state = machine->driver_data<lisa_state>();
 	int command;
 	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->COPS_Ready = 0;
 
@@ -736,7 +736,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
 	lisa_state *state = device->machine->driver_data<lisa_state>();
 	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* pull-up */
 	data |= (~ via_0->read(*space,VIA_DDRA)) & 0x01;
@@ -1057,7 +1057,7 @@ MACHINE_RESET( lisa )
 	state->rom_ptr = machine->region("maincpu")->base() + ROM_OFFSET;
 	state->videoROM_ptr = machine->region("gfx1")->base();
 
-//  cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
 //  m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */

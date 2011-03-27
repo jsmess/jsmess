@@ -528,7 +528,7 @@ static WRITE8_HANDLER(test_w)
 }
 #endif
 
-static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8)
 
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/*system ROM*/
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP /*BASIC ROM & cartridge ROM*/
@@ -555,7 +555,7 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-static ADDRESS_MAP_START(tutor_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(tutor_io, AS_IO, 8)
 	AM_RANGE(0xec0, 0xec7) AM_READ(read_keyboard)			/*keyboard interface*/
 	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)		/*cassette interface*/
 ADDRESS_MAP_END

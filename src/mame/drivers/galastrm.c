@@ -52,7 +52,7 @@ static INTERRUPT_GEN( galastrm_interrupt )
 {
 	galastrm_state *state = device->machine->driver_data<galastrm_state>();
 	state->frame_counter ^= 1;
-	cpu_set_input_line(device, 5, HOLD_LINE);
+	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( galastrm_interrupt6 )
@@ -172,7 +172,7 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( galastrm_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(galastrm_state, ram)								/* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(galastrm_state, spriteram, spriteram_size)

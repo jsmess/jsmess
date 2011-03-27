@@ -29,7 +29,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( cfx9850, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cfx9850, AS_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_BASE_MEMBER( cfx9850_state, video_ram )
 //  AM_RANGE( 0x100000, 0x10ffff ) /* some memory mapped i/o? */
@@ -91,7 +91,7 @@ static READ8_HANDLER( cfx9850_ki_r )
 }
 
 
-static ADDRESS_MAP_START( cfx9850_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cfx9850_io, AS_IO, 8 )
 	AM_RANGE( HCD62121_KOL, HCD62121_KOL ) AM_WRITE( cfx9850_kol_w )
 	AM_RANGE( HCD62121_KOH, HCD62121_KOH ) AM_WRITE( cfx9850_koh_w )
 	AM_RANGE( HCD62121_KI, HCD62121_KI ) AM_READ( cfx9850_ki_r )

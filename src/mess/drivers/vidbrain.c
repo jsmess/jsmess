@@ -158,7 +158,7 @@ void vidbrain_state::interrupt_check()
 		break;
 	}
 
-	cpu_set_input_line(m_maincpu, F8_INPUT_LINE_INT_REQ, interrupt);
+	device_set_input_line(m_maincpu, F8_INPUT_LINE_INT_REQ, interrupt);
 }
 
 
@@ -208,7 +208,7 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 //  ADDRESS_MAP( vidbrain_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vidbrain_mem, ADDRESS_SPACE_PROGRAM, 8, vidbrain_state )
+static ADDRESS_MAP_START( vidbrain_mem, AS_PROGRAM, 8, vidbrain_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xc000) AM_ROM
 	AM_RANGE(0x0800, 0x08ff) AM_READWRITE(vlsi_r, vlsi_w)
 	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0xe000) AM_RAM
@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vidbrain_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vidbrain_io, ADDRESS_SPACE_IO, 8, vidbrain_state )
+static ADDRESS_MAP_START( vidbrain_io, AS_IO, 8, vidbrain_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
@@ -365,7 +365,7 @@ DISCRETE_SOUND_END
 /*
 static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 {
-    cpu_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
+    device_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
 
     cputag_set_input_line(device->machine, F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
 }
@@ -426,7 +426,7 @@ static IRQ_CALLBACK( vidbrain_int_ack )
 void vidbrain_state::machine_start()
 {
 	// register IRQ callback
-	cpu_set_irq_callback(m_maincpu, vidbrain_int_ack);
+	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
 
 	// register for state saving
 	state_save_register_global(machine, m_vector);

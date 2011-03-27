@@ -75,13 +75,13 @@ READ8_MEMBER( zsbc3_state::zsbc3_2a_r )
 	return 4 | ((m_term_data) ? 1 : 0);
 }
 
-static ADDRESS_MAP_START(zsbc3_mem, ADDRESS_SPACE_PROGRAM, 8, zsbc3_state)
+static ADDRESS_MAP_START(zsbc3_mem, AS_PROGRAM, 8, zsbc3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x0800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zsbc3_io , ADDRESS_SPACE_IO, 8, zsbc3_state)
+static ADDRESS_MAP_START( zsbc3_io , AS_IO, 8, zsbc3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x28, 0x28) AM_READWRITE(zsbc3_28_r,zsbc3_28_w)

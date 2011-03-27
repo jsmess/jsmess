@@ -72,11 +72,11 @@ public:
 };
 
 
-static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("sgcpu_board", sgcpu_r, sgcpu_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(cru_map, AS_IO, 8)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0080, 0x01ff) AM_DEVREAD("sgcpu_board", sgcpu_cru_r )
 

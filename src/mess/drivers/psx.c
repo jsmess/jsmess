@@ -429,7 +429,7 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 	{
 		device_t *cpu = machine->device("maincpu");
 
-		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
 
 		if( load_psxexe( cpu, state->exe_buffer, state->exe_size ) ||
 			load_cpe( cpu, state->exe_buffer, state->exe_size ) ||
@@ -453,7 +453,7 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 static QUICKLOAD_LOAD( psx_exe_load )
 {
 	psx1_state *state = image.device().machine->driver_data<psx1_state>();
-	address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = image.device().machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	state->exe_size = 0;
 	state->exe_buffer = (UINT8*)malloc( quickload_size );
@@ -665,7 +665,7 @@ static WRITE8_HANDLER( psx_cd_w )
 	psxcd->write_byte(offset, data);
 }
 
-static ADDRESS_MAP_START( psx_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP

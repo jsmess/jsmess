@@ -230,14 +230,14 @@ SNAPSHOT_LOAD( nascom1 )
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
 		{
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b0);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b1);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b2);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b3);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b4);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b5);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b6);
-			cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM)->write_byte(addr++, b7);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b0);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b1);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b2);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b3);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b4);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b5);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b6);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b7);
 		}
 	}
 
@@ -274,28 +274,28 @@ DRIVER_INIT( nascom1 )
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 1 * 1024:
-		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_nop_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x1400, 0x9000, 0, 0);
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x1400, 0x4fff, 0, 0, "bank1");
-		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_nop_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x5000, 0xafff, 0, 0);
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x1400, 0x8fff, 0, 0, "bank1");
-		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_nop_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x9000, 0xafff, 0, 0);
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 		break;
 
 	case 40 * 1024:
-		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x1400, 0xafff, 0, 0, "bank1");
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 		break;

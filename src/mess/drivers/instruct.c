@@ -55,14 +55,14 @@ READ8_MEMBER(instruct_state::instruct_sense_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(instruct_mem, ADDRESS_SPACE_PROGRAM, 8, instruct_state)
+static ADDRESS_MAP_START(instruct_mem, AS_PROGRAM, 8, instruct_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x1700, 0x17ff) AM_RAM
 	AM_RANGE( 0x1f00, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( instruct_io, ADDRESS_SPACE_IO, 8, instruct_state)
+static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(instruct_f8_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(instruct_fc_r)

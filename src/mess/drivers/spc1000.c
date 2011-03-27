@@ -29,7 +29,7 @@ public:
 
 
 
-static ADDRESS_MAP_START(spc1000_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
@@ -107,7 +107,7 @@ static READ8_DEVICE_HANDLER(spc1000_gmode_r)
 	return state->GMODE;
 }
 
-static ADDRESS_MAP_START( spc1000_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( spc1000_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(spc1000_video_ram_r, spc1000_video_ram_w)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("mc6847", spc1000_gmode_r, spc1000_gmode_w)
@@ -215,7 +215,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(spc1000)
 {
 	spc1000_state *state = machine->driver_data<spc1000_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine->region("maincpu")->base();
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 

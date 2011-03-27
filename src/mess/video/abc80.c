@@ -55,7 +55,7 @@ static TIMER_DEVICE_CALLBACK( vsync_on_tick )
 {
 	abc80_state *state = timer.machine->driver_data<abc80_state>();
 
-	cpu_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -67,7 +67,7 @@ static TIMER_DEVICE_CALLBACK( vsync_off_tick )
 {
 	abc80_state *state = timer.machine->driver_data<abc80_state>();
 
-	cpu_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

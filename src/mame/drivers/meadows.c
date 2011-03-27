@@ -215,7 +215,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 	meadows_state *state = device->machine->driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
 	state->main_sense_state ^= 1;
-	cpu_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -230,7 +230,7 @@ static INTERRUPT_GEN( minferno_interrupt )
 {
 	meadows_state *state = device->machine->driver_data<meadows_state>();
 	state->main_sense_state++;
-	cpu_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -315,7 +315,7 @@ static INTERRUPT_GEN( audio_interrupt )
 	meadows_state *state = device->machine->driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
 	state->audio_sense_state ^= 1;
-	cpu_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -339,7 +339,7 @@ static PALETTE_INIT( meadows )
  *
  *************************************/
 
-static ADDRESS_MAP_START( meadows_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( meadows_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("STICK")
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( meadows_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bowl3d_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bowl3d_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS1")
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("INPUTS2")
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( bowl3d_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( minferno_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
 	AM_RANGE(0x1f00, 0x1f00) AM_READ_PORT("JOY1")
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( minferno_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( minferno_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( minferno_io_map, AS_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
@@ -390,7 +390,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c03) AM_READWRITE(audio_hardware_r, audio_hardware_w)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM

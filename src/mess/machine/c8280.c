@@ -90,7 +90,7 @@ WRITE_LINE_DEVICE_HANDLER( c8280_ieee488_ifc_w )
     ADDRESS_MAP( c8280_dos_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c8280_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c8280_dos_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c8280", 0x0000)
 ADDRESS_MAP_END
 
@@ -98,7 +98,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c8280_fdc_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c8280_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c8280_fdc_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*-------------------------------------------------

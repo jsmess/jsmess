@@ -215,19 +215,19 @@ public:
 #define X301	19660000
 
 
-static ADDRESS_MAP_START( nakajies210_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nakajies210_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x1ffff ) AM_RAM
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nakajies220_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nakajies220_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nakajies250_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nakajies250_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0x80000 )
 ADDRESS_MAP_END
@@ -254,11 +254,11 @@ static void nakajies_update_irqs( running_machine *machine )
 
 	if ( vector >= 0xf8 )
 	{
-		cpu_set_input_line_and_vector( state->cpu, 0, ASSERT_LINE, vector );
+		device_set_input_line_and_vector( state->cpu, 0, ASSERT_LINE, vector );
 	}
 	else
 	{
-		cpu_set_input_line( state->cpu, 0, CLEAR_LINE );
+		device_set_input_line( state->cpu, 0, CLEAR_LINE );
 	}
 }
 
@@ -301,7 +301,7 @@ static READ8_HANDLER( unk_a0_r )
 }
 
 
-static ADDRESS_MAP_START( nakajies_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8 )
 	AM_RANGE( 0x0060, 0x0060 ) AM_READWRITE( irq_enable_r, irq_enable_w )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READWRITE( irq_clear_r, irq_clear_w )
 	AM_RANGE( 0x00a0, 0x00a0 ) AM_READ( unk_a0_r )

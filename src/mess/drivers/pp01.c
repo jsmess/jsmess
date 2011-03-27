@@ -14,7 +14,7 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(pp01_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pp01_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(pp01_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_RAMBANK("bank16")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pp01_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pp01_io, AS_IO, 8 )
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0xcc, 0xcf) AM_WRITE(pp01_video_write_mode_w)

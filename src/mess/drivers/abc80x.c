@@ -291,7 +291,7 @@ READ8_MEMBER( abc802_state::pling_r )
 
 void abc800_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (m_fetch_charram)
 	{
@@ -312,7 +312,7 @@ void abc800_state::bankswitch()
 
 void abc802_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (m_lrs)
 	{
@@ -334,7 +334,7 @@ void abc802_state::bankswitch()
 
 void abc806_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT32 videoram_mask = ram_get_size(m_ram) - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
@@ -414,7 +414,7 @@ void abc806_state::bankswitch()
 
 					memory_install_read_bank(program, 0x7000, 0x77ff, 0, 0, bank_name);
 					memory_unmap_write(program, 0x7000, 0x77ff, 0, 0);
-					program->install_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
+					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
 					memory_set_bank(machine, bank_name, 0);
 					break;
 
@@ -449,7 +449,7 @@ void abc806_state::bankswitch()
 			if (start_addr == 0x7000)
 			{
 				memory_install_readwrite_bank(program, 0x7000, 0x77ff, 0, 0, bank_name);
-				program->install_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
+				program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
 			}
 			else
 			{
@@ -539,7 +539,7 @@ READ_LINE_MEMBER( abc800_state::keyboard_txd_r )
 
 static WRITE_LINE_DEVICE_HANDLER( keyboard_rxd_w )
 {
-	cpu_set_input_line(device, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(device, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -641,7 +641,7 @@ READ8_MEMBER( abc800_state::keyboard_t1_r )
 //  ADDRESS_MAP( abc800c_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800c_mem, ADDRESS_SPACE_PROGRAM, 8, abc800_state )
+static ADDRESS_MAP_START( abc800c_mem, AS_PROGRAM, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
@@ -654,7 +654,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800c_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800c_io, ADDRESS_SPACE_IO, 8, abc800_state )
+static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, inp_r, utp_w)
@@ -676,7 +676,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800_keyboard_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800_keyboard_io, ADDRESS_SPACE_IO, 8, abc800_state )
+static ADDRESS_MAP_START( abc800_keyboard_io, AS_IO, 8, abc800_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_col_r, keyboard_row_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_ctrl_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_t1_r)
@@ -687,7 +687,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800m_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800m_mem, ADDRESS_SPACE_PROGRAM, 8, abc800_state )
+static ADDRESS_MAP_START( abc800m_mem, AS_PROGRAM, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x4000, 0x77ff) AM_ROM
@@ -700,7 +700,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800m_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800m_io, ADDRESS_SPACE_IO, 8, abc800_state )
+static ADDRESS_MAP_START( abc800m_io, AS_IO, 8, abc800_state )
 	AM_IMPORT_FROM( abc800c_io )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD_LEGACY(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_address_w)
@@ -712,7 +712,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc802_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc802_mem, ADDRESS_SPACE_PROGRAM, 8, abc802_state )
+static ADDRESS_MAP_START( abc802_mem, AS_PROGRAM, 8, abc802_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(m_char_ram)
@@ -724,7 +724,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc802_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc802_io, ADDRESS_SPACE_IO, 8, abc802_state )
+static ADDRESS_MAP_START( abc802_io, AS_IO, 8, abc802_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, inp_r, utp_w)
@@ -748,7 +748,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc806_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc806_mem, ADDRESS_SPACE_PROGRAM, 8, abc806_state )
+static ADDRESS_MAP_START( abc806_mem, AS_PROGRAM, 8, abc806_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
@@ -773,7 +773,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc806_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc806_io, ADDRESS_SPACE_IO, 8, abc806_state )
+static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, inp_r, utp_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, stat_r, cs_w)

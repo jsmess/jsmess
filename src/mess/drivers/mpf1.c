@@ -40,14 +40,14 @@
 
 /* Address Maps */
 
-static ADDRESS_MAP_START( mpf1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpf1_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1b_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpf1b_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
@@ -55,13 +55,13 @@ static ADDRESS_MAP_START( mpf1b_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1p_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpf1p_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mpf1_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1b_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mpf1b_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( mpf1b_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0x01) AM_DEVREADWRITE(TMS5220_TAG, tms5220_status_r, tms5220_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1p_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mpf1p_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
@@ -513,7 +513,7 @@ DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 
 static DRIVER_INIT( mpf1 )
 {
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mpf1_direct_update_handler, *machine));
+	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mpf1_direct_update_handler, *machine));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)

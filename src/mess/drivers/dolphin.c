@@ -104,13 +104,13 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 	return data;
 }
 
-static ADDRESS_MAP_START(dolphin_mem, ADDRESS_SPACE_PROGRAM, 8, dolphin_state)
+static ADDRESS_MAP_START(dolphin_mem, AS_PROGRAM, 8, dolphin_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x01ff) AM_ROM
 	AM_RANGE( 0x0200, 0x02ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dolphin_io , ADDRESS_SPACE_IO, 8, dolphin_state)
+static ADDRESS_MAP_START( dolphin_io , AS_IO, 8, dolphin_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(dolphin_00_w) // 4-led display
 	//AM_RANGE(0x06, 0x06) AM_WRITE(dolphin_06_w)  // speaker (NOT a keyclick)

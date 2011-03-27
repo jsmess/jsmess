@@ -165,7 +165,7 @@ static SCREEN_UPDATE( casloopy )
 	return 0;
 }
 
-static ADDRESS_MAP_START( casloopy_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE_MEMBER(casloopy_state, bios_rom)
 //  AM_RANGE(0x01000000, 0x017fffff) - i/o?
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( casloopy_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( casloopy_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( casloopy_sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("subcpu",0)
 ADDRESS_MAP_END
 #endif

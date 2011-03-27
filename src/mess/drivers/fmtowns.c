@@ -318,7 +318,7 @@ static TIMER_CALLBACK(towns_freerun_inc)
 static TIMER_CALLBACK(towns_wait_end)
 {
 	towns_state* state = machine->driver_data<towns_state>();
-	cpu_set_input_line(state->maincpu,INPUT_LINE_HALT,CLEAR_LINE);
+	device_set_input_line(state->maincpu,INPUT_LINE_HALT,CLEAR_LINE);
 }
 
 static READ8_HANDLER(towns_sys6c_r)
@@ -333,7 +333,7 @@ static WRITE8_HANDLER(towns_sys6c_w)
 //  logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
 	state->ftimer -= 0x54;
 	// halts the CPU for a period of time (exact length unknown)
-	cpu_set_input_line(state->maincpu,INPUT_LINE_HALT,ASSERT_LINE);
+	device_set_input_line(state->maincpu,INPUT_LINE_HALT,ASSERT_LINE);
 	state->towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::never);
 }
 
@@ -1992,7 +1992,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out2_changed )
 	towns_speaker_set_input(device->machine,state);
 }
 
-static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
@@ -2018,7 +2018,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 32)
   ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // 386SX has only a 24-bit address range
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
@@ -2045,7 +2045,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ux_mem, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 32)
   ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // 386SX has only a 24-bit address range
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
@@ -2072,7 +2072,7 @@ static ADDRESS_MAP_START(ux_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
+static ADDRESS_MAP_START( towns_io , AS_IO, 32)
   // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
   // System ports
   AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0x00ff00ff)
@@ -2356,8 +2356,8 @@ static DRIVER_INIT( towns )
 	// CD-ROM init
 	state->towns_cd.read_timer = machine->scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine->device("dma_1"));
 
-	cpu_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
-	memory_install_ram(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x100000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,NULL);
+	device_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
+	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM),0x100000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,NULL);
 
 }
 
@@ -2396,7 +2396,7 @@ static MACHINE_RESET( towns )
 	state->towns_mainmem_enable = 0x00;
 	state->towns_system_port = 0x00;
 	state->towns_ram_enable = 0x00;
-	towns_update_video_banks(cpu_get_address_space(state->maincpu,ADDRESS_SPACE_PROGRAM));
+	towns_update_video_banks(state->maincpu->memory().space(AS_PROGRAM));
 	state->towns_kb_status = 0x18;
 	state->towns_kb_irq1_enable = 0;
 	state->towns_pad_mask = 0x7f;

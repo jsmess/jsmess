@@ -274,13 +274,13 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 	{
 		case 0:
 			if (state->control & 0x0001)
-				cpu_set_input_line(device, 1, HOLD_LINE);
+				device_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 1:
 			/* trigger V-blank interrupt */
 			if (state->control & 0x0004)
-				cpu_set_input_line(device, 3, HOLD_LINE);
+				device_set_input_line(device, 3, HOLD_LINE);
 			break;
 	}
 }
@@ -311,7 +311,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 	qdrmfgp_state *state = device->machine->driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
 	if (state->control & 0x0008)
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)
@@ -340,7 +340,7 @@ static void gp2_ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(qdrmfgp_state, workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE_MEMBER(qdrmfgp_state, workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */

@@ -603,7 +603,7 @@ static WRITE8_HANDLER( smc777_irq_mask_w )
 	state->irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(smc777_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r,smc777_mem_w)
 ADDRESS_MAP_END
@@ -687,7 +687,7 @@ static WRITE8_HANDLER( smc777_io_w )
 	else 										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(space->cpu),low_offs,data); }
 }
 
-static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( smc777_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_io_r,smc777_io_w)
 ADDRESS_MAP_END
@@ -944,7 +944,7 @@ static INTERRUPT_GEN( smc777_vblank_irq )
 	smc777_state *state = device->machine->driver_data<smc777_state>();
 
 	if(state->irq_mask)
-		cpu_set_input_line(device,0,HOLD_LINE);
+		device_set_input_line(device,0,HOLD_LINE);
 }
 
 #define MASTER_CLOCK XTAL_4_028MHz

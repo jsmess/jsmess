@@ -400,7 +400,7 @@ READ16_MEMBER(mac_state::mac_config_r)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(mac512ke_map, ADDRESS_SPACE_PROGRAM, 16, mac_state )
+static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_WRITE(mac_scc_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START(mac512ke_map, ADDRESS_SPACE_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macplus_map, ADDRESS_SPACE_PROGRAM, 16, mac_state )
+static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_WRITE(mac_scc_w)
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START(macplus_map, ADDRESS_SPACE_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macprtb_map, ADDRESS_SPACE_PROGRAM, 16, mac_state )
+static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0x900000, 0x93ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0c0000)
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START(macprtb_map, ADDRESS_SPACE_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maclc_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
+static ADDRESS_MAP_START(maclc_map, AS_PROGRAM, 32, mac_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x80ffffff)	// V8 uses bit 31 and 23-0 for address decoding only
 
 	AM_RANGE(0xa00000, 0xafffff) AM_ROM AM_REGION("bootrom", 0)	// ROM (in 32-bit mode)
@@ -446,7 +446,7 @@ static ADDRESS_MAP_START(maclc_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_BASE(m_rbv_vram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maclc3_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
+static ADDRESS_MAP_START(maclc3_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START(maclc3_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_BASE(m_rbv_vram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
+static ADDRESS_MAP_START(macii_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
 
 	// MMU remaps I/O without the F
@@ -487,7 +487,7 @@ static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("rops264", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
+static ADDRESS_MAP_START(maciici_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x4007ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff80000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -502,7 +502,7 @@ static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
+static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -519,7 +519,7 @@ static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32, mac_state )
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrmac_map, ADDRESS_SPACE_PROGRAM, 64, mac_state )
+static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	// 8 MB standard
 
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)

@@ -92,7 +92,7 @@ static const centronics_interface amiga_centronics_config =
   Address maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(amiga_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x80000) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(amiga_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* System ROM - mirror */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(keyboard_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(keyboard_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x003f) AM_RAM /* internal user ram */
 	AM_RANGE(0x0040, 0x007f) AM_NOP /* unassigned */
 	AM_RANGE(0x0080, 0x0080) AM_NOP /* port a */
@@ -147,7 +147,7 @@ ADDRESS_MAP_END
  *
  */
 
-static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(cdtv_mem, AS_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(amiga_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w)
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* CDTV & System ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cdtv_rcmcu_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(cdtv_rcmcu_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x003f) AM_RAM /* internal user ram */
 	AM_RANGE(0x0040, 0x007f) AM_NOP /* unassigned */
 	AM_RANGE(0x0080, 0x0080) AM_NOP /* port a */
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START(cdtv_rcmcu_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("rcmcu", 0) /* internal mask rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(a1000_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(a1000_mem, AS_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(amiga_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
@@ -520,7 +520,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write_bank(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
+		memory_install_write_bank(device->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
 		if (device->machine->region("user2")->base() != NULL)
@@ -528,7 +528,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_unmap_write(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, 0);
+		memory_unmap_write(device->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, 0);
 
 	set_led_status( device->machine, 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -582,12 +582,12 @@ static void amiga_reset(running_machine *machine)
 	if (input_port_read(machine, "hardware") & 0x08)
 	{
 		/* Install RTC */
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
+		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
 	}
 	else
 	{
 		/* No RTC support */
-		memory_unmap_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0);
+		memory_unmap_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdc0000, 0xdc003f, 0, 0);
 	}
 }
 

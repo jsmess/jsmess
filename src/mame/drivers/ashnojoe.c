@@ -96,7 +96,7 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 	}
 }
 
-static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_BASE_MEMBER(ashnojoe_state, tileram_3)
 	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_BASE_MEMBER(ashnojoe_state, tileram_4)
@@ -138,13 +138,13 @@ static READ8_HANDLER( sound_latch_status_r )
 	return state->soundlatch_status;
 }
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
@@ -277,7 +277,7 @@ GFXDECODE_END
 static void ym2203_irq_handler( device_t *device, int irq )
 {
 	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_a )
@@ -317,7 +317,7 @@ static void ashnojoe_vclk_cb( device_t *device )
 	else
 	{
 		msm5205_data_w(device, state->adpcm_byte & 0xf);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	state->msm5205_vclk_toggle ^= 1;

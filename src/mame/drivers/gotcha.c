@@ -95,7 +95,7 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 }
 
 
-static ADDRESS_MAP_START( gotcha_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( gotcha_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// TWO addresses!
@@ -239,7 +239,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	gotcha_state *state = device->machine->driver_data<gotcha_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym2151_interface ym2151_config =

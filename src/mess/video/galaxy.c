@@ -16,7 +16,7 @@
 static TIMER_CALLBACK( gal_video )
 {
 	galaxy_state *state = machine->driver_data<galaxy_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int y, x;
 	if (state->interrupts_enabled == TRUE)
 	{

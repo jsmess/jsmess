@@ -187,7 +187,7 @@ WRITE8_MEMBER( rex6000_state::touchscreen_w )
 	m_touchscreen[offset&0x0f] = data;
 }
 
-static ADDRESS_MAP_START(rex6000_mem, ADDRESS_SPACE_PROGRAM, 8, rex6000_state)
+static ADDRESS_MAP_START(rex6000_mem, AS_PROGRAM, 8, rex6000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM	AM_REGION("flash", 0)
 	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK("bank1")
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START(rex6000_mem, ADDRESS_SPACE_PROGRAM, 8, rex6000_state)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM				//system RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rex6000_io, ADDRESS_SPACE_IO, 8, rex6000_state)
+static ADDRESS_MAP_START( rex6000_io, AS_IO, 8, rex6000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x04 ) AM_READWRITE(bankswitch_r, bankswitch_w)
@@ -216,7 +216,7 @@ static INPUT_CHANGED( trigger_irq )
 
 	state->m_irq_flag |= 0x01;
 
-	cpu_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 /* Input ports */
@@ -281,7 +281,7 @@ static TIMER_DEVICE_CALLBACK( irq_timer )
 
 	state->m_irq_flag |= 0x20;
 
-	cpu_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( sec_timer )
@@ -290,7 +290,7 @@ static TIMER_DEVICE_CALLBACK( sec_timer )
 
 	state->m_irq_flag |= 0x10;
 
-	cpu_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 

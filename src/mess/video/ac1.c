@@ -29,7 +29,7 @@ VIDEO_START( ac1 )
 SCREEN_UPDATE( ac1 )
 {
 	int x,y;
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 16; y++ )
 	{
@@ -45,7 +45,7 @@ SCREEN_UPDATE( ac1 )
 SCREEN_UPDATE( ac1_32 )
 {
 	int x,y;
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 32; y++ )
 	{

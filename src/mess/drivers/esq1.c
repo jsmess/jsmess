@@ -100,7 +100,7 @@ static MACHINE_RESET( esq1 )
 	memory_set_bankptr(machine, "osbank", machine->region("osrom")->base() );
 }
 
-static ADDRESS_MAP_START( esq1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM					// OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_r, es5503_w)

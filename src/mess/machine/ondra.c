@@ -42,19 +42,19 @@ static void ondra_update_banks(running_machine *machine)
 	ondra_state *state = machine->driver_data<ondra_state>();
 	UINT8 *mem = machine->region("maincpu")->base();
 	if (state->bank1_status==0) {
-		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
+		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0);
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	} else {
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
 	}
 	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 	if (state->bank2_status==0) {
-		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, "bank3");
+		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xffff, 0, 0, "bank3");
 		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
 	} else {
-		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0);
-		memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, ondra_keyboard_r);
+		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xffff, 0, 0);
+		memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xffff, 0, 0, ondra_keyboard_r);
 	}
 }
 

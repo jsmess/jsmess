@@ -107,7 +107,7 @@ static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(device->machine->device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:
@@ -171,7 +171,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	cpu_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
+	device_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
 }
 
 
@@ -243,7 +243,7 @@ static WRITE8_HANDLER( exdos_card_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( enterprise_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( enterprise_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( enterprise_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE("wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)

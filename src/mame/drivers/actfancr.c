@@ -58,12 +58,12 @@ static WRITE8_HANDLER( actfancr_sound_w )
 {
 	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
 	AM_RANGE(0x062000, 0x063fff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE_MEMBER(actfancr_state, pf1_data)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, main_ram) /* Main ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triothep_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04001f) AM_WRITE(actfancr_pf2_control_w)
 	AM_RANGE(0x044000, 0x045fff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE_MEMBER(actfancr_state, pf2_data)
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
@@ -266,7 +266,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int linestate)
 {
 	actfancr_state *state = device->machine->driver_data<actfancr_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
+	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -589,7 +589,7 @@ static READ8_HANDLER( cycle_r )
 
 	if (pc == 0xe29a && ret == 0)
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 		return 1;
 	}
 
@@ -607,7 +607,7 @@ static READ8_HANDLER( cyclej_r )
 
 	if (pc == 0xe2b1 && ret == 0)
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 		return 1;
 	}
 
@@ -616,12 +616,12 @@ static READ8_HANDLER( cyclej_r )
 
 static DRIVER_INIT( actfancr )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
 }
 
 static DRIVER_INIT( actfancrj )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
 }
 
 

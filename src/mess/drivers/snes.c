@@ -61,7 +61,7 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x400000, 0x5fffff) AM_READ(snes_r_bank3)		/* ROM (and reserved in Mode 20) */
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( superfx_map, AS_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
 	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
 	AM_RANGE(0x600000, 0x7dffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( spc_map, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
@@ -89,19 +89,19 @@ static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_prg_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( setadsp_prg_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( setadsp_prg_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( setadsp_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( setadsp_data_map, AS_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 

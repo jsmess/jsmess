@@ -322,7 +322,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 	if ( fdc->fdc_status[drive].mfm[cur_pos-2] == ( ( sync >> 8 ) & 0xff ) &&
 		 fdc->fdc_status[drive].mfm[cur_pos-1] == ( sync & 0xff ) )
 	{
-		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 		amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0xffff);
 	}
@@ -367,7 +367,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 	{
 		if ( fdc->fdc_status[drive].len > 0 )
 		{
-			address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+			address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 			logerror("Write to disk unsupported yet\n" );
 
@@ -404,7 +404,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 
 		if ( fdc->fdc_status[drive].len <= 0 )
 		{
-			address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+			address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 			amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
 		}
@@ -438,7 +438,7 @@ void amiga_fdc_setup_dma( device_t *device ) {
 	}
 
 	if ( drive == -1 ) {
-		address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 		logerror("Disk DMA started with no drive selected!\n" );
 		amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);

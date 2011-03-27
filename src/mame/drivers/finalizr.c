@@ -28,12 +28,12 @@ static INTERRUPT_GEN( finalizr_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->irq_enable)
-			cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (state->nmi_enable)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( finalizr_flipscreen_w )
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
 	finalizr_state *state = space->machine->driver_data<finalizr_state>();
-	cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
+	device_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( i8039_irqen_w )
     */
 
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
+		device_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( i8039_T1_r )
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( i8039_T0_w )
     */
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, scroll)
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
@@ -128,11 +128,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)

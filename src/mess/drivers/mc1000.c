@@ -35,7 +35,7 @@
 static void mc1000_bankswitch(running_machine *machine)
 {
 	mc1000_state *state = machine->driver_data<mc1000_state>();
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
 	memory_set_bank(machine, "bank2", state->mc6845_bank);
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( mc6847_attr_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mc1000_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mc1000_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(mc1000_state, mc6845_video_ram)
 	AM_RANGE(0x2800, 0x3fff) AM_RAM
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( mc1000_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mc1000_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mc1000_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
@@ -362,7 +362,7 @@ static const ay8910_interface ay8910_intf =
 static MACHINE_START( mc1000 )
 {
 	mc1000_state *state = machine->driver_data<mc1000_state>();
-	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
 	state->mc6845 = machine->device(MC6845_TAG);
@@ -566,7 +566,7 @@ DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 
 static DRIVER_INIT( mc1000 )
 {
-	cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mc1000_direct_update_handler, *machine));
+	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mc1000_direct_update_handler, *machine));
 }
 
 /* System Drivers */

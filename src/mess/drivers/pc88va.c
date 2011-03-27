@@ -527,7 +527,7 @@ static WRITE16_HANDLER( sys_mem_w )
 	}
 }
 
-static ADDRESS_MAP_START( pc88va_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pc88va_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 //  AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
 	AM_RANGE(0xa0000, 0xdffff) AM_READWRITE(sys_mem_r,sys_mem_w)
@@ -621,7 +621,7 @@ static WRITE8_HANDLER( idp_command_w )
 
 static void tsp_sprite_enable(running_machine *machine, UINT32 spr_offset, UINT8 sw_bit)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->write_word(spr_offset, space->read_word(spr_offset) & ~0x200);
 	space->write_word(spr_offset, space->read_word(spr_offset) | (sw_bit & 0x200));
@@ -1067,7 +1067,7 @@ static WRITE8_HANDLER( sys_port1_w )
 	// ...
 }
 
-static ADDRESS_MAP_START( pc88va_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16 )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //  AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
 	AM_RANGE(0x0020, 0x0021) AM_NOP // RS-232C
@@ -1140,7 +1140,7 @@ ADDRESS_MAP_END
 // (*) are specific N88 V1 / V2 ports
 
 /* FDC subsytem CPU */
-static ADDRESS_MAP_START( pc88va_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc88va_z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1151,7 +1151,7 @@ static WRITE8_HANDLER( fdc_irq_vector_w )
 	state->fdc_irq_opcode = data;
 }
 
-static ADDRESS_MAP_START( pc88va_z80_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 //  AM_RANGE(0xf4, 0xf4) // Drive Control Port
@@ -1509,7 +1509,7 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 static MACHINE_START( pc88va )
 {
 	pc88va_state *state = machine->driver_data<pc88va_state>();
-	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
 
 	state->t3_mouse_timer = machine->scheduler().timer_alloc(FUNC(t3_mouse_callback));
 	state->t3_mouse_timer->adjust(attotime::never);
@@ -1539,7 +1539,7 @@ static MACHINE_RESET( pc88va )
 	state->fdc_mode = 0;
 	state->fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
-	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
+	device_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )

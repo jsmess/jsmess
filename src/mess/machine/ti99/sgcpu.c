@@ -189,13 +189,13 @@ static READ16_DEVICE_HANDLER( sgcpu_datamux_r )
 	sgcpu->lowbyte = sgcpu->latch;
 
 	// Takes three cycles
-	cpu_adjust_icount(sgcpu->cpu, -3);
+	device_adjust_icount(sgcpu->cpu, -3);
 
 	ti99_peb_data_rz(sgcpu->peribox, addroff, &hbyte);
 	sgcpu->highbyte = hbyte;
 
 	// Takes three cycles
-	cpu_adjust_icount(sgcpu->cpu, -3);
+	device_adjust_icount(sgcpu->cpu, -3);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
 //  printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
@@ -228,13 +228,13 @@ static WRITE16_DEVICE_HANDLER( sgcpu_datamux_w )
 	ti99_peb_data_w(sgcpu->peribox, addroff+1, data & 0xff);
 
 	// Takes three cycles
-	cpu_adjust_icount(sgcpu->cpu,-3);
+	device_adjust_icount(sgcpu->cpu,-3);
 
 	// Write to the PEB
 	ti99_peb_data_w(sgcpu->peribox, addroff, (data>>8) & 0xff);
 
 	// Takes three cycles
-	cpu_adjust_icount(sgcpu->cpu,-3);
+	device_adjust_icount(sgcpu->cpu,-3);
 }
 
 /*
@@ -325,7 +325,7 @@ WRITE16_DEVICE_HANDLER( sgcpu_w )
 	sgcpu_state *sgcpu = get_safe_token(device);
 	if (sgcpu->cpu == NULL) return;
 
-//  cpu_adjust_icount(sgcpu->cpu, -4);
+//  device_adjust_icount(sgcpu->cpu, -4);
 
 	int addroff = offset << 1;
 	UINT16 zone = addroff & 0xe000;

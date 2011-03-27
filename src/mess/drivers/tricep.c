@@ -33,7 +33,7 @@ static WRITE16_HANDLER(tricep_terminal_w)
 	terminal_write(devconf,0,data >> 8);
 }
 
-static ADDRESS_MAP_START(tricep_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(tricep_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(tricep_state, ram)
 	AM_RANGE(0x00fd0000, 0x00fd1fff) AM_ROM AM_REGION("user1",0)

@@ -99,7 +99,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	}
 }
 
-static ADDRESS_MAP_START(a5105_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM //ROM bank
@@ -214,7 +214,7 @@ static WRITE8_HANDLER( a5105_memsel_w )
 	//printf("Memsel change to %02x %02x %02x %02x\n",state->memsel[0],state->memsel[1],state->memsel[2],state->memsel[3]);
 }
 
-static ADDRESS_MAP_START( a5105_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( a5105_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	AM_RANGE(0x40, 0x4b) fdc, upd765?
@@ -357,7 +357,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(a5105)
 {
 	a5105_state *state = machine->driver_data<a5105_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
 	beep_set_frequency(state->m_beep, 500);
 }
@@ -381,7 +381,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( a5105_vblank_irq )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE,0x44);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE,0x44);
 }
 
 static PALETTE_INIT( gdc )
@@ -425,7 +425,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START( upd7220_map, 0, 8 )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 

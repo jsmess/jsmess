@@ -187,7 +187,7 @@ static WRITE8_HANDLER(t5182shared_w)
 }
 
 
-static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE_MEMBER(panicr_state, mainram)
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_MEMBER(panicr_state, spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
@@ -256,9 +256,9 @@ static SCREEN_UPDATE( panicr)
 static INTERRUPT_GEN( panicr_interrupt )
 {
 	if (cpu_getiloops(device))
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);
 }
 
 static INPUT_PORTS_START( panicr )

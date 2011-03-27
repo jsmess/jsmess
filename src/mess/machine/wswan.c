@@ -226,7 +226,7 @@ MACHINE_START( wscolor )
 MACHINE_RESET( wswan )
 {
 	wswan_state *state = machine->driver_data<wswan_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Intialize ports */
 	memcpy( state->ws_portram, ws_portram_init, 256 );
@@ -1356,7 +1356,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	else
 		size = image.get_software_region_length("rom");
 
-	state->ws_ram = (UINT8*) cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM)->get_read_ptr(0);
+	state->ws_ram = (UINT8*) image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0);
 	memset(state->ws_ram, 0, 0xffff);
 	state->ROMBanks = size / 65536;
 
@@ -1460,7 +1460,7 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	/* Handle Sound DMA */
 	if ( ( state->sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
 		wswan_port_w( space, 0x89, space->read_byte(state->sound_dma.source ) );
 		state->sound_dma.size--;

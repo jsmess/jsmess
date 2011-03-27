@@ -85,7 +85,7 @@ static WRITE8_HANDLER( mrflea_io_w )
 	mrflea_state *state = space->machine->driver_data<mrflea_state>();
 	state->status |= 0x08; // pending command to IO CPU
 	state->io = data;
-	cpu_set_input_line(state->subcpu, 0, HOLD_LINE );
+	device_set_input_line(state->subcpu, 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( mrflea_main_r )
@@ -124,7 +124,7 @@ static INTERRUPT_GEN( mrflea_slave_interrupt )
 {
 	mrflea_state *state = device->machine->driver_data<mrflea_state>();
 	if (cpu_getiloops(device) == 0 || (state->status & 0x08))
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mrflea_interrupt_type_r )
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( mrflea_data1_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mrflea_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrflea_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_BASE_MEMBER(mrflea_state, videoram)
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( mrflea_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_BASE_MEMBER(mrflea_state, spriteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrflea_master_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mrflea_master_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
@@ -181,14 +181,14 @@ static ADDRESS_MAP_START( mrflea_master_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mrflea_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrflea_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 	AM_RANGE(0x9000, 0x905a) AM_RAM /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrflea_slave_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mrflea_slave_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_READ(mrflea_interrupt_type_r) AM_WRITENOP /* ? / irq ACK */

@@ -297,7 +297,7 @@ static void c65_dma_port_w( running_machine *machine, int offset, int value )
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset & 3)
 	{
@@ -820,13 +820,13 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 		{
 			memory_set_bankptr(machine, "bank8", state->colorram + 0x400);
 			memory_set_bankptr(machine, "bank9", state->colorram + 0x400);
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
-			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
+			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
 		}
 		else
 		{
-			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0,c65_write_io_dc00);
+			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0,c65_write_io_dc00);
 		}
 	}
 
@@ -896,18 +896,18 @@ void c65_bankswitch( running_machine *machine )
 
 		if (state->io_dc00_on)
 		{
-			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_write_io_dc00);
+			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
+			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_write_io_dc00);
 		}
 		else
 		{
-			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
-			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
+			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
+			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
 			memory_set_bankptr(machine, "bank8", state->colorram + 0x400);
 			memory_set_bankptr(machine, "bank9", state->colorram + 0x400);
 		}
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_read_io);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_write_io);
+		memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_read_io);
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_write_io);
 	}
 	else
 	{
@@ -927,8 +927,8 @@ void c65_bankswitch( running_machine *machine )
 			memory_set_bankptr(machine, "bank6", state->memory + 0xd800);
 			memory_set_bankptr(machine, "bank8", state->memory + 0xdc00);
 		}
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank4");
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank5");
+		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank4");
+		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank5");
 	}
 
 	if (!state->game && state->exrom)

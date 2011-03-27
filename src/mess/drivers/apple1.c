@@ -79,7 +79,7 @@ $F000-$FFFF:    ROM address space
 
 /* memory w/r functions */
 
-static ADDRESS_MAP_START( apple1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_NOP
 
 	/* Cassette interface I/O space: */

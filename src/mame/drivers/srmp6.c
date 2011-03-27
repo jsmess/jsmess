@@ -530,7 +530,7 @@ static WRITE16_HANDLER(paletteram_w)
 	}
 }
 
-static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp6, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
 	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")		// banked ROM (used by ROM check)
@@ -658,9 +658,9 @@ INPUT_PORTS_END
 static INTERRUPT_GEN(srmp6_interrupt)
 {
 	if(!cpu_getiloops(device))
-		cpu_set_input_line(device,3,HOLD_LINE);
+		device_set_input_line(device,3,HOLD_LINE);
 	else
-		cpu_set_input_line(device,4,HOLD_LINE);
+		device_set_input_line(device,4,HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( srmp6, srmp6_state )

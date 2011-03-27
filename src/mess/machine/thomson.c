@@ -530,7 +530,7 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 
 static void to7_update_cart_bank(running_machine *machine)
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	if ( thom_cart_nb_banks )
 	{
@@ -1557,7 +1557,7 @@ MACHINE_RESET ( to7 )
 
 MACHINE_START ( to7 )
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* mem = machine->region("maincpu")->base();
 	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
@@ -1639,7 +1639,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 static void to770_update_ram_bank(running_machine *machine)
 {
 	device_t *sys_pia = machine->device( THOM_PIA_SYS );
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 	int bank;
 
@@ -2064,7 +2064,7 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 
 static void mo5_update_cart_bank(running_machine *machine)
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int rom_is_ram = mo5_reg_cart & 4;
 	int bank = 0;
 
@@ -2430,7 +2430,7 @@ static UINT8 to9_soft_bank;
 
 static void to9_update_cart_bank(running_machine *machine)
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	int slot = ( mc6846_get_output_port(machine->device("mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
@@ -2514,7 +2514,7 @@ READ8_HANDLER ( to9_cartridge_r )
 static void to9_update_ram_bank (running_machine *machine)
 {
 	device_t *sys_pia = machine->device( THOM_PIA_SYS );
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 port = mc6846_get_output_port(machine->device("mc6846"));
 	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
@@ -3573,7 +3573,7 @@ static STATE_POSTLOAD( to8_update_floppy_bank_postload )
 static void to8_update_ram_bank (running_machine *machine)
 {
 	device_t *sys_pia = machine->device( THOM_PIA_SYS );
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = 0;
 
 	if ( to8_reg_sys1 & 0x10 )
@@ -3643,7 +3643,7 @@ static STATE_POSTLOAD( to8_update_ram_bank_postload )
 
 static void to8_update_cart_bank (running_machine *machine)
 {
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 
 	/* reset bank switch */
@@ -4411,7 +4411,7 @@ static STATE_POSTLOAD( mo6_update_ram_bank_postload )
 static void mo6_update_cart_bank (running_machine *machine)
 {
 	device_t *sys_pia = machine->device( THOM_PIA_SYS );
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int b = (pia6821_get_output_a( sys_pia ) >> 5) & 1;
 	int bank = 0;
 

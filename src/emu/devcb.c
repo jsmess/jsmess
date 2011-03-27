@@ -48,9 +48,9 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -61,7 +61,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 
 		resolved->target = resolved;
 		resolved->read = trampoline_read8_to_read_line;
-		resolved->realtarget = device_get_space(targetdev, spacenum);
+		resolved->realtarget = targetdev->memory().space(spacenum);
 		if (resolved->realtarget == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find device '%s' space %d (requested by %s '%s')", config->tag, (int)spacenum, device->name(), device->tag());
 		resolved->real.readspace = config->readspace;
@@ -120,7 +120,7 @@ static WRITE_LINE_DEVICE_HANDLER( trampoline_writecpu_to_write_line )
 {
 	const devcb_resolved_write_line *resolved = (const devcb_resolved_write_line *)device;
 	device_t *targetdev = (device_t *)resolved->realtarget;
-	cpu_set_input_line(targetdev, resolved->real.writeline, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(targetdev, resolved->real.writeline, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_write_line *config, device_t *device)
@@ -137,9 +137,9 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -150,7 +150,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 
 		resolved->target = resolved;
 		resolved->write = trampoline_write8_to_write_line;
-		resolved->realtarget = device_get_space(targetdev, spacenum);
+		resolved->realtarget = targetdev->memory().space(spacenum);
 		if (resolved->realtarget == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find device '%s' space %d (requested by %s '%s')", config->tag, (int)spacenum, device->name(), device->tag());
 		resolved->real.writespace = config->writespace;
@@ -235,9 +235,9 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -246,7 +246,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 		if (!targetdev->interface(memory))
 			fatalerror("devcb_resolve_read8: device '%s' (requested by %s '%s') has no memory", config->tag, device->name(), device->tag());
 
-		resolved->target = device_get_space(targetdev, spacenum);
+		resolved->target = targetdev->memory().space(spacenum);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read8: unable to find device '%s' space %d (requested by %s '%s')", config->tag, (int)spacenum, device->name(), device->tag());
 		resolved->read = (read8_device_func)config->readspace;
@@ -314,9 +314,9 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -325,7 +325,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 		if (!targetdev->interface(memory))
 			fatalerror("devcb_resolve_write8: device '%s' (requested by %s '%s') has no memory", config->tag, device->name(), device->tag());
 
-		resolved->target = device_get_space(targetdev, spacenum);
+		resolved->target = targetdev->memory().space(spacenum);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write8: unable to find device '%s' space %d (requested by %s '%s')", config->tag, (int)spacenum, device->name(), device->tag());
 		resolved->write = (write8_device_func)config->writespace;

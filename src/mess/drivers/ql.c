@@ -164,10 +164,10 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 	{
 		switch (ipl)
 		{
-		case 0:	cpu_set_input_line(m_maincpu, M68K_IRQ_7, ASSERT_LINE);	break;
-		case 1:	cpu_set_input_line(m_maincpu, M68K_IRQ_5, ASSERT_LINE);	break; // CTRL-ALT-7 pressed
-		case 2:	cpu_set_input_line(m_maincpu, M68K_IRQ_2, ASSERT_LINE);	break;
-		case 3:	cpu_set_input_line(m_maincpu, M68K_IRQ_7, CLEAR_LINE);	break;
+		case 0:	device_set_input_line(m_maincpu, M68K_IRQ_7, ASSERT_LINE);	break;
+		case 1:	device_set_input_line(m_maincpu, M68K_IRQ_5, ASSERT_LINE);	break; // CTRL-ALT-7 pressed
+		case 2:	device_set_input_line(m_maincpu, M68K_IRQ_2, ASSERT_LINE);	break;
+		case 3:	device_set_input_line(m_maincpu, M68K_IRQ_7, CLEAR_LINE);	break;
 		}
 
 		m_ipl = ipl;
@@ -209,7 +209,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
 //  int irq = (m_ser2_rxd | m_ser1_txd);
 
-//  cpu_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
+//  device_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
 
 	return (m_comdata << 7);
 }
@@ -394,7 +394,7 @@ static WRITE_LINE_DEVICE_HANDLER( disk_io_drq_w )
 //  ADDRESS_MAP( ql_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
+static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP 						// 16K Cartridge ROM
 	AM_RANGE(0x010000, 0x017fff) AM_UNMAP 									// Trump card ROM is mapped in here
@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ipc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ipc_io, ADDRESS_SPACE_IO, 8, ql_state )
+static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ql_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(ipc_port1_w)
@@ -937,7 +937,7 @@ void ql_state::machine_start()
 
 void ql_state::machine_reset()
 {
-	address_space 	*program 	= cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space 	*program 	= m_maincpu->memory().space(AS_PROGRAM);
 
 	disk_type=input_port_read(machine,QL_CONFIG_PORT) & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",disk_type);
@@ -975,16 +975,16 @@ void ql_state::machine_reset()
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
 			memory_install_rom(program, 0x0c0000, 0x0c3fff, 0, 0, &machine->region(M68008_TAG)->base()[SANDY_ROM_BASE]);
-			program->install_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
-			program->install_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
+			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
 			disk_io_base=SANDY_IO_BASE;
 			break;
 		case DISK_TYPE_TRUMP :
 			logerror("Configuring TrumpCard\n");
-			program->install_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate_create(ql_state, cart_rom_r, *this));
-			program->install_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate_create(ql_state, trump_card_rom_r, *this));
-			program->install_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
-			program->install_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			program->install_read_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate_create(ql_state, cart_rom_r, *this));
+			program->install_read_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate_create(ql_state, trump_card_rom_r, *this));
+			program->install_read_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
+			program->install_write_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
 			disk_io_base=TRUMP_IO_BASE;
 			break;
 	}

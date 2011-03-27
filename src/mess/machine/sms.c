@@ -1616,7 +1616,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	/* Terebi Oekaki (TV Draw) is a SG1000 game with special input device which is compatible with SG1000 Mark III */
 	if ((detect_tvdraw(state->cartridge[index].ROM)) && state->is_region_japan)
 	{
-		address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
 		memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &sms_tvdraw_axis_w);
 		memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &sms_tvdraw_status_r);
 		memory_install_read8_handler(program, 0xa000, 0xa000, 0, 0, &sms_tvdraw_data_r);
@@ -1628,7 +1628,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		// FIXME: we should have by default FFFD-FFFF to be only a mirror for DFFD-DFFF (with no bankswitch logic)
 		// and then the handlers should be installed here for all but the KOREAN_NOBANK carts
 		// However, to avoid memory map breakage, we currently go the other way around
-		address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
 		memory_install_readwrite8_handler(program, 0xfffc, 0xffff, 0, 0, &sms_kor_nobank_r, &sms_kor_nobank_w);
 	}
 
@@ -1726,7 +1726,7 @@ MACHINE_START( sms )
 #ifdef MESS
 MACHINE_RESET( sms )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	sms_state *state = machine->driver_data<sms_state>();
 
 	state->ctrl_reg = 0xff;
@@ -1851,7 +1851,7 @@ WRITE8_HANDLER( sms_store_control_w )
 void sms_store_int_callback( running_machine *machine, int state )
 {
 	sms_state *driver_state = machine->driver_data<sms_state>();
-	cpu_set_input_line(driver_state->store_control & 0x01 ? driver_state->control_cpu : driver_state->main_cpu, 0, state);
+	device_set_input_line(driver_state->store_control & 0x01 ? driver_state->control_cpu : driver_state->main_cpu, 0, state);
 }
 
 

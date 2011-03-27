@@ -52,7 +52,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_1800_w )
 }
 
 
-static ADDRESS_MAP_START(phunsy_mem, ADDRESS_SPACE_PROGRAM, 8, phunsy_state)
+static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
@@ -151,7 +151,7 @@ READ8_MEMBER( phunsy_state::phunsy_sense_r )
 }
 
 
-static ADDRESS_MAP_START( phunsy_io, ADDRESS_SPACE_IO, 8, phunsy_state)
+static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( S2650_CTRL_PORT, S2650_CTRL_PORT ) AM_WRITE( phunsy_ctrl_w )
 	AM_RANGE( S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE( phunsy_data_r, phunsy_data_w )

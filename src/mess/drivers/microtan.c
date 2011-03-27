@@ -52,7 +52,7 @@
 #include "formats/m65_snqk.h"
 
 
-static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE_MEMBER(microtan_state, videoram)
 	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE("ay8910.1", ay8910_address_w)

@@ -1029,7 +1029,7 @@ static WRITE8_HANDLER( pc9801_opn_w )
 }
 
 
-static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE8(pc9801_tvram_r,pc9801_tvram_w,0xffff) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(pc9801_gvram_r,pc9801_gvram_w,0xffff) //bitmap VRAM
@@ -1040,7 +1040,7 @@ static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* first device is even offsets, second one is odd offsets */
-static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
+static ADDRESS_MAP_START( pc9801_io, AS_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,pc9801_00_w,0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,pc9801_20_w,0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801_30_r,pc9801_30_w,0xffff) //i8251 RS232c / i8255 system port
@@ -1372,11 +1372,11 @@ static WRITE8_HANDLER( pc9801rs_a0_w )
 	pc9801_a0_w(space,offset,data);
 }
 
-static ADDRESS_MAP_START( pc9801rs_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801rs_io, ADDRESS_SPACE_IO, 32)
+static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -1459,11 +1459,11 @@ static WRITE8_HANDLER( pc9821_a0_w )
 	pc9801rs_a0_w(space,offset,data);
 }
 
-static ADDRESS_MAP_START( pc9821_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
+static ADDRESS_MAP_START( pc9821_io, AS_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -1527,11 +1527,11 @@ static ADDRESS_MAP_START( pc9821_io, ADDRESS_SPACE_IO, 32)
 //	AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_1_map, 0, 8 )
+static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_chr",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, 0, 8 )
+static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_btm",upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
@@ -2171,7 +2171,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(pc9801)
 {
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	upd1990a_cs_w(machine->device("upd1990a"), 1);
 	upd1990a_oe_w(machine->device("upd1990a"), 1);
@@ -2240,7 +2240,7 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 {
 	pc9801_state *state = device->machine->driver_data<pc9801_state>();
 	#if 0
-	address_space *space = cpu_get_address_space(device->machine->device("maincpu"), ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	static UINT8 test;
 
 	if(input_code_pressed_once(device->machine,JOYCODE_BUTTON1))

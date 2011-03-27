@@ -67,7 +67,7 @@ public:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(eacc_mem, ADDRESS_SPACE_PROGRAM, 8, eacc_state)
+static ADDRESS_MAP_START(eacc_mem, AS_PROGRAM, 8, eacc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal
@@ -121,7 +121,7 @@ static TIMER_DEVICE_CALLBACK( eacc_nmi )
 {
 	eacc_state *state = timer.machine->driver_data<eacc_state>();
 	if (state->m_cb2)
-		cpu_set_input_line(timer.machine->device("maincpu"), INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(timer.machine->device("maincpu"), INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
@@ -194,7 +194,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 
 WRITE8_MEMBER( eacc_state::eacc_multiplex_w )
 {
-	cpu_set_input_line(machine->device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(machine->device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
 	m_multiplex = data & 0xf8;
 	eacc_display();
 }

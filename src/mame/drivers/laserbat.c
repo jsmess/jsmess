@@ -166,7 +166,7 @@ static WRITE8_HANDLER( laserbat_cntmov_w )
 
 */
 
-static ADDRESS_MAP_START( laserbat_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_ROM
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( laserbat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laserbat_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(laserbat_cnteff_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
 	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r) AM_WRITE(laserbat_csound1_w)
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( laserbat_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( catnmous_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_w) // soundlatch ?
 	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
 	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r)
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( catnmous_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?
-static ADDRESS_MAP_START( catnmous_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -584,13 +584,13 @@ static const sn76477_interface laserbat_sn76477_interface =
 static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a )
 {
 	laserbat_state *laserbat = device->machine->driver_data<laserbat_state>();
-	cpu_set_input_line(laserbat->audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(laserbat->audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 {
 	laserbat_state *laserbat = device->machine->driver_data<laserbat_state>();
-	cpu_set_input_line(laserbat->audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(laserbat->audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
@@ -666,7 +666,7 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x0a);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x0a);
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )

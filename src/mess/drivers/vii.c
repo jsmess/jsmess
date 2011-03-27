@@ -157,7 +157,7 @@ static void vii_set_pixel(vii_state *state, UINT32 offset, UINT16 rgb)
 static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	UINT32 h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	UINT32 w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -233,7 +233,7 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 	UINT32 tilemap = regs[4];
 	UINT32 palette_map = regs[5];
 	UINT32 h, w, hn, wn;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(!(ctrl & PAGE_ENABLE_MASK))
 	{
@@ -295,7 +295,7 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int depth, UINT32 base_addr)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 tile, attr;
 	INT16 x, y;
 	UINT32 h, w;
@@ -387,7 +387,7 @@ static SCREEN_UPDATE( vii )
 static void vii_do_dma(running_machine *machine, UINT32 len)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 src = state->video_regs[0x70];
 	UINT32 dst = state->video_regs[0x71] + 0x2c00;
 	UINT32 j;
@@ -552,7 +552,7 @@ static void vii_do_i2c(running_machine *machine)
 static void spg_do_dma(running_machine *machine, UINT32 len)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	UINT32 src = ((state->io_regs[0x101] & 0x3f) << 16) | state->io_regs[0x100];
 	UINT32 dst = state->io_regs[0x103] & 0x3fff;
@@ -789,7 +789,7 @@ static WRITE16_HANDLER( vii_spriteram_w )
 }
 */
 
-static ADDRESS_MAP_START( vii_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x004fff ) AM_RAM AM_BASE_MEMBER(vii_state,ram)
 	AM_RANGE( 0x005000, 0x0051ff ) AM_READWRITE(vii_video_r, vii_video_w)
 	AM_RANGE( 0x005200, 0x0055ff ) AM_RAM AM_BASE_MEMBER(vii_state,rowscroll)

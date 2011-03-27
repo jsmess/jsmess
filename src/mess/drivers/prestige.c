@@ -121,7 +121,7 @@ READ8_MEMBER( prestige_state::bankswitch_r )
 
 WRITE8_MEMBER( prestige_state::bankswitch_w )
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -240,7 +240,7 @@ WRITE8_MEMBER( prestige_state::mouse_w )
 	}
 }
 
-static ADDRESS_MAP_START(prestige_mem, ADDRESS_SPACE_PROGRAM, 8, prestige_state)
+static ADDRESS_MAP_START(prestige_mem, AS_PROGRAM, 8, prestige_state)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START(prestige_mem, ADDRESS_SPACE_PROGRAM, 8, prestige_state)
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prestige_io , ADDRESS_SPACE_IO, 8, prestige_state)
+static ADDRESS_MAP_START( prestige_io , AS_IO, 8, prestige_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(mouse_r, mouse_w)
@@ -397,7 +397,7 @@ static IRQ_CALLBACK( prestige_int_ack )
 	UINT32 vector;
 	prestige_state *state = device->machine->driver_data<prestige_state>();
 
-	cpu_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 
 	if (state->m_irq_counter == 0x02)
 	{
@@ -418,7 +418,7 @@ void prestige_state::machine_start()
 	UINT8 *ram = ram_get_ptr(m_ram);
 	memset(ram, 0x00, ram_get_size(m_ram));
 
-	cpu_set_irq_callback(m_maincpu, prestige_int_ack);
+	device_set_irq_callback(m_maincpu, prestige_int_ack);
 
 	memory_configure_bank(machine, "bank1", 0, 64, machine->region("maincpu")->base(), 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 64, machine->region("maincpu")->base(), 0x4000);

@@ -198,14 +198,14 @@ static WRITE8_HANDLER( hopper_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( m14_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE_MEMBER(m14_state, video_ram)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE_MEMBER(m14_state, color_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( m14_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITENOP
 	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITENOP
@@ -225,7 +225,7 @@ static INPUT_CHANGED( left_coin_inserted )
 	m14_state *state = field->port->machine->driver_data<m14_state>();
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		cpu_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
@@ -233,7 +233,7 @@ static INPUT_CHANGED( right_coin_inserted )
 	m14_state *state = field->port->machine->driver_data<m14_state>();
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		cpu_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( m14 )
@@ -308,8 +308,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( m14_irq )
 {
-	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-	cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
+	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
 }
 
 static MACHINE_START( m14 )

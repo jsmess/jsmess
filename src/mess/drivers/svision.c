@@ -233,7 +233,7 @@ static WRITE8_HANDLER(tvlink_w)
 	}
 }
 
-static ADDRESS_MAP_START( svision_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_BASE_MEMBER(svision_state, reg)
 	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(svision_state, videoram)
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( svision_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tvlink_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( tvlink_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_BASE_MEMBER(svision_state, reg)
 	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(svision_state, videoram)
@@ -421,7 +421,7 @@ static INTERRUPT_GEN( svision_frame_int )
 {
 	svision_state *state = device->machine->driver_data<svision_state>();
 	if (BANK&1)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
 	svision_sound_decrement(state->sound);
 }

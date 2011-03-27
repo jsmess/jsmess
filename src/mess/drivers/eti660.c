@@ -51,12 +51,12 @@ static WRITE8_HANDLER( eti660_colorram_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( eti660_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eti660_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( eti660_io_map, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(MC6821_TAG, pia_r, pia_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(eti660_colorram_w)

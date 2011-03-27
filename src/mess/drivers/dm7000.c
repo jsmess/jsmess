@@ -67,7 +67,7 @@ public:
  400c 000x   scp
  400d 000x   modem
 */
-static ADDRESS_MAP_START( dm7000_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// RAM page 0 - 32MB
 	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM // RAM page 1 - 32MB

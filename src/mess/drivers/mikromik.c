@@ -71,7 +71,7 @@
 
 WRITE8_MEMBER( mm1_state::ls259_w )
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int d = BIT(data, 0);
 
 	switch (offset)
@@ -132,7 +132,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8, mm1_state )
+static ADDRESS_MAP_START( mm1_map, AS_PROGRAM, 8, mm1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY(I8237_TAG, i8237_r, i8237_w)
@@ -145,12 +145,12 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8, mm1_state )
 	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mm1m6_map, ADDRESS_SPACE_PROGRAM, 8, mm1_state )
+static ADDRESS_MAP_START( mm1m6_map, AS_PROGRAM, 8, mm1_state )
 	AM_IMPORT_FROM(mm1_map)
 	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE_LEGACY(UPD7220_TAG, upd7220_r, upd7220_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mm1_upd7220_map, 0, 8, mm1_state )
+static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 8, mm1_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_LEGACY(UPD7220_TAG,upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
@@ -389,7 +389,7 @@ static I8212_INTERFACE( mm1_i8212_intf )
 
 WRITE_LINE_MEMBER( mm1_state::dma_hrq_changed )
 {
-	cpu_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w(m_dmac, state);
@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER( mm1_state::tc_w )
 
 	m_tc = !state;
 
-	cpu_set_input_line(m_maincpu, I8085_RST75_LINE, state);
+	device_set_input_line(m_maincpu, I8085_RST75_LINE, state);
 }
 
 WRITE_LINE_MEMBER( mm1_state::dack3_w )
@@ -670,7 +670,7 @@ static const floppy_config mm1_floppy_config =
 
 void mm1_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* find memory regions */
 	m_key_rom = machine->region("keyboard")->base();
@@ -696,7 +696,7 @@ void mm1_state::machine_start()
 
 void mm1_state::machine_reset()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int i;
 
 	/* reset LS259 */

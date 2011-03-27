@@ -154,7 +154,7 @@ static WRITE8_HANDLER( beast_data_w )
 	state->data_to_beast = data;
 	state->z80_to_beast_full = 1;
 	state->beast_int0_l = 0;
-	cpu_set_input_line(state->beast, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device_set_input_line(state->beast, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( beast_data_r )
@@ -176,7 +176,7 @@ static READ8_HANDLER( beast_status_r )
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
 	djboy_state *state = space->machine->driver_data<djboy_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	djboy_state *state = space->machine->driver_data<djboy_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->cpu2, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->cpu2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
@@ -250,7 +250,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
 	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
@@ -260,14 +260,14 @@ static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu0_port_am, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cpu0_port_am, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_MEMBER(djboy_state, videoram)
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_port_am, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
@@ -290,13 +290,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu2_am, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_am, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_port_am, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( beast_p1_w )
 	if (data == 0xff)
 	{
 		state->beast_int0_l = 1;
-		cpu_set_input_line(state->beast, INPUT_LINE_IRQ0, CLEAR_LINE);
+		device_set_input_line(state->beast, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
 	state->beast_p1 = data;
@@ -394,11 +394,11 @@ static WRITE8_HANDLER( beast_p3_w )
 	djboy_state *state = space->machine->driver_data<djboy_state>();
 
 	state->beast_p3 = data;
-	cpu_set_input_line(state->cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 /* Program/data maps are defined in the 8051 core */
 
-static ADDRESS_MAP_START( djboy_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( djboy_mcu_io_map, AS_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(beast_p0_r, beast_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(beast_p1_r, beast_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(beast_p2_r, beast_p2_w)

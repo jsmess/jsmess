@@ -126,7 +126,7 @@ READ8Z_DEVICE_HANDLER( ti998spch_rz )
 
 	if ((offset & 0xfc01)==0x9000)
 	{
-		cpu_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
+		device_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 		*value = tms5220_status_r(spsys->vsp, offset) & 0xff;
 	}
 }
@@ -140,7 +140,7 @@ WRITE8_DEVICE_HANDLER( ti998spch_w )
 
 	if ((offset & 0xfc01)==0x9400)
 	{
-		cpu_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
+		device_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 		/* RN: the stupid design of the tms5220 core means that ready is cleared */
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
@@ -152,7 +152,7 @@ WRITE8_DEVICE_HANDLER( ti998spch_w )
 			int cycles_to_ready = device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
-			cpu_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
+			device_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
 			device->machine->scheduler().timer_set(attotime::zero, FUNC(NULL));
 		}
 		tms5220_data_w(spsys->vsp, offset, data);

@@ -79,7 +79,7 @@ static VIDEO_START( paso7 )
 /* cheap kludge to use the keyboard without going nuts with the debugger ... */
 static void fake_keyboard_data(running_machine *machine)
 {
-	address_space *ram_space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *ram_space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	ram_space->write_byte(0xfda4,0x00); //clear flag
 
@@ -591,7 +591,7 @@ static READ8_HANDLER( pasopia7_io_r )
 
 	if(state->mio_sel)
 	{
-		address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *ram_space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 		state->mio_sel = 0;
 		//printf("%08x\n",offset);
@@ -635,7 +635,7 @@ static WRITE8_HANDLER( pasopia7_io_w )
 
 	if(state->mio_sel)
 	{
-		address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *ram_space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 		state->mio_sel = 0;
 		ram_space->write_byte(offset, data);
 		return;
@@ -668,7 +668,7 @@ static WRITE8_HANDLER( pasopia7_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(paso7_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1")
@@ -677,7 +677,7 @@ static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( paso7_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( paso7_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE( pasopia7_io_r, pasopia7_io_w )
 ADDRESS_MAP_END

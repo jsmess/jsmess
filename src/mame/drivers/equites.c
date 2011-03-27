@@ -399,7 +399,7 @@ D                                                                               
 static TIMER_CALLBACK( equites_nmi_callback )
 {
 	equites_state *state = machine->driver_data<equites_state>();
-	cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
@@ -432,7 +432,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
@@ -442,7 +442,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cpu_set_input_line(state->audio_cpu, I8085_INTR_LINE, HOLD_LINE);
+			device_set_input_line(state->audio_cpu, I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -583,9 +583,9 @@ static void equites_msm5232_gate( device_t *device, int state )
 static INTERRUPT_GEN( equites_interrupt )
 {
 	if (cpu_getiloops(device))
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 1, HOLD_LINE);
+		device_set_input_line(device, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER(equites_8155_w)
@@ -689,18 +689,18 @@ static WRITE16_HANDLER(mcu_w)
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
 	equites_state *state = space->machine->driver_data<equites_state>();
-	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
+	device_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
 	equites_state *state = space->machine->driver_data<equites_state>();
-	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
+	device_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
 
-static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( splndrbt_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_MEMBER(equites_state, workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
@@ -746,7 +746,7 @@ static ADDRESS_MAP_START( splndrbt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram_2)	// sprite RAM 2 (8-bit)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_w)
@@ -759,12 +759,12 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(equites_8155_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(equites_state, mcu_ram) /* main CPU shared RAM */
 ADDRESS_MAP_END
 
@@ -1899,8 +1899,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1913,7 +1913,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
 #endif
 }
 

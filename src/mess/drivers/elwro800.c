@@ -115,21 +115,21 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	{
 		// rom BAS0
 		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0000); /* BAS0 ROM */
-		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
+		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0);
 		state->ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
 		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x4000); /* BOOT ROM */
-		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
+		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0);
 		state->ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
 		memory_set_bankptr(machine, "bank1", messram);
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 		state->ram_at_0000 = 1;
 	}
 
@@ -137,12 +137,12 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	if (!BIT(cs,1))
 	{
 		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x2000);	/* BAS1 ROM */
-		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0);
+		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0);
 	}
 	else
 	{
 		memory_set_bankptr(machine, "bank2", messram + 0x2000); /* RAM */
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank2");
+		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank2");
 	}
 
 	if (BIT(ls175,2))
@@ -377,13 +377,13 @@ static WRITE8_HANDLER(elwro800jr_io_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START(elwro800_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(elwro800_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(elwro800_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(elwro800_io, AS_IO, 8)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(elwro800jr_io_r, elwro800jr_io_w)
 ADDRESS_MAP_END
 
@@ -521,7 +521,7 @@ static MACHINE_RESET(elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
 
-	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(elwro800_direct_handler, *machine));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(elwro800_direct_handler, *machine));
 }
 
 static const cassette_config elwro800jr_cassette_config =
@@ -534,7 +534,7 @@ static const cassette_config elwro800jr_cassette_config =
 
 static INTERRUPT_GEN( elwro800jr_interrupt )
 {
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static const floppy_config elwro800jr_floppy_config =

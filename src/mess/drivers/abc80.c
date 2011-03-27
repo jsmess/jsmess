@@ -414,7 +414,7 @@ static WRITE_LINE_DEVICE_HANDLER( vco_voltage_w )
 //  ADDRESS_MAP( abc80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc80_mem, ADDRESS_SPACE_PROGRAM, 8, abc80_state )
+static ADDRESS_MAP_START( abc80_mem, AS_PROGRAM, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
@@ -430,7 +430,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc80_io, ADDRESS_SPACE_IO, 8, abc80_state )
+static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, inp_r, utp_w)
@@ -677,7 +677,7 @@ void abc80_state::machine_start()
 	/* configure RAM expansion */
 	if (ram_get_size(m_ram) == 16 * 1024)
 	{
-		memory_unmap_readwrite(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+		memory_unmap_readwrite(m_maincpu->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
 	}
 
 	/* register for state saving */

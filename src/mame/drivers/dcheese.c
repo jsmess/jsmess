@@ -53,7 +53,7 @@ static void update_irq_state( device_t *cpu )
 
 	int i;
 	for (i = 1; i < 5; i++)
-		cpu_set_input_line(cpu, i, state->irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(cpu, i, state->irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -101,7 +101,7 @@ static MACHINE_START( dcheese )
 	state->audiocpu = machine->device("audiocpu");
 	state->bsmt = machine->device("bsmt");
 
-	cpu_set_irq_callback(state->maincpu, irq_callback);
+	device_set_irq_callback(state->maincpu, irq_callback);
 
 	state->save_item(NAME(state->irq_state));
 	state->save_item(NAME(state->soundlatch_full));
@@ -144,7 +144,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		state->soundlatch_full = 1;
-		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+		device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -163,7 +163,7 @@ static READ8_HANDLER( sound_command_r )
 
 	/* read the latch and clear the IRQ */
 	state->soundlatch_full = 0;
-	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -214,7 +214,7 @@ static WRITE8_HANDLER( bsmt_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
@@ -236,7 +236,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)

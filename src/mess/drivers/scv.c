@@ -40,7 +40,7 @@ public:
 
 
 
-static ADDRESS_MAP_START( scv_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
 	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE_MEMBER(scv_state, vram )	/* VRAM + 4 registers */
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( scv_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scv_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( scv_io, AS_IO, 8 )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( scv_porta_w )
 	AM_RANGE( 0x01, 0x01 ) AM_READ( scv_portb_r )
 	AM_RANGE( 0x02, 0x02 ) AM_READWRITE( scv_portc_r, scv_portc_w )

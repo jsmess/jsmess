@@ -1149,7 +1149,7 @@ static READ32_HANDLER( atarigx2_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
@@ -1517,9 +1517,9 @@ ROM_START( spclords )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
-	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
-	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, BAD_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, BAD_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, BAD_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1563,9 +1563,9 @@ ROM_START( spclordsb )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
-	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
-	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, BAD_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, BAD_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, BAD_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1609,9 +1609,9 @@ ROM_START( spclordsg )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
-	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
-	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, BAD_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, BAD_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, BAD_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1655,9 +1655,9 @@ ROM_START( spclordsa )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
-	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
-	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, BAD_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, BAD_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, BAD_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -2246,7 +2246,7 @@ static DRIVER_INIT( rrreveng )
 
 	state->playfield_base = 0x000;
 
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
 }
 
 

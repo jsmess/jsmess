@@ -305,7 +305,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 
 Z80BIN_EXECUTE( sorcerer )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space->read_byte(0xdffa) != 0xc3))
 		return;					/* can't run a program if the cartridge isn't in */
@@ -358,7 +358,7 @@ SNAPSHOT_LOAD(sorcerer)
 {
 	device_t *cpu = image.device().machine->device("maincpu");
 	UINT8 *RAM = image.device().machine->region(cpu->tag())->base();
-	address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu->memory().space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
 
@@ -417,7 +417,7 @@ MACHINE_START( sorcerer )
 	UINT16 endmem = 0xbfff;
 #endif
 
-	address_space *space = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	/* configure RAM */
 	switch (ram_get_size(state->m_ram))
 	{
@@ -438,7 +438,7 @@ MACHINE_START( sorcerer )
 MACHINE_RESET( sorcerer )
 {
 	sorcerer_state *state = machine->driver_data<sorcerer_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Initialize cassette interface */
 	state->m_cass_data.output.length = 0;

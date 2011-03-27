@@ -6,7 +6,7 @@
 #include "includes/gamepock.h"
 #include "rendlay.h"
 
-static ADDRESS_MAP_START(gamepock_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 	AM_RANGE(0x1000,0x3fff) AM_NOP
@@ -15,7 +15,7 @@ static ADDRESS_MAP_START(gamepock_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff80,0xffff) AM_RAM				/* 128 bytes microcontroller RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gamepock_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START(gamepock_io, AS_IO, 8 )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( gamepock_port_a_w )
 	AM_RANGE( 0x01, 0x01 ) AM_READWRITE( gamepock_port_b_r, gamepock_port_b_w )
 	AM_RANGE( 0x02, 0x02 ) AM_READ( gamepock_port_c_r )

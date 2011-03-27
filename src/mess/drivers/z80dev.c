@@ -40,13 +40,13 @@ READ8_MEMBER( z80dev_state::test_r )
 	return space.machine->rand();
 }
 
-static ADDRESS_MAP_START(z80dev_mem, ADDRESS_SPACE_PROGRAM, 8, z80dev_state)
+static ADDRESS_MAP_START(z80dev_mem, AS_PROGRAM, 8, z80dev_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80dev_io , ADDRESS_SPACE_IO, 8, z80dev_state)
+static ADDRESS_MAP_START( z80dev_io , AS_IO, 8, z80dev_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("LINE0")

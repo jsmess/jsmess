@@ -211,12 +211,12 @@ static READ8_HANDLER( spoker_magic_r )
 
 
 
-static ADDRESS_MAP_START( spoker_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spoker_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spoker_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
@@ -382,7 +382,7 @@ static INTERRUPT_GEN( spoker_interrupt )
 	spoker_state *state = device->machine->driver_data<spoker_state>();
 
 	 if (state->nmi_enable & 0x80)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( spoker, spoker_state )

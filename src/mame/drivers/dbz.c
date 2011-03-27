@@ -68,12 +68,12 @@ static INTERRUPT_GEN( dbz_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 			break;
 
 		case 1:
 			if (k053246_is_irq_enabled(state->k053246))
-				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 			break;
 	}
 }
@@ -110,7 +110,7 @@ static WRITE16_HANDLER( dbz_sound_command_w )
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
 	dbz_state *state = space->machine->driver_data<dbz_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq( device_t *device, int irq )
@@ -118,12 +118,12 @@ static void dbz_sound_irq( device_t *device, int irq )
 	dbz_state *state = device->machine->driver_data<dbz_state>();
 
 	if (irq)
-		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+		device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+		device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x480000, 0x48ffff) AM_RAM
 	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	// '157 RAM is mirrored twice
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
-static ADDRESS_MAP_START( dbz_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( dbz_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbz_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dbz_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
 ADDRESS_MAP_END

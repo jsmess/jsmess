@@ -766,7 +766,7 @@ QUICKLOAD_LOAD ( coco )
 		}
 		else
 		{
-			address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+			address_space *space = image.device().machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 			/* data block - need to cap the maximum length of the block */
 			block_length = MIN(block_length, length - position);
@@ -2076,7 +2076,7 @@ static void setup_memory_map(running_machine *machine)
 	};
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 	coco_state *state = machine->driver_data<coco_state>();
 	UINT8 memsize	= sam6883_memorysize(state->sam);
 	UINT8 maptype	= sam6883_maptype(state->sam);
@@ -2421,7 +2421,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		{ 0xfe00, 0xfeff }
 	};
 
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 	int i, offset;
 	UINT8 *readbank;
 	UINT8 *cart_rom = machine->region("cart")->base();

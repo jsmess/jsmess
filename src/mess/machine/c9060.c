@@ -127,7 +127,7 @@ WRITE_LINE_DEVICE_HANDLER( c9060_ieee488_ifc_w )
     ADDRESS_MAP( c9060_dos_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c9060_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c9060_dos_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
@@ -143,7 +143,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c9060_fdc_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c9060_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c9060_fdc_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
@@ -337,7 +337,7 @@ static WRITE_LINE_DEVICE_HANDLER( riot1_irq_w )
 {
 	c9060_t *c9060 = get_safe_token(device->owner());
 
-	cpu_set_input_line(c9060->cpu_dos, M6502_IRQ_LINE, state);
+	device_set_input_line(c9060->cpu_dos, M6502_IRQ_LINE, state);
 }
 
 static const riot6532_interface riot1_intf =
@@ -534,8 +534,8 @@ static DEVICE_RESET( c9060 )
 	c9060->via->reset();
 
 	/* toggle M6502 SO */
-	cpu_set_input_line(c9060->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
-	cpu_set_input_line(c9060->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
+	device_set_input_line(c9060->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
+	device_set_input_line(c9060->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
 }
 
 /*-------------------------------------------------

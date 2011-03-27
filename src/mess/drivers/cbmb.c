@@ -121,7 +121,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
  *************************************/
 
 
-static ADDRESS_MAP_START(cbmb_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(cbmb_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x0ffff) AM_READONLY AM_WRITENOP
 	AM_RANGE(0x10000, 0x4ffff) AM_RAM
 	AM_RANGE(0x50002, 0x5ffff) AM_READONLY AM_WRITENOP
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START(cbmb_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE_MEMBER(cbmb_state, kernal)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(p500_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x2ffff) AM_READONLY AM_WRITENOP
 	AM_RANGE(0x30000, 0x7ffff) AM_RAM

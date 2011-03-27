@@ -91,7 +91,7 @@ static WRITE64_HANDLER( adb_portb_w )
 	}
 }
 
-static ADDRESS_MAP_START( pippin_mem, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( pippin_mem, AS_PROGRAM, 64 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
 

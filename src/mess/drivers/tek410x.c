@@ -29,11 +29,11 @@ public:
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tek4107a_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tek4107a_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tek4107a_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tek4107a_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* Input Ports */

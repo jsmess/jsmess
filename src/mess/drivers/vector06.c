@@ -21,12 +21,12 @@
 #include "machine/ram.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(vector06_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vector06_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( vector06_io , AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )

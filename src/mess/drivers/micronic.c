@@ -199,12 +199,12 @@ static WRITE8_HANDLER( bank_select_w )
 	if (data < 2)
 	{
 		memory_set_bank(space->machine, "bank1", data);
-		memory_unmap_write(cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0);
+		memory_unmap_write(space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0);
 	}
 	else
 	{
 		memory_set_bank(space->machine, "bank1", (data < 9) ? data : 8);
-		memory_install_write_bank(cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_install_write_bank(space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank1");
 	}
 }
 
@@ -306,13 +306,13 @@ static TIMER_CALLBACK( rtc_periodic_irq )
     Machine
 ***************************************************************************/
 
-static ADDRESS_MAP_START(micronic_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(micronic_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(micronic_state, ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(micronic_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(micronic_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 
 	/* keypad */
@@ -474,7 +474,7 @@ static MACHINE_START( micronic )
 static MACHINE_RESET( micronic )
 {
 	memory_set_bank(machine, "bank1", 0);
-	memory_unmap_write(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0);
+	memory_unmap_write(machine->device(Z80_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0);
 }
 
 static MACHINE_CONFIG_START( micronic, micronic_state )

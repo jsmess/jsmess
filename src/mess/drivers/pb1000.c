@@ -53,7 +53,7 @@ public:
 	UINT16 read_touchscreen(running_machine *machine, UINT8 line);
 };
 
-static ADDRESS_MAP_START(pb1000_mem, ADDRESS_SPACE_PROGRAM, 16, pb1000_state)
+static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START(pb1000_mem, ADDRESS_SPACE_PROGRAM, 16, pb1000_state)
 	AM_RANGE( 0x18000, 0x1ffff ) AM_RAM					AM_SHARE("nvram2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pb2000c_mem, ADDRESS_SPACE_PROGRAM, 16, pb1000_state)
+static ADDRESS_MAP_START(pb2000c_mem, AS_PROGRAM, 16, pb1000_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O

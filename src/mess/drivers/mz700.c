@@ -100,10 +100,10 @@ static TIMER_DEVICE_CALLBACK( ne556_other_callback )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mz700_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz700_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mz700_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mz700_bank_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(mz700_bank_1_w)
@@ -114,10 +114,10 @@ static ADDRESS_MAP_START( mz700_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(mz700_bank_6_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz800_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mz800_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz800_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mz800_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xcc, 0xcc) AM_WRITE( mz800_write_format_w )
 	AM_RANGE(0xcd, 0xcd) AM_WRITE( mz800_read_format_w )

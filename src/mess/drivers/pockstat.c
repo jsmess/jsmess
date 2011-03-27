@@ -321,19 +321,19 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 	}
 	if(drvstate->intc_regs.hold & drvstate->intc_regs.enable & PS_INT_IRQ_MASK)
 	{
-		cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 	if(drvstate->intc_regs.hold & drvstate->intc_regs.enable & PS_INT_FIQ_MASK)
 	{
-		cpu_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
+		device_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
+		device_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -535,7 +535,7 @@ static WRITE32_HANDLER( ps_clock_w )
 		case 0x0000/4:
 			verboselog(space->machine, 0, "ps_clock_w: Clock Mode = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&state->clock_regs.mode);
-			cputag_set_clock(space->machine, "maincpu", CPU_FREQ[state->clock_regs.mode & 0x0f]);
+			space->machine->device("maincpu")->set_unscaled_clock(CPU_FREQ[state->clock_regs.mode & 0x0f]);
 			break;
 		case 0x0004/4:
 			verboselog(space->machine, 0, "ps_clock_w: Clock Control = %08x & %08x\n", data, mem_mask );
@@ -835,7 +835,7 @@ static WRITE32_HANDLER( ps_dac_w )
 	dac_data_16_w(space->machine->device("dac"), (UINT16)((data + 0x8000) & 0x0000ffff));
 }
 
-static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
 	AM_RANGE(0x02000000, 0x02ffffff) AM_READ(ps_rombank_r)
 	AM_RANGE(0x04000000, 0x04003fff) AM_ROM AM_REGION("maincpu", 0)

@@ -146,7 +146,7 @@ static READ8_HANDLER( pl80_port_d_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pl80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pl80_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 /*  AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
     AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( pl80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff8, 0xfff) AM_ROM // Interrupt Vectors
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pl80_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pl80_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_WRITE(pl80_port_a_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(pl80_port_b_w)

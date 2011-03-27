@@ -132,7 +132,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 	logerror("GEN IRQ: %x\n", combined_state);
-	cpu_set_input_line(toratora->maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(toratora->maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -307,7 +307,7 @@ static const pia6821_interface pia_u3_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE_MEMBER(toratora_state, videoram, videoram_size)

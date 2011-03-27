@@ -44,7 +44,7 @@ static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
 {
 	h8_state *state = timer.machine->driver_data<h8_state>();
 	if (state->irq_ctl & 1)
-		cpu_set_input_line_and_vector(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+		device_set_input_line_and_vector(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
 static READ8_HANDLER( h8_f0_r )
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( h8_f0_w )
 	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
 	beep_set_state(state->beeper, (data & 0x80) ? 0 : 1);
 
-	cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
+	device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
 	state->irq_ctl &= 0xf0;
 	if (data & 0x40) state->irq_ctl |= 1;
 	if (~data & 0x10) state->irq_ctl |= 2;
@@ -115,13 +115,13 @@ static WRITE8_HANDLER( h8_f1_w )
 	if (state->digit) output_set_digit_value(state->digit, state->segment);
 }
 
-static ADDRESS_MAP_START(h8_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h8_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( h8_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(h8_f0_r,h8_f0_w)
@@ -191,7 +191,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 			c=drvstate->ff_b^1; // from /Q of 2nd flipflop
 			drvstate->ff_b=a; // from Q of 1st flipflop
 			if (c)
-				cpu_set_input_line_and_vector(device->machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+				device_set_input_line_and_vector(device->machine->device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
 		}
 	}
 	else

@@ -38,7 +38,7 @@ static void ffe_irq( device_t *device, int scanline, int vblank, int blanked )
 	{
 		if ((0xffff - state->IRQ_count) < 114)
 		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = 0xffff;
 			state->IRQ_enable = 0;
 		}

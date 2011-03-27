@@ -46,7 +46,7 @@ INLINE const ti99_video_config *get_config(device_t *device)
 READ16_DEVICE_HANDLER( ti_tms991x_r16 )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -64,7 +64,7 @@ READ16_DEVICE_HANDLER( ti_tms991x_r16 )
 READ8Z_DEVICE_HANDLER( ti8_tms991x_rz )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* read VDP status */
@@ -82,7 +82,7 @@ READ8Z_DEVICE_HANDLER( ti8_tms991x_rz )
 READ16_DEVICE_HANDLER( ti_v9938_r16 )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -100,7 +100,7 @@ READ16_DEVICE_HANDLER( ti_v9938_r16 )
 WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* write VDP address */
@@ -118,7 +118,7 @@ WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
 WRITE8_DEVICE_HANDLER( ti8_tms991x_w )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* write VDP address */
@@ -136,7 +136,7 @@ WRITE8_DEVICE_HANDLER( ti8_tms991x_w )
 WRITE16_DEVICE_HANDLER ( ti_v9938_w16 )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	switch (offset & 3)
 	{
@@ -165,7 +165,7 @@ WRITE16_DEVICE_HANDLER ( ti_v9938_w16 )
 WRITE8_DEVICE_HANDLER ( gen_v9938_w )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	switch (offset & 6)
 	{
@@ -194,7 +194,7 @@ WRITE8_DEVICE_HANDLER ( gen_v9938_w )
 READ8Z_DEVICE_HANDLER( gen_v9938_rz )
 {
 	ti99_video_state *video = get_safe_token(device);
-//  cpu_adjust_icount(video->cpu, -4);
+//  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* read VDP status */
@@ -209,14 +209,14 @@ READ8Z_DEVICE_HANDLER( gen_v9938_rz )
 READ16_DEVICE_HANDLER ( ti_video_rnop )
 {
 	ti99_video_state *video = get_safe_token(device);
-	cpu_adjust_icount(video->cpu, -4);
+	device_adjust_icount(video->cpu, -4);
 	return 0;
 }
 
 WRITE16_DEVICE_HANDLER ( ti_video_wnop )
 {
 	ti99_video_state *video = get_safe_token(device);
-	cpu_adjust_icount(video->cpu, -4);
+	device_adjust_icount(video->cpu, -4);
 }
 /**************************************************************************/
 // Interfacing to mouse attached to v9938
@@ -238,7 +238,7 @@ static DEVICE_START( ti99_video )
 	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
 
 	video->cpu = device->machine->device("maincpu");
-	video->space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	video->space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (conf->chip==TI_TMS991X)
 	{

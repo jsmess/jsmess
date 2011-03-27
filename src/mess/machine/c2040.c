@@ -264,7 +264,7 @@ static TIMER_CALLBACK( bit_tick )
 
 		if ((device->type() == C8050) || (device->type() == C8250) || (device->type() == SFD1001))
 		{
-			cpu_set_input_line(c2040->cpu_fdc, M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
+			device_set_input_line(c2040->cpu_fdc, M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
 		}
 	}
 }
@@ -422,7 +422,7 @@ WRITE_LINE_DEVICE_HANDLER( c2040_ieee488_ifc_w )
     ADDRESS_MAP( c2040_dos_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c2040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c2040_dos_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
@@ -439,7 +439,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c2040_fdc_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c2040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c2040_fdc_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
@@ -455,7 +455,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c4040_dos_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c4040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c4040_dos_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
@@ -472,7 +472,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c4040_fdc_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c4040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c4040_fdc_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
@@ -488,7 +488,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c8050_dos_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c8050_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c8050_dos_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
@@ -504,7 +504,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( c8050_fdc_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( c8050_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c8050_fdc_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
@@ -520,7 +520,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sfd1001_dos_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sfd1001_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfd1001_dos_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
@@ -536,7 +536,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sfd1001_fdc_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sfd1001_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfd1001_fdc_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
@@ -740,7 +740,7 @@ static WRITE_LINE_DEVICE_HANDLER( riot1_irq_w )
 {
 	c2040_t *c2040 = get_safe_token(device->owner());
 
-	cpu_set_input_line(c2040->cpu_dos, M6502_IRQ_LINE, state);
+	device_set_input_line(c2040->cpu_dos, M6502_IRQ_LINE, state);
 }
 
 static const riot6532_interface riot1_intf =
@@ -1075,7 +1075,7 @@ static WRITE8_DEVICE_HANDLER( miot_pb_w )
 	/* interrupt */
 	if (c2040->miot_irq != BIT(data, 7))
 	{
-		cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 		c2040->miot_irq = BIT(data, 7);
 	}
 }
@@ -1171,7 +1171,7 @@ static WRITE8_DEVICE_HANDLER( c8050_miot_pb_w )
 	/* interrupt */
 	if (c2040->miot_irq != BIT(data, 7))
 	{
-		cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 		c2040->miot_irq = BIT(data, 7);
 	}
 }
@@ -1593,8 +1593,8 @@ static DEVICE_RESET( c2040 )
 	c2040->via->reset();
 
 	/* toggle M6502 SO */
-	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
-	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
+	device_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
+	device_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
 
 	/* turn off spindle motors */
 	c2040->unit[0].mtr = c2040->unit[1].mtr = 1;

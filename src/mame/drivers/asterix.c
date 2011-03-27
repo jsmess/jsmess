@@ -63,7 +63,7 @@ static INTERRUPT_GEN( asterix_interrupt )
 	if (!k056832_is_irq_enabled(state->k056832, 0))
 		return;
 
-	cpu_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
+	device_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
 static READ8_DEVICE_HANDLER( asterix_sound_r )
@@ -74,21 +74,21 @@ static READ8_DEVICE_HANDLER( asterix_sound_r )
 static TIMER_CALLBACK( nmi_callback )
 {
 	asterix_state *state = machine->driver_data<asterix_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	asterix_state *state = space->machine->driver_data<asterix_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
 	asterix_state *state = space->machine->driver_data<asterix_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 // Check the routine at 7f30 in the ead version.
@@ -174,7 +174,7 @@ static WRITE16_HANDLER( protection_w )
 	}
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k053245_word_r, k053245_word_w)
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE("k056832", k056832_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf801, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_status_port_r, ym2151_data_port_w)

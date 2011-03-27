@@ -36,7 +36,7 @@
 #include "includes/wswan.h"
 #include "imagedev/cartslot.h"
 
-static ADDRESS_MAP_START (wswan_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM		/* 16kb RAM / 4 colour tiles */
 	AM_RANGE(0x04000, 0x0ffff) AM_NOP		/* nothing */
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(wswan_sram_r, wswan_sram_w)	/* SRAM bank */
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START (wswan_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xF0000, 0xFffff) AM_ROMBANK("bank15")	/* ROM bank 14 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (wscolor_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START (wscolor_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM		/* 16kb RAM / 4 colour tiles, 16 colour tiles + palettes */
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(wswan_sram_r, wswan_sram_w)	/* SRAM bank */
 	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank2")	/* ROM bank 1 */
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START (wscolor_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xF0000, 0xFffff) AM_ROMBANK("bank15")	/* ROM bank 14 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (wswan_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START (wswan_io, AS_IO, 8)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(wswan_port_r, wswan_port_w)	/* I/O ports */
 ADDRESS_MAP_END
 

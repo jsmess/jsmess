@@ -1090,7 +1090,7 @@ bit 0: ram 4
 static void kc85_4_update_0x08000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 	unsigned char *ram_page;
 
     if (state->kc85_pio_data[1] & (1<<5))
@@ -1158,7 +1158,7 @@ static void kc85_4_update_0x08000(running_machine *machine)
 static void kc85_4_update_0x00000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* access ram? */
 	if (state->kc85_pio_data[0] & (1<<1))
@@ -1201,7 +1201,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 static void kc85_4_update_0x04000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* access ram? */
 	if (state->kc85_86_data & (1<<0))
@@ -1249,7 +1249,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 static void kc85_4_update_0x0c000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	if (state->kc85_86_data & (1<<7))
 	{
@@ -1289,7 +1289,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 static void kc85_4_update_0x0e000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 	if (state->kc85_pio_data[0] & (1<<0))
 	{
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
@@ -1407,7 +1407,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
 static void kc85_3_update_0x0c000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	if (state->kc85_pio_data[0] & (1<<7))
 	{
@@ -1429,7 +1429,7 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 static void kc85_3_update_0x0e000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	if (state->kc85_pio_data[0] & (1<<0))
 	{
@@ -1452,7 +1452,7 @@ for write operations */
 static void kc85_3_update_0x00000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* access ram? */
 	if (state->kc85_pio_data[0] & (1<<1))
@@ -1497,7 +1497,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 static void kc85_3_update_0x08000(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
 	unsigned char *ram_page;
 
     if (state->kc85_pio_data[0] & (1<<2))

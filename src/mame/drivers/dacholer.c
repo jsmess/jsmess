@@ -94,10 +94,10 @@ static WRITE8_HANDLER(snd_w)
 {
 	dacholer_state *state = space->machine->driver_data<dacholer_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(background_w) AM_BASE_MEMBER(dacholer_state, bgvideoram)
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(dacholer_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( snd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xd000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -157,7 +157,7 @@ static WRITE8_HANDLER( music_irq_w )
 	state->music_interrupt_enable = data;
 }
 
-static ADDRESS_MAP_START( snd_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( snd_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
@@ -406,7 +406,7 @@ static INTERRUPT_GEN( sound_irq )
 	dacholer_state *state = device->machine->driver_data<dacholer_state>();
 	if (state->music_interrupt_enable == 1)
 	{
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
 	}
 }
 
@@ -420,7 +420,7 @@ static void adpcm_int( device_t *device )
 		state->msm_toggle ^= 1;
 		if (state->msm_toggle == 0)
 		{
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x38);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x38);
 		}
 	}
 }

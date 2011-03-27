@@ -225,7 +225,7 @@ static const cassette_config apple2gs_cassette_config =
 	NULL
 };
 
-static ADDRESS_MAP_START( apple2gs_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8 )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 

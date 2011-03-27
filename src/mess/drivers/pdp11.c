@@ -44,7 +44,7 @@ static READ16_HANDLER(term_rx_status_r)
 	return state->term_status;
 }
 
-static ADDRESS_MAP_START(pdp11_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
@@ -54,7 +54,7 @@ static ADDRESS_MAP_START(pdp11_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0xff76, 0xff77 ) AM_WRITE(term_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pdp11qb_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe9ff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xefff ) AM_ROM

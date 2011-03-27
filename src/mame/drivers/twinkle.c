@@ -625,7 +625,7 @@ static READ32_HANDLER(shared_psx_r)
 	return result;
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
@@ -716,19 +716,19 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 	if ((!(data & 0x0080)) && (state->spu_ctrl & 0x0080))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_1, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0100)) && (state->spu_ctrl & 0x0100))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_2, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_2, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0200)) && (state->spu_ctrl & 0x0200))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_4, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_4, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0400)) && (state->spu_ctrl & 0x0400))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_6, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_6, CLEAR_LINE);
 	}
 
 	state->spu_ctrl = data;
@@ -766,7 +766,7 @@ static WRITE16_HANDLER( shared_68k_w )
 	state->spu_shared[offset] = data & 0xff;
 }
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	// 220000 = LEDs?

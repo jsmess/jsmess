@@ -59,7 +59,7 @@ void tandy2k_state::speaker_update()
 
 READ8_MEMBER( tandy2k_state::videoram_r )
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
 	UINT16 data = program->read_word(addr);
@@ -131,10 +131,10 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	upd765_reset_w(m_fdc, BIT(data, 5));
 
 	/* timer 0 enable */
-	cpu_set_input_line(m_maincpu, INPUT_LINE_TMRIN0, BIT(data, 6));
+	device_set_input_line(m_maincpu, INPUT_LINE_TMRIN0, BIT(data, 6));
 
 	/* timer 1 enable */
-	cpu_set_input_line(m_maincpu, INPUT_LINE_TMRIN1, BIT(data, 7));
+	device_set_input_line(m_maincpu, INPUT_LINE_TMRIN1, BIT(data, 7));
 }
 
 WRITE8_MEMBER( tandy2k_state::dma_mux_w )
@@ -333,7 +333,7 @@ WRITE8_MEMBER( tandy2k_state::keyboard_y8_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tandy2k_mem, ADDRESS_SPACE_PROGRAM, 16, tandy2k_state )
+static ADDRESS_MAP_START( tandy2k_mem, AS_PROGRAM, 16, tandy2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xf7fff) AM_RAM AM_BASE(m_hires_ram)
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( tandy2k_mem, ADDRESS_SPACE_PROGRAM, 16, tandy2k_state 
 	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
+static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0x00ff)
 	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0x00ff)
@@ -362,18 +362,18 @@ static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
 //  AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
+static ADDRESS_MAP_START( tandy2k_hd_io, AS_IO, 16, tandy2k_state )
 	AM_IMPORT_FROM(tandy2k_io)
 //  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
 //  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8_LEGACY(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0x00ff)
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8_LEGACY(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vpac_mem, 0, 8, tandy2k_state )
+static ADDRESS_MAP_START( vpac_mem, AS_0, 8, tandy2k_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8, tandy2k_state )
+static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, tandy2k_state )
   AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_y0_w)
   AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_y8_w)
   AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(keyboard_x0_r)
@@ -518,7 +518,7 @@ bool tandy2k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
     tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
-    address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+    address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
 
     for (int sx = 0; sx < x_count; sx++)
     {
@@ -841,7 +841,7 @@ static const centronics_interface centronics_intf =
 void tandy2k_state::machine_start()
 {
 	/* memory banking */
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 	int ram_size = ram_get_size(m_ram);
 

@@ -224,7 +224,7 @@ public:
     Memory map - see description above
 */
 
-static ADDRESS_MAP_START(ti99_8_memmap, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(ti99_8_memmap, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("mapper", ti99_mapper8_r, ti99_mapper8_w )
 ADDRESS_MAP_END
 
@@ -233,7 +233,7 @@ ADDRESS_MAP_END
     CRU map - see description above
 */
 
-static ADDRESS_MAP_START(ti99_8_cru_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(ti99_8_cru_map, AS_IO, 8)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0000, 0x02ff) AM_DEVREAD("crubus", ti99_crubus_r )
 

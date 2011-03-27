@@ -80,7 +80,7 @@ void vixen_state::update_interrupt()
 {
 	int state = (m_cmd_d1 & m_fdint) | m_vsync | (!m_enb_srq_int & !m_srq) | (!m_enb_atn_int & !m_atn) | (!m_enb_xmt_int & m_txrdy) | (!m_enb_rcv_int & m_rxrdy);
 
-	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -213,7 +213,7 @@ READ8_MEMBER( vixen_state::port3_r )
 //  ADDRESS_MAP( vixen_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vixen_mem, ADDRESS_SPACE_PROGRAM, 8, vixen_state )
+static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_BASE(m_video_ram)
@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vixen_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vixen_io, ADDRESS_SPACE_IO, 8, vixen_state )
+static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(FDC1797_TAG, wd17xx_r, wd17xx_w)
@@ -736,7 +736,7 @@ static IRQ_CALLBACK( vixen_int_ack )
 void vixen_state::machine_start()
 {
 	// interrupt callback
-	cpu_set_irq_callback(m_maincpu, vixen_int_ack);
+	device_set_irq_callback(m_maincpu, vixen_int_ack);
 
 	// configure memory banking
 	UINT8 *ram = ram_get_ptr(m_ram);
@@ -767,7 +767,7 @@ void vixen_state::machine_start()
 
 void vixen_state::machine_reset()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	memory_install_read_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank1");
 	memory_install_write_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank2");
@@ -870,7 +870,7 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 	{
 		if (state->m_reset)
 		{
-			address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+			address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
 
 			memory_install_read_bank(program, 0x0000, 0xefff, 0, 0, "bank1");
 			memory_install_write_bank(program, 0x0000, 0xefff, 0, 0, "bank2");

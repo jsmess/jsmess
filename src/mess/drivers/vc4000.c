@@ -90,7 +90,7 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 }
 
 
-static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( vc4000_mem , AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vc4000_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( vc4000_io , AS_IO, 8)
 	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( vc4000_vsync_r)
 ADDRESS_MAP_END
 
@@ -194,7 +194,7 @@ static PALETTE_INIT( vc4000 )
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine *machine = image.device().machine;
-	address_space *memspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *memspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -376,7 +376,7 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int quick_length;

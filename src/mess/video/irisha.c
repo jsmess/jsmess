@@ -20,7 +20,7 @@ SCREEN_UPDATE( irisha )
 	UINT8 code1, code2;
 	UINT8 col;
 	int y, x, b;
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	// draw image
 	for (y = 0; y < 200; y++)

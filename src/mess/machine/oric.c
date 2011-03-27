@@ -155,7 +155,7 @@ WRITE8_HANDLER (oric_psg_porta_write)
 static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 {
 	oric_state *state = device->machine->driver_data<oric_state>();
-	address_space *space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	address_space *space = device->machine->device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/*logerror("port a read\r\n"); */
 
@@ -468,7 +468,7 @@ static void oric_install_apple2_interface(running_machine *machine)
 {
 	oric_state *state = machine->driver_data<oric_state>();
 	device_t *fdc = machine->device("fdc");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->is_telestrat)
 		return;
@@ -487,7 +487,7 @@ static void oric_enable_memory(running_machine *machine, int low, int high, int 
 {
 	oric_state *state = machine->driver_data<oric_state>();
 	int i;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->is_telestrat)
 		return;
@@ -592,7 +592,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 static void oric_install_apple2_v2_interface(running_machine *machine)
 {
 	device_t *fdc = machine->device("fdc");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
@@ -797,7 +797,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 static void oric_install_jasmin_interface(running_machine *machine)
 {
 	oric_state *state = machine->driver_data<oric_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* romdis */
 	state->port_3fb_w = 1;
 	oric_jasmin_set_mem_0x0c000(machine);
@@ -1022,7 +1022,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 static void oric_install_microdisc_interface(running_machine *machine)
 {
 	oric_state *state = machine->driver_data<oric_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_handler(space, 0x0310, 0x031f, 0, 0, oric_microdisc_r);
@@ -1099,7 +1099,7 @@ MACHINE_RESET( oric )
 {
 	oric_state *state = machine->driver_data<oric_state>();
 	int disc_interface_id = input_port_read(machine, "FLOPPY") & 0x07;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	if (state->is_telestrat)
 		return;
 
@@ -1291,7 +1291,7 @@ CB2
 static void telestrat_refresh_mem(running_machine *machine)
 {
 	oric_state *state = machine->driver_data<oric_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	telestrat_mem_block *mem_block = &state->telestrat_blocks[state->telestrat_bank_selection];
 

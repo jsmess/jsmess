@@ -66,7 +66,7 @@ void tek4051_state::update_irq()
 {
 	int state = m_kb_pia_irqa | m_kb_pia_irqb | m_x_pia_irqa | m_x_pia_irqb | m_gpib_pia_irqa | m_gpib_pia_irqb | m_com_pia_irqa | m_com_pia_irqb | m_acia_irq;
 
-	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state);
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state);
 }
 
 
@@ -78,7 +78,7 @@ void tek4051_state::update_nmi()
 {
 	int state = m_y_pia_irqa | m_y_pia_irqb | m_tape_pia_irqa | m_tape_pia_irqb;
 
-	cpu_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
 }
 
 
@@ -119,7 +119,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 void tek4051_state::bankswitch(UINT8 data)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	//int d = data & 0x07;
 	int lbs = (data >> 3) & 0x07;
@@ -176,7 +176,7 @@ WRITE8_MEMBER( tek4051_state::lbs_w )
 //  ADDRESS_MAP( tek4051_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tek4051_mem, ADDRESS_SPACE_PROGRAM, 8, tek4051_state )
+static ADDRESS_MAP_START( tek4051_mem, AS_PROGRAM, 8, tek4051_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM // optional RAM
 	AM_RANGE(0x8000, 0x877f) AM_ROM AM_REGION(MC6800_TAG, 0)
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tek4052_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tek4052_mem, ADDRESS_SPACE_PROGRAM, 8, tek4052_state )
+static ADDRESS_MAP_START( tek4052_mem, AS_PROGRAM, 8, tek4052_state )
 ADDRESS_MAP_END
 
 
@@ -1165,7 +1165,7 @@ static IEEE488_DAISY( ieee488_daisy )
 
 void tek4051_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	// configure RAM
 	switch (ram_get_size(m_ram))

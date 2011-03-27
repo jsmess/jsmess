@@ -291,14 +291,14 @@ static WRITE8_HANDLER( multi8_kanji_w )
 	state->knj_addr = (offset == 0) ? (state->knj_addr & 0xff00) | (data & 0xff) : (state->knj_addr & 0x00ff) | (data << 8);
 }
 
-static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(multi8_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( multi8_vram_r, multi8_vram_w )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( multi8_io , AS_IO, 8)
 //  ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
@@ -553,7 +553,7 @@ static WRITE8_DEVICE_HANDLER( portb_w )
         ---- x--- memory bank status
         ---- -xxx page screen graphics in B/W mode
     */
-//  address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+//  address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 //  printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
 

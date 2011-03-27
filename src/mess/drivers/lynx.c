@@ -14,7 +14,7 @@
 
 static QUICKLOAD_LOAD( lynx );
 
-static ADDRESS_MAP_START( lynx_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( lynx_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_BASE_MEMBER(lynx_state, mem_0000)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_BASE_MEMBER(lynx_state, mem_fc00)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_BASE_MEMBER(lynx_state, mem_fd00)
@@ -140,7 +140,7 @@ ROM_END
 static QUICKLOAD_LOAD( lynx )
 {
 	device_t *cpu = image.device().machine->device("maincpu");
-	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = image.device().machine->region("maincpu")->base();
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3

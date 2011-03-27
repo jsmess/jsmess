@@ -133,9 +133,9 @@ static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
-		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break; // sound?
+		case 2:  device_set_input_line(device, 2, HOLD_LINE); break;
+		case 1:  device_set_input_line(device, 3, HOLD_LINE); break;
+		case 0:  device_set_input_line(device, 5, HOLD_LINE); break; // sound?
 	}
 }
 
@@ -861,7 +861,7 @@ static WRITE16_HANDLER( galpani3_framebuffer3_bgcol_w )
 
 
 
-static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM

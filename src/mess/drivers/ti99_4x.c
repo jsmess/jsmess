@@ -53,7 +53,7 @@ public:
 /*
     Memory map
 */
-static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM			/*RAM PAD, mirrored 4 times*/
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("datamux_16_8", ti99_dmux_r, ti99_dmux_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(memmap_4ev, AS_PROGRAM, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM			/*RAM PAD, mirrored 4 times*/
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 /*
     CRU map
 */
-static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(cru_map, AS_IO, 8)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0000, 0x01ff) AM_DEVREAD("crubus", ti99_crubus_r )
 

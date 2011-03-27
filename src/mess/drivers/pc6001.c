@@ -768,7 +768,7 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w)
 	i8255a_w(device,offset,data);
 }
 
-static ADDRESS_MAP_START(pc6001_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
@@ -776,7 +776,7 @@ static ADDRESS_MAP_START(pc6001_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(pc6001_state, ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pc6001_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
@@ -1328,7 +1328,7 @@ static READ8_HANDLER( pc6001m2_bank_w0_r )
 	return state->bank_w;
 }
 
-static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pc6001m2_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(work_ram0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(work_ram1_w)
@@ -1340,7 +1340,7 @@ static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(work_ram7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
@@ -1383,7 +1383,7 @@ static WRITE8_HANDLER( pc6601_fdc_w )
 {
 }
 
-static ADDRESS_MAP_START( pc6601_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pc6601_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
@@ -1588,7 +1588,7 @@ static WRITE8_DEVICE_HANDLER(necsr_ppi8255_w)
 }
 
 
-static ADDRESS_MAP_START(pc6001sr_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pc6001sr_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(sr_work_ram0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(sr_work_ram1_w)
@@ -1600,7 +1600,7 @@ static ADDRESS_MAP_START(pc6001sr_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(sr_work_ram7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc6001sr_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc6001sr_bank_rn_r,pc6001sr_bank_rn_w)
@@ -1795,7 +1795,7 @@ static INTERRUPT_GEN( pc6001_interrupt )
 	state->cur_keycode = check_joy_press(device->machine);
 	if(IRQ_LOG) printf("Stick IRQ called 0x16\n");
 	state->irq_vector = 0x16;
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( pc6001sr_interrupt )
@@ -1806,13 +1806,13 @@ static INTERRUPT_GEN( pc6001sr_interrupt )
 	state->cur_keycode = check_joy_press(device->machine);
 	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n");
 	state->irq_vector = (state->kludge) ? 0x22 : 0x16;
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK ( pc6001_irq_callback )
 {
 	pc6001_state *state = device->machine->driver_data<pc6001_state>();
-	cpu_set_input_line(device, 0, CLEAR_LINE);
+	device_set_input_line(device, 0, CLEAR_LINE);
 	return state->irq_vector;
 }
 
@@ -2009,7 +2009,7 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	pc6001_state *state = timer.machine->driver_data<pc6001_state>();
-	address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = timer.machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = input_port_read(timer.machine,"key1");
 	UINT32 key2 = input_port_read(timer.machine,"key2");
 	UINT32 key3 = input_port_read(timer.machine,"key3");
@@ -2061,7 +2061,7 @@ static MACHINE_RESET(pc6001)
 
 	state->port_c_8255=0;
 
-	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	state->cas_switch = 0;
 	state->cas_offset = 0;
 	state->timer_irq_mask = 1;
@@ -2079,7 +2079,7 @@ static MACHINE_RESET(pc6001m2)
 
 	state->port_c_8255=0;
 
-	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	state->cas_switch = 0;
 	state->cas_offset = 0;
 
@@ -2115,7 +2115,7 @@ static MACHINE_RESET(pc6001sr)
 
 	state->port_c_8255=0;
 
-	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	state->cas_switch = 0;
 	state->cas_offset = 0;
 

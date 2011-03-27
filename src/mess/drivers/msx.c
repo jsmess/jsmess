@@ -297,7 +297,7 @@ PCB Layouts missing
 #include "sound/k051649.h"
 #include "sound/2413intf.h"
 
-static ADDRESS_MAP_START (msx_memory_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START (msx_memory_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE( msx_page0_w )
 	AM_RANGE( 0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE( msx_page0_1_w )
 	AM_RANGE( 0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE( msx_page1_w )
@@ -322,7 +322,7 @@ static WRITE8_DEVICE_HANDLER( msx_ay8910_w )
 }
 
 
-static ADDRESS_MAP_START (msx_io_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START (msx_io_map, AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START (msx_io_map, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START (msx2_io_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START (msx2_io_map, AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )

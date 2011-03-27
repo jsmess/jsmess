@@ -42,31 +42,31 @@ static void mc68328_set_interrupt_line(device_t *device, UINT32 line, UINT32 act
 
             if(mc68328->regs.isr & INT_M68K_LINE7)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_7, ASSERT_LINE, mc68328->regs.ivr | 0x07);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_7, ASSERT_LINE, mc68328->regs.ivr | 0x07);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE6)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_6, ASSERT_LINE, mc68328->regs.ivr | 0x06);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_6, ASSERT_LINE, mc68328->regs.ivr | 0x06);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE5)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_5, ASSERT_LINE, mc68328->regs.ivr | 0x05);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_5, ASSERT_LINE, mc68328->regs.ivr | 0x05);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE4)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_4, ASSERT_LINE, mc68328->regs.ivr | 0x04);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_4, ASSERT_LINE, mc68328->regs.ivr | 0x04);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE3)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_3, ASSERT_LINE, mc68328->regs.ivr | 0x03);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_3, ASSERT_LINE, mc68328->regs.ivr | 0x03);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE2)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_2, ASSERT_LINE, mc68328->regs.ivr | 0x02);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_2, ASSERT_LINE, mc68328->regs.ivr | 0x02);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE1)
             {
-                cpu_set_input_line_and_vector(cpu, M68K_IRQ_1, ASSERT_LINE, mc68328->regs.ivr | 0x01);
+                device_set_input_line_and_vector(cpu, M68K_IRQ_1, ASSERT_LINE, mc68328->regs.ivr | 0x01);
             }
         }
     }
@@ -76,31 +76,31 @@ static void mc68328_set_interrupt_line(device_t *device, UINT32 line, UINT32 act
 
         if((line & INT_M68K_LINE7) && !(mc68328->regs.isr & INT_M68K_LINE7))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_7, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_7, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE6) && !(mc68328->regs.isr & INT_M68K_LINE6))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_6, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_6, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE5) && !(mc68328->regs.isr & INT_M68K_LINE5))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_5, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_5, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE4) && !(mc68328->regs.isr & INT_M68K_LINE4))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_4, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_4, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE3) && !(mc68328->regs.isr & INT_M68K_LINE3))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_3, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_3, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE2) && !(mc68328->regs.isr & INT_M68K_LINE2))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_2, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_2, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE1) && !(mc68328->regs.isr & INT_M68K_LINE1))
         {
-            cpu_set_input_line(cpu, M68K_IRQ_1, CLEAR_LINE);
+            device_set_input_line(cpu, M68K_IRQ_1, CLEAR_LINE);
         }
     }
 }

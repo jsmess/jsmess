@@ -284,7 +284,7 @@ static GFXDECODE_START( polgar )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START(polgar_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( mboard_write_board_8)		// Chessboard
@@ -297,7 +297,7 @@ static ADDRESS_MAP_START(polgar_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(milano_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1f9f) AM_RAM
 	AM_RANGE( 0x1fd0, 0x1fd0) AM_WRITE ( milano_write_board)	// Chessboard
 	AM_RANGE( 0x1fe0, 0x1fe0) AM_READ( milano_read_board )		// Chessboard

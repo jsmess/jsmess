@@ -102,7 +102,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 							if (flag_clk ==1)
 							{
 								flag_clk=0;
-								cputag_set_clock(space->machine, "maincpu", XTAL_5MHz);  /* Augmentation CPU*/
+								space->machine->device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
 							}
 						}
 	if (offset==0x04)	{	/* 0x804 => video page, BR*/
@@ -111,7 +111,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 							if (flag_clk ==0)
 							{
 								flag_clk=1;
-								cputag_set_clock(space->machine, "maincpu", XTAL_1_75MHz);  /* Ralentissement CPU*/
+								space->machine->device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
 							}
 						}
 	if (offset==0x08)	{	/* 0x808 => base page, HR*/
@@ -119,7 +119,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 							if (flag_clk ==1)
 							{
 								flag_clk=0;
-								cputag_set_clock(space->machine, "maincpu", XTAL_5MHz);  /* Augmentation CPU*/
+								space->machine->device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
 							}
 
 						}
@@ -129,7 +129,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 							if (flag_clk ==0)
 							{
 								flag_clk=1;
-								cputag_set_clock(space->machine, "maincpu", XTAL_1_75MHz);  /* Ralentissement CPU*/
+								space->machine->device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
 							}
 						}
 }

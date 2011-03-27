@@ -249,7 +249,7 @@ WRITE8_HANDLER( trs80m4_84_w )
     d0 Select bit 0 */
 
 	/* get address space instead of io space */
-	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *base = space->machine->region("maincpu")->base();
 
 	state->mode = (state->mode & 0x73) | (data & 0x8c);
@@ -390,7 +390,7 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
         d0 Video banking exists yes/no (1=not banked) */
 
 	/* get address space instead of io space */
-	//address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	//address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->model4 &= 0xf7;
 	state->model4 |= (data << 3);
@@ -526,7 +526,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
     d2 Mode Select (0=64 chars, 1=32chars)
     d1 Cassette Motor (1=On) */
 
-	cputag_set_clock(space->machine, "maincpu", data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
+	space->machine->device("maincpu")->set_unscaled_clock(data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
 	state->mode = (state->mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
 
@@ -609,7 +609,7 @@ WRITE8_HANDLER( lnw80_fe_w )
     d0 inverse video (entire screen) */
 
 	/* get address space instead of io space */
-	address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->mode = (state->mode & 0x87) | ((data & 0x0f) << 3);
 
@@ -685,13 +685,13 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 		if (state->mask & IRQ_M4_RTC)
 		{
 			state->irq |= IRQ_M4_RTC;
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 		}
 	}
 	else		// Model 1
 	{
 		state->irq |= IRQ_M1_RTC;
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -927,7 +927,7 @@ MACHINE_RESET( trs80 )
 MACHINE_RESET( trs80m4 )
 {
 	trs80_state *state = machine->driver_data<trs80_state>();
-	address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	state->cassette_data = 0;
 
 	memory_install_read_bank (mem, 0x0000, 0x0fff, 0, 0, "bank1");
@@ -956,7 +956,7 @@ MACHINE_RESET( trs80m4 )
 MACHINE_RESET( lnw80 )
 {
 	trs80_state *state = machine->driver_data<trs80_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	state->cassette_data = 0;
 	state->reg_load = 1;
 	lnw80_fe_w(space, 0, 0);

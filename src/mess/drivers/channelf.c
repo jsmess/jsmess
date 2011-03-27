@@ -186,14 +186,14 @@ static WRITE8_HANDLER( channelf_2102B_w )  /* SKR */
 	LOG(("whB: data=%d, a[9]=%d,a[8]=%d,a[0]=%d\n",data,state->r2102.a[9],state->r2102.a[8],state->r2102.a[0]));
 }
 
-static ADDRESS_MAP_START( channelf_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( channelf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x27ff) AM_ROM /* Cartridge Data */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM /* Schach RAM */
 	AM_RANGE(0x3000, 0xffff) AM_ROM /* Cartridge Data continued */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( channelf_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( channelf_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(channelf_port_0_r, channelf_port_0_w) /* Front panel switches */
 	AM_RANGE(0x01, 0x01) AM_READWRITE(channelf_port_1_r, channelf_port_1_w) /* Right controller     */
 	AM_RANGE(0x04, 0x04) AM_READWRITE(channelf_port_4_r, channelf_port_4_w) /* Left controller      */

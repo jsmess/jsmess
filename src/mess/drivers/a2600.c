@@ -818,7 +818,7 @@ DIRECT_UPDATE_HANDLER( modeF6_opbase )
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 )
 	{
-		modeF6_switch_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
+		modeF6_switch_w( machine->device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
 	return address;
 }
@@ -1171,7 +1171,7 @@ DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
 		state->bank_base[1] = machine->region("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
 		memory_set_bankptr(machine, "bank1", state->bank_base[1] );
 		/* and restore old opbase handler */
-		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(FE_old_opbase_handler);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(FE_old_opbase_handler);
 	}
 	else
 	{
@@ -1184,7 +1184,7 @@ DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
 static void modeFE_switch(running_machine *machine,UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine->driver_data<a2600_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
        should be the last byte that was on the data bus
     */
@@ -1210,7 +1210,7 @@ static  READ8_HANDLER(current_bank_r)
 	return state->current_bank;
 }
 
-static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE_MEMBER(a2600_state, riot_ram)
@@ -1333,7 +1333,7 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 			"bank4",
 		};
 
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM),
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
@@ -1698,7 +1698,7 @@ static void set_controller( running_machine *machine, const char *controller, un
 static MACHINE_RESET( a2600 )
 {
 	a2600_state *state = machine->driver_data<a2600_state>();
-	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int chip = 0xFF;
 	unsigned long controltemp;
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto

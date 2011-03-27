@@ -52,7 +52,7 @@
 
 void bw12_state::bankswitch()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	switch (m_bank)
 	{
@@ -191,13 +191,13 @@ READ8_MEMBER( bw12_state::ls259_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( bw12_mem, ADDRESS_SPACE_PROGRAM, 8, bw12_state )
+static ADDRESS_MAP_START( bw12_mem, AS_PROGRAM, 8, bw12_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bw12_io, ADDRESS_SPACE_IO, 8, bw12_state )
+static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(ls259_r, ls259_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_address_w)

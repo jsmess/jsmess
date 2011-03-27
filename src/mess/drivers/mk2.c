@@ -52,7 +52,7 @@ MOS MPS 6332 005 2179
   83, 84 contains display variables
  */
 // only lower 12 address bits on bus!
-static ADDRESS_MAP_START(mk2_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
 	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_r, mos6530_w)
