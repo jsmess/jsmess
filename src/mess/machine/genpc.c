@@ -568,19 +568,16 @@ ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb
 {
 }
  
-#define memory_install_readwrite8_device_handler_mask(space, device, start, end, mask, mirror, rhandler, whandler, unitmask) \
-	const_cast<address_space *>(space)->install_legacy_readwrite_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler, unitmask)
-
 void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
 {	
 	int buswidth = machine->firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, rhandler, whandler, 0);			
+			maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0);
 			break;
 		case 16:
-			memory_install_readwrite8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, rhandler, whandler, 0xffff);			
+			maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0xffff);
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -588,19 +585,16 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 	}
 }
 
-#define memory_install_write8_device_handler_mask(space, device, start, end, mask, mirror, whandler, unitmask) \
-	const_cast<address_space *>(space)->install_legacy_write_handler(*(device), start, end, mask, mirror, whandler, #whandler, unitmask)
-
 void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler)
 {	
 	int buswidth = machine->firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_write8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, whandler, 0);			
+			maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0);
 			break;
 		case 16:
-			memory_install_write8_device_handler_mask(maincpu->memory().space(AS_IO), dev, start, end, mask, mirror, whandler, 0xffff);			
+			maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0xffff);
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
