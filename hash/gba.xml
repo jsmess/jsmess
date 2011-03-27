@@ -2810,6 +2810,17 @@
 	</software>
 
 	<software name="atvquad">
+		<description>ATV - Quad Power Racing (Euro, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>Liquid Games</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="atv - quad power racing (europe) (rev. 1).bin" size="4194304" crc="4b4e8bc7" sha1="2234f23928c871b00bd48bdcdd5273362d4e0cdc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atvquada" cloneof="atvquad">
 		<description>ATV - Quad Power Racing (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>Acclaim</publisher>
@@ -6983,6 +6994,18 @@
 	</software>
 
 	<software name="mirrabm2">
+		<description>Dave Mirra Freestyle BMX 2 (Euro, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>Liquid Games</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="8388608">
+				<rom name="dave mirra freestyle bmx 2 (europe) (rev. 1) (en,fr,de,es,it).bin" size="8388608" crc="8e39fee9" sha1="4c3a3ecba81f7a7df5a05d294bbe796109dd5d4d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mirrabm2a" cloneof="mirrabm2">
 		<description>Dave Mirra Freestyle BMX 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Acclaim</publisher>
