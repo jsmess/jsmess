@@ -220,7 +220,7 @@ static DRIVER_INIT( aquarius )
 	{
 		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-		memory_install_readwrite_bank(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 0x1000 - 1, 0, 0, "bank1");
+		space->install_readwrite_bank(0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 0x1000 - 1, "bank1");
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 	}
 }

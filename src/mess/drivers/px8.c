@@ -93,31 +93,31 @@ static void bankswitch(running_machine *machine)
 	if (!state->bank0)
 	{
 		/* IPL ROM */
-		memory_install_rom(program, 0x0000, 0x7fff, 0, 0, ipl_rom);
+		program->install_rom(0x0000, 0x7fff, ipl_rom);
 	}
 	else
 	{
 		if (state->bk2)
 		{
 			/* D-RAM (L) */
-			memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+			program->install_ram(0x0000, 0x7fff, ram);
 		}
 		else
 		{
 			/* OPTION ROM (L) */
-			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+			program->unmap_readwrite(0x0000, 0x7fff);
 		}
 	}
 
 	if (state->bk2)
 	{
 		/* D-RAM (H) */
-		memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x8000);
+		program->install_ram(0x8000, 0xffff, ram + 0x8000);
 	}
 	else
 	{
 		/* OPTION ROM (H) */
-		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		program->unmap_readwrite(0x8000, 0xffff);
 	}
 }
 

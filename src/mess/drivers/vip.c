@@ -266,19 +266,19 @@ WRITE8_MEMBER( vip_state::bankswitch_w )
 	switch (ram_get_size(m_ram))
 	{
 	case 1 * 1024:
-		memory_install_ram(program, 0x0000, 0x03ff, 0, 0x7c00, ram);
+		program->install_ram(0x0000, 0x03ff, 0, 0x7c00, ram);
 		break;
 
 	case 2 * 1024:
-		memory_install_ram(program, 0x0000, 0x07ff, 0, 0x7800, ram);
+		program->install_ram(0x0000, 0x07ff, 0, 0x7800, ram);
 		break;
 
 	case 4 * 1024:
-		memory_install_ram(program, 0x0000, 0x0fff, 0, 0x7000, ram);
+		program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 		break;
 
 	case 32 * 1024:
-		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+		program->install_ram(0x0000, 0x7fff, ram);
 		break;
 	}
 }
@@ -642,13 +642,13 @@ void vip_state::machine_reset()
 	switch (input_port_read(machine, "VIDEO"))
 	{
 	case VIDEO_CDP1861:
-		memory_unmap_write(io, 0x05, 0x05, 0, 0);
-		memory_unmap_write(program, 0xc000, 0xdfff, 0, 0);
+		io->unmap_write(0x05, 0x05);
+		program->unmap_write(0xc000, 0xdfff);
 		break;
 
 	case VIDEO_CDP1862:
-		memory_install_write8_device_handler(io, m_cgc, 0x05, 0x05, 0, 0, cdp1862_bkg_w);
-//      memory_install_write8_handler(program, 0xc000, 0xdfff, 0, 0, vip_colorram_w);
+		io->install_legacy_write_handler(*m_cgc, 0x05, 0x05, FUNC(cdp1862_bkg_w));
+//      program->install_legacy_write_handler(0xc000, 0xdfff, FUNC(vip_colorram_w));
 		break;
 	}
 
@@ -681,7 +681,7 @@ void vip_state::machine_reset()
 	}
 
 	/* enable ROM all thru address space */
-	memory_install_rom(program, 0x0000, 0x01ff, 0, 0xfe00, machine->region(CDP1802_TAG)->base());
+	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, machine->region(CDP1802_TAG)->base());
 }
 
 /* Machine Drivers */

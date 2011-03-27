@@ -285,7 +285,7 @@ static void orionz80_switch_bank(running_machine *machine)
 	bank_select = (state->orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = state->orionz80_dispatcher & 0x03;
 
-	memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+	space->install_write_bank(0x0000, 0x3fff, "bank1");
 	if ((state->orionz80_dispatcher & 0x80)==0)
 	{ // dispatcher on
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * bank_select + segment_select * 0x4000 );
@@ -299,19 +299,19 @@ static void orionz80_switch_bank(running_machine *machine)
 
 	if ((state->orionz80_dispatcher & 0x20) == 0)
 	{
-		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
-		memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-		memory_install_write8_handler(space, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);
-		memory_install_read8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
-		memory_install_read8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-		memory_install_read8_handler(space, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);
+		space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
+		space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
+		space->install_legacy_write_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_w));
+		space->install_legacy_read_handler(0xf400, 0xf4ff, FUNC(orion128_system_r));
+		space->install_legacy_read_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_r));
+		space->install_legacy_read_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_r));
 
-		memory_install_write8_handler(space, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
-		memory_install_write8_handler(space, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
-		memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
-		memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-		memory_unmap_write(space, 0xfc00, 0xfeff, 0, 0);
-		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
+		space->install_legacy_write_handler(0xf800, 0xf8ff, FUNC(orion128_video_mode_w));
+		space->install_legacy_write_handler(0xf900, 0xf9ff, FUNC(orionz80_memory_page_w));
+		space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(orion128_video_page_w));
+		space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(orionz80_dispatcher_w));
+		space->unmap_write(0xfc00, 0xfeff);
+		space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
 
 		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xf000);
 		memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0xf800);
@@ -345,23 +345,23 @@ MACHINE_RESET ( orionz80 )
 	orion_state *state = machine->driver_data<orion_state>();
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_install_write_bank(space, 0x4000, 0xefff, 0, 0, "bank2");
-	memory_install_write_bank(space, 0xf000, 0xf3ff, 0, 0, "bank3");
+	space->unmap_write(0x0000, 0x3fff);
+	space->install_write_bank(0x4000, 0xefff, "bank2");
+	space->install_write_bank(0xf000, 0xf3ff, "bank3");
 
-	memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
-	memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-	memory_install_write8_handler(space, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);
-	memory_install_read8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
-	memory_install_read8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-	memory_install_read8_handler(space, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_r);
+	space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
+	space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
+	space->install_legacy_write_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_w));
+	space->install_legacy_read_handler(0xf400, 0xf4ff, FUNC(orion128_system_r));
+	space->install_legacy_read_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_r));
+	space->install_legacy_read_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_r));
 
-	memory_install_write8_handler(space, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
-	memory_install_write8_handler(space, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
-	memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
-	memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-	memory_unmap_write(space, 0xfc00, 0xfeff, 0, 0);
-	memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
+	space->install_legacy_write_handler(0xf800, 0xf8ff, FUNC(orion128_video_mode_w));
+	space->install_legacy_write_handler(0xf900, 0xf9ff, FUNC(orionz80_memory_page_w));
+	space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(orion128_video_page_w));
+	space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(orionz80_dispatcher_w));
+	space->unmap_write(0xfc00, 0xfeff);
+	space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
 
 
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
@@ -437,14 +437,14 @@ static void orionpro_bank_switch(running_machine *machine)
 	{
 		page = state->orionpro_128_page & 7;
 	}
-	memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
-	memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank2");
-	memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank3");
-	memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank4");
-	memory_install_write_bank(space, 0xc000, 0xefff, 0, 0, "bank5");
-	memory_install_write_bank(space, 0xf000, 0xf3ff, 0, 0, "bank6");
-	memory_install_write_bank(space, 0xf400, 0xf7ff, 0, 0, "bank7");
-	memory_install_write_bank(space, 0xf800, 0xffff, 0, 0, "bank8");
+	space->install_write_bank(0x0000, 0x1fff, "bank1");
+	space->install_write_bank(0x2000, 0x3fff, "bank2");
+	space->install_write_bank(0x4000, 0x7fff, "bank3");
+	space->install_write_bank(0x8000, 0xbfff, "bank4");
+	space->install_write_bank(0xc000, 0xefff, "bank5");
+	space->install_write_bank(0xf000, 0xf3ff, "bank6");
+	space->install_write_bank(0xf400, 0xf7ff, "bank7");
+	space->install_write_bank(0xf800, 0xffff, "bank8");
 
 
 	if ((state->orionpro_dispatcher & 0x01)==0x00)
@@ -459,12 +459,12 @@ static void orionpro_bank_switch(running_machine *machine)
 	}
 	if ((state->orionpro_dispatcher & 0x10)==0x10)
 	{	// ROM1 enabled
-		memory_unmap_write(space, 0x0000, 0x1fff, 0, 0);
+		space->unmap_write(0x0000, 0x1fff);
 		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x20000);
 	}
 	if ((state->orionpro_dispatcher & 0x08)==0x08)
 	{	// ROM2 enabled
-		memory_unmap_write(space, 0x2000, 0x3fff, 0, 0);
+		space->unmap_write(0x2000, 0x3fff);
 		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x22000 + (state->orionpro_rom2_segment & 7) * 0x2000);
 	}
 
@@ -492,20 +492,20 @@ static void orionpro_bank_switch(running_machine *machine)
 	{
 		memory_set_bankptr(machine, "bank6", ram + 0x10000 * 0 + 0xf000);
 
-		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
-		memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-		memory_unmap_write(space, 0xf600, 0xf6ff, 0, 0);
-		memory_install_write8_handler(space, 0xf700, 0xf7ff, 0, 0, orion128_floppy_w);
-		memory_install_read8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
-		memory_install_read8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-		memory_unmap_read(space, 0xf600, 0xf6ff, 0, 0);
-		memory_install_read8_handler(space, 0xf700, 0xf7ff, 0, 0, orion128_floppy_r);
+		space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
+		space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
+		space->unmap_write(0xf600, 0xf6ff);
+		space->install_legacy_write_handler(0xf700, 0xf7ff, FUNC(orion128_floppy_w));
+		space->install_legacy_read_handler(0xf400, 0xf4ff, FUNC(orion128_system_r));
+		space->install_legacy_read_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_r));
+		space->unmap_read(0xf600, 0xf6ff);
+		space->install_legacy_read_handler(0xf700, 0xf7ff, FUNC(orion128_floppy_r));
 
-		memory_install_write8_handler(space, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
-		memory_install_write8_handler(space, 0xf900, 0xf9ff, 0, 0, orionpro_memory_page_w);
-		memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
-		memory_unmap_write(space, 0xfb00, 0xfeff, 0, 0);
-		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
+		space->install_legacy_write_handler(0xf800, 0xf8ff, FUNC(orion128_video_mode_w));
+		space->install_legacy_write_handler(0xf900, 0xf9ff, FUNC(orionpro_memory_page_w));
+		space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(orion128_video_page_w));
+		space->unmap_write(0xfb00, 0xfeff);
+		space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
 
 
 		memory_set_bankptr(machine, "bank8", ram + 0x10000 * 0 + 0xf800);

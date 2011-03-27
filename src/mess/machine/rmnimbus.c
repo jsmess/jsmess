@@ -1236,14 +1236,14 @@ WRITE16_HANDLER( nimbus_i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(space->machine->device(MAINCPU_TAG)->memory().space(AS_PROGRAM), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_r);
-				memory_install_write16_handler(space->machine->device(MAINCPU_TAG)->memory().space(AS_PROGRAM), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_w);
+				space->machine->device(MAINCPU_TAG)->memory().space(AS_PROGRAM)->install_legacy_read_handler(temp, temp + 0xff, FUNC(nimbus_i186_internal_port_r));
+				space->machine->device(MAINCPU_TAG)->memory().space(AS_PROGRAM)->install_legacy_write_handler(temp, temp + 0xff, FUNC(nimbus_i186_internal_port_w));
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(space->machine->device(MAINCPU_TAG)->memory().space(AS_IO), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_r);
-				memory_install_write16_handler(space->machine->device(MAINCPU_TAG)->memory().space(AS_IO), temp, temp + 0xff, 0, 0, nimbus_i186_internal_port_w);
+				space->machine->device(MAINCPU_TAG)->memory().space(AS_IO)->install_legacy_read_handler(temp, temp + 0xff, FUNC(nimbus_i186_internal_port_r));
+				space->machine->device(MAINCPU_TAG)->memory().space(AS_IO)->install_legacy_write_handler(temp, temp + 0xff, FUNC(nimbus_i186_internal_port_w));
 			}
 			break;
 
@@ -2054,12 +2054,12 @@ static void nimbus_bank_memory(running_machine *machine)
             map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 
             memory_set_bankptr(machine, bank, map_base);
-            memory_install_readwrite_bank(space, memmap[blockno].start, memmap[blockno].end, 0, 0, bank);
+            space->install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, bank);
             //if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
         }
         else
         {
-            memory_nop_readwrite(space, memmap[blockno].start, memmap[blockno].end, 0, 0);
+            space->nop_readwrite(memmap[blockno].start, memmap[blockno].end);
             if(LOG_RAM) logerror("NOP\n");
         }
     }

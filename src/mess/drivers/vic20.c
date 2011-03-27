@@ -535,16 +535,16 @@ static MACHINE_START( vic20 )
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 32*1024:
-		memory_install_ram(program, 0x6000, 0x7fff, 0, 0, NULL);
+		program->install_ram(0x6000, 0x7fff, NULL);
 		/* fallthru */
 	case 24*1024:
-		memory_install_ram(program, 0x4000, 0x5fff, 0, 0, NULL);
+		program->install_ram(0x4000, 0x5fff, NULL);
 		/* fallthru */
 	case 16*1024:
-		memory_install_ram(program, 0x2000, 0x3fff, 0, 0, NULL);
+		program->install_ram(0x2000, 0x3fff, NULL);
 		/* fallthru */
 	case 8*1024:
-		memory_install_ram(program, 0x0400, 0x0fff, 0, 0, NULL);
+		program->install_ram(0x0400, 0x0fff, NULL);
 	}
 
 	/* register for state saving */
@@ -585,13 +585,13 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 			image.fread(ptr + address, 0x2000);
 			image.fread(ptr + 0xa000, 0x2000);
 
-			memory_install_rom(program, address, address + 0x1fff, 0, 0, ptr + address);
-			memory_install_rom(program, 0xa000, 0xbfff, 0, 0, ptr + 0xa000);
+			program->install_rom(address, address + 0x1fff, ptr + address);
+			program->install_rom(0xa000, 0xbfff, ptr + 0xa000);
 		}
 		else
 		{
 			image.fread(ptr + address, size);
-			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 	}
 	else
@@ -601,7 +601,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		{
 			address = 0x2000;
 			memcpy(ptr + address, image.get_software_region("2000"), size);
-			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
 		size = image.get_software_region_length("4000");
@@ -609,7 +609,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		{
 			address = 0x4000;
 			memcpy(ptr + address, image.get_software_region("4000"), size);
-			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
 		size = image.get_software_region_length("6000");
@@ -617,7 +617,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		{
 			address = 0x6000;
 			memcpy(ptr + address, image.get_software_region("6000"), size);
-			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
 		size = image.get_software_region_length("a000");
@@ -625,7 +625,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		{
 			address = 0xa000;
 			memcpy(ptr + address, image.get_software_region("a000"), size);
-			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
 		size = image.get_software_region_length("b000");
@@ -633,7 +633,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		{
 			address = 0xb000;
 			memcpy(ptr + address, image.get_software_region("b000"), size);
-			memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
+			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 	}
 

@@ -422,15 +422,15 @@ MACHINE_START( sorcerer )
 	switch (ram_get_size(state->m_ram))
 	{
 	case 8*1024:
-		memory_unmap_readwrite(space, 0x2000, endmem, 0, 0);
+		space->unmap_readwrite(0x2000, endmem);
 		break;
 
 	case 16*1024:
-		memory_unmap_readwrite(space, 0x4000, endmem, 0, 0);
+		space->unmap_readwrite(0x4000, endmem);
 		break;
 
 	case 32*1024:
-		memory_unmap_readwrite(space, 0x8000, endmem, 0, 0);
+		space->unmap_readwrite(0x8000, endmem);
 		break;
 	}
 }

@@ -422,8 +422,8 @@ static MACHINE_RESET(nanos)
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank3");
-	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");
+	space->install_write_bank(0x0000, 0x0fff, "bank3");
+	space->install_write_bank(0x1000, 0xffff, "bank2");
 
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x1000);

@@ -93,40 +93,40 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 	sprintf(bank,"bank%d",blocknum);
 	if (data>=0xE0 && data<=0xEF) {
 		// This is RAM
-		memory_install_read_bank (space, startaddr, endaddr, 0, 0, bank);
+		space->install_read_bank (startaddr, endaddr, bank);
 		switch(data) {
 			case 0xe6 :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_1_w);
+					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_r_1_w));
 					break;
 			case 0xe7 :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_2_w);
+					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_r_2_w));
 					break;
 			case 0xea :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_g_1_w);
+					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_g_1_w));
 					break;
 			case 0xeb :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_g_2_w);
+					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_g_2_w));
 					break;
 			case 0xee :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_b_1_w);
+					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_b_1_w));
 					break;
 			case 0xef :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_b_2_w);
+					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_b_2_w));
 					break;
 
 			default :
-					memory_install_write_bank(space, startaddr, endaddr, 0, 0, bank);
+					space->install_write_bank(startaddr, endaddr, bank);
 					break;
 		}
 
 		memory_set_bankptr(machine, bank, ram_get_ptr(machine->device(RAM_TAG)) + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
-		memory_install_read_bank (space, startaddr, endaddr, 0, 0, bank);
-		memory_unmap_write(space, startaddr, endaddr, 0, 0);
+		space->install_read_bank (startaddr, endaddr, bank);
+		space->unmap_write(startaddr, endaddr);
 		memory_set_bankptr(machine, bank, mem + ((data & 0x0F)-8)* 0x1000+0x10000);
 	} else {
 		logerror("%02x %02x\n",block,data);
-		memory_unmap_readwrite (space, startaddr, endaddr, 0, 0);
+		space->unmap_readwrite (startaddr, endaddr);
 	}
 }
 

@@ -726,7 +726,7 @@ static DEVICE_START( c1551 )
 	address_space *program = device->machine->device(config->cpu_tag)->memory().space(AS_PROGRAM);
 	UINT32 start_address = c1551->address ? 0xfec0 : 0xfef0;
 
-	memory_install_readwrite8_device_handler(program, c1551->tpi1, start_address, start_address + 7, 0, 0, tpi6525_r, tpi6525_w);
+	program->install_legacy_readwrite_handler(*c1551->tpi1, start_address, start_address + 7, FUNC(tpi6525_r), FUNC(tpi6525_w));
 
 	/* register for state saving */
 	device->save_item(NAME(c1551->tcbm_data));

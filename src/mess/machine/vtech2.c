@@ -157,8 +157,8 @@ WRITE8_HANDLER( laser_bank_select_w )
         /* memory mapped I/O bank selected? */
 		if (data == 2)
 		{
-			memory_install_read8_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_soft[offset]);
-			memory_install_write8_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_soft[offset]);
+			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mra_bank_soft[offset]));
+			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mwa_bank_soft[offset]));
 		}
 		else
 		{
@@ -171,14 +171,14 @@ WRITE8_HANDLER( laser_bank_select_w )
 				{
 					logerror("select bank #%d VIDEO!\n", offset+1);
 				}
-				memory_install_read_bank(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_hard[offset]);
-				memory_install_write_bank(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_hard[offset]);
+				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
+				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
 
 			}
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
-				memory_nop_readwrite(space->machine->device("maincpu")->memory().space(AS_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0);
+				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
 
 			}
 		}

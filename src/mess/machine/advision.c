@@ -30,7 +30,7 @@ void advision_state::machine_start()
 	/* configure EA banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8048_TAG)->base(), 0);
-	memory_install_readwrite_bank(m_maincpu->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
+	m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	memory_set_bank(machine, "bank1", 0);
 
 	/* allocate external RAM */

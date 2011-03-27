@@ -311,7 +311,7 @@ static DEVICE_START( vic1112 )
 	program->install_readwrite_handler(0x9810, 0x981f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via1), write8_delegate_create(via6522_device, write, *vic1112->via1));
 
 	/* map ROM to memory */
-	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, device->machine->region("vic1112:vic1112")->base());
+	program->install_rom(0xb000, 0xb7ff, device->machine->region("vic1112:vic1112")->base());
 
 	/* ground REN */
 	ieee488_ren_w(vic1112->bus, device, 0);

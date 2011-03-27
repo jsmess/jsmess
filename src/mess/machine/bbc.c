@@ -431,11 +431,11 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	if (state->ACCCON_TST)
 	{
 		memory_set_bankptr( space->machine, "bank8", space->machine->region("user1")->base()+0x43c00);
-		memory_install_read_bank(space, 0xFC00,0xFEFF,0,0,"bank8");
+		space->install_read_bank(0xFC00,0xFEFF,"bank8");
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0xFC00,0xFEFF,0,0,bbcm_r);
+		space->install_legacy_read_handler(0xFC00,0xFEFF,FUNC(bbcm_r));
 	}
 
 }
@@ -2182,7 +2182,7 @@ MACHINE_START( bbcm )
 
 	/* Set ROM/IO bank to point to rom */
 	memory_set_bankptr( machine, "bank8", machine->region("user1")->base()+0x43c00);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xFC00, 0xFEFF, 0, 0, "bank8");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xFC00, 0xFEFF, "bank8");
 }
 
 MACHINE_RESET( bbcm )

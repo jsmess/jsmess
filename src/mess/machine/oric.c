@@ -473,12 +473,12 @@ static void oric_install_apple2_interface(running_machine *machine)
 	if (state->is_telestrat)
 		return;
 
-	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
-	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
-	memory_install_read_bank(space, 0x0320, 0x03ff, 0, 0, "bank4");
+	space->install_legacy_read_handler(0x0300, 0x030f, FUNC(oric_IO_r));
+	space->install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
+	space->install_read_bank(0x0320, 0x03ff, "bank4");
 
-	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
-	memory_install_write8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_w);
+	space->install_legacy_write_handler(0x0300, 0x030f, FUNC(oric_IO_w));
+	space->install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
 	memory_set_bankptr(machine, "bank4",	machine->region("maincpu")->base() + 0x014000 + 0x020);
 }
 
@@ -496,33 +496,33 @@ static void oric_enable_memory(running_machine *machine, int low, int high, int 
 		switch(i) {
 		case 1:
 			if (rd) {
-				memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank1");
+				space->install_read_bank(0xc000, 0xdfff, "bank1");
 			} else {
-				memory_nop_read(space, 0xc000, 0xdfff, 0, 0);
+				space->nop_read(0xc000, 0xdfff);
 			}
 			if (wr) {
-				memory_install_write_bank(space, 0xc000, 0xdfff, 0, 0, "bank5");
+				space->install_write_bank(0xc000, 0xdfff, "bank5");
 			} else {
-				memory_unmap_write(space, 0xc000, 0xdfff, 0, 0);
+				space->unmap_write(0xc000, 0xdfff);
 			}
 			break;
 		case 2:
 			if (rd) {
-				memory_install_read_bank(space, 0xe000, 0xf7ff, 0, 0, "bank2");
+				space->install_read_bank(0xe000, 0xf7ff, "bank2");
 			} else {
-				memory_nop_read(space, 0xe000, 0xf7ff, 0, 0);
+				space->nop_read(0xe000, 0xf7ff);
 			}
 			if (wr) {
-				memory_install_write_bank(space, 0xe000, 0xf7ff, 0, 0, "bank6");
+				space->install_write_bank(0xe000, 0xf7ff, "bank6");
 			} else {
-				memory_unmap_write(space, 0xe000, 0xf7ff, 0, 0);
+				space->unmap_write(0xe000, 0xf7ff);
 			}
 			break;
 		case 3:
 			if (rd) {
-				memory_install_read_bank(space, 0xf800, 0xffff, 0, 0, "bank3");
+				space->install_read_bank(0xf800, 0xffff, "bank3");
 			} else {
-				memory_nop_read(space, 0xf800, 0xffff, 0, 0);
+				space->nop_read(0xf800, 0xffff);
 			}
 			break;
 		}
@@ -594,13 +594,13 @@ static void oric_install_apple2_v2_interface(running_machine *machine)
 	device_t *fdc = machine->device("fdc");
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
-	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
-	memory_install_read_bank(space, 0x0320, 0x03ff, 0, 0, "bank4");
+	space->install_legacy_read_handler(0x0300, 0x030f, FUNC(oric_IO_r));
+	space->install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
+	space->install_read_bank(0x0320, 0x03ff, "bank4");
 
-	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
-	memory_install_write8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_w);
-	memory_install_write8_handler(space, 0x0380, 0x0383, 0, 0, apple2_v2_interface_w);
+	space->install_legacy_write_handler(0x0300, 0x030f, FUNC(oric_IO_w));
+	space->install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
+	space->install_legacy_write_handler(0x0380, 0x0383, FUNC(apple2_v2_interface_w));
 
 	apple2_v2_interface_w(space, 0, 0);
 }
@@ -802,11 +802,11 @@ static void oric_install_jasmin_interface(running_machine *machine)
 	state->port_3fb_w = 1;
 	oric_jasmin_set_mem_0x0c000(machine);
 
-	memory_install_read8_handler(space, 0x0300, 0x03ef, 0, 0, oric_IO_r);
-	memory_install_read8_handler(space, 0x03f0, 0x03ff, 0, 0, oric_jasmin_r);
+	space->install_legacy_read_handler(0x0300, 0x03ef, FUNC(oric_IO_r));
+	space->install_legacy_read_handler(0x03f0, 0x03ff, FUNC(oric_jasmin_r));
 
-	memory_install_write8_handler(space, 0x0300, 0x03ef, 0, 0, oric_IO_w);
-	memory_install_write8_handler(space, 0x03f0, 0x03ff, 0, 0, oric_jasmin_w);
+	space->install_legacy_write_handler(0x0300, 0x03ef, FUNC(oric_IO_w));
+	space->install_legacy_write_handler(0x03f0, 0x03ff, FUNC(oric_jasmin_w));
 }
 
 /*********************************/
@@ -1024,13 +1024,13 @@ static void oric_install_microdisc_interface(running_machine *machine)
 	oric_state *state = machine->driver_data<oric_state>();
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
-	memory_install_read8_handler(space, 0x0310, 0x031f, 0, 0, oric_microdisc_r);
-	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, oric_IO_r);
+	space->install_legacy_read_handler(0x0300, 0x030f, FUNC(oric_IO_r));
+	space->install_legacy_read_handler(0x0310, 0x031f, FUNC(oric_microdisc_r));
+	space->install_legacy_read_handler(0x0320, 0x03ff, FUNC(oric_IO_r));
 
-	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
-	memory_install_write8_handler(space, 0x0310, 0x031f, 0, 0, oric_microdisc_w);
-	memory_install_write8_handler(space, 0x0320, 0x03ff, 0, 0, oric_IO_w);
+	space->install_legacy_write_handler(0x0300, 0x030f, FUNC(oric_IO_w));
+	space->install_legacy_write_handler(0x0310, 0x031f, FUNC(oric_microdisc_w));
+	space->install_legacy_write_handler(0x0320, 0x03ff, FUNC(oric_IO_w));
 
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
@@ -1130,8 +1130,8 @@ MACHINE_RESET( oric )
 			}
 			else
 			{
-				memory_install_read8_handler(space, 0x0300, 0x03ff, 0, 0, oric_IO_r);
-				memory_install_write8_handler(space, 0x0300, 0x03ff, 0, 0, oric_IO_w);
+				space->install_legacy_read_handler(0x0300, 0x03ff, FUNC(oric_IO_r));
+				space->install_legacy_write_handler(0x0300, 0x03ff, FUNC(oric_IO_w));
 			}
 		}
 		break;
@@ -1301,23 +1301,23 @@ static void telestrat_refresh_mem(running_machine *machine)
 		{
 			memory_set_bankptr(machine, "bank1", mem_block->ptr);
 			memory_set_bankptr(machine, "bank2", mem_block->ptr);
-			memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank1");
-			memory_install_write_bank(space, 0xc000, 0xffff, 0, 0, "bank2");
+			space->install_read_bank(0xc000, 0xffff, "bank1");
+			space->install_write_bank(0xc000, 0xffff, "bank2");
 		}
 		break;
 
 		case TELESTRAT_MEM_BLOCK_ROM:
 		{
 			memory_set_bankptr(machine, "bank1", mem_block->ptr);
-			memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank1");
-			memory_nop_write(space, 0xc000, 0xffff, 0, 0);
+			space->install_read_bank(0xc000, 0xffff, "bank1");
+			space->nop_write(0xc000, 0xffff);
 		}
 		break;
 
 		default:
 		case TELESTRAT_MEM_BLOCK_UNDEFINED:
 		{
-			memory_nop_readwrite(space, 0xc000, 0xffff, 0, 0);
+			space->nop_readwrite(0xc000, 0xffff);
 		}
 		break;
 	}

@@ -474,24 +474,24 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	/* ram, part 1 */
-	memory_install_readwrite_bank(space, 0x0000, 0xdfff - size, 0, 0, "bank1");
+	space->install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(px4->ram));
 
 	/* actual rom data, part 1 */
-	memory_install_read_bank(space, 0xe000 - size, 0xffff - size, 0, 0, "bank2");
-	memory_nop_write(space, 0xe000 - size, 0xffff - size, 0, 0);
+	space->install_read_bank(0xe000 - size, 0xffff - size, "bank2");
+	space->nop_write(0xe000 - size, 0xffff - size);
 	memory_set_bankptr(space->machine, "bank2", space->machine->region(region)->base() + (size - 0x2000));
 
 	/* rom data, part 2 */
 	if (size != 0x2000)
 	{
-		memory_install_read_bank(space, 0x10000 - size, 0xdfff, 0, 0, "bank3");
-		memory_nop_write(space, 0x10000 - size, 0xdfff, 0, 0);
+		space->install_read_bank(0x10000 - size, 0xdfff, "bank3");
+		space->nop_write(0x10000 - size, 0xdfff);
 		memory_set_bankptr(space->machine, "bank3", space->machine->region(region)->base());
 	}
 
 	/* ram, continued */
-	memory_install_readwrite_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
+	space->install_readwrite_bank(0xe000, 0xffff, "bank4");
 	memory_set_bankptr(space->machine, "bank4", ram_get_ptr(px4->ram) + 0xe000);
 }
 
@@ -511,16 +511,16 @@ static WRITE8_HANDLER( px4_bankr_w )
 	{
 	case 0x00:
 		/* system bank */
-		memory_install_read_bank(space_program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_nop_write(space_program, 0x0000, 0x7fff, 0, 0);
+		space_program->install_read_bank(0x0000, 0x7fff, "bank1");
+		space_program->nop_write(0x0000, 0x7fff);
 		memory_set_bankptr(space->machine, "bank1", space->machine->region("os")->base());
-		memory_install_readwrite_bank(space_program, 0x8000, 0xffff, 0, 0, "bank2");
+		space_program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		memory_set_bankptr(space->machine, "bank2", ram_get_ptr(px4->ram) + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
-		memory_install_readwrite_bank(space_program, 0x0000, 0xffff, 0, 0, "bank1");
+		space_program->install_readwrite_bank(0x0000, 0xffff, "bank1");
 		memory_set_bankptr(space->machine, "bank1", ram_get_ptr(px4->ram));
 		break;
 

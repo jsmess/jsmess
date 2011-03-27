@@ -2118,11 +2118,11 @@ static void setup_memory_map(running_machine *machine)
 			else
 				memory_set_bankptr(machine, bank,&ram_get_ptr(machine->device(RAM_TAG))[memmap[wbank-1].start]);
 
-			memory_install_readwrite_bank(space, memmap[block_index].start, memmap[block_index].end, 0, 0, bank);
+			space->install_readwrite_bank(memmap[block_index].start, memmap[block_index].end, bank);
 		}
 		else
 		{
-			memory_nop_readwrite(space, memmap[block_index].start, memmap[block_index].end, 0, 0);
+			space->nop_readwrite(memmap[block_index].start, memmap[block_index].end);
 		}
 	}
 
@@ -2144,7 +2144,7 @@ static void setup_memory_map(running_machine *machine)
 				offset = &cart_rom[(0x1000*(block_index-4)) % cart_length];
 
 			memory_set_bankptr(machine, bank,offset);
-			memory_nop_write(space, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0);
+			space->nop_write(memmap[block_index+8].start, memmap[block_index+8].end);
 		}
 	}
 }
@@ -2439,13 +2439,13 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 				readbank = &cart_rom[offset & ~0x80008000];
 			else
 				readbank = &state->rom[offset & ~0x80000000];
-			memory_unmap_write(space, bank_info[i].start, bank_info[i].end, 0, 0);
+			space->unmap_write(bank_info[i].start, bank_info[i].end);
 		}
 		else
 		{
 			/* offset into normal RAM */
 			readbank = &ram_get_ptr(machine->device(RAM_TAG))[offset];
-			memory_install_write_bank(space, bank_info[i].start, bank_info[i].end, 0, 0, bank);
+			space->install_write_bank(bank_info[i].start, bank_info[i].end, bank);
 		}
 
 		/* set up the banks */
@@ -2560,12 +2560,12 @@ WRITE8_HANDLER(coco3_gime_w)
 				if (state->gimereg[0] & 0x04)
 				{
 					device_t *device = cococart_device(space->machine);
-					memory_install_read8_device_handler(space, device, 0xFF40, 0xFF5F, 0, 0, coco_cartridge_r);
-					memory_install_write8_device_handler(space, device, 0xFF40, 0xFF5F, 0, 0, coco_cartridge_w);
+					space->install_legacy_read_handler(*device, 0xFF40, 0xFF5F, FUNC(coco_cartridge_r));
+					space->install_legacy_write_handler(*device, 0xFF40, 0xFF5F, FUNC(coco_cartridge_w));
 				}
 				else
 				{
-					memory_nop_readwrite(space, 0xFF40, 0xFF5F, 0, 0);
+					space->nop_readwrite(0xFF40, 0xFF5F);
 				}
 			}
 			break;

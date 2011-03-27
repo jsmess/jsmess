@@ -73,14 +73,14 @@ static DRIVER_INIT(dc)
 
 static DRIVER_INIT(dcus)
 {
-	memory_install_read64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc2303b0, 0xc2303b7, 0, 0, dcus_idle_skip_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }
 
 static DRIVER_INIT(dcjp)
 {
-	memory_install_read64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc2302f8, 0xc2302ff, 0, 0, dcjp_idle_skip_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }

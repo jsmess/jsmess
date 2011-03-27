@@ -242,60 +242,60 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 		case 0x00 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x37ff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x37ff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x37ff, "bank1");
+						space->install_write_bank(0x0000, 0x37ff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Keyboard
-						memory_install_read8_handler (space, 0x3800, 0x39ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0x3800, 0x39ff, 0, 0, "bank3");
+						space->install_legacy_read_handler (0x3800, 0x39ff, FUNC(keyboard_r));
+						space->install_write_bank(0x3800, 0x39ff, "bank3");
 						memory_set_bankptr(machine, "bank3", ram + 0x3800);
 						// System reg
-						memory_install_read8_handler (space, 0x3a00, 0x3aff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0x3a00, 0x3aff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0x3a00, 0x3aff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0x3a00, 0x3aff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0x3b00, 0x3bff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0x3b00, 0x3bff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0x3b00, 0x3bff, FUNC(devices_r));
+						space->install_legacy_write_handler(0x3b00, 0x3bff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0x3c00, 0x3fff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0x3c00, 0x3fff, 0, 0, text_w);
+						space->install_legacy_read_handler (0x3c00, 0x3fff, FUNC(text_r));
+						space->install_legacy_write_handler(0x3c00, 0x3fff, FUNC(text_w));
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xffff, 0, 0, "bank4");
-						memory_install_write_bank(space, 0x4000, 0xffff, 0, 0, "bank5");
+						space->install_read_bank (0x4000, 0xffff, "bank4");
+						space->install_write_bank(0x4000, 0xffff, "bank5");
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						memory_set_bankptr(machine, "bank5", ram + 0x4000);
 					}
 					break;
 		case 0x01 : {
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xffff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xffff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xffff, "bank3");
+						space->install_write_bank(0x2000, 0xffff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 					}
 					break;
 		case 0x02 : {
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xffff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xffff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xffff, "bank3");
+						space->install_write_bank(0x4000, 0xffff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 					}
 					break;
 		case 0x03 : {
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xffff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xffff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xffff, "bank1");
+						space->install_write_bank(0x0000, 0xffff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram);
 						memory_set_bankptr(machine, "bank2", ram);
 					}
@@ -304,545 +304,545 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 		case 0x05 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xf7ff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xf7ff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xf7ff, "bank3");
+						space->install_write_bank(0x2000, 0xf7ff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank5");
 						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x06 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xf7ff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xf7ff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xf7ff, "bank3");
+						space->install_write_bank(0x4000, 0xf7ff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank5");
 						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x07 :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xf7ff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xf7ff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xf7ff, "bank1");
+						space->install_write_bank(0x0000, 0xf7ff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram);
 						memory_set_bankptr(machine, "bank2", ram);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank3");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank3");
 						memory_set_bankptr(machine, "bank3", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x08 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Keyboard
-						memory_install_read8_handler (space, 0x3800, 0x39ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0x3800, 0x39ff, 0, 0, "bank3");
+						space->install_legacy_read_handler (0x3800, 0x39ff, FUNC(keyboard_r));
+						space->install_write_bank(0x3800, 0x39ff, "bank3");
 						memory_set_bankptr(machine, "bank3", ram + 0x3800);
 						// System reg
-						memory_install_read8_handler (space, 0x3a00, 0x3aff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0x3a00, 0x3aff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0x3a00, 0x3aff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0x3a00, 0x3aff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0x3b00, 0x3bff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0x3b00, 0x3bff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0x3b00, 0x3bff, FUNC(devices_r));
+						space->install_legacy_write_handler(0x3b00, 0x3bff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0x3c00, 0x3fff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0x3c00, 0x3fff, 0, 0, text_w);
+						space->install_legacy_read_handler (0x3c00, 0x3fff, FUNC(text_r));
+						space->install_legacy_write_handler(0x3c00, 0x3fff, FUNC(text_w));
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xbfff, 0, 0, "bank4");
-						memory_install_write_bank(space, 0x4000, 0xbfff, 0, 0, "bank5");
+						space->install_read_bank (0x4000, 0xbfff, "bank4");
+						space->install_write_bank(0x4000, 0xbfff, "bank5");
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						memory_set_bankptr(machine, "bank5", ram + 0x4000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 
 					}
 					break;
 		case 0x09 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xbfff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xbfff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xbfff, "bank3");
+						space->install_write_bank(0x2000, 0xbfff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x0A :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xbfff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xbfff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xbfff, "bank3");
+						space->install_write_bank(0x4000, 0xbfff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x0B :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xbfff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xbfff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xbfff, "bank1");
+						space->install_write_bank(0x0000, 0xbfff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram + 0x0000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x0C :
 		case 0x0D :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0x3fff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0x3fff, "bank3");
+						space->install_write_bank(0x2000, 0x3fff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Video RAM
-						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0x4000, 0x7fff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0x4000, 0x7fff, FUNC(gzu_w));
 						// RAM
-						memory_install_read_bank (space, 0x8000, 0xfdff, 0, 0, "bank5");
-						memory_install_write_bank(space, 0x8000, 0xfdff, 0, 0, "bank6");
+						space->install_read_bank (0x8000, 0xfdff, "bank5");
+						space->install_write_bank(0x8000, 0xfdff, "bank6");
 						memory_set_bankptr(machine, "bank5", ram + 0x8000);
 						memory_set_bankptr(machine, "bank6", ram + 0x8000);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x0E :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Video RAM
-						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0x4000, 0x7fff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0x4000, 0x7fff, FUNC(gzu_w));
 						// RAM
-						memory_install_read_bank (space, 0x8000, 0xfdff, 0, 0, "bank5");
-						memory_install_write_bank(space, 0x8000, 0xfdff, 0, 0, "bank6");
+						space->install_read_bank (0x8000, 0xfdff, "bank5");
+						space->install_write_bank(0x8000, 0xfdff, "bank6");
 						memory_set_bankptr(machine, "bank5", ram + 0x8000);
 						memory_set_bankptr(machine, "bank6", ram + 0x8000);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x0F :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram + 0x0000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Video RAM
-						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0x4000, 0x7fff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0x4000, 0x7fff, FUNC(gzu_w));
 						// RAM
-						memory_install_read_bank (space, 0x8000, 0xfdff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x8000, 0xfdff, 0, 0, "bank4");
+						space->install_read_bank (0x8000, 0xfdff, "bank3");
+						space->install_write_bank(0x8000, 0xfdff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x8000);
 						memory_set_bankptr(machine, "bank4", ram + 0x8000);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x10 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x5fff, "bank1");
+						space->install_write_bank(0x0000, 0x5fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x6000, 0xf7ff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x6000, 0xf7ff, 0, 0, "bank4");
+						space->install_read_bank (0x6000, 0xf7ff, "bank3");
+						space->install_write_bank(0x6000, 0xf7ff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x6000);
 						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank5");
 						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x11 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xf7ff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xf7ff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xf7ff, "bank3");
+						space->install_write_bank(0x2000, 0xf7ff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank5");
 						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x12 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xf7ff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xf7ff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xf7ff, "bank3");
+						space->install_write_bank(0x4000, 0xf7ff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank5");
 						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x13 :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xf7ff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xf7ff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xf7ff, "bank1");
+						space->install_write_bank(0x0000, 0xf7ff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram + 0x0000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Keyboard
-						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
-						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank3");
+						space->install_legacy_read_handler (0xf800, 0xf9ff, FUNC(keyboard_r));
+						space->install_write_bank(0xf800, 0xf9ff, "bank3");
 						memory_set_bankptr(machine, "bank3", ram + 0xf800);
 						// System reg
-						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xfa00, 0xfaff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(sysreg_w));
 						// Devices
-						memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfb00, 0xfbff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(devices_w));
 						// Text Video Memory
-						memory_install_read8_handler (space, 0xfc00, 0xffff, 0, 0, text_r);
-						memory_install_write8_handler(space, 0xfc00, 0xffff, 0, 0, text_w);
+						space->install_legacy_read_handler (0xfc00, 0xffff, FUNC(text_r));
+						space->install_legacy_write_handler(0xfc00, 0xffff, FUNC(text_w));
 					}
 					break;
 		case 0x14 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x5fff, "bank1");
+						space->install_write_bank(0x0000, 0x5fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x6000, 0xfdff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x6000, 0xfdff, 0, 0, "bank4");
+						space->install_read_bank (0x6000, 0xfdff, "bank3");
+						space->install_write_bank(0x6000, 0xfdff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x6000);
 						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x15 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xfdff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xfdff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xfdff, "bank3");
+						space->install_write_bank(0x2000, 0xfdff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x16 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xfdff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xfdff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xfdff, "bank3");
+						space->install_write_bank(0x4000, 0xfdff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x17 :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xfdff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xfdff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xfdff, "bank1");
+						space->install_write_bank(0x0000, 0xfdff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram);
 						memory_set_bankptr(machine, "bank2", ram);
 						// Devices
-						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
-						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
+						space->install_legacy_read_handler (0xfe00, 0xfeff, FUNC(devices_r));
+						space->install_legacy_write_handler(0xfe00, 0xfeff, FUNC(devices_w));
 						// System reg
-						memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xff00, 0xffff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xff00, 0xffff, FUNC(sysreg_w));
 					}
 					break;
 		case 0x18 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x5fff, "bank1");
+						space->install_write_bank(0x0000, 0x5fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x6000, 0xbeff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x6000, 0xbeff, 0, 0, "bank4");
+						space->install_read_bank (0x6000, 0xbeff, "bank3");
+						space->install_write_bank(0x6000, 0xbeff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x6000);
 						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// System reg
-						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xbf00, 0xbfff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xbf00, 0xbfff, FUNC(sysreg_w));
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x19 :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xbeff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xbeff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xbeff, "bank3");
+						space->install_write_bank(0x2000, 0xbeff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// System reg
-						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xbf00, 0xbfff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xbf00, 0xbfff, FUNC(sysreg_w));
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x1A :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xbeff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xbeff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xbeff, "bank3");
+						space->install_write_bank(0x4000, 0xbeff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// System reg
-						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xbf00, 0xbfff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xbf00, 0xbfff, FUNC(sysreg_w));
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x1B :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xbeff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xbeff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xbeff, "bank1");
+						space->install_write_bank(0x0000, 0xbeff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram);
 						memory_set_bankptr(machine, "bank2", ram);
 						// System reg
-						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
-						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
+						space->install_legacy_read_handler (0xbf00, 0xbfff, FUNC(sysreg_r));
+						space->install_legacy_write_handler(0xbf00, 0xbfff, FUNC(sysreg_w));
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x1C :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x5fff, "bank1");
+						space->install_write_bank(0x0000, 0x5fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x6000, 0xbfff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x6000, 0xbfff, 0, 0, "bank4");
+						space->install_read_bank (0x6000, 0xbfff, "bank3");
+						space->install_write_bank(0x6000, 0xbfff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x6000);
 						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x1D :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x1fff, "bank1");
+						space->install_write_bank(0x0000, 0x1fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x2000, 0xbfff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x2000, 0xbfff, 0, 0, "bank4");
+						space->install_read_bank (0x2000, 0xbfff, "bank3");
+						space->install_write_bank(0x2000, 0xbfff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x2000);
 						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x1E :
 					{
 						// ROM
-						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0x3fff, "bank1");
+						space->install_write_bank(0x0000, 0x3fff, "bank2");
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
-						memory_install_read_bank (space, 0x4000, 0xbfff, 0, 0, "bank3");
-						memory_install_write_bank(space, 0x4000, 0xbfff, 0, 0, "bank4");
+						space->install_read_bank (0x4000, 0xbfff, "bank3");
+						space->install_write_bank(0x4000, 0xbfff, "bank4");
 						memory_set_bankptr(machine, "bank3", ram + 0x4000);
 						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 		case 0x1F :
 					{
 						// RAM
-						memory_install_read_bank (space, 0x0000, 0xbfff, 0, 0, "bank1");
-						memory_install_write_bank(space, 0x0000, 0xbfff, 0, 0, "bank2");
+						space->install_read_bank (0x0000, 0xbfff, "bank1");
+						space->install_write_bank(0x0000, 0xbfff, "bank2");
 						memory_set_bankptr(machine, "bank1", ram);
 						memory_set_bankptr(machine, "bank2", ram);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
+						space->install_legacy_read_handler (0xc000, 0xffff, FUNC(gzu_r));
+						space->install_legacy_write_handler(0xc000, 0xffff, FUNC(gzu_w));
 					}
 					break;
 

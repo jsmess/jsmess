@@ -288,17 +288,17 @@ static void set_ram_mode(running_machine *machine)
 
 	if (state->ram_disable)
 	{
-		memory_unmap_readwrite(program, 0xff00, 0xffff, 0, 0);
+		program->unmap_readwrite(0xff00, 0xffff);
 	}
 	else
 	{
 		if (state->ram_protect)
 		{
-			memory_install_rom(program, 0xff00, 0xffff, 0, 0, ram);
+			program->install_rom(0xff00, 0xffff, ram);
 		}
 		else
 		{
-			memory_install_ram(program, 0xff00, 0xffff, 0, 0, ram);
+			program->install_ram(0xff00, 0xffff, ram);
 		}
 	}
 }
@@ -555,11 +555,11 @@ static MACHINE_START( cosmicos )
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 256:
-		memory_unmap_readwrite(program, 0x0000, 0xbfff, 0, 0);
+		program->unmap_readwrite(0x0000, 0xbfff);
 		break;
 
 	case 4*1024:
-		memory_unmap_readwrite(program, 0x1000, 0xbfff, 0, 0);
+		program->unmap_readwrite(0x1000, 0xbfff);
 		break;
 	}
 

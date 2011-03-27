@@ -47,19 +47,19 @@ static void i82439tx_configure_memory(device_t *device, UINT8 val, offs_t begin,
 	switch (val & 0x03)
 	{
 	case 0:
-		memory_install_rom(i82439tx->space, begin, end, 0, 0, i82439tx->rom + (begin - 0xc0000));
-		memory_nop_write(i82439tx->space, begin, end, 0, 0);
+		i82439tx->space->install_rom(begin, end, i82439tx->rom + (begin - 0xc0000));
+		i82439tx->space->nop_write(begin, end);
 		break;
 	case 1:
-		memory_install_rom(i82439tx->space, begin, end, 0, 0, i82439tx->bios_ram + (begin - 0xc0000) / 4);
-		memory_nop_write(i82439tx->space, begin, end, 0, 0);
+		i82439tx->space->install_rom(begin, end, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+		i82439tx->space->nop_write(begin, end);
 		break;
 	case 2:
-		memory_install_rom(i82439tx->space, begin, end, 0, 0, i82439tx->rom + (begin - 0xc0000));
-		memory_install_writeonly(i82439tx->space, begin, end, 0, 0, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+		i82439tx->space->install_rom(begin, end, i82439tx->rom + (begin - 0xc0000));
+		i82439tx->space->install_writeonly(begin, end, i82439tx->bios_ram + (begin - 0xc0000) / 4);
 		break;
 	case 3:
-		memory_install_ram(i82439tx->space, begin, end, 0, 0, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+		i82439tx->space->install_ram(begin, end, i82439tx->bios_ram + (begin - 0xc0000) / 4);
 		break;
 	}
 }

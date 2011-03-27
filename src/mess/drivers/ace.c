@@ -596,15 +596,15 @@ void ace_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 1*1024:
-		memory_unmap_readwrite(program, 0x4000, 0xffff, 0, 0);
+		program->unmap_readwrite(0x4000, 0xffff);
 		break;
 
 	case 16*1024:
-		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		program->unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 32*1024:
-		memory_unmap_readwrite(program, 0xc000, 0xffff, 0, 0);
+		program->unmap_readwrite(0xc000, 0xffff);
 		break;
 	}
 }

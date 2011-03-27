@@ -256,7 +256,7 @@ static READ8_HANDLER( fk1_bank_ram_r )
 	address_space *space_mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
 
-	memory_install_write_bank(space_mem, 0x0000, 0x3fff, 0, 0, "bank1");
+	space_mem->install_write_bank(0x0000, 0x3fff, "bank1");
 	memory_set_bankptr(space->machine, "bank1", ram);
 	memory_set_bankptr(space->machine, "bank2", ram + 0x4000);
 	return 0;
@@ -265,7 +265,7 @@ static READ8_HANDLER( fk1_bank_ram_r )
 static READ8_HANDLER( fk1_bank_rom_r )
 {
 	address_space *space_mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_unmap_write(space_mem, 0x0000, 0x3fff, 0, 0);
+	space_mem->unmap_write(0x0000, 0x3fff);
 	memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
 	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x10000);
 	return 0;
@@ -383,7 +383,7 @@ static MACHINE_RESET(fk1)
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	space->unmap_write(0x0000, 0x3fff);
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base()); // ROM
 	memory_set_bankptr(machine, "bank2", ram + 0x10000); // VRAM
 	memory_set_bankptr(machine, "bank3", ram + 0x8000);

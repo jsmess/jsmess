@@ -2609,18 +2609,18 @@ static MACHINE_START( x68000 )
 	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->spriteram = (UINT16*)machine->region("user1")->base();
-	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
-	memory_install_write16_handler(space,0x000000,0xbffffb,0xffffffff,0,(write16_space_func)x68k_emptyram_w);
-	memory_install_readwrite_bank(space,0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
+	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read16_space_func)x68k_emptyram_r));
+	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write16_space_func)x68k_emptyram_w));
+	space->install_readwrite_bank(0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine->device(RAM_TAG)));
-	memory_install_read16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_r);
-	memory_install_write16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_w);
+	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
+	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
 	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram_r);
-	memory_install_write16_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram_w);
+	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
+	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
 	memory_set_bankptr(machine, "bank3",state->tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_r);
-	memory_install_write16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_w);
+	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
+	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
@@ -2640,21 +2640,21 @@ static MACHINE_START( x68030 )
 	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->spriteram = (UINT16*)machine->region("user1")->base();
-	memory_install_read32_handler(space,0x000000,0xbffffb,0xffffffff,0,(read32_space_func)x68k_rom0_r);
-	memory_install_write32_handler(space,0x000000,0xbffffb,0xffffffff,0,(write32_space_func)x68k_rom0_w);
-	memory_install_readwrite_bank(space,0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
+	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read32_space_func)x68k_rom0_r));
+	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write32_space_func)x68k_rom0_w));
+	space->install_readwrite_bank(0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	memory_install_readwrite_bank(space,0x3000000,0x3000000+ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank5");
+	space->install_readwrite_bank(0x3000000,0x3000000+ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank5");
 	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine->device(RAM_TAG)));
 	memory_set_bankptr(machine, "bank5",ram_get_ptr(machine->device(RAM_TAG)));
-	memory_install_read32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_r);
-	memory_install_write32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_w);
+	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
+	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
 	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read32_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram32_r);
-	memory_install_write32_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram32_w);
+	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
+	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
 	memory_set_bankptr(machine, "bank3",state->tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_r);
-	memory_install_write32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_w);
+	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
+	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer

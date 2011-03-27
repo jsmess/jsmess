@@ -677,7 +677,7 @@ void abc80_state::machine_start()
 	/* configure RAM expansion */
 	if (ram_get_size(m_ram) == 16 * 1024)
 	{
-		memory_unmap_readwrite(m_maincpu->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
+		m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(0x8000, 0xbfff);
 	}
 
 	/* register for state saving */

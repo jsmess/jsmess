@@ -219,11 +219,11 @@ static MACHINE_RESET(spc1000)
 	UINT8 *mem = machine->region("maincpu")->base();
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
-	memory_install_read_bank(space, 0x0000, 0x7fff, 0, 0, "bank1");
-	memory_install_read_bank(space, 0x8000, 0xffff, 0, 0, "bank3");
+	space->install_read_bank(0x0000, 0x7fff, "bank1");
+	space->install_read_bank(0x8000, 0xffff, "bank3");
 
-	memory_install_write_bank(space, 0x0000, 0x7fff, 0, 0, "bank2");
-	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
+	space->install_write_bank(0x0000, 0x7fff, "bank2");
+	space->install_write_bank(0x8000, 0xffff, "bank4");
 
 	memory_set_bankptr(machine, "bank1", mem);
 	memory_set_bankptr(machine, "bank2", ram);

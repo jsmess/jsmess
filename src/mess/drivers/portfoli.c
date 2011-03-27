@@ -457,12 +457,12 @@ WRITE8_MEMBER( portfolio_state::ncc1_w )
 	{
 		// system ROM
 		UINT8 *rom = machine->region(M80C88A_TAG)->base();
-		memory_install_rom(program, 0xc0000, 0xdffff, 0, 0, rom);
+		program->install_rom(0xc0000, 0xdffff, rom);
 	}
 	else
 	{
 		// credit card memory
-		memory_unmap_readwrite(program, 0xc0000, 0xdffff, 0, 0);
+		program->unmap_readwrite(0xc0000, 0xdffff);
 	}
 
 	//logerror("NCC %02x\n", data);
@@ -787,11 +787,11 @@ void portfolio_state::machine_start()
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 128 * 1024:
-		memory_unmap_readwrite(program, 0x1f000, 0x9efff, 0, 0);
+		program->unmap_readwrite(0x1f000, 0x9efff);
 		break;
 
 	case 384 * 1024:
-		memory_unmap_readwrite(program, 0x5f000, 0x9efff, 0, 0);
+		program->unmap_readwrite(0x5f000, 0x9efff);
 		break;
 	}
 
@@ -821,17 +821,17 @@ void portfolio_state::machine_reset()
 	// peripherals
 	m_pid = input_port_read(&m_machine, "PERIPHERAL");
 
-	memory_unmap_readwrite(io, 0x8070, 0x807b, 0, 0);
-	memory_unmap_readwrite(io, 0x807d, 0x807e, 0, 0);
+	io->unmap_readwrite(0x8070, 0x807b);
+	io->unmap_readwrite(0x807d, 0x807e);
 
 	switch (m_pid)
 	{
 	case PID_SERIAL:
-		memory_install_readwrite8_device_handler(io, m_uart, 0x8070, 0x8077, 0, 0, ins8250_r, ins8250_w);
+		io->install_legacy_readwrite_handler(*m_uart, 0x8070, 0x8077, FUNC(ins8250_r), FUNC(ins8250_w));
 		break;
 
 	case PID_PARALLEL:
-		memory_install_readwrite8_device_handler(io, m_ppi, 0x8078, 0x807b, 0, 0, i8255a_r, i8255a_w);
+		io->install_legacy_readwrite_handler(*m_ppi, 0x8078, 0x807b, FUNC(i8255a_r), FUNC(i8255a_w));
 		break;
 	}
 }

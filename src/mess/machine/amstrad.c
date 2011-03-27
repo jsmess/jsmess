@@ -1425,17 +1425,17 @@ static void amstrad_setLowerRom(running_machine *machine)
 
 		if ( state->asic.enabled && ( state->asic.rmr2 & 0x18 ) == 0x18 )
 		{
-			memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_r);
-			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_r);
-			memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, amstrad_plus_asic_4000_w);
-			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, amstrad_plus_asic_6000_w);
+			space->install_legacy_read_handler(0x4000, 0x5fff, FUNC(amstrad_plus_asic_4000_r));
+			space->install_legacy_read_handler(0x6000, 0x7fff, FUNC(amstrad_plus_asic_6000_r));
+			space->install_legacy_write_handler(0x4000, 0x5fff, FUNC(amstrad_plus_asic_4000_w));
+			space->install_legacy_write_handler(0x6000, 0x7fff, FUNC(amstrad_plus_asic_6000_w));
 		}
 		else
 		{
-			memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank3");
-			memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank4");
-			memory_install_write_bank(space, 0x4000, 0x5fff, 0, 0, "bank11");
-			memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank12");
+			space->install_read_bank(0x4000, 0x5fff, "bank3");
+			space->install_read_bank(0x6000, 0x7fff, "bank4");
+			space->install_write_bank(0x4000, 0x5fff, "bank11");
+			space->install_write_bank(0x6000, 0x7fff, "bank12");
 		}
 
 		if(state->AmstradCPC_RamBanks[0] != NULL)
@@ -3031,29 +3031,29 @@ static void amstrad_common_init(running_machine *machine)
 	state->GateArray_RamConfiguration = 0;
 	state->gate_array.hsync_counter = 2;
 
-	memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
-	memory_install_read_bank(space, 0x2000, 0x3fff, 0, 0, "bank2");
+	space->install_read_bank(0x0000, 0x1fff, "bank1");
+	space->install_read_bank(0x2000, 0x3fff, "bank2");
 
-	memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank3");
-	memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank4");
+	space->install_read_bank(0x4000, 0x5fff, "bank3");
+	space->install_read_bank(0x6000, 0x7fff, "bank4");
 
-	memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank5");
-	memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank6");
+	space->install_read_bank(0x8000, 0x9fff, "bank5");
+	space->install_read_bank(0xa000, 0xbfff, "bank6");
 
-	memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank7");
-	memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank8");
+	space->install_read_bank(0xc000, 0xdfff, "bank7");
+	space->install_read_bank(0xe000, 0xffff, "bank8");
 
-	memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank9");
-	memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank10");
+	space->install_write_bank(0x0000, 0x1fff, "bank9");
+	space->install_write_bank(0x2000, 0x3fff, "bank10");
 
-	memory_install_write_bank(space, 0x4000, 0x5fff, 0, 0, "bank11");
-	memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank12");
+	space->install_write_bank(0x4000, 0x5fff, "bank11");
+	space->install_write_bank(0x6000, 0x7fff, "bank12");
 
-	memory_install_write_bank(space, 0x8000, 0x9fff, 0, 0, "bank13");
-	memory_install_write_bank(space, 0xa000, 0xbfff, 0, 0, "bank14");
+	space->install_write_bank(0x8000, 0x9fff, "bank13");
+	space->install_write_bank(0xa000, 0xbfff, "bank14");
 
-	memory_install_write_bank(space, 0xc000, 0xdfff, 0, 0, "bank15");
-	memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank16");
+	space->install_write_bank(0xc000, 0xdfff, "bank15");
+	space->install_write_bank(0xe000, 0xffff, "bank16");
 
 	space->machine->device("maincpu")->reset();
 	if ( state->system_type == SYSTEM_CPC || state->system_type == SYSTEM_ALESTE )

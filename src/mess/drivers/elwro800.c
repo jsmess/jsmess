@@ -115,21 +115,21 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	{
 		// rom BAS0
 		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0000); /* BAS0 ROM */
-		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
 		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x4000); /* BOOT ROM */
-		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
 		memory_set_bankptr(machine, "bank1", messram);
-		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
 		state->ram_at_0000 = 1;
 	}
 
@@ -137,12 +137,12 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	if (!BIT(cs,1))
 	{
 		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x2000);	/* BAS1 ROM */
-		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x3fff);
 	}
 	else
 	{
 		memory_set_bankptr(machine, "bank2", messram + 0x2000); /* RAM */
-		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x2000, 0x3fff, "bank2");
 	}
 
 	if (BIT(ls175,2))

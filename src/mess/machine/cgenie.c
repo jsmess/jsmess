@@ -85,21 +85,21 @@ MACHINE_RESET( cgenie )
 	{
 		if ( input_port_read(machine, "DSW0") & 0x80 )
 		{
-			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank10");
-			memory_nop_write(space, 0xc000, 0xdfff, 0, 0);
+			space->install_read_bank(0xc000, 0xdfff, "bank10");
+			space->nop_write(0xc000, 0xdfff);
 			memory_set_bankptr(machine, "bank10", &ROM[0x0c000]);
 			logerror("cgenie DOS enabled\n");
 			memcpy(&ROM[0x0c000],&ROM[0x10000], 0x2000);
 		}
 		else
 		{
-			memory_nop_readwrite(space, 0xc000, 0xdfff, 0, 0);
+			space->nop_readwrite(0xc000, 0xdfff);
 			logerror("cgenie DOS disabled (no floppy image given)\n");
 		}
 	}
 	else
 	{
-		memory_nop_readwrite(space, 0xc000, 0xdfff, 0, 0);
+		space->nop_readwrite(0xc000, 0xdfff);
 		logerror("cgenie DOS disabled\n");
 		memset(&machine->region("maincpu")->base()[0x0c000], 0x00, 0x2000);
 	}
@@ -107,14 +107,14 @@ MACHINE_RESET( cgenie )
 	/* copy EXT ROM, if enabled or wipe out that memory area */
 	if( input_port_read(machine, "DSW0") & 0x20 )
 	{
-		memory_install_rom(space, 0xe000, 0xefff, 0, 0, 0); // mess 0135u3 need to check
+		space->install_rom(0xe000, 0xefff, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
 		memcpy(&machine->region("maincpu")->base()[0x0e000],
 			   &machine->region("maincpu")->base()[0x12000], 0x1000);
 	}
 	else
 	{
-		memory_nop_readwrite(space, 0xe000, 0xefff, 0, 0);
+		space->nop_readwrite(0xe000, 0xefff);
 		logerror("cgenie EXT disabled\n");
 		memset(&machine->region("maincpu")->base()[0x0e000], 0x00, 0x1000);
 	}
@@ -149,8 +149,8 @@ MACHINE_START( cgenie )
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	memory_install_read_bank(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
-	memory_install_write8_handler(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, cgenie_videoram_w);
+	space->install_read_bank(0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, "bank1");
+	space->install_legacy_write_handler(0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, FUNC(cgenie_videoram_w));
 	state->videoram = ram_get_ptr(machine->device(RAM_TAG));
 	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 	machine->scheduler().timer_pulse(attotime::from_hz(11025), FUNC(handle_cassette_input));

@@ -471,23 +471,23 @@ static VIDEO_START( pc_cga )
 	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
 	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
 
-	memory_install_readwrite_bank(space, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
+	space->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_r );
-			memory_install_write8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga8_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga8_w) );
 			break;
 
 		case 16:
-			memory_install_read16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
-			memory_install_write16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga16le_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga16le_w) );
 			break;
 
 		case 32:
-			memory_install_read32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
-			memory_install_write32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga32le_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga32le_w) );
 			break;
 
 		default:
@@ -511,23 +511,23 @@ static VIDEO_START( pc_cga32k )
 	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
 
 
-	memory_install_readwrite_bank(space, 0xb8000, 0xbffff, 0, 0, "bank11" );
+	space->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
 	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_r );
-			memory_install_write8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga8_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga8_w) );
 			break;
 
 		case 16:
-			memory_install_read16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
-			memory_install_write16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga16le_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga16le_w) );
 			break;
 
 		case 32:
-			memory_install_read32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
-			memory_install_write32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga32le_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga32le_w) );
 			break;
 
 		default:
@@ -1337,15 +1337,15 @@ static WRITE8_HANDLER( pc_cga8_w )
 			switch(buswidth)
 			{
 				case 8:
-					memory_install_readwrite8_handler(space_prg, 0xb8000, 0xb87ff, 0, 0, char_ram_r,char_ram_w );
+					space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_r),FUNC(char_ram_w) );
 					break;
 
 				case 16:
-					memory_install_readwrite16_handler(space_prg, 0xb8000, 0xb87ff, 0, 0, char_ram_16le_r,char_ram_16le_w );
+					space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_16le_r),FUNC(char_ram_16le_w) );
 					break;
 
 				case 32:
-					memory_install_readwrite32_handler(space_prg, 0xb8000, 0xb87ff, 0, 0, char_ram_32_r,char_ram_32_w );
+					space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_32_r),FUNC(char_ram_32_w) );
 					break;
 
 				default:
@@ -1354,9 +1354,9 @@ static WRITE8_HANDLER( pc_cga8_w )
 			}
 		} else {
 			if (cga.videoram_size== 0x4000) {
-				memory_install_readwrite_bank(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
+				space_prg->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 			} else {
-				memory_install_readwrite_bank(space_prg, 0xb8000, 0xbffff, 0, 0, "bank11" );
+				space_prg->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
 			}
 		}
 		break;
@@ -1774,12 +1774,12 @@ static VIDEO_START( pc1512 )
 	address_space *space = machine->firstcpu->memory().space( AS_PROGRAM );
 	address_space *io_space = machine->firstcpu->memory().space( AS_IO );
 
-	memory_install_read_bank( space, 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
+	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);
-	memory_install_write16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, pc1512_videoram16le_w );
+	space->install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram16le_w) );
 
-	memory_install_read16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );
-	memory_install_write16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_w );
+	io_space->install_legacy_read_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_r) );
+	io_space->install_legacy_write_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_w) );
 	
 }
 

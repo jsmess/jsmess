@@ -1098,8 +1098,8 @@ DRIVER_INIT( pc1640 )
 {
 	address_space *io_space = machine->firstcpu->memory().space( AS_IO );
 
-	memory_install_read16_handler(io_space, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
-	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
+	io_space->install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_16le_port278_r) );
+	io_space->install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_16le_port4278_r) );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }

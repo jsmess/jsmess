@@ -196,14 +196,14 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 
 	/* install the handlers */
 	if (read_addr == NULL) {
-		memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM )->unmap_read(start, start + size - 1);
 	} else {
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0, bank_0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM )->install_read_bank(start, start + size - 1, bank_0);
 	}
 	if (write_addr == NULL) {
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM )->unmap_write(start, start + size - 1);
 	} else {
-		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM ), start, start + size - 1, 0, 0, bank_1);
+		machine->device("maincpu")->memory().space(AS_PROGRAM )->install_write_bank(start, start + size - 1, bank_1);
 	}
 
 	/* and set the banks */

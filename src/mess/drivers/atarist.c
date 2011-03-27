@@ -2209,19 +2209,19 @@ void st_state::configure_memory()
 	switch (ram_get_size(m_ram))
 	{
 	case 256 * 1024:
-		memory_unmap_readwrite(program, 0x040000, 0x3fffff, 0, 0);
+		program->unmap_readwrite(0x040000, 0x3fffff);
 		break;
 
 	case 512 * 1024:
-		memory_unmap_readwrite(program, 0x080000, 0x3fffff, 0, 0);
+		program->unmap_readwrite(0x080000, 0x3fffff);
 		break;
 
 	case 1024 * 1024:
-		memory_unmap_readwrite(program, 0x100000, 0x3fffff, 0, 0);
+		program->unmap_readwrite(0x100000, 0x3fffff);
 		break;
 
 	case 2048 * 1024:
-		memory_unmap_readwrite(program, 0x200000, 0x3fffff, 0, 0);
+		program->unmap_readwrite(0x200000, 0x3fffff);
 		break;
 	}
 }
@@ -2347,7 +2347,7 @@ void stbook_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 1024 * 1024:
-		memory_unmap_readwrite(program, 0x100000, 0x3fffff, 0, 0);
+		program->unmap_readwrite(0x100000, 0x3fffff);
 		break;
 	}
 

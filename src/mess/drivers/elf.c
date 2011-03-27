@@ -272,8 +272,8 @@ static MACHINE_START( elf2 )
 	dm9368_rbi_w(state->dm9368_h, 1);
 
 	/* setup memory banking */
-	memory_install_read_bank(program, 0x0000, 0x00ff, 0, 0, "bank1");
-	memory_install_write8_handler(program, 0x0000, 0x00ff, 0, 0, memory_w);
+	program->install_read_bank(0x0000, 0x00ff, "bank1");
+	program->install_legacy_write_handler(0x0000, 0x00ff, FUNC(memory_w));
 	memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
 	memory_set_bank(machine, "bank1", 0);
 

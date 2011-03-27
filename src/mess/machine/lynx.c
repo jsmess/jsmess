@@ -1738,14 +1738,14 @@ WRITE8_HANDLER( lynx_memory_config_w )
 	state->memory_config = data;
 
 	if (data & 1) {
-		memory_install_readwrite_bank(space, 0xfc00, 0xfcff, 0, 0, "bank1");
+		space->install_readwrite_bank(0xfc00, 0xfcff, "bank1");
 	} else {
-		memory_install_readwrite8_handler(space, 0xfc00, 0xfcff, 0, 0, suzy_read, suzy_write);
+		space->install_legacy_readwrite_handler(0xfc00, 0xfcff, FUNC(suzy_read), FUNC(suzy_write));
 	}
 	if (data & 2) {
-		memory_install_readwrite_bank(space, 0xfd00, 0xfdff, 0, 0, "bank2");
+		space->install_readwrite_bank(0xfd00, 0xfdff, "bank2");
 	} else {
-		memory_install_readwrite8_handler(space, 0xfd00, 0xfdff, 0, 0, mikey_read, mikey_write);
+		space->install_legacy_readwrite_handler(0xfd00, 0xfdff, FUNC(mikey_read), FUNC(mikey_write));
 	}
 
 	if (data & 1)

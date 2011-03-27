@@ -51,19 +51,19 @@ static void primo_update_memory(running_machine *machine)
 	switch (state->port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
-			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+			space->unmap_write(0x0000, 0x3fff);
 			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base()+0x10000);
 			break;
 		case 0x01:	/* EPROM extension 1 */
-			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+			space->unmap_write(0x0000, 0x3fff);
 			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base()+0x14000);
 			break;
 		case 0x02:	/* RAM */
-			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+			space->install_write_bank(0x0000, 0x3fff, "bank1");
 			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base());
 			break;
 		case 0x03:	/* EPROM extension 2 */
-			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+			space->unmap_write(0x0000, 0x3fff);
 			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base()+0x18000);
 			break;
 	}

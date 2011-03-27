@@ -929,10 +929,10 @@ static void mmc1_set_wram( address_space *space, int board )
 	{
 		case STD_SXROM:		// here also reads are disabled!
 			if (!BIT(state->mmc_reg[3], 4))
-				memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+				space->install_readwrite_bank(0x6000, 0x7fff, "bank5");
 			else
 			{
-				memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
+				space->unmap_readwrite(0x6000, 0x7fff);
 				break;
 			}
 		case STD_SXROM_A:	// ignore WRAM enable bit
@@ -943,10 +943,10 @@ static void mmc1_set_wram( address_space *space, int board )
 			break;
 		case STD_SOROM:		// there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
 			if (!BIT(state->mmc_reg[3], 4))
-				memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+				space->install_readwrite_bank(0x6000, 0x7fff, "bank5");
 			else
 			{
-				memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
+				space->unmap_readwrite(0x6000, 0x7fff);
 				break;
 			}
 		case STD_SOROM_A:	// ignore WRAM enable bit
@@ -1218,18 +1218,18 @@ static void mmc3_set_wram( address_space *space )
 		return;
 
 	if (BIT(state->mmc3_wram_protect, 7))
-		memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+		space->install_readwrite_bank(0x6000, 0x7fff, "bank5");
 	else
 	{
-		memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
+		space->unmap_readwrite(0x6000, 0x7fff);
 		return;
 	}
 
 	if (!BIT(state->mmc3_wram_protect, 6))
-		memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+		space->install_write_bank(0x6000, 0x7fff, "bank5");
 	else
 	{
-		memory_unmap_write(space, 0x6000, 0x7fff, 0, 0);
+		space->unmap_write(0x6000, 0x7fff);
 		return;
 	}
 }
@@ -2482,13 +2482,13 @@ static WRITE8_HANDLER( jxrom_w )
 				if (!(data & 0x40))
 				{
 					// is PRG ROM
-					memory_unmap_write(space, 0x6000, 0x7fff, 0, 0);
+					space->unmap_write(0x6000, 0x7fff);
 					prg8_67(space->machine, data & 0x3f);
 				}
 				else if (data & 0x80)
 				{
 					// is PRG RAM
-					memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+					space->install_write_bank(0x6000, 0x7fff, "bank5");
 					state->prg_bank[4] = state->battery_bank5_start + (data & 0x3f);
 					memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
 				}

@@ -945,13 +945,13 @@ static VIDEO_START( pc_t1t )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_handler(space,   0xb8000, 0xbbfff, 0, 0, pc_t1t_videoram_r, pc_t1t_videoram_w );
-			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_T1T_r,pc_T1T_w );
+			space->install_legacy_readwrite_handler(0xb8000, 0xbbfff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w) );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w) );
 			break;
 
 		case 16:
-			memory_install_readwrite16_handler(space,   0xb8000, 0xbbfff, 0, 0, pc_t1t_videoram16le_r, pc_t1t_videoram16le_w );
-			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_T1T16le_r,pc_T1T16le_w );
+			space->install_legacy_readwrite_handler(0xb8000, 0xbbfff, FUNC(pc_t1t_videoram16le_r), FUNC(pc_t1t_videoram16le_w) );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T16le_r),FUNC(pc_T1T16le_w) );
 			break;
 
 		default:
@@ -976,7 +976,7 @@ static VIDEO_START( pc_pcjr )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_T1T_r,pc_pcjr_w );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_pcjr_w) );
 			break;
 
 		default:

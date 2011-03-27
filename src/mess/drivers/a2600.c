@@ -1333,9 +1333,9 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 			"bank4",
 		};
 
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM),
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(
 			0x1000 + (i + 0) * 0x1000 / count - 0,
-			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
+			0x1000 + (i + 1) * 0x1000 / count - 1, handler[i]);
 
 		state->bank_base[i + 1] = cart + init;
 		memory_set_bankptr(machine,handler[i], state->bank_base[i + 1]);
@@ -1876,7 +1876,7 @@ static MACHINE_RESET( a2600 )
 
 	if (state->banking_mode == modeDC)
 	{
-		memory_install_read8_handler(space, 0x1fec, 0x1fec, 0, 0, current_bank_r);
+		space->install_legacy_read_handler(0x1fec, 0x1fec, FUNC(current_bank_r));
 	}
 
 	/* set up bank switch registers */
@@ -1884,67 +1884,67 @@ static MACHINE_RESET( a2600 )
 	switch (state->banking_mode)
 	{
 	case modeF8:
-		memory_install_write8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
+		space->install_legacy_write_handler(0x1ff8, 0x1ff9, FUNC(modeF8_switch_w));
+		space->install_legacy_read_handler(0x1ff8, 0x1ff9, FUNC(modeF8_switch_r));
 		break;
 
 	case modeFA:
-		memory_install_write8_handler(space, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_w);
-		memory_install_read8_handler(space, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_r);
+		space->install_legacy_write_handler(0x1ff8, 0x1ffa, FUNC(modeFA_switch_w));
+		space->install_legacy_read_handler(0x1ff8, 0x1ffa, FUNC(modeFA_switch_r));
 		break;
 
 	case modeF6:
-		memory_install_write8_handler(space, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
-		memory_install_read8_handler(space, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
+		space->install_legacy_write_handler(0x1ff6, 0x1ff9, FUNC(modeF6_switch_w));
+		space->install_legacy_read_handler(0x1ff6, 0x1ff9, FUNC(modeF6_switch_r));
 		space->set_direct_update_handler(direct_update_delegate_create_static(modeF6_opbase, *machine));
 		break;
 
 	case modeF4:
-		memory_install_write8_handler(space, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_w);
-		memory_install_read8_handler(space, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_r);
+		space->install_legacy_write_handler(0x1ff4, 0x1ffb, FUNC(modeF4_switch_w));
+		space->install_legacy_read_handler(0x1ff4, 0x1ffb, FUNC(modeF4_switch_r));
 		break;
 
 	case modeE0:
-		memory_install_write8_handler(space, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_w);
-		memory_install_read8_handler(space, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_r);
+		space->install_legacy_write_handler(0x1fe0, 0x1ff8, FUNC(modeE0_switch_w));
+		space->install_legacy_read_handler(0x1fe0, 0x1ff8, FUNC(modeE0_switch_r));
 		break;
 
 	case mode3F:
-		memory_install_write8_handler(space, 0x00, 0x3f, 0, 0, mode3F_switch_w);
+		space->install_legacy_write_handler(0x00, 0x3f, FUNC(mode3F_switch_w));
 		break;
 
 	case modeUA:
-		memory_install_write8_handler(space, 0x200, 0x27f, 0, 0, modeUA_switch_w);
-		memory_install_read8_handler(space, 0x200, 0x27f, 0, 0, modeUA_switch_r);
+		space->install_legacy_write_handler(0x200, 0x27f, FUNC(modeUA_switch_w));
+		space->install_legacy_read_handler(0x200, 0x27f, FUNC(modeUA_switch_r));
 		break;
 
 	case modeE7:
-		memory_install_write8_handler(space, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_w);
-		memory_install_read8_handler(space, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
-		memory_install_write8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
-		memory_install_read8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
-		memory_install_readwrite_bank(space, 0x1800, 0x18ff, 0, 0, "bank9");
+		space->install_legacy_write_handler(0x1fe0, 0x1fe7, FUNC(modeE7_switch_w));
+		space->install_legacy_read_handler(0x1fe0, 0x1fe7, FUNC(modeE7_switch_r));
+		space->install_legacy_write_handler(0x1fe8, 0x1feb, FUNC(modeE7_RAM_switch_w));
+		space->install_legacy_read_handler(0x1fe8, 0x1feb, FUNC(modeE7_RAM_switch_r));
+		space->install_readwrite_bank(0x1800, 0x18ff, "bank9");
 		memory_set_bankptr(machine, "bank9", state->extra_RAM->base() + 4 * 256 );
 		break;
 
 	case modeDC:
-		memory_install_write8_handler(space, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_w);
-		memory_install_read8_handler(space, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_r);
+		space->install_legacy_write_handler(0x1ff0, 0x1ff0, FUNC(modeDC_switch_w));
+		space->install_legacy_read_handler(0x1ff0, 0x1ff0, FUNC(modeDC_switch_r));
 		break;
 
 	case modeFE:
-		memory_install_write8_handler(space, 0x01fe, 0x01fe, 0, 0, modeFE_switch_w);
-		memory_install_read8_handler(space, 0x01fe, 0x01fe, 0, 0, modeFE_switch_r);
+		space->install_legacy_write_handler(0x01fe, 0x01fe, FUNC(modeFE_switch_w));
+		space->install_legacy_read_handler(0x01fe, 0x01fe, FUNC(modeFE_switch_r));
 		break;
 
 	case mode3E:
-		memory_install_write8_handler(space, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
-		memory_install_write8_handler(space, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
-		memory_install_write8_handler(space, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
+		space->install_legacy_write_handler(0x3e, 0x3e, FUNC(mode3E_RAM_switch_w));
+		space->install_legacy_write_handler(0x3f, 0x3f, FUNC(mode3E_switch_w));
+		space->install_legacy_write_handler(0x1400, 0x15ff, FUNC(mode3E_RAM_w));
 		break;
 
 	case modeSS:
-		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, modeSS_r);
+		space->install_legacy_read_handler(0x1000, 0x1fff, FUNC(modeSS_r));
 		state->bank_base[1] = state->extra_RAM->base() + 2 * 0x800;
 		state->bank_base[2] = CART;
 		memory_set_bankptr(machine, "bank1", state->bank_base[1] );
@@ -1957,15 +1957,15 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeFV:
-		memory_install_write8_handler(space, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
-		memory_install_read8_handler(space, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
+		space->install_legacy_write_handler(0x1fd0, 0x1fd0, FUNC(modeFV_switch_w));
+		space->install_legacy_read_handler(0x1fd0, 0x1fd0, FUNC(modeFV_switch_r));
 		break;
 
 	case modeDPC:
-		memory_install_read8_handler(space, 0x1000, 0x103f, 0, 0, modeDPC_r);
-		memory_install_write8_handler(space, 0x1040, 0x107f, 0, 0, modeDPC_w);
-		memory_install_write8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
+		space->install_legacy_read_handler(0x1000, 0x103f, FUNC(modeDPC_r));
+		space->install_legacy_write_handler(0x1040, 0x107f, FUNC(modeDPC_w));
+		space->install_legacy_write_handler(0x1ff8, 0x1ff9, FUNC(modeF8_switch_w));
+		space->install_legacy_read_handler(0x1ff8, 0x1ff9, FUNC(modeF8_switch_r));
 		space->set_direct_update_handler(direct_update_delegate_create_static(modeDPC_opbase_handler, *machine));
 		{
 			int	data_fetcher;
@@ -1985,8 +1985,8 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeJVP:
-		memory_install_read8_handler(space, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
-		memory_install_write8_handler(space, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
+		space->install_legacy_read_handler(0x0FA0, 0x0FC0, FUNC(modeJVP_switch_r));
+		space->install_legacy_write_handler(0x0FA0, 0x0FC0, FUNC(modeJVP_switch_w));
 		break;
 	}
 
@@ -1994,24 +1994,24 @@ static MACHINE_RESET( a2600 )
 
 	if (state->banking_mode == modeFA)
 	{
-		memory_install_write_bank(space, 0x1000, 0x10ff, 0, 0, "bank9");
-		memory_install_read_bank(space, 0x1100, 0x11ff, 0, 0, "bank9");
+		space->install_write_bank(0x1000, 0x10ff, "bank9");
+		space->install_read_bank(0x1100, 0x11ff, "bank9");
 
 		memory_set_bankptr(machine,"bank9", state->extra_RAM->base());
 	}
 
 	if (state->banking_mode == modeCV)
 	{
-		memory_install_write_bank(space, 0x1400, 0x17ff, 0, 0, "bank9");
-		memory_install_read_bank(space, 0x1000, 0x13ff, 0, 0, "bank9");
+		space->install_write_bank(0x1400, 0x17ff, "bank9");
+		space->install_read_bank(0x1000, 0x13ff, "bank9");
 
 		memory_set_bankptr(machine,"bank9", state->extra_RAM->base());
 	}
 
 	if (chip)
 	{
-		memory_install_write_bank(space, 0x1000, 0x107f, 0, 0, "bank9");
-		memory_install_read_bank(space, 0x1080, 0x10ff, 0, 0, "bank9");
+		space->install_write_bank(0x1000, 0x107f, "bank9");
+		space->install_read_bank(0x1080, 0x10ff, "bank9");
 
 		memory_set_bankptr(machine,"bank9", state->extra_RAM->base());
 	}

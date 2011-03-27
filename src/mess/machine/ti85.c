@@ -80,12 +80,12 @@ static void update_ti83p_memory (running_machine *machine)
 		{
 
 			memory_set_bankptr(machine, "bank3", state->ti8x_ram + 0x004000*(state->ti8x_memory_page_1&0x01));
-			memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
+			space->install_write_bank(0x8000, 0xbfff, "bank3");
 		}
 		else
 		{
 			memory_set_bankptr(machine, "bank2", state->ti8x_ram + 0x004000*(state->ti8x_memory_page_1&0x01));
-			memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
+			space->install_write_bank(0x4000, 0x7fff, "bank2");
 		}
 	}
 	else
@@ -93,12 +93,12 @@ static void update_ti83p_memory (running_machine *machine)
 		if (state->ti83p_port4 & 1)
 		{
 			memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x1f));
-			memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+			space->unmap_write(0x8000, 0xbfff);
 		}
 		else
 		{
 			memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x1f));
-			memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+			space->unmap_write(0x4000, 0x7fff);
 		}
 	}
 
@@ -107,12 +107,12 @@ static void update_ti83p_memory (running_machine *machine)
 		if (state->ti83p_port4 & 1)
 		{
 			memory_set_bankptr(machine, "bank4", state->ti8x_ram + 0x004000*(state->ti8x_memory_page_2&0x01));
-			memory_install_write_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
+			space->install_write_bank(0xc000, 0xffff, "bank4");
 		}
 		else
 		{
 			memory_set_bankptr(machine, "bank3", state->ti8x_ram + 0x004000*(state->ti8x_memory_page_2&0x01));
-			memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
+			space->install_write_bank(0x8000, 0xbfff, "bank3");
 		}
 
 	}
@@ -121,12 +121,12 @@ static void update_ti83p_memory (running_machine *machine)
 		if (state->ti83p_port4 & 1)
 		{
 			memory_set_bankptr(machine, "bank4", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x1f));
-			memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+			space->unmap_write(0xc000, 0xffff);
 		}
 		else
 		{
 			memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x1f));
-			memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+			space->unmap_write(0x8000, 0xbfff);
 		}
 	}
 }
@@ -139,23 +139,23 @@ static void update_ti86_memory (running_machine *machine)
 	if (state->ti8x_memory_page_1 & 0x40)
 	{
 		memory_set_bankptr(machine, "bank2", state->ti8x_ram + 0x004000*(state->ti8x_memory_page_1&0x07));
-		memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
+		space->install_write_bank(0x4000, 0x7fff, "bank2");
 	}
 	else
 	{
 		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x0f));
-		memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+		space->unmap_write(0x4000, 0x7fff);
 	}
 
 	if (state->ti8x_memory_page_2 & 0x40)
 	{
 		memory_set_bankptr(machine, "bank3", state->ti8x_ram + 0x004000*(state->ti8x_memory_page_2&0x07));
-		memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
+		space->install_write_bank(0x8000, 0xbfff, "bank3");
 	}
 	else
 	{
 		memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x0f));
-		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+		space->unmap_write(0x8000, 0xbfff);
 	}
 
 }
@@ -193,8 +193,8 @@ MACHINE_START( ti81 )
 
 	machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	space->unmap_write(0x0000, 0x3fff);
+	space->unmap_write(0x4000, 0x7fff);
 	memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	memory_set_bankptr(machine, "bank2", mem + 0x014000);
 }
@@ -234,8 +234,8 @@ MACHINE_START( ti82 )
 
 	machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	space->unmap_write(0x0000, 0x3fff);
+	space->unmap_write(0x4000, 0x7fff);
 	memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	memory_set_bankptr(machine, "bank2", mem + 0x014000);
 }
@@ -269,8 +269,8 @@ MACHINE_START( ti85 )
 
 	machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	space->unmap_write(0x0000, 0x3fff);
+	space->unmap_write(0x4000, 0x7fff);
 	memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	memory_set_bankptr(machine, "bank2", mem + 0x014000);
 }
@@ -317,9 +317,9 @@ MACHINE_START( ti83p )
 
 	state->ti8x_ram = auto_alloc_array(machine, UINT8, 32*1024);
 	{
-		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-		memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
-		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+		space->unmap_write(0x0000, 0x3fff);
+		space->unmap_write(0x4000, 0x7fff);
+		space->unmap_write(0x8000, 0xbfff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x010000);
@@ -362,7 +362,7 @@ MACHINE_START( ti86 )
 
 	state->ti8x_ram = auto_alloc_array(machine, UINT8, 128*1024);
 	{
-		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+		space->unmap_write(0x0000, 0x3fff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x014000);

@@ -102,11 +102,11 @@ void bw2_state::bankswitch(UINT8 data)
 	switch (m_bank)
 	{
 	case BANK_RAM1:
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		break;
 
 	case BANK_VRAM:
-		memory_install_readwrite_bank(program, 0x0000, 0x3fff, 0, 0x4000, "bank1");
+		program->install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
 		break;
 
 	case BANK_RAM2:
@@ -116,17 +116,17 @@ void bw2_state::bankswitch(UINT8 data)
 	case BANK_RAM6:
 		if (m_bank > max_ram_bank)
 		{
-			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+			program->unmap_readwrite(0x0000, 0x7fff);
 		}
 		else
 		{
-			memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+			program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		}
 		break;
 
 	case BANK_ROM:
-		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+		program->install_read_bank(0x0000, 0x7fff, "bank1");
+		program->unmap_write(0x0000, 0x7fff);
 		break;
 	}
 
@@ -179,11 +179,11 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 	{
 	case BANK_RAM1:
 	case BANK_RAMCARD_RAM:
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		break;
 
 	case BANK_VRAM:
-		memory_install_readwrite_bank(program, 0x0000, 0x3fff, 0, 0x4000, "bank1");
+		program->install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
 		break;
 
 	case BANK_RAM3:
@@ -191,22 +191,22 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 	case BANK_RAM6:
 		if (m_bank > max_ram_bank)
 		{
-			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+			program->unmap_readwrite(0x0000, 0x7fff);
 		}
 		else
 		{
-			memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+			program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		}
 		break;
 
 	case BANK_RAMCARD_ROM:
-		memory_install_read_bank(program, 0x0000, 0x3fff, 0, 0x4000, "bank1");
-		memory_unmap_write(program, 0x0000, 0x3fff, 0, 0x4000);
+		program->install_read_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
+		program->unmap_write(0x0000, 0x3fff, 0, 0x4000);
 		break;
 
 	case BANK_ROM:
-		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+		program->install_read_bank(0x0000, 0x7fff, "bank1");
+		program->unmap_write(0x0000, 0x7fff);
 		break;
 	}
 
@@ -222,11 +222,11 @@ WRITE8_MEMBER( bw2_state::ramcard_bank_w )
 
 	if ((get_ramdisk_size() == 256) && (ramcard_bank > 7))
 	{
-		memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+		program->unmap_readwrite(0x0000, 0x7fff);
 	}
 	else
 	{
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 	}
 
 	memory_configure_bank(machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram + bank_offset, 0);
@@ -776,7 +776,7 @@ void bw2_state::machine_reset()
 
 		memory_configure_bank(machine, "bank1", BANK_RAM2, 5, m_work_ram + 0x8000, 0x8000);
 
-		memory_unmap_write(io, 0x30, 0x30, 0, 0x0f);
+		io->unmap_write(0x30, 0x30, 0, 0x0f);
 	}
 
 	memory_set_bank(machine, "bank1", BANK_ROM);

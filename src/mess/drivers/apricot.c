@@ -242,8 +242,8 @@ static DRIVER_INIT( apricot )
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
 
-	memory_unmap_readwrite(prg, 0x40000, 0xeffff, 0, 0);
-	memory_install_ram(prg, 0x00000, ram_size - 1, 0, 0, ram);
+	prg->unmap_readwrite(0x40000, 0xeffff);
+	prg->install_ram(0x00000, ram_size - 1, ram);
 
 	device_set_irq_callback(maincpu, apricot_irq_ack);
 

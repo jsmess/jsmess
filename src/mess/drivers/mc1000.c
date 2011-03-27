@@ -43,11 +43,11 @@ static void mc1000_bankswitch(running_machine *machine)
 	/* extended RAM */
 	if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
 	{
-		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
+		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 	}
 	else
 	{
-		memory_unmap_readwrite(program, 0x4000, 0x7fff, 0, 0);
+		program->unmap_readwrite(0x4000, 0x7fff);
 	}
 
 	/* MC6847 video RAM */
@@ -55,16 +55,16 @@ static void mc1000_bankswitch(running_machine *machine)
 	{
 		if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
 		{
-			memory_install_readwrite_bank(program, 0x8000, 0x97ff, 0, 0, "bank4");
+			program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
 		}
 		else
 		{
-			memory_unmap_readwrite(program, 0x8000, 0x97ff, 0, 0);
+			program->unmap_readwrite(0x8000, 0x97ff);
 		}
 	}
 	else
 	{
-		memory_install_readwrite_bank(program, 0x8000, 0x97ff, 0, 0, "bank4");
+		program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
 	}
 
 	memory_set_bank(machine, "bank4", state->mc6847_bank);
@@ -72,11 +72,11 @@ static void mc1000_bankswitch(running_machine *machine)
 	/* extended RAM */
 	if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
 	{
-		memory_install_readwrite_bank(program, 0x9800, 0xbfff, 0, 0, "bank5");
+		program->install_readwrite_bank(0x9800, 0xbfff, "bank5");
 	}
 	else
 	{
-		memory_unmap_readwrite(program, 0x9800, 0xbfff, 0, 0);
+		program->unmap_readwrite(0x9800, 0xbfff);
 	}
 }
 
@@ -371,14 +371,14 @@ static MACHINE_START( mc1000 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* setup memory banking */
-	memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
+	program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z80_TAG)->base() + 0xc000, 0);
 	memory_set_bank(machine, "bank1", 1);
 
 	state->rom0000 = 1;
 
-	memory_install_readwrite_bank(program, 0x2000, 0x27ff, 0, 0, "bank2");
+	program->install_readwrite_bank(0x2000, 0x27ff, "bank2");
 	memory_configure_bank(machine, "bank2", 0, 1, machine->region(Z80_TAG)->base() + 0x2000, 0);
 	memory_configure_bank(machine, "bank2", 1, 1, state->mc6845_video_ram, 0);
 	memory_set_bank(machine, "bank2", 0);

@@ -333,7 +333,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 	mem_type = (state->memory_config[bank]>>6) & 0x03;
 	mem_bank = state->memory_config[bank] & 0x03f;
 
-	memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_r[bank]);
+	space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_r[bank]);
 
 	switch (mem_type)
 	{
@@ -349,7 +349,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			memory_set_bankptr(machine, bank1, addr);
 
-			memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
+			space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
 		}
 		break;
@@ -366,7 +366,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 			memory_set_bankptr(machine, bank1, addr);
 			memory_set_bankptr(machine, bank5, addr);
 
-			memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_w[bank]);
+			space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 			LOG(("BANK %d: RAM\n",bank));
 		}
 		break;
@@ -390,12 +390,12 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 					/* yes */
 					memory_set_bankptr(machine, bank5, addr);
 
-					memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_w[bank]);
+					space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 				}
 				else
 				{
 					/* no */
-					memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
+					space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 				}
 
 				LOG(("BANK %d: CARD-RAM\n",bank));
@@ -403,7 +403,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 			else
 			{
 				/* if no card connected, then writes fail */
-				memory_nop_readwrite(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
+				space->nop_readwrite((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 			}
 		}
 		break;

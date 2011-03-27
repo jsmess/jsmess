@@ -296,12 +296,12 @@ void abc800_state::bankswitch()
 	if (m_fetch_charram)
 	{
 		// HR video RAM selected
-		memory_install_ram(program, 0x0000, 0x3fff, 0, 0, m_video_ram);
+		program->install_ram(0x0000, 0x3fff, m_video_ram);
 	}
 	else
 	{
 		// BASIC ROM selected
-		memory_install_rom(program, 0x0000, 0x3fff, 0, 0, machine->region(Z80_TAG)->base());
+		program->install_rom(0x0000, 0x3fff, machine->region(Z80_TAG)->base());
 	}
 }
 
@@ -317,13 +317,13 @@ void abc802_state::bankswitch()
 	if (m_lrs)
 	{
 		// ROM and video RAM selected
-		memory_install_rom(program, 0x0000, 0x77ff, 0, 0, machine->region(Z80_TAG)->base());
-		memory_install_ram(program, 0x7800, 0x7fff, 0, 0, m_char_ram);
+		program->install_rom(0x0000, 0x77ff, machine->region(Z80_TAG)->base());
+		program->install_ram(0x7800, 0x7fff, m_char_ram);
 	}
 	else
 	{
 		// low RAM selected
-		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram_get_ptr(m_ram));
+		program->install_ram(0x0000, 0x7fff, ram_get_ptr(m_ram));
 	}
 }
 
@@ -355,7 +355,7 @@ void abc806_state::bankswitch()
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
-			memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+			program->install_readwrite_bank(start_addr, end_addr, bank_name);
 			memory_configure_bank(machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
 			memory_set_bank(machine, bank_name, 1);
 		}
@@ -369,7 +369,7 @@ void abc806_state::bankswitch()
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
-			memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+			program->install_readwrite_bank(start_addr, end_addr, bank_name);
 			memory_set_bank(machine, bank_name, 0);
 		}
 	}
@@ -389,7 +389,7 @@ void abc806_state::bankswitch()
 				// map to video RAM
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
-				memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+				program->install_readwrite_bank(start_addr, end_addr, bank_name);
 				memory_configure_bank(machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
 				memory_set_bank(machine, bank_name, 1);
 			}
@@ -403,8 +403,8 @@ void abc806_state::bankswitch()
 					// ROM
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_read_bank(program, start_addr, end_addr, 0, 0, bank_name);
-					memory_unmap_write(program, start_addr, end_addr, 0, 0);
+					program->install_read_bank(start_addr, end_addr, bank_name);
+					program->unmap_write(start_addr, end_addr);
 					memory_set_bank(machine, bank_name, 0);
 					break;
 
@@ -412,8 +412,8 @@ void abc806_state::bankswitch()
 					// ROM/char RAM
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_read_bank(program, 0x7000, 0x77ff, 0, 0, bank_name);
-					memory_unmap_write(program, 0x7000, 0x77ff, 0, 0);
+					program->install_read_bank(0x7000, 0x77ff, bank_name);
+					program->unmap_write(0x7000, 0x77ff);
 					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
 					memory_set_bank(machine, bank_name, 0);
 					break;
@@ -422,7 +422,7 @@ void abc806_state::bankswitch()
 					// work RAM
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+					program->install_readwrite_bank(start_addr, end_addr, bank_name);
 					memory_set_bank(machine, bank_name, 0);
 					break;
 				}
@@ -448,12 +448,12 @@ void abc806_state::bankswitch()
 
 			if (start_addr == 0x7000)
 			{
-				memory_install_readwrite_bank(program, 0x7000, 0x77ff, 0, 0, bank_name);
+				program->install_readwrite_bank(0x7000, 0x77ff, bank_name);
 				program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
 			}
 			else
 			{
-				memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+				program->install_readwrite_bank(start_addr, end_addr, bank_name);
 			}
 
 			memory_configure_bank(machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);

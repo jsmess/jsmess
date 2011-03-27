@@ -364,7 +364,7 @@ static DRIVER_INIT( vg5k )
 	UINT16 ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	if (ram_size > 0x4000)
-		memory_install_ram(program, 0x8000, 0x3fff + ram_size, 0, 0, ram);
+		program->install_ram(0x8000, 0x3fff + ram_size, ram);
 }
 
 

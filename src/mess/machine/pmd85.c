@@ -35,13 +35,13 @@ static void pmd851_update_memory(running_machine *machine)
 	{
 		UINT8 *mem = machine->region("maincpu")->base();
 
-		memory_unmap_write(space, 0x0000, 0x0fff, 0, 0);
-		memory_nop_write(space, 0x1000, 0x1fff, 0, 0);
-		memory_unmap_write(space, 0x2000, 0x2fff, 0, 0);
-		memory_nop_write(space, 0x3000, 0x3fff, 0, 0);
+		space->unmap_write(0x0000, 0x0fff);
+		space->nop_write(0x1000, 0x1fff);
+		space->unmap_write(0x2000, 0x2fff);
+		space->nop_write(0x3000, 0x3fff);
 
-		memory_nop_read(space, 0x1000, 0x1fff, 0, 0);
-		memory_nop_read(space, 0x3000, 0x3fff, 0, 0);
+		space->nop_read(0x1000, 0x1fff);
+		space->nop_read(0x3000, 0x3fff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
@@ -53,14 +53,14 @@ static void pmd851_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_install_write_bank(space, 0x1000, 0x1fff, 0, 0, "bank2");
-		memory_install_write_bank(space, 0x2000, 0x2fff, 0, 0, "bank3");
-		memory_install_write_bank(space, 0x3000, 0x3fff, 0, 0, "bank4");
-		memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank5");
+		space->install_write_bank(0x0000, 0x0fff, "bank1");
+		space->install_write_bank(0x1000, 0x1fff, "bank2");
+		space->install_write_bank(0x2000, 0x2fff, "bank3");
+		space->install_write_bank(0x3000, 0x3fff, "bank4");
+		space->install_write_bank(0x4000, 0x7fff, "bank5");
 
-		memory_install_read_bank(space, 0x1000, 0x1fff, 0, 0, "bank2");
-		memory_install_read_bank(space, 0x3000, 0x3fff, 0, 0, "bank4");
+		space->install_read_bank(0x1000, 0x1fff, "bank2");
+		space->install_read_bank(0x3000, 0x3fff, "bank4");
 
 		memory_set_bankptr(machine, "bank1", ram);
 		memory_set_bankptr(machine, "bank2", ram + 0x1000);
@@ -80,8 +80,8 @@ static void pmd852a_update_memory(running_machine *machine)
 	{
 		UINT8 *mem = machine->region("maincpu")->base();
 
-		memory_unmap_write(space, 0x0000, 0x0fff, 0, 0);
-		memory_unmap_write(space, 0x2000, 0x2fff, 0, 0);
+		space->unmap_write(0x0000, 0x0fff);
+		space->unmap_write(0x2000, 0x2fff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", ram + 0x9000);
@@ -97,8 +97,8 @@ static void pmd852a_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_install_write_bank(space, 0x2000, 0x2fff, 0, 0, "bank3");
+		space->install_write_bank(0x0000, 0x0fff, "bank1");
+		space->install_write_bank(0x2000, 0x2fff, "bank3");
 
 		memory_set_bankptr(machine, "bank1", ram);
 		memory_set_bankptr(machine, "bank2", ram + 0x1000);
@@ -156,9 +156,9 @@ static void alfa_update_memory(running_machine *machine)
 	{
 		UINT8 *mem = machine->region("maincpu")->base();
 
-		memory_unmap_write(space, 0x0000, 0x0fff, 0, 0);
-		memory_unmap_write(space, 0x1000, 0x33ff, 0, 0);
-		memory_nop_write(space, 0x3400, 0x3fff, 0, 0);
+		space->unmap_write(0x0000, 0x0fff);
+		space->unmap_write(0x1000, 0x33ff);
+		space->nop_write(0x3400, 0x3fff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x011000);
@@ -169,9 +169,9 @@ static void alfa_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_install_write_bank(space, 0x1000, 0x33ff, 0, 0, "bank2");
-		memory_install_write_bank(space, 0x3400, 0x3fff, 0, 0, "bank3");
+		space->install_write_bank(0x0000, 0x0fff, "bank1");
+		space->install_write_bank(0x1000, 0x33ff, "bank2");
+		space->install_write_bank(0x3400, 0x3fff, "bank3");
 
 		memory_set_bankptr(machine, "bank1", ram);
 		memory_set_bankptr(machine, "bank2", ram + 0x1000);
@@ -190,7 +190,7 @@ static void mato_update_memory(running_machine *machine)
 	{
 		UINT8 *mem = machine->region("maincpu")->base();
 
-		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+		space->unmap_write(0x0000, 0x3fff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", ram + 0xc000);
@@ -199,7 +199,7 @@ static void mato_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+		space->install_write_bank(0x0000, 0x3fff, "bank1");
 
 		memory_set_bankptr(machine, "bank1", ram);
 		memory_set_bankptr(machine, "bank2", ram + 0x4000);
@@ -215,7 +215,7 @@ static void c2717_update_memory(running_machine *machine)
 
 	if (state->startup_mem_map)
 	{
-		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+		space->unmap_write(0x0000, 0x3fff);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", ram + 0x4000);
@@ -224,7 +224,7 @@ static void c2717_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+		space->install_write_bank(0x0000, 0x3fff, "bank1");
 		memory_set_bankptr(machine, "bank1", ram);
 		memory_set_bankptr(machine, "bank2", ram + 0x4000);
 	}

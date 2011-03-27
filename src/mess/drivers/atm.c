@@ -112,8 +112,8 @@ static MACHINE_RESET( atm )
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *beta = machine->device(BETA_DISK_TAG);
 
-	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	space->install_read_bank(0x0000, 0x3fff, "bank1");
+	space->unmap_write(0x0000, 0x3fff);
 
 	if (beta->started())  {
 		betadisk_enable(beta);

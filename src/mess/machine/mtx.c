@@ -86,19 +86,19 @@ static void bankswitch(running_machine *machine, UINT8 data)
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= ram_get_size(messram)/0x8000)
 	{
-		memory_nop_readwrite(program, 0x4000, 0x7fff, 0, 0);
-		memory_nop_readwrite(program, 0x8000, 0xbfff, 0, 0);
+		program->nop_readwrite(0x4000, 0x7fff);
+		program->nop_readwrite(0x8000, 0xbfff);
 	}
 	else if (ram_page + 1 == ram_get_size(messram)/0x8000)
 	{
-		memory_nop_readwrite(program, 0x4000, 0x7fff, 0, 0);
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+		program->nop_readwrite(0x4000, 0x7fff);
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
 		memory_set_bank(machine, "bank4", ram_page);
 	}
 	else
 	{
-		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
 		memory_set_bank(machine, "bank3", ram_page);
 		memory_set_bank(machine, "bank4", ram_page);
 	}

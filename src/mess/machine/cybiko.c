@@ -82,8 +82,8 @@ static void cybiko_rs232_reset(void);
 
 static void init_ram_handler(running_machine *machine, offs_t start, offs_t size, offs_t mirror)
 {
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), start, start + size - 1, 0, mirror - size, "bank1");
-	memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), start, start + size - 1, 0, mirror - size, "bank1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(start, start + size - 1, 0, mirror - size, "bank1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(start, start + size - 1, 0, mirror - size, "bank1");
 	memory_set_bankptr( machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 }
 

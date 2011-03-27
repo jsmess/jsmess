@@ -184,10 +184,10 @@ MACHINE_RESET( vector06 )
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	device_set_irq_callback(machine->device("maincpu"), vector06_irq_callback);
-	memory_install_read_bank (space, 0x0000, 0x7fff, 0, 0, "bank1");
-	memory_install_write_bank(space, 0x0000, 0x7fff, 0, 0, "bank2");
-	memory_install_read_bank (space, 0x8000, 0xffff, 0, 0, "bank3");
-	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
+	space->install_read_bank (0x0000, 0x7fff, "bank1");
+	space->install_write_bank(0x0000, 0x7fff, "bank2");
+	space->install_read_bank (0x8000, 0xffff, "bank3");
+	space->install_write_bank(0x8000, 0xffff, "bank4");
 
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
 	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);

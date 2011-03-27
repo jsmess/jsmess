@@ -324,8 +324,8 @@ static MACHINE_RESET( scorpion )
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->ram_0000 = NULL;
-	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, scorpion_0000_w);
+	space->install_read_bank(0x0000, 0x3fff, "bank1");
+	space->install_legacy_write_handler(0x0000, 0x3fff, FUNC(scorpion_0000_w));
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);

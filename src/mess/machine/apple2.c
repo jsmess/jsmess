@@ -204,15 +204,15 @@ void apple2_update_memory(running_machine *machine)
 			/* install the actual handlers */
 			if (begin <= end_r) {
 				if (rh) {
-					memory_install_read8_handler(space, begin, end_r, 0, 0, rh);
+					space->install_legacy_read_handler(begin, end_r, FUNC(rh));
 				} else {
-					memory_install_read_bank(space, begin, end_r, 0, 0, rbank);
+					space->install_read_bank(begin, end_r, rbank);
 				}
 			}
 
 			/* did we 'go past the end?' */
 			if (end_r < state->mem_config.memmap[i].end)
-				memory_nop_read(space, end_r + 1, state->mem_config.memmap[i].end, 0, 0);
+				space->nop_read(end_r + 1, state->mem_config.memmap[i].end);
 
 			/* set the memory bank */
 			if (rbase)
@@ -288,19 +288,19 @@ void apple2_update_memory(running_machine *machine)
 			/* install the actual handlers */
 			if (begin <= end_w) {
 				if (wh) {
-					memory_install_write8_handler(space, begin, end_w, 0, 0, wh);
+					space->install_legacy_write_handler(begin, end_w, FUNC(wh));
 				} else {
 					if (wh_nop) {
-						memory_nop_write(space, begin, end_w, 0, 0);
+						space->nop_write(begin, end_w);
 					} else {
-						memory_install_write_bank(space, begin, end_w, 0, 0, wbank);
+						space->install_write_bank(begin, end_w, wbank);
 					}
 				}
 			}
 
 			/* did we 'go past the end?' */
 			if (end_w < state->mem_config.memmap[i].end)
-				memory_nop_write(space, end_w + 1, state->mem_config.memmap[i].end, 0, 0);
+				space->nop_write(end_w + 1, state->mem_config.memmap[i].end);
 
 			/* set the memory bank */
 			if (wbase)

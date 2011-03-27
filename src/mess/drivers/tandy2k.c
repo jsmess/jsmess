@@ -845,7 +845,7 @@ void tandy2k_state::machine_start()
 	UINT8 *ram = ram_get_ptr(m_ram);
 	int ram_size = ram_get_size(m_ram);
 
-	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
+	program->install_ram(0x00000, ram_size - 1, ram);
 
 	/* patch out i186 relocation register check */
 	UINT8 *rom = machine->region(I80186_TAG)->base();

@@ -662,7 +662,7 @@ static DRIVER_INIT( vtech1 )
 	if (vtech1->ram_size == 18*1024 || vtech1->ram_size == 22*1024 || vtech1->ram_size == 32*1024)
 	{
 		offs_t base = 0x7800 + (vtech1->ram_size - 0x4000);
-		memory_install_readwrite_bank(prg, base, base + 0x3fff, 0, 0, "bank2");
+		prg->install_readwrite_bank(base, base + 0x3fff, "bank2");
 		memory_set_bankptr(machine, "bank2", vtech1->ram + base - 0x7800);
 	}
 
@@ -670,11 +670,11 @@ static DRIVER_INIT( vtech1 )
 	if (vtech1->ram_size >= 66*1024)
 	{
 		/* install fixed first bank */
-		memory_install_readwrite_bank(prg, 0x8000, 0xbfff, 0, 0, "bank2");
+		prg->install_readwrite_bank(0x8000, 0xbfff, "bank2");
 		memory_set_bankptr(machine, "bank2", vtech1->ram + 0x800);
 
 		/* install the others, dynamically banked in */
-		memory_install_readwrite_bank(prg, 0xc000, 0xffff, 0, 0, "bank3");
+		prg->install_readwrite_bank(0xc000, 0xffff, "bank3");
 		memory_configure_bank(machine, "bank3", 0, (vtech1->ram_size - 0x4800) / 0x4000, vtech1->ram + 0x4800, 0x4000);
 		memory_set_bank(machine, "bank3", 0);
 	}
@@ -710,7 +710,7 @@ static DRIVER_INIT( vtech1h )
 	vtech1->videoram_size = 0x2000;
 	vtech1->videoram = auto_alloc_array(machine, UINT8, vtech1->videoram_size);
 
-	memory_install_readwrite_bank(prg, 0x7000, 0x77ff, 0, 0, "bank4");
+	prg->install_readwrite_bank(0x7000, 0x77ff, "bank4");
 	memory_configure_bank(machine, "bank4", 0, 4, vtech1->videoram, 0x800);
 	memory_set_bank(machine, "bank4", 0);
 }

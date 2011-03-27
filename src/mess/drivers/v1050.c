@@ -143,13 +143,13 @@ void v1050_state::bankswitch()
 
 	if (BIT(m_bank, 0))
 	{
-		memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
 		memory_set_bank(machine, "bank1", bank);
 	}
 	else
 	{
-		memory_install_read_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x1fff, 0, 0);
+		program->install_read_bank(0x0000, 0x1fff, "bank1");
+		program->unmap_write(0x0000, 0x1fff);
 		memory_set_bank(machine, "bank1", 3);
 	}
 
@@ -157,12 +157,12 @@ void v1050_state::bankswitch()
 
 	if (bank == 2)
 	{
-		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
+		program->unmap_readwrite(0x4000, 0xbfff);
 	}
 	else
 	{
-		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
 		memory_set_bank(machine, "bank3", bank);
 		memory_set_bank(machine, "bank4", bank);
 	}
@@ -1130,17 +1130,17 @@ void v1050_state::machine_start()
 	memory_configure_bank(machine, "bank1", 2, 1, ram + 0x1c000, 0);
 	memory_configure_bank(machine, "bank1", 3, 1, machine->region(Z80_TAG)->base(), 0);
 
-	memory_install_readwrite_bank(program, 0x2000, 0x3fff, 0, 0, "bank2");
+	program->install_readwrite_bank(0x2000, 0x3fff, "bank2");
 	memory_configure_bank(machine, "bank2", 0, 2, ram + 0x2000, 0x10000);
 	memory_configure_bank(machine, "bank2", 2, 1, ram + 0x1e000, 0);
 
-	memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
+	program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 	memory_configure_bank(machine, "bank3", 0, 2, ram + 0x4000, 0x10000);
 
-	memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+	program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
 	memory_configure_bank(machine, "bank4", 0, 2, ram + 0x8000, 0x10000);
 
-	memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank5");
+	program->install_readwrite_bank(0xc000, 0xffff, "bank5");
 	memory_configure_bank(machine, "bank5", 0, 3, ram + 0xc000, 0);
 
 	bankswitch();

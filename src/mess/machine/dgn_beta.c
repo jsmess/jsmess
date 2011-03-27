@@ -297,8 +297,8 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 				logerror("Error RAM in Last page !\n");
 			}
 			writebank=bank_info[Page].handler;
-			memory_install_write8_handler(space_0, bank_start, bank_end,0,0,writebank);
-			memory_install_write8_handler(space_1, bank_start, bank_end,0,0,writebank);
+			space_0->install_legacy_write_handler(bank_start, bank_end,FUNC(writebank));
+			space_1->install_legacy_write_handler(bank_start, bank_end,FUNC(writebank));
 		}
 		else					// Block is rom, or undefined
 		{
@@ -312,8 +312,8 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 			else
 				readbank=state->system_rom;
 
-			memory_unmap_write(space_0, bank_start, bank_end,0,0);
-			memory_unmap_write(space_1, bank_start, bank_end,0,0);
+			space_0->unmap_write(bank_start, bank_end);
+			space_1->unmap_write(bank_start, bank_end);
 		}
 
 		state->PageRegs[state->TaskReg][Page].memory=readbank;

@@ -82,12 +82,12 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 
 		if (d)
 		{
-			memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+			program->install_readwrite_bank(0x0000, 0x0fff, "bank1");
 		}
 		else
 		{
-			memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
-			memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
+			program->install_read_bank(0x0000, 0x0fff, "bank1");
+			program->unmap_write(0x0000, 0x0fff);
 		}
 		break;
 
@@ -676,8 +676,8 @@ void mm1_state::machine_start()
 	m_key_rom = machine->region("keyboard")->base();
 
 	/* setup memory banking */
-	memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
-	memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
+	program->install_read_bank(0x0000, 0x0fff, "bank1");
+	program->unmap_write(0x0000, 0x0fff);
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
 	memory_set_bank(machine, "bank1", 0);

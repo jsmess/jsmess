@@ -168,29 +168,29 @@ static void bankswitch(running_machine *machine)
 	if (state->boot_rom)
 	{
 		/* enable BOOT ROM */
-		memory_install_rom(program, 0x0000, 0x07ff, 0, 0, rom);
-		memory_install_ram(program, 0x0800, 0x7fff, 0, 0, ram + 0x800);
+		program->install_rom(0x0000, 0x07ff, rom);
+		program->install_ram(0x0800, 0x7fff, ram + 0x800);
 	}
 	else
 	{
 		/* enable RAM */
-		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+		program->install_ram(0x0000, 0x7fff, ram);
 	}
 
 	if (state->bank > last_page)
 	{
-		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		program->unmap_readwrite(0x8000, 0xffff);
 	}
 	else
 	{
 		/* enable RAM */
-		memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + (state->bank * 0x8000));
+		program->install_ram(0x8000, 0xffff, ram + (state->bank * 0x8000));
 	}
 
 	if (state->msel)
 	{
 		/* enable video RAM */
-		memory_install_ram(program, 0xf800, 0xffff, 0, 0, state->video_ram);
+		program->install_ram(0xf800, 0xffff, state->video_ram);
 	}
 }
 

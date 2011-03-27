@@ -146,7 +146,7 @@ DRIVER_INIT( apple1 )
 {
 	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
-	memory_install_readwrite_bank(space,0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
+	space->install_readwrite_bank(0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, "bank1");
 	memory_set_bankptr(machine,"bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
 	/* Poll the keyboard input ports periodically.  These include both

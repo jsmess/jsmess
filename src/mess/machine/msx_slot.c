@@ -46,17 +46,17 @@ static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 	case 4:
 		memory_set_bankptr (machine,"bank4", mem);
 		memory_set_bankptr (machine,"bank5", mem + 0x1ff8);
-		memory_install_read_bank(space, 0x7ff8, 0x7fff, 0, 0, "bank5");
+		space->install_read_bank(0x7ff8, 0x7fff, "bank5");
 		break;
 	case 5:
 		memory_set_bankptr (machine,"bank6", mem);
 		memory_set_bankptr (machine,"bank7", mem + 0x1800);
-		memory_install_read_bank(space, 0x9800, 0x9fff, 0, 0, "bank7");
+		space->install_read_bank(0x9800, 0x9fff, "bank7");
 		break;
 	case 6:
 		memory_set_bankptr (machine,"bank8", mem);
 		memory_set_bankptr (machine,"bank9", mem + 0x1800);
-		memory_install_read_bank(space, 0xb800, 0xbfff, 0, 0, "bank9");
+		space->install_read_bank(0xb800, 0xbfff, "bank9");
 		break;
 	case 7:
 		memory_set_bankptr (machine,"bank10", mem);
@@ -396,9 +396,9 @@ MSX_SLOT_MAP(konami_scc)
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		if (state->cart.scc.active ) {
-			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9800, 0x9fff, 0, 0,konami_scc_bank5);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9800, 0x9fff, FUNC(konami_scc_bank5));
 		} else {
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9800, 0x9fff, 0, 0,"bank7");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x9800, 0x9fff,"bank7");
 		}
 		break;
 	case 3:
@@ -1310,12 +1310,12 @@ MSX_SLOT_MAP(diskrom)
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
 		msx_cpu_setbank (machine, 4, state->mem + 0x2000);
-		memory_install_read8_handler(space, 0x7ff8, 0x7fff, 0, 0, msx_diskrom_page1_r);
+		space->install_legacy_read_handler(0x7ff8, 0x7fff, FUNC(msx_diskrom_page1_r));
 		break;
 	case 2:
 		msx_cpu_setbank (machine, 5, drvstate->empty);
 		msx_cpu_setbank (machine, 6, drvstate->empty);
-		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, msx_diskrom_page2_r);
+		space->install_legacy_read_handler(0xb800, 0xbfff, FUNC(msx_diskrom_page2_r));
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, drvstate->empty);
@@ -1438,12 +1438,12 @@ MSX_SLOT_MAP(diskrom2)
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
 		msx_cpu_setbank (machine, 4, state->mem + 0x2000);
-		memory_install_read8_handler(space, 0x7fb8, 0x7fbc, 0, 0, msx_diskrom2_page1_r);
+		space->install_legacy_read_handler(0x7fb8, 0x7fbc, FUNC(msx_diskrom2_page1_r));
 		break;
 	case 2:
 		msx_cpu_setbank (machine, 5, drvstate->empty);
 		msx_cpu_setbank (machine, 6, drvstate->empty);
-		memory_install_read8_handler(space, 0xb800, 0xbfbc, 0, 0, msx_diskrom2_page2_r);
+		space->install_legacy_read_handler(0xb800, 0xbfbc, FUNC(msx_diskrom2_page2_r));
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, drvstate->empty);
@@ -2282,14 +2282,14 @@ MSX_SLOT_MAP(soundcartridge)
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		if (state->cart.sccp.scc_active) {
-			memory_install_read8_handler(space, 0x9800, 0x9fff, 0, 0, soundcartridge_scc);
+			space->install_legacy_read_handler(0x9800, 0x9fff, FUNC(soundcartridge_scc));
 		} else {
-			memory_install_read_bank(space, 0x9800, 0x9fff, 0, 0, "bank7");
+			space->install_read_bank(0x9800, 0x9fff, "bank7");
 		}
 		if (state->cart.sccp.scc_active) {
-			memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, soundcartridge_sccp);
+			space->install_legacy_read_handler(0xb800, 0xbfff, FUNC(soundcartridge_sccp));
 		} else {
-			memory_install_read_bank(space, 0xb800, 0xbfff, 0, 0, "bank9");
+			space->install_read_bank(0xb800, 0xbfff, "bank9");
 		}
 		break;
 	case 3:

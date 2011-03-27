@@ -183,8 +183,8 @@ void exp85_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
-	memory_install_read_bank(program, 0x0000, 0x07ff, 0, 0, "bank1");
-	memory_unmap_write(program, 0x0000, 0x07ff, 0, 0 );
+	program->install_read_bank(0x0000, 0x07ff, "bank1");
+	program->unmap_write(0x0000, 0x07ff);
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085A_TAG)->base() + 0xf000, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8085A_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);

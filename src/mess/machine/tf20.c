@@ -76,7 +76,7 @@ static READ8_HANDLER( tf20_rom_disable )
 	address_space *prg = space->cpu->memory().space(AS_PROGRAM);
 
 	/* switch in ram */
-	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, ram_get_ptr(tf20->ram));
+	prg->install_ram(0x0000, 0x7fff, ram_get_ptr(tf20->ram));
 
 	return 0xff;
 }
@@ -345,7 +345,7 @@ static DEVICE_START( tf20 )
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
 	/* enable second half of ram */
-	memory_install_ram(prg, 0x8000, 0xffff, 0, 0, ram_get_ptr(tf20->ram) + 0x8000);
+	prg->install_ram(0x8000, 0xffff, ram_get_ptr(tf20->ram) + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )
@@ -354,7 +354,7 @@ static DEVICE_RESET( tf20 )
 	address_space *prg = cpu->memory().space(AS_PROGRAM);
 
 	/* enable rom */
-	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());
+	prg->install_rom(0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());
 }
 
 DEVICE_GET_INFO( tf20 )

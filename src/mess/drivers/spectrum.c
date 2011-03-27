@@ -627,9 +627,9 @@ DRIVER_INIT( spectrum )
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	    case 48*1024:
-		memory_install_ram(space, 0x8000, 0xffff, 0, 0, NULL); // Fall through
+		space->install_ram(0x8000, 0xffff, NULL); // Fall through
 	    case 16*1024:
-		memory_install_ram(space, 0x5b00, 0x7fff, 0, 0, NULL);
+		space->install_ram(0x5b00, 0x7fff, NULL);
 	}
 }
 

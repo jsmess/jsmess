@@ -520,7 +520,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write_bank(device->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
+		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
 		if (device->machine->region("user2")->base() != NULL)
@@ -528,7 +528,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_unmap_write(device->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, 0);
+		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, state->chip_ram_size - 1);
 
 	set_led_status( device->machine, 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -582,12 +582,12 @@ static void amiga_reset(running_machine *machine)
 	if (input_port_read(machine, "hardware") & 0x08)
 	{
 		/* Install RTC */
-		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdc0000, 0xdc003f, FUNC(amiga_clock_r), FUNC(amiga_clock_w));
 	}
 	else
 	{
 		/* No RTC support */
-		memory_unmap_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdc0000, 0xdc003f, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0xdc0000, 0xdc003f);
 	}
 }
 

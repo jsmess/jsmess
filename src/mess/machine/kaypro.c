@@ -53,16 +53,16 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 
 	if (data & 0x80)
 	{
-		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
-		memory_install_read_bank (mem, 0x0000, 0x0fff, 0, 0, "bank1");
+		mem->unmap_readwrite (0x0000, 0x3fff);
+		mem->install_read_bank (0x0000, 0x0fff, "bank1");
 		memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
-		memory_install_readwrite8_handler (mem, 0x3000, 0x3fff, 0, 0, kaypro_videoram_r, kaypro_videoram_w);
+		mem->install_legacy_readwrite_handler (0x3000, 0x3fff, FUNC(kaypro_videoram_r), FUNC(kaypro_videoram_w));
 	}
 	else
 	{
-		memory_unmap_readwrite(mem, 0x0000, 0x3fff, 0, 0);
-		memory_install_read_bank (mem, 0x0000, 0x3fff, 0, 0, "bank2");
-		memory_install_write_bank (mem, 0x0000, 0x3fff, 0, 0, "bank3");
+		mem->unmap_readwrite(0x0000, 0x3fff);
+		mem->install_read_bank (0x0000, 0x3fff, "bank2");
+		mem->install_write_bank (0x0000, 0x3fff, "bank3");
 		memory_set_bankptr(mem->machine, "bank2", mem->machine->region("rambank")->base());
 		memory_set_bankptr(mem->machine, "bank3", mem->machine->region("rambank")->base());
 	}
@@ -170,15 +170,15 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 
 	if (data & 0x80)
 	{
-		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
-		memory_install_read_bank (mem, 0x0000, 0x1fff, 0, 0, "bank1");
+		mem->unmap_readwrite (0x0000, 0x3fff);
+		mem->install_read_bank (0x0000, 0x1fff, "bank1");
 		memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 	}
 	else
 	{
-		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
-		memory_install_read_bank (mem, 0x0000, 0x3fff, 0, 0, "bank2");
-		memory_install_write_bank (mem, 0x0000, 0x3fff, 0, 0, "bank3");
+		mem->unmap_readwrite (0x0000, 0x3fff);
+		mem->install_read_bank (0x0000, 0x3fff, "bank2");
+		mem->install_write_bank (0x0000, 0x3fff, "bank3");
 		memory_set_bankptr(mem->machine, "bank2", mem->machine->region("rambank")->base());
 		memory_set_bankptr(mem->machine, "bank3", mem->machine->region("rambank")->base());
 	}

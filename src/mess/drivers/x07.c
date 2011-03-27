@@ -1386,7 +1386,7 @@ void x07_state::machine_start()
 
 	/* install RAM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	memory_install_ram(program, 0x0000, ram_get_size(m_ram) - 1, 0, 0, ram_get_ptr(m_ram));
+	program->install_ram(0x0000, ram_get_size(m_ram) - 1, ram_get_ptr(m_ram));
 }
 
 void x07_state::machine_reset()

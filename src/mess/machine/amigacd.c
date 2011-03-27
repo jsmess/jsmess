@@ -390,14 +390,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 static void	dmac_install(running_machine *machine, offs_t base)
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
-	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
+	space->install_legacy_read_handler(base, base + 0xFFFF, FUNC(amiga_dmac_r));
+	space->install_legacy_write_handler(base, base + 0xFFFF, FUNC(amiga_dmac_w));
 }
 
 static void	dmac_uninstall(running_machine *machine, offs_t base)
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_unmap_readwrite(space, base, base + 0xFFFF, 0, 0);
+	space->unmap_readwrite(base, base + 0xFFFF);
 }
 
 static const amiga_autoconfig_device dmac_device =

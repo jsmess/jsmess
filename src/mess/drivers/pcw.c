@@ -243,15 +243,15 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 	{
 		/* when upper 16 bytes are accessed use keyboard read
            handler */
-		memory_install_read8_handler(space,
-			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
-			pcw_keyboard_data_r);
+		space->install_legacy_read_handler(
+			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, FUNC(
+			pcw_keyboard_data_r));
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
 	{
 		/* restore bank handler across entire block */
-		memory_install_read_bank(space,block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,block_name);
+		space->install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	memory_set_bankptr(machine, block_name, ram_get_ptr(machine->device(RAM_TAG)) + ((bank * 0x4000) % ram_get_size(machine->device(RAM_TAG))));

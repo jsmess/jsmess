@@ -597,7 +597,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		}
 
 		// setup cartridge ROM area
-		memory_install_read_bank(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM),0x000080,0x0fffff,0,0,"cart_rom");
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
 		memory_set_bankptr(image.device().machine,"cart_rom",&image.device().machine->region("maincpu")->base()[0x80]);
 
 		// handle possible protection

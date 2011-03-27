@@ -458,8 +458,8 @@ static void init_at_common(running_machine *machine)
 		if (ram_get_size(machine->device(RAM_TAG)) > 0x0a0000)
 		{
 			offs_t ram_limit = 0x100000 + ram_get_size(machine->device(RAM_TAG)) - 0x0a0000;
-			memory_install_read_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
-			memory_install_write_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
+			space->install_read_bank(0x100000,  ram_limit - 1, "bank1");
+			space->install_write_bank(0x100000,  ram_limit - 1, "bank1");
 			memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0xa0000);
 		}
 	}

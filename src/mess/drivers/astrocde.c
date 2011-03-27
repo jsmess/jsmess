@@ -99,13 +99,13 @@ static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write prote
     {
         if (write_protect_on == 0)  // write protect off, so install memory normally
         {
-            memory_install_ram(space, expansion_ram_start, expansion_ram_end, 0, 0, expram);
+            space->install_ram(expansion_ram_start, expansion_ram_end, expram);
             if (shadow_ram_end > expansion_ram_end)
-                memory_install_ram(space, expansion_ram_end + 1, shadow_ram_end, 0, 0, expram);
+                space->install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
         }
         else  // write protect on, so make memory read only
         {
-            memory_nop_write(space, expansion_ram_start, expansion_ram_end, 0, 0);
+            space->nop_write(expansion_ram_start, expansion_ram_end);
         }
      }
 }
@@ -315,7 +315,7 @@ MACHINE_RESET( astrocde )
     int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
     address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
     UINT8 *expram = ram_get_ptr(machine->device("ram_tag"));
-    memory_unmap_readwrite(space, 0x5000, 0xffff, 0, 0);  // unmap any previously installed expansion RAM
+    space->unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
 
     get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
@@ -323,13 +323,13 @@ MACHINE_RESET( astrocde )
     {
         if (write_protect_on == 0)  // write protect off, so install memory normally
         {
-            memory_install_ram(space, expansion_ram_start, expansion_ram_end, 0, 0, expram);
+            space->install_ram(expansion_ram_start, expansion_ram_end, expram);
             if (shadow_ram_end > expansion_ram_end)
-                memory_install_ram(space, expansion_ram_end + 1, shadow_ram_end, 0, 0, expram);
+                space->install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
         }
         else  // write protect on, so make memory read only
         {
-            memory_nop_write(space, expansion_ram_start, expansion_ram_end, 0, 0);
+            space->nop_write(expansion_ram_start, expansion_ram_end);
         }
      }
 }

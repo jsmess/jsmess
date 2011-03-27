@@ -175,7 +175,7 @@ MACHINE_START( aim65 )
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Init RAM */
-	memory_install_ram(space, 0x0000, ram_get_size(ram) - 1, 0, 0, ram_get_ptr(ram));
+	space->install_ram(0x0000, ram_get_size(ram) - 1, ram_get_ptr(ram));
 }
 
 

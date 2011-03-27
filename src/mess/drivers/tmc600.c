@@ -255,11 +255,11 @@ void tmc600_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 8*1024:
-		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+		program->unmap_readwrite(0x8000, 0xbfff);
 		break;
 
 	case 16*1024:
-		memory_unmap_readwrite(program, 0xa000, 0xbfff, 0, 0);
+		program->unmap_readwrite(0xa000, 0xbfff);
 		break;
 	}
 

@@ -1298,14 +1298,14 @@ WRITE16_HANDLER( compis_i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
-				memory_install_write16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
+				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(temp, temp + 0xff, FUNC(compis_i186_internal_port_r));
+				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(temp, temp + 0xff, FUNC(compis_i186_internal_port_w));
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(space->machine->device("maincpu")->memory().space(AS_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
-				memory_install_write16_handler(space->machine->device("maincpu")->memory().space(AS_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
+				space->machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(temp, temp + 0xff, FUNC(compis_i186_internal_port_r));
+				space->machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(temp, temp + 0xff, FUNC(compis_i186_internal_port_w));
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

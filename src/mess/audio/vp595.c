@@ -78,11 +78,11 @@ void vp595_install_write_handlers(device_t *device, address_space *io, int enabl
 
 	if (enabled)
 	{
-		memory_install_write8_device_handler(io, vp595->cdp1863, 0x03, 0x03, 0, 0, vp595_cdp1863_w);
+		io->install_legacy_write_handler(*vp595->cdp1863, 0x03, 0x03, FUNC(vp595_cdp1863_w));
 	}
 	else
 	{
-		memory_unmap_write(io, 0x03, 0x03, 0, 0);
+		io->unmap_write(0x03, 0x03);
 	}
 }
 

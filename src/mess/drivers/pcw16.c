@@ -375,31 +375,31 @@ static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RA
 	switch (type) {
 	case PCW16_MEM_ROM:
 		/* rom */
-		memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_read_handler_dram[bank]);
-		memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
+		space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
+		space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 		break;
 
 	case PCW16_MEM_FLASH_1:
 		/* sram */
-		memory_install_read8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash0_bank_handlers_r[bank]);
-		memory_install_write8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash0_bank_handlers_w[bank]);
+		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash0_bank_handlers_r[bank]));
+		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash0_bank_handlers_w[bank]));
 		break;
 
 	case PCW16_MEM_FLASH_2:
-		memory_install_read8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash1_bank_handlers_r[bank]);
-		memory_install_write8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash1_bank_handlers_w[bank]);
+		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash1_bank_handlers_r[bank]));
+		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash1_bank_handlers_w[bank]));
 		break;
 
 	case PCW16_MEM_NONE:
-		memory_install_read8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_no_mem_r);
-		memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
+		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_no_mem_r));
+		space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 		break;
 
 	default:
 	case PCW16_MEM_DRAM:
 		/* dram */
-		memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_read_handler_dram[bank]);
-		memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_write_handler_dram[bank]);
+		space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
+		space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_write_handler_dram[bank]);
 		break;
 	}
 

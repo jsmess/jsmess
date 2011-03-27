@@ -3089,13 +3089,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 		if (cart_size <= (16 * 1024 * 1024))
 		{
-			memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-			memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd000000, 0xdffffff, FUNC(eeprom_r));
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd000000, 0xdffffff, FUNC(eeprom_w));
 		}
 		else
 		{
-			memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-			memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xdffff00, 0xdffffff, FUNC(eeprom_r));
+			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdffff00, 0xdffffff, FUNC(eeprom_w));
 		}
 	}
 
@@ -3104,8 +3104,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->nvptr = (UINT8 *)&state->gba_sram;
 		state->nvsize = 0x10000;
 
-		memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-		memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000000, 0xe00ffff, FUNC(sram_r));
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000000, 0xe00ffff, FUNC(sram_w));
 	}
 
 	if (chip & GBA_CHIP_FLASH_1M)
@@ -3115,8 +3115,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->flash_size = 0x20000;
 		state->flash_mask = 0x1ffff/4;
 
-		memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
-		memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000000, 0xe01ffff, FUNC(flash_r));
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000000, 0xe01ffff, FUNC(flash_w));
 	}
 
 	if ((chip & GBA_CHIP_FLASH) || (chip & GBA_CHIP_FLASH_512))
@@ -3126,8 +3126,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->flash_size = 0x10000;
 		state->flash_mask = 0xffff/4;
 
-		memory_install_read32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
-		memory_install_write32_handler(image.device().machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000000, 0xe00ffff, FUNC(flash_r));
+		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000000, 0xe00ffff, FUNC(flash_w));
 	}
 
 	if (chip & GBA_CHIP_RTC)

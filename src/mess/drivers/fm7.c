@@ -353,8 +353,8 @@ static READ8_HANDLER( fm7_rom_en_r )
 	state->basic_rom_en = 1;
 	if(state->type == SYS_FM7)
 	{
-		memory_install_read_bank(space,0x8000,0xfbff,0,0,"bank1");
-		memory_nop_write(space,0x8000,0xfbff,0,0);
+		space->install_read_bank(0x8000,0xfbff,"bank1");
+		space->nop_write(0x8000,0xfbff);
 		memory_set_bankptr(space->machine,"bank1",RAM+0x38000);
 	}
 	else
@@ -371,7 +371,7 @@ static WRITE8_HANDLER( fm7_rom_en_w )
 	state->basic_rom_en = 0;
 	if(state->type == SYS_FM7)
 	{
-		memory_install_readwrite_bank(space,0x8000,0xfbff,0,0,"bank1");
+		space->install_readwrite_bank(0x8000,0xfbff,"bank1");
 		memory_set_bankptr(space->machine,"bank1",RAM+0x8000);
 	}
 	else
@@ -1025,40 +1025,40 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 		switch(physical)
 		{
 			case 0x10:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram0_r,fm7_vram0_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram0_r),FUNC(fm7_vram0_w));
 				break;
 			case 0x11:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram1_r,fm7_vram1_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram1_r),FUNC(fm7_vram1_w));
 				break;
 			case 0x12:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram2_r,fm7_vram2_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram2_r),FUNC(fm7_vram2_w));
 				break;
 			case 0x13:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram3_r,fm7_vram3_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram3_r),FUNC(fm7_vram3_w));
 				break;
 			case 0x14:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram4_r,fm7_vram4_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram4_r),FUNC(fm7_vram4_w));
 				break;
 			case 0x15:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram5_r,fm7_vram5_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram5_r),FUNC(fm7_vram5_w));
 				break;
 			case 0x16:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram6_r,fm7_vram6_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram6_r),FUNC(fm7_vram6_w));
 				break;
 			case 0x17:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram7_r,fm7_vram7_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram7_r),FUNC(fm7_vram7_w));
 				break;
 			case 0x18:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram8_r,fm7_vram8_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram8_r),FUNC(fm7_vram8_w));
 				break;
 			case 0x19:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram9_r,fm7_vram9_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram9_r),FUNC(fm7_vram9_w));
 				break;
 			case 0x1a:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vramA_r,fm7_vramA_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vramA_r),FUNC(fm7_vramA_w));
 				break;
 			case 0x1b:
-				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vramB_r,fm7_vramB_w);
+				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vramB_r),FUNC(fm7_vramB_w));
 				break;
 		}
 //      memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x10000);
@@ -1066,12 +1066,12 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical == 0x1c)
 	{
-		memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_console_ram_banked_r,fm7_console_ram_banked_w);
+		space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_console_ram_banked_r),FUNC(fm7_console_ram_banked_w));
 		return;
 	}
 	if(physical == 0x1d)
 	{
-		memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_sub_ram_ports_banked_r,fm7_sub_ram_ports_banked_w);
+		space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_sub_ram_ports_banked_r),FUNC(fm7_sub_ram_ports_banked_w));
 		return;
 	}
 	if(physical == 0x36 || physical == 0x37)
@@ -1079,8 +1079,8 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 		if(state->init_rom_en)
 		{
 			RAM = space->machine->region("init")->base();
-			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
-			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
+			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+			space->nop_write(bank*0x1000,(bank*0x1000)+size);
 			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x36000);
 			return;
 		}
@@ -1090,13 +1090,13 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 		if(state->basic_rom_en)
 		{
 			RAM = space->machine->region("fbasic")->base();
-			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
-			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
+			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+			space->nop_write(bank*0x1000,(bank*0x1000)+size);
 			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x38000);
 			return;
 		}
 	}
-	memory_install_readwrite_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
+	space->install_readwrite_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 	memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12));
 }
 
@@ -1127,7 +1127,7 @@ static void fm7_mmr_refresh(address_space* space)
 		window_addr = ((state->mmr.window_offset << 8) + 0x7c00) & 0xffff;
 //      if(window_addr < 0xfc00)
 		{
-			memory_install_readwrite_bank(space,0x7c00,0x7fff,0,0,"bank24");
+			space->install_readwrite_bank(0x7c00,0x7fff,"bank24");
 			memory_set_bankptr(space->machine,"bank24",RAM+window_addr);
 		}
 	}

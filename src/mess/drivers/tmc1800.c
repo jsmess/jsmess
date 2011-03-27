@@ -201,15 +201,15 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	switch (ram_get_size(device->machine->device(RAM_TAG)))
 	{
 	case 4 * 1024:
-		memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x0fff, 0, 0x7000, "bank1");
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, "bank1");
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank1");
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		break;
 	}
 
@@ -220,13 +220,13 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	switch (bank)
 	{
 	case TMC2000_BANK_MONITOR:
-		memory_install_read_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
-		memory_unmap_write(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00 );
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x81ff, 0, 0x7e00, "bank2");
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0x81ff, 0, 0x7e00 );
 		break;
 
 	case TMC2000_BANK_COLORRAM: // write-only
-		memory_install_write_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
-		memory_unmap_read(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00);
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x8000, 0x81ff, 0, 0x7e00, "bank2");
+		device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_read(0x8000, 0x81ff, 0, 0x7e00);
 		break;
 	}
 
@@ -241,7 +241,7 @@ static WRITE8_DEVICE_HANDLER( nano_bankswitch_w )
 
 	memory_set_bank(device->machine, "bank1", OSCNANO_BANK_RAM);
 
-	memory_install_readwrite_bank(device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
+	device->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x0fff, 0, 0x7000, "bank1");
 
 	/* write to CDP1864 tone latch */
 
@@ -708,13 +708,13 @@ static MACHINE_RESET( tmc2000 )
 
 	/* enable monitor mirror at 0x0000 */
 	memory_set_bank(machine, "bank1", TMC2000_BANK_ROM);
-	memory_install_readwrite_bank(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, "bank1");
-	memory_unmap_write(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00);
+	machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x01ff, 0, 0x7e00, "bank1");
+	machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x01ff, 0, 0x7e00);
 
 	/* enable monitor */
 	memory_set_bank(machine, "bank2", TMC2000_BANK_MONITOR);
-	memory_install_readwrite_bank(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, "bank2");
-	memory_unmap_write(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00);
+	machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x8000, 0x81ff, 0, 0x7e00, "bank2");
+	machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0x81ff, 0, 0x7e00);
 }
 
 // OSCOM Nano
@@ -749,7 +749,7 @@ static MACHINE_RESET( nano )
 
 	/* enable ROM */
 	memory_set_bank(machine, "bank1", OSCNANO_BANK_ROM);
-	memory_install_readwrite_bank(machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, "bank1");
+	machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x01ff, 0, 0x7e00, "bank1");
 }
 
 /* Machine Drivers */

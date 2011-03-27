@@ -367,52 +367,52 @@ void comx35_state::set_active_bank()
 	switch (m_bank)
 	{
 	case BANK_NONE:
-		memory_unmap_readwrite(program, 0xc000, 0xdfff, 0, 0);
+		program->unmap_readwrite(0xc000, 0xdfff);
 		break;
 
 	case BANK_FLOPPY:
-		memory_install_read_bank(program, 0xc000, 0xdfff, 0, 0, "bank1");
-		memory_unmap_write(program, 0xc000, 0xdfff, 0, 0);
+		program->install_read_bank(0xc000, 0xdfff, "bank1");
+		program->unmap_write(0xc000, 0xdfff);
 		break;
 
 	case BANK_PRINTER_PARALLEL:
-		memory_install_read_bank(program, 0xc000, 0xc7ff, 0, 0, "bank1");
-		memory_unmap_write(program, 0xc000, 0xc7ff, 0, 0);
-		memory_unmap_readwrite(program, 0xc800, 0xdfff, 0, 0);
+		program->install_read_bank(0xc000, 0xc7ff, "bank1");
+		program->unmap_write(0xc000, 0xc7ff);
+		program->unmap_readwrite(0xc800, 0xdfff);
 		break;
 
 	case BANK_PRINTER_PARALLEL_FM:
-		memory_install_read_bank(program, 0xc000, 0xcfff, 0, 0, "bank1");
-		memory_unmap_write(program, 0xc000, 0xcfff, 0, 0);
-		memory_unmap_readwrite(program, 0xd000, 0xdfff, 0, 0);
+		program->install_read_bank(0xc000, 0xcfff, "bank1");
+		program->unmap_write(0xc000, 0xcfff);
+		program->unmap_readwrite(0xd000, 0xdfff);
 		break;
 
 	case BANK_PRINTER_SERIAL:
-		memory_install_read_bank(program, 0xc000, 0xc7ff, 0, 0, "bank1");
-		memory_unmap_write(program, 0xc000, 0xc7ff, 0, 0);
-		memory_unmap_readwrite(program, 0xc800, 0xdfff, 0, 0);
+		program->install_read_bank(0xc000, 0xc7ff, "bank1");
+		program->unmap_write(0xc000, 0xc7ff);
+		program->unmap_readwrite(0xc800, 0xdfff);
 		break;
 
 	case BANK_PRINTER_THERMAL:
-		memory_install_read_bank(program, 0xc000, 0xcfff, 0, 0, "bank1");
-		memory_unmap_write(program, 0xc000, 0xcfff, 0, 0);
-		memory_unmap_readwrite(program, 0xd000, 0xdfff, 0, 0);
+		program->install_read_bank(0xc000, 0xcfff, "bank1");
+		program->unmap_write(0xc000, 0xcfff);
+		program->unmap_readwrite(0xd000, 0xdfff);
 		break;
 
 	case BANK_JOYCARD:
-		memory_unmap_readwrite(program, 0xc000, 0xdfff, 0, 0);
+		program->unmap_readwrite(0xc000, 0xdfff);
 		break;
 
 	case BANK_80_COLUMNS:
 		{
-			memory_install_read_bank(program, 0xc000, 0xc7ff, 0, 0, "bank1"); // ROM
-			memory_unmap_write(program, 0xc000, 0xc7ff, 0, 0); // ROM
-			memory_unmap_readwrite(program, 0xc800, 0xcfff, 0, 0);
-			memory_install_ram(program, 0xd000, 0xd7ff, 0, 0, m_videoram);
-			memory_unmap_read(program, 0xd800, 0xd800, 0, 0);
-			memory_install_write8_device_handler(program, m_crtc, 0xd800, 0xd800, 0, 0, mc6845_address_w);
-			memory_install_readwrite8_device_handler(program, m_crtc, 0xd801, 0xd801, 0, 0, mc6845_register_r, mc6845_register_w);
-			memory_unmap_readwrite(program, 0xd802, 0xdfff, 0, 0);
+			program->install_read_bank(0xc000, 0xc7ff, "bank1"); // ROM
+			program->unmap_write(0xc000, 0xc7ff); // ROM
+			program->unmap_readwrite(0xc800, 0xcfff);
+			program->install_ram(0xd000, 0xd7ff, m_videoram);
+			program->unmap_read(0xd800, 0xd800);
+			program->install_legacy_write_handler(*m_crtc, 0xd800, 0xd800, FUNC(mc6845_address_w));
+			program->install_legacy_readwrite_handler(*m_crtc, 0xd801, 0xd801, FUNC(mc6845_register_r), FUNC(mc6845_register_w));
+			program->unmap_readwrite(0xd802, 0xdfff);
 		}
 		break;
 
@@ -420,7 +420,7 @@ void comx35_state::set_active_bank()
 		{
 			bank = BANK_RAMCARD + m_rambank;
 
-			memory_install_readwrite_bank(program, 0xc000, 0xdfff, 0, 0, "bank1");
+			program->install_readwrite_bank(0xc000, 0xdfff, "bank1");
 		}
 		break;
 	}
@@ -570,8 +570,8 @@ void comx35_state::machine_start()
 	program->set_direct_update_handler(direct_update_delegate_create_static(comx35_opbase_handler, *machine));
 
 	/* BASIC ROM banking */
-	memory_install_read_bank(program, 0x1000, 0x17ff, 0, 0, "bank2");
-	memory_unmap_write(program, 0x1000, 0x17ff, 0, 0);
+	program->install_read_bank(0x1000, 0x17ff, "bank2");
+	program->unmap_write(0x1000, 0x17ff);
 	memory_configure_bank(machine, "bank2", 0, 1, machine->region(CDP1802_TAG)->base() + 0x1000, 0); // normal ROM
 	memory_configure_bank(machine, "bank2", 1, 1, machine->region(CDP1802_TAG)->base() + 0xe000, 0); // expansion box ROM
 
@@ -580,13 +580,13 @@ void comx35_state::machine_start()
 
 	if (is_expansion_box_installed())
 	{
-		memory_install_read_bank(program, 0xe000, 0xefff, 0, 0, "bank3");
-		memory_unmap_write(program, 0xe000, 0xefff, 0, 0);
+		program->install_read_bank(0xe000, 0xefff, "bank3");
+		program->unmap_write(0xe000, 0xefff);
 		memory_set_bank(machine, "bank2", 1);
 	}
 	else
 	{
-		memory_unmap_readwrite(program, 0xe000, 0xefff, 0, 0);
+		program->unmap_readwrite(0xe000, 0xefff);
 		memory_set_bank(machine, "bank2", 0);
 	}
 

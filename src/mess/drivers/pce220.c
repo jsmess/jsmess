@@ -110,7 +110,7 @@ static WRITE8_HANDLER( ram_bank_w )
 {
 	address_space *space_prg = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = BIT(data,2);
-	memory_install_write_bank(space_prg, 0x0000, 0x3fff, 0, 0, "bank1");
+	space_prg->install_write_bank(0x0000, 0x3fff, "bank1");
 
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG))+0x0000+bank*0x8000);
 	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG))+0x4000+bank*0x8000);
@@ -204,7 +204,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(pce220)
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	space->unmap_write(0x0000, 0x3fff);
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x0000);
 }
 

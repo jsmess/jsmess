@@ -181,10 +181,10 @@ WRITE8_HANDLER ( lviv_io_w )
 
 		state->startup_mem_map = 0;
 
-		memory_install_write_bank(cpuspace, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_install_write_bank(cpuspace, 0x4000, 0x7fff, 0, 0, "bank2");
-		memory_install_write_bank(cpuspace, 0x8000, 0xbfff, 0, 0, "bank3");
-		memory_unmap_write(cpuspace, 0xC000, 0xffff, 0, 0);
+		cpuspace->install_write_bank(0x0000, 0x3fff, "bank1");
+		cpuspace->install_write_bank(0x4000, 0x7fff, "bank2");
+		cpuspace->install_write_bank(0x8000, 0xbfff, "bank3");
+		cpuspace->unmap_write(0xC000, 0xffff);
 
 		memory_set_bankptr(space->machine,"bank1", ram);
 		memory_set_bankptr(space->machine,"bank2", ram + 0x4000);
@@ -244,10 +244,10 @@ MACHINE_RESET( lviv )
 
 	state->startup_mem_map = 1;
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
-	memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
-	memory_unmap_write(space, 0xC000, 0xffff, 0, 0);
+	space->unmap_write(0x0000, 0x3fff);
+	space->unmap_write(0x4000, 0x7fff);
+	space->unmap_write(0x8000, 0xbfff);
+	space->unmap_write(0xC000, 0xffff);
 
 	mem = machine->region("maincpu")->base();
 	memory_set_bankptr(machine,"bank1", mem + 0x010000);

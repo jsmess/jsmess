@@ -615,42 +615,42 @@ static VIDEO_START( pc_ega )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read_bank(space, 0xa0000, 0xaffff, 0, 0, "bank11" );
-			memory_install_read_bank(space, 0xb0000, 0xb7fff, 0, 0, "bank12" );
-			memory_install_read_bank(space, 0xb8000, 0xbffff, 0, 0, "bank13" );
-			memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram_w );
-			memory_install_read8_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_r );
-			memory_install_write8_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_w );
-			memory_install_read8_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_r );
-			memory_install_write8_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_w );
-			memory_install_read8_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_r );
-			memory_install_write8_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_w );
+			space->install_read_bank(0xa0000, 0xaffff, "bank11" );
+			space->install_read_bank(0xb0000, 0xb7fff, "bank12" );
+			space->install_read_bank(0xb8000, 0xbffff, "bank13" );
+			space->install_legacy_write_handler(0xa0000, 0xbffff, FUNC(pc_ega_videoram_w) );
+			spaceio->install_legacy_read_handler(0x3b0, 0x3bb, FUNC(pc_ega8_3b0_r) );
+			spaceio->install_legacy_write_handler(0x3b0, 0x3bb, FUNC(pc_ega8_3b0_w) );
+			spaceio->install_legacy_read_handler(0x3c0, 0x3cf, FUNC(pc_ega8_3c0_r) );
+			spaceio->install_legacy_write_handler(0x3c0, 0x3cf, FUNC(pc_ega8_3c0_w) );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3db, FUNC(pc_ega8_3d0_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3db, FUNC(pc_ega8_3d0_w) );
 			break;
 
 		case 16:
-			memory_install_read_bank(space, 0xa0000, 0xaffff, 0, 0, "bank11" );
-			memory_install_read_bank(space, 0xb0000, 0xb7fff, 0, 0, "bank12" );
-			memory_install_read_bank(space, 0xb8000, 0xbffff, 0, 0, "bank13" );
-			memory_install_write16_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram16le_w );
-			memory_install_read16_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_r );
-			memory_install_write16_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_w );
-			memory_install_read16_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_r );
-			memory_install_write16_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_w );
-			memory_install_read16_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_r );
-			memory_install_write16_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_w );
+			space->install_read_bank(0xa0000, 0xaffff, "bank11" );
+			space->install_read_bank(0xb0000, 0xb7fff, "bank12" );
+			space->install_read_bank(0xb8000, 0xbffff, "bank13" );
+			space->install_legacy_write_handler(0xa0000, 0xbffff, FUNC(pc_ega_videoram16le_w) );
+			spaceio->install_legacy_read_handler(0x3b0, 0x3bb, FUNC(pc_ega16le_3b0_r) );
+			spaceio->install_legacy_write_handler(0x3b0, 0x3bb, FUNC(pc_ega16le_3b0_w) );
+			spaceio->install_legacy_read_handler(0x3c0, 0x3cf, FUNC(pc_ega16le_3c0_r) );
+			spaceio->install_legacy_write_handler(0x3c0, 0x3cf, FUNC(pc_ega16le_3c0_w) );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3db, FUNC(pc_ega16le_3d0_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3db, FUNC(pc_ega16le_3d0_w) );
 			break;
 
 		case 32:
-			memory_install_read_bank(space, 0xa0000, 0xaffff, 0, 0, "bank11" );
-			memory_install_read_bank(space, 0xb0000, 0xb7fff, 0, 0, "bank12" );
-			memory_install_read_bank(space, 0xb8000, 0xbffff, 0, 0, "bank13" );
-			memory_install_write32_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram32le_w );
-			memory_install_read32_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_r );
-			memory_install_write32_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_w );
-			memory_install_read32_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_r );
-			memory_install_write32_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_w );
-			memory_install_read32_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_r );
-			memory_install_write32_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_w );
+			space->install_read_bank(0xa0000, 0xaffff, "bank11" );
+			space->install_read_bank(0xb0000, 0xb7fff, "bank12" );
+			space->install_read_bank(0xb8000, 0xbffff, "bank13" );
+			space->install_legacy_write_handler(0xa0000, 0xbffff, FUNC(pc_ega_videoram32le_w) );
+			spaceio->install_legacy_read_handler(0x3b0, 0x3bb, FUNC(pc_ega32le_3b0_r) );
+			spaceio->install_legacy_write_handler(0x3b0, 0x3bb, FUNC(pc_ega32le_3b0_w) );
+			spaceio->install_legacy_read_handler(0x3c0, 0x3cf, FUNC(pc_ega32le_3c0_r) );
+			spaceio->install_legacy_write_handler(0x3c0, 0x3cf, FUNC(pc_ega32le_3c0_w) );
+			spaceio->install_legacy_read_handler(0x3d0, 0x3db, FUNC(pc_ega32le_3d0_r) );
+			spaceio->install_legacy_write_handler(0x3d0, 0x3db, FUNC(pc_ega32le_3d0_w) );
 			break;
 
 		default:

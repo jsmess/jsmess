@@ -169,30 +169,30 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
-	memory_install_write_bank(space, 0xc000, 0xffbf, 0, 0, "bank3");
-	memory_install_write_bank(space, 0xffc0, 0xffdf, 0, 0, "bank4");
+	space->install_write_bank(0xc000, 0xffbf, "bank3");
+	space->install_write_bank(0xffc0, 0xffdf, "bank4");
 	memory_set_bankptr(machine, "bank4", ram + 0xffc0);
 	switch(i)
 	{
 		case 0 :
-				memory_install_write_bank(space, 0x0000, 0x8fff, 0, 0, "bank1");
-				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, video_memory_w);
+				space->install_write_bank(0x0000, 0x8fff, "bank1");
+				space->install_legacy_write_handler(0x9000, 0xbfff, FUNC(video_memory_w));
 
 				memory_set_bankptr(machine, "bank1", ram);
 				memory_set_bankptr(machine, "bank2", ram + 0x9000);
 				memory_set_bankptr(machine, "bank3", ram + 0xc000);
 				break;
 		case 1 :
-				memory_install_write_bank(space, 0x0000, 0x8fff, 0, 0, "bank1");
-				memory_install_write_bank(space, 0x9000, 0xbfff, 0, 0, "bank2");
+				space->install_write_bank(0x0000, 0x8fff, "bank1");
+				space->install_write_bank(0x9000, 0xbfff, "bank2");
 
 				memory_set_bankptr(machine, "bank1", ram + 0x10000);
 				memory_set_bankptr(machine, "bank2", ram + 0x19000);
 				memory_set_bankptr(machine, "bank3", ram + 0x1c000);
 				break;
 		case 2 :
-				memory_unmap_write(space, 0x0000, 0x8fff, 0, 0);
-				memory_unmap_write(space, 0x9000, 0xbfff, 0, 0);
+				space->unmap_write(0x0000, 0x8fff);
+				space->unmap_write(0x9000, 0xbfff);
 
 				memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
 				memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x19000);
@@ -319,12 +319,12 @@ static void erik_set_bank(running_machine *machine)
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_install_write_bank(space, 0x4000, 0x8fff, 0, 0, "bank2");
-	memory_install_write_bank(space, 0x9000, 0xbfff, 0, 0, "bank3");
-	memory_install_write_bank(space, 0xc000, 0xefff, 0, 0, "bank4");
-	memory_install_write_bank(space, 0xf000, 0xf7ff, 0, 0, "bank5");
-	memory_install_write_bank(space, 0xf800, 0xffff, 0, 0, "bank6");
+	space->install_write_bank(0x0000, 0x3fff, "bank1");
+	space->install_write_bank(0x4000, 0x8fff, "bank2");
+	space->install_write_bank(0x9000, 0xbfff, "bank3");
+	space->install_write_bank(0xc000, 0xefff, "bank4");
+	space->install_write_bank(0xf000, 0xf7ff, "bank5");
+	space->install_write_bank(0xf800, 0xffff, "bank6");
 
 	switch(bank1)
 	{
@@ -334,7 +334,7 @@ static void erik_set_bank(running_machine *machine)
 						memory_set_bankptr(machine, "bank1", ram + 0x10000*(bank1-1));
 						break;
 		case	0:
-						memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+						space->unmap_write(0x0000, 0x3fff);
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						break;
 	}
@@ -346,7 +346,7 @@ static void erik_set_bank(running_machine *machine)
 						memory_set_bankptr(machine, "bank2", ram + 0x10000*(bank2-1) + 0x4000);
 						break;
 		case	0:
-						memory_unmap_write(space, 0x4000, 0x8fff, 0, 0);
+						space->unmap_write(0x4000, 0x8fff);
 						memory_set_bankptr(machine, "bank2", mem + 0x14000);
 						break;
 	}
@@ -358,7 +358,7 @@ static void erik_set_bank(running_machine *machine)
 						memory_set_bankptr(machine, "bank3", ram + 0x10000*(bank3-1) + 0x9000);
 						break;
 		case	0:
-						memory_unmap_write(space, 0x9000, 0xbfff, 0, 0);
+						space->unmap_write(0x9000, 0xbfff);
 						memory_set_bankptr(machine, "bank3", mem + 0x19000);
 						break;
 	}
@@ -372,12 +372,12 @@ static void erik_set_bank(running_machine *machine)
 						memory_set_bankptr(machine, "bank6", ram + 0x10000*(bank4-1) + 0x0f800);
 						break;
 		case	0:
-						memory_unmap_write(space, 0xc000, 0xefff, 0, 0);
+						space->unmap_write(0xc000, 0xefff);
 						memory_set_bankptr(machine, "bank4", mem + 0x1c000);
-						memory_unmap_write(space, 0xf000, 0xf7ff, 0, 0);
-						memory_nop_read(space, 0xf000, 0xf7ff, 0, 0);
-						memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);
-						memory_install_read8_handler(space, 0xf800, 0xffff, 0, 0, specialist_keyboard_r);
+						space->unmap_write(0xf000, 0xf7ff);
+						space->nop_read(0xf000, 0xf7ff);
+						space->install_legacy_write_handler(0xf800, 0xffff, FUNC(specialist_keyboard_w));
+						space->install_legacy_read_handler(0xf800, 0xffff, FUNC(specialist_keyboard_r));
 						break;
 	}
 }

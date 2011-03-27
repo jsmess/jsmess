@@ -447,7 +447,7 @@ void ti68k_state::machine_start()
 		m_hw_version = HW1;
 		m_initial_pc = ((rom[2]) << 16) | rom[3];
 
-		memory_unmap_read(m_maincpu->space(AS_PROGRAM), 0x200000, 0x5fffff, 0, 0);
+		m_maincpu->space(AS_PROGRAM)->unmap_read(0x200000, 0x5fffff);
 
 		if (m_initial_pc > 0x400000)
 		{

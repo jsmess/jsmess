@@ -31,17 +31,17 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
-				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-				memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+				space->install_read_bank(0x0000, 0x3fff, "bank1");
+				space->unmap_write(0x0000, 0x3fff);
 				memory_set_bankptr(space->machine, "bank1", machine->region("sys")->base());
 				break;
 		case 0x08 : // Cart ROM selected
-				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-				memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+				space->install_read_bank(0x0000, 0x3fff, "bank1");
+				space->unmap_write(0x0000, 0x3fff);
 				memory_set_bankptr(space->machine, "bank1", machine->region("cart")->base());
 				break;
 		case 0x10 : // RAM selected
-				memory_install_readwrite_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+				space->install_readwrite_bank(0x0000, 0x3fff, "bank1");
 				memory_set_bankptr(space->machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 				break;
 	}
@@ -56,22 +56,22 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
-				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
-				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+				space->install_read_bank(0xc000, 0xffff, "bank4");
+				space->unmap_write(0xc000, 0xffff);
 				memory_set_bankptr(space->machine, "bank4", machine->region("cart")->base());
 				break;
 		case 0x40 : // System ROM selected
-				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
-				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+				space->install_read_bank(0xc000, 0xffff, "bank4");
+				space->unmap_write(0xc000, 0xffff);
 				memory_set_bankptr(space->machine, "bank4", machine->region("sys")->base());
 				break;
 		case 0x80 : // RAM selected
-				memory_install_readwrite_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
+				space->install_readwrite_bank(0xc000, 0xffff, "bank4");
 				memory_set_bankptr(space->machine, "bank4", ram_get_ptr(machine->device(RAM_TAG))+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
-				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
-				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+				space->install_read_bank(0xc000, 0xffff, "bank4");
+				space->unmap_write(0xc000, 0xffff);
 				memory_set_bankptr(space->machine, "bank4", machine->region("ext")->base());
 				break;
 

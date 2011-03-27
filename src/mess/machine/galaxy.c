@@ -157,12 +157,12 @@ SNAPSHOT_LOAD( galaxy )
 DRIVER_INIT( galaxy )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_readwrite_bank( space, 0x2800, 0x2800 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
+	space->install_readwrite_bank( 0x2800, 0x2800 + ram_get_size(machine->device(RAM_TAG)) - 1, "bank1");
 	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
 	if (ram_get_size(machine->device(RAM_TAG)) < (6 + 48) * 1024)
 	{
-		memory_nop_readwrite( space, 0x2800 + ram_get_size(machine->device(RAM_TAG)), 0xffff, 0, 0);
+		space->nop_readwrite( 0x2800 + ram_get_size(machine->device(RAM_TAG)), 0xffff);
 	}
 }
 
@@ -177,11 +177,11 @@ MACHINE_RESET( galaxy )
 
 	/* ROM 2 enable/disable */
 	if (input_port_read(machine, "ROM2")) {
-		memory_install_read_bank(space, 0x1000, 0x1fff, 0, 0, "bank10");
+		space->install_read_bank(0x1000, 0x1fff, "bank10");
 	} else {
-		memory_nop_read(space, 0x1000, 0x1fff, 0, 0);
+		space->nop_read(0x1000, 0x1fff);
 	}
-	memory_nop_write(space, 0x1000, 0x1fff, 0, 0);
+	space->nop_write(0x1000, 0x1fff);
 
 	if (input_port_read(machine, "ROM2"))
 		memory_set_bankptr(machine,"bank10", machine->region("maincpu")->base() + 0x1000);
@@ -208,8 +208,8 @@ MACHINE_RESET( galaxyp )
 	ROM[0x03fa] = 0x00;
 	ROM[0x03fb] = 0xe0;
 
-	memory_install_read_bank(space, 0xe000, 0xefff, 0, 0, "bank11");
-	memory_nop_write(space, 0xe000, 0xefff, 0, 0);
+	space->install_read_bank(0xe000, 0xefff, "bank11");
+	space->nop_write(0xe000, 0xefff);
 	memory_set_bankptr(machine,"bank11", machine->region("maincpu")->base() + 0xe000);
 	state->interrupts_enabled = TRUE;
 }

@@ -51,7 +51,7 @@ static MACHINE_RESET(vt520)
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
-	memory_unmap_write(space, 0x0000, 0xffff, 0, 0);
+	space->unmap_write(0x0000, 0xffff);
 	memory_set_bankptr(machine, "bank1", rom + 0x70000);
 }
 

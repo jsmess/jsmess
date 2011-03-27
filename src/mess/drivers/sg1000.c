@@ -789,15 +789,15 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	switch (size)
 	{
 	case 40 * 1024:
-		memory_install_read_bank(program, 0x8000, 0x9fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x8000, 0x9fff, 0, 0);
+		program->install_read_bank(0x8000, 0x9fff, "bank1");
+		program->unmap_write(0x8000, 0x9fff);
 		memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
 		memory_set_bank(machine, "bank1", 0);
 		break;
 
 	case 48 * 1024:
-		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x8000, 0xbfff, 0, 0);
+		program->install_read_bank(0x8000, 0xbfff, "bank1");
+		program->unmap_write(0x8000, 0xbfff);
 		memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
 		memory_set_bank(machine, "bank1", 0);
 		break;
@@ -808,11 +808,11 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 			program->install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate_create(sg1000_state, tvdraw_axis_w, *this), 0);
 			program->install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_status_r, *this), 0);
 			program->install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_data_r, *this), 0);
-			memory_nop_write(program, 0xa000, 0xa000, 0, 0);
+			program->nop_write(0xa000, 0xa000);
 		}
 		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
 		{
-			memory_install_readwrite_bank(program, 0x8000, 0x9fff, 0, 0, "bank1");
+			program->install_readwrite_bank(0x8000, 0x9fff, "bank1");
 		}
 		break;
 	}
@@ -846,7 +846,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	state->install_cartridge(ptr, size);
 
 	/* work RAM banking */
-	memory_install_readwrite_bank(program, 0xc000, 0xc3ff, 0, 0x3c00, "bank2");
+	program->install_readwrite_bank(0xc000, 0xc3ff, 0, 0x3c00, "bank2");
 
 	return IMAGE_INIT_PASS;
 }
@@ -893,18 +893,18 @@ void sc3000_state::install_cartridge(UINT8 *ptr, int size)
 
 	if (IS_CARTRIDGE_BASIC_LEVEL_III(ptr))
 	{
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank1");
-		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank1");
+		program->install_readwrite_bank(0xc000, 0xffff, "bank2");
 	}
 	else if (IS_CARTRIDGE_MUSIC_EDITOR(ptr))
 	{
-		memory_install_readwrite_bank(program, 0x8000, 0x9fff, 0, 0, "bank1");
-		memory_install_readwrite_bank(program, 0xc000, 0xc7ff, 0, 0x3800, "bank2");
+		program->install_readwrite_bank(0x8000, 0x9fff, "bank1");
+		program->install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
 	}
 	else
 	{
 		/* regular cartridges */
-		memory_install_readwrite_bank(program, 0xc000, 0xc7ff, 0, 0x3800, "bank2");
+		program->install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
 	}
 }
 

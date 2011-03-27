@@ -242,7 +242,7 @@ static DRIVER_INIT( mc10 )
 	else if (mc10->m_ram_size == 24*1024)
 		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x2000);
 	else  if (mc10->m_ram_size != 32*1024)		//ensure that is not alice90
-		memory_nop_readwrite(prg, 0x5000, 0x8fff, 0, 0);
+		prg->nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
 	state_save_register_global(machine, mc10->m_keyboard_strobe);

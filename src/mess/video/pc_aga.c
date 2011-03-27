@@ -696,15 +696,15 @@ VIDEO_START( pc_aga )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram_r, pc200_videoram_w );
-			memory_install_readwrite8_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r, pc_aga_mda_w );
-			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r, pc_aga_cga_w );
+			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w) );
+			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w) );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_aga_cga_r), FUNC(pc_aga_cga_w) );
 			break;
 
 		case 16:
-			memory_install_readwrite16_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r, pc200_videoram16le_w );
-			memory_install_readwrite16_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r, pc16le_aga_mda_w );
-			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r, pc16le_aga_cga_w );
+			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram16le_r), FUNC(pc200_videoram16le_w) );
+			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc16le_aga_mda_r), FUNC(pc16le_aga_mda_w) );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc16le_aga_cga_r), FUNC(pc16le_aga_cga_w) );
 			break;
 
 		default:
@@ -730,15 +730,15 @@ VIDEO_START( pc200 )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_readwrite8_handler(space,   0xb0000, 0xbffff, 0, 0, pc_aga_videoram_r, pc_aga_videoram_w );
-			memory_install_readwrite8_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r, pc_aga_mda_w );
-			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc200_cga_r,  pc200_cga_w );
+			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w) );
+			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w) );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga_r),  FUNC(pc200_cga_w) );
 			break;
 
 		case 16:
-			memory_install_readwrite16_handler(space,   0xb0000, 0xbffff, 0, 0, pc_aga_videoram16le_r, pc_aga_videoram16le_w );
-			memory_install_readwrite16_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r, pc16le_aga_mda_w );
-			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r, pc200_cga16le_w );
+			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram16le_r), FUNC(pc_aga_videoram16le_w) );
+			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc16le_aga_mda_r), FUNC(pc16le_aga_mda_w) );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga16le_r), FUNC(pc200_cga16le_w) );
 			break;
 
 		default:

@@ -588,9 +588,9 @@ static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t 
 {
 	address_space *space = machine->device("ppc1")->memory().space(AS_PROGRAM);
 
-	memory_nop_readwrite(space, 0xC00A0000, 0xC00BFFFF, 0, 0);
+	space->nop_readwrite(0xC00A0000, 0xC00BFFFF);
 
-	memory_install_readwrite_bank(space, 0xC0000000 + begin, 0xC0000000 + end, 0, 0, "bank4");
+	space->install_readwrite_bank(0xC0000000 + begin, 0xC0000000 + end, "bank4");
 }
 
 
@@ -1037,8 +1037,8 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 						address_space *space = device->machine->device("ppc1")->memory().space(AS_PROGRAM);
 
 						addr = (state->scsi53c810_data[5] | 0xC0000000) & ~0xFF;
-						memory_install_read64_handler(space, addr, addr + 0xFF, 0, 0, scsi53c810_r);
-						memory_install_write64_handler(space, addr, addr + 0xFF, 0, 0, scsi53c810_w);
+						space->install_legacy_read_handler(addr, addr + 0xFF, FUNC(scsi53c810_r));
+						space->install_legacy_write_handler(addr, addr + 0xFF, FUNC(scsi53c810_w));
 					}
 				}
 				break;
@@ -1122,8 +1122,8 @@ DRIVER_INIT( bebox )
 	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 
 	/* install MESS managed RAM */
-	memory_install_readwrite_bank(space_0, 0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
-	memory_install_readwrite_bank(space_1, 0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
+	space_0->install_readwrite_bank(0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
+	space_1->install_readwrite_bank(0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
 	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
 
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
@@ -1132,8 +1132,8 @@ DRIVER_INIT( bebox )
 	/* install VGA memory */
 	vram_begin = 0xC1000000;
 	vram_end = vram_begin + pc_vga_memory_size() - 1;
-	memory_install_readwrite64_handler(space_0, vram_begin, vram_end, 0, 0, bebox_video_r, bebox_video_w);
-	memory_install_readwrite64_handler(space_1, vram_begin, vram_end, 0, 0, bebox_video_r, bebox_video_w);
+	space_0->install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
+	space_1->install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
      * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
@@ -1153,7 +1153,7 @@ DRIVER_INIT( bebox )
 			/* bcctr 0x14, 0 */
 			U64(0x4E80042000000000)
 		};
-		memory_install_read_bank(space_1, 0x9421FFF0, 0x9421FFFF, 0, 0, "bank1");
+		space_1->install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
 		memory_set_bankptr(machine, "bank1", ops);
 	}
 }

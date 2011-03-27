@@ -1617,10 +1617,10 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if ((detect_tvdraw(state->cartridge[index].ROM)) && state->is_region_japan)
 	{
 		address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
-		memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &sms_tvdraw_axis_w);
-		memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &sms_tvdraw_status_r);
-		memory_install_read8_handler(program, 0xa000, 0xa000, 0, 0, &sms_tvdraw_data_r);
-		memory_nop_write(program, 0xa000, 0xa000, 0, 0);
+		program->install_legacy_write_handler(0x6000, 0x6000, FUNC(&sms_tvdraw_axis_w));
+		program->install_legacy_read_handler(0x8000, 0x8000, FUNC(&sms_tvdraw_status_r));
+		program->install_legacy_read_handler(0xa000, 0xa000, FUNC(&sms_tvdraw_data_r));
+		program->nop_write(0xa000, 0xa000);
 	}
 
 	if (state->cartridge[index].features & CF_KOREAN_NOBANK_MAPPER)
@@ -1629,7 +1629,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		// and then the handlers should be installed here for all but the KOREAN_NOBANK carts
 		// However, to avoid memory map breakage, we currently go the other way around
 		address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
-		memory_install_readwrite8_handler(program, 0xfffc, 0xffff, 0, 0, &sms_kor_nobank_r, &sms_kor_nobank_w);
+		program->install_legacy_readwrite_handler(0xfffc, 0xffff, FUNC(&sms_kor_nobank_r), FUNC(&sms_kor_nobank_w));
 	}
 
 	LOG(("Cart Features: %x\n", state->cartridge[index].features));
@@ -1740,12 +1740,12 @@ MACHINE_RESET( sms )
 	if (state->cartridge[state->current_cartridge].features & CF_CODEMASTERS_MAPPER)
 	{
 		/* Install special memory handlers */
-		memory_install_write8_handler(space, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w);
-		memory_install_write8_handler(space, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w);
+		space->install_legacy_write_handler(0x0000, 0x0000, FUNC(sms_codemasters_page0_w));
+		space->install_legacy_write_handler(0x4000, 0x4000, FUNC(sms_codemasters_page1_w));
 	}
 
 	if (state->cartridge[state->current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER)
-		memory_install_write8_handler(space, 0x0000, 0x0003, 0, 0, sms_korean_zemina_banksw_w);
+		space->install_legacy_write_handler(0x0000, 0x0003, FUNC(sms_korean_zemina_banksw_w));
 
 	if (state->cartridge[state->current_cartridge].features & CF_GG_SMS_MODE)
 		sms_vdp_set_ggsmsmode(state->vdp, 1);

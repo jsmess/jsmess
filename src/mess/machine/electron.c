@@ -213,11 +213,11 @@ WRITE8_HANDLER( electron_ula_w )
 			if ( state->ula.rompage == 8 || state->ula.rompage == 9 )
 			{
 				state->ula.rompage = 8;
-				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, electron_read_keyboard );
+				space->install_legacy_read_handler( 0x8000, 0xbfff, FUNC(electron_read_keyboard) );
 			}
 			else
 			{
-				memory_install_read_bank( space, 0x8000, 0xbfff, 0, 0, "bank2");
+				space->install_read_bank( 0x8000, 0xbfff, "bank2");
 			}
 			memory_set_bank(space->machine, "bank2", state->ula.rompage);
 		}

@@ -145,14 +145,14 @@ void xerox820_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_rom(program, 0x0000, 0x0fff, 0, 0, machine->region("monitor")->base());
-		memory_unmap_readwrite(program, 0x1000, 0x1fff, 0, 0);
-		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, m_video_ram);
+		program->install_rom(0x0000, 0x0fff, machine->region("monitor")->base());
+		program->unmap_readwrite(0x1000, 0x1fff);
+		program->install_ram(0x3000, 0x3fff, m_video_ram);
 	}
 	else
 	{
 		/* RAM */
-		memory_install_ram(program, 0x0000, 0x3fff, 0, 0, ram);
+		program->install_ram(0x0000, 0x3fff, ram);
 	}
 }
 
@@ -164,15 +164,15 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_rom(program, 0x0000, 0x17ff, 0, 0, machine->region("monitor")->base());
-		memory_unmap_readwrite(program, 0x1800, 0x2fff, 0, 0);
-		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, m_video_ram);
-		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
+		program->install_rom(0x0000, 0x17ff, machine->region("monitor")->base());
+		program->unmap_readwrite(0x1800, 0x2fff);
+		program->install_ram(0x3000, 0x3fff, m_video_ram);
+		program->unmap_readwrite(0x4000, 0xbfff);
 	}
 	else
 	{
 		/* RAM */
-		memory_install_ram(program, 0x0000, 0xbfff, 0, 0, ram);
+		program->install_ram(0x0000, 0xbfff, ram);
 	}
 }
 

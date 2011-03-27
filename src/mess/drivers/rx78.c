@@ -514,7 +514,7 @@ static DRIVER_INIT( rx78 )
 	address_space *prg = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(ram_size == 0x4000)
-		memory_unmap_readwrite(prg, 0x6000, 0xafff, 0, 0);
+		prg->unmap_readwrite(0x6000, 0xafff);
 }
 
 /* Driver */

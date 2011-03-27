@@ -128,13 +128,13 @@ void pc8201_state::bankswitch(UINT8 data)
 	if (rom_bank > 1)
 	{
 		/* RAM */
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 	}
 	else
 	{
 		/* ROM */
-		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0 );
+		program->install_read_bank(0x0000, 0x7fff, "bank1");
+		program->unmap_write(0x0000, 0x7fff);
 	}
 
 	memory_set_bank(machine, "bank1", rom_bank);
@@ -144,31 +144,31 @@ void pc8201_state::bankswitch(UINT8 data)
 	case 0:
 		if (ram_get_size(m_ram) > 16 * 1024)
 		{
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+			program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		}
 		else
 		{
-			memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
-			memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
+			program->unmap_readwrite(0x8000, 0xbfff);
+			program->install_readwrite_bank(0xc000, 0xffff, "bank2");
 		}
 		break;
 
 	case 1:
-		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		program->unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 2:
 		if (ram_get_size(m_ram) > 32 * 1024)
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+			program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		else
-			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+			program->unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 3:
 		if (ram_get_size(m_ram) > 64 * 1024)
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+			program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		else
-			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+			program->unmap_readwrite(0x8000, 0xffff);
 		break;
 	}
 
@@ -479,23 +479,23 @@ void tandy200_state::bankswitch(UINT8 data)
 	if (rom_bank == 3)
 	{
 		/* invalid ROM bank */
-		memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+		program->unmap_readwrite(0x0000, 0x7fff);
 	}
 	else
 	{
-		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+		program->install_read_bank(0x0000, 0x7fff, "bank1");
+		program->unmap_write(0x0000, 0x7fff);
 		memory_set_bank(machine, "bank1", rom_bank);
 	}
 
 	if (ram_get_size(m_ram) < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
-		memory_unmap_readwrite(program, 0xa000, 0xffff, 0, 0);
+		program->unmap_readwrite(0xa000, 0xffff);
 	}
 	else
 	{
-		memory_install_readwrite_bank(program, 0xa000, 0xffff, 0, 0, "bank2");
+		program->install_readwrite_bank(0xa000, 0xffff, "bank2");
 		memory_set_bank(machine, "bank2", ram_bank);
 	}
 }
@@ -1133,8 +1133,8 @@ void kc85_state::machine_start()
 	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
-	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-	memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+	program->install_read_bank(0x0000, 0x7fff, "bank1");
+	program->unmap_write(0x0000, 0x7fff);
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
@@ -1143,12 +1143,12 @@ void kc85_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 16 * 1024:
-		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
-		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
+		program->unmap_readwrite(0x8000, 0xbfff);
+		program->install_readwrite_bank(0xc000, 0xffff, "bank2");
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0,"bank2");
+		program->install_readwrite_bank(0x8000, 0xffff,"bank2");
 		break;
 	}
 
@@ -1200,8 +1200,8 @@ void trsm100_state::machine_start()
 	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
-	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-	memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+	program->install_read_bank(0x0000, 0x7fff, "bank1");
+	program->unmap_write(0x0000, 0x7fff);
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
@@ -1210,22 +1210,22 @@ void trsm100_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 8 * 1024:
-		memory_unmap_readwrite(program, 0x8000, 0xcfff, 0, 0);
-		memory_install_readwrite_bank(program, 0xe000, 0xffff, 0, 0, "bank2");
+		program->unmap_readwrite(0x8000, 0xcfff);
+		program->install_readwrite_bank(0xe000, 0xffff, "bank2");
 		break;
 
 	case 16 * 1024:
-		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
-		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
+		program->unmap_readwrite(0x8000, 0xbfff);
+		program->install_readwrite_bank(0xc000, 0xffff, "bank2");
 		break;
 
 	case 24 * 1024:
-		memory_unmap_readwrite(program, 0x8000, 0x9fff, 0, 0);
-		memory_install_readwrite_bank(program, 0xa000, 0xffff, 0, 0, "bank2");
+		program->unmap_readwrite(0x8000, 0x9fff);
+		program->install_readwrite_bank(0xa000, 0xffff, "bank2");
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
+		program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		break;
 	}
 

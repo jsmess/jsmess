@@ -181,14 +181,14 @@ void bigbord2_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_rom(program, 0x0000, 0x0fff, 0, 0, machine->region("monitor")->base());
-		memory_unmap_readwrite(program, 0x1000, 0x1fff, 0, 0);
-		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, m_videoram);
+		program->install_rom(0x0000, 0x0fff, machine->region("monitor")->base());
+		program->unmap_readwrite(0x1000, 0x1fff);
+		program->install_ram(0x3000, 0x3fff, m_videoram);
 	}
 	else
 	{
 		/* RAM */
-		memory_install_ram(program, 0x0000, 0x3fff, 0, 0, ram);
+		program->install_ram(0x0000, 0x3fff, ram);
 	}
 }
 #endif

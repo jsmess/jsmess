@@ -71,13 +71,13 @@ static void tiki100_bankswitch(running_machine *machine)
 		if (!state->rome)
 		{
 			/* reserved */
-			memory_unmap_readwrite(program, 0x0000, 0xffff, 0, 0);
+			program->unmap_readwrite(0x0000, 0xffff);
 		}
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
-			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, gfxram_r, gfxram_w);
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
+			program->install_legacy_readwrite_handler(0x0000, 0x7fff, FUNC(gfxram_r), FUNC(gfxram_w));
+			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			memory_set_bank(machine, "bank1", BANK_VIDEO_RAM);
 			memory_set_bank(machine, "bank2", BANK_VIDEO_RAM);
@@ -89,10 +89,10 @@ static void tiki100_bankswitch(running_machine *machine)
 		if (!state->rome)
 		{
 			/* ROM, RAM, RAM */
-			memory_install_read_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
-			memory_unmap_write( program, 0x0000, 0x3fff, 0, 0 );
-			memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank2");
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
+			program->install_read_bank(0x0000, 0x3fff, "bank1");
+			program->unmap_write( 0x0000, 0x3fff);
+			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			memory_set_bank(machine, "bank1", BANK_ROM);
 			memory_set_bank(machine, "bank2", BANK_RAM);
@@ -101,9 +101,9 @@ static void tiki100_bankswitch(running_machine *machine)
 		else
 		{
 			/* RAM, RAM, RAM */
-			memory_install_readwrite_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
-			memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank2");
-			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
+			program->install_readwrite_bank(0x0000, 0x3fff, "bank1");
+			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			memory_set_bank(machine, "bank1", BANK_RAM);
 			memory_set_bank(machine, "bank2", BANK_RAM);

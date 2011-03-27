@@ -66,16 +66,16 @@ void xor100_state::bankswitch()
 	case EPROM_0000:
 		if (m_bank < banks)
 		{
-			memory_install_write_bank(program, 0x0000, 0xffff, 0, 0, "bank1");
+			program->install_write_bank(0x0000, 0xffff, "bank1");
 			memory_set_bank(machine, "bank1", 1 + m_bank);
 		}
 		else
 		{
-			memory_unmap_write(program, 0x0000, 0xffff, 0, 0);
+			program->unmap_write(0x0000, 0xffff);
 		}
 
-		memory_install_read_bank(program, 0x0000, 0xf7ff, 0x07ff, 0, "bank2");
-		memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank3");
+		program->install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
+		program->install_read_bank(0xf800, 0xffff, "bank3");
 		memory_set_bank(machine, "bank2", 0);
 		memory_set_bank(machine, "bank3", 0);
 		break;
@@ -83,36 +83,36 @@ void xor100_state::bankswitch()
 	case EPROM_F800:
 		if (m_bank < banks)
 		{
-			memory_install_write_bank(program, 0x0000, 0xffff, 0, 0, "bank1");
-			memory_install_read_bank(program, 0x0000, 0xf7ff, 0, 0, "bank2");
+			program->install_write_bank(0x0000, 0xffff, "bank1");
+			program->install_read_bank(0x0000, 0xf7ff, "bank2");
 			memory_set_bank(machine, "bank1", 1 + m_bank);
 			memory_set_bank(machine, "bank2", 1 + m_bank);
 		}
 		else
 		{
-			memory_unmap_write(program, 0x0000, 0xffff, 0, 0);
-			memory_unmap_read(program, 0x0000, 0xf7ff, 0, 0);
+			program->unmap_write(0x0000, 0xffff);
+			program->unmap_read(0x0000, 0xf7ff);
 		}
 
-		memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank3");
+		program->install_read_bank(0xf800, 0xffff, "bank3");
 		memory_set_bank(machine, "bank3", 0);
 		break;
 
 	case EPROM_OFF:
 		if (m_bank < banks)
 		{
-			memory_install_write_bank(program, 0x0000, 0xffff, 0, 0, "bank1");
-			memory_install_read_bank(program, 0x0000, 0xf7ff, 0, 0, "bank2");
-			memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank3");
+			program->install_write_bank(0x0000, 0xffff, "bank1");
+			program->install_read_bank(0x0000, 0xf7ff, "bank2");
+			program->install_read_bank(0xf800, 0xffff, "bank3");
 			memory_set_bank(machine, "bank1", 1 + m_bank);
 			memory_set_bank(machine, "bank2", 1 + m_bank);
 			memory_set_bank(machine, "bank3", 1 + m_bank);
 		}
 		else
 		{
-			memory_unmap_write(program, 0x0000, 0xffff, 0, 0);
-			memory_unmap_read(program, 0x0000, 0xf7ff, 0, 0);
-			memory_unmap_read(program, 0xf800, 0xffff, 0, 0);
+			program->unmap_write(0x0000, 0xffff);
+			program->unmap_read(0x0000, 0xf7ff);
+			program->unmap_read(0xf800, 0xffff);
 		}
 		break;
 	}

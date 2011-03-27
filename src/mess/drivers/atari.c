@@ -754,18 +754,18 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
 		base3 = base + 0x14000;  /* 8K lo BIOS */
 		base4 = base + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xcfff, "bank3");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xc000, 0xcfff);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xd800, 0xffff, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xd800, 0xffff);
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
 		base3 = base + 0x0c000;  /* 8K RAM */
 		base4 = base + 0x0d800;  /* 4K RAM + 8K RAM */
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
 	memory_set_bankptr(machine, "bank3", base3);
 	memory_set_bankptr(machine, "bank4", base4);
@@ -774,14 +774,14 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x02 )
 	{
 		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank1");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xa000, 0xbfff, "bank1");
 		base1 = base + 0x0a000;  /* 8K RAM */
 	}
 	else
 	{
 		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank1");
-		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xbfff, "bank1");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xa000, 0xbfff);
 		base1 = base + 0x10000;  /* 8K BASIC */
 	}
 
@@ -791,14 +791,14 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x5000, 0x57ff, "bank2");
 		base2 = base + 0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
-		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x5000, 0x57ff);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_set_bankptr(machine, "bank2", base2);
@@ -816,18 +816,18 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
 		base3 = base + 0x14000;  /* 8K lo BIOS */
 		base4 = base + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xcfff, "bank3");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xc000, 0xcfff);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xd800, 0xffff, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xd800, 0xffff);
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
 		base3 = base + 0x0c000;  /* 8K RAM */
 		base4 = base + 0x0d800;  /* 4K RAM + 8K RAM */
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
 	memory_set_bankptr(machine, "bank3", base3);
 	memory_set_bankptr(machine, "bank4", base4);
@@ -837,14 +837,14 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		base2 = base + 0x05000;  /* 0x0800 bytes */
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x5000, 0x57ff, "bank2");
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5000, 0x57ff);
 	}
 	memory_set_bankptr(machine, "bank2", base2);
 }
@@ -860,18 +860,18 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
 		base3 = base + 0x14000;  /* 8K lo BIOS */
 		base4 = base + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xcfff, "bank3");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xc000, 0xcfff);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xd800, 0xffff, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xd800, 0xffff);
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
 		base3 = base + 0x0c000;  /* 8K RAM */
 		base4 = base + 0x0d800;  /* 4K RAM + 8K RAM */
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
 	memory_set_bankptr(machine, "bank3", base3);
 	memory_set_bankptr(machine, "bank4", base4);
@@ -881,14 +881,14 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x5000, 0x57ff, "bank2");
 		base2 = base + 0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
-		memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x5000, 0x57ff);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_set_bankptr(machine, "bank2", base2);

@@ -166,27 +166,27 @@ static void prof80_bankswitch(running_machine *machine)
 		switch (block)
 		{
 		case BLK_RAM1:
-			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + ((bank % 8) * 0x1000));
+			program->install_ram(start_addr, end_addr, ram + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_RAM2:
-			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x8000 + ((bank % 8) * 0x1000));
+			program->install_ram(start_addr, end_addr, ram + 0x8000 + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_RAM3:
-			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x10000 + ((bank % 8) * 0x1000));
+			program->install_ram(start_addr, end_addr, ram + 0x10000 + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_RAM4:
-			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x18000 + ((bank % 8) * 0x1000));
+			program->install_ram(start_addr, end_addr, ram + 0x18000 + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_EPROM:
-			memory_install_rom(program, start_addr, end_addr, 0, 0, rom + ((bank % 2) * 0x1000));
+			program->install_rom(start_addr, end_addr, rom + ((bank % 2) * 0x1000));
 			break;
 
 		default:
-			memory_unmap_readwrite(program, start_addr, end_addr, 0, 0);
+			program->unmap_readwrite(start_addr, end_addr);
 		}
 
 		//logerror("Segment %u address %04x-%04x block %u\n", bank, start_addr, end_addr, block);

@@ -315,29 +315,29 @@ static MACHINE_START( lc80 )
 	memory_configure_bank(machine, "bank4", 0, 1, machine->region(Z80_TAG)->base() + 0x2000, 0);
 	memory_set_bank(machine, "bank4", 0);
 
-	memory_install_readwrite_bank(program, 0x0000, 0x07ff, 0, 0, "bank1");
-	memory_install_readwrite_bank(program, 0x0800, 0x0fff, 0, 0, "bank2");
-	memory_install_readwrite_bank(program, 0x1000, 0x17ff, 0, 0, "bank3");
+	program->install_readwrite_bank(0x0000, 0x07ff, "bank1");
+	program->install_readwrite_bank(0x0800, 0x0fff, "bank2");
+	program->install_readwrite_bank(0x1000, 0x17ff, "bank3");
 
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 1*1024:
-		memory_install_readwrite_bank(program, 0x2000, 0x23ff, 0, 0, "bank4");
-		memory_unmap_readwrite(program, 0x2400, 0x2fff, 0, 0);
+		program->install_readwrite_bank(0x2000, 0x23ff, "bank4");
+		program->unmap_readwrite(0x2400, 0x2fff);
 		break;
 
 	case 2*1024:
-		memory_install_readwrite_bank(program, 0x2000, 0x27ff, 0, 0, "bank4");
-		memory_unmap_readwrite(program, 0x2800, 0x2fff, 0, 0);
+		program->install_readwrite_bank(0x2000, 0x27ff, "bank4");
+		program->unmap_readwrite(0x2800, 0x2fff);
 		break;
 
 	case 3*1024:
-		memory_install_readwrite_bank(program, 0x2000, 0x2bff, 0, 0, "bank4");
-		memory_unmap_readwrite(program, 0x2c00, 0x2fff, 0, 0);
+		program->install_readwrite_bank(0x2000, 0x2bff, "bank4");
+		program->unmap_readwrite(0x2c00, 0x2fff);
 		break;
 
 	case 4*1024:
-		memory_install_readwrite_bank(program, 0x2000, 0x2fff, 0, 0, "bank4");
+		program->install_readwrite_bank(0x2000, 0x2fff, "bank4");
 		break;
 	}
 

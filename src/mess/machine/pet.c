@@ -509,51 +509,51 @@ WRITE8_HANDLER( cbm8096_w )
 	{
 		if (data & 0x40)
 		{
-			memory_install_read8_handler(space, 0xe800, 0xefff, 0, 0, cbm8096_io_r);
-			memory_install_write8_handler(space, 0xe800, 0xefff, 0, 0, cbm8096_io_w);
+			space->install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
+			space->install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
 		}
 		else
 		{
-			memory_install_read_bank(space, 0xe800, 0xefff, 0, 0, "bank7");
+			space->install_read_bank(0xe800, 0xefff, "bank7");
 			if (!(data & 2))
-				memory_install_write_bank(space, 0xe800, 0xefff, 0, 0, "bank7");
+				space->install_write_bank(0xe800, 0xefff, "bank7");
 			else
-				memory_nop_write(space, 0xe800, 0xefff, 0, 0);
+				space->nop_write(0xe800, 0xefff);
 		}
 
 
 		if ((data & 2) == 0) {
-			memory_install_write_bank(space, 0xc000, 0xe7ff, 0, 0, "bank6");
-			memory_install_write_bank(space, 0xf000, 0xffef, 0, 0, "bank8");
-			memory_install_write_bank(space, 0xfff1, 0xffff, 0, 0, "bank9");
+			space->install_write_bank(0xc000, 0xe7ff, "bank6");
+			space->install_write_bank(0xf000, 0xffef, "bank8");
+			space->install_write_bank(0xfff1, 0xffff, "bank9");
 		} else {
-			memory_nop_write(space, 0xc000, 0xe7ff, 0, 0);
-			memory_nop_write(space, 0xf000, 0xffef, 0, 0);
-			memory_nop_write(space, 0xfff1, 0xffff, 0, 0);
+			space->nop_write(0xc000, 0xe7ff);
+			space->nop_write(0xf000, 0xffef);
+			space->nop_write(0xfff1, 0xffff);
 		}
 
 		if (data & 0x20)
 		{
 			state->pet80_bank1_base = state->memory + 0x8000;
 			memory_set_bankptr(space->machine, "bank1", state->pet80_bank1_base);
-			memory_install_write8_handler(space, 0x8000, 0x8fff, 0, 0, pet80_bank1_w);
+			space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 		}
 		else
 		{
 			if (!(data & 1))
-				memory_install_write_bank(space, 0x8000, 0x8fff, 0, 0, "bank1");
+				space->install_write_bank(0x8000, 0x8fff, "bank1");
 			else
-				memory_nop_write(space, 0x8000, 0x8fff, 0, 0);
+				space->nop_write(0x8000, 0x8fff);
 		}
 
 		if ((data & 1) == 0 ){
-			memory_install_write_bank(space, 0x9000, 0x9fff, 0, 0, "bank2");
-			memory_install_write_bank(space, 0xa000, 0xafff, 0, 0, "bank3");
-			memory_install_write_bank(space, 0xb000, 0xbfff, 0, 0, "bank4");
+			space->install_write_bank(0x9000, 0x9fff, "bank2");
+			space->install_write_bank(0xa000, 0xafff, "bank3");
+			space->install_write_bank(0xb000, 0xbfff, "bank4");
 		} else {
-			memory_nop_write(space, 0x9000, 0x9fff, 0, 0);
-			memory_nop_write(space, 0xa000, 0xafff, 0, 0);
-			memory_nop_write(space, 0xb000, 0xbfff, 0, 0);
+			space->nop_write(0x9000, 0x9fff);
+			space->nop_write(0xa000, 0xafff);
+			space->nop_write(0xb000, 0xbfff);
 		}
 
 		if (data & 4)
@@ -604,28 +604,28 @@ WRITE8_HANDLER( cbm8096_w )
 	{
 		state->pet80_bank1_base = state->memory + 0x8000;
 		memory_set_bankptr(space->machine, "bank1", state->pet80_bank1_base );
-		memory_install_write8_handler(space, 0x8000, 0x8fff, 0, 0, pet80_bank1_w);
+		space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 
 		memory_set_bankptr(space->machine, "bank2", state->memory + 0x9000);
-		memory_unmap_write(space, 0x9000, 0x9fff, 0, 0);
+		space->unmap_write(0x9000, 0x9fff);
 
 		memory_set_bankptr(space->machine, "bank3", state->memory + 0xa000);
-		memory_unmap_write(space, 0xa000, 0xafff, 0, 0);
+		space->unmap_write(0xa000, 0xafff);
 
 		memory_set_bankptr(space->machine, "bank4", state->memory + 0xb000);
-		memory_unmap_write(space, 0xb000, 0xbfff, 0, 0);
+		space->unmap_write(0xb000, 0xbfff);
 
 		memory_set_bankptr(space->machine, "bank6", state->memory + 0xc000);
-		memory_unmap_write(space, 0xc000, 0xe7ff, 0, 0);
+		space->unmap_write(0xc000, 0xe7ff);
 
-		memory_install_read8_handler(space, 0xe800, 0xefff, 0, 0, cbm8096_io_r);
-		memory_install_write8_handler(space, 0xe800, 0xefff, 0, 0, cbm8096_io_w);
+		space->install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
+		space->install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
 
 		memory_set_bankptr(space->machine, "bank8", state->memory + 0xf000);
-		memory_unmap_write(space, 0xf000, 0xffef, 0, 0);
+		space->unmap_write(0xf000, 0xffef);
 
 		memory_set_bankptr(space->machine, "bank9", state->memory + 0xfff1);
-		memory_unmap_write(space, 0xfff1, 0xffff, 0, 0);
+		space->unmap_write(0xfff1, 0xffff);
 	}
 }
 
@@ -701,12 +701,12 @@ static void pet_common_driver_init( running_machine *machine )
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank10");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, "bank10");
 	memory_set_bankptr(machine, "bank10", state->memory);
 
 	if (ram_get_size(machine->device(RAM_TAG)) < 0x8000)
 	{
-		memory_nop_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), ram_get_size(machine->device(RAM_TAG)), 0x7FFF, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(ram_get_size(machine->device(RAM_TAG)), 0x7FFF);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
@@ -795,11 +795,11 @@ MACHINE_RESET( pet )
 	{
 		if (input_port_read(machine, "CFG") & 0x08)
 		{
-			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff0, 0xfff0, 0, 0, cbm8096_w);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff0, 0xfff0, FUNC(cbm8096_w));
 		}
 		else
 		{
-			memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff0, 0xfff0, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfff0, 0xfff0);
 		}
 		cbm8096_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 	}

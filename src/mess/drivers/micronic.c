@@ -199,12 +199,12 @@ static WRITE8_HANDLER( bank_select_w )
 	if (data < 2)
 	{
 		memory_set_bank(space->machine, "bank1", data);
-		memory_unmap_write(space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0);
+		space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 	}
 	else
 	{
 		memory_set_bank(space->machine, "bank1", (data < 9) ? data : 8);
-		memory_install_write_bank(space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank1");
+		space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x7fff, "bank1");
 	}
 }
 
@@ -474,7 +474,7 @@ static MACHINE_START( micronic )
 static MACHINE_RESET( micronic )
 {
 	memory_set_bank(machine, "bank1", 0);
-	memory_unmap_write(machine->device(Z80_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0);
+	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 }
 
 static MACHINE_CONFIG_START( micronic, micronic_state )

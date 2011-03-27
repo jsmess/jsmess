@@ -374,71 +374,71 @@ static void apple3_update_memory(running_machine *machine)
 	/* install bank 8 (C000-CFFF) */
 	if (state->via_0_a & 0x40)
 	{
-		memory_install_read8_handler(space, 0xC000, 0xC0FF, 0, 0, apple3_c0xx_r);
-		memory_install_write8_handler(space, 0xC000, 0xC0FF, 0, 0, apple3_c0xx_w);
+		space->install_legacy_read_handler(0xC000, 0xC0FF, FUNC(apple3_c0xx_r));
+		space->install_legacy_write_handler(0xC000, 0xC0FF, FUNC(apple3_c0xx_w));
 	}
 	else
 	{
-		memory_install_read_bank(space, 0xC000, 0xC0FF, 0, 0, "bank8");
+		space->install_read_bank(0xC000, 0xC0FF, "bank8");
 		if (state->via_0_a & 0x08)
-			memory_unmap_write(space, 0xC000, 0xC0FF, 0, 0);
+			space->unmap_write(0xC000, 0xC0FF);
 		else
-			memory_install_write_bank(space, 0xC000, 0xC0FF, 0, 0, "bank8");
+			space->install_write_bank(0xC000, 0xC0FF, "bank8");
 		apple3_setbank(machine,"bank8", ~0, 0x4000);
 	}
 
 	/* install bank 9 (C100-C4FF) */
 	if (state->via_0_a & 0x40)
 	{
-		memory_nop_readwrite(space, 0xC100, 0xC4FF, 0, 0);
+		space->nop_readwrite(0xC100, 0xC4FF);
 	}
 	else
 	{
-		memory_install_read_bank(space, 0xC100, 0xC4FF, 0, 0, "bank9");
+		space->install_read_bank(0xC100, 0xC4FF, "bank9");
 		if (state->via_0_a & 0x08)
-			memory_unmap_write(space, 0xC100, 0xC4FF, 0, 0);
+			space->unmap_write(0xC100, 0xC4FF);
 		else
-			memory_install_write_bank(space, 0xC100, 0xC4FF, 0, 0, "bank9");
+			space->install_write_bank(0xC100, 0xC4FF, "bank9");
 		apple3_setbank(machine,"bank9", ~0, 0x4100);
 	}
 
 	/* install bank 10 (C500-C7FF) */
-	memory_install_read_bank(space, 0xC500, 0xC7FF, 0, 0, "bank10");
+	space->install_read_bank(0xC500, 0xC7FF, "bank10");
 	if (state->via_0_a & 0x08)
-		memory_unmap_write(space, 0xC500, 0xC7FF, 0, 0);
+		space->unmap_write(0xC500, 0xC7FF);
 	else
-		memory_install_write_bank(space, 0xC500, 0xC7FF, 0, 0, "bank10");
+		space->install_write_bank(0xC500, 0xC7FF, "bank10");
 	apple3_setbank(machine,"bank10", ~0, 0x4500);
 
 	/* install bank 11 (C800-CFFF) */
 	if (state->via_0_a & 0x40)
 	{
-		memory_nop_readwrite(space, 0xC800, 0xCFFF, 0, 0);
+		space->nop_readwrite(0xC800, 0xCFFF);
 	}
 	else
 	{
-		memory_install_read_bank(space, 0xC800, 0xCFFF, 0, 0, "bank11");
+		space->install_read_bank(0xC800, 0xCFFF, "bank11");
 		if (state->via_0_a & 0x08)
-			memory_unmap_write(space, 0xC800, 0xCFFF, 0, 0);
+			space->unmap_write(0xC800, 0xCFFF);
 		else
-			memory_install_write_bank(space, 0xC800, 0xCFFF, 0, 0, "bank11");
+			space->install_write_bank(0xC800, 0xCFFF, "bank11");
 		apple3_setbank(machine,"bank11", ~0, 0x4800);
 	}
 
 	/* install bank 6 (D000-EFFF) */
-	memory_install_read_bank(space, 0xD000, 0xEFFF, 0, 0, "bank6");
+	space->install_read_bank(0xD000, 0xEFFF, "bank6");
 	if (state->via_0_a & 0x08)
-		memory_unmap_write(space, 0xD000, 0xEFFF, 0, 0);
+		space->unmap_write(0xD000, 0xEFFF);
 	else
-		memory_install_write_bank(space, 0xD000, 0xEFFF, 0, 0, "bank6");
+		space->install_write_bank(0xD000, 0xEFFF, "bank6");
 	apple3_setbank(machine,"bank6", ~0, 0x5000);
 
 	/* install bank 7 (F000-FFFF) */
-	memory_install_read_bank(space, 0xF000, 0xFFFF, 0, 0, "bank7");
+	space->install_read_bank(0xF000, 0xFFFF, "bank7");
 	if (state->via_0_a & 0x09)
-		memory_unmap_write(space, 0xF000, 0xFFFF, 0, 0);
+		space->unmap_write(0xF000, 0xFFFF);
 	else
-		memory_install_write_bank(space, 0xF000, 0xFFFF, 0, 0, "bank7");
+		space->install_write_bank(0xF000, 0xFFFF, "bank7");
 	if (state->via_0_a & 0x01)
 		memory_set_bankptr(machine,"bank7", machine->region("maincpu")->base());
 	else

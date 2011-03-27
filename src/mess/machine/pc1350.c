@@ -128,26 +128,26 @@ MACHINE_START( pc1350 )
 	state->power = 1;
 	machine->scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1350_power_up));
 
-	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");
+	space->install_readwrite_bank(0x6000, 0x6fff, "bank1");
 	memory_set_bankptr(machine, "bank1", &ram_get_ptr(machine->device(RAM_TAG))[0x0000]);
 
 	if (ram_get_size(machine->device(RAM_TAG)) >= 0x3000)
 	{
-		memory_install_readwrite_bank(space, 0x4000, 0x5fff, 0, 0, "bank2");
+		space->install_readwrite_bank(0x4000, 0x5fff, "bank2");
 		memory_set_bankptr(machine, "bank2", &ram_get_ptr(machine->device(RAM_TAG))[0x1000]);
 	}
 	else
 	{
-		memory_nop_readwrite(space, 0x4000, 0x5fff, 0, 0);
+		space->nop_readwrite(0x4000, 0x5fff);
 	}
 
 	if (ram_get_size(machine->device(RAM_TAG)) >= 0x5000)
 	{
-		memory_install_readwrite_bank(space, 0x2000, 0x3fff, 0, 0, "bank3");
+		space->install_readwrite_bank(0x2000, 0x3fff, "bank3");
 		memory_set_bankptr(machine, "bank3", &ram_get_ptr(machine->device(RAM_TAG))[0x3000]);
 	}
 	else
 	{
-		memory_nop_readwrite(space, 0x2000, 0x3fff, 0, 0);
+		space->nop_readwrite(0x2000, 0x3fff);
 	}
 }

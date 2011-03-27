@@ -164,21 +164,21 @@ void vp550_install_write_handlers(device_t *device, address_space *program, int 
 
 	if (enabled)
 	{
-		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_A], 0x8001, 0x8001, 0, 0, cdp1863_str_w);
-		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_B], 0x8002, 0x8002, 0, 0, cdp1863_str_w);
-		memory_install_write8_device_handler(program, device, 0x8003, 0x8003, 0, 0, vp550_octave_w);
-		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_A], 0x8010, 0x8010, 0, 0, vp550_vlmn_w);
-		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_B], 0x8020, 0x8020, 0, 0, vp550_vlmn_w);
-		memory_install_write8_device_handler(program, vp550->sync_timer, 0x8030, 0x8030, 0, 0, vp550_sync_w);
+		program->install_legacy_write_handler(*vp550->cdp1863[CHANNEL_A], 0x8001, 0x8001, FUNC(cdp1863_str_w));
+		program->install_legacy_write_handler(*vp550->cdp1863[CHANNEL_B], 0x8002, 0x8002, FUNC(cdp1863_str_w));
+		program->install_legacy_write_handler(*device, 0x8003, 0x8003, FUNC(vp550_octave_w));
+		program->install_legacy_write_handler(*vp550->cdp1863[CHANNEL_A], 0x8010, 0x8010, FUNC(vp550_vlmn_w));
+		program->install_legacy_write_handler(*vp550->cdp1863[CHANNEL_B], 0x8020, 0x8020, FUNC(vp550_vlmn_w));
+		program->install_legacy_write_handler(*vp550->sync_timer, 0x8030, 0x8030, FUNC(vp550_sync_w));
 	}
 	else
 	{
-		memory_unmap_write(program, 0x8001, 0x8001, 0, 0);
-		memory_unmap_write(program, 0x8002, 0x8002, 0, 0);
-		memory_unmap_write(program, 0x8003, 0x8003, 0, 0);
-		memory_unmap_write(program, 0x8010, 0x8010, 0, 0);
-		memory_unmap_write(program, 0x8020, 0x8020, 0, 0);
-		memory_unmap_write(program, 0x8030, 0x8030, 0, 0);
+		program->unmap_write(0x8001, 0x8001);
+		program->unmap_write(0x8002, 0x8002);
+		program->unmap_write(0x8003, 0x8003);
+		program->unmap_write(0x8010, 0x8010);
+		program->unmap_write(0x8020, 0x8020);
+		program->unmap_write(0x8030, 0x8030);
 	}
 }
 

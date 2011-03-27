@@ -665,10 +665,10 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 		expansion_ram_end = 0x80000 + (ram_get_size(space->machine->device(RAM_TAG)) - 128*1024) - 1;
 
 		if (data == 0x00) {
-			memory_install_readwrite_bank(space, expansion_ram_begin, expansion_ram_end,0,0,"bank16");
+			space->install_readwrite_bank(expansion_ram_begin, expansion_ram_end,"bank16");
 			memory_set_bankptr(space->machine, "bank16", ram_get_ptr(space->machine->device(RAM_TAG)) + 128*1024);
 		} else {
-			memory_nop_readwrite(space, expansion_ram_begin, expansion_ram_end,0,0);
+			space->nop_readwrite(expansion_ram_begin, expansion_ram_end);
 		}
 	}
 }
@@ -820,13 +820,13 @@ void c65_bankswitch_interface( running_machine *machine, int value )
 		{
 			memory_set_bankptr(machine, "bank8", state->colorram + 0x400);
 			memory_set_bankptr(machine, "bank9", state->colorram + 0x400);
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0dc00, 0x0dfff, "bank8");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0dc00, 0x0dfff, "bank9");
 		}
 		else
 		{
-			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
-			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0,c65_write_io_dc00);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
 		}
 	}
 
@@ -896,18 +896,18 @@ void c65_bankswitch( running_machine *machine )
 
 		if (state->io_dc00_on)
 		{
-			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
-			memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_write_io_dc00);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
 		}
 		else
 		{
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0dc00, 0x0dfff, "bank8");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0dc00, 0x0dfff, "bank9");
 			memory_set_bankptr(machine, "bank8", state->colorram + 0x400);
 			memory_set_bankptr(machine, "bank9", state->colorram + 0x400);
 		}
-		memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_read_io);
-		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_write_io);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0d000, 0x0d7ff, FUNC(c65_read_io));
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0d000, 0x0d7ff, FUNC(c65_write_io));
 	}
 	else
 	{
@@ -927,8 +927,8 @@ void c65_bankswitch( running_machine *machine )
 			memory_set_bankptr(machine, "bank6", state->memory + 0xd800);
 			memory_set_bankptr(machine, "bank8", state->memory + 0xdc00);
 		}
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank4");
-		memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank5");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0d000, 0x0d7ff, "bank4");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0d000, 0x0d7ff, "bank5");
 	}
 
 	if (!state->game && state->exrom)

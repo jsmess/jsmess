@@ -466,7 +466,7 @@ static void c64_bankswitch( running_machine *machine, int reset )
 			memory_set_bankptr(machine, "bank2", state->memory + 0x8000);
 			memory_set_bankptr(machine, "bank3", state->memory + 0xa000);
 			memory_set_bankptr(machine, "bank4", state->romh);
-			memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xffff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xffff);
 	}
 	else
 	{
@@ -1572,20 +1572,20 @@ static void setup_c64_custom_mappers(running_machine *machine)
 		case KCS_PC:		/* Type #  2 not working */
 			break;
 		case FINAL_CART_III:    /* Type #  3 not working - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xdfff */
-			memory_install_write8_handler( space, 0xdfff, 0xdfff, 0, 0, fc3_bank_w );
+			space->install_legacy_write_handler( 0xdfff, 0xdfff, FUNC(fc3_bank_w) );
 			break;
 		case SIMONS_BASIC:	/* Type #  4 not working */
 			break;
 		case OCEAN_1:           /* Type #  5 - up to 64 8k banks, loaded at 0x8000 or 0xa000, banks chosen by writing to 0xde00 */
-			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, ocean1_bank_w );
+			space->install_legacy_write_handler( 0xde00, 0xde00, FUNC(ocean1_bank_w) );
 			break;
 		case EXPERT:		/* Type #  6 not working */
 			break;
 		case FUN_PLAY:          /* Type #  7 - 16 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
-			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, funplay_bank_w );
+			space->install_legacy_write_handler( 0xde00, 0xde00, FUNC(funplay_bank_w) );
 			break;
 		case SUPER_GAMES:		/* Type #  8 not working */
-			memory_install_write8_handler( space, 0xdf00, 0xdf00, 0, 0, supergames_bank_w );
+			space->install_legacy_write_handler( 0xdf00, 0xdf00, FUNC(supergames_bank_w) );
 			break;
 		case ATOMIC_POWER:	/* Type #  9 not working */
 			break;
@@ -1600,21 +1600,21 @@ static void setup_c64_custom_mappers(running_machine *machine)
 		case MAGIC_FORMEL:	/* Type # 14 not working */
 			break;
 		case C64GS:             /* Type # 15 - up to 64 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 + bank */
-			memory_install_write8_handler( space, 0xde00, 0xdeff, 0, 0, c64gs_bank_w );
+			space->install_legacy_write_handler( 0xde00, 0xdeff, FUNC(c64gs_bank_w) );
 			break;
 		case DINAMIC:           /* Type # 17 - 16 8k banks, loaded at 0x8000, banks chosen by reading to 0xde00 + bank */
-			memory_install_read8_handler( space, 0xde00, 0xdeff, 0, 0, dinamic_bank_r );
+			space->install_legacy_read_handler( 0xde00, 0xdeff, FUNC(dinamic_bank_r) );
 			break;
 		case ZAXXON:		/* Type # 18 */
-			memory_install_read8_handler( space, 0x8000, 0x9fff, 0, 0, zaxxon_bank_r );
+			space->install_legacy_read_handler( 0x8000, 0x9fff, FUNC(zaxxon_bank_r) );
 			break;
 		case DOMARK:		/* Type # 19 */
-			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, domark_bank_w );
+			space->install_legacy_write_handler( 0xde00, 0xde00, FUNC(domark_bank_w) );
 			break;
 		case SUPER_SNAP_5:	/* Type # 20 not working */
 			break;
 		case COMAL_80:          /* Type # 21 - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
-			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, comal80_bank_w );
+			space->install_legacy_write_handler( 0xde00, 0xde00, FUNC(comal80_bank_w) );
 			break;
 		case GENERIC_CRT:       /* Type #  0 - single bank, no bankswitch, loaded at start with correct size and place */
 		default:

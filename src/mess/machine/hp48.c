@@ -792,23 +792,23 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 		}
 
 		if (state->modules[i].data)
-			memory_install_read_bank( space, base, end, 0, mirror, bank );
+			space->install_read_bank( base, end, 0, mirror, bank );
 		else
 		{
 			if (state->modules[i].read != NULL)
-				memory_install_read8_handler( space, base, end, 0, mirror, state->modules[i].read );
+				space->install_legacy_read_handler( base, end, 0, mirror, FUNC(state->modules[i].read) );
 		}
 
 		if (state->modules[i].isnop)
-			memory_nop_write(space, base, end, 0, mirror);
+			space->nop_write(base, end, 0, mirror);
 		else
 		{
 			if (state->modules[i].data)
-				memory_install_write_bank( space, base, end, 0, mirror, bank );
+				space->install_write_bank( base, end, 0, mirror, bank );
 			else
 			{
 				if (state->modules[i].write != NULL)
-					memory_install_write8_handler( space, base, end, 0, mirror, state->modules[i].write );
+					space->install_legacy_write_handler( base, end, 0, mirror, FUNC(state->modules[i].write) );
 			}
 		}
 

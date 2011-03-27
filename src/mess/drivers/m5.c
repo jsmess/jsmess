@@ -629,7 +629,7 @@ void m5_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 4*1024:
-		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		program->unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 36*1024:

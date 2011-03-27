@@ -141,7 +141,7 @@ static void bankswitch(running_machine *machine)
 
 	UINT8 *eprom = machine->region("a000")->base() + (state->eprom << 12);
 
-	memory_install_rom(program, 0xa000, 0xafff, 0, 0, eprom);
+	program->install_rom(0xa000, 0xafff, eprom);
 }
 
 /*-------------------------------------------------

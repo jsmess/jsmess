@@ -258,7 +258,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			ChosenROM = machine->region("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
 			memory_set_bankptr(machine, "bank1", ChosenROM);
-			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+			space->unmap_write(0x0000, 0x3fff);
 
 			logerror("rom switch: %02x\n", ROMSelection);
 	}
@@ -277,7 +277,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			ram_data = messram + (memory_selection[0] << 14);
 			memory_set_bankptr(machine, "bank1", ram_data);
 			/* allow writes to 0x0000-0x03fff */
-			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+			space->install_write_bank(0x0000, 0x3fff, "bank1");
 
 			ram_data = messram + (memory_selection[1] << 14);
 			memory_set_bankptr(machine, "bank2", ram_data);

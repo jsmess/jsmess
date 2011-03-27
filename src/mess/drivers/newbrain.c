@@ -73,14 +73,14 @@ static void check_interrupt(running_machine *machine)
 /* Bank Switching */
 
 #define memory_install_unmapped(program, bank, bank_start, bank_end) \
-	memory_unmap_readwrite(program, bank_start, bank_end, 0, 0);
+	program->unmap_readwrite(bank_start, bank_end);
 
 #define memory_install_rom_helper(program, bank, bank_start, bank_end) \
-	memory_install_read_bank(program, bank_start, bank_end, 0, 0, bank); \
-	memory_unmap_write(program, bank_start, bank_end, 0, 0);
+	program->install_read_bank(bank_start, bank_end, bank); \
+	program->unmap_write(bank_start, bank_end);
 
 #define memory_install_ram_helper(program, bank, bank_start, bank_end) \
-	memory_install_readwrite_bank(program, bank_start, bank_end, 0, 0, bank);
+	program->install_readwrite_bank(bank_start, bank_end, bank);
 
 static void newbrain_eim_bankswitch(running_machine *machine)
 {

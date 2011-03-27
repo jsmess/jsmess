@@ -30,14 +30,14 @@ static void samcoupe_update_bank(address_space *space, int bank_num, UINT8 *memo
 	if (memory)
 	{
 		memory_set_bankptr(space->machine, bank, memory);
-		memory_install_read_bank (space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0, bank);
+		space->install_read_bank (((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, bank);
 		if (is_readonly) {
-			memory_unmap_write(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0);
+			space->unmap_write(((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF);
 		} else {
-			memory_install_write_bank(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0, bank);
+			space->install_write_bank(((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, bank);
 		}
 	} else {
-		memory_nop_readwrite(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0);
+		space->nop_readwrite(((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF);
 	}
 }
 
@@ -262,12 +262,12 @@ MACHINE_RESET( samcoupe )
 	{
 		/* install RTC */
 		device_t *rtc = machine->device("sambus_clock");
-		memory_install_readwrite8_device_handler(spaceio, rtc, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
+		spaceio->install_legacy_readwrite_handler(*rtc, 0xef, 0xef, 0xffff, 0xff00, FUNC(samcoupe_rtc_r), FUNC(samcoupe_rtc_w));
 	}
 	else
 	{
 		/* no RTC support */
-		memory_unmap_readwrite(spaceio, 0xef, 0xef, 0xffff, 0xff00);
+		spaceio->unmap_readwrite(0xef, 0xef, 0xffff, 0xff00);
 	}
 
 	/* initialize memory */

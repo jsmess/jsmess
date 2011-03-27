@@ -679,12 +679,12 @@ static MACHINE_START( osi600 )
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 4*1024:
-		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_unmap_readwrite(program, 0x1000, 0x1fff, 0, 0);
+		program->install_readwrite_bank(0x0000, 0x0fff, "bank1");
+		program->unmap_readwrite(0x1000, 0x1fff);
 		break;
 
 	case 8*1024:
-		memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
 		break;
 	}
 
@@ -709,12 +709,12 @@ static MACHINE_START( c1p )
 	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 8*1024:
-		memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
-		memory_unmap_readwrite(program, 0x2000, 0x4fff, 0, 0);
+		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program->unmap_readwrite(0x2000, 0x4fff);
 		break;
 
 	case 20*1024:
-		memory_install_readwrite_bank(program, 0x0000, 0x4fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x4fff, "bank1");
 		break;
 	}
 

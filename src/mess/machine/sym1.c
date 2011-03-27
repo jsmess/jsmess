@@ -202,24 +202,24 @@ static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
 	if ((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) {
-		memory_nop_write(cpu0space, 0xa600, 0xa67f, 0, 0);
+		cpu0space->nop_write(0xa600, 0xa67f);
 	} else {
-		memory_install_write_bank(cpu0space, 0xa600, 0xa67f, 0, 0, "bank5");
+		cpu0space->install_write_bank(0xa600, 0xa67f, "bank5");
 	}
 	if ((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) {
-		memory_nop_write(cpu0space, 0x0400, 0x07ff, 0, 0);
+		cpu0space->nop_write(0x0400, 0x07ff);
 	} else {
-		memory_install_write_bank(cpu0space, 0x0400, 0x07ff, 0, 0, "bank2");
+		cpu0space->install_write_bank(0x0400, 0x07ff, "bank2");
 	}
 	if ((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) {
-		memory_nop_write(cpu0space, 0x0800, 0x0bff, 0, 0);
+		cpu0space->nop_write(0x0800, 0x0bff);
 	} else {
-		memory_install_write_bank(cpu0space, 0x0800, 0x0bff, 0, 0, "bank3");
+		cpu0space->install_write_bank(0x0800, 0x0bff, "bank3");
 	}
 	if ((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) {
-		memory_nop_write(cpu0space, 0x0c00, 0x0fff, 0, 0);
+		cpu0space->nop_write(0x0c00, 0x0fff);
 	} else {
-		memory_install_write_bank(cpu0space, 0x0c00, 0x0fff, 0, 0, "bank4");
+		cpu0space->install_write_bank(0x0c00, 0x0fff, "bank4");
 	}
 }
 
@@ -290,8 +290,8 @@ DRIVER_INIT( sym1 )
 	/* wipe expansion memory banks that are not installed */
 	if (ram_get_size(machine->device(RAM_TAG)) < 4*1024)
 	{
-		memory_nop_readwrite(machine->device( "maincpu")->memory().space( AS_PROGRAM ),
-			ram_get_size(machine->device(RAM_TAG)), 0x0fff, 0, 0);
+		machine->device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
+			ram_get_size(machine->device(RAM_TAG)), 0x0fff);
 	}
 
 	/* allocate a timer to refresh the led display */
@@ -304,8 +304,8 @@ MACHINE_RESET( sym1 )
 	sym1_state *state = machine->driver_data<sym1_state>();
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
        so that the CPU can find its reset vectors */
-	memory_install_read_bank(machine->device( "maincpu")->memory().space( AS_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
-	memory_nop_write(machine->device( "maincpu")->memory().space( AS_PROGRAM ),0xf800, 0xffff, 0, 0);
+	machine->device( "maincpu")->memory().space( AS_PROGRAM )->install_read_bank(0xf800, 0xffff, "bank1");
+	machine->device( "maincpu")->memory().space( AS_PROGRAM )->nop_write(0xf800, 0xffff);
 	memory_set_bankptr(machine, "bank1", state->monitor + 0x800);
 	machine->device("maincpu")->reset();
 }

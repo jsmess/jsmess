@@ -473,14 +473,14 @@ MACHINE_RESET( c16 )
 		memory_set_bankptr(machine, "bank6", ram + (0x8000 % ram_size));
 		memory_set_bankptr(machine, "bank7", ram + (0xc000 % ram_size));
 
-		memory_install_write_bank(space, 0xff20, 0xff3d, 0, 0,"bank10");
-		memory_install_write_bank(space, 0xff40, 0xffff, 0, 0, "bank11");
+		space->install_write_bank(0xff20, 0xff3d,"bank10");
+		space->install_write_bank(0xff40, 0xffff, "bank11");
 		memory_set_bankptr(machine, "bank10", ram + (0xff20 % ram_size));
 		memory_set_bankptr(machine, "bank11", ram + (0xff40 % ram_size));
 	}
 	else
 	{
-		memory_install_write_bank(space, 0x4000, 0xfcff, 0, 0, "bank10");
+		space->install_write_bank(0x4000, 0xfcff, "bank10");
 		memory_set_bankptr(machine, "bank10", ram + (0x4000 % ram_size));
 	}
 }
@@ -519,13 +519,13 @@ static TIMER_CALLBACK( c16_sidhack_tick )
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x02)
 	{
 		if (state->pal)
-			memory_install_write8_handler(space, 0xd400, 0xd41f, 0, 0, c16_sidcart_16k);
+			space->install_legacy_write_handler(0xd400, 0xd41f, FUNC(c16_sidcart_16k));
 		else
-			memory_install_write8_handler(space, 0xd400, 0xd41f, 0, 0, c16_sidcart_64k);
+			space->install_legacy_write_handler(0xd400, 0xd41f, FUNC(c16_sidcart_64k));
 	}
 	else
 	{
-		memory_unmap_write(space, 0xd400, 0xd41f, 0, 0);
+		space->unmap_write(0xd400, 0xd41f);
 	}
 }
 #endif
@@ -536,9 +536,9 @@ static TIMER_CALLBACK( c16_sidcard_tick )
 	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x01)
-		memory_install_readwrite8_device_handler(space, state->sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r, sid6581_w);
+		space->install_legacy_readwrite_handler(*state->sid, 0xfe80, 0xfe9f, FUNC(sid6581_r), FUNC(sid6581_w));
 	else
-		memory_install_readwrite8_device_handler(space, state->sid, 0xfd40, 0xfd5f, 0, 0, sid6581_r, sid6581_w);
+		space->install_legacy_readwrite_handler(*state->sid, 0xfd40, 0xfd5f, FUNC(sid6581_r), FUNC(sid6581_w));
 }
 
 INTERRUPT_GEN( c16_frame_interrupt )

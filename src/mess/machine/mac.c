@@ -233,12 +233,12 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 
 	if (!is_rom)
 	{
-		memory_install_readwrite_bank(space, memory_begin, memory_end, memory_mask, 0, bank);
+		space->install_readwrite_bank(memory_begin, memory_end, memory_mask, 0, bank);
 	}
 	else
 	{
-		memory_unmap_write(space, memory_begin, memory_end, memory_mask, 0);
-		memory_install_read_bank(space, memory_begin, memory_end, memory_mask, 0, bank);
+		space->unmap_write(memory_begin, memory_end, memory_mask, 0);
+		space->install_read_bank(memory_begin, memory_end, memory_mask, 0, bank);
 	}
 
 	memory_set_bankptr(machine, bank, memory_data);
@@ -420,7 +420,7 @@ void mac_state::v8_resize()
 		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
 		// force unmap of entire RAM region
-		memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
+		space->unmap_write(0, 0x9fffff, 0x9fffff, 0);
 
 		// LC has 2 MB built-in, all other V8-style machines have 4 MB
 		// we reserve the first 2 or 4 MB of mess_ram for the onboard,

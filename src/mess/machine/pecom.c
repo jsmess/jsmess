@@ -33,12 +33,12 @@ MACHINE_RESET( pecom )
 
 	pecom_state *state = machine->driver_data<pecom_state>();
 
-	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
-	memory_unmap_write(space, 0xf000, 0xf7ff, 0, 0);
-	memory_unmap_write(space, 0xf800, 0xffff, 0, 0);
-	memory_install_read_bank (space, 0xf000, 0xf7ff, 0, 0, "bank3");
-	memory_install_read_bank (space, 0xf800, 0xffff, 0, 0, "bank4");
+	space->unmap_write(0x0000, 0x3fff);
+	space->install_write_bank(0x4000, 0x7fff, "bank2");
+	space->unmap_write(0xf000, 0xf7ff);
+	space->unmap_write(0xf800, 0xffff);
+	space->install_read_bank (0xf000, 0xf7ff, "bank3");
+	space->install_read_bank (0xf800, 0xffff, "bank4");
 	memory_set_bankptr(machine, "bank1", rom + 0x8000);
 	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 	memory_set_bankptr(machine, "bank3", rom + 0xf000);
@@ -78,22 +78,22 @@ WRITE8_HANDLER( pecom_bank_w )
 //  pecom_state *state = space->machine->driver_data<pecom_state>();
 	address_space *space2 = space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *rom = space->machine->region(CDP1802_TAG)->base();
-	memory_install_write_bank(space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x0000);
 
 	if (data==2)
 	{
-		memory_install_read8_handler (space2, 0xf000, 0xf7ff, 0, 0, pecom_cdp1869_charram_r);
-		memory_install_write8_handler(space2, 0xf000, 0xf7ff, 0, 0, pecom_cdp1869_charram_w);
-		memory_install_read8_handler (space2, 0xf800, 0xffff, 0, 0, pecom_cdp1869_pageram_r);
-		memory_install_write8_handler(space2, 0xf800, 0xffff, 0, 0, pecom_cdp1869_pageram_w);
+		space2->install_legacy_read_handler (0xf000, 0xf7ff, FUNC(pecom_cdp1869_charram_r));
+		space2->install_legacy_write_handler(0xf000, 0xf7ff, FUNC(pecom_cdp1869_charram_w));
+		space2->install_legacy_read_handler (0xf800, 0xffff, FUNC(pecom_cdp1869_pageram_r));
+		space2->install_legacy_write_handler(0xf800, 0xffff, FUNC(pecom_cdp1869_pageram_w));
 	}
 	else
 	{
-		memory_unmap_write(space2, 0xf000, 0xf7ff, 0, 0);
-		memory_unmap_write(space2, 0xf800, 0xffff, 0, 0);
-		memory_install_read_bank (space2, 0xf000, 0xf7ff, 0, 0, "bank3");
-		memory_install_read_bank (space2, 0xf800, 0xffff, 0, 0, "bank4");
+		space2->unmap_write(0xf000, 0xf7ff);
+		space2->unmap_write(0xf800, 0xffff);
+		space2->install_read_bank (0xf000, 0xf7ff, "bank3");
+		space2->install_read_bank (0xf800, 0xffff, "bank4");
 		memory_set_bankptr(space->machine, "bank3", rom + 0xf000);
 		memory_set_bankptr(space->machine, "bank4", rom + 0xf800);
 	}

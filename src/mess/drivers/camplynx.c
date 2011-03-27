@@ -312,22 +312,22 @@ INPUT_PORTS_END
 static MACHINE_RESET( lynx128k )
 {
 	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_read_bank (mem, 0x0000, 0x1fff, 0, 0, "bank1");
-	memory_install_read_bank (mem, 0x2000, 0x3fff, 0, 0, "bank2");
-	memory_install_read_bank (mem, 0x4000, 0x5fff, 0, 0, "bank3");
-	memory_install_read_bank (mem, 0x6000, 0x7fff, 0, 0, "bank4");
-	memory_install_read_bank (mem, 0x8000, 0x9fff, 0, 0, "bank5");
-	memory_install_read_bank (mem, 0xa000, 0xbfff, 0, 0, "bank6");
-	memory_install_read_bank (mem, 0xc000, 0xdfff, 0, 0, "bank7");
-	memory_install_read_bank (mem, 0xe000, 0xffff, 0, 0, "bank8");
-	memory_install_write_bank (mem, 0x0000, 0x1fff, 0, 0, "bank11");
-	memory_install_write_bank (mem, 0x2000, 0x3fff, 0, 0, "bank12");
-	memory_install_write_bank (mem, 0x4000, 0x5fff, 0, 0, "bank13");
-	memory_install_write_bank (mem, 0x6000, 0x7fff, 0, 0, "bank14");
-	memory_install_write_bank (mem, 0x8000, 0x9fff, 0, 0, "bank15");
-	memory_install_write_bank (mem, 0xa000, 0xbfff, 0, 0, "bank16");
-	memory_install_write_bank (mem, 0xc000, 0xdfff, 0, 0, "bank17");
-	memory_install_write_bank (mem, 0xe000, 0xffff, 0, 0, "bank18");
+	mem->install_read_bank (0x0000, 0x1fff, "bank1");
+	mem->install_read_bank (0x2000, 0x3fff, "bank2");
+	mem->install_read_bank (0x4000, 0x5fff, "bank3");
+	mem->install_read_bank (0x6000, 0x7fff, "bank4");
+	mem->install_read_bank (0x8000, 0x9fff, "bank5");
+	mem->install_read_bank (0xa000, 0xbfff, "bank6");
+	mem->install_read_bank (0xc000, 0xdfff, "bank7");
+	mem->install_read_bank (0xe000, 0xffff, "bank8");
+	mem->install_write_bank (0x0000, 0x1fff, "bank11");
+	mem->install_write_bank (0x2000, 0x3fff, "bank12");
+	mem->install_write_bank (0x4000, 0x5fff, "bank13");
+	mem->install_write_bank (0x6000, 0x7fff, "bank14");
+	mem->install_write_bank (0x8000, 0x9fff, "bank15");
+	mem->install_write_bank (0xa000, 0xbfff, "bank16");
+	mem->install_write_bank (0xc000, 0xdfff, "bank17");
+	mem->install_write_bank (0xe000, 0xffff, "bank18");
 
 	lynx128k_bank_w(mem, 0, 0);
 }

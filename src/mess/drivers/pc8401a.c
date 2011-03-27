@@ -92,26 +92,26 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		if (rombank < 3)
 		{
 			/* internal ROM */
-			memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-			memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+			program->install_read_bank(0x0000, 0x7fff, "bank1");
+			program->unmap_write(0x0000, 0x7fff);
 			memory_set_bank(machine, "bank1", rombank);
 		}
 		else
 		{
 			/* ROM cartridge */
-			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+			program->unmap_readwrite(0x0000, 0x7fff);
 		}
 		//logerror("0x0000-0x7fff = ROM %u\n", rombank);
 		break;
 
 	case 1: /* RAM 0000H to 7FFFH */
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		memory_set_bank(machine, "bank1", 4);
 		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
 	case 2:	/* RAM 8000H to FFFFH */
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		memory_set_bank(machine, "bank1", 5);
 		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
 		break;
@@ -124,19 +124,19 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	switch (ram8000)
 	{
 	case 0: /* cell addresses 0000H to 3FFFH */
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 		memory_set_bank(machine, "bank3", 0);
 		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
 		break;
 
 	case 1: /* cell addresses 4000H to 7FFFH */
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 		memory_set_bank(machine, "bank3", 1);
 		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
 		break;
 
 	case 2: /* cell addresses 8000H to BFFFH */
-		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 		memory_set_bank(machine, "bank3", 2);
 		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
 		break;
@@ -144,12 +144,12 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	case 3: /* RAM cartridge */
 		if (ram_get_size(machine->device(RAM_TAG)) > 64)
 		{
-			memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+			program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			memory_set_bank(machine, "bank3", 3); // TODO or 4
 		}
 		else
 		{
-			memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+			program->unmap_readwrite(0x8000, 0xbfff);
 		}
 		//logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
@@ -158,15 +158,15 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	if (BIT(data, 6))
 	{
 		/* CRT video RAM */
-		memory_install_readwrite_bank(program, 0xc000, 0xdfff, 0, 0, "bank4");
-		memory_unmap_readwrite(program, 0xe000, 0xe7ff, 0, 0);
+		program->install_readwrite_bank(0xc000, 0xdfff, "bank4");
+		program->unmap_readwrite(0xe000, 0xe7ff);
 		memory_set_bank(machine, "bank4", 1);
 		//logerror("0xc000-0xdfff = video RAM\n");
 	}
 	else
 	{
 		/* RAM */
-		memory_install_readwrite_bank(program, 0xc000, 0xe7ff, 0, 0, "bank4");
+		program->install_readwrite_bank(0xc000, 0xe7ff, "bank4");
 		memory_set_bank(machine, "bank4", 0);
 		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
 	}

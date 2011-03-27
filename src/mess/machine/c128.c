@@ -515,12 +515,12 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 
 	if ((!state->game && state->exrom) || (charen && (loram || hiram)))
 	{
-		memory_install_read8_handler(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+		machine->device("m8502")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd000, 0xdfff, FUNC(c128_read_io));
 		state->write_io = 1;
 	}
 	else
 	{
-		memory_install_read_bank(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
+		machine->device("m8502")->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank5");
 		state->write_io = 0;
 		if ((!charen && (loram || hiram)))
 			memory_set_bankptr(machine, "bank13", state->chargen);
@@ -701,17 +701,17 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 		else
 			state->ram_top = 0x10000;
 
-		memory_install_read8_handler(machine->device("m8502")->memory().space(AS_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
+		machine->device("m8502")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xff00, 0xff04, FUNC(c128_mmu8722_ff00_r));
 
 		if (MMU_IO_ON)
 		{
 			state->write_io = 1;
-			memory_install_read8_handler(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+			machine->device("m8502")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd000, 0xdfff, FUNC(c128_read_io));
 		}
 		else
 		{
 			state->write_io = 0;
-			memory_install_read_bank(machine->device("m8502")->memory().space(AS_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
+			machine->device("m8502")->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank13");
 		}
 
 

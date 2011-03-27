@@ -459,21 +459,21 @@ static void set_ram_size(running_machine *machine)
 		if(bankno<nobanks)
 		{
 			memory_set_bankptr(machine, bank, map_base);
-			memory_install_readwrite_bank(space, bank_base, bank_base+(RAM_BANK_SIZE-1), 0, 0, bank);
+			space->install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
 			logerror("Mapping bank %d at %05X to RAM\n",bankno,bank_base);
 		}
 		else
 		{
-			memory_nop_readwrite(space,bank_base, bank_base+(RAM_BANK_SIZE-1), 0, 0);
+			space->nop_readwrite(bank_base, bank_base+(RAM_BANK_SIZE-1));
 			logerror("Mapping bank %d at %05X to NOP\n",bankno,bank_base);
 		}
 	}
 
 	// Graphics red and blue plane memory mapping, green is in main memory
 	memory_set_bankptr(machine, RED_PLANE_TAG, &state->video_mem[RED_PLANE_OFFSET]);
-	memory_install_readwrite_bank(space, RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), 0, 0, RED_PLANE_TAG);
+	space->install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
 	memory_set_bankptr(machine, BLUE_PLANE_TAG, &state->video_mem[BLUE_PLANE_OFFSET]);
-	memory_install_readwrite_bank(space, BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), 0, 0, BLUE_PLANE_TAG);
+	space->install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 
 DRIVER_INIT(mbc55x)

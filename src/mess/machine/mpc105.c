@@ -42,8 +42,8 @@ static void mpc105_update_memory(running_machine *machine)
 			address_space *space = ((cpu_device *)cpu)->memory().space( AS_PROGRAM );
 
 			/* first clear everything out */
-			memory_nop_read(space, 0x00000000, 0x3FFFFFFF, 0, 0);
-			memory_nop_read(space, 0x00000000, 0x3FFFFFFF, 0, 0);
+			space->nop_read(0x00000000, 0x3FFFFFFF);
+			space->nop_read(0x00000000, 0x3FFFFFFF);
 		}
 	}
 
@@ -72,10 +72,10 @@ static void mpc105_update_memory(running_machine *machine)
 					{
 						address_space *space = ((cpu_device *)cpu)->memory().space( AS_PROGRAM );
 
-						memory_install_read64_handler(space, begin, end,
-							0, 0, (read64_space_func) (FPTR)(bank + mpc105->bank_base));
-						memory_install_write64_handler(space, begin, end,
-							0, 0, (write64_space_func) (FPTR)(bank + mpc105->bank_base));
+						space->install_legacy_read_handler(begin, end,
+							0, 0, FUNC((read64_space_func)(FPTR)(bank + mpc105->bank_base)));
+						space->install_legacy_write_handler(begin, end,
+							0, 0, FUNC((write64_space_func)(FPTR)(bank + mpc105->bank_base)));
 					}
 					sprintf(bank_str,"bank%d",bank + mpc105->bank_base);
 					memory_set_bankptr(machine, bank_str, ram_get_ptr(machine->device(RAM_TAG)));

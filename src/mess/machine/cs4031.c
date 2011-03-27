@@ -168,13 +168,13 @@ void cs4031_device::device_start()
 	UINT32 ram_size = ram_get_size(ram_device);
 
 	// install base memory
-	memory_install_ram(m_space, 0x000000, 0x09ffff, 0, 0, m_ram);
+	m_space->install_ram(0x000000, 0x09ffff, m_ram);
 
 	// install extended memory
-	memory_install_ram(m_space, 0x100000, ram_size - 1, 0, 0, m_ram + 0x100000);
+	m_space->install_ram(0x100000, ram_size - 1, m_ram + 0x100000);
 
 	// install bios rom at cpu inital pc
-	memory_install_rom(m_space, 0xffff0000, 0xffffffff, 0, 0, m_bios + 0xf0000);
+	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
 }
 
 //-------------------------------------------------
@@ -204,7 +204,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 		if (LOG_MEMORY)
 			logerror("ROM read from %x to %x\n", start, end);
 
-		memory_install_read_bank(m_space, start, end, 0, 0, region);
+		m_space->install_read_bank(start, end, region);
 		memory_set_bankptr(m_space->machine, region, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
@@ -212,7 +212,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 		if (LOG_MEMORY)
 			logerror("ISA read from %x to %x\n", start, end);
 
-		memory_install_read_bank(m_space, start, end, 0, 0, region);
+		m_space->install_read_bank(start, end, region);
 		memory_set_bankptr(m_space->machine, region, m_isa + start);
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
@@ -220,7 +220,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 		if (LOG_MEMORY)
 			logerror("RAM read from %x to %x\n", start, end);
 
-		memory_install_read_bank(m_space, start, end, 0, 0, region);
+		m_space->install_read_bank(start, end, region);
 		memory_set_bankptr(m_space->machine, region, m_ram + start);
 	}
 	else
@@ -228,7 +228,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 		if (LOG_MEMORY)
 			logerror("NOP read from %x to %x\n", start, end);
 
-		memory_nop_read(m_space, start, end, 0, 0);
+		m_space->nop_read(start, end);
 	}
 }
 
@@ -239,7 +239,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 		if (LOG_MEMORY)
 			logerror("ROM write from %x to %x\n", start, end);
 
-		memory_install_write_bank(m_space, start, end, 0, 0, region);
+		m_space->install_write_bank(start, end, region);
 		memory_set_bankptr(m_space->machine, region, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
@@ -247,7 +247,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 		if (LOG_MEMORY)
 			logerror("ISA write from %x to %x\n", start, end);
 
-		memory_install_write_bank(m_space, start, end, 0, 0, region);
+		m_space->install_write_bank(start, end, region);
 		memory_set_bankptr(m_space->machine, region, m_isa + start);
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
@@ -255,7 +255,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 		if (LOG_MEMORY)
 			logerror("RAM write from %x to %x\n", start, end);
 
-		memory_install_write_bank(m_space, start, end, 0, 0, region);
+		m_space->install_write_bank(start, end, region);
 		memory_set_bankptr(m_space->machine, region, m_ram + start);
 	}
 	else
@@ -263,7 +263,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 		if (LOG_MEMORY)
 			logerror("NOP write from %x to %x\n", start, end);
 
-		memory_nop_write(m_space, start, end, 0 ,0);
+		m_space->nop_write(start, end);
 	}
 }
 

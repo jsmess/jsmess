@@ -89,15 +89,15 @@ static void avigo_setbank(running_machine *machine, int bank, void *address, rea
 	}
 	if (rh)
 	{
-		memory_install_read8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, rh);
+		space->install_legacy_read_handler((bank * 0x4000),(bank * 0x4000) + 0x3FFF, FUNC(rh));
 	} else {
-//      memory_nop_read(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
+//      space->nop_read((bank * 0x4000),(bank * 0x4000) + 0x3FFF);
 	}
 	if (wh)
 	{
-		memory_install_write8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, wh);
+		space->install_legacy_write_handler((bank * 0x4000),(bank * 0x4000) + 0x3FFF, FUNC(wh));
 	} else {
-//      memory_nop_write(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
+//      space->nop_write((bank * 0x4000),(bank * 0x4000) + 0x3FFF);
 	}
 }
 
@@ -327,8 +327,8 @@ static void avigo_refresh_memory(running_machine *machine)
 			memory_set_bankptr(machine, "bank3", addr);
 			memory_set_bankptr(machine, "bank7", addr);
 			state->banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
-			memory_install_read_bank (space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank3");
-			memory_install_write_bank(space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank7");
+			space->install_read_bank ((2 * 0x4000),(2 * 0x4000) + 0x3FFF, "bank3");
+			space->install_write_bank((2 * 0x4000),(2 * 0x4000) + 0x3FFF, "bank7");
 			break;
 
 		/* %111 */

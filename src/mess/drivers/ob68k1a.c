@@ -288,7 +288,7 @@ void ob68k1a_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 32*1024:
-		memory_unmap_readwrite(program, 0x008000, 0x01ffff, 0, 0);
+		program->unmap_readwrite(0x008000, 0x01ffff);
 		break;
 	}
 }

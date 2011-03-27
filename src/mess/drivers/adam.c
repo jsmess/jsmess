@@ -257,58 +257,58 @@ void adam_state::bankswitch()
 	case LO_SMARTWRITER:
 		if (BIT(m_adamnet, 1))
 		{
-			memory_unmap_readwrite(program, 0x0000, 0x5fff, 0, 0);
-			memory_install_rom(program, 0x6000, 0x7fff, 0, 0, machine->region("wp")->base() + 0x8000);
+			program->unmap_readwrite(0x0000, 0x5fff);
+			program->install_rom(0x6000, 0x7fff, machine->region("wp")->base() + 0x8000);
 		}
 		else
 		{
-			memory_install_rom(program, 0x0000, 0x7fff, 0, 0, machine->region("wp")->base());
+			program->install_rom(0x0000, 0x7fff, machine->region("wp")->base());
 		}
 		break;
 
 	case LO_INTERNAL_RAM:
-		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+		program->install_ram(0x0000, 0x7fff, ram);
 		break;
 
 	case LO_RAM_EXPANSION:
 		if (ram_get_size(m_ram) > 64 * 1024)
-			memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram + 0x10000);
+			program->install_ram(0x0000, 0x7fff, ram + 0x10000);
 		else
-			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+			program->unmap_readwrite(0x0000, 0x7fff);
 		break;
 
 	case LO_OS7_ROM_INTERNAL_RAM:
-		memory_install_rom(program, 0x0000, 0x1fff, 0, 0, machine->region("os7")->base());
-		memory_install_ram(program, 0x2000, 0x7fff, 0, 0, ram + 0x2000);
+		program->install_rom(0x0000, 0x1fff, machine->region("os7")->base());
+		program->install_ram(0x2000, 0x7fff, ram + 0x2000);
 		break;
 	}
 
 	switch ((m_mioc >> 2) & 0x03)
 	{
 	case HI_INTERNAL_RAM:
-		memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x8000);
+		program->install_ram(0x8000, 0xffff, ram + 0x8000);
 		break;
 
 	case HI_ROM_EXPANSION:
-		memory_install_rom(program, 0x8000, 0xffff, 0, 0, machine->region("xrom")->base());
+		program->install_rom(0x8000, 0xffff, machine->region("xrom")->base());
 		break;
 
 	case HI_RAM_EXPANSION:
 		if (m_game)
 		{
-			memory_install_rom(program, 0x8000, 0xffff, 0, 0, machine->region("cart")->base());
+			program->install_rom(0x8000, 0xffff, machine->region("cart")->base());
 		}
 		else
 		{
 			if (ram_get_size(m_ram) > 64 * 1024)
-				memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x18000);
+				program->install_ram(0x8000, 0xffff, ram + 0x18000);
 			else
-				memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+				program->unmap_readwrite(0x8000, 0xffff);
 		}
 		break;
 
 	case HI_CARTRIDGE_ROM:
-		memory_install_rom(program, 0x8000, 0xffff, 0, 0, machine->region("cart")->base());
+		program->install_rom(0x8000, 0xffff, machine->region("cart")->base());
 		break;
 	}
 }

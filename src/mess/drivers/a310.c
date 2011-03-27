@@ -107,7 +107,7 @@ static DRIVER_INIT(a310)
 
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x02000000, 0x02000000+(ram_size-1), 0, 0, a310_psy_wram_r, a310_psy_wram_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), FUNC(a310_psy_wram_r), FUNC(a310_psy_wram_w) );
 
 	archimedes_driver_init(machine);
 }

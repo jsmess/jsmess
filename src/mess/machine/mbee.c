@@ -287,35 +287,35 @@ WRITE8_HANDLER( mbee256_50_w )
 	memory_set_bank(space->machine, "bank9", (data & 4) ? 1 : 0);
 
 	// 8000-8FFF, F000-FFFF
-	memory_unmap_readwrite (mem, 0x8000, 0x87ff, 0, 0);
-	memory_unmap_readwrite (mem, 0x8800, 0x8fff, 0, 0);
-	memory_unmap_readwrite (mem, 0xf000, 0xf7ff, 0, 0);
-	memory_unmap_readwrite (mem, 0xf800, 0xffff, 0, 0);
+	mem->unmap_readwrite (0x8000, 0x87ff);
+	mem->unmap_readwrite (0x8800, 0x8fff);
+	mem->unmap_readwrite (0xf000, 0xf7ff);
+	mem->unmap_readwrite (0xf800, 0xffff);
 
 	switch (data & 0x1c)
 	{
 		case 0x00:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_legacy_readwrite_handler (0xf000, 0xf7ff, FUNC(mbeeppc_low_r), FUNC(mbeeppc_low_w));
+			mem->install_legacy_readwrite_handler (0xf800, 0xffff, FUNC(mbeeppc_high_r), FUNC(mbeeppc_high_w));
 			memory_set_bank(space->machine, "bank8l", 0); // rom
 			memory_set_bank(space->machine, "bank8h", 0); // rom
 			break;
 		case 0x04:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_legacy_readwrite_handler (0xf000, 0xf7ff, FUNC(mbeeppc_low_r), FUNC(mbeeppc_low_w));
+			mem->install_legacy_readwrite_handler (0xf800, 0xffff, FUNC(mbeeppc_high_r), FUNC(mbeeppc_high_w));
 			memory_set_bank(space->machine, "bank8l", 1); // ram
 			memory_set_bank(space->machine, "bank8h", 1); // ram
 			break;
 		case 0x08:
 		case 0x18:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
+			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(space->machine, "bank8l", 0); // rom
 			memory_set_bank(space->machine, "bank8h", 0); // rom
 			memory_set_bank(space->machine, "bankfl", 0); // ram
@@ -323,10 +323,10 @@ WRITE8_HANDLER( mbee256_50_w )
 			break;
 		case 0x0c:
 		case 0x1c:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
+			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(space->machine, "bank8l", 1); // ram
 			memory_set_bank(space->machine, "bank8h", 1); // ram
 			memory_set_bank(space->machine, "bankfl", 0); // ram
@@ -334,10 +334,10 @@ WRITE8_HANDLER( mbee256_50_w )
 			break;
 		case 0x10:
 		case 0x14:
-			memory_install_readwrite8_handler (mem, 0x8000, 0x87ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0x8800, 0x8fff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			mem->install_legacy_readwrite_handler (0x8000, 0x87ff, FUNC(mbeeppc_low_r), FUNC(mbeeppc_low_w));
+			mem->install_legacy_readwrite_handler (0x8800, 0x8fff, FUNC(mbeeppc_high_r), FUNC(mbeeppc_high_w));
+			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
+			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(space->machine, "bankfl", 0); // ram
 			memory_set_bank(space->machine, "bankfh", 0); // ram
 			break;
@@ -369,35 +369,35 @@ WRITE8_HANDLER( mbee128_50_w )
 	memory_set_bank(space->machine, "bank9", (data & 4) ? 1 : 0);
 
 	// 8000-8FFF, F000-FFFF
-	memory_unmap_readwrite (mem, 0x8000, 0x87ff, 0, 0);
-	memory_unmap_readwrite (mem, 0x8800, 0x8fff, 0, 0);
-	memory_unmap_readwrite (mem, 0xf000, 0xf7ff, 0, 0);
-	memory_unmap_readwrite (mem, 0xf800, 0xffff, 0, 0);
+	mem->unmap_readwrite (0x8000, 0x87ff);
+	mem->unmap_readwrite (0x8800, 0x8fff);
+	mem->unmap_readwrite (0xf000, 0xf7ff);
+	mem->unmap_readwrite (0xf800, 0xffff);
 
 	switch (data & 0x1c)
 	{
 		case 0x00:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_legacy_readwrite_handler (0xf000, 0xf7ff, FUNC(mbeeppc_low_r), FUNC(mbeeppc_low_w));
+			mem->install_legacy_readwrite_handler (0xf800, 0xffff, FUNC(mbeeppc_high_r), FUNC(mbeeppc_high_w));
 			memory_set_bank(space->machine, "bank8l", 0); // rom
 			memory_set_bank(space->machine, "bank8h", 0); // rom
 			break;
 		case 0x04:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_readwrite8_handler (mem, 0xf000, 0xf7ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_legacy_readwrite_handler (0xf000, 0xf7ff, FUNC(mbeeppc_low_r), FUNC(mbeeppc_low_w));
+			mem->install_legacy_readwrite_handler (0xf800, 0xffff, FUNC(mbeeppc_high_r), FUNC(mbeeppc_high_w));
 			memory_set_bank(space->machine, "bank8l", 1); // ram
 			memory_set_bank(space->machine, "bank8h", 1); // ram
 			break;
 		case 0x08:
 		case 0x18:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
+			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(space->machine, "bank8l", 0); // rom
 			memory_set_bank(space->machine, "bank8h", 0); // rom
 			memory_set_bank(space->machine, "bankfl", 0); // ram
@@ -405,10 +405,10 @@ WRITE8_HANDLER( mbee128_50_w )
 			break;
 		case 0x0c:
 		case 0x1c:
-			memory_install_read_bank (mem, 0x8000, 0x87ff, 0, 0, "bank8l");
-			memory_install_read_bank (mem, 0x8800, 0x8fff, 0, 0, "bank8h");
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
+			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
+			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
+			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(space->machine, "bank8l", 1); // ram
 			memory_set_bank(space->machine, "bank8h", 1); // ram
 			memory_set_bank(space->machine, "bankfl", 0); // ram
@@ -416,10 +416,10 @@ WRITE8_HANDLER( mbee128_50_w )
 			break;
 		case 0x10:
 		case 0x14:
-			memory_install_readwrite8_handler (mem, 0x8000, 0x87ff, 0, 0, mbeeppc_low_r, mbeeppc_low_w);
-			memory_install_readwrite8_handler (mem, 0x8800, 0x8fff, 0, 0, mbeeppc_high_r, mbeeppc_high_w);
-			memory_install_read_bank (mem, 0xf000, 0xf7ff, 0, 0, "bankfl");
-			memory_install_read_bank (mem, 0xf800, 0xffff, 0, 0, "bankfh");
+			mem->install_legacy_readwrite_handler (0x8000, 0x87ff, FUNC(mbeeppc_low_r), FUNC(mbeeppc_low_w));
+			mem->install_legacy_readwrite_handler (0x8800, 0x8fff, FUNC(mbeeppc_high_r), FUNC(mbeeppc_high_w));
+			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
+			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(space->machine, "bankfl", 0); // ram
 			memory_set_bank(space->machine, "bankfh", 0); // ram
 			break;

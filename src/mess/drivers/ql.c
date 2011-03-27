@@ -305,12 +305,12 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 	// If we have more than 640K them map extra ram into top 256K
 	// else just map to unmap.
 	if (ram_get_size(m_ram)>(640*1024))
-		memory_install_ram(&space, 0x0c0000, 0x0fffff, 0, 0, NULL); 
+		space.install_ram(0x0c0000, 0x0fffff, NULL); 
 	else
-		memory_unmap_readwrite(&space, 0x0c0000, 0x0fffff, 0, 0);
+		space.unmap_readwrite(0x0c0000, 0x0fffff);
 	
 	// Setup trumcard rom mapped to rom so unlink us
-	memory_install_rom(&space, 0x010000, 0x018000, 0, 0, &machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x010000, 0x018000, &machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	return machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];	
 }
@@ -318,10 +318,10 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 READ8_MEMBER( ql_state::cart_rom_r )
 {
 	// Setup trumcard rom mapped in at $c0000	
-	memory_install_rom(&space, 0x0c0000, 0x0c8000, 0, 0, &machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x0c0000, 0x0c8000, &machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	// Setup cart rom to rom handler, so unlink us
-	memory_install_rom(&space, 0x0c000, 0x0ffff, 0, 0, &machine->region(M68008_TAG)->base()[CART_ROM_BASE]);
+	space.install_rom(0x0c000, 0x0ffff, &machine->region(M68008_TAG)->base()[CART_ROM_BASE]);
 
 	return machine->region(M68008_TAG)->base()[CART_ROM_BASE+offset];
 }
@@ -950,23 +950,23 @@ void ql_state::machine_reset()
 	switch (ram_get_size(m_ram))
 	{
 		case 128*1024:
-			memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
+			program->unmap_readwrite(0x040000, 0x0fffff);
 			break;
 
 		case 192*1024:
-			memory_unmap_readwrite(program, 0x050000, 0x0fffff, 0, 0);
+			program->unmap_readwrite(0x050000, 0x0fffff);
 			break;
 
 		case 256*1024:
-			memory_unmap_readwrite(program, 0x060000, 0x0fffff, 0, 0);
+			program->unmap_readwrite(0x060000, 0x0fffff);
 			break;
 
 		case 384*1024:
-			memory_unmap_readwrite(program, 0x080000, 0x0fffff, 0, 0);
+			program->unmap_readwrite(0x080000, 0x0fffff);
 			break;
 
 		case 640*1024:
-			memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
+			program->unmap_readwrite(0x0c0000, 0x0fffff);
 			break;
 	}	
 
@@ -974,7 +974,7 @@ void ql_state::machine_reset()
 	{
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
-			memory_install_rom(program, 0x0c0000, 0x0c3fff, 0, 0, &machine->region(M68008_TAG)->base()[SANDY_ROM_BASE]);
+			program->install_rom(0x0c0000, 0x0c3fff, &machine->region(M68008_TAG)->base()[SANDY_ROM_BASE]);
 			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
 			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
 			disk_io_base=SANDY_IO_BASE;

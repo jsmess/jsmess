@@ -107,8 +107,8 @@ static MACHINE_START( palm )
 {
 	palm_state *state = machine->driver_data<palm_state>();
     address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-    memory_install_read_bank (space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
-    memory_install_write_bank(space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
+    space->install_read_bank (0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
+    space->install_write_bank(0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
     memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
     state->save_item(NAME(state->port_f_latch));

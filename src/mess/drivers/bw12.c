@@ -57,23 +57,23 @@ void bw12_state::bankswitch()
 	switch (m_bank)
 	{
 	case 0: /* ROM */
-		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+		program->install_read_bank(0x0000, 0x7fff, "bank1");
+		program->unmap_write(0x0000, 0x7fff);
 		break;
 
 	case 1: /* BK0 */
-		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		break;
 
 	case 2: /* BK1 */
 	case 3: /* BK2 */
 		if (ram_get_size(m_ram) > 64*1024)
 		{
-			memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+			program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		}
 		else
 		{
-			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+			program->unmap_readwrite(0x0000, 0x7fff);
 		}
 		break;
 	}

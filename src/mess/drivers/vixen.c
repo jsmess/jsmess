@@ -769,8 +769,8 @@ void vixen_state::machine_reset()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	memory_install_read_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank1");
-	memory_install_write_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank2");
+	program->install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
+	program->install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
 
 	memory_set_bank(machine, "bank1", 1);
 	memory_set_bank(machine, "bank2", 1);
@@ -872,8 +872,8 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 		{
 			address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
 
-			memory_install_read_bank(program, 0x0000, 0xefff, 0, 0, "bank1");
-			memory_install_write_bank(program, 0x0000, 0xefff, 0, 0, "bank2");
+			program->install_read_bank(0x0000, 0xefff, "bank1");
+			program->install_write_bank(0x0000, 0xefff, "bank2");
 
 			memory_set_bank(machine, "bank1", 0);
 			memory_set_bank(machine, "bank2", 0);

@@ -1698,40 +1698,40 @@ static void apple2gs_setup_memory(running_machine *machine)
 	state_save_register_item_pointer(machine, "APPLE2GS_SLOWMEM", NULL, 0, state->slowmem, 128*1024);
 
 	/* install expanded memory */
-	memory_install_readwrite_bank(space, 0x010000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
+	space->install_readwrite_bank(0x010000, ram_get_size(machine->device(RAM_TAG)) - 1, "bank1");
 	memory_set_bankptr(machine,"bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x010000);
 
 	/* install hi memory */
-	memory_install_read_bank(space, 0xe00000, 0xe1ffff, 0, 0, "bank2");
-	memory_install_write8_handler(space, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
-	memory_install_write8_handler(space, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
-	memory_install_write8_handler(space, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
-	memory_install_write8_handler(space, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
-	memory_install_write8_handler(space, 0xe12000, 0xe13fff, 0, 0, apple2gs_E12xxx_w);
+	space->install_read_bank(0xe00000, 0xe1ffff, "bank2");
+	space->install_legacy_write_handler(0xe00000, 0xe1ffff, FUNC(apple2gs_slowmem_w));
+	space->install_legacy_write_handler(0xe00400, 0xe007ff, FUNC(apple2gs_E004xx_w));
+	space->install_legacy_write_handler(0xe02000, 0xe03fff, FUNC(apple2gs_E02xxx_w));
+	space->install_legacy_write_handler(0xe10400, 0xe107ff, FUNC(apple2gs_E104xx_w));
+	space->install_legacy_write_handler(0xe12000, 0xe13fff, FUNC(apple2gs_E12xxx_w));
 	memory_set_bankptr(machine,"bank2", state->slowmem);
 
 	/* install alternate ROM bank */
 	begin = 0x1000000 - machine->region("maincpu")->bytes();
 	end = 0xffffff;
-	memory_install_read_bank(space, begin, end, 0, 0, "bank3");
+	space->install_read_bank(begin, end, "bank3");
 	memory_set_bankptr(machine,"bank3", machine->region("maincpu")->base());
 
 	/* install new xxC000-xxCFFF handlers */
-	memory_install_read8_handler(space, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);
-	memory_install_write8_handler(space, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_w);
-	memory_install_read8_handler(space, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_r);
-	memory_install_write8_handler(space, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_w);
-	memory_install_read8_handler(space, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_r);
-	memory_install_write8_handler(space, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
-	memory_install_read8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
-	memory_install_write8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
+	space->install_legacy_read_handler(0x00c000, 0x00cfff, FUNC(apple2gs_00Cxxx_r));
+	space->install_legacy_write_handler(0x00c000, 0x00cfff, FUNC(apple2gs_00Cxxx_w));
+	space->install_legacy_read_handler(0x01c000, 0x01cfff, FUNC(apple2gs_01Cxxx_r));
+	space->install_legacy_write_handler(0x01c000, 0x01cfff, FUNC(apple2gs_01Cxxx_w));
+	space->install_legacy_read_handler(0xe0c000, 0xe0cfff, FUNC(apple2gs_E0Cxxx_r));
+	space->install_legacy_write_handler(0xe0c000, 0xe0cfff, FUNC(apple2gs_E0Cxxx_w));
+	space->install_legacy_read_handler(0xe1c000, 0xe1cfff, FUNC(apple2gs_E1Cxxx_r));
+	space->install_legacy_write_handler(0xe1c000, 0xe1cfff, FUNC(apple2gs_E1Cxxx_w));
 	space->set_direct_update_handler(direct_update_delegate_create_static(apple2gs_opbase, *machine));
 
 
 	/* install aux memory writes (for shadowing) */
-	memory_install_write8_handler(space, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
-	memory_install_write8_handler(space, 0x012000, 0x013FFF, 0, 0, apple2gs_aux2000_w);
-	memory_install_write8_handler(space, 0x014000, 0x019FFF, 0, 0, apple2gs_aux4000_w);
+	space->install_legacy_write_handler(0x010400, 0x0107FF, FUNC(apple2gs_aux0400_w));
+	space->install_legacy_write_handler(0x012000, 0x013FFF, FUNC(apple2gs_aux2000_w));
+	space->install_legacy_write_handler(0x014000, 0x019FFF, FUNC(apple2gs_aux4000_w));
 
 	/* setup the Apple II memory system */
 	memset(&cfg, 0, sizeof(cfg));

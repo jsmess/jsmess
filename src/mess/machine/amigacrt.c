@@ -129,7 +129,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 
 static void amiga_ar1_check_overlay( running_machine *machine )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, 0x00007f, 0, 0, amiga_ar1_chipmem_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, 0x00007f, FUNC(amiga_ar1_chipmem_w));
 }
 
 static void amiga_ar1_init( running_machine *machine )
@@ -148,11 +148,11 @@ static void amiga_ar1_init( running_machine *machine )
 	memset(ar_ram, 0, 0x4000);
 
 	/* Install ROM */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, "bank2");
-	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf00000, 0xf7ffff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xf00000, 0xf7ffff, "bank2");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xf00000, 0xf7ffff);
 
 	/* Install RAM */
-	memory_install_readwrite_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, "bank3");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x9fc000, 0x9fffff, "bank3");
 
 	/* Configure Banks */
 	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
@@ -203,11 +203,11 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 {
 	if ( data & 2 )
 	{
-		memory_install_read16_handler(space, 0xbfd000, 0xbfefff, 0, 0, amiga_ar23_cia_r);
+		space->install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_ar23_cia_r));
 	}
 	else
 	{
-		memory_install_read16_handler(space, 0xbfd000, 0xbfefff, 0, 0, amiga_cia_r);
+		space->install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_cia_r));
 	}
 
 	amiga_ar23_mode = (data&0x3);
@@ -238,7 +238,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write_bank(space, 0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
+			space->install_write_bank(0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
 		}
 	}
 
@@ -280,7 +280,7 @@ static void amiga_ar23_freeze( running_machine *machine )
 		memory_set_bank(machine, "bank1", 2);
 
 		/* writes go to chipram */
-		memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, state->chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->chip_ram_size - 1, FUNC(amiga_ar23_chipmem_w));
 
 		/* trigger NMI irq */
 		cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
@@ -338,7 +338,7 @@ static READ16_HANDLER( amiga_ar23_custom_r )
 static void amiga_ar23_check_overlay( running_machine *machine )
 {
 	amiga_ar23_mode = 3;
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000000, 0x00000f, 0, 0, amiga_ar23_chipmem_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, 0x00000f, FUNC(amiga_ar23_chipmem_w));
 }
 
 static void amiga_ar23_init( running_machine *machine, int ar3 )
@@ -364,20 +364,20 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	}
 
 	/* Install ROM */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x400000, 0x400000+size, 0, mirror, "bank2");
-	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x400000, 0x400000+size, 0, mirror);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x400000, 0x400000+size, 0, mirror, "bank2");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x400000, 0x400000+size, 0, mirror);
 
 	/* Install RAM */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x440000, 0x44ffff, 0, 0, "bank3");
-	memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x440000, 0x44ffff, 0, 0, "bank3");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x440000, 0x44ffff, "bank3");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x440000, 0x44ffff, "bank3");
 
 	/* Install Custom chip monitor */
-//  memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);
-//  memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_w);
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xdff000, 0xdff1ff, FUNC(amiga_ar23_custom_r));
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdff000, 0xdff1ff, FUNC(amiga_ar23_custom_w));
 
 	/* Install status/mode handlers */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x400000, 0x400007, 0, mirror, amiga_ar23_mode_r);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x400000, 0x400003, 0, mirror, amiga_ar23_mode_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x400000, 0x400007, 0, mirror, FUNC(amiga_ar23_mode_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x400000, 0x400003, 0, mirror, FUNC(amiga_ar23_mode_w));
 
 	/* Configure Banks */
 	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());

@@ -44,8 +44,8 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		memory_install_read_bank(space, start, end, 0, 0, page_num);
-		memory_nop_write(space, start, end, 0, 0 );
+		space->install_read_bank(start, end, page_num);
+		space->nop_write(start, end);
 		memory_set_bankptr(space->machine, page_num, space->machine->region("exos")->base() + (index * 0x4000));
 		break;
 
@@ -53,15 +53,15 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x05:
 	case 0x06:
 	case 0x07:
-		memory_install_read_bank(space, start, end, 0, 0, page_num);
-		memory_nop_write(space, start, end, 0, 0);
+		space->install_read_bank(start, end, page_num);
+		space->nop_write(start, end);
 		memory_set_bankptr(space->machine, page_num, space->machine->region("cartridges")->base() + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
 	case 0x21:
-		memory_install_read_bank(space, start, end, 0, 0, page_num);
-		memory_nop_write(space, start, end, 0, 0);
+		space->install_read_bank(start, end, page_num);
+		space->nop_write(start, end);
 		memory_set_bankptr(space->machine, page_num, space->machine->region("exdos")->base() + ((index - 0x20) * 0x4000));
 		break;
 
@@ -72,12 +72,12 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 		/* additional 64k ram */
 		if (ram_get_size(space->machine->device(RAM_TAG)) == 128*1024)
 		{
-			memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
+			space->install_readwrite_bank(start, end, page_num);
 			memory_set_bankptr(space->machine, page_num, ram_get_ptr(space->machine->device(RAM_TAG)) + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
-			memory_unmap_readwrite(space, start, end, 0, 0);
+			space->unmap_readwrite(start, end);
 		}
 		break;
 
@@ -86,12 +86,12 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xfe:
 	case 0xff:
 		/* basic 64k ram */
-		memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
+		space->install_readwrite_bank(start, end, page_num);
 		memory_set_bankptr(space->machine, page_num, ram_get_ptr(space->machine->device(RAM_TAG)) + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
-		memory_unmap_readwrite(space, start, end, 0, 0);
+		space->unmap_readwrite(start, end);
 	}
 }
 

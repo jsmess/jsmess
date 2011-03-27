@@ -460,31 +460,31 @@ static MACHINE_START( pc8001 )
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region("n80")->base(), 0);
-	memory_install_read_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
-	memory_unmap_write(program, 0x0000, 0x5fff, 0, 0);
+	program->install_read_bank(0x0000, 0x5fff, "bank1");
+	program->unmap_write(0x0000, 0x5fff);
 
 	switch (ram_get_size(messram))
 	{
 	case 16*1024:
 		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram), 0);
-		memory_unmap_readwrite(program, 0x6000, 0xbfff, 0, 0);
-		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
-		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank3");
+		program->unmap_readwrite(0x6000, 0xbfff);
+		program->unmap_readwrite(0x8000, 0xbfff);
+		program->install_readwrite_bank(0xc000, 0xffff, "bank3");
 		break;
 
 	case 32*1024:
 		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram), 0);
-		memory_unmap_readwrite(program, 0x6000, 0xbfff, 0, 0);
-		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
+		program->unmap_readwrite(0x6000, 0xbfff);
+		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 		break;
 
 	case 64*1024:
 		memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(messram), 0);
 		memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(messram) + 0x6000, 0);
 		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram) + 0x8000, 0);
-		memory_install_readwrite_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
-		memory_install_readwrite_bank(program, 0x6000, 0xbfff, 0, 0, "bank2");
-		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
+		program->install_readwrite_bank(0x0000, 0x5fff, "bank1");
+		program->install_readwrite_bank(0x6000, 0xbfff, "bank2");
+		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 		memory_set_bank(machine, "bank2", 0);
 		break;
 	}

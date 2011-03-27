@@ -154,7 +154,7 @@ void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
-	memory_install_readwrite_bank(space, start, end, mask, mirror, tag );
+	space->install_readwrite_bank(start, end, mask, mirror, tag );
 	memory_set_bankptr(&m_machine, tag, data);
 }
 
@@ -162,8 +162,8 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 {
 	astring tempstring;
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);	
-	memory_install_read_bank(space, start, end, mask, mirror, tag);
-	memory_unmap_write(space, start, end, mask, mirror);		
+	space->install_read_bank(start, end, mask, mirror, tag);
+	space->unmap_write(start, end, mask, mirror);		
 	memory_set_bankptr(&m_machine, tag, machine->region(dev->subtag(tempstring, region))->base());
 }
 

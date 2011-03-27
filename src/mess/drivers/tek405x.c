@@ -127,19 +127,19 @@ void tek4051_state::bankswitch(UINT8 data)
 	switch (lbs)
 	{
 	case LBS_RBC:
-		memory_install_rom(program, 0x8800, 0xa7ff, 0, 0, machine->region(MC6800_TAG)->base() + 0x800);
+		program->install_rom(0x8800, 0xa7ff, machine->region(MC6800_TAG)->base() + 0x800);
 		break;
 
 	case LBS_BSOFL:
-		memory_install_rom(program, 0x8800, 0xa7ff, 0, 0, machine->region("020_0147_00")->base());
+		program->install_rom(0x8800, 0xa7ff, machine->region("020_0147_00")->base());
 		break;
 
 	case LBS_BSCOM:
-		memory_install_rom(program, 0x8800, 0xa7ff, 0, 0, machine->region("672_0799_08")->base());
+		program->install_rom(0x8800, 0xa7ff, machine->region("672_0799_08")->base());
 		break;
 
 	default:
-		memory_unmap_readwrite(program, 0x8800, 0xa7ff, 0, 0);
+		program->unmap_readwrite(0x8800, 0xa7ff);
 	}
 }
 
@@ -1171,15 +1171,15 @@ void tek4051_state::machine_start()
 	switch (ram_get_size(m_ram))
 	{
 	case 8*1024:
-		memory_unmap_readwrite(program, 0x2000, 0x7fff, 0, 0);
+		program->unmap_readwrite(0x2000, 0x7fff);
 		break;
 
 	case 16*1024:
-		memory_unmap_readwrite(program, 0x4000, 0x7fff, 0, 0);
+		program->unmap_readwrite(0x4000, 0x7fff);
 		break;
 
 	case 24*1024:
-		memory_unmap_readwrite(program, 0x6000, 0x7fff, 0, 0);
+		program->unmap_readwrite(0x6000, 0x7fff);
 		break;
 	}
 

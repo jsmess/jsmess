@@ -76,9 +76,9 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 	memory_set_bankptr(machine, "bank7", &state->ROM[0x2000]);		/* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
-	memory_install_readwrite_bank(space, 0x0480, 0x04FF, 0, 0,"bank10");
+	space->install_readwrite_bank(0x0480, 0x04FF,"bank10");
 	memory_set_bankptr(machine, "bank10", state->ROM + 0x0480);
-	memory_install_readwrite_bank(space, 0x1800, 0x27FF, 0, 0, "bank11");
+	space->install_readwrite_bank(0x1800, 0x27FF, "bank11");
 	memory_set_bankptr(machine, "bank11", state->ROM + 0x1800);
 }
 
@@ -116,8 +116,8 @@ MACHINE_RESET( a7800 )
 	if (state->cart_type & 0x01)
 	{
 		device_t *pokey = machine->device("pokey");
-		memory_install_read8_device_handler(space, pokey, 0x4000, 0x7FFF, 0, 0, pokey_r);
-		memory_install_write8_device_handler(space, pokey, 0x4000, 0x7FFF, 0, 0, pokey_w);
+		space->install_legacy_read_handler(*pokey, 0x4000, 0x7FFF, FUNC(pokey_r));
+		space->install_legacy_write_handler(*pokey, 0x4000, 0x7FFF, FUNC(pokey_w));
 	}
 }
 
