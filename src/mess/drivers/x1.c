@@ -68,6 +68,9 @@
 	- Marvelous: needs write protection disabled (btanb)
 	- Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
 	  Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
+	- Faeries Residence: to load this game, put a basic v2.0 in drive 0, then execute a NEWON command. Load game disks into drive 0 and 1 then
+	  type run"START" (case sensitive)
+	- POPLEMON: same as above, but you need to type run"POP"
 
 =================================================================================================
 
