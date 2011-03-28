@@ -2231,7 +2231,7 @@ static MACHINE_START( gba )
 
 ROM_START( gba )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) )
+	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) SHA1(300c20df6731a33952ded8c436f7f186d25d3492) )
 
 	/* cartridge region - 32 MBytes (128 Mbit) */
 	ROM_REGION( 0x2000000, "cartridge", ROMREGION_ERASEFF )

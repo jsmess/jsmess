@@ -340,7 +340,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( spc1000 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "spcall.rom", 0x0000, 0x8000, CRC(19638fc9))
+	ROM_LOAD( "spcall.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
 ROM_END
 
 /* Driver */
