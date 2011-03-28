@@ -196,6 +196,7 @@ const game_driver * const drivers[] =
 	DRIVER( tg16 )	  /* Turbo Grafix-16  NEC 1989-1993    */
 	DRIVER( sgx )	   /* SuperGrafX NEC 1989     */
 	DRIVER( pcfx )	  /* PC-FX NEC 1994    */
+	DRIVER( pcfxga )	/* PC-FX NEC 199? (PC-FX on a PC ISA Card) */
 
 	/* Arcadia 2001 family */
 	DRIVER( advsnha )		/* Advision Home Arcade  */
