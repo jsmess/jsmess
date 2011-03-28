@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- TODO: fix floppy image naming in these ... -->
 <softwarelist name="x68k_flop" description="Sharp X68k disk images">
+
+	<software name="177">
+		<description>177</description>
+		<year>1986</year>
+		<publisher>Macadamia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 0.xdf" size="1261568" crc="5e03679b" sha1="9680fbb8de2461f45f00b4df8bfc64de4bbcad10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="akumajou">
 		<description>Akumajou Dracula</description>
@@ -36,6 +48,66 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk 1.xdf" size="1261568" crc="d93369da" sha1="83166698f3abbbd8141f2c2d9360fb67188c3720" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys1">
+		<description>Ancient Ys Vanished Omen</description>
+		<year>1987</year>
+		<publisher>Nihon Falcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 1 ancient ys vanished omen (y) (falcom) [xdf].xdf" size="1261568" crc="ab1c66f2" sha1="5b17dd2e11f4c4a2f33a051047fa424841c95a85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is a remake of the one above, not a real clone -->
+	<software name="ys1x">
+		<description>Ancient Ys Vanished Omen X68000</description>
+		<year>1991</year>
+		<publisher>Nihon Falcom-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 2 ancient ys vanished [disk 1] (y) [xdf].xdf" size="1261568" crc="802815d1" sha1="007a53035c13dc7e4512e9a6d8efce0678e55dd6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 2 ancient ys vanished [disk 2] (y) [xdf].xdf" size="1261568" crc="77c6da35" sha1="390a65f076abed6c77206ded3b6bef5ef4c4bb6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys2">
+		<description>Ancient Ys 2 Vanished Omen The Final Chapter (Prototype)</description>
+		<year>1988</year>
+		<publisher>Nihon Falcom?</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 2 ancient ys vanished the final chapter - prototype (y) [xdf].xdf" size="1261568" crc="d493c406" sha1="6009e32f60b00f26d8098f9aa2d52a86f68c07e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys3">
+		<description>Ys 3: Wanderers from Ys</description>
+		<year>1990</year>
+		<publisher>Nihon Falcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 3 wanderers from ys [disk 3] (1990) (falcom) [xdf].xdf" size="1261568" crc="d9ed205d" sha1="7a15e45c0581cf5aec11d519b766fb7ca91cdc9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 3 wanderers from ys [disk 1] (1990) (falcom) [xdf].xdf" size="1261568" crc="04aadf9c" sha1="6a597391c09705218d5f64c828eaaf09edec2d13" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 3 wanderers from ys [disk 2] (1990) (falcom) [xdf].xdf" size="1261568" crc="49c5946a" sha1="09e6c1d5db2b0db23c903529394ecc3b66137d0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,6 +150,44 @@
 		</part>
 	</software>
 
+	<software name="human68k">
+		<description>Human 68k OS (v2.0)</description>
+		<year>198?</year>
+		<publisher>Sharp-Hudson</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 1.xdf" size="1261568" crc="6131eea4" sha1="0b89004e8231d0c2ffb8dd9a059eb233bcfa8790" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk 2.xdf" size="1261568" crc="82b8e88e" sha1="4d9f17b75122ce96f422cd5c2fb95a52d5ecb7a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karatedo">
+		<description>Karatedo</description>
+		<year>199?</year>
+		<publisher>?</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="karatedo (y) [xdf].xdf" size="1261568" crc="49d1502e" sha1="3d3a186168b2c740a3f1e11f587fc3e5d3b93b91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keeper">
+		<description>Keeper</description>
+		<year>1993</year>
+		<publisher>Success-ASCII</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="keeper (1993) (success-ascii) [xdf].xdf" size="1261568" crc="ae496a60" sha1="a287590c6daae92d95ddb6207075eec868829e66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magshot">
 		<description>Magical Shot</description>
 		<year>199?</year>
@@ -110,5 +220,51 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="prosoc68">
+		<description>Pro Soccer 68</description>
+		<year>1991</year>
+		<publisher>Anco</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro soccer 68 (1991) (anco) [xdf].xdf" size="1261568" crc="47a4313d" sha1="2d95c7b61ac68578b1d4a12501f6e4b7802d722c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- load this via Human 68k -->
+	<software name="smb">
+		<description>Famicom - Super Mario Bros.</description>
+		<year>1985</year>
+		<publisher>Nintendo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="famicom - super mario bros (1985) (nintendo) [xdf].xdf" size="1261568" crc="2c6d35b3" sha1="c1dfd26c4d7fde821400b37d0c4de60e757dd440" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinbee">
+		<description>Twin Bee</description>
+		<year>198?</year>
+		<publisher>Konami-Sharp-SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="twin bee (y) (konami) [xdf].xdf" size="1261568" crc="e2881171" sha1="c68fe9dcb395343bd46a45c4ffb1c84ea1eacb07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xevious">
+		<description>Xevious</description>
+		<year>199?</year>
+		<publisher>Namco-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="xevious (namco-dempa) [xdf].xdf" size="1261568" crc="af814cab" sha1="8b8f1b67e101092fd9b867b4f9b8b4a9627e09d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
