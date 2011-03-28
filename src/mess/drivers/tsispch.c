@@ -25,13 +25,15 @@
    * IR4,5,6,7 unknown so far, not hooked up yet
 *  Hooked the terminal to the i8251a uart at u15
 *  Hooked up upd7720 reset line
+*  Verified CPU and DSP clocks
 *
 *  TODO:
-*  Attach the upd7720 serial output to the DAC; this requires fixing the upd7725 core!
-*  Attach the other i8251a uart (assuming it is hooked to the hardware at all!)
-*  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code
-*  Correct memory maps and io maps - partly done
-*  8259 PIC: figure out where IR4-7 come from
+*  UPD7720: hook up serial output and SCK, and hook SO to the DAC; this requires fixing the upd7725 core to actually support SCK and serial output/SO!
+*  Attach the other i8251a uart (assuming it is hooked to the main hardware at all!)
+*  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code; this probably involves overriding and duplicating much of the exec_xx sections of the 7725 core
+*  Correct memory maps and io maps, and figure out what all the proms do - mostly done
+*  8259 PIC: figure out where IR4-7 come from, if anywhere.
+*  UPD7720: hook up p0 and p1 as outputs, and figure out how IR0 is masked from p0.
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
 *  Everything else
 *
@@ -396,11 +398,14 @@ INPUT_PORTS_END
 ******************************************************************************/
 static MACHINE_CONFIG_START( prose2k, tsispch_state )
     /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8086, 4000000) /* TODO: correct clock speed? theres a 16mhz xtal... */
+	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
+    MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
     MCFG_CPU_PROGRAM_MAP(i8086_mem)
     MCFG_CPU_IO_MAP(i8086_io)
 
-    MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* TODO: correct clock (may be correct, since theres a 24mhz xtal) and correct dsp type is UPD77P20 */
+	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
+	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
+    MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
     MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
     MCFG_CPU_DATA_MAP(dsp_data_map)
 
