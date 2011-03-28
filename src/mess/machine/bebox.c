@@ -98,7 +98,6 @@
 #include "cpu/powerpc/ppc.h"
 #include "machine/ins8250.h"
 #include "machine/pc_fdc.h"
-#include "machine/mpc105.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -582,29 +581,6 @@ static WRITE64_HANDLER( bebox_video_w )
 	mem_mask = BIG_ENDIANIZE_INT64(mem_mask);
 	COMBINE_DATA(&mem[offset]);
 }
-
-
-static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
-{
-	address_space *space = machine->device("ppc1")->memory().space(AS_PROGRAM);
-
-	space->nop_readwrite(0xC00A0000, 0xC00BFFFF);
-
-	space->install_readwrite_bank(0xC0000000 + begin, 0xC0000000 + end, "bank4");
-}
-
-
-static const struct pc_vga_interface bebox_vga_interface =
-{
-	"bank4",
-	bebox_map_vga_memory,
-
-	NULL,
-
-	AS_PROGRAM,
-	0x80000000
-};
-
 
 /*************************************
  *
@@ -1116,8 +1092,6 @@ DRIVER_INIT( bebox )
 	offs_t vram_begin;
 	offs_t vram_end;
 
-	mpc105_init(machine, 0);
-
 	/* set up boot and flash ROM */
 	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 
@@ -1126,7 +1100,6 @@ DRIVER_INIT( bebox )
 	space_1->install_readwrite_bank(0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
 	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
 
-	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(machine, &bebox_8042_interface);
 
 	/* install VGA memory */

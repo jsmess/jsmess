@@ -11,51 +11,137 @@
 #include "machine/pci.h"
 #include "machine/ram.h"
 
-#define LOG_MPC105		1
+#define LOG_MPC105		0
 
-struct mpc105_info
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type MPC105 = mpc105_device_config::static_alloc_device_config;
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  mpc105_device_config - constructor
+//-------------------------------------------------
+
+mpc105_device_config::mpc105_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "MPC105", tag, owner, clock)
 {
-	int bank_base;
-	UINT8 bank_enable;
-	UINT32 bank_registers[8];
-};
+}
 
 
-static struct mpc105_info *mpc105;
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
 
-
-static void mpc105_update_memory(running_machine *machine)
+device_config *mpc105_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	const cpu_device *cpu = NULL;
+    return global_alloc(mpc105_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *mpc105_device_config::alloc_device(running_machine &machine) const
+{
+    return auto_alloc(&machine, mpc105_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  static_set_bank_base - configuration helper
+//  to set the bank base
+//-------------------------------------------------
+
+void mpc105_device_config::static_set_bank_base(device_config *device, int bank_base)
+{
+	mpc105_device_config *mpc105 = downcast<mpc105_device_config *>(device);
+	mpc105->m_bank_base = bank_base;
+}
+
+//-------------------------------------------------
+//  static_set_cputag - configuration helper
+//  to set the cpu tag
+//-------------------------------------------------
+
+void mpc105_device_config::static_set_cputag(device_config *device, const char *tag)
+{
+	mpc105_device_config *mpc105 = downcast<mpc105_device_config *>(device);
+	mpc105->m_cputag = tag;
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  mpc105_device - constructor
+//-------------------------------------------------
+
+mpc105_device::mpc105_device(running_machine &_machine, const mpc105_device_config &config)
+    : device_t(_machine, config),
+      m_config(config),
+	  m_maincpu(*owner(), config.m_cputag)	  
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mpc105_device::device_start()
+{
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mpc105_device::device_reset()
+{
+	m_bank_base = m_config.m_bank_base;
+	m_bank_enable = 0;
+	memset(m_bank_registers,0,sizeof(m_bank_registers));
+}
+
+
+//-------------------------------------------------
+//  update_memory - MMU update 
+//-------------------------------------------------
+
+void mpc105_device::update_memory()
+{
 	int bank;
 	offs_t begin, end;
 	char bank_str[10];
 
 	if (LOG_MPC105)
-		logerror("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", mpc105->bank_enable);
+		logerror("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", m_bank_enable);
 
-	if (mpc105->bank_base > 0)
+	if (m_bank_base > 0)
 	{
-		/* TODO: Fix me properly! changing all cpus???? */
-		for (bool gotone = machine->config().m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
-		{
-			address_space *space = ((cpu_device *)cpu)->memory().space( AS_PROGRAM );
+		address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 
-			/* first clear everything out */
-			space->nop_read(0x00000000, 0x3FFFFFFF);
-			space->nop_read(0x00000000, 0x3FFFFFFF);
-		}
+		/* first clear everything out */
+		space->nop_read(0x00000000, 0x3FFFFFFF);
+		space->nop_read(0x00000000, 0x3FFFFFFF);
 	}
 
 	for (bank = 0; bank < MPC105_MEMORYBANK_COUNT; bank++)
 	{
-		if (mpc105->bank_enable & (1 << bank))
+		if (m_bank_enable & (1 << bank))
 		{
-			begin = (((mpc105->bank_registers[(bank / 4) + 0] >> (bank % 4) * 8)) & 0xFF) << 20
-				|	(((mpc105->bank_registers[(bank / 4) + 2] >> (bank % 4) * 8)) & 0x03) << 28;
+			begin = (((m_bank_registers[(bank / 4) + 0] >> (bank % 4) * 8)) & 0xFF) << 20
+				|	(((m_bank_registers[(bank / 4) + 2] >> (bank % 4) * 8)) & 0x03) << 28;
 
-			end   = (((mpc105->bank_registers[(bank / 4) + 4] >> (bank % 4) * 8)) & 0xFF) << 20
-				|	(((mpc105->bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
+			end   = (((m_bank_registers[(bank / 4) + 4] >> (bank % 4) * 8)) & 0xFF) << 20
+				|	(((m_bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
 				| 0x000FFFFF;
 
 			end = MIN(end, begin + ram_get_size(machine->device(RAM_TAG)) - 1);
@@ -63,21 +149,17 @@ static void mpc105_update_memory(running_machine *machine)
 			if ((begin + 0x100000) <= end)
 			{
 				if (LOG_MPC105)
-					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + mpc105->bank_base, begin, end, ram_get_ptr(machine->device(RAM_TAG)), ram_get_ptr(machine->device(RAM_TAG)) + (end - begin));
+					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, ram_get_ptr(machine->device(RAM_TAG)), ram_get_ptr(machine->device(RAM_TAG)) + (end - begin));
 
-				if (mpc105->bank_base > 0)
+				if (m_bank_base > 0)
 				{
-					/* TODO: Fix me properly! changing all cpus??? */
-					for (bool gotone = machine->config().m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
-					{
-						address_space *space = ((cpu_device *)cpu)->memory().space( AS_PROGRAM );
+					address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 
-						space->install_legacy_read_handler(begin, end,
-							0, 0, FUNC((read64_space_func)(FPTR)(bank + mpc105->bank_base)));
-						space->install_legacy_write_handler(begin, end,
-							0, 0, FUNC((write64_space_func)(FPTR)(bank + mpc105->bank_base)));
-					}
-					sprintf(bank_str,"bank%d",bank + mpc105->bank_base);
+					space->install_legacy_read_handler(begin, end,
+						0, 0, FUNC((read64_space_func)(FPTR)(bank + m_bank_base)));
+					space->install_legacy_write_handler(begin, end,
+						0, 0, FUNC((write64_space_func)(FPTR)(bank + m_bank_base)));
+					sprintf(bank_str,"bank%d",bank + m_bank_base);
 					memory_set_bankptr(machine, bank_str, ram_get_ptr(machine->device(RAM_TAG)));
 				}
 			}
@@ -85,9 +167,11 @@ static void mpc105_update_memory(running_machine *machine)
 	}
 }
 
+//-------------------------------------------------
+//  pci_read - implementation of PCI read
+//-------------------------------------------------
 
-
-UINT32 mpc105_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
+UINT32 mpc105_device::pci_read(device_t *busdevice, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result;
 
@@ -112,11 +196,11 @@ UINT32 mpc105_pci_read(device_t *busdevice, device_t *device, int function, int 
 		case 0x94:	/* memory ending address 2 */
 		case 0x98:	/* extended memory ending address 1 */
 		case 0x9C:	/* extended memory ending address 2 */
-			result = mpc105->bank_registers[(offset - 0x80) / 4];
+			result = m_bank_registers[(offset - 0x80) / 4];
 			break;
 
 		case 0xA0:	/* memory enable */
-			result = mpc105->bank_enable;
+			result = m_bank_enable;
 			break;
 
 		case 0xA8:	/* processor interface configuration 1 */
@@ -162,12 +246,13 @@ UINT32 mpc105_pci_read(device_t *busdevice, device_t *device, int function, int 
 }
 
 
+//-------------------------------------------------
+//  pci_write - implementation of PCI write
+//-------------------------------------------------
 
-void mpc105_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void mpc105_device::pci_write(device_t *busdevice, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	int i;
-	running_machine *machine = busdevice->machine;
-
 	if (function != 0)
 		return;
 
@@ -182,18 +267,18 @@ void mpc105_pci_write(device_t *busdevice, device_t *device, int function, int o
 		case 0x98:	/* extended memory ending address 1 */
 		case 0x9C:	/* extended memory ending address 2 */
 			i = (offset - 0x80) / 4;
-			if (mpc105->bank_registers[i] != data)
+			if (m_bank_registers[i] != data)
 			{
-				mpc105->bank_registers[i] = data;
-				mpc105_update_memory(machine);
+				m_bank_registers[i] = data;
+				update_memory();
 			}
 			break;
 
 		case 0xA0:	/* memory enable */
-			if (mpc105->bank_enable != (UINT8) data)
+			if (m_bank_enable != (UINT8) data)
 			{
-				mpc105->bank_enable = (UINT8) data;
-				mpc105_update_memory(machine);
+				m_bank_enable = (UINT8) data;
+				update_memory();
 			}
 			break;
 
@@ -210,11 +295,14 @@ void mpc105_pci_write(device_t *busdevice, device_t *device, int function, int o
 }
 
 
-
-void mpc105_init(running_machine *machine, int bank_base)
+UINT32 mpc105_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
 {
-	/* setup PCI */
-	mpc105 = auto_alloc(machine, struct mpc105_info);
-	memset(mpc105, '\0', sizeof(*mpc105));
-	mpc105->bank_base = bank_base;
+	mpc105_device *mpc105 = dynamic_cast<mpc105_device *>(device);
+	return mpc105->pci_read(busdevice, function, offset, mem_mask);
+}
+
+void mpc105_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+{
+	mpc105_device *mpc105 = dynamic_cast<mpc105_device *>(device);
+	mpc105->pci_write(busdevice, function, offset, data, mem_mask);
 }

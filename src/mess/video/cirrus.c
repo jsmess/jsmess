@@ -64,10 +64,9 @@
 #include "emu.h"
 #include "memconv.h"
 #include "cirrus.h"
-
+#include "pc_vga_mess.h"
 
 #define LOG_PCIACCESS	0
-
 
 static void cirrus_update_8bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 {
@@ -131,7 +130,79 @@ static pc_video_update_proc cirrus_choosevideomode(const UINT8 *sequencer,
 	return proc;
 }
 
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
+const device_type CIRRUS = cirrus_device_config::static_alloc_device_config;
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  cirrus_device_config - constructor
+//-------------------------------------------------
+
+cirrus_device_config::cirrus_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "CIRRUS", tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *cirrus_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+    return global_alloc(cirrus_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *cirrus_device_config::alloc_device(running_machine &machine) const
+{
+    return auto_alloc(&machine, cirrus_device(machine, *this));
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cirrus_device - constructor
+//-------------------------------------------------
+
+cirrus_device::cirrus_device(running_machine &_machine, const cirrus_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+}
+
+static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
+{
+	address_space *space = machine->device("ppc1")->memory().space(AS_PROGRAM);
+
+	space->nop_readwrite(0xC00A0000, 0xC00BFFFF);
+
+	space->install_readwrite_bank(0xC0000000 + begin, 0xC0000000 + end, "bank4");
+}
+
+static const struct pc_vga_interface bebox_vga_interface =
+{
+	"bank4",
+	bebox_map_vga_memory,
+
+	NULL,
+
+	AS_PROGRAM,
+	0x80000000
+};
 
 const struct pc_svga_interface cirrus_svga_interface =
 {
@@ -143,14 +214,28 @@ const struct pc_svga_interface cirrus_svga_interface =
 };
 
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-/*************************************
- *
- *  PCI card interface
- *
- *************************************/
+void cirrus_device::device_start()
+{
+	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
+}
 
-UINT32 cirrus5430_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void cirrus_device::device_reset()
+{
+}
+
+//-------------------------------------------------
+//  pci_read - implementation of PCI read
+//-------------------------------------------------
+
+UINT32 cirrus_device::pci_read(device_t *busdevice, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
@@ -178,17 +263,32 @@ UINT32 cirrus5430_pci_read(device_t *busdevice, device_t *device, int function, 
 
 	if (LOG_PCIACCESS)
 		logerror("cirrus5430_pci_read(): function=%d offset=0x%02X result=0x%04X\n", function, offset, result);
-	return result;
+	return result;	
 }
 
 
+//-------------------------------------------------
+//  pci_write - implementation of PCI write
+//-------------------------------------------------
 
-void cirrus5430_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void cirrus_device::pci_write(device_t *busdevice, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	if (LOG_PCIACCESS)
 		logerror("cirrus5430_pci_write(): function=%d offset=0x%02X data=0x%04X\n", function, offset, data);
 }
 
+
+UINT32 cirrus5430_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
+{
+	cirrus_device *cirrus = dynamic_cast<cirrus_device *>(device);
+	return cirrus->pci_read(busdevice, function, offset, mem_mask);
+}
+
+void cirrus5430_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+{
+	cirrus_device *cirrus = dynamic_cast<cirrus_device *>(device);
+	cirrus->pci_write(busdevice, function, offset, data, mem_mask);
+}
 
 
 /*************************************
@@ -197,13 +297,8 @@ void cirrus5430_pci_write(device_t *busdevice, device_t *device, int function, i
  *
  *************************************/
 
-WRITE8_HANDLER( cirrus_42E8_w )
+WRITE8_DEVICE_HANDLER( cirrus_42E8_w )
 {
 	if (data & 0x80)
-		pc_vga_reset(space->machine);
+		pc_vga_reset(device->machine);
 }
-
-
-
-WRITE64_HANDLER( cirrus_64be_42E8_w ) { write64be_with_write8_handler(cirrus_42E8_w, space, offset, data, mem_mask); }
-
