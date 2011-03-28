@@ -515,19 +515,14 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/at29040.o	\
 	$(MESS_MACHINE)/at45dbxx.o	\
 	$(MESS_MACHINE)/ay31015.o	\
-	$(MESS_MACHINE)/cdp1871.o	\
 	$(MESS_MACHINE)/ctronics.o	\
 	$(MESS_MACHINE)/com8116.o	\
-	$(MESS_MACHINE)/e0516.o		\
 	$(MESS_MACHINE)/er59256.o	\
 	$(MESS_MACHINE)/hd63450.o	\
-	$(MESS_MACHINE)/i8155.o		\
-	$(MESS_MACHINE)/i8212.o		\
 	$(MESS_MACHINE)/i8214.o		\
 	$(MESS_MACHINE)/i82371ab.o	\
 	$(MESS_MACHINE)/i82439tx.o	\
 	$(MESS_MACHINE)/i8271.o		\
-	$(MESS_MACHINE)/i8355.o		\
 	$(MESS_MACHINE)/ieee488.o	\
 	$(MESS_MACHINE)/isa.o		\
 	$(MESS_MACHINE)/kb3600.o	\
@@ -542,7 +537,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/msm58321.o	\
 	$(MESS_MACHINE)/msm8251.o	\
 	$(MESS_MACHINE)/mos6530.o	\
-	$(MESS_MACHINE)/nmc9306.o	\
 	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
@@ -563,18 +557,13 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/upd7002.o	\
 	$(MESS_MACHINE)/upd7201.o	\
 	$(MESS_MACHINE)/wd17xx.o	\
-	$(MESS_MACHINE)/z8536.o	\
 	$(MESS_VIDEO)/cdp1861.o		\
 	$(MESS_VIDEO)/cdp1862.o		\
-	$(MESS_VIDEO)/crt9007.o		\
-	$(MESS_VIDEO)/crt9021.o		\
-	$(MESS_VIDEO)/crt9212.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/dm9368.o		\
 	$(MESS_VIDEO)/hd44102.o		\
 	$(MESS_VIDEO)/hd44780.o		\
-	$(MESS_VIDEO)/hd61830.o		\
 	$(MESS_VIDEO)/hd66421.o		\
 	$(MESS_VIDEO)/i82720.o		\
 	$(MESS_VIDEO)/i8275.o		\
