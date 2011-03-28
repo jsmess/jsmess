@@ -43,8 +43,19 @@
 *  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
 *
 *  0x03400: the peripheral register
-*    the low 8 bits are Sw4
+*    the low 8 bits (7-0) are Sw4
 *    the high 8 bits:
+*    Bit F E D C B A 9 8
+*        | | | | | | | \- unknown, possibly related to 7720 p0 int mask
+*        | | | | | | \--- LED 6 control (0 = on)
+*        | | | | | \----- LED 5 control (0 = on)
+*        | | | | \------- LED 4 control (0 = on)
+*        | | | \--------- LED 3 control (0 = on)
+*        | | \----------- unknown
+*        | \------------- UPD7720 RESET line (0 = high/in reset, 1 = low/running)
+*        \--------------- unknown
+*
+* in other words:
 *                    LEDS 6    5    4    3
 *    write of 0100 - LEDS on,  on,  on,  on (7720 mask int changed? needs further test)
 *    write of 0200 - LEDS off, on,  on,  on (led 6 control)
