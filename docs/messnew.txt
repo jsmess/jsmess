@@ -21,19 +21,20 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
+- Applix 1616
+- Commodore PC 30 III
 - Ferguson Big Board II
 - Hewlett-Packard HP9816
-- Savia 84
-- SacState 8008
+- IBM PC 5140 Convertible
+- IBM PC JX
+- Olivetti M24
+- Olivetti M240
 - PDP-11 [Unibus](M9301-YA)
 - PDP-11 [Unibus](M9312)
 - PDP-11 [Q-BUS] (M7195 - MXV11)
+- SacState 8008
+- Savia 84
 - Terak 8510A
-- Olivetti M24
-- Olivetti M240
-- IBM PC 5140 Convertible
-- IBM PC JX
-- Commodore PC 30 III
 
 
 
