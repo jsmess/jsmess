@@ -1881,5 +1881,6 @@ const game_driver * const drivers[] =
 	DRIVER( prose2k )
 	DRIVER( eacc )
 	DRIVER( argo )
+	DRIVER( applix )
 
 #endif /* DRIVER_RECURSIVE */

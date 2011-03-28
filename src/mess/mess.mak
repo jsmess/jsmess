@@ -1721,6 +1721,7 @@ $(MESSOBJ)/zvt.a:				\
 $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
+	$(MESS_DRIVERS)/applix.o	\
 	$(MESS_DRIVERS)/beehive.o	\
 	$(MESS_DRIVERS)/bob85.o		\
 	$(MESS_DRIVERS)/busicom.o	\
