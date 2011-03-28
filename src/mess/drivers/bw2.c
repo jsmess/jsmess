@@ -34,7 +34,6 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "formats/basicdsk.h"
-#include "machine/serial.h"
 #include "machine/i8255a.h"
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
@@ -693,43 +692,6 @@ static const wd17xx_interface bw2_wd17xx_interface =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-/* Serial */
-
-static DEVICE_IMAGE_LOAD( bw2_serial )
-{
-	bw2_state *state =  image.device().machine->driver_data<bw2_state>();
-
-	if (device_load_serial(image) == IMAGE_INIT_PASS)
-	{
-		serial_device_setup(image, 9600 >> input_port_read(image.device().machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
-
-		msm8251_connect_to_serial_device(state->m_uart, image);
-
-		serial_device_set_transmit_state(image, 1);
-
-		return IMAGE_INIT_PASS;
-	}
-
-	return IMAGE_INIT_FAIL;
-}
-
-DEVICE_GET_INFO( bw2_serial )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( bw2_serial );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "BW2 serial port");	                    break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(BW2_SERIAL, bw2_serial);
-DEFINE_LEGACY_IMAGE_DEVICE(BW2_SERIAL, bw2_serial);
-
 /* Machine */
 
 void bw2_state::machine_start()
@@ -782,9 +744,6 @@ void bw2_state::machine_reset()
 	memory_set_bank(machine, "bank1", BANK_ROM);
 }
 
-#define MCFG_BW2_SERIAL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, BW2_SERIAL, 0)
-
 static MACHINE_CONFIG_START( bw2, bw2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
@@ -822,8 +781,6 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
-
-	MCFG_BW2_SERIAL_ADD("serial")
 MACHINE_CONFIG_END
 
 /***************************************************************************

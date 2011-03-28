@@ -8,7 +8,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "includes/newbrain.h"
-#include "machine/serial.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "imagedev/cassette.h"
@@ -1493,36 +1492,6 @@ static const cassette_config newbrain_cassette_config =
 	NULL
 };
 
-
-static DEVICE_IMAGE_LOAD( newbrain_serial )
-{
-	if (device_load_serial(image)==IMAGE_INIT_PASS)
-	{
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
-
-		serial_device_set_transmit_state(image, 1);
-
-		return IMAGE_INIT_PASS;
-	}
-
-	return IMAGE_INIT_FAIL;
-}
-
-
-DEVICE_GET_INFO( newbrain_serial )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( newbrain_serial );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "Newbrain serial port");	                    break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
 /* F4 Character Displayer */
 static const gfx_layout newbrain_charlayout =
 {
@@ -1541,14 +1510,7 @@ static GFXDECODE_START( newbrain )
 	GFXDECODE_ENTRY( "chargen", 0x0000, newbrain_charlayout, 0, 1 )
 GFXDECODE_END
 
-DECLARE_LEGACY_IMAGE_DEVICE(NEWBRAIN_SERIAL, newbrain_serial);
-DEFINE_LEGACY_IMAGE_DEVICE(NEWBRAIN_SERIAL, newbrain_serial);
-
-#define MCFG_NEWBRAIN_SERIAL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NEWBRAIN_SERIAL, 0)
-
 static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
-
 	/* basic system hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(newbrain_map)
@@ -1577,8 +1539,6 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
-
-	MCFG_NEWBRAIN_SERIAL_ADD("serial")
 MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(newbrain)
