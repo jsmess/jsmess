@@ -2904,7 +2904,7 @@ void save_options(OPTIONS_TYPE opt_type, windows_options &opts, int game_num)
 	{
 		// Don't try to save a null global options file,  or it will be erased. 
 		//if (NULL == opts)
-			return;
+			//return;
 		global = opts;
 		filename = astring_cpyc(astring_alloc(), CONFIGNAME);
 	} else if (opt_type == OPTIONS_VECTOR)
