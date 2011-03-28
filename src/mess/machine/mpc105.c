@@ -37,7 +37,7 @@ static void mpc105_update_memory(running_machine *machine)
 	if (mpc105->bank_base > 0)
 	{
 		/* TODO: Fix me properly! changing all cpus???? */
-		for (bool gotone = machine->config->m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
+		for (bool gotone = machine->config().m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
 		{
 			address_space *space = ((cpu_device *)cpu)->memory().space( AS_PROGRAM );
 
@@ -68,7 +68,7 @@ static void mpc105_update_memory(running_machine *machine)
 				if (mpc105->bank_base > 0)
 				{
 					/* TODO: Fix me properly! changing all cpus??? */
-					for (bool gotone = machine->config->m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
+					for (bool gotone = machine->config().m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
 					{
 						address_space *space = ((cpu_device *)cpu)->memory().space( AS_PROGRAM );
 

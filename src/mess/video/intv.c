@@ -515,7 +515,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 							decodechar(machine->gfx[1],
 								   code,
 								   state->gram,
-								   machine->config->gfxdecodeinfo[1].gfxlayout);
+								   machine->config()->gfxdecodeinfo[1].gfxlayout);
 							state->gramdirtybytes[code] = 0;
 						}
 						// Draw GRAM char
@@ -570,7 +570,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 						decodechar(machine->gfx[1],
 							   code,
 							   state->gram,
-							   machine->config->gfxdecodeinfo[1].gfxlayout);
+							   machine->config()->gfxdecodeinfo[1].gfxlayout);
 						state->gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
@@ -619,7 +619,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
                         decodechar(machine->gfx[1],
                            code,
                            state->gram,
-                           machine->config->gfxdecodeinfo[1].gfxlayout);
+                           machine->config()->gfxdecodeinfo[1].gfxlayout);
                         state->gramdirtybytes[code] = 0;
                     }
                     // Draw GRAM char
@@ -637,11 +637,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
                         decodechar(machine->gfx[1],
                            code,
                            state->gram,
-                           machine->config->gfxdecodeinfo[1].gfxlayout);
+                           machine->config()->gfxdecodeinfo[1].gfxlayout);
                         decodechar(machine->gfx[1],
                            code+1,
                            state->gram,
-                           machine->config->gfxdecodeinfo[1].gfxlayout);
+                           machine->config()->gfxdecodeinfo[1].gfxlayout);
                         state->gramdirtybytes[code] = 0;
                         state->gramdirtybytes[code+1] = 0;
                     }

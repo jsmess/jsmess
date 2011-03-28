@@ -466,7 +466,7 @@ static void nc_common_open_stream_for_reading(running_machine *machine)
 	nc_state *state = machine->driver_data<nc_state>();
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
-	sprintf(filename,"%s.nv", machine->gamedrv->name);
+	sprintf(filename,"%s.nv", machine->system().name);
 
 	state->file = global_alloc(emu_file(machine->options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->file->open(filename);
@@ -477,7 +477,7 @@ static void nc_common_open_stream_for_writing(running_machine *machine)
 	nc_state *state = machine->driver_data<nc_state>();
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
-	sprintf(filename,"%s.nv", machine->gamedrv->name);
+	sprintf(filename,"%s.nv", machine->system().name);
 	
 	state->file = global_alloc(emu_file(machine->options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->file->open(filename);

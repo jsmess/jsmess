@@ -1245,7 +1245,7 @@ static void ted7360_soundport_w( device_t *device, int offset, int data )
 		else
 			ted7360->reg[offset] = data;
 
-		ted7360->tone1samples = device->machine->sample_rate / TONE_FREQUENCY (TONE1_VALUE);
+		ted7360->tone1samples = device->machine->sample_rate() / TONE_FREQUENCY (TONE1_VALUE);
 		DBG_LOG(1, "ted7360", ("tone1 %d %d sample:%d\n", TONE1_VALUE, TONE_FREQUENCY(TONE1_VALUE), ted7360->tone1samples));
 		break;
 
@@ -1253,10 +1253,10 @@ static void ted7360_soundport_w( device_t *device, int offset, int data )
 	case 0x10:
 		ted7360->reg[offset] = data;
 
-		ted7360->tone2samples = device->machine->sample_rate / TONE_FREQUENCY (TONE2_VALUE);
+		ted7360->tone2samples = device->machine->sample_rate() / TONE_FREQUENCY (TONE2_VALUE);
 		DBG_LOG (1, "ted7360", ("tone2 %d %d sample:%d\n", TONE2_VALUE, TONE_FREQUENCY(TONE2_VALUE), ted7360->tone2samples));
 
-		ted7360->noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * device->machine->sample_rate * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
+		ted7360->noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * device->machine->sample_rate() * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 		DBG_LOG (1, "ted7360", ("noise %d sample:%d\n", NOISE_FREQUENCY, ted7360->noisesamples));
 
 		if (!NOISE_ON || ((double) ted7360->noisepos / ted7360->noisesamples >= 1.0))
@@ -1346,7 +1346,7 @@ static void ted7360_sound_start( device_t *device )
 	ted7360_state *ted7360 = get_safe_token(device);
 	int i;
 
-	ted7360->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, ted7360_update);
+	ted7360->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, ted7360_update);
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	ted7360->noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;

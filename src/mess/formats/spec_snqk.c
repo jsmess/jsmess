@@ -2171,7 +2171,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         case SPECTRUM_Z80_SNAPSHOT_48K_OLD:
         case SPECTRUM_Z80_SNAPSHOT_48K:
                 logerror("48K .Z80 file\n");
-                if (!strcmp(machine->gamedrv->name,"ts2068"))
+                if (!strcmp(machine->system().name,"ts2068"))
                     logerror("48K .Z80 file in TS2068\n");
                 break;
         case SPECTRUM_Z80_SNAPSHOT_128K:
@@ -2181,7 +2181,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
                     logerror("Not a 48K .Z80 file\n");
                     return;
                 }
-                if (!strcmp(machine->gamedrv->name,"ts2068"))
+                if (!strcmp(machine->system().name,"ts2068"))
                 {
                     logerror("Not a TS2068 .Z80 file\n");
                     return;
@@ -2189,7 +2189,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
                 break;
         case SPECTRUM_Z80_SNAPSHOT_TS2068:
                 logerror("TS2068 .Z80 file\n");
-                if (strcmp(machine->gamedrv->name,"ts2068"))
+                if (strcmp(machine->system().name,"ts2068"))
                     logerror("Not a TS2068 machine\n");
                 break;
         case SPECTRUM_Z80_SNAPSHOT_SAMRAM:
@@ -2315,7 +2315,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         hi = snapdata[33] & 0x0ff;
         cpu_set_reg(machine->device("maincpu"), Z80_PC, (hi << 8) | lo);
 
-        if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine->gamedrv->name,"ts2068")))
+        if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine->system().name,"ts2068")))
         {
             device_t *ay8912 = machine->device("ay8912");
 
@@ -2399,13 +2399,13 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
             state->port_7ffd_data = (snapdata[35] & 0x0ff);
             spectrum_update_paging(machine);
         }
-        if ((z80_type == SPECTRUM_Z80_SNAPSHOT_48K) && !strcmp(machine->gamedrv->name,"ts2068"))
+        if ((z80_type == SPECTRUM_Z80_SNAPSHOT_48K) && !strcmp(machine->system().name,"ts2068"))
         {
             state->port_f4_data = 0x03;
             state->port_ff_data = 0x00;
             ts2068_update_memory(machine);
         }
-        if (z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068 && !strcmp(machine->gamedrv->name,"ts2068"))
+        if (z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068 && !strcmp(machine->system().name,"ts2068"))
         {
             state->port_f4_data = snapdata[35];
             state->port_ff_data = snapdata[36];

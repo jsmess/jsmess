@@ -1601,7 +1601,7 @@ static void help_about_mess(HWND wnd)
 static void help_about_thissystem(running_machine *machine, HWND wnd)
 {
 	char buf[256];
-	snprintf(buf, ARRAY_LENGTH(buf), "mess.chm::/sysinfo/%s.htm", machine->gamedrv->name);
+	snprintf(buf, ARRAY_LENGTH(buf), "mess.chm::/sysinfo/%s.htm", machine->system().name);
 	help_display(wnd, buf);
 }
 
@@ -1962,7 +1962,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	}
 
 	// set the help menu to refer to this machine
-	snprintf(buf, ARRAY_LENGTH(buf), "About %s (%s)...", machine->gamedrv->description, machine->gamedrv->name);
+	snprintf(buf, ARRAY_LENGTH(buf), "About %s (%s)...", machine->system().description, machine->system().name);
 	set_menu_text(menu_bar, ID_HELP_ABOUTSYSTEM, buf);
 
 	// initialize state_filename for each driver, so we don't carry names in-between them
@@ -1971,7 +1971,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 		char *dst;
 
 		snprintf(state_filename, ARRAY_LENGTH(state_filename),
-			"%s State", machine->gamedrv->description);
+			"%s State", machine->system().description);
 
 		src = state_filename;
 		dst = state_filename;

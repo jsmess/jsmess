@@ -560,7 +560,7 @@ DRIVER_INIT( svi318 )
 
 	memset(&state->svi, 0, sizeof (state->svi) );
 
-	if ( ! strcmp( machine->gamedrv->name, "svi318" ) || ! strcmp( machine->gamedrv->name, "svi318n" ) )
+	if ( ! strcmp( machine->system().name, "svi318" ) || ! strcmp( machine->system().name, "svi318n" ) )
 	{
 		state->svi.svi318 = 1;
 	}

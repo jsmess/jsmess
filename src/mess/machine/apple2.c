@@ -773,7 +773,7 @@ static void apple2_mem_C800(running_machine *machine, offs_t begin, offs_t end, 
 static void apple2_mem_CE00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2_state *state = machine->driver_data<apple2_state>();
-	if ((state->flags & VAR_ROMSWITCH) && !strcmp(machine->gamedrv->name, "apple2cp"))
+	if ((state->flags & VAR_ROMSWITCH) && !strcmp(machine->system().name, "apple2cp"))
 	{
 		meminfo->read_mem		= APPLE2_MEM_AUX;
 		meminfo->write_mem		= APPLE2_MEM_AUX;
@@ -1049,17 +1049,17 @@ static void apple2_reset(running_machine &machine)
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int need_intcxrom;
 
-	need_intcxrom = !strcmp(machine.gamedrv->name, "apple2c")
-		|| !strcmp(machine.gamedrv->name, "apple2c0")
-		|| !strcmp(machine.gamedrv->name, "apple2c3")
-		|| !strcmp(machine.gamedrv->name, "apple2c4")
-		|| !strcmp(machine.gamedrv->name, "prav8c")
-		|| !strcmp(machine.gamedrv->name, "apple2cp")
-		|| !strncmp(machine.gamedrv->name, "apple2g", 7);
+	need_intcxrom = !strcmp(machine.system().name, "apple2c")
+		|| !strcmp(machine.system().name, "apple2c0")
+		|| !strcmp(machine.system().name, "apple2c3")
+		|| !strcmp(machine.system().name, "apple2c4")
+		|| !strcmp(machine.system().name, "prav8c")
+		|| !strcmp(machine.system().name, "apple2cp")
+		|| !strncmp(machine.system().name, "apple2g", 7);
 	apple2_setvar(&machine, need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
 	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
-	if (!strncmp(machine.gamedrv->name, "apple2g", 7))
+	if (!strncmp(machine.system().name, "apple2g", 7))
 	{
 		apple2_setvar(&machine, VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 	}
@@ -1657,7 +1657,7 @@ MACHINE_START( apple2 )
 	/* there appears to be some hidden RAM that is swapped in on the Apple
      * IIc plus; I have not found any official documentation but the BIOS
      * clearly uses this area as writeable memory */
-	if (!strcmp(machine->gamedrv->name, "apple2cp"))
+	if (!strcmp(machine->system().name, "apple2cp"))
 		apple2cp_ce00_ram = auto_alloc_array(machine, UINT8, 0x200);
 
 	apple2_init_common(machine);

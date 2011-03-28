@@ -370,7 +370,7 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	}
 
 	/* Fix for Ivel Ultra */
-	if (!strcmp(machine->gamedrv->name, "ivelultr")) {
+	if (!strcmp(machine->system().name, "ivelultr")) {
 		int len = machine->region("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
@@ -379,12 +379,12 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	}
 
 	/* do we need to flip the gfx? */
-	if (!strcmp(machine->gamedrv->name, "apple2")
-		|| !strcmp(machine->gamedrv->name, "apple2p")
-		|| !strcmp(machine->gamedrv->name, "prav82")
-		|| !strcmp(machine->gamedrv->name, "prav8m")
-		|| !strcmp(machine->gamedrv->name, "ace100")
-		|| !strcmp(machine->gamedrv->name, "apple2jp"))
+	if (!strcmp(machine->system().name, "apple2")
+		|| !strcmp(machine->system().name, "apple2p")
+		|| !strcmp(machine->system().name, "prav82")
+		|| !strcmp(machine->system().name, "prav8m")
+		|| !strcmp(machine->system().name, "ace100")
+		|| !strcmp(machine->system().name, "apple2jp"))
 	{
 		int len = machine->region("gfx1")->bytes();
 		for (i = 0; i < len; i++)

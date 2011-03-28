@@ -526,7 +526,7 @@ DEVICE_IMAGE_LOAD( a800_cart )
 
 	a800_cart_loaded |= (size > 0x0000) ? 1 : 0;
 
-	logerror("%s loaded left cartridge '%s' size %dK\n", image.device().machine->gamedrv->name, image.filename(), size/1024);
+	logerror("%s loaded left cartridge '%s' size %dK\n", image.device().machine->system().name, image.filename(), size/1024);
 	return IMAGE_INIT_PASS;
 }
 
@@ -558,7 +558,7 @@ DEVICE_IMAGE_LOAD( a800_cart_right )
 
 	a800_cart_loaded |= (size > 0x0000) ? 2 : 0;
 
-	logerror("%s loaded right cartridge '%s' size 8K\n", image.device().machine->gamedrv->name, image.filename());
+	logerror("%s loaded right cartridge '%s' size 8K\n", image.device().machine->system().name, image.filename());
 	return IMAGE_INIT_PASS;
 }
 
@@ -630,7 +630,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 		}
 	}
 	logerror("%s loaded cartridge '%s' size %dK\n",
-		image.device().machine->gamedrv->name, image.filename() , size/1024);
+		image.device().machine->system().name, image.filename() , size/1024);
 	return IMAGE_INIT_PASS;
 }
 

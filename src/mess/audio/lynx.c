@@ -378,9 +378,9 @@ static DEVICE_RESET( lynx_sound )
 static DEVICE_START(lynx_sound)
 {
 	lynx_sound_state *state = get_safe_token(device);
-	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, lynx_update);
+	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, lynx_update);
 
-	state->usec_per_sample = 1000000 / device->machine->sample_rate;
+	state->usec_per_sample = 1000000 / device->machine->sample_rate();
 
 	lynx_audio_init(device);
 }
@@ -389,9 +389,9 @@ static DEVICE_START(lynx_sound)
 static DEVICE_START(lynx2_sound)
 {
 	lynx_sound_state *state = get_safe_token(device);
-	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, lynx2_update);
+	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), 0, lynx2_update);
 
-	state->usec_per_sample = 1000000 / device->machine->sample_rate;
+	state->usec_per_sample = 1000000 / device->machine->sample_rate();
 
 	lynx_audio_init(device);
 }

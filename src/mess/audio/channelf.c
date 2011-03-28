@@ -99,8 +99,8 @@ static DEVICE_START(channelf_sound)
 	channelf_sound_state *state = get_safe_token(device);
 	int rate;
 
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, channelf_sh_update);
-	rate = device->machine->sample_rate;
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, channelf_sh_update);
+	rate = device->machine->sample_rate();
 
 	/*
      * 2V = 1000Hz ~= 3579535/224/16

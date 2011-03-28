@@ -589,7 +589,7 @@ void spectrum_EventList_AddItemOffset(running_machine *machine, int ID, int Data
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 
 	if (!state->CyclesPerFrame)
-		state->CyclesPerFrame = (int)(machine->firstcpu->unscaled_clock() / machine->primary_screen->frame_period().attoseconds);	//totalcycles();    //_(int)(cpunum_get_clock(0) / machine->config->frames_per_second);
+		state->CyclesPerFrame = (int)(machine->firstcpu->unscaled_clock() / machine->primary_screen->frame_period().attoseconds);	//totalcycles();    //_(int)(cpunum_get_clock(0) / machine->config()->frames_per_second);
 
 	if (state->NumEvents < state->TotalEvents)
 	{

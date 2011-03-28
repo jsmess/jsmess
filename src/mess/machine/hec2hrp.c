@@ -155,17 +155,17 @@ READ8_HANDLER( hector_keyboard_r )
 		{
 		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 		  hector_flag_hr=1;
-		if (strncmp(machine->gamedrv->name , "hec2hrx"  , 7)==0 ||
-				strncmp(machine->gamedrv->name , "hec2mx40" , 8)==0 ||
-				strncmp(machine->gamedrv->name , "hec2mx80" , 8)==0   ) /* aviable for HRX and up */
+		if (strncmp(machine->system().name , "hec2hrx"  , 7)==0 ||
+				strncmp(machine->system().name , "hec2mx40" , 8)==0 ||
+				strncmp(machine->system().name , "hec2mx80" , 8)==0   ) /* aviable for HRX and up */
 			{
 				memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
 				memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 				hector_disc2_reset(machine);
 
 			}
-		if (strncmp(machine->gamedrv->name , "hector1"  , 7)==0 ||
-				strncmp(machine->gamedrv->name , "interact" , 8)==0   ) /* aviable for BR machines */
+		if (strncmp(machine->system().name , "hector1"  , 7)==0 ||
+				strncmp(machine->system().name , "interact" , 8)==0   ) /* aviable for BR machines */
 
 					hector_flag_hr=0;
 

@@ -818,7 +818,7 @@ static emu_file *nvram_system_fopen( running_machine *machine, UINT32 openflags,
 	astring *fname;
 	file_error filerr;
 	emu_file *file;
-	fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, name, ".nv");
+	fname = astring_assemble_4( astring_alloc(), machine->system().name, PATH_SEPARATOR, name, ".nv");
 	filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
 	astring_free( fname);
 	return (filerr == FILERR_NONE) ? file : NULL;

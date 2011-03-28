@@ -159,8 +159,8 @@ static DEVICE_START( dave_sound )
 
 	for (i=0; i<3; i++)
 	{
-		dave->Period[i] = (STEP * device->machine->sample_rate) / 125000;
-		dave->Count[i] = (STEP * device->machine->sample_rate) / 125000;
+		dave->Period[i] = (STEP * device->machine->sample_rate()) / 125000;
+		dave->Count[i] = (STEP * device->machine->sample_rate()) / 125000;
 		dave->level[i] = 0;
 	}
 
@@ -168,7 +168,7 @@ static DEVICE_START( dave_sound )
     the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
-	dave->sound_stream_var = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
+	dave->sound_stream_var = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), NULL, dave_update_sound);
 }
 
 
@@ -454,7 +454,7 @@ static WRITE8_DEVICE_HANDLER(dave_sound_w)
 			count++;
 
 
-			dave->Period[channel_index] = ((STEP  * device->machine->sample_rate)/125000) * count;
+			dave->Period[channel_index] = ((STEP  * device->machine->sample_rate())/125000) * count;
 
 		}
 		break;

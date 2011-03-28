@@ -140,7 +140,7 @@ NVRAM_HANDLER( cybikoxt )
 static emu_file *nvram_system_fopen( running_machine *machine, UINT32 openflags, const char *name)
 {
 	file_error filerr;
-	astring *fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, name, ".nv");	
+	astring *fname = astring_assemble_4( astring_alloc(), machine->system().name, PATH_SEPARATOR, name, ".nv");	
 	emu_file *file = global_alloc(emu_file(machine->options().nvram_directory(), openflags));
 	filerr = file->open(astring_c( fname));	
 	astring_free( fname);

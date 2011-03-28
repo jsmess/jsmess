@@ -630,7 +630,7 @@ const char *hashfile_extrainfo(device_image_interface &image)
 	/* now read the hash file */
 	image.crc();
 	extra_info = NULL;
-	drv = image.device().machine->gamedrv;
+	drv = &image.device().machine->system();
 	do
 	{
 		rc = read_hash_config(image, drv->name);

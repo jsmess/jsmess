@@ -529,13 +529,13 @@ int osd_start_audio_stream(int stereo)
 	if (current_testcase.wavwrite)
 	{
 		snprintf(buf, ARRAY_LENGTH(buf), "snap/_%s.wav", current_testcase.name);
-		wavptr = wav_open(buf, machine->sample_rate, 2);
+		wavptr = wav_open(buf, machine->sample_rate(), 2);
 	}
 	else
 	{
 		wavptr = NULL;
 	}
-	samples_this_frame = (int) ((double)machine->sample_rate / (double)machine->screen[0].refresh);
+	samples_this_frame = (int) ((double)machine->sample_rate() / (double)machine->screen[0].refresh);
 	return samples_this_frame;
 }
 
@@ -555,7 +555,7 @@ void osd_stop_audio_stream(void)
 
 void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
 {
-	if (wavptr && (machine->sample_rate != 0))
+	if (wavptr && (machine->sample_rate() != 0))
 		wav_add_data_16((wav_file*)wavptr, buffer, samples_this_frame * 2);
 }
 
@@ -854,7 +854,7 @@ static void command_image_loadcreate(running_machine *machine)
 	}
 
 	success = FALSE;
-	for (gamedrv = machine->gamedrv; !success && gamedrv; gamedrv = driver_get_compatible(gamedrv))
+	for (gamedrv = machine->system(); !success && gamedrv; gamedrv = driver_get_compatible(gamedrv))
 	{
 		/* assemble the full path */
 		filepath = assemble_software_path(astring_alloc(), gamedrv, filename);

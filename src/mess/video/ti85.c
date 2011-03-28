@@ -129,49 +129,49 @@ PALETTE_INIT( ti85 )
 		for (j=0; j < 7; j++)
 			colortable_entry_set_value(machine->colortable, i*7+j, ti85_palette[i][j]);
 
-	if (!strncmp(machine->gamedrv->name, "ti81", 4))
+	if (!strncmp(machine->system().name, "ti81", 4))
 	{
 		state->ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI81_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI81_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->gamedrv->name, "ti85", 4))
+	else if (!strncmp(machine->system().name, "ti85", 4))
 	{
 		state->ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI85_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI85_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->gamedrv->name, "ti82", 4))
+	else if (!strncmp(machine->system().name, "ti82", 4))
 	{
 		state->ti_video_memory_size = TI82_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI82_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI82_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->gamedrv->name, "ti83p", 5))
+	else if (!strncmp(machine->system().name, "ti83p", 5))
 	{
 		state->ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI83_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI83_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->gamedrv->name, "ti83", 4))
+	else if (!strncmp(machine->system().name, "ti83", 4))
 	{
 		state->ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI83_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI83_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->gamedrv->name, "ti86", 4))
+	else if (!strncmp(machine->system().name, "ti86", 4))
 	{
 		state->ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI86_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI86_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->gamedrv->name, "ti73", 4))
+	else if (!strncmp(machine->system().name, "ti73", 4))
 	{
 		state->ti_video_memory_size = TI73_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI73_SCREEN_X_SIZE;

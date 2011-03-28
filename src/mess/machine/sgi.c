@@ -539,7 +539,7 @@ void sgi_mc_init(running_machine *machine)
 	nMC_DMAZoomByteCnt = 0;
 
 	// if Indigo2, ID appropriately
-	if (!strcmp(machine->gamedrv->name, "ip244415"))
+	if (!strcmp(machine->system().name, "ip244415"))
 	{
 		nMC_SysID = 0x11;	// rev. B MC, EISA bus present
 	}

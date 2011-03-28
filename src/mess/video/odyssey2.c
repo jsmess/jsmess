@@ -582,8 +582,8 @@ VIDEO_START( odyssey2 )
 	state->lum = 0;
 	state->lfsr = 0;
 
-	state->o2_snd_shift[0] = machine->sample_rate / 983;
-	state->o2_snd_shift[1] = machine->sample_rate / 3933;
+	state->o2_snd_shift[0] = machine->sample_rate() / 983;
+	state->o2_snd_shift[1] = machine->sample_rate() / 3933;
 
 	state->start_vpos = I824X_START_Y;
 	state->start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;

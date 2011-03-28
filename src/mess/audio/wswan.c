@@ -59,7 +59,7 @@ INLINE wswan_sound_state *get_safe_token(device_t *device)
 static void wswan_ch_set_freq( running_machine *machine, struct CHAN *ch, UINT16 freq )
 {
 	ch->freq = freq;
-	ch->period = machine->sample_rate / ( 3072000  / ( ( 2048 - freq ) << 5 ) );
+	ch->period = machine->sample_rate() / ( 3072000  / ( ( 2048 - freq ) << 5 ) );
 }
 
 WRITE8_DEVICE_HANDLER( wswan_sound_port_w )
@@ -114,7 +114,7 @@ WRITE8_DEVICE_HANDLER( wswan_sound_port_w )
 		state->sweep_step = (INT8)data;
 		break;
 	case 0x8D:				/* Sweep time */
-		state->sweep_time = device->machine->sample_rate / ( 3072000 / ( 8192 * (data + 1) ) );
+		state->sweep_time = device->machine->sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
 		break;
 	case 0x8E:				/* Noise control */
 		state->noise_type = data & 0x07;
@@ -200,7 +200,7 @@ static STREAM_UPDATE( wswan_sh_update )
 				if ( state->sweep_count >= state->sweep_time ) {
 					state->sweep_count = 0;
 					state->audio3.freq += state->sweep_step;
-					state->audio3.period = device->machine->sample_rate / ( 3072000  / ( ( 2048 - state->audio3.freq ) << 5 ) );
+					state->audio3.period = device->machine->sample_rate() / ( 3072000  / ( ( 2048 - state->audio3.freq ) << 5 ) );
 				}
 			}
 			left += state->audio3.vol_left * sample;
@@ -233,7 +233,7 @@ static STREAM_UPDATE( wswan_sh_update )
 static DEVICE_START(wswan_sound)
 {
 	wswan_sound_state *state = get_safe_token(device);
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, wswan_sh_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), 0, wswan_sh_update);
 
 	state->audio1.on = 0;
 	state->audio1.signal = 16;

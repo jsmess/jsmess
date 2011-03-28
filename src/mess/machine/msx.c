@@ -853,7 +853,7 @@ static void msx_memory_init (running_machine *machine)
 	}
 
 	for (driver = msx_driver_list; driver->name[0]; driver++) {
-		if (!strcmp (driver->name, machine->gamedrv->name)) {
+		if (!strcmp (driver->name, machine->system().name)) {
 			layout = driver->layout;
 		}
 	}

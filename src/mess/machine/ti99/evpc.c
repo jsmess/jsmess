@@ -373,7 +373,7 @@ static DEVICE_NVRAM( ti99_evpc )
 {
 	// Called between START and RESET
 	ti99_evpc_state *card = get_safe_token(device);
-	astring *hsname = astring_assemble_3(astring_alloc(), device->machine->gamedrv->name, PATH_SEPARATOR, "evpc.nv");
+	astring *hsname = astring_assemble_3(astring_alloc(), device->machine->system().name, PATH_SEPARATOR, "evpc.nv");
 	file_error filerr;
 
 	if (read_or_write==0)

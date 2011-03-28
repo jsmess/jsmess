@@ -698,8 +698,8 @@ static DEVICE_START( gameboy_sound )
 	memset(&gb->snd_3, 0, sizeof(gb->snd_3));
 	memset(&gb->snd_4, 0, sizeof(gb->snd_4));
 
-	gb->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, gameboy_update);
-	gb->rate = device->machine->sample_rate;
+	gb->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), 0, gameboy_update);
+	gb->rate = device->machine->sample_rate();
 
 	/* Calculate the envelope and sweep tables */
 	for( I = 0; I < 8; I++ )

@@ -144,7 +144,7 @@ static void cps1_build_palette(running_machine *machine, const UINT16* const pal
 static MACHINE_RESET( cps )
 {
 	cpschngr_state *state = machine->driver_data<cpschngr_state>();
-	const char *gamename = machine->gamedrv->name;
+	const char *gamename = machine->system().name;
 	const struct CPS1config *pCFG=&cps1_config_table[0];
 
 	while(pCFG->name)

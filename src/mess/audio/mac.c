@@ -79,7 +79,7 @@ static STREAM_UPDATE( mac_sound_update )
 	}
 
 	/* if we're not enabled, just fill with 0 */
-	if (device->machine->sample_rate == 0)
+	if (device->machine->sample_rate() == 0)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;

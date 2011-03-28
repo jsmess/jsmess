@@ -39,7 +39,7 @@ void vc4000_soundport_w (device_t *device, int offset, int data)
 			token->pos = 0;
 			token->level = TRUE;
 			// frequency 7874/(data+1)
-			token->size = device->machine->sample_rate * (data + 1) /7874;
+			token->size = device->machine->sample_rate() * (data + 1) /7874;
 			break;
 	}
 }
@@ -80,7 +80,7 @@ static DEVICE_START(vc4000_sound)
 {
 	vc4000_sound *token = get_token(device);
 	memset(token, 0, sizeof(*token));
-    token->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, vc4000_update);
+    token->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, vc4000_update);
 }
 
 

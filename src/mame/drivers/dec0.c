@@ -314,8 +314,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x180000, 0x1800ff) AM_READWRITE(hippodrm_shared_r, hippodrm_shared_w)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_8bit_w)
-	AM_RANGE(0x1a1000, 0x1a17ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
+	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control0_8bit_packed_w)
+	AM_RANGE(0x1a0010, 0x1a001f) AM_DEVWRITE("tilegen3", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x1a1000, 0x1a17ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
 	AM_RANGE(0x1d0000, 0x1d00ff) AM_READWRITE(hippodrm_prot_r, hippodrm_prot_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -1302,11 +1303,11 @@ static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region(device, 0,0);
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
 	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region(device, 0,1);
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,1,0);
 	MCFG_DEVICE_ADD("tilegen3", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region(device, 0,2);
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,2,0);
 
 	MCFG_VIDEO_START(dec0)
 MACHINE_CONFIG_END
@@ -2888,7 +2889,7 @@ static void dump_to_file(running_machine* machine, UINT8* ROM, int offset, int s
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s_%08x_%08x", machine->gamedrv->name, offset, size);
+		sprintf(filename,"%s_%08x_%08x", machine->system().name, offset, size);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

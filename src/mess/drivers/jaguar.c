@@ -201,7 +201,7 @@ static emu_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
     emu_file *file;
     if (image->exists())
     {
-        fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image->basename_noext(), ".nv");
+        fname = astring_assemble_4( astring_alloc(), machine->system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
         astring_free( fname);
         return (filerr == FILERR_NONE) ? file : NULL;

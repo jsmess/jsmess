@@ -37,7 +37,7 @@
 VIDEO_START( pc1403 )
 {
 	pc1403_state *state = machine->driver_data<pc1403_state>();
-	if (strcmp(machine->gamedrv->name, "pc1403h") == 0)
+	if (strcmp(machine->system().name, "pc1403h") == 0)
 	{
 		state->DOWN = 69;
 		state->RIGHT = 155;

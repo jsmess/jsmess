@@ -58,7 +58,7 @@ static void pentagon_update_memory(running_machine *machine)
 	if (beta->started() && betadisk_is_active(beta) && !( state->port_7ffd_data & 0x10 ) )
 	{
 		/* GLUK */
-		if (strcmp(machine->gamedrv->name, "pent1024")==0) {
+		if (strcmp(machine->system().name, "pent1024")==0) {
 			state->ROMSelection = 2;
 		} else {
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ;

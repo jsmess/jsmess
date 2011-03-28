@@ -248,7 +248,7 @@ static DRIVER_INIT( mc10 )
 	state_save_register_global(machine, mc10->m_keyboard_strobe);
 
 	//for alice32 force port4 DDR to 0xff at startup
-	if (!strcmp(machine->gamedrv->name, "alice32") || !strcmp(machine->gamedrv->name, "alice90"))
+	if (!strcmp(machine->system().name, "alice32") || !strcmp(machine->system().name, "alice90"))
 		m6801_io_w(prg, 0x05, 0xff);
 }
 

@@ -636,22 +636,22 @@ static NVRAM_HANDLER( psion )
 
 void psion_state::machine_start()
 {
-	if (!strcmp(machine->gamedrv->name, "psionlam"))
+	if (!strcmp(machine->system().name, "psionlam"))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 0;
 	}
-	else if (!strcmp(machine->gamedrv->name, "psionp350"))
+	else if (!strcmp(machine->system().name, "psionp350"))
 	{
 		m_rom_bank_count = 0;
 		m_ram_bank_count = 5;
 	}
-	else if (!strncmp(machine->gamedrv->name, "psionlz", 7))
+	else if (!strncmp(machine->system().name, "psionlz", 7))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 3;
 	}
-	else if (!strcmp(machine->gamedrv->name, "psionp464"))
+	else if (!strcmp(machine->system().name, "psionp464"))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 9;

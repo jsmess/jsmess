@@ -1482,7 +1482,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 		// This line requires that cartslot_t be included in cartslot.h,
 		// otherwise one cannot make use of multicart handling within such a
 		// custom LOAD function.
-		multicart_open_error me = multicart_open(image.device().machine->options(), image.filename(), image.device().machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+		multicart_open_error me = multicart_open(image.device().machine->options(), image.filename(), image.device().machine->system().name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 
 		// Now that we have loaded the image files, let the PCB put them all
 		// together. This means we put the images in a structure which allows

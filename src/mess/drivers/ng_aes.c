@@ -161,7 +161,7 @@ static void update_interrupts( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 
-	if(strcmp((char*)machine->gamedrv->name,"aes") != 0)
+	if(strcmp((char*)machine->system().name,"aes") != 0)
 	{  // raster and vblank IRQs are swapped on the NeoCD.
 		cputag_set_input_line(machine, "maincpu", 2, state->vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
 		cputag_set_input_line(machine, "maincpu", 1, state->display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
@@ -487,7 +487,7 @@ static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	if(strcmp((char*)field->port->machine->gamedrv->name,"aes") != 0)
+	if(strcmp((char*)field->port->machine->system().name,"aes") != 0)
 		return 0x00;  // On the Neo Geo CD, the memory card is internal and therefore always present.
 	else
 		return (memcard_present(field->port->machine) == -1) ? 0x07 : 0x00;

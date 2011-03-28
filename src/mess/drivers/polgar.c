@@ -129,7 +129,7 @@ static WRITE8_HANDLER ( write_io )
 		for (i=0;i<8;i++)
 		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
 	}
-	else if (!data && (!strcmp(space->machine->m_game.name,"milano")))
+	else if (!data && (!strcmp(space->machine->system().name,"milano")))
 		for (i=0;i<8;i++)
 		{
 			output_set_led_value(i,!BIT(state->latch_data,i));

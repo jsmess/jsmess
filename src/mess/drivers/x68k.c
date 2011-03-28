@@ -1686,7 +1686,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	int v;
 	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
-	if(strcmp(machine->gamedrv->name,"x68030") == 0)
+	if(strcmp(machine->system().name,"x68030") == 0)
 		v = 0x0b;
 	else
 		v = 0x09;
@@ -1699,7 +1699,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		int pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPC);
 		int sr = cpu_get_reg(machine->device("maincpu"), M68K_SR);
 		//int pda = cpu_get_reg(machine->device("maincpu"), M68K_PREF_DATA);
-		if(strcmp(machine->gamedrv->name,"x68030") == 0)
+		if(strcmp(machine->system().name,"x68030") == 0)
 		{  // byte order varies on the 68030
 			addr = (ram[0x0b] << 24) | (ram[0x0a] << 16) |(ram[0x09] << 8) | ram[0x08];
 		}

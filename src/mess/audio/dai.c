@@ -75,9 +75,9 @@ static DEVICE_START(dai_sound)
 {
 	dai_sound_state *state = get_token(device);
 
-	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
+	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), 0, dai_sh_update);
 
-	logerror ("sample rate: %d\n", device->machine->sample_rate);
+	logerror ("sample rate: %d\n", device->machine->sample_rate());
 }
 
 static STREAM_UPDATE( dai_sh_update )

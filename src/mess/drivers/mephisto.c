@@ -387,19 +387,19 @@ static MACHINE_RESET( mephisto )
 
 /* adjust artwork depending on current emulation*/
 
-	if (!strcmp(machine->m_game.name,"mm2") )
+	if (!strcmp(machine->system().name,"mm2") )
 		output_set_value("MM",1);
-	else if (!strcmp(machine->m_game.name,"mm4") )
+	else if (!strcmp(machine->system().name,"mm4") )
 		output_set_value("MM",2);
-	else if (!strcmp(machine->m_game.name,"mm4tk") )
+	else if (!strcmp(machine->system().name,"mm4tk") )
 		output_set_value("MM",5);
-	else if (!strcmp(machine->m_game.name,"mm5tk") )
+	else if (!strcmp(machine->system().name,"mm5tk") )
 		output_set_value("MM",5);
-	else if (!strcmp(machine->m_game.name,"mm5") )
+	else if (!strcmp(machine->system().name,"mm5") )
 		output_set_value("MM",3);
-	else if (!strcmp(machine->m_game.name,"mm50") )
+	else if (!strcmp(machine->system().name,"mm50") )
 		output_set_value("MM",3);
-	else if (!strcmp(machine->m_game.name,"rebel5") )
+	else if (!strcmp(machine->system().name,"rebel5") )
 		output_set_value("MM",4);
 }
 

@@ -97,7 +97,7 @@ static DEVICE_START( socrates_snd )
 	chip->DAC_output = 0x00; /* output */
 	chip->state[0] = chip->state[1] = chip->state[2] = 0;
 	chip->accum[0] = chip->accum[1] = chip->accum[2] = 0xFF;
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, socrates_snd_pcm_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate(), chip, socrates_snd_pcm_update);
 }
 
 
