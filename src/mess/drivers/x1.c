@@ -209,7 +209,8 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+//#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/i8255a.h"
 #include "machine/z80dma.h"
 #include "sound/ay8910.h"
@@ -225,7 +226,6 @@
 #include "formats/x1_tap.h"
 #include "imagedev/cartslot.h"
 #include "includes/x1.h"
-//#include <ctype.h>
 
 #define MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz
@@ -1768,8 +1768,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return i8255a_r(space->machine->device("ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(space->machine->device("ay"), 0); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(space->machine->device("dma"), 0); }
-	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(space->machine->device("sio"), (offset-0x1f90) & 1); }
-	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(space->machine->device("sio"), (offset-0x1f92) & 1); }
+	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return z80dart_ba_cd_r(space->machine->device("sio"), (offset-0x1f90) & 3); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(space->machine->device("ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(space->machine->device("ctc"), offset-0x1fa8); }
@@ -1824,8 +1823,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(space->machine->device("dma"), 0,data); }
-	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(space->machine->device("sio"), (offset-0x1f90) & 1,data); }
-	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(space->machine->device("sio"), (offset-0x1f92) & 1,data); }
+	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ z80dart_ba_cd_w(space->machine->device("sio"), (offset-0x1f90) & 3,data); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(space->machine->device("ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(space->machine->device("ctc"), offset-0x1fa8,data); }
@@ -2364,6 +2362,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO2 callback
 };
 
+#if 0
 static const z80sio_interface sio_intf =
 {
 	0,					/* interrupt handler */
@@ -2372,6 +2371,29 @@ static const z80sio_interface sio_intf =
 	0,					/* BREAK changed handler */
 	0,					/* transmit handler */
 	0					/* receive handler */
+};
+#endif
+
+
+static Z80DART_INTERFACE( sio_intf )
+{
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
 
 static const z80_daisy_config x1_daisy[] =
@@ -2386,7 +2408,7 @@ static const z80_daisy_config x1turbo_daisy[] =
     { "x1kb" },
 	{ "ctc" },
 	{ "dma" },
-//  { "sio" },
+	{ "sio" },
 	{ NULL }
 };
 
@@ -2682,7 +2704,8 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MCFG_MACHINE_RESET(x1turbo)
 
-	MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
+//	MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
+	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , sio_intf )
 	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
 
 	MCFG_DEVICE_REMOVE("fdc")
