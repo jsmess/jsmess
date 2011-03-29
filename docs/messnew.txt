@@ -10,6 +10,7 @@ New System Drivers Supported:
 - Mikrosha-86RK [Miodrag Milanovic]
 - IBM PC 5155 [Lord Nightmare]
 - EA Car Computer (not working) [Robbbert]
+- 68k Single Board Computer [Robbbert]
 
 
 
