@@ -4,12 +4,16 @@
 
 
 DECLARE_LEGACY_IMAGE_DEVICE(TI85SERIAL, ti85serial);
+DECLARE_LEGACY_IMAGE_DEVICE(TI82SERIAL, ti82serial);
 DECLARE_LEGACY_IMAGE_DEVICE(TI86SERIAL, ti86serial);
 
 extern void ti85_update_serial(device_t *device);
 
 #define MCFG_TI85SERIAL_ADD( _tag ) \
 		MCFG_DEVICE_ADD( _tag, TI85SERIAL, 0 )
+
+#define MCFG_TI82SERIAL_ADD( _tag ) \
+		MCFG_DEVICE_ADD( _tag, TI82SERIAL, 0 )
 
 #define MCFG_TI86SERIAL_ADD( _tag ) \
 		MCFG_DEVICE_ADD( _tag, TI86SERIAL, 0 )
