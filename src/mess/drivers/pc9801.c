@@ -1033,7 +1033,7 @@ static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE8(pc9801_tvram_r,pc9801_tvram_w,0xffff) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(pc9801_gvram_r,pc9801_gvram_w,0xffff) //bitmap VRAM
-//  AM_RANGE(0xcc000, 0xcdfff) AM_ROM //sound BIOS
+	AM_RANGE(0xcc000, 0xcdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
 	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
 //  AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
 	AM_RANGE(0xe8000, 0xfffff) AM_ROM AM_REGION("ipl",0)
@@ -2417,6 +2417,9 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "urm04-02.bin", 0x08001, 0x4000, CRC(e4855a53) SHA1(223f66482c77409706cfc64c214cec7237c364e9) )
 	ROM_LOAD16_BYTE( "urm05-02.bin", 0x10000, 0x4000, CRC(ffefec65) SHA1(106e0d920e857e59da12225a489ca2756ca405c1) )
 	ROM_LOAD16_BYTE( "urm06-02.bin", 0x10001, 0x4000, CRC(1147760b) SHA1(4e0299091dfd53ac7988d40c5a6775a10389faac) )
+
+	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
 
