@@ -2781,7 +2781,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 
 	CreateGameOptions(opts, game_num);
 	// Copy over the defaults 
-	opts = global;
+	ui_parse_ini_file(opts, CONFIGNAME);
 
 	if (opt_type == OPTIONS_GLOBAL)
 	{
