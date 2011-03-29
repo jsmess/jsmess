@@ -1707,6 +1707,7 @@ $(MESSOBJ)/zvt.a:				\
 	$(MESS_VIDEO)/pp01.o		\
 
 $(MESSOBJ)/skeleton.a:			\
+	$(MESS_DRIVERS)/68ksbc.o	\
 	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\
