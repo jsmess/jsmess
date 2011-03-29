@@ -249,65 +249,6 @@ WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 	}
 }
 
-READ8_MEMBER( bw2_state::fdc_r )
-{
-	UINT8 data = 0xff;
-
-	switch (offset & 0x03)
-	{
-	case 0:
-		data = wd17xx_status_r(m_fdc, 0);
-		break;
-	case 1:
-		data = wd17xx_track_r(m_fdc, 0);
-		break;
-	case 2:
-		data = wd17xx_sector_r(m_fdc, 0);
-		break;
-	case 3:
-		data = wd17xx_data_r(m_fdc, 0);
-		break;
-	}
-
-	return data;
-}
-
-WRITE8_MEMBER( bw2_state::fdc_w )
-{
-	switch (offset & 0x3)
-	{
-	case 0:
-		/* disk side is encoded in bit 1 of Type II/III commands */
-
-		if (BIT(data, 7))
-		{
-			if ((data & 0xf0) != 0xd0)
-			{
-				int side = BIT(data, 1);
-
-				wd17xx_set_side(m_fdc, side);
-
-				data &= ~0x02;
-			}
-		}
-
-		wd17xx_command_w(m_fdc, 0, data);
-		break;
-
-	case 1:
-		wd17xx_track_w(m_fdc, 0, data);
-		break;
-
-	case 2:
-		wd17xx_sector_w(m_fdc, 0, data);
-		break;
-
-	case 3:
-		wd17xx_data_w(m_fdc, 0, data);
-		break;
-	};
-}
-
 static ADDRESS_MAP_START( bw2_mem, AS_PROGRAM, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
@@ -321,10 +262,10 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY(PIT8253_TAG, pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE_LEGACY(MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 //  AM_RANGE( 0x30, 0x3f ) SLOT
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE_LEGACY( MSM8251_TAG, msm8251_data_r, msm8251_data_w )
-	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE_LEGACY( MSM8251_TAG, msm8251_status_r, msm8251_control_w )
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
-	AM_RANGE( 0x60, 0x63 ) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w)
 //  AM_RANGE( 0x70, 0x7f ) MODEMSEL
 ADDRESS_MAP_END
 
@@ -606,7 +547,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 	floppy_drive_set_ready_state(m_floppy1, 1, 1);
 }
 
-static const struct pit8253_config bw2_pit8253_interface =
+static const struct pit8253_config pit_intf =
 {
 	{
 		{
@@ -650,7 +591,7 @@ static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 	return state->m_video_ram[ma & 0x3fff];
 }
 
-static MSM6255_INTERFACE( bw2_msm6255_intf )
+static MSM6255_INTERFACE( lcdc_intf )
 {
 	SCREEN_TAG,
 	0,
@@ -684,7 +625,7 @@ static const floppy_config bw2_floppy_config =
 	"floppy_5_25"
 };
 
-static const wd17xx_interface bw2_wd17xx_interface =
+static const wd17xx_interface fdc_intf =
 {
 	DEVCB_LINE_GND,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
@@ -745,15 +686,12 @@ void bw2_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( bw2, bw2_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
-	MCFG_CPU_PROGRAM_MAP( bw2_mem)
-	MCFG_CPU_IO_MAP( bw2_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(bw2_mem)
+	MCFG_CPU_IO_MAP(bw2_io)
 
-	MCFG_PIT8253_ADD( PIT8253_TAG, bw2_pit8253_interface )
-	MCFG_I8255A_ADD( I8255A_TAG, ppi_intf )
-
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD( SCREEN_TAG, LCD )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
@@ -764,20 +702,19 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_PALETTE_LENGTH( 2 )
 	MCFG_PALETTE_INIT( bw2 )
 
-	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, bw2_msm6255_intf)
-
-	/* printer */
+	// devices
+	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
+	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, lcdc_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-
-	/* uart */
 	MCFG_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
-
-	MCFG_WD179X_ADD(WD2797_TAG, bw2_wd17xx_interface )
-
+	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
+
+	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")

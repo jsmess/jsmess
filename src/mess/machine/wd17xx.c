@@ -398,10 +398,10 @@ static void wd17xx_timed_read_sector_request(device_t *device);
 INLINE wd1770_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == WD1770 || device->type() == WD1771 || device->type() == WD1772 ||
-		device->type() == WD1773 || device->type() == WD179X || device->type() == WD1793 ||
-		device->type() == WD2793 || device->type() == WD2797 || device->type() == WD177X ||
-		device->type() == MB8877);
+	assert(device->type() == WD1770 || device->type() == WD1771 || device->type() == WD1772 || device->type() == WD1773 || 
+		device->type() == WD1793 ||	device->type() == WD1795 || device->type() == WD1797 || 
+		device->type() == WD2793 || device->type() == WD2795 || device->type() == WD2797 || 
+		device->type() == WD177X || device->type() == WD179X || device->type() == MB8877);
 
 	return (wd1770_state *)downcast<legacy_device_base *>(device)->token();
 }
@@ -413,7 +413,8 @@ INLINE wd1770_state *get_safe_token(device_t *device)
 
 static int wd17xx_has_side_select(device_t *device)
 {
-	return (device->type() == WD1773 || device->type() == WD1793 || device->type() == WD2797);
+	return (device->type() == WD1795 || device->type() == WD1797 || 
+			device->type() == WD2795 || device->type() == WD2797);
 }
 
 static int wd17xx_dden(device_t *device)
@@ -2131,19 +2132,29 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_NAME		"WD1773"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd179x##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD179x"
-#include "devtempl.h"
-
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1793##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD1793"
 #include "devtempl.h"
 
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1795##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"WD1795"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1797##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"WD1797"
+#include "devtempl.h"
+
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2793##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD2793"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2795##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"WD2795"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2797##s
@@ -2152,6 +2163,11 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd177x##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"WD179x"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd179x##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD179x"
 #include "devtempl.h"
@@ -2165,10 +2181,13 @@ DEFINE_LEGACY_DEVICE(WD1770, wd1770);
 DEFINE_LEGACY_DEVICE(WD1771, wd1771);
 DEFINE_LEGACY_DEVICE(WD1772, wd1772);
 DEFINE_LEGACY_DEVICE(WD1773, wd1773);
-DEFINE_LEGACY_DEVICE(WD179X, wd179x);
 DEFINE_LEGACY_DEVICE(WD1793, wd1793);
+DEFINE_LEGACY_DEVICE(WD1795, wd1795);
+DEFINE_LEGACY_DEVICE(WD1797, wd1797);
 DEFINE_LEGACY_DEVICE(WD2793, wd2793);
+DEFINE_LEGACY_DEVICE(WD2795, wd2795);
 DEFINE_LEGACY_DEVICE(WD2797, wd2797);
 DEFINE_LEGACY_DEVICE(WD177X, wd177x);
+DEFINE_LEGACY_DEVICE(WD179X, wd179x);
 DEFINE_LEGACY_DEVICE(MB8877, mb8877);
 

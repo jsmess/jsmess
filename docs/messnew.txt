@@ -40,9 +40,11 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-- [ABC802] Connected ABC99 keyboard. [Curt Coder]
+- [ABC802] Connected to ABC99 keyboard, removed keyboard hack. [Curt Coder]
 
-- [ABC806] Connected ABC99 keyboard. [Curt Coder]
+- [ABC806] Connected to ABC99 keyboard, removed keyboard hack. [Curt Coder]
+
+- [ABC1600] Implemented video and ABC 99 keyboard. [Curt Coder]
 
 - [AC1] Added cassette support. [Robbbert]
 
@@ -56,6 +58,8 @@ System Driver Changes:
   are now playable.  [ranger_lennier]
 
 - [BBC] Made the SAA505x implementation a device.  [Atari Ace]
+
+- [BW2] Set proper FDC type and removed floppy side select hack. [Curt Coder]
 
 - [Einstein] Fixed addressing of character ROM for 80 column mode, added
   dump of 80 column rom, fixed bit 0 of status register to reflect 6845
@@ -151,6 +155,9 @@ Source Changes:
 
 - Cleanups; static qualifiers, added driver_states, consistent get_safe_token
   usage, reduced calls to ram_get_ptr() and region(...)->base().  [Atari Ace]
+
+- [WD17XX] Added device types WD1795, WD1797, WD2795, and fixed 
+   wd17xx_has_side_select(). [Curt Coder]
 
 
 

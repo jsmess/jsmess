@@ -60,8 +60,6 @@ public:
 	void ramcard_bankswitch(UINT8 data);
 
 	DECLARE_WRITE8_MEMBER( ramcard_bank_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
