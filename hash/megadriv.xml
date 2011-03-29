@@ -5,23 +5,17 @@
    
     2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)	PAL
     2IN1 (PSYCHIC PINBALL MICRO MACHINES)	PAL
-    AAAHH!!! REAL MONSTERS					PAL			dump check
-    ADVANCED DAISENRYAKU					JAPAN		we have Rev 0, Rev A needed
+    ADVANCED DAISENRYAKU					JAPAN		we have Rev A, Rev 0 needed
     ARNOLD PALMER TOURNAMENT GOLF			PAL
     AWESOME POSSUM							JAPAN
     BATTLE SQUADRON							PAL
     BEAVIS & BUTTHEAD						PAL
-    BUGS BUNNY IN DOUBLE TROUBLE			PAL
-    BULLS VS LAKERS							PAL
     CAPTAIN LANG							JAPAN
     CAPTAIN PLANET							ASIA
     CENTURION								USA/PAL		needs proper dump
     DAVIS CUP TENNIS						JAPAN
     DYNAMITE HEADDY SAMPLE					JAPAN
     ECCO JR									USA/PAL		graphic corruption on later revision
-    ESWAT									PAL			dump check
-    EVANDER HOLYFIELD'S BOXING				PAL
-    EX-MUTANTS								PAL
     F-22 (JUNE 1992)						USA/PAL		needs proper dump
     FAERY TALE ADVENTURE					PAL
     FATAL FURY 2							PAL			Australia-only PAL release
@@ -35,9 +29,6 @@
     INTERNATIONAL SUPERSTAR SOCCER			BRAZIL
     JEWEL MASTER							USA/PAL		we have Rev A, Rev 0 needed (does it match Japanese release?)
     MARBLE MADNESS							JAPAN
-    MIDNIGHT RESISTANCE						PAL
-    MOTHERBASE								PAL			32X cart
-    MUTANT LEAGUE FOOTBALL					PAL
     NBA PLAYOFFS - BULLS VS BLAZERS			JAPAN		conflict in current info
     NFL PRO FOOTBALL '94					JAPAN
     OSAKA BANK MY LINE						JAPAN
@@ -47,13 +38,11 @@
     PAPERBOY 2								PAL
     PGA TOUR GOLF							USA/PAL		we have v1.1 and v1.2, v1.0 needed (does it exist?)
     PHANTASY STAR IV						PAL
-    PINK GOES TO HOLLYWOOD					PAL
     ROAD RASH								JAPAN
     ROAD RASH								USA/PAL		needs proper dump
     SHINING FORCE							PAL
     SIDE POCKET								JAPAN/USA	conflict in current info
     SMURFS									PAL			we have Rev A, Rev 0 needed
-    SPIDERMAN AND X-MEN ARCADE'S REVENGE	PAL
     SUMISEI HOME TANMATSU					JAPAN
     SUPER DAISENRYAKU						JAPAN		we have Rev 0, Rev A needed (confirmed by Ototo)
     TOM & JERRY								JAPAN
@@ -62,8 +51,6 @@
     WORLD CHAMPIONSHIP SOCCER II			PAL
     WORLD CUP SOCCER						JAPAN/USA	we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
     WORLD OF ILLUSION						JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
-    ZANY GOLF								PAL
-    ZOOM!									PAL
 -->
 
 <!-- 
@@ -423,6 +410,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="arcadecl">
 		<description>Arcade Classics (Euro, USA)</description>
 		<year>1996</year>
@@ -436,6 +424,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="artalive">
 		<!-- Serial: G-4069 (Jpn) - Release Date: 1992-03-27 (Jpn) -->
 		<description>Art Alive (World)</description>
@@ -450,6 +439,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe and Japan is confirmed -->
 	<software name="sor">
 		<!-- Serial: G-4050 (Jpn) - Release Date: 1991-08-02 (Jpn) -->
 		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tetsuken (Jpn, Rev. A)</description>
@@ -464,6 +454,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe and Japan is confirmed -->
 	<software name="sora" cloneof="sor">
 		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tetsuken (Jpn)</description>
 		<year>1991</year>
@@ -522,6 +513,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="ghouls">
 		<description>Ghouls 'n Ghosts (Euro, USA, Kor, Rev. A)</description>
 		<year>1989</year>
@@ -538,6 +530,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only USA is confirmed -->
 	<software name="ghouls1" cloneof="ghouls">
 		<description>Ghouls 'n Ghosts (Euro, USA)</description>
 		<year>1989</year>
@@ -572,6 +565,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="homea">
 		<description>Home Alone (Euro, USA)</description>
 		<year>1992</year>
@@ -585,6 +579,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="joemont2a" cloneof="joemont2">
 		<description>Joe Montana II Sports Talk Football (World)</description>
 		<year>1991</year>
@@ -626,6 +621,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="megabomb">
 		<description>Mega Bomberman (Euro, Kor)</description>
 		<year>1994</year>
@@ -678,6 +674,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="psampras">
 		<description>Pete Sampras Tennis (Euro, USA, J-Cart)</description>
 		<year>1994</year>
@@ -691,6 +688,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="pstar2">
 		<description>Phantasy Star II (Euro, USA, Rev. A)</description>
 		<year>1989</year>
@@ -859,6 +857,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="sharr">
 		<description>Space Harrier II (World)</description>
 		<year>1989</year>
@@ -892,6 +891,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="smgp">
 		<description>Super Monaco GP (Euro, Jpn, Rev. A)</description>
 		<year>1990</year>
@@ -905,6 +905,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="ssmashtv">
 		<description>Super Smash TV (Euro, USA)</description>
 		<year>1992</year>
@@ -918,6 +919,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="addfam">
 		<description>The Addams Family (Euro, USA)</description>
 		<year>1994</year>
@@ -986,6 +988,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- Only Europe is confirmed -->
 	<software name="crashdum">
 		<description>The Incredible Crash Dummies (Euro, USA)</description>
 		<year>1993</year>
@@ -995,6 +998,174 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic1" value="MPR-16269-S" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16259.ic1" size="1048576" crc="1f6e574a" sha1="ca0115dd843e072815c4be86a7a491b26e3c4762" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="eswat">
+		<description>ESWAT - City Under Siege (Euro, USA, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13192A S69" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13192a.ic1" size="524288" crc="e72f8a36" sha1="5cb96061bd2b00c82f8d6b46ab9802e2b1820c86" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="evander">
+		<!-- Serial: G-4084 (Jpn) - Release Date: 1992-10-30 (Jpn) -->
+		<description>Evander Holyfield's 'Real Deal' Boxing (World)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6304A" />
+			<feature name="ic1" value="MPR-14860-T" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14860.ic1" size="524288" crc="4fef37c8" sha1="eb4aca22f8b5837a0a0b10491c46714948b09844" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="exmutant">
+		<description>Ex-Mutants (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<feature name="pcb" value="171-5978BA" />
+				<feature name="ic1" value="MPR-15225-T" />
+				<rom name="mpr-15225.ic1" size="1048576" crc="33b1979f" sha1="20b282ff8220291d98853888cfe504692c04e654" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="gforce2">
+		<!-- Serial: T-68013 (Jpn) - Release Date: 1991-09-13 (Jpn) -->
+		<description>Galaxy Force II (World, Rev. B)</description>
+		<year>1991</year>
+		<publisher>CRI ~ Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<feature name="pcb" value="171-5978BA" />
+				<feature name="ic1" value="MPR-14248B-F" />
+				<rom name="mpr-14248b.ic1" size="1048576" crc="d15f5c3c" sha1="db1615fc239cb0ed9fdc792217964c33e1e700fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="mutantlf">
+		<description>Mutant League Football (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P100001 REV F" />
+			<feature name="u1" value="MUTANT LEAGUE MLF03" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mlf03.u1" size="1048576" crc="dce29c9d" sha1="6f8638a1c56229ddcb71c9da9f652b49c2978f44" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="pink">
+		<description>Pink Goes to Hollywood (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>TecMagik</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-16065-H" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16065.ic1" size="1048576" crc="b5804771" sha1="fc63d2a2a723f60f2141bc50bd94acef74ba9ab3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="spidxmen">
+		<description>Spider-Man and X-Men - Arcade's Revenge (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Flying Edge</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<feature name="pcb" value="171-5978BA" />
+				<feature name="ic1" value="MPR-15709-S" />
+				<rom name="mpr-15709.ic1" size="1048576" crc="4a4414ea" sha1="978dabcc7d098edebc9d3f2fef04f27fd6aeab19" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="zoom">
+		<!-- Serial: G-4023 (Jpn) - Release Date: 1990-01-13 -->
+		<description>Zoom! (World)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12807 T05" />
+			<dataarea name="rom" size="262144">
+				<rom name="mpr-12807.ic1" size="262144" crc="724d6965" sha1="05efc300b3f68496200cb73a2a462a97f930a011" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+<!-- Need proper dump, can't open cart to verify -->
+	<software name="zanygolf">
+		<description>Zany Golf (Euro, USA, v1.1)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="zany golf (euro, usa) (v1.1).bin" size="524288" crc="74ed7607" sha1="f1c3b211c91edfed9c96f422cd10633afa43fdf0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugsbune" cloneof="bugsbun">
+		<description>Bugs Bunny in Double Trouble (Euro)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-18887-U" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-18887.ic1" size="2097152" crc="cec0a0bb" sha1="ee079f3cbb168bab62d5f0643709d840a9b5d2d5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe and Korea is confirmed -->
+	<software name="kidcham">
+		<description>Kid Chameleon (Euro, Korea, USA)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-14557 W29" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14557.ic1" size="1048576" crc="ce36e6cc" sha1="28b904000b2863b6760531807760b571f1a5fc1d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Can't open cart for now to confirm -->
+	<software name="fifa95k" cloneof="fifa95">
+		<description>FIFA Soccer 95 (Kor)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="lh5370hd.bin" size="2097152" crc="012591f9" sha1="ad1202a2e4166f8266d5633b8c5beb59c6cbd005" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3724,17 +3895,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="budokan - the martial spirit (usa).bin" size="524288" crc="acd9f5fc" sha1="93bc8242106bc9b2e0a8a974a3f65b559dd2941d" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bugsbun">
-		<description>Bugs Bunny in Double Trouble (USA)</description>
-		<year>1996</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="bugs bunny in double trouble (usa).bin" size="2097152" crc="365305a2" sha1="50b18d9f9935a46854641c9cfc5b3d3b230edd5e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7148,20 +7308,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="eswat">
-		<description>ESWAT - City Under Siege (USA)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="eswat - city under siege (usa).bin" size="524288" crc="e72f8a36" sha1="5cb96061bd2b00c82f8d6b46ab9802e2b1820c86" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="eswatj" cloneof="eswat">
 		<!-- Serial: G-4029 - Release Date: 1990-07-14 -->
-		<description>Cyber Police ESWAT (Jpn)</description>
+		<description>Cyber Police ESWAT (Jpn, Rev. 0)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7257,30 +7406,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="j. league champion soccer (jpn).bin" size="524288" crc="453c405e" sha1="c28d8dac0f5582c3c2754342605764ee6e5b8af3" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="evander">
-		<!-- Serial: G-4084 (Jpn) - Release Date: 1992-10-30 (Jpn) -->
-		<description>Evander Holyfield's 'Real Deal' Boxing (World)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="SEGA-EEPROM" />
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14860.bin" size="524288" crc="4fef37c8" sha1="eb4aca22f8b5837a0a0b10491c46714948b09844" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="exmutant">
-		<description>Ex-Mutants (Euro, USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="ex-mutants (euro, usa).bin" size="1048576" crc="33b1979f" sha1="20b282ff8220291d98853888cfe504692c04e654" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7818,17 +7943,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fifa95k" cloneof="fifa95">
-		<description>FIFA Soccer 95 (Kor)</description>
-		<year>1994</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="lh5370hd.bin" size="2097152" crc="012591f9" sha1="ad1202a2e4166f8266d5633b8c5beb59c6cbd005" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="futbol" cloneof="fifa95">
 		<description>Futbol Argentino 98 - Pasion de Multitudes (Pirate)</description>
 		<year>199?</year>
@@ -8267,18 +8381,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gain ground (world) (alt).bin" size="524288" crc="83e7b8ae" sha1="3cc501086f794ac663aad14d5c5a75b648041151" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gforce2">
-		<!-- Serial: T-68013 (Jpn) - Release Date: 1991-09-13 (Jpn) -->
-		<description>Galaxy Force II (World, Rev. B)</description>
-		<year>1991</year>
-		<publisher>CRI ~ Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14248b.bin" size="1048576" crc="d15f5c3c" sha1="db1615fc239cb0ed9fdc792217964c33e1e700fc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10420,17 +10522,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="kick off 3 - european challenge (euro).bin" size="1048576" crc="bc37401a" sha1="e449cfd4f9d59cf28b4842d465022a399964d0d6" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kidcham">
-		<description>Kid Chameleon (Euro, USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14557.bin" size="1048576" crc="ce36e6cc" sha1="28b904000b2863b6760531807760b571f1a5fc1d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -12734,17 +12825,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="musha aleste - full metal fighter ellinor (jpn).bin" size="524288" crc="8fde18ab" sha1="71d363186b9ee023fd2ae1fb9f518c59bf7b8bee" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mutantlf">
-		<description>Mutant League Football (Euro, USA)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mutant league football (euro, usa).bin" size="1048576" crc="dce29c9d" sha1="6f8638a1c56229ddcb71c9da9f652b49c2978f44" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15540,17 +15620,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="phelios (usa).bin" size="524288" crc="11c79320" sha1="c2e34b7eb411ac78bb480e30434808b2ae4989ea" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pink">
-		<description>Pink Goes to Hollywood (USA)</description>
-		<year>1993</year>
-		<publisher>TecMagik</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pink goes to hollywood (usa).bin" size="1048576" crc="b5804771" sha1="fc63d2a2a723f60f2141bc50bd94acef74ba9ab3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19252,17 +19321,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="spider-man and venom - separation anxiety (euro, usa).bin" size="3145728" crc="512ade32" sha1="563b45254c168aa0de0bba8fadd75a2d1e8e094b" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spidxmen">
-		<description>Spider-Man and X-Men - Arcade's Revenge (USA)</description>
-		<year>1994</year>
-		<publisher>Flying Edge</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="spider-man and x-men - arcade's revenge (usa).bin" size="1048576" crc="4a4414ea" sha1="978dabcc7d098edebc9d3f2fef04f27fd6aeab19" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25026,17 +25084,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="zanygolf">
-		<description>Zany Golf (Euro, USA, v1.1)</description>
-		<year>1990</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="zany golf (euro, usa) (v1.1).bin" size="524288" crc="74ed7607" sha1="f1c3b211c91edfed9c96f422cd10633afa43fdf0" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="zanygolf1" cloneof="zanygolf">
 		<description>Zany Golf (Euro, USA)</description>
 		<year>1990</year>
@@ -25155,18 +25202,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="zool - ninja of the 'nth' dimension (usa).bin" size="1048576" crc="cb2939f1" sha1="ee016f127b81f1ca25657e8fa47fac0c4ed15c97" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoom">
-		<!-- Serial: G-4023 (Jpn) - Release Date: 1990-01-13 -->
-		<description>Zoom! (World)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="zoom! (world).bin" size="262144" crc="724d6965" sha1="05efc300b3f68496200cb73a2a462a97f930a011" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
