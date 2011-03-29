@@ -566,6 +566,11 @@ READ8_HANDLER ( ti83_port_0000_r )
 	return data;
 }
 
+READ8_HANDLER ( ti83p_port_0000_r )
+{
+	return 0xff; // TODO
+}
+
  READ8_HANDLER ( ti83p_port_0002_r )
 {
 	ti85_state *state = space->machine->driver_data<ti85_state>();
@@ -750,6 +755,11 @@ WRITE8_HANDLER ( ti83_port_0003_w )
 		//state->timer_interrupt_mask = data&0x04;
 		state->LCD_mask = data&0x02;
 		state->LCD_status = data&0x08;
+}
+
+WRITE8_HANDLER ( ti83p_port_0000_w )
+{
+	//TODO
 }
 
 WRITE8_HANDLER ( ti83p_port_0002_w )

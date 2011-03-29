@@ -220,7 +220,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti82_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti82_port_0000_r, ti82_port_0000_w )	//TODO
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti82_port_0000_r, ti82_port_0000_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
+	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
+	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
@@ -243,7 +253,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti83p_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti82_port_0000_r, ti82_port_0000_w)	//TODO
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti83p_port_0000_r, ti83p_port_0000_w)	//TODO
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti83p_port_0002_r, ti83p_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti83_port_0003_r, ti83p_port_0003_w )
@@ -557,6 +567,11 @@ static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_TI82SERIAL_ADD( "ti82serial" )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ti81v2, ti82 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(ti81v2_io)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( ti83, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( 6000000)		/* 6 MHz */
@@ -749,7 +764,7 @@ ROM_END
 COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,     "Texas Instruments",    "TI-81",                        GAME_NO_SOUND )
 COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,     "Texas Instruments",    "TI-85",                        GAME_NO_SOUND )
 COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,     "Texas Instruments",    "TI-82",                        GAME_NO_SOUND )
-COMP( 1994, ti81v2,     ti81,   0,      ti82,   ti81,   0,     "Texas Instruments",    "TI-81 v2.0",                   GAME_NO_SOUND )
+COMP( 1994, ti81v2,     ti81,   0,      ti81v2, ti81,   0,     "Texas Instruments",    "TI-81 v2.0",                   GAME_NO_SOUND )
 COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,     "Texas Instruments",    "TI-83",                        GAME_NO_SOUND )
 COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,     "Texas Instruments",    "TI-86",                        GAME_NO_SOUND )
 COMP( 1998, ti73,       0,      0,      ti83p,  ti82,   0,     "Texas Instruments",    "TI-73",                        GAME_NOT_WORKING | GAME_NO_SOUND)
