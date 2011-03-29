@@ -27,21 +27,7 @@
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "formats/basicdsk.h"
-#include "machine/i8255a.h"
-#include "machine/ctronics.h"
-#include "machine/msm8251.h"
-#include "machine/wd17xx.h"
-#include "machine/pit8253.h"
-#include "video/msm6255.h"
 #include "includes/bw2.h"
-#include "rendlay.h"
 
 int bw2_state::get_ramdisk_size()
 {
@@ -258,9 +244,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w )
-	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY(PIT8253_TAG, pit8253_r, pit8253_w )
-	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE_LEGACY(MSM6255_TAG, msm6255_register_r, msm6255_register_w )
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY(PIT8253_TAG, pit8253_r, pit8253_w)
+	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE(MSM6255_TAG, msm6255_device, read, write)
 //  AM_RANGE( 0x30, 0x3f ) SLOT
 	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
@@ -579,7 +565,7 @@ static PALETTE_INIT( bw2 )
 
 bool bw2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	msm6255_update(m_lcdc, &bitmap, &cliprect);
+	m_lcdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }

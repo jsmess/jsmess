@@ -1,7 +1,21 @@
 #ifndef __BW2__
 #define __BW2__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+#include "machine/i8255a.h"
+#include "machine/ctronics.h"
+#include "machine/msm8251.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/wd17xx.h"
+#include "video/msm6255.h"
+#include "rendlay.h"
+
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"ic1"
@@ -44,7 +58,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_uart;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_lcdc;
+	required_device<msm6255_device> m_lcdc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
