@@ -1419,7 +1419,7 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 	if (VERBOSE)
 	{
 		if (w->data_count < 4)
-			logerror("wd17xx_status_r: $%02X (data_count %d)\n", result, w->data_count);
+			logerror("%s: wd17xx_status_r: $%02X (data_count %d)\n", device->machine().describe_context(), result, w->data_count);
 	}
 
 	return result;
@@ -1431,7 +1431,7 @@ READ8_DEVICE_HANDLER( wd17xx_track_r )
 	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
-		logerror("wd17xx_track_r: $%02X\n", w->track);
+		logerror("%s: wd17xx_track_r: $%02X\n", device->machine().describe_context(), w->track);
 
 	return w->track;
 }
@@ -1442,7 +1442,7 @@ READ8_DEVICE_HANDLER( wd17xx_sector_r )
 	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
-		logerror("wd17xx_sector_r: $%02X\n", w->sector);
+		logerror("%s: wd17xx_sector_r: $%02X\n", device->machine().describe_context(), w->sector);
 
 	return w->sector;
 }
@@ -1453,7 +1453,7 @@ READ8_DEVICE_HANDLER( wd17xx_data_r )
 	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE_DATA)
-		logerror("wd17xx_data_r: %02x\n", w->data);
+		logerror("%s: wd17xx_data_r: %02x\n", device->machine().describe_context(), w->data);
 
 	/* clear data request */
 	wd17xx_clear_drq(device);
@@ -1488,7 +1488,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 	if ((data & ~FDC_MASK_TYPE_IV) == FDC_FORCE_INT)
 	{
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X FORCE_INT (data_count %d)\n", data, w->data_count);
+			logerror("%s: wd17xx_command_w $%02X FORCE_INT (data_count %d)\n", device->machine().describe_context(), data, w->data_count);
 
 		w->data_count = 0;
 		w->data_offset = 0;
@@ -1537,8 +1537,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		{
 			if (VERBOSE)
             {
-				logerror("wd17xx_command_w $%02X READ_SEC\n", data);
-                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X\n",w->command,w->track,w->sector,w->data);
+				logerror("%s: wd17xx_command_w $%02X READ_SEC (", device->machine().describe_context(), data);
+                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X)\n",w->command,w->track,w->sector,w->data);
             }
 			w->read_cmd = data;
 			w->command = data & ~FDC_MASK_TYPE_II;
@@ -1556,8 +1556,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		{
 			if (VERBOSE)
             {
-				logerror("wd17xx_command_w $%02X WRITE_SEC\n", data);
-                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X\n",w->command,w->track,w->sector,w->data);
+				logerror("%s: wd17xx_command_w $%02X WRITE_SEC (", device->machine().describe_context(), data);
+                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X)\n",w->command,w->track,w->sector,w->data);
             }
 
 			w->write_cmd = data;
@@ -1575,7 +1575,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_III) == FDC_READ_TRK)
 		{
 			if (VERBOSE)
-				logerror("wd17xx_command_w $%02X READ_TRK\n", data);
+				logerror("%s: wd17xx_command_w $%02X READ_TRK\n", device->machine().describe_context(), data);
 
 			w->command = data & ~FDC_MASK_TYPE_III;
 			w->command_type = TYPE_III;
@@ -1592,7 +1592,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_III) == FDC_WRITE_TRK)
 		{
 			if (VERBOSE)
-				logerror("wd17xx_command_w $%02X WRITE_TRK\n", data);
+				logerror("%s: wd17xx_command_w $%02X WRITE_TRK\n", device->machine().describe_context(), data);
 
 			w->command_type = TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
@@ -1633,7 +1633,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_III) == FDC_READ_DAM)
 		{
 			if (VERBOSE)
-				logerror("wd17xx_command_w $%02X READ_DAM\n", data);
+				logerror("%s: wd17xx_command_w $%02X READ_DAM\n", device->machine().describe_context(), data);
 
 			w->command_type = TYPE_III;
 			w->command = data & ~FDC_MASK_TYPE_III;
@@ -1651,7 +1651,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		}
 
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X unknown\n", data);
+			logerror("%s: wd17xx_command_w $%02X unknown\n", device->machine().describe_context(), data);
 
 		return;
 	}
@@ -1664,7 +1664,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 	if ((data & ~FDC_MASK_TYPE_I) == FDC_RESTORE)
 	{
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X RESTORE\n", data);
+			logerror("%s: wd17xx_command_w $%02X RESTORE\n", device->machine().describe_context(), data);
 
 		wd17xx_command_restore(device);
 	}
@@ -1695,7 +1695,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 		newtrack = w->data;
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X SEEK (data_reg is $%02X)\n", data, newtrack);
+			logerror("%s: wd17xx_command_w $%02X SEEK (data_reg is $%02X)\n", device->machine().describe_context(), data, newtrack);
 
 		/* reset busy count */
 		w->busy_count = 0;
@@ -1724,7 +1724,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 	if ((data & ~(FDC_STEP_UPDATE | FDC_MASK_TYPE_I)) == FDC_STEP)
 	{
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X STEP dir %+d\n", data, w->direction);
+			logerror("%s: wd17xx_command_w $%02X STEP dir %+d\n", device->machine().describe_context(), data, w->direction);
 
 		w->command_type = TYPE_I;
         /* if it is a real floppy, issue a step command */
@@ -1747,7 +1747,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 	if ((data & ~(FDC_STEP_UPDATE | FDC_MASK_TYPE_I)) == FDC_STEP_IN)
 	{
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X STEP_IN\n", data);
+			logerror("%s: wd17xx_command_w $%02X STEP_IN\n", device->machine().describe_context(), data);
 
 		w->command_type = TYPE_I;
 		w->direction = +1;
@@ -1768,7 +1768,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 	if ((data & ~(FDC_STEP_UPDATE | FDC_MASK_TYPE_I)) == FDC_STEP_OUT)
 	{
 		if (VERBOSE)
-			logerror("wd17xx_command_w $%02X STEP_OUT\n", data);
+			logerror("%s: wd17xx_command_w $%02X STEP_OUT\n", device->machine().describe_context(), data);
 
 		w->command_type = TYPE_I;
 		w->direction = -1;
@@ -1814,7 +1814,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_track_w )
 	w->track = data;
 
 	if (VERBOSE)
-		logerror("wd17xx_track_w $%02X\n", data);
+		logerror("%s: wd17xx_track_w $%02X\n", device->machine().describe_context(), data);
 }
 
 /* write the FDC sector register */
@@ -1825,7 +1825,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 	w->sector = data;
 
 	if (VERBOSE)
-		logerror("wd17xx_sector_w $%02X\n", data);
+		logerror("%s: wd17xx_sector_w $%02X\n", device->machine().describe_context(), data);
 }
 
 /* write the FDC data register */
@@ -1980,7 +1980,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 	else
 	{
 		if (VERBOSE)
-			logerror("wd17xx_data_w $%02X\n", data);
+			logerror("%s: wd17xx_data_w $%02X\n", device->machine().describe_context(), data);
 	}
 	w->data = data;
 }
