@@ -22,19 +22,7 @@
 
 */
 
-#include "emu.h"
 #include "includes/pc8001.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "machine/i8257.h"
-#include "machine/ctronics.h"
-#include "machine/i8214.h"
-#include "machine/i8255a.h"
-#include "machine/msm8251.h"
-#include "machine/upd1990a.h"
-#include "video/upd3301.h"
-#include "sound/speaker.h"
 
 /* Read/Write Handlers */
 
@@ -64,7 +52,7 @@ static WRITE8_HANDLER( port30_w )
 	state->color = BIT(data, 1);
 
 	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 static WRITE8_HANDLER( pc8001mk2_port31_w )
@@ -169,6 +157,48 @@ static ADDRESS_MAP_START( pc8001mk2_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* Input Ports */
+
+static WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w )
+{
+	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
+	driver_state->m_rtc->c0_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w )
+{
+	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
+	driver_state->m_rtc->c1_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
+{
+	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
+	driver_state->m_rtc->c2_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( upd1990a_data_in_w )
+{
+	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
+	driver_state->m_rtc->data_in_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
+{
+	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
+	driver_state->m_rtc->stb_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
+{
+	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
+	driver_state->m_rtc->clk_w(state);
+}
+
+static READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
+{
+	pc8001_state *state = device->machine().driver_data<pc8001_state>();
+	return state->m_rtc->data_out_r();
+}
 
 static INPUT_PORTS_START( pc8001 )
 	PORT_START("KEY0")
@@ -319,7 +349,7 @@ static SCREEN_UPDATE( pc8001 )
 {
 	pc8001_state *state = screen->machine().driver_data<pc8001_state>();
 
-	upd3301_update(state->upd3301, bitmap, cliprect);
+	upd3301_update(state->m_crtc, bitmap, cliprect);
 
 	return 0;
 }
@@ -441,47 +471,38 @@ static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = machine.driver_data<pc8001_state>();
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
-	device_t *messram = machine.device(RAM_TAG);
-
-	/* look up devices */
-	state->i8257 = machine.device(I8257_TAG);
-	state->upd1990a = machine.device(UPD1990A_TAG);
-	state->upd3301 = machine.device(UPD3301_TAG);
-	state->speaker = machine.device(SPEAKER_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
-	state->centronics = machine.device(CENTRONICS_TAG);
 
 	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
-	upd1990a_oe_w(state->upd1990a, 1);
+	state->m_rtc->cs_w(1);
+	state->m_rtc->oe_w(1);
 
 	/* initialize DMA */
-	i8257_ready_w(state->i8257, 1);
+	i8257_ready_w(state->m_dma, 1);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 1, 1, machine.region("n80")->base(), 0);
 	program->install_read_bank(0x0000, 0x5fff, "bank1");
 	program->unmap_write(0x0000, 0x5fff);
 
-	switch (ram_get_size(messram))
+	switch (ram_get_size(state->m_ram))
 	{
 	case 16*1024:
-		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram), 0);
+		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(state->m_ram), 0);
 		program->unmap_readwrite(0x6000, 0xbfff);
 		program->unmap_readwrite(0x8000, 0xbfff);
 		program->install_readwrite_bank(0xc000, 0xffff, "bank3");
 		break;
 
 	case 32*1024:
-		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram), 0);
+		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(state->m_ram), 0);
 		program->unmap_readwrite(0x6000, 0xbfff);
 		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 		break;
 
 	case 64*1024:
-		memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(messram), 0);
-		memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(messram) + 0x6000, 0);
-		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram) + 0x8000, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(state->m_ram), 0);
+		memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(state->m_ram) + 0x6000, 0);
+		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(state->m_ram) + 0x8000, 0);
 		program->install_readwrite_bank(0x0000, 0x5fff, "bank1");
 		program->install_readwrite_bank(0x6000, 0xbfff, "bank2");
 		program->install_readwrite_bank(0x8000, 0xffff, "bank3");

@@ -26,21 +26,7 @@
 
 */
 
-#include "emu.h"
 #include "includes/prof80.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "video/mc6845.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/i8255a.h"
-#include "machine/upd765.h"
-#include "machine/upd1990a.h"
-#include "machine/z80sti.h"
-#include "machine/ctronics.h"
-#include "machine/rescap.h"
-#include "sound/speaker.h"
 
 /* Keyboard HACK */
 
@@ -212,18 +198,18 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 	switch (sa)
 	{
 	case 0: /* C0/TDI */
-		upd1990a_data_in_w(state->upd1990a, fa);
-		upd1990a_c0_w(state->upd1990a, fa);
+		state->m_rtc->data_in_w(fa);
+		state->m_rtc->c0_w(fa);
 		state->c0 = fa;
 		break;
 
 	case 1: /* C1 */
-		upd1990a_c1_w(state->upd1990a, fa);
+		state->m_rtc->c1_w(fa);
 		state->c1 = fa;
 		break;
 
 	case 2: /* C2 */
-		upd1990a_c2_w(state->upd1990a, fa);
+		state->m_rtc->c2_w(fa);
 		state->c2 = fa;
 		break;
 
@@ -231,7 +217,7 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 		break;
 
 	case 4: /* TCK */
-		upd1990a_clk_w(state->upd1990a, fa);
+		state->m_rtc->clk_w(fa);
 		break;
 
 	case 5:	/* IN USE */
@@ -268,7 +254,7 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 	switch (sb)
 	{
 	case 0: /* RESF */
-		if (fb) upd765_reset(state->upd765, 0);
+		if (fb) upd765_reset(state->m_fdc, 0);
 		break;
 
 	case 1: /* MINI */
@@ -292,7 +278,7 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 		break;
 
 	case 6: /* TSTB */
-		upd1990a_stb_w(state->upd1990a, fb);
+		state->m_rtc->stb_w(fb);
 		break;
 
 	case 7: /* MME */
@@ -400,7 +386,7 @@ static READ8_HANDLER( status2_r )
 	data |= js5 << 4;
 
 	/* RTC data */
-	data |= !upd1990a_data_out_r(state->upd1990a) << 7;
+	data |= !state->m_rtc->data_out_r() << 7;
 
 	return data;
 }
@@ -1186,13 +1172,9 @@ static MACHINE_START( prof80 )
 {
 	prof80_state *state = machine.driver_data<prof80_state>();
 
-	/* find devices */
-	state->upd765 = machine.device(UPD765_TAG);
-	state->upd1990a = machine.device(UPD1990A_TAG);
-
 	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
-	upd1990a_oe_w(state->upd1990a, 1);
+	state->m_rtc->cs_w(1);
+	state->m_rtc->oe_w(1);
 
 	/* configure FDC */
 	floppy_drive_set_index_pulse_callback(floppy_get_device(machine, 0), prof80_fdc_index_callback);

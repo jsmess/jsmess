@@ -1,8 +1,24 @@
+#pragma once
+
 #ifndef __KYOCERA__
 #define __KYOCERA__
 
-#include "video/hd61830.h"
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "machine/ctronics.h"
+#include "machine/i8155.h"
+#include "machine/msm8251.h"
 #include "machine/ram.h"
+#include "machine/rp5c01a.h"
+#include "machine/upd1990a.h"
+#include "video/hd44102.h"
+#include "video/hd61830.h"
+#include "sound/speaker.h"
+#include "rendlay.h"
 
 #define SCREEN_TAG		"screen"
 #define I8085_TAG		"m19"
@@ -56,7 +72,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_rtc;
+	required_device<upd1990a_device> m_rtc;
 	required_device<device_t> m_lcdc0;
 	required_device<device_t> m_lcdc1;
 	required_device<device_t> m_lcdc2;

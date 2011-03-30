@@ -28,7 +28,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_rtc;
+	required_device<upd1990a_device> m_rtc;
 
 	UINT8 *m_lcd_data;
 	UINT8 m_kb_matrix;
@@ -125,7 +125,7 @@ bool pc1500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 void pc1500_state::machine_reset()
 {
 	m_kb_matrix = 0xff;
-	upd1990a_cs_w(m_rtc, 1);
+	m_rtc->cs_w(1);
 }
 
 static INPUT_PORTS_START( pc1500 )
@@ -222,13 +222,13 @@ WRITE8_MEMBER( pc1500_state::kb_matrix_w )
 
 WRITE8_MEMBER( pc1500_state::port_c_w )
 {
-	upd1990a_data_in_w(m_rtc, BIT(data, 0));
-	upd1990a_stb_w(m_rtc, BIT(data, 1));
-	upd1990a_clk_w(m_rtc, BIT(data, 2));
-	upd1990a_oe_w(m_rtc, BIT(data, 3));
-	upd1990a_c0_w(m_rtc, BIT(data, 3));
-	upd1990a_c1_w(m_rtc, BIT(data, 4));
-	upd1990a_c2_w(m_rtc, BIT(data, 5));
+	m_rtc->data_in_w(BIT(data, 0));
+	m_rtc->stb_w(BIT(data, 1));
+	m_rtc->clk_w(BIT(data, 2));
+	m_rtc->oe_w(BIT(data, 3));
+	m_rtc->c0_w(BIT(data, 3));
+	m_rtc->c1_w(BIT(data, 4));
+	m_rtc->c2_w(BIT(data, 5));
 }
 
 READ8_MEMBER( pc1500_state::port_b_r )
@@ -245,8 +245,8 @@ READ8_MEMBER( pc1500_state::port_b_r )
 
 	data |= 0x08;
 
-	data |= (upd1990a_tp_r(m_rtc)<<5);
-	data |= (upd1990a_data_out_r(m_rtc)<<6);
+	data |= (m_rtc->tp_r()<<5);
+	data |= (m_rtc->data_out_r()<<6);
 	data |= (input_port_read(m_machine, "ON")<<7);
 
 	return data;

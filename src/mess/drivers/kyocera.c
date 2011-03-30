@@ -60,22 +60,8 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/kyocera.h"
-#include "cpu/i8085/i8085.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "machine/ctronics.h"
-#include "machine/upd1990a.h"
-#include "machine/i8155.h"
-#include "machine/rp5c01a.h"
-#include "machine/msm8251.h"
-#include "video/hd44102.h"
-#include "video/hd61830.h"
-#include "sound/speaker.h"
 
 /* Read/Write Handlers */
 
@@ -216,7 +202,7 @@ WRITE8_MEMBER( pc8201_state::scp_w )
 	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* RTC strobe */
-	upd1990a_stb_w(m_rtc, BIT(data, 4));
+	m_rtc->stb_w(BIT(data, 4));
 
 	/* printer strobe */
 	centronics_strobe_w(m_centronics, BIT(data, 5));
@@ -456,7 +442,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	centronics_strobe_w(m_centronics, BIT(data, 1));
 
 	/* RTC strobe */
-	upd1990a_stb_w(m_rtc, BIT(data, 2));
+	m_rtc->stb_w(BIT(data, 2));
 
 	/* cassette motor */
 	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -932,11 +918,11 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	hd44102_cs2_w(m_lcdc7, BIT(data, 7));
 
 	/* RTC */
-	upd1990a_c0_w(m_rtc, BIT(data, 0));
-	upd1990a_c1_w(m_rtc, BIT(data, 1));
-	upd1990a_c2_w(m_rtc, BIT(data, 2));
-	upd1990a_clk_w(m_rtc, BIT(data, 3));
-	upd1990a_data_in_w(m_rtc, BIT(data, 4));
+	m_rtc->c0_w(BIT(data, 0));
+	m_rtc->c1_w(BIT(data, 1));
+	m_rtc->c2_w(BIT(data, 2));
+	m_rtc->clk_w(BIT(data, 3));
+	m_rtc->data_in_w(BIT(data, 4));
 }
 
 WRITE8_MEMBER( kc85_state::i8155_pb_w )
@@ -988,7 +974,7 @@ READ8_MEMBER( kc85_state::i8155_pc_r )
 	UINT8 data = 0;
 
 	// clock data input
-	data |= upd1990a_data_out_r(m_rtc);
+	data |= m_rtc->data_out_r();
 
 	// centronics busy
 	data |= centronics_not_busy_r(m_centronics) << 1;
@@ -1129,8 +1115,8 @@ void kc85_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize RTC */
-	upd1990a_cs_w(m_rtc, 1);
-	upd1990a_oe_w(m_rtc, 1);
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
 	program->install_read_bank(0x0000, 0x7fff, "bank1");
@@ -1167,8 +1153,8 @@ void pc8201_state::machine_start()
 	UINT8 *ram = ram_get_ptr(m_ram);
 
 	/* initialize RTC */
-	upd1990a_cs_w(m_rtc, 1);
-	upd1990a_oe_w(m_rtc, 1);
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
 	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(I8085_TAG)->base(), 0);
@@ -1196,8 +1182,8 @@ void trsm100_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize RTC */
-	upd1990a_cs_w(m_rtc, 1);
-	upd1990a_oe_w(m_rtc, 1);
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
 	program->install_read_bank(0x0000, 0x7fff, "bank1");

@@ -1,13 +1,4 @@
-#include "emu.h"
 #include "includes/pc8401a.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/cartslot.h"
-#include "machine/i8255a.h"
-#include "machine/msm8251.h"
-#include "machine/upd1990a.h"
-#include "video/sed1330.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
 
 /*
 
@@ -247,10 +238,10 @@ static WRITE8_HANDLER( rtc_cmd_w )
 
 	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
-	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
-	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
-	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
-	upd1990a_data_in_w(state->upd1990a, BIT(data, 3));
+	state->m_rtc->c0_w(BIT(data, 0));
+	state->m_rtc->c1_w(BIT(data, 1));
+	state->m_rtc->c2_w(BIT(data, 2));
+	state->m_rtc->data_in_w(BIT(data, 3));
 }
 
 static WRITE8_HANDLER( rtc_ctrl_w )
@@ -272,9 +263,9 @@ static WRITE8_HANDLER( rtc_ctrl_w )
 
 	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
-	upd1990a_oe_w(state->upd1990a, BIT(data, 0));
-	upd1990a_stb_w(state->upd1990a, BIT(data, 1));
-	upd1990a_clk_w(state->upd1990a, BIT(data, 2));
+	state->m_rtc->oe_w(BIT(data, 0));
+	state->m_rtc->stb_w(BIT(data, 1));
+	state->m_rtc->clk_w(BIT(data, 2));
 }
 
 static READ8_HANDLER( io_rom_data_r )
@@ -516,11 +507,8 @@ static MACHINE_START( pc8401a )
 {
 	pc8401a_state *state = machine.driver_data<pc8401a_state>();
 
-	/* find devices */
-	state->upd1990a = machine.device(UPD1990A_TAG);
-
 	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
+	state->m_rtc->cs_w(1);
 
 	/* allocate CRT video RAM */
 	state->crt_ram = auto_alloc_array(machine, UINT8, PC8401A_CRT_VIDEORAM_SIZE);

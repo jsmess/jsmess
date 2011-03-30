@@ -1,5 +1,17 @@
+#pragma once
+
 #ifndef __PC8401A__
 #define __PC8401A__
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cartslot.h"
+#include "machine/i8255a.h"
+#include "machine/msm8251.h"
+#include "machine/ram.h"
+#include "machine/upd1990a.h"
+#include "video/sed1330.h"
+#include "video/mc6845.h"
 
 #define SCREEN_TAG		"screen"
 #define CRT_SCREEN_TAG	"screen2"
@@ -22,7 +34,19 @@ class pc8401a_state : public driver_device
 {
 public:
 	pc8401a_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_rtc(*this, UPD1990A_TAG),
+		  m_lcdc(*this, SED1330_TAG),
+		  m_crtc(*this, MC6845_TAG),
+		  m_screen_lcd(*this, SCREEN_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<upd1990a_device> m_rtc;
+	required_device<device_t> m_lcdc;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_screen_lcd;
 
 	/* keyboard state */
 	int key_strobe;			/* key pressed */
@@ -39,10 +63,6 @@ public:
 	UINT8 *video_ram;		/* LCD video RAM */
 	UINT8 *crt_ram;			/* CRT video RAM */
 
-	device_t *upd1990a;
-	device_t *sed1330;
-	device_t *mc6845;
-	device_t *lcd;
 	UINT8 key_latch;
 };
 

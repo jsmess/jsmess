@@ -160,6 +160,19 @@
 
 //#define USE_PROPER_I8214
 
+#define UPD1990A_TAG "upd1990a"
+
+class pc8801_state : public driver_device
+{
+public:
+	pc8801_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_rtc(*this, UPD1990A_TAG)
+	{ }
+
+	required_device<upd1990a_device> m_rtc;
+};
+
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
@@ -891,8 +904,10 @@ static WRITE8_HANDLER( pc8801_ctrl_w )
     ---- --x- upd1990a strobe bit
     */
 
-	upd1990a_stb_w(space->machine().device("upd1990a"), (data & 2) >> 1);
-	upd1990a_clk_w(space->machine().device("upd1990a"), (data & 4) >> 2);
+	pc8801_state *state = space->machine().driver_data<pc8801_state>();
+
+	state->m_rtc->stb_w((data & 2) >> 1);
+	state->m_rtc->clk_w((data & 4) >> 2);
 
 	if(((device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
 		beep_set_state(space->machine().device("beeper"),1);
@@ -1314,10 +1329,12 @@ static WRITE8_HANDLER( pc8801_baudrate_w )
 
 static WRITE8_HANDLER( pc8801_rtc_w )
 {
-	upd1990a_c0_w(space->machine().device("upd1990a"), (data & 1) >> 0);
-	upd1990a_c1_w(space->machine().device("upd1990a"), (data & 2) >> 1);
-	upd1990a_c2_w(space->machine().device("upd1990a"), (data & 4) >> 2);
-	upd1990a_data_in_w(space->machine().device("upd1990a"), (data & 8) >> 3);
+	pc8801_state *state = space->machine().driver_data<pc8801_state>();
+
+	state->m_rtc->c0_w((data & 1) >> 0);
+	state->m_rtc->c1_w((data & 2) >> 1);
+	state->m_rtc->c2_w((data & 4) >> 2);
+	state->m_rtc->data_in_w((data & 8) >> 3);
 
 	/* TODO: remaining bits */
 }
@@ -1520,6 +1537,13 @@ About natural keyboards: currently,
 - "Roll Up" and "Roll Down" are mapped to 'Page Up' and 'Page Down'
 - "Help" is mapped to 'F8'
  */
+
+static READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
+{
+	pc8801_state *state = device->machine().driver_data<pc8801_state>();
+
+	return state->m_rtc->data_out_r();
+}
 
 static INPUT_PORTS_START( pc8001 )
 	PORT_START("KEY0")
@@ -1955,10 +1979,12 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 
 static MACHINE_START( pc8801 )
 {
+	pc8801_state *state = machine.driver_data<pc8801_state>();
+
 	device_set_irq_callback(machine.device("maincpu"), pc8801_irq_callback);
 
-	upd1990a_cs_w(machine.device("upd1990a"), 1);
-	upd1990a_oe_w(machine.device("upd1990a"), 1);
+	state->m_rtc->cs_w(1);
+	state->m_rtc->oe_w(1);
 }
 
 static MACHINE_RESET( pc8801 )
@@ -2106,7 +2132,7 @@ static const ym2203_interface pc88_ym2203_intf =
 
 #define MASTER_CLOCK XTAL_4MHz
 
-static MACHINE_CONFIG_START( pc8801, driver_device )
+static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
@@ -2130,7 +2156,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD("i8214", MASTER_CLOCK, pic_intf)
 	#endif
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc8801_upd1990a_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	//MCFG_CASSETTE_ADD("cassette", pc88_cassette_config)
 

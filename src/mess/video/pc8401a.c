@@ -1,7 +1,4 @@
-#include "emu.h"
 #include "includes/pc8401a.h"
-#include "video/sed1330.h"
-#include "video/mc6845.h"
 #include "pc8500.lh"
 
 /* PC-8401A */
@@ -34,11 +31,6 @@ static VIDEO_START( pc8500 )
 {
 	pc8401a_state *state = machine.driver_data<pc8401a_state>();
 
-	/* find devices */
-	state->sed1330 = machine.device(SED1330_TAG);
-	state->mc6845 = machine.device(MC6845_TAG);
-	state->lcd = machine.device(SCREEN_TAG);
-
 	/* allocate video memory */
 	state->video_ram = auto_alloc_array(machine, UINT8, PC8500_LCD_VIDEORAM_SIZE);
 
@@ -50,13 +42,13 @@ static SCREEN_UPDATE( pc8500 )
 {
 	pc8401a_state *state = screen->machine().driver_data<pc8401a_state>();
 
-	if (screen == state->lcd)
+	if (screen == state->m_screen_lcd)
 	{
-		sed1330_update(state->sed1330, bitmap, cliprect);
+		sed1330_update(state->m_lcdc, bitmap, cliprect);
 	}
 	else
 	{
-		mc6845_update(state->mc6845, bitmap, cliprect);
+		mc6845_update(state->m_crtc, bitmap, cliprect);
 	}
 
 	return 0;

@@ -1,5 +1,22 @@
+#pragma once
+
 #ifndef __PROF80__
 #define __PROF80__
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "video/mc6845.h"
+#include "formats/basicdsk.h"
+#include "imagedev/flopdrv.h"
+#include "machine/ram.h"
+#include "machine/i8255a.h"
+#include "machine/upd765.h"
+#include "machine/upd1990a.h"
+#include "machine/z80sti.h"
+#include "machine/ctronics.h"
+#include "machine/rescap.h"
+#include "sound/speaker.h"
 
 #define Z80_TAG					"z1"
 #define UPD765_TAG				"z38"
@@ -30,7 +47,15 @@ class prof80_state : public driver_device
 {
 public:
 	prof80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_rtc(*this, UPD1990A_TAG),
+		  m_fdc(*this, UPD765_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<upd1990a_device> m_rtc;
+	required_device<device_t> m_fdc;
 
 	/* memory state */
 	UINT8 mmu[16];			/* MMU block register */
@@ -48,10 +73,6 @@ public:
 	/* GRIP state */
 	UINT8 gripd;			/* GRIP data */
 	UINT8 gripc;			/* GRIP status */
-
-	/* devices */
-	device_t *upd765;
-	device_t *upd1990a;
 
 	/* timers */
 	emu_timer	*floppy_motor_off_timer;

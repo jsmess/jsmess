@@ -553,7 +553,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/tc8521.o	\
 	$(MESS_MACHINE)/terminal.o	\
 	$(MESS_MACHINE)/teleprinter.o	\
-	$(MESS_MACHINE)/upd1990a.o	\
 	$(MESS_MACHINE)/upd7002.o	\
 	$(MESS_MACHINE)/upd7201.o	\
 	$(MESS_MACHINE)/wd17xx.o	\

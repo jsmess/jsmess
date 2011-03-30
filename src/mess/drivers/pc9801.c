@@ -237,15 +237,19 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
+#define UPD1990A_TAG "upd1990a"
+
 class pc9801_state : public driver_device
 {
 public:
 	pc9801_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		 m_hgdc1(*this, "upd7220_chr"),
-		 m_hgdc2(*this, "upd7220_btm")
-		{ }
+		  m_rtc(*this, UPD1990A_TAG),
+		  m_hgdc1(*this, "upd7220_chr"),
+		  m_hgdc2(*this, "upd7220_btm")
+	{ }
 
+	required_device<upd1990a_device> m_rtc;
 	required_device<device_t> m_hgdc1;
 	required_device<device_t> m_hgdc2;
 
@@ -534,16 +538,18 @@ static READ8_HANDLER( pc9801_20_r )
 
 static WRITE8_HANDLER( pc9801_20_w )
 {
+	pc9801_state *state = space->machine().driver_data<pc9801_state>();
+
 	if((offset & 1) == 0)
 	{
 		if(offset == 0)
 		{
-			upd1990a_c0_w(space->machine().device("upd1990a"),      (data & 0x01) >> 0);
-			upd1990a_c1_w(space->machine().device("upd1990a"),      (data & 0x02) >> 1);
-			upd1990a_c2_w(space->machine().device("upd1990a"),      (data & 0x04) >> 2);
-			upd1990a_stb_w(space->machine().device("upd1990a"),     (data & 0x08) >> 3);
-			upd1990a_clk_w(space->machine().device("upd1990a"),     (data & 0x10) >> 4);
-			upd1990a_data_in_w(space->machine().device("upd1990a"), (data & 0x20) >> 5);
+			state->m_rtc->c0_w((data & 0x01) >> 0);
+			state->m_rtc->c1_w((data & 0x02) >> 1);
+			state->m_rtc->c2_w((data & 0x04) >> 2);
+			state->m_rtc->stb_w((data & 0x08) >> 3);
+			state->m_rtc->clk_w((data & 0x10) >> 4);
+			state->m_rtc->data_in_w((data & 0x20) >> 5);
 			if(data & 0xc0)
 				printf("RTC write to undefined bits %02x\n",data & 0xc0);
 		}
@@ -552,8 +558,6 @@ static WRITE8_HANDLER( pc9801_20_w )
 	}
 	else // odd
 	{
-		pc9801_state *state = space->machine().driver_data<pc9801_state>();
-
 		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
 		state->dma_offset[0][((offset >> 1)+1) & 3] = data & 0x0f;
 	}
@@ -1565,6 +1569,13 @@ static INPUT_CHANGED( shift_stroke )
 		state->keyb_press = 0;
 }
 
+static READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
+{
+	pc9801_state *state = device->machine().driver_data<pc9801_state>();
+
+	return state->m_rtc->data_out_r();
+}
+
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("KEY0") // 0x00 - 0x07
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -2171,10 +2182,12 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(pc9801)
 {
+	pc9801_state *state = machine.driver_data<pc9801_state>();
+
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 
-	upd1990a_cs_w(machine.device("upd1990a"), 1);
-	upd1990a_oe_w(machine.device("upd1990a"), 1);
+	state->m_rtc->cs_w(1);
+	state->m_rtc->oe_w(1);
 }
 
 static MACHINE_RESET(pc9801)
@@ -2276,7 +2289,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255A_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255A_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255A_ADD( "ppi8255_fdd", ppi_fdd_intf )
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
 	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_config)
