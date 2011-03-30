@@ -1845,7 +1845,7 @@ static const floppy_config pc88_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
-	NULL
+	"floppy_5_25"
 };
 
 /* Cassette Configuration */
@@ -2161,6 +2161,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	//MCFG_CASSETTE_ADD("cassette", pc88_cassette_config)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
