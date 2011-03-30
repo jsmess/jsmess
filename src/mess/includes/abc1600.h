@@ -139,6 +139,10 @@ public:
 	void write_user_memory(offs_t offset, UINT8 data);
 	UINT8 read_supervisor_memory(offs_t offset);
 	void write_supervisor_memory(offs_t offset, UINT8 data);
+
+	inline void update_drdy0();
+	inline void update_drdy1();
+	inline void update_drdy2();
 	inline offs_t get_dma_address(int index, UINT16 offset);
 	inline UINT8 dma_mreq_r(int index, UINT16 offset);
 	inline void dma_mreq_w(int index, UINT16 offset, UINT8 data);

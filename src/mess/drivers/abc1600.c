@@ -10,9 +10,12 @@
 
     TODO:
 
-	- sector not boot
-    - floppy
-	- watchdog
+	- floppy
+		- sector 0 not boot
+	- BUS0I/0X/1/2
+	- M68K bus errors
+	- short/long reset (RSTBUT)
+	- SCC interrupt
     - CIO (interrupt controller)
 		- RTC
 		- NVRAM
@@ -71,9 +74,9 @@
 // DMA map
 enum
 {
-	DMAMAP_R2_LO = 2,
+	DMAMAP_R2_LO = 0,
 	DMAMAP_R2_HI,
-	DMAMAP_R1_LO,
+	DMAMAP_R1_LO = 4,
 	DMAMAP_R1_HI,
 	DMAMAP_R0_LO,
 	DMAMAP_R0_HI
@@ -536,13 +539,13 @@ READ8_MEMBER( abc1600_state::cause_r )
 		7		X20
 	
 	*/
-
-	//watchdog_reset_w()
 	
 	UINT8 data = 0x02;
 	
 	// DMA status
 	data |= m_cause;
+	
+	watchdog_reset(machine);
 
 	return data;
 }
@@ -715,10 +718,60 @@ WRITE8_MEMBER( abc1600_state::page_w )
 }
 
 
+
 //**************************************************************************
 //  DMA
 //**************************************************************************
 
+//-------------------------------------------------
+//  update_drdy0 - 
+//-------------------------------------------------
+
+inline void abc1600_state::update_drdy0()
+{
+	if (m_sysfs)
+	{
+		// floppy
+		m_dma0->rdy_w(!wd17xx_drq_r(m_fdc));
+	}
+	else
+	{
+		// BUS0I/BUS0X
+		m_dma0->rdy_w(1);
+	}
+}
+
+
+//-------------------------------------------------
+//  update_drdy1 - 
+//-------------------------------------------------
+
+inline void abc1600_state::update_drdy1()
+{
+	if (m_sysscc)
+	{
+		// SCC
+		m_dma1->rdy_w(1);
+	}
+	else
+	{
+		// BUS1
+		m_dma1->rdy_w(1);
+	}
+}
+
+
+//-------------------------------------------------
+//  update_drdy2 - 
+//-------------------------------------------------
+
+inline void abc1600_state::update_drdy2()
+{
+	// Winchester
+	m_dma2->rdy_w(1);
+}
+
+	
 //-------------------------------------------------
 //  get_dma_address - 
 //-------------------------------------------------
@@ -912,19 +965,12 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 	
 	case 6: // SYSSCC
 		m_sysscc = state;
+		update_drdy1();
 		break;
 	
 	case 7: // SYSFS
 		m_sysfs = state;
-		
-		if (m_sysfs)
-		{
-			z80dma_rdy_w(m_dma0, !wd17xx_drq_r(m_fdc));
-		}
-		else
-		{
-			z80dma_rdy_w(m_dma0, 1);
-		}
+		update_drdy0();
 		break;
 	}
 }
@@ -1292,14 +1338,7 @@ static const floppy_config abc1600_floppy_config =
 
 WRITE_LINE_MEMBER( abc1600_state::drq_w )
 {
-	if (m_sysfs)
-	{
-		z80dma_rdy_w(m_dma0, !state);
-	}
-	else
-	{
-		z80dma_rdy_w(m_dma0, 1);
-	}
+	update_drdy0();
 }
 
 static const wd17xx_interface fdc_intf =
@@ -1390,6 +1429,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_64MHz/8/10/20000/8/8))
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc1600_video)
