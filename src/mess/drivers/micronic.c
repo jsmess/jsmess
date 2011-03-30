@@ -123,9 +123,9 @@
 #include "sound/beep.h"
 #include "rendlay.h"
 
-static UINT8 keypad_r (running_machine *machine)
+static UINT8 keypad_r (running_machine &machine)
 {
-	micronic_state *state = machine->driver_data<micronic_state>();
+	micronic_state *state = machine.driver_data<micronic_state>();
 	static const char *const bitnames[] = {"BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5"};
 	UINT8 port, bit, data = 0;
 
@@ -138,30 +138,30 @@ static UINT8 keypad_r (running_machine *machine)
 
 static READ8_HANDLER( kp_r )
 {
-	return  keypad_r(space->machine);
+	return  keypad_r(space->machine());
 }
 
 static READ8_HANDLER( status_flag_r )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 	return  state->status_flag;
 }
 
 static WRITE8_HANDLER( status_flag_w )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 	state->status_flag = data;
 }
 
 static WRITE8_HANDLER( kp_matrix_w )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 	state->kp_matrix = data;
 }
 
 static WRITE8_HANDLER( beep_w )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 	UINT16 frequency = 0;
 
 	beep_set_state(state->speaker, (data) ? 1 : 0);
@@ -191,26 +191,26 @@ static WRITE8_HANDLER( beep_w )
 
 static READ8_HANDLER( irq_flag_r )
 {
-	return (input_port_read(space->machine, "BACKBATTERY")<<4) | (input_port_read(space->machine, "MAINBATTERY")<<3) | (keypad_r(space->machine) ? 0 : 1);
+	return (input_port_read(space->machine(), "BACKBATTERY")<<4) | (input_port_read(space->machine(), "MAINBATTERY")<<3) | (keypad_r(space->machine()) ? 0 : 1);
 }
 
 static WRITE8_HANDLER( bank_select_w )
 {
 	if (data < 2)
 	{
-		memory_set_bank(space->machine, "bank1", data);
-		space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
+		memory_set_bank(space->machine(), "bank1", data);
+		space->machine().device(Z80_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 	}
 	else
 	{
-		memory_set_bank(space->machine, "bank1", (data < 9) ? data : 8);
-		space->machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x7fff, "bank1");
+		memory_set_bank(space->machine(), "bank1", (data < 9) ? data : 8);
+		space->machine().device(Z80_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x7fff, "bank1");
 	}
 }
 
 static WRITE8_HANDLER( lcd_contrast_w )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 
 	state->lcd_contrast = data;
 }
@@ -220,9 +220,9 @@ static WRITE8_HANDLER( lcd_contrast_w )
     RTC-146818
 ***************************************************************************/
 
-static void set_146818_periodic_irq(running_machine *machine, UINT8 data)
+static void set_146818_periodic_irq(running_machine &machine, UINT8 data)
 {
-	micronic_state *state = machine->driver_data<micronic_state>();
+	micronic_state *state = machine.driver_data<micronic_state>();
 
 	attotime timer_per = attotime::from_seconds(0);
 
@@ -251,17 +251,17 @@ static void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 
 static WRITE8_HANDLER( rtc_address_w )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 	state->rtc_address = data;
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
 	rtc->write(*space, 0, data);
 }
 
 static READ8_HANDLER( rtc_data_r )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
+	micronic_state *state = space->machine().driver_data<micronic_state>();
 	UINT8 data = 0;
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
 	switch(state->rtc_address & 0x3f)
 	{
 		case 0x0c:
@@ -277,14 +277,14 @@ static READ8_HANDLER( rtc_data_r )
 
 static WRITE8_HANDLER( rtc_data_w )
 {
-	micronic_state *state = space->machine->driver_data<micronic_state>();
-	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
+	micronic_state *state = space->machine().driver_data<micronic_state>();
+	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
 	rtc->write(*space, 1, data);
 
 	switch(state->rtc_address & 0x3f)
 	{
 		case 0x0a:
-			set_146818_periodic_irq(space->machine, data);
+			set_146818_periodic_irq(space->machine(), data);
 
 			break;
 		case 0x0b:
@@ -294,7 +294,7 @@ static WRITE8_HANDLER( rtc_data_w )
 
 static TIMER_CALLBACK( rtc_periodic_irq )
 {
-	micronic_state *state = machine->driver_data<micronic_state>();
+	micronic_state *state = machine.driver_data<micronic_state>();
 
 	if (state->periodic_irq)
 		cputag_set_input_line(machine, Z80_TAG, 0, HOLD_LINE);
@@ -398,20 +398,20 @@ INPUT_PORTS_END
 
 static NVRAM_HANDLER( micronic )
 {
-	micronic_state *state = machine->driver_data<micronic_state>();
+	micronic_state *state = machine.driver_data<micronic_state>();
 	UINT8 reg_a = 0, reg_b = 0;
 
 	if (read_or_write)
 	{
 		file->write(state->ram, 0x8000);
-		file->write(ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
+		file->write(ram_get_ptr(machine.device(RAM_TAG)), 224*1024);
 	}
 	else
 	{
 		if (file)
 		{
 			file->read(state->ram, 0x8000);
-			file->read(ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
+			file->read(ram_get_ptr(machine.device(RAM_TAG)), 224*1024);
 
 			/* reload register A and B for restore the periodic irq state */
 			file->seek(0x4000a, SEEK_SET);
@@ -439,7 +439,7 @@ static VIDEO_START( micronic )
 
 static SCREEN_UPDATE( micronic )
 {
-	micronic_state *state = screen->machine->driver_data<micronic_state>();
+	micronic_state *state = screen->machine().driver_data<micronic_state>();
 
 	state->hd61830->update_screen(bitmap, cliprect);
 
@@ -454,19 +454,19 @@ static HD61830_INTERFACE( lcdc_intf )
 
 static MACHINE_START( micronic )
 {
-	micronic_state *state = machine->driver_data<micronic_state>();
+	micronic_state *state = machine.driver_data<micronic_state>();
 
 	/* find devices */
-	state->hd61830 = machine->device<hd61830_device>(HD61830_TAG);
-	state->speaker = machine->device("beep");
+	state->hd61830 = machine.device<hd61830_device>(HD61830_TAG);
+	state->speaker = machine.device("beep");
 
 	/* ROM banks */
-	memory_configure_bank(machine, "bank1", 0x00, 0x02, machine->region(Z80_TAG)->base(), 0x10000);
+	memory_configure_bank(machine, "bank1", 0x00, 0x02, machine.region(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
-	memory_configure_bank(machine, "bank1", 0x02, 0x07, ram_get_ptr(machine->device(RAM_TAG)), 0x8000);
+	memory_configure_bank(machine, "bank1", 0x02, 0x07, ram_get_ptr(machine.device(RAM_TAG)), 0x8000);
 
-	state->rtc_periodic_irq = machine->scheduler().timer_alloc(FUNC(rtc_periodic_irq));
+	state->rtc_periodic_irq = machine.scheduler().timer_alloc(FUNC(rtc_periodic_irq));
 	/* register for state saving */
 //  state_save_register_global(machine, state->);
 }
@@ -474,7 +474,7 @@ static MACHINE_START( micronic )
 static MACHINE_RESET( micronic )
 {
 	memory_set_bank(machine, "bank1", 0);
-	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 }
 
 static MACHINE_CONFIG_START( micronic, micronic_state )

@@ -38,8 +38,8 @@ INPUT_PORTS_END
 static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
-	UINT8 *charmap = device->machine->region("gfx1")->base();
+	bitmap_t *bitmap = device->machine().generic.tmpbitmap;
+	UINT8 *charmap = device->machine().region("gfx1")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
@@ -66,12 +66,12 @@ const i8275_interface ipds_i8275_interface = {
 
 static MACHINE_RESET(ipds)
 {
-	cpu_set_reg(machine->device("maincpu"), I8085_PC, (UINT64)0x0000);
+	cpu_set_reg(machine.device("maincpu"), I8085_PC, (UINT64)0x0000);
 }
 
 static SCREEN_UPDATE( ipds )
 {
-    device_t *devconf = screen->machine->device("i8275");
+    device_t *devconf = screen->machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;

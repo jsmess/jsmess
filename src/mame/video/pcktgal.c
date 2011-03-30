@@ -1,12 +1,12 @@
 #include "emu.h"
 #include "includes/pcktgal.h"
-
+#include "video/decbac06.h"
 
 PALETTE_INIT( pcktgal )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -20,53 +20,19 @@ PALETTE_INIT( pcktgal )
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		bit3 = (color_prom[i] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
-WRITE8_HANDLER( pcktgal_videoram_w )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	pcktgal_state *state = space->machine->driver_data<pcktgal_state>();
-	UINT8 *videoram = state->videoram;
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
-}
-
-WRITE8_HANDLER( pcktgal_flipscreen_w )
-{
-	if (flip_screen_get(space->machine) != (data & 0x80))
-	{
-		flip_screen_set(space->machine, data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
-	}
-}
-
-static TILE_GET_INFO( get_bg_tile_info )
-{
-	pcktgal_state *state = machine->driver_data<pcktgal_state>();
-	UINT8 *videoram = state->videoram;
-	int code = videoram[tile_index*2+1] + ((videoram[tile_index*2] & 0x0f) << 8);
-	int color = videoram[tile_index*2] >> 4;
-
-	SET_TILE_INFO(0, code, color, 0);
-}
-
-VIDEO_START( pcktgal )
-{
-	pcktgal_state *state = machine->driver_data<pcktgal_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-}
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	pcktgal_state *state = machine->driver_data<pcktgal_state>();
+	pcktgal_state *state = machine.driver_data<pcktgal_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -89,7 +55,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				if (flipy) flipy=0; else flipy=1;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
 					(spriteram[offs+1] & 0x70) >> 4,
 					flipx,flipy,
@@ -100,8 +66,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pcktgal )
 {
-	pcktgal_state *state = screen->machine->driver_data<pcktgal_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+//	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
+
+SCREEN_UPDATE( pcktgalb )
+{
+	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
+	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw_bootleg(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect);
+	return 0;}

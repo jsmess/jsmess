@@ -166,20 +166,20 @@ static attotime prescale(int val)
 }
 #endif
 
-static void mfp_init(running_machine *machine)
+static void mfp_init(running_machine &machine)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	state->mfp.tadr = state->mfp.tbdr = state->mfp.tcdr = state->mfp.tddr = 0xff;
 
 	state->mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	state->mfp.current_irq = -1;  // No current interrupt
 
 #if 0
-    mfp_timer[0] = machine->scheduler().timer_alloc(FUNC(mfp_timer_a_callback));
-    mfp_timer[1] = machine->scheduler().timer_alloc(FUNC(mfp_timer_b_callback));
-    mfp_timer[2] = machine->scheduler().timer_alloc(FUNC(mfp_timer_c_callback));
-    mfp_timer[3] = machine->scheduler().timer_alloc(FUNC(mfp_timer_d_callback));
-    mfp_irq = machine->scheduler().timer_alloc(FUNC(mfp_update_irq));
+    mfp_timer[0] = machine.scheduler().timer_alloc(FUNC(mfp_timer_a_callback));
+    mfp_timer[1] = machine.scheduler().timer_alloc(FUNC(mfp_timer_b_callback));
+    mfp_timer[2] = machine.scheduler().timer_alloc(FUNC(mfp_timer_c_callback));
+    mfp_timer[3] = machine.scheduler().timer_alloc(FUNC(mfp_timer_d_callback));
+    mfp_irq = machine.scheduler().timer_alloc(FUNC(mfp_update_irq));
     mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
@@ -187,7 +187,7 @@ static void mfp_init(running_machine *machine)
 #ifdef UNUSED_FUNCTION
 TIMER_CALLBACK(mfp_update_irq)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
     int x;
 
     if((state->ioc.irqstatus & 0xc0) != 0)
@@ -234,9 +234,9 @@ TIMER_CALLBACK(mfp_update_irq)
     }
 }
 
-void mfp_trigger_irq(running_machine *machine, int irq)
+void mfp_trigger_irq(running_machine &machine, int irq)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
     // check if interrupt is enabled
     if(irq > 7)
     {
@@ -262,7 +262,7 @@ void mfp_trigger_irq(running_machine *machine, int irq)
 
 TIMER_CALLBACK(mfp_timer_a_callback)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
     state->mfp.timer[0].counter--;
     if(state->mfp.timer[0].counter == 0)
     {
@@ -273,7 +273,7 @@ TIMER_CALLBACK(mfp_timer_a_callback)
 
 TIMER_CALLBACK(mfp_timer_b_callback)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
     state->mfp.timer[1].counter--;
     if(state->mfp.timer[1].counter == 0)
     {
@@ -284,7 +284,7 @@ TIMER_CALLBACK(mfp_timer_b_callback)
 
 TIMER_CALLBACK(mfp_timer_c_callback)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
     state->mfp.timer[2].counter--;
     if(state->mfp.timer[2].counter == 0)
     {
@@ -295,7 +295,7 @@ TIMER_CALLBACK(mfp_timer_c_callback)
 
 TIMER_CALLBACK(mfp_timer_d_callback)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
     state->mfp.timer[3].counter--;
     if(state->mfp.timer[3].counter == 0)
     {
@@ -322,7 +322,7 @@ void mfp_set_timer(int timer, unsigned char data)
 // LED timer callback
 static TIMER_CALLBACK( x68k_led_callback )
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int drive;
 	if(state->led_state == 0)
 		state->led_state = 1;
@@ -344,13 +344,13 @@ static TIMER_CALLBACK( x68k_led_callback )
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	device_t* device = space->machine->device("hd63450");
+	device_t* device = space->machine().device("hd63450");
 	hd63450_w(device, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	device_t* device = space->machine->device("hd63450");
+	device_t* device = space->machine().device("hd63450");
 	return hd63450_r(device, offset, mem_mask);
 }
 
@@ -440,9 +440,9 @@ static int x68k_keyboard_pop_scancode(x68k_state *state)
 	return ret;
 }
 
-static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char code)
+static void x68k_keyboard_push_scancode(running_machine &machine,unsigned char code)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	state->keyboard.keynum++;
 	if(state->keyboard.keynum >= 1)
 	{ // keyboard buffer full
@@ -470,7 +470,7 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 
 static TIMER_CALLBACK(x68k_keyboard_poll)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int x;
 	static const char *const keynames[] = { "key1", "key2", "key3", "key4" };
 
@@ -520,7 +520,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 #ifdef UNUSED_FUNCTION
 void mfp_recv_data(int data)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	state->mfp.rsr |= 0x80;  // Buffer full
 	state->mfp.tsr |= 0x80;
 	state->mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
@@ -533,10 +533,10 @@ void mfp_recv_data(int data)
 // mouse input
 // port B of the Z8530 SCC
 // typically read from the SCC data port on receive buffer full interrupt per byte
-static int x68k_read_mouse(running_machine *machine)
+static int x68k_read_mouse(running_machine &machine)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	device_t *scc = machine->device("scc");
+	x68k_state *state = machine.driver_data<x68k_state>();
+	device_t *scc = machine.device("scc");
 	char val = 0;
 	char ipt = 0;
 
@@ -581,14 +581,14 @@ static int x68k_read_mouse(running_machine *machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
-	device_t *scc = space->machine->device("scc");
+	device_t *scc = space->machine().device("scc");
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
 		return scc8530_r(scc, 0);
 	case 1:
-		return x68k_read_mouse(space->machine);
+		return x68k_read_mouse(space->machine());
 	case 2:
 		return scc8530_r(scc, 1);
 	case 3:
@@ -600,8 +600,8 @@ static READ16_HANDLER( x68k_scc_r )
 
 static WRITE16_HANDLER( x68k_scc_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
-	device_t *scc = space->machine->device("scc");
+	x68k_state *state = space->machine().driver_data<x68k_state>();
+	device_t *scc = space->machine().device("scc");
 	offset %= 4;
 
 	switch(offset)
@@ -634,8 +634,8 @@ static WRITE16_HANDLER( x68k_scc_w )
 
 static TIMER_CALLBACK(x68k_scc_ack)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	device_t *scc = machine->device("scc");
+	x68k_state *state = machine.driver_data<x68k_state>();
+	device_t *scc = machine.device("scc");
 	if(state->mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
@@ -658,10 +658,10 @@ static TIMER_CALLBACK(x68k_scc_ack)
 	}
 }
 
-static void x68k_set_adpcm(running_machine* machine)
+static void x68k_set_adpcm(running_machine &machine)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	device_t *dev = machine->device("hd63450");
+	x68k_state *state = machine.driver_data<x68k_state>();
+	device_t *dev = machine.device("hd63450");
 	UINT32 rate = 0;
 
 	switch(state->adpcm.rate & 0x0c)
@@ -692,11 +692,11 @@ static void x68k_set_adpcm(running_machine* machine)
 
 static UINT8 md_3button_r(device_t* device, int port)
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(port == 1)
 	{
-		UINT8 porta = input_port_read(device->machine,"md3b") & 0xff;
-		UINT8 portb = (input_port_read(device->machine,"md3b") >> 8) & 0xff;
+		UINT8 porta = input_port_read(device->machine(),"md3b") & 0xff;
+		UINT8 portb = (input_port_read(device->machine(),"md3b") >> 8) & 0xff;
 		if(state->mdctrl.mux1 & 0x10)
 		{
 			return porta | 0x90;
@@ -708,8 +708,8 @@ static UINT8 md_3button_r(device_t* device, int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (input_port_read(device->machine,"md3b") >> 16) & 0xff;
-		UINT8 portb = (input_port_read(device->machine,"md3b") >> 24) & 0xff;
+		UINT8 porta = (input_port_read(device->machine(),"md3b") >> 16) & 0xff;
+		UINT8 portb = (input_port_read(device->machine(),"md3b") >> 24) & 0xff;
 		if(state->mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
@@ -725,31 +725,31 @@ static UINT8 md_3button_r(device_t* device, int port)
 // Megadrive 6 button gamepad
 static TIMER_CALLBACK(md_6button_port1_timeout)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	state->mdctrl.seq1 = 0;
 }
 
 static TIMER_CALLBACK(md_6button_port2_timeout)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	state->mdctrl.seq2 = 0;
 }
 
-static void md_6button_init(running_machine* machine)
+static void md_6button_init(running_machine &machine)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	state->mdctrl.io_timeout1 = machine->scheduler().timer_alloc(FUNC(md_6button_port1_timeout));
-	state->mdctrl.io_timeout2 = machine->scheduler().timer_alloc(FUNC(md_6button_port2_timeout));
+	x68k_state *state = machine.driver_data<x68k_state>();
+	state->mdctrl.io_timeout1 = machine.scheduler().timer_alloc(FUNC(md_6button_port1_timeout));
+	state->mdctrl.io_timeout2 = machine.scheduler().timer_alloc(FUNC(md_6button_port2_timeout));
 }
 
 static UINT8 md_6button_r(device_t* device, int port)
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(port == 1)
 	{
-		UINT8 porta = input_port_read(device->machine,"md6b") & 0xff;
-		UINT8 portb = (input_port_read(device->machine,"md6b") >> 8) & 0xff;
-		UINT8 extra = input_port_read(device->machine,"md6b_extra") & 0x0f;
+		UINT8 porta = input_port_read(device->machine(),"md6b") & 0xff;
+		UINT8 portb = (input_port_read(device->machine(),"md6b") >> 8) & 0xff;
+		UINT8 extra = input_port_read(device->machine(),"md6b_extra") & 0x0f;
 
 		switch(state->mdctrl.seq1)
 		{
@@ -785,9 +785,9 @@ static UINT8 md_6button_r(device_t* device, int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (input_port_read(device->machine,"md6b") >> 16) & 0xff;
-		UINT8 portb = (input_port_read(device->machine,"md6b") >> 24) & 0xff;
-		UINT8 extra = (input_port_read(device->machine,"md6b_extra") >> 4) & 0x0f;
+		UINT8 porta = (input_port_read(device->machine(),"md6b") >> 16) & 0xff;
+		UINT8 portb = (input_port_read(device->machine(),"md6b") >> 24) & 0xff;
+		UINT8 extra = (input_port_read(device->machine(),"md6b_extra") >> 4) & 0x0f;
 
 		switch(state->mdctrl.seq2)
 		{
@@ -833,11 +833,11 @@ static UINT8 md_6button_r(device_t* device, int port)
 // The buttons are read the same as normal, regardless of ctl.
 static UINT8 xpd1lr_r(device_t* device, int port)
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(port == 1)
 	{
-		UINT8 porta = input_port_read(device->machine,"xpd1lr") & 0xff;
-		UINT8 portb = (input_port_read(device->machine,"xpd1lr") >> 8) & 0xff;
+		UINT8 porta = input_port_read(device->machine(),"xpd1lr") & 0xff;
+		UINT8 portb = (input_port_read(device->machine(),"xpd1lr") >> 8) & 0xff;
 		if(state->mdctrl.mux1 & 0x10)
 		{
 			return porta;
@@ -849,8 +849,8 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (input_port_read(device->machine,"xpd1lr") >> 16) & 0xff;
-		UINT8 portb = (input_port_read(device->machine,"xpd1lr") >> 24) & 0xff;
+		UINT8 porta = (input_port_read(device->machine(),"xpd1lr") >> 16) & 0xff;
+		UINT8 portb = (input_port_read(device->machine(),"xpd1lr") >> 24) & 0xff;
 		if(state->mdctrl.mux2 & 0x20)
 		{
 			return porta;
@@ -866,14 +866,14 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
-	int ctrl = input_port_read(device->machine,"ctrltype") & 0x0f;
+	x68k_state *state = device->machine().driver_data<x68k_state>();
+	int ctrl = input_port_read(device->machine(),"ctrltype") & 0x0f;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
 			if(state->joy.joy1_enable == 0)
-				return input_port_read(device->machine, "joy1");
+				return input_port_read(device->machine(), "joy1");
 			else
 				return 0xff;
 		case 0x01:  // 3-button Megadrive gamepad
@@ -889,14 +889,14 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
-	int ctrl = input_port_read(device->machine,"ctrltype") & 0xf0;
+	x68k_state *state = device->machine().driver_data<x68k_state>();
+	int ctrl = input_port_read(device->machine(),"ctrltype") & 0xf0;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
 			if(state->joy.joy2_enable == 0)
-				return input_port_read(device->machine, "joy2");
+				return input_port_read(device->machine(), "joy2");
 			else
 				return 0xff;
 		case 0x10:  // 3-button Megadrive gamepad
@@ -912,7 +912,7 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 
 static READ8_DEVICE_HANDLER( ppi_port_c_r )
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 	return state->ppi_port[2];
 }
 
@@ -926,16 +926,16 @@ static READ8_DEVICE_HANDLER( ppi_port_c_r )
 */
 static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 	// ADPCM / Joystick control
-	device_t *oki = device->machine->device("okim6258");
+	device_t *oki = device->machine().device("okim6258");
 
 	state->ppi_port[2] = data;
 	if((data & 0x0f) != (state->ppi_prev & 0x0f))
 	{
 		state->adpcm.pan = data & 0x03;
 		state->adpcm.rate = data & 0x0c;
-		x68k_set_adpcm(device->machine);
+		x68k_set_adpcm(device->machine());
 		okim6258_set_divider(oki, (data >> 2) & 3);
 	}
 
@@ -945,7 +945,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((state->ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		state->mdctrl.seq1++;
-		state->mdctrl.io_timeout1->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		state->mdctrl.io_timeout1->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 
 	state->joy.joy2_enable = data & 0x20;
@@ -953,7 +953,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((state->ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		state->mdctrl.seq2++;
-		state->mdctrl.io_timeout2->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		state->mdctrl.io_timeout2->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 	state->ppi_prev = data;
 
@@ -965,8 +965,8 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 // NEC uPD72065 at 0xe94000
 static WRITE16_HANDLER( x68k_fdc_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
-	device_t *fdc = space->machine->device("upd72065");
+	x68k_state *state = space->machine().driver_data<x68k_state>();
+	device_t *fdc = space->machine().device("upd72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
@@ -987,8 +987,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						(dynamic_cast<device_image_interface *>(floppy_get_device(space->machine, drive)))->unload();
-						floppy_mon_w(floppy_get_device(space->machine, drive), ASSERT_LINE);
+						(dynamic_cast<device_image_interface *>(floppy_get_device(space->machine(), drive)))->unload();
+						floppy_mon_w(floppy_get_device(space->machine(), drive), ASSERT_LINE);
 					}
 				}
 			}
@@ -999,14 +999,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	case 0x03:
 		state->fdc.media_density[data & 0x03] = data & 0x10;
 		state->fdc.motor[data & 0x03] = data & 0x80;
-		floppy_mon_w(floppy_get_device(space->machine, data & 0x03), !BIT(data, 7));
+		floppy_mon_w(floppy_get_device(space->machine(), data & 0x03), !BIT(data, 7));
 		if(data & 0x80)
 		{
 			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
 				{
-					floppy_mon_w(floppy_get_device(space->machine, drive), CLEAR_LINE);
+					floppy_mon_w(floppy_get_device(space->machine(), drive), CLEAR_LINE);
 					output_set_indexed_value("access_drv",drive,0);
 				}
 				else
@@ -1017,14 +1017,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		{
 			for(drive=0;drive<4;drive++)
 			{
-				floppy_mon_w(floppy_get_device(space->machine, drive), ASSERT_LINE);
+				floppy_mon_w(floppy_get_device(space->machine(), drive), ASSERT_LINE);
 				output_set_indexed_value("access_drv",drive,1);
 			}
 		}
-		floppy_drive_set_ready_state(floppy_get_device(space->machine, 0),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(space->machine, 2),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(space->machine, 3),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 2),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine(), 3),1,1);
 #if 0
 		for(drive=0;drive<4;drive++)
 		{
@@ -1037,17 +1037,17 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
-//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",cpu_get_pc(space->cpu),data,offset);
+//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",cpu_get_pc(&space->device()),data,offset);
 		break;
 	}
 }
 
 static READ16_HANDLER( x68k_fdc_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	unsigned int ret;
 	int x;
-	device_t *fdc = space->machine->device("upd72065");
+	device_t *fdc = space->machine().device("upd72065");
 
 	switch(offset)
 	{
@@ -1083,22 +1083,22 @@ static READ16_HANDLER( x68k_fdc_r )
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
 {
-	x68k_state *drvstate = device->machine->driver_data<x68k_state>();
+	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
 	if((drvstate->ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
 		drvstate->current_vector[1] = drvstate->ioc.fdcvector;
 		drvstate->ioc.irqstatus |= 0x80;
 		drvstate->current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cputag_set_input_line_and_vector(device->machine, "maincpu", 1, ASSERT_LINE, drvstate->current_vector[1]);
+		cputag_set_input_line_and_vector(device->machine(), "maincpu", 1, ASSERT_LINE, drvstate->current_vector[1]);
 	}
 }
 
-static int x68k_fdc_read_byte(running_machine *machine,int addr)
+static int x68k_fdc_read_byte(running_machine &machine,int addr)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int data = -1;
-	device_t *fdc = machine->device("upd72065");
+	device_t *fdc = machine.device("upd72065");
 
 	if(state->fdc.drq_state != 0)
 		data = upd765_dack_r(fdc, 0);
@@ -1106,15 +1106,15 @@ static int x68k_fdc_read_byte(running_machine *machine,int addr)
 	return data;
 }
 
-static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
+static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 {
-	device_t *fdc = machine->device("upd72065");
+	device_t *fdc = machine.device("upd72065");
 	upd765_dack_w(fdc, 0, data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER ( fdc_drq )
 {
-	x68k_state *drvstate = device->machine->driver_data<x68k_state>();
+	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
 	drvstate->fdc.drq_state = state;
 }
 
@@ -1124,7 +1124,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 	{
 	case 0x00:
 	case 0x01:
-		ym2151_w(space->machine->device("ym2151"), offset, data);
+		ym2151_w(space->machine().device("ym2151"), offset, data);
 		break;
 	}
 }
@@ -1132,23 +1132,23 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_r(space->machine->device("ym2151"), 1);
+		return ym2151_r(space->machine().device("ym2151"), 1);
 
 	return 0xffff;
 }
 
 static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
-	device_t *fdc = device->machine->device("upd72065");
-	device_t *okim = device->machine->device("okim6258");
+	x68k_state *state = device->machine().driver_data<x68k_state>();
+	device_t *fdc = device->machine().device("upd72065");
+	device_t *okim = device->machine().device("okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	upd765_ready_w(fdc,data & 0x01);
 	state->adpcm.clock = data & 0x02;
-	x68k_set_adpcm(device->machine);
+	x68k_set_adpcm(device->machine());
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
 }
 
@@ -1170,7 +1170,7 @@ static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 */
 static WRITE16_HANDLER( x68k_ioc_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	switch(offset)
 	{
 	case 0x00:
@@ -1203,7 +1203,7 @@ static WRITE16_HANDLER( x68k_ioc_w )
 
 static READ16_HANDLER( x68k_ioc_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	switch(offset)
 	{
 	case 0x00:
@@ -1236,7 +1236,7 @@ static READ16_HANDLER( x68k_ioc_r )
 */
 static WRITE16_HANDLER( x68k_sysport_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	switch(offset)
 	{
 	case 0x00:
@@ -1253,14 +1253,14 @@ static WRITE16_HANDLER( x68k_sysport_w )
 		state->sysport.sram_writeprotect = data;
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",cpu_get_pc(space->cpu),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",cpu_get_pc(&space->device()),data,offset);
 		break;
 	}
 }
 
 static READ16_HANDLER( x68k_sysport_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	int ret = 0;
 	switch(offset)
 	{
@@ -1282,7 +1282,7 @@ static READ16_HANDLER( x68k_sysport_r )
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( x68k_mfp_r )
 {
-	device_t *x68k_mfp = space->machine->device(MC68901_TAG);
+	device_t *x68k_mfp = space->machine().device(MC68901_TAG);
 
 	return mc68901_register_r(x68k_mfp, offset);
 }
@@ -1290,25 +1290,25 @@ static READ16_HANDLER( x68k_mfp_r )
 
 static READ16_HANDLER( x68k_mfp_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 
 	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
-//  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
+//  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(&space->device()),offset);
     switch(offset)
     {
 #if 0
     case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
-        if(machine->primary_screen->vpos() == state->crtc.reg[9])
+        if(machine.primary_screen->vpos() == state->crtc.reg[9])
             ret |= 0x40;
         if(state->crtc.vblank == 0)
             ret |= 0x10;  // Vsync signal (low if in vertical retrace)
 //      if(state->mfp.isrb & 0x08)
 //          ret |= 0x08;  // FM IRQ signal
-        if(machine->primary_screen->hpos() > state->crtc.width - 32)
+        if(machine.primary_screen->hpos() > state->crtc.width - 32)
             ret |= 0x80;  // Hsync signal
-//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(space->cpu),offset,ret);
+//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(&space->device()),offset,ret);
         return ret;  // bit 5 is always 1
     case 3:
         return state->mfp.iera;
@@ -1355,7 +1355,7 @@ static READ16_HANDLER( x68k_mfp_r )
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
@@ -1475,7 +1475,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 			// Keyboard control command.
 			state->mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(state, data);
-//          logerror("MFP: [%08x] USART Sent data %04x\n",cpu_get_pc(space->cpu),data);
+//          logerror("MFP: [%08x] USART Sent data %04x\n",cpu_get_pc(&space->device()),data);
 		}
 		break;
 	default:
@@ -1505,9 +1505,9 @@ static WRITE16_DEVICE_HANDLER( x68k_rtc_w )
 	rp5c15_w(device, offset, data, mem_mask);
 }
 
-static void x68k_rtc_alarm_irq(running_machine *machine, int state)
+static void x68k_rtc_alarm_irq(running_machine &machine, int state)
 {
-	x68k_state *drvstate = machine->driver_data<x68k_state>();
+	x68k_state *drvstate = machine.driver_data<x68k_state>();
 	if(drvstate->mfp.aer & 0x01)
 	{
 		if(state == 1)
@@ -1531,7 +1531,7 @@ static void x68k_rtc_alarm_irq(running_machine *machine, int state)
 
 static WRITE16_HANDLER( x68k_sram_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 
 	if(state->sysport.sram_writeprotect == 0x31)
 	{
@@ -1541,12 +1541,12 @@ static WRITE16_HANDLER( x68k_sram_w )
 
 static READ16_HANDLER( x68k_sram_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
 	if(offset == 0x08/2)
-		return ram_get_size(space->machine->device(RAM_TAG)) >> 16;  // RAM size
+		return ram_get_size(space->machine().device(RAM_TAG)) >> 16;  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1560,9 +1560,9 @@ static READ16_HANDLER( x68k_sram_r )
 
 static READ32_HANDLER( x68k_sram32_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(offset == 0x08/4)
-		return (ram_get_size(space->machine->device(RAM_TAG)) & 0xffff0000);  // RAM size
+		return (ram_get_size(space->machine().device(RAM_TAG)) & 0xffff0000);  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1576,7 +1576,7 @@ static READ32_HANDLER( x68k_sram32_r )
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(state->sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(state->m_nvram + offset);
@@ -1585,13 +1585,13 @@ static WRITE32_HANDLER( x68k_sram32_w )
 
 static WRITE16_HANDLER( x68k_vid_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	int val;
 	if(offset < 0x100)  // Graphic layer palette
 	{
 		COMBINE_DATA(state->video.gfx_pal+offset);
 		val = state->video.gfx_pal[offset];
-		palette_set_color_rgb(space->machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(space->machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1599,7 +1599,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(state->video.text_pal+(offset-0x100));
 		val = state->video.text_pal[offset-0x100];
-		palette_set_color_rgb(space->machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(space->machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1640,7 +1640,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 
 static READ16_HANDLER( x68k_vid_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(offset < 0x100)
 		return state->video.gfx_pal[offset];
 
@@ -1684,9 +1684,9 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 {
 	int val = param;
 	int v;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
-	if(strcmp(machine->system().name,"x68030") == 0)
+	if(strcmp(machine.system().name,"x68030") == 0)
 		v = 0x0b;
 	else
 		v = 0x09;
@@ -1695,15 +1695,15 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	if(ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (ram[0x09] << 24) | (ram[0x08] << 16) |(ram[0x0b] << 8) | ram[0x0a];
-		int sp = cpu_get_reg(machine->device("maincpu"), STATE_GENSP);
-		int pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPC);
-		int sr = cpu_get_reg(machine->device("maincpu"), M68K_SR);
-		//int pda = cpu_get_reg(machine->device("maincpu"), M68K_PREF_DATA);
-		if(strcmp(machine->system().name,"x68030") == 0)
+		int sp = cpu_get_reg(machine.device("maincpu"), STATE_GENSP);
+		int pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPC);
+		int sr = cpu_get_reg(machine.device("maincpu"), M68K_SR);
+		//int pda = cpu_get_reg(machine.device("maincpu"), M68K_PREF_DATA);
+		if(strcmp(machine.system().name,"x68030") == 0)
 		{  // byte order varies on the 68030
 			addr = (ram[0x0b] << 24) | (ram[0x0a] << 16) |(ram[0x09] << 8) | ram[0x08];
 		}
-		cpu_set_reg(machine->device("maincpu"), STATE_GENSP, sp - 14);
+		cpu_set_reg(machine.device("maincpu"), STATE_GENSP, sp - 14);
 		ram[sp-11] = (val & 0xff000000) >> 24;
 		ram[sp-12] = (val & 0x00ff0000) >> 16;
 		ram[sp-9] = (val & 0x0000ff00) >> 8;
@@ -1714,93 +1714,93 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
 		ram[sp-5] = (sr & 0xff00) >> 8;
 		ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpu_set_reg(machine->device("maincpu"), STATE_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
+		cpu_set_reg(machine.device("maincpu"), STATE_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
 }
 
 static READ16_HANDLER( x68k_rom0_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
        then access causes a bus error */
 	state->current_vector[2] = 0x02;  // bus error
 	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
-	if(input_port_read(space->machine, "options") & 0x02)
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
 	}
 	return 0xff;
 }
 
 static WRITE16_HANDLER( x68k_rom0_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
        then access causes a bus error */
 	state->current_vector[2] = 0x02;  // bus error
 	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
-	if(input_port_read(space->machine, "options") & 0x02)
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
 	}
 }
 
 static READ16_HANDLER( x68k_emptyram_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location is unused RAM, access here causes a bus error
        Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	state->current_vector[2] = 0x02;  // bus error
 	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
-	if(input_port_read(space->machine, "options") & 0x02)
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
 	}
 	return 0xff;
 }
 
 static WRITE16_HANDLER( x68k_emptyram_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location is unused RAM, access here causes a bus error
        Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	state->current_vector[2] = 0x02;  // bus error
 	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
-	if(input_port_read(space->machine, "options") & 0x02)
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
 	}
 }
 
 static READ16_HANDLER( x68k_exp_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(input_port_read(space->machine, "options") & 0x02)
+	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		state->current_vector[2] = 0x02;  // bus error
 		state->current_irq_line = 2;
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
 	}
 	return 0xffff;
@@ -1808,31 +1808,31 @@ static READ16_HANDLER( x68k_exp_r )
 
 static WRITE16_HANDLER( x68k_exp_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(input_port_read(space->machine, "options") & 0x02)
+	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		state->current_vector[2] = 0x02;  // bus error
 		state->current_irq_line = 2;
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
 	}
 }
 
-static void x68k_dma_irq(running_machine *machine, int channel)
+static void x68k_dma_irq(running_machine &machine, int channel)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	device_t *device = machine->device("hd63450");
+	x68k_state *state = machine.driver_data<x68k_state>();
+	device_t *device = machine.device("hd63450");
 	state->current_vector[3] = hd63450_get_vector(device, channel);
 	state->current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->current_vector[3]);
 	cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,state->current_vector[3]);
 }
 
-static void x68k_dma_end(running_machine *machine, int channel,int irq)
+static void x68k_dma_end(running_machine &machine, int channel,int irq)
 {
 	if(irq != 0)
 	{
@@ -1840,10 +1840,10 @@ static void x68k_dma_end(running_machine *machine, int channel,int irq)
 	}
 }
 
-static void x68k_dma_error(running_machine *machine, int channel, int irq)
+static void x68k_dma_error(running_machine &machine, int channel, int irq)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	device_t *device = machine->device("hd63450");
+	x68k_state *state = machine.driver_data<x68k_state>();
+	device_t *device = machine.device("hd63450");
 	if(irq != 0)
 	{
 		state->current_vector[3] = hd63450_get_error_vector(device,channel);
@@ -1854,7 +1854,7 @@ static void x68k_dma_error(running_machine *machine, int channel, int irq)
 
 static void x68k_fm_irq(device_t *device, int irq)
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(irq == CLEAR_LINE)
 	{
 		state->mfp.gpio |= 0x08;
@@ -1895,14 +1895,14 @@ static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
 
 static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 {
-	x68k_state *drvstate = device->machine->driver_data<x68k_state>();
+	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
 	if(drvstate->mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
 	if(state != CLEAR_LINE)
 		state = HOLD_LINE;  // to get around erroneous spurious interrupt
 //  if((state->ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //      return;
-	cputag_set_input_line(device->machine, "maincpu", 6, state);
+	cputag_set_input_line(device->machine(), "maincpu", 6, state);
 	drvstate->current_vector[6] = 0;
 	drvstate->mfp_prev = state;
 }
@@ -1910,7 +1910,7 @@ static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 static INTERRUPT_GEN( x68k_vsync_irq )
 {
 #if 0
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	if(state->mfp.ierb & 0x40)
 	{
 		state->mfp.isrb |= 0x40;
@@ -1920,15 +1920,15 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 		mfp_trigger_irq(MFP_IRQ_GPIP4);
 	}
 	if(state->crtc.height == 256)
-		machine->primary_screen->update_partial(256);//state->crtc.reg[4]/2);
+		machine.primary_screen->update_partial(256);//state->crtc.reg[4]/2);
 	else
-		machine->primary_screen->update_partial(512);//state->crtc.reg[4]);
+		machine.primary_screen->update_partial(512);//state->crtc.reg[4]);
 #endif
 }
 
 static IRQ_CALLBACK(x68k_int_ack)
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
+	x68k_state *state = device->machine().driver_data<x68k_state>();
 
 	if(irqline == 6)  // MFP
 	{
@@ -1936,12 +1936,12 @@ static IRQ_CALLBACK(x68k_int_ack)
 		if(state->current_vector[6] != 0x4b && state->current_vector[6] != 0x4c)
 			state->current_vector[6] = state->m_mfp->get_vector();
 		else
-			cputag_set_input_line_and_vector(device->machine, "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
+			cputag_set_input_line_and_vector(device->machine(), "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->current_vector[6],irqline);
 		return state->current_vector[6];
 	}
 
-	cputag_set_input_line_and_vector(device->machine, "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
 		state->ioc.irqstatus &= ~0xf0;
@@ -2460,13 +2460,13 @@ INPUT_PORTS_END
 
 static void x68k_load_proc(device_image_interface &image)
 {
-	x68k_state *state = image.device().machine->driver_data<x68k_state>();
+	x68k_state *state = image.device().machine().driver_data<x68k_state>();
 	if(state->ioc.irqstatus & 0x02)
 	{
 		state->current_vector[1] = 0x61;
 		state->ioc.irqstatus |= 0x40;
 		state->current_irq_line = 1;
-		cputag_set_input_line_and_vector(image.device().machine, "maincpu",1,ASSERT_LINE,state->current_vector[1]);  // Disk insert/eject interrupt
+		cputag_set_input_line_and_vector(image.device().machine(), "maincpu",1,ASSERT_LINE,state->current_vector[1]);  // Disk insert/eject interrupt
 		logerror("IOC: Disk image inserted\n");
 	}
 	state->fdc.disk_inserted[floppy_get_drive(&image.device())] = 1;
@@ -2474,13 +2474,13 @@ static void x68k_load_proc(device_image_interface &image)
 
 static void x68k_unload_proc(device_image_interface &image)
 {
-	x68k_state *state = image.device().machine->driver_data<x68k_state>();
+	x68k_state *state = image.device().machine().driver_data<x68k_state>();
 	if(state->ioc.irqstatus & 0x02)
 	{
 		state->current_vector[1] = 0x61;
 		state->ioc.irqstatus |= 0x40;
 		state->current_irq_line = 1;
-		cputag_set_input_line_and_vector(image.device().machine, "maincpu",1,ASSERT_LINE,state->current_vector[1]);  // Disk insert/eject interrupt
+		cputag_set_input_line_and_vector(image.device().machine(), "maincpu",1,ASSERT_LINE,state->current_vector[1]);  // Disk insert/eject interrupt
 	}
 	state->fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
@@ -2531,17 +2531,17 @@ static const mb89352_interface x68k_scsi_intf =
 
 static MACHINE_RESET( x68000 )
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
        Just copying the inital stack pointer and program counter should
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = machine->region("user2")->base();
+	UINT8* romdata = machine.region("user2")->base();
 	attotime irq_time;
 
-	memset(ram_get_ptr(machine->device(RAM_TAG)),0,ram_get_size(machine->device(RAM_TAG)));
-	memcpy(ram_get_ptr(machine->device(RAM_TAG)),romdata,8);
+	memset(ram_get_ptr(machine.device(RAM_TAG)),0,ram_get_size(machine.device(RAM_TAG)));
+	memcpy(ram_get_ptr(machine.device(RAM_TAG)),romdata,8);
 
 	// init keyboard
 	state->keyboard.delay = 500;  // 3*100+200
@@ -2570,15 +2570,15 @@ static MACHINE_RESET( x68000 )
 
 	mfp_init(machine);
 
-	state->scanline = machine->primary_screen->vpos();// = state->crtc.reg[6];  // Vertical start
+	state->scanline = machine.primary_screen->vpos();// = state->crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	state->crtc.vblank = 1;
-	irq_time = machine->primary_screen->time_until_pos(state->crtc.reg[6],2);
+	irq_time = machine.primary_screen->time_until_pos(state->crtc.reg[6],2);
 	state->vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
-	state->scanline_timer->adjust(machine->primary_screen->scan_period(), 1);
+	state->scanline_timer->adjust(machine.primary_screen->scan_period(), 1);
 
 	state->mfp.gpio = 0xfb;
 
@@ -2600,19 +2600,19 @@ static MACHINE_RESET( x68000 )
 	}
 
 	// reset CPU
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static MACHINE_START( x68000 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	x68k_state *state = machine->driver_data<x68k_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->spriteram = (UINT16*)machine->region("user1")->base();
+	state->spriteram = (UINT16*)machine.region("user1")->base();
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read16_space_func)x68k_emptyram_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write16_space_func)x68k_emptyram_w));
-	space->install_readwrite_bank(0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
-	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine->device(RAM_TAG)));
+	space->install_readwrite_bank(0x000000,ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank1");
+	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine.device(RAM_TAG)));
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
 	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2636,17 +2636,17 @@ static MACHINE_START( x68000 )
 
 static MACHINE_START( x68030 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	x68k_state *state = machine->driver_data<x68k_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->spriteram = (UINT16*)machine->region("user1")->base();
+	state->spriteram = (UINT16*)machine.region("user1")->base();
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read32_space_func)x68k_rom0_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write32_space_func)x68k_rom0_w));
-	space->install_readwrite_bank(0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
+	space->install_readwrite_bank(0x000000,ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	space->install_readwrite_bank(0x3000000,0x3000000+ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank5");
-	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine->device(RAM_TAG)));
-	memory_set_bankptr(machine, "bank5",ram_get_ptr(machine->device(RAM_TAG)));
+	space->install_readwrite_bank(0x3000000,0x3000000+ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank5");
+	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine.device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank5",ram_get_ptr(machine.device(RAM_TAG)));
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
 	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2670,9 +2670,9 @@ static MACHINE_START( x68030 )
 
 static DRIVER_INIT( x68000 )
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	unsigned char* rom = machine->region("maincpu")->base();
-	unsigned char* user2 = machine->region("user2")->base();
+	x68k_state *state = machine.driver_data<x68k_state>();
+	unsigned char* rom = machine.region("maincpu")->base();
+	unsigned char* user2 = machine.region("user2")->base();
 	state->gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
@@ -2681,7 +2681,7 @@ static DRIVER_INIT( x68000 )
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = machine->region("user3")->base();
+		unsigned char* ramptr = machine.region("user3")->base();
 		memcpy(state->sram,ramptr,0x4000);
 	}
 #endif
@@ -2691,17 +2691,17 @@ static DRIVER_INIT( x68000 )
 
 	mfp_init(machine);
 
-	device_set_irq_callback(machine->device("maincpu"), x68k_int_ack);
+	device_set_irq_callback(machine.device("maincpu"), x68k_int_ack);
 
 	// init keyboard
 	state->keyboard.delay = 500;  // 3*100+200
 	state->keyboard.repeat = 110;  // 4^2*5+30
-	state->kb_timer = machine->scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
-	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(x68k_hsync));
-	state->raster_irq = machine->scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
-	state->vblank_irq = machine->scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
-	state->mouse_timer = machine->scheduler().timer_alloc(FUNC(x68k_scc_ack));
-	state->led_timer = machine->scheduler().timer_alloc(FUNC(x68k_led_callback));
+	state->kb_timer = machine.scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
+	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(x68k_hsync));
+	state->raster_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
+	state->vblank_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
+	state->mouse_timer = machine.scheduler().timer_alloc(FUNC(x68k_scc_ack));
+	state->led_timer = machine.scheduler().timer_alloc(FUNC(x68k_led_callback));
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);
@@ -2711,14 +2711,14 @@ static DRIVER_INIT( x68000 )
 
 static DRIVER_INIT( x68kxvi )
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
 	state->sysport.cputype = 0xfe; // 68000, 16MHz
 }
 
 static DRIVER_INIT( x68030 )
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
 	state->sysport.cputype = 0xdc; // 68030, 25MHz
 }

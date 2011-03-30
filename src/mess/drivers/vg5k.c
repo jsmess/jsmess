@@ -67,7 +67,7 @@ public:
 
 static READ8_HANDLER( printer_r )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 
 	return (printer_is_ready(vg5k->printer) ? 0x00 : 0xff);
 }
@@ -75,7 +75,7 @@ static READ8_HANDLER( printer_r )
 
 static WRITE8_HANDLER( printer_w )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 
 	printer_output(vg5k->printer, data);
 }
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( printer_w )
 
 static WRITE8_HANDLER ( ef9345_offset_w )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 
 	vg5k->ef9345_offset = data;
 }
@@ -91,7 +91,7 @@ static WRITE8_HANDLER ( ef9345_offset_w )
 
 static READ8_HANDLER ( ef9345_io_r )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 
 	return vg5k->ef9345->data_r(*space, vg5k->ef9345_offset, 0xff);
 }
@@ -99,7 +99,7 @@ static READ8_HANDLER ( ef9345_io_r )
 
 static WRITE8_HANDLER ( ef9345_io_w )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 
 	vg5k->ef9345->data_w(*space, vg5k->ef9345_offset, data, 0xff);
 }
@@ -107,7 +107,7 @@ static WRITE8_HANDLER ( ef9345_io_w )
 
 static READ8_HANDLER ( cassette_r )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 	double level;
 
 	level = cassette_input(vg5k->cassette);
@@ -118,7 +118,7 @@ static READ8_HANDLER ( cassette_r )
 
 static WRITE8_HANDLER ( cassette_w )
 {
-	vg5k_state *vg5k = space->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
 
 	dac_data_w(vg5k->dac, data <<2);
 
@@ -282,14 +282,14 @@ static TIMER_CALLBACK( z80_irq_clear )
 
 static TIMER_DEVICE_CALLBACK( z80_irq )
 {
-	cputag_set_input_line(timer.machine, "maincpu", 0, ASSERT_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
 
-	timer.machine->scheduler().timer_set(attotime::from_usec(100), FUNC(z80_irq_clear));
+	timer.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(z80_irq_clear));
 }
 
 static TIMER_DEVICE_CALLBACK( vg5k_scanline )
 {
-	vg5k_state *vg5k = timer.machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = timer.machine().driver_data<vg5k_state>();
 
 	vg5k->ef9345->update_scanline((UINT16)param);
 }
@@ -297,19 +297,19 @@ static TIMER_DEVICE_CALLBACK( vg5k_scanline )
 
 static MACHINE_START( vg5k )
 {
-	vg5k_state *vg5k = machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = machine.driver_data<vg5k_state>();
 
-	vg5k->ef9345 = machine->device<ef9345_device>("ef9345");
-	vg5k->dac = machine->device("dac");
-	vg5k->printer = machine->device("printer");
-	vg5k->cassette = machine->device("cassette");
+	vg5k->ef9345 = machine.device<ef9345_device>("ef9345");
+	vg5k->dac = machine.device("dac");
+	vg5k->printer = machine.device("printer");
+	vg5k->cassette = machine.device("cassette");
 
 	state_save_register_global(machine, vg5k->ef9345_offset);
 }
 
 static MACHINE_RESET( vg5k )
 {
-	vg5k_state *vg5k = machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = machine.driver_data<vg5k_state>();
 
 	vg5k->ef9345_offset = 0;
 }
@@ -320,7 +320,7 @@ static VIDEO_START( vg5k )
 
 static SCREEN_UPDATE( vg5k )
 {
-	vg5k_state *vg5k = screen->machine->driver_data<vg5k_state>();
+	vg5k_state *vg5k = screen->machine().driver_data<vg5k_state>();
 
 	vg5k->ef9345->video_update(bitmap, cliprect);
 
@@ -347,7 +347,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( vg5k )
 {
-	UINT8 *FNT = machine->region("ef9345")->base();
+	UINT8 *FNT = machine.region("ef9345")->base();
 	UINT16 a,b,c,d,dest=0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
@@ -359,9 +359,9 @@ static DRIVER_INIT( vg5k )
 
 
 	/* install expansion memory*/
-	address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
-	UINT16 ram_size = ram_get_size(machine->device(RAM_TAG));
+	address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT16 ram_size = ram_get_size(machine.device(RAM_TAG));
 
 	if (ram_size > 0x4000)
 		program->install_ram(0x8000, 0x3fff + ram_size, ram);

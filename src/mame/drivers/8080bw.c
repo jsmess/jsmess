@@ -1156,7 +1156,7 @@ MACHINE_CONFIG_END
 
 static CUSTOM_INPUT( sflush_80_r )
 {
-	return (field->port->machine->primary_screen->vpos() & 0x80) ? 1 : 0;
+	return (field->port->machine().primary_screen->vpos() & 0x80) ? 1 : 0;
 }
 
 static ADDRESS_MAP_START( sflush_map, AS_PROGRAM, 8 )
@@ -1361,7 +1361,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( polaris_interrupt )
 {
-	_8080bw_state *state = device->machine->driver_data<_8080bw_state>();
+	_8080bw_state *state = device->machine().driver_data<_8080bw_state>();
 	state->polaris_cloud_speed++;
 
 	if (state->polaris_cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
@@ -1373,7 +1373,7 @@ static INTERRUPT_GEN( polaris_interrupt )
 
 static MACHINE_START( polaris )
 {
-	_8080bw_state *state = machine->driver_data<_8080bw_state>();
+	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 	state->save_item(NAME(state->polaris_cloud_speed));
 	state->save_item(NAME(state->polaris_cloud_pos));
 
@@ -1730,13 +1730,13 @@ INPUT_PORTS_END
 
 static READ8_HANDLER(indianbt_r)
 {
-	switch(cpu_get_pc(space->cpu))
+	switch(cpu_get_pc(&space->device()))
 	{
 		case 0x5fed:	return 0x10;
 		case 0x5ffc:	return 0;
 	}
-	logerror("unknown port 0 read @ %x\n",cpu_get_pc(space->cpu));
-	return space->machine->rand();
+	logerror("unknown port 0 read @ %x\n",cpu_get_pc(&space->device()));
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( indianbt_io_map, AS_IO, 8 )
@@ -1782,7 +1782,7 @@ MACHINE_CONFIG_END
 
 static WRITE8_HANDLER( steelwkr_sh_port_3_w )
 {
-	coin_lockout_global_w(space->machine, !(~data & 0x03));		/* possibly */
+	coin_lockout_global_w(space->machine(), !(~data & 0x03));		/* possibly */
 }
 
 static ADDRESS_MAP_START( steelwkr_io_map, AS_IO, 8 )
@@ -2166,8 +2166,8 @@ MACHINE_CONFIG_END
 /* decrypt function for vortex */
 static DRIVER_INIT( vortex )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
-	int length = machine->region("maincpu")->bytes();
+	UINT8 *rom = machine.region("maincpu")->base();
+	int length = machine.region("maincpu")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
 	for (x = 0; x < length; x++)

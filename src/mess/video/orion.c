@@ -18,14 +18,14 @@ VIDEO_START( orion128 )
 
 SCREEN_UPDATE( orion128 )
 {
-	orion_state *state = screen->machine->driver_data<orion_state>();
+	orion_state *state = screen->machine().driver_data<orion_state>();
 	UINT8 code1,code2,code3,code4,color,val;
 	int y, x,b;
 	int orionproshift = (state->orion128_video_mode & 0x10) ? 1 : 0;
 	int part1addr = (3-((state->orion128_video_page & 3) | orionproshift)) * 0x4000;
 	int part2addr = part1addr + 0x10000;
 	int video_mode = state->orion128_video_mode & state->video_mode_mask;
-	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
 
 	for (x = 0; x < state->orion128_video_width; x++)
 	{

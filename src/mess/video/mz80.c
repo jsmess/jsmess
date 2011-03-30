@@ -40,9 +40,9 @@ VIDEO_START( mz80k )
 
 SCREEN_UPDATE( mz80k )
 {
-	mz80_state *state = screen->machine->driver_data<mz80_state>();
+	mz80_state *state = screen->machine().driver_data<mz80_state>();
 	int x,y;
-	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	state->mz80k_vertical = state->mz80k_vertical ? 0 : 1;
 	state->mz80k_cursor_cnt++;
 	if (state->mz80k_cursor_cnt==64) state->mz80k_cursor_cnt = 0;
@@ -52,7 +52,7 @@ SCREEN_UPDATE( mz80k )
 		for(x = 0; x < 40; x++ )
 		{
 			int code = space->read_byte(0xD000 + x + y*40);
-			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8);
+			drawgfx_opaque(bitmap, NULL, screen->machine().gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

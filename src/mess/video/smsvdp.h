@@ -44,8 +44,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*smsvdp_int_cb)( running_machine *machine, int state );
-typedef void (*smsvdp_pause_cb)( running_machine *machine );
+typedef void (*smsvdp_int_cb)( running_machine &machine, int state );
+typedef void (*smsvdp_pause_cb)( running_machine &machine );
 
 typedef struct _smsvdp_interface smsvdp_interface;
 struct _smsvdp_interface

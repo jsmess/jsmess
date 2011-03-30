@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 
 static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
@@ -52,7 +52,7 @@ static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 
 static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
@@ -67,7 +67,7 @@ static CDP1869_PCB_READ( comx35_pcb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
 {
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
+	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
 
 	if (!driver_state->m_iden && !state)
 	{
@@ -102,12 +102,12 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 void comx35_state::video_start()
 {
 	// allocate memory
-	m_charram = auto_alloc_array(machine, UINT8, COMX35_CHARRAM_SIZE);
-	m_videoram = auto_alloc_array(machine, UINT8, COMX35_VIDEORAM_SIZE);
+	m_charram = auto_alloc_array(m_machine, UINT8, COMX35_CHARRAM_SIZE);
+	m_videoram = auto_alloc_array(m_machine, UINT8, COMX35_VIDEORAM_SIZE);
 
 	// register for save state
-	state_save_register_global_pointer(machine, m_charram, COMX35_CHARRAM_SIZE);
-	state_save_register_global_pointer(machine, m_videoram, COMX35_VIDEORAM_SIZE);
+	state_save_register_global_pointer(m_machine, m_charram, COMX35_CHARRAM_SIZE);
+	state_save_register_global_pointer(m_machine, m_videoram, COMX35_VIDEORAM_SIZE);
 }
 
 bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -128,9 +128,9 @@ bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 static MC6845_UPDATE_ROW( comx35_update_row )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
-	UINT8 *charrom = device->machine->region("chargen")->base();
+	UINT8 *charrom = device->machine().region("chargen")->base();
 
 	int column, bit;
 
@@ -159,7 +159,7 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_hsync_changed )
 {
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
+	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
 
 	driver_state->m_cdp1802_ef4 = state;
 }

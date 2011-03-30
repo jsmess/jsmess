@@ -26,14 +26,14 @@ public:
 
 static READ8_HANDLER(pimps_terminal_status_r)
 {
-	pimps_state *state = space->machine->driver_data<pimps_state>();
+	pimps_state *state = space->machine().driver_data<pimps_state>();
 	if (state->received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
 static READ8_DEVICE_HANDLER(pimps_terminal_r)
 {
-	pimps_state *state = device->machine->driver_data<pimps_state>();
+	pimps_state *state = device->machine().driver_data<pimps_state>();
 	UINT8 retVal = state->received_char;
 	state->received_char = 0;
 	return retVal;
@@ -58,13 +58,13 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pimps)
 {
-	pimps_state *state = machine->driver_data<pimps_state>();
+	pimps_state *state = machine.driver_data<pimps_state>();
 	state->received_char = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( pimps_kbd_put )
 {
-	pimps_state *state = device->machine->driver_data<pimps_state>();
+	pimps_state *state = device->machine().driver_data<pimps_state>();
 	state->received_char = data;
 }
 

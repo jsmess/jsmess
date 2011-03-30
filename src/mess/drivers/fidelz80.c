@@ -593,7 +593,7 @@ expect that the software reads these once on startup only.
     I8255 Device
 ******************************************************************************/
 
-void fidelz80_state::update_display(running_machine *machine)
+void fidelz80_state::update_display(running_machine &machine)
 {
 	// data for the 4x 7seg leds, bits are 0bxABCDEFG
 	UINT8 out_digit = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
@@ -627,16 +627,16 @@ READ8_MEMBER( fidelz80_state::fidelz80_portc_r )
 	switch (m_kp_matrix & 0xf0)
 	{
 		case 0xe0:
-			data = input_port_read(space.machine, "LINE1");
+			data = input_port_read(m_machine, "LINE1");
 			break;
 		case 0xd0:
-			data = input_port_read(space.machine, "LINE2");
+			data = input_port_read(m_machine, "LINE2");
 			break;
 		case 0xb0:
-			data = input_port_read(space.machine, "LINE3");
+			data = input_port_read(m_machine, "LINE3");
 			break;
 		case 0x70:
-			data = input_port_read(space.machine, "LINE4");
+			data = input_port_read(m_machine, "LINE4");
 			break;
 	}
 
@@ -652,7 +652,7 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 
 		m_led_selected = data;
 
-		update_display(space.machine);
+		update_display(m_machine);
 	}
 
 	// ignoring the language switch enable for now, is bit 0x40
@@ -670,7 +670,7 @@ READ8_MEMBER( fidelz80_state::cc10_portb_r )
     -xxx xxxx ??
     */
 
-	return input_port_read(space.machine, "LEVEL");
+	return input_port_read(m_machine, "LEVEL");
 }
 
 WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
@@ -679,7 +679,7 @@ WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 
 	m_digit_data = data;
 
-	update_display(space.machine);
+	update_display(m_machine);
 }
 
 READ8_MEMBER( fidelz80_state::vcc_portb_r )
@@ -700,7 +700,7 @@ WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
 	{
 		m_digit_data = data;
 
-		update_display(space.machine);
+		update_display(m_machine);
 	}
 }
 
@@ -789,28 +789,28 @@ READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
 	switch (m_kp_matrix)
 	{
 		case 0x01:
-			data = input_port_read(space.machine, "LINE1");
+			data = input_port_read(m_machine, "LINE1");
 			break;
 		case 0x02:
-			data = input_port_read(space.machine, "LINE2");
+			data = input_port_read(m_machine, "LINE2");
 			break;
 		case 0x04:
-			data = input_port_read(space.machine, "LINE3");
+			data = input_port_read(m_machine, "LINE3");
 			break;
 		case 0x08:
-			data = input_port_read(space.machine, "LINE4");
+			data = input_port_read(m_machine, "LINE4");
 			break;
 		case 0x10:
-			data = input_port_read(space.machine, "LINE5");
+			data = input_port_read(m_machine, "LINE5");
 			break;
 		case 0x20:
-			data = input_port_read(space.machine, "LINE6");
+			data = input_port_read(m_machine, "LINE6");
 			break;
 		case 0x40:
-			data = input_port_read(space.machine, "LINE7");
+			data = input_port_read(m_machine, "LINE7");
 			break;
 		case 0x80:
-			data = input_port_read(space.machine, "LINE8");
+			data = input_port_read(m_machine, "LINE8");
 			break;
 		default:
 			data = 0xf0;
@@ -831,7 +831,7 @@ READ8_MEMBER(fidelz80_state::unknown_r)
 
 READ8_MEMBER(fidelz80_state::rand_r)
 {
-	return space.machine->rand();
+	return space.machine().rand();
 }
 
 /******************************************************************************
@@ -840,7 +840,7 @@ READ8_MEMBER(fidelz80_state::rand_r)
 
 static WRITE8_DEVICE_HANDLER( digit_w )
 {
-	fidelz80_state *state = device->machine->driver_data<fidelz80_state>();
+	fidelz80_state *state = device->machine().driver_data<fidelz80_state>();
 
 	if (state->m_kp_matrix)
 		switch (offset)
@@ -965,14 +965,14 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( fidelz80_trigger_reset )
 {
-	fidelz80_state *state = field->port->machine->driver_data<fidelz80_state>();
+	fidelz80_state *state = field->port->machine().driver_data<fidelz80_state>();
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( abc_trigger_reset )
 {
-	fidelz80_state *state = field->port->machine->driver_data<fidelz80_state>();
+	fidelz80_state *state = field->port->machine().driver_data<fidelz80_state>();
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 	device_set_input_line(state->m_i8041, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);

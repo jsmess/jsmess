@@ -59,7 +59,7 @@ struct _vdc8563_state
 		if (VERBOSE_LEVEL >= N) \
 		{ \
 			if (M) \
-				logerror("%11.6f: %-24s",device->machine->time().as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",device->machine().time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -364,7 +364,7 @@ static void vdc8563_time( device_t *device )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	double newtime, ftime;
-	newtime = device->machine->time().as_double();
+	newtime = device->machine().time().as_double();
 
 	if (vdc8563_clocks_in_frame(device) == 0.0)
 		return;
@@ -396,7 +396,7 @@ static void vdc8563_time( device_t *device )
 static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int x, y, i;
 	rectangle rect;
 	int w = CRTC6845_CHAR_COLUMNS;
@@ -416,8 +416,8 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, 
 		{
 			if (vdc8563->dirty[i])
 			{
-				drawgfx_opaque(bitmap,&rect,machine->gfx[0], vdc8563->ram[i], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
-						machine->gfx[0]->width * x + 8, height * y + height);
+				drawgfx_opaque(bitmap,&rect,machine.gfx[0], vdc8563->ram[i], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
+						machine.gfx[0]->width * x + 8, height * y + height);
 
 				if ((vdc8563->cursor_on) && (i == (CRTC6845_CURSOR_POS & vdc8563->mask)))
 				{
@@ -426,7 +426,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, 
 						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
 					if (k > 0)
-						plot_box(bitmap, machine->gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine->gfx[0]->width, k, FRAMECOLOR);
+						plot_box(bitmap, machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width, k, FRAMECOLOR);
 				}
 
 				vdc8563->dirty[i] = 0;
@@ -439,7 +439,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, 
 static void vdc8563_text_screenrefresh( device_t *device, bitmap_t *bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int x, y, i, j;
 	rectangle rect;
 	int w = CRTC6845_CHAR_COLUMNS;
@@ -487,7 +487,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_t *bitmap, int 
 						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
 					if (k > 0)
-						plot_box(bitmap, machine->gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine->gfx[0]->width,
+						plot_box(bitmap, machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width,
 								k, 0x10 | (vdc8563->ram[j] & 0x0f));
 				}
 
@@ -503,7 +503,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_t *bitmap, int 
 static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t *bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int x, y, i, j, k;
 	rectangle rect;
 	int w = CRTC6845_CHAR_COLUMNS;
@@ -526,8 +526,8 @@ static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t *bitmap, i
 				k = ((i << 4) + j) & vdc8563->mask;
 				if (vdc8563->dirty[k])
 				{
-					drawgfx_opaque(bitmap, &rect, machine->gfx[1], vdc8563->ram[k], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
-							machine->gfx[0]->width * x + 8, height * y + height + j);
+					drawgfx_opaque(bitmap, &rect, machine.gfx[1], vdc8563->ram[k], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
+							machine.gfx[0]->width * x + 8, height * y + height + j);
 					vdc8563->dirty[k] = 0;
 				}
 			}
@@ -559,7 +559,7 @@ UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle
 		{
 			if (full_refresh || vdc8563->fontdirty[i])
 			{
-				gfx_element_mark_dirty(device->machine->gfx[0],i);
+				gfx_element_mark_dirty(device->machine().gfx[0],i);
 				vdc8563->fontdirty[i] = 0;
 			}
 		}
@@ -575,13 +575,13 @@ UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle
 		int h = CRTC6845_CHAR_LINES;
 		int height = CRTC6845_CHAR_HEIGHT;
 
-		plot_box(bitmap, 0, 0, device->machine->gfx[0]->width * (w + 2), height, FRAMECOLOR);
+		plot_box(bitmap, 0, 0, device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height, device->machine->gfx[0]->width, height * h, FRAMECOLOR);
+		plot_box(bitmap, 0, height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
 
-		plot_box(bitmap, device->machine->gfx[0]->width * (w + 1), height, device->machine->gfx[0]->width, height * h, FRAMECOLOR);
+		plot_box(bitmap, device->machine().gfx[0]->width * (w + 1), height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height * (h + 1), device->machine->gfx[0]->width * (w + 2), height, FRAMECOLOR);
+		plot_box(bitmap, 0, height * (h + 1), device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
 	}
 
 	vdc8563->changed = 0;
@@ -597,9 +597,9 @@ static DEVICE_START( vdc8563 )
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	const vdc8563_interface *intf = (vdc8563_interface *)device->baseconfig().static_config();
 
-	vdc8563->screen = device->machine->device<screen_device>(intf->screen);
+	vdc8563->screen = device->machine().device<screen_device>(intf->screen);
 
-	vdc8563->ram = auto_alloc_array_clear(device->machine, UINT8, 0x20000);
+	vdc8563->ram = auto_alloc_array_clear(device->machine(), UINT8, 0x20000);
 	vdc8563->dirty = vdc8563->ram + 0x10000;
 
 	/* currently no driver uses 16k only */

@@ -221,7 +221,7 @@ READ16_MEMBER( st_state::fdc_data_r )
 		if (LOG) logerror("Indeterminate DMA Sector Count Read!\n");
 
 		// sector count register is write only, reading it returns unpredictable values
-		data = machine->rand() & 0xff;
+		data = machine().rand() & 0xff;
 	}
 	else
 	{
@@ -424,8 +424,8 @@ void st_state::mouse_tick()
 
     */
 
-	UINT8 x = input_port_read_safe(machine, "IKBD_MOUSEX", 0x00);
-	UINT8 y = input_port_read_safe(machine, "IKBD_MOUSEY", 0x00);
+	UINT8 x = input_port_read_safe(machine(), "IKBD_MOUSEX", 0x00);
+	UINT8 y = input_port_read_safe(machine(), "IKBD_MOUSEY", 0x00);
 
 	if (m_ikbd_mouse_pc == 0)
 	{
@@ -477,7 +477,7 @@ void st_state::mouse_tick()
 
 static TIMER_CALLBACK( st_mouse_tick )
 {
-	st_state *state = machine->driver_data<st_state>();
+	st_state *state = machine.driver_data<st_state>();
 
 	state->mouse_tick();
 }
@@ -507,21 +507,21 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 	UINT8 data = 0xff;
 
 	// keyboard data
-	if (!BIT(m_ikbd_keylatch, 1)) data &= input_port_read(machine, "P31");
-	if (!BIT(m_ikbd_keylatch, 2)) data &= input_port_read(machine, "P32");
-	if (!BIT(m_ikbd_keylatch, 3)) data &= input_port_read(machine, "P33");
-	if (!BIT(m_ikbd_keylatch, 4)) data &= input_port_read(machine, "P34");
-	if (!BIT(m_ikbd_keylatch, 5)) data &= input_port_read(machine, "P35");
-	if (!BIT(m_ikbd_keylatch, 6)) data &= input_port_read(machine, "P36");
-	if (!BIT(m_ikbd_keylatch, 7)) data &= input_port_read(machine, "P37");
-	if (!BIT(m_ikbd_keylatch, 8)) data &= input_port_read(machine, "P40");
-	if (!BIT(m_ikbd_keylatch, 9)) data &= input_port_read(machine, "P41");
-	if (!BIT(m_ikbd_keylatch, 10)) data &= input_port_read(machine, "P42");
-	if (!BIT(m_ikbd_keylatch, 11)) data &= input_port_read(machine, "P43");
-	if (!BIT(m_ikbd_keylatch, 12)) data &= input_port_read(machine, "P44");
-	if (!BIT(m_ikbd_keylatch, 13)) data &= input_port_read(machine, "P45");
-	if (!BIT(m_ikbd_keylatch, 14)) data &= input_port_read(machine, "P46");
-	if (!BIT(m_ikbd_keylatch, 15)) data &= input_port_read(machine, "P47");
+	if (!BIT(m_ikbd_keylatch, 1)) data &= input_port_read(machine(), "P31");
+	if (!BIT(m_ikbd_keylatch, 2)) data &= input_port_read(machine(), "P32");
+	if (!BIT(m_ikbd_keylatch, 3)) data &= input_port_read(machine(), "P33");
+	if (!BIT(m_ikbd_keylatch, 4)) data &= input_port_read(machine(), "P34");
+	if (!BIT(m_ikbd_keylatch, 5)) data &= input_port_read(machine(), "P35");
+	if (!BIT(m_ikbd_keylatch, 6)) data &= input_port_read(machine(), "P36");
+	if (!BIT(m_ikbd_keylatch, 7)) data &= input_port_read(machine(), "P37");
+	if (!BIT(m_ikbd_keylatch, 8)) data &= input_port_read(machine(), "P40");
+	if (!BIT(m_ikbd_keylatch, 9)) data &= input_port_read(machine(), "P41");
+	if (!BIT(m_ikbd_keylatch, 10)) data &= input_port_read(machine(), "P42");
+	if (!BIT(m_ikbd_keylatch, 11)) data &= input_port_read(machine(), "P43");
+	if (!BIT(m_ikbd_keylatch, 12)) data &= input_port_read(machine(), "P44");
+	if (!BIT(m_ikbd_keylatch, 13)) data &= input_port_read(machine(), "P45");
+	if (!BIT(m_ikbd_keylatch, 14)) data &= input_port_read(machine(), "P46");
+	if (!BIT(m_ikbd_keylatch, 15)) data &= input_port_read(machine(), "P47");
 
 	return data;
 }
@@ -545,7 +545,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
     */
 
-	UINT8 data = input_port_read_safe(machine, "IKBD_JOY1", 0xff) & 0x06;
+	UINT8 data = input_port_read_safe(machine(), "IKBD_JOY1", 0xff) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -602,7 +602,7 @@ WRITE8_MEMBER( st_state::ikbd_port3_w )
     */
 
 	// caps lock led
-	set_led_status(machine, 1, BIT(data, 0));
+	set_led_status(machine(), 1, BIT(data, 0));
 
 	// keyboard row select
 	m_ikbd_keylatch = (m_ikbd_keylatch & 0xff00) | data;
@@ -632,9 +632,9 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = input_port_read_safe(machine, "IKBD_JOY0", 0xff);
+	UINT8 data = input_port_read_safe(machine(), "IKBD_JOY0", 0xff);
 
-	if ((input_port_read(machine, "config") & 0x01) == 0)
+	if ((input_port_read(machine(), "config") & 0x01) == 0)
 	{
 		data = (data & 0xf0) | m_ikbd_mouse;
 	}
@@ -724,7 +724,7 @@ void ste_state::dmasound_tick()
 {
 	if (m_dmasnd_samples == 0)
 	{
-		UINT8 *RAM = ram_get_ptr(machine->device(RAM_TAG));
+		UINT8 *RAM = ram_get_ptr(machine().device(RAM_TAG));
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -774,7 +774,7 @@ void ste_state::dmasound_tick()
 
 static TIMER_CALLBACK( atariste_dmasound_tick )
 {
-	ste_state *state = machine->driver_data<ste_state>();
+	ste_state *state = machine.driver_data<ste_state>();
 
 	state->dmasound_tick();
 }
@@ -1025,7 +1025,7 @@ void ste_state::microwire_tick()
 
 static TIMER_CALLBACK( atariste_microwire_tick )
 {
-	ste_state *state = machine->driver_data<ste_state>();
+	ste_state *state = machine.driver_data<ste_state>();
 
 	state->microwire_tick();
 }
@@ -1139,7 +1139,7 @@ READ16_MEMBER( stbook_state::config_r )
 
     */
 
-	return (input_port_read(machine, "SW400") << 8) | 0xff;
+	return (input_port_read(machine(), "SW400") << 8) | 0xff;
 }
 
 
@@ -1912,7 +1912,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= rs232_ri_r(m_rs232) << 6;
 
 	// monochrome monitor detect
-	data |= input_port_read(machine, "config") & 0x80;
+	data |= input_port_read(machine(), "config") & 0x80;
 
 	return data;
 }
@@ -1990,7 +1990,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= rs232_ri_r(m_rs232) << 6;
 
 	// monochrome monitor detect, DMA sound active
-	data |= (input_port_read(machine, "config") & 0x80) ^ (m_dmasnd_active << 7);
+	data |= (input_port_read(machine(), "config") & 0x80) ^ (m_dmasnd_active << 7);
 
 	return data;
 }
@@ -2187,7 +2187,7 @@ static const centronics_interface centronics_intf =
 
 static IRQ_CALLBACK( atarist_int_ack )
 {
-	st_state *state = device->machine->driver_data<st_state>();
+	st_state *state = device->machine().driver_data<st_state>();
 
 	if (irqline == M68K_IRQ_6)
 	{
@@ -2234,26 +2234,26 @@ void st_state::state_save()
 {
 	m_dma_error = 1;
 
-	state_save_register_global(machine, m_mmu);
-	state_save_register_global(machine, m_dma_base);
-	state_save_register_global(machine, m_dma_error);
-	state_save_register_global(machine, m_fdc_mode);
-	state_save_register_global(machine, m_fdc_sectors);
-	state_save_register_global(machine, m_fdc_dmabytes);
-	state_save_register_global(machine, m_ikbd_keylatch);
-	state_save_register_global(machine, m_ikbd_mouse);
-	state_save_register_global(machine, m_ikbd_mouse_x);
-	state_save_register_global(machine, m_ikbd_mouse_y);
-	state_save_register_global(machine, m_ikbd_mouse_px);
-	state_save_register_global(machine, m_ikbd_mouse_py);
-	state_save_register_global(machine, m_ikbd_mouse_pc);
-	state_save_register_global(machine, m_ikbd_rx);
-	state_save_register_global(machine, m_ikbd_tx);
-	state_save_register_global(machine, m_ikbd_joy);
-	state_save_register_global(machine, m_midi_rx);
-	state_save_register_global(machine, m_midi_tx);
-	state_save_register_global(machine, m_acia_ikbd_irq);
-	state_save_register_global(machine, m_acia_midi_irq);
+	state_save_register_global(machine(), m_mmu);
+	state_save_register_global(machine(), m_dma_base);
+	state_save_register_global(machine(), m_dma_error);
+	state_save_register_global(machine(), m_fdc_mode);
+	state_save_register_global(machine(), m_fdc_sectors);
+	state_save_register_global(machine(), m_fdc_dmabytes);
+	state_save_register_global(machine(), m_ikbd_keylatch);
+	state_save_register_global(machine(), m_ikbd_mouse);
+	state_save_register_global(machine(), m_ikbd_mouse_x);
+	state_save_register_global(machine(), m_ikbd_mouse_y);
+	state_save_register_global(machine(), m_ikbd_mouse_px);
+	state_save_register_global(machine(), m_ikbd_mouse_py);
+	state_save_register_global(machine(), m_ikbd_mouse_pc);
+	state_save_register_global(machine(), m_ikbd_rx);
+	state_save_register_global(machine(), m_ikbd_tx);
+	state_save_register_global(machine(), m_ikbd_joy);
+	state_save_register_global(machine(), m_midi_rx);
+	state_save_register_global(machine(), m_midi_tx);
+	state_save_register_global(machine(), m_acia_ikbd_irq);
+	state_save_register_global(machine(), m_acia_midi_irq);
 }
 
 
@@ -2270,7 +2270,7 @@ void st_state::machine_start()
 	device_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	// allocate timers
-	m_mouse_timer = machine->scheduler().timer_alloc(FUNC(st_mouse_tick));
+	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(st_mouse_tick));
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 
 	// register for state saving
@@ -2286,19 +2286,19 @@ void ste_state::state_save()
 {
 	st_state::state_save();
 
-	state_save_register_global(machine, m_dmasnd_base);
-	state_save_register_global(machine, m_dmasnd_end);
-	state_save_register_global(machine, m_dmasnd_cntr);
-	state_save_register_global(machine, m_dmasnd_baselatch);
-	state_save_register_global(machine, m_dmasnd_endlatch);
-	state_save_register_global(machine, m_dmasnd_ctrl);
-	state_save_register_global(machine, m_dmasnd_mode);
-	state_save_register_global_array(machine, m_dmasnd_fifo);
-	state_save_register_global(machine, m_dmasnd_samples);
-	state_save_register_global(machine, m_dmasnd_active);
-	state_save_register_global(machine, m_mw_data);
-	state_save_register_global(machine, m_mw_mask);
-	state_save_register_global(machine, m_mw_shift);
+	state_save_register_global(machine(), m_dmasnd_base);
+	state_save_register_global(machine(), m_dmasnd_end);
+	state_save_register_global(machine(), m_dmasnd_cntr);
+	state_save_register_global(machine(), m_dmasnd_baselatch);
+	state_save_register_global(machine(), m_dmasnd_endlatch);
+	state_save_register_global(machine(), m_dmasnd_ctrl);
+	state_save_register_global(machine(), m_dmasnd_mode);
+	state_save_register_global_array(machine(), m_dmasnd_fifo);
+	state_save_register_global(machine(), m_dmasnd_samples);
+	state_save_register_global(machine(), m_dmasnd_active);
+	state_save_register_global(machine(), m_mw_data);
+	state_save_register_global(machine(), m_mw_mask);
+	state_save_register_global(machine(), m_mw_shift);
 }
 
 
@@ -2315,8 +2315,8 @@ void ste_state::machine_start()
 	device_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	/* allocate timers */
-	m_dmasound_timer = machine->scheduler().timer_alloc(FUNC(atariste_dmasound_tick));
-	m_microwire_timer = machine->scheduler().timer_alloc(FUNC(atariste_microwire_tick));
+	m_dmasound_timer = machine().scheduler().timer_alloc(FUNC(atariste_dmasound_tick));
+	m_microwire_timer = machine().scheduler().timer_alloc(FUNC(atariste_microwire_tick));
 
 	/* register for state saving */
 	state_save();
@@ -2331,7 +2331,7 @@ void megaste_state::machine_start()
 {
 	ste_state::machine_start();
 
-	state_save_register_global(machine, m_cache);
+	state_save_register_global(machine(), m_cache);
 }
 
 

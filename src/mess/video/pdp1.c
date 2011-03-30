@@ -37,8 +37,8 @@ static const rectangle panel_bitmap_bounds =
 	0,	panel_window_height-1,	/* min_y, max_y */
 };
 
-static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap);
-static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap);
+static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap);
+static void pdp1_draw_panel(running_machine &machine, bitmap_t *bitmap);
 
 static void pdp1_erase_lightpen(pdp1_state *state, bitmap_t *bitmap);
 static void pdp1_draw_lightpen(pdp1_state *state, bitmap_t *bitmap);
@@ -53,7 +53,7 @@ INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 */
 VIDEO_START( pdp1 )
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	state->typewriter_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
@@ -65,13 +65,13 @@ VIDEO_START( pdp1 )
 
 	bitmap_fill(state->typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
-	state->crt = machine->device("crt");
+	state->crt = machine.device("crt");
 }
 
 
 SCREEN_EOF( pdp1 )
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 
 	crt_eof(state->crt);
 }
@@ -79,9 +79,9 @@ SCREEN_EOF( pdp1 )
 /*
     schedule a pixel to be plotted
 */
-void pdp1_plot(running_machine *machine, int x, int y)
+void pdp1_plot(running_machine &machine, int x, int y)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/01777;
 	y = y*crt_window_height/01777;
@@ -94,12 +94,12 @@ void pdp1_plot(running_machine *machine, int x, int y)
 */
 SCREEN_UPDATE( pdp1 )
 {
-	pdp1_state *state = screen->machine->driver_data<pdp1_state>();
+	pdp1_state *state = screen->machine().driver_data<pdp1_state>();
 	pdp1_erase_lightpen(state, bitmap);
 	crt_update(state->crt, bitmap);
 	pdp1_draw_lightpen(state, bitmap);
 
-	pdp1_draw_panel(screen->machine, state->panel_bitmap);
+	pdp1_draw_panel(screen->machine(), state->panel_bitmap);
 	copybitmap(bitmap, state->panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
 	copybitmap(bitmap, state->typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
@@ -157,7 +157,7 @@ enum
 };
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
-static void pdp1_draw_led(running_machine *machine, bitmap_t *bitmap, int x, int y, int state)
+static void pdp1_draw_led(running_machine &machine, bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -167,7 +167,7 @@ static void pdp1_draw_led(running_machine *machine, bitmap_t *bitmap, int x, int
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
-static void pdp1_draw_multipleled(running_machine *machine, bitmap_t *bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleled(running_machine &machine, bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -181,7 +181,7 @@ static void pdp1_draw_multipleled(running_machine *machine, bitmap_t *bitmap, in
 
 
 /* draw a small 8*8 switch */
-static void pdp1_draw_switch(running_machine *machine, bitmap_t *bitmap, int x, int y, int state)
+static void pdp1_draw_switch(running_machine &machine, bitmap_t *bitmap, int x, int y, int state)
 {
 	int xx, yy;
 	int i;
@@ -222,7 +222,7 @@ static void pdp1_draw_switch(running_machine *machine, bitmap_t *bitmap, int x, 
 
 
 /* draw nb_bits switches which represent nb_bits bits in value */
-static void pdp1_draw_multipleswitch(running_machine *machine, bitmap_t *bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleswitch(running_machine &machine, bitmap_t *bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -236,14 +236,14 @@ static void pdp1_draw_multipleswitch(running_machine *machine, bitmap_t *bitmap,
 
 
 /* write a single char on screen */
-static void pdp1_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
+static void pdp1_draw_char(running_machine &machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx_transpen(bitmap, NULL, machine->gfx[0], character-32, color, 0, 0,
+	drawgfx_transpen(bitmap, NULL, machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
 /* write a string on screen */
-static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const char *buf, int x, int y, int color)
+static void pdp1_draw_string(running_machine &machine, bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -258,9 +258,9 @@ static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const c
 /*
     draw the operator control panel (fixed backdrop)
 */
-static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
+static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	/* fill with black */
 	bitmap_fill(state->panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
 
@@ -310,44 +310,44 @@ static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 /*
     draw the operator control panel (dynamic elements)
 */
-static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
+static void pdp1_draw_panel(running_machine &machine, bitmap_t *bitmap)
 {
 	/* column 1: registers, test word, test address */
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_pc_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_PC), 16);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_ma_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_MA), 16);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_mb_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_MB), 18);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_ac_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_AC), 18);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_io_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_IO), 18);
-	pdp1_draw_switch(machine, bitmap, x_panel_col1_offset, y_panel_ta_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_EXTEND_SW));
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+16, y_panel_ta_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_TA), 16);
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset, y_panel_tw_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_TW), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_pc_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_PC), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_ma_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_MA), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_mb_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_MB), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_ac_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_AC), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_io_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_IO), 18);
+	pdp1_draw_switch(machine, bitmap, x_panel_col1_offset, y_panel_ta_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_EXTEND_SW));
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+16, y_panel_ta_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_TA), 16);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset, y_panel_tw_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_TW), 18);
 
 	/* column 2: 1-bit indicators */
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, cpu_get_reg(machine->device("maincpu"), PDP1_RUN));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cyc_offset, cpu_get_reg(machine->device("maincpu"), PDP1_CYC));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_defer_offset, cpu_get_reg(machine->device("maincpu"), PDP1_DEFER));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, cpu_get_reg(machine.device("maincpu"), PDP1_RUN));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cyc_offset, cpu_get_reg(machine.device("maincpu"), PDP1_CYC));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_defer_offset, cpu_get_reg(machine.device("maincpu"), PDP1_DEFER));
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_hs_cyc_offset, 0);	/* not emulated */
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, cpu_get_reg(machine->device("maincpu"), PDP1_BRK_CTR) & 1);
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, cpu_get_reg(machine->device("maincpu"), PDP1_BRK_CTR) & 2);
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ov_offset, cpu_get_reg(machine->device("maincpu"), PDP1_OV));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, cpu_get_reg(machine->device("maincpu"), PDP1_RIM));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_sbm_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SBM));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_exd_offset, cpu_get_reg(machine->device("maincpu"), PDP1_EXD));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, cpu_get_reg(machine->device("maincpu"), PDP1_IOH));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioc_offset, cpu_get_reg(machine->device("maincpu"), PDP1_IOC));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, cpu_get_reg(machine->device("maincpu"), PDP1_IOS));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, cpu_get_reg(machine.device("maincpu"), PDP1_BRK_CTR) & 1);
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, cpu_get_reg(machine.device("maincpu"), PDP1_BRK_CTR) & 2);
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ov_offset, cpu_get_reg(machine.device("maincpu"), PDP1_OV));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, cpu_get_reg(machine.device("maincpu"), PDP1_RIM));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_sbm_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SBM));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_exd_offset, cpu_get_reg(machine.device("maincpu"), PDP1_EXD));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, cpu_get_reg(machine.device("maincpu"), PDP1_IOH));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioc_offset, cpu_get_reg(machine.device("maincpu"), PDP1_IOC));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, cpu_get_reg(machine.device("maincpu"), PDP1_IOS));
 
 	/* column 3: power, single step, single inst, sense, flags, instr... */
 	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_power_offset, 1);	/* always on */
 	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_power_offset, 1);	/* always on */
-	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SNGL_STEP));
-	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SNGL_STEP));
-	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SNGL_INST));
-	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, cpu_get_reg(machine->device("maincpu"), PDP1_SNGL_INST));
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_SS), 6);
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+16, cpu_get_reg(machine->device("maincpu"), PDP1_SS), 6);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_pf_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_PF), 6);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ir_offset+8, cpu_get_reg(machine->device("maincpu"), PDP1_IR), 5);
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_STEP));
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_STEP));
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_INST));
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_INST));
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_SS), 6);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+16, cpu_get_reg(machine.device("maincpu"), PDP1_SS), 6);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_pf_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_PF), 6);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ir_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_IR), 5);
 }
 
 
@@ -376,24 +376,24 @@ enum
 };
 
 
-static void pdp1_typewriter_linefeed(running_machine *machine)
+static void pdp1_typewriter_linefeed(running_machine &machine)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	UINT8 buf[typewriter_window_width];
 	int y;
 
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
 		extract_scanline8(state->typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(state->typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens);
+		draw_scanline8(state->typewriter_bitmap, 0, y, typewriter_window_width, buf, machine.pens);
 	}
 
 	bitmap_fill(state->typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
 }
 
-void pdp1_typewriter_drawchar(running_machine *machine, int character)
+void pdp1_typewriter_drawchar(running_machine &machine, int character)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	static const char ascii_table[2][64] =
 	{	/* n-s = non-spacing */
 		{	/* lower case */
@@ -504,9 +504,9 @@ void pdp1_typewriter_drawchar(running_machine *machine, int character)
     lightpen code
 */
 
-void pdp1_update_lightpen_state(running_machine *machine, const lightpen_t *new_state)
+void pdp1_update_lightpen_state(running_machine &machine, const lightpen_t *new_state)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	state->lightpen_state = *new_state;
 }
 

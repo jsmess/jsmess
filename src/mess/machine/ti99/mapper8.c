@@ -533,7 +533,7 @@ static DEVICE_START( mapper8 )
 	mapper8_state *mapper = get_safe_token(device);
 	mapper->sram = (UINT8*)malloc(SRAM_SIZE);
 	mapper->dram = (UINT8*)malloc(DRAM_SIZE);
-	mapper->rom = device->machine->region("maincpu")->base();
+	mapper->rom = device->machine().region("maincpu")->base();
 
 	memset(mapper->sram, 0x00, SRAM_SIZE);
 	memset(mapper->dram, 0x00, DRAM_SIZE);
@@ -574,7 +574,7 @@ static DEVICE_START( mapper8 )
 					dev = (void *)j;
 			}
 			if (dev==NULL)
-				dev = device->machine->device(cons[i].name);
+				dev = device->machine().device(cons[i].name);
 
 			if (dev!=NULL)
 			{

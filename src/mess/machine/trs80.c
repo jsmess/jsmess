@@ -47,7 +47,7 @@
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
+	trs80_state *state = machine.driver_data<trs80_state>();
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
     1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
@@ -88,7 +88,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 
 READ8_HANDLER( trs80m4_e0_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Indicates which devices are interrupting - d6..d3 not emulated.
     Whenever an interrupt occurs, this port is immediately read
     to find out which device requires service. Lowest-numbered
@@ -103,13 +103,13 @@ READ8_HANDLER( trs80m4_e0_r )
     d1 Cass 1500 baud Falling
     d0 Cass 1500 baud Rising */
 
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	return ~(state->mask & state->irq);
 }
 
 READ8_HANDLER( trs80m4_e4_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Indicates which devices are interrupting - d6..d5 not emulated.
     Whenever an NMI occurs, this port is immediately read
     to find out which device requires service. Lowest-numbered
@@ -120,7 +120,7 @@ READ8_HANDLER( trs80m4_e4_r )
     d6 status of Motor Timeout (0=true)
     d5 status of Reset signal (0=true - this will reboot the computer) */
 
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	return ~(state->nmi_mask & state->nmi_data);
 }
@@ -140,7 +140,7 @@ READ8_HANDLER( trs80m4_e8_r )
 
 READ8_HANDLER( trs80m4_ea_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* UART Status Register
     d7 Data Received ('1'=condition true)
     d6 Transmitter Holding Register empty ('1'=condition true)
@@ -163,7 +163,7 @@ READ8_HANDLER( trs80m4_ea_r )
 
 READ8_HANDLER( trs80m4_eb_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* UART received data */
 	UINT8 data = ay31015_get_received_data( state->ay31015 );
 	ay31015_set_input_pin( state->ay31015, AY31015_RDAV, 0 );
@@ -173,7 +173,7 @@ READ8_HANDLER( trs80m4_eb_r )
 
 READ8_HANDLER( trs80m4_ec_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Reset the RTC interrupt */
 	state->irq &= ~IRQ_M4_RTC;
 	return 0;
@@ -181,7 +181,7 @@ READ8_HANDLER( trs80m4_ec_r )
 
 READ8_HANDLER( sys80_f9_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* UART Status Register - d6..d4 not emulated
     d7 Transmit buffer empty (inverted)
     d6 CTS pin
@@ -206,13 +206,13 @@ READ8_HANDLER( sys80_f9_r )
 
 READ8_HANDLER( lnw80_fe_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	return ((state->mode & 0x78) >> 3) | 0xf0;
 }
 
 READ8_HANDLER( trs80_ff_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* ModeSel and cassette data
     d7 cassette data from tape
     d2 modesel setting */
@@ -223,7 +223,7 @@ READ8_HANDLER( trs80_ff_r )
 
 READ8_HANDLER( trs80m4_ff_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Return of cassette data stream from tape
     d7 Low-speed data
     d6..d1 info from write of port EC
@@ -237,7 +237,7 @@ READ8_HANDLER( trs80m4_ff_r )
 
 WRITE8_HANDLER( trs80m4_84_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Hi-res graphics control - d6..d4 not emulated
     d7 Page Control
     d6 Fix upper memory
@@ -249,8 +249,8 @@ WRITE8_HANDLER( trs80m4_84_w )
     d0 Select bit 0 */
 
 	/* get address space instead of io space */
-	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *base = space->machine->region("maincpu")->base();
+	address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *base = space->machine().region("maincpu")->base();
 
 	state->mode = (state->mode & 0x73) | (data & 0x8c);
 
@@ -264,30 +264,30 @@ WRITE8_HANDLER( trs80m4_84_w )
 			if (state->model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
 			{
 				if (state->model4 & 8)
-					memory_set_bankptr(space->machine, "bank1", base);
+					memory_set_bankptr(space->machine(), "bank1", base);
 				else
-					memory_set_bankptr(space->machine, "bank1", base + 0x10000);
+					memory_set_bankptr(space->machine(), "bank1", base + 0x10000);
 
-				memory_set_bankptr(space->machine, "bank2", base + 0x11000);
-				memory_set_bankptr(space->machine, "bank4", base + 0x137ea);
+				memory_set_bankptr(space->machine(), "bank2", base + 0x11000);
+				memory_set_bankptr(space->machine(), "bank4", base + 0x137ea);
 			}
 			else
 			{
-				memory_set_bankptr(space->machine, "bank1", base);
-				memory_set_bankptr(space->machine, "bank2", base + 0x01000);
-				memory_set_bankptr(space->machine, "bank4", base + 0x037ea);
+				memory_set_bankptr(space->machine(), "bank1", base);
+				memory_set_bankptr(space->machine(), "bank2", base + 0x01000);
+				memory_set_bankptr(space->machine(), "bank4", base + 0x037ea);
 			}
 
-			memory_set_bankptr(space->machine, "bank7", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank8", base + 0x1f400);
-			memory_set_bankptr(space->machine, "bank9", base + 0x1f800);
-			memory_set_bankptr(space->machine, "bank11", base + 0x05000);
-			memory_set_bankptr(space->machine, "bank12", base + 0x06000);
-			memory_set_bankptr(space->machine, "bank14", base + 0x09000);
-			memory_set_bankptr(space->machine, "bank15", base + 0x0a000);
-			memory_set_bankptr(space->machine, "bank17", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank18", base + 0x1f400);
-			memory_set_bankptr(space->machine, "bank19", base + 0x1f800);
+			memory_set_bankptr(space->machine(), "bank7", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank8", base + 0x1f400);
+			memory_set_bankptr(space->machine(), "bank9", base + 0x1f800);
+			memory_set_bankptr(space->machine(), "bank11", base + 0x05000);
+			memory_set_bankptr(space->machine(), "bank12", base + 0x06000);
+			memory_set_bankptr(space->machine(), "bank14", base + 0x09000);
+			memory_set_bankptr(space->machine(), "bank15", base + 0x0a000);
+			memory_set_bankptr(space->machine(), "bank17", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank18", base + 0x1f400);
+			memory_set_bankptr(space->machine(), "bank19", base + 0x1f800);
 			mem->install_legacy_readwrite_handler (0x37e8, 0x37e9, FUNC(trs80_printer_r), FUNC(trs80_printer_w));	/* 3 & 13 */
 			mem->install_legacy_read_handler (0x3800, 0x3bff, FUNC(trs80_keyboard_r));	/* 5 */
 			mem->install_legacy_readwrite_handler (0x3c00, 0x3fff, FUNC(trs80_videoram_r), FUNC(trs80_videoram_w));	/* 6 & 16 */
@@ -298,90 +298,90 @@ WRITE8_HANDLER( trs80m4_84_w )
 			if (state->model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
 			{
 				if (state->model4 & 8)
-					memory_set_bankptr(space->machine, "bank1", base);
+					memory_set_bankptr(space->machine(), "bank1", base);
 				else
-					memory_set_bankptr(space->machine, "bank1", base + 0x10000);
+					memory_set_bankptr(space->machine(), "bank1", base + 0x10000);
 
-				memory_set_bankptr(space->machine, "bank2", base + 0x11000);
-				memory_set_bankptr(space->machine, "bank3", base + 0x137e8);
-				memory_set_bankptr(space->machine, "bank4", base + 0x137ea);
+				memory_set_bankptr(space->machine(), "bank2", base + 0x11000);
+				memory_set_bankptr(space->machine(), "bank3", base + 0x137e8);
+				memory_set_bankptr(space->machine(), "bank4", base + 0x137ea);
 			}
 			else
 			{
-				memory_set_bankptr(space->machine, "bank1", base);
-				memory_set_bankptr(space->machine, "bank2", base + 0x01000);
-				memory_set_bankptr(space->machine, "bank3", base + 0x037e8);
-				memory_set_bankptr(space->machine, "bank4", base + 0x037ea);
+				memory_set_bankptr(space->machine(), "bank1", base);
+				memory_set_bankptr(space->machine(), "bank2", base + 0x01000);
+				memory_set_bankptr(space->machine(), "bank3", base + 0x037e8);
+				memory_set_bankptr(space->machine(), "bank4", base + 0x037ea);
 			}
 
-			memory_set_bankptr(space->machine, "bank7", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank8", base + 0x1f400);
-			memory_set_bankptr(space->machine, "bank9", base + 0x1f800);
-			memory_set_bankptr(space->machine, "bank11", base + 0x10000);
-			memory_set_bankptr(space->machine, "bank12", base + 0x11000);
-			memory_set_bankptr(space->machine, "bank13", base + 0x137e8);
-			memory_set_bankptr(space->machine, "bank14", base + 0x137ea);
-			memory_set_bankptr(space->machine, "bank15", base + 0x0a000);
-			memory_set_bankptr(space->machine, "bank17", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank18", base + 0x1f400);
-			memory_set_bankptr(space->machine, "bank19", base + 0x1f800);
+			memory_set_bankptr(space->machine(), "bank7", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank8", base + 0x1f400);
+			memory_set_bankptr(space->machine(), "bank9", base + 0x1f800);
+			memory_set_bankptr(space->machine(), "bank11", base + 0x10000);
+			memory_set_bankptr(space->machine(), "bank12", base + 0x11000);
+			memory_set_bankptr(space->machine(), "bank13", base + 0x137e8);
+			memory_set_bankptr(space->machine(), "bank14", base + 0x137ea);
+			memory_set_bankptr(space->machine(), "bank15", base + 0x0a000);
+			memory_set_bankptr(space->machine(), "bank17", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank18", base + 0x1f400);
+			memory_set_bankptr(space->machine(), "bank19", base + 0x1f800);
 			mem->install_legacy_read_handler (0x3800, 0x3bff, FUNC(trs80_keyboard_r));	/* 5 */
 			mem->install_legacy_readwrite_handler (0x3c00, 0x3fff, FUNC(trs80_videoram_r), FUNC(trs80_videoram_w));	/* 6 & 16 */
 			break;
 
 		case 2:	/* keyboard and video are moved to high memory, and the rest is ram */
-			memory_set_bankptr(space->machine, "bank1", base + 0x10000);
-			memory_set_bankptr(space->machine, "bank2", base + 0x11000);
-			memory_set_bankptr(space->machine, "bank3", base + 0x137e8);
-			memory_set_bankptr(space->machine, "bank4", base + 0x137ea);
-			memory_set_bankptr(space->machine, "bank5", base + 0x13800);
-			memory_set_bankptr(space->machine, "bank6", base + 0x13c00);
-			memory_set_bankptr(space->machine, "bank7", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank11", base + 0x10000);
-			memory_set_bankptr(space->machine, "bank12", base + 0x11000);
-			memory_set_bankptr(space->machine, "bank13", base + 0x137e8);
-			memory_set_bankptr(space->machine, "bank14", base + 0x137ea);
-			memory_set_bankptr(space->machine, "bank15", base + 0x13800);
-			memory_set_bankptr(space->machine, "bank16", base + 0x13c00);
-			memory_set_bankptr(space->machine, "bank17", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank18", base + 0x0a000);
+			memory_set_bankptr(space->machine(), "bank1", base + 0x10000);
+			memory_set_bankptr(space->machine(), "bank2", base + 0x11000);
+			memory_set_bankptr(space->machine(), "bank3", base + 0x137e8);
+			memory_set_bankptr(space->machine(), "bank4", base + 0x137ea);
+			memory_set_bankptr(space->machine(), "bank5", base + 0x13800);
+			memory_set_bankptr(space->machine(), "bank6", base + 0x13c00);
+			memory_set_bankptr(space->machine(), "bank7", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank11", base + 0x10000);
+			memory_set_bankptr(space->machine(), "bank12", base + 0x11000);
+			memory_set_bankptr(space->machine(), "bank13", base + 0x137e8);
+			memory_set_bankptr(space->machine(), "bank14", base + 0x137ea);
+			memory_set_bankptr(space->machine(), "bank15", base + 0x13800);
+			memory_set_bankptr(space->machine(), "bank16", base + 0x13c00);
+			memory_set_bankptr(space->machine(), "bank17", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank18", base + 0x0a000);
 			mem->install_legacy_read_handler (0xf400, 0xf7ff, FUNC(trs80_keyboard_r));	/* 8 */
 			mem->install_legacy_readwrite_handler (0xf800, 0xffff, FUNC(trs80_videoram_r), FUNC(trs80_videoram_w));	/* 9 & 19 */
 			state->model4++;
 			break;
 
 		case 3:	/* 64k of ram */
-			memory_set_bankptr(space->machine, "bank1", base + 0x10000);
-			memory_set_bankptr(space->machine, "bank2", base + 0x11000);
-			memory_set_bankptr(space->machine, "bank3", base + 0x137e8);
-			memory_set_bankptr(space->machine, "bank4", base + 0x137ea);
-			memory_set_bankptr(space->machine, "bank5", base + 0x13800);
-			memory_set_bankptr(space->machine, "bank6", base + 0x13c00);
-			memory_set_bankptr(space->machine, "bank7", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank8", base + 0x1f400);
-			memory_set_bankptr(space->machine, "bank9", base + 0x1f800);
-			memory_set_bankptr(space->machine, "bank11", base + 0x10000);
-			memory_set_bankptr(space->machine, "bank12", base + 0x11000);
-			memory_set_bankptr(space->machine, "bank13", base + 0x137e8);
-			memory_set_bankptr(space->machine, "bank14", base + 0x137ea);
-			memory_set_bankptr(space->machine, "bank15", base + 0x13800);
-			memory_set_bankptr(space->machine, "bank16", base + 0x13c00);
-			memory_set_bankptr(space->machine, "bank17", base + 0x14000);
-			memory_set_bankptr(space->machine, "bank18", base + 0x1f400);
-			memory_set_bankptr(space->machine, "bank19", base + 0x1f800);
+			memory_set_bankptr(space->machine(), "bank1", base + 0x10000);
+			memory_set_bankptr(space->machine(), "bank2", base + 0x11000);
+			memory_set_bankptr(space->machine(), "bank3", base + 0x137e8);
+			memory_set_bankptr(space->machine(), "bank4", base + 0x137ea);
+			memory_set_bankptr(space->machine(), "bank5", base + 0x13800);
+			memory_set_bankptr(space->machine(), "bank6", base + 0x13c00);
+			memory_set_bankptr(space->machine(), "bank7", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank8", base + 0x1f400);
+			memory_set_bankptr(space->machine(), "bank9", base + 0x1f800);
+			memory_set_bankptr(space->machine(), "bank11", base + 0x10000);
+			memory_set_bankptr(space->machine(), "bank12", base + 0x11000);
+			memory_set_bankptr(space->machine(), "bank13", base + 0x137e8);
+			memory_set_bankptr(space->machine(), "bank14", base + 0x137ea);
+			memory_set_bankptr(space->machine(), "bank15", base + 0x13800);
+			memory_set_bankptr(space->machine(), "bank16", base + 0x13c00);
+			memory_set_bankptr(space->machine(), "bank17", base + 0x14000);
+			memory_set_bankptr(space->machine(), "bank18", base + 0x1f400);
+			memory_set_bankptr(space->machine(), "bank19", base + 0x1f800);
 			break;
 	}
 }
 
 WRITE8_HANDLER( trs80m4_90_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	speaker_level_w(state->speaker, ~data & 1);
 }
 
 WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only RAM */
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	/* Meaning of model4 variable:
         d5..d4 memory mode (as described in section above)
         d3 rom switch (1=enabled) only effective in mode0 and 1
@@ -390,7 +390,7 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
         d0 Video banking exists yes/no (1=not banked) */
 
 	/* get address space instead of io space */
-	//address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	//address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->model4 &= 0xf7;
 	state->model4 |= (data << 3);
@@ -400,10 +400,10 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
 		switch (state->model4 & 8)
 		{
 			case 0:		/* Read-only RAM replaces rom */
-				memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base() + 0x10000);
+				memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000);
 				break;
 			case 8:		/* Normal setup - rom enabled */
-				memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
+				memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base());
 				break;
 		}
 	}
@@ -411,7 +411,7 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
 
 WRITE8_HANDLER( trs80m4_e0_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Interrupt settings - which devices are allowed to interrupt - bits align with read of E0
     d6 Enable Rec Err
     d5 Enable Rec Data
@@ -426,7 +426,7 @@ WRITE8_HANDLER( trs80m4_e0_w )
 
 WRITE8_HANDLER( trs80m4_e4_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Disk to NMI interface
     d7 1=enable disk INTRQ to generate NMI
     d6 1=enable disk Motor Timeout to generate NMI */
@@ -436,7 +436,7 @@ WRITE8_HANDLER( trs80m4_e4_w )
 
 WRITE8_HANDLER( trs80m4_e8_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* d1 when '1' enables control register load (see below) */
 
 	state->reg_load = data & 2;
@@ -444,7 +444,7 @@ WRITE8_HANDLER( trs80m4_e8_w )
 
 WRITE8_HANDLER( trs80m4_e9_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* UART set baud rate. Rx = bits 0..3, Tx = bits 4..7
     00h    50
     11h    75
@@ -470,7 +470,7 @@ WRITE8_HANDLER( trs80m4_e9_w )
 
 WRITE8_HANDLER( trs80m4_ea_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	if (state->reg_load)
 
 /* d2..d0 not emulated
@@ -511,13 +511,13 @@ WRITE8_HANDLER( trs80m4_ea_w )
 
 WRITE8_HANDLER( trs80m4_eb_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	ay31015_set_transmit_data( state->ay31015, data );
 }
 
 WRITE8_HANDLER( trs80m4_ec_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Hardware settings - d5..d4 not emulated
     d6 CPU fast (1=4MHz, 0=2MHz)
     d5 1=Enable Video Wait
@@ -526,7 +526,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
     d2 Mode Select (0=64 chars, 1=32chars)
     d1 Cassette Motor (1=On) */
 
-	space->machine->device("maincpu")->set_unscaled_clock(data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
+	space->machine().device("maincpu")->set_unscaled_clock(data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
 	state->mode = (state->mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
 
@@ -537,7 +537,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
 
 WRITE8_HANDLER( trs80m4_f4_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Selection of drive and parameters - d6..d5 not emulated.
  A write also causes the selected drive motor to turn on for about 3 seconds.
  When the motor turns off, the drive is deselected.
@@ -575,10 +575,10 @@ WRITE8_HANDLER( trs80m4_f4_w )
 	wd17xx_dden_w(state->fdc, !BIT(data, 7));
 
 	/* CLEAR_LINE means to turn motors on */
-	floppy_mon_w(floppy_get_device(space->machine, 0), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 1), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 2), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 3), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 0), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 1), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 2), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 3), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_HANDLER( sys80_f8_w )
@@ -591,7 +591,7 @@ WRITE8_HANDLER( sys80_f8_w )
 
 WRITE8_HANDLER( sys80_fe_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* not emulated
     d4 select internal or external cassette player */
 
@@ -601,7 +601,7 @@ WRITE8_HANDLER( sys80_fe_w )
 /* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
 WRITE8_HANDLER( lnw80_fe_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* lnw80 video options
     d3 bankswitch lower 16k between roms and hires ram (1=hires)
     d2 enable colour    \
@@ -609,7 +609,7 @@ WRITE8_HANDLER( lnw80_fe_w )
     d0 inverse video (entire screen) */
 
 	/* get address space instead of io space */
-	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->mode = (state->mode & 0x87) | ((data & 0x0f) << 3);
 
@@ -622,7 +622,7 @@ WRITE8_HANDLER( lnw80_fe_w )
 	{
 		mem->unmap_readwrite (0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x2fff, "bank1");
-		memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
+		memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base());
 		mem->install_legacy_readwrite_handler (0x37e0, 0x37e3, FUNC(trs80_irq_status_r), FUNC(trs80_motor_w));
 		mem->install_legacy_readwrite_handler (0x37e8, 0x37eb, FUNC(trs80_printer_r), FUNC(trs80_printer_w));
 		mem->install_legacy_readwrite_handler (*state->fdc, 0x37ec, 0x37ec, FUNC(trs80_wd179x_r), FUNC(wd17xx_command_w));
@@ -636,7 +636,7 @@ WRITE8_HANDLER( lnw80_fe_w )
 
 WRITE8_HANDLER( trs80_ff_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Standard output port of Model I
     d3 ModeSel bit
     d2 Relay
@@ -657,7 +657,7 @@ WRITE8_HANDLER( trs80_ff_w )
 
 WRITE8_HANDLER( trs80m4_ff_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Cassette port
     d1, d0 Cassette output */
 
@@ -675,7 +675,7 @@ WRITE8_HANDLER( trs80m4_ff_w )
 
 INTERRUPT_GEN( trs80_rtc_interrupt )
 {
-	trs80_state *state = device->machine->driver_data<trs80_state>();
+	trs80_state *state = device->machine().driver_data<trs80_state>();
 /* This enables the processing of interrupts for the clock and the flashing cursor.
     The OS counts one tick for each interrupt. The Model I has 40 ticks per
     second, while the Model III/4 has 30. */
@@ -695,9 +695,9 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 	}
 }
 
-static void trs80_fdc_interrupt_internal(running_machine *machine)
+static void trs80_fdc_interrupt_internal(running_machine &machine)
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
+	trs80_state *state = machine.driver_data<trs80_state>();
 	if (state->model4)
 	{
 		if (state->nmi_mask & 0x80)	// Model 4 does a NMI
@@ -715,15 +715,15 @@ static void trs80_fdc_interrupt_internal(running_machine *machine)
 
 INTERRUPT_GEN( trs80_fdc_interrupt )	/* not used - should it be? */
 {
-	trs80_fdc_interrupt_internal(device->machine);
+	trs80_fdc_interrupt_internal(device->machine());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( trs80_fdc_intrq_w )
 {
-	trs80_state *drvstate = device->machine->driver_data<trs80_state>();
+	trs80_state *drvstate = device->machine().driver_data<trs80_state>();
 	if (state)
 	{
-		trs80_fdc_interrupt_internal(device->machine);
+		trs80_fdc_interrupt_internal(device->machine());
 	}
 	else
 	{
@@ -751,7 +751,7 @@ const wd17xx_interface trs80_wd17xx_interface =
 
 READ8_DEVICE_HANDLER (trs80_wd179x_r)
 {
-	if (input_port_read(device->machine, "CONFIG") & 0x80)
+	if (input_port_read(device->machine(), "CONFIG") & 0x80)
 		return wd17xx_status_r(device, offset);
 	else
 		return 0xff;
@@ -759,7 +759,7 @@ READ8_DEVICE_HANDLER (trs80_wd179x_r)
 
 READ8_HANDLER ( trs80_printer_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	/* Bit 7 - 1 = Busy; 0 = Not Busy
        Bit 6 - 1 = Out of Paper; 0 = Paper
        Bit 5 - 1 = Printer selected; 0 = Printer not selected
@@ -777,7 +777,7 @@ READ8_HANDLER ( trs80_printer_r )
 
 WRITE8_HANDLER( trs80_printer_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	centronics_strobe_w(state->printer, 1);
 	centronics_data_w(state->printer, 0, data);
 	centronics_strobe_w(state->printer, 0);
@@ -785,7 +785,7 @@ WRITE8_HANDLER( trs80_printer_w )
 
 WRITE8_HANDLER( trs80_cassunit_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* not emulated
     01 for unit 1 (default
     02 for unit 2 */
@@ -795,7 +795,7 @@ WRITE8_HANDLER( trs80_cassunit_w )
 
 READ8_HANDLER( trs80_irq_status_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* (trs80l2) Whenever an interrupt occurs, 37E0 is read to see what devices require service.
     d7 = RTC
     d6 = FDC
@@ -804,7 +804,7 @@ READ8_HANDLER( trs80_irq_status_r )
     which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
 	int result = state->irq;
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	state->irq = 0;
 	return result;
 }
@@ -812,7 +812,7 @@ READ8_HANDLER( trs80_irq_status_r )
 
 WRITE8_HANDLER( trs80_motor_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	UINT8 drive = 255;
 
 	LOG(("trs80 motor_w $%02X\n", data));
@@ -853,10 +853,10 @@ WRITE8_HANDLER( trs80_motor_w )
 
 	if (drive > 3)
 	{	/* Turn motors off */
-		floppy_mon_w(floppy_get_device(space->machine, 0), ASSERT_LINE);
-		floppy_mon_w(floppy_get_device(space->machine, 1), ASSERT_LINE);
-		floppy_mon_w(floppy_get_device(space->machine, 2), ASSERT_LINE);
-		floppy_mon_w(floppy_get_device(space->machine, 3), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine(), 0), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine(), 1), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine(), 2), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine(), 3), ASSERT_LINE);
 		return;
 	}
 
@@ -864,10 +864,10 @@ WRITE8_HANDLER( trs80_motor_w )
 	wd17xx_set_side(state->fdc,state->head);
 
 	/* Turn motors on */
-	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 1), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 2), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 3), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 1), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 2), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 3), CLEAR_LINE);
 }
 
 /*************************************
@@ -878,21 +878,21 @@ READ8_HANDLER( trs80_keyboard_r )
 	UINT8 result = 0;
 
 	if (offset & 1)
-		result |= input_port_read(space->machine, "LINE0");
+		result |= input_port_read(space->machine(), "LINE0");
 	if (offset & 2)
-		result |= input_port_read(space->machine, "LINE1");
+		result |= input_port_read(space->machine(), "LINE1");
 	if (offset & 4)
-		result |= input_port_read(space->machine, "LINE2");
+		result |= input_port_read(space->machine(), "LINE2");
 	if (offset & 8)
-		result |= input_port_read(space->machine, "LINE3");
+		result |= input_port_read(space->machine(), "LINE3");
 	if (offset & 16)
-		result |= input_port_read(space->machine, "LINE4");
+		result |= input_port_read(space->machine(), "LINE4");
 	if (offset & 32)
-		result |= input_port_read(space->machine, "LINE5");
+		result |= input_port_read(space->machine(), "LINE5");
 	if (offset & 64)
-		result |= input_port_read(space->machine, "LINE6");
+		result |= input_port_read(space->machine(), "LINE6");
 	if (offset & 128)
-		result |= input_port_read(space->machine, "LINE7");
+		result |= input_port_read(space->machine(), "LINE7");
 
 	return result;
 }
@@ -904,30 +904,30 @@ READ8_HANDLER( trs80_keyboard_r )
 
 MACHINE_START( trs80 )
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
+	trs80_state *state = machine.driver_data<trs80_state>();
 	state->tape_unit=1;
 	state->reg_load=1;
 	state->nmi_data=0xff;
 
-	state->cassette_data_timer = machine->scheduler().timer_alloc(FUNC(cassette_data_callback));
+	state->cassette_data_timer = machine.scheduler().timer_alloc(FUNC(cassette_data_callback));
 	state->cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
-	state->printer = machine->device("centronics");
-	state->ay31015 = machine->device("tr1602");
-	state->cass = machine->device("cassette");
-	state->speaker = machine->device("speaker");
-	state->fdc = machine->device("wd179x");
+	state->printer = machine.device("centronics");
+	state->ay31015 = machine.device("tr1602");
+	state->cass = machine.device("cassette");
+	state->speaker = machine.device("speaker");
+	state->fdc = machine.device("wd179x");
 }
 
 MACHINE_RESET( trs80 )
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
+	trs80_state *state = machine.driver_data<trs80_state>();
 	state->cassette_data = 0;
 }
 
 MACHINE_RESET( trs80m4 )
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
-	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	trs80_state *state = machine.driver_data<trs80_state>();
+	address_space *mem = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->cassette_data = 0;
 
 	mem->install_read_bank (0x0000, 0x0fff, "bank1");
@@ -955,8 +955,8 @@ MACHINE_RESET( trs80m4 )
 
 MACHINE_RESET( lnw80 )
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	trs80_state *state = machine.driver_data<trs80_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->cassette_data = 0;
 	state->reg_load = 1;
 	lnw80_fe_w(space, 0, 0);

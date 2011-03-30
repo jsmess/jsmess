@@ -103,10 +103,10 @@ static MACHINE_RESET( ti990_10 )
 
 static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
-	ti990_10_state *state = device->machine->driver_data<ti990_10_state>();
+	ti990_10_state *state = device->machine().driver_data<ti990_10_state>();
 	vdt911_keyboard(state->terminal);
 
-	ti990_line_interrupt(device->machine);
+	ti990_line_interrupt(device->machine());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -125,7 +125,7 @@ static void rset_callback(device_t *device)
 static void lrex_callback(device_t *device)
 {
 	/* right??? */
-	ti990_hold_load(device->machine);
+	ti990_hold_load(device->machine());
 }
 
 /*
@@ -146,13 +146,13 @@ static const vdt911_init_params_t vdt911_intf =
 
 static VIDEO_START( ti990_10 )
 {
-	ti990_10_state *state = machine->driver_data<ti990_10_state>();
-	state->terminal = machine->device("vdt911");
+	ti990_10_state *state = machine.driver_data<ti990_10_state>();
+	state->terminal = machine.device("vdt911");
 }
 
 static SCREEN_UPDATE( ti990_10 )
 {
-	ti990_10_state *state = screen->machine->driver_data<ti990_10_state>();
+	ti990_10_state *state = screen->machine().driver_data<ti990_10_state>();
 	vdt911_refresh(state->terminal, bitmap, 0, 0);
 	return 0;
 }
@@ -295,7 +295,7 @@ static DRIVER_INIT( ti990_10 )
 	/* load specific ti990/12 rom page */
 	const int page = 3;
 
-	memmove(machine->region("maincpu")->base()+0x1FFC00, machine->region("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
+	memmove(machine.region("maincpu")->base()+0x1FFC00, machine.region("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
 #endif
 	vdt911_init(machine);
 }

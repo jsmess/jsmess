@@ -322,14 +322,14 @@ static const UINT8 abc80_keycodes[7*4][8] =
 
 static TIMER_CALLBACK( keyboard_data_clear )
 {
-	abc80_state *state = machine->driver_data<abc80_state>();
+	abc80_state *state = machine.driver_data<abc80_state>();
 
 	state->m_key_data = 0;
 }
 
-static void abc80_keyboard_scan(running_machine *machine)
+static void abc80_keyboard_scan(running_machine &machine)
 {
-	abc80_state *state = machine->driver_data<abc80_state>();
+	abc80_state *state = machine.driver_data<abc80_state>();
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
 	int table = 0, row, col;
@@ -380,13 +380,13 @@ static void abc80_keyboard_scan(running_machine *machine)
 	if (!state->m_key_strobe && state->m_key_data)
 	{
 		z80pio_pa_w(state->m_pio, 0, state->m_key_data);
-		machine->scheduler().timer_set(attotime::from_msec(50), FUNC(keyboard_data_clear));
+		machine.scheduler().timer_set(attotime::from_msec(50), FUNC(keyboard_data_clear));
 	}
 }
 
 static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 {
-	abc80_keyboard_scan(timer.machine);
+	abc80_keyboard_scan(timer.machine());
 }
 
 
@@ -505,7 +505,7 @@ static const sn76477_interface csg_intf =
 
 static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
-	abc80_state *state = timer.machine->driver_data<abc80_state>();
+	abc80_state *state = timer.machine().driver_data<abc80_state>();
 
 	/* toggle ASTB every other video line */
 	state->m_pio_astb = !state->m_pio_astb;
@@ -681,9 +681,9 @@ void abc80_state::machine_start()
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, m_key_data);
-	state_save_register_global(machine, m_key_strobe);
-	state_save_register_global(machine, m_pio_astb);
+	state_save_register_global(m_machine, m_key_data);
+	state_save_register_global(m_machine, m_key_strobe);
+	state_save_register_global(m_machine, m_pio_astb);
 }
 
 

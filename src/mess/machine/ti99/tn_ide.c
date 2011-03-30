@@ -352,7 +352,7 @@ static DEVICE_START( tn_ide )
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 
-	card->ram = auto_alloc_array(device->machine, UINT8, 0x080000);
+	card->ram = auto_alloc_array(device->machine(), UINT8, 0x080000);
 	card->sram_enable_dip = 0;
 }
 
@@ -365,7 +365,7 @@ static DEVICE_RESET( tn_ide )
 	tn_ide_state *card = get_safe_token(device);
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "HDCTRL") & HD_IDE)
+	if (input_port_read(device->machine(), "HDCTRL") & HD_IDE)
 	{
 		int success = mount_card(peb, device, &tn_ide_card, get_pebcard_config(device)->slot);
 		if (!success) return;
@@ -377,7 +377,7 @@ static DEVICE_RESET( tn_ide )
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			card->select_mask = 0x1fe000;

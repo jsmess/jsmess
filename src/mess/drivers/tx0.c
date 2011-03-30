@@ -70,7 +70,7 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up our font */
-	dst = machine->region("gfx1")->base();
+	dst = machine.region("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
@@ -244,7 +244,7 @@ static PALETTE_INIT( tx0 )
 #endif
 	UINT8 i, r, g, b;
 
-	machine->colortable = colortable_alloc(machine, total_colors_needed);
+	machine.colortable = colortable_alloc(machine, total_colors_needed);
 
 	/* initialize CRT palette */
 
@@ -261,7 +261,7 @@ static PALETTE_INIT( tx0 )
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
@@ -281,22 +281,22 @@ static PALETTE_INIT( tx0 )
         mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
 #endif
 #endif
-	colortable_palette_set_color(machine->colortable, 0, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine.colortable, 0, MAKE_RGB(0, 0, 0));
 
 	/* load static palette */
 	for ( i = 0; i < 6; i++ )
 	{
 		r = tx0_colors[i*3]; g = tx0_colors[i*3+1]; b = tx0_colors[i*3+2];
-		colortable_palette_set_color(machine->colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
 	}
 
 	/* copy colortable to palette */
 	for( i = 0; i < total_colors_needed; i++ )
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		colortable_entry_set_value(machine->colortable, total_colors_needed + i, tx0_palette[i]);
+		colortable_entry_set_value(machine.colortable, total_colors_needed + i, tx0_palette[i]);
 }
 
 static void tx0_io_cpy(device_t *device);
@@ -367,7 +367,7 @@ enum
 
 static MACHINE_RESET( tx0 )
 {
-	tx0_state *state = machine->driver_data<tx0_state>();
+	tx0_state *state = machine.driver_data<tx0_state>();
 	/* reset device state */
 	state->tape_reader.rcl = state->tape_reader.rc = 0;
 }
@@ -384,13 +384,13 @@ static void tx0_machine_stop(running_machine &machine)
 
 static MACHINE_START( tx0 )
 {
-	tx0_state *state = machine->driver_data<tx0_state>();
-	state->tape_reader.timer = machine->scheduler().timer_alloc(FUNC(reader_callback));
-	state->tape_puncher.timer = machine->scheduler().timer_alloc(FUNC(puncher_callback));
-	state->typewriter.prt_timer = machine->scheduler().timer_alloc(FUNC(prt_callback));
-	state->dis_timer = machine->scheduler().timer_alloc(FUNC(dis_callback));
+	tx0_state *state = machine.driver_data<tx0_state>();
+	state->tape_reader.timer = machine.scheduler().timer_alloc(FUNC(reader_callback));
+	state->tape_puncher.timer = machine.scheduler().timer_alloc(FUNC(puncher_callback));
+	state->typewriter.prt_timer = machine.scheduler().timer_alloc(FUNC(prt_callback));
+	state->dis_timer = machine.scheduler().timer_alloc(FUNC(dis_callback));
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, tx0_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, tx0_machine_stop);
 }
 
 
@@ -410,7 +410,7 @@ static DEVICE_START( tx0_typewriter ) {}
 */
 static DEVICE_IMAGE_LOAD( tx0_readtape )
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 
 	/* reader unit */
 	state->tape_reader.fd = &image;
@@ -441,7 +441,7 @@ static DEVICE_IMAGE_LOAD( tx0_readtape )
 
 static DEVICE_IMAGE_UNLOAD( tx0_readtape )
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 
 	/* reader unit */
 	state->tape_reader.fd = NULL;
@@ -499,7 +499,7 @@ static void begin_tape_read(tx0_state *state, int binary)
 */
 static TIMER_CALLBACK(reader_callback)
 {
-	tx0_state *state = machine->driver_data<tx0_state>();
+	tx0_state *state = machine.driver_data<tx0_state>();
 	int not_ready;
 	UINT8 data;
 	int ac;
@@ -516,20 +516,20 @@ static TIMER_CALLBACK(reader_callback)
 			if (data & 0100)
 			{
 				/* read current AC */
-				ac = cpu_get_reg(machine->device("maincpu"), TX0_AC);
+				ac = cpu_get_reg(machine.device("maincpu"), TX0_AC);
 				/* cycle right */
 				ac = (ac >> 1) | ((ac & 1) << 17);
 				/* shuffle and insert data into AC */
 				ac = (ac /*& 0333333*/) | ((data & 001) << 17) | ((data & 002) << 13) | ((data & 004) << 9) | ((data & 010) << 5) | ((data & 020) << 1) | ((data & 040) >> 3);
 				/* write modified AC */
-				cpu_set_reg(machine->device("maincpu"), TX0_AC, ac);
+				cpu_set_reg(machine.device("maincpu"), TX0_AC, ac);
 
 				state->tape_reader.rc = (state->tape_reader.rc+1) & 3;
 
 				if (state->tape_reader.rc == 0)
 				{	/* IO complete */
 					state->tape_reader.rcl = 0;
-					cpu_set_reg(machine->device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
+					cpu_set_reg(machine.device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 				}
 			}
 		}
@@ -547,7 +547,7 @@ static TIMER_CALLBACK(reader_callback)
 */
 static DEVICE_IMAGE_LOAD( tx0_punchtape )
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 
 	/* punch unit */
 	state->tape_puncher.fd = &image;
@@ -557,7 +557,7 @@ static DEVICE_IMAGE_LOAD( tx0_punchtape )
 
 static DEVICE_IMAGE_UNLOAD( tx0_punchtape )
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 
 	/* punch unit */
 	state->tape_puncher.fd = NULL;
@@ -565,7 +565,7 @@ static DEVICE_IMAGE_UNLOAD( tx0_punchtape )
 
 static TIMER_CALLBACK(puncher_callback)
 {
-	cpu_set_reg(machine->device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
+	cpu_set_reg(machine.device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -573,7 +573,7 @@ static TIMER_CALLBACK(puncher_callback)
 */
 static void tx0_io_r1l(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	begin_tape_read(state, 0);
 }
 
@@ -582,7 +582,7 @@ static void tx0_io_r1l(device_t *device)
 */
 static void tx0_io_r3l(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	begin_tape_read(state, 1);
 }
 
@@ -591,7 +591,7 @@ static void tx0_io_r3l(device_t *device)
 */
 static void tx0_io_p6h(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	int ac;
 
 	/* read current AC */
@@ -607,7 +607,7 @@ static void tx0_io_p6h(device_t *device)
 */
 static void tx0_io_p7h(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	int ac;
 
 	/* read current AC */
@@ -631,7 +631,7 @@ static void tx0_io_p7h(device_t *device)
 */
 static DEVICE_IMAGE_LOAD(tx0_typewriter)
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 	/* open file */
 	state->typewriter.fd = &image;
 
@@ -640,16 +640,16 @@ static DEVICE_IMAGE_LOAD(tx0_typewriter)
 
 static DEVICE_IMAGE_UNLOAD(tx0_typewriter)
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 	state->typewriter.fd = NULL;
 }
 
 /*
     Write a character to typewriter
 */
-static void typewriter_out(running_machine *machine, UINT8 data)
+static void typewriter_out(running_machine &machine, UINT8 data)
 {
-	tx0_state *state = machine->driver_data<tx0_state>();
+	tx0_state *state = machine.driver_data<tx0_state>();
 	tx0_typewriter_drawchar(machine, data);
 	if (state->typewriter.fd)
 		state->typewriter.fd->fwrite(& data, 1);
@@ -660,7 +660,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 */
 static TIMER_CALLBACK(prt_callback)
 {
-	cpu_set_reg(machine->device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
+	cpu_set_reg(machine.device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -668,7 +668,7 @@ static TIMER_CALLBACK(prt_callback)
 */
 static void tx0_io_prt(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	int ac;
 	int ch;
 
@@ -676,7 +676,7 @@ static void tx0_io_prt(device_t *device)
 	ac = cpu_get_reg(device, TX0_AC);
 	/* shuffle and print 6-bit word */
 	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
-	typewriter_out(device->machine, ch);
+	typewriter_out(device->machine(), ch);
 
 	state->typewriter.prt_timer->adjust(attotime::from_msec(100));
 }
@@ -687,7 +687,7 @@ static void tx0_io_prt(device_t *device)
 */
 static TIMER_CALLBACK(dis_callback)
 {
-	cpu_set_reg(machine->device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
+	cpu_set_reg(machine.device("maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -695,7 +695,7 @@ static TIMER_CALLBACK(dis_callback)
 */
 static void tx0_io_dis(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	int ac;
 	int x;
 	int y;
@@ -703,7 +703,7 @@ static void tx0_io_dis(device_t *device)
 	ac = cpu_get_reg(device, TX0_AC);
 	x = ac >> 9;
 	y = ac & 0777;
-	tx0_plot(device->machine, x, y);
+	tx0_plot(device->machine(), x, y);
 
 	state->dis_timer->adjust(attotime::from_usec(50));
 }
@@ -765,7 +765,7 @@ static void schedule_unselect(tx0_state *state)
 
 static DEVICE_START( tx0_magtape )
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	state->magtape.img = dynamic_cast<device_image_interface *>(device);
 }
 
@@ -774,7 +774,7 @@ static DEVICE_START( tx0_magtape )
 */
 static DEVICE_IMAGE_LOAD( tx0_magtape )
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 	state->magtape.img = &image;
 
 	state->magtape.irg_pos = MTIRGP_END;
@@ -794,7 +794,7 @@ static DEVICE_IMAGE_LOAD( tx0_magtape )
 
 static DEVICE_IMAGE_UNLOAD( tx0_magtape )
 {
-	tx0_state *state = image.device().machine->driver_data<tx0_state>();
+	tx0_state *state = image.device().machine().driver_data<tx0_state>();
 	state->magtape.img = NULL;
 
 	if (state->magtape.timer)
@@ -805,7 +805,7 @@ static DEVICE_IMAGE_UNLOAD( tx0_magtape )
 		if ((state->magtape.state == MTS_SELECTED) || ((state->magtape.state == MTS_SELECTING) && (state->magtape.command == 2)))
 		{	/* unit has become unavailable */
 			state->magtape.state = MTS_UNSELECTING;
-			cpu_set_reg(image.device().machine->device("maincpu"), TX0_PF, cpu_get_reg(image.device().machine->device("maincpu"), TX0_PF) | PF_RWC);
+			cpu_set_reg(image.device().machine().device("maincpu"), TX0_PF, cpu_get_reg(image.device().machine().device("maincpu"), TX0_PF) | PF_RWC);
 			schedule_unselect(state);
 		}
 	}
@@ -813,7 +813,7 @@ static DEVICE_IMAGE_UNLOAD( tx0_magtape )
 
 static void magtape_callback(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	UINT8 buf = 0;
 	int lr;
 
@@ -1254,7 +1254,7 @@ static void magtape_callback(device_t *device)
 
 static void tx0_sel(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	state->magtape.sel_pending = TRUE;
 
 	if (state->magtape.state == MTS_UNSELECTED)
@@ -1267,7 +1267,7 @@ static void tx0_sel(device_t *device)
 
 static void tx0_io_cpy(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	switch (state->magtape.state)
 	{
 	case MTS_UNSELECTED:
@@ -1302,7 +1302,7 @@ static void tx0_io_cpy(device_t *device)
 */
 static void tx0_io_reset_callback(device_t *device)
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	state->tape_reader.rcl = state->tape_reader.rc = 0;
 	if (state->tape_reader.timer)
 		state->tape_reader.timer->enable(0);
@@ -1321,9 +1321,9 @@ static void tx0_io_reset_callback(device_t *device)
 /*
     typewriter keyboard handler
 */
-static void tx0_keyboard(running_machine *machine)
+static void tx0_keyboard(running_machine &machine)
 {
-	tx0_state *state = machine->driver_data<tx0_state>();
+	tx0_state *state = machine.driver_data<tx0_state>();
 	int i;
 	int j;
 
@@ -1351,7 +1351,7 @@ static void tx0_keyboard(running_machine *machine)
             previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
-			cpu_set_reg(machine->device("maincpu"), TX0_LR, lr);
+			cpu_set_reg(machine.device("maincpu"), TX0_LR, lr);
 			tx0_typewriter_drawchar(machine, charcode);	/* we want to echo input */
 			break;
 		}
@@ -1366,7 +1366,7 @@ static void tx0_keyboard(running_machine *machine)
 */
 static INTERRUPT_GEN( tx0_interrupt )
 {
-	tx0_state *state = device->machine->driver_data<tx0_state>();
+	tx0_state *state = device->machine().driver_data<tx0_state>();
 	int control_keys;
 	int tsr_keys;
 
@@ -1375,7 +1375,7 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine, "CSW");
+	control_keys = input_port_read(device->machine(), "CSW");
 
 	if (control_keys & tx0_control)
 	{
@@ -1384,31 +1384,31 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 		if (control_transitions & tx0_stop_cyc0)
 		{
-			cpu_set_reg(device->machine->device("maincpu"), TX0_STOP_CYC0, !cpu_get_reg(device->machine->device("maincpu"), TX0_STOP_CYC0));
+			cpu_set_reg(device->machine().device("maincpu"), TX0_STOP_CYC0, !cpu_get_reg(device->machine().device("maincpu"), TX0_STOP_CYC0));
 		}
 		if (control_transitions & tx0_stop_cyc1)
 		{
-			cpu_set_reg(device->machine->device("maincpu"), TX0_STOP_CYC1, !cpu_get_reg(device->machine->device("maincpu"), TX0_STOP_CYC1));
+			cpu_set_reg(device->machine().device("maincpu"), TX0_STOP_CYC1, !cpu_get_reg(device->machine().device("maincpu"), TX0_STOP_CYC1));
 		}
 		if (control_transitions & tx0_gbl_cm_sel)
 		{
-			cpu_set_reg(device->machine->device("maincpu"), TX0_GBL_CM_SEL, !cpu_get_reg(device->machine->device("maincpu"), TX0_GBL_CM_SEL));
+			cpu_set_reg(device->machine().device("maincpu"), TX0_GBL_CM_SEL, !cpu_get_reg(device->machine().device("maincpu"), TX0_GBL_CM_SEL));
 		}
 		if (control_transitions & tx0_stop)
 		{
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RUN, (UINT64)0);
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RIM, (UINT64)0);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RUN, (UINT64)0);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RIM, (UINT64)0);
 		}
 		if (control_transitions & tx0_restart)
 		{
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RUN, 1);
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RIM, (UINT64)0);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RUN, 1);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RIM, (UINT64)0);
 		}
 		if (control_transitions & tx0_read_in)
 		{	/* set cpu to read instructions from perforated tape */
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RESET, (UINT64)0);
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RUN, (UINT64)0);
-			cpu_set_reg(device->machine->device("maincpu"), TX0_RIM, 1);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RESET, (UINT64)0);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RUN, (UINT64)0);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_RIM, 1);
 		}
 		if (control_transitions & tx0_toggle_dn)
 		{
@@ -1426,16 +1426,16 @@ static INTERRUPT_GEN( tx0_interrupt )
 		{
 			if (state->tsr_index >= 2)
 			{
-				UINT32 cm_sel = (UINT32) cpu_get_reg(device->machine->device("maincpu"), TX0_CM_SEL);
-				cpu_set_reg(device->machine->device("maincpu"), TX0_CM_SEL, cm_sel ^ (1 << (state->tsr_index - 2)));
+				UINT32 cm_sel = (UINT32) cpu_get_reg(device->machine().device("maincpu"), TX0_CM_SEL);
+				cpu_set_reg(device->machine().device("maincpu"), TX0_CM_SEL, cm_sel ^ (1 << (state->tsr_index - 2)));
 			}
 		}
 		if (control_transitions & tx0_lr_sel)
 		{
 			if (state->tsr_index >= 2)
 			{
-				UINT32 lr_sel = (UINT32) cpu_get_reg(device->machine->device("maincpu"), TX0_LR_SEL);
-				cpu_set_reg(device->machine->device("maincpu"), TX0_LR_SEL, (lr_sel ^ (1 << (state->tsr_index - 2))));
+				UINT32 lr_sel = (UINT32) cpu_get_reg(device->machine().device("maincpu"), TX0_LR_SEL);
+				cpu_set_reg(device->machine().device("maincpu"), TX0_LR_SEL, (lr_sel ^ (1 << (state->tsr_index - 2))));
 			}
 		}
 
@@ -1444,14 +1444,14 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 
 		/* handle toggle switch register keys */
-		tsr_keys = (input_port_read(device->machine, "MSW") << 16) | input_port_read(device->machine, "LSW");
+		tsr_keys = (input_port_read(device->machine(), "MSW") << 16) | input_port_read(device->machine(), "LSW");
 
 		/* compute transitions */
 		tsr_transitions = tsr_keys & (~ state->old_tsr_keys);
 
 		/* update toggle switch register */
 		if (tsr_transitions)
-			cpu_set_reg(device->machine->device("maincpu"), TX0_TBR+state->tsr_index, cpu_get_reg(device->machine->device("maincpu"), TX0_TBR+state->tsr_index) ^ tsr_transitions);
+			cpu_set_reg(device->machine().device("maincpu"), TX0_TBR+state->tsr_index, cpu_get_reg(device->machine().device("maincpu"), TX0_TBR+state->tsr_index) ^ tsr_transitions);
 
 		/* remember new state of toggle switch register keys */
 		state->old_tsr_keys = tsr_keys;
@@ -1461,7 +1461,7 @@ static INTERRUPT_GEN( tx0_interrupt )
 		state->old_control_keys = 0;
 		state->old_tsr_keys = 0;
 
-		tx0_keyboard(device->machine);
+		tx0_keyboard(device->machine());
 	}
 }
 

@@ -205,7 +205,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( comquest )
 {
-//  UINT8 *mem=machine->region("user1")->base();
+//  UINT8 *mem=machine.region("user1")->base();
 //  memory_set_bankptr(machine, 1,mem+0x00000);
 }
 

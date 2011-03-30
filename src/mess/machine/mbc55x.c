@@ -38,7 +38,7 @@
 
 #define LOG_KEYBOARD        1
 
-static void keyboard_reset(running_machine *machine);
+static void keyboard_reset(running_machine &machine);
 static TIMER_CALLBACK(keyscan_callback);
 static WRITE_LINE_DEVICE_HANDLER(pit8253_t2);
 
@@ -58,20 +58,20 @@ const wd17xx_interface mbc55x_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-//static void mbc55x_recalculate_ints(running_machine *machine);
+//static void mbc55x_recalculate_ints(running_machine &machine);
 
-static void mbc55x_debug(running_machine *machine, int ref, int params, const char *param[]);
+static void mbc55x_debug(running_machine &machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(device_t &device, offs_t curpc);
 
-//static void fdc_reset(running_machine *machine);
-//static void set_disk_int(running_machine *machine, int state);
+//static void fdc_reset(running_machine &machine);
+//static void set_disk_int(running_machine &machine, int state);
 
 /* 8255 Configuration */
 
 READ8_HANDLER(ppi8255_r)
 {
-	device_t *ppi8255 = space->machine->device(PPI8255_TAG);
+	device_t *ppi8255 = space->machine().device(PPI8255_TAG);
 
 	switch(offset)
 	{
@@ -85,7 +85,7 @@ READ8_HANDLER(ppi8255_r)
 
 WRITE8_HANDLER(ppi8255_w)
 {
-	device_t *ppi8255 = space->machine->device(PPI8255_TAG);
+	device_t *ppi8255 = space->machine().device(PPI8255_TAG);
 
 	switch(offset)
 	{
@@ -121,7 +121,7 @@ WRITE8_DEVICE_HANDLER(mbc55x_ppi_portb_w)
 
 WRITE8_DEVICE_HANDLER(mbc55x_ppi_portc_w)
 {
-	device_t *wd17xx = device->machine->device(FDC_TAG);
+	device_t *wd17xx = device->machine().device(FDC_TAG);
 
 	wd17xx_set_drive(wd17xx,(data & 0x03));
 	wd17xx_set_side(wd17xx,((data & 0x04) >> 2));
@@ -157,7 +157,7 @@ const struct pic8259_interface mbc55x_pic8259_config =
 
 READ8_HANDLER(pic8259_r)
 {
-	device_t *pic8259 = space->machine->device(PIC8259_TAG);
+	device_t *pic8259 = space->machine().device(PIC8259_TAG);
 
 	switch (offset)
 	{
@@ -170,7 +170,7 @@ READ8_HANDLER(pic8259_r)
 
 WRITE8_HANDLER(pic8259_w)
 {
-	device_t *pic8259 = space->machine->device(PIC8259_TAG);
+	device_t *pic8259 = space->machine().device(PIC8259_TAG);
 
 	switch (offset)
 	{
@@ -181,7 +181,7 @@ WRITE8_HANDLER(pic8259_w)
 
 static IRQ_CALLBACK(mbc55x_irq_callback)
 {
-	device_t *pic8259 = device->machine->device(PIC8259_TAG);
+	device_t *pic8259 = device->machine().device(PIC8259_TAG);
 
 	return pic8259_acknowledge( pic8259 );
 }
@@ -211,7 +211,7 @@ const struct pit8253_config mbc55x_pit8253_config =
 
 READ8_HANDLER(pit8253_r)
 {
-	device_t *pit8253 = space->machine->device(PIT8253_TAG);
+	device_t *pit8253 = space->machine().device(PIT8253_TAG);
 
 	switch(offset)
 	{
@@ -225,7 +225,7 @@ READ8_HANDLER(pit8253_r)
 
 WRITE8_HANDLER(pit8253_w)
 {
-	device_t *pit8253 = space->machine->device(PIT8253_TAG);
+	device_t *pit8253 = space->machine().device(PIT8253_TAG);
 
 	switch(offset)
 	{
@@ -238,7 +238,7 @@ WRITE8_HANDLER(pit8253_w)
 
 static WRITE_LINE_DEVICE_HANDLER(pit8253_t2)
 {
-	device_t *msm8251_kb	= device->machine->device(MSM8251A_KB_TAG);
+	device_t *msm8251_kb	= device->machine().device(MSM8251A_KB_TAG);
 
 	msm8251_transmit_clock(msm8251_kb);
 	msm8251_receive_clock(msm8251_kb);
@@ -248,23 +248,23 @@ static WRITE_LINE_DEVICE_HANDLER(pit8253_t2)
 
 READ8_HANDLER(vram_page_r)
 {
-	mbc55x_state *state	= space->machine->driver_data<mbc55x_state>();
+	mbc55x_state *state	= space->machine().driver_data<mbc55x_state>();
 
 	return state->vram_page;
 }
 
 WRITE8_HANDLER(vram_page_w)
 {
-	mbc55x_state *state	= space->machine->driver_data<mbc55x_state>();
+	mbc55x_state *state	= space->machine().driver_data<mbc55x_state>();
 
-	logerror("%s : set vram page to %02X\n",space->machine->describe_context(),data);
+	logerror("%s : set vram page to %02X\n",space->machine().describe_context(),data);
 
 	state->vram_page=data;
 }
 
 READ8_HANDLER(mbc55x_disk_r)
 {
-	device_t *wd17xx = space->machine->device(FDC_TAG);
+	device_t *wd17xx = space->machine().device(FDC_TAG);
 
 	switch(offset)
 	{
@@ -278,7 +278,7 @@ READ8_HANDLER(mbc55x_disk_r)
 
 WRITE8_HANDLER(mbc55x_disk_w)
 {
-	device_t *wd17xx = space->machine->device(FDC_TAG);
+	device_t *wd17xx = space->machine().device(FDC_TAG);
 
 	switch(offset)
 	{
@@ -302,9 +302,9 @@ static WRITE_LINE_DEVICE_HANDLER( mbc55x_fdc_drq_w )
 
 */
 
-static void keyboard_reset(running_machine *machine)
+static void keyboard_reset(running_machine &machine)
 {
-	mbc55x_state *state = machine->driver_data<mbc55x_state>();
+	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	logerror("keyboard_reset()\n");
 
     memset(state->keyboard.keyrows,0xFF,MBC55X_KEYROWS);
@@ -314,11 +314,11 @@ static void keyboard_reset(running_machine *machine)
     state->keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 }
 
-static void scan_keyboard(running_machine *machine)
+static void scan_keyboard(running_machine &machine)
 
 {
-	mbc55x_state *state 	= machine->driver_data<mbc55x_state>();
-	device_t	 *msm8251	= machine->device(MSM8251A_KB_TAG);
+	mbc55x_state *state 	= machine.driver_data<mbc55x_state>();
+	device_t	 *msm8251	= machine.device(MSM8251A_KB_TAG);
     UINT8   keyrow;
     UINT8   row;
     UINT8   bitno;
@@ -402,13 +402,13 @@ const msm8251_interface mbc55x_msm8251a_interface =
 
 READ8_HANDLER(mbc55x_kb_usart_r)
 {
-	mbc55x_state *state 	= space->machine->driver_data<mbc55x_state>();
-	device_t	*msm8251	= space->machine->device(MSM8251A_KB_TAG);
+	mbc55x_state *state 	= space->machine().driver_data<mbc55x_state>();
+	device_t	*msm8251	= space->machine().device(MSM8251A_KB_TAG);
 	UINT8		result		= 0;
 
 	switch (offset)
 	{
-		case 0	: //logerror("%s read kb_uart\n",space->machine->describe_context());
+		case 0	: //logerror("%s read kb_uart\n",space->machine().describe_context());
 				  result=msm8251_data_r(msm8251,0); break;
 
 		case 2	: result=msm8251_status_r(msm8251,0);
@@ -423,7 +423,7 @@ READ8_HANDLER(mbc55x_kb_usart_r)
 
 WRITE8_HANDLER(mbc55x_kb_usart_w)
 {
-	device_t *msm8251 = space->machine->device(MSM8251A_KB_TAG);
+	device_t *msm8251 = space->machine().device(MSM8251A_KB_TAG);
 
 	switch (offset)
 	{
@@ -432,15 +432,15 @@ WRITE8_HANDLER(mbc55x_kb_usart_w)
 	}
 }
 
-static void set_ram_size(running_machine *machine)
+static void set_ram_size(running_machine &machine)
 {
-	mbc55x_state	*state		= machine->driver_data<mbc55x_state>();
-    address_space	*space		= machine->device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
-    int 			ramsize 	= ram_get_size(machine->device(RAM_TAG));
+	mbc55x_state	*state		= machine.driver_data<mbc55x_state>();
+    address_space	*space		= machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+    int 			ramsize 	= ram_get_size(machine.device(RAM_TAG));
 	int 			nobanks		= ramsize / RAM_BANK_SIZE;
 	char			bank[10];
     int 			bankno;
-	UINT8			*ram    	= &ram_get_ptr(machine->device(RAM_TAG))[0];
+	UINT8			*ram    	= &ram_get_ptr(machine.device(RAM_TAG))[0];
     UINT8			*map_base;
 	int				bank_base;
 
@@ -484,35 +484,35 @@ MACHINE_RESET( mbc55x )
 {
 	set_ram_size(machine);
 	keyboard_reset(machine);
-	device_set_irq_callback(machine->device(MAINCPU_TAG), mbc55x_irq_callback);
+	device_set_irq_callback(machine.device(MAINCPU_TAG), mbc55x_irq_callback);
 }
 
 MACHINE_START( mbc55x )
 {
-	mbc55x_state *state = machine->driver_data<mbc55x_state>();
+	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	/* init cpu */
 //  mbc55x_cpu_init(machine);
 
 
 	/* setup debug commands */
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine, "mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, mbc55x_debug);
 
 		/* set up the instruction hook */
-		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
+		machine.device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
 
 	state->debug_machine=DEBUG_NONE;
 
 	// Allocate keyscan timer
-	state->keyboard.keyscan_timer=machine->scheduler().timer_alloc(FUNC(keyscan_callback));
+	state->keyboard.keyscan_timer=machine.scheduler().timer_alloc(FUNC(keyscan_callback));
 }
 
 
-static void mbc55x_debug(running_machine *machine, int ref, int params, const char *param[])
+static void mbc55x_debug(running_machine &machine, int ref, int params, const char *param[])
 {
-	mbc55x_state *state = machine->driver_data<mbc55x_state>();
+	mbc55x_state *state = machine.driver_data<mbc55x_state>();
     if(params>0)
     {
         sscanf(param[0],"%d",&state->debug_machine);
@@ -530,7 +530,7 @@ static void mbc55x_debug(running_machine *machine, int ref, int params, const ch
 
 static int instruction_hook(device_t &device, offs_t curpc)
 {
-	mbc55x_state	*state = device.machine->driver_data<mbc55x_state>();
+	mbc55x_state	*state = device.machine().driver_data<mbc55x_state>();
     address_space	*space = device.memory().space(AS_PROGRAM);
     UINT8           *addr_ptr;
 
@@ -549,7 +549,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 static void decode_dos21(device_t *device,offs_t pc)
 {
-    device_t *cpu = device->machine->device(MAINCPU_TAG);
+    device_t *cpu = device->machine().device(MAINCPU_TAG);
 
     UINT16  ax = cpu_get_reg(cpu,I8086_AX);
     UINT16  bx = cpu_get_reg(cpu,I8086_BX);
@@ -572,7 +572,7 @@ static void decode_dos21(device_t *device,offs_t pc)
     logerror("=======================================================================\n");
 
 	if((ax & 0xff00)==0x0900)
-		debugger_break(device->machine);
+		debugger_break(device->machine());
 }
 
 

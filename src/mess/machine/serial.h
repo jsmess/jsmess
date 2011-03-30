@@ -113,25 +113,25 @@ struct _serial_connection
 
 	/* this callback is executed when this side has refreshed it's state,
     to let the other end know */
-	void	(*out_callback)(running_machine *machine, int id, unsigned long state);
+	void	(*out_callback)(running_machine &machine, int id, unsigned long state);
 	/* this callback is executed when the other side has refreshed it's state,
     to let the other end know */
-	void	(*in_callback)(running_machine *machine, int id, unsigned long state);
+	void	(*in_callback)(running_machine &machine, int id, unsigned long state);
 };
 
 /*----------- defined in machine/serial.c -----------*/
 
 /* setup out and in callbacks */
-void serial_connection_init(running_machine *machine, serial_connection *connection);
+void serial_connection_init(running_machine &machine, serial_connection *connection);
 
 /* set callback which will be executed when in status has changed */
-void serial_connection_set_in_callback(running_machine *machine, serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long status));
+void serial_connection_set_in_callback(running_machine &machine, serial_connection *connection, void (*in_cb)(running_machine &machine, int id, unsigned long status));
 
 /* output status, if callback is setup it will be executed with the new status */
-void serial_connection_out(running_machine *machine, serial_connection *connection);
+void serial_connection_out(running_machine &machine, serial_connection *connection);
 
 /* join two serial connections */
-void serial_connection_link(running_machine *machine, serial_connection *connection_a, serial_connection *connection_b);
+void serial_connection_link(running_machine &machine, serial_connection *connection_a, serial_connection *connection_b);
 
 
 /*******************************************************************************/
@@ -213,7 +213,7 @@ struct _serial_transmit_register
 
 /* setup transmit reg ready for transmit */
 void transmit_register_setup(serial_transmit_register *transmit_reg, data_form *data_form,unsigned char data_byte);
-void	transmit_register_send_bit(running_machine *machine, serial_transmit_register *transmit_reg, serial_connection *connection);
+void	transmit_register_send_bit(running_machine &machine, serial_transmit_register *transmit_reg, serial_connection *connection);
 void	transmit_register_reset(serial_transmit_register *transmit_reg);
 
 /*******************************************************************************/

@@ -212,7 +212,7 @@ READ16_DEVICE_HANDLER( ti99_dmux_r )
 	}
 
 	// Takes three cycles
-	device_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine().device("maincpu"),-3);
 
 	for (int i=0; i < MAXDEV; i++)
 	{
@@ -231,7 +231,7 @@ READ16_DEVICE_HANDLER( ti99_dmux_r )
 	}
 
 	// Takes three cycles
-	device_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine().device("maincpu"),-3);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
 	return (hbyte<<8) | dmux->latch ;
@@ -298,7 +298,7 @@ WRITE16_DEVICE_HANDLER( ti99_dmux_w )
 	}
 
 	// Takes three cycles
-	device_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine().device("maincpu"),-3);
 
 	for (int i=0; i < MAXDEV; i++)
 	{
@@ -317,7 +317,7 @@ WRITE16_DEVICE_HANDLER( ti99_dmux_w )
 	}
 
 	// Takes three cycles
-	device_adjust_icount(device->machine->device("maincpu"),-3);
+	device_adjust_icount(device->machine().device("maincpu"),-3);
 }
 
 /* CRU space is not involved in the dmux. */
@@ -341,7 +341,7 @@ static DEVICE_STOP( datamux )
 static DEVICE_RESET( datamux )
 {
 	datamux_state *dmux = get_safe_token(device);
-	dmux->use32k = (input_port_read(device->machine, "RAM")==RAM_TI32_INT)? TRUE : FALSE;
+	dmux->use32k = (input_port_read(device->machine(), "RAM")==RAM_TI32_INT)? TRUE : FALSE;
 
 	dmux->devindex = 0;
 	int i = 0;
@@ -358,12 +358,12 @@ static DEVICE_RESET( datamux )
 	{
 		if (cons[i].name != NULL)
 		{
-			device_t *dev = device->machine->device(cons[i].name);
+			device_t *dev = device->machine().device(cons[i].name);
 			if (dev!=NULL)
 			{
 				UINT32 set = 0;
 				if (cons[i].setting!=NULL)
-					set = input_port_read(device->machine, cons[i].setting);
+					set = input_port_read(device->machine(), cons[i].setting);
 
 				if (((set & cons[i].set)==cons[i].set)&&((set & cons[i].unset)==0))
 				{

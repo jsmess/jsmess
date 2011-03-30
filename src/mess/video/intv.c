@@ -12,7 +12,7 @@ INLINE void intv_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 VIDEO_START( intv )
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
 	//int i,j,k;
 
 	state->tms9927_num_rows = 25;
@@ -123,9 +123,9 @@ static void determine_sprite_collisions(intv_state *state)
     }
 }
 
-static void render_sprites(running_machine *machine)
+static void render_sprites(running_machine &machine)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
     INT32 cardMemoryLocation, pixelSize;
     INT32 spritePixelHeight;
     INT32 nextMemoryLocation;
@@ -135,7 +135,7 @@ static void render_sprites(running_machine *machine)
     INT32 xInc;
     INT32 i, j;
 
-    UINT8* memory = machine->region("maincpu")->base();
+    UINT8* memory = machine.region("maincpu")->base();
 
     for (i = 0; i < 8; i++) {
 		intv_sprite_type* s = &state->sprite[i];
@@ -205,7 +205,7 @@ static void render_sprites(running_machine *machine)
     }
 }
 
-static void render_line(running_machine *machine, bitmap_t *bitmap,
+static void render_line(running_machine &machine, bitmap_t *bitmap,
 	UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
 {
     UINT32 color = (nextByte & 0x80 ? fgcolor : bgcolor);
@@ -257,7 +257,7 @@ static void render_line(running_machine *machine, bitmap_t *bitmap,
     intv_plot_pixel(bitmap, x+15, y+1, color);
 }
 
-static void render_colored_squares(running_machine *machine, bitmap_t *bitmap,
+static void render_colored_squares(running_machine &machine, bitmap_t *bitmap,
 	UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
 {
     plot_box(bitmap, x, y, 8, 8, (color0<<1)+1);
@@ -266,12 +266,12 @@ static void render_colored_squares(running_machine *machine, bitmap_t *bitmap,
     plot_box(bitmap, x+8, y+8, 8, 8, (color3<<1)+1);
 }
 
-static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
+static void render_color_stack_mode(running_machine &machine, bitmap_t *bitmap)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
     UINT8 h, csPtr = 0, nexty = 0;
     UINT16 nextCard, nextx = 0;
-    UINT8 *ram = machine->region("maincpu")->base();
+    UINT8 *ram = machine.region("maincpu")->base();
 
     for (h = 0; h < 240; h++) {
         nextCard = state->ram16[h];
@@ -328,13 +328,13 @@ static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
     }
 }
 
-static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
+static void render_fg_bg_mode(running_machine &machine, bitmap_t *bitmap)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
     UINT8 i, j, isGrom, fgcolor, bgcolor, nexty = 0;
     UINT16 nextCard, memoryLocation, nextx = 0;
     UINT8* memory;
-    UINT8* ram = machine->region("maincpu")->base();
+    UINT8* ram = machine.region("maincpu")->base();
 
     for (i = 0; i < 240; i++) {
         nextCard = state->ram16[i];
@@ -366,9 +366,9 @@ static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
     }
 }
 
-static void copy_sprites_to_background(running_machine *machine, bitmap_t *bitmap)
+static void copy_sprites_to_background(running_machine &machine, bitmap_t *bitmap)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
     UINT8 width, currentPixel;
     UINT8 borderCollision, foregroundCollision;
     UINT8 spritePixelHeight, x, y;
@@ -434,9 +434,9 @@ static void copy_sprites_to_background(running_machine *machine, bitmap_t *bitma
     }
 }
 
-static void render_background(running_machine *machine, bitmap_t *bitmap)
+static void render_background(running_machine &machine, bitmap_t *bitmap)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
 	if (state->color_stack_mode)
         render_color_stack_mode(machine, bitmap);
     else
@@ -444,9 +444,9 @@ static void render_background(running_machine *machine, bitmap_t *bitmap)
 }
 
 #ifdef UNUSED_CODE
-static void draw_background(running_machine *machine, bitmap_t *bitmap, int transparency)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, int transparency)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
 	// First, draw the background
 	int offs = 0;
 	int value = 0;
@@ -512,14 +512,14 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 						code %= 64;  // keep from going outside the array
 						//if (state->gramdirtybytes[code] == 1)
 						{
-							decodechar(machine->gfx[1],
+							decodechar(machine.gfx[1],
 								   code,
 								   state->gram,
-								   machine->config()->gfxdecodeinfo[1].gfxlayout);
+								   machine.config()->gfxdecodeinfo[1].gfxlayout);
 							state->gramdirtybytes[code] = 0;
 						}
 						// Draw GRAM char
-						drawgfx(bitmap,machine->gfx[1],
+						drawgfx(bitmap,machine.gfx[1],
 							code,
 							bgcolor*16+fgcolor,
 							0,0,col*16,row*16,
@@ -534,7 +534,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 					}
 					else // read from grom
 					{
-						drawgfx(bitmap,machine->gfx[0],
+						drawgfx(bitmap,machine.gfx[0],
 							code,
 							bgcolor*16+fgcolor,
 							0,0,col*16,row*16,
@@ -567,14 +567,14 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 				{
 					//if (state->gramdirtybytes[code] == 1)
 					{
-						decodechar(machine->gfx[1],
+						decodechar(machine.gfx[1],
 							   code,
 							   state->gram,
-							   machine->config()->gfxdecodeinfo[1].gfxlayout);
+							   machine.config()->gfxdecodeinfo[1].gfxlayout);
 						state->gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx(bitmap,machine.gfx[1],
 						code,
 						bgcolor*16+fgcolor,
 						0,0,col*16,row*16,
@@ -582,7 +582,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 				}
 				else // read from GROM
 				{
-					drawgfx(bitmap,machine->gfx[0],
+					drawgfx(bitmap,machine.gfx[0],
 						code,
 						bgcolor*16+fgcolor,
 						0,0,col*16,row*16,
@@ -597,9 +597,9 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 
 /* TBD: need to handle sprites behind foreground? */
 #ifdef UNUSED_FUNCTION
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_foreground)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, int behind_foreground)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
     int i;
     int code;
 
@@ -616,14 +616,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
                 {
                     //if (state->gramdirtybytes[code] == 1)
                     {
-                        decodechar(machine->gfx[1],
+                        decodechar(machine.gfx[1],
                            code,
                            state->gram,
-                           machine->config()->gfxdecodeinfo[1].gfxlayout);
+                           machine.config()->gfxdecodeinfo[1].gfxlayout);
                         state->gramdirtybytes[code] = 0;
                     }
                     // Draw GRAM char
-                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
+                    drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[1],
                         code,
                         s->color,
                         s->xflip,s->yflip,
@@ -634,25 +634,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
                 {
                     //if ((state->gramdirtybytes[code] == 1) || (state->gramdirtybytes[code+1] == 1))
                     {
-                        decodechar(machine->gfx[1],
+                        decodechar(machine.gfx[1],
                            code,
                            state->gram,
-                           machine->config()->gfxdecodeinfo[1].gfxlayout);
-                        decodechar(machine->gfx[1],
+                           machine.config()->gfxdecodeinfo[1].gfxlayout);
+                        decodechar(machine.gfx[1],
                            code+1,
                            state->gram,
-                           machine->config()->gfxdecodeinfo[1].gfxlayout);
+                           machine.config()->gfxdecodeinfo[1].gfxlayout);
                         state->gramdirtybytes[code] = 0;
                         state->gramdirtybytes[code+1] = 0;
                     }
                     // Draw GRAM char
-                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
+                    drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[1],
                         code,
                         s->color,
                         s->xflip,s->yflip,
                         s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
                         0x8000*s->xsize, 0x8000*s->ysize,0);
-                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
+                    drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[1],
                         code+1,
                         s->color,
                         s->xflip,s->yflip,
@@ -665,7 +665,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
                 if (s->yres == 1)
                 {
                     // Draw GROM char
-                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
+                    drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[0],
                         code,
                         s->color,
                         s->xflip,s->yflip,
@@ -674,13 +674,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
                 }
                 else
                 {
-                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
+                    drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[0],
                         code,
                         s->color,
                         s->xflip,s->yflip,
                         s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
                         0x8000*s->xsize, 0x8000*s->ysize,0);
-                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
+                    drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[0],
                         code+1,
                         s->color,
                         s->xflip,s->yflip,
@@ -693,9 +693,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
 }
 #endif
 
-static void draw_borders(running_machine *machine, bitmap_t *bm)
+static void draw_borders(running_machine &machine, bitmap_t *bm)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
 	if (state->left_edge_inhibit)
 		plot_box(bm, 0, 0, 16-state->col_delay*2, 16*12, (state->border_color<<1)+1);
 
@@ -703,30 +703,30 @@ static void draw_borders(running_machine *machine, bitmap_t *bm)
 		plot_box(bm, 0, 0, 16*20, 16-state->row_delay*2, (state->border_color<<1)+1);
 }
 
-void intv_stic_screenrefresh(running_machine *machine)
+void intv_stic_screenrefresh(running_machine &machine)
 {
-	intv_state *state = machine->driver_data<intv_state>();
+	intv_state *state = machine.driver_data<intv_state>();
 	int i;
 
 	if (state->stic_handshake != 0)
 	{
 		state->stic_handshake = 0;
 		// Render the background
-		render_background(machine, machine->generic.tmpbitmap);
+		render_background(machine, machine.generic.tmpbitmap);
 		// Render the sprites into their buffers
 		render_sprites(machine);
 		for (i = 0; i < 8; i++) state->sprite[i].collision = 0;
 		// Copy the sprites to the background
-		copy_sprites_to_background(machine, machine->generic.tmpbitmap);
+		copy_sprites_to_background(machine, machine.generic.tmpbitmap);
 		determine_sprite_collisions(state);
 		for (i = 0; i < 8; i++) state->collision_registers[i] |= state->sprite[i].collision;
 		/* draw the screen borders if enabled */
-		draw_borders(machine, machine->generic.tmpbitmap);
+		draw_borders(machine, machine.generic.tmpbitmap);
 	}
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		bitmap_fill(machine->generic.tmpbitmap, NULL, (state->border_color<<1)+1);
+		bitmap_fill(machine.generic.tmpbitmap, NULL, (state->border_color<<1)+1);
 	}
 }
 
@@ -736,7 +736,7 @@ void intv_stic_screenrefresh(running_machine *machine)
 
  READ8_HANDLER( intvkbd_tms9927_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	UINT8 rv;
 	switch (offset)
 	{
@@ -759,7 +759,7 @@ void intv_stic_screenrefresh(running_machine *machine)
 
 WRITE8_HANDLER( intvkbd_tms9927_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	switch (offset)
 	{
 		case 3:
@@ -783,7 +783,7 @@ WRITE8_HANDLER( intvkbd_tms9927_w )
 
 SCREEN_UPDATE( intvkbd )
 {
-	intv_state *state = screen->machine->driver_data<intv_state>();
+	intv_state *state = screen->machine().driver_data<intv_state>();
 	UINT8 *videoram = state->videoram;
 	int x,y,offs;
 	int current_row;
@@ -802,7 +802,7 @@ SCREEN_UPDATE( intvkbd )
 			{
 				offs = current_row*64+x;
 				drawgfx_transpen(bitmap, NULL,
-					screen->machine->gfx[1],
+					screen->machine().gfx[1],
 					videoram[offs],
 					7, /* white */
 					0,0,
@@ -813,7 +813,7 @@ SCREEN_UPDATE( intvkbd )
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
 				drawgfx_transpen(bitmap, NULL,
-					screen->machine->gfx[1],
+					screen->machine().gfx[1],
 					191, /* a block */
 					7,   /* white   */
 					0,0,
@@ -826,25 +826,25 @@ SCREEN_UPDATE( intvkbd )
 #if 0
 	// debugging
 	c = tape_motor_mode_desc[state->tape_motor_mode][0];
-	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
+	drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
 		c,
 		1,
 		0,0,
 		0*8,0*8, 0);
 	for(y=0;y<5;y++)
 	{
-		drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
+		drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
 			state->tape_unknown_write[y]+'0',
 			1,
 			0,0,
 			0*8,(y+2)*8, 0);
 	}
-	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
+	drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
 			state->tape_unknown_write[5]+'0',
 			1,
 			0,0,
 			0*8,8*8, 0);
-	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
+	drawgfx_transpen(bitmap,&machine.screen[0].visarea, machine.gfx[1],
 			state->tape_interrupts_enabled+'0',
 			1,
 			0,0,

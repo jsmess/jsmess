@@ -79,7 +79,7 @@
 
 /* Read/Write Handlers */
 
-static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
+static UINT8 read_keyboard(running_machine &machine, UINT16 keylatch)
 {
 	UINT8 data = 0xff;
 
@@ -137,7 +137,7 @@ void pc8201_state::bankswitch(UINT8 data)
 		program->unmap_write(0x0000, 0x7fff);
 	}
 
-	memory_set_bank(machine, "bank1", rom_bank);
+	memory_set_bank(m_machine, "bank1", rom_bank);
 
 	switch (ram_bank)
 	{
@@ -172,7 +172,7 @@ void pc8201_state::bankswitch(UINT8 data)
 		break;
 	}
 
-	memory_set_bank(machine, "bank2", ram_bank);
+	memory_set_bank(m_machine, "bank2", ram_bank);
 }
 
 WRITE8_MEMBER( pc8201_state::bank_w )
@@ -288,7 +288,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 	data |= 0x20;
 
 	// low power sensor
-	data |= BIT(input_port_read(machine, "BATTERY"), 0) << 7;
+	data |= BIT(input_port_read(m_machine, "BATTERY"), 0) << 7;
 
 	return data;
 }
@@ -331,7 +331,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 	data |= 0x20;
 
 	// low power sensor
-	data |= BIT(input_port_read(machine, "BATTERY"), 0) << 7;
+	data |= BIT(input_port_read(m_machine, "BATTERY"), 0) << 7;
 
 	return data;
 }
@@ -406,7 +406,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 
 	if (m_rom_sel)
 	{
-		data = machine->region("option")->base()[m_rom_addr & 0x1ffff];
+		data = m_machine.region("option")->base()[m_rom_addr & 0x1ffff];
 	}
 
 	return data;
@@ -450,7 +450,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
     */
 
 	/* ROM bank selection */
-	memory_set_bank(machine, "bank1", BIT(data, 0));
+	memory_set_bank(m_machine, "bank1", BIT(data, 0));
 
 	/* printer strobe */
 	centronics_strobe_w(m_centronics, BIT(data, 1));
@@ -464,7 +464,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 
 READ8_MEMBER( kc85_state::keyboard_r )
 {
-	return read_keyboard(machine, m_keylatch);
+	return read_keyboard(m_machine, m_keylatch);
 }
 
 void tandy200_state::bankswitch(UINT8 data)
@@ -485,7 +485,7 @@ void tandy200_state::bankswitch(UINT8 data)
 	{
 		program->install_read_bank(0x0000, 0x7fff, "bank1");
 		program->unmap_write(0x0000, 0x7fff);
-		memory_set_bank(machine, "bank1", rom_bank);
+		memory_set_bank(m_machine, "bank1", rom_bank);
 	}
 
 	if (ram_get_size(m_ram) < ((ram_bank + 1) * 24 * 1024))
@@ -496,7 +496,7 @@ void tandy200_state::bankswitch(UINT8 data)
 	else
 	{
 		program->install_readwrite_bank(0xa000, 0xffff, "bank2");
-		memory_set_bank(machine, "bank2", ram_bank);
+		memory_set_bank(m_machine, "bank2", ram_bank);
 	}
 }
 
@@ -512,7 +512,7 @@ WRITE8_MEMBER( tandy200_state::bank_w )
 
 READ8_MEMBER( tandy200_state::stbk_r )
 {
-	return read_keyboard(machine, m_keylatch);
+	return read_keyboard(m_machine, m_keylatch);
 }
 
 WRITE8_MEMBER( tandy200_state::stbk_w )
@@ -1135,9 +1135,9 @@ void kc85_state::machine_start()
 	/* configure ROM banking */
 	program->install_read_bank(0x0000, 0x7fff, "bank1");
 	program->unmap_write(0x0000, 0x7fff);
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
-	memory_set_bank(machine, "bank1", 0);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(I8085_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region("option")->base(), 0);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	/* configure RAM banking */
 	switch (ram_get_size(m_ram))
@@ -1152,14 +1152,14 @@ void kc85_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
-	memory_set_bank(machine, "bank2", 0);
+	memory_configure_bank(m_machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_set_bank(m_machine, "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_bank);
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_buzzer);
-	state_save_register_global(machine, m_bell);
+	state_save_register_global(m_machine, m_bank);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_buzzer);
+	state_save_register_global(m_machine, m_bell);
 }
 
 void pc8201_state::machine_start()
@@ -1171,24 +1171,24 @@ void pc8201_state::machine_start()
 	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, ram + 0x8000, 0x8000);
-	memory_set_bank(machine, "bank1", 0);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(I8085_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region("option")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 2, 2, ram + 0x8000, 0x8000);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 1, ram, 0);
-	memory_configure_bank(machine, "bank2", 2, 2, ram + 0x8000, 0x8000);
-	memory_set_bank(machine, "bank2", 0);
+	memory_configure_bank(m_machine, "bank2", 0, 1, ram, 0);
+	memory_configure_bank(m_machine, "bank2", 2, 2, ram + 0x8000, 0x8000);
+	memory_set_bank(m_machine, "bank2", 0);
 
 	bankswitch(0);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_bank);
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_buzzer);
-	state_save_register_global(machine, m_bell);
-	state_save_register_global(machine, m_iosel);
+	state_save_register_global(m_machine, m_bank);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_buzzer);
+	state_save_register_global(m_machine, m_bell);
+	state_save_register_global(m_machine, m_iosel);
 }
 
 void trsm100_state::machine_start()
@@ -1202,9 +1202,9 @@ void trsm100_state::machine_start()
 	/* configure ROM banking */
 	program->install_read_bank(0x0000, 0x7fff, "bank1");
 	program->unmap_write(0x0000, 0x7fff);
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
-	memory_set_bank(machine, "bank1", 0);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(I8085_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region("option")->base(), 0);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	/* configure RAM banking */
 	switch (ram_get_size(m_ram))
@@ -1229,34 +1229,34 @@ void trsm100_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
-	memory_set_bank(machine, "bank2", 0);
+	memory_configure_bank(m_machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_set_bank(m_machine, "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_bank);
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_buzzer);
-	state_save_register_global(machine, m_bell);
+	state_save_register_global(m_machine, m_bank);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_buzzer);
+	state_save_register_global(m_machine, m_bell);
 }
 
 void tandy200_state::machine_start()
 {
 	/* configure ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8085_TAG)->base() + 0x10000, 0);
-	memory_configure_bank(machine, "bank1", 2, 1, machine->region("option")->base(), 0);
-	memory_set_bank(machine, "bank1", 0);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(I8085_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region(I8085_TAG)->base() + 0x10000, 0);
+	memory_configure_bank(m_machine, "bank1", 2, 1, m_machine.region("option")->base(), 0);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 3, ram_get_ptr(m_ram), 0x6000);
-	memory_set_bank(machine, "bank2", 0);
+	memory_configure_bank(m_machine, "bank2", 0, 3, ram_get_ptr(m_ram), 0x6000);
+	memory_set_bank(m_machine, "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_bank);
-	state_save_register_global(machine, m_tp);
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_buzzer);
-	state_save_register_global(machine, m_bell);
+	state_save_register_global(m_machine, m_bank);
+	state_save_register_global(m_machine, m_tp);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_buzzer);
+	state_save_register_global(m_machine, m_bell);
 }
 
 static const cassette_config kc85_cassette_config =
@@ -1287,7 +1287,7 @@ static I8085_CONFIG( kc85_i8085_config )
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
-	tandy200_state *state = timer.machine->driver_data<tandy200_state>();
+	tandy200_state *state = timer.machine().driver_data<tandy200_state>();
 
 	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, state->m_tp);
 

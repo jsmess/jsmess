@@ -272,12 +272,12 @@ MACHINE_START( ti99_4p )
 */
 MACHINE_RESET( ti99_4p )
 {
-	tms9901_set_single_int(machine->device("tms9901"), 12, 0);
+	tms9901_set_single_int(machine.device("tms9901"), 12, 0);
 }
 
 INTERRUPT_GEN( ti99_4p_hblank_interrupt )
 {
-	v9938_interrupt(device->machine, 0);
+	v9938_interrupt(device->machine(), 0);
 }
 
 /*

@@ -84,13 +84,13 @@
  */
 static WRITE8_HANDLER( einstein_80col_ram_w )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	einstein->crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)] = data;
 }
 
 static READ8_HANDLER( einstein_80col_ram_r )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	return einstein->crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)];
 }
 
@@ -104,8 +104,8 @@ static READ8_HANDLER( einstein_80col_ram_r )
 */
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
-	einstein_state *einstein = device->machine->driver_data<einstein_state>();
-	UINT8 *data = device->machine->region("gfx1")->base();
+	einstein_state *einstein = device->machine().driver_data<einstein_state>();
+	UINT8 *data = device->machine().region("gfx1")->base();
 	UINT8 char_code, data_byte;
 	int i, x;
 
@@ -127,7 +127,7 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_6845_de_changed )
 {
-	einstein_state *einstein = device->machine->driver_data<einstein_state>();
+	einstein_state *einstein = device->machine().driver_data<einstein_state>();
 	einstein->de=state;
 }
 
@@ -138,11 +138,11 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_6845_de_changed )
  */
 static READ8_HANDLER( einstein_80col_state_r )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	UINT8 result = 0;
 
 	result |= einstein->de;
-	result |= input_port_read(space->machine, "80column_dips") & 0x06;
+	result |= input_port_read(space->machine(), "80column_dips") & 0x06;
 
 	return result;
 }
@@ -165,9 +165,9 @@ static const z80_daisy_config einstein_daisy_chain[] =
 ***************************************************************************/
 
 /* refresh keyboard data. It is refreshed when the keyboard line is written */
-static void einstein_scan_keyboard(running_machine *machine)
+static void einstein_scan_keyboard(running_machine &machine)
 {
-	einstein_state *einstein = machine->driver_data<einstein_state>();
+	einstein_state *einstein = machine.driver_data<einstein_state>();
 	UINT8 data = 0xff;
 
 	if (!BIT(einstein->keyboard_line, 0)) data &= input_port_read(machine, "LINE0");
@@ -184,13 +184,13 @@ static void einstein_scan_keyboard(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( einstein_keyboard_timer_callback )
 {
-	einstein_state *einstein = timer.machine->driver_data<einstein_state>();
+	einstein_state *einstein = timer.machine().driver_data<einstein_state>();
 
 	/* re-scan keyboard */
-	einstein_scan_keyboard(timer.machine);
+	einstein_scan_keyboard(timer.machine());
 
 	/* if /fire1 or /fire2 is 0, signal a fire interrupt */
-	if ((input_port_read(timer.machine, "BUTTONS") & 0x03) != 0)
+	if ((input_port_read(timer.machine(), "BUTTONS") & 0x03) != 0)
 	{
 		einstein->interrupt |= EINSTEIN_FIRE_INT;
 	}
@@ -205,7 +205,7 @@ static TIMER_DEVICE_CALLBACK( einstein_keyboard_timer_callback )
 
 static WRITE8_HANDLER( einstein_keyboard_line_write )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
@@ -213,15 +213,15 @@ static WRITE8_HANDLER( einstein_keyboard_line_write )
 	einstein->keyboard_line = data;
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(space->machine);
+	einstein_scan_keyboard(space->machine());
 }
 
 static READ8_HANDLER( einstein_keyboard_data_read )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(space->machine);
+	einstein_scan_keyboard(space->machine());
 
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_data_read: %02x\n", einstein->keyboard_data);
@@ -237,7 +237,7 @@ static READ8_HANDLER( einstein_keyboard_data_read )
 static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 {
 	if(VERBOSE_DISK)
-		logerror("%s: einstein_drsel_w %02x\n", device->machine->describe_context(), data);
+		logerror("%s: einstein_drsel_w %02x\n", device->machine().describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
@@ -246,7 +246,7 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 	if (BIT(data, 3)) wd17xx_set_drive(device, 3);
 
 	/* double sided drive connected? */
-	if (input_port_read(device->machine, "config") & data)
+	if (input_port_read(device->machine(), "config") & data)
 	{
 		/* bit 4 selects the side then */
 		wd17xx_set_side(device, BIT(data, 4));
@@ -261,7 +261,7 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 /* channel 0 and 1 have a 2 MHz input clock for triggering */
 static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 {
-	einstein_state *einstein = timer.machine->driver_data<einstein_state>();
+	einstein_state *einstein = timer.machine().driver_data<einstein_state>();
 
 	/* toggle line status */
 	einstein->ctc_trigger ^= 1;
@@ -277,13 +277,13 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_transmit_clock )
 {
-	device_t *uart = device->machine->device(IC_I060);
+	device_t *uart = device->machine().device(IC_I060);
 	msm8251_transmit_clock(uart);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 {
-	device_t *uart = device->machine->device(IC_I060);
+	device_t *uart = device->machine().device(IC_I060);
 	msm8251_receive_clock(uart);
 }
 
@@ -292,18 +292,18 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
     MEMORY BANKING
 ***************************************************************************/
 
-static void einstein_page_rom(running_machine *machine)
+static void einstein_page_rom(running_machine &machine)
 {
-	einstein_state *einstein = machine->driver_data<einstein_state>();
-	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? machine->region("bios")->base() : ram_get_ptr(machine->device(RAM_TAG)));
+	einstein_state *einstein = machine.driver_data<einstein_state>();
+	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? machine.region("bios")->base() : ram_get_ptr(machine.device(RAM_TAG)));
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
 static WRITE8_HANDLER( einstein_rom_w )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	einstein->rom_enabled ^= 1;
-	einstein_page_rom(space->machine);
+	einstein_page_rom(space->machine());
 }
 
 
@@ -313,15 +313,15 @@ static WRITE8_HANDLER( einstein_rom_w )
 
 static READ8_HANDLER( einstein_kybintmsk_r )
 {
-	device_t *printer = space->machine->device("centronics");
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	device_t *printer = space->machine().device("centronics");
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	UINT8 data = 0;
 
 	/* clear key int. a read of this I/O port will do this or a reset */
 	einstein->interrupt &= ~EINSTEIN_KEY_INT;
 
 	/* bit 0 and 1: fire buttons on the joysticks */
-	data |= input_port_read(space->machine, "BUTTONS");
+	data |= input_port_read(space->machine(), "BUTTONS");
 
 	/* bit 2 to 4: printer status */
 	data |= centronics_busy_r(printer) << 2;
@@ -329,19 +329,19 @@ static READ8_HANDLER( einstein_kybintmsk_r )
 	data |= centronics_fault_r(printer) << 4;
 
 	/* bit 5 to 7: graph, control and shift key */
-	data |= input_port_read(space->machine, "EXTRA");
+	data |= input_port_read(space->machine(), "EXTRA");
 
 	if(VERBOSE_KEYBOARD)
-		logerror("%s: einstein_kybintmsk_r %02x\n", space->machine->describe_context(), data);
+		logerror("%s: einstein_kybintmsk_r %02x\n", space->machine().describe_context(), data);
 
 	return data;
 }
 
 static WRITE8_HANDLER( einstein_kybintmsk_w )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
-	logerror("%s: einstein_kybintmsk_w %02x\n", space->machine->describe_context(), data);
+	logerror("%s: einstein_kybintmsk_w %02x\n", space->machine().describe_context(), data);
 
 	/* set mask from bit 0 */
 	if (data & 0x01)
@@ -360,9 +360,9 @@ static WRITE8_HANDLER( einstein_kybintmsk_w )
 /* writing 0 enables the /ADC interrupt */
 static WRITE8_HANDLER( einstein_adcintmsk_w )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
-	logerror("%s: einstein_adcintmsk_w %02x\n", space->machine->describe_context(), data);
+	logerror("%s: einstein_adcintmsk_w %02x\n", space->machine().describe_context(), data);
 
 	if (data & 0x01)
 	{
@@ -380,9 +380,9 @@ static WRITE8_HANDLER( einstein_adcintmsk_w )
 /* writing 0 enables the /FIRE interrupt */
 static WRITE8_HANDLER( einstein_fire_int_w )
 {
-	einstein_state *einstein = space->machine->driver_data<einstein_state>();
+	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
-	logerror("%s: einstein_fire_int_w %02x\n", space->machine->describe_context(), data);
+	logerror("%s: einstein_fire_int_w %02x\n", space->machine().describe_context(), data);
 
 	if (data & 0x01)
 	{
@@ -416,17 +416,17 @@ static MACHINE_START( einstein )
 
 static MACHINE_RESET( einstein )
 {
-	einstein_state *einstein = machine->driver_data<einstein_state>();
+	einstein_state *einstein = machine.driver_data<einstein_state>();
 	device_t *floppy;
 	UINT8 config = input_port_read(machine, "config");
 
 	/* save pointers to our devices */
-	einstein->color_screen = machine->device("screen");
-	einstein->ctc = machine->device(IC_I058);
+	einstein->color_screen = machine.device("screen");
+	einstein->ctc = machine.device(IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
 	einstein->rom_enabled = 1;
 	einstein_page_rom(machine);
 
@@ -442,26 +442,26 @@ static MACHINE_RESET( einstein )
 	/* configure floppy drives */
 	floppy_type type_80 = FLOPPY_STANDARD_5_25_DSHD;
 	floppy_type type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
-	floppy = machine->device("floppy0");
+	floppy = machine.device("floppy0");
 	floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
-	floppy = machine->device("floppy1");
+	floppy = machine.device("floppy1");
 	floppy_drive_set_geometry(floppy, config & 0x02 ? type_80 : type_40);
-	floppy = machine->device("floppy2");
+	floppy = machine.device("floppy2");
 	floppy_drive_set_geometry(floppy, config & 0x04 ? type_80 : type_40);
-	floppy = machine->device("floppy3");
+	floppy = machine.device("floppy3");
 	floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);
 }
 
 static MACHINE_RESET( einstein2 )
 {
-	einstein_state *einstein = machine->driver_data<einstein_state>();
+	einstein_state *einstein = machine.driver_data<einstein_state>();
 
 	/* call standard initialization first */
 	MACHINE_RESET_CALL(einstein);
 
 	/* get 80 column specific devices */
-	einstein->mc6845 = machine->device("crtc");
-	einstein->crtc_screen = machine->device<screen_device>("80column");
+	einstein->mc6845 = machine.device("crtc");
+	einstein->crtc_screen = machine.device<screen_device>("80column");
 
 	/* 80 column card palette */
 	palette_set_color(machine, TMS9928A_PALETTE_SIZE, RGB_BLACK);
@@ -470,7 +470,7 @@ static MACHINE_RESET( einstein2 )
 
 static MACHINE_START( einstein2 )
 {
-	einstein_state *einstein = machine->driver_data<einstein_state>();
+	einstein_state *einstein = machine.driver_data<einstein_state>();
 	einstein->crtc_ram = auto_alloc_array(machine, UINT8, 2048);
 	MACHINE_START_CALL(einstein);
 }
@@ -482,7 +482,7 @@ static MACHINE_START( einstein2 )
 
 static SCREEN_UPDATE( einstein2 )
 {
-	einstein_state *einstein = screen->machine->driver_data<einstein_state>();
+	einstein_state *einstein = screen->machine().driver_data<einstein_state>();
 
 	if (screen == einstein->color_screen)
 		SCREEN_UPDATE_CALL(tms9928a);

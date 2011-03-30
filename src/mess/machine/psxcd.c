@@ -137,7 +137,7 @@ device_config *psxcd_device_config::static_alloc_device_config(const machine_con
 
 device_t *psxcd_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, psxcd_device(machine, *this));
+	return auto_alloc(machine, psxcd_device(machine, *this));
 }
 
 //
@@ -203,7 +203,7 @@ void psxcd_device::device_reset()
 		m_timerinuse[i] = false;
 	}
 
-	m_cddevice = machine->device(m_devname);
+	m_cddevice = m_machine.device(m_devname);
 	if (m_cddevice)
 	{
 		m_cd = cd_get_cdrom_file(m_cddevice);
@@ -212,7 +212,7 @@ void psxcd_device::device_reset()
 		{
 //			printf("psxcd: found disc!\n");
 			driver = open_mess_drv();
-			driver->set_machine(m_machine);
+			driver->set_machine(&m_machine);
 			driver->set_cdrom_file(m_cd);
 		}
 		else
@@ -931,7 +931,7 @@ void psxcd_device::cmd_complete(command_result *res)
 
 	if (doint)
 	{
-		psx_irq_set(&m_machine, 0x0004);
+		psx_irq_set(m_machine, 0x0004);
 	}
 
 	add_result(res);

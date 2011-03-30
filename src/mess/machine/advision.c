@@ -28,20 +28,20 @@
 void advision_state::machine_start()
 {
 	/* configure EA banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8048_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region("bios")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region(I8048_TAG)->base(), 0);
 	m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");
-	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	/* allocate external RAM */
-	m_ext_ram = auto_alloc_array(machine, UINT8, 0x400);
+	m_ext_ram = auto_alloc_array(m_machine, UINT8, 0x400);
 }
 
 void advision_state::machine_reset()
 {
 	/* enable internal ROM */
 	device_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
-	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	/* reset sound CPU */
 	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
@@ -60,7 +60,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 
 	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 
-	memory_set_bank(machine, "bank1", ea);
+	memory_set_bank(m_machine, "bank1", ea);
 
 	m_rambank = (data & 0x03) << 8;
 }
@@ -163,7 +163,7 @@ READ8_MEMBER( advision_state::vsync_r )
 READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = input_port_read(machine, "joystick");
+	UINT8 in = input_port_read(m_machine, "joystick");
 	UINT8 data = in | 0x0f;
 
 	// Get buttons

@@ -44,13 +44,13 @@ static READ8_HANDLER (key_r)
 
 static WRITE8_HANDLER (disp_1_w)
 {
-	k1003_state *state = space->machine->driver_data<k1003_state>();
+	k1003_state *state = space->machine().driver_data<k1003_state>();
 	state->disp_1 = data;
 }
 
 static WRITE8_HANDLER (disp_2_w)
 {
-	k1003_state *state = space->machine->driver_data<k1003_state>();
+	k1003_state *state = space->machine().driver_data<k1003_state>();
 	state->disp_2 = data;
 }
 
@@ -67,7 +67,7 @@ static UINT8 bit_to_dec(UINT8 val) {
 }
 static WRITE8_HANDLER (disp_w)
 {
-	k1003_state *state = space->machine->driver_data<k1003_state>();
+	k1003_state *state = space->machine().driver_data<k1003_state>();
 	output_set_digit_value(bit_to_dec(data)*2,   state->disp_1);
 	output_set_digit_value(bit_to_dec(data)*2+1, state->disp_2);
 }

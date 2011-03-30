@@ -14,14 +14,14 @@ WRITE8_MEMBER( super80_state::pio_port_a_w )
 
 static READ8_DEVICE_HANDLER( pio_port_b_r ) // cannot be modernised yet as super80 hangs at start
 {
-	super80_state *state = device->machine->driver_data<super80_state>();
+	super80_state *state = device->machine().driver_data<super80_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	int bit;
 	UINT8 data = 0xff;
 
 	for (bit = 0; bit < 8; bit++)
-		if (!BIT(state->m_keylatch, bit)) data &= input_port_read(device->machine, keynames[bit]);
+		if (!BIT(state->m_keylatch, bit)) data &= input_port_read(device->machine(), keynames[bit]);
 
 	return data;
 };
@@ -40,9 +40,9 @@ Z80PIO_INTERFACE( super80_pio_intf )
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
-static void super80_cassette_motor( running_machine *machine, UINT8 data )
+static void super80_cassette_motor( running_machine &machine, UINT8 data )
 {
-	super80_state *state = machine->driver_data<super80_state>();
+	super80_state *state = machine.driver_data<super80_state>();
 	if (data)
 		cassette_change_state(state->m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	else
@@ -78,7 +78,7 @@ static void super80_cassette_motor( running_machine *machine, UINT8 data )
 
 static TIMER_CALLBACK( super80_timer )
 {
-	super80_state *state = machine->driver_data<super80_state>();
+	super80_state *state = machine.driver_data<super80_state>();
 	UINT8 cass_ws=0;
 
 	state->m_cass_data[1]++;
@@ -104,7 +104,7 @@ static TIMER_CALLBACK( super80_reset )
 static TIMER_CALLBACK( super80_halfspeed )
 {
 	UINT8 go_fast = 0;
-	super80_state *state = machine->driver_data<super80_state>();
+	super80_state *state = machine.driver_data<super80_state>();
 	if (!(state->m_shared & 4) || (!(input_port_read(machine, "CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
@@ -157,7 +157,7 @@ READ8_MEMBER( super80_state::super80_dc_r )
 
 READ8_MEMBER( super80_state::super80_f2_r )
 {
-	UINT8 data = input_port_read(machine, "DSW") & 0xf0;	// dip switches on pcb
+	UINT8 data = input_port_read(m_machine, "DSW") & 0xf0;	// dip switches on pcb
 	data |= m_cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;				// bit 3 - not used
 	return data;
@@ -177,7 +177,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data;
 	speaker_level_w(m_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 2) super80_cassette_motor(machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 2) super80_cassette_motor(m_machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
 	cassette_output(m_cass, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	m_last_data = data;
@@ -188,7 +188,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data | 0x14;
 	speaker_level_w(m_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 2) super80_cassette_motor(machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 2) super80_cassette_motor(m_machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
 	cassette_output(m_cass, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	m_last_data = data;
@@ -199,20 +199,20 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 void super80_state::machine_reset()
 {
 	m_shared=0xff;
-	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
-	memory_set_bank(machine, "boot", 1);
+	m_machine.scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
+	memory_set_bank(m_machine, "boot", 1);
 }
 
-static void driver_init_common( running_machine *machine )
+static void driver_init_common( running_machine &machine )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
-	machine->scheduler().timer_pulse(attotime::from_hz(200000), FUNC(super80_timer));	/* timer for keyboard and cassette */
+	machine.scheduler().timer_pulse(attotime::from_hz(200000), FUNC(super80_timer));	/* timer for keyboard and cassette */
 }
 
 DRIVER_INIT( super80 )
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(super80_halfspeed));	/* timer for 1MHz slowdown */
+	machine.scheduler().timer_pulse(attotime::from_hz(100), FUNC(super80_halfspeed));	/* timer for 1MHz slowdown */
 	driver_init_common(machine);
 }
 

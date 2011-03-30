@@ -737,7 +737,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static SCREEN_EOF( perfrman )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 
@@ -1742,12 +1742,12 @@ ROM_END
 
 static DRIVER_INIT( tigerh )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(tigerh_mcu_r), FUNC(tigerh_mcu_w)  );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(tigerh_mcu_r), FUNC(tigerh_mcu_w)  );
 }
 
 static DRIVER_INIT( tigerhb )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(tigerhb_e803_r), FUNC(tigerhb_e803_w)  );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(tigerhb_e803_r), FUNC(tigerhb_e803_w)  );
 }
 
 
@@ -1772,10 +1772,10 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6D38: 20 F8         jr   nz,$6D32
         6D3A: 10 E0         djnz $6D1C
     */
-	if (cpu_get_pc(space->cpu) == 0x6d1e) return 0;
-	if (cpu_get_pc(space->cpu) == 0x6d24) return 6;
-	if (cpu_get_pc(space->cpu) == 0x6d2c) return 2;
-	if (cpu_get_pc(space->cpu) == 0x6d34) return 4;
+	if (cpu_get_pc(&space->device()) == 0x6d1e) return 0;
+	if (cpu_get_pc(&space->device()) == 0x6d24) return 6;
+	if (cpu_get_pc(&space->device()) == 0x6d2c) return 2;
+	if (cpu_get_pc(&space->device()) == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
         6AD4: DB 00         in   a,($00)
@@ -1796,45 +1796,45 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6AF7: 20 FA         jr   nz,$6AF3
        This seems to be what used to be the MCU status.
     */
-	if (cpu_get_pc(space->cpu) == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(space->cpu) == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(space->cpu) == 0x6af5) return 0; /* bit 2 must be OFF */
+	if (cpu_get_pc(&space->device()) == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(&space->device()) == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(&space->device()) == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",cpu_get_pc(space->cpu));
+	logerror("Port Read PC=%04x\n",cpu_get_pc(&space->device()));
 
 	return 0;
 }
 
-static void getstar_init( running_machine *machine )
+static void getstar_init( running_machine &machine )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(getstar_e803_r), FUNC(getstar_e803_w) );
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(slapfight_port_00_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(getstar_e803_r), FUNC(getstar_e803_w) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(slapfight_port_00_r) );
 }
 
 static DRIVER_INIT( getstar )
 {
-	slapfght_state *state = machine->driver_data<slapfght_state>();
+	slapfght_state *state = machine.driver_data<slapfght_state>();
 	state->getstar_id = GETSTAR;
 	getstar_init(machine);
 }
 
 static DRIVER_INIT( getstarj )
 {
-	slapfght_state *state = machine->driver_data<slapfght_state>();
+	slapfght_state *state = machine.driver_data<slapfght_state>();
 	state->getstar_id = GETSTARJ;
 	getstar_init(machine);
 }
 
 static DRIVER_INIT( gtstarb1 )
 {
-	slapfght_state *state = machine->driver_data<slapfght_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	slapfght_state *state = machine.driver_data<slapfght_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	state->getstar_id = GTSTARB1;
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0, 0x0, FUNC(gtstarb1_port_0_read) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0, 0x0, FUNC(gtstarb1_port_0_read) );
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -1844,20 +1844,20 @@ static DRIVER_INIT( gtstarb1 )
 
 static DRIVER_INIT( gtstarb2 )
 {
-	slapfght_state *state = machine->driver_data<slapfght_state>();
+	slapfght_state *state = machine.driver_data<slapfght_state>();
 	state->getstar_id = GTSTARB2;
 	getstar_init(machine);
 }
 
 static DRIVER_INIT( slapfigh )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(slapfight_mcu_r), FUNC(slapfight_mcu_w) );
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(slapfight_mcu_status_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(slapfight_mcu_r), FUNC(slapfight_mcu_w) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(slapfight_mcu_status_r) );
 }
 
 static DRIVER_INIT( perfrman )
 {
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(perfrman_port_00_r) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(perfrman_port_00_r) );
 }
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */

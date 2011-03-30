@@ -448,18 +448,18 @@ static PALETTE_INIT( arcadia )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 8);
+	machine.colortable = colortable_alloc(machine, 8);
 
 	for (i = 0; i < 8; i++)
-		colortable_palette_set_color(machine->colortable, i, arcadia_colors[i]);
+		colortable_palette_set_color(machine.colortable, i, arcadia_colors[i]);
 
 	for (i = 0; i < 128+8; i++)
-		colortable_entry_set_value(machine->colortable, i, arcadia_palette[i]);
+		colortable_entry_set_value(machine.colortable, i, arcadia_palette[i]);
 }
 
 static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
-	UINT8 *rom = image.device().machine->region("maincpu")->base();
+	UINT8 *rom = image.device().machine().region("maincpu")->base();
 	int size;
 
 	memset(rom, 0, 0x8000);
@@ -467,8 +467,8 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	{
 		size = image.length();
 
-		if (size > image.device().machine->region("maincpu")->bytes())
-			size = image.device().machine->region("maincpu")->bytes();
+		if (size > image.device().machine().region("maincpu")->bytes())
+			size = image.device().machine().region("maincpu")->bytes();
 
 		if (image.fread(rom, size) != size)
 			return IMAGE_INIT_FAIL;
@@ -740,13 +740,13 @@ ROM_END
 static DRIVER_INIT( arcadia )
 {
 	int i;
-	UINT8 *gfx=machine->region("gfx1")->base();
+	UINT8 *gfx=machine.region("gfx1")->base();
 	for (i=0; i<256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-	    UINT8 *rom=machine->region("maincpu")->base();
+	    UINT8 *rom=machine.region("maincpu")->base();
 	    /* this is a simple routine to display all rom characters
            on the display for a snapshot */
 	    static const UINT8 prog[]={ // address 0 of course

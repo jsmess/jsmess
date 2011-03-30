@@ -69,13 +69,13 @@ public:
 /*extern UINT8 *c65_monitor; */
 /*extern UINT8 *c65_graphics; */
 
-void c65_bankswitch (running_machine *machine);
-//void c65_colorram_write (running_machine *machine, int offset, int value);
+void c65_bankswitch (running_machine &machine);
+//void c65_colorram_write (running_machine &machine, int offset, int value);
 
-int c65_dma_read(running_machine *machine, int offset);
-int c65_dma_read_color(running_machine *machine, int offset);
-void c65_vic_interrupt(running_machine *machine, int level);
-void c65_bankswitch_interface(running_machine *machine, int value);
+int c65_dma_read(running_machine &machine, int offset);
+int c65_dma_read_color(running_machine &machine, int offset);
+void c65_vic_interrupt(running_machine &machine, int level);
+void c65_bankswitch_interface(running_machine &machine, int value);
 
 DRIVER_INIT( c65 );
 DRIVER_INIT( c65pal );

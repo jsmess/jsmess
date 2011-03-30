@@ -31,7 +31,7 @@ static DEVICE_START(specimx_sound)
 {
 	specimx_sound_state *state = get_safe_token(device);
 	state->specimx_input[0] = state->specimx_input[1] = state->specimx_input[2] = 0;
-	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, specimx_sh_update);
+	state->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, specimx_sh_update);
 }
 
 static STREAM_UPDATE( specimx_sh_update )

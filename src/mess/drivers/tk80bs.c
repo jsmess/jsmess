@@ -67,7 +67,7 @@ static VIDEO_START( tk80bs )
 
 static SCREEN_UPDATE( tk80bs )
 {
-	tk80bs_state *state = screen->machine->driver_data<tk80bs_state>();
+	tk80bs_state *state = screen->machine().driver_data<tk80bs_state>();
 	int x,y;
 	int count;
 
@@ -79,7 +79,7 @@ static SCREEN_UPDATE( tk80bs )
 		{
 			int tile = state->vram[count];
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile, 0, 0, 0, x*8, y*8);
+			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
 
 			count++;
 		}
@@ -91,7 +91,7 @@ static SCREEN_UPDATE( tk80bs )
 /* FIXME: current i8255 core doesn't seem to like this system at all, so we use custom code here for now */
 static READ8_HANDLER( ppi_custom_r )
 {
-	tk80bs_state *state = space->machine->driver_data<tk80bs_state>();
+	tk80bs_state *state = space->machine().driver_data<tk80bs_state>();
 //  printf("%02x\n",offset);
 
 	switch(offset+0x7dfc)
@@ -244,10 +244,10 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( keyboard_callback )
 {
-	tk80bs_state *state = timer.machine->driver_data<tk80bs_state>();
+	tk80bs_state *state = timer.machine().driver_data<tk80bs_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = input_port_read(timer.machine,"key_modifiers") & 0x1f;
+	UINT8 keymod = input_port_read(timer.machine(),"key_modifiers") & 0x1f;
 	scancode = 0;
 
 	state->shift_press_flag = ((keymod & 0x02) >> 1);
@@ -256,7 +256,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(timer.machine,portnames[port_i])>>i) & 1)
+			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
 			{
 				if(keymod & 0x04) // kana key pressed
 				{

@@ -214,7 +214,7 @@ public:
 
 /*----------- defined in video/gba.c -----------*/
 
-void gba_draw_scanline(running_machine *machine, int y);
-void gba_video_start(running_machine *machine);
+void gba_draw_scanline(running_machine &machine, int y);
+void gba_video_start(running_machine &machine);
 
 #endif

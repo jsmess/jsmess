@@ -33,7 +33,7 @@ public:
 
 READ8_MEMBER(nixieclock_state::data_r)
 {
-	return input_port_read(machine, "INPUT") & 0x0f;
+	return input_port_read(m_machine, "INPUT") & 0x0f;
 }
 
 static UINT8 nixie_to_num(UINT16 val)
@@ -126,14 +126,14 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK(timer_callback)
 {
-	nixieclock_state *state = timer.machine->driver_data<nixieclock_state>();
-	i4004_set_test(timer.machine->device("maincpu"),state->timer);
+	nixieclock_state *state = timer.machine().driver_data<nixieclock_state>();
+	i4004_set_test(timer.machine().device("maincpu"),state->timer);
 	state->timer^=1;
 }
 
 static MACHINE_START(4004clk)
 {
-	nixieclock_state *state = machine->driver_data<nixieclock_state>();
+	nixieclock_state *state = machine.driver_data<nixieclock_state>();
 	state->timer = 0;
 
 	/* register for state saving */

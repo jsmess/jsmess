@@ -35,7 +35,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine, M6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), M6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( beta )
@@ -79,7 +79,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( led_refresh )
 {
-	beta_state *state = machine->driver_data<beta_state>();
+	beta_state *state = machine.driver_data<beta_state>();
 
 	if (state->ls145_p < 6)
 	{
@@ -105,20 +105,20 @@ static READ8_DEVICE_HANDLER( beta_riot_a_r )
 
     */
 
-	beta_state *state = device->machine->driver_data<beta_state>();
+	beta_state *state = device->machine().driver_data<beta_state>();
 
 	UINT8 data = 0xff;
 
 	switch (state->ls145_p)
 	{
-	case 6: data &= input_port_read(device->machine, "Q6"); break;
-	case 7: data &= input_port_read(device->machine, "Q7"); break;
-	case 8: data &= input_port_read(device->machine, "Q8"); break;
-	case 9: data &= input_port_read(device->machine, "Q9"); break;
+	case 6: data &= input_port_read(device->machine(), "Q6"); break;
+	case 7: data &= input_port_read(device->machine(), "Q7"); break;
+	case 8: data &= input_port_read(device->machine(), "Q8"); break;
+	case 9: data &= input_port_read(device->machine(), "Q9"); break;
 	default:
 		if (!state->eprom_oe && !state->eprom_ce)
 		{
-			data = device->machine->region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff];
+			data = device->machine().region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", state->eprom_addr & 0x7ff, data);
 		}
 	}
@@ -143,7 +143,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
 
     */
 
-	beta_state *state = device->machine->driver_data<beta_state>();
+	beta_state *state = device->machine().driver_data<beta_state>();
 
 //  logerror("PA %02x\n", data);
 
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 
     */
 
-	beta_state *state = device->machine->driver_data<beta_state>();
+	beta_state *state = device->machine().driver_data<beta_state>();
 
 	//logerror("PB %02x %02x\n", data, olddata);
 
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 	if (BIT(data, 6) && (!BIT(state->old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", state->eprom_addr & 0x7ff, state->eprom_data);
-		device->machine->region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff] &= state->eprom_data;
+		device->machine().region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff] &= state->eprom_data;
 	}
 
 	state->old_data = data;
@@ -228,7 +228,7 @@ static const riot6532_interface beta_riot_interface =
 
 static DEVICE_IMAGE_UNLOAD( beta_eprom )
 {
-	UINT8 *ptr = image.device().machine->region(EPROM_TAG)->base();
+	UINT8 *ptr = image.device().machine().region(EPROM_TAG)->base();
 
 	image.fwrite(ptr, 0x800);
 }
@@ -237,12 +237,12 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 
 static MACHINE_START( beta )
 {
-	beta_state *state = machine->driver_data<beta_state>();
+	beta_state *state = machine.driver_data<beta_state>();
 
 	/* find devices */
-	state->speaker = machine->device(SPEAKER_TAG);
+	state->speaker = machine.device(SPEAKER_TAG);
 
-	state->led_refresh_timer = machine->scheduler().timer_alloc(FUNC(led_refresh));
+	state->led_refresh_timer = machine.scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
 	state->save_item(NAME(state->eprom_oe));

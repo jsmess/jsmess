@@ -52,7 +52,7 @@ public:
 
 static DRIVER_INIT( zexall )
 {
-	zexall_state *state = machine->driver_data<zexall_state>();
+	zexall_state *state = machine.driver_data<zexall_state>();
 	state->m_out_ack = 0;
 	state->m_out_req = 0;
 	state->m_out_req_last = 0;
@@ -62,8 +62,8 @@ static DRIVER_INIT( zexall )
 static MACHINE_RESET( zexall )
 {
 // rom is self-modifying, so need to refresh it on each run
-	zexall_state *state = machine->driver_data<zexall_state>();
-	UINT8 *rom = machine->region("romcode")->base();
+	zexall_state *state = machine.driver_data<zexall_state>();
+	UINT8 *rom = machine.region("romcode")->base();
 	UINT8 *ram = state->main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);

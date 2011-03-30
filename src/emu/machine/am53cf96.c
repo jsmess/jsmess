@@ -69,11 +69,11 @@ READ32_HANDLER( am53cf96_r )
 
 	if (reg == REG_FIFO)
 	{
-//      mame_printf_debug("53cf96: read FIFO PC=%x\n", cpu_get_pc(space->cpu));
+//      mame_printf_debug("53cf96: read FIFO PC=%x\n", cpu_get_pc(&space->device()));
 		return 0;
 	}
 
-//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, cpu_get_pc(space->cpu));
+//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, cpu_get_pc(&space->device()));
 
 	if (reg == REG_IRQSTATE)
 	{
@@ -106,7 +106,7 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 	val &= 0xff;
 
-//  logerror("53cf96: w %x to reg %d (ofs %02x data %08x mask %08x PC=%x)\n", val, reg, offset, data, mem_mask, cpu_get_pc(space->cpu));
+//  logerror("53cf96: w %x to reg %d (ofs %02x data %08x mask %08x PC=%x)\n", val, reg, offset, data, mem_mask, cpu_get_pc(&space->device()));
 
 	// if writing to the target ID, cache it off for later
 	if (reg == REG_STATUS)
@@ -144,7 +144,7 @@ WRITE32_HANDLER( am53cf96_w )
 			case 2: // reset device
 				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 
-				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, cpu_get_pc(space->cpu));
+				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, cpu_get_pc(&space->device()));
 				if (devices[last_id])
 				{
 					SCSIReset( devices[last_id] );
@@ -159,10 +159,10 @@ WRITE32_HANDLER( am53cf96_w )
 			case 3:	// reset SCSI bus
 				scsi_regs[REG_INTSTATE] = 4;	// command sent OK
 				xfer_state = 0;
-				space->machine->scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
+				space->machine().scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
 				break;
 			case 0x42:  	// select with ATN steps
-				space->machine->scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
+				space->machine().scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
 				if ((fifo[1] == 0) || (fifo[1] == 0x48) || (fifo[1] == 0x4b))
 				{
 					scsi_regs[REG_INTSTATE] = 6;
@@ -172,7 +172,7 @@ WRITE32_HANDLER( am53cf96_w )
 					scsi_regs[REG_INTSTATE] = 4;
 				}
 
-				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, cpu_get_pc(space->cpu));
+				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, cpu_get_pc(&space->device()));
 				if (devices[last_id])
 				{
 					int length;
@@ -192,7 +192,7 @@ WRITE32_HANDLER( am53cf96_w )
 			case 0x10:	// information transfer (must not change xfer_state)
 			case 0x11:	// second phase of information transfer
 			case 0x12:	// message accepted
-				space->machine->scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
+				space->machine().scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
 				scsi_regs[REG_INTSTATE] = 6;	// command sent OK
 				break;
 			default:
@@ -208,7 +208,7 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 }
 
-void am53cf96_init( running_machine *machine, const struct AM53CF96interface *interface )
+void am53cf96_init( running_machine &machine, const struct AM53CF96interface *interface )
 {
 	int i;
 

@@ -181,7 +181,7 @@ void bigbord2_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x0fff, machine->region("monitor")->base());
+		program->install_rom(0x0000, 0x0fff, machine.region("monitor")->base());
 		program->unmap_readwrite(0x1000, 0x1fff);
 		program->install_ram(0x3000, 0x3fff, m_videoram);
 	}
@@ -352,7 +352,7 @@ WRITE8_MEMBER( bigbord2_state::kbpio_pa_w )
 
 static void bigbord2_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, Z80_TAG, 0, state);
+	cputag_set_input_line(device->machine(), Z80_TAG, 0, state);
 }
 
 const z80sio_interface sio_intf =
@@ -370,7 +370,7 @@ const z80sio_interface sio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	//bigbord2_state *state = timer.machine->driver_data<bigbord2_state>();
+	//bigbord2_state *state = timer.machine().driver_data<bigbord2_state>();
 
 	//z80ctc_trg0_w(state->m_ctc, 1);
 	//z80ctc_trg0_w(state->m_ctc, 0);
@@ -445,7 +445,7 @@ static const wd17xx_interface fdc_intf =
 void bigbord2_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine->region("chargen")->base();
+	m_char_rom = m_machine.region("chargen")->base();
 }
 
 
@@ -477,7 +477,7 @@ void bigbord2_state::set_floppy_parameters(size_t length)
 
 static void bigbord2_load_proc(device_image_interface &image)
 {
-	bigbord2_state *state = image.device().machine->driver_data<bigbord2_state>();
+	bigbord2_state *state = image.device().machine().driver_data<bigbord2_state>();
 
 	state->set_floppy_parameters(image.length());
 }
@@ -491,14 +491,14 @@ void bigbord2_state::machine_start()
 	floppy_install_load_proc(m_floppy1, bigbord2_load_proc);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_term_data);
-	state_save_register_global(machine, m_scroll);
-	state_save_register_global(machine, m_ncset2);
-	state_save_register_global(machine, m_vatt);
-	state_save_register_global(machine, m_fdc_irq);
-	state_save_register_global(machine, m_fdc_drq);
-	state_save_register_global(machine, m_8n5);
-	state_save_register_global(machine, m_dsdd);
+	state_save_register_global(m_machine, m_term_data);
+	state_save_register_global(m_machine, m_scroll);
+	state_save_register_global(m_machine, m_ncset2);
+	state_save_register_global(m_machine, m_vatt);
+	state_save_register_global(m_machine, m_fdc_irq);
+	state_save_register_global(m_machine, m_fdc_drq);
+	state_save_register_global(m_machine, m_8n5);
+	state_save_register_global(m_machine, m_dsdd);
 }
 
 void bigbord2_state::machine_reset()
@@ -565,7 +565,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE( bigbord2 )
 {
-	bigbord2_state *state = screen->machine->driver_data<bigbord2_state>();
+	bigbord2_state *state = screen->machine().driver_data<bigbord2_state>();
 	state->m_framecnt++;
 	mc6845_update(state->m_6845, bitmap, cliprect);
 	return 0;
@@ -573,7 +573,7 @@ static SCREEN_UPDATE( bigbord2 )
 
 MC6845_UPDATE_ROW( bigbord2_update_row )
 {
-	bigbord2_state *state = device->machine->driver_data<bigbord2_state>();
+	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);

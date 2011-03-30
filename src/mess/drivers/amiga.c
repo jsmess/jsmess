@@ -49,14 +49,14 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 static READ16_HANDLER( amiga_clock_r )
 {
-	device_t *rtc = space->machine->device("rtc");
+	device_t *rtc = space->machine().device("rtc");
 	return msm6242_r(rtc, offset / 2);
 }
 
 
 static WRITE16_HANDLER( amiga_clock_w )
 {
-	device_t *rtc = space->machine->device("rtc");
+	device_t *rtc = space->machine().device("rtc");
 	msm6242_w(rtc, offset / 2, data);
 }
 
@@ -493,23 +493,23 @@ MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 {
-	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r(device->machine->device("fdc"));
+	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	ret |= amiga_fdc_status_r(device->machine().device("fdc"));
 	return ret;
 }
 
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
 {
-	return input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	return input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
 }
 
 
 static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 {
-	amiga_state *state = device->machine->driver_data<amiga_state>();
+	amiga_state *state = device->machine().driver_data<amiga_state>();
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, "bank1", data & 1);
+	memory_set_bank(device->machine(), "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
@@ -520,21 +520,21 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
-		if (device->machine->region("user2")->base() != NULL)
-			amiga_cart_check_overlay(device->machine);
+		if (device->machine().region("user2")->base() != NULL)
+			amiga_cart_check_overlay(device->machine());
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, state->chip_ram_size - 1);
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, state->chip_ram_size - 1);
 
-	set_led_status( device->machine, 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
+	set_led_status( device->machine(), 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
 }
 
-static UINT16 amiga_read_joy0dat(running_machine *machine)
+static UINT16 amiga_read_joy0dat(running_machine &machine)
 {
 	if ( input_port_read(machine, "input") & 0x20 ) {
 		/* Joystick */
@@ -548,7 +548,7 @@ static UINT16 amiga_read_joy0dat(running_machine *machine)
 	}
 }
 
-static UINT16 amiga_read_joy1dat(running_machine *machine)
+static UINT16 amiga_read_joy1dat(running_machine &machine)
 {
 	if ( input_port_read(machine, "input") & 0x10 ) {
 		/* Joystick */
@@ -562,38 +562,38 @@ static UINT16 amiga_read_joy1dat(running_machine *machine)
 	}
 }
 
-static UINT16 amiga_read_dskbytr(running_machine *machine)
+static UINT16 amiga_read_dskbytr(running_machine &machine)
 {
-	return amiga_fdc_get_byte(machine->device("fdc"));
+	return amiga_fdc_get_byte(machine.device("fdc"));
 }
 
-static void amiga_write_dsklen(running_machine *machine, UINT16 data)
+static void amiga_write_dsklen(running_machine &machine, UINT16 data)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	if ( data & 0x8000 ) {
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(machine->device("fdc"));
+			amiga_fdc_setup_dma(machine.device("fdc"));
 	}
 }
 
 
-static void amiga_reset(running_machine *machine)
+static void amiga_reset(running_machine &machine)
 {
 	if (input_port_read(machine, "hardware") & 0x08)
 	{
 		/* Install RTC */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdc0000, 0xdc003f, FUNC(amiga_clock_r), FUNC(amiga_clock_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdc0000, 0xdc003f, FUNC(amiga_clock_r), FUNC(amiga_clock_w));
 	}
 	else
 	{
 		/* No RTC support */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0xdc0000, 0xdc003f);
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0xdc0000, 0xdc003f);
 	}
 }
 
 static DRIVER_INIT( amiga )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	static const amiga_machine_interface amiga_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -611,7 +611,7 @@ static DRIVER_INIT( amiga )
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine);
@@ -644,7 +644,7 @@ static DRIVER_INIT( amiga_ecs )
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, state->chip_ram, 0);
-	memory_configure_bank(1, 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(1, 1, 1, machine.region("user1")->base(), 0);
 
 	/* initialize Action Replay (if present) */
 	amiga_cart_init(machine);
@@ -656,7 +656,7 @@ static DRIVER_INIT( amiga_ecs )
 
 static DRIVER_INIT( cdtv )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	static const amiga_machine_interface amiga_intf =
 	{
 		ECS_CHIP_RAM_MASK,
@@ -674,7 +674,7 @@ static DRIVER_INIT( cdtv )
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
 	amigakbd_init(machine);

@@ -17,11 +17,11 @@ VIDEO_START( pp01 )
 
 SCREEN_UPDATE( pp01 )
 {
-	pp01_state *state = screen->machine->driver_data<pp01_state>();
+	pp01_state *state = screen->machine().driver_data<pp01_state>();
 	UINT8 code_r,code_g,code_b;
 	UINT8 col;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
 
 	for (y = 0; y < 256; y++)
 	{

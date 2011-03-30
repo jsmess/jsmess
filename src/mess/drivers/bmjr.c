@@ -40,9 +40,9 @@ static VIDEO_START( bmjr )
 
 static SCREEN_UPDATE( bmjr )
 {
-	bmjr_state *state = screen->machine->driver_data<bmjr_state>();
+	bmjr_state *state = screen->machine().driver_data<bmjr_state>();
 	int x,y,xi,yi,count;
-	UINT8 *gfx_rom = screen->machine->region("char")->base();
+	UINT8 *gfx_rom = screen->machine().region("char")->base();
 
 	count = 0x0100;
 
@@ -64,7 +64,7 @@ static SCREEN_UPDATE( bmjr )
 					else
 						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
-					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[pen];
 				}
 			}
 
@@ -78,19 +78,19 @@ static SCREEN_UPDATE( bmjr )
 
 static READ8_HANDLER( key_r )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
 	                                        "KEYC", "KEYD", "UNUSED", "UNUSED" };
 
 
-	return (input_port_read(space->machine, keynames[state->key_mux]) & 0xf) | ((input_port_read(space->machine, "KEYMOD") & 0xf) << 4);
+	return (input_port_read(space->machine(), keynames[state->key_mux]) & 0xf) | ((input_port_read(space->machine(), "KEYMOD") & 0xf) << 4);
 }
 
 static WRITE8_HANDLER( key_w )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	state->key_mux = data & 0xf;
 
 //  if(data & 0xf0)
@@ -110,7 +110,7 @@ static READ8_HANDLER( unk_r )
 
 static READ8_HANDLER( tape_r )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	//cassette_change_state(state->cassette,CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 
 	return (cassette_input(state->cassette) > 0.03) ? 0xff : 0x00;
@@ -118,10 +118,10 @@ static READ8_HANDLER( tape_r )
 
 static WRITE8_HANDLER( tape_w )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	if(!state->tape_switch)
 	{
-		beep_set_state(space->machine->device("beeper"),!(data & 0x80));
+		beep_set_state(space->machine().device("beeper"),!(data & 0x80));
 	}
 	else
 	{
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( tape_w )
 
 static READ8_HANDLER( tape_stop_r )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	state->tape_switch = 0;
 	//cassette_change_state(state->cassette,CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 	cassette_change_state(state->cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
@@ -141,7 +141,7 @@ static READ8_HANDLER( tape_stop_r )
 
 static READ8_HANDLER( tape_start_r )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	state->tape_switch = 1;
 	cassette_change_state(state->cassette,CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
@@ -149,7 +149,7 @@ static READ8_HANDLER( tape_start_r )
 
 static WRITE8_HANDLER( xor_display_w )
 {
-	bmjr_state *state = space->machine->driver_data<bmjr_state>();
+	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	state->xor_display = data;
 }
 
@@ -321,15 +321,15 @@ static PALETTE_INIT( bmjr )
 
 static MACHINE_START(bmjr)
 {
-	beep_set_frequency(machine->device("beeper"),1200); //guesswork
-	beep_set_state(machine->device("beeper"),0);
+	beep_set_frequency(machine.device("beeper"),1200); //guesswork
+	beep_set_state(machine.device("beeper"),0);
 }
 
 static MACHINE_RESET(bmjr)
 {
-	bmjr_state *state = machine->driver_data<bmjr_state>();
+	bmjr_state *state = machine.driver_data<bmjr_state>();
 	state->tape_switch = 0;
-	state->cassette = machine->device("cassette");
+	state->cassette = machine.device("cassette");
 	cassette_change_state(state->cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 

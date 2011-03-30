@@ -66,12 +66,12 @@ extern struct mscrtc6845 *mscrtc6845;
 
 ***************************************************************************/
 
-struct mscrtc6845 *mscrtc6845_init(running_machine *machine, const struct mscrtc6845_config *config);
+struct mscrtc6845 *mscrtc6845_init(running_machine &machine, const struct mscrtc6845_config *config);
 
 void mscrtc6845_set_clock(struct mscrtc6845 *crtc, int freq);
 
 /* to be called before drawing screen */
-void mscrtc6845_time(running_machine *machine, struct mscrtc6845 *crtc);
+void mscrtc6845_time(running_machine &machine, struct mscrtc6845 *crtc);
 
 int mscrtc6845_get_char_columns(struct mscrtc6845 *crtc);
 int mscrtc6845_get_char_height(struct mscrtc6845 *crtc);

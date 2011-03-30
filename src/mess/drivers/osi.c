@@ -233,7 +233,7 @@ DISCRETE_SOUND_END
 
 static READ8_HANDLER( osi600_keyboard_r )
 {
-	osi_state *state = space->machine->driver_data<osi_state>();
+	osi_state *state = space->machine().driver_data<osi_state>();
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
@@ -242,7 +242,7 @@ static READ8_HANDLER( osi600_keyboard_r )
 
 	for (bit = 0; bit < 8; bit++)
 	{
-		if (!BIT(state->keylatch, bit)) data &= input_port_read(space->machine, keynames[bit]);
+		if (!BIT(state->keylatch, bit)) data &= input_port_read(space->machine(), keynames[bit]);
 	}
 
 	return data;
@@ -250,8 +250,8 @@ static READ8_HANDLER( osi600_keyboard_r )
 
 static WRITE8_HANDLER( osi600_keyboard_w )
 {
-	device_t *discrete = space->machine->device("discrete");
-	osi_state *state = space->machine->driver_data<osi_state>();
+	device_t *discrete = space->machine().device("discrete");
+	osi_state *state = space->machine().driver_data<osi_state>();
 
 	state->keylatch = data;
 
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( osi600_keyboard_w )
 
 static WRITE8_HANDLER( uk101_keyboard_w )
 {
-	osi_state *state = space->machine->driver_data<osi_state>();
+	osi_state *state = space->machine().driver_data<osi_state>();
 
 	state->keylatch = data;
 }
@@ -282,8 +282,8 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
     */
 
-	device_t *discrete = space->machine->device("discrete");
-	osi_state *state = space->machine->driver_data<osi_state>();
+	device_t *discrete = space->machine().device("discrete");
+	osi_state *state = space->machine().driver_data<osi_state>();
 
 	state->_32 = BIT(data, 0);
 	state->coloren = BIT(data, 1);
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
 static WRITE8_HANDLER( osi630_ctrl_w )
 {
-	device_t *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine().device("beep");
 	/*
 
         bit     description
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( osi630_ctrl_w )
 
 static WRITE8_HANDLER( osi630_sound_w )
 {
-	device_t *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine().device("beep");
 	if (data) beep_set_frequency(speaker, 49152/data);
 }
 
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( osi630_sound_w )
 
 static void osi470_index_callback(device_t *controller, device_t *img, int state)
 {
-	osi_state *driver_state = img->machine->driver_data<osi_state>();
+	osi_state *driver_state = img->machine().driver_data<osi_state>();
 
 	driver_state->fdc_index = state;
 }
@@ -379,7 +379,7 @@ static READ8_DEVICE_HANDLER( osi470_pia_a_r )
 
     */
 
-	osi_state *state = device->machine->driver_data<osi_state>();
+	osi_state *state = device->machine().driver_data<osi_state>();
 
 	return (state->fdc_index << 7);
 }
@@ -615,14 +615,14 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( cassette_rx )
 {
-	osi_state *driver_state = device->machine->driver_data<osi_state>();
+	osi_state *driver_state = device->machine().driver_data<osi_state>();
 
 	return (cassette_input(driver_state->cassette) > 0.0) ? 1 : 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cassette_tx )
 {
-	osi_state *driver_state = device->machine->driver_data<osi_state>();
+	osi_state *driver_state = device->machine().driver_data<osi_state>();
 
 	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
 }
@@ -665,18 +665,18 @@ static ACIA6850_INTERFACE( osi470_acia_intf )
 
 static MACHINE_START( osi600 )
 {
-	osi_state *state = machine->driver_data<osi_state>();
+	osi_state *state = machine.driver_data<osi_state>();
 
-	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(M6502_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region(M6502_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (ram_get_size(machine->device(RAM_TAG)))
+	switch (ram_get_size(machine.device(RAM_TAG)))
 	{
 	case 4*1024:
 		program->install_readwrite_bank(0x0000, 0x0fff, "bank1");
@@ -695,18 +695,18 @@ static MACHINE_START( osi600 )
 
 static MACHINE_START( c1p )
 {
-	osi_state *state = machine->driver_data<osi_state>();
+	osi_state *state = machine.driver_data<osi_state>();
 
-	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(M6502_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region(M6502_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (ram_get_size(machine->device(RAM_TAG)))
+	switch (ram_get_size(machine.device(RAM_TAG)))
 	{
 	case 8*1024:
 		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
@@ -918,14 +918,14 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	device_t *speaker = machine->device("beep");
+	device_t *speaker = machine.device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }
 
 static DRIVER_INIT( c1p )
 {
-	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	machine.scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 }
 
 

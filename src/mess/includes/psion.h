@@ -73,8 +73,8 @@ public:
 	virtual void machine_reset();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	UINT8 kb_read(running_machine *machine);
-	void update_banks(running_machine *machine);
+	UINT8 kb_read(running_machine &machine);
+	void update_banks(running_machine &machine);
 	datapack *get_active_slot(UINT8 data);
 	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
 	DECLARE_READ8_MEMBER( hd63701_int_reg_r );

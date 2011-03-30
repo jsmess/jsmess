@@ -97,80 +97,80 @@ public:
 static WRITE8_HANDLER( lynx48k_bank_w )
 {
 	if (!data)
-		memory_set_bank(space->machine, "bank1", 0);
+		memory_set_bank(space->machine(), "bank1", 0);
 	else
 	if (data & 2)
-		memory_set_bank(space->machine, "bank1", 1);
+		memory_set_bank(space->machine(), "bank1", 1);
 	else
 	if (data & 4)
-		memory_set_bank(space->machine, "bank1", 2);
+		memory_set_bank(space->machine(), "bank1", 2);
 	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(&space->device()), data);
 }
 
 static WRITE8_HANDLER( lynx128k_bank_w )
 {
 	/* get address space */
-	address_space *mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *base = mem->machine->region("maincpu")->base();
+	address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *base = mem->machine().region("maincpu")->base();
 
 	/* Set read banks */
 	UINT8 bank = data & 0x0f;
 
 	if (!bank)
 	{
-		memory_set_bankptr(mem->machine, "bank1", base + 0x00000);
-		memory_set_bankptr(mem->machine, "bank2", base + 0x02000);
-		memory_set_bankptr(mem->machine, "bank3", base + 0x04000);
-		memory_set_bankptr(mem->machine, "bank4", base + 0x16000);
-		memory_set_bankptr(mem->machine, "bank5", base + 0x18000);
-		memory_set_bankptr(mem->machine, "bank6", base + 0x1a000);
-		memory_set_bankptr(mem->machine, "bank7", base + 0x0c000);
-		memory_set_bankptr(mem->machine, "bank8", base + 0x0e000);
+		memory_set_bankptr(mem->machine(), "bank1", base + 0x00000);
+		memory_set_bankptr(mem->machine(), "bank2", base + 0x02000);
+		memory_set_bankptr(mem->machine(), "bank3", base + 0x04000);
+		memory_set_bankptr(mem->machine(), "bank4", base + 0x16000);
+		memory_set_bankptr(mem->machine(), "bank5", base + 0x18000);
+		memory_set_bankptr(mem->machine(), "bank6", base + 0x1a000);
+		memory_set_bankptr(mem->machine(), "bank7", base + 0x0c000);
+		memory_set_bankptr(mem->machine(), "bank8", base + 0x0e000);
 	}
 	else
 	if (bank == 0x0e)
 	{
-		memory_set_bankptr(mem->machine, "bank1", base + 0x20000);
-		memory_set_bankptr(mem->machine, "bank2", base + 0x22000);
-		memory_set_bankptr(mem->machine, "bank3", base + 0x24000);
-		memory_set_bankptr(mem->machine, "bank4", base + 0x26000);
-		memory_set_bankptr(mem->machine, "bank5", base + 0x28000);
-		memory_set_bankptr(mem->machine, "bank6", base + 0x2a000);
-		memory_set_bankptr(mem->machine, "bank7", base + 0x2c000);
-		memory_set_bankptr(mem->machine, "bank8", base + 0x2e000);
+		memory_set_bankptr(mem->machine(), "bank1", base + 0x20000);
+		memory_set_bankptr(mem->machine(), "bank2", base + 0x22000);
+		memory_set_bankptr(mem->machine(), "bank3", base + 0x24000);
+		memory_set_bankptr(mem->machine(), "bank4", base + 0x26000);
+		memory_set_bankptr(mem->machine(), "bank5", base + 0x28000);
+		memory_set_bankptr(mem->machine(), "bank6", base + 0x2a000);
+		memory_set_bankptr(mem->machine(), "bank7", base + 0x2c000);
+		memory_set_bankptr(mem->machine(), "bank8", base + 0x2e000);
 	}
 	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(&space->device()), data);
 
 	/* Set write banks */
 	bank = data & 0xd0;
 
 	if (!bank)
 	{
-		memory_set_bankptr(mem->machine, "bank11", base + 0x10000);
-		memory_set_bankptr(mem->machine, "bank12", base + 0x12000);
-		memory_set_bankptr(mem->machine, "bank13", base + 0x14000);
-		memory_set_bankptr(mem->machine, "bank14", base + 0x16000);
-		memory_set_bankptr(mem->machine, "bank15", base + 0x18000);
-		memory_set_bankptr(mem->machine, "bank16", base + 0x1a000);
-		memory_set_bankptr(mem->machine, "bank17", base + 0x1c000);
-		memory_set_bankptr(mem->machine, "bank18", base + 0x1e000);
+		memory_set_bankptr(mem->machine(), "bank11", base + 0x10000);
+		memory_set_bankptr(mem->machine(), "bank12", base + 0x12000);
+		memory_set_bankptr(mem->machine(), "bank13", base + 0x14000);
+		memory_set_bankptr(mem->machine(), "bank14", base + 0x16000);
+		memory_set_bankptr(mem->machine(), "bank15", base + 0x18000);
+		memory_set_bankptr(mem->machine(), "bank16", base + 0x1a000);
+		memory_set_bankptr(mem->machine(), "bank17", base + 0x1c000);
+		memory_set_bankptr(mem->machine(), "bank18", base + 0x1e000);
 	}
 	else
 	if (bank == 0xc0)
 	{
-		memory_set_bankptr(mem->machine, "bank11", base + 0x20000);
-		memory_set_bankptr(mem->machine, "bank12", base + 0x22000);
-		memory_set_bankptr(mem->machine, "bank13", base + 0x24000);
-		memory_set_bankptr(mem->machine, "bank14", base + 0x26000);
-		memory_set_bankptr(mem->machine, "bank15", base + 0x28000);
-		memory_set_bankptr(mem->machine, "bank16", base + 0x2a000);
-		memory_set_bankptr(mem->machine, "bank17", base + 0x2c000);
-		memory_set_bankptr(mem->machine, "bank18", base + 0x2e000);
+		memory_set_bankptr(mem->machine(), "bank11", base + 0x20000);
+		memory_set_bankptr(mem->machine(), "bank12", base + 0x22000);
+		memory_set_bankptr(mem->machine(), "bank13", base + 0x24000);
+		memory_set_bankptr(mem->machine(), "bank14", base + 0x26000);
+		memory_set_bankptr(mem->machine(), "bank15", base + 0x28000);
+		memory_set_bankptr(mem->machine(), "bank16", base + 0x2a000);
+		memory_set_bankptr(mem->machine(), "bank17", base + 0x2c000);
+		memory_set_bankptr(mem->machine(), "bank18", base + 0x2e000);
 	}
 	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(&space->device()), data);
 }
 
 static ADDRESS_MAP_START( lynx48k_mem, AS_PROGRAM, 8)
@@ -311,7 +311,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( lynx128k )
 {
-	address_space *mem = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *mem = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	mem->install_read_bank (0x0000, 0x1fff, "bank1");
 	mem->install_read_bank (0x2000, 0x3fff, "bank2");
 	mem->install_read_bank (0x4000, 0x5fff, "bank3");
@@ -334,7 +334,7 @@ static MACHINE_RESET( lynx128k )
 
 static WRITE8_DEVICE_HANDLER( lynx128k_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, data);
+	cputag_set_input_line(device->machine(), "maincpu", 0, data);
 }
 
 
@@ -363,7 +363,7 @@ static PALETTE_INIT( lynx48k )
 
 static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
-	UINT8 *RAM = device->machine->region("maincpu")->base();
+	UINT8 *RAM = device->machine().region("maincpu")->base();
 	UINT8 r,g,b;
 	UINT16 x, *p = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -386,7 +386,7 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 
 static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
-	UINT8 *RAM = device->machine->region("maincpu")->base();
+	UINT8 *RAM = device->machine().region("maincpu")->base();
 	UINT8 r,g,b;
 	UINT16 x, *p = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -409,14 +409,14 @@ static MC6845_UPDATE_ROW( lynx128k_update_row )
 
 static VIDEO_START( lynx48k )
 {
-	camplynx_state *state = machine->driver_data<camplynx_state>();
+	camplynx_state *state = machine.driver_data<camplynx_state>();
 
-	state->mc6845 = machine->device("crtc");
+	state->mc6845 = machine.device("crtc");
 }
 
 static SCREEN_UPDATE( lynx48k )
 {
-	camplynx_state *state = screen->machine->driver_data<camplynx_state>();
+	camplynx_state *state = screen->machine().driver_data<camplynx_state>();
 
 	mc6845_update(state->mc6845, bitmap, cliprect);
 	return 0;
@@ -514,7 +514,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( lynx48k )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 3, &RAM[0x8000],  0x8000);
 }
 

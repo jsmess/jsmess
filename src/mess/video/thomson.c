@@ -50,9 +50,9 @@ static UINT8 thom_hires_better;
 
 
 
-static int thom_update_screen_size( running_machine *machine )
+static int thom_update_screen_size( running_machine &machine )
 {
-	screen_device *screen = machine->first_screen();
+	screen_device *screen = machine.first_screen();
 	const rectangle &visarea = screen->visible_area();
 	UINT8 p = input_port_read(machine, "vconfig");
 	int new_w, new_h, changed = 0;
@@ -76,7 +76,7 @@ static int thom_update_screen_size( running_machine *machine )
 	if ( ( visarea.max_x != new_w ) || ( visarea.max_y != new_h ) )
 	{
 		changed = 1;
-		machine->primary_screen->set_visible_area(0, new_w, 0, new_h );
+		machine.primary_screen->set_visible_area(0, new_w, 0, new_h );
 	}
 
 	return changed;
@@ -95,7 +95,7 @@ static emu_timer* thom_video_timer; /* time elapsed from begining of frame */
 
 
 /* elapsed time from begining of frame, in us */
-INLINE unsigned thom_video_elapsed ( running_machine *machine )
+INLINE unsigned thom_video_elapsed ( running_machine &machine )
 {
 	unsigned u;
 	attotime elapsed = thom_video_timer ->elapsed( );
@@ -107,7 +107,7 @@ INLINE unsigned thom_video_elapsed ( running_machine *machine )
 
 
 
-struct thom_vsignal thom_get_vsignal ( running_machine *machine )
+struct thom_vsignal thom_get_vsignal ( running_machine &machine )
 {
 	struct thom_vsignal v;
 	int gpl = thom_video_elapsed( machine ) - 64 * THOM_BORDER_HEIGHT - 7;
@@ -133,7 +133,7 @@ struct thom_vsignal thom_get_vsignal ( running_machine *machine )
 
 
 
-static void thom_get_lightpen_pos( running_machine *machine, int*x, int* y )
+static void thom_get_lightpen_pos( running_machine &machine, int*x, int* y )
 {
 	*x = input_port_read(machine, "lightpen_x");
 	*y = input_port_read(machine, "lightpen_y");
@@ -153,7 +153,7 @@ static void thom_get_lightpen_pos( running_machine *machine, int*x, int* y )
 
 
 
-struct thom_vsignal thom_get_lightpen_vsignal ( running_machine *machine, int xdec, int ydec, int xdec2 )
+struct thom_vsignal thom_get_lightpen_vsignal ( running_machine &machine, int xdec, int ydec, int xdec2 )
 {
 	struct thom_vsignal v;
 	int x, y;
@@ -197,13 +197,13 @@ static emu_timer *thom_lightpen_timer;
 
 
 /* lightpen callback function to call from timer */
-static void (*thom_lightpen_cb) ( running_machine *machine, int );
+static void (*thom_lightpen_cb) ( running_machine &machine, int );
 
 
 
-void thom_set_lightpen_callback ( running_machine *machine, int nb, void (*cb) ( running_machine *machine, int step ) )
+void thom_set_lightpen_callback ( running_machine &machine, int nb, void (*cb) ( running_machine &machine, int step ) )
 {
-	LOG (( "%f thom_set_lightpen_callback called\n", machine->time().as_double()));
+	LOG (( "%f thom_set_lightpen_callback called\n", machine.time().as_double()));
 	thom_lightpen_nb = nb;
 	thom_lightpen_cb = cb;
 }
@@ -292,7 +292,7 @@ static int thom_mode_is_hires( int mode )
 
 
 /* either the border index or its palette entry has changed */
-static void thom_border_changed( running_machine *machine )
+static void thom_border_changed( running_machine &machine )
 {
 	unsigned l = thom_video_elapsed( machine );
 	unsigned y = l >> 6;
@@ -331,7 +331,7 @@ static void thom_border_changed( running_machine *machine )
 
 
 /* the video mode or page has changed */
-static void thom_gplinfo_changed( running_machine *machine )
+static void thom_gplinfo_changed( running_machine &machine )
 {
 	unsigned l = thom_video_elapsed( machine ) - THOM_BORDER_HEIGHT * 64 - 7;
 	unsigned y = l >> 6;
@@ -346,7 +346,7 @@ static void thom_gplinfo_changed( running_machine *machine )
 
 
 
-void thom_set_border_color ( running_machine *machine, unsigned index )
+void thom_set_border_color ( running_machine &machine, unsigned index )
 {
 	assert( index < 16 );
 	if ( index != thom_border_index )
@@ -359,7 +359,7 @@ void thom_set_border_color ( running_machine *machine, unsigned index )
 
 
 
-void thom_set_palette ( running_machine *machine, unsigned index, UINT16 color )
+void thom_set_palette ( running_machine &machine, unsigned index, UINT16 color )
 {
 	assert( index < 16 );
 
@@ -380,7 +380,7 @@ void thom_set_palette ( running_machine *machine, unsigned index, UINT16 color )
 
 
 
-void thom_set_video_mode ( running_machine *machine, unsigned mode )
+void thom_set_video_mode ( running_machine &machine, unsigned mode )
 {
 	assert( mode < THOM_VMODE_NB );
 
@@ -395,7 +395,7 @@ void thom_set_video_mode ( running_machine *machine, unsigned mode )
 
 
 
-void thom_set_video_page ( running_machine *machine, unsigned page )
+void thom_set_video_page ( running_machine &machine, unsigned page )
 {
 	assert( page < THOM_NB_PAGES )
 		;
@@ -412,13 +412,13 @@ void thom_set_video_page ( running_machine *machine, unsigned page )
 
 
 
-typedef void ( *thom_scandraw ) ( running_machine *machine, UINT8* vram, UINT16* dst, UINT16* pal,
+typedef void ( *thom_scandraw ) ( running_machine &machine, UINT8* vram, UINT16* dst, UINT16* pal,
 				  int org, int len );
 
 
 
 #define UPDATE( name, res )						\
-	static void name##_scandraw_##res ( running_machine *machine,	\
+	static void name##_scandraw_##res ( running_machine &machine,	\
 					    UINT8* vram, UINT16* dst,	UINT16* pal, \
 					    int org, int len )		\
 	{								\
@@ -866,7 +866,7 @@ static UINT32 thom_floppy_rcount;
 
 
 
-void thom_set_mode_point ( running_machine *machine, int point )
+void thom_set_mode_point ( running_machine &machine, int point )
 {
 	assert( point >= 0 && point <= 1 );
 	thom_mode_point = ( ! point ) * 0x2000;
@@ -875,7 +875,7 @@ void thom_set_mode_point ( running_machine *machine, int point )
 
 
 
-void thom_floppy_active ( running_machine *machine, int write )
+void thom_floppy_active ( running_machine &machine, int write )
 {
 	int fold = FLOP_STATE, fnew;
 
@@ -913,7 +913,7 @@ SCREEN_UPDATE ( thom )
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-	//LOG (( "%f thom: video update called\n", machine->time().as_double()));
+	//LOG (( "%f thom: video update called\n", machine.time().as_double()));
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -1011,11 +1011,11 @@ SCREEN_UPDATE ( thom )
 
 static emu_timer *thom_init_timer;
 
-static void (*thom_init_cb) ( running_machine *machine, int init );
+static void (*thom_init_cb) ( running_machine &machine, int init );
 
 
 
-void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_machine *machine, int init ) )
+void thom_set_init_callback ( running_machine &machine, void (*cb) ( running_machine &machine, int init ) )
 {
 	thom_init_cb = cb;
 }
@@ -1025,7 +1025,7 @@ void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_mac
 static TIMER_CALLBACK( thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", machine->time().as_double(), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
+	LOG (( "%f thom_set_init: %i, at line %i col %i\n", machine.time().as_double(), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
 
 	if ( thom_init_cb )
 		thom_init_cb( machine, init );
@@ -1041,7 +1041,7 @@ SCREEN_EOF ( thom )
 	UINT16 b = 0;
 	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, 0, -1, 0 );
 
-	LOG (( "%f thom: video eof called\n", machine->time().as_double() ));
+	LOG (( "%f thom: video eof called\n", machine.time().as_double() ));
 
 	/* floppy indicator count */
 	if ( thom_floppy_wcount )
@@ -1153,17 +1153,17 @@ VIDEO_START ( thom )
 	state_save_register_global(machine,  thom_floppy_rcount );
 	output_set_value( "floppy", 0 );
 
-	thom_video_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	thom_video_timer = machine.scheduler().timer_alloc(FUNC(NULL));
 
-	thom_scanline_timer = machine->scheduler().timer_alloc(FUNC(thom_scanline_start));
+	thom_scanline_timer = machine.scheduler().timer_alloc(FUNC(thom_scanline_start));
 
 	thom_lightpen_nb = 0;
 	thom_lightpen_cb = NULL;
-	thom_lightpen_timer = machine->scheduler().timer_alloc(FUNC(thom_lightpen_step));
+	thom_lightpen_timer = machine.scheduler().timer_alloc(FUNC(thom_lightpen_step));
 	state_save_register_global(machine,  thom_lightpen_nb );
 
 	thom_init_cb = NULL;
-	thom_init_timer = machine->scheduler().timer_alloc(FUNC(thom_set_init));
+	thom_init_timer = machine.scheduler().timer_alloc(FUNC(thom_set_init));
 
 	state_save_register_global(machine,  thom_bwidth );
 	state_save_register_global(machine,  thom_bheight );
@@ -1215,7 +1215,7 @@ WRITE8_HANDLER ( to7_vram_w )
 /* bits 0-13 : latched gpl of lightpen position */
 /* bit    14:  latched INIT */
 /* bit    15:  latched INIL */
-unsigned to7_lightpen_gpl ( running_machine *machine, int decx, int decy )
+unsigned to7_lightpen_gpl ( running_machine &machine, int decx, int decy )
 {
 	int x,y;
 	thom_get_lightpen_pos( machine, &x, &y );

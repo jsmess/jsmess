@@ -269,7 +269,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (!(c1541->data & 0xff))
 		{
 			/* simulate weak bits with randomness */
-			c1541->data = (c1541->data & 0xff00) | (machine->rand() & 0xff);
+			c1541->data = (c1541->data & 0xff00) | (machine.rand() & 0xff);
 		}
 	}
 
@@ -1216,7 +1216,7 @@ static DEVICE_START( c1541 )
 	/* find devices */
 	c1541->via0 = device->subdevice<via6522_device>(M6522_0_TAG);
 	c1541->via1 = device->subdevice<via6522_device>(M6522_1_TAG);
-	c1541->bus = device->machine->device(config->bus_tag);
+	c1541->bus = device->machine().device(config->bus_tag);
 	c1541->image = device->subdevice(FLOPPY_0);
 
 	/* install image callbacks */
@@ -1224,10 +1224,10 @@ static DEVICE_START( c1541 )
 	floppy_install_load_proc(c1541->image, on_disk_change);
 
 	/* allocate track buffer */
-//  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, G64_BUFFER_SIZE);
+//  c1541->track_buffer = auto_alloc_array(device->machine(), UINT8, G64_BUFFER_SIZE);
 
 	/* allocate data timer */
-	c1541->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
+	c1541->bit_timer = device->machine().scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 //  device->save_pointer(NAME(c1541->track_buffer), G64_BUFFER_SIZE);

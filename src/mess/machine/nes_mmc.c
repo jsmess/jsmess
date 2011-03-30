@@ -167,7 +167,7 @@ static WRITE8_HANDLER( mapper17_l_w );
 
 WRITE8_HANDLER( nes_chr_w )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 	int bank = offset >> 10;
 
 	if (state->chr_map[bank].source == CHRRAM)
@@ -178,7 +178,7 @@ WRITE8_HANDLER( nes_chr_w )
 
 READ8_HANDLER( nes_chr_r )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 	int bank = offset >> 10;
 
 	// a few CNROM boards contained copy protection schemes through
@@ -193,7 +193,7 @@ READ8_HANDLER( nes_chr_r )
 
 WRITE8_HANDLER( nes_nt_w )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 	int page = ((offset & 0xc00) >> 10);
 
 	if (state->nt_page[page].writable == 0)
@@ -204,7 +204,7 @@ WRITE8_HANDLER( nes_nt_w )
 
 READ8_HANDLER( nes_nt_r )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 	int page = ((offset & 0xc00) >> 10);
 
 	if (state->nt_page[page].source == MMC5FILL)
@@ -219,7 +219,7 @@ READ8_HANDLER( nes_nt_r )
 
 WRITE8_HANDLER( nes_low_mapper_w )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 
 	if (state->mmc_write_low)
 		(*state->mmc_write_low)(space, offset, data);
@@ -229,7 +229,7 @@ WRITE8_HANDLER( nes_low_mapper_w )
 
 READ8_HANDLER( nes_low_mapper_r )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 
 	if (state->mmc_read_low)
 		return (*state->mmc_read_low)(space, offset);
@@ -245,9 +245,9 @@ READ8_HANDLER( nes_low_mapper_r )
 
 *************************************************************/
 
-static void wram_bank( running_machine *machine, int bank, int source )
+static void wram_bank( running_machine &machine, int bank, int source )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	assert(state->battery || state->prg_ram);
 	if (source == NES_BATTERY)
@@ -263,9 +263,9 @@ static void wram_bank( running_machine *machine, int bank, int source )
 	memory_set_bank(machine, "bank5", state->prg_bank[4]);
 }
 
-INLINE void prg_bank_refresh( running_machine *machine )
+INLINE void prg_bank_refresh( running_machine &machine )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	memory_set_bank(machine, "bank1", state->prg_bank[0]);
 	memory_set_bank(machine, "bank2", state->prg_bank[1]);
 	memory_set_bank(machine, "bank3", state->prg_bank[2]);
@@ -274,9 +274,9 @@ INLINE void prg_bank_refresh( running_machine *machine )
 
 /* PRG ROM in 8K, 16K or 32K blocks */
 
-static void prg32( running_machine *machine, int bank )
+static void prg32( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* if there is only 16k PRG, return */
 	if (!(state->prg_chunks >> 1))
@@ -292,9 +292,9 @@ static void prg32( running_machine *machine, int bank )
 	prg_bank_refresh(machine);
 }
 
-static void prg16_89ab( running_machine *machine, int bank )
+static void prg16_89ab( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references a 16k chunk */
 	bank &= (state->prg_chunks - 1);
@@ -304,9 +304,9 @@ static void prg16_89ab( running_machine *machine, int bank )
 	prg_bank_refresh(machine);
 }
 
-static void prg16_cdef( running_machine *machine, int bank )
+static void prg16_cdef( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references a 16k chunk */
 	bank &= (state->prg_chunks - 1);
@@ -316,9 +316,9 @@ static void prg16_cdef( running_machine *machine, int bank )
 	prg_bank_refresh(machine);
 }
 
-static void prg8_89( running_machine *machine, int bank )
+static void prg8_89( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
@@ -327,9 +327,9 @@ static void prg8_89( running_machine *machine, int bank )
 	prg_bank_refresh(machine);
 }
 
-static void prg8_ab( running_machine *machine, int bank )
+static void prg8_ab( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
@@ -338,9 +338,9 @@ static void prg8_ab( running_machine *machine, int bank )
 	prg_bank_refresh(machine);
 }
 
-static void prg8_cd( running_machine *machine, int bank )
+static void prg8_cd( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
@@ -349,9 +349,9 @@ static void prg8_cd( running_machine *machine, int bank )
 	prg_bank_refresh(machine);
 }
 
-static void prg8_ef( running_machine *machine, int bank )
+static void prg8_ef( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
@@ -363,9 +363,9 @@ static void prg8_ef( running_machine *machine, int bank )
 /* We define an additional helper to map PRG-ROM to 0x6000-0x7000 */
 // TODO: are we implementing this correctly in the mappers which uses it? check!
 
-static void prg8_67( running_machine *machine, int bank )
+static void prg8_67( running_machine &machine, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
@@ -375,9 +375,9 @@ static void prg8_67( running_machine *machine, int bank )
 }
 
 /* We also define an additional helper to map 8k PRG-ROM to one of the banks (passed as parameter) */
-static void prg8_x( running_machine *machine, int start, int bank )
+static void prg8_x( running_machine &machine, int start, int bank )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	assert(start < 4);
 
@@ -391,9 +391,9 @@ static void prg8_x( running_machine *machine, int start, int bank )
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */
 
 // this can be probably removed later, but it is useful while testing xml and unf handling with VRAM & VROM
-INLINE void chr_sanity_check( running_machine *machine, int source )
+INLINE void chr_sanity_check( running_machine &machine, int source )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	if (source == CHRRAM && state->vram == NULL)
 		fatalerror("CHRRAM bankswitch with no VRAM");
@@ -402,9 +402,9 @@ INLINE void chr_sanity_check( running_machine *machine, int source )
 		fatalerror("CHRROM bankswitch with no VROM");
 }
 
-static void chr8( running_machine *machine, int bank, int source )
+static void chr8( running_machine &machine, int bank, int source )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	int i;
 
 	chr_sanity_check(machine, source);
@@ -431,9 +431,9 @@ static void chr8( running_machine *machine, int bank, int source )
 	}
 }
 
-static void chr4_x( running_machine *machine, int start, int bank, int source )
+static void chr4_x( running_machine &machine, int start, int bank, int source )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	int i;
 
 	chr_sanity_check(machine, source);
@@ -460,19 +460,19 @@ static void chr4_x( running_machine *machine, int start, int bank, int source )
 	}
 }
 
-static void chr4_0( running_machine *machine, int bank, int source )
+static void chr4_0( running_machine &machine, int bank, int source )
 {
 	chr4_x(machine, 0, bank, source);
 }
 
-static void chr4_4( running_machine *machine, int bank, int source )
+static void chr4_4( running_machine &machine, int bank, int source )
 {
 	chr4_x(machine, 4, bank, source);
 }
 
-static void chr2_x( running_machine *machine, int start, int bank, int source )
+static void chr2_x( running_machine &machine, int start, int bank, int source )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	int i;
 
 	chr_sanity_check(machine, source);
@@ -499,29 +499,29 @@ static void chr2_x( running_machine *machine, int start, int bank, int source )
 	}
 }
 
-static void chr2_0( running_machine *machine, int bank, int source )
+static void chr2_0( running_machine &machine, int bank, int source )
 {
 	chr2_x(machine, 0, bank, source);
 }
 
-static void chr2_2( running_machine *machine, int bank, int source )
+static void chr2_2( running_machine &machine, int bank, int source )
 {
 	chr2_x(machine, 2, bank, source);
 }
 
-static void chr2_4( running_machine *machine, int bank, int source )
+static void chr2_4( running_machine &machine, int bank, int source )
 {
 	chr2_x(machine, 4, bank, source);
 }
 
-static void chr2_6( running_machine *machine, int bank, int source )
+static void chr2_6( running_machine &machine, int bank, int source )
 {
 	chr2_x(machine, 6, bank, source);
 }
 
-static void chr1_x( running_machine *machine, int start, int bank, int source )
+static void chr1_x( running_machine &machine, int start, int bank, int source )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	chr_sanity_check(machine, source);
 
@@ -541,42 +541,42 @@ static void chr1_x( running_machine *machine, int start, int bank, int source )
 	}
 }
 
-static void chr1_0 (running_machine *machine, int bank, int source)
+static void chr1_0 (running_machine &machine, int bank, int source)
 {
 	chr1_x(machine, 0, bank, source);
 }
 
-static void chr1_1( running_machine *machine, int bank, int source )
+static void chr1_1( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 1, bank, source);
 }
 
-static void chr1_2( running_machine *machine, int bank, int source )
+static void chr1_2( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 2, bank, source);
 }
 
-static void chr1_3( running_machine *machine, int bank, int source )
+static void chr1_3( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 3, bank, source);
 }
 
-static void chr1_4( running_machine *machine, int bank, int source )
+static void chr1_4( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 4, bank, source);
 }
 
-static void chr1_5( running_machine *machine, int bank, int source )
+static void chr1_5( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 5, bank, source);
 }
 
-static void chr1_6( running_machine *machine, int bank, int source )
+static void chr1_6( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 6, bank, source);
 }
 
-static void chr1_7( running_machine *machine, int bank, int source )
+static void chr1_7( running_machine &machine, int bank, int source )
 {
 	chr1_x(machine, 7, bank, source);
 }
@@ -584,9 +584,9 @@ static void chr1_7( running_machine *machine, int bank, int source )
 
 /* NameTable paging and mirroring */
 
-static void set_nt_page( running_machine *machine, int page, int source, int bank, int writable )
+static void set_nt_page( running_machine &machine, int page, int source, int bank, int writable )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	UINT8* base_ptr;
 
 	switch (source)
@@ -621,7 +621,7 @@ static void set_nt_page( running_machine *machine, int page, int source, int ban
 	state->nt_page[page].writable = writable;
 }
 
-void set_nt_mirroring( running_machine *machine, int mirroring )
+void set_nt_mirroring( running_machine &machine, int mirroring )
 {
 	/* setup our videomem handlers based on mirroring */
 	switch (mirroring)

@@ -97,10 +97,10 @@ static void write_reg_01A(rmnimbus_state *state);
 static void write_reg_01C(rmnimbus_state *state);
 static void write_reg_01E(rmnimbus_state *state);
 static void write_reg_026(rmnimbus_state *state);
-static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno);
+static void change_palette(running_machine &machine, UINT8 bank, UINT16 colours, UINT8 regno);
 
-static void video_debug(running_machine *machine, int ref, int params, const char *param[]);
-static void video_regdump(running_machine *machine, int ref, int params, const char *param[]);
+static void video_debug(running_machine &machine, int ref, int params, const char *param[]);
+static void video_regdump(running_machine &machine, int ref, int params, const char *param[]);
 
 /*
     I'm not sure which of thes return values on a real machine, so for the time being I'm going
@@ -109,8 +109,8 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
 
 READ16_HANDLER (nimbus_video_io_r)
 {
-	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
-    int     pc=cpu_get_pc(space->cpu);
+	rmnimbus_state *state = space->machine().driver_data<rmnimbus_state>();
+    int     pc=cpu_get_pc(&space->device());
     UINT16  result;
 
     switch (offset)
@@ -270,8 +270,8 @@ static UINT16 read_reg_00A(rmnimbus_state *state)
 
 WRITE16_HANDLER (nimbus_video_io_w)
 {
-	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
-    int pc=cpu_get_pc(space->cpu);
+	rmnimbus_state *state = space->machine().driver_data<rmnimbus_state>();
+    int pc=cpu_get_pc(&space->device());
 
     if(offset<reg028)
     {
@@ -306,10 +306,10 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg022  : state->vidregs[reg022]=data; break;
         case    reg024  : state->vidregs[reg024]=data; break;
         case    reg026  : state->vidregs[reg026]=data; write_reg_026(state); break;
-        case    reg028  : change_palette(space->machine,0,data,reg028); break;
-        case    reg02A  : change_palette(space->machine,1,data,reg02A); break;
-        case    reg02C  : change_palette(space->machine,2,data,reg02C); break;
-        case    reg02E  : change_palette(space->machine,3,data,reg02E); break;
+        case    reg028  : change_palette(space->machine(),0,data,reg028); break;
+        case    reg02A  : change_palette(space->machine(),1,data,reg02A); break;
+        case    reg02C  : change_palette(space->machine(),2,data,reg02C); break;
+        case    reg02E  : change_palette(space->machine(),3,data,reg02E); break;
 
         default         : break;
     }
@@ -564,9 +564,9 @@ static void write_reg_026(rmnimbus_state *state)
         logerror("reg 026 write, border_colour=%02X\n",state->vidregs[reg026] & 0x0F);
 }
 
-static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno)
+static void change_palette(running_machine &machine, UINT8 bank, UINT16 colours, UINT8 regno)
 {
-	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
+	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     UINT8   colourno;
     UINT16  mask;
     UINT8   shifts;
@@ -600,9 +600,9 @@ static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours,
     }
 }
 
-static void video_debug(running_machine *machine, int ref, int params, const char *param[])
+static void video_debug(running_machine &machine, int ref, int params, const char *param[])
 {
-	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
+	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     if(params>0)
     {
         sscanf(param[0],"%d",&state->debug_video);
@@ -614,9 +614,9 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
     }
 }
 
-static void video_regdump(running_machine *machine, int ref, int params, const char *param[])
+static void video_regdump(running_machine &machine, int ref, int params, const char *param[])
 {
-	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
+	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     int regno;
 
     for(regno=0;regno<0x08;regno++)
@@ -635,12 +635,12 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
 
 VIDEO_START( nimbus )
 {
-	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
+	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     state->debug_video=0;
 
     logerror("VIDEO_START\n");
 
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
         debug_console_register_command(machine, "nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
         debug_console_register_command(machine, "nimbus_vid_regdump", CMDFLAG_NONE, 0, 0, 1, video_regdump);
@@ -649,7 +649,7 @@ VIDEO_START( nimbus )
 
 VIDEO_RESET( nimbus )
 {
-	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
+	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
     // When we reset clear the video registers and video memory.
     memset(&state->vidregs,0x00,sizeof(state->vidregs));
     memset(&state->video_mem,0,sizeof(state->video_mem));
@@ -666,7 +666,7 @@ SCREEN_EOF( nimbus )
 
 SCREEN_UPDATE( nimbus )
 {
-	rmnimbus_state *state = screen->machine->driver_data<rmnimbus_state>();
+	rmnimbus_state *state = screen->machine().driver_data<rmnimbus_state>();
     int     XCoord;
     int     YCoord = screen->vpos();
 

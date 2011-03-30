@@ -137,7 +137,7 @@ static READ8Z_DEVICE_HANDLER( speech_rz )
 
 	if ((offset & adapter->select_mask)==adapter->select_value)
 	{
-		device_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
+		device_adjust_icount(device->machine().device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 		*value = tms5220_status_r(adapter->vsp, offset) & 0xff;
 	}
 }
@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 
 	if ((offset & adapter->select_mask)==(adapter->select_value | 0x0400))
 	{
-		device_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
+		device_adjust_icount(device->machine().device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 		/* RN: the stupid design of the tms5220 core means that ready is cleared */
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
@@ -160,11 +160,11 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 		if (!tms5220_readyq_r(adapter->vsp))
 		{
 			attotime time_to_ready = attotime::from_double(tms5220_time_to_ready(adapter->vsp));
-			int cycles_to_ready = device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
+			int cycles_to_ready = device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
-			device_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
-			device->machine->scheduler().timer_set(attotime::zero, FUNC(NULL));
+			device_adjust_icount(device->machine().device("maincpu"),-cycles_to_ready);
+			device->machine().scheduler().timer_set(attotime::zero, FUNC(NULL));
 		}
 		tms5220_data_w(adapter->vsp, offset, data);
 	}
@@ -199,7 +199,7 @@ static DEVICE_RESET( ti99_speech )
 	/* Register the adapter */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "SPEECH"))
+	if (input_port_read(device->machine(), "SPEECH"))
 	{
 		int success = mount_card(peb, device, &speech_adapter_card, get_pebcard_config(device)->slot);
 		if (!success)
@@ -211,8 +211,8 @@ static DEVICE_RESET( ti99_speech )
 		astring *region = new astring();
 		astring_assemble_3(region, device->tag(), ":", speech_region);
 
-		adapter->speechrom_data = device->machine->region(astring_c(region))->base();
-		adapter->speechROMlen = device->machine->region(astring_c(region))->bytes();
+		adapter->speechrom_data = device->machine().region(astring_c(region))->base();
+		adapter->speechROMlen = device->machine().region(astring_c(region))->bytes();
 		adapter->speechROMaddr = 0;
 		adapter->load_pointer = 0;
 		adapter->ROM_bits_count = 0;
@@ -220,7 +220,7 @@ static DEVICE_RESET( ti99_speech )
 		adapter->select_mask = 0x7fc01;
 		adapter->select_value = 0x79000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			adapter->select_mask = 0x1ffc01;

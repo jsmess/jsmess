@@ -56,14 +56,14 @@ public:
 
 static TIMER_CALLBACK( h19_beepoff )
 {
-	h19_state *state = machine->driver_data<h19_state>();
+	h19_state *state = machine.driver_data<h19_state>();
 	beep_set_state(state->beeper, 0);
 }
 
 static READ8_HANDLER( h19_80_r )
 {
 // keyboard data
-	h19_state *state = space->machine->driver_data<h19_state>();
+	h19_state *state = space->machine().driver_data<h19_state>();
 	UINT8 ret = state->term_data;
 	state->term_data = 0;
 	return ret;
@@ -72,13 +72,13 @@ static READ8_HANDLER( h19_80_r )
 static READ8_HANDLER( h19_a0_r )
 {
 // keyboard status
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	return 0x7f; // says that a key is ready and no modifier keys are pressed
 }
 
 static WRITE8_HANDLER( h19_c0_w )
 {
-	h19_state *state = space->machine->driver_data<h19_state>();
+	h19_state *state = space->machine().driver_data<h19_state>();
 /* Beeper control - a 96L02 contains 2 oneshots, one for bell and one for keyclick.
 - lengths need verifying
     offset 00-1F = keyclick
@@ -86,7 +86,7 @@ static WRITE8_HANDLER( h19_c0_w )
 
 	UINT8 length = (offset & 0x20) ? 200 : 4;
 	beep_set_state(state->beeper, 1);
-	space->machine->scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
+	space->machine().scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
 }
 
 static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8)
@@ -278,27 +278,27 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(h19)
 {
-	h19_state *state = machine->driver_data<h19_state>();
-	state->beeper = machine->device("beep");
+	h19_state *state = machine.driver_data<h19_state>();
+	state->beeper = machine.device("beep");
 	beep_set_frequency(state->beeper, H19_BEEP_FRQ);
 }
 
 static VIDEO_START( h19 )
 {
-	h19_state *state = machine->driver_data<h19_state>();
-	state->charrom = machine->region("chargen")->base();
+	h19_state *state = machine.driver_data<h19_state>();
+	state->charrom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( h19 )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
 static MC6845_UPDATE_ROW( h19_update_row )
 {
-	h19_state *state = device->machine->driver_data<h19_state>();
+	h19_state *state = device->machine().driver_data<h19_state>();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
@@ -333,7 +333,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 
 static INS8250_INTERRUPT(h19_ace_irq)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 static const ins8250_interface h19_ace_interface =
@@ -379,9 +379,9 @@ GFXDECODE_END
 
 static WRITE8_DEVICE_HANDLER( h19_kbd_put )
 {
-	h19_state *state = device->machine->driver_data<h19_state>();
+	h19_state *state = device->machine().driver_data<h19_state>();
 	state->term_data = data;
-	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( h19_terminal_intf )

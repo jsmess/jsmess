@@ -50,7 +50,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( pcfx )
 {
-	memory_set_bankptr( machine, "bank1", machine->region("user1")->base() );
+	memory_set_bankptr( machine, "bank1", machine.region("user1")->base() );
 }
 
 

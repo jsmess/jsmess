@@ -142,8 +142,8 @@ READ8_HANDLER( gg_input_port_2_r );
 INPUT_CHANGED( lgun1_changed );
 INPUT_CHANGED( lgun2_changed );
 
-void sms_pause_callback( running_machine *machine );
-void sms_store_int_callback( running_machine *machine, int state );
+void sms_pause_callback( running_machine &machine );
+void sms_store_int_callback( running_machine &machine, int state );
 
 DEVICE_START( sms_cart );
 DEVICE_IMAGE_LOAD( sms_cart );

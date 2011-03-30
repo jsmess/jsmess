@@ -135,12 +135,12 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 	}
 }
 
-int apple525_get_count(running_machine *machine) {
+int apple525_get_count(running_machine &machine) {
 	int cnt = 0;
-	if (machine->device(FLOPPY_0)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_0))!=NULL) cnt++;
-    if (machine->device(FLOPPY_1)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_1))!=NULL) cnt++;
-    if (machine->device(FLOPPY_2)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_2))!=NULL) cnt++;
-    if (machine->device(FLOPPY_3)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_3))!=NULL) cnt++;
+	if (machine.device(FLOPPY_0)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_0))!=NULL) cnt++;
+    if (machine.device(FLOPPY_1)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_1))!=NULL) cnt++;
+    if (machine.device(FLOPPY_2)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_2))!=NULL) cnt++;
+    if (machine.device(FLOPPY_3)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_3))!=NULL) cnt++;
 	return cnt;
 }
 
@@ -149,12 +149,12 @@ void apple525_set_lines(device_t *device,UINT8 lines)
 	int i, count;
 	device_t *image;
 
-	count = apple525_get_count(device->machine);
+	count = apple525_get_count(device->machine());
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
+			image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_APPLE, i);
 			if (image)
 				apple525_disk_set_lines(device,image, lines);
 		}
@@ -212,7 +212,7 @@ static UINT8 apple525_process_byte(device_t *img, int write_value)
 	return read_value;
 }
 
-static device_t *apple525_selected_image(running_machine *machine)
+static device_t *apple525_selected_image(running_machine &machine)
 {
 	int i,count;
 
@@ -229,14 +229,14 @@ static device_t *apple525_selected_image(running_machine *machine)
 UINT8 apple525_read_data(device_t *device)
 {
 	device_t *image;
-	image = apple525_selected_image(device->machine);
+	image = apple525_selected_image(device->machine());
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
 
 void apple525_write_data(device_t *device,UINT8 data)
 {
 	device_t *image;
-	image = apple525_selected_image(device->machine);
+	image = apple525_selected_image(device->machine());
 	if (image)
 		apple525_process_byte(image, data);
 }
@@ -246,13 +246,13 @@ int apple525_read_status(device_t *device)
 	int i, count, result = 0;
 	device_image_interface *image;
 
-	count = apple525_get_count(device->machine);
+	count = apple525_get_count(device->machine());
 
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i));
+			image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_APPLE, i));
 			if (image && !image->is_writable())
 				result = 1;
 		}
@@ -266,7 +266,7 @@ static DEVICE_START( apple525_floppy )
 {
 
 	DEVICE_START_CALL(floppy);
-	flopimg_alloc_custom_data(device,auto_alloc_clear(device->machine,struct apple525_disk));
+	flopimg_alloc_custom_data(device,auto_alloc_clear(device->machine(),struct apple525_disk));
 	floppy_set_type(device,FLOPPY_TYPE_APPLE);
 }
 

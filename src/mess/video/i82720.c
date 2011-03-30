@@ -256,7 +256,7 @@ void gdc_fifo_enqueue(TYP_GDC* gdcp, UINT8 data, UINT8 cmdflag)
       gdcp->fifo.write_pos = (gdcp->fifo.write_pos + 1) & 0x0f;
    } else {
 //      LOG(("gdc_fifo_enqueue: The fifo is full at PC = %04X\n",
-                    //cpu_get_pc(space->cpu)));
+                    //cpu_get_pc(&space->device())));
    }
 }
 
@@ -1321,7 +1321,7 @@ WRITE8_HANDLER ( compis_gdc_w )
 
 		default:
 			logerror("%04X: GDC UNKNOWN Port Write %04X = %04X\n",
-                  cpu_get_pc(space->cpu), offset, data);
+                  cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
 }
@@ -1341,7 +1341,7 @@ READ8_HANDLER (compis_gdc_r)
 		case 0x00:	/* Status register */
 
 			LOG(("%04X: GDC Port %04X (Status) Read",
-                       cpu_get_pc(space->cpu), offset));
+                       cpu_get_pc(&space->device()), offset));
          /* Optimize this later, i.e. when we know what to return */
 			data = ( gdc_fifo_reading(&gdc) && !gdc_fifo_empty(&gdc)) |
             (gdc_fifo_full(&gdc) << 1) |
@@ -1355,7 +1355,7 @@ READ8_HANDLER (compis_gdc_r)
 		case 0x01:	/* FIFO Read */
 
 			LOG(("%04X: GDC Port %04X (Fifo) Read",
-                       cpu_get_pc(space->cpu),
+                       cpu_get_pc(&space->device()),
                        offset));
          if ( gdc_fifo_reading(&gdc)) {
             UINT8* data_p = gdc_fifo_dequeue(&gdc);
@@ -1372,11 +1372,11 @@ READ8_HANDLER (compis_gdc_r)
 
       default:
          LOG(("%04X: GDC UNKNOWN Port Read %04X",
-                          cpu_get_pc(space->cpu), offset));
+                          cpu_get_pc(&space->device()), offset));
          data = 0x44;
-         if ( cpu_get_pc(space->cpu) == 0xF952D ) {
+         if ( cpu_get_pc(&space->device()) == 0xF952D ) {
             data = 0x04;
-         } else if ( cpu_get_pc(space->cpu) == 0xF953B ) {
+         } else if ( cpu_get_pc(&space->device()) == 0xF953B ) {
             data = 0x64;
          }
          /* If we return 0xff zoom will be 2 */
@@ -1445,7 +1445,7 @@ PALETTE_INIT( compis_gdc )
 
 static compis_gdc_interface sIntf;
 
-static void compis_gdc_start(running_machine *machine, const compis_gdc_interface *intf)
+static void compis_gdc_start(running_machine &machine, const compis_gdc_interface *intf)
 {
 	/* Only 32KB or 128KB of VRAM */
 	switch(intf->vramsize)

@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(nanos_tc_w)
 {
-	device_t *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine().device("upd765");
 	upd765_tc_w(fdc, BIT(data,1));
 }
 
@@ -95,7 +95,7 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 static void z80daisy_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, state);
 }
 
 static const z80sio_interface sio_intf =
@@ -240,13 +240,13 @@ INPUT_PORTS_END
 
 static VIDEO_START( nanos )
 {
-	nanos_state *state = machine->driver_data<nanos_state>();
-	state->FNT = machine->region("gfx1")->base();
+	nanos_state *state = machine.driver_data<nanos_state>();
+	state->FNT = machine.region("gfx1")->base();
 }
 
 static SCREEN_UPDATE( nanos )
 {
-	nanos_state *state = screen->machine->driver_data<nanos_state>();
+	nanos_state *state = screen->machine().driver_data<nanos_state>();
 //  static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -263,7 +263,7 @@ static SCREEN_UPDATE( nanos )
 			{
 				if (ra < 8)
 				{
-					chr = ram_get_ptr(screen->machine->device(RAM_TAG))[0xf800+ x];
+					chr = ram_get_ptr(screen->machine().device(RAM_TAG))[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = state->FNT[(chr<<3) | ra ];
@@ -289,7 +289,7 @@ static SCREEN_UPDATE( nanos )
 
 static READ8_DEVICE_HANDLER (nanos_port_a_r)
 {
-	nanos_state *state = device->machine->driver_data<nanos_state>();
+	nanos_state *state = device->machine().driver_data<nanos_state>();
 	UINT8 retVal;
 	if (state->key_command==0)  {
 		return state->key_pressed;
@@ -308,12 +308,12 @@ static READ8_DEVICE_HANDLER (nanos_port_b_r)
 
 static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 {
-	nanos_state *state = device->machine->driver_data<nanos_state>();
+	nanos_state *state = device->machine().driver_data<nanos_state>();
 	state->key_command = BIT(data,1);
 	if (BIT(data,7)) {
-		memory_set_bankptr(device->machine, "bank1", device->machine->region("maincpu")->base());
+		memory_set_bankptr(device->machine(), "bank1", device->machine().region("maincpu")->base());
 	} else {
-		memory_set_bankptr(device->machine, "bank1", ram_get_ptr(device->machine->device(RAM_TAG)));
+		memory_set_bankptr(device->machine(), "bank1", ram_get_ptr(device->machine().device(RAM_TAG)));
 	}
 }
 static UINT8 row_number(UINT8 code) {
@@ -330,19 +330,19 @@ static UINT8 row_number(UINT8 code) {
 
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	nanos_state *state = timer.machine->driver_data<nanos_state>();
+	nanos_state *state = timer.machine().driver_data<nanos_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
 
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
-	UINT8 shift = input_port_read(timer.machine, "LINEC") & 0x02 ? 1 : 0;
-	UINT8 ctrl =  input_port_read(timer.machine, "LINEC") & 0x01 ? 1 : 0;
+	UINT8 shift = input_port_read(timer.machine(), "LINEC") & 0x02 ? 1 : 0;
+	UINT8 ctrl =  input_port_read(timer.machine(), "LINEC") & 0x01 ? 1 : 0;
 	state->key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	input_port_read(timer.machine, keynames[i]);
+		code =	input_port_read(timer.machine(), keynames[i]);
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -414,23 +414,23 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 static MACHINE_START(nanos)
 {
-	nanos_state *state = machine->driver_data<nanos_state>();
+	nanos_state *state = machine.driver_data<nanos_state>();
 	state->key_pressed = 0xff;
 }
 
 static MACHINE_RESET(nanos)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->install_write_bank(0x0000, 0x0fff, "bank3");
 	space->install_write_bank(0x1000, 0xffff, "bank2");
 
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x1000);
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x1000);
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)));
 
-	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
+	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
 }
 
 static Z80PIO_INTERFACE( nanos_z80pio_intf )

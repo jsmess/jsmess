@@ -17,7 +17,7 @@ VIDEO_START( orao )
 
 SCREEN_UPDATE( orao )
 {
-	orao_state *state = screen->machine->driver_data<orao_state>();
+	orao_state *state = screen->machine().driver_data<orao_state>();
 	UINT8 code;
 	int y, x, b;
 

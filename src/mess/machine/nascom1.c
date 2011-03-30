@@ -41,13 +41,13 @@
 
 static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_intrq_w )
 {
-	nascom1_state *drvstate = device->machine->driver_data<nascom1_state>();
+	nascom1_state *drvstate = device->machine().driver_data<nascom1_state>();
 	drvstate->nascom2_fdc.irq = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_drq_w )
 {
-	nascom1_state *drvstate = device->machine->driver_data<nascom1_state>();
+	nascom1_state *drvstate = device->machine().driver_data<nascom1_state>();
 	drvstate->nascom2_fdc.drq = state;
 }
 
@@ -62,15 +62,15 @@ const wd17xx_interface nascom2_wd17xx_interface =
 
 READ8_HANDLER( nascom2_fdc_select_r )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 	return state->nascom2_fdc.select | 0xa0;
 }
 
 
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
-	device_t *fdc = space->machine->device("wd1793");
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
+	device_t *fdc = space->machine().device("wd1793");
 	state->nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
@@ -92,7 +92,7 @@ WRITE8_HANDLER( nascom2_fdc_select_w )
  */
 READ8_HANDLER( nascom2_fdc_status_r )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 	return (state->nascom2_fdc.drq << 7) | state->nascom2_fdc.irq;
 }
 
@@ -104,11 +104,11 @@ READ8_HANDLER( nascom2_fdc_status_r )
 
 READ8_HANDLER ( nascom1_port_00_r )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
 	if (state->portstat.stat_count < 9)
-		return (input_port_read(space->machine, keynames[state->portstat.stat_count]) | ~0x7f);
+		return (input_port_read(space->machine(), keynames[state->portstat.stat_count]) | ~0x7f);
 
 	return (0xff);
 }
@@ -116,9 +116,9 @@ READ8_HANDLER ( nascom1_port_00_r )
 
 WRITE8_HANDLER( nascom1_port_00_w )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 
-	cassette_change_state( space->machine->device("cassette"),
+	cassette_change_state( space->machine().device("cassette"),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	if (!(data & NASCOM1_KEY_RESET))
@@ -150,20 +150,20 @@ WRITE8_HANDLER( nascom1_port_00_w )
 
 READ8_HANDLER( nascom1_port_01_r )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 	return ay31015_get_received_data( state->hd6402 );
 }
 
 
 WRITE8_HANDLER( nascom1_port_01_w )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 	ay31015_set_transmit_data( state->hd6402, data );
 }
 
 READ8_HANDLER( nascom1_port_02_r )
 {
-	nascom1_state *state = space->machine->driver_data<nascom1_state>();
+	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 	UINT8 data = 0x31;
 
 	ay31015_set_input_pin( state->hd6402, AY31015_SWE, 0 );
@@ -191,7 +191,7 @@ WRITE8_DEVICE_HANDLER( nascom1_hd6402_so )
 
 DEVICE_IMAGE_LOAD( nascom1_cassette )
 {
-	nascom1_state *state = image.device().machine->driver_data<nascom1_state>();
+	nascom1_state *state = image.device().machine().driver_data<nascom1_state>();
 	state->tape_size = image.length();
 	state->tape_image = (UINT8*)image.ptr();
 	if (!state->tape_image)
@@ -204,7 +204,7 @@ DEVICE_IMAGE_LOAD( nascom1_cassette )
 
 DEVICE_IMAGE_UNLOAD( nascom1_cassette )
 {
-	nascom1_state *state = image.device().machine->driver_data<nascom1_state>();
+	nascom1_state *state = image.device().machine().driver_data<nascom1_state>();
 	state->tape_image = NULL;
 	state->tape_size = state->tape_index = 0;
 }
@@ -230,14 +230,14 @@ SNAPSHOT_LOAD( nascom1 )
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
 		{
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b0);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b1);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b2);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b3);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b4);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b5);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b6);
-			image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b7);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b0);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b1);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b2);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b3);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b4);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b5);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b6);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr++, b7);
 		}
 	}
 
@@ -254,8 +254,8 @@ SNAPSHOT_LOAD( nascom1 )
 
 MACHINE_RESET( nascom1 )
 {
-	nascom1_state *state = machine->driver_data<nascom1_state>();
-	state->hd6402 = machine->device("hd6402");
+	nascom1_state *state = machine.driver_data<nascom1_state>();
+	state->hd6402 = machine.device("hd6402");
 
 	/* Set up hd6402 pins */
 	ay31015_set_input_pin( state->hd6402, AY31015_SWE, 1 );
@@ -271,33 +271,33 @@ MACHINE_RESET( nascom1 )
 
 DRIVER_INIT( nascom1 )
 {
-	switch (ram_get_size(machine->device(RAM_TAG)))
+	switch (ram_get_size(machine.device(RAM_TAG)))
 	{
 	case 1 * 1024:
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x1400, 0x9000);
 		break;
 
 	case 16 * 1024:
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0x4fff, "bank1");
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x5000, 0xafff);
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 		break;
 
 	case 32 * 1024:
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0x8fff, "bank1");
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x9000, 0xafff);
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 		break;
 
 	case 40 * 1024:
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0xafff, "bank1");
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 		break;
 	}
 }

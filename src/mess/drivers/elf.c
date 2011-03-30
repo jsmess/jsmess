@@ -43,14 +43,14 @@ static READ8_DEVICE_HANDLER( dispon_r )
 
 static READ8_HANDLER( data_r )
 {
-	elf2_state *state = space->machine->driver_data<elf2_state>();
+	elf2_state *state = space->machine().driver_data<elf2_state>();
 
 	return state->data;
 }
 
 static WRITE8_HANDLER( data_w )
 {
-	elf2_state *state = space->machine->driver_data<elf2_state>();
+	elf2_state *state = space->machine().driver_data<elf2_state>();
 
 	dm9368_w(state->dm9368_l, 0, data & 0x0f);
 	dm9368_w(state->dm9368_h, 0, data >> 4);
@@ -58,19 +58,19 @@ static WRITE8_HANDLER( data_w )
 
 static WRITE8_HANDLER( memory_w )
 {
-	elf2_state *state = space->machine->driver_data<elf2_state>();
+	elf2_state *state = space->machine().driver_data<elf2_state>();
 
-	if (LOAD(space->machine))
+	if (LOAD(space->machine()))
 	{
-		if (MEMORY_PROTECT(space->machine))
+		if (MEMORY_PROTECT(space->machine()))
 		{
 			/* latch data from memory */
-			data = ram_get_ptr(space->machine->device(RAM_TAG))[offset];
+			data = ram_get_ptr(space->machine().device(RAM_TAG))[offset];
 		}
 		else
 		{
 			/* write latched data to memory */
-			ram_get_ptr(space->machine->device(RAM_TAG))[offset] = data;
+			ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
 		}
 
 		/* write data to 7 segment displays */
@@ -100,7 +100,7 @@ static INPUT_CHANGED( input_w )
 	if (newval)
 	{
 		/* assert DMAIN */
-		cputag_set_input_line(field->port->machine, CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
+		cputag_set_input_line(field->port->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
 	}
 }
 
@@ -144,17 +144,17 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( wait_r )
 {
-	return LOAD(device->machine);
+	return LOAD(device->machine());
 }
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	return RUN(device->machine);
+	return RUN(device->machine());
 }
 
 static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	return INPUT(device->machine);
+	return INPUT(device->machine());
 }
 
 static COSMAC_SC_WRITE( elf2_sc_w )
@@ -179,7 +179,7 @@ static WRITE_LINE_DEVICE_HANDLER( elf2_q_w )
 
 static READ8_DEVICE_HANDLER( elf2_dma_r )
 {
-	elf2_state *state = device->machine->driver_data<elf2_state>();
+	elf2_state *state = device->machine().driver_data<elf2_state>();
 
 	return state->data;
 }
@@ -204,7 +204,7 @@ static COSMAC_INTERFACE( elf2_config )
 
 static WRITE_LINE_DEVICE_HANDLER( mm74c923_da_w )
 {
-	elf2_state *driver_state = device->machine->driver_data<elf2_state>();
+	elf2_state *driver_state = device->machine().driver_data<elf2_state>();
 
 	if (state)
 	{
@@ -212,7 +212,7 @@ static WRITE_LINE_DEVICE_HANDLER( mm74c923_da_w )
 		driver_state->data <<= 4;
 		driver_state->data |= mm74c922_r(device, 0) & 0x0f;
 
-		if (LOAD(device->machine))
+		if (LOAD(device->machine()))
 		{
 			/* write data to 7 segment displays */
 			dm9368_w(driver_state->dm9368_l, 0, driver_state->data & 0x0f);
@@ -237,7 +237,7 @@ static MM74C922_INTERFACE( keyboard_intf )
 
 static SCREEN_UPDATE( elf2 )
 {
-	elf2_state *state = screen->machine->driver_data<elf2_state>();
+	elf2_state *state = screen->machine().driver_data<elf2_state>();
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
@@ -257,15 +257,15 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 
 static MACHINE_START( elf2 )
 {
-	elf2_state *state = machine->driver_data<elf2_state>();
-	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	elf2_state *state = machine.driver_data<elf2_state>();
+	address_space *program = machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->cdp1861 = machine->device(CDP1861_TAG);
-	state->mm74c923 = machine->device(MM74C923_TAG);
-	state->dm9368_l = machine->device(DM9368_L_TAG);
-	state->dm9368_h = machine->device(DM9368_H_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->cdp1861 = machine.device(CDP1861_TAG);
+	state->mm74c923 = machine.device(MM74C923_TAG);
+	state->dm9368_l = machine.device(DM9368_L_TAG);
+	state->dm9368_h = machine.device(DM9368_H_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* initialize LED displays */
 	dm9368_rbi_w(state->dm9368_l, 1);
@@ -274,7 +274,7 @@ static MACHINE_START( elf2 )
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
 	program->install_legacy_write_handler(0x0000, 0x00ff, FUNC(memory_w));
-	memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(machine.device(RAM_TAG)), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
@@ -337,12 +337,12 @@ static QUICKLOAD_LOAD( elf )
 {
 	int size = image.length();
 
-	if (size > ram_get_size(image.device().machine->device(RAM_TAG)))
+	if (size > ram_get_size(image.device().machine().device(RAM_TAG)))
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	image.fread( ram_get_ptr(image.device().machine->device(RAM_TAG)), size);
+	image.fread( ram_get_ptr(image.device().machine().device(RAM_TAG)), size);
 
 	return IMAGE_INIT_PASS;
 }

@@ -179,7 +179,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 	if (offset & 0x04)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = device->machine->time();
+		attotime curtime = device->machine().time();
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
@@ -227,7 +227,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 			if (port->out_port_func.target != NULL)
 				devcb_call_write8(&port->out_port_func, 0, data);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu), data);
+				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine().firstcpu), data);
 		}
 	}
 }
@@ -289,7 +289,7 @@ READ8_DEVICE_HANDLER( mos6530_r )
 				port->in = devcb_call_read8(&port->in_port_func, 0);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu));
+				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine().firstcpu));
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);
@@ -394,7 +394,7 @@ static DEVICE_START( mos6530 )
 	devcb_resolve_write8(&miot->port[1].out_port_func, &intf->out_pb_func, device);
 
 	/* allocate timers */
-	miot->timer = device->machine->scheduler().timer_alloc(FUNC(timer_end_callback), (void *)device);
+	miot->timer = device->machine().scheduler().timer_alloc(FUNC(timer_end_callback), (void *)device);
 
 	/* register for save states */
 	device->save_item(NAME(miot->port[0].in));

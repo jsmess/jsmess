@@ -28,7 +28,7 @@ static gmaster_sound *get_token(device_t *device)
 
 int gmaster_io_callback(device_t *device, int ioline, int state)
 {	/* comes across with cpu device - need to use sound device */
-	gmaster_sound *token = get_token(device->machine->device("custom"));
+	gmaster_sound *token = get_token(device->machine().device("custom"));
 
 	switch (ioline)
 	{
@@ -66,7 +66,7 @@ static STREAM_UPDATE( gmaster_update )
 static DEVICE_START( gmaster_sound )
 {
 	gmaster_sound *token = get_token(device);
-	token->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, gmaster_update);
+	token->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, gmaster_update);
 }
 
 

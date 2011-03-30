@@ -63,7 +63,7 @@ enum {
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
 
-/* ram_get_ptr(machine->device(RAM_TAG)) layout defines */
+/* ram_get_ptr(machine.device(RAM_TAG)) layout defines */
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
@@ -106,25 +106,25 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w );
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor );
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor );
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor );
-static void gb_timer_increment( running_machine *machine );
+static void gb_timer_increment( running_machine &machine );
 
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/		/* Display general debug information */
 /* #define V_BANK*/			/* Display bank switching debug information */
 #endif
 
-static void gb_init_regs(running_machine *machine)
+static void gb_init_regs(running_machine &machine)
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	/* Initialize the registers */
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w( machine->device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
-	gb_io_w( machine->device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
+	gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
+	gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
 }
 
-static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
+static void gb_rom16_0000( running_machine &machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, "bank5", addr );
 	memory_set_bankptr( machine, "bank10", addr + 0x0100 );
@@ -132,26 +132,26 @@ static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
 	memory_set_bankptr( machine, "bank11", addr + 0x0900 );
 }
 
-static void gb_rom16_4000( running_machine *machine, UINT8 *addr )
+static void gb_rom16_4000( running_machine &machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, "bank1", addr );
 	memory_set_bankptr( machine, "bank4", addr + 0x2000 );
 }
 
-static void gb_rom8_4000( running_machine *machine, UINT8 *addr )
+static void gb_rom8_4000( running_machine &machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, "bank1", addr );
 }
 
-static void gb_rom8_6000( running_machine *machine, UINT8 *addr )
+static void gb_rom8_6000( running_machine &machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, "bank4", addr );
 }
 
-static void gb_init(running_machine *machine)
+static void gb_init(running_machine &machine)
 {
-	gb_state *state = machine->driver_data<gb_state>();
-	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
+	gb_state *state = machine.driver_data<gb_state>();
+	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Initialize the memory banks */
 	state->MBC1Mode = 0;
@@ -235,7 +235,7 @@ static void gb_init(running_machine *machine)
 			break;
 	}
 
-	gb_sound_w(space->machine->device("custom"), 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w(space->machine().device("custom"), 0x16, 0x00 );       /* Initialize sound hardware */
 
 	state->divcount = 0;
 	state->triggering_irq = 0;
@@ -244,11 +244,11 @@ static void gb_init(running_machine *machine)
 
 MACHINE_START( gb )
 {
-	gb_state *state = machine->driver_data<gb_state>();
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
+	gb_state *state = machine.driver_data<gb_state>();
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
@@ -256,11 +256,11 @@ MACHINE_START( gb )
 
 MACHINE_START( gbc )
 {
-	gb_state *state = machine->driver_data<gb_state>();
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
+	gb_state *state = machine.driver_data<gb_state>();
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gbc_video );
@@ -268,7 +268,7 @@ MACHINE_START( gbc )
 
 MACHINE_RESET( gb )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	gb_init(machine);
 
 	gb_video_reset( machine, GB_VIDEO_DMG );
@@ -276,7 +276,7 @@ MACHINE_RESET( gb )
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() );
+	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
 
 	state->divcount = 0x0004;
 }
@@ -284,15 +284,15 @@ MACHINE_RESET( gb )
 
 MACHINE_START( sgb )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 
 	state->sgb_packets = -1;
 	state->sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
@@ -300,7 +300,7 @@ MACHINE_START( sgb )
 
 MACHINE_RESET( sgb )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	gb_init(machine);
 
 	gb_video_reset( machine, GB_VIDEO_SGB );
@@ -310,7 +310,7 @@ MACHINE_RESET( sgb )
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() );
+	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
 
 	memset( state->sgb_tile_data, 0, 0x2000 );
 
@@ -335,7 +335,7 @@ MACHINE_RESET( sgb )
 
 MACHINE_RESET( gbpocket )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	gb_init(machine);
 
 	gb_video_reset( machine, GB_VIDEO_MGB );
@@ -343,9 +343,9 @@ MACHINE_RESET( gbpocket )
 	gb_init_regs(machine);
 
 	/* Initialize the Sound registers */
-	gb_sound_w(machine->device("custom"), 0x16,0x80);
-	gb_sound_w(machine->device("custom"), 0x15,0xF3);
-	gb_sound_w(machine->device("custom"), 0x14,0x77);
+	gb_sound_w(machine.device("custom"), 0x16,0x80);
+	gb_sound_w(machine.device("custom"), 0x15,0xF3);
+	gb_sound_w(machine.device("custom"), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
@@ -355,7 +355,7 @@ MACHINE_RESET( gbpocket )
 
 MACHINE_RESET( gbc )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	int ii;
 
 	gb_init(machine);
@@ -367,13 +367,13 @@ MACHINE_RESET( gbc )
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() );
-	memory_set_bankptr(machine, "bank6", machine->region("maincpu")->base() + 0x100 );
+	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
+	memory_set_bankptr(machine, "bank6", machine.region("maincpu")->base() + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		state->GBC_RAMMap[ii] = ram_get_ptr(machine->device(RAM_TAG)) + CGB_START_RAM_BANKS + ii * 0x1000;
+		state->GBC_RAMMap[ii] = ram_get_ptr(machine.device(RAM_TAG)) + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (state->GBC_RAMMap[ii], 0, 0x1000);
 	}
 }
@@ -392,16 +392,16 @@ static void gb_machine_stop(running_machine &machine)
 	image->battery_save(state->gb_cart_ram, state->RAMBanks * 0x2000);
 }
 
-static void gb_set_mbc1_banks( running_machine *machine )
+static void gb_set_mbc1_banks( running_machine &machine )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	gb_rom16_4000( machine, state->ROMMap[ state->ROMBank ] );
 	memory_set_bankptr( machine, "bank2", state->RAMMap[ state->MBC1Mode ? ( state->ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x1F; /* Only uses lower 5 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
@@ -409,12 +409,12 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
 
 	state->ROMBank = ( state->ROMBank & 0x01E0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_banks( space->machine );
+	gb_set_mbc1_banks(space->machine());
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x0F; /* Only uses lower 4 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
@@ -424,13 +424,13 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
 	if( offset & 0x0100 )
 		state->ROMBank = ( state->ROMBank & 0x100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( space->machine, state->ROMMap[state->ROMBank] );
+	gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	data &= 0x7F; /* Only uses lower 7 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
@@ -438,17 +438,17 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
 
 	state->ROMBank = ( state->ROMBank & 0x0100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( space->machine, state->ROMMap[state->ROMBank] );
+	gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	/* MBC5 has a 9 bit bank select
       Writing into 2000-2FFF sets the lower 8 bits
       Writing into 3000-3FFF sets the 9th bit
     */
-	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	if( offset & 0x1000 )
 	{
 		state->ROMBank = (state->ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
@@ -458,23 +458,23 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 		state->ROMBank = (state->ROMBank & 0x100 ) | data;
 	}
 	/* Switch banks */
-	gb_rom16_4000( space->machine, state->ROMMap[state->ROMBank] );
+	gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc6 )
 {
-	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x2000 + offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x2000 + offset, data );
 	if ( offset & 0x0800 )
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_4000( space->machine, state->ROMMap[state->ROMBank>>1] + ( ( state->ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_4000( space->machine(), state->ROMMap[state->ROMBank>>1] + ( ( state->ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
@@ -485,13 +485,13 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 )
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x3000 + offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x3000 + offset, data );
 	if ( offset & 0x0800 )
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_6000( space->machine, state->ROMMap[state->ROMBank00>>1] + ( ( state->ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_6000( space->machine(), state->ROMMap[state->ROMBank00>>1] + ( ( state->ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
@@ -502,19 +502,19 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 )
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc7 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x2000 + offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x2000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 )
 	{
 		state->ROMBank = data;
-		gb_rom16_4000( space->machine, state->ROMMap[state->ROMBank] );
+		gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
 	}
 }
 
 static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 )
 {
-        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x3000 + offset, data );
+        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x3000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 )
 	{
@@ -532,31 +532,31 @@ static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 )
 
 static WRITE8_HANDLER( gb_rom_bank_select_wisdom )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( space->cpu ), offset );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( &space->device() ), offset );
 	/* The address determines the bank to select */
 	state->ROMBank = ( offset << 1 ) & 0x1FF;
-	memory_set_bankptr( space->machine, "bank5", state->ROMMap[ state->ROMBank ] );
-	memory_set_bankptr( space->machine, "bank10", state->ROMMap[ state->ROMBank ] + 0x0100 );
-	gb_rom16_4000( space->machine, state->ROMMap[ state->ROMBank + 1 ] );
+	memory_set_bankptr( space->machine(), "bank5", state->ROMMap[ state->ROMBank ] );
+	memory_set_bankptr( space->machine(), "bank10", state->ROMMap[ state->ROMBank ] + 0x0100 );
+	gb_rom16_4000( space->machine(), state->ROMMap[ state->ROMBank + 1 ] );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x3; /* Only uses the lower 2 bits */
 
 	/* Select the upper bits of the ROMMask */
 	state->ROMBank = ( state->ROMBank & 0x1F ) | ( data << 5 );
 
 	/* Switch banks */
-	gb_set_mbc1_banks( space->machine );
+	gb_set_mbc1_banks(space->machine());
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	if( data & 0x8 )
 	{	/* RTC banks */
 		if ( state->CartType & TIMER )
@@ -565,7 +565,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 			if ( data < 5 )
 			{
 				memset( state->MBC3RTCData, state->MBC3RTCMap[state->MBC3RTCBank], 0x2000 );
-				memory_set_bankptr( space->machine, "bank2", state->MBC3RTCData );
+				memory_set_bankptr( space->machine(), "bank2", state->MBC3RTCData );
 			}
 		}
 	}
@@ -574,14 +574,14 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 		state->RAMBank = data & 0x3;
 		state->MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		memory_set_bankptr( space->machine, "bank2", state->RAMMap[state->RAMBank] );
+		memory_set_bankptr( space->machine(), "bank2", state->RAMMap[state->RAMBank] );
 	}
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	data &= 0x0F;
 	if( state->CartType & RUMBLE )
 	{
@@ -589,27 +589,27 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 	}
 	state->RAMBank = data;
 	/* Switch banks */
-	memory_set_bankptr (space->machine, "bank2", state->RAMMap[state->RAMBank] );
+	memory_set_bankptr (space->machine(), "bank2", state->RAMMap[state->RAMBank] );
 }
 
 WRITE8_HANDLER ( gb_ram_enable )
 {
 	/* FIXME: Currently we don't handle this, but a value of 0xA will enable
      * writing to the cart's RAM banks */
-	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 }
 
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	state->MBC1Mode = data & 0x1;
-	gb_set_mbc1_banks( space->machine );
+	gb_set_mbc1_banks(space->machine());
 }
 
 static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	if( state->CartType & TIMER )
 	{
 		/* FIXME: RTC Latch goes here */
@@ -623,8 +623,8 @@ static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 
 static WRITE8_HANDLER( gb_ram_tama5 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0xA000 + offset, data );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0xA000 + offset, data );
 	switch( offset & 0x0001 )
 	{
 	case 0x0000:    /* Write to data register */
@@ -632,11 +632,11 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 		{
 		case 0x00:      /* Bits 0-3 for rom bank selection */
 			state->ROMBank = ( state->ROMBank & 0xF0 ) | ( data & 0x0F );
-			gb_rom16_4000( space->machine, state->ROMMap[state->ROMBank] );
+			gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
 			break;
 		case 0x01:      /* Bit 4(-7?) for rom bank selection */
 			state->ROMBank = ( state->ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			gb_rom16_4000( space->machine, state->ROMMap[state->ROMBank] );
+			gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
 			break;
 		case 0x04:      /* Data to write lo */
 			state->gbTama5Byte = ( state->gbTama5Byte & 0xF0 ) | ( data & 0x0F );
@@ -668,7 +668,7 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 				}
 			case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
 			default:
-				logerror( "0x%04X: Unknown addressing mode\n", cpu_get_pc( space->cpu ) );
+				logerror( "0x%04X: Unknown addressing mode\n", cpu_get_pc( &space->device() ) );
 				break;
 			}
 			break;
@@ -686,7 +686,7 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
 			state->MBC3RTCData[0] = 0x01;
-			memory_set_bankptr( space->machine, "bank2", state->MBC3RTCData );
+			memory_set_bankptr( space->machine(), "bank2", state->MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
 			state->MBC3RTCData[0] = state->gbTama5Byte & 0x0F;
@@ -695,7 +695,7 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 			state->MBC3RTCData[0] = ( state->gbTama5Byte & 0xF0 ) >> 4;
 			break;
 		default:
-			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", cpu_get_pc( space->cpu ), data );
+			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", cpu_get_pc( &space->device() ), data );
 			break;
 		}
 		state->gbLastTama5Command = data;
@@ -708,21 +708,21 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x000 );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x000 );
 	if ( data & 0x40 )
 	{
 		state->mmm01_bank_offset = state->mmm01_reg1;
-		memory_set_bankptr( space->machine, "bank5", state->ROMMap[ state->mmm01_bank_offset ] );
-		memory_set_bankptr( space->machine, "bank10", state->ROMMap[ state->mmm01_bank_offset ] + 0x0100 );
-		gb_rom16_4000( space->machine, state->ROMMap[ state->mmm01_bank_offset + state->mmm01_bank ] );
+		memory_set_bankptr( space->machine(), "bank5", state->ROMMap[ state->mmm01_bank_offset ] );
+		memory_set_bankptr( space->machine(), "bank10", state->ROMMap[ state->mmm01_bank_offset ] + 0x0100 );
+		gb_rom16_4000( space->machine(), state->ROMMap[ state->mmm01_bank_offset + state->mmm01_bank ] );
 	}
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x2000 );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x2000 );
 
 	state->mmm01_reg1 = data & state->ROMMask;
 	state->mmm01_bank = state->mmm01_reg1 & state->mmm01_bank_mask;
@@ -730,18 +730,18 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w )
 	{
 		state->mmm01_bank = 1;
 	}
-	gb_rom16_4000( space->machine, state->ROMMap[ state->mmm01_bank_offset + state->mmm01_bank ] );
+	gb_rom16_4000( space->machine(), state->ROMMap[ state->mmm01_bank_offset + state->mmm01_bank ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w )
 {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x4000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x4000 );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x6000 );
+	gb_state *state = space->machine().driver_data<gb_state>();
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x6000 );
 	/* Not sure if this is correct, Taito Variety Pack sets these values */
 	/* Momotarou Collection 2 writes 01 and 21 here */
 	switch( data )
@@ -754,9 +754,9 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
 
 /* Korean MBC1 variant mapping */
 
-static void gb_set_mbc1_kor_banks( running_machine *machine )
+static void gb_set_mbc1_kor_banks( running_machine &machine )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	if ( state->ROMBank & 0x30 )
 	{
 		gb_rom16_0000( machine, state->ROMMap[ state->ROMBank & 0x30 ] );
@@ -767,7 +767,7 @@ static void gb_set_mbc1_kor_banks( running_machine *machine )
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x0F; /* Only uses lower 5 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
@@ -775,31 +775,31 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
 
 	state->ROMBank = ( state->ROMBank & 0x01F0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_kor_banks( space->machine );
+	gb_set_mbc1_kor_banks(space->machine());
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x3; /* Only uses the lower 2 bits */
 
 	/* Select the upper bits of the ROMMask */
 	state->ROMBank = ( state->ROMBank & 0x0F ) | ( data << 4 );
 
 	/* Switch banks */
-	gb_set_mbc1_kor_banks( space->machine );
+	gb_set_mbc1_kor_banks(space->machine());
 }
 
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	state->MBC1Mode = data & 0x1;
-	gb_set_mbc1_kor_banks( space->machine );
+	gb_set_mbc1_kor_banks(space->machine());
 }
 
 WRITE8_HANDLER ( gb_io_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	static const UINT8 timer_shifts[4] = {10, 4, 6, 8};
 
 	switch (offset)
@@ -807,9 +807,9 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x00:						/* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
-			JOYPAD &= (input_port_read(space->machine, "INPUTS") >> 4) | 0xF0;
+			JOYPAD &= (input_port_read(space->machine(), "INPUTS") >> 4) | 0xF0;
 		if (!(data & 0x10))
-			JOYPAD &= input_port_read(space->machine, "INPUTS") | 0xF0;
+			JOYPAD &= input_port_read(space->machine(), "INPUTS") | 0xF0;
 		return;
 	case 0x01:						/* SB - Serial transfer data */
 		break;
@@ -824,7 +824,7 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			state->SIOCount = 8;
-			state->gb_serial_timer->adjust(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512));
+			state->gb_serial_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
 			state->gb_serial_timer->enable( 1 );
 			break;
 		}
@@ -832,7 +832,7 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
 		if ( state->divcount >= 16 )
-			gb_timer_increment(space->machine);
+			gb_timer_increment(space->machine());
 		state->divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
@@ -857,7 +857,7 @@ WRITE8_HANDLER ( gb_io_w )
 			/* Check if TIMECNT should be incremented */
 			if ( ( state->divcount & ( state->shift_cycles - 1 ) ) >= ( state->shift_cycles >> 1 ) )
 			{
-				gb_timer_increment(space->machine);
+				gb_timer_increment(space->machine());
 			}
 		}
 		state->shift = timer_shifts[data & 0x03];
@@ -865,7 +865,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		cpu_set_reg( space->machine->device("maincpu"), LR35902_IF, data );
+		cpu_set_reg( space->machine().device("maincpu"), LR35902_IF, data );
 		break;
 	}
 
@@ -874,11 +874,11 @@ WRITE8_HANDLER ( gb_io_w )
 
 WRITE8_HANDLER ( gb_io2_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	if ( offset == 0x10 )
 	{
 		/* disable BIOS ROM */
-		gb_rom16_0000( space->machine, state->ROMMap[state->ROMBank00] );
+		gb_rom16_0000( space->machine(), state->ROMMap[state->ROMBank00] );
 	}
 	else
 	{
@@ -920,7 +920,7 @@ static const char *const sgbcmds[26] =
 
 WRITE8_HANDLER ( sgb_io_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	UINT8 *sgb_data = state->sgb_data;
 
 	switch( offset )
@@ -934,7 +934,7 @@ WRITE8_HANDLER ( sgb_io_w )
 				state->sgb_bitcount = 0;
 				state->sgb_start = 1;
 				state->sgb_rest = 0;
-				JOYPAD = 0x0F & ((input_port_read(space->machine, "INPUTS") >> 4) | input_port_read(space->machine, "INPUTS") | 0xF0);
+				JOYPAD = 0x0F & ((input_port_read(space->machine(), "INPUTS") >> 4) | input_port_read(space->machine(), "INPUTS") | 0xF0);
 				break;
 			case 0x10:				   /* data true */
 				if (state->sgb_rest)
@@ -958,7 +958,7 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					state->sgb_rest = 0;
 				}
-				JOYPAD = 0x1F & ((input_port_read(space->machine, "INPUTS") >> 4) | 0xF0);
+				JOYPAD = 0x1F & ((input_port_read(space->machine(), "INPUTS") >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
 				if (state->sgb_rest)
@@ -1262,7 +1262,7 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x0B:	/* PAL_TRN */
 								{
-									UINT8 *gb_vram = gb_get_vram_ptr( space->machine );
+									UINT8 *gb_vram = gb_get_vram_ptr(space->machine());
 									UINT16 I, col;
 
 									for( I = 0; I < 2048; I++ )
@@ -1298,15 +1298,15 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x13:	/* CHR_TRN */
 								if( sgb_data[1] & 0x1 )
-									memcpy( state->sgb_tile_data + 4096, gb_get_vram_ptr(space->machine) + 0x0800, 4096 );
+									memcpy( state->sgb_tile_data + 4096, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
 								else
-									memcpy( state->sgb_tile_data, gb_get_vram_ptr(space->machine) + 0x0800, 4096 );
+									memcpy( state->sgb_tile_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
 								break;
 							case 0x14:	/* PCT_TRN */
 								{
 									int I;
 									UINT16 col;
-									UINT8 *gb_vram = gb_get_vram_ptr( space->machine );
+									UINT8 *gb_vram = gb_get_vram_ptr(space->machine());
 									if( state->sgb_hack )
 									{
 										memcpy( state->sgb_tile_map, gb_vram + 0x1000, 2048 );
@@ -1328,7 +1328,7 @@ WRITE8_HANDLER ( sgb_io_w )
 								}
 								break;
 							case 0x15:	/* ATTR_TRN */
-								memcpy( state->sgb_atf_data, gb_get_vram_ptr( space->machine ) + 0x0800, 4050 );
+								memcpy( state->sgb_atf_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4050 );
 								break;
 							case 0x16:	/* ATTR_SET */
 								{
@@ -1385,7 +1385,7 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					state->sgb_rest = 0;
 				}
-				JOYPAD = 0x2F & (input_port_read(space->machine, "INPUTS") | 0xF0);
+				JOYPAD = 0x2F & (input_port_read(space->machine(), "INPUTS") | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
 				if (state->sgb_start)
@@ -1418,18 +1418,18 @@ WRITE8_HANDLER ( sgb_io_w )
 /* Interrupt Enable register */
 READ8_HANDLER( gb_ie_r )
 {
-	return cpu_get_reg( space->machine->device("maincpu"), LR35902_IE );
+	return cpu_get_reg( space->machine().device("maincpu"), LR35902_IE );
 }
 
 WRITE8_HANDLER ( gb_ie_w )
 {
-	cpu_set_reg( space->machine->device("maincpu"), LR35902_IE, data & 0x1F );
+	cpu_set_reg( space->machine().device("maincpu"), LR35902_IE, data & 0x1F );
 }
 
 /* IO read */
 READ8_HANDLER ( gb_io_r )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	switch(offset)
 	{
 		case 0x04:
@@ -1444,7 +1444,7 @@ READ8_HANDLER ( gb_io_r )
 			return state->gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | cpu_get_reg( space->machine->device("maincpu"), LR35902_IF );
+			return 0xE0 | cpu_get_reg( space->machine().device("maincpu"), LR35902_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -1453,13 +1453,13 @@ READ8_HANDLER ( gb_io_r )
 
 DEVICE_START(gb_cart)
 {
-	gb_state *state = device->machine->driver_data<gb_state>();
+	gb_state *state = device->machine().driver_data<gb_state>();
 	int I;
 
-	state->gb_dummy_rom_bank = auto_alloc_array(device->machine, UINT8, 0x4000);
+	state->gb_dummy_rom_bank = auto_alloc_array(device->machine(), UINT8, 0x4000);
 	memset(state->gb_dummy_rom_bank, 0xff, 0x4000);
 
-	state->gb_dummy_ram_bank = auto_alloc_array(device->machine, UINT8, 0x2000);
+	state->gb_dummy_ram_bank = auto_alloc_array(device->machine(), UINT8, 0x2000);
 	memset(state->gb_dummy_ram_bank, 0xff, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++)
@@ -1481,7 +1481,7 @@ DEVICE_START(gb_cart)
 
 DEVICE_IMAGE_LOAD(gb_cart)
 {
-	gb_state *state = image.device().machine->driver_data<gb_state>();
+	gb_state *state = image.device().machine().driver_data<gb_state>();
 	static const char *const CartTypes[] =
 	{
 		"ROM ONLY",
@@ -1635,7 +1635,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Claim memory */
-	state->gb_cart = auto_alloc_array(image.device().machine, UINT8, filesize);
+	state->gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
 
 	if (image.software_entry() == NULL)
 	{
@@ -1879,7 +1879,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if (state->RAMBanks && state->MBCType)
 	{
 		/* Claim memory */
-		state->gb_cart_ram = auto_alloc_array(image.device().machine, UINT8, state->RAMBanks * 0x2000);
+		state->gb_cart_ram = auto_alloc_array(image.device().machine(), UINT8, state->RAMBanks * 0x2000);
 		memset(state->gb_cart_ram, 0xFF, state->RAMBank * 0x2000);
 
 		for (I = 0; I < state->RAMBanks; I++)
@@ -1902,12 +1902,12 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	/* If there's an RTC claim memory to store the RTC contents */
 	if (state->CartType & TIMER)
 	{
-		state->MBC3RTCData = auto_alloc_array(image.device().machine, UINT8, 0x2000);
+		state->MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
 	}
 
 	if (state->MBCType == MBC_TAMA5)
 	{
-		state->MBC3RTCData = auto_alloc_array(image.device().machine, UINT8, 0x2000);
+		state->MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
 		memset(state->gbTama5Memory, 0xff, sizeof(state->gbTama5Memory));
 	}
 
@@ -1926,7 +1926,7 @@ INTERRUPT_GEN( gb_scanline_interrupt )
 
 static TIMER_CALLBACK(gb_serial_timer_proc)
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	/* Shift in a received bit */
 	SIODATA = (SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */
@@ -1940,9 +1940,9 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	}
 }
 
-INLINE void gb_timer_check_irq( running_machine *machine )
+INLINE void gb_timer_check_irq( running_machine &machine )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	state->reloading = 0;
 	if ( state->triggering_irq )
 	{
@@ -1956,9 +1956,9 @@ INLINE void gb_timer_check_irq( running_machine *machine )
 	}
 }
 
-static void gb_timer_increment( running_machine *machine )
+static void gb_timer_increment( running_machine &machine )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	gb_timer_check_irq(machine);
 
 	TIMECNT += 1;
@@ -1970,11 +1970,11 @@ static void gb_timer_increment( running_machine *machine )
 
 void gb_timer_callback(device_t *device, int cycles)
 {
-	gb_state *state = device->machine->driver_data<gb_state>();
+	gb_state *state = device->machine().driver_data<gb_state>();
 	UINT16 old_gb_divcount = state->divcount;
 	state->divcount += cycles;
 
-	gb_timer_check_irq(device->machine);
+	gb_timer_check_irq(device->machine());
 
 	if ( TIMEFRQ & 0x04 )
 	{
@@ -1982,30 +1982,30 @@ void gb_timer_callback(device_t *device, int cycles)
 		UINT16 new_count = state->divcount >> state->shift;
 		if ( cycles > state->shift_cycles )
 		{
-			gb_timer_increment(device->machine);
+			gb_timer_increment(device->machine());
 			old_count++;
 		}
 		if ( new_count != old_count )
 		{
-			gb_timer_increment(device->machine);
+			gb_timer_increment(device->machine());
 		}
 		if ( new_count << state->shift < state->divcount )
 		{
-			gb_timer_check_irq(device->machine);
+			gb_timer_check_irq(device->machine());
 		}
 	}
 }
 
 WRITE8_HANDLER ( gbc_io2_w )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	switch( offset )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			cpu_set_reg( space->machine->device("maincpu"), LR35902_SPEED, data );
+			cpu_set_reg( space->machine().device("maincpu"), LR35902_SPEED, data );
 			return;
 		case 0x10:	/* BFF - Bios disable */
-			gb_rom16_0000( space->machine, state->ROMMap[state->ROMBank00] );
+			gb_rom16_0000( space->machine(), state->ROMMap[state->ROMBank00] );
 			return;
 		case 0x16:	/* RP - Infrared port */
 			break;
@@ -2013,7 +2013,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 			state->GBC_RAMBank = data & 0x7;
 			if ( ! state->GBC_RAMBank )
 				state->GBC_RAMBank = 1;
-			memory_set_bankptr (space->machine, "bank3", state->GBC_RAMMap[state->GBC_RAMBank]);
+			memory_set_bankptr (space->machine(), "bank3", state->GBC_RAMMap[state->GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2023,11 +2023,11 @@ WRITE8_HANDLER ( gbc_io2_w )
 
 READ8_HANDLER( gbc_io2_r )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
-		return cpu_get_reg( space->machine->device("maincpu"), LR35902_SPEED );
+		return cpu_get_reg( space->machine().device("maincpu"), LR35902_SPEED );
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */
@@ -2046,9 +2046,9 @@ READ8_HANDLER( gbc_io2_r )
 
 MACHINE_START( megaduck )
 {
-	gb_state *state = machine->driver_data<gb_state>();
+	gb_state *state = machine.driver_data<gb_state>();
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
@@ -2131,25 +2131,25 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_HANDLER( megaduck_sound_w1 )
 {
-	gb_sound_w(space->machine->device("custom"), megaduck_sound_offsets[offset], data );
+	gb_sound_w(space->machine().device("custom"), megaduck_sound_offsets[offset], data );
 }
 
 READ8_HANDLER( megaduck_sound_r1 )
 {
-	return gb_sound_r( space->machine->device("custom"), megaduck_sound_offsets[offset] );
+	return gb_sound_r( space->machine().device("custom"), megaduck_sound_offsets[offset] );
 }
 
 WRITE8_HANDLER( megaduck_sound_w2 )
 {
 	switch(offset)
 	{
-		case 0x00:	gb_sound_w(space->machine->device("custom"), 0x10, data );	break;
-		case 0x01:	gb_sound_w(space->machine->device("custom"), 0x12, data );	break;
-		case 0x02:	gb_sound_w(space->machine->device("custom"), 0x11, data );	break;
-		case 0x03:	gb_sound_w(space->machine->device("custom"), 0x13, data );	break;
-		case 0x04:	gb_sound_w(space->machine->device("custom"), 0x14, data );	break;
-		case 0x05:	gb_sound_w(space->machine->device("custom"), 0x16, data );	break;
-		case 0x06:	gb_sound_w(space->machine->device("custom"), 0x15, data );	break;
+		case 0x00:	gb_sound_w(space->machine().device("custom"), 0x10, data );	break;
+		case 0x01:	gb_sound_w(space->machine().device("custom"), 0x12, data );	break;
+		case 0x02:	gb_sound_w(space->machine().device("custom"), 0x11, data );	break;
+		case 0x03:	gb_sound_w(space->machine().device("custom"), 0x13, data );	break;
+		case 0x04:	gb_sound_w(space->machine().device("custom"), 0x14, data );	break;
+		case 0x05:	gb_sound_w(space->machine().device("custom"), 0x16, data );	break;
+		case 0x06:	gb_sound_w(space->machine().device("custom"), 0x15, data );	break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -2165,37 +2165,37 @@ WRITE8_HANDLER( megaduck_sound_w2 )
 
 READ8_HANDLER( megaduck_sound_r2 )
 {
-	return gb_sound_r(space->machine->device("custom"), 0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(space->machine().device("custom"), 0x10 + megaduck_sound_offsets[offset]);
 }
 
 WRITE8_HANDLER( megaduck_rom_bank_select_type1 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	if( state->ROMMask )
 	{
 		state->ROMBank = data & state->ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr (space->machine, "bank1", state->ROMMap[state->ROMBank]);
+		memory_set_bankptr (space->machine(), "bank1", state->ROMMap[state->ROMBank]);
 	}
 }
 
 WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
 {
-	gb_state *state = space->machine->driver_data<gb_state>();
+	gb_state *state = space->machine().driver_data<gb_state>();
 	if( state->ROMMask )
 	{
 		state->ROMBank = (data << 1) & state->ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr( space->machine, "bank10", state->ROMMap[state->ROMBank]);
-		memory_set_bankptr( space->machine, "bank1", state->ROMMap[state->ROMBank + 1]);
+		memory_set_bankptr( space->machine(), "bank10", state->ROMMap[state->ROMBank]);
+		memory_set_bankptr( space->machine(), "bank1", state->ROMMap[state->ROMBank + 1]);
 	}
 }
 
 DEVICE_IMAGE_LOAD(megaduck_cart)
 {
-	gb_state *state = image.device().machine->driver_data<gb_state>();
+	gb_state *state = image.device().machine().driver_data<gb_state>();
 	int I;
 	UINT32 filesize;
 
@@ -2218,7 +2218,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	state->ROMBanks = filesize / 0x4000;
 
 	/* Claim memory */
-	state->gb_cart = auto_alloc_array(image.device().machine, UINT8, filesize);
+	state->gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
 
 	/* Read cartridge */
 	if (image.software_entry() == NULL)

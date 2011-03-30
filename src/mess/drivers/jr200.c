@@ -100,7 +100,7 @@ static VIDEO_START( jr200 )
 
 static SCREEN_UPDATE( jr200 )
 {
-	jr200_state *state = screen->machine->driver_data<jr200_state>();
+	jr200_state *state = screen->machine().driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
 
 	bitmap_fill(bitmap, cliprect, state->border_col);
@@ -139,12 +139,12 @@ static SCREEN_UPDATE( jr200 )
 					}
 					else // tile mode
 					{
-						gfx_data = screen->machine->region(attr & 0x40 ? "pcg" : "gfx_ram")->base();
+						gfx_data = screen->machine().region(attr & 0x40 ? "pcg" : "gfx_ram")->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
 
-					*BITMAP_ADDR16(bitmap, y*8+yi+16, x*8+xi+16) = screen->machine->pens[pen];
+					*BITMAP_ADDR16(bitmap, y*8+yi+16, x*8+xi+16) = screen->machine().pens[pen];
 				}
 			}
 		}
@@ -155,37 +155,37 @@ static SCREEN_UPDATE( jr200 )
 
 static READ8_HANDLER( jr200_pcg_1_r )
 {
-	UINT8 *pcg = space->machine->region("pcg")->base();
+	UINT8 *pcg = space->machine().region("pcg")->base();
 
 	return pcg[offset+0x000];
 }
 
 static READ8_HANDLER( jr200_pcg_2_r )
 {
-	UINT8 *pcg = space->machine->region("pcg")->base();
+	UINT8 *pcg = space->machine().region("pcg")->base();
 
 	return pcg[offset+0x400];
 }
 
 static WRITE8_HANDLER( jr200_pcg_1_w )
 {
-	UINT8 *pcg = space->machine->region("pcg")->base();
+	UINT8 *pcg = space->machine().region("pcg")->base();
 
 	pcg[offset+0x000] = data;
-	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x000) >> 3);
+	gfx_element_mark_dirty(space->machine().gfx[1], (offset+0x000) >> 3);
 }
 
 static WRITE8_HANDLER( jr200_pcg_2_w )
 {
-	UINT8 *pcg = space->machine->region("pcg")->base();
+	UINT8 *pcg = space->machine().region("pcg")->base();
 
 	pcg[offset+0x400] = data;
-	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x400) >> 3);
+	gfx_element_mark_dirty(space->machine().gfx[1], (offset+0x400) >> 3);
 }
 
 static READ8_HANDLER( jr200_bios_char_r )
 {
-	UINT8 *gfx = space->machine->region("gfx_ram")->base();
+	UINT8 *gfx = space->machine().region("gfx_ram")->base();
 
 	return gfx[offset];
 }
@@ -193,11 +193,11 @@ static READ8_HANDLER( jr200_bios_char_r )
 
 static WRITE8_HANDLER( jr200_bios_char_w )
 {
-//  UINT8 *gfx = space->machine->region("gfx_ram")->base();
+//  UINT8 *gfx = space->machine().region("gfx_ram")->base();
 
 	/* TODO: writing is presumably controlled by an I/O bit */
 //  gfx[offset] = data;
-//  gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
+//  gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
 }
 
 /*
@@ -208,12 +208,12 @@ I/O Device
 
 static READ8_HANDLER( mcu_keyb_r )
 {
-	jr200_state *state = space->machine->driver_data<jr200_state>();
+	jr200_state *state = space->machine().driver_data<jr200_state>();
 	int row, col, table = 0;
 	UINT8 keydata = 0;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
-	if (input_port_read(space->machine, "ROW9") & 0x07)
+	if (input_port_read(space->machine(), "ROW9") & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
@@ -222,7 +222,7 @@ static READ8_HANDLER( mcu_keyb_r )
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(space->machine, keynames[row]);
+		UINT8 data = input_port_read(space->machine(), keynames[row]);
 
 		for (col = 0; col < 8; col++)
 		{
@@ -245,36 +245,36 @@ static READ8_HANDLER( mcu_keyb_r )
 static WRITE8_HANDLER( jr200_beep_w )
 {
 	/* writing 0x0e enables the beeper, writing anything else disables it */
-	beep_set_state(space->machine->device("beeper"),((data & 0xf) == 0x0e) ? 1 : 0);
+	beep_set_state(space->machine().device("beeper"),((data & 0xf) == 0x0e) ? 1 : 0);
 }
 
 static WRITE8_HANDLER( jr200_beep_freq_w )
 {
-	jr200_state *state = space->machine->driver_data<jr200_state>();
+	jr200_state *state = space->machine().driver_data<jr200_state>();
 	UINT32 beep_freq;
 
 	state->freq_reg[offset] = data;
 
 	beep_freq = ((state->freq_reg[0]<<8) | (state->freq_reg[1] & 0xff)) + 1;
 
-	beep_set_frequency(space->machine->device("beeper"),84000 / beep_freq);
+	beep_set_frequency(space->machine().device("beeper"),84000 / beep_freq);
 }
 
 static WRITE8_HANDLER( jr200_border_col_w )
 {
-	jr200_state *state = space->machine->driver_data<jr200_state>();
+	jr200_state *state = space->machine().driver_data<jr200_state>();
 	state->border_col = data;
 }
 
 
 static TIMER_CALLBACK(timer_d_callback)
 {
-	device_set_input_line(machine->firstcpu, 0, HOLD_LINE);
+	device_set_input_line(machine.firstcpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mn1271_io_r )
 {
-	jr200_state *state = space->machine->driver_data<jr200_state>();
+	jr200_state *state = space->machine().driver_data<jr200_state>();
 	UINT8 retVal = state->mn1271_ram[offset];
 	if((offset+0xc800) > 0xca00)
 		retVal= 0xff;
@@ -298,7 +298,7 @@ static READ8_HANDLER( mn1271_io_r )
 
 static WRITE8_HANDLER( mn1271_io_w )
 {
-	jr200_state *state = space->machine->driver_data<jr200_state>();
+	jr200_state *state = space->machine().driver_data<jr200_state>();
 	state->mn1271_ram[offset] = data;
 	switch(offset+0xc800)
 	{
@@ -468,17 +468,17 @@ GFXDECODE_END
 
 static MACHINE_START(jr200)
 {
-	jr200_state *state = machine->driver_data<jr200_state>();
-	beep_set_frequency(machine->device("beeper"),0);
-	beep_set_state(machine->device("beeper"),0);
-	state->timer_d = machine->scheduler().timer_alloc(FUNC(timer_d_callback));
+	jr200_state *state = machine.driver_data<jr200_state>();
+	beep_set_frequency(machine.device("beeper"),0);
+	beep_set_state(machine.device("beeper"),0);
+	state->timer_d = machine.scheduler().timer_alloc(FUNC(timer_d_callback));
 }
 
 static MACHINE_RESET(jr200)
 {
-	jr200_state *state = machine->driver_data<jr200_state>();
-	UINT8 *gfx_rom = machine->region("gfx_rom")->base();
-	UINT8 *gfx_ram = machine->region("gfx_ram")->base();
+	jr200_state *state = machine.driver_data<jr200_state>();
+	UINT8 *gfx_rom = machine.region("gfx_rom")->base();
+	UINT8 *gfx_ram = machine.region("gfx_ram")->base();
 	int i;
 	memset(state->mn1271_ram,0,0x800);
 
@@ -486,7 +486,7 @@ static MACHINE_RESET(jr200)
 		gfx_ram[i] = gfx_rom[i];
 
 	for(i=0;i<0x800;i+=8)
-		gfx_element_mark_dirty(machine->gfx[0], i >> 3);
+		gfx_element_mark_dirty(machine.gfx[0], i >> 3);
 }
 
 

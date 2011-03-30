@@ -72,12 +72,12 @@ static TIMER_CALLBACK( sys2900_boot )
 static MACHINE_RESET(sys2900)
 {
 	memory_set_bank(machine, "boot", 1);
-	machine->scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
+	machine.scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
 }
 
 DRIVER_INIT( sys2900 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf000);
 }
 

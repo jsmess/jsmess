@@ -225,8 +225,8 @@ static DEVICE_START( scc8530 )
 	memset(scc, 0, sizeof(*scc));
 	scc->clock = device->clock();
 
-	scc->channel[0].baudtimer = device->machine->scheduler().timer_alloc(FUNC(scc8530_baud_expire), (void *)device);
-	scc->channel[1].baudtimer = device->machine->scheduler().timer_alloc(FUNC(scc8530_baud_expire), (void *)device);
+	scc->channel[0].baudtimer = device->machine().scheduler().timer_alloc(FUNC(scc8530_baud_expire), (void *)device);
+	scc->channel[1].baudtimer = device->machine().scheduler().timer_alloc(FUNC(scc8530_baud_expire), (void *)device);
 }
 
 

@@ -41,12 +41,12 @@
 
 static READ8_DEVICE_HANDLER( riot_joystick_r )
 {
-	return input_port_read(device->machine, "joysticks");
+	return input_port_read(device->machine(), "joysticks");
 }
 
 static READ8_DEVICE_HANDLER( riot_console_button_r )
 {
-	return input_port_read(device->machine, "console_buttons");
+	return input_port_read(device->machine(), "console_buttons");
 }
 
 const riot6532_interface a7800_r6532_interface =
@@ -62,11 +62,11 @@ const riot6532_interface a7800_r6532_interface =
     DRIVER INIT
 ***************************************************************************/
 
-static void a7800_driver_init(running_machine *machine, int ispal, int lines)
+static void a7800_driver_init(running_machine &machine, int ispal, int lines)
 {
-	a7800_state *state = machine->driver_data<a7800_state>();
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	state->ROM = machine->region("maincpu")->base();
+	a7800_state *state = machine.driver_data<a7800_state>();
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	state->ROM = machine.region("maincpu")->base();
 	state->ispal = ispal;
 	state->lines = lines;
 
@@ -97,16 +97,16 @@ DRIVER_INIT( a7800_pal )
 
 MACHINE_RESET( a7800 )
 {
-	a7800_state *state = machine->driver_data<a7800_state>();
+	a7800_state *state = machine.driver_data<a7800_state>();
 	UINT8 *memory;
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->ctrl_lock = 0;
 	state->ctrl_reg = 0;
 	state->maria_flag = 0;
 
 	/* set banks to default states */
-	memory = machine->region("maincpu")->base();
+	memory = machine.region("maincpu")->base();
 	memory_set_bankptr(machine,  "bank1", memory + 0x4000 );
 	memory_set_bankptr(machine,  "bank2", memory + 0x8000 );
 	memory_set_bankptr(machine,  "bank3", memory + 0xA000 );
@@ -115,7 +115,7 @@ MACHINE_RESET( a7800 )
 	/* pokey cartridge */
 	if (state->cart_type & 0x01)
 	{
-		device_t *pokey = machine->device("pokey");
+		device_t *pokey = machine.device("pokey");
 		space->install_legacy_read_handler(*pokey, 0x4000, 0x7FFF, FUNC(pokey_r));
 		space->install_legacy_write_handler(*pokey, 0x4000, 0x7FFF, FUNC(pokey_w));
 	}
@@ -187,15 +187,15 @@ static int a7800_verify_cart(char header[128])
 
 DEVICE_START( a7800_cart )
 {
-	a7800_state *state = device->machine->driver_data<a7800_state>();
-	UINT8 *memory = device->machine->region("maincpu")->base();
+	a7800_state *state = device->machine().driver_data<a7800_state>();
+	UINT8 *memory = device->machine().region("maincpu")->base();
 
 	state->bios_bkup = NULL;
 	state->cart_bkup = NULL;
 
 	/* Allocate memory for BIOS bank switching */
-	state->bios_bkup = auto_alloc_array_clear(device->machine, UINT8, 0x4000);
-	state->cart_bkup = auto_alloc_array(device->machine, UINT8, 0x4000);
+	state->bios_bkup = auto_alloc_array_clear(device->machine(), UINT8, 0x4000);
+	state->cart_bkup = auto_alloc_array(device->machine(), UINT8, 0x4000);
 
 	/* save the BIOS so we can switch it in and out */
 	memcpy( state->bios_bkup, memory + 0xC000, 0x4000 );
@@ -245,10 +245,10 @@ static UINT16 a7800_get_pcb_id(const char *pcb)
 
 DEVICE_IMAGE_LOAD( a7800_cart )
 {
-	a7800_state *state = image.device().machine->driver_data<a7800_state>();
+	a7800_state *state = image.device().machine().driver_data<a7800_state>();
 	UINT32 len = 0, start = 0;
 	unsigned char header[128];
-	UINT8 *memory = image.device().machine->region("maincpu")->base();
+	UINT8 *memory = image.device().machine().region("maincpu")->base();
 	const char	*pcb_name;
 
 	// detect cart type either from xml or from header
@@ -386,7 +386,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 
 WRITE8_HANDLER( a7800_RAM0_w )
 {
-	a7800_state *state = space->machine->driver_data<a7800_state>();
+	a7800_state *state = space->machine().driver_data<a7800_state>();
 	state->ROM[0x2040 + offset] = data;
 	state->ROM[0x40 + offset] = data;
 }
@@ -394,8 +394,8 @@ WRITE8_HANDLER( a7800_RAM0_w )
 
 WRITE8_HANDLER( a7800_cart_w )
 {
-	a7800_state *state = space->machine->driver_data<a7800_state>();
-	UINT8 *memory = space->machine->region("maincpu")->base();
+	a7800_state *state = space->machine().driver_data<a7800_state>();
+	UINT8 *memory = space->machine().region("maincpu")->base();
 
 	if(offset < 0x4000)
 	{
@@ -405,7 +405,7 @@ WRITE8_HANDLER( a7800_cart_w )
 		}
 		else if(state->cart_type & 0x01)
 		{
-			device_t *pokey = space->machine->device("pokey");
+			device_t *pokey = space->machine().device("pokey");
 			pokey_w(pokey, offset, data);
 		}
 		else
@@ -425,8 +425,8 @@ WRITE8_HANDLER( a7800_cart_w )
 		{
 			data &= 0x07;
 		}
-		memory_set_bankptr(space->machine, "bank2",memory + 0x10000 + (data << 14));
-		memory_set_bankptr(space->machine, "bank3",memory + 0x12000 + (data << 14));
+		memory_set_bankptr(space->machine(), "bank2",memory + 0x10000 + (data << 14));
+		memory_set_bankptr(space->machine(), "bank3",memory + 0x12000 + (data << 14));
 	/*  logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( state->cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -435,11 +435,11 @@ WRITE8_HANDLER( a7800_cart_w )
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			memory_set_bankptr(space->machine, "bank1",memory + 0x10000 );
+			memory_set_bankptr(space->machine(), "bank1",memory + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			memory_set_bankptr(space->machine, "bank1",memory + 0x14000 );
+			memory_set_bankptr(space->machine(), "bank1",memory + 0x14000 );
 		}
 	}
 	else if(( state->cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -449,8 +449,8 @@ WRITE8_HANDLER( a7800_cart_w )
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		memory_set_bankptr(space->machine,  "bank3", memory + 0x10000 + ( data << 14 ) );
-		memory_set_bankptr(space->machine,  "bank4", memory + 0x12000 + ( data << 14 ) );
+		memory_set_bankptr(space->machine(),  "bank3", memory + 0x10000 + ( data << 14 ) );
+		memory_set_bankptr(space->machine(),  "bank4", memory + 0x12000 + ( data << 14 ) );
 	}
 }
 
@@ -464,20 +464,20 @@ READ8_HANDLER( a7800_TIA_r )
 	switch(offset)
 	{
 		case 0x08:
-			  return((input_port_read(space->machine, "buttons") & 0x02) << 6);
+			  return((input_port_read(space->machine(), "buttons") & 0x02) << 6);
 		case 0x09:
-			  return((input_port_read(space->machine, "buttons") & 0x08) << 4);
+			  return((input_port_read(space->machine(), "buttons") & 0x08) << 4);
 		case 0x0A:
-			  return((input_port_read(space->machine, "buttons") & 0x01) << 7);
+			  return((input_port_read(space->machine(), "buttons") & 0x01) << 7);
 		case 0x0B:
-			  return((input_port_read(space->machine, "buttons") & 0x04) << 5);
+			  return((input_port_read(space->machine(), "buttons") & 0x04) << 5);
 		case 0x0c:
-			if((input_port_read(space->machine, "buttons") & 0x08) ||(input_port_read(space->machine, "buttons") & 0x02))
+			if((input_port_read(space->machine(), "buttons") & 0x08) ||(input_port_read(space->machine(), "buttons") & 0x02))
 				return 0x00;
 			else
 				return 0x80;
 		case 0x0d:
-			if((input_port_read(space->machine, "buttons") & 0x01) ||(input_port_read(space->machine, "buttons") & 0x04))
+			if((input_port_read(space->machine(), "buttons") & 0x01) ||(input_port_read(space->machine(), "buttons") & 0x04))
 				return 0x00;
 			else
 				return 0x80;
@@ -491,7 +491,7 @@ READ8_HANDLER( a7800_TIA_r )
 
 WRITE8_HANDLER( a7800_TIA_w )
 {
-	a7800_state *state = space->machine->driver_data<a7800_state>();
+	a7800_state *state = space->machine().driver_data<a7800_state>();
 	switch(offset) {
 	case 0x01:
 		if(data & 0x01)
@@ -510,6 +510,6 @@ WRITE8_HANDLER( a7800_TIA_w )
 		}
 		break;
 	}
-	tia_sound_w(space->machine->device("tia"), offset, data);
+	tia_sound_w(space->machine().device("tia"), offset, data);
 	state->ROM[offset] = data;
 }

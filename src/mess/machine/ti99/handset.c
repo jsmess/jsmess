@@ -175,7 +175,7 @@ static int ti99_handset_poll_keyboard(device_t *device, int num)
 	int i;
 
 	/* read current key state */
-	key_buf = ( input_port_read(device->machine, keynames[num]) | (input_port_read(device->machine, keynames[num + 1]) << 16) ) >> (4*num);
+	key_buf = ( input_port_read(device->machine(), keynames[num]) | (input_port_read(device->machine(), keynames[num + 1]) << 16) ) >> (4*num);
 
 	// If a key was previously pressed, this key was not shift, and this key is
 	// still down, then don't change the current key press.
@@ -251,8 +251,8 @@ static int ti99_handset_poll_joystick(device_t *device, int num)
 	int message;
 
 	/* read joystick position */
-	current_joy_x = input_port_read(device->machine, joynames[0][num]);
-	current_joy_y = input_port_read(device->machine, joynames[1][num]);
+	current_joy_x = input_port_read(device->machine(), joynames[0][num]);
+	current_joy_y = input_port_read(device->machine(), joynames[1][num]);
 
 	/* compare with last saved position */
 	current_joy = current_joy_x | (current_joy_y << 4);
@@ -341,14 +341,14 @@ void ti99_handset_task(device_t *device)
 static DEVICE_START( ti99_handset )
 {
 	ti99_handset_state *handset = get_safe_token(device);
-	handset->timer = device->machine->scheduler().timer_alloc(FUNC(ti99_handset_ack_callback), (void *)device);
+	handset->timer = device->machine().scheduler().timer_alloc(FUNC(ti99_handset_ack_callback), (void *)device);
 }
 
 static DEVICE_RESET( ti99_handset )
 {
 	const ti99_handset_config* conf = (const ti99_handset_config*)get_config(device);
 	ti99_handset_state *handset = get_safe_token(device);
-	handset->console9901 = device->machine->device(conf->sysintf);
+	handset->console9901 = device->machine().device(conf->sysintf);
 	handset->buf = 0;
 	handset->buflen = 0;
 	handset->clock = 0;

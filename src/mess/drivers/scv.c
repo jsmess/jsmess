@@ -151,7 +151,7 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( scv_cart_ram_w )
 {
-	scv_state *state = space->machine->driver_data<scv_state>();
+	scv_state *state = space->machine().driver_data<scv_state>();
 
 	/* Check if cartridge ram is enabled */
 	if ( state->cart_ram_enabled )
@@ -163,7 +163,7 @@ static WRITE8_HANDLER( scv_cart_ram_w )
 
 static WRITE8_HANDLER( scv_cart_ram2_w )
 {
-	scv_state *state = space->machine->driver_data<scv_state>();
+	scv_state *state = space->machine().driver_data<scv_state>();
 
 	/* Check if cartridge ram is enabled */
 	if ( state->cart_ram_enabled )
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( scv_cart_ram2_w )
 
 static WRITE8_HANDLER( scv_porta_w )
 {
-	scv_state *state = space->machine->driver_data<scv_state>();
+	scv_state *state = space->machine().driver_data<scv_state>();
 
 	state->porta = data;
 }
@@ -186,32 +186,32 @@ static WRITE8_HANDLER( scv_porta_w )
 
 static READ8_HANDLER( scv_portb_r )
 {
-	scv_state *state = space->machine->driver_data<scv_state>();
+	scv_state *state = space->machine().driver_data<scv_state>();
 	UINT8 data = 0xff;
 
 	if ( ! ( state->porta & 0x01 ) )
-		data &= input_port_read( space->machine, "PA0" );
+		data &= input_port_read( space->machine(), "PA0" );
 
 	if ( ! ( state->porta & 0x02 ) )
-		data &= input_port_read( space->machine, "PA1" );
+		data &= input_port_read( space->machine(), "PA1" );
 
 	if ( ! ( state->porta & 0x04 ) )
-		data &= input_port_read( space->machine, "PA2" );
+		data &= input_port_read( space->machine(), "PA2" );
 
 	if ( ! ( state->porta & 0x08 ) )
-		data &= input_port_read( space->machine, "PA3" );
+		data &= input_port_read( space->machine(), "PA3" );
 
 	if ( ! ( state->porta & 0x10 ) )
-		data &= input_port_read( space->machine, "PA4" );
+		data &= input_port_read( space->machine(), "PA4" );
 
 	if ( ! ( state->porta & 0x20 ) )
-		data &= input_port_read( space->machine, "PA5" );
+		data &= input_port_read( space->machine(), "PA5" );
 
 	if ( ! ( state->porta & 0x40 ) )
-		data &= input_port_read( space->machine, "PA6" );
+		data &= input_port_read( space->machine(), "PA6" );
 
 	if ( ! ( state->porta & 0x80 ) )
-		data &= input_port_read( space->machine, "PA7" );
+		data &= input_port_read( space->machine(), "PA7" );
 
 	return data;
 }
@@ -219,18 +219,18 @@ static READ8_HANDLER( scv_portb_r )
 
 static READ8_HANDLER( scv_portc_r )
 {
-	scv_state *state = space->machine->driver_data<scv_state>();
+	scv_state *state = space->machine().driver_data<scv_state>();
 	UINT8 data = state->portc;
 
-	data = ( data & 0xfe ) | ( input_port_read( space->machine, "PC0" ) & 0x01 );
+	data = ( data & 0xfe ) | ( input_port_read( space->machine(), "PC0" ) & 0x01 );
 
 	return data;
 }
 
 
-static void scv_set_banks( running_machine *machine )
+static void scv_set_banks( running_machine &machine )
 {
-	scv_state *state = machine->driver_data<scv_state>();
+	scv_state *state = machine.driver_data<scv_state>();
 
 	state->cart_ram_enabled = false;
 
@@ -301,39 +301,39 @@ static void scv_set_banks( running_machine *machine )
 
 static WRITE8_HANDLER( scv_portc_w )
 {
-	scv_state *state = space->machine->driver_data<scv_state>();
+	scv_state *state = space->machine().driver_data<scv_state>();
 
-	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(space->machine->device("maincpu")), data );
+	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(space->machine().device("maincpu")), data );
 	state->portc = data;
 
-	scv_set_banks( space->machine );
-	upd1771_pcm_w( space->machine->device( "upd1771c" ), state->portc & 0x08 );
+	scv_set_banks( space->machine() );
+	upd1771_pcm_w( space->machine().device( "upd1771c" ), state->portc & 0x08 );
 }
 
 
 static DEVICE_START( scv_cart )
 {
-	scv_state *state = device->machine->driver_data<scv_state>();
+	scv_state *state = device->machine().driver_data<scv_state>();
 
-	state->cart_rom = device->machine->region( "cart" )->base();
+	state->cart_rom = device->machine().region( "cart" )->base();
 	state->cart_rom_size = 0;
 	state->cart_ram = NULL;
 	state->cart_ram_size = 0;
 
-	scv_set_banks( device->machine );
+	scv_set_banks( device->machine() );
 }
 
 
 static DEVICE_IMAGE_LOAD( scv_cart )
 {
-	scv_state *state = image.device().machine->driver_data<scv_state>();
+	scv_state *state = image.device().machine().driver_data<scv_state>();
 
 	if ( image.software_entry() == NULL )
 	{
-		UINT8 *cart = image.device().machine->region( "cart" )->base();
+		UINT8 *cart = image.device().machine().region( "cart" )->base();
 		int size = image.length();
 
-		if ( size > image.device().machine->region( "cart" )->bytes() )
+		if ( size > image.device().machine().region( "cart" )->bytes() )
 		{
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
 			return IMAGE_INIT_FAIL;
@@ -358,7 +358,7 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 		state->cart_ram_size = image.get_software_region_length( "ram" );
 	}
 
-	scv_set_banks( image.device().machine );
+	scv_set_banks( image.device().machine() );
 
 	return IMAGE_INIT_PASS;
 }
@@ -418,8 +418,8 @@ static PALETTE_INIT( scv )
 
 static TIMER_CALLBACK( scv_vb_callback )
 {
-	scv_state *state = machine->driver_data<scv_state>();
-	int vpos = machine->primary_screen->vpos();
+	scv_state *state = machine.driver_data<scv_state>();
+	int vpos = machine.primary_screen->vpos();
 
 	switch( vpos )
 	{
@@ -431,7 +431,7 @@ static TIMER_CALLBACK( scv_vb_callback )
 		break;
 	}
 
-	state->vb_timer->adjust( machine->primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
+	state->vb_timer->adjust( machine.primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
 }
 
 
@@ -560,7 +560,7 @@ INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
 
 static SCREEN_UPDATE( scv )
 {
-	scv_state *state = screen->machine->driver_data<scv_state>();
+	scv_state *state = screen->machine().driver_data<scv_state>();
 	int x, y;
 	UINT8 fg = state->vram[0x1403] >> 4;
 	UINT8 bg = state->vram[0x1403] & 0x0f;
@@ -595,7 +595,7 @@ static SCREEN_UPDATE( scv )
 			if ( text_x && text_y )
 			{
 				/* Text mode */
-				UINT8 *char_data = screen->machine->region( "charrom" )->base() + ( d & 0x7f ) * 8;
+				UINT8 *char_data = screen->machine().region( "charrom" )->base() + ( d & 0x7f ) * 8;
 				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else
@@ -720,23 +720,23 @@ static SCREEN_UPDATE( scv )
 
 static WRITE_LINE_DEVICE_HANDLER( scv_upd1771_ack_w )
 {
-	cputag_set_input_line(device->machine, "maincpu", UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_START( scv )
 {
-	scv_state *state = machine->driver_data<scv_state>();
+	scv_state *state = machine.driver_data<scv_state>();
 
-	state->vb_timer = machine->scheduler().timer_alloc(FUNC(scv_vb_callback));
+	state->vb_timer = machine.scheduler().timer_alloc(FUNC(scv_vb_callback));
 }
 
 
 static MACHINE_RESET( scv )
 {
-	scv_state *state = machine->driver_data<scv_state>();
+	scv_state *state = machine.driver_data<scv_state>();
 
-	state->vb_timer->adjust( machine->primary_screen->time_until_pos(0, 0 ) );
+	state->vb_timer->adjust( machine.primary_screen->time_until_pos(0, 0 ) );
 }
 
 

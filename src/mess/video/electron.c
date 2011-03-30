@@ -40,14 +40,14 @@ static TIMER_CALLBACK( electron_scanline_interrupt );
 
 VIDEO_START( electron )
 {
-	electron_state *state = machine->driver_data<electron_state>();
+	electron_state *state = machine.driver_data<electron_state>();
 	int i;
 	for( i = 0; i < 256; i++ ) {
 		state->map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		state->map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
-	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(electron_scanline_interrupt));
-	state->scanline_timer->adjust( machine->primary_screen->time_until_pos(0), 0, machine->primary_screen->scan_period() );
+	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(electron_scanline_interrupt));
+	state->scanline_timer->adjust( machine.primary_screen->time_until_pos(0), 0, machine.primary_screen->scan_period() );
 }
 
 INLINE UINT8 read_vram( electron_state *state, UINT16 addr )
@@ -62,7 +62,7 @@ INLINE void electron_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 SCREEN_UPDATE( electron )
 {
-	electron_state *state = screen->machine->driver_data<electron_state>();
+	electron_state *state = screen->machine().driver_data<electron_state>();
 	int i;
 	int x = 0;
 	int pal[16];
@@ -258,8 +258,8 @@ SCREEN_UPDATE( electron )
 
 static TIMER_CALLBACK( electron_scanline_interrupt )
 {
-	electron_state *state = machine->driver_data<electron_state>();
-	switch (machine->primary_screen->vpos())
+	electron_state *state = machine.driver_data<electron_state>();
+	switch (machine.primary_screen->vpos())
 	{
 	case 43:
 		electron_interrupt_handler( machine, INT_SET, INT_RTC );

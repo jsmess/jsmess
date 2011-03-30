@@ -112,7 +112,7 @@ public:
 	int *videoULA_pallet_lookup;
 	int x_screen_offset;
 	int y_screen_offset;
-	void (*draw_function)(running_machine *machine);
+	void (*draw_function)(running_machine &machine);
 };
 
 
@@ -204,10 +204,10 @@ VIDEO_START( bbcm );
 SCREEN_UPDATE( bbc );
 
 void bbc_draw_RGB_in(device_t *device, int offset, int data);
-void bbc_set_video_memory_lookups(running_machine *machine, int ramsize);
-void bbc_frameclock(running_machine *machine);
-void bbc_setscreenstart(running_machine *machine, int b4, int b5);
-void bbcbp_setvideoshadow(running_machine *machine, int vdusel);
+void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
+void bbc_frameclock(running_machine &machine);
+void bbc_setscreenstart(running_machine &machine, int b4, int b5);
+void bbcbp_setvideoshadow(running_machine &machine, int vdusel);
 
 WRITE8_HANDLER ( bbc_videoULA_w );
 

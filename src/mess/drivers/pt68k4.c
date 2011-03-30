@@ -32,12 +32,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pt68k4)
 {
-	pt68k4_state *state = machine->driver_data<pt68k4_state>();
-	UINT8* user1 = machine->region("user1")->base();
+	pt68k4_state *state = machine.driver_data<pt68k4_state>();
+	UINT8* user1 = machine.region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,8);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static VIDEO_START( pt68k4 )

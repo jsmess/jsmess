@@ -113,8 +113,8 @@ WRITE8_HANDLER ( odyssey2_lum_w );
 
 STREAM_UPDATE( odyssey2_sh_update );
 
-void odyssey2_ef9341_w( running_machine *machine, int command, int b, UINT8 data );
-UINT8 odyssey2_ef9341_r( running_machine *machine, int command, int b );
+void odyssey2_ef9341_w( running_machine &machine, int command, int b, UINT8 data );
+UINT8 odyssey2_ef9341_r( running_machine &machine, int command, int b );
 
 DECLARE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);
 

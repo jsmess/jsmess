@@ -207,12 +207,12 @@ static VIDEO_START( pcm )
 
 static SCREEN_UPDATE( pcm )
 {
-	pcm_state *state = screen->machine->driver_data<pcm_state>();
+	pcm_state *state = screen->machine().driver_data<pcm_state>();
 	UINT8 code;
 	UINT8 line;
 	int y, x, j, b;
 
-	UINT8 *gfx = screen->machine->region("chargen")->base();
+	UINT8 *gfx = screen->machine().region("chargen")->base();
 
 	for (y = 0; y < 32; y++)
 	{

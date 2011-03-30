@@ -24,12 +24,12 @@
 
 VIDEO_START( policetr )
 {
-	policetr_state *state = machine->driver_data<policetr_state>();
+	policetr_state *state = machine.driver_data<policetr_state>();
 	/* the source bitmap is in ROM */
-	state->srcbitmap = machine->region("gfx1")->base();
+	state->srcbitmap = machine.region("gfx1")->base();
 
 	/* compute the height */
-	state->srcbitmap_height_mask = (machine->region("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
+	state->srcbitmap_height_mask = (machine.region("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
 	state->dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
@@ -43,9 +43,9 @@ VIDEO_START( policetr )
  *
  *************************************/
 
-static void render_display_list(running_machine *machine, offs_t offset)
+static void render_display_list(running_machine &machine, offs_t offset)
 {
-	policetr_state *state = machine->driver_data<policetr_state>();
+	policetr_state *state = machine.driver_data<policetr_state>();
 	/* mask against the R3000 address space */
 	offset &= 0x1fffffff;
 
@@ -141,17 +141,17 @@ static void render_display_list(running_machine *machine, offs_t offset)
 
 WRITE32_HANDLER( policetr_video_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	/* we assume 4-byte accesses */
 	if (mem_mask)
-		logerror("%08X: policetr_video_w access with mask %08X\n", cpu_get_previouspc(space->cpu), mem_mask);
+		logerror("%08X: policetr_video_w access with mask %08X\n", cpu_get_previouspc(&space->device()), mem_mask);
 
 	/* 4 offsets */
 	switch (offset)
 	{
 		/* offset 0 specifies the start address of a display list */
 		case 0:
-			render_display_list(space->machine, data);
+			render_display_list(space->machine(), data);
 			break;
 
 		/* offset 1 specifies a latch value in the upper 8 bits */
@@ -194,7 +194,7 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
+					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(&space->device()), data, mem_mask, state->video_latch);
 					break;
 			}
 			break;
@@ -208,7 +208,7 @@ WRITE32_HANDLER( policetr_video_w )
 				/* latch 0x00 is unknown; 0, 1, and 2 get written into the upper 12 bits before rendering */
 				case 0x00:
 					if (data != (0 << 20) && data != (1 << 20) && data != (2 << 20))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(&space->device()), data, mem_mask, state->video_latch);
 					break;
 
 				/* latch 0x10 specifies destination bitmap X and Y offsets */
@@ -220,28 +220,28 @@ WRITE32_HANDLER( policetr_video_w )
 				/* latch 0x20 is unknown; either 0xef or 0x100 is written every IRQ4 */
 				case 0x20:
 					if (data != (0x100 << 12) && data != (0xef << 12))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(&space->device()), data, mem_mask, state->video_latch);
 					break;
 
 				/* latch 0x40 is unknown; a 0 is written every IRQ4 */
 				case 0x40:
 					if (data != 0)
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(&space->device()), data, mem_mask, state->video_latch);
 					break;
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					cputag_set_input_line(space->machine, "maincpu", R3000_IRQ4, CLEAR_LINE);
+					cputag_set_input_line(space->machine(), "maincpu", R3000_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					cputag_set_input_line(space->machine, "maincpu", R3000_IRQ5, CLEAR_LINE);
+					cputag_set_input_line(space->machine(), "maincpu", R3000_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
+					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(&space->device()), data, mem_mask, state->video_latch);
 					break;
 			}
 			break;
@@ -259,35 +259,35 @@ WRITE32_HANDLER( policetr_video_w )
 
 READ32_HANDLER( policetr_video_r )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	int inputval;
-	int width = space->machine->primary_screen->width();
-	int height = space->machine->primary_screen->height();
+	int width = space->machine().primary_screen->width();
+	int height = space->machine().primary_screen->height();
 
 	/* the value read is based on the latch */
 	switch (state->video_latch)
 	{
 		/* latch 0x00 is player 1's gun X coordinate */
 		case 0x00:
-			inputval = ((input_port_read(space->machine, "GUNX1") & 0xff) * width) >> 8;
+			inputval = ((input_port_read(space->machine(), "GUNX1") & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x01 is player 1's gun Y coordinate */
 		case 0x01:
-			inputval = ((input_port_read(space->machine, "GUNY1") & 0xff) * height) >> 8;
+			inputval = ((input_port_read(space->machine(), "GUNY1") & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 
 		/* latch 0x02 is player 2's gun X coordinate */
 		case 0x02:
-			inputval = ((input_port_read(space->machine, "GUNX2") & 0xff) * width) >> 8;
+			inputval = ((input_port_read(space->machine(), "GUNX2") & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x03 is player 2's gun Y coordinate */
 		case 0x03:
-			inputval = ((input_port_read(space->machine, "GUNY2") & 0xff) * height) >> 8;
+			inputval = ((input_port_read(space->machine(), "GUNY2") & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 
@@ -302,7 +302,7 @@ READ32_HANDLER( policetr_video_r )
 	}
 
 	/* log anything else */
-	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(space->cpu), state->video_latch);
+	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(&space->device()), state->video_latch);
 	return 0;
 }
 
@@ -317,7 +317,7 @@ READ32_HANDLER( policetr_video_r )
 
 WRITE32_HANDLER( policetr_palette_offset_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	if (ACCESSING_BITS_16_23)
 	{
 		state->palette_offset = (data >> 16) & 0xff;
@@ -328,13 +328,13 @@ WRITE32_HANDLER( policetr_palette_offset_w )
 
 WRITE32_HANDLER( policetr_palette_data_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	if (ACCESSING_BITS_16_23)
 	{
 		state->palette_data[state->palette_index] = (data >> 16) & 0xff;
 		if (++state->palette_index == 3)
 		{
-			palette_set_color(space->machine, state->palette_offset, MAKE_RGB(state->palette_data[0], state->palette_data[1], state->palette_data[2]));
+			palette_set_color(space->machine(), state->palette_offset, MAKE_RGB(state->palette_data[0], state->palette_data[1], state->palette_data[2]));
 			state->palette_index = 0;
 		}
 	}
@@ -350,7 +350,7 @@ WRITE32_HANDLER( policetr_palette_data_w )
 
 SCREEN_UPDATE( policetr )
 {
-	policetr_state *state = screen->machine->driver_data<policetr_state>();
+	policetr_state *state = screen->machine().driver_data<policetr_state>();
 	int width = cliprect->max_x - cliprect->min_x + 1;
 	int y;
 

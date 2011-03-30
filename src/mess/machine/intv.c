@@ -11,32 +11,32 @@
 
 WRITE16_HANDLER ( intvkbd_dualport16_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned char *RAM;
 
 	COMBINE_DATA(&state->intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = space->machine->region("keyboard")->base();
+	RAM	 = space->machine().region("keyboard")->base();
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
 READ8_HANDLER ( intvkbd_dualport8_lsb_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	return (UINT8) (state->intvkbd_dualport_ram[offset] >> 0);
 }
 
 WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned char *RAM;
 
 	state->intvkbd_dualport_ram[offset] &= ~0x00FF;
 	state->intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = space->machine->region("keyboard")->base();
+	RAM	 = space->machine().region("keyboard")->base();
 	RAM[offset] = data;
 }
 
@@ -44,7 +44,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
 
 READ8_HANDLER ( intvkbd_dualport8_msb_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned char rv;
 
 	if (offset < 0x100)
@@ -52,27 +52,27 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 		switch (offset)
 		{
 			case 0x000:
-				rv = input_port_read(space->machine, "TEST") & 0x80;
+				rv = input_port_read(space->machine(), "TEST") & 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
-				rv = (input_port_read(space->machine, "TEST") & 0x40) << 1;
+				rv = (input_port_read(space->machine(), "TEST") & 0x40) << 1;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
-				rv = (input_port_read(space->machine, "TEST") & 0x20) << 2;
+				rv = (input_port_read(space->machine(), "TEST") & 0x20) << 2;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
-				rv = (input_port_read(space->machine, "TEST") & 0x10) << 3;
+				rv = (input_port_read(space->machine(), "TEST") & 0x10) << 3;
 				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
-				rv = (input_port_read(space->machine, "TEST") & 0x08) << 4;
+				rv = (input_port_read(space->machine(), "TEST") & 0x08) << 4;
 				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
-				rv = (input_port_read(space->machine, "TEST") & 0x04) << 5;
+				rv = (input_port_read(space->machine(), "TEST") & 0x04) << 5;
 				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
@@ -92,25 +92,25 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 			case 0x060:	/* Keyboard Read */
 				rv = 0xff;
 				if (state->intvkbd_keyboard_col == 0)
-					rv = input_port_read(space->machine, "ROW0");
+					rv = input_port_read(space->machine(), "ROW0");
 				if (state->intvkbd_keyboard_col == 1)
-					rv = input_port_read(space->machine, "ROW1");
+					rv = input_port_read(space->machine(), "ROW1");
 				if (state->intvkbd_keyboard_col == 2)
-					rv = input_port_read(space->machine, "ROW2");
+					rv = input_port_read(space->machine(), "ROW2");
 				if (state->intvkbd_keyboard_col == 3)
-					rv = input_port_read(space->machine, "ROW3");
+					rv = input_port_read(space->machine(), "ROW3");
 				if (state->intvkbd_keyboard_col == 4)
-					rv = input_port_read(space->machine, "ROW4");
+					rv = input_port_read(space->machine(), "ROW4");
 				if (state->intvkbd_keyboard_col == 5)
-					rv = input_port_read(space->machine, "ROW5");
+					rv = input_port_read(space->machine(), "ROW5");
 				if (state->intvkbd_keyboard_col == 6)
-					rv = input_port_read(space->machine, "ROW6");
+					rv = input_port_read(space->machine(), "ROW6");
 				if (state->intvkbd_keyboard_col == 7)
-					rv = input_port_read(space->machine, "ROW7");
+					rv = input_port_read(space->machine(), "ROW7");
 				if (state->intvkbd_keyboard_col == 8)
-					rv = input_port_read(space->machine, "ROW8");
+					rv = input_port_read(space->machine(), "ROW8");
 				if (state->intvkbd_keyboard_col == 9)
-					rv = input_port_read(space->machine, "ROW9");
+					rv = input_port_read(space->machine(), "ROW9");
 				break;
 			case 0x80:
 				rv = 0x00;
@@ -160,7 +160,7 @@ static const char *const tape_motor_mode_desc[8] =
 
 WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned int mask;
 
 	if (offset < 0x100)
@@ -258,7 +258,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 				intvkbd_tms9927_w(space, offset-0xc0, data);
 				break;
 			default:
-				logerror("%04X: Unknown write %02x to 0x40%02x\n",cpu_get_pc(space->cpu),data,offset);
+				logerror("%04X: Unknown write %02x to 0x40%02x\n",cpu_get_pc(&space->device()),data,offset);
 				break;
 		}
 	}
@@ -271,14 +271,14 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 
 READ16_HANDLER( intv_gram_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("read: %d = GRAM(%d)\n",state->gram[offset],offset);
 	return (int)state->gram[offset];
 }
 
 WRITE16_HANDLER( intv_gram_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
     data &= 0xFF;
 
 	state->gram[offset] = data;
@@ -289,14 +289,14 @@ WRITE16_HANDLER( intv_gram_w )
 
 READ16_HANDLER( intv_ram8_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("%x = ram8_r(%x)\n",state->ram8[offset],offset);
 	return (int)state->ram8[offset];
 }
 
 WRITE16_HANDLER( intv_ram8_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("ram8_w(%x) = %x\n",offset,data);
 	state->ram8[offset] = data&0xff;
 }
@@ -304,15 +304,15 @@ WRITE16_HANDLER( intv_ram8_w )
 
 READ16_HANDLER( intv_ram16_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("%x = ram16_r(%x)\n",state->ram16[offset],offset);
 	return (int)state->ram16[offset];
 }
 
 WRITE16_HANDLER( intv_ram16_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
-	//logerror("%g: WRITING TO GRAM offset = %d\n",machine->time(),offset);
+	intv_state *state = space->machine().driver_data<intv_state>();
+	//logerror("%g: WRITING TO GRAM offset = %d\n",machine.time(),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
 	state->ram16[offset] = data&0xffff;
 }
@@ -332,7 +332,7 @@ static int intv_load_rom_file(device_image_interface &image)
 	UINT8 high_byte;
 	UINT8 low_byte;
 
-	UINT8 *memory = image.device().machine->region("maincpu")->base();
+	UINT8 *memory = image.device().machine().region("maincpu")->base();
 	const char *filetype = image.filetype();
 
 	/* if it is in .rom format, we enter here */
@@ -476,14 +476,14 @@ DRIVER_INIT( intv )
 /* Set Reset and INTR/INTRM Vector */
 MACHINE_RESET( intv )
 {
-	device_set_input_line_vector(machine->device("maincpu"), CP1610_RESET, 0x1000);
+	device_set_input_line_vector(machine.device("maincpu"), CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
-	device_set_input_line_vector(machine->device("maincpu"), CP1610_INT_INTRM, 0x1004);
-	device_set_input_line_vector(machine->device("maincpu"), CP1610_INT_INTR,  0x1004);
+	device_set_input_line_vector(machine.device("maincpu"), CP1610_INT_INTRM, 0x1004);
+	device_set_input_line_vector(machine.device("maincpu"), CP1610_INT_INTR,  0x1004);
 
 	/* Set initial PC */
-	cpu_set_reg(machine->device("maincpu"), CP1610_R7, 0x1000);
+	cpu_set_reg(machine.device("maincpu"), CP1610_R7, 0x1000);
 
 	return;
 }
@@ -496,11 +496,11 @@ static TIMER_CALLBACK(intv_interrupt_complete)
 
 INTERRUPT_GEN( intv_interrupt )
 {
-	intv_state *state = device->machine->driver_data<intv_state>();
-	cputag_set_input_line(device->machine, "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
+	intv_state *state = device->machine().driver_data<intv_state>();
+	cputag_set_input_line(device->machine(), "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
 	state->sr1_int_pending = 1;
-	device->machine->scheduler().timer_set(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(3791), FUNC(intv_interrupt_complete));
-	intv_stic_screenrefresh(device->machine);
+	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3791), FUNC(intv_interrupt_complete));
+	intv_stic_screenrefresh(device->machine());
 }
 
 static const UINT8 controller_table[] =
@@ -522,13 +522,13 @@ READ8_HANDLER( intv_right_control_r )
 		switch(byte)
 		{
 			case 0:
-				value = input_port_read(space->machine, "IN0");
+				value = input_port_read(space->machine(), "IN0");
 				break;
 			case 1:
-				value = input_port_read(space->machine, "IN1");
+				value = input_port_read(space->machine(), "IN1");
 				break;
 			case 2:
-				value = input_port_read(space->machine, "IN2");
+				value = input_port_read(space->machine(), "IN2");
 				break;
 		}
 		for(bit=7; bit>=0; bit--)
@@ -555,7 +555,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 	{
 		/* First, initialize these as empty so that the intellivision
          * will think that the playcable is not attached */
-		UINT8 *memory = image.device().machine->region("maincpu")->base();
+		UINT8 *memory = image.device().machine().region("maincpu")->base();
 
 		/* assume playcable is absent */
 		memory[0x4800 << 1] = 0xff;
@@ -566,7 +566,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 
 	if (strcmp(image.device().tag(),"cart2") == 0) /* Keyboard component cartridge slot */
 	{
-		UINT8 *memory = image.device().machine->region("keyboard")->base();
+		UINT8 *memory = image.device().machine().region("keyboard")->base();
 
 		/* Assume an 8K cart, like BASIC */
 		image.fread( &memory[0xe000], 0x2000);

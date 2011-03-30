@@ -52,25 +52,25 @@ public:
 READ8_MEMBER( zrt80_state::zrt80_10_r )
 {
 	UINT8 ret = term_data;
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return ret;
 }
 
 static TIMER_CALLBACK( zrt80_beepoff )
 {
-	zrt80_state *state = machine->driver_data<zrt80_state>();
+	zrt80_state *state = machine.driver_data<zrt80_state>();
 	beep_set_state(state->m_beep, 0);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_30_w)
 {
-	machine->scheduler().timer_set(attotime::from_msec(100), FUNC(zrt80_beepoff));
+	m_machine.scheduler().timer_set(attotime::from_msec(100), FUNC(zrt80_beepoff));
 	beep_set_state(m_beep, 1);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 {
-	machine->scheduler().timer_set(attotime::from_msec(400), FUNC(zrt80_beepoff));
+	m_machine.scheduler().timer_set(attotime::from_msec(400), FUNC(zrt80_beepoff));
 	beep_set_state(m_beep, 1);
 }
 
@@ -182,30 +182,30 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(zrt80)
 {
-	zrt80_state *state = machine->driver_data<zrt80_state>();
+	zrt80_state *state = machine.driver_data<zrt80_state>();
 	beep_set_frequency(state->m_beep, 800);
 }
 
 static VIDEO_START( zrt80 )
 {
-	zrt80_state *state = machine->driver_data<zrt80_state>();
-	state->FNT = machine->region("chargen")->base();
+	zrt80_state *state = machine.driver_data<zrt80_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( zrt80 )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
 static MC6845_UPDATE_ROW( zrt80_update_row )
 {
-	zrt80_state *state = device->machine->driver_data<zrt80_state>();
+	zrt80_state *state = device->machine().driver_data<zrt80_state>();
 	UINT8 chr,gfx,inv,i;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
-	UINT8 polarity = input_port_read(device->machine, "DIPSW1") & 4 ? 0xff : 0;
+	UINT8 polarity = input_port_read(device->machine(), "DIPSW1") & 4 ? 0xff : 0;
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -245,7 +245,7 @@ static const mc6845_interface zrt80_crtc6845_interface =
 static INS8250_INTERRUPT( zrt80_com_interrupt )
 {
 	logerror("com int\r\n");
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ins8250_interface zrt80_com_interface =
@@ -260,7 +260,7 @@ static const ins8250_interface zrt80_com_interface =
 WRITE8_MEMBER( zrt80_state::zrt80_kbd_put )
 {
 	term_data = data;
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( zrt80_terminal_intf )

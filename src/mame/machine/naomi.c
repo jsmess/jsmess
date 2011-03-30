@@ -27,11 +27,11 @@ UINT16 actel_id;
 
 static READ64_HANDLER( naomi_bios_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc04173c)
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
-		//device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0xc04173c)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
+		//device_spin_until_interrupt(&space->device());
 //  else
-//      printf("%08x\n", cpu_get_pc(space->cpu));
+//      printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0x2ad238/8];
 }
@@ -63,12 +63,12 @@ static UINT8 asciihex_to_dec(UINT8 in)
 }
 
 // development helper function
-static void create_pic_from_retdat(running_machine* machine)
+static void create_pic_from_retdat(running_machine& machine)
 {
 	{
-		UINT8* hexregion = machine->region("pichex")->base();
-		UINT8* retregion = machine->region("picreturn")->base();
-		UINT8* newregion = machine->region("pic")->base();
+		UINT8* hexregion = machine.region("pichex")->base();
+		UINT8* retregion = machine.region("picreturn")->base();
+		UINT8* newregion = machine.region("pic")->base();
 		int outcount = 0;
 
 		if (hexregion && retregion && newregion)
@@ -149,7 +149,7 @@ static void create_pic_from_retdat(running_machine* machine)
 			{
 				FILE *fp;
 				char filename[256];
-				sprintf(filename,"picbin_%s", machine->system().name);
+				sprintf(filename,"picbin_%s", machine.system().name);
 				fp=fopen(filename, "w+b");
 				if (fp)
 				{
@@ -171,7 +171,7 @@ static void create_pic_from_retdat(running_machine* machine)
 
 DRIVER_INIT(naomi)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_bios_idle_skip_r)); // rev e bios
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_bios_idle_skip_r)); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -188,7 +188,7 @@ DRIVER_INIT(naomi2)
 
 DRIVER_INIT(naomi_mp)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_bios_idle_skip_r)); // rev e bios
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_bios_idle_skip_r)); // rev e bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
@@ -197,22 +197,22 @@ DRIVER_INIT(naomi_mp)
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0x0c0c9adc)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x1aae18/8];
 }
 
 DRIVER_INIT( ggxxsla )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc1aae18, 0xc1aae1f, FUNC(naomigd_ggxxsla_idle_skip_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc1aae18, 0xc1aae1f, FUNC(naomigd_ggxxsla_idle_skip_r));
 	DRIVER_INIT_CALL(naomi);
 }
 
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0xc0b5c3c) // or 0xc0bab0c
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x1837b8/8];
 }
@@ -220,38 +220,38 @@ static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 
 DRIVER_INIT( ggxx )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc1837b8, 0xc1837bf, FUNC(naomigd_ggxx_idle_skip_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc1837b8, 0xc1837bf, FUNC(naomigd_ggxx_idle_skip_r));
 	DRIVER_INIT_CALL(naomi);
 }
 
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0xc0b84bc) // or 0xc0bab0c
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
-	//printf("%08x\n", cpu_get_pc(space->cpu));
+	//printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0x18d6c8/8];
 }
 
 DRIVER_INIT( ggxxrl )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc18d6c8, 0xc18d6cf, FUNC(naomigd_ggxxrl_idle_skip_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc18d6c8, 0xc18d6cf, FUNC(naomigd_ggxxrl_idle_skip_r));
 	DRIVER_INIT_CALL(naomi);
 }
 
 /* at least speeds up the annoying copyright screens ;-) */
 static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc36a2dc)
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0xc36a2dc)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x5dc900/8];
 }
 
 DRIVER_INIT( sfz3ugd )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc5dc900, 0xc5dc907, FUNC(naomigd_sfz3ugd_idle_skip_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc5dc900, 0xc5dc907, FUNC(naomigd_sfz3ugd_idle_skip_r));
 	DRIVER_INIT_CALL(naomi);
 }
 

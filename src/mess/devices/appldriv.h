@@ -17,7 +17,7 @@ void apple525_set_enable_lines(device_t *device,int enable_mask);
 UINT8 apple525_read_data(device_t *device);
 void apple525_write_data(device_t *device,UINT8 data);
 int apple525_read_status(device_t *device);
-int apple525_get_count(running_machine *machine);
+int apple525_get_count(running_machine &machine);
 
 typedef struct _appledriv_config appledriv_config;
 struct _appledriv_config

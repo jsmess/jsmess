@@ -75,7 +75,7 @@ DEVICE_IMAGE_LOAD( svi318_cart );
 DEVICE_IMAGE_UNLOAD( svi318_cart );
 
 INTERRUPT_GEN( svi318_interrupt );
-void svi318_vdp_interrupt(running_machine *machine, int i);
+void svi318_vdp_interrupt(running_machine &machine, int i);
 
 WRITE8_HANDLER( svi318_writemem1 );
 WRITE8_HANDLER( svi318_writemem2 );
@@ -91,7 +91,7 @@ WRITE8_DEVICE_HANDLER( svi318_ppi_w );
 WRITE8_HANDLER( svi318_psg_port_b_w );
 READ8_HANDLER( svi318_psg_port_a_r );
 
-int svi318_cassette_present(running_machine *machine, int id);
+int svi318_cassette_present(running_machine &machine, int id);
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
 VIDEO_START( svi328_806 );

@@ -285,7 +285,7 @@ static const UINT8 chars[0x40][8]={
 
 VIDEO_START( arcadia )
 {
-	arcadia_state *state = machine->driver_data<arcadia_state>();
+	arcadia_state *state = machine.driver_data<arcadia_state>();
 	int i;
 	memcpy(&state->chars, chars, sizeof(chars));
 	for (i=0; i<0x40; i++)
@@ -303,7 +303,7 @@ VIDEO_START( arcadia )
 	}
 
 	{
-		screen_device *screen = machine->first_screen();
+		screen_device *screen = machine.first_screen();
 		int width = screen->width();
 		int height = screen->height();
 		state->bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -312,51 +312,51 @@ VIDEO_START( arcadia )
 
 READ8_HANDLER(arcadia_video_r)
 {
-	arcadia_state *state = space->machine->driver_data<arcadia_state>();
+	arcadia_state *state = space->machine().driver_data<arcadia_state>();
     UINT8 data=0;
     switch (offset) {
     case 0xff: data=state->charline|0xf0;break;
-    case 0x100: data=input_port_read(space->machine, "controller1_col1");break;
-    case 0x101: data=input_port_read(space->machine, "controller1_col2");break;
-    case 0x102: data=input_port_read(space->machine, "controller1_col3");break;
-    case 0x103: data=input_port_read(space->machine, "controller1_extra");break;
-    case 0x104: data=input_port_read(space->machine, "controller2_col1");break;
-    case 0x105: data=input_port_read(space->machine, "controller2_col2");break;
-    case 0x106: data=input_port_read(space->machine, "controller2_col3");break;
-    case 0x107: data=input_port_read(space->machine, "controller2_extra");break;
-    case 0x108: data=input_port_read(space->machine, "panel");break;
+    case 0x100: data=input_port_read(space->machine(), "controller1_col1");break;
+    case 0x101: data=input_port_read(space->machine(), "controller1_col2");break;
+    case 0x102: data=input_port_read(space->machine(), "controller1_col3");break;
+    case 0x103: data=input_port_read(space->machine(), "controller1_extra");break;
+    case 0x104: data=input_port_read(space->machine(), "controller2_col1");break;
+    case 0x105: data=input_port_read(space->machine(), "controller2_col2");break;
+    case 0x106: data=input_port_read(space->machine(), "controller2_col3");break;
+    case 0x107: data=input_port_read(space->machine(), "controller2_extra");break;
+    case 0x108: data=input_port_read(space->machine(), "panel");break;
 #if 0
     case 0x1fe:
 	if (state->ad_select)
-		data=input_port_read(space->machine, "controller1_joy_y")<<3;
+		data=input_port_read(space->machine(), "controller1_joy_y")<<3;
 	else
-		data=input_port_read(space->machine, "controller1_joy_x")<<3;
+		data=input_port_read(space->machine(), "controller1_joy_x")<<3;
 	break;
     case 0x1ff:
 	if (state->ad_select)
-		data=input_port_read(space->machine, "controller2_joy_y")<<3;
+		data=input_port_read(space->machine(), "controller2_joy_y")<<3;
 	else
-		data=input_port_read(space->machine, "controller2_joy_x")<<3;
+		data=input_port_read(space->machine(), "controller2_joy_x")<<3;
 	break;
 #else
     case 0x1fe:
 	data = 0x80;
 	if (state->ad_select) {
-	    if (input_port_read(space->machine, "joysticks")&0x10) data=0;
-	    if (input_port_read(space->machine, "joysticks")&0x20) data=0xff;
+	    if (input_port_read(space->machine(), "joysticks")&0x10) data=0;
+	    if (input_port_read(space->machine(), "joysticks")&0x20) data=0xff;
 	} else {
-	    if (input_port_read(space->machine, "joysticks")&0x40) data=0xff;
-	    if (input_port_read(space->machine, "joysticks")&0x80) data=0;
+	    if (input_port_read(space->machine(), "joysticks")&0x40) data=0xff;
+	    if (input_port_read(space->machine(), "joysticks")&0x80) data=0;
 	}
 	break;
     case 0x1ff:
 	data = 0x6f; // 0x7f too big for alien invaders (movs right)
 	if (state->ad_select) {
-	    if (input_port_read(space->machine, "joysticks")&0x1) data=0;
-	    if (input_port_read(space->machine, "joysticks")&0x2) data=0xff;
+	    if (input_port_read(space->machine(), "joysticks")&0x1) data=0;
+	    if (input_port_read(space->machine(), "joysticks")&0x2) data=0xff;
 	} else {
-	    if (input_port_read(space->machine, "joysticks")&0x4) data=0xff;
-	    if (input_port_read(space->machine, "joysticks")&0x8) data=0;
+	    if (input_port_read(space->machine(), "joysticks")&0x4) data=0xff;
+	    if (input_port_read(space->machine(), "joysticks")&0x8) data=0;
 	}
 	break;
 #endif
@@ -368,7 +368,7 @@ READ8_HANDLER(arcadia_video_r)
 
 WRITE8_HANDLER(arcadia_video_w)
 {
-	arcadia_state *state = space->machine->driver_data<arcadia_state>();
+	arcadia_state *state = space->machine().driver_data<arcadia_state>();
 	state->reg.data[offset]=data;
 	switch (offset)
 	{
@@ -376,11 +376,11 @@ WRITE8_HANDLER(arcadia_video_w)
 			state->ypos=255-data+YPOS;
 			break;
 		case 0xfd:
-			arcadia_soundport_w(space->machine->device("custom"), offset&3, data);
+			arcadia_soundport_w(space->machine().device("custom"), offset&3, data);
 			state->multicolor=data&0x80;
 			break;
 		case 0xfe:
-			arcadia_soundport_w(space->machine->device("custom"), offset&3, data);
+			arcadia_soundport_w(space->machine().device("custom"), offset&3, data);
 			state->shift=(data>>5);
 			break;
 		case 0xf0: case 0xf2: case 0xf4: case 0xf6:
@@ -410,10 +410,10 @@ WRITE8_HANDLER(arcadia_video_w)
 	}
 }
 
-INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 *ch, int charcode,
+INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 *ch, int charcode,
 			      int y, int x)
 {
-	arcadia_state *state = machine->driver_data<arcadia_state>();
+	arcadia_state *state = machine.driver_data<arcadia_state>();
     int k,b,cc,sc, colour;
     if (state->multicolor)
 	{
@@ -446,9 +446,9 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
             if (y+1<bitmap->height) {
                 state->bg[y+1][x>>3]|=b>>(x&7);
                 state->bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
-                drawgfx_opaque(bitmap, 0, machine->gfx[0], b,colour,
+                drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
                         0,0,x,y);
-                drawgfx_opaque(bitmap, 0, machine->gfx[0], b,colour,
+                drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
                         0,0,x,y+1);
             }
 		}
@@ -461,16 +461,16 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
             state->bg[y][x>>3]|=b>>(x&7);
 	    state->bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-	    drawgfx_opaque(bitmap, 0, machine->gfx[0], b,colour,
+	    drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
 		    0,0,x,y);
 		}
     }
 }
 
-INLINE void arcadia_vh_draw_line(running_machine *machine, bitmap_t *bitmap,
+INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_t *bitmap,
 				 int y, UINT8 chars1[16])
 {
-	arcadia_state *state = machine->driver_data<arcadia_state>();
+	arcadia_state *state = machine.driver_data<arcadia_state>();
     int x, ch, j, h;
     int graphics=state->graphics;
     h=state->doublescan?16:8;
@@ -521,9 +521,9 @@ static int arcadia_sprite_collision(arcadia_state *state, int n1, int n2)
     return FALSE;
 }
 
-static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
+static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 {
-	arcadia_state *state = machine->driver_data<arcadia_state>();
+	arcadia_state *state = machine.driver_data<arcadia_state>();
     int i, k, x, y, color=0;
     UINT8 b;
 
@@ -602,8 +602,8 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 INTERRUPT_GEN( arcadia_video_line )
 {
-	arcadia_state *state = device->machine->driver_data<arcadia_state>();
-	screen_device *screen = device->machine->first_screen();
+	arcadia_state *state = device->machine().driver_data<arcadia_state>();
+	screen_device *screen = device->machine().first_screen();
 	int width = screen->width();
 
 	if (state->ad_delay<=0)
@@ -630,7 +630,7 @@ INTERRUPT_GEN( arcadia_video_line )
 		{
 			if (((state->line-state->ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(device->machine, state->bitmap, state->charline*h+state->ypos,
+				arcadia_vh_draw_line(device->machine(), state->bitmap, state->charline*h+state->ypos,
 					state->reg.d.chars1[state->charline]);
 			}
 		}
@@ -639,7 +639,7 @@ INTERRUPT_GEN( arcadia_video_line )
 			{
 				if (((state->line-state->ypos)&(h-1))==0)
 				{
-					arcadia_vh_draw_line(device->machine, state->bitmap, state->charline*h+state->ypos,
+					arcadia_vh_draw_line(device->machine(), state->bitmap, state->charline*h+state->ypos,
 						state->reg.d.chars2[state->charline-13]);
 				}
 			state->charline-=13;
@@ -652,18 +652,18 @@ INTERRUPT_GEN( arcadia_video_line )
 			}
 	}
 	if (state->line==261)
-		arcadia_draw_sprites(device->machine, state->bitmap);
+		arcadia_draw_sprites(device->machine(), state->bitmap);
 }
 
 READ8_HANDLER(arcadia_vsync_r)
 {
-	arcadia_state *state = space->machine->driver_data<arcadia_state>();
+	arcadia_state *state = space->machine().driver_data<arcadia_state>();
     return state->line>=216?0x80:0;
 }
 
 SCREEN_UPDATE( arcadia )
 {
-	arcadia_state *state = screen->machine->driver_data<arcadia_state>();
+	arcadia_state *state = screen->machine().driver_data<arcadia_state>();
 	copybitmap(bitmap, state->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -24,7 +24,7 @@ static int ROM_bits_count;				/* current bit position in ROM */
 /*
     set the speech ROMs
 */
-void spchroms_config(running_machine *machine, const spchroms_interface *intf)
+void spchroms_config(running_machine &machine, const spchroms_interface *intf)
 {
 	if (intf->memory_region == NULL)
 	{	/* no speech ROM */
@@ -33,9 +33,9 @@ void spchroms_config(running_machine *machine, const spchroms_interface *intf)
 	}
 	else
 	{	/* speech ROM */
-		speechrom_data = machine->region(intf->memory_region)->base();
+		speechrom_data = machine.region(intf->memory_region)->base();
 		/* take region length */
-		speechROMlen = machine->region(intf->memory_region)->bytes();
+		speechROMlen = machine.region(intf->memory_region)->bytes();
 	}
 }
 

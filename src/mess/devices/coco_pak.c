@@ -61,7 +61,7 @@ static DEVICE_RESET(coco_pak)
 	coco_pak_pcb_t *pak_pcb = get_token(device);
 	cococart_line_value cart_line;
 
-	cart_line = input_port_read_safe(device->machine, "CARTAUTO", 0x01)
+	cart_line = input_port_read_safe(device->machine(), "CARTAUTO", 0x01)
 		? COCOCART_LINE_VALUE_Q
 		: COCOCART_LINE_VALUE_CLEAR;
 
@@ -116,8 +116,8 @@ static void banked_pak_set_bank(device_t *device, UINT32 bank)
 
 	UINT64 pos;
 	UINT32 i;
-	UINT8 *rom = device->machine->region("cart")->base();
-	UINT32 rom_length = device->machine->region("cart")->bytes();
+	UINT8 *rom = device->machine().region("cart")->base();
+	UINT32 rom_length = device->machine().region("cart")->bytes();
 
 	pos = (bank * 0x4000) % pak_pcb->cart->length();
 

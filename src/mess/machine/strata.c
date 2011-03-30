@@ -85,7 +85,7 @@ static DEVICE_START( strataflash )
 	strata->mode = FM_NORMAL;
 	strata->status = 0x80;
 	strata->master_lock = 0;
-	strata->data_ptr = auto_alloc_array(device->machine, UINT8, FEEPROM_SIZE + WRBUF_SIZE + PROT_REGS_SIZE + BLOCKLOCK_SIZE);
+	strata->data_ptr = auto_alloc_array(device->machine(), UINT8, FEEPROM_SIZE + WRBUF_SIZE + PROT_REGS_SIZE + BLOCKLOCK_SIZE);
 	strata->wrbuf = strata->data_ptr + FEEPROM_SIZE;
 	strata->prot_regs = strata->wrbuf + WRBUF_SIZE;
 	strata->blocklock = strata->prot_regs + PROT_REGS_SIZE;
@@ -96,7 +96,7 @@ static DEVICE_START( strataflash )
 	/* set-up factory-programmed protection register segment */
 	strata->prot_regs[BYTE_XOR_LE(0)] &= 0xfe;
 	for (i=2; i<10; i++)
-		strata->prot_regs[i] = device->machine->rand();
+		strata->prot_regs[i] = device->machine().rand();
 }
 
 DEVICE_GET_INFO( strataflash )

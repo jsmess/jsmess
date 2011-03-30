@@ -95,7 +95,7 @@ INPUT_PORTS_END
 static const unsigned i86_address_mask = 0x000fffff;
 
 
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); } 
+static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine(), "IN0"); } 
 
 static const struct pc_vga_interface vga_interface =
 {
@@ -141,13 +141,13 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	
+	/* video hardware */
+	MCFG_PALETTE_LENGTH( 256 )
+
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 0, "mda", ISA8_MDA)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
-
-	/* video hardware */
-	MCFG_PALETTE_LENGTH( 256 )
 	
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -271,7 +271,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,   		"<generic>",  "PC (CGA)" , 0)
-COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,    		"<generic>",  "PC (MDA)" , 0)
-COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,    		"<generic>",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      xtvga,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING)
+COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,   		"<generic>",  "PC (CGA)" , GAME_NO_SOUND)
+COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,    		"<generic>",  "PC (MDA)" , GAME_NO_SOUND)
+COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,    		"<generic>",  "PC (Hercules)" , GAME_NO_SOUND)
+COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      xtvga,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING | GAME_NO_SOUND)

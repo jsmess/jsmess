@@ -312,7 +312,7 @@ INPUT_PORTS_END
 /* Steph 2000-10-27 I remapped the 'Machine Name' Dip Switches (easier to understand) */
 static INPUT_CHANGED( cpc_monitor_changed )
 {
-	running_machine *machine = field->port->machine;
+	running_machine &machine = field->port->machine();
 	const UINT8	*color_prom = NULL;
 
 	if ( (input_port_read(machine, "green_display")) & 0x01 )

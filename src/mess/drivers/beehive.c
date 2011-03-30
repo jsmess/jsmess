@@ -48,16 +48,16 @@ static MACHINE_RESET(beehive)
 
 static VIDEO_START( beehive )
 {
-	beehive_state *state = machine->driver_data<beehive_state>();
-	state->FNT = machine->region("chargen")->base();
-	state->videoram = machine->region("maincpu")->base()+0x81fa;
+	beehive_state *state = machine.driver_data<beehive_state>();
+	state->FNT = machine.region("chargen")->base();
+	state->videoram = machine.region("maincpu")->base()+0x81fa;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
 static SCREEN_UPDATE( beehive )
 {
-	beehive_state *state = screen->machine->driver_data<beehive_state>();
+	beehive_state *state = screen->machine().driver_data<beehive_state>();
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;

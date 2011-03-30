@@ -29,13 +29,13 @@
 
 SNAPSHOT_LOAD(jupiter)
 {
-	UINT8 *RAM = image.device().machine->region("maincpu")->base();
-	device_t *cpu = image.device().machine->device("maincpu");
-	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *RAM = image.device().machine().region("maincpu")->base();
+	device_t *cpu = image.device().machine().device("maincpu");
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned char jupiter_repeat, jupiter_byte, loop;
 	int done=0, jupiter_index=0x2000;
 
-	if (input_port_read(space->machine, "CFG")==0)
+	if (input_port_read(space->machine(), "CFG")==0)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");

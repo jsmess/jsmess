@@ -134,7 +134,7 @@ device_config *bsmt2000_device_config::static_alloc_device_config(const machine_
 
 device_t *bsmt2000_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, bsmt2000_device(machine, *this));
+	return auto_alloc(machine, bsmt2000_device(machine, *this));
 }
 
 
@@ -155,7 +155,7 @@ void bsmt2000_device_config::static_set_ready_callback(device_config *device, re
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *bsmt2000_device_config::rom_region() const
+const rom_entry *bsmt2000_device_config::device_rom_region() const
 {
 	return ROM_NAME( bsmt2000 );
 }
@@ -166,7 +166,7 @@ const rom_entry *bsmt2000_device_config::rom_region() const
 //  the device's machine fragment
 //-------------------------------------------------
 
-machine_config_constructor bsmt2000_device_config::machine_config_additions() const
+machine_config_constructor bsmt2000_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( bsmt2000 );
 }

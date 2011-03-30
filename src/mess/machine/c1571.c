@@ -186,7 +186,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (!c1571->yb)
 		{
 			/* simulate weak bits with randomness */
-			c1571->yb = machine->rand() & 0xff;
+			c1571->yb = machine.rand() & 0xff;
 		}
 	}
 
@@ -954,7 +954,7 @@ static DEVICE_START( c1571 )
 	c1571->via1 = device->subdevice<via6522_device>(M6522_1_TAG);
 	c1571->cia = device->subdevice(M6526_TAG);
 	c1571->wd1770 = device->subdevice(WD1770_TAG);
-	c1571->serial_bus = device->machine->device(config->serial_bus_tag);
+	c1571->serial_bus = device->machine().device(config->serial_bus_tag);
 	c1571->image = device->subdevice(FLOPPY_0);
 
 	/* install image callbacks */
@@ -962,7 +962,7 @@ static DEVICE_START( c1571 )
 	floppy_install_load_proc(c1571->image, on_disk_change);
 
 	/* allocate data timer */
-	c1571->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
+	c1571->bit_timer = device->machine().scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 	device->save_item(NAME(c1571->address));

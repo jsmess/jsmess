@@ -1512,7 +1512,7 @@ static DEVICE_START( c2040 )
 	c2040->riot1 = device->subdevice(M6532_1_TAG);
 	c2040->miot = device->subdevice(M6530_TAG);
 	c2040->via = device->subdevice<via6522_device>(M6522_TAG);
-	c2040->bus = device->machine->device(config->bus_tag);
+	c2040->bus = device->machine().device(config->bus_tag);
 	c2040->unit[0].image = device->subdevice(FLOPPY_0);
 	c2040->unit[1].image = device->subdevice(FLOPPY_1);
 
@@ -1545,7 +1545,7 @@ static DEVICE_START( c2040 )
 	c2040->gcr = region->base() + region->bytes() - 0x800;
 
 	/* allocate data timer */
-	c2040->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
+	c2040->bit_timer = device->machine().scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 	device->save_item(NAME(c2040->drive));

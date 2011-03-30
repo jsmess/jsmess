@@ -26,20 +26,20 @@
 /* main interface */
 struct pc_fdc_interface
 {
-	void (*pc_fdc_interrupt)(running_machine*,int);
-	void (*pc_fdc_dma_drq)(running_machine*,int);
-	device_t *(*get_image)(running_machine*, int floppy_index);
-	device_t *(*get_device)(running_machine*);
+	void (*pc_fdc_interrupt)(running_machine&,int);
+	void (*pc_fdc_dma_drq)(running_machine&,int);
+	device_t *(*get_image)(running_machine&, int floppy_index);
+	device_t *(*get_device)(running_machine&);
 };
 
 extern const upd765_interface pc_fdc_upd765_connected_interface;
 extern const upd765_interface pc_fdc_upd765_not_connected_interface;
 extern const upd765_interface pc_fdc_upd765_connected_1_drive_interface;
 
-void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface);
-void pc_fdc_set_tc_state(running_machine *machine, int state);
-int	pc_fdc_dack_r(running_machine *machine);
-void pc_fdc_dack_w(running_machine *machine, int);
+void pc_fdc_init(running_machine &machine, const struct pc_fdc_interface *iface);
+void pc_fdc_set_tc_state(running_machine &machine, int state);
+int	pc_fdc_dack_r(running_machine &machine);
+void pc_fdc_dack_w(running_machine &machine, int);
 
 READ8_HANDLER(pc_fdc_r);
 WRITE8_HANDLER(pc_fdc_w);

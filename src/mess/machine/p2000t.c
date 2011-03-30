@@ -44,7 +44,7 @@
 */
 READ8_HANDLER (	p2000t_port_000f_r )
 {
-	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	p2000t_state *state = space->machine().driver_data<p2000t_state>();
 	static const char *const keynames[] = {
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
 		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
@@ -52,15 +52,15 @@ READ8_HANDLER (	p2000t_port_000f_r )
 
 	if (state->port_101f & P2000M_101F_KEYINT)
 	{
-		return (input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") &
-		input_port_read(space->machine, "KEY2") & input_port_read(space->machine, "KEY3") &
-		input_port_read(space->machine, "KEY4") & input_port_read(space->machine, "KEY5") &
-		input_port_read(space->machine, "KEY6") & input_port_read(space->machine, "KEY7") &
-		input_port_read(space->machine, "KEY8") & input_port_read(space->machine, "KEY9"));
+		return (input_port_read(space->machine(), "KEY0") & input_port_read(space->machine(), "KEY1") &
+		input_port_read(space->machine(), "KEY2") & input_port_read(space->machine(), "KEY3") &
+		input_port_read(space->machine(), "KEY4") & input_port_read(space->machine(), "KEY5") &
+		input_port_read(space->machine(), "KEY6") & input_port_read(space->machine(), "KEY7") &
+		input_port_read(space->machine(), "KEY8") & input_port_read(space->machine(), "KEY9"));
 	}
 	else if (offset < 10)
 	{
-		return (input_port_read(space->machine, keynames[offset]));
+		return (input_port_read(space->machine(), keynames[offset]));
 	}
 	return (0xff);
 }
@@ -98,7 +98,7 @@ READ8_HANDLER (	p2000t_port_202f_r )
 */
 WRITE8_HANDLER ( p2000t_port_101f_w )
 {
-	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	p2000t_state *state = space->machine().driver_data<p2000t_state>();
 	state->port_101f = data;
 }
 
@@ -116,7 +116,7 @@ WRITE8_HANDLER ( p2000t_port_101f_w )
 */
 WRITE8_HANDLER ( p2000t_port_303f_w )
 {
-	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	p2000t_state *state = space->machine().driver_data<p2000t_state>();
 	state->port_303f = data;
 }
 
@@ -134,7 +134,7 @@ WRITE8_HANDLER ( p2000t_port_303f_w )
 */
 WRITE8_HANDLER ( p2000t_port_505f_w )
 {
-	device_t *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine().device("speaker");
 	speaker_level_w(speaker, BIT(data,0));
 }
 
@@ -156,7 +156,7 @@ WRITE8_HANDLER ( p2000t_port_505f_w )
 */
 WRITE8_HANDLER ( p2000t_port_707f_w )
 {
-	p2000t_state *state = space->machine->driver_data<p2000t_state>();
+	p2000t_state *state = space->machine().driver_data<p2000t_state>();
 	state->port_707f = data;
 }
 

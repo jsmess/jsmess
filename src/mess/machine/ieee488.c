@@ -262,11 +262,11 @@ static DEVICE_START( ieee488 )
 	/* create a linked list of devices */
 	for ( ; daisy->tag != NULL; daisy++)
 	{
-		*tailptr = auto_alloc(device->machine, ieee488_daisy_state);
+		*tailptr = auto_alloc(device->machine(), ieee488_daisy_state);
 
 		/* find device */
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = device->machine->device(daisy->tag);
+		(*tailptr)->device = device->machine().device(daisy->tag);
 
 		if ((*tailptr)->device == NULL)
 		{

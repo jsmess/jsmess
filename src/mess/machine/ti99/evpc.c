@@ -53,13 +53,13 @@ static int get_evpc_switch(device_t *device, int number)
 	switch (number)
 	{
 	case 0:
-		return input_port_read(device->machine, "EVPC-SW1");
+		return input_port_read(device->machine(), "EVPC-SW1");
 	case 1:
-		return input_port_read(device->machine, "EVPC-SW3");
+		return input_port_read(device->machine(), "EVPC-SW3");
 	case 2:
-		return input_port_read(device->machine, "EVPC-SW4");
+		return input_port_read(device->machine(), "EVPC-SW4");
 	case 3:
-		return input_port_read(device->machine, "EVPC-SW8");
+		return input_port_read(device->machine(), "EVPC-SW8");
 	default:
 		logerror("evpc: Invalid switch index %02x\n", number);
 		return 0;
@@ -366,21 +366,21 @@ static DEVICE_RESET( ti99_evpc )
 
 	astring_assemble_3(region, device->tag(), ":", evpc_region);
 
-	card->dsrrom = device->machine->region(astring_c(region))->base();
+	card->dsrrom = device->machine().region(astring_c(region))->base();
 }
 
 static DEVICE_NVRAM( ti99_evpc )
 {
 	// Called between START and RESET
 	ti99_evpc_state *card = get_safe_token(device);
-	astring *hsname = astring_assemble_3(astring_alloc(), device->machine->system().name, PATH_SEPARATOR, "evpc.nv");
+	astring *hsname = astring_assemble_3(astring_alloc(), device->machine().system().name, PATH_SEPARATOR, "evpc.nv");
 	file_error filerr;
 
 	if (read_or_write==0)
 	{
 		logerror("evpc: device nvram load %s\n", astring_c(hsname));
 
-		emu_file nvfile(device->machine->options().nvram_directory(), OPEN_FLAG_READ);
+		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
 		filerr = nvfile.open(astring_c(hsname));
 		if (filerr == FILERR_NONE)
 		{
@@ -391,7 +391,7 @@ static DEVICE_NVRAM( ti99_evpc )
 	else
 	{
 		logerror("evpc: device nvram save %s\n", astring_c(hsname));
-		emu_file nvfile(device->machine->options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		filerr = nvfile.open(astring_c(hsname));
 
 		if (filerr == FILERR_NONE)

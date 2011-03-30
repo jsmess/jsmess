@@ -210,11 +210,11 @@ static RTC8583_INTERFCE( rtc_intf )
 void prof180x_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(machine, m_c0);
-	state_save_register_global(machine, m_c1);
-	state_save_register_global(machine, m_c2);
-	state_save_register_global(machine, m_mm0);
-	state_save_register_global(machine, m_mm1);
+	state_save_register_global(m_machine, m_c0);
+	state_save_register_global(m_machine, m_c1);
+	state_save_register_global(m_machine, m_c2);
+	state_save_register_global(m_machine, m_mm0);
+	state_save_register_global(m_machine, m_mm1);
 }
 
 void prof180x_state::machine_reset()

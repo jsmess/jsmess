@@ -75,9 +75,9 @@ static const UINT8 trs80m2_keycodes[3][9][8] =
 	}
 };
 
-static void trs80m2_keyboard_scan(running_machine *machine)
+static void trs80m2_keyboard_scan(running_machine &machine)
 {
-	trs80m2_state *state = machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = machine.driver_data<trs80m2_state>();
 
 	if (!state->kbirq) return;
 
@@ -120,7 +120,7 @@ static void trs80m2_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( trs80m2_keyboard_tick )
 {
-	trs80m2_keyboard_scan(timer.machine);
+	trs80m2_keyboard_scan(timer.machine());
 }
 
 /* Read/Write Handlers */
@@ -155,13 +155,13 @@ static WRITE8_DEVICE_HANDLER( drvslt_w )
 	wd17xx_dden_w(device, BIT(data, 7));
 }
 
-static void bankswitch(running_machine *machine)
+static void bankswitch(running_machine &machine)
 {
-	trs80m2_state *state = machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = machine.driver_data<trs80m2_state>();
 
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
-	device_t *messram = machine->device(RAM_TAG);
-	UINT8 *rom = machine->region(Z80_TAG)->base();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	device_t *messram = machine.device(RAM_TAG);
+	UINT8 *rom = machine.region(Z80_TAG)->base();
 	UINT8 *ram = ram_get_ptr(messram);
 	int last_page = (ram_get_size(messram) / 0x8000) - 1;
 
@@ -211,15 +211,15 @@ static WRITE8_HANDLER( rom_enable_w )
 
     */
 
-	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 
 	state->boot_rom = BIT(data, 0);
-	bankswitch(space->machine);
+	bankswitch(space->machine());
 }
 
 static READ8_HANDLER( keyboard_r )
 {
-	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 
 	/* clear keyboard interrupt */
 	if (!state->kbirq)
@@ -236,7 +236,7 @@ static READ8_HANDLER( keyboard_r )
 static READ8_HANDLER( rtc_r )
 {
 	/* clear RTC interrupt */
-	cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -258,7 +258,7 @@ static READ8_HANDLER( nmi_r )
 
     */
 
-	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 
 	UINT8 data = 0;
 
@@ -294,7 +294,7 @@ static WRITE8_HANDLER( nmi_w )
 
     */
 
-	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 
 	/* memory bank select */
 	state->bank = data & 0x0f;
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( nmi_w )
 	if (state->enable_rtc_int && state->rtc_int)
 	{
 		/* trigger RTC interrupt */
-		cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* video display enable */
@@ -317,23 +317,23 @@ static WRITE8_HANDLER( nmi_w )
 
 	/* video RAM enable */
 	state->msel = BIT(data, 7);
-	bankswitch(space->machine);
+	bankswitch(space->machine());
 }
 
 //static READ8_HANDLER( keyboard_busy_r )
 //{
-//  trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+//  trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 //
 //  return state->kbirq;
 //}
 //
 //static READ8_HANDLER( keyboard_data_r )
 //{
-//  trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+//  trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 //
 //  static const char *const KEY_ROW[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
 //
-//  return input_port_read(space->machine, KEY_ROW[state->key_latch]);
+//  return input_port_read(space->machine(), KEY_ROW[state->key_latch]);
 //}
 //
 //static WRITE8_HANDLER( keyboard_ctrl_w )
@@ -353,7 +353,7 @@ static WRITE8_HANDLER( nmi_w )
 //
 //    */
 //
-//  trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+//  trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 //
 //  int kbdata = BIT(data, 0);
 //  int kbclk = BIT(data, 1);
@@ -399,7 +399,7 @@ static WRITE8_HANDLER( nmi_w )
 //
 //    */
 //
-//  trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
+//  trs80m2_state *state = space->machine().driver_data<trs80m2_state>();
 //
 //  state->key_latch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 //}
@@ -663,7 +663,7 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
-	trs80m2_state *state = device->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -690,14 +690,14 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( de_w )
 {
-	trs80m2_state *driver_state = device->machine->driver_data<trs80m2_state>();
+	trs80m2_state *driver_state = device->machine().driver_data<trs80m2_state>();
 
 	driver_state->de = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 {
-	trs80m2_state *driver_state = device->machine->driver_data<trs80m2_state>();
+	trs80m2_state *driver_state = device->machine().driver_data<trs80m2_state>();
 
 	if (state)
 	{
@@ -706,7 +706,7 @@ static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 		if (driver_state->enable_rtc_int && driver_state->rtc_int)
 		{
 			/* trigger RTC interrupt */
-			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+			cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 }
@@ -727,22 +727,22 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_START( trs80m2 )
 {
-	trs80m2_state *state = machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = machine.driver_data<trs80m2_state>();
 
 	/* find devices */
-	state->mc6845 = machine->device(MC6845_TAG);
+	state->mc6845 = machine.device(MC6845_TAG);
 
 	/* find memory regions */
-	state->char_rom = machine->region(MC6845_TAG)->base();
+	state->char_rom = machine.region(MC6845_TAG)->base();
 }
 
 static SCREEN_UPDATE( trs80m2 )
 {
-	trs80m2_state *state = screen->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = screen->machine().driver_data<trs80m2_state>();
 
 	if (state->blnkvid)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	}
 	else
 	{
@@ -787,7 +787,7 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 
     */
 
-	trs80m2_state *state = device->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
 
 	UINT8 data = 0;
 
@@ -829,7 +829,7 @@ static WRITE8_DEVICE_HANDLER( pio_pa_w )
 
     */
 
-	trs80m2_state *state = device->machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
 
 	/* prime */
 	centronics_prime_w(state->centronics, BIT(data, 3));
@@ -888,7 +888,7 @@ static Z80DART_INTERFACE( sio_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	trs80m2_state *state =  timer.machine->driver_data<trs80m2_state>();
+	trs80m2_state *state =  timer.machine().driver_data<trs80m2_state>();
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -925,7 +925,7 @@ static const floppy_config trs80m2_floppy_config =
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 {
-	trs80m2_state *driver_state = device->machine->driver_data<trs80m2_state>();
+	trs80m2_state *driver_state = device->machine().driver_data<trs80m2_state>();
 
 	driver_state->fdc_intrq = state;
 
@@ -955,14 +955,14 @@ static const z80_daisy_config trs80m2_daisy_chain[] =
 
 static MACHINE_START( trs80m2 )
 {
-	trs80m2_state *state = machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = machine.driver_data<trs80m2_state>();
 
 	/* find devices */
-	state->z80ctc = machine->device(Z80CTC_TAG);
-	state->z80pio = machine->device(Z80PIO_TAG);
-	state->mc6845 = machine->device(MC6845_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->floppy = machine->device(FLOPPY_0);
+	state->z80ctc = machine.device(Z80CTC_TAG);
+	state->z80pio = machine.device(Z80PIO_TAG);
+	state->mc6845 = machine.device(MC6845_TAG);
+	state->centronics = machine.device(CENTRONICS_TAG);
+	state->floppy = machine.device(FLOPPY_0);
 
 	/* Shugart SA-800 motor spins constantly */
 	floppy_mon_w(state->floppy, CLEAR_LINE);
@@ -987,7 +987,7 @@ static MACHINE_START( trs80m2 )
 
 static MACHINE_RESET( trs80m2 )
 {
-	trs80m2_state *state = machine->driver_data<trs80m2_state>();
+	trs80m2_state *state = machine.driver_data<trs80m2_state>();
 
 	/* clear keyboard interrupt */
 	state->kbirq = 1;

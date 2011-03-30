@@ -41,11 +41,11 @@ static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_call
 
 static DEVICE_START(gamepock_cart)
 {
-	memory_set_bankptr( device->machine, "bank1", device->machine->region("user1" )->base() );
+	memory_set_bankptr( device->machine(), "bank1", device->machine().region("user1" )->base() );
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	UINT8 *cart = image.device().machine->region("user1" )->base();
+	UINT8 *cart = image.device().machine().region("user1" )->base();
 
 	if ( image.software_entry() == NULL )
 	{
@@ -60,7 +60,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		cart = image.get_software_region( "rom" );
 	}
 
-	memory_set_bankptr( image.device().machine, "bank1", cart );
+	memory_set_bankptr( image.device().machine(), "bank1", cart );
 
 	return IMAGE_INIT_PASS;
 }

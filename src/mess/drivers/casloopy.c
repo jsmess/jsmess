@@ -242,7 +242,7 @@ ROM_END
 
 static DRIVER_INIT( casloopy )
 {
-	casloopy_state *state = machine->driver_data<casloopy_state>();
+	casloopy_state *state = machine.driver_data<casloopy_state>();
 	/* load hand made bios data*/
 	state->bios_rom[0/4] = 0x6000964; //SPC
 	state->bios_rom[4/4] = 0xffffff0; //SSP

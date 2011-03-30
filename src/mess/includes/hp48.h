@@ -116,7 +116,7 @@ void hp48_rsi( device_t *device );
 
 /***************************** serial ********************************/
 
-extern void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data );
+extern void hp48_rs232_start_recv_byte( running_machine &machine, UINT8 data );
 
 
 /****************************** cards ********************************/

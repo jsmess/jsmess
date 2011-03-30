@@ -14,17 +14,17 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*vic3_lightpen_x_callback)(running_machine *machine);
-typedef UINT8 (*vic3_lightpen_y_callback)(running_machine *machine);
-typedef UINT8 (*vic3_lightpen_button_callback)(running_machine *machine);
+typedef UINT8 (*vic3_lightpen_x_callback)(running_machine &machine);
+typedef UINT8 (*vic3_lightpen_y_callback)(running_machine &machine);
+typedef UINT8 (*vic3_lightpen_button_callback)(running_machine &machine);
 
-typedef int (*vic3_dma_read)(running_machine *machine, int);
-typedef int (*vic3_dma_read_color)(running_machine *machine, int);
-typedef void (*vic3_irq) (running_machine *, int);
+typedef int (*vic3_dma_read)(running_machine &machine, int);
+typedef int (*vic3_dma_read_color)(running_machine &machine, int);
+typedef void (*vic3_irq) (running_machine &, int);
 
-typedef void (*vic3_port_changed_callback) (running_machine *, int);
+typedef void (*vic3_port_changed_callback) (running_machine &, int);
 
-typedef UINT8 (*vic3_c64mem_callback)(running_machine *machine, int offset);
+typedef UINT8 (*vic3_c64mem_callback)(running_machine &machine, int offset);
 
 typedef enum
 {

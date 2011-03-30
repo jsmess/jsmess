@@ -59,12 +59,12 @@ static VIDEO_START( bml3 )
 
 static SCREEN_UPDATE( bml3 )
 {
-	bml3_state *state = screen->machine->driver_data<bml3_state>();
+	bml3_state *state = screen->machine().driver_data<bml3_state>();
 	int x,y,count;
 	int xi,yi;
 	int width,height;
-	UINT8 *gfx_rom = screen->machine->region("char")->base();
-	UINT8 *vram = screen->machine->region("vram")->base();
+	UINT8 *gfx_rom = screen->machine().region("char")->base();
+	UINT8 *vram = screen->machine().region("vram")->base();
 
 	count = 0x0000;
 
@@ -95,11 +95,11 @@ static SCREEN_UPDATE( bml3 )
 
 					if(height)
 					{
-						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+0, x*8+xi) = screen->machine->pens[pen];
-						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+1, x*8+xi) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+0, x*8+xi) = screen->machine().pens[pen];
+						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+1, x*8+xi) = screen->machine().pens[pen];
 					}
 					else
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[pen];
 				}
 			}
 
@@ -112,8 +112,8 @@ static SCREEN_UPDATE( bml3 )
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(screen->machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(screen->machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -124,11 +124,11 @@ static SCREEN_UPDATE( bml3 )
 						{
 							if(height)
 							{
-								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+0, x*8+xc) = screen->machine->pens[0x7];
-								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+1, x*8+xc) = screen->machine->pens[0x7];
+								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+0, x*8+xc) = screen->machine().pens[0x7];
+								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+1, x*8+xc) = screen->machine().pens[0x7];
 							}
 							else
-								*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = screen->machine->pens[0x7];
+								*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = screen->machine().pens[0x7];
 						}
 					}
 				}
@@ -143,11 +143,11 @@ static SCREEN_UPDATE( bml3 )
 
 static WRITE8_HANDLER( bml3_6845_w )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
 	if(offset == 0)
 	{
 		state->addr_latch = data;
-		mc6845_address_w(space->machine->device("crtc"), 0,data);
+		mc6845_address_w(space->machine().device("crtc"), 0,data);
 	}
 	else
 	{
@@ -158,13 +158,13 @@ static WRITE8_HANDLER( bml3_6845_w )
 		else if(state->addr_latch == 0x0f)
 			state->cursor_addr = (state->cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(space->machine->device("crtc"), 0,data);
+		mc6845_register_w(space->machine().device("crtc"), 0,data);
 	}
 }
 
 static READ8_HANDLER( bml3_keyboard_r )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
 	if(state->keyb_press_flag)
 	{
 		int res;
@@ -179,12 +179,12 @@ static READ8_HANDLER( bml3_keyboard_r )
 /* Note: this custom code is there just for simplicity, it'll be nuked in the end */
 static READ8_HANDLER( bml3_io_r )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 
 	if(offset == 0x19) return state->io_latch;
 	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
-//  if(offset == 0xc5 || offset == 0xca) return space->machine->rand(); //tape related
+//  if(offset == 0xc5 || offset == 0xca) return space->machine().rand(); //tape related
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
 	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
 
@@ -203,17 +203,17 @@ static READ8_HANDLER( bml3_io_r )
 
 	if(offset < 0xf0)
 	{
-		//if(cpu_get_pc(space->cpu) != 0xf838 && cpu_get_pc(space->cpu) != 0xfac4 && cpu_get_pc(space->cpu) != 0xf83c)
+		//if(cpu_get_pc(&space->device()) != 0xf838 && cpu_get_pc(&space->device()) != 0xfac4 && cpu_get_pc(&space->device()) != 0xf83c)
 		if(offset >= 0xd0 && offset < 0xe0)
-			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(space->cpu));
-		return 0;//space->machine->rand();
+			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(&space->device()));
+		return 0;//space->machine().rand();
 	}
 
 	/* TODO: pretty sure that there's a bankswitch for this */
 	return rom[offset+0xff00];
 }
 
-static void m6845_change_clock(running_machine *machine, UINT8 setting)
+static void m6845_change_clock(running_machine &machine, UINT8 setting)
 {
 	int m6845_clock = XTAL_3_579545MHz;
 
@@ -225,12 +225,12 @@ static void m6845_change_clock(running_machine *machine, UINT8 setting)
 		case 0x88: m6845_clock = XTAL_3_579545MHz/1; break; //640 x 375
 	}
 
-	mc6845_set_clock(machine->device("crtc"), m6845_clock);
+	mc6845_set_clock(machine.device("crtc"), m6845_clock);
 }
 
 static WRITE8_HANDLER( bml3_hres_reg_w )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
 	/*
     x--- ---- width (1) 80 / (0) 40
     -x-- ---- used in some modes, unknown purpose
@@ -239,40 +239,40 @@ static WRITE8_HANDLER( bml3_hres_reg_w )
 
 	state->hres_reg = data;
 
-	m6845_change_clock(space->machine,(state->hres_reg & 0x80) | (state->vres_reg & 0x08));
+	m6845_change_clock(space->machine(),(state->hres_reg & 0x80) | (state->vres_reg & 0x08));
 }
 
 static WRITE8_HANDLER( bml3_vres_reg_w )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
 	/*
     ---- x--- char height
     */
 	state->vres_reg = data;
 
-	m6845_change_clock(space->machine,(state->hres_reg & 0x80) | (state->vres_reg & 0x08));
+	m6845_change_clock(space->machine(),(state->hres_reg & 0x80) | (state->vres_reg & 0x08));
 }
 
 static WRITE8_HANDLER( bml3_io_w )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
 	if(offset == 0x19)							{ state->io_latch = data; } //???
 //  else if(offset == 0xc4)                     { /* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else if(offset == 0xc6 || offset == 0xc7)	{ bml3_6845_w(space,offset-0xc6,data); }
 	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
-	else if(offset == 0xd3)						{ beep_set_state(space->machine->device("beeper"),!(data & 0x80)); }
+	else if(offset == 0xd3)						{ beep_set_state(space->machine().device("beeper"),!(data & 0x80)); }
 	else if(offset == 0xd6)						{ bml3_vres_reg_w(space,0,data); }
 	else if(offset == 0xd8)						{ state->attr_latch = data; }
 	else
 	{
-		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(space->cpu));
+		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(&space->device()));
 	}
 }
 
 static READ8_HANDLER( bml3_vram_r )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
-	UINT8 *vram = space->machine->region("vram")->base();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
+	UINT8 *vram = space->machine().region("vram")->base();
 
 	/* TODO: this presumably also triggers an attr latch read, unsure yet */
 	state->attr_latch = vram[offset+0x4000];
@@ -282,8 +282,8 @@ static READ8_HANDLER( bml3_vram_r )
 
 static WRITE8_HANDLER( bml3_vram_w )
 {
-	bml3_state *state = space->machine->driver_data<bml3_state>();
-	UINT8 *vram = space->machine->region("vram")->base();
+	bml3_state *state = space->machine().driver_data<bml3_state>();
+	UINT8 *vram = space->machine().region("vram")->base();
 
 	vram[offset] = data;
 	vram[offset+0x4000] = state->attr_latch;
@@ -411,7 +411,7 @@ static const mc6845_interface mc6845_intf =
 
 static TIMER_DEVICE_CALLBACK( keyboard_callback )
 {
-	bml3_state *state = timer.machine->driver_data<bml3_state>();
+	bml3_state *state = timer.machine().driver_data<bml3_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	scancode = 0;
@@ -420,12 +420,12 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(timer.machine,portnames[port_i])>>i) & 1)
+			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
 			{
 				{
 					state->keyb_press = scancode;
 					state->keyb_press_flag = 1;
-					cputag_set_input_line(timer.machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+					cputag_set_input_line(timer.machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 					return;
 				}
 			}
@@ -438,13 +438,13 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 #if 0
 static INTERRUPT_GEN( bml3_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( bml3_firq )
 {
 	/* almost surely used to load the tapes */
-	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 }
 #endif
 
@@ -458,8 +458,8 @@ static PALETTE_INIT( bml3 )
 
 static MACHINE_START(bml3)
 {
-	beep_set_frequency(machine->device("beeper"),1200); //guesswork
-	beep_set_state(machine->device("beeper"),0);
+	beep_set_frequency(machine.device("beeper"),1200); //guesswork
+	beep_set_state(machine.device("beeper"),0);
 }
 
 static MACHINE_RESET(bml3)

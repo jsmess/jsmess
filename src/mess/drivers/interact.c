@@ -126,7 +126,7 @@ static MACHINE_START(interact)
 
 static SCREEN_UPDATE( interact )
 {
-	interact_state *state = screen->machine->driver_data<interact_state>();
+	interact_state *state = screen->machine().driver_data<interact_state>();
 	UINT8 *videoram = state->videoram;
 	screen->set_visible_area(0, 113, 0, 75);
 	hector_hr( bitmap, videoram,  77, 32);

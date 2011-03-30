@@ -383,24 +383,24 @@ static PALETTE_INIT( vtech2 )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 16);
+	machine.colortable = colortable_alloc(machine, 16);
 
 	for ( i = 0; i < 16; i++ )
-		colortable_palette_set_color(machine->colortable, i, vt_colors[i]);
+		colortable_palette_set_color(machine.colortable, i, vt_colors[i]);
 
 	for (i = 0; i < 256; i++)
 	{
-		colortable_entry_set_value(machine->colortable, 2*i, i&15);
-		colortable_entry_set_value(machine->colortable, 2*i+1, i>>4);
+		colortable_entry_set_value(machine.colortable, 2*i, i&15);
+		colortable_entry_set_value(machine.colortable, 2*i+1, i>>4);
 	}
 
 	for (i = 0; i < 16; i++)
-		colortable_entry_set_value(machine->colortable, 512+i, i);
+		colortable_entry_set_value(machine.colortable, 512+i, i);
 }
 
 static INTERRUPT_GEN( vtech2_interrupt )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 }
 
 static const cassette_config laser_cassette_config =

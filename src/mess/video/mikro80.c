@@ -17,8 +17,8 @@ VIDEO_START( mikro80 )
 
 SCREEN_UPDATE( mikro80 )
 {
-	mikro80_state *state = screen->machine->driver_data<mikro80_state>();
-	UINT8 *gfx = screen->machine->region("gfx1")->base();
+	mikro80_state *state = screen->machine().driver_data<mikro80_state>();
+	UINT8 *gfx = screen->machine().region("gfx1")->base();
 	int x,y,b;
 
 	for(y = 0; y < 32*8; y++ )

@@ -23,13 +23,13 @@ static const UINT8 mcm6571a_shift[] =
 
 VIDEO_START( poly88 )
 {
-	poly88_state *state = machine->driver_data<poly88_state>();
-	state->FNT = machine->region("chargen")->base();
+	poly88_state *state = machine.driver_data<poly88_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 SCREEN_UPDATE( poly88 )
 {
-	poly88_state *state = screen->machine->driver_data<poly88_state>();
+	poly88_state *state = screen->machine().driver_data<poly88_state>();
 	int x,y,j,b;
 	UINT16 addr;
 	int xpos;

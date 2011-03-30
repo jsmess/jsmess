@@ -78,20 +78,20 @@ static TIMER_CALLBACK( namco_54xx_latch_callback )
 
 static READ8_HANDLER( namco_54xx_K_r )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_54xx_R0_r )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_cmd & 0x0f;
 }
 
 
 static WRITE8_HANDLER( namco_54xx_O_w )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		discrete_sound_w(state->discrete, NAMCO_54XX_1_DATA(state->basenode), out);
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 
 	discrete_sound_w(state->discrete, NAMCO_54XX_2_DATA(state->basenode), out);
@@ -120,7 +120,7 @@ WRITE8_DEVICE_HANDLER( namco_54xx_write )
 {
 	namco_54xx_state *state = get_safe_token(device);
 
-	device->machine->scheduler().synchronize(FUNC(namco_54xx_latch_callback), data, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(namco_54xx_latch_callback), data, (void *)device);
 
 	device_set_input_line(state->cpu, 0, ASSERT_LINE);
 
@@ -129,7 +129,7 @@ WRITE8_DEVICE_HANDLER( namco_54xx_write )
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	device->machine->scheduler().timer_set(attotime::from_usec(21), FUNC(namco_54xx_irq_clear), 0, (void *)device);
+	device->machine().scheduler().timer_set(attotime::from_usec(21), FUNC(namco_54xx_irq_clear), 0, (void *)device);
 }
 
 
@@ -174,7 +174,7 @@ static DEVICE_START( namco_54xx )
 
 	/* find the attached discrete sound device */
 	assert(config->discrete != NULL);
-	state->discrete = device->machine->device(config->discrete);
+	state->discrete = device->machine().device(config->discrete);
 	assert(state->discrete != NULL);
 	state->basenode = config->firstnode;
 }

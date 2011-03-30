@@ -317,7 +317,7 @@ static const ti99_peb_card tn_usbsm_card =
 static DEVICE_START( tn_usbsm )
 {
 	tn_usbsm_state *card = get_safe_token(device);
-	card->ram = auto_alloc_array(device->machine, UINT16, 0x100000/2);
+	card->ram = auto_alloc_array(device->machine(), UINT16, 0x100000/2);
 	card->smartmedia = device->subdevice("smartmedia");
 	card->strata = device->subdevice("strata");
 }
@@ -332,7 +332,7 @@ static DEVICE_RESET( tn_usbsm )
 	/* Register the card */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "HDCTRL") & HD_USB)
+	if (input_port_read(device->machine(), "HDCTRL") & HD_USB)
 	{
 		int success = mount_card(peb, device, &tn_usbsm_card, get_pebcard_config(device)->slot);
 		if (!success) return;
@@ -345,7 +345,7 @@ static DEVICE_RESET( tn_usbsm )
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			card->select_mask = 0x1fe000;

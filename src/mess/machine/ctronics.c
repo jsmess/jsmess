@@ -176,7 +176,7 @@ static TIMER_CALLBACK( ack_callback )
 		printer_output(centronics->printer, centronics->data);
 
 		/* ready to receive more data, return BUSY to low */
-		machine->scheduler().timer_set(attotime::from_usec(7), FUNC(busy_callback), FALSE, ptr);
+		machine.scheduler().timer_set(attotime::from_usec(7), FUNC(busy_callback), FALSE, ptr);
 	}
 }
 
@@ -193,12 +193,12 @@ static TIMER_CALLBACK( busy_callback )
 	if (param == TRUE)
 	{
 		/* timer to turn ACK low to receive data */
-		machine->scheduler().timer_set(attotime::from_usec(10), FUNC(ack_callback), FALSE, ptr);
+		machine.scheduler().timer_set(attotime::from_usec(10), FUNC(ack_callback), FALSE, ptr);
 	}
 	else
 	{
 		/* timer to return ACK to high state */
-		machine->scheduler().timer_set(attotime::from_usec(5), FUNC(ack_callback), TRUE, ptr);
+		machine.scheduler().timer_set(attotime::from_usec(5), FUNC(ack_callback), TRUE, ptr);
 	}
 }
 
@@ -267,7 +267,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_strobe_w )
 	if (centronics->strobe == TRUE && state == FALSE && centronics->busy == FALSE)
 	{
 		/* STROBE has gone low, data is ready */
-		device->machine->scheduler().timer_set(attotime::zero, FUNC(busy_callback), TRUE, centronics);
+		device->machine().scheduler().timer_set(attotime::zero, FUNC(busy_callback), TRUE, centronics);
 	}
 
 	centronics->strobe = state;

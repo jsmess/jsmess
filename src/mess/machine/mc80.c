@@ -22,7 +22,7 @@ static IRQ_CALLBACK(mc8020_irq_callback)
 
 MACHINE_RESET(mc8020)
 {
-	device_set_irq_callback(machine->device("maincpu"), mc8020_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), mc8020_irq_callback);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
@@ -89,7 +89,7 @@ WRITE8_HANDLER( mc8030_zve_write_protect_w )
 
 WRITE8_HANDLER( mc8030_vis_w )
 {
-	mc80_state *state = space->machine->driver_data<mc80_state>();
+	mc80_state *state = space->machine().driver_data<mc80_state>();
 	// reg C
 	// 7 6 5 4 -- module
 	//         3 - 0 left half, 1 right half
@@ -120,7 +120,7 @@ static IRQ_CALLBACK(mc8030_irq_callback)
 
 MACHINE_RESET(mc8030)
 {
-	device_set_irq_callback(machine->device("maincpu"), mc8030_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), mc8030_irq_callback);
 }
 
 static READ8_DEVICE_HANDLER (zve_port_a_r)

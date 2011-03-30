@@ -47,10 +47,10 @@ public:
 	virtual void machine_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gatearray_w );
-	UINT16 pb2000c_kb_r(running_machine *machine);
-	UINT16 pb1000_kb_r(running_machine *machine);
-	void kb_matrix_w(running_machine *machine, UINT8 matrix);
-	UINT16 read_touchscreen(running_machine *machine, UINT8 line);
+	UINT16 pb2000c_kb_r(running_machine &machine);
+	UINT16 pb1000_kb_r(running_machine &machine);
+	void kb_matrix_w(running_machine &machine, UINT8 matrix);
+	UINT16 read_touchscreen(running_machine &machine, UINT8 line);
 };
 
 static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
@@ -304,11 +304,11 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 	m_gatearray[offset] = data&0xff;
 
 	if (m_gatearray[0])
-		memory_set_bankptr(space.machine, "bank1", machine->region("card1")->base());
+		memory_set_bankptr(m_machine, "bank1", m_machine.region("card1")->base());
 	else if (m_gatearray[1])
-		memory_set_bankptr(space.machine, "bank1", machine->region("card2")->base());
+		memory_set_bankptr(m_machine, "bank1", m_machine.region("card2")->base());
 	else
-		memory_set_bankptr(space.machine, "bank1", machine->region("rom")->base());
+		memory_set_bankptr(m_machine, "bank1", m_machine.region("rom")->base());
 }
 
 bool pb1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -318,7 +318,7 @@ bool pb1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 static void lcd_control(hd61700_cpu_device &device, UINT8 data)
 {
-	pb1000_state *state = device.machine->driver_data<pb1000_state>();
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
 	state->m_hd44352->control_write(data);
 }
@@ -326,7 +326,7 @@ static void lcd_control(hd61700_cpu_device &device, UINT8 data)
 
 static UINT8 lcd_data_r(hd61700_cpu_device &device)
 {
-	pb1000_state *state = device.machine->driver_data<pb1000_state>();
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
 	return state->m_hd44352->data_read();
 }
@@ -334,13 +334,13 @@ static UINT8 lcd_data_r(hd61700_cpu_device &device)
 
 static void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
 {
-	pb1000_state *state = device.machine->driver_data<pb1000_state>();
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
 	state->m_hd44352->data_write(data);
 }
 
 
-UINT16 pb1000_state::read_touchscreen(running_machine *machine, UINT8 line)
+UINT16 pb1000_state::read_touchscreen(running_machine &machine, UINT8 line)
 {
 	UINT8 x = input_port_read(machine, "POSX")/0x40;
 	UINT8 y = input_port_read(machine, "POSY")/0x40;
@@ -355,7 +355,7 @@ UINT16 pb1000_state::read_touchscreen(running_machine *machine, UINT8 line)
 }
 
 
-UINT16 pb1000_state::pb1000_kb_r(running_machine *machine)
+UINT16 pb1000_state::pb1000_kb_r(running_machine &machine)
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	UINT16 data = 0;
@@ -379,7 +379,7 @@ UINT16 pb1000_state::pb1000_kb_r(running_machine *machine)
 	return data;
 }
 
-UINT16 pb1000_state::pb2000c_kb_r(running_machine *machine)
+UINT16 pb1000_state::pb2000c_kb_r(running_machine &machine)
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	UINT16 data = 0;
@@ -401,7 +401,7 @@ UINT16 pb1000_state::pb2000c_kb_r(running_machine *machine)
 	return data;
 }
 
-void pb1000_state::kb_matrix_w(running_machine *machine, UINT8 matrix)
+void pb1000_state::kb_matrix_w(running_machine &machine, UINT8 matrix)
 {
 	if (matrix & 0x80)
 	{
@@ -428,9 +428,9 @@ void pb1000_state::kb_matrix_w(running_machine *machine, UINT8 matrix)
 
 static void kb_matrix_w_call(hd61700_cpu_device &device, UINT8 matrix)
 {
-	pb1000_state *state = device.machine->driver_data<pb1000_state>();
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
-	state->kb_matrix_w(device.machine, matrix);
+	state->kb_matrix_w(device.machine(), matrix);
 }
 
 static UINT8 pb1000_port_r(hd61700_cpu_device &device)
@@ -447,22 +447,22 @@ static UINT8 pb2000c_port_r(hd61700_cpu_device &device)
 
 static void port_w(hd61700_cpu_device &device, UINT8 data)
 {
-	beep_set_state(device.machine->device("beep"), (BIT(data,7) ^ BIT(data,6)));
+	beep_set_state(device.machine().device("beep"), (BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
 }
 
 static UINT16 pb1000_kb_r_call(hd61700_cpu_device &device)
 {
-	pb1000_state *state = device.machine->driver_data<pb1000_state>();
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
-	return state->pb1000_kb_r(device.machine);
+	return state->pb1000_kb_r(device.machine());
 }
 
 static UINT16 pb2000c_kb_r_call(hd61700_cpu_device &device)
 {
-	pb1000_state *state = device.machine->driver_data<pb1000_state>();
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
-	return state->pb2000c_kb_r(device.machine);
+	return state->pb2000c_kb_r(device.machine());
 }
 
 static const hd61700_config pb1000_config =
@@ -495,9 +495,9 @@ static TIMER_CALLBACK( keyboard_timer )
 
 void pb1000_state::machine_start()
 {
-	memory_set_bankptr(machine, "bank1", machine->region("rom")->base());
+	memory_set_bankptr(m_machine, "bank1", m_machine.region("rom")->base());
 
-	m_kb_timer = machine->scheduler().timer_alloc(FUNC(keyboard_timer));
+	m_kb_timer = m_machine.scheduler().timer_alloc(FUNC(keyboard_timer));
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 

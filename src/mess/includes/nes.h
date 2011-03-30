@@ -61,8 +61,8 @@ typedef struct
 	UINT8* access;	/* direct access when possible */
 } name_table;
 
-typedef void (*nes_prg_callback)(running_machine *machine, int start, int bank);
-typedef void (*nes_chr_callback)(running_machine *machine, int start, int bank, int source);
+typedef void (*nes_prg_callback)(running_machine &machine, int start, int bank);
+typedef void (*nes_chr_callback)(running_machine &machine, int start, int bank, int source);
 
 class nes_state : public driver_device
 {

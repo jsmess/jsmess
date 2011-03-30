@@ -102,7 +102,7 @@ static void fdc_handle_hold(device_t *device)
 		state = CLEAR_LINE;
 
 	// TODO: use READY
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state);
 }
 
 /*
@@ -120,9 +120,9 @@ static void set_geometry(device_t *drive, floppy_type_t type)
 
 static void set_all_geometries(device_t *device, floppy_type_t type)
 {
-	set_geometry(device->machine->device(PFLOPPY_0), type);
-	set_geometry(device->machine->device(PFLOPPY_1), type);
-	set_geometry(device->machine->device(PFLOPPY_2), type);
+	set_geometry(device->machine().device(PFLOPPY_0), type);
+	set_geometry(device->machine().device(PFLOPPY_1), type);
+	set_geometry(device->machine().device(PFLOPPY_2), type);
 }
 
 
@@ -348,11 +348,11 @@ static DEVICE_START( ti99_fdc )
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
 
-	card->motor_on_timer = device->machine->scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
+	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", fdc_region);
-	card->rom = device->machine->region(astring_c(region))->base();
+	card->rom = device->machine().region(astring_c(region))->base();
 	card->controller = device->subdevice("fd1771");
 }
 
@@ -366,7 +366,7 @@ static DEVICE_RESET( ti99_fdc )
 	ti99_fdc_state *card = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine, "DISKCTRL") == DISK_TIFDC)
+	if (input_port_read(device->machine(), "DISKCTRL") == DISK_TIFDC)
 	{
 		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &fdc_card, get_pebcard_config(device)->slot);
@@ -380,7 +380,7 @@ static DEVICE_RESET( ti99_fdc )
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			card->select_mask = 0x1fe000;

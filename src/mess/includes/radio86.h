@@ -60,7 +60,7 @@ extern WRITE8_HANDLER ( radio86_pagesel );
 extern const i8257_interface radio86_dma;
 
 
-extern void radio86_init_keyboard(running_machine *machine);
+extern void radio86_init_keyboard(running_machine &machine);
 
 
 /*----------- defined in video/radio86.c -----------*/

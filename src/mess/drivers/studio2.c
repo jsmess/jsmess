@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( reset_w )
 {
-	studio2_state *state = field->port->machine->driver_data<studio2_state>();
+	studio2_state *state = field->port->machine().driver_data<studio2_state>();
 
 	if (oldval && !newval)
 	{
@@ -319,7 +319,7 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 
 static SCREEN_UPDATE( studio2 )
 {
-	studio2_state *state = screen->machine->driver_data<studio2_state>();
+	studio2_state *state = screen->machine().driver_data<studio2_state>();
 
 	cdp1861_update(state->m_vdc, bitmap, cliprect);
 
@@ -336,21 +336,21 @@ static PALETTE_INIT( visicom )
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
+	studio2_state *state = device->machine().driver_data<studio2_state>();
 
 	return BIT(state->m_color, 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
+	studio2_state *state = device->machine().driver_data<studio2_state>();
 
 	return BIT(state->m_color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
+	studio2_state *state = device->machine().driver_data<studio2_state>();
 
 	return BIT(state->m_color, 2);
 }
@@ -374,7 +374,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 static SCREEN_UPDATE( mpt02 )
 {
-	studio2_state *state = screen->machine->driver_data<studio2_state>();
+	studio2_state *state = screen->machine().driver_data<studio2_state>();
 
 	cdp1864_update(state->m_cti, bitmap, cliprect);
 
@@ -385,26 +385,26 @@ static SCREEN_UPDATE( mpt02 )
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	return BIT(input_port_read(device->machine, "CLEAR"), 0);
+	return BIT(input_port_read(device->machine(), "CLEAR"), 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( ef3_r )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
+	studio2_state *state = device->machine().driver_data<studio2_state>();
 
-	return BIT(input_port_read(device->machine, "A"), state->m_keylatch);
+	return BIT(input_port_read(device->machine(), "A"), state->m_keylatch);
 }
 
 static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
+	studio2_state *state = device->machine().driver_data<studio2_state>();
 
-	return BIT(input_port_read(device->machine, "B"), state->m_keylatch);
+	return BIT(input_port_read(device->machine(), "B"), state->m_keylatch);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 {
-	device_t *speaker = device->machine->device("beep");
+	device_t *speaker = device->machine().device("beep");
 	beep_set_state(speaker, state);
 }
 
@@ -426,7 +426,7 @@ static COSMAC_INTERFACE( studio2_cosmac_intf )
 
 static WRITE8_DEVICE_HANDLER( mpt02_dma_w )
 {
-	studio2_state *state = device->machine->driver_data<studio2_state>();
+	studio2_state *state = device->machine().driver_data<studio2_state>();
 	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
 	state->m_color = state->m_color_ram[addr];
@@ -456,7 +456,7 @@ static COSMAC_INTERFACE( mpt02_cosmac_intf )
 void studio2_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(m_machine, m_keylatch);
 }
 
 void studio2_state::machine_reset()
@@ -475,7 +475,7 @@ DEVICE_IMAGE_LOAD( studio2_cart_load )
 		// WARNING: list code currently assume that cart mapping starts at 0x400.
 		// the five dumps currently available work like this, but the .st2 format
 		// allows for more freedom... how was the content of a real cart mapped?
-		UINT8 *ptr = ((UINT8 *) image.device().machine->region(CDP1802_TAG)->base()) + 0x400;
+		UINT8 *ptr = ((UINT8 *) image.device().machine().region(CDP1802_TAG)->base()) + 0x400;
 		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));
 		return IMAGE_INIT_PASS;
 	}
@@ -598,14 +598,14 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	device_t *speaker = machine->device("beep");
+	device_t *speaker = machine.device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }
 
 static DRIVER_INIT( studio2 )
 {
-	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	machine.scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 }
 
 /* Game Drivers */

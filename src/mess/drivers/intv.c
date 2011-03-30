@@ -73,21 +73,21 @@ static PALETTE_INIT( intv )
 	UINT8 i, j, r, g, b;
 	/* Two copies of everything (why?) */
 
-	machine->colortable = colortable_alloc(machine, 32);
+	machine.colortable = colortable_alloc(machine, 32);
 
 	for ( i = 0; i < 16; i++ )
 	{
 		r = intv_colors[i*3]; g = intv_colors[i*3+1]; b = intv_colors[i*3+2];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
-		colortable_palette_set_color(machine->colortable, i + 16, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i + 16, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0;i<16;i++)
 	{
 		for(j=0;j<16;j++)
 		{
-		colortable_entry_set_value(machine->colortable, k++, i);
-		colortable_entry_set_value(machine->colortable, k++, j);
+		colortable_entry_set_value(machine.colortable, k++, i);
+		colortable_entry_set_value(machine.colortable, k++, j);
 		}
 	}
 
@@ -95,8 +95,8 @@ static PALETTE_INIT( intv )
 	{
 		for(j=16;j<32;j++)
 		{
-			colortable_entry_set_value(machine->colortable, k++, i);
-			colortable_entry_set_value(machine->colortable, k++, j);
+			colortable_entry_set_value(machine.colortable, k++, i);
+			colortable_entry_set_value(machine.colortable, k++, j);
 		}
 	}
 }
@@ -369,8 +369,8 @@ static TIMER_CALLBACK(intv_interrupt2_complete)
 
 static INTERRUPT_GEN( intv_interrupt2 )
 {
-	cputag_set_input_line(device->machine, "keyboard", 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(device->machine->device<cpu_device>("keyboard")->cycles_to_attotime(100), FUNC(intv_interrupt2_complete));
+	cputag_set_input_line(device->machine(), "keyboard", 0, ASSERT_LINE);
+	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), FUNC(intv_interrupt2_complete));
 }
 
 static MACHINE_CONFIG_START( intv, intv_state )

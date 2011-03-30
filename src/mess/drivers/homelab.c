@@ -19,14 +19,14 @@ static READ8_HANDLER (homelab_keyboard_r)
 {
 	UINT8 key_mask = (offset ^ 0xff) & 0xff;
 	UINT8 key = 0xff;
-	if ((key_mask & 0x01)!=0) { key &= input_port_read(space->machine,"LINE0"); }
-	if ((key_mask & 0x02)!=0) { key &= input_port_read(space->machine,"LINE1"); }
-	if ((key_mask & 0x04)!=0) { key &= input_port_read(space->machine,"LINE2"); }
-	if ((key_mask & 0x08)!=0) { key &= input_port_read(space->machine,"LINE3"); }
-	if ((key_mask & 0x10)!=0) { key &= input_port_read(space->machine,"LINE4"); }
-	if ((key_mask & 0x20)!=0) { key &= input_port_read(space->machine,"LINE5"); }
-	if ((key_mask & 0x40)!=0) { key &= input_port_read(space->machine,"LINE6"); }
-	if ((key_mask & 0x80)!=0) { key &= input_port_read(space->machine,"LINE7"); }
+	if ((key_mask & 0x01)!=0) { key &= input_port_read(space->machine(),"LINE0"); }
+	if ((key_mask & 0x02)!=0) { key &= input_port_read(space->machine(),"LINE1"); }
+	if ((key_mask & 0x04)!=0) { key &= input_port_read(space->machine(),"LINE2"); }
+	if ((key_mask & 0x08)!=0) { key &= input_port_read(space->machine(),"LINE3"); }
+	if ((key_mask & 0x10)!=0) { key &= input_port_read(space->machine(),"LINE4"); }
+	if ((key_mask & 0x20)!=0) { key &= input_port_read(space->machine(),"LINE5"); }
+	if ((key_mask & 0x40)!=0) { key &= input_port_read(space->machine(),"LINE6"); }
+	if ((key_mask & 0x80)!=0) { key &= input_port_read(space->machine(),"LINE7"); }
 	return key;
 }
 

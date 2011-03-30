@@ -43,14 +43,14 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( cfx9850_kol_w )
 {
-	cfx9850_state *state = space->machine->driver_data<cfx9850_state>();
+	cfx9850_state *state = space->machine().driver_data<cfx9850_state>();
 
 	state->ko = ( state->ko & 0xff00 ) | data;
 }
 
 static WRITE8_HANDLER( cfx9850_koh_w )
 {
-	cfx9850_state *state = space->machine->driver_data<cfx9850_state>();
+	cfx9850_state *state = space->machine().driver_data<cfx9850_state>();
 
 	state->ko = ( state->ko & 0x00ff ) | ( data << 8 );
 }
@@ -58,32 +58,32 @@ static WRITE8_HANDLER( cfx9850_koh_w )
 
 static READ8_HANDLER( cfx9850_ki_r )
 {
-	cfx9850_state *state = space->machine->driver_data<cfx9850_state>();
+	cfx9850_state *state = space->machine().driver_data<cfx9850_state>();
 	UINT8 data = 0;
 
 	if ( state->ko & 0x0001 )
-		data |= input_port_read( space->machine, "KO1" );
+		data |= input_port_read( space->machine(), "KO1" );
 	if ( state->ko & 0x0002 )
-		data |= input_port_read( space->machine, "KO2" );
+		data |= input_port_read( space->machine(), "KO2" );
 	if ( state->ko & 0x0004 )
-		data |= input_port_read( space->machine, "KO3" );
+		data |= input_port_read( space->machine(), "KO3" );
 	if ( state->ko & 0x0008 )
-		data |= input_port_read( space->machine, "KO4" );
+		data |= input_port_read( space->machine(), "KO4" );
 	if ( state->ko & 0x0010 )
-		data |= input_port_read( space->machine, "KO5" );
+		data |= input_port_read( space->machine(), "KO5" );
 	if ( state->ko & 0x0020 )
-		data |= input_port_read( space->machine, "KO6" );
+		data |= input_port_read( space->machine(), "KO6" );
 	if ( state->ko & 0x0040 )
-		data |= input_port_read( space->machine, "KO7" );
+		data |= input_port_read( space->machine(), "KO7" );
 	if ( state->ko & 0x0080 )
-		data |= input_port_read( space->machine, "KO8" );
+		data |= input_port_read( space->machine(), "KO8" );
 	if ( state->ko & 0x0100 )
-		data |= input_port_read( space->machine, "KO9" );
+		data |= input_port_read( space->machine(), "KO9" );
 	if ( state->ko & 0x0200 )
-		data |= input_port_read( space->machine, "KO10" );
+		data |= input_port_read( space->machine(), "KO10" );
 	/* KO11 is not connected */
 	if ( state->ko & 0x0800 )
-		data |= input_port_read( space->machine, "KO12" );
+		data |= input_port_read( space->machine(), "KO12" );
 	/* KO13 is not connected */
 	/* KO14 is not connected */
 
@@ -194,7 +194,7 @@ static PALETTE_INIT( cfx9850 )
 
 static SCREEN_UPDATE( cfx9850 )
 {
-	cfx9850_state *state = screen->machine->driver_data<cfx9850_state>();
+	cfx9850_state *state = screen->machine().driver_data<cfx9850_state>();
 	UINT16 offset = 0;
 
 	for ( int i = 0; i < 16; i++ )

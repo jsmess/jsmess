@@ -179,8 +179,8 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 	sm->page_total_size = get_UINT32BE(custom_header.page_total_size);
 	sm->num_pages = get_UINT32BE(custom_header.num_pages);
 	sm->log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
-	sm->data_ptr = auto_alloc_array(device->machine, UINT8, sm->page_total_size*sm->num_pages);
-	sm->data_uid_ptr = auto_alloc_array(device->machine, UINT8, 256 + 16);
+	sm->data_ptr = auto_alloc_array(device->machine(), UINT8, sm->page_total_size*sm->num_pages);
+	sm->data_uid_ptr = auto_alloc_array(device->machine(), UINT8, 256 + 16);
 	sm->mode = SM_M_INIT;
 	sm->pointer_mode = SM_PM_A;
 	sm->page_addr = 0;
@@ -189,7 +189,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 	if (!image.is_writable())
 		sm->status |= 0x80;
 	sm->accumulated_status = 0;
-	sm->pagereg = auto_alloc_array(device->machine, UINT8, sm->page_total_size);
+	sm->pagereg = auto_alloc_array(device->machine(), UINT8, sm->page_total_size);
 	sm->id[0] = sm->id[1] = sm->id[2] = 0;
 
 	if (custom_header.version == 0)
@@ -258,8 +258,8 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 		return IMAGE_INIT_FAIL;
 	}
 
-	sm->data_ptr = auto_alloc_array(device->machine, UINT8, sm->page_total_size*sm->num_pages);
-	sm->data_uid_ptr = auto_alloc_array(device->machine, UINT8, 256 + 16);
+	sm->data_ptr = auto_alloc_array(device->machine(), UINT8, sm->page_total_size*sm->num_pages);
+	sm->data_uid_ptr = auto_alloc_array(device->machine(), UINT8, 256 + 16);
 	sm->mode = SM_M_INIT;
 	sm->pointer_mode = SM_PM_A;
 	sm->page_addr = 0;
@@ -268,7 +268,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 	if (!image.is_writable())
 		sm->status |= 0x80;
 	sm->accumulated_status = 0;
-	sm->pagereg = auto_alloc_array(device->machine, UINT8, sm->page_total_size);
+	sm->pagereg = auto_alloc_array(device->machine(), UINT8, sm->page_total_size);
 	memcpy( sm->id, custom_header.data1, 3);
 	sm->mp_opcode = 0;
 
@@ -321,7 +321,7 @@ static DEVICE_IMAGE_UNLOAD( smartmedia )
 	sm->byte_addr = 0;
 	sm->status = 0x40;
 	sm->accumulated_status = 0;
-	sm->pagereg = auto_alloc_array(device->machine, UINT8, sm->page_total_size);
+	sm->pagereg = auto_alloc_array(device->machine(), UINT8, sm->page_total_size);
 	sm->id[0] = sm->id[1] = sm->id[2] = 0;
 	sm->mp_opcode = 0;
 	sm->mode_3065 = 0;

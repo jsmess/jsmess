@@ -23,7 +23,7 @@
 /* Driver initialization */
 DRIVER_INIT( partner )
 {
-	partner_state *state = machine->driver_data<partner_state>();
+	partner_state *state = machine.driver_data<partner_state>();
 	state->tape_value = 0x80;
 }
 
@@ -43,13 +43,13 @@ const wd17xx_interface partner_wd17xx_interface =
 
 MACHINE_START( partner )
 {
-	device_t *fdc = machine->device("wd1793");
+	device_t *fdc = machine.device("wd1793");
 	wd17xx_set_pause_time(fdc, 10);
 }
 
-static void partner_window_1(running_machine *machine, UINT8 bank_num, UINT16 offset,UINT8 *rom)
+static void partner_window_1(running_machine &machine, UINT8 bank_num, UINT16 offset,UINT8 *rom)
 {
-	partner_state *state = machine->driver_data<partner_state>();
+	partner_state *state = machine.driver_data<partner_state>();
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
 	switch(state->win_mem_page) {
@@ -65,9 +65,9 @@ static void partner_window_1(running_machine *machine, UINT8 bank_num, UINT16 of
 	}
 }
 
-static void partner_window_2(running_machine *machine, UINT8 bank_num, UINT16 offset,UINT8 *rom)
+static void partner_window_2(running_machine &machine, UINT8 bank_num, UINT16 offset,UINT8 *rom)
 {
-	partner_state *state = machine->driver_data<partner_state>();
+	partner_state *state = machine.driver_data<partner_state>();
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
 	switch(state->win_mem_page) {
@@ -81,7 +81,7 @@ static void partner_window_2(running_machine *machine, UINT8 bank_num, UINT16 of
 }
 
 static READ8_HANDLER ( partner_floppy_r ) {
-	device_t *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine().device("wd1793");
 
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -97,7 +97,7 @@ static READ8_HANDLER ( partner_floppy_r ) {
 }
 
 static WRITE8_HANDLER ( partner_floppy_w ) {
-	device_t *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine().device("wd1793");
 
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -107,26 +107,26 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 			default   : wd17xx_data_w(fdc,0,data);break;
 		}
 	} else {
-		floppy_mon_w(floppy_get_device(space->machine, 0), 1);
-		floppy_mon_w(floppy_get_device(space->machine, 1), 1);
+		floppy_mon_w(floppy_get_device(space->machine(), 0), 1);
+		floppy_mon_w(floppy_get_device(space->machine(), 1), 1);
 		if (((data >> 6) & 1)==1) {
 			wd17xx_set_drive(fdc,0);
-			floppy_mon_w(floppy_get_device(space->machine, 0), 0);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 1);
+			floppy_mon_w(floppy_get_device(space->machine(), 0), 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1, 1);
 		}
 		if (((data >> 3) & 1)==1) {
 			wd17xx_set_drive(fdc,1);
-			floppy_mon_w(floppy_get_device(space->machine, 1), 0);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1, 1);
+			floppy_mon_w(floppy_get_device(space->machine(), 1), 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1, 1);
 		}
 		wd17xx_set_side(fdc,data >> 7);
 	}
 }
 
-static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
+static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 {
-	partner_state *state = machine->driver_data<partner_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	partner_state *state = machine.driver_data<partner_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(state->win_mem_page) {
 		case 2 :
 				// FDD
@@ -141,12 +141,12 @@ static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 				break;
 	}
 }
-static void partner_bank_switch(running_machine *machine)
+static void partner_bank_switch(running_machine &machine)
 {
-	partner_state *state = machine->driver_data<partner_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	partner_state *state = machine.driver_data<partner_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	space->install_write_bank(0x0000, 0x07ff, "bank1");
 	space->install_write_bank(0x0800, 0x3fff, "bank2");
@@ -348,22 +348,22 @@ static void partner_bank_switch(running_machine *machine)
 
 WRITE8_HANDLER ( partner_win_memory_page_w )
 {
-	partner_state *state = space->machine->driver_data<partner_state>();
+	partner_state *state = space->machine().driver_data<partner_state>();
 	state->win_mem_page = ~data;
-	partner_bank_switch(space->machine);
+	partner_bank_switch(space->machine());
 }
 
 WRITE8_HANDLER (partner_mem_page_w )
 {
-	partner_state *state = space->machine->driver_data<partner_state>();
+	partner_state *state = space->machine().driver_data<partner_state>();
 	state->mem_page = (data >> 4) & 0x0f;
-	partner_bank_switch(space->machine);
+	partner_bank_switch(space->machine());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	i8257_hlda_w(device, state);
@@ -387,7 +387,7 @@ I8257_INTERFACE( partner_dma )
 
 MACHINE_RESET( partner )
 {
-	partner_state *state = machine->driver_data<partner_state>();
+	partner_state *state = machine.driver_data<partner_state>();
 	state->mem_page = 0;
 	state->win_mem_page = 0;
 	partner_bank_switch(machine);

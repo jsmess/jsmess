@@ -81,7 +81,7 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 {
 	UINT8 keyin, i, data = 0xff;
 
-	keyin = input_port_read(machine, "X0");
+	keyin = input_port_read(m_machine, "X0");
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
@@ -90,7 +90,7 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 				break;
 			}
 
-	keyin = input_port_read(machine, "X1");
+	keyin = input_port_read(m_machine, "X1");
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
@@ -99,7 +99,7 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 				break;
 			}
 
-	data &= input_port_read(machine, "X2");
+	data &= input_port_read(m_machine, "X2");
 
 	return data;
 }

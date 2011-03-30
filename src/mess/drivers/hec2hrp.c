@@ -297,7 +297,7 @@ static MACHINE_RESET(hec2hrp)
 static MACHINE_START( hec2hrx )
 /*****************************************************************************/
 {
-	UINT8 *RAM   = machine->region("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
@@ -310,19 +310,19 @@ static MACHINE_START( hec2hrx )
 
 /******************************************************SPECIFIQUE MX ***************************/
 	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]                    , 0); // Mess ram
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, machine->region("page1")->base() , 0); // Rom page 1
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, machine->region("page2")->base() , 0); // Rom page 2
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, machine.region("page1")->base() , 0); // Rom page 1
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, machine.region("page2")->base() , 0); // Rom page 2
 	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 /******************************************************SPECIFIQUE MX ***************************/
 
 /*************************************************SPECIFIQUE DISK II ***************************/
-	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, machine->region("rom_disc2")->base() , 0); // ROM
-	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, machine->region("disc2mem" )->base() , 0); // RAM
+	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, machine.region("rom_disc2")->base() , 0); // ROM
+	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, machine.region("disc2mem" )->base() , 0); // RAM
 	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
 /*************************************************SPECIFIQUE DISK II ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	hec2hrp_state *state = machine->driver_data<hec2hrp_state>();
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	state->hector_videoram  = hector_videoram;
 
 	hector_init(machine);

@@ -292,7 +292,7 @@ static DEVICE_RESET( ti99grom )
 	if (gromconf->region==NULL)
 		grom->memptr = (*gromconf->get_memory)(device->owner());
 	else
-		grom->memptr = device->machine->region(gromconf->region)->base();
+		grom->memptr = device->machine().region(gromconf->region)->base();
 
 	//  TODO: Check whether this may be 0 for console GROMs.
 	//  assert (grom->memptr!=NULL);

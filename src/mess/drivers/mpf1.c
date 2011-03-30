@@ -90,12 +90,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( trigger_irq )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( mpf1 )
@@ -216,7 +216,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( led_refresh )
 {
-	mpf1_state *state = machine->driver_data<mpf1_state>();
+	mpf1_state *state = machine.driver_data<mpf1_state>();
 
 	if (BIT(state->lednum, 5)) output_set_digit_value(0, param);
 	if (BIT(state->lednum, 4)) output_set_digit_value(1, param);
@@ -228,19 +228,19 @@ static TIMER_CALLBACK( led_refresh )
 
 static READ8_DEVICE_HANDLER( mpf1_porta_r )
 {
-	mpf1_state *state = device->machine->driver_data<mpf1_state>();
+	mpf1_state *state = device->machine().driver_data<mpf1_state>();
 	UINT8 data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
-	if (!BIT(state->lednum, 0)) data &= input_port_read(device->machine, "PC0");
-	if (!BIT(state->lednum, 1)) data &= input_port_read(device->machine, "PC1");
-	if (!BIT(state->lednum, 2)) data &= input_port_read(device->machine, "PC2");
-	if (!BIT(state->lednum, 3)) data &= input_port_read(device->machine, "PC3");
-	if (!BIT(state->lednum, 4)) data &= input_port_read(device->machine, "PC4");
-	if (!BIT(state->lednum, 5)) data &= input_port_read(device->machine, "PC5");
+	if (!BIT(state->lednum, 0)) data &= input_port_read(device->machine(), "PC0");
+	if (!BIT(state->lednum, 1)) data &= input_port_read(device->machine(), "PC1");
+	if (!BIT(state->lednum, 2)) data &= input_port_read(device->machine(), "PC2");
+	if (!BIT(state->lednum, 3)) data &= input_port_read(device->machine(), "PC3");
+	if (!BIT(state->lednum, 4)) data &= input_port_read(device->machine(), "PC4");
+	if (!BIT(state->lednum, 5)) data &= input_port_read(device->machine(), "PC5");
 
 	/* bit 6, user key */
-	data &= input_port_read(device->machine, "SPECIAL") & 1 ? 0xff : 0xbf;
+	data &= input_port_read(device->machine(), "SPECIAL") & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
 	data |= (cassette_input(state->cassette) > 0 ? 1 : 0) << 7;
@@ -250,7 +250,7 @@ static READ8_DEVICE_HANDLER( mpf1_porta_r )
 
 static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 {
-	mpf1_state *state = device->machine->driver_data<mpf1_state>();
+	mpf1_state *state = device->machine().driver_data<mpf1_state>();
 
 	/* swap bits around for the mame 7-segment emulation */
 	UINT8 led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
@@ -261,7 +261,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 {
-	mpf1_state *state = device->machine->driver_data<mpf1_state>();
+	mpf1_state *state = device->machine().driver_data<mpf1_state>();
 
 	/* bits 0-5, led select and keyboard latch */
 	state->lednum = data & 0x3f;
@@ -273,11 +273,11 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 	if (state->_break)
 	{
 		state->m1 = 0;
-		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 	/* bit 7, tape output, tone and led */
-	set_led_status(device->machine, 0, !BIT(data, 7));
+	set_led_status(device->machine(), 0, !BIT(data, 7));
 	speaker_level_w(state->speaker, BIT(data, 7));
 	cassette_output(state->cassette, BIT(data, 7));
 }
@@ -354,19 +354,19 @@ static TIMER_DEVICE_CALLBACK( check_halt_callback )
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = cpu_get_reg(timer.machine->device(Z80_TAG), Z80_HALT);
-	set_led_status(timer.machine, 1, led_halt);
+	INT64 led_halt = cpu_get_reg(timer.machine().device(Z80_TAG), Z80_HALT);
+	set_led_status(timer.machine(), 1, led_halt);
 }
 
 static MACHINE_START( mpf1 )
 {
-	mpf1_state *state = machine->driver_data<mpf1_state>();
+	mpf1_state *state = machine.driver_data<mpf1_state>();
 
 	/* find devices */
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->speaker = machine.device(SPEAKER_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
-	state->led_refresh_timer = machine->scheduler().timer_alloc(FUNC(led_refresh));
+	state->led_refresh_timer = machine.scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
 	state->save_item(NAME(state->_break));
@@ -376,7 +376,7 @@ static MACHINE_START( mpf1 )
 
 static MACHINE_RESET( mpf1 )
 {
-	mpf1_state *state = machine->driver_data<mpf1_state>();
+	mpf1_state *state = machine.driver_data<mpf1_state>();
 
 	state->lednum = 0;
 }
@@ -504,7 +504,7 @@ DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 
 		if (state->m1 == 5)
 		{
-			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+			cputag_set_input_line(*machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 
@@ -513,7 +513,7 @@ DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 
 static DRIVER_INIT( mpf1 )
 {
-	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mpf1_direct_update_handler, *machine));
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mpf1_direct_update_handler, machine));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)

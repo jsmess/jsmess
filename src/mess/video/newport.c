@@ -29,7 +29,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -38,7 +38,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine *machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine.device("maincpu")), buf );
 	}
 }
 
@@ -190,7 +190,7 @@ SCREEN_UPDATE( newport )
 {
 	int y;
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 
 	/* loop over rows and copy to the destination */
 	for( y = cliprect->min_y; y <= cliprect->max_y; y++ )
@@ -214,7 +214,7 @@ static UINT32 nCMAP0_Palette[0x10000];
 
 static WRITE32_HANDLER( newport_cmap0_w )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -234,7 +234,7 @@ static WRITE32_HANDLER( newport_cmap0_w )
 
 static READ32_HANDLER( newport_cmap0_r )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -252,7 +252,7 @@ static READ32_HANDLER( newport_cmap0_r )
 
 static READ32_HANDLER( newport_cmap1_r )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -271,7 +271,7 @@ static READ32_HANDLER( newport_cmap1_r )
 static READ32_HANDLER( newport_xmap0_r )
 {
 	UINT8 nModeIdx;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -320,7 +320,7 @@ static READ32_HANDLER( newport_xmap0_r )
 static WRITE32_HANDLER( newport_xmap0_w )
 {
 	UINT8 n8BitVal = data & 0x000000ff;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -359,7 +359,7 @@ static WRITE32_HANDLER( newport_xmap0_w )
 static READ32_HANDLER( newport_xmap1_r )
 {
 	UINT8 nModeIdx;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -408,7 +408,7 @@ static READ32_HANDLER( newport_xmap1_r )
 static WRITE32_HANDLER( newport_xmap1_w )
 {
 	UINT8 n8BitVal = data & 0x000000ff;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -447,7 +447,7 @@ static WRITE32_HANDLER( newport_xmap1_w )
 static READ32_HANDLER( newport_vc2_r )
 {
 	UINT16 ret16;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_DCBRegSelect )
 	{
@@ -472,7 +472,7 @@ static READ32_HANDLER( newport_vc2_r )
 
 static WRITE32_HANDLER( newport_vc2_w )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( nREX3_XFerWidth )
 	{
@@ -589,7 +589,7 @@ static WRITE32_HANDLER( newport_vc2_w )
 READ32_HANDLER( newport_rex3_r )
 {
 	UINT32 nTemp;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 //  if( offset >= ( 0x0800 / 4 ) )
 //  {
@@ -875,7 +875,7 @@ READ32_HANDLER( newport_rex3_r )
 	return 0;
 }
 
-static void DoREX3Command(running_machine *machine)
+static void DoREX3Command(running_machine &machine)
 {
 	UINT32 nCommand = ( ( nREX3_DrawMode0 & ( 1 << 15 ) ) >> 15 ) |
 						( ( nREX3_DrawMode0 & ( 1 <<  5 ) ) >>  4 ) |
@@ -965,7 +965,7 @@ static void DoREX3Command(running_machine *machine)
 WRITE32_HANDLER( newport_rex3_w )
 {
 	UINT32 nTemp=0;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	if( offset & 0x00000200 )
 	{

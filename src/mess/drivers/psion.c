@@ -133,7 +133,7 @@ UINT8 datapack::control_lines_r()
 
 int datapack::load(device_image_interface &image)
 {
-	running_machine *machine = image.device().machine;
+	running_machine &machine = image.device().machine();
 	UINT8 *data;
 	UINT32 length;
 
@@ -173,7 +173,7 @@ int datapack::load(device_image_interface &image)
 
 void datapack::unload(device_image_interface &image)
 {
-	running_machine *machine = image.device().machine;
+	running_machine &machine = image.device().machine();
 
 	// save battery only if a write-access occurs
 	if (len > 0 && write_flag)
@@ -214,13 +214,13 @@ void datapack::reset()
 
 static TIMER_DEVICE_CALLBACK( nmi_timer )
 {
-	psion_state *state = timer.machine->driver_data<psion_state>();
+	psion_state *state = timer.machine().driver_data<psion_state>();
 
 	if (state->m_enable_nmi)
-		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-UINT8 psion_state::kb_read(running_machine *machine)
+UINT8 psion_state::kb_read(running_machine &machine)
 {
 	static const char *const bitnames[] = {"K1", "K2", "K3", "K4", "K5", "K6", "K7"};
 	UINT8 line, data = 0x7c;
@@ -241,7 +241,7 @@ UINT8 psion_state::kb_read(running_machine *machine)
 	return data & 0x7c;
 }
 
-void psion_state::update_banks(running_machine *machine)
+void psion_state::update_banks(running_machine &machine)
 {
 	if (m_ram_bank < m_ram_bank_count && m_ram_bank_count)
 		memory_set_bank(machine, "rambank", m_ram_bank);
@@ -350,7 +350,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
         ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(space.machine) | input_port_read(space.machine, "BATTERY") | input_port_read(space.machine, "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
+		return kb_read(m_machine) | input_port_read(m_machine, "BATTERY") | input_port_read(m_machine, "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		{
@@ -380,7 +380,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		/* switch off, CPU goes into standby mode */
 		m_enable_nmi = 0;
 		m_stby_pwr = 1;
-		space.machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
+		space.machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 		break;
 	case 0x100:
 		m_pulse = 1;
@@ -402,7 +402,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		{
 			m_ram_bank=0;
 			m_rom_bank=0;
-			update_banks(space.machine);
+			update_banks(m_machine);
 		}
 		else
 			m_kb_counter++;
@@ -411,7 +411,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		if (offset == 0x2a0 && m_ram_bank_count)
 		{
 			m_ram_bank++;
-			update_banks(space.machine);
+			update_banks(m_machine);
 		}
 		else
 			m_enable_nmi = 1;
@@ -420,7 +420,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		if (offset == 0x2e0 && m_rom_bank_count)
 		{
 			m_rom_bank++;
-			update_banks(space.machine);
+			update_banks(m_machine);
 		}
 		else
 			m_enable_nmi = 0;
@@ -461,7 +461,7 @@ READ8_MEMBER( psion_state::io_r )
 
 static INPUT_CHANGED( psion_on )
 {
-	cpu_device *cpu = field->port->machine->device<cpu_device>("maincpu");
+	cpu_device *cpu = field->port->machine().device<cpu_device>("maincpu");
 
 	/* reset the CPU for resume from standby */
 	if (cpu->suspended(SUSPEND_REASON_HALT))
@@ -579,35 +579,35 @@ INPUT_PORTS_END
 
 static DEVICE_IMAGE_LOAD( psion_pack1 )
 {
-	psion_state *state = image.device().machine->driver_data<psion_state>();
+	psion_state *state = image.device().machine().driver_data<psion_state>();
 
 	return state->m_pack1.load(image);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack1 )
 {
-	psion_state *state = image.device().machine->driver_data<psion_state>();
+	psion_state *state = image.device().machine().driver_data<psion_state>();
 
 	state->m_pack1.unload(image);
 }
 
 static DEVICE_IMAGE_LOAD( psion_pack2 )
 {
-	psion_state *state = image.device().machine->driver_data<psion_state>();
+	psion_state *state = image.device().machine().driver_data<psion_state>();
 
 	return state->m_pack2.load(image);
 }
 
 static DEVICE_IMAGE_UNLOAD( psion_pack2 )
 {
-	psion_state *state = image.device().machine->driver_data<psion_state>();
+	psion_state *state = image.device().machine().driver_data<psion_state>();
 
 	state->m_pack2.unload(image);
 }
 
 static NVRAM_HANDLER( psion )
 {
-	psion_state *state = machine->driver_data<psion_state>();
+	psion_state *state = machine.driver_data<psion_state>();
 
 	if (read_or_write)
 	{
@@ -636,22 +636,22 @@ static NVRAM_HANDLER( psion )
 
 void psion_state::machine_start()
 {
-	if (!strcmp(machine->system().name, "psionlam"))
+	if (!strcmp(m_machine.system().name, "psionlam"))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 0;
 	}
-	else if (!strcmp(machine->system().name, "psionp350"))
+	else if (!strcmp(m_machine.system().name, "psionp350"))
 	{
 		m_rom_bank_count = 0;
 		m_ram_bank_count = 5;
 	}
-	else if (!strncmp(machine->system().name, "psionlz", 7))
+	else if (!strncmp(m_machine.system().name, "psionlz", 7))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 3;
 	}
-	else if (!strcmp(machine->system().name, "psionp464"))
+	else if (!strcmp(m_machine.system().name, "psionp464"))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 9;
@@ -664,32 +664,32 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)machine->region("maincpu")->base();
+		UINT8* rom_base = (UINT8 *)m_machine.region("maincpu")->base();
 
-		memory_configure_bank(machine, "rombank", 0, 1, rom_base + 0x8000, 0x4000);
-		memory_configure_bank(machine, "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
-		memory_set_bank(machine, "rombank", 0);
+		memory_configure_bank(m_machine, "rombank", 0, 1, rom_base + 0x8000, 0x4000);
+		memory_configure_bank(m_machine, "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
+		memory_set_bank(m_machine, "rombank", 0);
 	}
 
 	if (m_ram_bank_count)
 	{
-		m_paged_ram = auto_alloc_array(machine, UINT8, m_ram_bank_count * 0x4000);
-		memory_configure_bank(machine, "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
-		memory_set_bank(machine, "rambank", 0);
+		m_paged_ram = auto_alloc_array(m_machine, UINT8, m_ram_bank_count * 0x4000);
+		memory_configure_bank(m_machine, "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
+		memory_set_bank(m_machine, "rambank", 0);
 	}
 
-	state_save_register_global(machine, m_kb_counter);
-	state_save_register_global(machine, m_enable_nmi);
-	state_save_register_global(machine, m_tcsr_value);
-	state_save_register_global(machine, m_stby_pwr);
-	state_save_register_global(machine, m_pulse);
-	state_save_register_global(machine, m_rom_bank);
-	state_save_register_global(machine, m_ram_bank);
-	state_save_register_global(machine, m_port2_ddr);
-	state_save_register_global(machine, m_port2);
-	state_save_register_global(machine, m_port6_ddr);
-	state_save_register_global(machine, m_port6);
-	state_save_register_global_pointer(machine, m_paged_ram, m_ram_bank_count * 0x4000);
+	state_save_register_global(m_machine, m_kb_counter);
+	state_save_register_global(m_machine, m_enable_nmi);
+	state_save_register_global(m_machine, m_tcsr_value);
+	state_save_register_global(m_machine, m_stby_pwr);
+	state_save_register_global(m_machine, m_pulse);
+	state_save_register_global(m_machine, m_rom_bank);
+	state_save_register_global(m_machine, m_ram_bank);
+	state_save_register_global(m_machine, m_port2_ddr);
+	state_save_register_global(m_machine, m_port2);
+	state_save_register_global(m_machine, m_port6_ddr);
+	state_save_register_global(m_machine, m_port6);
+	state_save_register_global_pointer(m_machine, m_paged_ram, m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()
@@ -701,7 +701,7 @@ void psion_state::machine_reset()
 	m_pulse=0;
 
 	if (m_rom_bank_count || m_ram_bank_count)
-		update_banks(machine);
+		update_banks(m_machine);
 }
 
 bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -711,7 +711,7 @@ bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 static DRIVER_INIT( psion )
 {
-	psion_state *state = machine->driver_data<psion_state>();
+	psion_state *state = machine.driver_data<psion_state>();
 
 	state->m_pack1.reset();
 	state->m_pack2.reset();

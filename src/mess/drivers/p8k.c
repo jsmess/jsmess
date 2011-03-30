@@ -178,7 +178,7 @@ static SCREEN_UPDATE( p8k )
 
 static void p8k_daisy_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state);
 }
 
 /* Z80 DMA */
@@ -187,7 +187,7 @@ static WRITE_LINE_DEVICE_HANDLER( p8k_dma_irq_w )
 {
 	if (state)
 	{
-		device_t *i8272 = device->machine->device("i8272");
+		device_t *i8272 = device->machine().device("i8272");
 		upd765_tc_w(i8272, state);
 	}
 
@@ -328,7 +328,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 {
-	device_t *z80pio = device->machine->device("z80pio_2");
+	device_t *z80pio = device->machine().device("z80pio_2");
 
 	z80pio_pb_w(z80pio, 0, (state) ? 0x10 : 0x00);
 }

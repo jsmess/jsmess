@@ -130,7 +130,7 @@ struct _smsvdp_t
 };
 
 static TIMER_CALLBACK( smsvdp_display_callback );
-static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap_t *bitmap, int offsetx, int offsety, int line );
+static void sms_refresh_line( running_machine &machine, smsvdp_t *smsvdp, bitmap_t *bitmap, int offsetx, int offsety, int line );
 static void sms_update_palette( smsvdp_t *smsvdp );
 
 
@@ -163,7 +163,7 @@ static void set_display_settings( device_t *device )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 
-	screen_device *screen = device->machine->first_screen();
+	screen_device *screen = device->machine().first_screen();
 	int height = screen->height();
 	int M1, M2, M3, M4;
 	M1 = smsvdp->reg[0x01] & 0x10;
@@ -232,13 +232,13 @@ static void set_display_settings( device_t *device )
 READ8_DEVICE_HANDLER( sms_vdp_vcount_r )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
-	int vpos = device->machine->primary_screen->vpos();
+	int vpos = device->machine().primary_screen->vpos();
 
-	if (device->machine->primary_screen->hpos() < VCOUNT_CHANGE_HPOS)
+	if (device->machine().primary_screen->hpos() < VCOUNT_CHANGE_HPOS)
 	{
 		vpos--;
 		if (vpos < 0)
-			vpos += device->machine->primary_screen->height();
+			vpos += device->machine().primary_screen->height();
 	}
 
 	return (smsvdp->sms_frame_timing[INIT_VCOUNT] + vpos) & 0xff;
@@ -320,7 +320,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	smsvdp_t *smsvdp = (smsvdp_t *) ptr;
 
 	rectangle rec;
-	int vpos = machine->primary_screen->vpos();
+	int vpos = machine.primary_screen->vpos();
 	int vpos_limit = smsvdp->sms_frame_timing[VERTICAL_BLANKING] + smsvdp->sms_frame_timing[TOP_BLANKING]
 	               + smsvdp->sms_frame_timing[TOP_BORDER] + smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V]
 	               + smsvdp->sms_frame_timing[BOTTOM_BORDER] + smsvdp->sms_frame_timing[BOTTOM_BLANKING];
@@ -353,7 +353,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	{
 		if (vpos == vpos_limit)
 		{
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(vpos, HINT_HPOS), FUNC(smsvdp_check_hint),0 ,smsvdp);
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(vpos, HINT_HPOS), FUNC(smsvdp_check_hint),0 ,smsvdp);
 		}
 		else
 		{
@@ -362,8 +362,8 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 
 		if (vpos == vpos_limit + 1)
 		{
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(vpos, VINT_FLAG_HPOS), FUNC(smsvdp_set_status), (int)STATUS_VINT, smsvdp);
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(vpos, VINT_HPOS), FUNC(smsvdp_check_vint), 0, smsvdp);
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(vpos, VINT_FLAG_HPOS), FUNC(smsvdp_set_status), (int)STATUS_VINT, smsvdp);
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(vpos, VINT_HPOS), FUNC(smsvdp_check_vint), 0, smsvdp);
 		}
 
 		sms_update_palette(smsvdp);
@@ -371,12 +371,12 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine.pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine.pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
@@ -395,19 +395,19 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 			smsvdp->reg9copy = smsvdp->reg[0x09];
 		}
 
-		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(vpos, HINT_HPOS), FUNC(smsvdp_check_hint),0, smsvdp);
+		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(vpos, HINT_HPOS), FUNC(smsvdp_check_hint),0, smsvdp);
 
 		sms_update_palette(smsvdp);
 
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine.pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine.pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		sms_refresh_line(machine, smsvdp, smsvdp->tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit);
 
@@ -425,12 +425,12 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine.pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine.pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
@@ -483,7 +483,7 @@ READ8_DEVICE_HANDLER( sms_vdp_ctrl_r )
 		smsvdp->irq_state = 0;
 
 		if (smsvdp->int_callback)
-			smsvdp->int_callback(device->machine, CLEAR_LINE);
+			smsvdp->int_callback(device->machine(), CLEAR_LINE);
 	}
 
 	/* low 5 bits return non-zero data (it fixes PGA Tour Golf course map introduction) */
@@ -565,7 +565,7 @@ WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w )
 
 			if (reg_num == 1)
 			{
-				device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(device->machine->primary_screen->vpos(), VINT_HPOS), FUNC(smsvdp_check_vint),0 ,smsvdp);
+				device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(device->machine().primary_screen->vpos(), VINT_HPOS), FUNC(smsvdp_check_vint),0 ,smsvdp);
 			}
 			smsvdp->addrmode = 0;
 			break;
@@ -672,7 +672,7 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int *pri
 	}
 }
 
-static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvdp, int *line_buffer, int *priority_selected, int pixel_plot_y, int line )
+static void sms_refresh_mode4_sprites( running_machine &machine, smsvdp_t *smsvdp, int *line_buffer, int *priority_selected, int pixel_plot_y, int line )
 {
 	int sprite_index;
 	int pixel_x, pixel_plot_x;
@@ -706,7 +706,7 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
-				machine->scheduler().timer_set(machine->primary_screen->time_until_pos(pixel_plot_y + line, SPROVR_HPOS), FUNC(smsvdp_set_status), (int)STATUS_SPROVR, smsvdp);
+				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(pixel_plot_y + line, SPROVR_HPOS), FUNC(smsvdp_set_status), (int)STATUS_SPROVR, smsvdp);
 			}
 			sprite_buffer_count++;
 		}
@@ -861,7 +861,7 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 			}
 		}
 		if (sprite_col_occurred)
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), FUNC(smsvdp_set_status), (int)STATUS_SPRCOL, smsvdp);
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), FUNC(smsvdp_set_status), (int)STATUS_SPRCOL, smsvdp);
 	}
 
 	/* Fill column 0 with overscan color from reg[0x07] */
@@ -879,7 +879,7 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 }
 
 
-static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *smsvdp, int *line_buffer, int pixel_plot_y, int line )
+static void sms_refresh_tms9918_sprites( running_machine &machine, smsvdp_t *smsvdp, int *line_buffer, int pixel_plot_y, int line )
 {
 	int pixel_plot_x;
 	int sprite_col_occurred, sprite_col_x;
@@ -913,7 +913,7 @@ static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *sms
 			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
-				machine->scheduler().timer_set(machine->primary_screen->time_until_pos(pixel_plot_y + line, SPROVR_HPOS), FUNC(smsvdp_set_status), (int)STATUS_SPROVR, smsvdp);
+				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(pixel_plot_y + line, SPROVR_HPOS), FUNC(smsvdp_set_status), (int)STATUS_SPROVR, smsvdp);
 			}
 			sprite_buffer_count++;
 		}
@@ -1125,7 +1125,7 @@ static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *sms
 			}
 		}
 		if (sprite_col_occurred)
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), FUNC(smsvdp_set_status), (int)STATUS_SPRCOL, smsvdp);
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), FUNC(smsvdp_set_status), (int)STATUS_SPRCOL, smsvdp);
 	}
 }
 
@@ -1218,7 +1218,7 @@ static void sms_refresh_line_mode0( smsvdp_t *smsvdp, int *line_buffer, int line
 }
 
 
-static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap_t *bitmap, int pixel_offset_x, int pixel_plot_y, int line )
+static void sms_refresh_line( running_machine &machine, smsvdp_t *smsvdp, bitmap_t *bitmap, int pixel_offset_x, int pixel_plot_y, int line )
 {
 	int x;
 	int *blitline_buffer = smsvdp->line_buffer;
@@ -1320,10 +1320,10 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 
 			for (x = 0 + 48; x < 160 + 48; x++)
 			{
-				rgb_t	c1 = machine->pens[line1[x]];
-				rgb_t	c2 = machine->pens[line2[x]];
-				rgb_t	c3 = machine->pens[line3[x]];
-				rgb_t	c4 = machine->pens[line4[x]];
+				rgb_t	c1 = machine.pens[line1[x]];
+				rgb_t	c2 = machine.pens[line2[x]];
+				rgb_t	c3 = machine.pens[line3[x]];
+				rgb_t	c4 = machine.pens[line4[x]];
 				*BITMAP_ADDR32(bitmap, pixel_plot_y, pixel_offset_x + x) =
 					MAKE_RGB((RGB_RED(c1) / 6 + RGB_RED(c2) / 3 + RGB_RED(c3) / 3 + RGB_RED(c4) / 6 ),
 						(RGB_GREEN(c1) / 6 + RGB_GREEN(c2) / 3 + RGB_GREEN(c3) / 3 + RGB_GREEN(c4) / 6 ),
@@ -1336,7 +1336,7 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 
 	for (x = 0; x < 256; x++)
 	{
-		*BITMAP_ADDR32(bitmap, pixel_plot_y + line, pixel_offset_x + x) = machine->pens[blitline_buffer[x]];
+		*BITMAP_ADDR32(bitmap, pixel_plot_y + line, pixel_offset_x + x) = machine.pens[blitline_buffer[x]];
 	}
 }
 
@@ -1427,7 +1427,7 @@ static DEVICE_START( smsvdp )
 	smsvdp_t *smsvdp = get_safe_token(device);
 	const smsvdp_interface *intf = get_interface(device);
 
-	screen_device *screen = device->machine->first_screen();
+	screen_device *screen = device->machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -1436,17 +1436,17 @@ static DEVICE_START( smsvdp )
 	smsvdp->pause_callback = intf->pause_callback;
 
 	/* Allocate video RAM */
-	smsvdp->VRAM = device->machine->region_alloc("vdp_vram", VRAM_SIZE, 1, ENDIANNESS_LITTLE);
-	smsvdp->CRAM = device->machine->region_alloc("vdp_cram", MAX_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
-	smsvdp->line_buffer = auto_alloc_array(device->machine, int, 256 * 5);
+	smsvdp->VRAM = device->machine().region_alloc("vdp_vram", VRAM_SIZE, 1, ENDIANNESS_LITTLE);
+	smsvdp->CRAM = device->machine().region_alloc("vdp_cram", MAX_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
+	smsvdp->line_buffer = auto_alloc_array(device->machine(), int, 256 * 5);
 
-	smsvdp->collision_buffer = auto_alloc_array(device->machine, UINT8, SMS_X_PIXELS);
-	smsvdp->sms_frame_timing = auto_alloc_array(device->machine, UINT8, 7);
+	smsvdp->collision_buffer = auto_alloc_array(device->machine(), UINT8, SMS_X_PIXELS);
+	smsvdp->sms_frame_timing = auto_alloc_array(device->machine(), UINT8, 7);
 
 	/* Make temp bitmap for rendering */
-	smsvdp->tmpbitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
+	smsvdp->tmpbitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED32);
 
-	smsvdp->smsvdp_display_timer = device->machine->scheduler().timer_alloc(FUNC(smsvdp_display_callback), smsvdp);
+	smsvdp->smsvdp_display_timer = device->machine().scheduler().timer_alloc(FUNC(smsvdp_display_callback), smsvdp);
 	smsvdp->smsvdp_display_timer->adjust(screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, screen->scan_period());
 
 	device->save_item(NAME(smsvdp->status));

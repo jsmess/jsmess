@@ -120,15 +120,15 @@ WRITE8_HANDLER(spectrum_port_fe_w);
 
 MACHINE_CONFIG_EXTERN( spectrum_128 );
 
-void spectrum_128_update_memory(running_machine *machine);
+void spectrum_128_update_memory(running_machine &machine);
 
 /*----------- defined in drivers/specpls3.c -----------*/
 
-void spectrum_plus3_update_memory(running_machine *machine);
+void spectrum_plus3_update_memory(running_machine &machine);
 
 /*----------- defined in drivers/timex.c -----------*/
 
-void ts2068_update_memory(running_machine *machine);
+void ts2068_update_memory(running_machine &machine);
 
 /*----------- defined in video/spectrum.c -----------*/
 
@@ -140,20 +140,20 @@ VIDEO_START( spectrum_128 );
 SCREEN_UPDATE( spectrum );
 SCREEN_EOF( spectrum );
 
-void spectrum_border_force_redraw (running_machine *machine);
-void spectrum_border_set_last_color (running_machine *machine, int NewColor);
-void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap, int full_refresh,
+void spectrum_border_force_redraw (running_machine &machine);
+void spectrum_border_set_last_color (running_machine &machine, int NewColor);
+void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap, int full_refresh,
                 int TopBorderLines, int ScreenLines, int BottomBorderLines,
                 int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
                 int LeftBorderCycles, int ScreenCycles, int RightBorderCycles,
                 int HorizontalRetraceCycles, int VRetraceTime, int EventID);
 
-void spectrum_EventList_Initialise(running_machine *machine, int NumEntries);
-void spectrum_EventList_Reset(running_machine *machine);
-void spectrum_EventList_SetOffsetStartTime(running_machine *machine, int StartTime);
-void spectrum_EventList_AddItemOffset(running_machine *machine, int ID, int Data,int Time);
-int spectrum_EventList_NumEvents(running_machine *machine);
-EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine *machine);
+void spectrum_EventList_Initialise(running_machine &machine, int NumEntries);
+void spectrum_EventList_Reset(running_machine &machine);
+void spectrum_EventList_SetOffsetStartTime(running_machine &machine, int StartTime);
+void spectrum_EventList_AddItemOffset(running_machine &machine, int ID, int Data,int Time);
+int spectrum_EventList_NumEvents(running_machine &machine);
+EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine &machine);
 
 /*----------- defined in video/timex.c -----------*/
 

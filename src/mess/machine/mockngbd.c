@@ -130,7 +130,7 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 		default:
 			if (LOG_MOCKINGBOARD)
-				logerror("mockingboard_r unmapped, offset: %02x, pc: %s\n", offset, device->machine->describe_context());
+				logerror("mockingboard_r unmapped, offset: %02x, pc: %s\n", offset, device->machine().describe_context());
 			break;
 	}
 	return 0x00;
@@ -144,8 +144,8 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
-	device_t *ay8910_1 = device->machine->device("ay8910.1");
-	device_t *ay8910_2 = device->machine->device("ay8910.2");
+	device_t *ay8910_1 = device->machine().device("ay8910.1");
+	device_t *ay8910_2 = device->machine().device("ay8910.2");
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)

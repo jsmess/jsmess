@@ -226,9 +226,9 @@ INLINE genboard_state *get_safe_token(device_t *device)
 */
 INTERRUPT_GEN( geneve_hblank_interrupt )
 {
-	device_t *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine().device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
-	v9938_interrupt(device->machine, 0);
+	v9938_interrupt(device->machine(), 0);
 	board->line_count++;
 	if (board->line_count == 262)
 	{
@@ -251,7 +251,7 @@ void set_gm_switches(device_t *board, int number, int value)
 		// TIMode switch. Causes reset when changed.
 		logerror("Genmod: Setting timode flag to %d\n", value);
 		((genboard_state*)board)->timode = value;
-		board->machine->schedule_hard_reset();
+		board->machine().schedule_hard_reset();
 	}
 }
 /****************************************************************************
@@ -895,7 +895,7 @@ static void poll_keyboard(device_t *device)
 	/* Poll keyboard */
 	for (i = 0; (i < 4) && (board->keyQueueLen <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
 	{
-		keystate = input_port_read(device->machine, keynames[2*i]) | (input_port_read(device->machine, keynames[2*i + 1]) << 16);
+		keystate = input_port_read(device->machine(), keynames[2*i]) | (input_port_read(device->machine(), keynames[2*i + 1]) << 16);
 		key_transitions = keystate ^ board->keyStateSave[i];
 		if (key_transitions)
 		{
@@ -1098,9 +1098,9 @@ static void poll_mouse(device_t *device)
 	int new_mx, new_my;
 	int delta_x, delta_y, buttons;
 
-	buttons = input_port_read(device->machine, "MOUSE0");
-	new_mx = input_port_read(device->machine, "MOUSEX");
-	new_my = input_port_read(device->machine, "MOUSEY");
+	buttons = input_port_read(device->machine(), "MOUSE0");
+	new_mx = input_port_read(device->machine(), "MOUSEX");
+	new_my = input_port_read(device->machine(), "MOUSEY");
 
 	/* compute x delta */
 	delta_x = new_mx - board->last_mx;
@@ -1137,7 +1137,7 @@ static void poll_mouse(device_t *device)
 static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
-	cputag_set_input_line(device->machine, "maincpu", 0, intreq? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, intreq? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -1150,10 +1150,10 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 */
 static READ8_DEVICE_HANDLER( R9901_0 )
 {
-	device_t *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine().device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 	int answer;
-	answer = input_port_read(device->machine, "JOY") >> (board->joySel * 8);
+	answer = input_port_read(device->machine(), "JOY") >> (board->joySel * 8);
 	return answer;
 }
 
@@ -1172,7 +1172,7 @@ static READ8_DEVICE_HANDLER( R9901_0 )
 static READ8_DEVICE_HANDLER( R9901_1 )
 {
 	int answer;
-	answer = (input_port_read(device->machine, "MOUSE0") & 4) ^ 4;
+	answer = (input_port_read(device->machine(), "MOUSE0") & 4) ^ 4;
 	return answer;
 }
 
@@ -1192,7 +1192,7 @@ static READ8_DEVICE_HANDLER( R9901_3 )
 {
 	int answer = 0;
 
-	if (! (input_port_read(device->machine, "MOUSE0") & 4))
+	if (! (input_port_read(device->machine(), "MOUSE0") & 4))
 		answer |= 0x10;
 
 	return answer;
@@ -1217,14 +1217,14 @@ static WRITE8_DEVICE_HANDLER( W9901_VDP_reset )
 */
 static WRITE8_DEVICE_HANDLER( W9901_joySel )
 {
-	device_t *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine().device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 	board->joySel = data;
 }
 
 static WRITE8_DEVICE_HANDLER( W9901_keyboardReset )
 {
-	device_t *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine().device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 
 	board->keyReset = !data;
@@ -1243,7 +1243,7 @@ static WRITE8_DEVICE_HANDLER( W9901_keyboardReset )
 		board->keyAutoRepeatKey = 0;
 	}
 	/*else
-        poll_keyboard(space->machine);*/
+        poll_keyboard(space->machine());*/
 }
 
 /*
@@ -1303,8 +1303,8 @@ const tms9901_interface tms9901_wiring_geneve =
 */
 WRITE_LINE_DEVICE_HANDLER( board_inta )
 {
-	tms9901_set_single_int(device->machine->device("tms9901"), 1, state);
-	cputag_set_input_line(device->machine, "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
+	tms9901_set_single_int(device->machine().device("tms9901"), 1, state);
+	cputag_set_input_line(device->machine(), "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -1312,7 +1312,7 @@ WRITE_LINE_DEVICE_HANDLER( board_inta )
 */
 WRITE_LINE_DEVICE_HANDLER( board_intb )
 {
-	tms9901_set_single_int(device->machine->device("tms9901"), 12, state);
+	tms9901_set_single_int(device->machine().device("tms9901"), 12, state);
 
 }
 
@@ -1324,9 +1324,9 @@ WRITE_LINE_DEVICE_HANDLER( board_ready )
 /*
     set the state of int2 (called by the v9938 core)
 */
-void tms9901_gen_set_int2(running_machine *machine, int state)
+void tms9901_gen_set_int2(running_machine &machine, int state)
 {
-	tms9901_set_single_int(machine->device("tms9901"), 2, state);
+	tms9901_set_single_int(machine.device("tms9901"), 2, state);
 }
 
 /***************************************************************************
@@ -1358,7 +1358,7 @@ static DEVICE_START( genboard )
 
 	board->sram = (UINT8*)malloc(SRAM_SIZE);
 	board->dram = (UINT8*)malloc(DRAM_SIZE);
-	board->eprom = device->machine->region("maincpu")->base();
+	board->eprom = device->machine().region("maincpu")->base();
 	assert(board->video && board->tms9901);
 	assert(board->peribox && board->cpu);
 	assert(board->sound && board->clock);
@@ -1413,34 +1413,34 @@ static DEVICE_RESET( genboard )
 	for (int i=0; i < 8; i++) board->map[i] = 0;
 
 	board->genmod = FALSE;
-	if (input_port_read(device->machine, "MODE")==0)
+	if (input_port_read(device->machine(), "MODE")==0)
 	{
-		switch (input_port_read(device->machine, "BOOTROM"))
+		switch (input_port_read(device->machine(), "BOOTROM"))
 		{
 		case GENEVE_098:
 			logerror("Geneve 9640: Using 0.98 boot eprom\n");
-			board->eprom = device->machine->region("maincpu")->base() + 0x4000;
+			board->eprom = device->machine().region("maincpu")->base() + 0x4000;
 			break;
 		case GENEVE_100:
 			logerror("Geneve 9640: Using 1.00 boot eprom\n");
-			board->eprom = device->machine->region("maincpu")->base();
+			board->eprom = device->machine().region("maincpu")->base();
 			break;
 		}
 	}
 	else
 	{
 		logerror("Geneve 9640: Using GenMod modification\n");
-		board->eprom = device->machine->region("maincpu")->base() + 0x8000;
+		board->eprom = device->machine().region("maincpu")->base() + 0x8000;
 		if (board->eprom[0] != 0xf0)
 		{
 			fatalerror("GenMod boot rom missing.\n");
 		}
 		board->genmod = TRUE;
-		board->turbo = input_port_read(device->machine, "GENMODDIPS") & GM_TURBO;
-		board->timode = input_port_read(device->machine, "GENMODDIPS") & GM_TIM;
+		board->turbo = input_port_read(device->machine(), "GENMODDIPS") & GM_TURBO;
+		board->timode = input_port_read(device->machine(), "GENMODDIPS") & GM_TIM;
 	}
 
-	switch (input_port_read(device->machine, "SRAM"))
+	switch (input_port_read(device->machine(), "SRAM"))
 	{
 /*  1 100. .... .... .... .... on-board sram (128K) -+
     1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion

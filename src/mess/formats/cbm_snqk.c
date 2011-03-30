@@ -23,14 +23,14 @@
 
 
 static int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
-								offs_t offset, void (*cbm_sethiaddress)(running_machine *machine, UINT16 hiaddress) )
+								offs_t offset, void (*cbm_sethiaddress)(running_machine &machine, UINT16 hiaddress) )
 {
 	char buffer[7];
 	UINT8 *data = NULL;
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;
-	address_space *space = image.device().machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = image.device().machine().firstcpu->memory().space(AS_PROGRAM);
 
 	if (!file_type)
 		goto error;
@@ -81,7 +81,7 @@ static int general_cbm_loadsnap( device_image_interface &image, const char *file
 	for (i = 0; i < snapshot_size; i++)
 		space->write_byte(address + i + offset, data[i]);
 
-	cbm_sethiaddress(image.device().machine, address + snapshot_size);
+	cbm_sethiaddress(image.device().machine(), address + snapshot_size);
 	free(data);
 	return IMAGE_INIT_PASS;
 
@@ -91,9 +91,9 @@ error:
 	return IMAGE_INIT_FAIL;
 }
 
-static void cbm_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
+static void cbm_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 
 	space->write_byte(0x31, hiaddress & 0xff);
 	space->write_byte(0x2f, hiaddress & 0xff);
@@ -118,9 +118,9 @@ QUICKLOAD_LOAD( cbm_vc20 )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
 }
 
-static void cbm_pet_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
+static void cbm_pet_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 
 	space->write_byte(0x2e, hiaddress & 0xff);
 	space->write_byte(0x2c, hiaddress & 0xff);
@@ -135,9 +135,9 @@ QUICKLOAD_LOAD( cbm_pet )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_pet_quick_sethiaddress);
 }
 
-static void cbm_pet1_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
+static void cbm_pet1_quick_sethiaddress(running_machine &machine, UINT16 hiaddress)
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 
 	space->write_byte(0x80, hiaddress & 0xff);
 	space->write_byte(0x7e, hiaddress & 0xff);
@@ -152,9 +152,9 @@ QUICKLOAD_LOAD( cbm_pet1 )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_pet1_quick_sethiaddress);
 }
 
-static void cbmb_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
+static void cbmb_quick_sethiaddress(running_machine &machine, UINT16 hiaddress)
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 
 	space->write_byte(0xf0046, hiaddress & 0xff);
 	space->write_byte(0xf0047, hiaddress >> 8);
@@ -170,9 +170,9 @@ QUICKLOAD_LOAD( p500 )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbmb_quick_sethiaddress);
 }
 
-static void cbm_c65_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
+static void cbm_c65_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 
 	space->write_byte(0x82, hiaddress & 0xff);
 	space->write_byte(0x83, hiaddress >> 8);

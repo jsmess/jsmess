@@ -199,11 +199,11 @@ enum
 
 static DRIVER_INIT(tutor)
 {
-	tutor_state *state = machine->driver_data<tutor_state>();
-	state->tape_interrupt_timer = machine->scheduler().timer_alloc(FUNC(tape_interrupt_handler));
+	tutor_state *state = machine.driver_data<tutor_state>();
+	state->tape_interrupt_timer = machine.scheduler().timer_alloc(FUNC(tape_interrupt_handler));
 
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region("maincpu")->base() + basic_base, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("maincpu")->base() + cartridge_base, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region("maincpu")->base() + basic_base, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("maincpu")->base() + cartridge_base, 0);
 	memory_set_bank(machine, "bank1", 0);
 }
 
@@ -230,7 +230,7 @@ static MACHINE_START(tutor)
 
 static MACHINE_RESET(tutor)
 {
-	tutor_state *state = machine->driver_data<tutor_state>();
+	tutor_state *state = machine.driver_data<tutor_state>();
 	state->cartridge_enable = 0;
 
 	state->tape_interrupt_enable = 0;
@@ -242,7 +242,7 @@ static MACHINE_RESET(tutor)
 static INTERRUPT_GEN( tutor_vblank_interrupt )
 {
 	/* No vblank interrupt? */
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
 /*
@@ -265,13 +265,13 @@ static READ8_HANDLER(read_keyboard)
 	UINT8 value;
 
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
-	value = input_port_read(space->machine, port);
+	value = input_port_read(space->machine(), port);
 
 	/* hack for ports overlapping with joystick */
 	if (offset == 4 || offset == 5)
 	{
 		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
-		value |= input_port_read(space->machine, port);
+		value |= input_port_read(space->machine(), port);
 	}
 
 	return value;
@@ -280,7 +280,7 @@ static READ8_HANDLER(read_keyboard)
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = image.device().machine->region("maincpu")->base();
+	UINT8 *ptr = image.device().machine().region("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -299,7 +299,7 @@ static DEVICE_IMAGE_LOAD( tutor_cart )
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(image.device().machine->region("maincpu")->base() + cartridge_base, 0, 0x6000);
+	memset(image.device().machine().region("maincpu")->base() + cartridge_base, 0, 0x6000);
 }
 
 /*
@@ -338,7 +338,7 @@ static  READ8_HANDLER(tutor_mapper_r)
 
 static WRITE8_HANDLER(tutor_mapper_w)
 {
-	tutor_state *state = space->machine->driver_data<tutor_state>();
+	tutor_state *state = space->machine().driver_data<tutor_state>();
 	switch (offset)
 	{
 	case 0x00:
@@ -348,13 +348,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
 		state->cartridge_enable = 0;
-		memory_set_bank(space->machine, "bank1", 0);
+		memory_set_bank(space->machine(), "bank1", 0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
 		state->cartridge_enable = 1;
-		memory_set_bank(space->machine, "bank1", 1);
+		memory_set_bank(space->machine(), "bank1", 1);
 		break;
 
 	default:
@@ -385,21 +385,21 @@ static WRITE8_HANDLER(tutor_mapper_w)
 
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
-	//tutor_state *state = machine->driver_data<tutor_state>();
+	//tutor_state *state = machine.driver_data<tutor_state>();
 	//assert(state->tape_interrupt_enable);
-	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(machine->device("cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(machine.device("cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
 static  READ8_HANDLER(tutor_cassette_r)
 {
-	return (cassette_input(space->machine->device("cassette")) > 0.0) ? 1 : 0;
+	return (cassette_input(space->machine().device("cassette")) > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
 static WRITE8_HANDLER(tutor_cassette_w)
 {
-	tutor_state *state = space->machine->driver_data<tutor_state>();
+	tutor_state *state = space->machine().driver_data<tutor_state>();
 	if (offset & /*0x1f*/0x1e)
 		logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 
@@ -411,7 +411,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			cassette_output(space->machine->device("cassette"), (data) ? +1.0 : -1.0);
+			cassette_output(space->machine().device("cassette"), (data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */
@@ -424,7 +424,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 				else
 				{
 					state->tape_interrupt_timer->adjust(attotime::never);
-					cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
+					cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 				}
 			}
 			break;

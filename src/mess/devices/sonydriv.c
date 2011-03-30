@@ -105,7 +105,7 @@ static void load_track_data(device_t *device,int floppy_select)
 	floppy *f;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, floppy_select));
+	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select));
 
 	track_size = floppy_get_track_size(flopimg_get_image(&cur_image->device()), f->head, floppy_drive_get_current_track(&cur_image->device()));
 	new_data = (UINT8*)cur_image->image_realloc(f->loadedtrack_data, track_size);
@@ -129,7 +129,7 @@ static void save_track_data(device_t *device, int floppy_select)
 	int len;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, floppy_select));
+	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select));
 
 	if (f->loadedtrack_dirty)
 	{
@@ -151,7 +151,7 @@ UINT8 sony_read_data(device_t *device)
 		return 0xFF;			/* right ??? */
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, sony_floppy_select));
+	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony_floppy_select));
 	if (!cur_image->exists())
 		return 0xFF;
 
@@ -170,7 +170,7 @@ void sony_write_data(device_t *device,UINT8 data)
 	floppy *f;
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, sony_floppy_select));
+	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony_floppy_select));
 	if (!cur_image->exists())
 		return;
 
@@ -247,13 +247,13 @@ int sony_read_status(device_t *device)
 	if (LOG_SONY_EXTRA)
 	{
 		printf("sony_status(): action=%x pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(device->machine->firstcpu), sony_floppy_enable ? "" : " (no drive enabled)");
+			action, (int) cpu_get_pc(device->machine().firstcpu), sony_floppy_enable ? "" : " (no drive enabled)");
 	}
 
 	if ((! sony_enable2()) && sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, sony_floppy_select));
+		cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony_floppy_select));
 		if (!cur_image->exists())
 			cur_image = NULL;
 
@@ -302,7 +302,7 @@ int sony_read_status(device_t *device)
 				result = floppy_get_heads_per_disk(flopimg_get_image(&cur_image->device())) - 1;
 			break;
 		case 0x0a:	/* At track 0: 0=track zero 1=not track zero */
-			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine->firstcpu));
+			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine().firstcpu));
 			if (cur_image)
 				result = floppy_tk00_r(&cur_image->device());
 			else
@@ -332,7 +332,7 @@ int sony_read_status(device_t *device)
 			/* (time in seconds) / (60 sec/minute) * (rounds/minute) * (60 pulses) * (2 pulse phases) */
 			if (cur_image)
 			{
-				result = ((int) (device->machine->time().as_double() / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
+				result = ((int) (device->machine().time().as_double() / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
 			}
 			break;
 		case 0x0f:	/* 400k/800k: Drive installed: 0=drive connected, 1=drive not connected */
@@ -367,13 +367,13 @@ static void sony_doaction(device_t *device)
 	if (LOG_SONY)
 	{
 		logerror("sony_doaction(): action=%d pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(device->machine->firstcpu), (sony_floppy_enable) ? "" : " (MOTOR OFF)");
+			action, (int) cpu_get_pc(device->machine().firstcpu), (sony_floppy_enable) ? "" : " (MOTOR OFF)");
 	}
 
 	if (sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, sony_floppy_select));
+		cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony_floppy_select));
 		if (!cur_image->exists())
 			cur_image = NULL;
 
@@ -498,7 +498,7 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 	device_t *fdc;
 
 	/* locate the FDC */
-	fdc = image.device().machine->device("fdc");
+	fdc = image.device().machine().device("fdc");
 
 	id = floppy_get_drive_by_type(&image.device(),FLOPPY_TYPE_SONY);
 	save_track_data(fdc, id);

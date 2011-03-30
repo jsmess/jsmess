@@ -285,7 +285,7 @@ static DEVICE_START( tms5501 )
 
 	for (i = 0; i < 5; i++)
 	{
-		tms->timer[i] = device->machine->scheduler().timer_alloc(FUNC(tms5501_timer_decrementer_callback), (void *) device);
+		tms->timer[i] = device->machine().scheduler().timer_alloc(FUNC(tms5501_timer_decrementer_callback), (void *) device);
 		tms->timer[i]->set_param(i);
 	}
 

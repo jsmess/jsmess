@@ -1482,7 +1482,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 		// This line requires that cartslot_t be included in cartslot.h,
 		// otherwise one cannot make use of multicart handling within such a
 		// custom LOAD function.
-		multicart_open_error me = multicart_open(image.device().machine->options(), image.filename(), image.device().machine->system().name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+		multicart_open_error me = multicart_open(image.device().machine().options(), image.filename(), image.device().machine().system().name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 
 		// Now that we have loaded the image files, let the PCB put them all
 		// together. This means we put the images in a structure which allows
@@ -1530,7 +1530,7 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 
 			// Close the multicart; all RAM resources will be
 			// written to disk
-			multicart_close(image.device().machine->options(),cart->mc);
+			multicart_close(image.device().machine().options(),cart->mc);
 			cart->mc = NULL;
 
 		}
@@ -1598,7 +1598,7 @@ static DEVICE_RESET(ti99_multicart)
 	// the reset line is an input used when plugging in a cartridge.
 
 	ti99_multicart_state *cartslots = get_safe_token(device);
-	int slotnumber = input_port_read(device->machine, "CARTSLOT");
+	int slotnumber = input_port_read(device->machine(), "CARTSLOT");
 	cartslots->fixed_slot = slotnumber-1; /* auto = -1 */
 }
 
@@ -1614,7 +1614,7 @@ READ8Z_DEVICE_HANDLER( gromportr_rz )
 	// Handle GRAM Kracker
 	// We could also consider to use a flag, but input_port_read uses
 	// a hashtable, so this should not be too slow
-	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
+	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 	{
 		ti99_cart_gk_rz(device, offset, value);
 		return;
@@ -1648,7 +1648,7 @@ WRITE8_DEVICE_HANDLER( gromportr_w )
 	cartridge_t *cart;
 
 	// Handle GRAM Kracker
-	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
+	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 		ti99_cart_gk_w(device, offset, data);
 
 	/* Sanity check. Higher slots are always empty. */
@@ -1704,7 +1704,7 @@ WRITE8_DEVICE_HANDLER(gromportg_w)
 		slot=0;
 
 	// Handle the GRAM Kracker
-	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
+	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 	{
 		cartridge_gram_kracker_writeg(device, offset, data);
 		return;
@@ -1749,7 +1749,7 @@ READ8Z_DEVICE_HANDLER(gromportg_rz)
 	// BTW, the GK does not have a readable address counter, but the console
 	// GROMs will keep our addess counter up to date. That is
 	// exactly what happens in the real machine.
-	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
+	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 	{
 		if ((offset & 0x0002)==0) cartridge_gram_kracker_readg(device, value);
 		return;
@@ -1804,7 +1804,7 @@ READ8Z_DEVICE_HANDLER( gromportc_rz )
 	int slot = cartslots->active_slot;
 
 	// Handle GRAM Kracker
-	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
+	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 	{
 		ti99_cart_cru_gk_rz(device, offset, value);
 		return;
@@ -1839,7 +1839,7 @@ WRITE8_DEVICE_HANDLER( gromportc_w )
 	int slot = cartslots->active_slot;
 
 	// Handle GRAM Kracker
-	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
+	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 	{
 		ti99_cart_cru_gk_w(device, offset, data);
 		return;

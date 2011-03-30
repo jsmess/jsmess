@@ -22,7 +22,7 @@ public:
 
 static READ16_HANDLER(terak_fdc_status_r)
 {
-	terak_state *state = space->machine->driver_data<terak_state>();
+	terak_state *state = space->machine().driver_data<terak_state>();
 	logerror("terak_fdc_status_r\n");
 	if (state->cmd==3) {
 		logerror("cmd is 3\n");
@@ -33,7 +33,7 @@ static READ16_HANDLER(terak_fdc_status_r)
 
 static WRITE16_HANDLER(terak_fdc_command_w)
 {
-	terak_state *state = space->machine->driver_data<terak_state>();
+	terak_state *state = space->machine().driver_data<terak_state>();
 	state->unit = (data >> 8) & 0x03;
 	state->cmd  = (data >> 1) & 0x07;
 	logerror("terak_fdc_command_w %04x [%d %d]\n",data,state->unit,state->cmd);	

@@ -21,7 +21,7 @@ INLINE void pcw_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 VIDEO_START( pcw )
 {
-	pcw_state *state = machine->driver_data<pcw_state>();
+	pcw_state *state = machine.driver_data<pcw_state>();
 	rectangle rect;
 	rect.min_x = rect.min_y = 0;
 	rect.max_x = PCW_PRINTER_WIDTH - 1;
@@ -58,7 +58,7 @@ PALETTE_INIT( pcw )
 ***************************************************************************/
 SCREEN_UPDATE( pcw )
 {
-	pcw_state *state = screen->machine->driver_data<pcw_state>();
+	pcw_state *state = screen->machine().driver_data<pcw_state>();
 	int x,y,b;
 	unsigned short roller_ram_offs;
 	unsigned char *roller_ram_ptr;
@@ -105,14 +105,14 @@ SCREEN_UPDATE( pcw )
 
 			x = PCW_BORDER_WIDTH;
 
-			roller_ram_ptr = ram_get_ptr(screen->machine->device(RAM_TAG)) + state->roller_ram_addr + roller_ram_offs;
+			roller_ram_ptr = ram_get_ptr(screen->machine().device(RAM_TAG)) + state->roller_ram_addr + roller_ram_offs;
 
 			/* get line address */
 			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */
 			line_data = ((unsigned char *)roller_ram_ptr)[0] | (((unsigned char *)roller_ram_ptr)[1]<<8);
 
 			/* calculate address of pixel data */
-			line_ptr = ram_get_ptr(screen->machine->device(RAM_TAG)) + ((line_data & 0x0e000)<<1) + ((line_data & 0x01ff8)<<1) + (line_data & 0x07);
+			line_ptr = ram_get_ptr(screen->machine().device(RAM_TAG)) + ((line_data & 0x0e000)<<1) + ((line_data & 0x01ff8)<<1) + (line_data & 0x07);
 
 			for (by=0; by<90; by++)
 			{
@@ -187,7 +187,7 @@ SCREEN_UPDATE( pcw )
 
 SCREEN_UPDATE( pcw_printer )
 {
-	pcw_state *state = screen->machine->driver_data<pcw_state>();
+	pcw_state *state = screen->machine().driver_data<pcw_state>();
 	
 	// printer output
 	rectangle rect;

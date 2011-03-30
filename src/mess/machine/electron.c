@@ -13,9 +13,9 @@
 #include "imagedev/cassette.h"
 
 
-static device_t *cassette_device_image( running_machine *machine )
+static device_t *cassette_device_image( running_machine &machine )
 {
-	return machine->device("cassette");
+	return machine.device("cassette");
 }
 
 static void electron_tape_start( electron_state *state )
@@ -43,7 +43,7 @@ static void electron_tape_stop( electron_state *state )
 
 static TIMER_CALLBACK(electron_tape_timer_handler)
 {
-	electron_state *state = machine->driver_data<electron_state>();
+	electron_state *state = machine.driver_data<electron_state>();
 	if ( state->ula.cassette_motor_mode )
 	{
 		double tap_val;
@@ -127,7 +127,7 @@ static READ8_HANDLER( electron_read_keyboard )
 	for( i = 0; i < 14; i++ )
 	{
 		if( !(offset & 1) )
-			data |= input_port_read(space->machine, keynames[i]) & 0x0f;
+			data |= input_port_read(space->machine(), keynames[i]) & 0x0f;
 
 		offset = offset >> 1;
 	}
@@ -155,8 +155,8 @@ WRITE8_HANDLER( electron_1mhz_w )
 
 READ8_HANDLER( electron_ula_r )
 {
-	electron_state *state = space->machine->driver_data<electron_state>();
-	UINT8 data = ((UINT8 *)space->machine->region("user1")->base())[0x43E00 + offset];
+	electron_state *state = space->machine().driver_data<electron_state>();
+	UINT8 data = ((UINT8 *)space->machine().region("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt status */
@@ -166,7 +166,7 @@ READ8_HANDLER( electron_ula_r )
 	case 0x01:	/* Unknown */
 		break;
 	case 0x04:	/* Casette data shift register */
-		electron_interrupt_handler( space->machine, INT_CLEAR, INT_RECEIVE_FULL );
+		electron_interrupt_handler(space->machine(), INT_CLEAR, INT_RECEIVE_FULL );
 		data = state->ula.tape_byte;
 		break;
 	}
@@ -179,8 +179,8 @@ static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 
 
 WRITE8_HANDLER( electron_ula_w )
 {
-	electron_state *state = space->machine->driver_data<electron_state>();
-	device_t *speaker = space->machine->device("beep");
+	electron_state *state = space->machine().driver_data<electron_state>();
+	device_t *speaker = space->machine().device("beep");
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
@@ -219,19 +219,19 @@ WRITE8_HANDLER( electron_ula_w )
 			{
 				space->install_read_bank( 0x8000, 0xbfff, "bank2");
 			}
-			memory_set_bank(space->machine, "bank2", state->ula.rompage);
+			memory_set_bank(space->machine(), "bank2", state->ula.rompage);
 		}
 		if ( data & 0x10 )
 		{
-			electron_interrupt_handler( space->machine, INT_CLEAR, INT_DISPLAY_END );
+			electron_interrupt_handler( space->machine(), INT_CLEAR, INT_DISPLAY_END );
 		}
 		if ( data & 0x20 )
 		{
-			electron_interrupt_handler( space->machine, INT_CLEAR, INT_RTC );
+			electron_interrupt_handler( space->machine(), INT_CLEAR, INT_RTC );
 		}
 		if ( data & 0x40 )
 		{
-			electron_interrupt_handler( space->machine, INT_CLEAR, INT_HIGH_TONE );
+			electron_interrupt_handler( space->machine(), INT_CLEAR, INT_HIGH_TONE );
 		}
 		if ( data & 0x80 )
 		{
@@ -270,7 +270,7 @@ WRITE8_HANDLER( electron_ula_w )
 		state->ula.vram = (UINT8 *)space->get_read_ptr(state->ula.screen_base );
 		logerror( "ULA: screen mode set to %d\n", state->ula.screen_mode );
 		state->ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
-		cassette_change_state( cassette_device_image( space->machine ), state->ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( cassette_device_image( space->machine() ), state->ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		state->ula.capslock_mode = ( data >> 7 ) & 0x01;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:
@@ -290,9 +290,9 @@ WRITE8_HANDLER( electron_ula_w )
 	}
 }
 
-void electron_interrupt_handler(running_machine *machine, int mode, int interrupt)
+void electron_interrupt_handler(running_machine &machine, int mode, int interrupt)
 {
-	electron_state *state = machine->driver_data<electron_state>();
+	electron_state *state = machine.driver_data<electron_state>();
 	if ( mode == INT_SET )
 	{
 		state->ula.interrupt_status |= interrupt;
@@ -319,7 +319,7 @@ void electron_interrupt_handler(running_machine *machine, int mode, int interrup
 
 static TIMER_CALLBACK(setup_beep)
 {
-	device_t *speaker = machine->device("beep");
+	device_t *speaker = machine.device("beep");
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 );
 }
@@ -327,7 +327,7 @@ static TIMER_CALLBACK(setup_beep)
 static void electron_reset(running_machine &machine)
 {
 	electron_state *state = machine.driver_data<electron_state>();
-	memory_set_bank(&machine, "bank2", 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	state->ula.communication_mode = 0x04;
 	state->ula.screen_mode = 0;
@@ -344,13 +344,13 @@ static void electron_reset(running_machine &machine)
 
 MACHINE_START( electron )
 {
-	electron_state *state = machine->driver_data<electron_state>();
-	memory_configure_bank(machine, "bank2", 0, 16, machine->region("user1")->base(), 0x4000);
+	electron_state *state = machine.driver_data<electron_state>();
+	memory_configure_bank(machine, "bank2", 0, 16, machine.region("user1")->base(), 0x4000);
 
 	state->ula.interrupt_status = 0x82;
 	state->ula.interrupt_control = 0x00;
-	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
-	state->tape_timer = machine->scheduler().timer_alloc(FUNC(electron_tape_timer_handler));
-	machine->add_notifier(MACHINE_NOTIFY_RESET, electron_reset);
+	machine.scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	state->tape_timer = machine.scheduler().timer_alloc(FUNC(electron_tape_timer_handler));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, electron_reset);
 }
 

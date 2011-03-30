@@ -124,7 +124,7 @@ UINT16 gaelco_decrypt(address_space *space, int offset, int data, int param1, in
 {
 	static int lastpc, lastoffset, lastencword, lastdecword;
 
-	int thispc = cpu_get_pc(space->cpu);
+	int thispc = cpu_get_pc(&space->device());
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */
@@ -146,7 +146,7 @@ UINT16 gaelco_decrypt(address_space *space, int offset, int data, int param1, in
 
 		lastdecword = data;
 
-//      logerror("%s : data1 = %4x > %4x @ %8x\n",space->machine->describe_context(),savedata,data,lastoffset);
+//      logerror("%s : data1 = %4x > %4x @ %8x\n",space->machine().describe_context(),savedata,data,lastoffset);
 	}
 	return data;
 }

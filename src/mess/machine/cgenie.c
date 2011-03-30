@@ -34,8 +34,8 @@
 
 static TIMER_CALLBACK( handle_cassette_input )
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
-	UINT8 new_level = ( cassette_input( machine->device("cassette") ) > 0.0 ) ? 1 : 0;
+	cgenie_state *state = machine.driver_data<cgenie_state>();
+	UINT8 new_level = ( cassette_input( machine.device("cassette") ) > 0.0 ) ? 1 : 0;
 
 	if ( new_level != state->cass_level )
 	{
@@ -47,10 +47,10 @@ static TIMER_CALLBACK( handle_cassette_input )
 
 MACHINE_RESET( cgenie )
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *ay8910 = machine->device("ay8910");
-	UINT8 *ROM = machine->region("maincpu")->base();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *ay8910 = machine.device("ay8910");
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
 	AYWriteReg(0, 0, 0);
@@ -101,7 +101,7 @@ MACHINE_RESET( cgenie )
 	{
 		space->nop_readwrite(0xc000, 0xdfff);
 		logerror("cgenie DOS disabled\n");
-		memset(&machine->region("maincpu")->base()[0x0c000], 0x00, 0x2000);
+		memset(&machine.region("maincpu")->base()[0x0c000], 0x00, 0x2000);
 	}
 
 	/* copy EXT ROM, if enabled or wipe out that memory area */
@@ -109,14 +109,14 @@ MACHINE_RESET( cgenie )
 	{
 		space->install_rom(0xe000, 0xefff, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
-		memcpy(&machine->region("maincpu")->base()[0x0e000],
-			   &machine->region("maincpu")->base()[0x12000], 0x1000);
+		memcpy(&machine.region("maincpu")->base()[0x0e000],
+			   &machine.region("maincpu")->base()[0x12000], 0x1000);
 	}
 	else
 	{
 		space->nop_readwrite(0xe000, 0xefff);
 		logerror("cgenie EXT disabled\n");
-		memset(&machine->region("maincpu")->base()[0x0e000], 0x00, 0x1000);
+		memset(&machine.region("maincpu")->base()[0x0e000], 0x00, 0x1000);
 	}
 
 	state->cass_level = 0;
@@ -125,9 +125,9 @@ MACHINE_RESET( cgenie )
 
 MACHINE_START( cgenie )
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *gfx = machine->region("gfx2")->base();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *gfx = machine.region("gfx2")->base();
 	int i;
 
 	/* initialize static variables */
@@ -149,11 +149,11 @@ MACHINE_START( cgenie )
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	space->install_read_bank(0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, "bank1");
-	space->install_legacy_write_handler(0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, FUNC(cgenie_videoram_w));
-	state->videoram = ram_get_ptr(machine->device(RAM_TAG));
-	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-	machine->scheduler().timer_pulse(attotime::from_hz(11025), FUNC(handle_cassette_input));
+	space->install_read_bank(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
+	space->install_legacy_write_handler(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 1, FUNC(cgenie_videoram_w));
+	state->videoram = ram_get_ptr(machine.device(RAM_TAG));
+	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+	machine.scheduler().timer_pulse(attotime::from_hz(11025), FUNC(handle_cassette_input));
 }
 
 /*************************************
@@ -175,10 +175,10 @@ MACHINE_START( cgenie )
 
 WRITE8_HANDLER( cgenie_port_ff_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	int port_ff_changed = state->port_ff ^ data;
 
-	cassette_output ( space->machine->device("cassette"), data & 0x01 ? -1.0 : 1.0 );
+	cassette_output ( space->machine().device("cassette"), data & 0x01 ? -1.0 : 1.0 );
 
 	/* background bits changed ? */
 	if( port_ff_changed & FF_BGD )
@@ -226,7 +226,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 				b = 15;
 			}
 		}
-		palette_set_color_rgb(space->machine, 0, r, g, b);
+		palette_set_color_rgb(space->machine(), 0, r, g, b);
 	}
 
 	/* character mode changed ? */
@@ -239,7 +239,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	/* graphics mode changed ? */
 	if( port_ff_changed & FF_FGR )
 	{
-		cgenie_mode_select(space->machine, data & FF_FGR);
+		cgenie_mode_select(space->machine(), data & FF_FGR);
 	}
 
 	state->port_ff = data;
@@ -248,7 +248,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 
 READ8_HANDLER( cgenie_port_ff_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	UINT8	data = state->port_ff & ~0x01;
 
 	data |= state->cass_bit;
@@ -270,28 +270,28 @@ int cgenie_port_xx_r( int offset )
 
 READ8_HANDLER( cgenie_psg_port_a_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	return state->psg_a_inp;
 }
 
 READ8_HANDLER( cgenie_psg_port_b_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	if( state->psg_a_out < 0xd0 )
 	{
 		/* comparator value */
 		state->psg_b_inp = 0x00;
 
-		if( input_port_read(space->machine, "JOY0") > state->psg_a_out )
+		if( input_port_read(space->machine(), "JOY0") > state->psg_a_out )
 			state->psg_b_inp |= 0x80;
 
-		if( input_port_read(space->machine, "JOY1") > state->psg_a_out )
+		if( input_port_read(space->machine(), "JOY1") > state->psg_a_out )
 			state->psg_b_inp |= 0x40;
 
-		if( input_port_read(space->machine, "JOY2") > state->psg_a_out )
+		if( input_port_read(space->machine(), "JOY2") > state->psg_a_out )
 			state->psg_b_inp |= 0x20;
 
-		if( input_port_read(space->machine, "JOY3") > state->psg_a_out )
+		if( input_port_read(space->machine(), "JOY3") > state->psg_a_out )
 			state->psg_b_inp |= 0x10;
 	}
 	else
@@ -300,113 +300,113 @@ READ8_HANDLER( cgenie_psg_port_b_r )
 		state->psg_b_inp = 0xFF;
 
 		if( !(state->psg_a_out & 0x01) )
-			state->psg_b_inp &= ~input_port_read(space->machine, "KP0");
+			state->psg_b_inp &= ~input_port_read(space->machine(), "KP0");
 
 		if( !(state->psg_a_out & 0x02) )
-			state->psg_b_inp &= ~input_port_read(space->machine, "KP1");
+			state->psg_b_inp &= ~input_port_read(space->machine(), "KP1");
 
 		if( !(state->psg_a_out & 0x04) )
-			state->psg_b_inp &= ~input_port_read(space->machine, "KP2");
+			state->psg_b_inp &= ~input_port_read(space->machine(), "KP2");
 
 		if( !(state->psg_a_out & 0x08) )
-			state->psg_b_inp &= ~input_port_read(space->machine, "KP3");
+			state->psg_b_inp &= ~input_port_read(space->machine(), "KP3");
 
 		if( !(state->psg_a_out & 0x10) )
-			state->psg_b_inp &= ~input_port_read(space->machine, "KP4");
+			state->psg_b_inp &= ~input_port_read(space->machine(), "KP4");
 
 		if( !(state->psg_a_out & 0x20) )
-			state->psg_b_inp &= ~input_port_read(space->machine, "KP5");
+			state->psg_b_inp &= ~input_port_read(space->machine(), "KP5");
 	}
 	return state->psg_b_inp;
 }
 
 WRITE8_HANDLER( cgenie_psg_port_a_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	state->psg_a_out = data;
 }
 
 WRITE8_HANDLER( cgenie_psg_port_b_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	state->psg_b_out = data;
 }
 
  READ8_HANDLER( cgenie_status_r )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0 */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return 0;
 	return wd17xx_status_r(fdc, offset);
 }
 
  READ8_HANDLER( cgenie_track_r )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return 0xff;
 	return wd17xx_track_r(fdc, offset);
 }
 
  READ8_HANDLER( cgenie_sector_r )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return 0xff;
 	return wd17xx_sector_r(fdc, offset);
 }
 
  READ8_HANDLER(cgenie_data_r )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return 0xff;
 	return wd17xx_data_r(fdc, offset);
 }
 
 WRITE8_HANDLER( cgenie_command_w )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, return immediately */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return;
 	wd17xx_command_w(fdc, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_track_w )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return;
 	wd17xx_track_w(fdc, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_sector_w )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return;
 	wd17xx_sector_w(fdc, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_data_w )
 {
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
-	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine(), "DSW0") & 0x80) == 0 )
 		return;
 	wd17xx_data_w(fdc, offset, data);
 }
 
  READ8_HANDLER( cgenie_irq_status_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 int result = state->irq_status;
 
 	state->irq_status &= ~(IRQ_TIMER | IRQ_FDC);
@@ -415,19 +415,19 @@ int result = state->irq_status;
 
 INTERRUPT_GEN( cgenie_timer_interrupt )
 {
-	cgenie_state *state = device->machine->driver_data<cgenie_state>();
+	cgenie_state *state = device->machine().driver_data<cgenie_state>();
 	if( (state->irq_status & IRQ_TIMER) == 0 )
 	{
 		state->irq_status |= IRQ_TIMER;
-		cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
 {
-	cgenie_state *drvstate = device->machine->driver_data<cgenie_state>();
+	cgenie_state *drvstate = device->machine().driver_data<cgenie_state>();
 	/* if disc hardware is not enabled, do not cause an int */
-	if (!( input_port_read(device->machine, "DSW0") & 0x80 ))
+	if (!( input_port_read(device->machine(), "DSW0") & 0x80 ))
 		return;
 
 	if (state)
@@ -435,7 +435,7 @@ static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
 		if( (drvstate->irq_status & IRQ_FDC) == 0 )
 		{
 			drvstate->irq_status |= IRQ_FDC;
-			cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+			cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 		}
 	}
 	else
@@ -454,8 +454,8 @@ const wd17xx_interface cgenie_wd17xx_interface =
 
 WRITE8_HANDLER( cgenie_motor_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
-	device_t *fdc = space->machine->device("wd179x");
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
+	device_t *fdc = space->machine().device("wd179x");
 	UINT8 drive = 255;
 
 	logerror("cgenie motor_w $%02X\n", data);
@@ -490,28 +490,28 @@ WRITE8_HANDLER( cgenie_motor_w )
 	int result = 0;
 
 	if( offset & 0x01 )
-		result |= input_port_read(space->machine, "ROW0");
+		result |= input_port_read(space->machine(), "ROW0");
 
 	if( offset & 0x02 )
-		result |= input_port_read(space->machine, "ROW1");
+		result |= input_port_read(space->machine(), "ROW1");
 
 	if( offset & 0x04 )
-		result |= input_port_read(space->machine, "ROW2");
+		result |= input_port_read(space->machine(), "ROW2");
 
 	if( offset & 0x08 )
-		result |= input_port_read(space->machine, "ROW3");
+		result |= input_port_read(space->machine(), "ROW3");
 
 	if( offset & 0x10 )
-		result |= input_port_read(space->machine, "ROW4");
+		result |= input_port_read(space->machine(), "ROW4");
 
 	if( offset & 0x20 )
-		result |= input_port_read(space->machine, "ROW5");
+		result |= input_port_read(space->machine(), "ROW5");
 
 	if( offset & 0x40 )
-		result |= input_port_read(space->machine, "ROW6");
+		result |= input_port_read(space->machine(), "ROW6");
 
 	if( offset & 0x80 )
-		result |= input_port_read(space->machine, "ROW7");
+		result |= input_port_read(space->machine(), "ROW7");
 
 	return result;
 }
@@ -520,16 +520,16 @@ WRITE8_HANDLER( cgenie_motor_w )
  *      Video RAM                    *
  *************************************/
 
-int cgenie_videoram_r( running_machine *machine, int offset )
+int cgenie_videoram_r( running_machine &machine, int offset )
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 *videoram = state->videoram;
 	return videoram[offset];
 }
 
 WRITE8_HANDLER( cgenie_videoram_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	UINT8 *videoram = state->videoram;
 	/* write to video RAM */
 	if( data == videoram[offset] )
@@ -539,13 +539,13 @@ WRITE8_HANDLER( cgenie_videoram_w )
 
  READ8_HANDLER( cgenie_colorram_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	return state->colorram[offset] | 0xf0;
 }
 
 WRITE8_HANDLER( cgenie_colorram_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	/* only bits 0 to 3 */
 	data &= 15;
 	/* nothing changed ? */
@@ -555,18 +555,18 @@ WRITE8_HANDLER( cgenie_colorram_w )
 	/* set new value */
 	state->colorram[offset] = data;
 	/* make offset relative to video frame buffer offset */
-	offset = (offset + (cgenie_get_register(space->machine, 12) << 8) + cgenie_get_register(space->machine, 13)) & 0x3ff;
+	offset = (offset + (cgenie_get_register(space->machine(), 12) << 8) + cgenie_get_register(space->machine(), 13)) & 0x3ff;
 }
 
  READ8_HANDLER( cgenie_fontram_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	return state->fontram[offset];
 }
 
 WRITE8_HANDLER( cgenie_fontram_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	UINT8 *dp;
 
 	if( data == state->fontram[offset] )
@@ -576,7 +576,7 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	state->fontram[offset] = data;
 
 	/* convert eight pixels */
-	dp = &space->machine->gfx[0]->gfxdata[(256 * 8 + offset) * space->machine->gfx[0]->width];
+	dp = &space->machine().gfx[0]->gfxdata[(256 * 8 + offset) * space->machine().gfx[0]->width];
 	dp[0] = (data & 0x80) ? 1 : 0;
 	dp[1] = (data & 0x40) ? 1 : 0;
 	dp[2] = (data & 0x20) ? 1 : 0;
@@ -595,26 +595,26 @@ WRITE8_HANDLER( cgenie_fontram_w )
 
 INTERRUPT_GEN( cgenie_frame_interrupt )
 {
-	cgenie_state *state = device->machine->driver_data<cgenie_state>();
-	if( state->tv_mode != (input_port_read(device->machine, "DSW0") & 0x10) )
+	cgenie_state *state = device->machine().driver_data<cgenie_state>();
+	if( state->tv_mode != (input_port_read(device->machine(), "DSW0") & 0x10) )
 	{
-		state->tv_mode = input_port_read(device->machine, "DSW0") & 0x10;
+		state->tv_mode = input_port_read(device->machine(), "DSW0") & 0x10;
 		/* force setting of background color */
 		state->port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(device->machine->device("maincpu")->memory().space(AS_PROGRAM), 0, state->port_ff ^ FF_BGD0);
+		cgenie_port_ff_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->port_ff ^ FF_BGD0);
 	}
 }
 
 
 READ8_DEVICE_HANDLER( cgenie_sh_control_port_r )
 {
-	cgenie_state *state = device->machine->driver_data<cgenie_state>();
+	cgenie_state *state = device->machine().driver_data<cgenie_state>();
 	return state->control_port;
 }
 
 WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w )
 {
-	cgenie_state *state = device->machine->driver_data<cgenie_state>();
+	cgenie_state *state = device->machine().driver_data<cgenie_state>();
 	state->control_port = data;
 	ay8910_address_w(device, offset, data);
 }

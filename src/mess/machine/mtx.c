@@ -56,7 +56,7 @@ READ8_DEVICE_HANDLER( mtx_strobe_r )
     by RAM in this mode.
 */
 
-static void bankswitch(running_machine *machine, UINT8 data)
+static void bankswitch(running_machine &machine, UINT8 data)
 {
 	/*
 
@@ -73,8 +73,8 @@ static void bankswitch(running_machine *machine, UINT8 data)
 
     */
 
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
-	device_t *messram = machine->device(RAM_TAG);
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	device_t *messram = machine.device(RAM_TAG);
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
@@ -106,7 +106,7 @@ static void bankswitch(running_machine *machine, UINT8 data)
 
 WRITE8_HANDLER( mtx_bankswitch_w )
 {
-	bankswitch(space->machine, data);
+	bankswitch(space->machine(), data);
 }
 
 /*-------------------------------------------------
@@ -115,7 +115,7 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 
 READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 {
-	mtx_state *state = device->machine->driver_data<mtx_state>();
+	mtx_state *state = device->machine().driver_data<mtx_state>();
 
 	sn76496_w(device, 0, state->sound_latch);
 
@@ -128,7 +128,7 @@ READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 
 WRITE8_HANDLER( mtx_sound_latch_w )
 {
-	mtx_state *state = space->machine->driver_data<mtx_state>();
+	mtx_state *state = space->machine().driver_data<mtx_state>();
 
 	state->sound_latch = data;
 }
@@ -189,7 +189,7 @@ READ8_DEVICE_HANDLER( mtx_prt_r )
 
 WRITE8_HANDLER( mtx_sense_w )
 {
-	mtx_state *state = space->machine->driver_data<mtx_state>();
+	mtx_state *state = space->machine().driver_data<mtx_state>();
 
 	state->key_sense = data;
 }
@@ -200,18 +200,18 @@ WRITE8_HANDLER( mtx_sense_w )
 
 READ8_HANDLER( mtx_key_lo_r )
 {
-	mtx_state *state = space->machine->driver_data<mtx_state>();
+	mtx_state *state = space->machine().driver_data<mtx_state>();
 
 	UINT8 data = 0xff;
 
-	if (!(state->key_sense & 0x01)) data &= input_port_read(space->machine, "ROW0");
-	if (!(state->key_sense & 0x02)) data &= input_port_read(space->machine, "ROW1");
-	if (!(state->key_sense & 0x04)) data &= input_port_read(space->machine, "ROW2");
-	if (!(state->key_sense & 0x08)) data &= input_port_read(space->machine, "ROW3");
-	if (!(state->key_sense & 0x10)) data &= input_port_read(space->machine, "ROW4");
-	if (!(state->key_sense & 0x20)) data &= input_port_read(space->machine, "ROW5");
-	if (!(state->key_sense & 0x40)) data &= input_port_read(space->machine, "ROW6");
-	if (!(state->key_sense & 0x80)) data &= input_port_read(space->machine, "ROW7");
+	if (!(state->key_sense & 0x01)) data &= input_port_read(space->machine(), "ROW0");
+	if (!(state->key_sense & 0x02)) data &= input_port_read(space->machine(), "ROW1");
+	if (!(state->key_sense & 0x04)) data &= input_port_read(space->machine(), "ROW2");
+	if (!(state->key_sense & 0x08)) data &= input_port_read(space->machine(), "ROW3");
+	if (!(state->key_sense & 0x10)) data &= input_port_read(space->machine(), "ROW4");
+	if (!(state->key_sense & 0x20)) data &= input_port_read(space->machine(), "ROW5");
+	if (!(state->key_sense & 0x40)) data &= input_port_read(space->machine(), "ROW6");
+	if (!(state->key_sense & 0x80)) data &= input_port_read(space->machine(), "ROW7");
 
 	return data;
 }
@@ -222,18 +222,18 @@ READ8_HANDLER( mtx_key_lo_r )
 
 READ8_HANDLER( mtx_key_hi_r )
 {
-	mtx_state *state = space->machine->driver_data<mtx_state>();
+	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	UINT8 data = input_port_read(space->machine, "country_code");
+	UINT8 data = input_port_read(space->machine(), "country_code");
 
-	if (!(state->key_sense & 0x01)) data &= input_port_read(space->machine, "ROW0") >> 8;
-	if (!(state->key_sense & 0x02)) data &= input_port_read(space->machine, "ROW1") >> 8;
-	if (!(state->key_sense & 0x04)) data &= input_port_read(space->machine, "ROW2") >> 8;
-	if (!(state->key_sense & 0x08)) data &= input_port_read(space->machine, "ROW3") >> 8;
-	if (!(state->key_sense & 0x10)) data &= input_port_read(space->machine, "ROW4") >> 8;
-	if (!(state->key_sense & 0x20)) data &= input_port_read(space->machine, "ROW5") >> 8;
-	if (!(state->key_sense & 0x40)) data &= input_port_read(space->machine, "ROW6") >> 8;
-	if (!(state->key_sense & 0x80)) data &= input_port_read(space->machine, "ROW7") >> 8;
+	if (!(state->key_sense & 0x01)) data &= input_port_read(space->machine(), "ROW0") >> 8;
+	if (!(state->key_sense & 0x02)) data &= input_port_read(space->machine(), "ROW1") >> 8;
+	if (!(state->key_sense & 0x04)) data &= input_port_read(space->machine(), "ROW2") >> 8;
+	if (!(state->key_sense & 0x08)) data &= input_port_read(space->machine(), "ROW3") >> 8;
+	if (!(state->key_sense & 0x10)) data &= input_port_read(space->machine(), "ROW4") >> 8;
+	if (!(state->key_sense & 0x20)) data &= input_port_read(space->machine(), "ROW5") >> 8;
+	if (!(state->key_sense & 0x40)) data &= input_port_read(space->machine(), "ROW6") >> 8;
+	if (!(state->key_sense & 0x80)) data &= input_port_read(space->machine(), "ROW7") >> 8;
 
 	return data;
 }
@@ -336,9 +336,9 @@ WRITE8_HANDLER( hrx_attr_w )
     TMS9928a_interface tms9928a_interface
 -------------------------------------------------*/
 
-static void mtx_tms9929a_interrupt(running_machine *machine, int data)
+static void mtx_tms9929a_interrupt(running_machine &machine, int data)
 {
-	mtx_state *state = machine->driver_data<mtx_state>();
+	mtx_state *state = machine.driver_data<mtx_state>();
 
 	z80ctc_trg0_w(state->z80ctc, data ? 0 : 1);
 }
@@ -353,7 +353,7 @@ static const TMS9928a_interface tms9928a_interface =
 
 INTERRUPT_GEN( mtx_interrupt )
 {
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
 /***************************************************************************
@@ -362,7 +362,7 @@ INTERRUPT_GEN( mtx_interrupt )
 
 SNAPSHOT_LOAD( mtx )
 {
-	address_space *program = image.device().machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = image.device().machine().device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	UINT8 header[18];
 	UINT16 addr;
@@ -403,17 +403,17 @@ SNAPSHOT_LOAD( mtx )
 
 MACHINE_START( mtx512 )
 {
-	mtx_state *state = machine->driver_data<mtx_state>();
-	device_t *messram = machine->device(RAM_TAG);
+	mtx_state *state = machine.driver_data<mtx_state>();
+	device_t *messram = machine.device(RAM_TAG);
 
 	/* find devices */
-	state->z80ctc = machine->device(Z80CTC_TAG);
-	state->z80dart = machine->device(Z80DART_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->z80ctc = machine.device(Z80CTC_TAG);
+	state->z80dart = machine.device(Z80DART_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* configure memory */
-	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
-	memory_configure_bank(machine, "bank2", 0, 8, machine->region("user2")->base(), 0x2000);
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	memory_configure_bank(machine, "bank2", 0, 8, machine.region("user2")->base(), 0x2000);
 	memory_configure_bank(machine, "bank3", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram), 0x4000);
 	memory_configure_bank(machine, "bank4", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram) + ram_get_size(messram)/2, 0x4000);
 

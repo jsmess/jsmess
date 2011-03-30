@@ -11,14 +11,14 @@ enum
 
 typedef struct asr733_init_params_t
 {
-	void (*int_callback)(running_machine *machine, int state);
+	void (*int_callback)(running_machine &machine, int state);
 } asr733_init_params_t;
 
 GFXDECODE_EXTERN( asr733 );
 
 PALETTE_INIT( asr733 );
 
-void asr733_init(running_machine *machine);
+void asr733_init(running_machine &machine);
 DECLARE_LEGACY_DEVICE(ASR733, asr733);
 
 #define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \

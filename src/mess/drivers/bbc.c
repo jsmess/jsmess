@@ -711,10 +711,10 @@ ROM_END
 
 static INTERRUPT_GEN( bbcb_vsync )
 {
-	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
+	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
 	via_0->write_ca1(1);
 	via_0->write_ca1(0);
-	bbc_frameclock(device->machine);
+	bbc_frameclock(device->machine());
 }
 
 
@@ -737,7 +737,7 @@ static const cassette_config bbc_cassette_config =
 
 static WRITE_LINE_DEVICE_HANDLER(bbcb_ack_w)
 {
-	via6522_device *via_1 = device->machine->device<via6522_device>("via6522_1");
+	via6522_device *via_1 = device->machine().device<via6522_device>("via6522_1");
 	via_1->write_ca1(!state); /* ack seems to be inverted? */
 }
 

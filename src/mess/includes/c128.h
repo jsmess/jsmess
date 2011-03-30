@@ -82,11 +82,11 @@ extern INTERRUPT_GEN( c128_frame_interrupt );
 
 extern SCREEN_UPDATE( c128 );
 
-void c128_bankswitch_64(running_machine *machine, int reset);
+void c128_bankswitch_64(running_machine &machine, int reset);
 
-int c128_dma_read(running_machine *machine, int offset);
-int c128_dma_read_color(running_machine *machine, int offset);
-void c128_vic_interrupt(running_machine *machine, int level);
+int c128_dma_read(running_machine &machine, int offset);
+int c128_dma_read_color(running_machine &machine, int offset);
+void c128_vic_interrupt(running_machine &machine, int level);
 
 UINT8 c128_m6510_port_read(device_t *device, UINT8 direction);
 void c128_m6510_port_write(device_t *device, UINT8 direction, UINT8 data);

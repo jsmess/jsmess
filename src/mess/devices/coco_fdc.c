@@ -184,7 +184,7 @@ INLINE rtc_type_t real_time_clock(device_t *device)
 	rtc_type_t result;
 	fdc_t *fdc = get_token(device);
 
-	result = (rtc_type_t) input_port_read_safe(device->machine, "real_time_clock", RTC_NONE);
+	result = (rtc_type_t) input_port_read_safe(device->machine(), "real_time_clock", RTC_NONE);
 
 	/* check to make sure we don't have any invalid values */
 	if (((result == RTC_DISTO) && (fdc->disto_msm6242 == NULL))

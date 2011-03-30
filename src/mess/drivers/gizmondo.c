@@ -36,7 +36,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -45,7 +45,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt);
 		vsprintf( buf, s_fmt, v);
 		va_end( v);
-		logerror( "%s: %s", machine->describe_context( ), buf);
+		logerror( "%s: %s", machine.describe_context( ), buf);
 	}
 }
 
@@ -70,7 +70,7 @@ public:
 
 static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 {
-	gizmondo_state *gizmondo = device->machine->driver_data<gizmondo_state>();
+	gizmondo_state *gizmondo = device->machine().driver_data<gizmondo_state>();
 	UINT32 data = gizmondo->port[port];
 	switch (port)
 	{
@@ -86,12 +86,12 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 			data = data & ~0x000000F2;
 			// keys
 			data |= 0x00F2;
-			if ((port_c & 0x01) == 0) data &= ~input_port_read( device->machine, "PORTF-01");
-			if ((port_c & 0x02) == 0) data &= ~input_port_read( device->machine, "PORTF-02");
-			if ((port_c & 0x04) == 0) data &= ~input_port_read( device->machine, "PORTF-04");
-			if ((port_c & 0x08) == 0) data &= ~input_port_read( device->machine, "PORTF-08");
-			if ((port_c & 0x10) == 0) data &= ~input_port_read( device->machine, "PORTF-10");
-			data &= ~input_port_read( device->machine, "PORTF");
+			if ((port_c & 0x01) == 0) data &= ~input_port_read( device->machine(), "PORTF-01");
+			if ((port_c & 0x02) == 0) data &= ~input_port_read( device->machine(), "PORTF-02");
+			if ((port_c & 0x04) == 0) data &= ~input_port_read( device->machine(), "PORTF-04");
+			if ((port_c & 0x08) == 0) data &= ~input_port_read( device->machine(), "PORTF-08");
+			if ((port_c & 0x10) == 0) data &= ~input_port_read( device->machine(), "PORTF-10");
+			data &= ~input_port_read( device->machine(), "PORTF");
 		}
 		break;
 		case S3C2440_GPIO_PORT_G :
@@ -99,7 +99,7 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 			data = data & ~0x00008001;
 			// keys
 			data = data | 0x8000;
-			data &= ~input_port_read( device->machine, "PORTG");
+			data &= ~input_port_read( device->machine(), "PORTG");
 			// no sd card inserted
 			data = data | 0x0001;
 		}
@@ -110,13 +110,13 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 
 static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 data)
 {
-	gizmondo_state *gizmondo = device->machine->driver_data<gizmondo_state>();
+	gizmondo_state *gizmondo = device->machine().driver_data<gizmondo_state>();
 	gizmondo->port[port] = data;
 }
 
 static INPUT_CHANGED( port_changed )
 {
-	gizmondo_state *gizmondo = field->port->machine->driver_data<gizmondo_state>();
+	gizmondo_state *gizmondo = field->port->machine().driver_data<gizmondo_state>();
 	s3c2440_request_eint( gizmondo->s3c2440, 4);
 	//s3c2440_request_irq( device, S3C2440_INT_EINT1);
 }
@@ -135,8 +135,8 @@ static QUICKLOAD_LOAD( gizmondo )
 
 static MACHINE_START( gizmondo )
 {
-	gizmondo_state *gizmondo = machine->driver_data<gizmondo_state>();
-	gizmondo->s3c2440 = machine->device( "s3c2440");
+	gizmondo_state *gizmondo = machine.driver_data<gizmondo_state>();
+	gizmondo->s3c2440 = machine.device( "s3c2440");
 	gizmondo->port[S3C2440_GPIO_PORT_B] = 0x055E;
 	gizmondo->port[S3C2440_GPIO_PORT_C] = 0x5F20;
 	gizmondo->port[S3C2440_GPIO_PORT_D] = 0x4F60;

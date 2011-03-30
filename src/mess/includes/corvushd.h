@@ -173,7 +173,7 @@
 //
 // Prototypes
 //
-UINT8 corvus_hdc_init( running_machine *machine );
+UINT8 corvus_hdc_init( running_machine &machine );
 READ8_HANDLER ( corvus_hdc_status_r );
 READ8_HANDLER ( corvus_hdc_data_r );
 WRITE8_HANDLER ( corvus_hdc_data_w );

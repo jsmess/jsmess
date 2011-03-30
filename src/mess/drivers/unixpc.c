@@ -65,7 +65,7 @@ WRITE16_MEMBER( unixpc_state::romlmap_w )
 	if (BIT(data, 15))
 		space.install_ram(0x000000, 0x3fffff, ram_get_ptr(m_ram));
 	else
-		space.install_rom(0x000000, 0x3fffff, space.machine->region("bootrom")->base());
+		space.install_rom(0x000000, 0x3fffff, space.machine().region("bootrom")->base());
 }
 
 void unixpc_state::machine_reset()

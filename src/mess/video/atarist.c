@@ -63,7 +63,7 @@ inline pen_t st_state::shift_mode_0()
 	m_shifter_rr[2] <<= 1;
 	m_shifter_rr[3] <<= 1;
 
-	return machine->pens[color];
+	return m_machine.pens[color];
 }
 
 
@@ -87,7 +87,7 @@ inline pen_t st_state::shift_mode_1()
 		m_shifter_shift = 0;
 	}
 
-	return machine->pens[color];
+	return m_machine.pens[color];
 }
 
 
@@ -124,7 +124,7 @@ inline pen_t st_state::shift_mode_2()
 		break;
 	}
 
-	return machine->pens[color];
+	return m_machine.pens[color];
 }
 
 
@@ -134,8 +134,8 @@ inline pen_t st_state::shift_mode_2()
 
 void st_state::shifter_tick()
 {
-	int y = machine->primary_screen->vpos();
-	int x = machine->primary_screen->hpos();
+	int y = m_machine.primary_screen->vpos();
+	int x = m_machine.primary_screen->hpos();
 
 	pen_t pen;
 
@@ -154,11 +154,11 @@ void st_state::shifter_tick()
 		break;
 
 	default:
-		pen = get_black_pen(machine);
+		pen = get_black_pen(m_machine);
 		break;
 	}
 
-	*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x) = pen;
+	*BITMAP_ADDR32(m_machine.generic.tmpbitmap, y, x) = pen;
 }
 
 
@@ -168,7 +168,7 @@ void st_state::shifter_tick()
 
 static TIMER_CALLBACK( atarist_shifter_tick )
 {
-	st_state *state = machine->driver_data<st_state>();
+	st_state *state = machine.driver_data<st_state>();
 
 	state->shifter_tick();
 }
@@ -205,8 +205,8 @@ inline void st_state::shifter_load()
 
 void st_state::glue_tick()
 {
-	int y = machine->primary_screen->vpos();
-	int x = machine->primary_screen->hpos();
+	int y = m_machine.primary_screen->vpos();
+	int x = m_machine.primary_screen->hpos();
 
 	int v = (y >= m_shifter_y_start) && (y < m_shifter_y_end);
 	int h = (x >= m_shifter_x_start) && (x < m_shifter_x_end);
@@ -242,13 +242,13 @@ void st_state::glue_tick()
 	{
 	case 0:
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x) = pen;
+		*BITMAP_ADDR32(m_machine.generic.tmpbitmap, y, x) = pen;
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x+1) = pen;
+		*BITMAP_ADDR32(m_machine.generic.tmpbitmap, y, x+1) = pen;
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x+2) = pen;
+		*BITMAP_ADDR32(m_machine.generic.tmpbitmap, y, x+2) = pen;
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x+3) = pen;
+		*BITMAP_ADDR32(m_machine.generic.tmpbitmap, y, x+3) = pen;
 		break;
 
 	case 1:
@@ -260,7 +260,7 @@ void st_state::glue_tick()
 		break;
 
 	default:
-		pen = get_black_pen(machine);
+		pen = get_black_pen(m_machine);
 		break;
 	}
 }
@@ -272,7 +272,7 @@ void st_state::glue_tick()
 
 static TIMER_CALLBACK( atarist_glue_tick )
 {
-	st_state *state = machine->driver_data<st_state>();
+	st_state *state = machine.driver_data<st_state>();
 
 	state->glue_tick();
 }
@@ -438,7 +438,7 @@ WRITE16_MEMBER( st_state::shifter_palette_w )
 	m_shifter_palette[offset] = data;
 	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
-	palette_set_color_rgb(machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
+	palette_set_color_rgb(m_machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
 
 
@@ -534,7 +534,7 @@ WRITE16_MEMBER( ste_state::shifter_palette_w )
 	m_shifter_palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
 
-	palette_set_color_rgb(machine, offset, r, g, b);
+	palette_set_color_rgb(m_machine, offset, r, g, b);
 }
 
 
@@ -726,7 +726,7 @@ void st_state::blitter_tick()
 
 static TIMER_CALLBACK( atarist_blitter_tick )
 {
-	st_state *state = machine->driver_data<st_state>();
+	st_state *state = machine.driver_data<st_state>();
 
 	state->blitter_tick();
 }
@@ -1058,7 +1058,7 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 				m_mfp->i3_w(m_blitter_done);
 
 				int nops = BLITTER_NOPS[m_blitter_op][m_blitter_hop]; // each NOP takes 4 cycles
-				machine->scheduler().timer_set(attotime::from_hz((Y2/4)/(4*nops)), FUNC(atarist_blitter_tick));
+				m_machine.scheduler().timer_set(attotime::from_hz((Y2/4)/(4*nops)), FUNC(atarist_blitter_tick));
 			}
 		}
 	}
@@ -1080,47 +1080,47 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 
 void st_state::video_start()
 {
-	m_shifter_timer = machine->scheduler().timer_alloc(FUNC(atarist_shifter_tick));
-	m_glue_timer = machine->scheduler().timer_alloc(FUNC(atarist_glue_tick));
+	m_shifter_timer = m_machine.scheduler().timer_alloc(FUNC(atarist_shifter_tick));
+	m_glue_timer = m_machine.scheduler().timer_alloc(FUNC(atarist_glue_tick));
 
-//  m_shifter_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
-	m_glue_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
+//  m_shifter_timer->adjust(m_machine.primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
+	m_glue_timer->adjust(m_machine.primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
 	/* register for state saving */
-	state_save_register_global(machine, m_shifter_base);
-	state_save_register_global(machine, m_shifter_ofs);
-	state_save_register_global(machine, m_shifter_sync);
-	state_save_register_global(machine, m_shifter_mode);
-	state_save_register_global_array(machine, m_shifter_palette);
-	state_save_register_global_array(machine, m_shifter_rr);
-	state_save_register_global_array(machine, m_shifter_ir);
-	state_save_register_global(machine, m_shifter_bitplane);
-	state_save_register_global(machine, m_shifter_shift);
-	state_save_register_global(machine, m_shifter_h);
-	state_save_register_global(machine, m_shifter_v);
-	state_save_register_global(machine, m_shifter_de);
+	state_save_register_global(m_machine, m_shifter_base);
+	state_save_register_global(m_machine, m_shifter_ofs);
+	state_save_register_global(m_machine, m_shifter_sync);
+	state_save_register_global(m_machine, m_shifter_mode);
+	state_save_register_global_array(m_machine, m_shifter_palette);
+	state_save_register_global_array(m_machine, m_shifter_rr);
+	state_save_register_global_array(m_machine, m_shifter_ir);
+	state_save_register_global(m_machine, m_shifter_bitplane);
+	state_save_register_global(m_machine, m_shifter_shift);
+	state_save_register_global(m_machine, m_shifter_h);
+	state_save_register_global(m_machine, m_shifter_v);
+	state_save_register_global(m_machine, m_shifter_de);
 
-	state_save_register_global_array(machine, m_blitter_halftone);
-	state_save_register_global(machine, m_blitter_src_inc_x);
-	state_save_register_global(machine, m_blitter_src_inc_y);
-	state_save_register_global(machine, m_blitter_dst_inc_x);
-	state_save_register_global(machine, m_blitter_dst_inc_y);
-	state_save_register_global(machine, m_blitter_src);
-	state_save_register_global(machine, m_blitter_dst);
-	state_save_register_global(machine, m_blitter_endmask1);
-	state_save_register_global(machine, m_blitter_endmask2);
-	state_save_register_global(machine, m_blitter_endmask3);
-	state_save_register_global(machine, m_blitter_xcount);
-	state_save_register_global(machine, m_blitter_ycount);
-	state_save_register_global(machine, m_blitter_xcountl);
-	state_save_register_global(machine, m_blitter_hop);
-	state_save_register_global(machine, m_blitter_op);
-	state_save_register_global(machine, m_blitter_ctrl);
-	state_save_register_global(machine, m_blitter_skew);
+	state_save_register_global_array(m_machine, m_blitter_halftone);
+	state_save_register_global(m_machine, m_blitter_src_inc_x);
+	state_save_register_global(m_machine, m_blitter_src_inc_y);
+	state_save_register_global(m_machine, m_blitter_dst_inc_x);
+	state_save_register_global(m_machine, m_blitter_dst_inc_y);
+	state_save_register_global(m_machine, m_blitter_src);
+	state_save_register_global(m_machine, m_blitter_dst);
+	state_save_register_global(m_machine, m_blitter_endmask1);
+	state_save_register_global(m_machine, m_blitter_endmask2);
+	state_save_register_global(m_machine, m_blitter_endmask3);
+	state_save_register_global(m_machine, m_blitter_xcount);
+	state_save_register_global(m_machine, m_blitter_ycount);
+	state_save_register_global(m_machine, m_blitter_xcountl);
+	state_save_register_global(m_machine, m_blitter_hop);
+	state_save_register_global(m_machine, m_blitter_op);
+	state_save_register_global(m_machine, m_blitter_ctrl);
+	state_save_register_global(m_machine, m_blitter_skew);
 
 	set_screen_parameters();
 
-	VIDEO_START_CALL(generic_bitmapped);
+	VIDEO_START_NAME(generic_bitmapped)(m_machine);
 }
 
 
@@ -1133,6 +1133,6 @@ void ste_state::video_start()
 	st_state::video_start();
 
 	// register for state saving
-	state_save_register_global(machine, m_shifter_lineofs);
-	state_save_register_global(machine, m_shifter_pixelofs);
+	state_save_register_global(m_machine, m_shifter_lineofs);
+	state_save_register_global(m_machine, m_shifter_pixelofs);
 }

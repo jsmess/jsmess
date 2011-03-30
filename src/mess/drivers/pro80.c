@@ -61,12 +61,12 @@ READ8_MEMBER( pro80_state::kp_r )
 {
 	UINT8 data = 0x0f;
 
-	if (!BIT(digit_sel, 0)) data &= input_port_read(space.machine, "LINE0");
-	if (!BIT(digit_sel, 1)) data &= input_port_read(space.machine, "LINE1");
-	if (!BIT(digit_sel, 2)) data &= input_port_read(space.machine, "LINE2");
-	if (!BIT(digit_sel, 3)) data &= input_port_read(space.machine, "LINE3");
-	if (!BIT(digit_sel, 4)) data &= input_port_read(space.machine, "LINE4");
-	if (!BIT(digit_sel, 5)) data &= input_port_read(space.machine, "LINE5");
+	if (!BIT(digit_sel, 0)) data &= input_port_read(m_machine, "LINE0");
+	if (!BIT(digit_sel, 1)) data &= input_port_read(m_machine, "LINE1");
+	if (!BIT(digit_sel, 2)) data &= input_port_read(m_machine, "LINE2");
+	if (!BIT(digit_sel, 3)) data &= input_port_read(m_machine, "LINE3");
+	if (!BIT(digit_sel, 4)) data &= input_port_read(m_machine, "LINE4");
+	if (!BIT(digit_sel, 5)) data &= input_port_read(m_machine, "LINE5");
 
 	return data;
 }

@@ -124,8 +124,8 @@ void mecmouse_poll(device_t *device)
 	int new_mx, new_my;
 	int delta_x, delta_y;
 
-	new_mx = input_port_read(device->machine, "MOUSEX");
-	new_my = input_port_read(device->machine, "MOUSEY");
+	new_mx = input_port_read(device->machine(), "MOUSEX");
+	new_my = input_port_read(device->machine(), "MOUSEY");
 
 	/* compute x delta */
 	delta_x = new_mx - mouse->last_mx;
@@ -163,7 +163,7 @@ int mecmouse_get_values(device_t *device)
 {
 	ti99_mecmouse_state *mouse = get_safe_token(device);
 	int answer;
-	int buttons = input_port_read(device->machine, "MOUSE0") & 3;
+	int buttons = input_port_read(device->machine(), "MOUSE0") & 3;
 	answer = (mouse->read_y ? mouse->y_buf : mouse->x_buf) << 4;
 
 	if ((buttons & 1)==0)
@@ -182,7 +182,7 @@ int mecmouse_get_values8(device_t *device, int mode)
 {
 	ti99_mecmouse_state *mouse = get_safe_token(device);
 	int answer;
-	int buttons = input_port_read(device->machine, "MOUSE0") & 3;
+	int buttons = input_port_read(device->machine(), "MOUSE0") & 3;
 
 	if (mode == 0)
 	{

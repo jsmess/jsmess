@@ -148,9 +148,9 @@ const unif *nes_unif_lookup( const char *board )
 
  *************************************************************/
 
-void unif_mapr_setup( running_machine *machine, const char *board )
+void unif_mapr_setup( running_machine &machine, const char *board )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	const unif *unif_board = nes_unif_lookup(board);
 
 	logerror("%s\n", board);

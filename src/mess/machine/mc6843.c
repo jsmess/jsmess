@@ -122,7 +122,7 @@ INLINE mc6843_t* get_safe_token( device_t *device )
 static device_t* mc6843_floppy_image ( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
-	return floppy_get_device( device->machine, mc6843->drive );
+	return floppy_get_device( device->machine(), mc6843->drive );
 }
 
 
@@ -215,7 +215,7 @@ static void mc6843_finish_STZ( device_t *device )
 		floppy_drive_seek( img, -1 );
 	}
 
-	LOG(( "%f mc6843_finish_STZ: actual=%i\n", device->machine->time().as_double(), floppy_drive_get_current_track( img ) ));
+	LOG(( "%f mc6843_finish_STZ: actual=%i\n", device->machine().time().as_double(), floppy_drive_get_current_track( img ) ));
 
 	/* update state */
 	mc6843->CTAR = 0;
@@ -237,7 +237,7 @@ static void mc6843_finish_SEK( device_t *device )
 	/* seek to track */
 	floppy_drive_seek( img, mc6843->GCR - mc6843->CTAR );
 
-	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", device->machine->time().as_double(), mc6843->CTAR, mc6843->GCR, floppy_drive_get_current_track( img ) ));
+	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", device->machine().time().as_double(), mc6843->CTAR, mc6843->GCR, floppy_drive_get_current_track( img ) ));
 
 	/* update state */
 	mc6843->CTAR = mc6843->GCR;
@@ -260,7 +260,7 @@ static int mc6843_address_search( device_t *device, chrn_id* id )
 		if ( ( ! floppy_drive_get_next_id( img, mc6843->side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
 		{
 			/* read address error */
-			LOG(( "%f mc6843_address_search: get_next_id failed\n", device->machine->time().as_double() ));
+			LOG(( "%f mc6843_address_search: get_next_id failed\n", device->machine().time().as_double() ));
 			mc6843->STRB |= 0x0a; /* set CRC error & Sector Address Undetected */
 			mc6843_cmd_end( device );
 			return 0;
@@ -269,7 +269,7 @@ static int mc6843_address_search( device_t *device, chrn_id* id )
 		if ( id->C != mc6843->LTAR )
 		{
 			/* track mismatch */
-			LOG(( "%f mc6843_address_search: track mismatch: logical=%i real=%i\n", device->machine->time().as_double(), mc6843->LTAR, id->C ));
+			LOG(( "%f mc6843_address_search: track mismatch: logical=%i real=%i\n", device->machine().time().as_double(), mc6843->LTAR, id->C ));
 			mc6843->data[0] = id->C; /* make the track number available to the CPU */
 			mc6843->STRA |= 0x20;    /* set Track Not Equal */
 			mc6843_cmd_end( device );
@@ -279,7 +279,7 @@ static int mc6843_address_search( device_t *device, chrn_id* id )
 		if ( id->R == mc6843->SAR )
 		{
 			/* found! */
-			LOG(( "%f mc6843_address_search: sector %i found on track %i\n", device->machine->time().as_double(), id->R, id->C ));
+			LOG(( "%f mc6843_address_search: sector %i found on track %i\n", device->machine().time().as_double(), id->R, id->C ));
 			if ( ! (mc6843->CMR & 0x20) )
 			{
 				mc6843->ISR |= 0x04; /* if no DMA, set Status Sense */
@@ -293,7 +293,7 @@ static int mc6843_address_search( device_t *device, chrn_id* id )
 			if ( r >= 4 )
 			{
 				/* time-out after 3 full revolutions */
-				LOG(( "%f mc6843_address_search: no sector %i found after 3 revolutions\n", device->machine->time().as_double(), mc6843->SAR ));
+				LOG(( "%f mc6843_address_search: no sector %i found after 3 revolutions\n", device->machine().time().as_double(), mc6843->SAR ));
 				mc6843->STRB |= 0x08; /* set Sector Address Undetected */
 				mc6843_cmd_end( device );
 				return 0;
@@ -315,7 +315,7 @@ static int mc6843_address_search_read( device_t *device, chrn_id* id )
 
 	if ( id->flags & ID_FLAG_CRC_ERROR_IN_DATA_FIELD )
 	{
-		LOG(( "%f mc6843_address_search_read: data CRC error\n", device->machine->time().as_double() ));
+		LOG(( "%f mc6843_address_search_read: data CRC error\n", device->machine().time().as_double() ));
 		mc6843->STRB |= 0x06; /* set CRC error & Data Mark Undetected */
 		mc6843_cmd_end( device );
 		return 0;
@@ -323,7 +323,7 @@ static int mc6843_address_search_read( device_t *device, chrn_id* id )
 
 	if ( id->flags & ID_FLAG_DELETED_DATA )
 	{
-		LOG(( "%f mc6843_address_search_read: deleted data\n", device->machine->time().as_double() ));
+		LOG(( "%f mc6843_address_search_read: deleted data\n", device->machine().time().as_double() ));
 		mc6843->STRA |= 0x02; /* set Delete Data Mark Detected */
 	}
 
@@ -392,7 +392,7 @@ static TIMER_CALLBACK( mc6843_cont )
 	mc6843_t* mc6843 = get_safe_token( device );
 	int cmd = mc6843->CMR & 0x0f;
 
-	LOG(( "%f mc6843_cont: timer called for cmd=%s(%i)\n", device->machine->time().as_double(), mc6843_cmd[cmd], cmd ));
+	LOG(( "%f mc6843_cont: timer called for cmd=%s(%i)\n", device->machine().time().as_double(), mc6843_cmd[cmd], cmd ));
 
 	mc6843->timer_cont->adjust( attotime::never );
 
@@ -427,7 +427,7 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 		int cmd = mc6843->CMR & 0x0f;
 
 		LOG(( "%f $%04x mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ),
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ),
 		      mc6843_cmd[cmd], cmd, mc6843->data_idx,
 		      mc6843->data_size, mc6843->GCR ));
 
@@ -480,7 +480,7 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 		{
 			/* XXX TODO: other read modes */
 			data = mc6843->data[0];
-			logerror( "$%04x mc6843 read in unsupported command mode %i\n", cpu_get_previouspc( device->machine->firstcpu ), cmd );
+			logerror( "$%04x mc6843 read in unsupported command mode %i\n", cpu_get_previouspc( device->machine().firstcpu ), cmd );
 		}
 
 		LOG(( "data=%02X\n", data ));
@@ -491,14 +491,14 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	case 1: /* Current-Track Address Register (CTAR) */
 		data = mc6843->CTAR;
 		LOG(( "%f $%04x mc6843_r: read CTAR %i (actual=%i)\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), data,
 		      floppy_drive_get_current_track( mc6843_floppy_image( device ) ) ));
 		break;
 
 	case 2: /* Interrupt Status Register (ISR) */
 		data = mc6843->ISR;
 		LOG(( "%f $%04x mc6843_r: read ISR %02X: cmd=%scomplete settle=%scomplete sense-rq=%i STRB=%i\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), data,
 		      (data & 1) ? "" : "not-" , (data & 2) ? "" : "not-",
 		      (data >> 2) & 1, (data >> 3) & 1 ));
 
@@ -524,7 +524,7 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 
 		data = mc6843->STRA;
 		LOG(( "%f $%04x mc6843_r: read STRA %02X: data-rq=%i del-dta=%i ready=%i t0=%i wp=%i trk-dif=%i idx=%i busy=%i\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), data,
 		      data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
 		      (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 ));
 		break;
@@ -533,7 +533,7 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	case 4: /* Status Register B (STRB) */
 		data = mc6843->STRB;
 		LOG(( "%f $%04x mc6843_r: read STRB %02X: data-err=%i CRC-err=%i dta--mrk-err=%i sect-mrk-err=%i seek-err=%i fi=%i wr-err=%i hard-err=%i\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), data,
 		      data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
 		      (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 ));
 
@@ -545,12 +545,12 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	case 7: /* Logical-Track Address Register (LTAR) */
 		data = mc6843->LTAR;
 		LOG(( "%f $%04x mc6843_r: read LTAR %i (actual=%i)\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), data,
 		      floppy_drive_get_current_track( mc6843_floppy_image( device ) ) ));
 		break;
 
 	default:
-		logerror( "$%04x mc6843 invalid read offset %i\n", cpu_get_previouspc( device->machine->firstcpu ), offset );
+		logerror( "$%04x mc6843 invalid read offset %i\n", cpu_get_previouspc( device->machine().firstcpu ), offset );
 	}
 
 	return data;
@@ -567,7 +567,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 		int FWF = (mc6843->CMR >> 4) & 1;
 
 		LOG(( "%f $%04x mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ),
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ),
 		      mc6843_cmd[cmd], cmd, mc6843->data_idx,
 		      mc6843->data_size, mc6843->GCR, data ));
 
@@ -584,7 +584,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 				/* end of sector write */
 				device_t* img = mc6843_floppy_image( device );
 
-				LOG(( "%f $%04x mc6843_w: write sector %i\n", device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), mc6843->data_id ));
+				LOG(( "%f $%04x mc6843_w: write sector %i\n", device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), mc6843->data_id ));
 
 				floppy_drive_write_sector_data(
 					img, mc6843->side, mc6843->data_id,
@@ -648,7 +648,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 					UINT8 track  = mc6843->data[1];
 					UINT8 sector = mc6843->data[3];
 					UINT8 filler = 0xe5; /* standard Thomson filler */
-					LOG(( "%f $%04x mc6843_w: address id detected track=%i sector=%i\n", device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), track, sector));
+					LOG(( "%f $%04x mc6843_w: address id detected track=%i sector=%i\n", device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), track, sector));
 					floppy_drive_format_sector( img, mc6843->side, sector, track, 0, sector, 0, filler );
 				}
 				else
@@ -670,7 +670,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 		else
 		{
 			/* XXX TODO: other write modes */
-			logerror( "$%04x mc6843 write %02X in unsupported command mode %i (FWF=%i)\n", cpu_get_previouspc( device->machine->firstcpu ), data, cmd, FWF );
+			logerror( "$%04x mc6843 write %02X in unsupported command mode %i (FWF=%i)\n", cpu_get_previouspc( device->machine().firstcpu ), data, cmd, FWF );
 		}
 		break;
 	}
@@ -678,7 +678,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 	case 1: /* Current-Track Address Register (CTAR) */
 		mc6843->CTAR = data & 0x7f;
 		LOG(( "%f $%04x mc6843_w: set CTAR to %i %02X (actual=%i) \n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), mc6843->CTAR, data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), mc6843->CTAR, data,
 		      floppy_drive_get_current_track( mc6843_floppy_image( device ) ) ));
 		break;
 
@@ -687,7 +687,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 		int cmd = data & 15;
 
 		LOG(( "%f $%04x mc6843_w: set CMR to $%02X: cmd=%s(%i) FWF=%i DMA=%i ISR3-intr=%i fun-intr=%i\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ),
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ),
 		      data, mc6843_cmd[cmd], cmd, (data >> 4) & 1, (data >> 5) & 1,
 		      (data >> 6) & 1, (data >> 7) & 1 ));
 
@@ -734,36 +734,36 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 
 		/* assume CLK freq = 1MHz (IBM 3740 compatibility) */
 		LOG(( "%f $%04x mc6843_w: set SUR to $%02X: head settling time=%fms, track-to-track seek time=%f\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ),
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ),
 		      data, 4.096 * (data & 15), 1.024 * ((data >> 4) & 15) ));
 		break;
 
 	case 4: /* Sector Address Register (SAR) */
 		mc6843->SAR = data & 0x1f;
-		LOG(( "%f $%04x mc6843_w: set SAR to %i (%02X)\n", device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), mc6843->SAR, data ));
+		LOG(( "%f $%04x mc6843_w: set SAR to %i (%02X)\n", device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), mc6843->SAR, data ));
 		break;
 
 	case 5: /* General Count Register (GCR) */
 		mc6843->GCR = data & 0x7f;
-		LOG(( "%f $%04x mc6843_w: set GCR to %i (%02X)\n", device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), mc6843->GCR, data ));
+		LOG(( "%f $%04x mc6843_w: set GCR to %i (%02X)\n", device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), mc6843->GCR, data ));
 		break;
 
 	case 6: /* CRC Control Register (CCR) */
 		mc6843->CCR = data & 3;
 		LOG(( "%f $%04x mc6843_w: set CCR to %02X: CRC=%s shift=%i\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), data,
 		      (data & 1) ? "enabled" : "disabled", (data >> 1) & 1 ));
 		break;
 
 	case 7: /* Logical-Track Address Register (LTAR) */
 		mc6843->LTAR = data & 0x7f;
 		LOG(( "%f $%04x mc6843_w: set LTAR to %i %02X (actual=%i)\n",
-		      device->machine->time().as_double(), cpu_get_previouspc( device->machine->firstcpu ), mc6843->LTAR, data,
+		      device->machine().time().as_double(), cpu_get_previouspc( device->machine().firstcpu ), mc6843->LTAR, data,
 		      floppy_drive_get_current_track( mc6843_floppy_image( device ) ) ));
 		break;
 
 	default:
-		logerror( "$%04x mc6843 invalid write offset %i (data=$%02X)\n", cpu_get_previouspc( device->machine->firstcpu ), offset, data );
+		logerror( "$%04x mc6843 invalid write offset %i (data=$%02X)\n", cpu_get_previouspc( device->machine().firstcpu ), offset, data );
 	}
 }
 
@@ -780,7 +780,7 @@ static DEVICE_RESET( mc6843 )
 	/* setup/reset floppy drive */
 	for ( i = 0; i < 4; i++ )
 	{
-		device_t * img = floppy_get_device( device->machine, i );
+		device_t * img = floppy_get_device( device->machine(), i );
 		floppy_mon_w(img, CLEAR_LINE);
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );
@@ -809,24 +809,24 @@ static DEVICE_START( mc6843 )
 
 	mc6843->iface = (const mc6843_interface*)device->baseconfig().static_config();
 
-	mc6843->timer_cont = device->machine->scheduler().timer_alloc(FUNC(mc6843_cont), (void*) device) ;
+	mc6843->timer_cont = device->machine().scheduler().timer_alloc(FUNC(mc6843_cont), (void*) device) ;
 
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->CTAR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->CMR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->ISR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->SUR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->STRA );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->STRB );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->SAR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->GCR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->CCR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->LTAR );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->drive );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->side );
-	state_save_register_item_array( device->machine,"mc6843", device->tag(), 0, mc6843->data );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->data_size );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->data_idx );
-	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->data_id );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->CTAR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->CMR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->ISR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->SUR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->STRA );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->STRB );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->SAR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->GCR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->CCR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->LTAR );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->drive );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->side );
+	state_save_register_item_array( device->machine(),"mc6843", device->tag(), 0, mc6843->data );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->data_size );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->data_idx );
+	state_save_register_item( device->machine(),"mc6843", device->tag(), 0, mc6843->data_id );
 }
 
 

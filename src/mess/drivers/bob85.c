@@ -27,11 +27,11 @@ public:
 
 static READ8_HANDLER(bob85_keyboard_r)
 {
-	bob85_state *state = space->machine->driver_data<bob85_state>();
+	bob85_state *state = space->machine().driver_data<bob85_state>();
 	UINT8 retVal = 0;
-	UINT8 line0 = input_port_read(space->machine, "LINE0");
-	UINT8 line1 = input_port_read(space->machine, "LINE1");
-	UINT8 line2 = input_port_read(space->machine, "LINE2");
+	UINT8 line0 = input_port_read(space->machine(), "LINE0");
+	UINT8 line1 = input_port_read(space->machine(), "LINE1");
+	UINT8 line2 = input_port_read(space->machine(), "LINE2");
 	if (line0!=0) {
 		switch(line0) {
 			case 0x01 : retVal = 0x80; break;

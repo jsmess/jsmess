@@ -37,7 +37,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(z9001)
 {
-	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xf000);
+	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xf000);
 }
 
 static VIDEO_START( z9001 )
@@ -46,12 +46,12 @@ static VIDEO_START( z9001 )
 
 static SCREEN_UPDATE( z9001 )
 {
-	z9001_state *state = screen->machine->driver_data<z9001_state>();
+	z9001_state *state = screen->machine().driver_data<z9001_state>();
 	UINT8 code;
 	UINT8 line;
 	int y, x, j, b;
 
-	UINT8 *gfx = screen->machine->region("gfx1")->base();
+	UINT8 *gfx = screen->machine().region("gfx1")->base();
 
 	for (y = 0; y < 24; y++)
 	{

@@ -14,7 +14,7 @@
 
 #define VERBOSE_LEVEL	(0)
 
-INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
+INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -23,7 +23,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine.device("maincpu")), buf );
 	}
 }
 
@@ -36,9 +36,9 @@ static const int coeff[32] = {
 static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
 static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed);
 static void draw_bg_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs);
-static void draw_gba_oam_window(gba_state *state, running_machine *machine, UINT32 *scanline, int y);
-static void draw_gba_oam(gba_state *state, running_machine *machine, UINT32 *scanline, int y);
-static void invalid_gba_draw_function(running_machine *machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux);
+static void draw_gba_oam_window(gba_state *state, running_machine &machine, UINT32 *scanline, int y);
+static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *scanline, int y);
+static void invalid_gba_draw_function(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux);
 
 /* Utility functions */
 INLINE int is_in_window(gba_state *state, int x, int window);
@@ -51,7 +51,7 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff_);
 #include "gbamode2.c"
 #include "gbam345.c"
 
-static void (*const gba_draw_scanline_modes[8][3])(running_machine *machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
+static void (*const gba_draw_scanline_modes[8][3])(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
 {
 	/* All modes have three sub-modes: No effects, effects, and windowed effects. */
 	{	/* Mode 0: 4 non-rotatable tilemaps and 1 OAM layer */
@@ -96,7 +96,7 @@ static void (*const gba_draw_scanline_modes[8][3])(running_machine *machine, gba
 	},
 };
 
-static void invalid_gba_draw_function(running_machine *machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux)
+static void invalid_gba_draw_function(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux)
 {
 	fatalerror( "Invalid screen mode (6 or 7)!" );
 }
@@ -616,7 +616,7 @@ static void draw_bg_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT3
 	}
 }
 
-static void draw_gba_oam_window(gba_state *state, running_machine *machine, UINT32 *scanline, int y)
+static void draw_gba_oam_window(gba_state *state, running_machine &machine, UINT32 *scanline, int y)
 {
 	INT16 gba_oamindex;
 	UINT32 tilebytebase, tileindex, tiledrawindex;
@@ -1062,7 +1062,7 @@ static void draw_gba_oam_window(gba_state *state, running_machine *machine, UINT
 	}
 }
 
-static void draw_gba_oam(gba_state *state, running_machine *machine, UINT32 *scanline, int y)
+static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *scanline, int y)
 {
 	INT16 gba_oamindex;
 	INT32 mosaiccnt = 0;
@@ -1741,12 +1741,12 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff_)
 	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
 }
 
-void gba_draw_scanline(running_machine *machine, int y)
+void gba_draw_scanline(running_machine &machine, int y)
 {
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 	int i, x;
-	gba_state *state = machine->driver_data<gba_state>();
+	gba_state *state = machine.driver_data<gba_state>();
 	UINT8 submode = 0;
 	int bpp = 0;
 
@@ -1799,6 +1799,6 @@ void gba_draw_scanline(running_machine *machine, int y)
 	return;
 }
 
-void gba_video_start(running_machine *machine)
+void gba_video_start(running_machine &machine)
 {
 }

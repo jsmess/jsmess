@@ -127,7 +127,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			device->machine->scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
+			device->machine().scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
 			sasi->transfer_byte_count++;
 			if(sasi->transfer_byte_count >= sasi->transfer_byte_total)
 			{
@@ -165,7 +165,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 			// reset REQ temporarily
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			device->machine->scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
+			device->machine().scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
 
 			sasi->command_byte_count++;
 			if(sasi->command_byte_count >= sasi->command_byte_total)
@@ -310,7 +310,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 				sasi->status_port |= 0x08;
 				sasi->command_byte_count = 0;
 				sasi->command_byte_total = 0;
-				device->machine->scheduler().timer_set(attotime::from_nsec(45), FUNC(req_delay), 0, sasi);
+				device->machine().scheduler().timer_set(attotime::from_nsec(45), FUNC(req_delay), 0, sasi);
 			}
 		}
 		break;
@@ -362,7 +362,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 			// reset REQ temporarily
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			device->machine->scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
+			device->machine().scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
 
 			return sasi->status;
 		}
@@ -418,7 +418,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			device->machine->scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
+			device->machine().scheduler().timer_set(attotime::from_nsec(450), FUNC(req_delay), 0, sasi);
 			sasi->transfer_byte_count++;
 			if(sasi->transfer_byte_count >= sasi->transfer_byte_total)
 			{

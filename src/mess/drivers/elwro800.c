@@ -82,12 +82,12 @@ static const struct upd765_interface elwro800jr_upd765_interface =
 
 static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 {
-	device_t *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine().device("upd765");
 
-	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
-	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
+	floppy_mon_w(floppy_get_device(space->machine(), 0), !BIT(data, 0));
+	floppy_mon_w(floppy_get_device(space->machine(), 1), !BIT(data, 1));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1,1);
 
 	upd765_tc_w(fdc, data & 0x04);
 
@@ -100,13 +100,13 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
  *
  *************************************/
 
-static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
+static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 {
-	UINT8 *prom = machine->region("proms")->base() + 0x200;
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *prom = machine.region("proms")->base() + 0x200;
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 	UINT8 cs;
 	UINT8 ls175;
-	elwro800_state *state = machine->driver_data<elwro800_state>();
+	elwro800_state *state = machine.driver_data<elwro800_state>();
 
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
@@ -114,35 +114,35 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	if (!BIT(cs,0))
 	{
 		// rom BAS0
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0000); /* BAS0 ROM */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0000); /* BAS0 ROM */
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x4000); /* BOOT ROM */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000); /* BOOT ROM */
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
 		memory_set_bankptr(machine, "bank1", messram);
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
 		state->ram_at_0000 = 1;
 	}
 
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,1))
 	{
-		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x2000);	/* BAS1 ROM */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x3fff);
+		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x2000);	/* BAS1 ROM */
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x3fff);
 	}
 	else
 	{
 		memory_set_bankptr(machine, "bank2", messram + 0x2000); /* RAM */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x2000, 0x3fff, "bank2");
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x2000, 0x3fff, "bank2");
 	}
 
 	if (BIT(ls175,2))
@@ -170,13 +170,13 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 
 static READ8_DEVICE_HANDLER(i8255_port_c_r)
 {
-	device_t *printer = device->machine->device("centronics");
+	device_t *printer = device->machine().device("centronics");
 	return (centronics_ack_r(printer) << 2);
 }
 
 static WRITE8_DEVICE_HANDLER(i8255_port_c_w)
 {
-	device_t *printer = device->machine->device("centronics");
+	device_t *printer = device->machine().device("centronics");
 	centronics_strobe_w(printer, (data >> 7) & 0x01);
 }
 
@@ -222,9 +222,9 @@ static const centronics_interface elwro800jr_centronics_interface =
 
 static READ8_HANDLER(elwro800jr_io_r)
 {
-	UINT8 *prom = space->machine->region("proms")->base();
+	UINT8 *prom = space->machine().region("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
-	elwro800_state *state = space->machine->driver_data<elwro800_state>();
+	elwro800_state *state = space->machine().driver_data<elwro800_state>();
 
 	if (!BIT(cs,0))
 	{
@@ -248,24 +248,24 @@ static READ8_HANDLER(elwro800jr_io_r)
 					{
 						port_name[4] = '0' + (7 - i);
 					}
-					data &= (input_port_read(space->machine, port_name));
+					data &= (input_port_read(space->machine(), port_name));
 				}
 			}
 
 			if ((offset & 0xff) == 0xfb)
 			{
-				data &= input_port_read(space->machine, "LINE9");
+				data &= input_port_read(space->machine(), "LINE9");
 			}
 
 			/* cassette input from wav */
-			if (cassette_input(space->machine->device("cassette")) > 0.0038 )
+			if (cassette_input(space->machine().device("cassette")) > 0.0038 )
 			{
 				data &= ~0x40;
 			}
 		}
 		else
 		{
-			data = input_port_read(space->machine, "NETWORK ID");
+			data = input_port_read(space->machine(), "NETWORK ID");
 		}
 
 		return data;
@@ -277,13 +277,13 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		device_t *ppi = space->machine->device("ppi8255");
+		device_t *ppi = space->machine().device("ppi8255");
 		return i8255a_r(ppi, (offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = space->machine->device("upd765");
+		device_t *fdc = space->machine().device("upd765");
 		if (offset & 1)
 		{
 			return upd765_data_r(fdc,0);
@@ -296,7 +296,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		device_t *usart = space->machine->device("msm8251");
+		device_t *usart = space->machine().device("msm8251");
 		if (offset & 1)
 		{
 			return msm8251_status_r(usart, 0);
@@ -319,7 +319,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 
 static WRITE8_HANDLER(elwro800jr_io_w)
 {
-	UINT8 *prom = space->machine->region("proms")->base();
+	UINT8 *prom = space->machine().region("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
@@ -330,18 +330,18 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,1))
 	{
 		// CF7
-		elwro800jr_mmu_w(space->machine, data);
+		elwro800jr_mmu_w(space->machine(), data);
 	}
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		device_t *ppi = space->machine->device("ppi8255");
+		device_t *ppi = space->machine().device("ppi8255");
 		i8255a_w(ppi, (offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = space->machine->device("upd765");
+		device_t *fdc = space->machine().device("upd765");
 		if (offset & 1)
 		{
 			upd765_data_w(fdc, 0, data);
@@ -350,7 +350,7 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		device_t *usart = space->machine->device("msm8251");
+		device_t *usart = space->machine().device("msm8251");
 		if (offset & 1)
 		{
 			msm8251_control_w(usart, 0, data);
@@ -507,8 +507,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(elwro800)
 {
-	elwro800_state *state = machine->driver_data<elwro800_state>();
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
+	elwro800_state *state = machine.driver_data<elwro800_state>();
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 
 	state->df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
@@ -521,7 +521,7 @@ static MACHINE_RESET(elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(elwro800_direct_handler, *machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(elwro800_direct_handler, machine));
 }
 
 static const cassette_config elwro800jr_cassette_config =

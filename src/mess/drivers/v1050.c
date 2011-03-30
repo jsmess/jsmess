@@ -144,16 +144,16 @@ void v1050_state::bankswitch()
 	if (BIT(m_bank, 0))
 	{
 		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-		memory_set_bank(machine, "bank1", bank);
+		memory_set_bank(m_machine, "bank1", bank);
 	}
 	else
 	{
 		program->install_read_bank(0x0000, 0x1fff, "bank1");
 		program->unmap_write(0x0000, 0x1fff);
-		memory_set_bank(machine, "bank1", 3);
+		memory_set_bank(m_machine, "bank1", 3);
 	}
 
-	memory_set_bank(machine, "bank2", bank);
+	memory_set_bank(m_machine, "bank2", bank);
 
 	if (bank == 2)
 	{
@@ -163,11 +163,11 @@ void v1050_state::bankswitch()
 	{
 		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bank(machine, "bank3", bank);
-		memory_set_bank(machine, "bank4", bank);
+		memory_set_bank(m_machine, "bank3", bank);
+		memory_set_bank(m_machine, "bank4", bank);
 	}
 
-	memory_set_bank(machine, "bank5", bank);
+	memory_set_bank(m_machine, "bank5", bank);
 }
 
 /* Keyboard HACK */
@@ -241,7 +241,7 @@ void v1050_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = 0xff;
 
-	UINT8 line_mod = input_port_read(machine, "ROW12");
+	UINT8 line_mod = input_port_read(m_machine, "ROW12");
 
 	if((line_mod & 0x07) && (line_mod & 0x18))
 	{
@@ -259,7 +259,7 @@ void v1050_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 12; row++)
 	{
-		UINT8 data = input_port_read(machine, keynames[row]);
+		UINT8 data = input_port_read(m_machine, keynames[row]);
 
 		for (col = 0; col < 8; col++)
 		{
@@ -285,7 +285,7 @@ void v1050_state::scan_keyboard()
 
 static TIMER_DEVICE_CALLBACK( v1050_keyboard_tick )
 {
-	v1050_state *state = timer.machine->driver_data<v1050_state>();
+	v1050_state *state = timer.machine().driver_data<v1050_state>();
 
 	state->scan_keyboard();
 }
@@ -362,7 +362,7 @@ READ8_MEMBER( v1050_state::keyboard_r )
 {
     static const char *const KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "XA", "XB" };
 
-    return input_port_read(machine, KEY_ROW[m_keylatch]);
+    return input_port_read(m_machine, KEY_ROW[m_keylatch]);
 }
 
 WRITE8_MEMBER( v1050_state::keyboard_w )
@@ -978,7 +978,7 @@ static I8255A_INTERFACE( rtc_ppi_intf )
 
 static TIMER_DEVICE_CALLBACK( kb_8251_tick )
 {
-	v1050_state *state = timer.machine->driver_data<v1050_state>();
+	v1050_state *state = timer.machine().driver_data<v1050_state>();
 
 	msm8251_transmit_clock(state->m_uart_kb);
 	msm8251_receive_clock(state->m_uart_kb);
@@ -1006,7 +1006,7 @@ static const msm8251_interface kb_8251_intf =
 
 static TIMER_DEVICE_CALLBACK( sio_8251_tick )
 {
-	v1050_state *state = timer.machine->driver_data<v1050_state>();
+	v1050_state *state = timer.machine().driver_data<v1050_state>();
 
 	msm8251_transmit_clock(state->m_uart_sio);
 	msm8251_receive_clock(state->m_uart_sio);
@@ -1098,7 +1098,7 @@ static const floppy_config v1050_floppy_config =
 
 static IRQ_CALLBACK( v1050_int_ack )
 {
-	v1050_state *state = device->machine->driver_data<v1050_state>();
+	v1050_state *state = device->machine().driver_data<v1050_state>();
 
 	UINT8 vector = 0xf0 | (i8214_a_r(state->m_pic, 0) << 1);
 
@@ -1124,39 +1124,39 @@ void v1050_state::machine_start()
 	device_set_irq_callback(m_maincpu, v1050_int_ack);
 
 	/* setup memory banking */
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(m_machine.device(RAM_TAG));
 
-	memory_configure_bank(machine, "bank1", 0, 2, ram, 0x10000);
-	memory_configure_bank(machine, "bank1", 2, 1, ram + 0x1c000, 0);
-	memory_configure_bank(machine, "bank1", 3, 1, machine->region(Z80_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 0, 2, ram, 0x10000);
+	memory_configure_bank(m_machine, "bank1", 2, 1, ram + 0x1c000, 0);
+	memory_configure_bank(m_machine, "bank1", 3, 1, m_machine.region(Z80_TAG)->base(), 0);
 
 	program->install_readwrite_bank(0x2000, 0x3fff, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 2, ram + 0x2000, 0x10000);
-	memory_configure_bank(machine, "bank2", 2, 1, ram + 0x1e000, 0);
+	memory_configure_bank(m_machine, "bank2", 0, 2, ram + 0x2000, 0x10000);
+	memory_configure_bank(m_machine, "bank2", 2, 1, ram + 0x1e000, 0);
 
 	program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
-	memory_configure_bank(machine, "bank3", 0, 2, ram + 0x4000, 0x10000);
+	memory_configure_bank(m_machine, "bank3", 0, 2, ram + 0x4000, 0x10000);
 
 	program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-	memory_configure_bank(machine, "bank4", 0, 2, ram + 0x8000, 0x10000);
+	memory_configure_bank(m_machine, "bank4", 0, 2, ram + 0x8000, 0x10000);
 
 	program->install_readwrite_bank(0xc000, 0xffff, "bank5");
-	memory_configure_bank(machine, "bank5", 0, 3, ram + 0xc000, 0);
+	memory_configure_bank(m_machine, "bank5", 0, 3, ram + 0xc000, 0);
 
 	bankswitch();
 
 	/* register for state saving */
-	state_save_register_global(machine, m_int_mask);
-	state_save_register_global(machine, m_int_state);
-	state_save_register_global(machine, m_f_int_enb);
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_keydata);
-	state_save_register_global(machine, m_keyavail);
-	state_save_register_global(machine, m_kb_so);
-	state_save_register_global(machine, m_rxrdy);
-	state_save_register_global(machine, m_txrdy);
-	state_save_register_global(machine, m_baud_sel);
-	state_save_register_global(machine, m_bank);
+	state_save_register_global(m_machine, m_int_mask);
+	state_save_register_global(m_machine, m_int_state);
+	state_save_register_global(m_machine, m_f_int_enb);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_keydata);
+	state_save_register_global(m_machine, m_keyavail);
+	state_save_register_global(m_machine, m_kb_so);
+	state_save_register_global(m_machine, m_rxrdy);
+	state_save_register_global(m_machine, m_txrdy);
+	state_save_register_global(m_machine, m_baud_sel);
+	state_save_register_global(m_machine, m_bank);
 }
 
 void v1050_state::machine_reset()

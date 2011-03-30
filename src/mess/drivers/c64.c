@@ -568,30 +568,30 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 
 static SCREEN_UPDATE( c64 )
 {
-	device_t *vic2 = screen->machine->device("vic2");
+	device_t *vic2 = screen->machine().device("vic2");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;
 }
 
-static UINT8 c64_lightpen_x_cb( running_machine *machine )
+static UINT8 c64_lightpen_x_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTX") & ~0x01;
 }
 
-static UINT8 c64_lightpen_y_cb( running_machine *machine )
+static UINT8 c64_lightpen_y_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTY") & ~0x01;
 }
 
-static UINT8 c64_lightpen_button_cb( running_machine *machine )
+static UINT8 c64_lightpen_button_cb( running_machine &machine )
 {
 	return input_port_read(machine, "OTHER") & 0x04;
 }
 
-static int c64_dma_read( running_machine *machine, int offset )
+static int c64_dma_read( running_machine &machine, int offset )
 {
-	c64_state *state = machine->driver_data<c64_state>();
+	c64_state *state = machine.driver_data<c64_state>();
 	if (!state->game && state->exrom)
 	{
 		if (offset < 0x3000)
@@ -606,22 +606,22 @@ static int c64_dma_read( running_machine *machine, int offset )
 	return state->vicaddr[offset];
 }
 
-static int c64_dma_read_ultimax( running_machine *machine, int offset )
+static int c64_dma_read_ultimax( running_machine &machine, int offset )
 {
-	c64_state *state = machine->driver_data<c64_state>();
+	c64_state *state = machine.driver_data<c64_state>();
 	if (offset < 0x3000)
 		return state->memory[offset];
 
 	return state->c64_romh[offset & 0x1fff];
 }
 
-static int c64_dma_read_color( running_machine *machine, int offset )
+static int c64_dma_read_color( running_machine &machine, int offset )
 {
-	c64_state *state = machine->driver_data<c64_state>();
+	c64_state *state = machine.driver_data<c64_state>();
 	return state->colorram[offset & 0x3ff] & 0xf;
 }
 
-static UINT8 c64_rdy_cb( running_machine *machine )
+static UINT8 c64_rdy_cb( running_machine &machine )
 {
 	return input_port_read(machine, "CYCLES") & 0x07;
 }

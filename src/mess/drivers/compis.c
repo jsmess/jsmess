@@ -78,9 +78,9 @@ static PALETTE_INIT( compis_gdc )
 void compis_state::video_start()
 {
 	// find memory regions
-//	m_char_rom = machine->region("pcg")->base();
+//	m_char_rom = machine.region("pcg")->base();
 
-	VIDEO_START_CALL(generic_bitmapped);
+	VIDEO_START_NAME(generic_bitmapped)(m_machine);
 }
 
 bool compis_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -119,7 +119,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 /* TODO: why it writes to ROM region? */
 static WRITE8_HANDLER( vram_w )
 {
-	UINT8 *vram = space->machine->region("vram")->base();
+	UINT8 *vram = space->machine().region("vram")->base();
 
 	vram[offset] = data;
 }

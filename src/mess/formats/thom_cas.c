@@ -122,7 +122,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	}
 
 	to7_k7_bitsize = 0;
-	to7_k7_bits = auto_alloc_array(cass->machine, UINT8, bitmax );
+	to7_k7_bits = auto_alloc_array(cass->machine(), UINT8, bitmax );
 
 /* store one period */
 #if K7_SPEED_HACK
@@ -157,7 +157,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 		}							\
 		if ( to7_k7_bitsize + 1 >= bitmax )			\
 		{							\
-			UINT8* a = auto_alloc_array(cass->machine, UINT8, bitmax * 2);		\
+			UINT8* a = auto_alloc_array(cass->machine(), UINT8, bitmax * 2);		\
 			memcpy ( a, to7_k7_bits, bitmax );		\
 			bitmax *= 2;					\
 			to7_k7_bits = a;				\

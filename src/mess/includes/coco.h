@@ -91,7 +91,7 @@ public:
 	int dclg_output_h;
 	int dclg_output_v;
 	int dclg_timer;
-	UINT8 (*update_keyboard)(running_machine *machine);
+	UINT8 (*update_keyboard)(running_machine &machine);
 	emu_timer *update_keyboard_timer;
 	emu_timer *mux_sel1_timer;
 	emu_timer *mux_sel2_timer;
@@ -108,7 +108,7 @@ public:
 	attotime hiresjoy_xtransitiontime;
 	attotime hiresjoy_ytransitiontime;
 	int dclg_previous_bit;
-	void (*printer_out)(running_machine *machine, int data);
+	void (*printer_out)(running_machine &machine, int data);
 };
 
 class coco3_state : public coco_state
@@ -134,7 +134,7 @@ public:
 
 /*----------- defined in video/coco.c -----------*/
 
-ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c,int scanline, int pos);
+ATTR_CONST UINT8 coco_get_attributes(running_machine &machine, UINT8 c,int scanline, int pos);
 
 VIDEO_START( dragon );
 VIDEO_START( coco );
@@ -147,8 +147,8 @@ VIDEO_START( coco3 );
 VIDEO_START( coco3p );
 SCREEN_UPDATE( coco3 );
 WRITE8_HANDLER ( coco3_palette_w );
-UINT32 coco3_get_video_base(running_machine *machine, UINT8 ff9d_mask, UINT8 ff9e_mask);
-void coco3_vh_blink(running_machine *machine);
+UINT32 coco3_get_video_base(running_machine &machine, UINT8 ff9d_mask, UINT8 ff9e_mask);
+void coco3_vh_blink(running_machine &machine);
 
 
 /*----------- defined in machine/coco.c -----------*/
@@ -192,11 +192,11 @@ READ8_HANDLER ( coco3_mmu_r );
 WRITE8_HANDLER ( coco3_mmu_w );
 READ8_HANDLER ( coco3_gime_r );
 WRITE8_HANDLER ( coco3_gime_w );
-offs_t coco3_mmu_translate(running_machine *machine,int bank, int offset);
+offs_t coco3_mmu_translate(running_machine &machine,int bank, int offset);
 WRITE8_DEVICE_HANDLER( coco_pia_1_w );
-void coco3_horizontal_sync_callback(running_machine *machine,int data);
-void coco3_field_sync_callback(running_machine *machine,int data);
-void coco3_gime_field_sync_callback(running_machine *machine);
+void coco3_horizontal_sync_callback(running_machine &machine,int data);
+void coco3_field_sync_callback(running_machine &machine,int data);
+void coco3_gime_field_sync_callback(running_machine &machine);
 
 void coco_cart_w(device_t *device, int data);
 void coco3_cart_w(device_t *device, int data);
@@ -222,7 +222,7 @@ READ8_HANDLER(dgnalpha_modem_r);
 WRITE8_HANDLER(dgnalpha_modem_w);
 
 #ifdef UNUSED_FUNCTION
-void coco_set_halt_line(running_machine *machine, int halt_line);
+void coco_set_halt_line(running_machine &machine, int halt_line);
 #endif
 
 /* CoCo 3 video vars; controlling key aspects of the emulation */
@@ -243,7 +243,7 @@ struct coco3_video_vars
 extern const struct coco3_video_vars coco3_vidvars;
 
 /* Setting it bitbanger bit */
-void coco_bitbanger_callback(running_machine *machine, UINT8 bit);
-void coco3_bitbanger_callback(running_machine *machine, UINT8 bit);
+void coco_bitbanger_callback(running_machine &machine, UINT8 bit);
+void coco3_bitbanger_callback(running_machine &machine, UINT8 bit);
 
 #endif /* __COCO_H__ */

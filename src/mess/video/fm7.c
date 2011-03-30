@@ -22,7 +22,7 @@
 
 READ8_HANDLER( fm7_subintf_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0x00;
 
 	if(state->video.sub_busy != 0 || state->video.sub_halt != 0)
@@ -36,20 +36,20 @@ READ8_HANDLER( fm7_subintf_r )
 
 WRITE8_HANDLER( fm7_subintf_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.sub_halt = data & 0x80;
 	if(data & 0x80)
 		state->video.sub_busy = data & 0x80;
 
-	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(),"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if(data & 0x40)
-		cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,ASSERT_LINE);
+		cputag_set_input_line(space->machine(),"sub",M6809_IRQ_LINE,ASSERT_LINE);
 	//popmessage("Sub CPU Interface write: %02x\n",data);
 }
 
 READ8_HANDLER( fm7_sub_busyflag_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(state->video.sub_halt == 0)
 		state->video.sub_busy = 0x00;
 	return 0x00;
@@ -57,7 +57,7 @@ READ8_HANDLER( fm7_sub_busyflag_r )
 
 WRITE8_HANDLER( fm7_sub_busyflag_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.sub_busy = 0x80;
 }
 
@@ -67,7 +67,7 @@ WRITE8_HANDLER( fm7_sub_busyflag_w )
  */
 READ8_HANDLER( fm7_cancel_ack )
 {
-	cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,CLEAR_LINE);
+	cputag_set_input_line(space->machine(),"sub",M6809_IRQ_LINE,CLEAR_LINE);
 	return 0x00;
 }
 
@@ -76,9 +76,9 @@ READ8_HANDLER( fm7_cancel_ack )
  */
 READ8_HANDLER( fm7_attn_irq_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.attn_irq = 1;
-	cputag_set_input_line(space->machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
+	cputag_set_input_line(space->machine(),"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
 	return 0xff;
 }
 
@@ -90,20 +90,20 @@ READ8_HANDLER( fm7_attn_irq_r )
  */
 READ8_HANDLER( fm7_vram_access_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.vram_access = 1;
 	return 0xff;
 }
 
 WRITE8_HANDLER( fm7_vram_access_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.vram_access = 0;
 }
 
 static TIMER_CALLBACK( fm77av_alu_task_end )
 {
-	fm7_state *state = machine->driver_data<fm7_state>();
+	fm7_state *state = machine.driver_data<fm7_state>();
 	state->alu.busy = 0;
 }
 
@@ -519,9 +519,9 @@ static UINT32 fm7_line_set_pixel(fm7_state *state, int x, int y)
 	return addr;
 }
 
-static void fm77av_line_draw(running_machine* machine)
+static void fm77av_line_draw(running_machine &machine)
 {
-	fm7_state *state = machine->driver_data<fm7_state>();
+	fm7_state *state = machine.driver_data<fm7_state>();
 	int x1 = state->alu.x0;
 	int x2 = state->alu.x1;
 	int y1 = state->alu.y0;
@@ -635,12 +635,12 @@ static void fm77av_line_draw(running_machine* machine)
 
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
-	machine->scheduler().timer_set(attotime::from_usec(byte_count/16), FUNC(fm77av_alu_task_end));
+	machine.scheduler().timer_set(attotime::from_usec(byte_count/16), FUNC(fm77av_alu_task_end));
 }
 
 READ8_HANDLER( fm7_vram_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	int offs;
 	UINT16 page = 0x0000;
 
@@ -678,7 +678,7 @@ READ8_HANDLER( fm7_vram_r )
 
 WRITE8_HANDLER( fm7_vram_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	int offs;
 	UINT16 page = 0x0000;
 
@@ -719,7 +719,7 @@ WRITE8_HANDLER( fm7_vram_w )
 // not pretty, but it should work.
 static WRITE8_HANDLER( fm7_vram_banked_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	int offs;
 	UINT16 page = 0x0000;
 
@@ -761,7 +761,7 @@ static WRITE8_HANDLER( fm7_vram_banked_w )
 
 READ8_HANDLER( fm7_vram0_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset);
@@ -769,7 +769,7 @@ READ8_HANDLER( fm7_vram0_r )
 
 READ8_HANDLER( fm7_vram1_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x1000);
@@ -777,7 +777,7 @@ READ8_HANDLER( fm7_vram1_r )
 
 READ8_HANDLER( fm7_vram2_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x2000);
@@ -785,7 +785,7 @@ READ8_HANDLER( fm7_vram2_r )
 
 READ8_HANDLER( fm7_vram3_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x3000);
@@ -793,7 +793,7 @@ READ8_HANDLER( fm7_vram3_r )
 
 READ8_HANDLER( fm7_vram4_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x4000);
@@ -801,7 +801,7 @@ READ8_HANDLER( fm7_vram4_r )
 
 READ8_HANDLER( fm7_vram5_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x5000);
@@ -809,7 +809,7 @@ READ8_HANDLER( fm7_vram5_r )
 
 READ8_HANDLER( fm7_vram6_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x6000);
@@ -817,7 +817,7 @@ READ8_HANDLER( fm7_vram6_r )
 
 READ8_HANDLER( fm7_vram7_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x7000);
@@ -825,7 +825,7 @@ READ8_HANDLER( fm7_vram7_r )
 
 READ8_HANDLER( fm7_vram8_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x8000);
@@ -833,7 +833,7 @@ READ8_HANDLER( fm7_vram8_r )
 
 READ8_HANDLER( fm7_vram9_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0x9000);
@@ -841,7 +841,7 @@ READ8_HANDLER( fm7_vram9_r )
 
 READ8_HANDLER( fm7_vramA_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0xa000);
@@ -849,7 +849,7 @@ READ8_HANDLER( fm7_vramA_r )
 
 READ8_HANDLER( fm7_vramB_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(!state->video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
 	return fm7_vram_r(space,offset+0xb000);
@@ -923,14 +923,14 @@ WRITE8_HANDLER( fm7_vramB_w )
  */
 READ8_HANDLER( fm7_crt_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.crt_enable = 1;
 	return 0xff;
 }
 
 WRITE8_HANDLER( fm7_crt_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.crt_enable = 0;
 }
 
@@ -942,7 +942,7 @@ WRITE8_HANDLER( fm7_crt_w )
  */
 WRITE8_HANDLER( fm7_vram_offset_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT16 new_offset = 0;
 
 	switch(offset)
@@ -991,7 +991,7 @@ WRITE8_HANDLER( fm7_vram_offset_w )
  */
 WRITE8_HANDLER( fm7_multipage_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	state->video.multi_page = data & 0x77;
 }
 
@@ -1005,13 +1005,13 @@ WRITE8_HANDLER( fm7_multipage_w )
  */
 READ8_HANDLER( fm7_palette_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	return state->video.fm7_pal[offset];
 }
 
 WRITE8_HANDLER( fm7_palette_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 r = 0,g = 0,b = 0;
 
 	if(data & 0x04)
@@ -1021,7 +1021,7 @@ WRITE8_HANDLER( fm7_palette_w )
 	if(data & 0x01)
 		b = 0xff;
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 	state->video.fm7_pal[offset] = data & 0x07;
 }
 
@@ -1038,7 +1038,7 @@ WRITE8_HANDLER( fm7_palette_w )
  */
 WRITE8_HANDLER( fm77av_analog_palette_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	int val;
 
 	switch(offset)
@@ -1053,21 +1053,21 @@ WRITE8_HANDLER( fm77av_analog_palette_w )
 			break;
 		case 2:
 			state->video.fm77av_pal_b[state->video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			palette_set_color(space->machine,state->video.fm77av_pal_selected+8,
+			palette_set_color(space->machine(),state->video.fm77av_pal_selected+8,
 				MAKE_RGB(state->video.fm77av_pal_r[state->video.fm77av_pal_selected],
 				state->video.fm77av_pal_g[state->video.fm77av_pal_selected],
 				state->video.fm77av_pal_b[state->video.fm77av_pal_selected]));
 			break;
 		case 3:
 			state->video.fm77av_pal_r[state->video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			palette_set_color(space->machine,state->video.fm77av_pal_selected+8,
+			palette_set_color(space->machine(),state->video.fm77av_pal_selected+8,
 				MAKE_RGB(state->video.fm77av_pal_r[state->video.fm77av_pal_selected],
 				state->video.fm77av_pal_g[state->video.fm77av_pal_selected],
 				state->video.fm77av_pal_b[state->video.fm77av_pal_selected]));
 			break;
 		case 4:
 			state->video.fm77av_pal_g[state->video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			palette_set_color(space->machine,state->video.fm77av_pal_selected+8,
+			palette_set_color(space->machine(),state->video.fm77av_pal_selected+8,
 				MAKE_RGB(state->video.fm77av_pal_r[state->video.fm77av_pal_selected],
 				state->video.fm77av_pal_g[state->video.fm77av_pal_selected],
 				state->video.fm77av_pal_b[state->video.fm77av_pal_selected]));
@@ -1092,10 +1092,10 @@ WRITE8_HANDLER( fm77av_analog_palette_w )
  */
 READ8_HANDLER( fm77av_video_flags_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0xff;
 
-	if(space->machine->primary_screen->vblank())
+	if(space->machine().primary_screen->vblank())
 		ret &= ~0x80;
 
 	if(state->alu.busy != 0)
@@ -1112,11 +1112,11 @@ READ8_HANDLER( fm77av_video_flags_r )
 
 WRITE8_HANDLER( fm77av_video_flags_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = space->machine->region("subsyscg")->base();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+	UINT8* RAM = space->machine().region("subsyscg")->base();
 
 	state->video.cgrom = data & 0x03;
-	memory_set_bankptr(space->machine,"bank20",RAM+(state->video.cgrom*0x800));
+	memory_set_bankptr(space->machine(),"bank20",RAM+(state->video.cgrom*0x800));
 	state->video.fine_offset = data & 0x04;
 	state->video.active_video_page = data & 0x20;
 	state->video.display_video_page = data & 0x40;
@@ -1132,13 +1132,13 @@ WRITE8_HANDLER( fm77av_video_flags_w )
  */
 READ8_HANDLER( fm77av_sub_modestatus_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0x00;
 
 	ret |= 0xbc;
 	ret |= (state->video.modestatus & 0x40);
 
-	if(!space->machine->primary_screen->vblank())
+	if(!space->machine().primary_screen->vblank())
 		ret |= 0x02;
 
 	if(state->video.vsync_flag != 0)
@@ -1149,7 +1149,7 @@ READ8_HANDLER( fm77av_sub_modestatus_r )
 
 WRITE8_HANDLER( fm77av_sub_modestatus_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	rectangle rect;
 	state->video.modestatus = data & 0x40;
 	if(data & 0x40)
@@ -1157,14 +1157,14 @@ WRITE8_HANDLER( fm77av_sub_modestatus_w )
 		rect.min_x = rect.min_y = 0;
 		rect.max_x = 320-1;
 		rect.max_y = 200-1;
-		space->machine->primary_screen->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
+		space->machine().primary_screen->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 	else
 	{
 		rect.min_x = rect.min_y = 0;
 		rect.max_x = 640-1;
 		rect.max_y = 200-1;
-		space->machine->primary_screen->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
+		space->machine().primary_screen->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 }
 
@@ -1177,8 +1177,8 @@ WRITE8_HANDLER( fm77av_sub_modestatus_w )
  */
 WRITE8_HANDLER( fm77av_sub_bank_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
-//  UINT8* RAM = space->machine->region("sub")->base();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+//  UINT8* RAM = space->machine().region("sub")->base();
 	UINT8* ROM;
 
 	if((data & 0x03) == (state->sb_prev & 0x03))
@@ -1188,32 +1188,32 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	switch (data & 0x03)
 	{
 		case 0x00:  // Type C, 640x200 (as used on the FM-7)
-			ROM = space->machine->region("subsys_c")->base();
-		//  memory_set_bankptr(space->machine,20,ROM);
-			memory_set_bankptr(space->machine,"bank21",ROM+0x800);
+			ROM = space->machine().region("subsys_c")->base();
+		//  memory_set_bankptr(space->machine(),20,ROM);
+			memory_set_bankptr(space->machine(),"bank21",ROM+0x800);
 			logerror("VID: Sub ROM Type C selected\n");
 			break;
 		case 0x01:  // Type A, 640x200
-			ROM = space->machine->region("subsys_a")->base();
-		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
-			memory_set_bankptr(space->machine,"bank21",ROM);
+			ROM = space->machine().region("subsys_a")->base();
+		//  memory_set_bankptr(space->machine(),20,RAM+0xd800);
+			memory_set_bankptr(space->machine(),"bank21",ROM);
 			logerror("VID: Sub ROM Type A selected\n");
 			break;
 		case 0x02:  // Type B, 320x200
-			ROM = space->machine->region("subsys_b")->base();
-		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
-			memory_set_bankptr(space->machine,"bank21",ROM);
+			ROM = space->machine().region("subsys_b")->base();
+		//  memory_set_bankptr(space->machine(),20,RAM+0xd800);
+			memory_set_bankptr(space->machine(),"bank21",ROM);
 			logerror("VID: Sub ROM Type B selected\n");
 			break;
 		case 0x03:  // CG Font?
-			ROM = space->machine->region("subsyscg")->base();
-		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
-			memory_set_bankptr(space->machine,"bank21",ROM);
+			ROM = space->machine().region("subsyscg")->base();
+		//  memory_set_bankptr(space->machine(),20,RAM+0xd800);
+			memory_set_bankptr(space->machine(),"bank21",ROM);
 			logerror("VID: Sub ROM CG selected\n");
 			break;
 	}
 	// reset sub CPU, set busy flag, set reset flag
-	cputag_set_input_line(space->machine,"sub",INPUT_LINE_RESET,PULSE_LINE);
+	cputag_set_input_line(space->machine(),"sub",INPUT_LINE_RESET,PULSE_LINE);
 	state->video.sub_busy = 0x80;
 	state->video.sub_halt = 0;
 	state->video.sub_reset = 1;
@@ -1250,7 +1250,7 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
  */
 READ8_HANDLER( fm77av_alu_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	switch(offset)
 	{
 		case 0x00:
@@ -1277,7 +1277,7 @@ READ8_HANDLER( fm77av_alu_r )
 
 WRITE8_HANDLER( fm77av_alu_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT16 dat;
 
 	switch(offset)
@@ -1380,7 +1380,7 @@ WRITE8_HANDLER( fm77av_alu_w )
 			dat = (state->alu.y1 & 0xff00) | data;
 			state->alu.y1 = dat;
 			// draw line
-			fm77av_line_draw(space->machine);
+			fm77av_line_draw(space->machine());
 //          logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,state->alu.y1);
 			break;
 		default:
@@ -1390,7 +1390,7 @@ WRITE8_HANDLER( fm77av_alu_w )
 
 TIMER_CALLBACK( fm77av_vsync )
 {
-	fm7_state *state = machine->driver_data<fm7_state>();
+	fm7_state *state = machine.driver_data<fm7_state>();
 	if(param == 0)  // start of vsync
 	{
 		state->video.vsync_flag = 1;
@@ -1399,15 +1399,15 @@ TIMER_CALLBACK( fm77av_vsync )
 	else
 	{
 		state->video.vsync_flag = 0;
-		state->fm77av_vsync_timer->adjust(machine->primary_screen->time_until_vblank_end());
+		state->fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
 	}
 }
 
 // called when banked into main CPU space by the MMR, available only if sub CPU is halted
 READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = space->machine->region("maincpu")->base();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+	UINT8* RAM = space->machine().region("maincpu")->base();
 	UINT8* ROM;
 
 	if(!state->video.sub_halt)
@@ -1421,7 +1421,7 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 		return RAM[0x1d000+offset];
 	if(offset > 0x800) // CGROM
 	{
-		ROM = space->machine->region("subsyscg")->base();
+		ROM = space->machine().region("subsyscg")->base();
 		return ROM[(state->video.cgrom*0x800)+(offset-0x800)];
 	}
 
@@ -1459,8 +1459,8 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 
 WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = space->machine->region("maincpu")->base();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+	UINT8* RAM = space->machine().region("maincpu")->base();
 
 	if(!state->video.sub_halt)
 		return;
@@ -1516,8 +1516,8 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 
 READ8_HANDLER( fm7_console_ram_banked_r )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = space->machine->region("maincpu")->base();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+	UINT8* RAM = space->machine().region("maincpu")->base();
 
 	if(!state->video.sub_halt)
 		return 0xff;
@@ -1527,8 +1527,8 @@ READ8_HANDLER( fm7_console_ram_banked_r )
 
 WRITE8_HANDLER( fm7_console_ram_banked_w )
 {
-	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = space->machine->region("maincpu")->base();
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+	UINT8* RAM = space->machine().region("maincpu")->base();
 
 	if(!state->video.sub_halt)
 		return;
@@ -1538,7 +1538,7 @@ WRITE8_HANDLER( fm7_console_ram_banked_w )
 
 VIDEO_START( fm7 )
 {
-	fm7_state *state = machine->driver_data<fm7_state>();
+	fm7_state *state = machine.driver_data<fm7_state>();
 	state->video.vram_access = 0;
 	state->video.crt_enable = 0;
 	state->video.vram_offset = 0x0000;
@@ -1556,7 +1556,7 @@ VIDEO_START( fm7 )
 
 SCREEN_UPDATE( fm7 )
 {
-	fm7_state *state = screen->machine->driver_data<fm7_state>();
+	fm7_state *state = screen->machine().driver_data<fm7_state>();
     UINT8 code_r = 0,code_g = 0,code_b = 0;
 	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
 	UINT8 code_r3 = 0,code_g3 = 0,code_b3 = 0;
@@ -1645,7 +1645,7 @@ static const rgb_t fm7_initial_palette[8] = {
 
 PALETTE_INIT( fm7 )
 {
-	fm7_state *state = machine->driver_data<fm7_state>();
+	fm7_state *state = machine.driver_data<fm7_state>();
 	int x;
 
 	palette_set_colors(machine, 0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));

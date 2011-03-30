@@ -42,7 +42,7 @@ public:
 
 static WRITE8_HANDLER( jr100_via_w )
 {
-	jr100_state *state = space->machine->driver_data<jr100_state>();
+	jr100_state *state = space->machine().driver_data<jr100_state>();
 	/* ACR: beeper masking */
 	if(offset == 0x0b)
 	{
@@ -50,7 +50,7 @@ static WRITE8_HANDLER( jr100_via_w )
 		state->beep_en = ((data & 0xe0) == 0xe0);
 
 		if(!state->beep_en)
-			beep_set_state(space->machine->device("beeper"),0);
+			beep_set_state(space->machine().device("beeper"),0);
 	}
 
 	/* T1L-L */
@@ -69,11 +69,11 @@ static WRITE8_HANDLER( jr100_via_w )
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
 		if(state->beep_en)
 		{
-			beep_set_state(space->machine->device("beeper"),1);
-			beep_set_frequency(space->machine->device("beeper"),894886.25 / (double)(state->t1latch) / 2.0);
+			beep_set_state(space->machine().device("beeper"),1);
+			beep_set_frequency(space->machine().device("beeper"),894886.25 / (double)(state->t1latch) / 2.0);
 		}
 	}
-	via6522_device *via = space->machine->device<via6522_device>("via");
+	via6522_device *via = space->machine().device<via6522_device>("via");
 	via->write(*space,offset,data);
 }
 
@@ -155,8 +155,8 @@ INPUT_PORTS_END
 
 static MACHINE_START(jr100)
 {
-	beep_set_frequency(machine->device("beeper"),0);
-	beep_set_state(machine->device("beeper"),0);
+	beep_set_frequency(machine.device("beeper"),0);
+	beep_set_state(machine.device("beeper"),0);
 }
 
 static MACHINE_RESET(jr100)
@@ -169,10 +169,10 @@ static VIDEO_START( jr100 )
 
 static SCREEN_UPDATE( jr100 )
 {
-	jr100_state *state = screen->machine->driver_data<jr100_state>();
+	jr100_state *state = screen->machine().driver_data<jr100_state>();
 	int x,y,xi,yi;
 
-	UINT8 *rom_pcg = screen->machine->region("maincpu")->base() + 0xe000;
+	UINT8 *rom_pcg = screen->machine().region("maincpu")->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
@@ -223,30 +223,30 @@ static const char *const keynames[] = {
 
 static READ8_DEVICE_HANDLER(jr100_via_read_b)
 {
-	jr100_state *state = device->machine->driver_data<jr100_state>();
+	jr100_state *state = device->machine().driver_data<jr100_state>();
 	UINT8 val = 0x1f;
 	if (keynames[state->keyboard_line]) {
-		val = input_port_read(device->machine, keynames[state->keyboard_line]);
+		val = input_port_read(device->machine(), keynames[state->keyboard_line]);
 	}
 	return val;
 }
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_a )
 {
-	jr100_state *state = device->machine->driver_data<jr100_state>();
+	jr100_state *state = device->machine().driver_data<jr100_state>();
 	state->keyboard_line = data & 0x0f;
 }
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
 {
-	jr100_state *state = device->machine->driver_data<jr100_state>();
+	jr100_state *state = device->machine().driver_data<jr100_state>();
 	state->use_pcg = (data & 0x20) ? TRUE : FALSE;
 	state->speaker = data>>7;
 }
 
 static WRITE_LINE_DEVICE_HANDLER(jr100_via_write_cb2)
 {
-	cassette_output(device->machine->device("cassette"), state ? -1.0 : +1.0);
+	cassette_output(device->machine().device("cassette"), state ? -1.0 : +1.0);
 }
 static const via6522_interface jr100_via_intf =
 {
@@ -274,13 +274,13 @@ static const cassette_config jr100_cassette_config =
 
 static TIMER_DEVICE_CALLBACK( sound_tick )
 {
-	jr100_state *state = timer.machine->driver_data<jr100_state>();
-	device_t *speaker = timer.machine->device("speaker");
+	jr100_state *state = timer.machine().driver_data<jr100_state>();
+	device_t *speaker = timer.machine().device("speaker");
 	speaker_level_w(speaker,state->speaker);
 	state->speaker = 0;
 
-	via6522_device *via = timer.machine->device<via6522_device>("via");
-	double level = cassette_input(timer.machine->device("cassette"));
+	via6522_device *via = timer.machine().device<via6522_device>("via");
+	double level = cassette_input(timer.machine().device("cassette"));
 	if (level > 0.0) {
 		via->write_ca1(0);
 		via->write_cb1(0);
@@ -299,7 +299,7 @@ static UINT32 readByLittleEndian(UINT8 *buf,int pos)
 
 static QUICKLOAD_LOAD(jr100)
 {
-	jr100_state *state = image.device().machine->driver_data<jr100_state>();
+	jr100_state *state = image.device().machine().driver_data<jr100_state>();
 	int quick_length;
 	UINT8 buf[0x10000];
 	int read_;

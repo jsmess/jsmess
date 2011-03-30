@@ -72,7 +72,7 @@
 
 static TILE_GET_INFO(terminal_gettileinfo)
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	int ch, gfxfont, code, color;
 
 	ch = state->current_terminal->mem[tile_index];
@@ -90,9 +90,9 @@ static TILE_GET_INFO(terminal_gettileinfo)
 		0);			/* flags */
 }
 
-static void terminal_draw(running_machine *machine, bitmap_t *dest, const rectangle *cliprect, terminal_t *terminal)
+static void terminal_draw(running_machine &machine, bitmap_t *dest, const rectangle *cliprect, terminal_t *terminal)
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	state->current_terminal = terminal;
 	tilemap_draw(dest, cliprect, terminal->tm, 0, 0);
 	state->current_terminal = NULL;
@@ -179,7 +179,7 @@ static void terminal_clear(terminal_t *terminal)
 }
 
 static terminal_t *terminal_create(
-	running_machine *machine,
+	running_machine &machine,
 	int gfx, int blank_char, int char_bits,
 	int (*getcursorcode)(int original_code),
 	int num_cols, int num_rows)
@@ -187,8 +187,8 @@ static terminal_t *terminal_create(
 	terminal_t *term;
 	int char_width, char_height;
 
-	char_width = machine->gfx[gfx]->width;
-	char_height = machine->gfx[gfx]->height;
+	char_width = machine.gfx[gfx]->width;
+	char_height = machine.gfx[gfx]->height;
 
 	term = (terminal_t *) auto_alloc_array(machine, char, sizeof(terminal_t) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));
@@ -230,7 +230,7 @@ static int apple1_getcursorcode(int original_code)
 
 VIDEO_START( apple1 )
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	state->blink_on = 1;		/* cursor is visible initially */
 	state->terminal = terminal_create(
 		machine,
@@ -244,9 +244,9 @@ VIDEO_START( apple1 )
 }
 
 /* This function handles all writes to the video display. */
-void apple1_vh_dsp_w (running_machine *machine, int data)
+void apple1_vh_dsp_w (running_machine &machine, int data)
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	int	x, y;
 	int cursor_x, cursor_y;
 
@@ -314,9 +314,9 @@ void apple1_vh_dsp_w (running_machine *machine, int data)
 
 /* This function handles clearing the video display on cold-boot or in
    response to a press of the CLEAR SCREEN switch. */
-void apple1_vh_dsp_clr (running_machine *machine)
+void apple1_vh_dsp_clr (running_machine &machine)
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	terminal_setcursor(state->terminal, 0, 0);
 	terminal_clear(state->terminal);
 }
@@ -325,12 +325,12 @@ void apple1_vh_dsp_clr (running_machine *machine)
    signal in response to a video display write.  This signal indicates
    the display has completed the write and is ready to accept another
    write. */
-attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
+attotime apple1_vh_dsp_time_to_ready (running_machine &machine)
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	int cursor_x, cursor_y;
 	int cursor_scanline;
-	double scanline_period = machine->primary_screen->scan_period().as_double();
+	double scanline_period = machine.primary_screen->scan_period().as_double();
 	double cursor_hfrac;
 
 	/* The video hardware refreshes the screen by reading the
@@ -349,27 +349,27 @@ attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
        for the visible part of the scanline. */
 	cursor_hfrac = (175 + cursor_x * apple1_charlayout.width) / 455;
 
-	if (machine->primary_screen->vpos() == cursor_scanline) {
+	if (machine.primary_screen->vpos() == cursor_scanline) {
 		/* video_screen_get_hpos() doesn't account for the horizontal
            blanking interval; it acts as if the scanline period is
            entirely composed of visible pixel times.  However, we can
            still use it to find what fraction of the current scanline
            period has elapsed. */
-		double current_hfrac = machine->primary_screen->hpos() /
-							   machine->first_screen()->width();
+		double current_hfrac = machine.primary_screen->hpos() /
+							   machine.first_screen()->width();
 		if (current_hfrac < cursor_hfrac)
 			return attotime::from_double(scanline_period * (cursor_hfrac - current_hfrac));
 	}
 
 	return attotime::from_double(
-		machine->primary_screen->time_until_pos(cursor_scanline, 0).as_double() +
+		machine.primary_screen->time_until_pos(cursor_scanline, 0).as_double() +
 		scanline_period * cursor_hfrac);
 }
 
 /* Blink the cursor on or off, as appropriate. */
-static void apple1_vh_cursor_blink (running_machine *machine)
+static void apple1_vh_cursor_blink (running_machine &machine)
 {
-	apple1_state *state = machine->driver_data<apple1_state>();
+	apple1_state *state = machine.driver_data<apple1_state>();
 	int new_blink_on;
 
 	/* The cursor is on for 2/3 of its blink period and off for 1/3.
@@ -378,7 +378,7 @@ static void apple1_vh_cursor_blink (running_machine *machine)
        number of one-third-cycles elapsed, then checking the result
        modulo 3. */
 
-	if (((int) (machine->time().as_double() / CURSOR_OFF_LENGTH)) % 3 < 2)
+	if (((int) (machine.time().as_double() / CURSOR_OFF_LENGTH)) % 3 < 2)
 		new_blink_on = 1;
 	else
 		new_blink_on = 0;
@@ -394,8 +394,8 @@ static void apple1_vh_cursor_blink (running_machine *machine)
 
 SCREEN_UPDATE( apple1 )
 {
-	apple1_state *state = screen->machine->driver_data<apple1_state>();
-	apple1_vh_cursor_blink(screen->machine);
-	terminal_draw(screen->machine, bitmap, NULL, state->terminal);
+	apple1_state *state = screen->machine().driver_data<apple1_state>();
+	apple1_vh_cursor_blink(screen->machine());
+	terminal_draw(screen->machine(), bitmap, NULL, state->terminal);
 	return 0;
 }

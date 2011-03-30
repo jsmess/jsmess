@@ -234,7 +234,7 @@ static void vp931_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldn
 
 	/* set the ERP signal to 1 to indicate start of frame, and set a timer to turn it off */
 	ld->player->daticerp = 1;
-	ld->device->machine->scheduler().timer_set(ld->screen->time_until_pos(15*2), FUNC(erp_off), 0, ld);
+	ld->device->machine().scheduler().timer_set(ld->screen->time_until_pos(15*2), FUNC(erp_off), 0, ld);
 }
 
 
@@ -246,7 +246,7 @@ static void vp931_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldn
 static INT32 vp931_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
 {
 	/* set the first VBI timer to go at the start of line 16 */
-	ld->device->machine->scheduler().timer_set(ld->screen->time_until_pos(16*2), FUNC(vbi_data_fetch), LASERDISC_CODE_LINE16 << 2, ld);
+	ld->device->machine().scheduler().timer_set(ld->screen->time_until_pos(16*2), FUNC(vbi_data_fetch), LASERDISC_CODE_LINE16 << 2, ld);
 
 	/* play forward by default */
 	return fieldnum;
@@ -261,7 +261,7 @@ static INT32 vp931_update(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 static void vp931_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 {
 	/* set a timer to synchronize execution before sending the data */
-	ld->device->machine->scheduler().synchronize(FUNC(deferred_data_w), data, ld);
+	ld->device->machine().scheduler().synchronize(FUNC(deferred_data_w), data, ld);
 }
 
 
@@ -283,7 +283,7 @@ static UINT8 vp931_data_r(laserdisc_state *ld)
 	}
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	ld->device->machine->scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
+	ld->device->machine().scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
 	return player->tocontroller;
 }
 
@@ -336,7 +336,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	if (which == 0)
 	{
 		device_set_input_line(player->cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
-		machine->scheduler().timer_set(attotime::from_nsec(5580), FUNC(irq_off), 0, ld);
+		machine.scheduler().timer_set(attotime::from_nsec(5580), FUNC(irq_off), 0, ld);
 	}
 
 	/* clock the data strobe on each subsequent callback */
@@ -344,7 +344,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	{
 		player->daticval = code >> (8 * (3 - which));
 		player->datastrobe = 1;
-		machine->scheduler().timer_set(attotime::from_nsec(5000), FUNC(datastrobe_off), 0, ld);
+		machine.scheduler().timer_set(attotime::from_nsec(5000), FUNC(datastrobe_off), 0, ld);
 	}
 
 	/* determine the next bit to fetch and reprime ourself */
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 		line++;
 	}
 	if (line <= LASERDISC_CODE_LINE18 + 1)
-		machine->scheduler().timer_set(ld->screen->time_until_pos(line*2, which * 2 * ld->screen->width() / 4), FUNC(vbi_data_fetch), (line << 2), ld);
+		machine.scheduler().timer_set(ld->screen->time_until_pos(line*2, which * 2 * ld->screen->width() / 4), FUNC(vbi_data_fetch), (line << 2), ld);
 }
 
 
@@ -444,7 +444,7 @@ static TIMER_DEVICE_CALLBACK( track_timer )
 
 static WRITE8_HANDLER( output0_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 
 	/*
@@ -460,7 +460,7 @@ static WRITE8_HANDLER( output0_w )
 
 	if (LOG_PORTS && (player->out0 ^ data) & 0xff)
 	{
-		printf("%03X:out0:", cpu_get_pc(space->cpu));
+		printf("%03X:out0:", cpu_get_pc(&space->device()));
 		if ( (data & 0x80)) printf(" ???");
 		if ( (data & 0x40)) printf(" LED1");
 		if ( (data & 0x20)) printf(" LED2");
@@ -485,7 +485,7 @@ static WRITE8_HANDLER( output0_w )
 
 static WRITE8_HANDLER( output1_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 	INT32 speed = 0;
 
@@ -502,7 +502,7 @@ static WRITE8_HANDLER( output1_w )
 
 	if (LOG_PORTS && (player->out1 ^ data) & 0x08)
 	{
-		mame_printf_debug("%03X:out1:", cpu_get_pc(space->cpu));
+		mame_printf_debug("%03X:out1:", cpu_get_pc(&space->device()));
 		if (!(data & 0x08)) mame_printf_debug(" SMS");
 		mame_printf_debug("\n");
 		player->out1 = data;
@@ -577,7 +577,7 @@ static READ8_HANDLER( keypad_r )
 
 static READ8_HANDLER( datic_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	return ld->player->daticval;
 }
 
@@ -589,7 +589,7 @@ static READ8_HANDLER( datic_r )
 
 static READ8_HANDLER( from_controller_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 
 	/* clear the pending flag and return the data */
@@ -605,7 +605,7 @@ static READ8_HANDLER( from_controller_r )
 
 static WRITE8_HANDLER( to_controller_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 
 	/* set the pending flag and stash the data */
@@ -617,7 +617,7 @@ static WRITE8_HANDLER( to_controller_w )
 		(*player->data_ready_cb)(ld->device, TRUE);
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	ld->device->machine->scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
+	ld->device->machine().scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
 }
 
 
@@ -627,7 +627,7 @@ static WRITE8_HANDLER( to_controller_w )
 
 static READ8_HANDLER( port1_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -650,7 +650,7 @@ static READ8_HANDLER( port1_r )
 
 static WRITE8_HANDLER( port1_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 
 	/*
@@ -663,7 +663,7 @@ static WRITE8_HANDLER( port1_w )
 
 	if (LOG_PORTS && (player->port1 ^ data) & 0x1f)
 	{
-		printf("%03X:port1:", cpu_get_pc(space->cpu));
+		printf("%03X:port1:", cpu_get_pc(&space->device()));
 		if (!(data & 0x10)) printf(" SPEED");
 		if (!(data & 0x08)) printf(" TIMENABLE");
 		if (!(data & 0x04)) printf(" REV");
@@ -724,7 +724,7 @@ static WRITE8_HANDLER( port1_w )
 
 static READ8_HANDLER( port2_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -763,7 +763,7 @@ static WRITE8_HANDLER( port2_w )
 
 static READ8_HANDLER( t0_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	return ld->player->datastrobe;
 }
 
@@ -776,6 +776,6 @@ static READ8_HANDLER( t0_r )
 
 static READ8_HANDLER( t1_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	return ld->player->trackstate;
 }

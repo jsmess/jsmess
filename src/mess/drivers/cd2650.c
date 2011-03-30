@@ -45,7 +45,7 @@ public:
 
 static READ8_HANDLER( cd2650_keyin_r )
 {
-	cd2650_state *state = space->machine->driver_data<cd2650_state>();
+	cd2650_state *state = space->machine().driver_data<cd2650_state>();
 	UINT8 ret = state->term_data;
 	state->term_data = 0x80;
 	if ((ret > 0x60) && (ret < 0x7b))
@@ -74,14 +74,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(cd2650)
 {
-	cd2650_state *state = machine->driver_data<cd2650_state>();
+	cd2650_state *state = machine.driver_data<cd2650_state>();
 	state->term_data = 0x80;
 }
 
 static VIDEO_START( cd2650 )
 {
-	cd2650_state *state = machine->driver_data<cd2650_state>();
-	state->charrom = machine->region("chargen")->base();
+	cd2650_state *state = machine.driver_data<cd2650_state>();
+	state->charrom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( cd2650 )
@@ -92,7 +92,7 @@ static SCREEN_UPDATE( cd2650 )
     When the bottom of the screen is reached, it does not scroll, it just wraps around.
     There is no scroll register or any indication of how scrolling might be accomplished. */
 
-	cd2650_state *state = screen->machine->driver_data<cd2650_state>();
+	cd2650_state *state = screen->machine().driver_data<cd2650_state>();
 	UINT16 offset = 0; // if we figure out how the scrolling works, that calculation goes here
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,x,mem;
@@ -138,7 +138,7 @@ static SCREEN_UPDATE( cd2650 )
 
 static WRITE8_DEVICE_HANDLER( cd2650_kbd_put )
 {
-	cd2650_state *state = device->machine->driver_data<cd2650_state>();
+	cd2650_state *state = device->machine().driver_data<cd2650_state>();
 	state->term_data = data;
 }
 

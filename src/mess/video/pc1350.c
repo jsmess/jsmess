@@ -97,7 +97,7 @@ static const POCKETC_FIGURE busy={
 
  READ8_HANDLER(pc1350_lcd_read)
 {
-	pc1350_state *state = space->machine->driver_data<pc1350_state>();
+	pc1350_state *state = space->machine().driver_data<pc1350_state>();
 	int data;
 	data = state->reg[offset&0xfff];
 	logerror("pc1350 read %.3x %.2x\n",offset,data);
@@ -106,14 +106,14 @@ static const POCKETC_FIGURE busy={
 
 WRITE8_HANDLER(pc1350_lcd_write)
 {
-	pc1350_state *state = space->machine->driver_data<pc1350_state>();
+	pc1350_state *state = space->machine().driver_data<pc1350_state>();
 	logerror("pc1350 write %.3x %.2x\n",offset,data);
 	state->reg[offset&0xfff] = data;
 }
 
-int pc1350_keyboard_line_r(running_machine *machine)
+int pc1350_keyboard_line_r(running_machine &machine)
 {
-	pc1350_state *state = machine->driver_data<pc1350_state>();
+	pc1350_state *state = machine.driver_data<pc1350_state>();
 	return state->reg[0xe00];
 }
 
@@ -131,10 +131,10 @@ static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 
 SCREEN_UPDATE( pc1350 )
 {
-	pc1350_state *state = screen->machine->driver_data<pc1350_state>();	/* The contrast colours need some work done - select contrast level 7 for now */
+	pc1350_state *state = screen->machine().driver_data<pc1350_state>();	/* The contrast colours need some work done - select contrast level 7 for now */
 	int x, y=DOWN, i, j, k=0, b;
 	int color[4];
-	running_machine *machine = screen->machine;
+	running_machine &machine = screen->machine();
 
 	bitmap_fill(bitmap, cliprect, 11);
 

@@ -54,7 +54,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine, "bank1", data & 1);
+		memory_set_bank(space->machine(), "bank1", data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
@@ -83,10 +83,10 @@ static WRITE32_HANDLER( aga_overlay_w )
 
 static WRITE8_DEVICE_HANDLER( ami1200_cia_0_porta_w )
 {
-	ami1200_state *state = device->machine->driver_data<ami1200_state>();
+	ami1200_state *state = device->machine().driver_data<ami1200_state>();
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(device->machine, 0, !BIT(data, 1));
+	set_led_status(device->machine(), 0, !BIT(data, 1));
 
 	handle_cd32_joystick_cia(state, data, mos6526_r(device, 2));
 }
@@ -109,14 +109,14 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_porta_w )
 static READ8_DEVICE_HANDLER( ami1200_cia_0_portb_r )
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_r\n", device->machine->describe_context());
+	logerror("%s:CIA0_portb_r\n", device->machine().describe_context());
 	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_w(%02x)\n", device->machine->describe_context(), data);
+	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
 static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32 )
@@ -133,9 +133,9 @@ ADDRESS_MAP_END
 //int cd32_input_port_val = 0;
 //int cd32_input_select = 0;
 
-static void cd32_potgo_w(running_machine *machine, UINT16 data)
+static void cd32_potgo_w(running_machine &machine, UINT16 data)
 {
-	ami1200_state *state = machine->driver_data<ami1200_state>();
+	ami1200_state *state = machine.driver_data<ami1200_state>();
 	int i;
 
 	state->potgo_value = state->potgo_value & 0x5500;
@@ -247,8 +247,8 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
-	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r(device->machine->device("fdc"));
+	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	ret |= amiga_fdc_status_r(device->machine().device("fdc"));
 	return ret;
 }
 
@@ -371,25 +371,25 @@ ROM_END
 
 // these come directly from amiga.c
 
-static UINT16 a1200_read_dskbytr(running_machine *machine)
+static UINT16 a1200_read_dskbytr(running_machine &machine)
 {
-	return amiga_fdc_get_byte(machine->device("fdc"));
+	return amiga_fdc_get_byte(machine.device("fdc"));
 }
 
-static void a1200_write_dsklen(running_machine *machine, UINT16 data)
+static void a1200_write_dsklen(running_machine &machine, UINT16 data)
 {
-	cd32_state *state = machine->driver_data<cd32_state>();
+	cd32_state *state = machine.driver_data<cd32_state>();
 	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(machine->device("fdc"));
+			amiga_fdc_setup_dma(machine.device("fdc"));
 	}
 }
 
 
 static DRIVER_INIT( a1200 )
 {
-	cd32_state *state = machine->driver_data<cd32_state>();
+	cd32_state *state = machine.driver_data<cd32_state>();
 	static const amiga_machine_interface cd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
@@ -408,7 +408,7 @@ static DRIVER_INIT( a1200 )
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* initialize keyboard */
 	amigakbd_init(machine);

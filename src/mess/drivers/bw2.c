@@ -31,7 +31,7 @@
 
 int bw2_state::get_ramdisk_size()
 {
-	return input_port_read(machine, "RAMCARD") * 256;
+	return input_port_read(m_machine, "RAMCARD") * 256;
 }
 
 /* Memory */
@@ -115,7 +115,7 @@ void bw2_state::bankswitch(UINT8 data)
 		break;
 	}
 
-	memory_set_bank(machine, "bank1", m_bank);
+	memory_set_bank(m_machine, "bank1", m_bank);
 }
 
 void bw2_state::ramcard_bankswitch(UINT8 data)
@@ -195,7 +195,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 		break;
 	}
 
-	memory_set_bank(machine, "bank1", m_bank);
+	memory_set_bank(m_machine, "bank1", m_bank);
 }
 
 WRITE8_MEMBER( bw2_state::ramcard_bank_w )
@@ -214,8 +214,8 @@ WRITE8_MEMBER( bw2_state::ramcard_bank_w )
 		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
 	}
 
-	memory_configure_bank(machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram + bank_offset, 0);
-	memory_set_bank(machine, "bank1", m_bank);
+	memory_configure_bank(m_machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram + bank_offset, 0);
+	memory_set_bank(m_machine, "bank1", m_bank);
 }
 
 /* Floppy */
@@ -455,7 +455,7 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 
 	if (m_kb_row <= 9)
 	{
-		data = input_port_read(machine, rownames[m_kb_row]);
+		data = input_port_read(m_machine, rownames[m_kb_row]);
 	}
 
 	return data;
@@ -572,7 +572,7 @@ bool bw2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 
 static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 {
-	bw2_state *state =  device->machine->driver_data<bw2_state>();
+	bw2_state *state =  device->machine().driver_data<bw2_state>();
 
 	return state->m_video_ram[ma & 0x3fff];
 }
@@ -624,38 +624,38 @@ static const wd17xx_interface fdc_intf =
 void bw2_state::machine_start()
 {
 	/* allocate memory */
-	m_work_ram = auto_alloc_array(machine, UINT8, ram_get_size(m_ram));
-	m_video_ram = auto_alloc_array(machine, UINT8, BW2_VIDEORAM_SIZE);
-	m_ramcard_ram = auto_alloc_array(machine, UINT8, BW2_RAMCARD_SIZE);
+	m_work_ram = auto_alloc_array(m_machine, UINT8, ram_get_size(m_ram));
+	m_video_ram = auto_alloc_array(m_machine, UINT8, BW2_VIDEORAM_SIZE);
+	m_ramcard_ram = auto_alloc_array(m_machine, UINT8, BW2_RAMCARD_SIZE);
 
 	/* memory banking */
-	memory_configure_bank(machine, "bank1", BANK_RAM1, 1, m_work_ram, 0);
-	memory_configure_bank(machine, "bank1", BANK_VRAM, 1, m_video_ram, 0);
-	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine->region("ic1")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_RAM1, 1, m_work_ram, 0);
+	memory_configure_bank(m_machine, "bank1", BANK_VRAM, 1, m_video_ram, 0);
+	memory_configure_bank(m_machine, "bank1", BANK_ROM, 1, m_machine.region("ic1")->base(), 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_kb_row);
-	state_save_register_global_pointer(machine, m_work_ram, ram_get_size(m_ram));
-	state_save_register_global_pointer(machine, m_ramcard_ram, BW2_RAMCARD_SIZE);
-	state_save_register_global(machine, m_bank);
-	state_save_register_global(machine, m_drive);
-	state_save_register_global(machine, m_mtron);
-	state_save_register_global(machine, m_mfdbk);
-	state_save_register_global_pointer(machine, m_video_ram, BW2_VIDEORAM_SIZE);
+	state_save_register_global(m_machine, m_kb_row);
+	state_save_register_global_pointer(m_machine, m_work_ram, ram_get_size(m_ram));
+	state_save_register_global_pointer(m_machine, m_ramcard_ram, BW2_RAMCARD_SIZE);
+	state_save_register_global(m_machine, m_bank);
+	state_save_register_global(m_machine, m_drive);
+	state_save_register_global(m_machine, m_mtron);
+	state_save_register_global(m_machine, m_mfdbk);
+	state_save_register_global_pointer(m_machine, m_video_ram, BW2_VIDEORAM_SIZE);
 }
 
 void bw2_state::machine_reset()
 {
-	address_space *io = machine->device(Z80_TAG)->memory().space(AS_IO);
+	address_space *io = m_machine.device(Z80_TAG)->memory().space(AS_IO);
 
 	if (get_ramdisk_size() > 0)
 	{
 		// RAMCARD installed
 
-		memory_configure_bank(machine, "bank1", BANK_RAMCARD_ROM, 1, machine->region("ramcard")->base(), 0);
-		memory_configure_bank(machine, "bank1", BANK_RAM3, 2, m_work_ram + 0x8000, 0x8000);
-		memory_configure_bank(machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram, 0);
-		memory_configure_bank(machine, "bank1", BANK_RAM6, 1, m_work_ram + 0x18000, 0);
+		memory_configure_bank(m_machine, "bank1", BANK_RAMCARD_ROM, 1, m_machine.region("ramcard")->base(), 0);
+		memory_configure_bank(m_machine, "bank1", BANK_RAM3, 2, m_work_ram + 0x8000, 0x8000);
+		memory_configure_bank(m_machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram, 0);
+		memory_configure_bank(m_machine, "bank1", BANK_RAM6, 1, m_work_ram + 0x18000, 0);
 
 		io->install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate_create(bw2_state, ramcard_bank_w, *this), 0);
 	}
@@ -663,12 +663,12 @@ void bw2_state::machine_reset()
 	{
 		// no RAMCARD
 
-		memory_configure_bank(machine, "bank1", BANK_RAM2, 5, m_work_ram + 0x8000, 0x8000);
+		memory_configure_bank(m_machine, "bank1", BANK_RAM2, 5, m_work_ram + 0x8000, 0x8000);
 
 		io->unmap_write(0x30, 0x30, 0, 0x0f);
 	}
 
-	memory_set_bank(machine, "bank1", BANK_ROM);
+	memory_set_bank(m_machine, "bank1", BANK_ROM);
 }
 
 static MACHINE_CONFIG_START( bw2, bw2_state )

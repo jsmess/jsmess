@@ -81,7 +81,7 @@ void fmscsi_device::device_start()
     // initialise SCSI devices, if any present
     for(x=0;x<m_config.scsidevs->devs_present;x++)
     {
-    	SCSIAllocInstance(machine, m_config.scsidevs->devices[x].scsiClass,
+    	SCSIAllocInstance(m_machine, m_config.scsidevs->devices[x].scsiClass,
 				&m_SCSIdevices[m_config.scsidevs->devices[x].scsiID],
 				m_config.scsidevs->devices[x].diskregion );
     }
@@ -144,7 +144,7 @@ void fmscsi_device::fmscsi_rescan()
 //      if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
 		{
 			SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[i].scsiID] );
-			SCSIAllocInstance( machine,
+			SCSIAllocInstance( m_machine,
 					m_config.scsidevs->devices[i].scsiClass,
 					&m_SCSIdevices[m_config.scsidevs->devices[i].scsiID],
 					m_config.scsidevs->devices[i].diskregion );
@@ -404,7 +404,7 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 
 	if(line == FMSCSI_LINE_SEL)
 	{
-		image = dynamic_cast<device_image_interface*>(machine->device(m_config.scsidevs->devices[m_target].diskregion));
+		image = dynamic_cast<device_image_interface*>(machine().device(m_config.scsidevs->devices[m_target].diskregion));
 		if(state != 0 && !(m_output_lines & FMSCSI_LINE_SEL)) // low to high transition
 		{
 			if (image->exists())  // if device is mounted

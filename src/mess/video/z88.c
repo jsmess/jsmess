@@ -117,27 +117,27 @@ static void z88_vh_render_line(bitmap_t *bitmap, int x, int y,int pen)
 }
 
 /* convert absolute offset into correct address to get data from */
-static unsigned char *z88_convert_address(running_machine *machine, unsigned long offset)
+static unsigned char *z88_convert_address(running_machine &machine, unsigned long offset)
 {
-//        return ram_get_ptr(machine->device(RAM_TAG));
+//        return ram_get_ptr(machine.device(RAM_TAG));
 	if (offset>(32*16384))
 	{
 		unsigned long get_offset;
 		get_offset = offset - (32*16384);
 		get_offset = get_offset & 0x01fffff;
-		return ram_get_ptr(machine->device(RAM_TAG)) + get_offset;
+		return ram_get_ptr(machine.device(RAM_TAG)) + get_offset;
 	}
 	else
 	{
 		offset = offset & 0x01FFFF;
-		return machine->region("maincpu")->base() + 0x010000 + offset;
+		return machine.region("maincpu")->base() + 0x010000 + offset;
 	}
 }
 
 
 SCREEN_EOF( z88 )
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = machine.driver_data<z88_state>();
 	state->frame_number++;
 	if (state->frame_number >= 50)
 	{
@@ -155,9 +155,9 @@ SCREEN_EOF( z88 )
 ***************************************************************************/
 SCREEN_UPDATE( z88 )
 {
-	z88_state *state = screen->machine->driver_data<z88_state>();
+	z88_state *state = screen->machine().driver_data<z88_state>();
 	int x,y;
-	unsigned char *ptr = z88_convert_address(screen->machine, state->blink.sbf);
+	unsigned char *ptr = z88_convert_address(screen->machine(), state->blink.sbf);
 	unsigned char *stored_ptr = ptr;
 	int pen0, pen1;
 
@@ -222,12 +222,12 @@ SCREEN_UPDATE( z88 )
 					if (ch & 0x0100)
 					{
 						ch_index =ch & 0x0ff;	//(~0x0100);
-						pCharGfx = z88_convert_address(screen->machine, state->blink.hires1);
+						pCharGfx = z88_convert_address(screen->machine(), state->blink.hires1);
 					}
 					else
 					{
 						ch_index = ch & 0x0ff;
-						pCharGfx = z88_convert_address(screen->machine, state->blink.hires0);
+						pCharGfx = z88_convert_address(screen->machine(), state->blink.hires0);
 					}
 
 					pCharGfx += (ch_index<<3);
@@ -245,13 +245,13 @@ SCREEN_UPDATE( z88 )
 				{
 				   ch_index = ch & (~0x01c0);
 
-				   pCharGfx = z88_convert_address(screen->machine, state->blink.lores0);
+				   pCharGfx = z88_convert_address(screen->machine(), state->blink.lores0);
 				}
 				else
 				{
 				   ch_index = ch;
 
-				   pCharGfx = z88_convert_address(screen->machine, state->blink.lores1);
+				   pCharGfx = z88_convert_address(screen->machine(), state->blink.lores1);
 				}
 
 				pCharGfx += (ch_index<<3);

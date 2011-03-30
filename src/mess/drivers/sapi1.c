@@ -24,19 +24,19 @@
 /* switch out the rom shadow */
 static WRITE8_HANDLER( sapizps3_00_w )
 {
-	memory_set_bank(space->machine, "bank1", 0);
+	memory_set_bank(space->machine(), "bank1", 0);
 }
 
 /* to stop execution in random ram */
 static READ8_HANDLER( sapizps3_25_r )
 {
-	sapi1_state *state = space->machine->driver_data<sapi1_state>();
+	sapi1_state *state = space->machine().driver_data<sapi1_state>();
 	return state->zps3_25;
 }
 
 static WRITE8_HANDLER( sapizps3_25_w )
 {
-	sapi1_state *state = space->machine->driver_data<sapi1_state>();
+	sapi1_state *state = space->machine().driver_data<sapi1_state>();
 	state->zps3_25 = data & 0xfc; //??
 }
 

@@ -265,9 +265,9 @@ VIDEO_START( pdp1 );
 SCREEN_EOF( pdp1 );
 SCREEN_UPDATE( pdp1 );
 
-void pdp1_plot(running_machine *machine, int x, int y);
-void pdp1_typewriter_drawchar(running_machine *machine, int character);
-void pdp1_update_lightpen_state(running_machine *machine, const lightpen_t *new_state);
+void pdp1_plot(running_machine &machine, int x, int y);
+void pdp1_typewriter_drawchar(running_machine &machine, int character);
+void pdp1_update_lightpen_state(running_machine &machine, const lightpen_t *new_state);
 
 
 #endif /* PDP1_H_ */

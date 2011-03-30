@@ -31,14 +31,14 @@ public:
 
 static WRITE8_HANDLER( czk80_80_w )
 {
-	device_t *terminal = space->machine->device(TERMINAL_TAG);
+	device_t *terminal = space->machine().device(TERMINAL_TAG);
 
 	terminal_write(terminal, 0, data);
 }
 
 static READ8_HANDLER( czk80_80_r )
 {
-	czk80_state *state = space->machine->driver_data<czk80_state>();
+	czk80_state *state = space->machine().driver_data<czk80_state>();
 	UINT8 ret = state->term_data;
 	state->term_data = 0;
 	return ret;
@@ -51,7 +51,7 @@ static READ8_HANDLER( czk80_c0_r )
 
 static READ8_HANDLER( czk80_81_r )
 {
-	czk80_state *state = space->machine->driver_data<czk80_state>();
+	czk80_state *state = space->machine().driver_data<czk80_state>();
 	return 1 | ((state->term_data) ? 2 : 0);
 }
 
@@ -73,8 +73,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(czk80)
 {
-	czk80_state *state = machine->driver_data<czk80_state>();
-	UINT8* bios = machine->region("maincpu")->base() + 0xe000;
+	czk80_state *state = machine.driver_data<czk80_state>();
+	UINT8* bios = machine.region("maincpu")->base() + 0xe000;
 
 	memcpy(state->ram,bios, 0x2000);
 	memcpy(state->ram+0xe000,bios, 0x2000);
@@ -83,7 +83,7 @@ static MACHINE_RESET(czk80)
 
 static WRITE8_DEVICE_HANDLER( czk80_kbd_put )
 {
-	czk80_state *state = device->machine->driver_data<czk80_state>();
+	czk80_state *state = device->machine().driver_data<czk80_state>();
 	state->term_data = data;
 }
 

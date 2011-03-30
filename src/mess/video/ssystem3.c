@@ -5,20 +5,20 @@
 #include "emu.h"
 #include "includes/ssystem3.h"
 
-void ssystem3_lcd_reset(running_machine *machine)
+void ssystem3_lcd_reset(running_machine &machine)
 {
-	ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = machine.driver_data<ssystem3_state>();
 	state->lcd.count=0; state->lcd.clock=1;
 }
 
-void ssystem3_lcd_write(running_machine *machine, int clock, int data)
+void ssystem3_lcd_write(running_machine &machine, int clock, int data)
 {
-	ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = machine.driver_data<ssystem3_state>();
   if (clock&&!state->lcd.clock) {
     state->lcd.data[state->lcd.count/8]&=~(1<<(state->lcd.count&7));
     if (data) state->lcd.data[state->lcd.count/8]|=1<<(state->lcd.count&7);
     if (state->lcd.count+1==40) {
-      logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(machine->device("maincpu")),
+      logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(machine.device("maincpu")),
 	       state->lcd.data[0], state->lcd.data[1], state->lcd.data[2], state->lcd.data[3], state->lcd.data[4]);
     }
     state->lcd.count=(state->lcd.count+1)%40;
@@ -48,7 +48,7 @@ PALETTE_INIT( ssystem3 )
 
 VIDEO_START( ssystem3 )
 {
-	ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = machine.driver_data<ssystem3_state>();
 	// artwork seams to need this
 	state->videoram = auto_alloc_array(machine, UINT8, 6 * 2 + 24);
 }
@@ -186,7 +186,7 @@ static void ssystem3_draw_led(bitmap_t *bitmap,INT16 color, int x, int y, int ch
 
 SCREEN_UPDATE( ssystem3 )
 {
-	ssystem3_state *state = screen->machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = screen->machine().driver_data<ssystem3_state>();
 	int i;
 
 	for (i=0; i<4; i++) {
@@ -206,7 +206,7 @@ SCREEN_UPDATE( ssystem3 )
 	ssystem3_draw_led(bitmap, state->lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
 	ssystem3_draw_led(bitmap, state->lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
-	if (input_port_read(screen->machine, "Configuration")&1) { // playfield(optional device)
+	if (input_port_read(screen->machine(), "Configuration")&1) { // playfield(optional device)
 	  static const int lcd_signs_on[]={
 	    0, // empty
 	    1, // bauer
@@ -223,7 +223,7 @@ SCREEN_UPDATE( ssystem3 )
 	      int figure, black;
 	      int xp=263+x*22;
 	      int yp=55+(y^7)*28;
-	      ssystem3_playfield_getfigure(screen->machine, x, y, &figure, &black);
+	      ssystem3_playfield_getfigure(screen->machine(), x, y, &figure, &black);
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');

@@ -88,7 +88,7 @@ struct _t6721_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", device->machine->time().as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", device->machine().time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while(0)
@@ -237,7 +237,7 @@ static DEVICE_START( t6721 )
 {
 	t6721_state *t6721 = get_safe_token(device);
 
-	t6721->timer = device->machine->scheduler().timer_alloc(FUNC(t6721_speech_timer), t6721);
+	t6721->timer = device->machine().scheduler().timer_alloc(FUNC(t6721_speech_timer), t6721);
 
 	device->save_item(NAME(t6721->sample_data));
 	device->save_item(NAME(t6721->data));

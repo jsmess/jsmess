@@ -46,7 +46,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x03:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		memory_set_bankptr(space->machine, page_num, space->machine->region("exos")->base() + (index * 0x4000));
+		memory_set_bankptr(space->machine(), page_num, space->machine().region("exos")->base() + (index * 0x4000));
 		break;
 
 	case 0x04:
@@ -55,14 +55,14 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x07:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		memory_set_bankptr(space->machine, page_num, space->machine->region("cartridges")->base() + ((index - 0x04) * 0x4000));
+		memory_set_bankptr(space->machine(), page_num, space->machine().region("cartridges")->base() + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
 	case 0x21:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		memory_set_bankptr(space->machine, page_num, space->machine->region("exdos")->base() + ((index - 0x20) * 0x4000));
+		memory_set_bankptr(space->machine(), page_num, space->machine().region("exdos")->base() + ((index - 0x20) * 0x4000));
 		break;
 
 	case 0xf8:
@@ -70,10 +70,10 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xfa:
 	case 0xfb:
 		/* additional 64k ram */
-		if (ram_get_size(space->machine->device(RAM_TAG)) == 128*1024)
+		if (ram_get_size(space->machine().device(RAM_TAG)) == 128*1024)
 		{
 			space->install_readwrite_bank(start, end, page_num);
-			memory_set_bankptr(space->machine, page_num, ram_get_ptr(space->machine->device(RAM_TAG)) + (index - 0xf4) * 0x4000);
+			memory_set_bankptr(space->machine(), page_num, ram_get_ptr(space->machine().device(RAM_TAG)) + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
@@ -87,7 +87,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xff:
 		/* basic 64k ram */
 		space->install_readwrite_bank(start, end, page_num);
-		memory_set_bankptr(space->machine, page_num, ram_get_ptr(space->machine->device(RAM_TAG)) + (index - 0xfc) * 0x4000);
+		memory_set_bankptr(space->machine(), page_num, ram_get_ptr(space->machine().device(RAM_TAG)) + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
@@ -99,7 +99,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 /* EP specific handling of dave register write */
 static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 {
-	ep_state *ep = device->machine->driver_data<ep_state>();
+	ep_state *ep = device->machine().driver_data<ep_state>();
 
 	switch (offset)
 	{
@@ -107,7 +107,7 @@ static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(device->machine->device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:
@@ -125,19 +125,19 @@ static READ8_DEVICE_HANDLER( enterprise_dave_reg_read )
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
 
-	ep_state *ep = device->machine->driver_data<ep_state>();
+	ep_state *ep = device->machine().driver_data<ep_state>();
 
 	switch (offset)
 	{
 		case 0x015:
 			/* read keyboard line */
-			dave_set_reg(device, 0x015, input_port_read(device->machine, keynames[ep->keyboard_line]));
+			dave_set_reg(device, 0x015, input_port_read(device->machine(), keynames[ep->keyboard_line]));
 			break;
 
 		case 0x016:
 		{
 			int ExternalJoystickInputs;
-			int ExternalJoystickPortInput = input_port_read(device->machine, "JOY1");
+			int ExternalJoystickPortInput = input_port_read(device->machine(), "JOY1");
 
 			if (ep->keyboard_line <= 4)
 			{
@@ -171,7 +171,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	device_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
+	device_set_input_line_vector(machine.device("maincpu"), 0, 0xff);
 }
 
 
@@ -181,7 +181,7 @@ static MACHINE_RESET( enterprise )
 
 static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_intrq_w )
 {
-	ep_state *ep = device->machine->driver_data<ep_state>();
+	ep_state *ep = device->machine().driver_data<ep_state>();
 
 	if (state)
 		ep->exdos_card_value |= 0x02;
@@ -191,7 +191,7 @@ static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
 {
-	ep_state *ep = device->machine->driver_data<ep_state>();
+	ep_state *ep = device->machine().driver_data<ep_state>();
 
 	if (state)
 		ep->exdos_card_value |= 0x80;
@@ -211,7 +211,7 @@ static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
 */
 static READ8_HANDLER( exdos_card_r )
 {
-	ep_state *ep = space->machine->driver_data<ep_state>();
+	ep_state *ep = space->machine().driver_data<ep_state>();
 	return ep->exdos_card_value;
 }
 
@@ -227,7 +227,7 @@ static READ8_HANDLER( exdos_card_r )
 */
 static WRITE8_HANDLER( exdos_card_w )
 {
-	device_t *fdc = space->machine->device("wd1770");
+	device_t *fdc = space->machine().device("wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);

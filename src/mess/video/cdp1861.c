@@ -237,7 +237,7 @@ void cdp1861_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprec
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine()));
 	}
 }
 
@@ -256,19 +256,19 @@ static DEVICE_START( cdp1861 )
 	devcb_resolve_write_line(&cdp1861->out_efx_func, &intf->out_efx_func, device);
 
 	/* get the cpu */
-	cdp1861->cpu = device->machine->device<cpu_device>(intf->cpu_tag);
+	cdp1861->cpu = device->machine().device<cpu_device>(intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1861->screen =  device->machine->device<screen_device>(intf->screen_tag);
+	cdp1861->screen =  device->machine().device<screen_device>(intf->screen_tag);
 	assert(cdp1861->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1861->bitmap = auto_bitmap_alloc(device->machine, cdp1861->screen->width(), cdp1861->screen->height(), cdp1861->screen->format());
+	cdp1861->bitmap = auto_bitmap_alloc(device->machine(), cdp1861->screen->width(), cdp1861->screen->height(), cdp1861->screen->format());
 
 	/* create the timers */
-	cdp1861->int_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1861_int_tick), (void *)device);
-	cdp1861->efx_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1861_efx_tick), (void *)device);
-	cdp1861->dma_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1861_dma_tick), (void *)device);
+	cdp1861->int_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1861_int_tick), (void *)device);
+	cdp1861->efx_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1861_efx_tick), (void *)device);
+	cdp1861->dma_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1861_dma_tick), (void *)device);
 
 	/* register for state saving */
 	device->save_item(NAME(cdp1861->disp));

@@ -114,64 +114,64 @@ static const unsigned short ti85_palette[32][7] =
 
 PALETTE_INIT( ti85 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
+	ti85_state *state = machine.driver_data<ti85_state>();
 	UINT8 i, j, r, g, b;
 
-	machine->colortable = colortable_alloc(machine, 224);
+	machine.colortable = colortable_alloc(machine, 224);
 
 	for ( i = 0; i < 224; i++ )
 	{
 		r = ti85_colors[i][0]; g = ti85_colors[i][1]; b = ti85_colors[i][2];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i=0; i < 32; i++)
 		for (j=0; j < 7; j++)
-			colortable_entry_set_value(machine->colortable, i*7+j, ti85_palette[i][j]);
+			colortable_entry_set_value(machine.colortable, i*7+j, ti85_palette[i][j]);
 
-	if (!strncmp(machine->system().name, "ti81", 4))
+	if (!strncmp(machine.system().name, "ti81", 4))
 	{
 		state->ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI81_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI81_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->system().name, "ti85", 4))
+	else if (!strncmp(machine.system().name, "ti85", 4))
 	{
 		state->ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI85_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI85_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->system().name, "ti82", 4))
+	else if (!strncmp(machine.system().name, "ti82", 4))
 	{
 		state->ti_video_memory_size = TI82_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI82_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI82_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->system().name, "ti83p", 5))
+	else if (!strncmp(machine.system().name, "ti83p", 5))
 	{
 		state->ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI83_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI83_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->system().name, "ti83", 4))
+	else if (!strncmp(machine.system().name, "ti83", 4))
 	{
 		state->ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI83_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI83_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->system().name, "ti86", 4))
+	else if (!strncmp(machine.system().name, "ti86", 4))
 	{
 		state->ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI86_SCREEN_X_SIZE;
 		state->ti_screen_y_size = TI86_SCREEN_Y_SIZE;
 		state->ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine->system().name, "ti73", 4))
+	else if (!strncmp(machine.system().name, "ti73", 4))
 	{
 		state->ti_video_memory_size = TI73_VIDEO_MEMORY_SIZE;
 		state->ti_screen_x_size = TI73_SCREEN_X_SIZE;
@@ -193,8 +193,8 @@ VIDEO_START( ti85 )
 
 SCREEN_UPDATE( ti85 )
 {
-	ti85_state *state = screen->machine->driver_data<ti85_state>();
-	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	ti85_state *state = screen->machine().driver_data<ti85_state>();
+	address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;
@@ -234,7 +234,7 @@ SCREEN_UPDATE( ti85 )
 
 SCREEN_UPDATE( ti82 )
 {
-	ti85_state *state = screen->machine->driver_data<ti85_state>();
+	ti85_state *state = screen->machine().driver_data<ti85_state>();
 	//for now use the ti85_palette
 
 	int x,y,b;

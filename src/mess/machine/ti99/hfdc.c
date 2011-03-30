@@ -174,7 +174,7 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 				// MZ: 00 should not be used since there is a bug in the
 				// DSR of the HFDC which causes problems with SD disks
 				// (controller tries DD and then fails to fall back to SD) */
-				reply = ~(input_port_read(device->machine, "HFDCDIP"));
+				reply = ~(input_port_read(device->machine(), "HFDCDIP"));
 			}
 			else
 			{
@@ -659,14 +659,14 @@ static DEVICE_START( ti99_hfdc )
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 
-	card->motor_on_timer = device->machine->scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
+	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 	card->ram = NULL;
 	card->ram_offset[0] = 0x2000; // static bank
 	card->controller = device->subdevice("smc92x4");
 	card->clock = device->subdevice("mm58274c");
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", hfdc_region);
-	card->rom = device->machine->region(astring_c(region))->base();
+	card->rom = device->machine().region(astring_c(region))->base();
 }
 
 static DEVICE_STOP( ti99_hfdc )
@@ -682,7 +682,7 @@ static DEVICE_RESET( ti99_hfdc )
 	static const char *const hardname[] = {MFMHD_0, MFMHD_1, MFMHD_2};
 
 	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine, "DISKCTRL") == DISK_HFDC)
+	if (input_port_read(device->machine(), "DISKCTRL") == DISK_HFDC)
 	{
 		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &hfdc_card, get_pebcard_config(device)->slot);
@@ -691,7 +691,7 @@ static DEVICE_RESET( ti99_hfdc )
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			logerror("HFDC: Configuring for GenMod\n");
@@ -706,12 +706,12 @@ static DEVICE_RESET( ti99_hfdc )
 //          memset(card->ram, 0, 32768);
 		}
 
-		if (input_port_read(device->machine, "HFDCDIP")&0x55)
+		if (input_port_read(device->machine(), "HFDCDIP")&0x55)
 			ti99_set_80_track_drives(TRUE);
 		else
 			ti99_set_80_track_drives(FALSE);
 
-		smc92x4_set_timing(card->controller, input_port_read(device->machine, "DRVSPD"));
+		smc92x4_set_timing(card->controller, input_port_read(device->machine(), "DRVSPD"));
 
 		// Connect floppy drives to controller. Note that *this* is the
 		// controller, not the controller chip. The pcb contains a select

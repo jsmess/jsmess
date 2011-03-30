@@ -15,10 +15,10 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*ted7360_dma_read)(running_machine *machine, int);
-typedef int (*ted7360_dma_read_rom)(running_machine *machine, int);
-typedef void (*ted7360_irq) (running_machine *, int);
-typedef UINT8 (*ted7360_key_cb) (running_machine *, int);
+typedef int (*ted7360_dma_read)(running_machine &machine, int);
+typedef int (*ted7360_dma_read_rom)(running_machine &machine, int);
+typedef void (*ted7360_irq) (running_machine &, int);
+typedef UINT8 (*ted7360_key_cb) (running_machine &, int);
 
 typedef enum
 {

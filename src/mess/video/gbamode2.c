@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-static void draw_mode2_scanline(running_machine *machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+static void draw_mode2_scanline(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
 	UINT32 backdrop = ((UINT16*)state->gba_pram)[0] | 0x30000000;
@@ -87,7 +87,7 @@ static void draw_mode2_scanline(running_machine *machine, gba_state *state, int 
 	state->gfxBG3Changed = 0;
 }
 
-static void draw_mode2_scanline_nowindow(running_machine *machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+static void draw_mode2_scanline_nowindow(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
 	UINT32 backdrop = ((UINT16*)state->gba_pram)[0] | 0x30000000;
@@ -225,7 +225,7 @@ static void draw_mode2_scanline_nowindow(running_machine *machine, gba_state *st
 	state->gfxBG3Changed = 0;
 }
 
-static void draw_mode2_scanline_all(running_machine *machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+static void draw_mode2_scanline_all(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
 	UINT32 backdrop = ((UINT16*)state->gba_pram)[0] | 0x30000000;

@@ -80,9 +80,9 @@ extern READ8_HANDLER( hector_cassette_r );
 extern WRITE8_HANDLER( hector_color_a_w );
 extern WRITE8_HANDLER( hector_color_b_w );
 
-extern void hector_init( running_machine *machine);
-extern void hector_reset(running_machine *machine, int hr, int with_D2);
-extern void hector_disc2_reset( running_machine *machine);
+extern void hector_init( running_machine &machine);
+extern void hector_reset(running_machine &machine, int hr, int with_D2);
+extern void hector_disc2_reset( running_machine &machine);
 
 extern READ8_HANDLER( hector_mx_io_port_r );
 extern WRITE8_HANDLER( hector_mx80_io_port_w );
@@ -135,7 +135,7 @@ WRITE8_HANDLER( hector_disc2_io61_port_w);
 READ8_HANDLER(  hector_disc2_io70_port_r);
 WRITE8_HANDLER( hector_disc2_io70_port_w);
 
-extern void hector_disc2_init( running_machine *machine);
+extern void hector_disc2_init( running_machine &machine);
 
 extern const upd765_interface hector_disc2_upd765_interface;
 extern const floppy_config    hector_disc2_floppy_config;

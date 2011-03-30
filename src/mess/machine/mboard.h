@@ -66,7 +66,7 @@ WRITE32_HANDLER( mboard_write_LED_32 );
 
 TIMER_DEVICE_CALLBACK( mboard_update_artwork );
 
-void mboard_savestate_register(running_machine *machine);
+void mboard_savestate_register(running_machine &machine);
 
 void mboard_set_board( void );
 void mboard_set_border_pieces (void);

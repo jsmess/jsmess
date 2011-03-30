@@ -167,7 +167,7 @@ device_config *cirrus_device_config::static_alloc_device_config(const machine_co
 
 device_t *cirrus_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, cirrus_device(machine, *this));
+    return auto_alloc(machine, cirrus_device(machine, *this));
 }
 
 //**************************************************************************
@@ -184,9 +184,9 @@ cirrus_device::cirrus_device(running_machine &_machine, const cirrus_device_conf
 {
 }
 
-static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
+static void bebox_map_vga_memory(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	address_space *space = machine->device("ppc1")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("ppc1")->memory().space(AS_PROGRAM);
 
 	space->nop_readwrite(0xC00A0000, 0xC00BFFFF);
 
@@ -220,7 +220,7 @@ const struct pc_svga_interface cirrus_svga_interface =
 
 void cirrus_device::device_start()
 {
-	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
+	pc_vga_init(machine(), &bebox_vga_interface, &cirrus_svga_interface);
 }
 
 //-------------------------------------------------
@@ -300,5 +300,5 @@ void cirrus5430_pci_write(device_t *busdevice, device_t *device, int function, i
 WRITE8_DEVICE_HANDLER( cirrus_42E8_w )
 {
 	if (data & 0x80)
-		pc_vga_reset(device->machine);
+		pc_vga_reset(device->machine());
 }

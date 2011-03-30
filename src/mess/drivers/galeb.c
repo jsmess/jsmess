@@ -26,7 +26,7 @@ static READ8_HANDLER( galeb_keyboard_r )
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(space->machine, keynames[offset]);
+	return input_port_read(space->machine(), keynames[offset]);
 }
 
 /* Address maps */

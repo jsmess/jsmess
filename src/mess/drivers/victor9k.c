@@ -98,7 +98,7 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
+	victor9k_state *state = device->machine().driver_data<victor9k_state>();
 	address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
 
 	if (BIT(ma, 13))
@@ -867,7 +867,7 @@ static IEEE488_DAISY( ieee488_daisy )
 
 static IRQ_CALLBACK( victor9k_irq_callback )
 {
-	victor9k_state *state = device->machine->driver_data<victor9k_state>();
+	victor9k_state *state = device->machine().driver_data<victor9k_state>();
 
 	return pic8259_acknowledge(state->m_pic);
 }

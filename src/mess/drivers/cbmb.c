@@ -339,28 +339,28 @@ static PALETTE_INIT( p500 )
 
 static SCREEN_UPDATE( p500 )
 {
-	device_t *vic2 = screen->machine->device("vic6567");
+	device_t *vic2 = screen->machine().device("vic6567");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;
 }
 
-static UINT8 cbmb_lightpen_x_cb( running_machine *machine )
+static UINT8 cbmb_lightpen_x_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTX") & ~0x01;
 }
 
-static UINT8 cbmb_lightpen_y_cb( running_machine *machine )
+static UINT8 cbmb_lightpen_y_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTY") & ~0x01;
 }
 
-static UINT8 cbmb_lightpen_button_cb( running_machine *machine )
+static UINT8 cbmb_lightpen_button_cb( running_machine &machine )
 {
 	return input_port_read(machine, "OTHER") & 0x04;
 }
 
-static UINT8 cbmb_rdy_cb( running_machine *machine )
+static UINT8 cbmb_rdy_cb( running_machine &machine )
 {
 	return input_port_read(machine, "CTRLSEL") & 0x08;
 }

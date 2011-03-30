@@ -40,11 +40,11 @@ READ8_MEMBER(mikrolab_state::keypad_r)
 	UINT8 data = 0xff;
 
 	if (BIT(m_kp_matrix, 4))
-		data &= input_port_read(space.machine, "LINE1");
+		data &= input_port_read(m_machine, "LINE1");
 	if (BIT(m_kp_matrix, 5))
-		data &= input_port_read(space.machine, "LINE2");
+		data &= input_port_read(m_machine, "LINE2");
 	if (BIT(m_kp_matrix, 6))
-		data &= input_port_read(space.machine, "LINE3");
+		data &= input_port_read(m_machine, "LINE3");
 
 	return data;
 }

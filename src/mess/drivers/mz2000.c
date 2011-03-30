@@ -60,10 +60,10 @@ static VIDEO_START( mz2000 )
 
 static SCREEN_UPDATE( mz2000 )
 {
-	mz2000_state *state = screen->machine->driver_data<mz2000_state>();
-	UINT8 *tvram = screen->machine->region("tvram")->base();
-	UINT8 *gvram = screen->machine->region("gvram")->base();
-	UINT8 *gfx_data = screen->machine->region("chargen")->base();
+	mz2000_state *state = screen->machine().driver_data<mz2000_state>();
+	UINT8 *tvram = screen->machine().region("tvram")->base();
+	UINT8 *gvram = screen->machine().region("gvram")->base();
+	UINT8 *gfx_data = screen->machine().region("chargen")->base();
 	int x,y,xi,yi;
 	UINT8 x_size;
 	UINT32 count;
@@ -82,8 +82,8 @@ static SCREEN_UPDATE( mz2000 )
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= state->gvram_mask;
 
-				*BITMAP_ADDR16(bitmap, y*2+0, x+xi) = screen->machine->pens[pen];
-				*BITMAP_ADDR16(bitmap, y*2+1, x+xi) = screen->machine->pens[pen];
+				*BITMAP_ADDR16(bitmap, y*2+0, x+xi) = screen->machine().pens[pen];
+				*BITMAP_ADDR16(bitmap, y*2+1, x+xi) = screen->machine().pens[pen];
 			}
 			count++;
 		}
@@ -123,27 +123,27 @@ static SCREEN_UPDATE( mz2000 )
 						{
 							if(state->width80 == 0)
 							{
-								*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine->pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine().pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine().pens[pen];
 							}
 							else
 							{
-								*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine().pens[pen];
 							}
 						}
 						else
 						{
 							if(state->width80 == 0)
 							{
-								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+0) = screen->machine->pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+1) = screen->machine->pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+0) = screen->machine->pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+1) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+0) = screen->machine().pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+1) = screen->machine().pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+0) = screen->machine().pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+1) = screen->machine().pens[pen];
 							}
 							else
 							{
-								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = screen->machine->pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = screen->machine->pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = screen->machine().pens[pen];
+								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = screen->machine().pens[pen];
 							}
 						}
 					}
@@ -157,51 +157,51 @@ static SCREEN_UPDATE( mz2000 )
 
 static READ8_HANDLER( mz2000_ipl_r )
 {
-	UINT8 *ipl = space->machine->region("ipl")->base();
+	UINT8 *ipl = space->machine().region("ipl")->base();
 
 	return ipl[offset];
 }
 
 static READ8_HANDLER( mz2000_wram_r )
 {
-	UINT8 *wram = space->machine->region("wram")->base();
+	UINT8 *wram = space->machine().region("wram")->base();
 
 	return wram[offset];
 }
 
 static WRITE8_HANDLER( mz2000_wram_w )
 {
-	UINT8 *wram = space->machine->region("wram")->base();
+	UINT8 *wram = space->machine().region("wram")->base();
 
 	wram[offset] = data;
 }
 
 static READ8_HANDLER( mz2000_tvram_r )
 {
-	UINT8 *tvram = space->machine->region("tvram")->base();
+	UINT8 *tvram = space->machine().region("tvram")->base();
 
 	return tvram[offset];
 }
 
 static WRITE8_HANDLER( mz2000_tvram_w )
 {
-	UINT8 *tvram = space->machine->region("tvram")->base();
+	UINT8 *tvram = space->machine().region("tvram")->base();
 
 	tvram[offset] = data;
 }
 
 static READ8_HANDLER( mz2000_gvram_r )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
-	UINT8 *gvram = space->machine->region("gvram")->base();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
+	UINT8 *gvram = space->machine().region("gvram")->base();
 
 	return gvram[offset+state->gvram_bank*0x4000];
 }
 
 static WRITE8_HANDLER( mz2000_gvram_w )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
-	UINT8 *gvram = space->machine->region("gvram")->base();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
+	UINT8 *gvram = space->machine().region("gvram")->base();
 
 	gvram[offset+state->gvram_bank*0x4000] = data;
 }
@@ -209,7 +209,7 @@ static WRITE8_HANDLER( mz2000_gvram_w )
 
 static READ8_HANDLER( mz2000_mem_r )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	UINT8 page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
@@ -238,7 +238,7 @@ static READ8_HANDLER( mz2000_mem_r )
 
 static WRITE8_HANDLER( mz2000_mem_w )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	UINT8 page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
@@ -263,14 +263,14 @@ static WRITE8_HANDLER( mz2000_mem_w )
 
 static WRITE8_HANDLER( mz2000_gvram_bank_w )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 
 	state->gvram_bank = data & 3;
 }
 
 static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
 {
-	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
 	if(state->has_fdc)
 		return wd17xx_r(device, offset) ^ 0xff;
@@ -280,7 +280,7 @@ static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
 
 static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
 {
-	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
 	if(state->has_fdc)
 		wd17xx_w(device, offset, data ^ 0xff);
@@ -288,14 +288,14 @@ static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
 
 static WRITE8_HANDLER( mz2000_fdc_w )
 {
-	device_t* dev = space->machine->device("mb8877a");
+	device_t* dev = space->machine().device("mb8877a");
 
 	switch(offset+0xdc)
 	{
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_mon_w(floppy_get_device(space->machine, data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), 1,0);
+			floppy_mon_w(floppy_get_device(space->machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
 			wd17xx_set_side(dev,(data & 1));
@@ -305,7 +305,7 @@ static WRITE8_HANDLER( mz2000_fdc_w )
 
 static WRITE8_HANDLER( timer_w )
 {
-	device_t *pit8253 = space->machine->device("pit");
+	device_t *pit8253 = space->machine().device("pit");
 
 	pit8253_gate0_w(pit8253, 1);
 	pit8253_gate1_w(pit8253, 1);
@@ -317,13 +317,13 @@ static WRITE8_HANDLER( timer_w )
 
 static WRITE8_HANDLER( mz2000_tvram_attr_w )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	state->tvram_attr = data;
 }
 
 static WRITE8_HANDLER( mz2000_gvram_mask_w )
 {
-	mz2000_state *state = space->machine->driver_data<mz2000_state>();
+	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	state->gvram_mask = data;
 }
 
@@ -492,14 +492,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(mz2000)
 {
-	mz2000_state *state = machine->driver_data<mz2000_state>();
+	mz2000_state *state = machine.driver_data<mz2000_state>();
 
 	state->ipl_enable = 1;
 	state->tvram_enable = 0;
 	state->gvram_enable = 0;
 
-	beep_set_frequency(machine->device("beeper"),4096);
-	beep_set_state(machine->device("beeper"),0);
+	beep_set_frequency(machine.device("beeper"),4096);
+	beep_set_state(machine.device("beeper"),0);
 
 	state->color_mode = input_port_read(machine,"CONFIG") & 1;
 	state->has_fdc = (input_port_read(machine,"CONFIG") & 2) >> 1;
@@ -566,8 +566,8 @@ static READ8_DEVICE_HANDLER( mz2000_portb_r )
 	*/
 	UINT8 res = 0xff ^ 0xe0;
 
-	res |= (cassette_input(device->machine->device("cassette")) > 0.00) ? 0x40 : 0x00;
-	res |= ((cassette_get_state(device->machine->device("cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
+	res |= (cassette_input(device->machine().device("cassette")) > 0.00) ? 0x40 : 0x00;
+	res |= ((cassette_get_state(device->machine().device("cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
 
 	popmessage("%02x",res);
 
@@ -606,7 +606,7 @@ static WRITE8_DEVICE_HANDLER( mz2000_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
 {
-	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 	/*
 		x--- ---- tape data write
 		-x-- ---- tape rec
@@ -625,10 +625,10 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
 	{
 		state->ipl_enable = 0;
 		/* correct? */
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
-	beep_set_state(device->machine->device("beeper"),data & 0x04);
+	beep_set_state(device->machine().device("beeper"),data & 0x04);
 
 	state->old_portc = data;
 }
@@ -645,7 +645,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 static WRITE8_DEVICE_HANDLER( mz2000_pio1_porta_w )
 {
-	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 	state->tvram_enable = ((data & 0xc0) == 0xc0);
 	state->gvram_enable = ((data & 0xc0) == 0x80);
 	state->width80 = ((data & 0x20) >> 5);
@@ -654,7 +654,7 @@ static WRITE8_DEVICE_HANDLER( mz2000_pio1_porta_w )
 
 static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
 {
-	mz2000_state *state = device->machine->driver_data<mz2000_state>();
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
@@ -666,16 +666,16 @@ static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= input_port_read(device->machine, keynames[i]);
+			res &= input_port_read(device->machine(), keynames[i]);
 
 		state->pio_latchb = res;
 
 		return res;
 	}
 
-	state->pio_latchb = input_port_read(device->machine, keynames[state->key_mux & 0xf]);
+	state->pio_latchb = input_port_read(device->machine(), keynames[state->key_mux & 0xf]);
 
-	return input_port_read(device->machine, keynames[state->key_mux & 0xf]);
+	return input_port_read(device->machine(), keynames[state->key_mux & 0xf]);
 }
 
 static Z80PIO_INTERFACE( mz2000_pio1_intf )

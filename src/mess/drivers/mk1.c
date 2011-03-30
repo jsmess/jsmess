@@ -61,44 +61,44 @@ public:
 
 
 static READ8_HANDLER( mk1_f8_r ) {
-	mk1_state *state = space->machine->driver_data<mk1_state>();
+	mk1_state *state = space->machine().driver_data<mk1_state>();
     UINT8 data = state->f8[offset];
 
     if ( offset == 0 ) {
-		if ( data & 1 ) data |= input_port_read(space->machine, "LINE1");
-		if ( data & 2 ) data |= input_port_read(space->machine, "LINE2");
-		if ( data & 4 ) data |= input_port_read(space->machine, "LINE3");
-		if ( data & 8 ) data |= input_port_read(space->machine, "LINE4");
+		if ( data & 1 ) data |= input_port_read(space->machine(), "LINE1");
+		if ( data & 2 ) data |= input_port_read(space->machine(), "LINE2");
+		if ( data & 4 ) data |= input_port_read(space->machine(), "LINE3");
+		if ( data & 8 ) data |= input_port_read(space->machine(), "LINE4");
 		if ( data & 0x10 ) {
-			if ( input_port_read(space->machine, "LINE1") & 0x10 ) data |= 1;
-			if ( input_port_read(space->machine, "LINE2") & 0x10 ) data |= 2;
-			if ( input_port_read(space->machine, "LINE3") & 0x10 ) data |= 4;
-			if ( input_port_read(space->machine, "LINE4") & 0x10 ) data |= 8;
+			if ( input_port_read(space->machine(), "LINE1") & 0x10 ) data |= 1;
+			if ( input_port_read(space->machine(), "LINE2") & 0x10 ) data |= 2;
+			if ( input_port_read(space->machine(), "LINE3") & 0x10 ) data |= 4;
+			if ( input_port_read(space->machine(), "LINE4") & 0x10 ) data |= 8;
 		}
 		if ( data & 0x20 ) {
-			if ( input_port_read(space->machine, "LINE1") & 0x20 ) data |= 1;
-			if ( input_port_read(space->machine, "LINE2") & 0x20 ) data |= 2;
-			if ( input_port_read(space->machine, "LINE3") & 0x20 ) data |= 4;
-			if ( input_port_read(space->machine, "LINE4") & 0x20 ) data |= 8;
+			if ( input_port_read(space->machine(), "LINE1") & 0x20 ) data |= 1;
+			if ( input_port_read(space->machine(), "LINE2") & 0x20 ) data |= 2;
+			if ( input_port_read(space->machine(), "LINE3") & 0x20 ) data |= 4;
+			if ( input_port_read(space->machine(), "LINE4") & 0x20 ) data |= 8;
 		}
 		if ( data & 0x40 ) {
-			if ( input_port_read(space->machine, "LINE1") & 0x40 ) data |= 1;
-			if ( input_port_read(space->machine, "LINE2") & 0x40 ) data |= 2;
-			if ( input_port_read(space->machine, "LINE3") & 0x40 ) data |= 4;
-			if ( input_port_read(space->machine, "LINE4") & 0x40 ) data |= 8;
+			if ( input_port_read(space->machine(), "LINE1") & 0x40 ) data |= 1;
+			if ( input_port_read(space->machine(), "LINE2") & 0x40 ) data |= 2;
+			if ( input_port_read(space->machine(), "LINE3") & 0x40 ) data |= 4;
+			if ( input_port_read(space->machine(), "LINE4") & 0x40 ) data |= 8;
 		}
 		if ( data & 0x80 ) {
-			if ( input_port_read(space->machine, "LINE1") & 0x80 ) data |= 1;
-			if ( input_port_read(space->machine, "LINE2") & 0x80 ) data |= 2;
-			if ( input_port_read(space->machine, "LINE3") & 0x80 ) data |= 4;
-			if ( input_port_read(space->machine, "LINE4") & 0x80 ) data |= 8;
+			if ( input_port_read(space->machine(), "LINE1") & 0x80 ) data |= 1;
+			if ( input_port_read(space->machine(), "LINE2") & 0x80 ) data |= 2;
+			if ( input_port_read(space->machine(), "LINE3") & 0x80 ) data |= 4;
+			if ( input_port_read(space->machine(), "LINE4") & 0x80 ) data |= 8;
 		}
     }
     return data;
 }
 
 static WRITE8_HANDLER( mk1_f8_w ) {
-	mk1_state *state = space->machine->driver_data<mk1_state>();
+	mk1_state *state = space->machine().driver_data<mk1_state>();
 	/* 0 is high and allows also input */
 	state->f8[offset] = data;
 
@@ -158,7 +158,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( mk1_update_leds )
 {
-	mk1_state *state = timer.machine->driver_data<mk1_state>();
+	mk1_state *state = timer.machine().driver_data<mk1_state>();
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -176,9 +176,9 @@ static MACHINE_START( mk1 )
 
 static void mk1_interrupt( device_t *device, UINT16 addr, int level )
 {
-	device_set_input_line_vector(device->machine->device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
+	device_set_input_line_vector(device->machine().device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
 
-	cputag_set_input_line(device->machine,"maincpu", F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine(),"maincpu", F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

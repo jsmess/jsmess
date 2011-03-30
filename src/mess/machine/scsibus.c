@@ -571,7 +571,7 @@ static void check_process_dataout(device_t *device)
 			capacity=(tracks * bus->data[2]) * 17;
 			LOG(1,"Tracks=%d, Heads=%d\n",tracks,bus->data[2]);
 			LOG(1,"Setting disk capacity to %d blocks\n",capacity);
-			//debugger_break(device->machine);
+			//debugger_break(device->machine());
 			break;
 
 		case SCSI_CMD_MODE_SELECT :
@@ -581,7 +581,7 @@ static void check_process_dataout(device_t *device)
 			LOG(1,"Tracks=%d, Heads=%d sec/track=%d\n",tracks,sense->head_count,sense->sectors_per_track);
 			LOG(1,"Setting disk capacity to %d blocks\n",capacity);
 			dump_data_bytes(bus,0x16);
-			//debugger_break(device->machine);
+			//debugger_break(device->machine());
 			break;
 	}
 }
@@ -797,7 +797,7 @@ static void scsi_change_phase(device_t *device, UINT8 newphase)
             scsi_out_line_change(device,SCSI_LINE_BSY,1);
 			LOG(1,"SCSIBUS: done\n\n");
 			//if (IS_COMMAND(SCSI_CMD_READ_CAPACITY))
-			//  debugger_break(device->machine);
+			//  debugger_break(device->machine());
             break;
 
         case SCSI_PHASE_COMMAND :
@@ -889,7 +889,7 @@ void init_scsibus(device_t *device)
         for (devno = 0; devno < scsidevs->devs_present; devno++)
         {
             LOG(1,"SCSIBUS:init devno=%d \n",devno);
-            SCSIAllocInstance( device->machine, scsidevs->devices[devno].scsiClass, &bus->devices[scsidevs->devices[devno].scsiID], scsidevs->devices[devno].diskregion );
+            SCSIAllocInstance( device->machine(), scsidevs->devices[devno].scsiClass, &bus->devices[scsidevs->devices[devno].scsiID], scsidevs->devices[devno].diskregion );
         }
 
         bus->initialised=1;
@@ -915,10 +915,10 @@ static DEVICE_START( scsibus )
     bus->phase=SCSI_PHASE_BUS_FREE;
 
     // Setup req/ack/sel timers
-    bus->req_timer=device->machine->scheduler().timer_alloc(FUNC(req_timer_callback), (void *)device);
-    bus->ack_timer=device->machine->scheduler().timer_alloc(FUNC(ack_timer_callback), (void *)device);
-	bus->sel_timer=device->machine->scheduler().timer_alloc(FUNC(sel_timer_callback), (void *)device);
-	bus->dataout_timer=device->machine->scheduler().timer_alloc(FUNC(dataout_timer_callback), (void *)device);
+    bus->req_timer=device->machine().scheduler().timer_alloc(FUNC(req_timer_callback), (void *)device);
+    bus->ack_timer=device->machine().scheduler().timer_alloc(FUNC(ack_timer_callback), (void *)device);
+	bus->sel_timer=device->machine().scheduler().timer_alloc(FUNC(sel_timer_callback), (void *)device);
+	bus->dataout_timer=device->machine().scheduler().timer_alloc(FUNC(dataout_timer_callback), (void *)device);
 
 }
 

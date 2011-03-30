@@ -202,14 +202,14 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
 	return state->m_reset;
 }
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
 	if (state->m_iden)
 	{
@@ -225,14 +225,14 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 
 static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
 	return (cassette_input(device) < 0) | state->m_cdp1802_ef4;
 }
 
 static COSMAC_SC_WRITE( comx35_sc_w )
 {
-	comx35_state *state = device->machine->driver_data<comx35_state>();
+	comx35_state *state = device->machine().driver_data<comx35_state>();
 
 	switch (sc)
 	{
@@ -271,7 +271,7 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_q_w )
 {
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
+	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
 
 	driver_state->m_cdp1802_q = state;
 
@@ -305,12 +305,12 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 static READ_LINE_DEVICE_HANDLER( comx35_shift_r )
 {
-	return BIT(input_port_read(device->machine, "MODIFIERS"), 0);
+	return BIT(input_port_read(device->machine(), "MODIFIERS"), 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( comx35_control_r )
 {
-	return BIT(input_port_read(device->machine, "MODIFIERS"), 1);
+	return BIT(input_port_read(device->machine(), "MODIFIERS"), 1);
 }
 
 static CDP1871_INTERFACE( comx35_cdp1871_intf )

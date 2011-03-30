@@ -17,7 +17,7 @@ void ti990_reset_int(void)
 	intlines = 0;
 }
 
-void ti990_set_int_line(running_machine *machine, int line, int state)
+void ti990_set_int_line(running_machine &machine, int line, int state)
 {
 	int level;
 
@@ -39,35 +39,35 @@ void ti990_set_int_line(running_machine *machine, int line, int state)
 
 void ti990_set_int2(device_t *device, int state)
 {
-	ti990_set_int_line(device->machine, 2, state);
+	ti990_set_int_line(device->machine(), 2, state);
 }
 
-void ti990_set_int3(running_machine *machine, int state)
+void ti990_set_int3(running_machine &machine, int state)
 {
 	ti990_set_int_line(machine, 3, state);
 }
 
-void ti990_set_int6(running_machine *machine, int state)
+void ti990_set_int6(running_machine &machine, int state)
 {
 	ti990_set_int_line(machine, 6, state);
 }
 
-void ti990_set_int7(running_machine *machine, int state)
+void ti990_set_int7(running_machine &machine, int state)
 {
 	ti990_set_int_line(machine, 7, state);
 }
 
-void ti990_set_int9(running_machine *machine, int state)
+void ti990_set_int9(running_machine &machine, int state)
 {
 	ti990_set_int_line(machine, 9, state);
 }
 
-void ti990_set_int10(running_machine *machine, int state)
+void ti990_set_int10(running_machine &machine, int state)
 {
 	ti990_set_int_line(machine, 10, state);
 }
 
-void ti990_set_int13(running_machine *machine, int state)
+void ti990_set_int13(running_machine &machine, int state)
 {
 	ti990_set_int_line(machine, 13, state);
 }
@@ -81,10 +81,10 @@ static TIMER_CALLBACK(clear_load)
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void ti990_hold_load(running_machine *machine)
+void ti990_hold_load(running_machine &machine)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-	machine->scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
+	machine.scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
 }
 
 /*
@@ -95,7 +95,7 @@ void ti990_hold_load(running_machine *machine)
 SMI sheet 4) */
 static char ckon_state;
 
-void ti990_line_interrupt(running_machine *machine)
+void ti990_line_interrupt(running_machine &machine)
 {
 	if (ckon_state)
 		ti990_set_int_line(machine, 5, 1);
@@ -105,7 +105,7 @@ void ti990_ckon_ckof_callback(device_t *device, int state)
 {
 	ckon_state = state;
 	if (! ckon_state)
-		ti990_set_int_line(device->machine, 5, 0);
+		ti990_set_int_line(device->machine(), 5, 0);
 }
 
 

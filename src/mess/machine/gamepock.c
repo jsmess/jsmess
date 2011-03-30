@@ -86,7 +86,7 @@ static void gamepock_lcd_update(gamepock_state *state)
 
 WRITE8_HANDLER( gamepock_port_a_w )
 {
-	gamepock_state *state = space->machine->driver_data<gamepock_state>();
+	gamepock_state *state = space->machine().driver_data<gamepock_state>();
 	UINT8	old_port_a = state->port_a;
 
 	state->port_a = data;
@@ -99,7 +99,7 @@ WRITE8_HANDLER( gamepock_port_a_w )
 
 WRITE8_HANDLER( gamepock_port_b_w )
 {
-	gamepock_state *state = space->machine->driver_data<gamepock_state>();
+	gamepock_state *state = space->machine().driver_data<gamepock_state>();
 	state->port_b = data;
 }
 
@@ -111,17 +111,17 @@ READ8_HANDLER( gamepock_port_b_r )
 
 READ8_HANDLER( gamepock_port_c_r )
 {
-	gamepock_state *state = space->machine->driver_data<gamepock_state>();
+	gamepock_state *state = space->machine().driver_data<gamepock_state>();
 	UINT8	data = 0xFF;
 
 	if ( state->port_a & 0x80 )
 	{
-		data &= input_port_read(space->machine, "IN0");
+		data &= input_port_read(space->machine(), "IN0");
 	}
 
 	if ( state->port_a & 0x40 )
 	{
-		data &= input_port_read(space->machine, "IN1");
+		data &= input_port_read(space->machine(), "IN1");
 	}
 
 	return data;
@@ -129,7 +129,7 @@ READ8_HANDLER( gamepock_port_c_r )
 
 MACHINE_RESET( gamepock )
 {
-	gamepock_state *state = machine->driver_data<gamepock_state>();
+	gamepock_state *state = machine.driver_data<gamepock_state>();
 	hd44102ch_init( state, 0 );
 	hd44102ch_init( state, 1 );
 	hd44102ch_init( state, 2 );
@@ -137,7 +137,7 @@ MACHINE_RESET( gamepock )
 
 SCREEN_UPDATE( gamepock )
 {
-	gamepock_state *state = screen->machine->driver_data<gamepock_state>();
+	gamepock_state *state = screen->machine().driver_data<gamepock_state>();
 	UINT8	ad;
 	int		i,j;
 
@@ -212,7 +212,7 @@ SCREEN_UPDATE( gamepock )
 /* This is called whenever the T0 pin switches state */
 int gamepock_io_callback( device_t *device, int ioline, int state )
 {
-	device_t *speaker = device->machine->device("speaker");
+	device_t *speaker = device->machine().device("speaker");
 	if ( ioline == UPD7810_TO )
 	{
 		speaker_level_w(speaker, state & 1 );

@@ -156,16 +156,16 @@ WRITE8_HANDLER( dgn_beta_page_w );
 READ8_HANDLER(dgnbeta_wd2797_r);
 WRITE8_HANDLER(dgnbeta_wd2797_w);
 
-void dgn_beta_frame_interrupt (running_machine *machine, int data);
+void dgn_beta_frame_interrupt (running_machine &machine, int data);
 
 
 /*----------- defined in video/dgn_beta.c -----------*/
 
 /* mc6845 video display generator */
-void dgnbeta_init_video(running_machine *machine);
-void dgnbeta_video_reset(running_machine *machine);
+void dgnbeta_init_video(running_machine &machine);
+void dgnbeta_video_reset(running_machine &machine);
 extern SCREEN_UPDATE( dgnbeta );
-void dgnbeta_vid_set_gctrl(running_machine *machine, int data);
+void dgnbeta_vid_set_gctrl(running_machine &machine, int data);
 
 /* 74HC670 4x4bit colour ram */
 WRITE8_HANDLER(dgnbeta_colour_ram_w);

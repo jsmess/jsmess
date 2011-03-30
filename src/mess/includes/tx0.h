@@ -154,8 +154,8 @@ VIDEO_START( tx0 );
 SCREEN_EOF( tx0 );
 SCREEN_UPDATE( tx0 );
 
-void tx0_plot(running_machine *machine, int x, int y);
-void tx0_typewriter_drawchar(running_machine *machine, int character);
+void tx0_plot(running_machine &machine, int x, int y);
+void tx0_typewriter_drawchar(running_machine &machine, int character);
 
 /* defines for each bit and mask in input port "CSW" */
 enum

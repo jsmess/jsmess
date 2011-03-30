@@ -37,8 +37,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
-static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space->machine->device("dma8237_2"), offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space->machine->device("dma8237_2"), offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space->machine().device("dma8237_2"), offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space->machine().device("dma8237_2"), offset / 2, data); }
 
 static READ64_HANDLER( bebox_dma8237_1_r )
 {
@@ -87,10 +87,10 @@ ADDRESS_MAP_END
 
 static READ64_HANDLER(bb_slave_64be_r)
 {
-	device_t *device = space->machine->device("pcibus");
+	device_t *device = space->machine().device("pcibus");
 
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
-	if ((cpu_get_pc(space->cpu) == 0xfff02e94) || (cpu_get_pc(space->cpu) == 0xfff02e84))
+	if ((cpu_get_pc(&space->device()) == 0xfff02e94) || (cpu_get_pc(&space->device()) == 0xfff02e84))
 	{
 		return 0x108000ff;	// indicate slave CPU
 	}

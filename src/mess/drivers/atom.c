@@ -134,12 +134,12 @@ Hardware:   PPIA 8255
     bankswitch - EPROM bankswitch
 -------------------------------------------------*/
 
-static void bankswitch(running_machine *machine)
+static void bankswitch(running_machine &machine)
 {
-	atom_state *state = machine->driver_data<atom_state>();
-	address_space *program = machine->device(SY6502_TAG)->memory().space(AS_PROGRAM);
+	atom_state *state = machine.driver_data<atom_state>();
+	address_space *program = machine.device(SY6502_TAG)->memory().space(AS_PROGRAM);
 
-	UINT8 *eprom = machine->region("a000")->base() + (state->eprom << 12);
+	UINT8 *eprom = machine.region("a000")->base() + (state->eprom << 12);
 
 	program->install_rom(0xa000, 0xafff, eprom);
 }
@@ -150,7 +150,7 @@ static void bankswitch(running_machine *machine)
 
 static READ8_HANDLER( eprom_r )
 {
-	atom_state *state = space->machine->driver_data<atom_state>();
+	atom_state *state = space->machine().driver_data<atom_state>();
 
 	return state->eprom;
 }
@@ -176,14 +176,14 @@ static WRITE8_HANDLER( eprom_w )
 
     */
 
-	atom_state *state = space->machine->driver_data<atom_state>();
+	atom_state *state = space->machine().driver_data<atom_state>();
 
 	/* block A */
 	state->eprom = data & 0x0f;
 
 	/* TODO block E */
 
-	bankswitch(space->machine);
+	bankswitch(space->machine());
 }
 
 /***************************************************************************
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine, SY6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), SY6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -366,7 +366,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( atom )
 {
-	atom_state *state = screen->machine->driver_data<atom_state>();
+	atom_state *state = screen->machine().driver_data<atom_state>();
 
 	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
@@ -396,7 +396,7 @@ static WRITE8_DEVICE_HANDLER( ppi_pa_w )
 
     */
 
-	atom_state *state = device->machine->driver_data<atom_state>();
+	atom_state *state = device->machine().driver_data<atom_state>();
 
 	/* keyboard column */
 	state->keylatch = data & 0x0f;
@@ -425,24 +425,24 @@ static READ8_DEVICE_HANDLER( ppi_pb_r )
 
     */
 
-	atom_state *state = device->machine->driver_data<atom_state>();
+	atom_state *state = device->machine().driver_data<atom_state>();
 	UINT8 data = 0xff;
 
 	switch (state->keylatch)
 	{
-	case 0: data &= input_port_read(device->machine, "KEY0"); break;
-	case 1: data &= input_port_read(device->machine, "KEY1"); break;
-	case 2: data &= input_port_read(device->machine, "KEY2"); break;
-	case 3: data &= input_port_read(device->machine, "KEY3"); break;
-	case 4: data &= input_port_read(device->machine, "KEY4"); break;
-	case 5: data &= input_port_read(device->machine, "KEY5"); break;
-	case 6: data &= input_port_read(device->machine, "KEY6"); break;
-	case 7: data &= input_port_read(device->machine, "KEY7"); break;
-	case 8: data &= input_port_read(device->machine, "KEY8"); break;
-	case 9: data &= input_port_read(device->machine, "KEY9"); break;
+	case 0: data &= input_port_read(device->machine(), "KEY0"); break;
+	case 1: data &= input_port_read(device->machine(), "KEY1"); break;
+	case 2: data &= input_port_read(device->machine(), "KEY2"); break;
+	case 3: data &= input_port_read(device->machine(), "KEY3"); break;
+	case 4: data &= input_port_read(device->machine(), "KEY4"); break;
+	case 5: data &= input_port_read(device->machine(), "KEY5"); break;
+	case 6: data &= input_port_read(device->machine(), "KEY6"); break;
+	case 7: data &= input_port_read(device->machine(), "KEY7"); break;
+	case 8: data &= input_port_read(device->machine(), "KEY8"); break;
+	case 9: data &= input_port_read(device->machine(), "KEY9"); break;
 	}
 
-	data &= input_port_read(device->machine, "KEY10");
+	data &= input_port_read(device->machine(), "KEY10");
 
 	return data;
 }
@@ -464,7 +464,7 @@ static READ8_DEVICE_HANDLER( ppi_pc_r )
 
     */
 
-	atom_state *state = device->machine->driver_data<atom_state>();
+	atom_state *state = device->machine().driver_data<atom_state>();
 
 	UINT8 data = 0;
 
@@ -475,7 +475,7 @@ static READ8_DEVICE_HANDLER( ppi_pc_r )
 	data |= (cassette_input(state->cassette) > 0.0) << 5;
 
 	/* keyboard RPT */
-	data |= BIT(input_port_read(device->machine, "RPT"), 0) << 6;
+	data |= BIT(input_port_read(device->machine(), "RPT"), 0) << 6;
 
 	/* MC6847 FS */
 	data |= mc6847_fs_r(state->mc6847) << 7;
@@ -500,7 +500,7 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 
     */
 
-	atom_state *state = device->machine->driver_data<atom_state>();
+	atom_state *state = device->machine().driver_data<atom_state>();
 
 	/* cassette output */
 	state->pc0 = BIT(data, 0);
@@ -561,7 +561,7 @@ static const via6522_interface via_intf =
 
 static void atom_8271_interrupt_callback(device_t *device, int state)
 {
-	atom_state *drvstate = device->machine->driver_data<atom_state>();
+	atom_state *drvstate = device->machine().driver_data<atom_state>();
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
     the nmi will be triggered, but when the state changes because the int
@@ -574,7 +574,7 @@ static void atom_8271_interrupt_callback(device_t *device, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cputag_set_input_line(device->machine, SY6502_TAG, INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(device->machine(), SY6502_TAG, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -635,7 +635,7 @@ static const floppy_config atom_floppy_config =
 
 static TIMER_DEVICE_CALLBACK( cassette_output_tick )
 {
-	atom_state *state = timer.machine->driver_data<atom_state>();
+	atom_state *state = timer.machine().driver_data<atom_state>();
 
 	int level = !(!(!state->hz2400 & state->pc1) & state->pc0);
 
@@ -663,7 +663,7 @@ static const cassette_config atom_cassette_config =
 
 static READ8_DEVICE_HANDLER( atom_mc6847_videoram_r )
 {
-	atom_state *state = device->machine->driver_data<atom_state>();
+	atom_state *state = device->machine().driver_data<atom_state>();
 
 	mc6847_as_w(device, BIT(state->video_ram[offset], 6));
 	mc6847_intext_w(device, BIT(state->video_ram[offset], 6));
@@ -698,21 +698,21 @@ static const mc6847_interface atom_mc6847_intf =
 
 static MACHINE_START( atom )
 {
-	atom_state *state = machine->driver_data<atom_state>();
+	atom_state *state = machine.driver_data<atom_state>();
 
 	/* this is temporary */
 	/* Kees van Oss mentions that address 8-b are used for the random number
     generator. I don't know if this is hardware, or random data because the
     ram chips are not cleared at start-up. So at this time, these numbers
     are poked into the memory to simulate it. When I have more details I will fix it */
-	machine->region(SY6502_TAG)->base()[0x08] = machine->rand() & 0x0ff;
-	machine->region(SY6502_TAG)->base()[0x09] = machine->rand() & 0x0ff;
-	machine->region(SY6502_TAG)->base()[0x0a] = machine->rand() & 0x0ff;
-	machine->region(SY6502_TAG)->base()[0x0b] = machine->rand() & 0x0ff;
+	machine.region(SY6502_TAG)->base()[0x08] = machine.rand() & 0x0ff;
+	machine.region(SY6502_TAG)->base()[0x09] = machine.rand() & 0x0ff;
+	machine.region(SY6502_TAG)->base()[0x0a] = machine.rand() & 0x0ff;
+	machine.region(SY6502_TAG)->base()[0x0b] = machine.rand() & 0x0ff;
 
 	/* find devices */
-	state->mc6847 = machine->device(MC6847_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->mc6847 = machine.device(MC6847_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 }
 
 /*-------------------------------------------------
@@ -782,26 +782,26 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
+		temp_copy = auto_alloc_array(image.device().machine(), UINT8, size);
 
 		if (size > 0x1000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			auto_free(image.device().machine, temp_copy);
+			auto_free(image.device().machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 
 		if (image.fread(temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			auto_free(image.device().machine, temp_copy);
+			auto_free(image.device().machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
 	{
 		size = image.get_software_region_length( "rom");
-		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
+		temp_copy = auto_alloc_array(image.device().machine(), UINT8, size);
 		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
@@ -809,9 +809,9 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 
 	/* With the following, we mirror the cart in the whole memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(image.device().machine->region(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
+		memcpy(image.device().machine().region(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
 
-	auto_free(image.device().machine, temp_copy);
+	auto_free(image.device().machine(), temp_copy);
 
 	return IMAGE_INIT_PASS;
 }

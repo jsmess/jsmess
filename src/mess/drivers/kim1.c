@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( kim1_reset )
 {
 	if (newval == 0)
-		field->port->machine->firstcpu->reset();
+		field->port->machine().firstcpu->reset();
 }
 
 
@@ -169,19 +169,19 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 {
-	kim1_state *state = device->machine->driver_data<kim1_state>();
+	kim1_state *state = device->machine().driver_data<kim1_state>();
 	UINT8	data = 0xff;
 
 	switch( ( state->u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = input_port_read(device->machine, "LINE0");
+		data = input_port_read(device->machine(), "LINE0");
 		break;
 	case 1:
-		data = input_port_read(device->machine, "LINE1");
+		data = input_port_read(device->machine(), "LINE1");
 		break;
 	case 2:
-		data = input_port_read(device->machine, "LINE2");
+		data = input_port_read(device->machine(), "LINE2");
 		break;
 	}
 	return data;
@@ -190,7 +190,7 @@ static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 
 static WRITE8_DEVICE_HANDLER( kim1_u2_write_a )
 {
-	kim1_state *state = device->machine->driver_data<kim1_state>();
+	kim1_state *state = device->machine().driver_data<kim1_state>();
 	UINT8 idx = ( state->u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
@@ -205,7 +205,7 @@ static WRITE8_DEVICE_HANDLER( kim1_u2_write_a )
 
 static READ8_DEVICE_HANDLER( kim1_u2_read_b )
 {
-	kim1_state *state = device->machine->driver_data<kim1_state>();
+	kim1_state *state = device->machine().driver_data<kim1_state>();
 	if ( mos6530_portb_out_get(device) & 0x20 )
 		return 0xFF;
 
@@ -215,13 +215,13 @@ static READ8_DEVICE_HANDLER( kim1_u2_read_b )
 
 static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 {
-	kim1_state *state = device->machine->driver_data<kim1_state>();
+	kim1_state *state = device->machine().driver_data<kim1_state>();
 	state->u2_port_b = data;
 
 	if ( data & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( device->machine->device("cassette"), ( data & 0x80 ) ? -1.0 : 1.0 );
+		cassette_output( device->machine().device("cassette"), ( data & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -247,8 +247,8 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 
 static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 {
-	kim1_state *state = timer.machine->driver_data<kim1_state>();
-	double tap_val = cassette_input( timer.machine->device("cassette") );
+	kim1_state *state = timer.machine().driver_data<kim1_state>();
+	double tap_val = cassette_input( timer.machine().device("cassette") );
 
 	if ( tap_val <= 0 )
 	{
@@ -268,7 +268,7 @@ static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 
 static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 {
-	kim1_state *state = timer.machine->driver_data<kim1_state>();
+	kim1_state *state = timer.machine().driver_data<kim1_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )
@@ -283,7 +283,7 @@ static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 
 static MACHINE_START( kim1 )
 {
-	kim1_state *state = machine->driver_data<kim1_state>();
+	kim1_state *state = machine.driver_data<kim1_state>();
 	state_save_register_item(machine, "kim1", NULL, 0, state->u2_port_b );
 	state_save_register_item(machine, "kim1", NULL, 0, state->_311_output );
 	state_save_register_item(machine, "kim1", NULL, 0, state->cassette_high_count );
@@ -292,7 +292,7 @@ static MACHINE_START( kim1 )
 
 static MACHINE_RESET( kim1 )
 {
-	kim1_state *state = machine->driver_data<kim1_state>();
+	kim1_state *state = machine.driver_data<kim1_state>();
 	int i;
 
 

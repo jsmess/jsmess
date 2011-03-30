@@ -79,13 +79,13 @@ enum
 
 static INPUT_CHANGED( panel_check )
 {
-	ssem_state *state = field->port->machine->driver_data<ssem_state>();
-    UINT8 edit0_state = input_port_read(field->port->machine, "EDIT0");
-    UINT8 edit1_state = input_port_read(field->port->machine, "EDIT1");
-    UINT8 edit2_state = input_port_read(field->port->machine, "EDIT2");
-    UINT8 edit3_state = input_port_read(field->port->machine, "EDIT3");
-    UINT8 misc_state = input_port_read(field->port->machine, "MISC");
-    device_t *ssem_cpu = field->port->machine->device("maincpu");
+	ssem_state *state = field->port->machine().driver_data<ssem_state>();
+    UINT8 edit0_state = input_port_read(field->port->machine(), "EDIT0");
+    UINT8 edit1_state = input_port_read(field->port->machine(), "EDIT1");
+    UINT8 edit2_state = input_port_read(field->port->machine(), "EDIT2");
+    UINT8 edit3_state = input_port_read(field->port->machine(), "EDIT3");
+    UINT8 misc_state = input_port_read(field->port->machine(), "MISC");
+    device_t *ssem_cpu = field->port->machine().device("maincpu");
 
     switch( (int)(FPTR)param )
     {
@@ -390,12 +390,12 @@ static const UINT8 char_glyphs[0x80][8] =
     { 0xff, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xff },
 };
 
-static void glyph_print(running_machine *machine, bitmap_t *bitmap, INT32 x, INT32 y, const char *msg, ...)
+static void glyph_print(running_machine &machine, bitmap_t *bitmap, INT32 x, INT32 y, const char *msg, ...)
 {
     va_list arg_list;
     char buf[32768];
     INT32 index = 0;
-    screen_device *screen = machine->first_screen();
+    screen_device *screen = machine.first_screen();
     const rectangle &visarea = screen->visible_area();
 
     va_start( arg_list, msg );
@@ -441,9 +441,9 @@ static void glyph_print(running_machine *machine, bitmap_t *bitmap, INT32 x, INT
 
 static SCREEN_UPDATE( ssem )
 {
-	ssem_state *state = screen->machine->driver_data<ssem_state>();
+	ssem_state *state = screen->machine().driver_data<ssem_state>();
     UINT32 line = 0;
-    device_t *ssem_cpu = screen->machine->device("maincpu");
+    device_t *ssem_cpu = screen->machine().device("maincpu");
     UINT32 accum = cpu_get_reg(ssem_cpu, SSEM_A);
     UINT32 bit = 0;
     UINT32 word = 0;
@@ -458,11 +458,11 @@ static SCREEN_UPDATE( ssem )
         {
             if(word & (1 << (31 - bit)))
             {
-                glyph_print(screen->machine, bitmap, bit << 3, line << 3, "%c", line == state->store_line ? 4 : 2);
+                glyph_print(screen->machine(), bitmap, bit << 3, line << 3, "%c", line == state->store_line ? 4 : 2);
             }
             else
             {
-                glyph_print(screen->machine, bitmap, bit << 3, line << 3, "%c", line == state->store_line ? 3 : 1);
+                glyph_print(screen->machine(), bitmap, bit << 3, line << 3, "%c", line == state->store_line ? 3 : 1);
             }
         }
     }
@@ -471,11 +471,11 @@ static SCREEN_UPDATE( ssem )
     {
         if(accum & (1 << bit))
         {
-            glyph_print(screen->machine, bitmap, bit << 3, 264, "%c", 2);
+            glyph_print(screen->machine(), bitmap, bit << 3, 264, "%c", 2);
         }
         else
         {
-            glyph_print(screen->machine, bitmap, bit << 3, 264, "%c", 1);
+            glyph_print(screen->machine(), bitmap, bit << 3, 264, "%c", 1);
         }
     }
 
@@ -483,7 +483,7 @@ static SCREEN_UPDATE( ssem )
                    (state->store[(state->store_line << 2) | 1] << 16) |
                    (state->store[(state->store_line << 2) | 2] <<  8) |
                    (state->store[(state->store_line << 2) | 3] <<  0));
-    glyph_print(screen->machine, bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", state->store_line, word, cpu_get_reg(ssem_cpu, SSEM_HALT));
+    glyph_print(screen->machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", state->store_line, word, cpu_get_reg(ssem_cpu, SSEM_HALT));
     return 0;
 }
 
@@ -512,7 +512,7 @@ static void strlower(char *buf)
 
 static DEVICE_IMAGE_LOAD(ssem_store)
 {
-	ssem_state *state = image.device().machine->driver_data<ssem_state>();
+	ssem_state *state = image.device().machine().driver_data<ssem_state>();
     const char* image_name = image.filename();
     char image_ext[5] = { 0 };
     char image_line[100] = { 0 };
@@ -624,7 +624,7 @@ static DEVICE_IMAGE_LOAD(ssem_store)
 
 static MACHINE_RESET( ssem )
 {
-	ssem_state *state = machine->driver_data<ssem_state>();
+	ssem_state *state = machine.driver_data<ssem_state>();
     state->store_line = 0;
 }
 

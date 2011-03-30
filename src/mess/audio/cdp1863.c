@@ -81,7 +81,7 @@ static void cdp1863_sound_update(device_t *device, stream_sample_t **inputs, str
 	if (cdp1863->oe)
 	{
 		double frequency;
-		int rate = device->machine->sample_rate() / 2;
+		int rate = device->machine().sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = cdp1863->incr;

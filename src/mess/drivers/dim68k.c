@@ -197,23 +197,23 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(dim68k)
 {
-	dim68k_state *state = machine->driver_data<dim68k_state>();
-	UINT8* ROM = machine->region("bootrom")->base();
+	dim68k_state *state = machine.driver_data<dim68k_state>();
+	UINT8* ROM = machine.region("bootrom")->base();
 
 	memcpy((UINT8*)state->ram, ROM, 0x2000);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static VIDEO_START( dim68k )
 {
-	dim68k_state *state = machine->driver_data<dim68k_state>();
-	state->FNT = machine->region("chargen")->base();
+	dim68k_state *state = machine.driver_data<dim68k_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( dim68k )
 {
-	dim68k_state *state = screen->machine->driver_data<dim68k_state>();
+	dim68k_state *state = screen->machine().driver_data<dim68k_state>();
 	mc6845_update(state->m_crtc, bitmap, cliprect);
 	return 0;
 }
@@ -221,7 +221,7 @@ static SCREEN_UPDATE( dim68k )
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
 MC6845_UPDATE_ROW( dim68k_update_row )
 {
-	dim68k_state *state = device->machine->driver_data<dim68k_state>();
+	dim68k_state *state = device->machine().driver_data<dim68k_state>();
 	UINT8 chr,gfx,x,xx,inv;
 	UINT16 chr16=0x2020; // set to spaces if screen is off
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);

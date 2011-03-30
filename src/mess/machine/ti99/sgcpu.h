@@ -3,7 +3,7 @@
 
 #include "machine/tms9901.h"
 
-void tms9901_sg_set_int2(running_machine *machine, int state);
+void tms9901_sg_set_int2(running_machine &machine, int state);
 
 READ16_DEVICE_HANDLER( sgcpu_r );
 WRITE16_DEVICE_HANDLER( sgcpu_w );

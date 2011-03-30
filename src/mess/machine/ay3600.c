@@ -38,8 +38,8 @@
 
 static TIMER_CALLBACK(AY3600_poll);
 
-static int AY3600_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len);
-static int AY3600_keyboard_accept_char(running_machine *machine, unicode_char ch);
+static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len);
+static int AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch);
 
 static const unsigned char ay3600_key_remap_2[9*8][4] =
 {
@@ -280,27 +280,27 @@ static const unsigned char ay3600_key_remap_2e[2][9*8][4] =
     HELPER FUNCTIONS
 ***************************************************************************/
 
-INLINE int a2_has_keypad(running_machine *machine)
+INLINE int a2_has_keypad(running_machine &machine)
 {
-	return machine->m_portlist.find("keypad_1") != NULL;
+	return machine.m_portlist.find("keypad_1") != NULL;
 }
 
-INLINE int a2_has_reset_dip(running_machine *machine)
+INLINE int a2_has_reset_dip(running_machine &machine)
 {
-	return machine->m_portlist.find("reset_dip") != NULL;
+	return machine.m_portlist.find("reset_dip") != NULL;
 }
 
-INLINE int a2_has_repeat(running_machine *machine)
+INLINE int a2_has_repeat(running_machine &machine)
 {
-	return machine->m_portlist.find("keyb_repeat") != NULL;
+	return machine.m_portlist.find("keyb_repeat") != NULL;
 }
 
-INLINE int a2_has_capslock(running_machine *machine)
+INLINE int a2_has_capslock(running_machine &machine)
 {
 	return !a2_has_repeat(machine); /* BUG: Doesn't work with Ace */
 }
 
-INLINE int a2_no_ctrl_reset(running_machine *machine)
+INLINE int a2_no_ctrl_reset(running_machine &machine)
 {
 	return ((a2_has_repeat(machine) && !a2_has_reset_dip(machine)) ||
 			(a2_has_reset_dip(machine) && !input_port_read(machine, "reset_dip")));
@@ -311,15 +311,15 @@ INLINE int a2_no_ctrl_reset(running_machine *machine)
   AY3600_init
 ***************************************************************************/
 
-int AY3600_init(running_machine *machine)
+int AY3600_init(running_machine &machine)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	/* Init the key remapping table */
 	state->ay3600_keys = auto_alloc_array_clear(machine, unsigned int, AY3600_KEYS_LENGTH);
 
 	/* We poll the keyboard periodically to scan the keys.  This is
     actually consistent with how the AY-3600 keyboard controller works. */
-	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(AY3600_poll));
+	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(AY3600_poll));
 
 	/* Set Caps Lock light to ON, since that's how we default it. */
 	set_led_status(machine,1,1);
@@ -349,7 +349,7 @@ int AY3600_init(running_machine *machine)
 
 static TIMER_CALLBACK(AY3600_poll)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int switchkey;	/* Normal, Shift, Control, or both */
 	int port, num_ports, bit, data;
 	int any_key_pressed = 0;   /* Have we pressed a key? True/False */
@@ -443,7 +443,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	{
 		state->reset_flag = 0;
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
-		machine->schedule_soft_reset();
+		machine.schedule_soft_reset();
 	}
 
 	/* run through real keys and see what's being pressed */
@@ -530,9 +530,9 @@ static TIMER_CALLBACK(AY3600_poll)
   AY3600_keydata_strobe_r ($C00x)
 ***************************************************************************/
 
-int AY3600_keydata_strobe_r(running_machine *machine)
+int AY3600_keydata_strobe_r(running_machine &machine)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int rc;
 	rc = state->keycode | (state->keywaiting ? 0x80 : 0x00);
 	LOG(("AY3600_keydata_strobe_r(): rc=0x%02x\n", rc));
@@ -545,9 +545,9 @@ int AY3600_keydata_strobe_r(running_machine *machine)
   AY3600_anykey_clearstrobe_r ($C01x)
 ***************************************************************************/
 
-int AY3600_anykey_clearstrobe_r(running_machine *machine)
+int AY3600_anykey_clearstrobe_r(running_machine &machine)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int rc;
 	state->keywaiting = 0;
 	rc = state->keycode | (state->keystilldown ? 0x80 : 0x00);
@@ -560,9 +560,9 @@ int AY3600_anykey_clearstrobe_r(running_machine *machine)
   AY3600_keymod_r ($C025 - IIgs only)
 ***************************************************************************/
 
-int AY3600_keymod_r(running_machine *machine)
+int AY3600_keymod_r(running_machine &machine)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	return state->keymodreg;
 }
 
@@ -602,9 +602,9 @@ static UINT8 AY3600_get_keycode(unicode_char ch)
 
 
 
-static int AY3600_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len)
+static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 
 	if (state->keywaiting)
 		return 0;
@@ -615,7 +615,7 @@ static int AY3600_keyboard_queue_chars(running_machine *machine, const unicode_c
 
 
 
-static int AY3600_keyboard_accept_char(running_machine *machine, unicode_char ch)
+static int AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch)
 {
 	return AY3600_get_keycode(ch) != 0;
 }

@@ -971,7 +971,7 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const re
 
 static MC6845_UPDATE_ROW( abc1600_update_row )
 {
-	abc1600_state *state = device->machine->driver_data<abc1600_state>();
+	abc1600_state *state = device->machine().driver_data<abc1600_state>();
 	state->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 }
 
@@ -1011,12 +1011,12 @@ static const mc6845_interface crtc_intf =
 void abc1600_state::video_start()
 {
 	// allocate video RAM
-	m_video_ram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(m_machine, UINT16, VIDEORAM_SIZE);
 	
 	// find memory regions
-	m_wrmsk_rom = machine->region("wrmsk")->base();
-	m_shinf_rom = machine->region("shinf")->base();
-	m_drmsk_rom = machine->region("drmsk")->base();
+	m_wrmsk_rom = m_machine.region("wrmsk")->base();
+	m_shinf_rom = m_machine.region("shinf")->base();
+	m_drmsk_rom = m_machine.region("drmsk")->base();
 
 	// state saving
 	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
@@ -1059,7 +1059,7 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
 	}
 
 	return 0;

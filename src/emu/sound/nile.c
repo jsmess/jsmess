@@ -78,7 +78,7 @@ WRITE16_DEVICE_HANDLER( nile_sndctrl_w )
 
 	COMBINE_DATA(&info->ctrl);
 
-//  printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, cpu_get_pc(space->cpu));
+//  printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, cpu_get_pc(&space->device()));
 
 	ctrl^=info->ctrl;
 }
@@ -133,7 +133,7 @@ WRITE16_DEVICE_HANDLER( nile_snd_w )
 		info->vpos[v] = info->frac[v] = info->lponce[v] = 0;
 	}
 
-	//printf("v%02d: %04x to reg %02d (PC=%x)\n", v, info->sound_regs[offset], r, cpu_get_pc(space->cpu));
+	//printf("v%02d: %04x to reg %02d (PC=%x)\n", v, info->sound_regs[offset], r, cpu_get_pc(&space->device()));
 }
 
 static STREAM_UPDATE( nile_update )
@@ -227,7 +227,7 @@ static DEVICE_START( nile )
 
 	info->sound_ram = *device->region();
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, info, nile_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, info, nile_update);
 }
 
 

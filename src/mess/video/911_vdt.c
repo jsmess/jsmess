@@ -83,7 +83,7 @@ typedef struct vdt_t
 {
 	vdt911_screen_size_t screen_size;	/* char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model */
 	vdt911_model_t model;				/* country code */
-	void (*int_callback)(running_machine *machine, int state);	/* interrupt callback, called when the state of irq changes */
+	void (*int_callback)(running_machine &machine, int state);	/* interrupt callback, called when the state of irq changes */
 
 	UINT8 data_reg;						/* vdt911 write buffer */
 	UINT8 display_RAM[2048];			/* vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model) */
@@ -134,16 +134,16 @@ PALETTE_INIT( vdt911 )
 {
 	UINT8 i, r, g, b;
 
-	machine->colortable = colortable_alloc(machine, 3);
+	machine.colortable = colortable_alloc(machine, 3);
 
 	for ( i = 0; i < 3; i++ )
 	{
 		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0;i<8;i++)
-		colortable_entry_set_value(machine->colortable, i, vdt911_palette[i]);
+		colortable_entry_set_value(machine.colortable, i, vdt911_palette[i]);
 }
 
 /*
@@ -175,10 +175,10 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 /*
     Initialize the 911 vdt core
 */
-void vdt911_init(running_machine *machine)
+void vdt911_init(running_machine &machine)
 {
 	UINT8 *base;
-	UINT8 *chr = machine->region(vdt911_chr_region)->base();
+	UINT8 *chr = machine.region(vdt911_chr_region)->base();
 
 	/* set up US character definitions */
 	base = chr+vdt911_US_chr_offset;
@@ -230,7 +230,7 @@ void vdt911_init(running_machine *machine)
 
 static TIMER_CALLBACK(setup_beep)
 {
-	beep_set_frequency(machine->device("beep"), 2000);
+	beep_set_frequency(machine.device("beep"), 2000);
 }
 
 
@@ -259,13 +259,13 @@ static DEVICE_START( vdt911 )
 	else
 		vdt->cursor_address_mask = 0x7ff;	/* 2 kb of RAM */
 
-	device->machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep), 0, vdt);
+	device->machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep), 0, vdt);
 
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
-	/*vdt->blink_clock =*/ device->machine->scheduler().timer_pulse(attotime::from_msec(250), FUNC(blink_callback), 0, vdt);
+	/*vdt->blink_clock =*/ device->machine().scheduler().timer_pulse(attotime::from_msec(250), FUNC(blink_callback), 0, vdt);
 
 	/* alloc beep timer */
-	vdt->beep_timer = device->machine->scheduler().timer_alloc(FUNC(beep_callback));
+	vdt->beep_timer = device->machine().scheduler().timer_alloc(FUNC(beep_callback));
 }
 
 DEVICE_GET_INFO( vdt911 )
@@ -303,7 +303,7 @@ static TIMER_CALLBACK(blink_callback)
 */
 static TIMER_CALLBACK(beep_callback)
 {
-	beep_set_state(machine->device("beep"), 0);
+	beep_set_state(machine.device("beep"), 0);
 }
 
 /*
@@ -412,7 +412,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 		case 0xc:
 			/* keyboard interrupt enable */
 			vdt->keyboard_interrupt_enable = data;
-			(*vdt->int_callback)(device->machine, vdt->keyboard_interrupt_enable && vdt->keyboard_data_ready);
+			(*vdt->int_callback)(device->machine(), vdt->keyboard_interrupt_enable && vdt->keyboard_data_ready);
 			break;
 
 		case 0xd:
@@ -470,14 +470,14 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 			{
 				vdt->keyboard_data_ready = 0;
 				if (vdt->keyboard_interrupt_enable)
-					(*vdt->int_callback)(device->machine, 0);
+					(*vdt->int_callback)(device->machine(), 0);
 			}
 			/*vdt->keyboard_parity_error = 0;*/
 			break;
 
 		case 0xe:
 			/* beep enable strobe - not tested */
-			beep_set_state(device->machine->device("beep"), 1);
+			beep_set_state(device->machine().device("beep"), 1);
 
 			vdt->beep_timer->adjust(attotime::from_usec(300));
 			break;
@@ -497,7 +497,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 void vdt911_refresh(device_t *device, bitmap_t *bitmap, int x, int y)
 {
 	vdt_t *vdt = get_safe_token(device);
-	const gfx_element *gfx = device->machine->gfx[vdt->model];
+	const gfx_element *gfx = device->machine().gfx[vdt->model];
 	int height = (vdt->screen_size == char_960) ? 12 : /*25*/24;
 	int use_8bit_charcodes = USES_8BIT_CHARCODES(vdt);
 	int address = 0;
@@ -597,7 +597,7 @@ void vdt911_keyboard(device_t *device)
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = input_port_read(device->machine, keynames[i]);
+		key_buf[i] = input_port_read(device->machine(), keynames[i]);
 	}
 
 	/* parse modifier keys */
@@ -697,7 +697,7 @@ void vdt911_keyboard(device_t *device)
 						vdt->keyboard_data = (int)key_translate[vdt->model][modifier_state][vdt->last_key_pressed];
 						vdt->keyboard_data_ready = 1;
 						if (vdt->keyboard_interrupt_enable)
-							(*vdt->int_callback)(device->machine, 1);
+							(*vdt->int_callback)(device->machine(), 1);
 						return;
 					}
 				}

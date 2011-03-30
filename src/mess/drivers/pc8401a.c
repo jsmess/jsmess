@@ -42,9 +42,9 @@
 /* Fake Keyboard */
 
 
-static void pc8401a_keyboard_scan(running_machine *machine)
+static void pc8401a_keyboard_scan(running_machine &machine)
 {
-	pc8401a_state *state = machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = machine.driver_data<pc8401a_state>();
 	int row, strobe = 0;
 
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -73,14 +73,14 @@ static void pc8401a_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 {
-	pc8401a_keyboard_scan(timer.machine);
+	pc8401a_keyboard_scan(timer.machine());
 }
 
 /* Read/Write Handlers */
 
-static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
+static void pc8401a_bankswitch(running_machine &machine, UINT8 data)
 {
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	int rombank = data & 0x03;
 	int ram0000 = (data >> 2) & 0x03;
@@ -142,7 +142,7 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		if (ram_get_size(machine->device(RAM_TAG)) > 64)
+		if (ram_get_size(machine.device(RAM_TAG)) > 64)
 		{
 			program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			memory_set_bank(machine, "bank3", 3); // TODO or 4
@@ -189,11 +189,11 @@ static WRITE8_HANDLER( mmr_w )
 
     */
 
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	if (data != state->mmr)
 	{
-		pc8401a_bankswitch(space->machine, data);
+		pc8401a_bankswitch(space->machine(), data);
 	}
 
 	state->mmr = data;
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( mmr_w )
 
 static READ8_HANDLER( mmr_r )
 {
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	return state->mmr;
 }
@@ -223,7 +223,7 @@ static READ8_HANDLER( rtc_r )
 
     */
 
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	return (state->rtc_data << 1) | (state->rtc_tp << 2);
 }
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( rtc_cmd_w )
 
     */
 
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( rtc_ctrl_w )
 
     */
 
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	upd1990a_oe_w(state->upd1990a, BIT(data, 0));
 	upd1990a_stb_w(state->upd1990a, BIT(data, 1));
@@ -279,9 +279,9 @@ static WRITE8_HANDLER( rtc_ctrl_w )
 
 static READ8_HANDLER( io_rom_data_r )
 {
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
-	UINT8 *iorom = space->machine->region("iorom")->base();
+	UINT8 *iorom = space->machine().region("iorom")->base();
 
 	//logerror("I/O ROM read from %05x\n", state->io_addr);
 
@@ -290,7 +290,7 @@ static READ8_HANDLER( io_rom_data_r )
 
 static WRITE8_HANDLER( io_rom_addr_w )
 {
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	switch (offset)
 	{
@@ -329,28 +329,28 @@ static READ8_HANDLER( port70_r )
 
     */
 
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	return 0x10 | state->key_strobe;
 }
 
 static READ8_HANDLER( port71_r )
 {
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 	return state->key_latch;
 }
 
 static WRITE8_HANDLER( port70_w )
 {
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
 
 	state->key_strobe = 0;
 }
 
 static WRITE8_HANDLER( port71_w )
 {
-	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
-	cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
+	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
+	cputag_set_input_line(space->machine(), Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
 	state->key_latch = data;
 }
 
@@ -514,10 +514,10 @@ INPUT_PORTS_END
 
 static MACHINE_START( pc8401a )
 {
-	pc8401a_state *state = machine->driver_data<pc8401a_state>();
+	pc8401a_state *state = machine.driver_data<pc8401a_state>();
 
 	/* find devices */
-	state->upd1990a = machine->device(UPD1990A_TAG);
+	state->upd1990a = machine.device(UPD1990A_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -526,21 +526,21 @@ static MACHINE_START( pc8401a )
 	state->crt_ram = auto_alloc_array(machine, UINT8, PC8401A_CRT_VIDEORAM_SIZE);
 
 	/* set up A0/A1 memory banking */
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region(Z80_TAG)->base(), 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 2, ram_get_ptr(machine->device(RAM_TAG)), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region(Z80_TAG)->base(), 0x8000);
+	memory_configure_bank(machine, "bank1", 4, 2, ram_get_ptr(machine.device(RAM_TAG)), 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* set up A2 memory banking */
-	memory_configure_bank(machine, "bank3", 0, 5, ram_get_ptr(machine->device(RAM_TAG)), 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 5, ram_get_ptr(machine.device(RAM_TAG)), 0x4000);
 	memory_set_bank(machine, "bank3", 0);
 
 	/* set up A3 memory banking */
-	memory_configure_bank(machine, "bank4", 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0xc000, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, ram_get_ptr(machine.device(RAM_TAG)) + 0xc000, 0);
 	memory_configure_bank(machine, "bank4", 1, 1, state->crt_ram, 0);
 	memory_set_bank(machine, "bank4", 0);
 
 	/* set up A4 memory banking */
-	memory_configure_bank(machine, "bank5", 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0xe800, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, ram_get_ptr(machine.device(RAM_TAG)) + 0xe800, 0);
 	memory_set_bank(machine, "bank5", 0);
 
 	/* bank switch */
@@ -606,14 +606,14 @@ static I8255A_INTERFACE( pc8401a_8255_interface )
 
 static WRITE_LINE_DEVICE_HANDLER( pc8401a_upd1990a_data_w )
 {
-	pc8401a_state *driver_state = device->machine->driver_data<pc8401a_state>();
+	pc8401a_state *driver_state = device->machine().driver_data<pc8401a_state>();
 
 	driver_state->rtc_data = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc8401a_upd1990a_tp_w )
 {
-	pc8401a_state *driver_state = device->machine->driver_data<pc8401a_state>();
+	pc8401a_state *driver_state = device->machine().driver_data<pc8401a_state>();
 
 	driver_state->rtc_tp = state;
 }

@@ -42,9 +42,9 @@ backup of playfield rom and picture/description of its board
 
 
 // in my opinion own cpu to display lcd field and to handle own buttons
-void ssystem3_playfield_getfigure(running_machine *machine, int x, int y, int *figure, int *black)
+void ssystem3_playfield_getfigure(running_machine &machine, int x, int y, int *figure, int *black)
 {
-	ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = machine.driver_data<ssystem3_state>();
   int d;
   if (x&1)
     d=state->playfield.u.s.field[y][x/2]&0xf;
@@ -55,17 +55,17 @@ void ssystem3_playfield_getfigure(running_machine *machine, int x, int y, int *f
   *black=d&8;
 }
 
-static void ssystem3_playfield_reset(running_machine *machine)
+static void ssystem3_playfield_reset(running_machine &machine)
 {
-	ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = machine.driver_data<ssystem3_state>();
   memset(&state->playfield, 0, sizeof(state->playfield));
   state->playfield.signal=FALSE;
   //  state->playfield.on=TRUE; //input_port_read(machine, "Configuration")&1;
 }
 
-static void ssystem3_playfield_write(running_machine *machine, int reset, int signal)
+static void ssystem3_playfield_write(running_machine &machine, int reset, int signal)
 {
-	ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = machine.driver_data<ssystem3_state>();
   int d=FALSE;
 
   if (!reset) {
@@ -73,10 +73,10 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
     state->playfield.bit=0;
     state->playfield.started=FALSE;
     state->playfield.signal=signal;
-    state->playfield.time=machine->time();
+    state->playfield.time=machine.time();
   }
   if (!signal && state->playfield.signal) {
-    attotime t=machine->time();
+    attotime t=machine.time();
     state->playfield.high_time=t - state->playfield.time;
     state->playfield.time=t;
 
@@ -92,7 +92,7 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
       if (d) state->playfield.data|=1<<(state->playfield.bit^7);
       state->playfield.bit++;
       if (state->playfield.bit==8) {
-	logerror("%.4x playfield wrote %d %02x\n", (int)cpu_get_pc(machine->device("maincpu")), state->playfield.count, state->playfield.data);
+	logerror("%.4x playfield wrote %d %02x\n", (int)cpu_get_pc(machine.device("maincpu")), state->playfield.count, state->playfield.data);
 	state->playfield.u.data[state->playfield.count]=state->playfield.data;
 	state->playfield.bit=0;
 	state->playfield.count=(state->playfield.count+1)%ARRAY_LENGTH(state->playfield.u.data);
@@ -101,7 +101,7 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
     }
 
   } else if (signal && !state->playfield.signal) {
-    attotime t=machine->time();
+    attotime t=machine.time();
     state->playfield.low_time= t - state->playfield.time;
     state->playfield.time=t;
     state->playfield.started=TRUE;
@@ -109,9 +109,9 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
   state->playfield.signal=signal;
 }
 
-static void ssystem3_playfield_read(running_machine *machine, int *on, int *ready)
+static void ssystem3_playfield_read(running_machine &machine, int *on, int *ready)
 {
-	//ssystem3_state *state = machine->driver_data<ssystem3_state>();
+	//ssystem3_state *state = machine.driver_data<ssystem3_state>();
 	*on=!(input_port_read(machine, "Configuration")&1);
 	//  *on=!state->playfield.on;
 	*ready=FALSE;
@@ -119,49 +119,49 @@ static void ssystem3_playfield_read(running_machine *machine, int *on, int *read
 
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_a)
 {
-	ssystem3_state *state = device->machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = device->machine().driver_data<ssystem3_state>();
 	state->porta=data;
   //  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
 }
 
 static READ8_DEVICE_HANDLER(ssystem3_via_read_a)
 {
-	ssystem3_state *state = device->machine->driver_data<ssystem3_state>();
+	ssystem3_state *state = device->machine().driver_data<ssystem3_state>();
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(state->porta&0x10)) data&=input_port_read(device->machine, "matrix1")|0xf1;
-  if (!(state->porta&0x20)) data&=input_port_read(device->machine, "matrix2")|0xf1;
-  if (!(state->porta&0x40)) data&=input_port_read(device->machine, "matrix3")|0xf1;
-  if (!(state->porta&0x80)) data&=input_port_read(device->machine, "matrix4")|0xf1;
+  if (!(state->porta&0x10)) data&=input_port_read(device->machine(), "matrix1")|0xf1;
+  if (!(state->porta&0x20)) data&=input_port_read(device->machine(), "matrix2")|0xf1;
+  if (!(state->porta&0x40)) data&=input_port_read(device->machine(), "matrix3")|0xf1;
+  if (!(state->porta&0x80)) data&=input_port_read(device->machine(), "matrix4")|0xf1;
 #else
-  if (!(state->porta&0x10)) data&=input_port_read(device->machine, "matrix1")|0xf0;
-  if (!(state->porta&0x20)) data&=input_port_read(device->machine, "matrix2")|0xf0;
-  if (!(state->porta&0x40)) data&=input_port_read(device->machine, "matrix3")|0xf0;
-  if (!(state->porta&0x80)) data&=input_port_read(device->machine, "matrix4")|0xf0;
+  if (!(state->porta&0x10)) data&=input_port_read(device->machine(), "matrix1")|0xf0;
+  if (!(state->porta&0x20)) data&=input_port_read(device->machine(), "matrix2")|0xf0;
+  if (!(state->porta&0x40)) data&=input_port_read(device->machine(), "matrix3")|0xf0;
+  if (!(state->porta&0x80)) data&=input_port_read(device->machine(), "matrix4")|0xf0;
 #endif
   if (!(state->porta&1)) {
-    if (!(input_port_read(device->machine, "matrix1")&1)) data&=~0x10;
-    if (!(input_port_read(device->machine, "matrix2")&1)) data&=~0x20;
-    if (!(input_port_read(device->machine, "matrix3")&1)) data&=~0x40;
-    if (!(input_port_read(device->machine, "matrix4")&1)) data&=~0x80;
+    if (!(input_port_read(device->machine(), "matrix1")&1)) data&=~0x10;
+    if (!(input_port_read(device->machine(), "matrix2")&1)) data&=~0x20;
+    if (!(input_port_read(device->machine(), "matrix3")&1)) data&=~0x40;
+    if (!(input_port_read(device->machine(), "matrix4")&1)) data&=~0x80;
   }
   if (!(state->porta&2)) {
-    if (!(input_port_read(device->machine, "matrix1")&2)) data&=~0x10;
-    if (!(input_port_read(device->machine, "matrix2")&2)) data&=~0x20;
-    if (!(input_port_read(device->machine, "matrix3")&2)) data&=~0x40;
-    if (!(input_port_read(device->machine, "matrix4")&2)) data&=~0x80;
+    if (!(input_port_read(device->machine(), "matrix1")&2)) data&=~0x10;
+    if (!(input_port_read(device->machine(), "matrix2")&2)) data&=~0x20;
+    if (!(input_port_read(device->machine(), "matrix3")&2)) data&=~0x40;
+    if (!(input_port_read(device->machine(), "matrix4")&2)) data&=~0x80;
   }
   if (!(state->porta&4)) {
-    if (!(input_port_read(device->machine, "matrix1")&4)) data&=~0x10;
-    if (!(input_port_read(device->machine, "matrix2")&4)) data&=~0x20;
-    if (!(input_port_read(device->machine, "matrix3")&4)) data&=~0x40;
-    if (!(input_port_read(device->machine, "matrix4")&4)) data&=~0x80;
+    if (!(input_port_read(device->machine(), "matrix1")&4)) data&=~0x10;
+    if (!(input_port_read(device->machine(), "matrix2")&4)) data&=~0x20;
+    if (!(input_port_read(device->machine(), "matrix3")&4)) data&=~0x40;
+    if (!(input_port_read(device->machine(), "matrix4")&4)) data&=~0x80;
   }
   if (!(state->porta&8)) {
-    if (!(input_port_read(device->machine, "matrix1")&8)) data&=~0x10;
-    if (!(input_port_read(device->machine, "matrix2")&8)) data&=~0x20;
-    if (!(input_port_read(device->machine, "matrix3")&8)) data&=~0x40;
-    if (!(input_port_read(device->machine, "matrix4")&8)) data&=~0x80;
+    if (!(input_port_read(device->machine(), "matrix1")&8)) data&=~0x10;
+    if (!(input_port_read(device->machine(), "matrix2")&8)) data&=~0x20;
+    if (!(input_port_read(device->machine(), "matrix3")&8)) data&=~0x40;
+    if (!(input_port_read(device->machine(), "matrix4")&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;
@@ -193,7 +193,7 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 {
 	UINT8 data=0xff;
 	int on, ready;
-	ssystem3_playfield_read(device->machine, &on, &ready);
+	ssystem3_playfield_read(device->machine(), &on, &ready);
 	if (!on) data&=~0x20;
 	if (!ready) data&=~0x10;
 	return data;
@@ -201,12 +201,12 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
-	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
-	address_space* space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	address_space* space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 d;
 
-	ssystem3_playfield_write(device->machine, data&1, data&8);
-	ssystem3_lcd_write(device->machine, data&4, data&2);
+	ssystem3_playfield_write(device->machine(), data&1, data&8);
+	ssystem3_lcd_write(device->machine(), data&4, data&2);
 
 	d=ssystem3_via_read_b(via_0, 0)&~0x40;
 	if (data&0x80) d|=0x40;

@@ -21,9 +21,9 @@
 #include "machine/ram.h"
 
 
-static void blink_reset(running_machine *machine)
+static void blink_reset(running_machine &machine)
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = machine.driver_data<z88_state>();
 	memset(&state->blink, 0, sizeof(state->blink));
 
 	/* rams is cleared on reset */
@@ -34,9 +34,9 @@ static void blink_reset(running_machine *machine)
 }
 
 
-static void z88_interrupt_refresh(running_machine *machine)
+static void z88_interrupt_refresh(running_machine &machine)
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = machine.driver_data<z88_state>();
 	/* ints enabled? */
 	if ((state->blink.ints & INT_GINT)!=0)
 	{
@@ -58,9 +58,9 @@ static void z88_interrupt_refresh(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
-static void z88_update_rtc_interrupt(running_machine *machine)
+static void z88_update_rtc_interrupt(running_machine &machine)
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = machine.driver_data<z88_state>();
 	state->blink.sta &=~STA_TIME;
 
 	/* time interrupt enabled? */
@@ -81,7 +81,7 @@ static void z88_update_rtc_interrupt(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 {
-	z88_state *state = timer.machine->driver_data<z88_state>();
+	z88_state *state = timer.machine().driver_data<z88_state>();
 	int refresh_ints = 0;
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
@@ -94,7 +94,7 @@ static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 		/* any key pressed will wake up z88 */
 		for (i=0; i<8; i++)
 		{
-			data &= input_port_read(timer.machine, keynames[i]);
+			data &= input_port_read(timer.machine(), keynames[i]);
 		}
 
 		/* if any key is pressed, then one or more bits will be 0 */
@@ -107,9 +107,9 @@ static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 			/* column has gone low in snooze/coma */
 			state->blink.sta |= STA_KEY;
 
-			timer.machine->scheduler().trigger(Z88_SNOOZE_TRIGGER);
+			timer.machine().scheduler().trigger(Z88_SNOOZE_TRIGGER);
 
-			z88_interrupt_refresh(timer.machine);
+			z88_interrupt_refresh(timer.machine());
 		}
 	}
 
@@ -173,16 +173,16 @@ static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 
 	if (refresh_ints)
 	{
-		z88_update_rtc_interrupt(timer.machine);
+		z88_update_rtc_interrupt(timer.machine());
 
 		/* refresh */
-		z88_interrupt_refresh(timer.machine);
+		z88_interrupt_refresh(timer.machine());
 	}
 }
 
 
 
-static void z88_install_memory_handler_pair(running_machine *machine, offs_t start, offs_t size, int bank_base, void *read_addr, void *write_addr)
+static void z88_install_memory_handler_pair(running_machine &machine, offs_t start, offs_t size, int bank_base, void *read_addr, void *write_addr)
 {
 	char bank_0[10];
 	char bank_1[10];
@@ -192,18 +192,18 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 
 	/* special case */
 	if (read_addr == NULL)
-		read_addr = &machine->region("maincpu")->base()[start];
+		read_addr = &machine.region("maincpu")->base()[start];
 
 	/* install the handlers */
 	if (read_addr == NULL) {
-		machine->device("maincpu")->memory().space(AS_PROGRAM )->unmap_read(start, start + size - 1);
+		machine.device("maincpu")->memory().space(AS_PROGRAM )->unmap_read(start, start + size - 1);
 	} else {
-		machine->device("maincpu")->memory().space(AS_PROGRAM )->install_read_bank(start, start + size - 1, bank_0);
+		machine.device("maincpu")->memory().space(AS_PROGRAM )->install_read_bank(start, start + size - 1, bank_0);
 	}
 	if (write_addr == NULL) {
-		machine->device("maincpu")->memory().space(AS_PROGRAM )->unmap_write(start, start + size - 1);
+		machine.device("maincpu")->memory().space(AS_PROGRAM )->unmap_write(start, start + size - 1);
 	} else {
-		machine->device("maincpu")->memory().space(AS_PROGRAM )->install_write_bank(start, start + size - 1, bank_1);
+		machine.device("maincpu")->memory().space(AS_PROGRAM )->install_write_bank(start, start + size - 1, bank_1);
 	}
 
 	/* and set the banks */
@@ -230,9 +230,9 @@ explains why the extra checks are done
     bank 3      0xC000-0xFFFF
 */
 
-static void z88_refresh_memory_bank(running_machine *machine, int bank)
+static void z88_refresh_memory_bank(running_machine &machine, int bank)
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = machine.driver_data<z88_state>();
 	void *read_addr;
 	void *write_addr;
 	unsigned long block;
@@ -252,7 +252,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = write_addr = ram_get_ptr(machine->device(RAM_TAG)) + (block<<14);
+			read_addr = write_addr = ram_get_ptr(machine.device(RAM_TAG)) + (block<<14);
 		}
 	}
 	else
@@ -267,7 +267,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = machine->region("maincpu")->base() + 0x010000 + (block << 14);
+			read_addr = machine.region("maincpu")->base() + 0x010000 + (block << 14);
 			write_addr = NULL;
 		}
 	}
@@ -283,14 +283,14 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		if ((state->blink.com & (1<<2))==0)
 		{
 			/* yes */
-			read_addr = machine->region("maincpu")->base() + 0x010000;
+			read_addr = machine.region("maincpu")->base() + 0x010000;
 			write_addr = NULL;
 		}
 		else
 		{
 			/* ram bank 20 */
-			read_addr = ram_get_ptr(machine->device(RAM_TAG));
-			write_addr = ram_get_ptr(machine->device(RAM_TAG));
+			read_addr = ram_get_ptr(machine.device(RAM_TAG));
+			write_addr = ram_get_ptr(machine.device(RAM_TAG));
 		}
 
 		z88_install_memory_handler_pair(machine, 0x0000, 0x2000, 9, read_addr, write_addr);
@@ -303,7 +303,7 @@ static MACHINE_START( z88 )
 
 static MACHINE_RESET( z88 )
 {
-	memset(ram_get_ptr(machine->device(RAM_TAG)), 0x0ff, ram_get_size(machine->device(RAM_TAG)));
+	memset(ram_get_ptr(machine.device(RAM_TAG)), 0x0ff, ram_get_size(machine.device(RAM_TAG)));
 
 	blink_reset(machine);
 
@@ -321,9 +321,9 @@ static ADDRESS_MAP_START(z88_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank5") AM_WRITE_BANK("bank10")
 ADDRESS_MAP_END
 
-static void blink_pb_w(running_machine *machine, int offset, int data, int reg_index)
+static void blink_pb_w(running_machine &machine, int offset, int data, int reg_index)
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = machine.driver_data<z88_state>();
     unsigned short addr_written = (offset & 0x0ff00) | (data & 0x0ff);
 
 	logerror("reg_index: %02x addr: %04x\n",reg_index,addr_written);
@@ -386,10 +386,10 @@ static void blink_pb_w(running_machine *machine, int offset, int data, int reg_i
 /* segment register write */
 static WRITE8_HANDLER(blink_srx_w)
 {
-	z88_state *state = space->machine->driver_data<z88_state>();
+	z88_state *state = space->machine().driver_data<z88_state>();
 	state->blink.mem[offset] = data;
 
-	z88_refresh_memory_bank(space->machine, offset);
+	z88_refresh_memory_bank(space->machine(), offset);
 }
 /*
  00b0 00
@@ -405,8 +405,8 @@ blink w: 03b6 03
 
 static WRITE8_HANDLER(z88_port_w)
 {
-	z88_state *state = space->machine->driver_data<z88_state>();
-	device_t *speaker = space->machine->device("speaker");
+	z88_state *state = space->machine().driver_data<z88_state>();
+	device_t *speaker = space->machine().device("speaker");
 	unsigned char port;
 
 	port = offset & 0x0ff;
@@ -418,7 +418,7 @@ static WRITE8_HANDLER(z88_port_w)
 		case 0x072:
 		case 0x073:
 		case 0x074:
-			blink_pb_w(space->machine, offset, data, port & 0x0f);
+			blink_pb_w(space->machine(), offset, data, port & 0x0f);
 			return;
 
 
@@ -433,8 +433,8 @@ static WRITE8_HANDLER(z88_port_w)
 			state->blink.tsta &= ~state->blink.tack;
 
 			/* refresh ints */
-			z88_update_rtc_interrupt(space->machine);
-			z88_interrupt_refresh(space->machine);
+			z88_update_rtc_interrupt(space->machine());
+			z88_interrupt_refresh(space->machine());
 		}
 		return;
 
@@ -447,8 +447,8 @@ static WRITE8_HANDLER(z88_port_w)
 			state->blink.tmk = data & 0x07;
 
 			/* refresh ints */
-			z88_update_rtc_interrupt(space->machine);
-			z88_interrupt_refresh(space->machine);
+			z88_update_rtc_interrupt(space->machine());
+			z88_interrupt_refresh(space->machine());
 		}
 		return;
 
@@ -488,7 +488,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 			if ((changed_bits & (1<<2))!=0)
 			{
-				z88_refresh_memory_bank(space->machine, 0);
+				z88_refresh_memory_bank(space->machine(), 0);
 			}
 		}
 		return;
@@ -499,8 +499,8 @@ static WRITE8_HANDLER(z88_port_w)
 		    logerror("int w: %02x\n", data);
 
 			state->blink.ints = data;
-			z88_update_rtc_interrupt(space->machine);
-			z88_interrupt_refresh(space->machine);
+			z88_update_rtc_interrupt(space->machine());
+			z88_interrupt_refresh(space->machine());
 		}
 		return;
 
@@ -513,8 +513,8 @@ static WRITE8_HANDLER(z88_port_w)
 			state->blink.ack = data & ((1<<6) | (1<<5) | (1<<3) | (1<<2));
 
 			state->blink.ints &= ~state->blink.ack;
-			z88_update_rtc_interrupt(space->machine);
-			z88_interrupt_refresh(space->machine);
+			z88_update_rtc_interrupt(space->machine());
+			z88_interrupt_refresh(space->machine());
 		}
 		return;
 
@@ -535,7 +535,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 static  READ8_HANDLER(z88_port_r)
 {
-	z88_state *state = space->machine->driver_data<z88_state>();
+	z88_state *state = space->machine().driver_data<z88_state>();
 	unsigned char port;
 
 	port = offset & 0x0ff;
@@ -561,35 +561,35 @@ static  READ8_HANDLER(z88_port_r)
 			{
 				state->blink.z88_state = Z88_SNOOZE;
 				/* spin cycles until rtc timer */
-				device_spin_until_trigger( space->machine->device("maincpu"), Z88_SNOOZE_TRIGGER);
+				device_spin_until_trigger( space->machine().device("maincpu"), Z88_SNOOZE_TRIGGER);
 
 				logerror("z88 entering snooze!\n");
 			}
 
 
 			if ((lines & 0x080)==0)
-				data &=input_port_read(space->machine, "LINE7");
+				data &=input_port_read(space->machine(), "LINE7");
 
 			if ((lines & 0x040)==0)
-				data &=input_port_read(space->machine, "LINE6");
+				data &=input_port_read(space->machine(), "LINE6");
 
 			if ((lines & 0x020)==0)
-				data &=input_port_read(space->machine, "LINE5");
+				data &=input_port_read(space->machine(), "LINE5");
 
 			if ((lines & 0x010)==0)
-				data &=input_port_read(space->machine, "LINE4");
+				data &=input_port_read(space->machine(), "LINE4");
 
 			if ((lines & 0x008)==0)
-				data &=input_port_read(space->machine, "LINE3");
+				data &=input_port_read(space->machine(), "LINE3");
 
 			if ((lines & 0x004)==0)
-				data &=input_port_read(space->machine, "LINE2");
+				data &=input_port_read(space->machine(), "LINE2");
 
 			if ((lines & 0x002)==0)
-				data &=input_port_read(space->machine, "LINE1");
+				data &=input_port_read(space->machine(), "LINE1");
 
 			if ((lines & 0x001)==0)
-				data &=input_port_read(space->machine, "LINE0");
+				data &=input_port_read(space->machine(), "LINE0");
 
 			logerror("lines: %02x\n",lines);
 			logerror("key r: %02x\n",data);

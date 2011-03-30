@@ -69,17 +69,17 @@ static UINT8 at_speaker_get_spk(void)
 }
 
 
-static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
+static void at_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine->device("speaker");
+	device_t *speaker = machine.device("speaker");
 	at_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
 
 
-static void at_speaker_set_input(running_machine *machine, UINT8 data)
+static void at_speaker_set_input(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine->device("speaker");
+	device_t *speaker = machine.device("speaker");
 	at_speaker_input = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -94,7 +94,7 @@ static void at_speaker_set_input(running_machine *machine, UINT8 data)
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
-	at_state *st = device->machine->driver_data<at_state>();
+	at_state *st = device->machine().driver_data<at_state>();
 	if (st->pic8259_master)
 	{
 		pic8259_ir0_w(st->pic8259_master, state);
@@ -104,7 +104,7 @@ static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out2_changed )
 {
-	at_speaker_set_input( device->machine, state ? 1 : 0 );
+	at_speaker_set_input( device->machine(), state ? 1 : 0 );
 }
 
 
@@ -128,9 +128,9 @@ const struct pit8253_config at_pit8254_config =
 };
 
 
-static void at_set_irq_line(running_machine *machine,int irq, int state)
+static void at_set_irq_line(running_machine &machine,int irq, int state)
 {
-	at_state *st = machine->driver_data<at_state>();
+	at_state *st = machine.driver_data<at_state>();
 
 	switch (irq)
 	{
@@ -187,7 +187,7 @@ WRITE8_HANDLER(at_page8_w)
 	if (LOG_PORT80 && (offset == 0))
 	{
 		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) cpu_get_reg(space->machine->device("maincpu"), STATE_GENPC));
+							(unsigned) cpu_get_reg(space->machine().device("maincpu"), STATE_GENPC));
 	}
 
 	switch(offset % 8) {
@@ -209,7 +209,7 @@ WRITE8_HANDLER(at_page8_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	at_state *st = device->machine->driver_data<at_state>();
+	at_state *st = device->machine().driver_data<at_state>();
 	device_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
@@ -237,27 +237,27 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 
 static READ8_DEVICE_HANDLER( at_dma8237_fdc_dack_r ) {
-	return pc_fdc_dack_r(device->machine);
+	return pc_fdc_dack_r(device->machine());
 }
 
 
 static READ8_DEVICE_HANDLER( at_dma8237_hdc_dack_r ) {
-	return pc_hdc_dack_r( device->machine );
+	return pc_hdc_dack_r(device->machine());
 }
 
 
 static WRITE8_DEVICE_HANDLER( at_dma8237_fdc_dack_w ) {
-	pc_fdc_dack_w( device->machine, data );
+	pc_fdc_dack_w( device->machine(), data );
 }
 
 
 static WRITE8_DEVICE_HANDLER( at_dma8237_hdc_dack_w ) {
-	pc_hdc_dack_w( device->machine, data );
+	pc_hdc_dack_w( device->machine(), data );
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) {
-	pc_fdc_set_tc_state( device->machine, state );
+	pc_fdc_set_tc_state( device->machine(), state );
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
@@ -304,13 +304,13 @@ I8237_INTERFACE( at_dma8237_2_config )
 /* called when a interrupt is set/cleared from com hardware */
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
-	at_state *st = device->machine->driver_data<at_state>();
+	at_state *st = device->machine().driver_data<at_state>();
 	pic8259_ir4_w(st->pic8259_master, state);
 }
 
 static INS8250_INTERRUPT( at_com_interrupt_2 )
 {
-	at_state *st = device->machine->driver_data<at_state>();
+	at_state *st = device->machine().driver_data<at_state>();
 	pic8259_ir3_w(st->pic8259_master, state);
 }
 
@@ -319,7 +319,7 @@ are connected */
 static void at_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
+	if (input_port_read(device->machine(), "DSW2") & (0x80>>n))
 		pc_mouse_handshake_in(device,data);
 }
 
@@ -371,24 +371,24 @@ const ins8250_interface ibm5170_com_interface[4]=
 
 #define FDC_DMA 2
 
-static void at_fdc_interrupt(running_machine *machine, int state)
+static void at_fdc_interrupt(running_machine &machine, int state)
 {
-	at_state *st = machine->driver_data<at_state>();
+	at_state *st = machine.driver_data<at_state>();
 	pic8259_ir6_w(st->pic8259_master, state);
-//if ( ram_get_ptr(machine->device(RAM_TAG))[0x0490] == 0x74 )
-//  ram_get_ptr(machine->device(RAM_TAG))[0x0490] = 0x54;
+//if ( ram_get_ptr(machine.device(RAM_TAG))[0x0490] == 0x74 )
+//  ram_get_ptr(machine.device(RAM_TAG))[0x0490] = 0x54;
 }
 
 
-static void at_fdc_dma_drq(running_machine *machine, int state)
+static void at_fdc_dma_drq(running_machine &machine, int state)
 {
-	at_state *st = machine->driver_data<at_state>();
+	at_state *st = machine.driver_data<at_state>();
 	i8237_dreq2_w( st->dma8237_1, state);
 }
 
-static device_t *at_get_device(running_machine *machine)
+static device_t *at_get_device(running_machine &machine)
 {
-	return machine->device("upd765");
+	return machine.device("upd765");
 }
 
 static const struct pc_fdc_interface fdc_interface =
@@ -408,7 +408,7 @@ static UINT8 at_offset1;
 
 READ8_HANDLER( at_portb_r )
 {
-	at_state *st = space->machine->driver_data<at_state>();
+	at_state *st = space->machine().driver_data<at_state>();
 
 	UINT8 data = at_speaker;
 	data &= ~0xc0; /* AT BIOS don't likes this being set */
@@ -431,10 +431,10 @@ READ8_HANDLER( at_portb_r )
 
 WRITE8_HANDLER( at_portb_w )
 {
-	at_state *st = space->machine->driver_data<at_state>();
+	at_state *st = space->machine().driver_data<at_state>();
 	at_speaker = data;
 	pit8253_gate2_w(st->pit8254, BIT(data, 0));
-	at_speaker_set_spkrdata( space->machine, data & 0x02 );
+	at_speaker_set_spkrdata( space->machine(), data & 0x02 );
 }
 
 
@@ -444,23 +444,23 @@ WRITE8_HANDLER( at_portb_w )
  *
  **********************************************************/
 
-static void init_at_common(running_machine *machine)
+static void init_at_common(running_machine &machine)
 {
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	soundblaster_config(&soundblaster);
 
 	// The CS4031 chipset does this itself
-	if (machine->device("cs4031") == NULL)
+	if (machine.device("cs4031") == NULL)
 	{
 		/* MESS managed RAM */
-		memory_set_bankptr(machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank10", ram_get_ptr(machine.device(RAM_TAG)));
 
-		if (ram_get_size(machine->device(RAM_TAG)) > 0x0a0000)
+		if (ram_get_size(machine.device(RAM_TAG)) > 0x0a0000)
 		{
-			offs_t ram_limit = 0x100000 + ram_get_size(machine->device(RAM_TAG)) - 0x0a0000;
+			offs_t ram_limit = 0x100000 + ram_get_size(machine.device(RAM_TAG)) - 0x0a0000;
 			space->install_read_bank(0x100000,  ram_limit - 1, "bank1");
 			space->install_write_bank(0x100000,  ram_limit - 1, "bank1");
-			memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0xa0000);
+			memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0xa0000);
 		}
 	}
 
@@ -474,7 +474,7 @@ static void init_at_common(running_machine *machine)
 }
 
 
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
+static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine(), "IN0"); }
 
 static const struct pc_vga_interface vga_interface =
 {
@@ -494,8 +494,8 @@ DRIVER_INIT( atcga )
 
 DRIVER_INIT( atega )
 {
-	UINT8	*dst = machine->region( "maincpu" )->base() + 0xc0000;
-	UINT8	*src = machine->region( "user1" )->base() + 0x3fff;
+	UINT8	*dst = machine.region( "maincpu" )->base() + 0xc0000;
+	UINT8	*src = machine.region( "user1" )->base() + 0x3fff;
 	int		i;
 
 	init_at_common(machine);
@@ -518,7 +518,7 @@ DRIVER_INIT( at386 )
 DRIVER_INIT( at_vga )
 {
 	init_at_common(machine);
-	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, machine.firstcpu, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 }
 
@@ -527,7 +527,7 @@ DRIVER_INIT( at_vga )
 DRIVER_INIT( ps2m30286 )
 {
 	init_at_common(machine);
-	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, machine.firstcpu, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 }
 
@@ -535,13 +535,13 @@ DRIVER_INIT( ps2m30286 )
 
 static IRQ_CALLBACK(at_irq_callback)
 {
-	at_state *st = device->machine->driver_data<at_state>();
+	at_state *st = device->machine().driver_data<at_state>();
 	return pic8259_acknowledge(st->pic8259_master);
 }
 
-static void pc_set_irq_line(running_machine *machine,int irq, int state)
+static void pc_set_irq_line(running_machine &machine,int irq, int state)
 {
-	at_state *st = machine->driver_data<at_state>();;
+	at_state *st = machine.driver_data<at_state>();;
 
 	switch (irq)
 	{
@@ -558,7 +558,7 @@ static void pc_set_irq_line(running_machine *machine,int irq, int state)
 
 MACHINE_START( at )
 {
-	device_set_irq_callback(machine->device("maincpu"), at_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), at_irq_callback);
 	/* FDC/HDC hardware */
 	pc_fdc_init( machine, &fdc_interface );
 	pc_hdc_setup(machine, pc_set_irq_line);
@@ -568,14 +568,14 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
-	at_state *st = machine->driver_data<at_state>();
-	st->maincpu = machine->device("maincpu");
-	st->pic8259_master = machine->device("pic8259_master");
-	st->pic8259_slave = machine->device("pic8259_slave");
-	st->dma8237_1 = machine->device("dma8237_1");
-	st->dma8237_2 = machine->device("dma8237_2");
-	st->pit8254 = machine->device("pit8254");
-	pc_mouse_set_serial_port( machine->device("ns16450_0") );
+	at_state *st = machine.driver_data<at_state>();
+	st->maincpu = machine.device("maincpu");
+	st->pic8259_master = machine.device("pic8259_master");
+	st->pic8259_slave = machine.device("pic8259_slave");
+	st->dma8237_1 = machine.device("dma8237_1");
+	st->dma8237_2 = machine.device("dma8237_2");
+	st->pit8254 = machine.device("pit8254");
+	pc_mouse_set_serial_port( machine.device("ns16450_0") );
 	pc_hdc_set_dma8237_device( st->dma8237_1 );
 	poll_delay = 4;
 }

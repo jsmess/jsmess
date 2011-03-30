@@ -30,25 +30,26 @@
 #include "sound/okim6295.h"
 #include "includes/actfancr.h"
 #include "video/decbac06.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
 static WRITE8_HANDLER( triothep_control_select_w )
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	state->trio_control_select = data;
 }
 
 static READ8_HANDLER( triothep_control_r )
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	switch (state->trio_control_select)
 	{
-		case 0: return input_port_read(space->machine, "P1");
-		case 1: return input_port_read(space->machine, "P2");
-		case 2: return input_port_read(space->machine, "DSW1");
-		case 3: return input_port_read(space->machine, "DSW2");
-		case 4: return input_port_read(space->machine, "SYSTEM");	/* VBL */
+		case 0: return input_port_read(space->machine(), "P1");
+		case 1: return input_port_read(space->machine(), "P2");
+		case 2: return input_port_read(space->machine(), "DSW1");
+		case 3: return input_port_read(space->machine(), "DSW2");
+		case 4: return input_port_read(space->machine(), "SYSTEM");	/* VBL */
 	}
 
 	return 0xff;
@@ -56,12 +57,26 @@ static READ8_HANDLER( triothep_control_r )
 
 static WRITE8_HANDLER( actfancr_sound_w )
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
+
+static WRITE8_HANDLER( actfancr_buffer_spriteram_w)
+{
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
+
+	UINT8* buffered_spriteram = space->machine().generic.buffered_spriteram.u8;
+	// make a buffered copy
+	memcpy(buffered_spriteram, space->machine().generic.spriteram.u8, 0x800);
+	// copy to a 16-bit region for our sprite draw code too
+	for (int i=0;i<0x800/2;i++)
+	{
+		state->spriteram16[i] = buffered_spriteram[i*2] | (buffered_spriteram[(i*2)+1] <<8);
+	}
+}
 
 static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
@@ -72,7 +87,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
 	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
+	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
 	AM_RANGE(0x130001, 0x130001) AM_READ_PORT("P2")
@@ -94,7 +109,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
 	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
+	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
@@ -269,7 +284,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int linestate)
 {
-	actfancr_state *state = device->machine->driver_data<actfancr_state>();
+	actfancr_state *state = device->machine().driver_data<actfancr_state>();
 	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
@@ -282,15 +297,15 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( actfancr )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_START( triothep )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 
 	MACHINE_START_CALL(actfancr);
 
@@ -299,13 +314,13 @@ static MACHINE_START( triothep )
 
 static MACHINE_RESET( actfancr )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 	state->flipscreen = 0;
 }
 
 static MACHINE_RESET( triothep )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 
 	MACHINE_RESET_CALL(actfancr);
 	state->trio_control_select = 0;
@@ -344,6 +359,9 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,1);
 	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
+
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 1);
 
 	MCFG_VIDEO_START(actfancr)
 
@@ -386,7 +404,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(triothep)
+	MCFG_SCREEN_UPDATE(actfancr)
 
 	MCFG_GFXDECODE(triothep)
 	MCFG_PALETTE_LENGTH(768)
@@ -396,7 +414,10 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
 
-	MCFG_VIDEO_START(triothep)
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 1);
+
+	MCFG_VIDEO_START(actfancr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

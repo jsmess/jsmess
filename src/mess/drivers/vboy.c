@@ -74,7 +74,7 @@ public:
 
 static READ32_HANDLER( port_02_read )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 	UINT32 value = 0x00;
 
 	switch ((offset << 2))
@@ -109,7 +109,7 @@ static READ32_HANDLER( port_02_read )
 
 static WRITE32_HANDLER( port_02_write )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	switch (offset<<2)
 	{
@@ -127,13 +127,13 @@ static WRITE32_HANDLER( port_02_write )
 		case 0x28:	// KCR (Keypad Control Reg)
 			if (data & 0x04 )
 			{
-				state->vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(space->machine, "INPUT") & 0x00ff);
-				state->vboy_regs.khb = (data & 0x01) ? 0 : (input_port_read(space->machine, "INPUT") & 0xff00) >> 8;
+				state->vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(space->machine(), "INPUT") & 0x00ff);
+				state->vboy_regs.khb = (data & 0x01) ? 0 : (input_port_read(space->machine(), "INPUT") & 0xff00) >> 8;
 			}
 			else if (data & 0x20)
 			{
-				state->vboy_regs.klb = input_port_read(space->machine, "INPUT") & 0x00ff;
-				state->vboy_regs.khb = (input_port_read(space->machine, "INPUT") & 0xff00) >> 8;
+				state->vboy_regs.klb = input_port_read(space->machine(), "INPUT") & 0x00ff;
+				state->vboy_regs.khb = (input_port_read(space->machine(), "INPUT") & 0xff00) >> 8;
 			}
 			state->vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
 			break;
@@ -150,7 +150,7 @@ static WRITE32_HANDLER( port_02_write )
 
 static READ16_HANDLER( vip_r )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	switch(offset << 1) {
 		case 0x00:	//INTPND
@@ -217,7 +217,7 @@ static READ16_HANDLER( vip_r )
 
 static WRITE16_HANDLER( vip_w )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	switch(offset << 1) {
 		case 0x00:	//INTPND
@@ -229,7 +229,7 @@ static WRITE16_HANDLER( vip_w )
 					break;
 		case 0x04:	//INTCLR
 					state->vip_regs.INTPND &= ~data;
-					cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
+					cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
 					//printf("%04x ACK\n",data);
 					break;
 		case 0x20:	//DPSTTS
@@ -240,15 +240,15 @@ static WRITE16_HANDLER( vip_w )
 					break;
 		case 0x24:	//BRTA
 					state->vip_regs.BRTA = data;
-					palette_set_color_rgb(space->machine, 1,(state->vip_regs.BRTA) & 0xff,0,0);
+					palette_set_color_rgb(space->machine(), 1,(state->vip_regs.BRTA) & 0xff,0,0);
 					break;
 		case 0x26:	//BRTB
 					state->vip_regs.BRTB = data;
-					palette_set_color_rgb(space->machine, 2,(state->vip_regs.BRTA + state->vip_regs.BRTB) & 0xff,0,0);
+					palette_set_color_rgb(space->machine(), 2,(state->vip_regs.BRTA + state->vip_regs.BRTB) & 0xff,0,0);
 					break;
 		case 0x28:	//BRTC
 					state->vip_regs.BRTC = data;
-					palette_set_color_rgb(space->machine, 3,(state->vip_regs.BRTA + state->vip_regs.BRTB + state->vip_regs.BRTC) & 0xff,0,0);
+					palette_set_color_rgb(space->machine(), 3,(state->vip_regs.BRTA + state->vip_regs.BRTB + state->vip_regs.BRTC) & 0xff,0,0);
 					break;
 		case 0x2A:	//REST
 					state->vip_regs.REST = data;
@@ -315,56 +315,56 @@ static WRITE16_HANDLER( vip_w )
 
 static WRITE16_HANDLER( vboy_font0_w )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	state->font[offset] = data | (state->font[offset] & (mem_mask ^ 0xffff));
 }
 
 static WRITE16_HANDLER( vboy_font1_w )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	state->font[offset + 0x1000] = data | (state->font[offset + 0x1000] & (mem_mask ^ 0xffff));
 }
 
 static WRITE16_HANDLER( vboy_font2_w )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	state->font[offset + 0x2000] = data | (state->font[offset + 0x2000] & (mem_mask ^ 0xffff));
 }
 
 static WRITE16_HANDLER( vboy_font3_w )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	state->font[offset + 0x3000] = data | (state->font[offset + 0x3000] & (mem_mask ^ 0xffff));
 }
 
 static READ16_HANDLER( vboy_font0_r )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	return state->font[offset];
 }
 
 static READ16_HANDLER( vboy_font1_r )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	return state->font[offset + 0x1000];
 }
 
 static READ16_HANDLER( vboy_font2_r )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	return state->font[offset + 0x2000];
 }
 
 static READ16_HANDLER( vboy_font3_r )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	return state->font[offset + 0x3000];
 }
@@ -403,14 +403,14 @@ static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 c
 
 static WRITE16_HANDLER( vboy_bgmap_w )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	state->bgmap[offset] = data | (state->bgmap[offset] & (mem_mask ^ 0xffff));
 }
 
 static READ16_HANDLER( vboy_bgmap_r )
 {
-	vboy_state *state = space->machine->driver_data<vboy_state>();
+	vboy_state *state = space->machine().driver_data<vboy_state>();
 
 	return state->bgmap[offset];
 }
@@ -497,7 +497,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vboy)
 {
-	vboy_state *state = machine->driver_data<vboy_state>();
+	vboy_state *state = machine.driver_data<vboy_state>();
 
 	/* Initial values taken from Reality Boy, to be verified when emulation improves */
 	state->vboy_regs.lpc = 0x6d;
@@ -516,7 +516,7 @@ static MACHINE_RESET(vboy)
 
 static VIDEO_START( vboy )
 {
-	vboy_state *state = machine->driver_data<vboy_state>();
+	vboy_state *state = machine.driver_data<vboy_state>();
 	int i;
 
 	// Allocate memory for temporary screens
@@ -638,10 +638,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, UINT8 r
 
 static SCREEN_UPDATE( vboy )
 {
-	vboy_state *state = screen->machine->driver_data<vboy_state>();
+	vboy_state *state = screen->machine().driver_data<vboy_state>();
 	int i;
 	UINT8 right = 0;
-	device_t *_3d_right_screen = screen->machine->device("3dright");
+	device_t *_3d_right_screen = screen->machine().device("3dright");
 
 	bitmap_fill(state->screen_output, cliprect, state->vip_regs.BKCOL);
 
@@ -658,7 +658,7 @@ static SCREEN_UPDATE( vboy )
 
 static TIMER_DEVICE_CALLBACK( video_tick )
 {
-	vboy_state *state = timer.machine->driver_data<vboy_state>();
+	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
 	state->vip_regs.XPSTTS = (state->vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
@@ -677,11 +677,11 @@ static PALETTE_INIT( vboy )
 
 static INTERRUPT_GEN( vboy_interrupt )
 {
-	vboy_state *state = device->machine->driver_data<vboy_state>();
+	vboy_state *state = device->machine().driver_data<vboy_state>();
 
 	if(state->vip_regs.INTENB)
 	{
-		cputag_set_input_line(device->machine, "maincpu", 4, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 4, HOLD_LINE);
 		state->vip_regs.INTPND |= 0x4000;
 	}
 }

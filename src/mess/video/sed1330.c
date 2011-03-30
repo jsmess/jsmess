@@ -649,7 +649,7 @@ static DEVICE_START( sed1330 )
 	devcb_resolve_write8(&sed1330->out_vd_func, &intf->out_vd_func, device);
 
 	/* get the screen device */
-	sed1330->screen = device->machine->device<screen_device>(intf->screen_tag);
+	sed1330->screen = device->machine().device<screen_device>(intf->screen_tag);
 	assert(sed1330->screen != NULL);
 
 	/* register for state saving */

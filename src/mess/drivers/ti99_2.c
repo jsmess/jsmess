@@ -98,34 +98,34 @@ public:
 
 static DRIVER_INIT( ti99_2_24 )
 {
-	ti99_2_state *state = machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	/* no ROM paging */
 	state->ROM_paged = 0;
 }
 
 static DRIVER_INIT( ti99_2_32 )
 {
-	ti99_2_state *state = machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	/* ROM paging enabled */
 	state->ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (space->machine->region("maincpu")->base()+0x4000)
-#define TI99_2_32_ROMPAGE1 (space->machine->region("maincpu")->base()+0x10000)
+#define TI99_2_32_ROMPAGE0 (space->machine().region("maincpu")->base()+0x4000)
+#define TI99_2_32_ROMPAGE1 (space->machine().region("maincpu")->base()+0x10000)
 
 static MACHINE_RESET( ti99_2 )
 {
-	ti99_2_state *state = machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	state->irq_state = ASSERT_LINE;
 	if (! state->ROM_paged)
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base()+0x4000);
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()+0x4000);
 	else
-		memory_set_bankptr(machine, "bank1", (machine->region("maincpu")->base()+0x4000));
+		memory_set_bankptr(machine, "bank1", (machine.region("maincpu")->base()+0x4000));
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
-	ti99_2_state *state = device->machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = device->machine().driver_data<ti99_2_state>();
 	device_set_input_line(device, 1, state->irq_state);
 	state->irq_state = (state->irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
@@ -153,7 +153,7 @@ static PALETTE_INIT(ti99_2)
 
 static SCREEN_UPDATE(ti99_2)
 {
-	ti99_2_state *state = screen->machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = screen->machine().driver_data<ti99_2_state>();
 	UINT8 *videoram = state->videoram;
 	int i, sx, sy;
 
@@ -163,7 +163,7 @@ static SCREEN_UPDATE(ti99_2)
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], videoram[i] & 0x7F, 0,
+		drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], videoram[i] & 0x7F, 0,
 			0, 0, sx, sy);
 
 		sx += 8;
@@ -219,7 +219,7 @@ ADDRESS_MAP_END
 /* write the current keyboard row */
 static WRITE8_HANDLER ( ti99_2_write_kbd )
 {
-	ti99_2_state *state = space->machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = space->machine().driver_data<ti99_2_state>();
 	offset &= 0x7;  /* other address lines are not decoded */
 
 	if (offset <= 2)
@@ -233,7 +233,7 @@ static WRITE8_HANDLER ( ti99_2_write_kbd )
 	/* now, we handle ROM paging */
 	if (state->ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(space->machine, "bank1", (state->KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(space->machine(), "bank1", (state->KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 
@@ -267,10 +267,10 @@ static WRITE8_HANDLER ( ti99_2_write_misc_cru )
 /* read keys in the current row */
 static  READ8_HANDLER ( ti99_2_read_kbd )
 {
-	ti99_2_state *state = space->machine->driver_data<ti99_2_state>();
+	ti99_2_state *state = space->machine().driver_data<ti99_2_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(space->machine, keynames[state->KeyRow]);
+	return input_port_read(space->machine(), keynames[state->KeyRow]);
 }
 
 static  READ8_HANDLER ( ti99_2_read_misc_cru )

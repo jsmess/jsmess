@@ -19,7 +19,7 @@
 // to change if a different ROM set ever surfaces.
 static READ8_HANDLER( fastfred_custom_io_r )
 {
-    switch (cpu_get_pc(space->cpu))
+    switch (cpu_get_pc(&space->device()))
     {
     case 0x03c0: return 0x9d;
     case 0x03e6: return 0x9f;
@@ -45,14 +45,14 @@ static READ8_HANDLER( fastfred_custom_io_r )
     case 0x7b58: return 0x20;
     }
 
-    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(space->cpu));
+    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(&space->device()));
     return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom1_io_r )
 {
 
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 	 case 0x049d: return 0xad;	/* compare */
 	 case 0x04b9:			/* compare with 0x9e ??? When ??? */
@@ -73,14 +73,14 @@ static READ8_HANDLER( flyboy_custom1_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(space->cpu));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(&space->device()));
 	return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom2_io_r )
 {
 
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 	 case 0x0395: return 0xf7;	/* $C900 compare         */
 	 case 0x03f5:			/* $c8fd                 */
@@ -98,7 +98,7 @@ static READ8_HANDLER( flyboy_custom2_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(space->cpu));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(&space->device()));
 	return 0x00;
 }
 
@@ -124,25 +124,25 @@ static READ8_HANDLER( boggy84_custom_io_r )
 
 static MACHINE_START( imago )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
-	gfx_element_set_source(machine->gfx[1], state->imago_sprites);
+	fastfred_state *state = machine.driver_data<fastfred_state>();
+	gfx_element_set_source(machine.gfx[1], state->imago_sprites);
 }
 
 static WRITE8_HANDLER( imago_dma_irq_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( imago_sprites_bank_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	state->imago_sprites_bank = (data & 2) >> 1;
 }
 
 static WRITE8_HANDLER( imago_sprites_dma_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
-	UINT8 *rom = (UINT8 *)space->machine->region("gfx2")->base();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	UINT8 *rom = (UINT8 *)space->machine().region("gfx2")->base();
 	UINT8 sprites_data;
 
 	sprites_data = rom[state->imago_sprites_address + 0x2000*0 + state->imago_sprites_bank * 0x1000];
@@ -154,12 +154,12 @@ static WRITE8_HANDLER( imago_sprites_dma_w )
 	sprites_data = rom[state->imago_sprites_address + 0x2000*2 + state->imago_sprites_bank * 0x1000];
 	state->imago_sprites[offset + 0x800*2] = sprites_data;
 
-	gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
+	gfx_element_mark_dirty(space->machine().gfx[1], offset/32);
 }
 
 static READ8_HANDLER( imago_sprites_offset_r )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	state->imago_sprites_address = offset;
 	return 0xff; //not really used
 }
@@ -978,54 +978,54 @@ ROM_END
 
 static DRIVER_INIT( flyboy )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc085, 0xc099, FUNC(flyboy_custom1_io_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc8fb, 0xc900, FUNC(flyboy_custom2_io_r));
+	fastfred_state *state = machine.driver_data<fastfred_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc085, 0xc099, FUNC(flyboy_custom1_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc8fb, 0xc900, FUNC(flyboy_custom2_io_r));
 	state->hardware_type = 1;
 }
 
 static DRIVER_INIT( flyboyb )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	state->hardware_type = 1;
 }
 
 static DRIVER_INIT( fastfred )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(fastfred_custom_io_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	fastfred_state *state = machine.driver_data<fastfred_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(fastfred_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	fastfred_state *state = machine.driver_data<fastfred_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84b )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	fastfred_state *state = machine.driver_data<fastfred_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 2;
 }
 
 static DRIVER_INIT( boggy84 )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(boggy84_custom_io_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	fastfred_state *state = machine.driver_data<fastfred_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(boggy84_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 2;
 }
 
 
 static DRIVER_INIT( imago )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	state->hardware_type = 3;
 }
 

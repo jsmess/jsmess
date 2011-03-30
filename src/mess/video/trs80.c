@@ -21,7 +21,7 @@
 
 WRITE8_HANDLER( trs80m4_88_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* This is for the programming of the CRTC registers.
     However this CRTC is mask-programmed, and only the
     start address register can be used. The cursor and
@@ -45,7 +45,7 @@ WRITE8_HANDLER( trs80m4_88_w )
 
 VIDEO_START( trs80 )
 {
-	trs80_state *state = machine->driver_data<trs80_state>();
+	trs80_state *state = machine.driver_data<trs80_state>();
 	state->size_store = 0xff;
 	state->mode &= 2;
 }
@@ -54,11 +54,11 @@ VIDEO_START( trs80 )
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 SCREEN_UPDATE( trs80 )
 {
-	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	trs80_state *state = screen->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = screen->machine->region("gfx1")->base();
+	UINT8 *FNT = screen->machine().region("gfx1")->base();
 	UINT8 cols = (state->mode & 1) ? 32 : 64;
 	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
@@ -118,11 +118,11 @@ SCREEN_UPDATE( trs80 )
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
 SCREEN_UPDATE( trs80m4 )
 {
-	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	trs80_state *state = screen->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = screen->machine->region("gfx1")->base();
+	UINT8 *FNT = screen->machine().region("gfx1")->base();
 	UINT8 skip=1;
 	UINT8 cols = (state->mode & 4) ? 80 : 64;
 	UINT8 rows = (state->mode & 4) ? 24 : 16;
@@ -215,11 +215,11 @@ SCREEN_UPDATE( trs80m4 )
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
 SCREEN_UPDATE( ht1080z )
 {
-	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	trs80_state *state = screen->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = screen->machine->region("gfx1")->base();
+	UINT8 *FNT = screen->machine().region("gfx1")->base();
 	UINT8 cols = (state->mode & 1) ? 32 : 64;
 	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
@@ -276,12 +276,12 @@ SCREEN_UPDATE( ht1080z )
 /* 8-bit video, 64/80 characters per line = lnw80 */
 SCREEN_UPDATE( lnw80 )
 {
-	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	trs80_state *state = screen->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	static const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
-	UINT8 *FNT = screen->machine->region("gfx1")->base();
+	UINT8 *FNT = screen->machine().region("gfx1")->base();
 	UINT8 cols = (state->mode & 0x10) ? 80 : 64;
 
 	/* Although the OS can select 32-character mode, it is not supported by hardware */
@@ -451,11 +451,11 @@ SCREEN_UPDATE( lnw80 )
 /* lores characters are in the character generator. Each character is 8x16. */
 SCREEN_UPDATE( radionic )
 {
-	trs80_state *state = screen->machine->driver_data<trs80_state>();
+	trs80_state *state = screen->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = screen->machine->region("gfx1")->base();
+	UINT8 *FNT = screen->machine().region("gfx1")->base();
 	UINT8 cols = (state->mode & 1) ? 32 : 64;
 	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
@@ -501,7 +501,7 @@ SCREEN_UPDATE( radionic )
 
 READ8_HANDLER( trs80_videoram_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	if ((state->mode & 0x80) && (~state->model4 & 1)) offset |= 0x400;
 	return videoram[offset];
@@ -509,7 +509,7 @@ READ8_HANDLER( trs80_videoram_r )
 
 WRITE8_HANDLER( trs80_videoram_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
 	if ((state->mode & 0x80) && (~state->model4 & 1)) offset |= 0x400;
 	videoram[offset] = data;
@@ -522,13 +522,13 @@ WRITE8_HANDLER( trs80_videoram_w )
 
 READ8_HANDLER( trs80_gfxram_r )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	return state->gfxram[offset];
 }
 
 WRITE8_HANDLER( trs80_gfxram_w )
 {
-	trs80_state *state = space->machine->driver_data<trs80_state>();
+	trs80_state *state = space->machine().driver_data<trs80_state>();
 	state->gfxram[offset] = data;
 }
 

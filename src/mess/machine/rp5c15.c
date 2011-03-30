@@ -109,7 +109,7 @@ struct _rp5c15_t
 	int pulse1_state;
 	int pulse16_state;
 	void (*timer_expired_func)(int state);
-	void (*alarm_callback)(running_machine *machine, int state);
+	void (*alarm_callback)(running_machine &machine, int state);
 	const rp5c15_intf* intf;
 	emu_timer* timer;
 };  //  Ricoh RP5C15
@@ -163,7 +163,7 @@ static DEVICE_START( rp5c15 )
 
 	rtc->alarm_callback = rtc->intf->alarm_irq_callback;
 
-	device->machine->base_datetime(systm);
+	device->machine().base_datetime(systm);
 
 	// date/time is stored as BCD
 	rtc->systime.sec_1 = systm.local_time.second % 10;
@@ -193,7 +193,7 @@ static DEVICE_START( rp5c15 )
 	rtc->test = 0x00;
 	rtc->pulse_count = 0;
 
-	rtc->timer = device->machine->scheduler().timer_alloc(FUNC(rtc_alarm_pulse), (void*)device);
+	rtc->timer = device->machine().scheduler().timer_alloc(FUNC(rtc_alarm_pulse), (void*)device);
 	rtc->timer->adjust(attotime::zero, 0, attotime::from_hz(32));
 }
 

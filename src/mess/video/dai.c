@@ -58,11 +58,11 @@ VIDEO_START( dai )
 
 SCREEN_UPDATE( dai )
 {
-	dai_state *state = screen->machine->driver_data<dai_state>();
-	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	dai_state *state = screen->machine().driver_data<dai_state>();
+	address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, j, k, l;
 
-	UINT8* char_rom = screen->machine->region("gfx1")->base();
+	UINT8* char_rom = screen->machine().region("gfx1")->base();
 
 	UINT16 dai_video_memory_start = 0xbfff;
 	UINT16 dai_scan_lines = 604;	/* scan lines of PAL tv */

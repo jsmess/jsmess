@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hncholms_prot_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x2b || cpu_get_pc(space->cpu) == 0xa27)
+	if(cpu_get_pc(&space->device()) == 0x2b || cpu_get_pc(&space->device()) == 0xa27)
 		return 1;
 	else
 		return 0;
@@ -475,7 +475,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( ckongs_coinage_r )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine, "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(field->port->machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
 

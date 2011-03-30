@@ -50,7 +50,7 @@
 ***************************************************************************/
 VIDEO_START( a7800 )
 {
-	a7800_state *state = machine->driver_data<a7800_state>();
+	a7800_state *state = machine.driver_data<a7800_state>();
 	int i;
 
 	VIDEO_START_CALL(generic_bitmapped);
@@ -84,10 +84,10 @@ VIDEO_START( a7800 )
 
 ***************************************************************************/
 
-static void maria_draw_scanline(running_machine *machine)
+static void maria_draw_scanline(running_machine &machine)
 {
-	a7800_state *state = machine->driver_data<a7800_state>();
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	a7800_state *state = machine.driver_data<a7800_state>();
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
 	unsigned int dl;
@@ -96,7 +96,7 @@ static void maria_draw_scanline(running_machine *machine)
 	UINT16 *scanline;
 
 	/* set up scanline */
-	scanline = BITMAP_ADDR16(machine->generic.tmpbitmap, state->maria_scanline, 0);
+	scanline = BITMAP_ADDR16(machine.generic.tmpbitmap, state->maria_scanline, 0);
 	for (i = 0; i < 320; i++)
 		scanline[i] = state->maria_backcolor;
 
@@ -319,10 +319,10 @@ static void maria_draw_scanline(running_machine *machine)
 
 INTERRUPT_GEN( a7800_interrupt )
 {
-	a7800_state *state = device->machine->driver_data<a7800_state>();
+	a7800_state *state = device->machine().driver_data<a7800_state>();
 	int frame_scanline;
-	UINT8 *ROM = device->machine->region("maincpu")->base();
-	address_space* space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = device->machine().region("maincpu")->base();
+	address_space* space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->maria_scanline++;
 
@@ -336,7 +336,7 @@ INTERRUPT_GEN( a7800_interrupt )
 
 	if( state->maria_wsync )
 	{
-		device->machine->scheduler().trigger( TRIGGER_HSYNC );
+		device->machine().scheduler().trigger( TRIGGER_HSYNC );
 		state->maria_wsync = 0;
 	}
 
@@ -394,7 +394,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( ( frame_scanline > 15 ) && state->maria_dodma )
 	{
 		if (state->maria_scanline < ( state->lines - 4 ) )
-			maria_draw_scanline(device->machine);
+			maria_draw_scanline(device->machine());
 
 		if( state->maria_offset == 0 )
 		{
@@ -431,7 +431,7 @@ INTERRUPT_GEN( a7800_interrupt )
 /* This routine is called at the start of vblank to refresh the screen */
 SCREEN_UPDATE( a7800 )
 {
-	a7800_state *state = screen->machine->driver_data<a7800_state>();
+	a7800_state *state = screen->machine().driver_data<a7800_state>();
 	state->maria_scanline = 0;
 	SCREEN_UPDATE_CALL(generic_bitmapped);
 	return 0;
@@ -442,8 +442,8 @@ SCREEN_UPDATE( a7800 )
 
  READ8_HANDLER( a7800_MARIA_r )
 {
-	a7800_state *state = space->machine->driver_data<a7800_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	a7800_state *state = space->machine().driver_data<a7800_state>();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	switch (offset)
 	{
 		case 0x08:
@@ -457,8 +457,8 @@ SCREEN_UPDATE( a7800 )
 
 WRITE8_HANDLER( a7800_MARIA_w )
 {
-	a7800_state *state = space->machine->driver_data<a7800_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	a7800_state *state = space->machine().driver_data<a7800_state>();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	switch (offset)
 	{
 		case 0x00:
@@ -483,7 +483,7 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			state->maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			device_spin_until_trigger(space->machine->device("maincpu"), TRIGGER_HSYNC);
+			device_spin_until_trigger(space->machine().device("maincpu"), TRIGGER_HSYNC);
 			state->maria_wsync=1;
 			break;
 

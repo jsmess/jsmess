@@ -21,7 +21,7 @@ DIRECT_UPDATE_HANDLER( pentagon_direct )
 		{
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		}
 	} else if (((pc & 0xff00) == 0x3d00) && (state->ROMSelection==1))
 	{
@@ -35,22 +35,22 @@ DIRECT_UPDATE_HANDLER( pentagon_direct )
 		if (state->ROMSelection == 3) {
 			if (beta->started()) {
 				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine->region("beta:beta")->base());
-				memory_set_bankptr(machine, "bank1", machine->region("beta:beta")->base());
+				memory_set_bankptr(*machine, "bank1", machine->region("beta:beta")->base());
 			}
 		} else {
 			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
-			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		}
 		return ~0;
 	}
 	return address;
 }
 
-static void pentagon_update_memory(running_machine *machine)
+static void pentagon_update_memory(running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	device_t *beta = machine->device(BETA_DISK_TAG);
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	device_t *beta = machine.device(BETA_DISK_TAG);
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	memory_set_bankptr(machine, "bank4", messram + ((state->port_7ffd_data & 0x07) * 0x4000));
@@ -58,7 +58,7 @@ static void pentagon_update_memory(running_machine *machine)
 	if (beta->started() && betadisk_is_active(beta) && !( state->port_7ffd_data & 0x10 ) )
 	{
 		/* GLUK */
-		if (strcmp(machine->system().name, "pent1024")==0) {
+		if (strcmp(machine.system().name, "pent1024")==0) {
 			state->ROMSelection = 2;
 		} else {
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ;
@@ -69,12 +69,12 @@ static void pentagon_update_memory(running_machine *machine)
 		state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ;
 	}
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 }
 
 static WRITE8_HANDLER(pentagon_port_7ffd_w)
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	/* disable paging */
 	if (state->port_7ffd_data & 0x20)
@@ -84,7 +84,7 @@ static WRITE8_HANDLER(pentagon_port_7ffd_w)
 	state->port_7ffd_data = data;
 
 	/* update memory */
-	pentagon_update_memory(space->machine);
+	pentagon_update_memory(space->machine());
 }
 
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8)
@@ -102,10 +102,10 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( pentagon )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
-	device_t *beta = machine->device(BETA_DISK_TAG);
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	device_t *beta = machine.device(BETA_DISK_TAG);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
 	space->unmap_write(0x0000, 0x3fff);
@@ -114,7 +114,7 @@ static MACHINE_RESET( pentagon )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	space->set_direct_update_handler(direct_update_delegate_create_static(pentagon_direct, *machine));
+	space->set_direct_update_handler(direct_update_delegate_create_static(pentagon_direct, machine));
 
 	memset(messram,0,128*1024);
 

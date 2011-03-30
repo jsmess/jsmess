@@ -51,32 +51,32 @@ struct _m6847_config
 	int cpu0_timing_factor;
 
 	/* callbacks */
-	void (*horizontal_sync_callback)(running_machine *machine, int line);
-	void (*field_sync_callback)(running_machine *machine,int line);
-	UINT8 (*get_attributes)(running_machine *machine, UINT8 c, int scanline, int pos) ATTR_CONST;
-	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
-	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch, int line);
+	void (*horizontal_sync_callback)(running_machine &machine, int line);
+	void (*field_sync_callback)(running_machine &machine,int line);
+	UINT8 (*get_attributes)(running_machine &machine, UINT8 c, int scanline, int pos) ATTR_CONST;
+	const UINT8 *(*get_video_ram)(running_machine &machine, int scanline);
+	UINT8 (*get_char_rom)(running_machine &machine, UINT8 ch, int line);
 
 	/* needed for the CoCo 3 */
-	int (*new_frame_callback)(running_machine *machine);	/* returns whether the M6847 is in charge of this frame */
-	void (*custom_prepare_scanline)(running_machine *machine, int scanline);
+	int (*new_frame_callback)(running_machine &machine);	/* returns whether the M6847 is in charge of this frame */
+	void (*custom_prepare_scanline)(running_machine &machine, int scanline);
 
 	const UINT32 *custom_palette;
 };
 
 /* creates a new M6847 instance */
-void m6847_init(running_machine *machine, const m6847_config *cfg);
+void m6847_init(running_machine &machine, const m6847_config *cfg);
 
 /* video update proc */
 SCREEN_UPDATE(m6847);
 void coco6847_video_changed(void);
 
 /* sync */
-int m6847_get_horizontal_sync(running_machine *machine);
-int m6847_get_field_sync(running_machine *machine);
+int m6847_get_horizontal_sync(running_machine &machine);
+int m6847_get_field_sync(running_machine &machine);
 
 /* timing functions */
-attotime coco6847_time_delay(running_machine *machine, m6847_timing_type timing, UINT64 target_time);
+attotime coco6847_time_delay(running_machine &machine, m6847_timing_type timing, UINT64 target_time);
 
 /* CoCo 3 hooks */
 attotime coco6847_scanline_time(int scanline);

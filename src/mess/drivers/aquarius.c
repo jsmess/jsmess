@@ -61,7 +61,7 @@
 */
 static READ8_HANDLER( cassette_r )
 {
-	device_t *cassette = space->machine->device("cassette");
+	device_t *cassette = space->machine().device("cassette");
 	return (cassette_input(cassette) < +0.0) ? 0 : 1;
 }
 
@@ -73,8 +73,8 @@ static READ8_HANDLER( cassette_r )
 */
 static WRITE8_HANDLER( cassette_w )
 {
-	device_t *speaker = space->machine->device("speaker");
-	device_t *cassette = space->machine->device("cassette");
+	device_t *speaker = space->machine().device("speaker");
+	device_t *cassette = space->machine().device("cassette");
 
 	speaker_level_w(speaker, BIT(data, 0));
 	cassette_output(cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( cassette_w )
 */
 static READ8_HANDLER( vsync_r )
 {
-	screen_device *screen = space->machine->primary_screen;
+	screen_device *screen = space->machine().primary_screen;
 	return screen->vblank() ? 0 : 1;
 }
 
@@ -147,14 +147,14 @@ static READ8_HANDLER( keyboard_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(offset,  8)) result &= input_port_read(space->machine, "ROW0");
-	if (!BIT(offset,  9)) result &= input_port_read(space->machine, "ROW1");
-	if (!BIT(offset, 10)) result &= input_port_read(space->machine, "ROW2");
-	if (!BIT(offset, 11)) result &= input_port_read(space->machine, "ROW3");
-	if (!BIT(offset, 12)) result &= input_port_read(space->machine, "ROW4");
-	if (!BIT(offset, 13)) result &= input_port_read(space->machine, "ROW5");
-	if (!BIT(offset, 14)) result &= input_port_read(space->machine, "ROW6");
-	if (!BIT(offset, 15)) result &= input_port_read(space->machine, "ROW7");
+	if (!BIT(offset,  8)) result &= input_port_read(space->machine(), "ROW0");
+	if (!BIT(offset,  9)) result &= input_port_read(space->machine(), "ROW1");
+	if (!BIT(offset, 10)) result &= input_port_read(space->machine(), "ROW2");
+	if (!BIT(offset, 11)) result &= input_port_read(space->machine(), "ROW3");
+	if (!BIT(offset, 12)) result &= input_port_read(space->machine(), "ROW4");
+	if (!BIT(offset, 13)) result &= input_port_read(space->machine(), "ROW5");
+	if (!BIT(offset, 14)) result &= input_port_read(space->machine(), "ROW6");
+	if (!BIT(offset, 15)) result &= input_port_read(space->machine(), "ROW7");
 
 	return result;
 }
@@ -180,14 +180,14 @@ static READ8_HANDLER( keyboard_r )
 */
 static WRITE8_HANDLER( scrambler_w )
 {
-	aquarius_state *state = space->machine->driver_data<aquarius_state>();
+	aquarius_state *state = space->machine().driver_data<aquarius_state>();
 	state->scrambler = data;
 }
 
 static READ8_HANDLER( cartridge_r )
 {
-	aquarius_state *state = space->machine->driver_data<aquarius_state>();
-	UINT8 *rom = space->machine->region("maincpu")->base() + 0xc000;
+	aquarius_state *state = space->machine().driver_data<aquarius_state>();
+	UINT8 *rom = space->machine().region("maincpu")->base() + 0xc000;
 	return rom[offset] ^ state->scrambler;
 }
 
@@ -199,13 +199,13 @@ static READ8_HANDLER( cartridge_r )
 /* note: 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2 */
 static READ8_HANDLER( floppy_r )
 {
-	logerror("%s: floppy_r[0x%02x]\n", space->machine->describe_context(), offset);
+	logerror("%s: floppy_r[0x%02x]\n", space->machine().describe_context(), offset);
 	return 0xff;
 }
 
 static WRITE8_HANDLER( floppy_w )
 {
-	logerror("%s: floppy_w[0x%02x] (0x%02x)\n", space->machine->describe_context(), offset, data);
+	logerror("%s: floppy_w[0x%02x] (0x%02x)\n", space->machine().describe_context(), offset, data);
 }
 
 
@@ -216,12 +216,12 @@ static WRITE8_HANDLER( floppy_w )
 static DRIVER_INIT( aquarius )
 {
 	/* install expansion memory if available */
-	if (ram_get_size(machine->device(RAM_TAG)) > 0x1000)
+	if (ram_get_size(machine.device(RAM_TAG)) > 0x1000)
 	{
-		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-		space->install_readwrite_bank(0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 0x1000 - 1, "bank1");
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+		space->install_readwrite_bank(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 0x1000 - 1, "bank1");
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 	}
 }
 
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 /* the 'reset' key is directly tied to the reset line of the cpu */
 static INPUT_CHANGED( aquarius_reset )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( aquarius )

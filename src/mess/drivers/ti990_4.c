@@ -70,7 +70,7 @@ static MACHINE_RESET(ti990_4)
 
 static INTERRUPT_GEN( ti990_4_line_interrupt )
 {
-	ti990_4_state *state = device->machine->driver_data<ti990_4_state>();
+	ti990_4_state *state = device->machine().driver_data<ti990_4_state>();
 
 #if VIDEO_911
 	vdt911_keyboard(state->terminal);
@@ -78,7 +78,7 @@ static INTERRUPT_GEN( ti990_4_line_interrupt )
 	asr733_keyboard(state->terminal);
 #endif
 
-	ti990_line_interrupt(device->machine);
+	ti990_line_interrupt(device->machine());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -98,14 +98,14 @@ static WRITE8_HANDLER ( rset_callback )
 
 static WRITE8_HANDLER ( ckon_ckof_callback )
 {
-	device_t *maincpu = space->machine->device("maincpu");
+	device_t *maincpu = space->machine().device("maincpu");
 	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 
 static WRITE8_HANDLER ( lrex_callback )
 {
 	/* right??? */
-	ti990_hold_load(space->machine);
+	ti990_hold_load(space->machine());
 }
 
 #if VIDEO_911
@@ -125,14 +125,14 @@ static const vdt911_init_params_t vdt911_intf =
 
 static VIDEO_START( ti990_4 )
 {
-	ti990_4_state *state = machine->driver_data<ti990_4_state>();
+	ti990_4_state *state = machine.driver_data<ti990_4_state>();
 
-	state->terminal = machine->device("vdt911");
+	state->terminal = machine.device("vdt911");
 }
 
 static SCREEN_UPDATE( ti990_4 )
 {
-	ti990_4_state *state = screen->machine->driver_data<ti990_4_state>();
+	ti990_4_state *state = screen->machine().driver_data<ti990_4_state>();
 	vdt911_refresh(state->terminal, bitmap, 0, 0);
 	return 0;
 }
@@ -146,14 +146,14 @@ static const asr733_init_params_t asr733_intf =
 
 static VIDEO_START( ti990_4 )
 {
-	ti990_4_state *state = machine->driver_data<ti990_4_state>();
+	ti990_4_state *state = machine.driver_data<ti990_4_state>();
 
-	state->terminal = machine->device("asr733");
+	state->terminal = machine.device("asr733");
 }
 
 static SCREEN_UPDATE( ti990_4 )
 {
-	ti990_4_state *state = screen->machine->driver_data<ti990_4_state>();
+	ti990_4_state *state = screen->machine().driver_data<ti990_4_state>();
 	asr733_refresh(state->terminal, bitmap, 0, 0);
 	return 0;
 }

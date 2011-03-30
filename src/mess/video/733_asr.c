@@ -63,7 +63,7 @@ typedef struct
 
 	int x;
 
-	void (*int_callback)(running_machine *, int state);
+	void (*int_callback)(running_machine &, int state);
 
 	bitmap_t *bitmap;
 } asr_t;
@@ -109,7 +109,7 @@ PALETTE_INIT( asr733 )
 /*
     Initialize the asr core
 */
-void asr733_init(running_machine *machine)
+void asr733_init(running_machine &machine)
 {
 	UINT8 *dst;
 
@@ -165,7 +165,7 @@ void asr733_init(running_machine *machine)
 		0x00,0x68,0xb0,0x00,0x00,0x00,0x00,0x00,0x20,0x50,0x20,0x50,0xa8,0x50,0x00,0x00
 	};
 
-	dst = machine->region(asr733_chr_region)->base();
+	dst = machine.region(asr733_chr_region)->base();
 
 	memcpy(dst, fontdata6x8, asrfontdata_size);
 }
@@ -182,13 +182,13 @@ static DEVICE_START( asr733 )
 {
 	asr_t *asr = get_safe_token(device);
 	const asr733_init_params_t *params = (const asr733_init_params_t *)device->baseconfig().static_config();
-	screen_device *screen = device->machine->first_screen();
+	screen_device *screen = device->machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	const rectangle &visarea = screen->visible_area();
 
 	asr->last_key_pressed = 0x80;
-	asr->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+	asr->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
 
 	bitmap_fill(asr->bitmap, &visarea, 0);
 
@@ -202,13 +202,13 @@ static void asr_field_interrupt(device_t *device)
 	{
 		asr->status |= AS_int_mask;
 		if (asr->int_callback)
-			(*asr->int_callback)(device->machine, 1);
+			(*asr->int_callback)(device->machine(), 1);
 	}
 	else
 	{
 		asr->status &= ~AS_int_mask;
 		if (asr->int_callback)
-			(*asr->int_callback)(device->machine, 0);
+			(*asr->int_callback)(device->machine(), 0);
 	}
 }
 
@@ -251,7 +251,7 @@ static void asr_draw_char(device_t *device, int character, int x, int y, int col
 {
 	asr_t *asr = get_safe_token(device);
 
-	drawgfx_opaque(asr->bitmap, NULL, device->machine->gfx[0], character-32, color, 0, 0,
+	drawgfx_opaque(asr->bitmap, NULL, device->machine().gfx[0], character-32, color, 0, 0,
 				x+1, y);
 }
 
@@ -264,7 +264,7 @@ static void asr_linefeed(device_t *device)
 	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
 		extract_scanline8(asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->machine->pens);
+		draw_scanline8(asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->machine().pens);
 	}
 
 	bitmap_fill(asr->bitmap, &asr_scroll_clear_window, 0);
@@ -666,7 +666,7 @@ void asr733_keyboard(device_t *device)
 	/* for (i = 0; i < 6; i++) */
 	for (i = 0; i < 4; i++)
 	{
-		key_buf[i] = input_port_read(device->machine, keynames[i]);
+		key_buf[i] = input_port_read(device->machine(), keynames[i]);
 	}
 
 	/* process key modifiers */

@@ -334,7 +334,7 @@ static SCREEN_UPDATE( sorcerer )
 {
 	UINT8 y,ra,chr,gfx,i;
 	UINT16 sy=0,ma=0xf080,x;
-	UINT8 *RAM = screen->machine->region("maincpu")->base();
+	UINT8 *RAM = screen->machine().region("maincpu")->base();
 
 	for (y = 0; y < 30; y++)
 	{
@@ -459,7 +459,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( sorcerer )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
 }
 

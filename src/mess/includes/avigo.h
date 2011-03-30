@@ -58,7 +58,7 @@ extern VIDEO_START( avigo );
 extern SCREEN_UPDATE( avigo );
 extern PALETTE_INIT( avigo );
 
-void avigo_vh_set_stylus_marker_position(running_machine *machine, int x, int y);
+void avigo_vh_set_stylus_marker_position(running_machine &machine, int x, int y);
 
 
 #endif /* AVIGO_H_ */

@@ -24,7 +24,7 @@ public:
 
 static WRITE8_HANDLER(swtpc_terminal_w)
 {
-	device_t *devconf = space->machine->device(TERMINAL_TAG);
+	device_t *devconf = space->machine().device(TERMINAL_TAG);
 	terminal_write(devconf,0,data);
 }
 

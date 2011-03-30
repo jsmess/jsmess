@@ -107,13 +107,13 @@ enum
 };
 
 // these are used to setup the proper PCB ID, for each supported type of files
-int nes_get_pcb_id(running_machine *machine, const char *feature);	// for softlist
-void unif_mapr_setup(running_machine *machine, const char *board);	// for UNIF files
-int nes_get_mmc_id(running_machine *machine, int mapper);	// for iNES files
+int nes_get_pcb_id(running_machine &machine, const char *feature);	// for softlist
+void unif_mapr_setup(running_machine &machine, const char *board);	// for UNIF files
+int nes_get_mmc_id(running_machine &machine, int mapper);	// for iNES files
 
 // these are used to setup handlers and callbacks necessary to the emulation (resp. at start and reset)
-void pcb_handlers_setup(running_machine *machine);
-int nes_pcb_reset(running_machine *machine);
+void pcb_handlers_setup(running_machine &machine);
+int nes_pcb_reset(running_machine &machine);
 
 
 WRITE8_HANDLER( nes_low_mapper_w );
@@ -140,7 +140,7 @@ READ8_HANDLER( waixing_sh2_chr_r );
 #define PPU_MIRROR_LOW		4
 #define PPU_MIRROR_4SCREEN	5	// Same effect as NONE, but signals that we should never mirror
 
-void set_nt_mirroring(running_machine *machine, int mirroring);
+void set_nt_mirroring(running_machine &machine, int mirroring);
 
 
 #endif

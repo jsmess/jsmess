@@ -128,10 +128,10 @@ static DEVICE_START( dl1416 )
 	assert(((const dl1416_interface *)(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config()))->type < MAX_DL1416_TYPES);
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->chip_enable);
-	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->cursor_enable);
-	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->write_enable);
-	state_save_register_item_array(device->machine, "dl1416", device->tag(), 0, dl1416->cursor_ram);
+	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->chip_enable);
+	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->cursor_enable);
+	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->write_enable);
+	state_save_register_item_array(device->machine(), "dl1416", device->tag(), 0, dl1416->cursor_ram);
 }
 
 
@@ -147,7 +147,7 @@ static DEVICE_RESET( dl1416 )
 
 	/* randomize cursor memory */
 	for (i = 0; i < 4; i++)
-		chip->cursor_ram[i] = device->machine->rand();
+		chip->cursor_ram[i] = device->machine().rand();
 }
 
 

@@ -88,7 +88,7 @@ static void initialize_palette(device_t *device)
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		palette_set_color_rgb(device->machine, i, r, g, b);
+		palette_set_color_rgb(device->machine(), i, r, g, b);
 	}
 }
 
@@ -179,11 +179,11 @@ static DEVICE_START( cdp1862 )
 	devcb_resolve_read_line(&cdp1862->in_gd_func, &intf->in_gd_func, device);
 
 	/* get the screen device */
-	cdp1862->screen = device->machine->device<screen_device>(intf->screen_tag);
+	cdp1862->screen = device->machine().device<screen_device>(intf->screen_tag);
 	assert(cdp1862->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1862->bitmap = auto_bitmap_alloc(device->machine, cdp1862->screen->width(), cdp1862->screen->height(), cdp1862->screen->format());
+	cdp1862->bitmap = auto_bitmap_alloc(device->machine(), cdp1862->screen->width(), cdp1862->screen->height(), cdp1862->screen->format());
 
 	/* initialize the palette */
 	initialize_palette(device);

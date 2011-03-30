@@ -447,32 +447,32 @@ static PALETTE_INIT( cgenie )
 {
 	UINT8 i, r, g, b;
 
-	machine->colortable = colortable_alloc(machine, 49);
+	machine.colortable = colortable_alloc(machine, 49);
 
 	for ( i = 0; i < 49; i++ )
 	{
 		r = cgenie_colors[i*3]; g = cgenie_colors[i*3+1]; b = cgenie_colors[i*3+2];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0; i<108; i++)
-		colortable_entry_set_value(machine->colortable, i, cgenie_palette[i]);
+		colortable_entry_set_value(machine.colortable, i, cgenie_palette[i]);
 }
 
 static PALETTE_INIT( cgenienz )
 {
 	UINT8 i, r, g, b;
 
-	machine->colortable = colortable_alloc(machine, 49);
+	machine.colortable = colortable_alloc(machine, 49);
 
 	for ( i = 0; i < 49; i++ )
 	{
 		r = cgenienz_colors[i*3]; g = cgenienz_colors[i*3+1]; b = cgenienz_colors[i*3+2];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0; i<108; i++)
-		colortable_entry_set_value(machine->colortable, i, cgenie_palette[i]);
+		colortable_entry_set_value(machine.colortable, i, cgenie_palette[i]);
 }
 
 static const ay8910_interface cgenie_ay8910_interface =
@@ -709,7 +709,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
                 spt = pd_list[i].SPT / heads;
                 dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
                 dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-                memcpy(image.device().machine->region("maincpu")->base() + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+                memcpy(image.device().machine().region("maincpu")->base() + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
                 break;
             }
         }

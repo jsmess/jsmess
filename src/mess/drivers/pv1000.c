@@ -58,16 +58,16 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pv1000_gfxram_w )
 {
-	UINT8 *gfxram = space->machine->region( "gfxram" )->base();
+	UINT8 *gfxram = space->machine().region( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
-	gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
+	gfx_element_mark_dirty(space->machine().gfx[1], offset/32);
 }
 
 
 static WRITE8_HANDLER( pv1000_io_w )
 {
-	d65010_state *state = space->machine->driver_data<d65010_state>();
+	d65010_state *state = space->machine().driver_data<d65010_state>();
 
 	switch ( offset )
 	{
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( pv1000_io_w )
 
 static READ8_HANDLER( pv1000_io_r )
 {
-	d65010_state *state = space->machine->driver_data<d65010_state>();
+	d65010_state *state = space->machine().driver_data<d65010_state>();
 	UINT8 data = state->io_regs[offset];
 
 //  logerror("pv1000_io_r offset=%02x\n", offset );
@@ -110,19 +110,19 @@ static READ8_HANDLER( pv1000_io_r )
 		data = 0;
 		if ( state->io_regs[5] & 0x08 )
 		{
-			data = input_port_read( space->machine, "IN3" );
+			data = input_port_read( space->machine(), "IN3" );
 		}
 		if ( state->io_regs[5] & 0x04 )
 		{
-			data = input_port_read( space->machine, "IN2" );
+			data = input_port_read( space->machine(), "IN2" );
 		}
 		if ( state->io_regs[5] & 0x02 )
 		{
-			data = input_port_read( space->machine, "IN1" );
+			data = input_port_read( space->machine(), "IN1" );
 		}
 		if ( state->io_regs[5] & 0x01 )
 		{
-			data = input_port_read( space->machine, "IN0" );
+			data = input_port_read( space->machine(), "IN0" );
 		}
 		state->fd_data = 0;
 		break;
@@ -174,7 +174,7 @@ static PALETTE_INIT( pv1000 )
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
-	UINT8 *cart = image.device().machine->region("cart")->base();
+	UINT8 *cart = image.device().machine().region("cart")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -211,7 +211,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 
 static SCREEN_UPDATE( pv1000 )
 {
-	d65010_state *state = screen->machine->driver_data<d65010_state>();
+	d65010_state *state = screen->machine().driver_data<d65010_state>();
 	int x, y;
 
 	for ( y = 0; y < 24; y++ )
@@ -223,12 +223,12 @@ static SCREEN_UPDATE( pv1000 )
 			if ( tile < 0xe0 )
 			{
 				tile += ( state->io_regs[7] * 8 );
-				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[0], tile, 0, 0, 0, x*8, y*8 );
+				drawgfx_opaque( bitmap, cliprect, screen->machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[1], tile, 0, 0, 0, x*8, y*8 );
+				drawgfx_opaque( bitmap, cliprect, screen->machine().gfx[1], tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}
@@ -249,7 +249,7 @@ static SCREEN_UPDATE( pv1000 )
 
 static STREAM_UPDATE( pv1000_sound_update )
 {
-	d65010_state *state = device->machine->driver_data<d65010_state>();
+	d65010_state *state = device->machine().driver_data<d65010_state>();
 	stream_sample_t *buffer = outputs[0];
 
 	while ( samples > 0 )
@@ -282,8 +282,8 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 static DEVICE_START( pv1000_sound )
 {
-	d65010_state *state = device->machine->driver_data<d65010_state>();
-	state->sh_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
+	d65010_state *state = device->machine().driver_data<d65010_state>();
+	state->sh_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
 }
 
 
@@ -305,7 +305,7 @@ DEVICE_GET_INFO( pv1000_sound )
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
 static TIMER_CALLBACK( d65010_irq_on_cb )
 {
-	d65010_state *state = machine->driver_data<d65010_state>();
+	d65010_state *state = machine.driver_data<d65010_state>();
 	int vpos = state->screen->vpos();
 	int next_vpos = vpos + 12;
 
@@ -324,7 +324,7 @@ static TIMER_CALLBACK( d65010_irq_on_cb )
 
 static TIMER_CALLBACK( d65010_irq_off_cb )
 {
-	d65010_state *state = machine->driver_data<d65010_state>();
+	d65010_state *state = machine.driver_data<d65010_state>();
 
 	device_set_input_line( state->maincpu, 0, CLEAR_LINE );
 }
@@ -332,18 +332,18 @@ static TIMER_CALLBACK( d65010_irq_off_cb )
 
 static MACHINE_START( pv1000 )
 {
-	d65010_state *state = machine->driver_data<d65010_state>();
+	d65010_state *state = machine.driver_data<d65010_state>();
 
-	state->irq_on_timer = machine->scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
-	state->irq_off_timer = machine->scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
-	state->maincpu = machine->device( "maincpu" );
-	state->screen = machine->device<screen_device>("screen" );
+	state->irq_on_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
+	state->irq_off_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
+	state->maincpu = machine.device( "maincpu" );
+	state->screen = machine.device<screen_device>("screen" );
 }
 
 
 static MACHINE_RESET( pv1000 )
 {
-	d65010_state *state = machine->driver_data<d65010_state>();
+	d65010_state *state = machine.driver_data<d65010_state>();
 
 	state->io_regs[5] = 0;
 	state->fd_data = 0;

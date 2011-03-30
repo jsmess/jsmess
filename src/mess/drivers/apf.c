@@ -61,12 +61,12 @@ public:
 
 };
 
-static void apf_update_ints(running_machine *machine);
+static void apf_update_ints(running_machine &machine);
 
 
 static READ8_DEVICE_HANDLER( apf_mc6847_videoram_r )
 {
-	apf_state *state = device->machine->driver_data<apf_state>();
+	apf_state *state = device->machine().driver_data<apf_state>();
 	mc6847_css_w(device, state->mc6847_css && BIT(state->videoram[offset + 0x200], 6));
 	mc6847_inv_w(device, BIT(state->videoram[offset + 0x200], 6));
 	mc6847_as_w(device, BIT(state->videoram[offset + 0x200], 7));
@@ -76,35 +76,35 @@ static READ8_DEVICE_HANDLER( apf_mc6847_videoram_r )
 
 static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
 {
-	apf_state *state_ = device->machine->driver_data<apf_state>();
+	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	if (state)
 		state_->apf_ints |= 0x10;
 	else
 		state_->apf_ints &= ~0x10;
 
-	apf_update_ints(device->machine);
+	apf_update_ints(device->machine());
 }
 
 static SCREEN_UPDATE( apf )
 {
-	device_t *mc6847 = screen->machine->device("mc6847");
+	device_t *mc6847 = screen->machine().device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
 static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_a_func)
 {
-	apf_state *state = device->machine->driver_data<apf_state>();
+	apf_state *state = device->machine().driver_data<apf_state>();
 	UINT8 data=~0;
 
 	if (!(state->pad_data & 0x08))
-		data &= input_port_read(device->machine, "joy3");
+		data &= input_port_read(device->machine(), "joy3");
 	if (!(state->pad_data & 0x04))
-		data &= input_port_read(device->machine, "joy2");
+		data &= input_port_read(device->machine(), "joy2");
 	if (!(state->pad_data & 0x02))
-		data &= input_port_read(device->machine, "joy1");
+		data &= input_port_read(device->machine(), "joy1");
 	if (!(state->pad_data & 0x01))
-		data &= input_port_read(device->machine, "joy0");
+		data &= input_port_read(device->machine(), "joy0");
 
 	return data;
 }
@@ -143,8 +143,8 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_a_func)
 
 static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
 {
-	apf_state *state = device->machine->driver_data<apf_state>();
-	device_t *mc6847 = device->machine->device("mc6847");
+	apf_state *state = device->machine().driver_data<apf_state>();
+	device_t *mc6847 = device->machine().device("mc6847");
 
 	/* bit 7..4 video control -- TODO: bit 5 and 4? */
 	mc6847_ag_w(mc6847, BIT(data, 7));
@@ -156,14 +156,14 @@ static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
 
 static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 {
-	apf_state *state_ = device->machine->driver_data<apf_state>();
+	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	state_->mc6847_css = state;
 }
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	device_t *speaker = device->machine->device("speaker");
+	device_t *speaker = device->machine().device("speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -173,16 +173,16 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 /* use bit 3 to identify state of irq from pia 1 */
 /* use bit 4 to identify state of irq from video */
 
-static void apf_update_ints(running_machine *machine)
+static void apf_update_ints(running_machine &machine)
 {
-	apf_state *state = machine->driver_data<apf_state>();
+	apf_state *state = machine.driver_data<apf_state>();
 
 	cputag_set_input_line(machine, "maincpu", 0, state->apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
 {
-	apf_state *state_ = device->machine->driver_data<apf_state>();
+	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	if (state)
 	{
@@ -193,13 +193,13 @@ static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
 		state_->apf_ints &= ~1;
 	}
 
-	apf_update_ints(device->machine);
+	apf_update_ints(device->machine());
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_b_func )
 {
-	apf_state *state_ = device->machine->driver_data<apf_state>();
+	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	//logerror("pia 0 irq b %d\n",state);
 
@@ -212,7 +212,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_b_func )
 		state_->apf_ints &= ~2;
 	}
 
-	apf_update_ints(device->machine);
+	apf_update_ints(device->machine());
 
 }
 
@@ -235,7 +235,7 @@ static const pia6821_interface apf_m1000_pia_interface=
 
 static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_a_func)
 {
-	apf_state *state = device->machine->driver_data<apf_state>();
+	apf_state *state = device->machine().driver_data<apf_state>();
 
 	return state->keyboard_data;
 }
@@ -246,7 +246,7 @@ static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(device->machine->device("cassette")) > 0.0038)
+	if (cassette_input(device->machine().device("cassette")) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -279,7 +279,7 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_a_func)
 
 static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 {
-	apf_state *state = device->machine->driver_data<apf_state>();
+	apf_state *state = device->machine().driver_data<apf_state>();
 
 	/* bits 2..0 = keyboard line */
 	/* bit 3 = ??? */
@@ -292,15 +292,15 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	state->keyboard_data = input_port_read(device->machine, keynames[keyboard_line]);
+	state->keyboard_data = input_port_read(device->machine(), keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(device->machine->device("cassette"),
+	cassette_change_state(device->machine().device("cassette"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(device->machine->device("cassette"),
+	cassette_output(device->machine().device("cassette"),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -314,7 +314,7 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_cb2_func)
 
 static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_a_func )
 {
-	apf_state *state_ = device->machine->driver_data<apf_state>();
+	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	if (state)
 	{
@@ -325,12 +325,12 @@ static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_a_func )
 		state_->apf_ints &= ~4;
 	}
 
-	apf_update_ints(device->machine);
+	apf_update_ints(device->machine());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_b_func )
 {
-	apf_state *state_ = device->machine->driver_data<apf_state>();
+	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	if (state)
 	{
@@ -341,7 +341,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_b_func )
 		state_->apf_ints &= ~8;
 	}
 
-	apf_update_ints(device->machine);
+	apf_update_ints(device->machine());
 
 }
 
@@ -364,7 +364,7 @@ static const pia6821_interface apf_imagination_pia_interface=
 
 static MACHINE_START( apf_imagination )
 {
-	apf_state *state = machine->driver_data<apf_state>();
+	apf_state *state = machine.driver_data<apf_state>();
 
 	state->apf_ints = 0;
 }
@@ -372,7 +372,7 @@ static MACHINE_START( apf_imagination )
 static WRITE8_HANDLER(apf_dischw_w)
 {
 	int drive;
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;
@@ -395,42 +395,42 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {
-	wd17xx_command_w(space->machine->device("wd179x"), offset,~data);
+	wd17xx_command_w(space->machine().device("wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w(space->machine->device("wd179x"), offset,~data);
+	wd17xx_track_w(space->machine().device("wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(space->machine->device("wd179x"), offset,~data);
+	wd17xx_sector_w(space->machine().device("wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w(space->machine->device("wd179x"), offset,~data);
+	wd17xx_data_w(space->machine().device("wd179x"), offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(space->machine->device("wd179x"), offset);
+	return ~wd17xx_status_r(space->machine().device("wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(space->machine->device("wd179x"), offset);
+	return ~wd17xx_track_r(space->machine().device("wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(space->machine->device("wd179x"), offset);
+	return ~wd17xx_sector_r(space->machine().device("wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r(space->machine->device("wd179x"), offset);
+	return wd17xx_data_r(space->machine().device("wd179x"), offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, AS_PROGRAM, 8)

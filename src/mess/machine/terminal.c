@@ -378,7 +378,7 @@ static UINT8 row_number(UINT8 code) {
 	return 0;
 }
 
-UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state, device_t *device)
+UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state, device_t *device)
 {
 	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6" };
 	int i;
@@ -492,7 +492,7 @@ static VIDEO_START( terminal )
 
 static SCREEN_UPDATE(terminal )
 {
-	device_t *devconf = screen->machine->device(TERMINAL_TAG);
+	device_t *devconf = screen->machine().device(TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -525,7 +525,7 @@ static DEVICE_START( terminal )
 	devcb_resolve_write8(&term->terminal_keyboard_func, &intf->terminal_keyboard_func, device);
 
 	if (term->terminal_keyboard_func.target)
-		device->machine->scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback), 0, (void*)device);
+		device->machine().scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback), 0, (void*)device);
 }
 
 /*-------------------------------------------------

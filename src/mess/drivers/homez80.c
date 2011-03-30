@@ -43,7 +43,7 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d",offset);
-	return input_port_read(machine, kbdrow);
+	return input_port_read(m_machine, kbdrow);
 }
 
 static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
@@ -209,19 +209,19 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(homez80)
 {
-	homez80_state *state = machine->driver_data<homez80_state>();
+	homez80_state *state = machine.driver_data<homez80_state>();
 	state->m_irq = 0;
 }
 
 static VIDEO_START( homez80 )
 {
-	homez80_state *state = machine->driver_data<homez80_state>();
-	state->m_char_rom = machine->region("chargen")->base();
+	homez80_state *state = machine.driver_data<homez80_state>();
+	state->m_char_rom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( homez80 )
 {
-	homez80_state *state = screen->machine->driver_data<homez80_state>();
+	homez80_state *state = screen->machine().driver_data<homez80_state>();
 	UINT8 y,ra,chr,gfx,i;
 	UINT16 sy=0,ma=0,x;
 
@@ -267,7 +267,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( homez80_interrupt )
 {
-	homez80_state *state = device->machine->driver_data<homez80_state>();	
+	homez80_state *state = device->machine().driver_data<homez80_state>();	
 	device_set_input_line(device, 0, (state->m_irq) ? HOLD_LINE : CLEAR_LINE);
 	state->m_irq ^= 1;
 }

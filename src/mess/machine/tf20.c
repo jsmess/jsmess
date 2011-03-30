@@ -72,8 +72,8 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 /* a read from this location disables the rom */
 static READ8_HANDLER( tf20_rom_disable )
 {
-	tf20_state *tf20 = get_safe_token(space->cpu->owner());
-	address_space *prg = space->cpu->memory().space(AS_PROGRAM);
+	tf20_state *tf20 = get_safe_token(space->device().owner());
+	address_space *prg = space->device().memory().space(AS_PROGRAM);
 
 	/* switch in ram */
 	prg->install_ram(0x0000, 0x7fff, ram_get_ptr(tf20->ram));
@@ -83,9 +83,9 @@ static READ8_HANDLER( tf20_rom_disable )
 
 static READ8_HANDLER( tf20_dip_r )
 {
-	logerror("%s: tf20_dip_r\n", space->machine->describe_context());
+	logerror("%s: tf20_dip_r\n", space->machine().describe_context());
 
-	return input_port_read(space->machine, "tf20_dip");
+	return input_port_read(space->machine(), "tf20_dip");
 }
 
 static TIMER_CALLBACK( tf20_upd765_tc_reset )
@@ -95,19 +95,19 @@ static TIMER_CALLBACK( tf20_upd765_tc_reset )
 
 static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 {
-	logerror("%s: tf20_upd765_tc_r\n", device->machine->describe_context());
+	logerror("%s: tf20_upd765_tc_r\n", device->machine().describe_context());
 
 	/* toggle tc on read */
 	upd765_tc_w(device, ASSERT_LINE);
-	device->machine->scheduler().timer_set(attotime::zero, FUNC(tf20_upd765_tc_reset), 0, device);
+	device->machine().scheduler().timer_set(attotime::zero, FUNC(tf20_upd765_tc_reset), 0, device);
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( tf20_fdc_control_w )
 {
-	tf20_state *tf20 = get_safe_token(space->cpu->owner());
-	logerror("%s: tf20_fdc_control_w %02x\n", space->machine->describe_context(), data);
+	tf20_state *tf20 = get_safe_token(space->device().owner());
+	logerror("%s: tf20_fdc_control_w %02x\n", space->machine().describe_context(), data);
 
 	/* bit 0, motor on signal */
 	floppy_mon_w(tf20->floppy_0, !BIT(data, 0));
@@ -128,7 +128,7 @@ static IRQ_CALLBACK( tf20_irq_ack )
 READ_LINE_DEVICE_HANDLER( tf20_rxs_r )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_rxs_r\n", device->machine->describe_context());
+	logerror("%s: tf20_rxs_r\n", device->machine().describe_context());
 
 	return upd7201_txda_r(tf20->upd7201);
 }
@@ -136,7 +136,7 @@ READ_LINE_DEVICE_HANDLER( tf20_rxs_r )
 READ_LINE_DEVICE_HANDLER( tf20_pins_r )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_pins_r\n", device->machine->describe_context());
+	logerror("%s: tf20_pins_r\n", device->machine().describe_context());
 
 	return upd7201_dtra_r(tf20->upd7201);
 }
@@ -145,7 +145,7 @@ READ_LINE_DEVICE_HANDLER( tf20_pins_r )
 WRITE_LINE_DEVICE_HANDLER( tf20_txs_w )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_txs_w %u\n", device->machine->describe_context(), state);
+	logerror("%s: tf20_txs_w %u\n", device->machine().describe_context(), state);
 
 	upd7201_rxda_w(tf20->upd7201, state);
 }
@@ -153,7 +153,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_txs_w )
 WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_pouts_w %u\n", device->machine->describe_context(), state);
+	logerror("%s: tf20_pouts_w %u\n", device->machine().describe_context(), state);
 
 	upd7201_ctsa_w(tf20->upd7201, state);
 }
@@ -163,7 +163,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w )
 WRITE_LINE_DEVICE_HANDLER( tf20_txc_w )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_txc_w %u\n", device->machine->describe_context(), state);
+	logerror("%s: tf20_txc_w %u\n", device->machine().describe_context(), state);
 
 	upd7201_rxda_w(tf20->upd7201, state);
 }
@@ -172,7 +172,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_txc_w )
 READ_LINE_DEVICE_HANDLER( tf20_rxc_r )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_rxc_r\n", device->machine->describe_context());
+	logerror("%s: tf20_rxc_r\n", device->machine().describe_context());
 
 	return upd7201_txda_r(tf20->upd7201);
 }
@@ -180,7 +180,7 @@ READ_LINE_DEVICE_HANDLER( tf20_rxc_r )
 WRITE_LINE_DEVICE_HANDLER( tf20_poutc_w )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_poutc_w %u\n", device->machine->describe_context(), state);
+	logerror("%s: tf20_poutc_w %u\n", device->machine().describe_context(), state);
 
 	upd7201_ctsa_w(tf20->upd7201, state);
 }
@@ -188,7 +188,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_poutc_w )
 READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_pinc_r\n", device->machine->describe_context());
+	logerror("%s: tf20_pinc_r\n", device->machine().describe_context());
 
 	return upd7201_dtra_r(tf20->upd7201);
 }

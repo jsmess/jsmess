@@ -639,7 +639,7 @@ static void lynx_blit_lines(lynx_state *state)
 
 static TIMER_CALLBACK(lynx_blitter_timer)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	state->suzy.data[SPRSYS] &= ~0x01; //state->blitter finished
 }
 
@@ -716,9 +716,9 @@ static TIMER_CALLBACK(lynx_blitter_timer)
 
 */
 
-static void lynx_blitter(running_machine *machine)
+static void lynx_blitter(running_machine &machine)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	static const int lynx_colors[4]={2,4,8,16};
 
 	static void (* const blit_line[4])(lynx_state *state, const int y, const int xdir)= {
@@ -737,7 +737,7 @@ static void lynx_blitter(running_machine *machine)
 	int i; int o;int colors;
 
 	state->blitter.memory_accesses = 0;
-	state->blitter.mem = (UINT8*)machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0x0000);
+	state->blitter.mem = (UINT8*)machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0x0000);
 
 	state->blitter.xoff   = GET_WORD(state->suzy.data, 0x04);
 	state->blitter.yoff   = GET_WORD(state->suzy.data, 0x06);
@@ -838,7 +838,7 @@ static void lynx_blitter(running_machine *machine)
 	}
 
 	if (0)
-		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(state->blitter.memory_accesses*20), FUNC(lynx_blitter_timer));
+		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(state->blitter.memory_accesses*20), FUNC(lynx_blitter_timer));
 }
 
 
@@ -947,7 +947,7 @@ static void lynx_multiply( lynx_state *state )
 
 static READ8_HANDLER( suzy_read )
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	UINT8 value = 0, input;
 
 	switch (offset)
@@ -958,7 +958,7 @@ static READ8_HANDLER( suzy_read )
 		case 0x92:	/* Better check this with docs! */
 			if (state->blitter.time==attotime::zero)
 			{
-				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(space->machine->time() - state->blitter.time) > state->blitter.memory_accesses * 20)
+				if (space->machine().device<cpu_device>("maincpu")->attotime_to_cycles(space->machine().time() - state->blitter.time) > state->blitter.memory_accesses * 20)
 				{
 					state->suzy.data[offset] &= ~0x01; //state->blitter finished
 					state->blitter.time = attotime::zero;
@@ -971,7 +971,7 @@ static READ8_HANDLER( suzy_read )
 				value |= 0x40;
 			break;
 		case 0xb0:
-			input = input_port_read(space->machine, "JOY");
+			input = input_port_read(space->machine(), "JOY");
 			switch (state->rotate)
 			{
 				case 1:
@@ -1003,10 +1003,10 @@ static READ8_HANDLER( suzy_read )
 				value = input;
 			break;
 		case 0xb1:
-			value = input_port_read(space->machine, "PAUSE");
+			value = input_port_read(space->machine(), "PAUSE");
 			break;
 		case 0xb2:
-			value = *(space->machine->region("user1")->base() + (state->suzy.high * state->granularity) + state->suzy.low);
+			value = *(space->machine().region("user1")->base() + (state->suzy.high * state->granularity) + state->suzy.low);
 			state->suzy.low = (state->suzy.low + 1) & (state->granularity - 1);
 			break;
 		case 0xb3: /* we need bank 1 emulation!!! */
@@ -1019,7 +1019,7 @@ static READ8_HANDLER( suzy_read )
 
 static WRITE8_HANDLER( suzy_write )
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	state->suzy.data[offset] = data;
 
 	/* Additional effects of a write */
@@ -1091,8 +1091,8 @@ static WRITE8_HANDLER( suzy_write )
 	case 0x91:
 		if (data & 0x01)
 		{
-			state->blitter.time = space->machine->time();
-			lynx_blitter(space->machine);
+			state->blitter.time = space->machine().time();
+			lynx_blitter(space->machine());
 		}
 		break;
 //  case 0xb2: case 0xb3: /* Cart Bank 0 & 1 */
@@ -1146,9 +1146,9 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 ; B1    1 EQU flip screen
 ; B0    1 EQU video DMA enabled
 */
-static void lynx_draw_lines(running_machine *machine, int newline)
+static void lynx_draw_lines(running_machine &machine, int newline)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	int h,w;
 	int x, yend;
 	UINT16 j; // clipping needed!
@@ -1182,7 +1182,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; state->line_y < yend; state->line_y++)
 			{
-				line = BITMAP_ADDR16(machine->generic.tmpbitmap, state->line_y, 0);
+				line = BITMAP_ADDR16(machine.generic.tmpbitmap, state->line_y, 0);
 				for (x = 160 - 2; x >= 0; j++, x -= 2)
 				{
 					byte = lynx_read_vram(state, j);
@@ -1195,7 +1195,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; state->line_y < yend; state->line_y++)
 			{
-				line = BITMAP_ADDR16(machine->generic.tmpbitmap, 102 - 1 - state->line_y, 0);
+				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 102 - 1 - state->line_y, 0);
 				for (x = 0; x < 160; j++, x += 2)
 				{
 					byte = lynx_read_vram(state, j);
@@ -1212,7 +1212,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; state->line_y < yend; state->line_y++)
 			{
-				line = BITMAP_ADDR16(machine->generic.tmpbitmap, 102 - 1 - state->line_y, 0);
+				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 102 - 1 - state->line_y, 0);
 				for (x = 160 - 2; x >= 0; j++, x -= 2)
 				{
 					byte = lynx_read_vram(state, j);
@@ -1225,7 +1225,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; state->line_y < yend; state->line_y++)
 			{
-				line = BITMAP_ADDR16(machine->generic.tmpbitmap, state->line_y, 0);
+				line = BITMAP_ADDR16(machine.generic.tmpbitmap, state->line_y, 0);
 				for (x = 0; x < 160; j++, x += 2)
 				{
 					byte = lynx_read_vram(state, j);
@@ -1242,7 +1242,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			state->width = w;
 			state->height = h;
-			machine->primary_screen->set_visible_area(0, w - 1, 0, h - 1);
+			machine.primary_screen->set_visible_area(0, w - 1, 0, h - 1);
 		}
 	}
 }
@@ -1293,16 +1293,16 @@ TIM_BORROWOUT   EQU %00000001
 
 static TIMER_CALLBACK(lynx_timer_shot);
 
-static void lynx_timer_init(running_machine *machine, int which)
+static void lynx_timer_init(running_machine &machine, int which)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	memset( &state->timer[which], 0, sizeof(LYNX_TIMER) );
-	state->timer[which].timer = machine->scheduler().timer_alloc(FUNC(lynx_timer_shot));
+	state->timer[which].timer = machine.scheduler().timer_alloc(FUNC(lynx_timer_shot));
 }
 
-static void lynx_timer_signal_irq(running_machine *machine, int which)
+static void lynx_timer_signal_irq(running_machine &machine, int which)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	if ( ( state->timer[which].cntrl1 & 0x80 ) && ( which != 4 ) )
 	{ // irq flag handling later
 		state->mikey.data[0x81] |= ( 1 << which );
@@ -1334,9 +1334,9 @@ static void lynx_timer_signal_irq(running_machine *machine, int which)
 	}
 }
 
-void lynx_timer_count_down(running_machine *machine, int which)
+void lynx_timer_count_down(running_machine &machine, int which)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	if ( ( state->timer[which].cntrl1 & 0x0f ) == 0x0f )
 	{
 		if ( state->timer[which].counter > 0 )
@@ -1363,7 +1363,7 @@ void lynx_timer_count_down(running_machine *machine, int which)
 
 static TIMER_CALLBACK(lynx_timer_shot)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	state->timer[param].cntrl2 |= 8;
 	lynx_timer_signal_irq( machine, param );
 	if ( ! ( state->timer[param].cntrl1 & 0x10 ) )
@@ -1474,12 +1474,12 @@ static void lynx_uart_reset(lynx_state *state)
 
 static TIMER_CALLBACK(lynx_uart_timer)
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	if (state->uart.buffer_loaded)
 	{
 		state->uart.data_to_send = state->uart.buffer;
 		state->uart.buffer_loaded = FALSE;
-		machine->scheduler().timer_set(attotime::from_usec(11), FUNC(lynx_uart_timer));
+		machine.scheduler().timer_set(attotime::from_usec(11), FUNC(lynx_uart_timer));
 	}
 	else
 		state->uart.sending = FALSE;
@@ -1494,7 +1494,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 
 static  READ8_HANDLER(lynx_uart_r)
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	UINT8 value = 0x00;
 	switch (offset)
 	{
@@ -1517,7 +1517,7 @@ static  READ8_HANDLER(lynx_uart_r)
 
 static WRITE8_HANDLER(lynx_uart_w)
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	logerror("uart write %.2x %.2x\n", offset, data);
 	switch (offset)
 	{
@@ -1535,7 +1535,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 			{
 				state->uart.sending = TRUE;
 				state->uart.data_to_send = data;
-				space->machine->scheduler().timer_set(attotime::from_usec(11), FUNC(lynx_uart_timer));
+				space->machine().scheduler().timer_set(attotime::from_usec(11), FUNC(lynx_uart_timer));
 			}
 			break;
 	}
@@ -1551,7 +1551,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 
 static READ8_HANDLER( mikey_read )
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	UINT8 direction, value = 0x00;
 
 	switch (offset)
@@ -1622,7 +1622,7 @@ static READ8_HANDLER( mikey_read )
 
 static WRITE8_HANDLER( mikey_write )
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	switch (offset)
 	{
 	case 0x00: case 0x01: case 0x02: case 0x03:
@@ -1648,7 +1648,7 @@ static WRITE8_HANDLER( mikey_write )
 		state->mikey.data[0x81] &= ~data; // clear interrupt source
 		logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!state->mikey.data[0x81])
-			cputag_set_input_line(space->machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */
@@ -1685,10 +1685,10 @@ static WRITE8_HANDLER( mikey_write )
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 		state->mikey.data[offset] = data;
-		lynx_draw_lines(space->machine, state->line);
+		lynx_draw_lines(space->machine(), state->line);
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
-		state->palette[offset & 0x0f] = space->machine->pens[
+		state->palette[offset & 0x0f] = space->machine().pens[
 			((state->mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
 			((state->mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
 			((state->mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
@@ -1726,13 +1726,13 @@ static WRITE8_HANDLER( mikey_write )
 
 READ8_HANDLER( lynx_memory_config_r )
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	return state->memory_config;
 }
 
 WRITE8_HANDLER( lynx_memory_config_w )
 {
-	lynx_state *state = space->machine->driver_data<lynx_state>();
+	lynx_state *state = space->machine().driver_data<lynx_state>();
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
      * when these are safe in the cpu */
 	state->memory_config = data;
@@ -1749,11 +1749,11 @@ WRITE8_HANDLER( lynx_memory_config_w )
 	}
 
 	if (data & 1)
-		memory_set_bankptr(space->machine, "bank1", state->mem_fc00);
+		memory_set_bankptr(space->machine(), "bank1", state->mem_fc00);
 	if (data & 2)
-		memory_set_bankptr(space->machine, "bank2", state->mem_fd00);
-	memory_set_bank(space->machine, "bank3", (data & 4) ? 1 : 0);
-	memory_set_bank(space->machine, "bank4", (data & 8) ? 1 : 0);
+		memory_set_bankptr(space->machine(), "bank2", state->mem_fd00);
+	memory_set_bank(space->machine(), "bank3", (data & 4) ? 1 : 0);
+	memory_set_bank(space->machine(), "bank4", (data & 8) ? 1 : 0);
 }
 
 static void lynx_reset(running_machine &machine)
@@ -1761,7 +1761,7 @@ static void lynx_reset(running_machine &machine)
 	lynx_state *state = machine.driver_data<lynx_state>();
 	lynx_memory_config_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 
-	cputag_set_input_line(&machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&state->suzy, 0, sizeof(state->suzy));
 	memset(&state->mikey, 0, sizeof(state->mikey));
@@ -1790,30 +1790,30 @@ static void lynx_reset(running_machine &machine)
 
 static STATE_POSTLOAD( lynx_postload )
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
-	lynx_memory_config_w( machine->device("maincpu")->memory().space(AS_PROGRAM), 0, state->memory_config);
+	lynx_state *state = machine.driver_data<lynx_state>();
+	lynx_memory_config_w( machine.device("maincpu")->memory().space(AS_PROGRAM), 0, state->memory_config);
 }
 
 MACHINE_START( lynx )
 {
-	lynx_state *state = machine->driver_data<lynx_state>();
+	lynx_state *state = machine.driver_data<lynx_state>();
 	int i;
 	state->save_item(NAME(state->memory_config));
 	state->save_pointer(NAME(state->mem_fe00), state->mem_fe00_size);
-	machine->state().register_postload(lynx_postload, NULL);
+	machine.state().register_postload(lynx_postload, NULL);
 
-	memory_configure_bank(machine, "bank3", 0, 1, machine->region("maincpu")->base() + 0x0000, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, machine.region("maincpu")->base() + 0x0000, 0);
 	memory_configure_bank(machine, "bank3", 1, 1, state->mem_fe00, 0);
-	memory_configure_bank(machine, "bank4", 0, 1, machine->region("maincpu")->base() + 0x01fa, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, machine.region("maincpu")->base() + 0x01fa, 0);
 	memory_configure_bank(machine, "bank4", 1, 1, state->mem_fffa, 0);
 
-	state->audio = machine->device("custom");
+	state->audio = machine.device("custom");
 	state->height = -1;
 	state->width = -1;
 
 	memset(&state->suzy, 0, sizeof(state->suzy));
 
-	machine->add_notifier(MACHINE_NOTIFY_RESET, lynx_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, lynx_reset);
 
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(machine, i);
@@ -1866,15 +1866,15 @@ int lynx_verify_cart (char *header, int kind)
 
 INTERRUPT_GEN( lynx_frame_int )
 {
-	lynx_state *state = device->machine->driver_data<lynx_state>();
+	lynx_state *state = device->machine().driver_data<lynx_state>();
 	state->rotate = state->rotate0;
-	if ((input_port_read(device->machine, "ROTATION") & 0x03) != 0x03)
-		state->rotate=input_port_read(device->machine, "ROTATION") & 0x03;
+	if ((input_port_read(device->machine(), "ROTATION") & 0x03) != 0x03)
+		state->rotate=input_port_read(device->machine(), "ROTATION") & 0x03;
 }
 
 void lynx_crc_keyword(device_image_interface &image)
 {
-	lynx_state *state = image.device().machine->driver_data<lynx_state>();
+	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	const char *info = NULL;
 
 	info = hashfile_extrainfo(image);
@@ -1891,8 +1891,8 @@ void lynx_crc_keyword(device_image_interface &image)
 
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
-	lynx_state *state = image.device().machine->driver_data<lynx_state>();
-	UINT8 *rom = image.device().machine->region("user1")->base();
+	lynx_state *state = image.device().machine().driver_data<lynx_state>();
+	UINT8 *rom = image.device().machine().region("user1")->base();
 	UINT32 size;
 	UINT8 header[0x40];
 

@@ -120,7 +120,7 @@ static DEVICE_RESET( ti99_samsmem )
 	/* Register the card */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "RAM")==RAM_SUPERAMS1024)
+	if (input_port_read(device->machine(), "RAM")==RAM_SUPERAMS1024)
 	{
 		int success = mount_card(peb, device, &samsmem_card, get_pebcard_config(device)->slot);
 		if (!success) return;

@@ -20,7 +20,7 @@ public:
 
 static READ8_HANDLER( okean240_rand_r )
 {
-	return 0;  // return space->machine->rand(); // so we can start booting
+	return 0;  // return space->machine().rand(); // so we can start booting
 }
 
 static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8)
@@ -51,13 +51,13 @@ static TIMER_CALLBACK( okean240_boot )
 
 static MACHINE_RESET(okean240)
 {
-	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
+	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
 	memory_set_bank(machine, "boot", 1);
 }
 
 DRIVER_INIT( okean240 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -68,7 +68,7 @@ static VIDEO_START( okean240 )
 // The video appears to be bitmapped, but atm this produces scrolling garbage
 static SCREEN_UPDATE( okean240 )
 {
-	okean240_state *state = screen->machine->driver_data<okean240_state>();
+	okean240_state *state = screen->machine().driver_data<okean240_state>();
 	UINT8 gfx;
 	UINT16 ma=0,x,y;
 

@@ -103,7 +103,7 @@ static READ16_HANDLER( pckgaldx_unknown_r )
 
 static READ16_HANDLER( pckgaldx_protection_r )
 {
-	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(space->cpu));
+	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(&space->device()));
 	return -1;
 }
 
@@ -319,10 +319,10 @@ static const deco16ic_interface pktgaldx_deco16ic_tilegen1_intf =
 
 static MACHINE_START( pktgaldx )
 {
-	pktgaldx_state *state = machine->driver_data<pktgaldx_state>();
+	pktgaldx_state *state = machine.driver_data<pktgaldx_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
+	state->maincpu = machine.device("maincpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )

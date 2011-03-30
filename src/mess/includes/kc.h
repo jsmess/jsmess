@@ -82,7 +82,7 @@ public:
 
 extern PALETTE_INIT( kc85 );
 
-void kc85_video_set_blink_state(running_machine *machine, int data);
+void kc85_video_set_blink_state(running_machine &machine, int data);
 
 VIDEO_START( kc85_3 );
 VIDEO_START( kc85_4 );
@@ -90,9 +90,9 @@ SCREEN_UPDATE( kc85_3 );
 SCREEN_UPDATE( kc85_4 );
 
 /* select video ram to display */
-void kc85_4_video_ram_select_bank(running_machine *machine, int bank);
+void kc85_4_video_ram_select_bank(running_machine &machine, int bank);
 /* select video ram which is visible in address space */
-unsigned char *kc85_4_get_video_ram_base(running_machine *machine, int bank, int colour);
+unsigned char *kc85_4_get_video_ram_base(running_machine &machine, int bank, int colour);
 
 
 /*----------- defined in machine/kc.c -----------*/

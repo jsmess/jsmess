@@ -66,12 +66,12 @@ INPUT_PORTS_END
 
 void msbc1_state::machine_reset()
 {
-	void *ram = machine->firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(0);
-	UINT8 *rom = machine->region(MC68000R12_TAG)->base();
+	void *ram = m_machine.firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(0);
+	UINT8 *rom = m_machine.region(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
 
-	machine->firstcpu->reset();
+	m_machine.firstcpu->reset();
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )

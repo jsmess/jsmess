@@ -22,13 +22,13 @@ public:
 
 static WRITE16_HANDLER(term_w)
 {
-	device_t *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine().device("terminal");
 	terminal_write(devconf,0,data);
 }
 
 static READ16_HANDLER(term_r)
 {
-	pdp11_state *state = space->machine->driver_data<pdp11_state>();
+	pdp11_state *state = space->machine().driver_data<pdp11_state>();
 	state->term_status = 0x0000;
 	return state->term_data;
 }
@@ -40,7 +40,7 @@ static READ16_HANDLER(term_tx_status_r)
 
 static READ16_HANDLER(term_rx_status_r)
 { 	
-	pdp11_state *state = space->machine->driver_data<pdp11_state>();
+	pdp11_state *state = space->machine().driver_data<pdp11_state>();
 	return state->term_status;
 }
 
@@ -70,8 +70,8 @@ INPUT_PORTS_END
 static MACHINE_RESET(pdp11) 
 {	
 	// Load M9301-YA 
-	UINT8* user1 = machine->region("user1")->base();
-	UINT8* maincpu = machine->region("maincpu")->base();
+	UINT8* user1 = machine.region("user1")->base();
+	UINT8* maincpu = machine.region("maincpu")->base();
 	int i;
 	
 	for(i=0;i<0x100;i++) {
@@ -97,8 +97,8 @@ static MACHINE_RESET(pdp11)
 static MACHINE_RESET(pdp11ub2) 
 {	
 	// Load M9312
-	UINT8* user1 = machine->region("user1")->base();
-	UINT8* maincpu = machine->region("maincpu")->base();
+	UINT8* user1 = machine.region("user1")->base();
+	UINT8* maincpu = machine.region("maincpu")->base();
 	int i;
 	
 	//   3   2   1   8
@@ -115,13 +115,13 @@ static MACHINE_RESET(pdp11ub2)
 		maincpu[0xea00 + i*2 + 1] = ((nib4 ^ 0x01)<<4) + ((nib1 & 0x01) | ((nib3 ^ 0x0c) & 0x0e));
 	}
 	
-	cpu_set_reg(machine->device("maincpu"), T11_PC, 0xea10);	 // diag*/
-	//cpu_set_reg(machine->device("maincpu"), T11_PC, 0xea64);	 // no-diag
+	cpu_set_reg(machine.device("maincpu"), T11_PC, 0xea10);	 // diag*/
+	//cpu_set_reg(machine.device("maincpu"), T11_PC, 0xea64);	 // no-diag
 }
 
 static MACHINE_RESET(pdp11qb) 
 {
-	cpu_set_reg(machine->device("maincpu"), T11_PC, 0xea00);
+	cpu_set_reg(machine.device("maincpu"), T11_PC, 0xea00);
 }
 
 static const struct t11_setup pdp11_data =
@@ -135,7 +135,7 @@ static const struct t11_setup mxv11_data =
 };
 static WRITE8_DEVICE_HANDLER( pdp_kbd_put )
 {
-	pdp11_state *state = device->machine->driver_data<pdp11_state>();
+	pdp11_state *state = device->machine().driver_data<pdp11_state>();
 	state->term_data = data;
 	state->term_status = 0xffff;
 }

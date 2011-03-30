@@ -92,7 +92,7 @@ public:
 #define VERBOSE_LEVEL ( 0 )
 
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -101,7 +101,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(machine->device("maincpu")), buf);
+		logerror("%08x: %s", cpu_get_pc(machine.device("maincpu")), buf);
 	}
 }
 
@@ -128,7 +128,7 @@ static const struct pit8253_config ip22_pit8254_config =
 
 static NVRAM_HANDLER( ip22 )
 {
-	ip22_state *state = machine->driver_data<ip22_state>();
+	ip22_state *state = machine.driver_data<ip22_state>();
 	if (read_or_write)
 	{
 		file->write(state->nRTC_UserRAM, 0x200);
@@ -172,9 +172,9 @@ static NVRAM_HANDLER( ip22 )
 /*static UINT8 nIOC_ParCntl;*/
 
 // raise a local0 interrupt
-static void int3_raise_local0_irq(running_machine *machine, UINT8 source_mask)
+static void int3_raise_local0_irq(running_machine &machine, UINT8 source_mask)
 {
-	ip22_state *state = machine->driver_data<ip22_state>();
+	ip22_state *state = machine.driver_data<ip22_state>();
 	// signal the interrupt is pending
 	state->int3_regs[0] |= source_mask;
 
@@ -193,9 +193,9 @@ static void int3_lower_local0_irq(ip22_state *state, UINT8 source_mask)
 
 #ifdef UNUSED_FUNCTION
 // raise a local1 interrupt
-static void int3_raise_local1_irq(running_machine *machine, UINT8 source_mask)
+static void int3_raise_local1_irq(running_machine &machine, UINT8 source_mask)
 {
-	ip22_state *state = machine->driver_data<ip22_state>();
+	ip22_state *state = machine.driver_data<ip22_state>();
 	// signal the interrupt is pending
 	state->int3_regs[2] |= source_mask;
 
@@ -209,17 +209,17 @@ static void int3_raise_local1_irq(running_machine *machine, UINT8 source_mask)
 // lower a local1 interrupt
 static void int3_lower_local1_irq(UINT8 source_mask)
 {
-	ip22_state *state = machine->driver_data<ip22_state>();
+	ip22_state *state = machine.driver_data<ip22_state>();
 	state->int3_regs[2] &= ~source_mask;
 }
 #endif
 
 static READ32_HANDLER( hpc3_pbus6_r )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	device_t *lpt = space->machine->device("lpt_0");
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	device_t *lpt = space->machine().device("lpt_0");
 	UINT8 ret8;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -233,7 +233,7 @@ static READ32_HANDLER( hpc3_pbus6_r )
 		return ret8;
 	case 0x030/4:
 		verboselog( machine, 2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
-		switch(cpu_get_pc(space->cpu))
+		switch(cpu_get_pc(&space->device()))
 		{
 			case 0x9fc1d9e4:	// interpreter (ip244415)
 			case 0x9fc1d9e0:	// DRC (ip244415)
@@ -268,19 +268,19 @@ static READ32_HANDLER( hpc3_pbus6_r )
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return state->int3_regs[offset-0x80/4];
 	case 0xb0/4:
-		ret8 = pit8253_r(machine->device("pit8254"), 0);
+		ret8 = pit8253_r(machine.device("pit8254"), 0);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
-		ret8 = pit8253_r(machine->device("pit8254"), 1);
+		ret8 = pit8253_r(machine.device("pit8254"), 1);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
-		ret8 = pit8253_r(machine->device("pit8254"), 2);
+		ret8 = pit8253_r(machine.device("pit8254"), 2);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
-		ret8 = pit8253_r(machine->device("pit8254"), 3);
+		ret8 = pit8253_r(machine.device("pit8254"), 3);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
@@ -292,10 +292,10 @@ static READ32_HANDLER( hpc3_pbus6_r )
 
 static WRITE32_HANDLER( hpc3_pbus6_w )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	device_t *lpt = space->machine->device("lpt_0");
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	device_t *lpt = space->machine().device("lpt_0");
 	char cChar;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -375,19 +375,19 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		break;
 	case 0xb0/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine->device("pit8254"), 0, data & 0x000000ff);
+		pit8253_w(machine.device("pit8254"), 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine->device("pit8254"), 1, data & 0x000000ff);
+		pit8253_w(machine.device("pit8254"), 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine->device("pit8254"), 2, data & 0x000000ff);
+		pit8253_w(machine.device("pit8254"), 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine->device("pit8254"), 3, data & 0x000000ff);
+		pit8253_w(machine.device("pit8254"), 3, data & 0x000000ff);
 		return;
 	default:
 		verboselog( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
@@ -401,8 +401,8 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 
 static READ32_HANDLER( hpc3_hd_enet_r )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -427,8 +427,8 @@ static READ32_HANDLER( hpc3_hd_enet_r )
 
 static WRITE32_HANDLER( hpc3_hd_enet_w )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -456,7 +456,7 @@ static WRITE32_HANDLER( hpc3_hd_enet_w )
 
 static READ32_HANDLER( hpc3_hd0_r )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -483,7 +483,7 @@ static READ32_HANDLER( hpc3_hd0_r )
 			return 0;
 		}
 	default:
-		verboselog(machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, cpu_get_pc(space->cpu) );
+		verboselog(machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, cpu_get_pc(&space->device()) );
 		return 0;
 	}
 	return 0;
@@ -491,7 +491,7 @@ static READ32_HANDLER( hpc3_hd0_r )
 
 static WRITE32_HANDLER( hpc3_hd0_w )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -520,8 +520,8 @@ static WRITE32_HANDLER( hpc3_hd0_w )
 
 static READ32_HANDLER( hpc3_pbus4_r )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -543,8 +543,8 @@ static READ32_HANDLER( hpc3_pbus4_r )
 
 static WRITE32_HANDLER( hpc3_pbus4_w )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -600,8 +600,8 @@ static WRITE32_HANDLER( hpc3_pbus4_w )
 
 static READ32_HANDLER( rtc_r )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 //  mame_printf_info("RTC_R: offset %x = %x (PC=%x)\n", offset, state->nRTC_Regs[offset], activecpu_get_pc());
 
@@ -734,8 +734,8 @@ static READ32_HANDLER( rtc_r )
 
 static WRITE32_HANDLER( rtc_w )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 	RTC_WRITECNT++;
 
@@ -880,7 +880,7 @@ static WRITE32_HANDLER( rtc_w )
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
 static WRITE32_HANDLER( ip22_write_ram )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
+	ip22_state *state = space->machine().driver_data<ip22_state>();
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
 	if (sgi_mc_r(space, 0xc8/4, 0xffffffff) & 0x10001000)
 	{
@@ -912,7 +912,7 @@ static WRITE32_HANDLER( ip22_write_ram )
 
 static READ32_HANDLER( hal2_r )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -929,8 +929,8 @@ static READ32_HANDLER( hal2_r )
 
 static WRITE32_HANDLER( hal2_w )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_machine *machine = space->machine;
+	ip22_state *state = space->machine().driver_data<ip22_state>();
+	running_machine &machine = space->machine();
 
 	switch( offset )
 	{
@@ -1062,15 +1062,15 @@ static WRITE32_HANDLER( hal2_w )
 
 static TIMER_CALLBACK(ip22_dma)
 {
-	//ip22_state *state = machine->driver_data<ip22_state>();
-	machine->scheduler().timer_set(attotime::never, FUNC(ip22_dma));
+	//ip22_state *state = machine.driver_data<ip22_state>();
+	machine.scheduler().timer_set(attotime::never, FUNC(ip22_dma));
 #if 0
 	if( state->nPBUS_DMA_Active )
 	{
 		UINT16 temp16 = ( state->mainram[(state->nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
-		dac_signed_data_16_w(machine->device("dac"), stemp16 ^ 0x8000);
+		dac_signed_data_16_w(machine.device("dac"), stemp16 ^ 0x8000);
 
 		state->nPBUS_DMA_CurPtr += 4;
 
@@ -1090,7 +1090,7 @@ static TIMER_CALLBACK(ip22_dma)
 				return;
 			}
 		}
-		machine->scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
+		machine.scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
 	}
 #endif
 }
@@ -1098,15 +1098,15 @@ static TIMER_CALLBACK(ip22_dma)
 static READ32_HANDLER( hpc3_pbusdma_r )
 {
 	UINT32 channel = offset / (0x2000/4);
-	verboselog(space->machine, 0, "PBUS DMA Channel %d Read: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, mem_mask );
+	verboselog(space->machine(), 0, "PBUS DMA Channel %d Read: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, mem_mask );
 	return 0;
 }
 
 static WRITE32_HANDLER( hpc3_pbusdma_w )
 {
-	ip22_state *state = space->machine->driver_data<ip22_state>();
+	ip22_state *state = space->machine().driver_data<ip22_state>();
 	UINT32 channel = offset / (0x2000/4);
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	switch( offset & 0x07ff )
 	{
@@ -1162,7 +1162,7 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 		verboselog(machine, 0, "    FIFO End: Rowe %04x\n", ( data & PBUS_CTRL_FIFO_END ) >> 24 );
 		if( ( data & PBUS_CTRL_DMASTART ) || ( data & PBUS_CTRL_LOAD_EN ) )
 		{
-			machine->scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
+			machine.scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
 			state->nPBUS_DMA_Active = 1;
 		}
 		return;
@@ -1172,16 +1172,16 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 
 static READ32_HANDLER( hpc3_unkpbus0_r )
 {
-	//ip22_state *state = space->machine->driver_data<ip22_state>();
+	//ip22_state *state = space->machine().driver_data<ip22_state>();
 	return 0;
-	//verboselog(space->machine, 0, "Unknown PBUS Read: 0x%08x (%08x)\n", 0x1fbc8000 + offset*4, mem_mask );
+	//verboselog(space->machine(), 0, "Unknown PBUS Read: 0x%08x (%08x)\n", 0x1fbc8000 + offset*4, mem_mask );
 	//return state->unkpbus0[offset];
 }
 
 static WRITE32_HANDLER( hpc3_unkpbus0_w )
 {
-	//ip22_state *state = space->machine->driver_data<ip22_state>();
-	//verboselog(space->machine, 0, "Unknown PBUS Write: 0x%08x = 0x%08x (%08x)\n", 0x1fbc8000 + offset*4, data, mem_mask );
+	//ip22_state *state = space->machine().driver_data<ip22_state>();
+	//verboselog(space->machine(), 0, "Unknown PBUS Write: 0x%08x = 0x%08x (%08x)\n", 0x1fbc8000 + offset*4, data, mem_mask );
 	//COMBINE_DATA(&state->unkpbus0[offset]);
 }
 
@@ -1211,7 +1211,7 @@ ADDRESS_MAP_END
 static TIMER_CALLBACK(ip22_timer)
 {
 	sgi_mc_update();
-	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
+	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 }
 
 static MACHINE_START( ip225015 )
@@ -1221,7 +1221,7 @@ static MACHINE_START( ip225015 )
 
 static MACHINE_RESET( ip225015 )
 {
-	ip22_state *state = machine->driver_data<ip22_state>();
+	ip22_state *state = machine.driver_data<ip22_state>();
 	sgi_mc_init(machine);
 	state->nHPC3_enetr_nbdp = 0x80000000;
 	state->nHPC3_enetr_cbp = 0x80000000;
@@ -1229,14 +1229,14 @@ static MACHINE_RESET( ip225015 )
 	RTC_REGISTERB = 0x08;
 	RTC_REGISTERD = 0x80;
 
-	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
+	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 
 	// set up low RAM mirror
 	memory_set_bankptr(machine, "bank1", state->mainram);
 
 	state->nPBUS_DMA_Active = 0;
 
-	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static void dump_chain(address_space *space, UINT32 ch_base)
@@ -1257,10 +1257,10 @@ static void dump_chain(address_space *space, UINT32 ch_base)
 #define HPC3_DMACTRL_ENABLE	(0x10)
 
 
-static void scsi_irq(running_machine *machine, int state)
+static void scsi_irq(running_machine &machine, int state)
 {
-	ip22_state *drvstate = machine->driver_data<ip22_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	ip22_state *drvstate = machine.driver_data<ip22_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state)
 	{
@@ -1372,7 +1372,7 @@ static void scsi_irq(running_machine *machine, int state)
 
 				dump_chain(space, drvstate->nHPC_SCSI0Descriptor);
 
-				printf("PC is %08x\n", cpu_get_pc(machine->device("maincpu")));
+				printf("PC is %08x\n", cpu_get_pc(machine.device("maincpu")));
 				printf("DMA to device: length %x xie %d eox %d\n", length, xie, eox);
 
 				if (length <= 0x4000)
@@ -1518,20 +1518,20 @@ static void ip225015_exit(running_machine &machine)
 	wd33c93_exit(&scsi_intf);
 }
 
-static int ip22_get_out2(running_machine *machine) {
-	return pit8253_get_output(machine->device("pit8254"), 2 );
+static int ip22_get_out2(running_machine &machine) {
+	return pit8253_get_output(machine.device("pit8254"), 2 );
 }
 
 static MACHINE_START( ip22 )
 {
 	// SCSI init
 	wd33c93_init(machine, &scsi_intf);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, ip225015_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, ip225015_exit);
 }
 
 static DRIVER_INIT( ip225015 )
 {
-	ip22_state *state = machine->driver_data<ip22_state>();
+	ip22_state *state = machine.driver_data<ip22_state>();
 	static const struct kbdc8042_interface at8042 =
 	{
 		KBDC8042_STANDARD, NULL, NULL, ip22_get_out2
@@ -1620,7 +1620,7 @@ static void rtc_update(ip22_state *state)
 
 static INTERRUPT_GEN( ip22_vbl )
 {
-	ip22_state *state = device->machine->driver_data<ip22_state>();
+	ip22_state *state = device->machine().driver_data<ip22_state>();
 	state->nIntCounter++;
 //  if( state->nIntCounter == 60 )
 	{

@@ -127,7 +127,7 @@ static unsigned char serial_helper_get_parity(unsigned char data)
 	return serial_parity_table[data & 0x0ff];
 }
 
-static void serial_device_in_callback(running_machine *machine, int id, unsigned long status)
+static void serial_device_in_callback(running_machine &machine, int id, unsigned long status)
 {
 /*  serial_t *ser = get_safe_token(device);
 
@@ -143,10 +143,10 @@ void serial_device_setup(device_t *device, int baud_rate, int num_data_bits, int
 	ser->form.word_length = num_data_bits;
 	ser->form.stop_bit_count = stop_bit_count;
 	ser->form.parity = parity_code;
-	ser->timer = device->machine->scheduler().timer_alloc(FUNC(serial_device_baud_rate_callback), (void *)device);
+	ser->timer = device->machine().scheduler().timer_alloc(FUNC(serial_device_baud_rate_callback), (void *)device);
 
-	serial_connection_init(device->machine,&ser->connection);
-	serial_connection_set_in_callback(device->machine,&ser->connection, serial_device_in_callback);
+	serial_connection_init(device->machine(),&ser->connection);
+	serial_connection_set_in_callback(device->machine(),&ser->connection, serial_device_in_callback);
 
 	/* signal to other end it is clear to send! */
 	/* data is initially high state */
@@ -156,7 +156,7 @@ void serial_device_setup(device_t *device, int baud_rate, int num_data_bits, int
 	/* set /dtr */
 	ser->connection.State |= SERIAL_STATE_DTR;
 	set_out_data_bit(ser->connection.State, 1);
-	serial_connection_out(device->machine,&ser->connection);
+	serial_connection_out(device->machine(),&ser->connection);
 	transmit_register_reset(&ser->transmit_reg);
 	receive_register_reset(&ser->receive_reg);
 	receive_register_setup(&ser->receive_reg, &ser->form);
@@ -459,7 +459,7 @@ static int transmit_register_get_data_bit(serial_transmit_register *transmit_reg
 }
 
 
-void transmit_register_send_bit(running_machine *machine, serial_transmit_register *transmit_reg, serial_connection *connection)
+void transmit_register_send_bit(running_machine &machine, serial_transmit_register *transmit_reg, serial_connection *connection)
 {
 	int data;
 
@@ -527,7 +527,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 void serial_device_connect(device_t *device, serial_connection *connection)
 {
 	serial_t *ser = get_safe_token(device);
-	serial_connection_link(device->machine, connection, &ser->connection);
+	serial_connection_link(device->machine(), connection, &ser->connection);
 }
 
 
@@ -690,20 +690,20 @@ static unsigned long serial_connection_spin_bits(unsigned long input_status)
 
 
 /* setup callbacks for connection */
-void serial_connection_init(running_machine *machine, serial_connection *connection)
+void serial_connection_init(running_machine &machine, serial_connection *connection)
 {
 	connection->out_callback = NULL;
 	connection->in_callback = NULL;
 }
 
 /* set callback which will be executed when in status has changed */
-void serial_connection_set_in_callback(running_machine *machine, serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long status))
+void serial_connection_set_in_callback(running_machine &machine, serial_connection *connection, void (*in_cb)(running_machine &machine, int id, unsigned long status))
 {
 	connection->in_callback = in_cb;
 }
 
 /* output new state through connection */
-void serial_connection_out(running_machine *machine, serial_connection *connection)
+void serial_connection_out(running_machine &machine, serial_connection *connection)
 {
 	if (connection->out_callback!=NULL)
 	{
@@ -716,7 +716,7 @@ void serial_connection_out(running_machine *machine, serial_connection *connecti
 }
 
 /* join two serial connections together */
-void serial_connection_link(running_machine *machine, serial_connection *connection_a, serial_connection *connection_b)
+void serial_connection_link(running_machine &machine, serial_connection *connection_a, serial_connection *connection_b)
 {
 	/* both connections should have their in connection setup! */
 	/* the in connection is the callback they use to update their state based

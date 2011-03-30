@@ -21,7 +21,7 @@
 void advision_state::video_start()
 {
 	m_video_hpos = 0;
-	m_display = auto_alloc_array(machine, UINT8, 8 * 8 * 256);
+	m_display = auto_alloc_array(m_machine, UINT8, 8 * 8 * 256);
 	memset(m_display, 0, 8 * 8 * 256);
 }
 

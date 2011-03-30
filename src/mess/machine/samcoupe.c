@@ -29,7 +29,7 @@ static void samcoupe_update_bank(address_space *space, int bank_num, UINT8 *memo
 
 	if (memory)
 	{
-		memory_set_bankptr(space->machine, bank, memory);
+		memory_set_bankptr(space->machine(), bank, memory);
 		space->install_read_bank (((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, bank);
 		if (is_readonly) {
 			space->unmap_write(((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF);
@@ -44,20 +44,20 @@ static void samcoupe_update_bank(address_space *space, int bank_num, UINT8 *memo
 
 static void samcoupe_install_ext_mem(address_space *space)
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	UINT8 *mem;
 
 	/* bank 3 */
-	if (state->lext >> 6 < ram_get_size(space->machine->device(RAM_TAG)) >> 20)
-		mem = &ram_get_ptr(space->machine->device(RAM_TAG))[(ram_get_size(space->machine->device(RAM_TAG)) & 0xfffff) + (state->lext >> 6) * 0x100000 + (state->lext & 0x3f) * 0x4000];
+	if (state->lext >> 6 < ram_get_size(space->machine().device(RAM_TAG)) >> 20)
+		mem = &ram_get_ptr(space->machine().device(RAM_TAG))[(ram_get_size(space->machine().device(RAM_TAG)) & 0xfffff) + (state->lext >> 6) * 0x100000 + (state->lext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
 	samcoupe_update_bank(space, 3, mem, FALSE);
 
 	/* bank 4 */
-	if (state->hext >> 6 < ram_get_size(space->machine->device(RAM_TAG)) >> 20)
-		mem = &ram_get_ptr(space->machine->device(RAM_TAG))[(ram_get_size(space->machine->device(RAM_TAG)) & 0xfffff) + (state->hext >> 6) * 0x100000 + (state->hext & 0x3f) * 0x4000];
+	if (state->hext >> 6 < ram_get_size(space->machine().device(RAM_TAG)) >> 20)
+		mem = &ram_get_ptr(space->machine().device(RAM_TAG))[(ram_get_size(space->machine().device(RAM_TAG)) & 0xfffff) + (state->hext >> 6) * 0x100000 + (state->hext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
@@ -67,9 +67,9 @@ static void samcoupe_install_ext_mem(address_space *space)
 
 void samcoupe_update_memory(address_space *space)
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
-	const int PAGE_MASK = ((ram_get_size(space->machine->device(RAM_TAG)) & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
+	const int PAGE_MASK = ((ram_get_size(space->machine().device(RAM_TAG)) & 0xfffff) / 0x4000) - 1;
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	UINT8 *memory;
 	int is_readonly;
 
@@ -77,7 +77,7 @@ void samcoupe_update_memory(address_space *space)
     if (state->lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
 		if ((state->lmpr & 0x1F) <= PAGE_MASK)
-			memory = &ram_get_ptr(space->machine->device(RAM_TAG))[(state->lmpr & PAGE_MASK) * 0x4000];
+			memory = &ram_get_ptr(space->machine().device(RAM_TAG))[(state->lmpr & PAGE_MASK) * 0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
@@ -92,7 +92,7 @@ void samcoupe_update_memory(address_space *space)
 
 	/* BANK2 */
 	if (((state->lmpr + 1) & 0x1f) <= PAGE_MASK)
-		memory = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->lmpr + 1) & PAGE_MASK) * 0x4000];
+		memory = &ram_get_ptr(space->machine().device(RAM_TAG))[((state->lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
 	samcoupe_update_bank(space, 2, memory, FALSE);
@@ -106,7 +106,7 @@ void samcoupe_update_memory(address_space *space)
 	{
 		/* BANK3 */
 		if ((state->hmpr & 0x1F) <= PAGE_MASK )
-			memory = &ram_get_ptr(space->machine->device(RAM_TAG))[(state->hmpr & PAGE_MASK)*0x4000];
+			memory = &ram_get_ptr(space->machine().device(RAM_TAG))[(state->hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		samcoupe_update_bank(space, 3, memory, FALSE);
@@ -121,7 +121,7 @@ void samcoupe_update_memory(address_space *space)
 		else
 		{
 			if (((state->hmpr + 1) & 0x1f) <= PAGE_MASK)
-				memory = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->hmpr + 1) & PAGE_MASK) * 0x4000];
+				memory = &ram_get_ptr(space->machine().device(RAM_TAG))[((state->hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
@@ -131,16 +131,16 @@ void samcoupe_update_memory(address_space *space)
 
 	/* video memory location */
 	if (state->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		state->videoram = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		state->videoram = &ram_get_ptr(space->machine().device(RAM_TAG))[((state->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		state->videoram = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		state->videoram = &ram_get_ptr(space->machine().device(RAM_TAG))[((state->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
-	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
+	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (offset & 1)
 		state->hext = data;
@@ -177,13 +177,13 @@ static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
 
 static TIMER_CALLBACK( samcoupe_mouse_reset )
 {
-	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = machine.driver_data<samcoupe_state>();
 	state->mouse_index = 0;
 }
 
-UINT8 samcoupe_mouse_r(running_machine *machine)
+UINT8 samcoupe_mouse_r(running_machine &machine)
 {
-	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = machine.driver_data<samcoupe_state>();
 	UINT8 result;
 
 	/* on a read, reset the timer */
@@ -228,12 +228,12 @@ UINT8 samcoupe_mouse_r(running_machine *machine)
 
 MACHINE_START( samcoupe )
 {
-	samcoupe_state *state = machine->driver_data<samcoupe_state>();
-	state->mouse_reset = machine->scheduler().timer_alloc(FUNC(samcoupe_mouse_reset));
+	samcoupe_state *state = machine.driver_data<samcoupe_state>();
+	state->mouse_reset = machine.scheduler().timer_alloc(FUNC(samcoupe_mouse_reset));
 
 	/* schedule our video updates */
-	state->video_update_timer = machine->scheduler().timer_alloc(FUNC(sam_video_update_callback));
-	state->video_update_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
+	state->video_update_timer = machine.scheduler().timer_alloc(FUNC(sam_video_update_callback));
+	state->video_update_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
 }
 
 /***************************************************************************
@@ -242,9 +242,9 @@ MACHINE_START( samcoupe )
 
 MACHINE_RESET( samcoupe )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine->device("maincpu")->memory().space(AS_IO);
-	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine.device("maincpu")->memory().space(AS_IO);
+	samcoupe_state *state = machine.driver_data<samcoupe_state>();
 
 	/* initialize state */
 	state->lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
@@ -261,7 +261,7 @@ MACHINE_RESET( samcoupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		device_t *rtc = machine->device("sambus_clock");
+		device_t *rtc = machine.device("sambus_clock");
 		spaceio->install_legacy_readwrite_handler(*rtc, 0xef, 0xef, 0xffff, 0xff00, FUNC(samcoupe_rtc_r), FUNC(samcoupe_rtc_w));
 	}
 	else

@@ -266,7 +266,7 @@ static void dma_indirect_lv2(address_space *space); /*DMA level 2 indirect trans
 
 /*A-Bus IRQ checks,where they could be located these?*/
 #define ABUSIRQ(_irq_,_vector_) \
-	{ cputag_set_input_line_and_vector(device->machine, "maincpu", _irq_, HOLD_LINE , _vector_); }
+	{ cputag_set_input_line_and_vector(device->machine(), "maincpu", _irq_, HOLD_LINE , _vector_); }
 #if 0
 if(stv_scu[42] & 1)//IRQ ACK
 {
@@ -463,7 +463,7 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
-static void smpc_intbackhelper(running_machine *machine)
+static void smpc_intbackhelper(running_machine &machine)
 {
 	int pad;
 	static const char *const padnames[] = { "JOY1", "JOY2" };
@@ -519,20 +519,20 @@ static UINT8 stv_SMPC_r8(address_space *space, int offset)
 			{
 				case 0:
 					return_data = 0x90;
-//                  return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>4) & 0xf);
+//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>4) & 0xf);
 					break;
 
 				case 1:
-//                  return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>12) & 0xf);
+//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>12) & 0xf);
 					break;
 
 				case 2:
-//                  return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>8) & 0xf);
+//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>8) & 0xf);
 					break;
 
 				case 3:
 					return_data = 0x94;
-//                  return_data = 0xf0 | (input_port_read(space->machine, "JOY1")&0x8) | 0x4;
+//                  return_data = 0xf0 | (input_port_read(space->machine(), "JOY1")&0x8) | 0x4;
 					break;
 			}
 		}
@@ -545,7 +545,7 @@ static UINT8 stv_SMPC_r8(address_space *space, int offset)
 
 	if (offset == 0x33) return_data = saturn_region;
 
-	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, offset>>1, return_data);
 
 
 	return return_data;
@@ -555,10 +555,10 @@ static void stv_SMPC_w8(address_space *space, int offset, UINT8 data)
 {
 	system_time systime;
 	UINT8 last;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	/* get the current date/time from the core */
-	machine->current_datetime(systime);
+	machine.current_datetime(systime);
 
   if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
 
@@ -640,7 +640,7 @@ static void stv_SMPC_w8(address_space *space, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				machine->scheduler().trigger(1000);
+				machine.scheduler().trigger(1000);
 				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
@@ -668,17 +668,17 @@ static void stv_SMPC_w8(address_space *space, int offset, UINT8 data)
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
-				machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
-				machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
+				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-				machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-				machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
+				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
@@ -776,7 +776,7 @@ static void stv_SMPC_w8(address_space *space, int offset, UINT8 data)
 
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag(), cpu_get_pc(space->cpu), data);
+				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -953,7 +953,7 @@ static READ32_HANDLER( stv_scu_r32 )
 	//}
 	if (offset == 31)
 	{
-		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(space->cpu));
+		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
 		return stv_scu[offset];
 	}
 	// Saturn BIOS needs this (need to investigate further)
@@ -968,7 +968,7 @@ static READ32_HANDLER( stv_scu_r32 )
     }
     else if( offset == 41) /*IRQ reg status read*/
     {
-		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(space->cpu),mem_mask);
+		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(&space->device()),mem_mask);
 
 		stv_scu[41] = (stv_irq.vblank_in & 1)<<0;
 		stv_scu[41]|= (stv_irq.vblank_out & 1)<<1;
@@ -990,12 +990,12 @@ static READ32_HANDLER( stv_scu_r32 )
 	}
 	else if( offset == 50 )
 	{
-		logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(space->cpu));
+		logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
 		return 0x00000000;/*SCU Version 0*/
 	}
     else
     {
-    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(space->cpu),offset,stv_scu[offset]);
+    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(&space->device()),offset,stv_scu[offset]);
     	return stv_scu[offset];
 	}
 }
@@ -1050,14 +1050,14 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cputag_set_input_line_and_vector(space->machine, "maincpu", 9, HOLD_LINE , 0x46);
+				//cputag_set_input_line_and_vector(space->machine(), "maincpu", 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cputag_set_input_line_and_vector(space->machine, "maincpu", 3, HOLD_LINE, 0x4c);
+						cputag_set_input_line_and_vector(space->machine(), "maincpu", 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1111,7 +1111,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cputag_set_input_line_and_vector(space->machine, "maincpu", 9, HOLD_LINE , 0x46);
+				//cputag_set_input_line_and_vector(space->machine(), "maincpu", 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1161,7 +1161,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cputag_set_input_line_and_vector(space->machine, "maincpu", 9, HOLD_LINE , 0x46);
+				//cputag_set_input_line_and_vector(space->machine(), "maincpu", 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1227,7 +1227,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		   stv_scu[40] != 0xffffffff)
 		{
 			if(LOG_SCU) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			space->cpu->tag(), cpu_get_pc(space->cpu),
+			space->device().tag(), cpu_get_pc(&space->device()),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
 			stv_scu[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
@@ -1398,7 +1398,7 @@ static void dma_direct_lv0(address_space *space)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this*/
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1499,7 +1499,7 @@ static void dma_direct_lv1(address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1600,7 +1600,7 @@ static void dma_direct_lv2(address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1675,7 +1675,7 @@ static void dma_indirect_lv0(address_space *space)
 
 	}while(job_done == 0);
 
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
 }
 
 static void dma_indirect_lv1(address_space *space)
@@ -1744,7 +1744,7 @@ static void dma_indirect_lv1(address_space *space)
 
 	}while(job_done == 0);
 
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
 }
 
 static void dma_indirect_lv2(address_space *space)
@@ -1812,7 +1812,7 @@ static void dma_indirect_lv2(address_space *space)
 
 	}while(job_done == 0);
 
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
 }
 
 
@@ -1833,7 +1833,7 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
-	device_t *scsp = space->machine->device("scsp");
+	device_t *scsp = space->machine().device("scsp");
 
 	offset <<= 1;
 	return (scsp_r(scsp, offset+1, 0xffff) | (scsp_r(scsp, offset, 0xffff)<<16));
@@ -1841,7 +1841,7 @@ static READ32_HANDLER( stv_scsp_regs_r32 )
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
-	device_t *scsp = space->machine->device("scsp");
+	device_t *scsp = space->machine().device("scsp");
 
 	offset <<= 1;
 	scsp_w(scsp, offset, data>>16, mem_mask >> 16);
@@ -1852,17 +1852,17 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	space->machine->scheduler().boost_interleave(minit_boost_timeslice, attotime::from_usec(minit_boost));
-	space->machine->scheduler().trigger(1000);
-	sh2_set_frt_input(space->machine->device("slave"), PULSE_LINE);
+	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
+	space->machine().scheduler().boost_interleave(minit_boost_timeslice, attotime::from_usec(minit_boost));
+	space->machine().scheduler().trigger(1000);
+	sh2_set_frt_input(space->machine().device("slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	space->machine->scheduler().boost_interleave(sinit_boost_timeslice, attotime::from_usec(sinit_boost));
-	sh2_set_frt_input(space->machine->device("maincpu"), PULSE_LINE);
+	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
+	space->machine().scheduler().boost_interleave(sinit_boost_timeslice, attotime::from_usec(sinit_boost));
+	sh2_set_frt_input(space->machine().device("maincpu"), PULSE_LINE);
 }
 
 static UINT32 backup[64*1024/4];
@@ -2055,27 +2055,27 @@ static int cur_scan;
 timer_0 = 0; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
-	cputag_set_input_line_and_vector(timer.machine, "maincpu", 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+	cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
 } \
 
 #define VBLANK_IN_IRQ \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
 } \
 
 #define HBLANK_IN_IRQ \
 timer_1 = stv_scu[37] & 0x1ff; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
-	cputag_set_input_line_and_vector(timer.machine, "maincpu", 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
+	cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
 } \
 
 #define TIMER_0_IRQ \
 if(timer_0 == (stv_scu[36] & 0x3ff)) \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
-	cputag_set_input_line_and_vector(timer.machine, "maincpu", 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
+	cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
 } \
 
 #define TIMER_1_IRQ	\
@@ -2084,14 +2084,14 @@ if((stv_scu[38] & 1)) \
 	if(!(stv_scu[38] & 0x80)) \
 	{ \
 		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
 	} \
 	else \
 	{ \
 		if((timer_0) == (stv_scu[36] & 0x3ff)) \
 		{ \
 			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-			cputag_set_input_line_and_vector(timer.machine, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+			cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
 		} \
 	} \
 } \
@@ -2105,8 +2105,8 @@ static TIMER_DEVICE_CALLBACK( hblank_in_irq )
 {
 	int scanline = param;
 
-//  h = timer.machine->primary_screen->height();
-//  w = timer.machine->primary_screen->width();
+//  h = timer.machine().primary_screen->height();
+//  w = timer.machine().primary_screen->width();
 
 	HBLANK_IN_IRQ;
 	TIMER_0_IRQ;
@@ -2114,11 +2114,11 @@ static TIMER_DEVICE_CALLBACK( hblank_in_irq )
 	if(scanline+1 < v_sync)
 	{
 		if(stv_irq.hblank_in || stv_irq.timer_0)
-			scan_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1, h_sync), scanline+1);
+			scan_timer->adjust(timer.machine().primary_screen->time_until_pos(scanline+1, h_sync), scanline+1);
 		/*set the first Timer-1 event*/
 		cur_scan = scanline+1;
 		if(stv_irq.timer_1)
-			t1_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1));
+			t1_timer->adjust(timer.machine().primary_screen->time_until_pos(scanline+1));
 	}
 
 	timer_0++;
@@ -2132,7 +2132,7 @@ static TIMER_DEVICE_CALLBACK( timer1_irq )
 
 	if((cur_point+1) < h_sync && stv_irq.timer_1)
 	{
-		t1_timer->adjust(timer.machine->primary_screen->time_until_pos(cur_scan, cur_point+1), cur_point+1);
+		t1_timer->adjust(timer.machine().primary_screen->time_until_pos(cur_scan, cur_point+1), cur_point+1);
 	}
 
 	if(timer_1 > 0) timer_1--;
@@ -2152,7 +2152,7 @@ static TIMER_DEVICE_CALLBACK( vblank_out_irq )
 static INTERRUPT_GEN( stv_interrupt )
 {
 //  scanline = 0;
-	const rectangle &visarea = device->machine->primary_screen->visible_area();
+	const rectangle &visarea = device->machine().primary_screen->visible_area();
 
 	h_sync = visarea.max_x+1;//horz
 	v_sync = visarea.max_y+1;//vert
@@ -2161,28 +2161,28 @@ static INTERRUPT_GEN( stv_interrupt )
 
 	/*Next V-Blank-OUT event*/
 	if(stv_irq.vblank_out)
-		vblank_out_timer->adjust(device->machine->primary_screen->time_until_pos(0));
+		vblank_out_timer->adjust(device->machine().primary_screen->time_until_pos(0));
 	/*Set the first Hblank-IN event*/
 	if(stv_irq.hblank_in || stv_irq.timer_0 || stv_irq.timer_1)
-		scan_timer->adjust(device->machine->primary_screen->time_until_pos(0, h_sync));
+		scan_timer->adjust(device->machine().primary_screen->time_until_pos(0, h_sync));
 
 	/*TODO: timing of this one (related to the VDP1 speed)*/
 	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0,0), FUNC(vdp1_irq));
+	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0,0), FUNC(vdp1_irq));
 }
 
-static void saturn_init_driver(running_machine *machine, int rgn)
+static void saturn_init_driver(running_machine &machine, int rgn)
 {
 	system_time systime;
 
 	saturn_region = rgn;
 
 	// set compatible options
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(machine->device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
-	machine->current_datetime(systime);
+	machine.current_datetime(systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
@@ -2226,7 +2226,7 @@ static int scsp_last_line = 0;
 
 static MACHINE_START( saturn )
 {
-	scsp_set_ram_base(machine->device("scsp"), sound_ram);
+	scsp_set_ram_base(machine.device("scsp"), sound_ram);
 
 	// save states
 	state_save_register_global_pointer(machine, smpc_ram, 0x80);
@@ -2253,7 +2253,7 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, smpcSR);
 	state_save_register_global_array(machine, SMEM);
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
 }
 
 static MACHINE_RESET( saturn )
@@ -2276,18 +2276,18 @@ static MACHINE_RESET( saturn )
 	memset(stv_workram_l, 0, 0x100000);
 	memset(stv_workram_h, 0, 0x100000);
 
-	machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
+	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = machine->device<timer_device>("scan_timer");
-	t1_timer = machine->device<timer_device>("t1_timer");
-	vblank_out_timer = machine->device<timer_device>("vbout_timer");
-	vblank_out_timer->adjust(machine->primary_screen->time_until_pos(0));
-	scan_timer->adjust(machine->primary_screen->time_until_pos(224, 352));
+	scan_timer = machine.device<timer_device>("scan_timer");
+	t1_timer = machine.device<timer_device>("t1_timer");
+	vblank_out_timer = machine.device<timer_device>("vbout_timer");
+	vblank_out_timer->adjust(machine.primary_screen->time_until_pos(0));
+	scan_timer->adjust(machine.primary_screen->time_until_pos(224, 352));
 }
 
 static const gfx_layout tiles8x8x4_layout =
@@ -2370,15 +2370,15 @@ static void scsp_irq(device_t *device, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cputag_set_input_line(device->machine, "audiocpu", -irq, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", -irq, CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(device->machine, "audiocpu", scsp_last_line, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", scsp_last_line, CLEAR_LINE);
 	}
 }
 

@@ -46,7 +46,7 @@ public:
 
 /*----------- defined in drivers/svision.c -----------*/
 
-void svision_irq( running_machine *machine );
+void svision_irq( running_machine &machine );
 
 
 /*----------- defined in audio/svision.c -----------*/

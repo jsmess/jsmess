@@ -34,9 +34,9 @@ PALETTE_INIT( lviv )
 }
 
 
-void lviv_update_palette(running_machine *machine, UINT8 pal)
+void lviv_update_palette(running_machine &machine, UINT8 pal)
 {
-	lviv_state *state = machine->driver_data<lviv_state>();
+	lviv_state *state = machine.driver_data<lviv_state>();
 	state->colortable[0][0] = 0;
 	state->colortable[0][1] = 0;
 	state->colortable[0][2] = 0;
@@ -65,7 +65,7 @@ VIDEO_START( lviv )
 
 SCREEN_UPDATE( lviv )
 {
-	lviv_state *state = screen->machine->driver_data<lviv_state>();
+	lviv_state *state = screen->machine().driver_data<lviv_state>();
 	int x,y;
 	int pen;
 	UINT8 data;

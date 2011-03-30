@@ -183,7 +183,7 @@ static void kermit_start_sending( kermit* state )
 
 	if ( state->conf && state->conf->send )
 	{
-		state->conf->send( state->machine, state->pout[ 0 ] );
+		state->conf->send( *state->machine, state->pout[ 0 ] );
 	}
 	state->posout = 1;
 
@@ -205,7 +205,7 @@ static void kermit_resend( kermit* state )
 			return;
 		}
 
-		state->conf->send( state->machine, state->pout[ 0 ] );
+		state->conf->send( *state->machine, state->pout[ 0 ] );
 
 		state->posout = 1;
 		state->retries--;
@@ -634,7 +634,7 @@ void kermit_byte_transmitted( device_t *device )
 
 	if ( state->conf && state->conf->send )
 	{
-		state->conf->send( state->machine, state->pout[ state->posout ] );
+		state->conf->send(*state->machine, state->pout[ state->posout ] );
 	}
 	state->posout++;
 }
@@ -645,8 +645,8 @@ static DEVICE_START( kermit )
 	LOG(( "kermit: start\n" ));
 	state->image = NULL;
 	state->conf = (kermit_config*) device->baseconfig().static_config();
-	state->machine = device->machine;
-	state->resend = device->machine->scheduler().timer_alloc(FUNC(kermit_resend_cb), state );
+	state->machine = &device->machine();
+	state->resend = device->machine().scheduler().timer_alloc(FUNC(kermit_resend_cb), state );
 	kermit_reset( state );
 }
 

@@ -176,7 +176,7 @@ public:
 	UINT8 mmm01_bank;
 	UINT8 mmm01_bank_mask;
 	gb_lcd_t lcd;
-	void (*update_scanline)( running_machine *machine );
+	void (*update_scanline)( running_machine &machine );
 };
 
 
@@ -254,8 +254,8 @@ READ8_HANDLER( gb_video_r );
 WRITE8_HANDLER( gb_video_w );
 MACHINE_START( gb_video );
 MACHINE_START( gbc_video );
-void gb_video_reset( running_machine *machine, int mode );
-UINT8 *gb_get_vram_ptr(running_machine *machine);
+void gb_video_reset( running_machine &machine, int mode );
+UINT8 *gb_get_vram_ptr(running_machine &machine);
 
 
 #endif /* GB_H_ */

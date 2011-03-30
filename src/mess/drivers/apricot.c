@@ -48,7 +48,7 @@ public:
 
 static READ8_DEVICE_HANDLER( apricot_sysctrl_r )
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
 	UINT8 data = 0;
 
 	data |= apricot->display_enabled << 3;
@@ -58,7 +58,7 @@ static READ8_DEVICE_HANDLER( apricot_sysctrl_r )
 
 static WRITE8_DEVICE_HANDLER( apricot_sysctrl_w )
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
 
 	apricot->display_on = BIT(data, 3);
 	apricot->video_mode = BIT(data, 4);
@@ -100,7 +100,7 @@ static const struct pit8253_config apricot_pit8253_intf =
 
 static void apricot_sio_irq_w(device_t *device, int state)
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
 	pic8259_ir5_w(apricot->pic8259, state);
 }
 
@@ -121,7 +121,7 @@ static const z80sio_interface apricot_z80sio_intf =
 
 static IRQ_CALLBACK( apricot_irq_ack )
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
 	return pic8259_acknowledge(apricot->pic8259);
 }
 
@@ -137,7 +137,7 @@ static const struct pic8259_interface apricot_pic8259_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_intrq_w )
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
 
 	pic8259_ir4_w(apricot->pic8259, state);
 //  i8089 external terminate channel 1
@@ -163,7 +163,7 @@ static const wd17xx_interface apricot_wd17xx_intf =
 
 static SCREEN_UPDATE( apricot )
 {
-	apricot_state *apricot = screen->machine->driver_data<apricot_state>();
+	apricot_state *apricot = screen->machine().driver_data<apricot_state>();
 
 	if (!apricot->display_on)
 		mc6845_update(apricot->mc6845, bitmap, cliprect);
@@ -175,8 +175,8 @@ static SCREEN_UPDATE( apricot )
 
 static MC6845_UPDATE_ROW( apricot_update_row )
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
-	UINT8 *ram = ram_get_ptr(device->machine->device(RAM_TAG));
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
+	UINT8 *ram = ram_get_ptr(device->machine().device(RAM_TAG));
 	int i, x;
 
 	if (apricot->video_mode)
@@ -210,7 +210,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( apricot_mc6845_de )
 {
-	apricot_state *apricot = device->machine->driver_data<apricot_state>();
+	apricot_state *apricot = device->machine().driver_data<apricot_state>();
 	apricot->display_enabled = state;
 }
 
@@ -235,21 +235,21 @@ static const mc6845_interface apricot_mc6845_intf =
 
 static DRIVER_INIT( apricot )
 {
-	apricot_state *apricot = machine->driver_data<apricot_state>();
-	device_t *maincpu = machine->device("maincpu");
+	apricot_state *apricot = machine.driver_data<apricot_state>();
+	device_t *maincpu = machine.device("maincpu");
 	address_space *prg = maincpu->memory().space(AS_PROGRAM);
 
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
-	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
 
 	prg->unmap_readwrite(0x40000, 0xeffff);
 	prg->install_ram(0x00000, ram_size - 1, ram);
 
 	device_set_irq_callback(maincpu, apricot_irq_ack);
 
-	apricot->pic8259 = machine->device("ic31");
-	apricot->wd2793 = machine->device("ic68");
-	apricot->mc6845 = machine->device("ic30");
+	apricot->pic8259 = machine.device("ic31");
+	apricot->wd2793 = machine.device("ic68");
+	apricot->mc6845 = machine.device("ic30");
 
 	apricot->video_mode = 0;
 	apricot->display_on = 1;

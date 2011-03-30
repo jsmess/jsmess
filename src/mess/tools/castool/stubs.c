@@ -139,7 +139,7 @@ void *restrack_register_object(object_type type, void *ptr, size_t size, const c
     freeing memory
 -------------------------------------------------*/
 
-void *auto_malloc_file_line(running_machine *machine, size_t size, const char *file, int line)
+void *auto_malloc_file_line(running_machine &machine, size_t size, const char *file, int line)
 {
 	void *result = pool_malloc_file_line(current_pool(), size, file, line);
 	return result;
@@ -151,7 +151,7 @@ void *auto_malloc_file_line(running_machine *machine, size_t size, const char *f
     freeing memory
 -------------------------------------------------*/
 
-void *auto_realloc_file_line(running_machine *machine, void *ptr, size_t size, const char *file, int line)
+void *auto_realloc_file_line(running_machine &machine, void *ptr, size_t size, const char *file, int line)
 {
 	object_pool *pool = current_pool();
 	if (ptr != NULL)
@@ -175,7 +175,7 @@ void *auto_realloc_file_line(running_machine *machine, void *ptr, size_t size, c
     string
 -------------------------------------------------*/
 
-char *auto_strdup_file_line(running_machine *machine, const char *str, const char *file, int line)
+char *auto_strdup_file_line(running_machine &machine, const char *str, const char *file, int line)
 {
 	return pool_strdup_file_line(current_pool(), str, file, line);
 }
@@ -186,7 +186,7 @@ char *auto_strdup_file_line(running_machine *machine, const char *str, const cha
     auto-freeing string if str is null
 -------------------------------------------------*/
 
-char *auto_strdup_allow_null_file_line(running_machine *machine, const char *str, const char *file, int line)
+char *auto_strdup_allow_null_file_line(running_machine &machine, const char *str, const char *file, int line)
 {
 	return (str != NULL) ? auto_strdup_file_line(machine, str, file, line) : NULL;
 }

@@ -156,8 +156,8 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_t *bitmap, int x, i
 ***************************************************************************/
 SCREEN_UPDATE( pcw16 )
 {
-	pcw16_state *state = screen->machine->driver_data<pcw16_state>();
-	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
+	pcw16_state *state = screen->machine().driver_data<pcw16_state>();
+	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
 	unsigned char *pScanLine = (unsigned char *)ram + 0x0fc00;	//0x03c00;  //0x020FC00;
 
 	int y;

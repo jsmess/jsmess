@@ -44,10 +44,10 @@ static READ8_HANDLER( lx800_porta_r )
 {
 	UINT8 result = 0;
 
-	logerror("%s: lx800_porta_r(%02x)\n", space->machine->describe_context(), offset);
+	logerror("%s: lx800_porta_r(%02x)\n", space->machine().describe_context(), offset);
 
-	result |= input_port_read(space->machine, "LINEFEED") << 3;
-	result |= input_port_read(space->machine, "FORMFEED") << 4;
+	result |= input_port_read(space->machine(), "LINEFEED") << 3;
+	result |= input_port_read(space->machine(), "FORMFEED") << 4;
 	result |= 1 << 5;
 
 	result |= 1 << 7;
@@ -57,7 +57,7 @@ static READ8_HANDLER( lx800_porta_r )
 
 static WRITE8_HANDLER( lx800_porta_w )
 {
-	logerror("%s: lx800_porta_w(%02x): %02x\n", space->machine->describe_context(), offset, data);
+	logerror("%s: lx800_porta_w(%02x): %02x\n", space->machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
 }
 
@@ -74,18 +74,18 @@ static READ8_HANDLER( lx800_portc_r )
 {
 	UINT8 result = 0;
 
-	logerror("%s: lx800_portc_r(%02x)\n", space->machine->describe_context(), offset);
+	logerror("%s: lx800_portc_r(%02x)\n", space->machine().describe_context(), offset);
 
-	result |= input_port_read(space->machine, "ONLINE") << 3;
+	result |= input_port_read(space->machine(), "ONLINE") << 3;
 
 	return result;
 }
 
 static WRITE8_HANDLER( lx800_portc_w )
 {
-	lx800_state *lx800 = space->machine->driver_data<lx800_state>();
+	lx800_state *lx800 = space->machine().driver_data<lx800_state>();
 
-	logerror("%s: lx800_portc_w(%02x): %02x\n", space->machine->describe_context(), offset, data);
+	logerror("%s: lx800_portc_w(%02x): %02x\n", space->machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
 	output_set_value("online_led", !BIT(data, 2));
@@ -115,7 +115,7 @@ static WRITE_LINE_DEVICE_HANDLER( lx800_paperempty_led_w )
 
 static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
 {
-	device->machine->device("maincpu")->reset();
+	device->machine().device("maincpu")->reset();
 }
 
 
@@ -125,9 +125,9 @@ static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
 
 static MACHINE_START( lx800 )
 {
-	lx800_state *lx800 = machine->driver_data<lx800_state>();
+	lx800_state *lx800 = machine.driver_data<lx800_state>();
 
-	lx800->speaker = machine->device("beep");
+	lx800->speaker = machine.device("beep");
 
 	beep_set_state(lx800->speaker, 0);
 	beep_set_frequency(lx800->speaker, 4000); /* ? */

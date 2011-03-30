@@ -30,7 +30,7 @@ public:
 
 static WRITE16_HANDLER( cat_video_status_w )
 {
-	cat_state *state = space->machine->driver_data<cat_state>();
+	cat_state *state = space->machine().driver_data<cat_state>();
 
 	state->video_enable = BIT( data, 3 );
 }
@@ -55,7 +55,7 @@ static READ16_HANDLER( cat_battery_r )
 }
 static WRITE16_HANDLER( cat_printer_w )
 {
-	cat_state *state = space->machine->driver_data<cat_state>();
+	cat_state *state = space->machine().driver_data<cat_state>();
 
 	state->pr_cont = data;
 }
@@ -69,12 +69,12 @@ static WRITE16_HANDLER( cat_floppy_w )
 
 static READ16_HANDLER( cat_keyboard_r )
 {
-	cat_state *state = space->machine->driver_data<cat_state>();
+	cat_state *state = space->machine().driver_data<cat_state>();
 	UINT16 retVal = 0;
 	// Read country code
 	if (state->pr_cont == 0x0900)
 	{
-		retVal = input_port_read(space->machine, "DIPSW1");
+		retVal = input_port_read(space->machine(), "DIPSW1");
 	}
 	// Regular keyboard read
 	if (state->pr_cont == 0x0800 || state->pr_cont == 0x0a00)
@@ -82,21 +82,21 @@ static READ16_HANDLER( cat_keyboard_r )
 		retVal=0xff00;
 		switch(state->keyboard_line)
 		{
-			case 0x01: retVal = input_port_read(space->machine, "LINE0") << 8; break;
-			case 0x02: retVal = input_port_read(space->machine, "LINE1") << 8; break;
-			case 0x04: retVal = input_port_read(space->machine, "LINE2") << 8; break;
-			case 0x08: retVal = input_port_read(space->machine, "LINE3") << 8; break;
-			case 0x10: retVal = input_port_read(space->machine, "LINE4") << 8; break;
-			case 0x20: retVal = input_port_read(space->machine, "LINE5") << 8; break;
-			case 0x40: retVal = input_port_read(space->machine, "LINE6") << 8; break;
-			case 0x80: retVal = input_port_read(space->machine, "LINE7") << 8; break;
+			case 0x01: retVal = input_port_read(space->machine(), "LINE0") << 8; break;
+			case 0x02: retVal = input_port_read(space->machine(), "LINE1") << 8; break;
+			case 0x04: retVal = input_port_read(space->machine(), "LINE2") << 8; break;
+			case 0x08: retVal = input_port_read(space->machine(), "LINE3") << 8; break;
+			case 0x10: retVal = input_port_read(space->machine(), "LINE4") << 8; break;
+			case 0x20: retVal = input_port_read(space->machine(), "LINE5") << 8; break;
+			case 0x40: retVal = input_port_read(space->machine(), "LINE6") << 8; break;
+			case 0x80: retVal = input_port_read(space->machine(), "LINE7") << 8; break;
 		}
 	}
 	return retVal;
 }
 static WRITE16_HANDLER( cat_keyboard_w )
 {
-	cat_state *state = space->machine->driver_data<cat_state>();
+	cat_state *state = space->machine().driver_data<cat_state>();
 
 	state->keyboard_line = data >> 8;
 }
@@ -262,22 +262,22 @@ static TIMER_CALLBACK(keyboard_callback)
 
 static IRQ_CALLBACK(cat_int_ack)
 {
-	cputag_set_input_line(device->machine, "maincpu",M68K_IRQ_1,CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu",M68K_IRQ_1,CLEAR_LINE);
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
 static MACHINE_START(cat)
 {
-	cat_state *state = machine->driver_data<cat_state>();
+	cat_state *state = machine.driver_data<cat_state>();
 
 	state->duart_inp = 0x0e;
-	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(keyboard_callback));
+	state->keyboard_timer = machine.scheduler().timer_alloc(FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(cat)
 {
-	cat_state *state = machine->driver_data<cat_state>();
-	device_set_irq_callback(machine->device("maincpu"), cat_int_ack);
+	cat_state *state = machine.driver_data<cat_state>();
+	device_set_irq_callback(machine.device("maincpu"), cat_int_ack);
 	state->keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 }
 
@@ -287,7 +287,7 @@ static VIDEO_START( cat )
 
 static SCREEN_UPDATE( cat )
 {
-	cat_state *state = screen->machine->driver_data<cat_state>();
+	cat_state *state = screen->machine().driver_data<cat_state>();
 	UINT16 code;
 	int y, x, b;
 
@@ -315,7 +315,7 @@ static SCREEN_UPDATE( cat )
 
 static TIMER_CALLBACK( swyft_reset )
 {
-	memset(machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
+	memset(machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
 }
 
 static MACHINE_START(swyft)
@@ -324,7 +324,7 @@ static MACHINE_START(swyft)
 
 static MACHINE_RESET(swyft)
 {
-	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(swyft_reset));
+	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(swyft_reset));
 }
 
 static VIDEO_START( swyft )
@@ -333,7 +333,7 @@ static VIDEO_START( swyft )
 
 static SCREEN_UPDATE( swyft )
 {
-	cat_state *state = screen->machine->driver_data<cat_state>();
+	cat_state *state = screen->machine().driver_data<cat_state>();
 	UINT16 code;
 	int y, x, b;
 
@@ -364,7 +364,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 
 static UINT8 duart_input(device_t *device)
 {
-	cat_state *state = device->machine->driver_data<cat_state>();
+	cat_state *state = device->machine().driver_data<cat_state>();
 
 	if (state->duart_inp != 0)
 	{
@@ -388,7 +388,7 @@ static const duart68681_config cat_duart68681_config =
 
 static NVRAM_HANDLER( cat )
 {
-	cat_state *state = machine->driver_data<cat_state>();
+	cat_state *state = machine.driver_data<cat_state>();
 
 	if (read_or_write)
 	{

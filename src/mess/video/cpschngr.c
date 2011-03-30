@@ -138,13 +138,13 @@ enum
 #define CPS1_VIDEOCONTROL       (0x22/2)    /* flip screen, rowscroll enable */
 
 
-static void cps1_build_palette(running_machine *machine, const UINT16* const palette_base);
+static void cps1_build_palette(running_machine &machine, const UINT16* const palette_base);
 
 
 static MACHINE_RESET( cps )
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
-	const char *gamename = machine->system().name;
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
+	const char *gamename = machine.system().name;
 	const struct CPS1config *pCFG=&cps1_config_table[0];
 
 	while(pCFG->name)
@@ -170,17 +170,17 @@ INLINE UINT16 *cps1_base(cpschngr_state *state, int offset, int boundary)
 
 WRITE16_HANDLER( cps1_cps_a_w )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	data = COMBINE_DATA(&state->cps1_cps_a_regs[offset]);
 
 	if (offset == CPS1_PALETTE_BASE)
-		cps1_build_palette(space->machine, cps1_base(state, CPS1_PALETTE_BASE, cps1_palette_align));
+		cps1_build_palette(space->machine(), cps1_base(state, CPS1_PALETTE_BASE, cps1_palette_align));
 }
 
 
 READ16_HANDLER( cps1_cps_b_r )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
 	/* game. */
@@ -198,10 +198,10 @@ READ16_HANDLER( cps1_cps_b_r )
 				state->cps1_cps_b_regs[state->cps1_game_config->mult_factor2/2]) >> 16;
 
 	if (offset == state->cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
-		return input_port_read(space->machine, "IN2");
+		return input_port_read(space->machine(), "IN2");
 
 	if (offset == state->cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
-		return input_port_read(space->machine, "IN3");
+		return input_port_read(space->machine(), "IN3");
 
 	return 0xffff;
 }
@@ -209,7 +209,7 @@ READ16_HANDLER( cps1_cps_b_r )
 
 WRITE16_HANDLER( cps1_cps_b_w )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	data = COMBINE_DATA(&state->cps1_cps_b_regs[offset]);
 
 	// additional outputs on C-board
@@ -219,15 +219,15 @@ WRITE16_HANDLER( cps1_cps_b_w )
 		{
 			if (state->cps1_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
 			{
-				coin_lockout_w(space->machine,2,~data & 0x01);
-				set_led_status(space->machine,0,data & 0x02);
-				set_led_status(space->machine,1,data & 0x04);
-				set_led_status(space->machine,2,data & 0x08);
+				coin_lockout_w(space->machine(),2,~data & 0x01);
+				set_led_status(space->machine(),0,data & 0x02);
+				set_led_status(space->machine(),1,data & 0x04);
+				set_led_status(space->machine(),2,data & 0x08);
 			}
 			else	// kod, captcomm, knights
 			{
-				coin_lockout_w(space->machine,2,~data & 0x02);
-				coin_lockout_w(space->machine,3,~data & 0x08);
+				coin_lockout_w(space->machine(),2,~data & 0x02);
+				coin_lockout_w(space->machine(),3,~data & 0x08);
 			}
 		}
 	}
@@ -235,11 +235,11 @@ WRITE16_HANDLER( cps1_cps_b_w )
 
 
 
-static void cps1_gfx_decode(running_machine *machine)
+static void cps1_gfx_decode(running_machine &machine)
 {
-	int size=machine->region("gfx")->bytes();
+	int size=machine.region("gfx")->bytes();
 	int i,j,gfxsize;
-	UINT8 *cps1_gfx = machine->region("gfx")->base();
+	UINT8 *cps1_gfx = machine.region("gfx")->base();
 
 
 	gfxsize=size/4;
@@ -363,7 +363,7 @@ static void cps1_get_video_base(cpschngr_state *state)
 
 WRITE16_HANDLER( cps1_gfxram_w )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	int page = (offset >> 7) & 0x3c0;
 	COMBINE_DATA(&state->cps1_gfxram[offset]);
 
@@ -377,9 +377,9 @@ WRITE16_HANDLER( cps1_gfxram_w )
 
 
 
-static int gfxrom_bank_mapper(running_machine *machine, int type, int code)
+static int gfxrom_bank_mapper(running_machine &machine, int type, int code)
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	const struct gfx_range *range = state->cps1_game_config->bank_mapper;
 	int shift = 0;
 
@@ -445,7 +445,7 @@ static TILEMAP_MAPPER( tilemap2_scan )
 
 static TILE_GET_INFO( get_tile0_info )
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	int code = state->cps1_scroll1[2*tile_index];
 	int attr = state->cps1_scroll1[2*tile_index+1];
 	int gfxset;
@@ -472,7 +472,7 @@ static TILE_GET_INFO( get_tile0_info )
 
 static TILE_GET_INFO( get_tile1_info )
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	int code = state->cps1_scroll2[2*tile_index];
 	int attr = state->cps1_scroll2[2*tile_index+1];
 
@@ -492,7 +492,7 @@ static TILE_GET_INFO( get_tile1_info )
 
 static TILE_GET_INFO( get_tile2_info )
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	int code = state->cps1_scroll3[2*tile_index] & 0x3fff;
 	int attr = state->cps1_scroll3[2*tile_index+1];
 
@@ -534,7 +534,7 @@ static void cps1_update_transmasks(cpschngr_state *state)
 
 VIDEO_START( cps1 )
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	int i;
 
 	MACHINE_RESET_CALL(cps);
@@ -584,9 +584,9 @@ VIDEO_START( cps1 )
 
 ***************************************************************************/
 
-static void cps1_build_palette(running_machine *machine, const UINT16* const palette_base)
+static void cps1_build_palette(running_machine &machine, const UINT16* const palette_base)
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	int offset, page;
 	const UINT16 *palette_ram = palette_base;
 
@@ -642,25 +642,25 @@ static void cps1_find_last_sprite(cpschngr_state *state)    /* Find the offset o
 }
 
 
-static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void cps1_render_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					\
 {																	\
 	if (flip_screen_get(machine))											\
 		pdrawgfx_transpen(bitmap,\
-				cliprect,machine->gfx[2],							\
+				cliprect,machine.gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				!(FLIPX),!(FLIPY),									\
-				511-16-(SX),255-16-(SY),							machine->priority_bitmap,0x02,15);					\
+				511-16-(SX),255-16-(SY),							machine.priority_bitmap,0x02,15);					\
 	else															\
 		pdrawgfx_transpen(bitmap,\
-				cliprect,machine->gfx[2],							\
+				cliprect,machine.gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				FLIPX,FLIPY,										\
-				SX,SY,												machine->priority_bitmap,0x02,15);					\
+				SX,SY,												machine.priority_bitmap,0x02,15);					\
 }
 
 
@@ -793,9 +793,9 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	cpschngr_state *state = screen->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = screen->machine().driver_data<cpschngr_state>();
 	int offs;
-	UINT8 *stars_rom = screen->machine->region("stars")->base();
+	UINT8 *stars_rom = screen->machine().region("stars")->base();
 
 	if (!stars_rom && (state->cps1_stars_enabled[0] || state->cps1_stars_enabled[1]))
 	{
@@ -813,7 +813,7 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 				int sy = (offs % 256);
 				sx = (sx - state->stars2x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - state->stars2y) & 0xff;
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					sx = 511 - sx;
 					sy = 255 - sy;
@@ -839,7 +839,7 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 				int sy = (offs % 256);
 				sx = (sx - state->stars1x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - state->stars1y) & 0xff;
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					sx = 511 - sx;
 					sy = 255 - sy;
@@ -856,9 +856,9 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 }
 
 
-static void cps1_render_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int primask)
+static void cps1_render_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int primask)
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	switch (layer)
 	{
 		case 0:
@@ -872,9 +872,9 @@ static void cps1_render_layer(running_machine *machine, bitmap_t *bitmap, const 
 	}
 }
 
-static void cps1_render_high_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer)
+static void cps1_render_high_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer)
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	switch (layer)
 	{
 		case 0:
@@ -897,12 +897,12 @@ static void cps1_render_high_layer(running_machine *machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( cps1 )
 {
-	cpschngr_state *state = screen->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = screen->machine().driver_data<cpschngr_state>();
 	int layercontrol,l0,l1,l2,l3;
 	int videocontrol = state->cps1_cps_a_regs[CPS1_VIDEOCONTROL];
 
 
-	flip_screen_set(screen->machine, videocontrol & 0x8000);
+	flip_screen_set(screen->machine(), videocontrol & 0x8000);
 
 	layercontrol = state->cps1_cps_b_regs[state->cps1_game_config->layer_control/2];
 
@@ -948,22 +948,22 @@ SCREEN_UPDATE( cps1 )
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
-	cps1_render_layer(screen->machine,bitmap,cliprect,l0,0);
-	if (l1 == 0) cps1_render_high_layer(screen->machine, bitmap, cliprect, l0); /* prepare mask for sprites */
-	cps1_render_layer(screen->machine,bitmap,cliprect,l1,0);
-	if (l2 == 0) cps1_render_high_layer(screen->machine, bitmap, cliprect, l1); /* prepare mask for sprites */
-	cps1_render_layer(screen->machine,bitmap,cliprect,l2,0);
-	if (l3 == 0) cps1_render_high_layer(screen->machine, bitmap, cliprect, l2); /* prepare mask for sprites */
-	cps1_render_layer(screen->machine,bitmap,cliprect,l3,0);
+	cps1_render_layer(screen->machine(),bitmap,cliprect,l0,0);
+	if (l1 == 0) cps1_render_high_layer(screen->machine(), bitmap, cliprect, l0); /* prepare mask for sprites */
+	cps1_render_layer(screen->machine(),bitmap,cliprect,l1,0);
+	if (l2 == 0) cps1_render_high_layer(screen->machine(), bitmap, cliprect, l1); /* prepare mask for sprites */
+	cps1_render_layer(screen->machine(),bitmap,cliprect,l2,0);
+	if (l3 == 0) cps1_render_high_layer(screen->machine(), bitmap, cliprect, l2); /* prepare mask for sprites */
+	cps1_render_layer(screen->machine(),bitmap,cliprect,l3,0);
 
 	return 0;
 }
 
 SCREEN_EOF( cps1 )
 {
-	cpschngr_state *state = machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = machine.driver_data<cpschngr_state>();
 	/* Get video memory base registers */
 	cps1_get_video_base(state);
 

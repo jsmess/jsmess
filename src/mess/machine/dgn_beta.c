@@ -109,8 +109,8 @@ static WRITE8_HANDLER( dgnbeta_ram_bG_w );
 
 /* Debugging commands and handlers. */
 static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
-static void execute_beta_dat_log(running_machine *machine, int ref, int params, const char *param[]);
-static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_dat_log(running_machine &machine, int ref, int params, const char *param[]);
+static void execute_beta_key_dump(running_machine &machine, int ref, int params, const char *param[]);
 
 /* Debugging variables */
 
@@ -134,10 +134,10 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pb_w);
 static WRITE_LINE_DEVICE_HANDLER(d_pia2_irq_a);
 static WRITE_LINE_DEVICE_HANDLER(d_pia2_irq_b);
 
-static void cpu0_recalc_irq(running_machine *machine, int state);
-static void cpu0_recalc_firq(running_machine *machine, int state);
+static void cpu0_recalc_irq(running_machine &machine, int state);
+static void cpu0_recalc_firq(running_machine &machine, int state);
 
-static void cpu1_recalc_firq(running_machine *machine, int state);
+static void cpu1_recalc_firq(running_machine &machine, int state);
 
 
 //static int DMA_NMI;               /* DMA cpu has received an NMI */
@@ -253,11 +253,11 @@ static const struct bank_info_entry bank_info[] =
 // this should probably be considdered a hack !
 //
 
-static void UpdateBanks(running_machine *machine, int first, int last)
+static void UpdateBanks(running_machine &machine, int first, int last)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
-	address_space *space_0 = machine->device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
-	address_space *space_1 = machine->device(DMACPU_TAG)->memory().space(AS_PROGRAM);
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
+	address_space *space_0 = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space *space_1 = machine.device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int		            Page;
 	UINT8		        *readbank;
 	write8_space_func	writebank;
@@ -266,7 +266,7 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 	int		            MapPage;
 	char                page_num[10];
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,cpu_get_pc(space_0->cpu)));
+	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,cpu_get_pc(&space_0->device())));
 	for(Page=first;Page<=last;Page++)
 	{
 		sprintf(page_num,"bank%d",Page+1);
@@ -283,17 +283,17 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((ram_get_size(machine->device(RAM_TAG)) / 1024)-1))		// Block is ram
+		if ((MapPage*4) < ((ram_get_size(machine.device(RAM_TAG)) / 1024)-1))		// Block is ram
 		{
 			if (!is_last_page(Page))
 			{
-				readbank = &ram_get_ptr(machine->device(RAM_TAG))[MapPage*RamPageSize];
+				readbank = &ram_get_ptr(machine.device(RAM_TAG))[MapPage*RamPageSize];
 				if(state->LogDatWrites)
 					debug_console_printf(machine, "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
-				readbank = &ram_get_ptr(machine->device(RAM_TAG))[(MapPage*RamPageSize)-256];
+				readbank = &ram_get_ptr(machine.device(RAM_TAG))[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
 			writebank=bank_info[Page].handler;
@@ -328,9 +328,9 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 }
 
 //
-static void SetDefaultTask(running_machine *machine)
+static void SetDefaultTask(running_machine &machine)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	UINT8 *videoram = state->videoram;
 	int		Idx;
 
@@ -362,13 +362,13 @@ static void SetDefaultTask(running_machine *machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-	videoram=&ram_get_ptr(machine->device(RAM_TAG))[TextVidBasePage*RamPageSize];
+	videoram=&ram_get_ptr(machine.device(RAM_TAG))[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
 READ8_HANDLER( dgn_beta_page_r )
 {
-	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
 	return state->PageRegs[state->PIATaskReg][offset].value;
 }
 
@@ -378,110 +378,110 @@ READ8_HANDLER( dgn_beta_page_r )
 
 WRITE8_HANDLER( dgn_beta_page_w )
 {
-	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
 	state->PageRegs[state->PIATaskReg][offset].value=data;
 
 	LOG_PAGE_WRITE(("PageRegWrite : task=$%X  offset=$%X value=$%X\n",state->PIATaskReg,offset,data));
 
 	if (state->EnableMapRegs)
 	{
-		UpdateBanks(space->machine, offset,offset);
+		UpdateBanks(space->machine(), offset,offset);
 		if (offset==15)
-			UpdateBanks(space->machine, offset+1,offset+1);
+			UpdateBanks(space->machine(), offset+1,offset+1);
 	}
 }
 
 /*********************** Memory bank write handlers ************************/
 /* These actually write the data to the memory, and not to the page regs ! */
-static void dgn_beta_bank_memory(running_machine *machine, int offset, int data, int bank)
+static void dgn_beta_bank_memory(running_machine &machine, int offset, int data, int bank)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->PageRegs[state->TaskReg][bank].memory[offset]=data;
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b0_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,0);
+	dgn_beta_bank_memory(space->machine(),offset,data,0);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b1_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,1);
+	dgn_beta_bank_memory(space->machine(),offset,data,1);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b2_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,2);
+	dgn_beta_bank_memory(space->machine(),offset,data,2);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b3_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,3);
+	dgn_beta_bank_memory(space->machine(),offset,data,3);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b4_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,4);
+	dgn_beta_bank_memory(space->machine(),offset,data,4);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b5_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,5);
+	dgn_beta_bank_memory(space->machine(),offset,data,5);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b6_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,6);
+	dgn_beta_bank_memory(space->machine(),offset,data,6);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b7_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,7);
+	dgn_beta_bank_memory(space->machine(),offset,data,7);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b8_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,8);
+	dgn_beta_bank_memory(space->machine(),offset,data,8);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_b9_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,9);
+	dgn_beta_bank_memory(space->machine(),offset,data,9);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bA_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,10);
+	dgn_beta_bank_memory(space->machine(),offset,data,10);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bB_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,11);
+	dgn_beta_bank_memory(space->machine(),offset,data,11);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bC_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,12);
+	dgn_beta_bank_memory(space->machine(),offset,data,12);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bD_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,13);
+	dgn_beta_bank_memory(space->machine(),offset,data,13);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bE_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,14);
+	dgn_beta_bank_memory(space->machine(),offset,data,14);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bF_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,15);
+	dgn_beta_bank_memory(space->machine(),offset,data,15);
 }
 
 static WRITE8_HANDLER( dgnbeta_ram_bG_w )
 {
-	dgn_beta_bank_memory(space->machine,offset,data,16);
+	dgn_beta_bank_memory(space->machine(),offset,data,16);
 }
 
 /*
@@ -567,7 +567,7 @@ static WRITE8_DEVICE_HANDLER(d_pia0_pa_w)
 
 static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 {
-	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	int RetVal;
 	int Idx;
 	int Selected;
@@ -588,7 +588,7 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 	{
 		for(Idx=0; Idx<NoKeyrows; Idx++)
 		{
-			state->Keyboard[Idx] = input_port_read(device->machine, keynames[Idx]);
+			state->Keyboard[Idx] = input_port_read(device->machine(), keynames[Idx]);
 
 			if(state->Keyboard[Idx] != 0x7F)
 				state->KAny_next = 1;
@@ -609,7 +609,7 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
 {
-	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	int	InClkState;
 	//int   OutClkState;
 
@@ -637,7 +637,7 @@ static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
 
 static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
 {
-	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	int	RowNo;
 	LOG_KEYBOARD(("\nCB2 Write\n"));
 
@@ -652,7 +652,7 @@ static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
 		state->RowShifter = (state->RowShifter<<1) | ((state->d_pia0_pb_last & KOutDat)>>4);
 		state->RowShifter &= 0x3FF;
 		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",state->RowShifter,state->Keyrow));
-		if (VERBOSE) debug_console_printf(device->machine, "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",state->RowShifter,RowNo,state->Keyrow);
+		if (VERBOSE) debug_console_printf(device->machine(), "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",state->RowShifter,RowNo,state->Keyrow);
 	}
 
 	state->d_pia0_cb2_last=data;
@@ -661,12 +661,12 @@ static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_a )
 {
-	cpu0_recalc_irq(device->machine, state);
+	cpu0_recalc_irq(device->machine(), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_b )
 {
-	cpu0_recalc_firq(device->machine, state);
+	cpu0_recalc_firq(device->machine(), state);
 }
 
 /* PIA #1 at $FC24-$FC27 I63
@@ -686,9 +686,9 @@ static READ8_DEVICE_HANDLER(d_pia1_pa_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 {
-	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	int	HALT_DMA;
-	device_t *fdc = device->machine->device(FDC_TAG);
+	device_t *fdc = device->machine().device(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != state->d_pia1_pa_last)
@@ -700,11 +700,11 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 			HALT_DMA = CLEAR_LINE;
 
 		LOG_HALT(("DMA_CPU HALT=%d\n", HALT_DMA));
-		cputag_set_input_line(device->machine, DMACPU_TAG, INPUT_LINE_HALT, HALT_DMA);
+		cputag_set_input_line(device->machine(), DMACPU_TAG, INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			device_yield(device->machine->device(MAINCPU_TAG));
+			device_yield(device->machine().device(MAINCPU_TAG));
 
 		state->d_pia1_pa_last = data & 0x80;
 	}
@@ -724,7 +724,7 @@ static READ8_DEVICE_HANDLER(d_pia1_pb_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 {
-	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	int	HALT_CPU;
 
 	/* Only play with halt line if halt bit changed since last write */
@@ -737,24 +737,24 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 			HALT_CPU = ASSERT_LINE;
 
 		LOG_HALT(("MAIN_CPU HALT=%d\n", HALT_CPU));
-		cputag_set_input_line(device->machine, MAINCPU_TAG, INPUT_LINE_HALT, HALT_CPU);
+		cputag_set_input_line(device->machine(), MAINCPU_TAG, INPUT_LINE_HALT, HALT_CPU);
 
 		state->d_pia1_pb_last = data & 0x02;
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			device_yield(device->machine->device(DMACPU_TAG));
+			device_yield(device->machine().device(DMACPU_TAG));
 	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia1_irq_a )
 {
-	cpu0_recalc_irq(device->machine, state);
+	cpu0_recalc_irq(device->machine(), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia1_irq_b )
 {
-	cpu0_recalc_irq(device->machine, state);
+	cpu0_recalc_irq(device->machine(), state);
 }
 
 /* PIA #2 at FCC0-FCC3 I28
@@ -773,7 +773,7 @@ static READ8_DEVICE_HANDLER(d_pia2_pa_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 {
-	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	int OldTask;
 	int OldEnableMap;
 	int NMI;
@@ -789,13 +789,13 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		LOG_INTS(("cpu1 NMI : %d\n", NMI));
 		if(!NMI)
 		{
-			cputag_set_input_line(device->machine, DMACPU_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+			cputag_set_input_line(device->machine(), DMACPU_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("device_yield()\n");
-			device_yield(device->machine->device(DMACPU_TAG));	/* Let DMA CPU run */
+			device_yield(device->machine().device(DMACPU_TAG));	/* Let DMA CPU run */
 		}
 		else
 		{
-			cputag_set_input_line(device->machine, DMACPU_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(device->machine(), DMACPU_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 		}
 
 		state->DMA_NMI_LAST = NMI;	/* Save it for next time */
@@ -823,7 +823,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		else
 			state->TaskReg = NoPagingTask;
 
-		UpdateBanks(device->machine, 0, IOPage + 1);
+		UpdateBanks(device->machine(), 0, IOPage + 1);
 	}
 	else
 	{
@@ -831,7 +831,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		if ((state->PIATaskReg != OldTask) && (state->EnableMapRegs))
 		{
 			state->TaskReg = state->PIATaskReg;
-			UpdateBanks(device->machine, 0, IOPage + 1);
+			UpdateBanks(device->machine(), 0, IOPage + 1);
 		}
 	}
 	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", state->TaskReg, state->PIATaskReg));
@@ -845,26 +845,26 @@ static READ8_DEVICE_HANDLER(d_pia2_pb_r)
 static WRITE8_DEVICE_HANDLER(d_pia2_pb_w)
 {
 	/* Update top video address lines */
-	dgnbeta_vid_set_gctrl(device->machine, data);
+	dgnbeta_vid_set_gctrl(device->machine(), data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_a )
 {
-	cpu0_recalc_irq(device->machine, state);
+	cpu0_recalc_irq(device->machine(), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
 {
-	cpu0_recalc_irq(device->machine, state);
+	cpu0_recalc_irq(device->machine(), state);
 }
 
 /************************************ Recalculate CPU inturrupts ****************************/
 /* CPU 0 */
-static void cpu0_recalc_irq(running_machine *machine, int state)
+static void cpu0_recalc_irq(running_machine &machine, int state)
 {
-	device_t *pia_0 = machine->device( PIA_0_TAG );
-	device_t *pia_1 = machine->device( PIA_1_TAG );
-	device_t *pia_2 = machine->device( PIA_2_TAG );
+	device_t *pia_0 = machine.device( PIA_0_TAG );
+	device_t *pia_1 = machine.device( PIA_1_TAG );
+	device_t *pia_2 = machine.device( PIA_2_TAG );
 	UINT8 pia0_irq_a = pia6821_get_irq_a(pia_0);
 	UINT8 pia1_irq_a = pia6821_get_irq_a(pia_1);
 	UINT8 pia1_irq_b = pia6821_get_irq_b(pia_1);
@@ -881,9 +881,9 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 	LOG_INTS(("cpu0 IRQ : %d\n", IRQ));
 }
 
-static void cpu0_recalc_firq(running_machine *machine, int state)
+static void cpu0_recalc_firq(running_machine &machine, int state)
 {
-	device_t *pia_0 = machine->device( PIA_0_TAG );
+	device_t *pia_0 = machine.device( PIA_0_TAG );
 	UINT8 pia0_irq_b = pia6821_get_irq_b(pia_0);
 	UINT8 FIRQ;
 
@@ -899,7 +899,7 @@ static void cpu0_recalc_firq(running_machine *machine, int state)
 
 /* CPU 1 */
 
-static void cpu1_recalc_firq(running_machine *machine, int state)
+static void cpu1_recalc_firq(running_machine &machine, int state)
 {
 	cputag_set_input_line(machine, DMACPU_TAG, M6809_FIRQ_LINE, state);
 	LOG_INTS(("cpu1 FIRQ : %d\n",state));
@@ -912,7 +912,7 @@ static void cpu1_recalc_firq(running_machine *machine, int state)
 /* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_intrq_w )
 {
-	dgn_beta_state *drvstate = device->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *drvstate = device->machine().driver_data<dgn_beta_state>();
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
     if(drvstate->wd2797_written)
         pia6821_ca1_w(device, state);
@@ -922,7 +922,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_drq_w )
 {
 	LOG_DISK(("dgnbeta_fdc_drq_w(%d)\n", state));
-	cpu1_recalc_firq(device->machine, state);
+	cpu1_recalc_firq(device->machine(), state);
 }
 
 const wd17xx_interface dgnbeta_wd17xx_interface =
@@ -936,7 +936,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface =
 READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	device_t *fdc = space->machine->device(FDC_TAG);
+	device_t *fdc = space->machine().device(FDC_TAG);
 
 	switch(offset & 0x03)
 	{
@@ -962,8 +962,8 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
-	device_t *fdc = space->machine->device(FDC_TAG);
+	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
+	device_t *fdc = space->machine().device(FDC_TAG);
 
     state->wd2797_written=1;
 
@@ -994,7 +994,7 @@ WRITE8_HANDLER(dgnbeta_wd2797_w)
 static void ScanInKeyboard(void)
 {
 #if 0
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int	Idx;
 	int	Row;
 	static const char *const keynames[] = {
@@ -1024,9 +1024,9 @@ static void ScanInKeyboard(void)
 }
 
 /* VBlank inturrupt */
-void dgn_beta_frame_interrupt (running_machine *machine, int data)
+void dgn_beta_frame_interrupt (running_machine &machine, int data)
 {
-	device_t *pia_2 = machine->device( PIA_2_TAG );
+	device_t *pia_2 = machine.device( PIA_2_TAG );
 
     /* Set PIA line, so it recognises inturrupt */
     if (!data)
@@ -1068,7 +1068,7 @@ static void dgnbeta_reset(running_machine &machine)
 	state->system_rom = machine.region(MAINCPU_TAG)->base();
 
 	/* Make sure CPU 1 is started out halted ! */
-	cputag_set_input_line(&machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */
@@ -1077,7 +1077,7 @@ static void dgnbeta_reset(running_machine &machine)
 	state->PIATaskReg = 0;
 	state->EnableMapRegs = 0;
 	memset(state->PageRegs, 0, sizeof(state->PageRegs));	/* Reset page registers to 0 */
-	SetDefaultTask(&machine);
+	SetDefaultTask(machine);
 
 	/* Set pullups on all PIA port A, to match what hardware does */
 	pia6821_set_port_a_z_mask(pia_0, 0xFF);
@@ -1102,26 +1102,26 @@ static void dgnbeta_reset(running_machine &machine)
 
 	state->videoram = ram_get_ptr(machine.device(RAM_TAG));		/* Point video ram at the start of physical ram */
 
-    dgnbeta_video_reset(&machine);
+    dgnbeta_video_reset(machine);
     wd17xx_reset(fdc);
     state->wd2797_written=0;
 }
 
 MACHINE_START( dgnbeta )
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	logerror("MACHINE_START( dgnbeta )\n");
 
     dgnbeta_init_video(machine);
 
-	if (machine->device<cpu_device>(MAINCPU_TAG)->debug()) {
-		machine->device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
+	if (machine.device<cpu_device>(MAINCPU_TAG)->debug()) {
+		machine.device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
 	}
 
-	machine->add_notifier(MACHINE_NOTIFY_RESET, dgnbeta_reset);
-	dgnbeta_reset(*machine);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, dgnbeta_reset);
+	dgnbeta_reset(machine);
 	/* setup debug commands */
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine, "beta_dat_log", CMDFLAG_NONE, 0, 0, 0, execute_beta_dat_log);
 		debug_console_register_command(machine, "beta_key_dump", CMDFLAG_NONE, 0, 0, 0, execute_beta_key_dump);
@@ -1302,17 +1302,17 @@ static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, c
 	return result;
 }
 
-static void execute_beta_dat_log(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_dat_log(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->LogDatWrites=!state->LogDatWrites;
 
 	debug_console_printf(machine, "DAT register write info set : %d\n",state->LogDatWrites);
 }
 
-static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_key_dump(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int Idx;
 
 	for(Idx=0;Idx<NoKeyrows;Idx++)

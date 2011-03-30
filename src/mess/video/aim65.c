@@ -78,8 +78,8 @@ static void aim65_printer_cr(aim65_state *state)
 
 static TIMER_CALLBACK(aim65_printer_timer)
 {
-	aim65_state *state = machine->driver_data<aim65_state>();
-	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+	aim65_state *state = machine.driver_data<aim65_state>();
+	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
 
 	via_0->write_cb1(state->printer_level);
 	via_0->write_cb1(!state->printer_level);
@@ -90,8 +90,8 @@ static TIMER_CALLBACK(aim65_printer_timer)
 
 WRITE8_DEVICE_HANDLER( aim65_printer_on )
 {
-	aim65_state *state = device->machine->driver_data<aim65_state>();
-	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
+	aim65_state *state = device->machine().driver_data<aim65_state>();
+	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
 	if (!data)
 	{
 		aim65_printer_cr(state);
@@ -107,7 +107,7 @@ WRITE8_DEVICE_HANDLER( aim65_printer_on )
 WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
 {
 #if 0
-	aim65_state *state = device->machine->driver_data<aim65_state>();
+	aim65_state *state = device->machine().driver_data<aim65_state>();
 	if (state->flag_a == 0) {
 		printerRAM[(state->printer_y * 20) + state->printer_x] |= data;
 		state->flag_a = 1;
@@ -118,7 +118,7 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
 WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 {
 #if 0
-	aim65_state *state = device->machine->driver_data<aim65_state>();
+	aim65_state *state = device->machine().driver_data<aim65_state>();
 	data &= 0x03;
 
 	if (state->flag_b == 0) {
@@ -130,8 +130,8 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 
 VIDEO_START( aim65 )
 {
-	aim65_state *state = machine->driver_data<aim65_state>();
-	state->print_timer = machine->scheduler().timer_alloc(FUNC(aim65_printer_timer));
+	aim65_state *state = machine.driver_data<aim65_state>();
+	state->print_timer = machine.scheduler().timer_alloc(FUNC(aim65_printer_timer));
 
 #if 0
 	videoram_size = 600 * 10 * 2;
@@ -171,7 +171,7 @@ SCREEN_UPDATE( aim65 )
 
 			for (b = 0; b<10; b++)
 			{
-				color=machine->pens[(data & 0x1)?2:0];
+				color=machine.pens[(data & 0x1)?2:0];
 				plot_pixel(bitmap,700 - ((b * 10) + x), y,color);
 				data = data >> 1;
 			}

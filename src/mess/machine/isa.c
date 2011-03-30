@@ -43,7 +43,7 @@ device_config *isa8_device_config::static_alloc_device_config(const machine_conf
  
 device_t *isa8_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, isa8_device(machine, *this));
+	return auto_alloc(machine, isa8_device(machine, *this));
 }
  
 void isa8_device_config::static_set_cputag(device_config *device, const char *tag)
@@ -152,7 +152,7 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
-	memory_set_bankptr(&m_machine, tag, data);
+	memory_set_bankptr(m_machine, tag, data);
 }
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
@@ -161,7 +161,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);	
 	space->install_read_bank(start, end, mask, mirror, tag);
 	space->unmap_write(start, end, mask, mirror);		
-	memory_set_bankptr(&m_machine, tag, machine->region(dev->subtag(tempstring, region))->base());
+	memory_set_bankptr(m_machine, tag, m_machine.region(dev->subtag(tempstring, region))->base());
 }
 
 // interrupt request from isa card

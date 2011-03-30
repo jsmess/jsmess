@@ -26,53 +26,53 @@ public:
 
 
 
-static void tvc_set_mem_page(running_machine *machine, UINT8 data)
+static void tvc_set_mem_page(running_machine &machine, UINT8 data)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
 				space->install_read_bank(0x0000, 0x3fff, "bank1");
 				space->unmap_write(0x0000, 0x3fff);
-				memory_set_bankptr(space->machine, "bank1", machine->region("sys")->base());
+				memory_set_bankptr(space->machine(), "bank1", machine.region("sys")->base());
 				break;
 		case 0x08 : // Cart ROM selected
 				space->install_read_bank(0x0000, 0x3fff, "bank1");
 				space->unmap_write(0x0000, 0x3fff);
-				memory_set_bankptr(space->machine, "bank1", machine->region("cart")->base());
+				memory_set_bankptr(space->machine(), "bank1", machine.region("cart")->base());
 				break;
 		case 0x10 : // RAM selected
 				space->install_readwrite_bank(0x0000, 0x3fff, "bank1");
-				memory_set_bankptr(space->machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+				memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+	memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000);
+		memory_set_bankptr(space->machine(), "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+		memory_set_bankptr(space->machine(), "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				memory_set_bankptr(space->machine, "bank4", machine->region("cart")->base());
+				memory_set_bankptr(space->machine(), "bank4", machine.region("cart")->base());
 				break;
 		case 0x40 : // System ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				memory_set_bankptr(space->machine, "bank4", machine->region("sys")->base());
+				memory_set_bankptr(space->machine(), "bank4", machine.region("sys")->base());
 				break;
 		case 0x80 : // RAM selected
 				space->install_readwrite_bank(0xc000, 0xffff, "bank4");
-				memory_set_bankptr(space->machine, "bank4", ram_get_ptr(machine->device(RAM_TAG))+0xc000);
+				memory_set_bankptr(space->machine(), "bank4", ram_get_ptr(machine.device(RAM_TAG))+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				memory_set_bankptr(space->machine, "bank4", machine->region("ext")->base());
+				memory_set_bankptr(space->machine(), "bank4", machine.region("ext")->base());
 				break;
 
 	}
@@ -80,19 +80,19 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 
 static WRITE8_HANDLER( tvc_bank_w )
 {
-	tvc_set_mem_page(space->machine, data);
+	tvc_set_mem_page(space->machine(), data);
 }
 
 static WRITE8_HANDLER( tvc_video_mode_w )
 {
-	tvc_state *state = space->machine->driver_data<tvc_state>();
+	tvc_state *state = space->machine().driver_data<tvc_state>();
 	state->video_mode = data & 0x03;
 }
 
 
 static WRITE8_HANDLER( tvc_palette_w )
 {
-	tvc_state *state = space->machine->driver_data<tvc_state>();
+	tvc_state *state = space->machine().driver_data<tvc_state>();
 	//  0 I 0 R | 0 G 0 B
 	//  0 0 0 0 | I R G B
 	int i = ((data&0x40)>>3) | ((data&0x10)>>2) | ((data&0x04)>>1) | (data&0x01);
@@ -102,29 +102,29 @@ static WRITE8_HANDLER( tvc_palette_w )
 
 static WRITE8_HANDLER( tvc_keyboard_w )
 {
-	tvc_state *state = space->machine->driver_data<tvc_state>();
+	tvc_state *state = space->machine().driver_data<tvc_state>();
 	state->keyline = data;
 }
 
 static READ8_HANDLER( tvc_keyboard_r )
 {
-	tvc_state *state = space->machine->driver_data<tvc_state>();
+	tvc_state *state = space->machine().driver_data<tvc_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
-	return input_port_read(space->machine, keynames[state->keyline & 0x0f]);
+	return input_port_read(space->machine(), keynames[state->keyline & 0x0f]);
 }
 
 static READ8_HANDLER( tvc_flipflop_r )
 {
-	tvc_state *state = space->machine->driver_data<tvc_state>();
+	tvc_state *state = space->machine().driver_data<tvc_state>();
 	return state->flipflop;
 }
 
 static WRITE8_HANDLER( tvc_flipflop_w )
 {
-	tvc_state *state = space->machine->driver_data<tvc_state>();
+	tvc_state *state = space->machine().driver_data<tvc_state>();
 	state->flipflop |= 0x10;
 }
 static READ8_HANDLER( tvc_port59_r )
@@ -253,7 +253,7 @@ INPUT_PORTS_END
 
 static MACHINE_START(tvc)
 {
-	tvc_state *state = machine->driver_data<tvc_state>();
+	tvc_state *state = machine.driver_data<tvc_state>();
 	int i;
 
 	for (i=0; i<4; i++)
@@ -264,8 +264,8 @@ static MACHINE_START(tvc)
 
 static MACHINE_RESET(tvc)
 {
-	tvc_state *state = machine->driver_data<tvc_state>();
-	memset(ram_get_ptr(machine->device(RAM_TAG)),0,(64+14)*1024);
+	tvc_state *state = machine.driver_data<tvc_state>();
+	memset(ram_get_ptr(machine.device(RAM_TAG)),0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
 	state->video_mode = 0;
 }
@@ -276,14 +276,14 @@ static VIDEO_START( tvc )
 
 static SCREEN_UPDATE( tvc )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
 static MC6845_UPDATE_ROW( tvc_update_row )
 {
-	tvc_state *state = device->machine->driver_data<tvc_state>();
+	tvc_state *state = device->machine().driver_data<tvc_state>();
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -292,7 +292,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = ram_get_ptr(device->machine->device(RAM_TAG))[ offset + 0x10000];
+					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
 					*p++ = state->col[(data >> 7)];
 					*p++ = state->col[(data >> 6)];
 					*p++ = state->col[(data >> 5)];
@@ -307,7 +307,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = ram_get_ptr(device->machine->device(RAM_TAG))[ offset + 0x10000];
+					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
 					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
 					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
 					*p++ = state->col[BIT(data,6)*2 + BIT(data,2)];
@@ -322,7 +322,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = ram_get_ptr(device->machine->device(RAM_TAG))[ offset + 0x10000];
+					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
 					*p++ = state->col[(data >> 4) & 0xf];
 					*p++ = state->col[(data >> 4) & 0xf];
 					*p++ = state->col[(data >> 4) & 0xf];
@@ -380,7 +380,7 @@ static const mc6845_interface tvc_crtc6845_interface =
 
 static INTERRUPT_GEN( tvc_interrupt )
 {
-	tvc_state *state = device->machine->driver_data<tvc_state>();
+	tvc_state *state = device->machine().driver_data<tvc_state>();
 	state->flipflop  &= ~0x10;
 	device_set_input_line(device, 0, HOLD_LINE);
 }

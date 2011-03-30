@@ -33,12 +33,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( c80 )
@@ -96,7 +96,7 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 
     */
 
-	c80_state *state = device->machine->driver_data<c80_state>();
+	c80_state *state = device->machine().driver_data<c80_state>();
 
 	UINT8 data = !state->pio1_brdy << 4 | 0x07;
 
@@ -106,9 +106,9 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 	{
 		if (!BIT(state->keylatch, i))
 		{
-			if (!BIT(input_port_read(device->machine, "ROW0"), i)) data &= ~0x01;
-			if (!BIT(input_port_read(device->machine, "ROW1"), i)) data &= ~0x02;
-			if (!BIT(input_port_read(device->machine, "ROW2"), i)) data &= ~0x04;
+			if (!BIT(input_port_read(device->machine(), "ROW0"), i)) data &= ~0x01;
+			if (!BIT(input_port_read(device->machine(), "ROW1"), i)) data &= ~0x02;
+			if (!BIT(input_port_read(device->machine(), "ROW2"), i)) data &= ~0x04;
 		}
 	}
 
@@ -134,7 +134,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	c80_state *state = device->machine->driver_data<c80_state>();
+	c80_state *state = device->machine().driver_data<c80_state>();
 
 	state->pio1_a5 = BIT(data, 5);
 
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	c80_state *state = device->machine->driver_data<c80_state>();
+	c80_state *state = device->machine().driver_data<c80_state>();
 
 	if (!state->pio1_a5)
 	{
@@ -175,7 +175,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pio1_brdy_w )
 {
-	c80_state *driver_state = device->machine->driver_data<c80_state>();
+	c80_state *driver_state = device->machine().driver_data<c80_state>();
 
 	driver_state->pio1_brdy = state;
 
@@ -226,10 +226,10 @@ static const z80_daisy_config c80_daisy_chain[] =
 
 static MACHINE_START( c80 )
 {
-	c80_state *state = machine->driver_data<c80_state>();
+	c80_state *state = machine.driver_data<c80_state>();
 
 	/* find devices */
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state->save_item(NAME(state->keylatch));

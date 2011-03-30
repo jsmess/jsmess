@@ -49,8 +49,8 @@ WRITE8_HANDLER ( zx81_io_w );
 VIDEO_START( zx );
 SCREEN_EOF( zx );
 
-void zx_ula_bkgnd(running_machine *machine, int color);
-void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param);
+void zx_ula_bkgnd(running_machine &machine, int color);
+void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param);
 
 //extern int ula_nmi_active;
 //extern int ula_scancode_count;

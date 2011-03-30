@@ -79,7 +79,7 @@ static DEVICE_RESET( ti99_mem32k )
 	/* Register the card */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "RAM")==RAM_TI32_EXT)
+	if (input_port_read(device->machine(), "RAM")==RAM_TI32_EXT)
 	{
 		int success = mount_card(peb, device, &ti32k_card, get_pebcard_config(device)->slot);
 		if (!success) return;

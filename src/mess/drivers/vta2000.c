@@ -44,9 +44,9 @@ static MACHINE_RESET(vta2000)
 
 static VIDEO_START( vta2000 )
 {
-	vta2000_state *state = machine->driver_data<vta2000_state>();
-	state->FNT = machine->region("chargen")->base();
-	state->videoram = machine->region("maincpu")->base()+0x80a0;
+	vta2000_state *state = machine.driver_data<vta2000_state>();
+	state->FNT = machine.region("chargen")->base();
+	state->videoram = machine.region("maincpu")->base()+0x80a0;
 }
 
 static SCREEN_UPDATE( vta2000 )
@@ -56,7 +56,7 @@ Each character pair consists of a data byte followed by an attribute.
 
 Here we just show the first 80x25, with no scrolling. */
 {
-	vta2000_state *state = screen->machine->driver_data<vta2000_state>();
+	vta2000_state *state = screen->machine().driver_data<vta2000_state>();
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,gfx,attr;
 	UINT16 sy=0,ma=0,x,xx=0,chr;

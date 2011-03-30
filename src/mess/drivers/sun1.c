@@ -36,7 +36,7 @@ static READ16_HANDLER(sun1_upd7201_r)
 
 static WRITE16_HANDLER(sun1_upd7201_w)
 {
-	device_t *devconf = space->machine->device(TERMINAL_TAG);
+	device_t *devconf = space->machine().device(TERMINAL_TAG);
 	if (offset==0) terminal_write(devconf,0,data >> 8);
 }
 
@@ -54,12 +54,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(sun1)
 {
-	sun1_state *state = machine->driver_data<sun1_state>();
-	UINT8* user1 = machine->region("user1")->base();
+	sun1_state *state = machine.driver_data<sun1_state>();
+	UINT8* user1 = machine.region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x4000);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 

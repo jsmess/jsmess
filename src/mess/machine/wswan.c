@@ -86,9 +86,9 @@ static const UINT8 ws_fake_bios_code[] = {
 	0xea, 0xc0, 0xff, 0x00, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void wswan_handle_irqs( running_machine *machine )
+static void wswan_handle_irqs( running_machine &machine )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	if ( state->ws_portram[0xb2] & state->ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
 		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->ws_portram[0xb0] + WSWAN_INT_HBLTMR );
 	} else if ( state->ws_portram[0xb2] & state->ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
@@ -110,9 +110,9 @@ static void wswan_handle_irqs( running_machine *machine )
 	}
 }
 
-static void wswan_set_irq_line( running_machine *machine, int irq)
+static void wswan_set_irq_line( running_machine &machine, int irq)
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	if ( state->ws_portram[0xb2] & irq )
 	{
 		state->ws_portram[0xb6] |= irq;
@@ -120,16 +120,16 @@ static void wswan_set_irq_line( running_machine *machine, int irq)
 	}
 }
 
-static void wswan_clear_irq_line( running_machine *machine, int irq)
+static void wswan_clear_irq_line( running_machine &machine, int irq)
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	state->ws_portram[0xb6] &= ~irq;
 	wswan_handle_irqs( machine );
 }
 
 static TIMER_CALLBACK(wswan_rtc_callback)
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	/* A second passed */
 	state->rtc.second = state->rtc.second + 1;
 	if ( ( state->rtc.second & 0x0F ) > 9 )
@@ -181,9 +181,9 @@ static void wswan_machine_stop( running_machine &machine )
 	}
 }
 
-static void wswan_setup_bios( running_machine *machine )
+static void wswan_setup_bios( running_machine &machine )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	if ( state->ws_bios_bank == NULL )
 	{
 		state->ws_bios_bank = auto_alloc_array(machine, UINT8, 0x10000 );
@@ -193,40 +193,40 @@ static void wswan_setup_bios( running_machine *machine )
 
 MACHINE_START( wswan )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	state->ws_bios_bank = NULL;
 	state->system_type = TYPE_WSWAN;
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
-	state->vdp.timer = machine->scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
+	state->vdp.timer = machine.scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
 	state->vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine);
 
 	/* Set up RTC timer */
 	if ( state->rtc.present )
-		machine->scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
+		machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
 }
 
 MACHINE_START( wscolor )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	state->ws_bios_bank = NULL;
 	state->system_type = TYPE_WSC;
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
-	state->vdp.timer = machine->scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
+	state->vdp.timer = machine.scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
 	state->vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine);
 
 	/* Set up RTC timer */
 	if ( state->rtc.present )
-		machine->scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
+		machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
 }
 
 MACHINE_RESET( wswan )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
-	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
+	wswan_state *state = machine.driver_data<wswan_state>();
+	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Intialize ports */
 	memcpy( state->ws_portram, ws_portram_init, 256 );
@@ -267,7 +267,7 @@ MACHINE_RESET( wswan )
 
 NVRAM_HANDLER( wswan )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	if ( read_or_write )
 	{
 		/* Save the EEPROM data */
@@ -290,7 +290,7 @@ NVRAM_HANDLER( wswan )
 
 READ8_HANDLER( wswan_sram_r )
 {
-	wswan_state *state = space->machine->driver_data<wswan_state>();
+	wswan_state *state = space->machine().driver_data<wswan_state>();
 	if ( state->eeprom.data == NULL )
 	{
 		return 0xFF;
@@ -300,7 +300,7 @@ READ8_HANDLER( wswan_sram_r )
 
 WRITE8_HANDLER( wswan_sram_w )
 {
-	wswan_state *state = space->machine->driver_data<wswan_state>();
+	wswan_state *state = space->machine().driver_data<wswan_state>();
 	if ( state->eeprom.data == NULL )
 	{
 		return;
@@ -310,11 +310,11 @@ WRITE8_HANDLER( wswan_sram_w )
 
 READ8_HANDLER( wswan_port_r )
 {
-	wswan_state *state = space->machine->driver_data<wswan_state>();
+	wswan_state *state = space->machine().driver_data<wswan_state>();
 	UINT8 value = state->ws_portram[offset];
 
 	if ( offset != 2 )
-	logerror( "PC=%X: port read %02X\n", cpu_get_pc( space->cpu ), offset );
+	logerror( "PC=%X: port read %02X\n", cpu_get_pc( &space->device() ), offset );
 	switch( offset )
 	{
 		case 0x02:		/* Current line */
@@ -382,8 +382,8 @@ READ8_HANDLER( wswan_port_r )
 
 WRITE8_HANDLER( wswan_port_w )
 {
-	wswan_state *state = space->machine->driver_data<wswan_state>();
-	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( space->cpu ), offset, data );
+	wswan_state *state = space->machine().driver_data<wswan_state>();
+	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( &space->device() ), offset, data );
 	switch( offset )
 	{
 		case 0x00:	/* Display control
@@ -859,7 +859,7 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 0-3 - Master volume
                    Bit 4-7 - Unknown
                 */
-			wswan_sound_port_w( space->machine->device("custom"), offset, data );
+			wswan_sound_port_w( space->machine().device("custom"), offset, data );
 			break;
 		case 0xa0:	/* Hardware type - this is probably read only
                    Bit 0   - Enable cartridge slot and/or disable bios
@@ -869,7 +869,7 @@ WRITE8_HANDLER( wswan_port_w )
 			if ( ( data & 0x01 ) && !state->bios_disabled )
 			{
 				state->bios_disabled = 1;
-				memory_set_bankptr( space->machine, "bank15", state->ROMMap[ ( ( ( state->ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( state->ROMBanks - 1 ) ] );
+				memory_set_bankptr( space->machine(), "bank15", state->ROMMap[ ( ( ( state->ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( state->ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xa2:	/* Timer control
@@ -978,13 +978,13 @@ WRITE8_HANDLER( wswan_port_w )
 			switch( data )
 			{
 			case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-				data = data | input_port_read(space->machine, "CURSY");
+				data = data | input_port_read(space->machine(), "CURSY");
 				break;
 			case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-				data = data | input_port_read(space->machine, "CURSX");
+				data = data | input_port_read(space->machine(), "CURSX");
 				break;
 			case 0x40:	/* Read buttons: START - A - B */
-				data = data | input_port_read(space->machine, "BUTTONS");
+				data = data | input_port_read(space->machine(), "BUTTONS");
 				break;
 			}
 			break;
@@ -998,7 +998,7 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 6   - VBlank interrupt acknowledge
                    Bit 7   - HBlank timer interrupt acknowledge
                 */
-			wswan_clear_irq_line( space->machine, data );
+			wswan_clear_irq_line( space->machine(), data );
 			data = state->ws_portram[0xB6];
 			break;
 		case 0xba:	/* Internal EEPROM data (low)
@@ -1049,20 +1049,20 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 0-3 - ROM bank base register for banks 4-15
                    Bit 4-7 - Unknown
                 */
-			memory_set_bankptr( space->machine, "bank4", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank5", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank6", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank7", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank8", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank9", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank10", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank11", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank12", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank13", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( state->ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine, "bank14", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank4", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank5", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank6", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank7", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank8", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank9", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank10", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank11", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank12", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank13", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( state->ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine(), "bank14", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( state->ROMBanks - 1 ) ] );
 			if ( state->bios_disabled )
 			{
-				memory_set_bankptr( space->machine, "bank15", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( state->ROMBanks - 1 ) ] );
+				memory_set_bankptr( space->machine(), "bank15", state->ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( state->ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xc1:	/* SRAM bank select
@@ -1076,12 +1076,12 @@ WRITE8_HANDLER( wswan_port_w )
 		case 0xc2:	/* ROM bank select for segment 2 (0x20000 - 0x2ffff)
                    Bit 0-7 - ROM bank for segment 2
                 */
-			memory_set_bankptr( space->machine, "bank2", state->ROMMap[ data & ( state->ROMBanks - 1 ) ]);
+			memory_set_bankptr( space->machine(), "bank2", state->ROMMap[ data & ( state->ROMBanks - 1 ) ]);
 			break;
 		case 0xc3:	/* ROM bank select for segment 3 (0x30000-0x3ffff)
                    Bit 0-7 - ROM bank for segment 3
                 */
-			memory_set_bankptr( space->machine, "bank3", state->ROMMap[ data & ( state->ROMBanks - 1 ) ]);
+			memory_set_bankptr( space->machine(), "bank3", state->ROMMap[ data & ( state->ROMBanks - 1 ) ]);
 			break;
 		case 0xc6:	/* EEPROM address lower bits port/EEPROM address and command port
                    1KBit EEPROM:
@@ -1257,7 +1257,7 @@ WRITE8_HANDLER( wswan_port_w )
 				state->ws_portram[0xcb] = state->rtc.year;
 				break;
 			default:
-				logerror( "%X: Unknown RTC command (%X) requested\n", cpu_get_pc( space->cpu ), data );
+				logerror( "%X: Unknown RTC command (%X) requested\n", cpu_get_pc( &space->device() ), data );
 			}
 			break;
 		case 0xcb:	/* RTC Data */
@@ -1326,7 +1326,7 @@ static const char* wswan_determine_romsize( UINT8 data )
 
 DEVICE_START(wswan_cart)
 {
-	wswan_state *state = device->machine->driver_data<wswan_state>();
+	wswan_state *state = device->machine().driver_data<wswan_state>();
 	/* Initialize EEPROM structure */
 	memset( &state->eeprom, 0, sizeof( state->eeprom ) );
 	state->eeprom.data = NULL;
@@ -1347,7 +1347,7 @@ DEVICE_START(wswan_cart)
 
 DEVICE_IMAGE_LOAD(wswan_cart)
 {
-	wswan_state *state = image.device().machine->driver_data<wswan_state>();
+	wswan_state *state = image.device().machine().driver_data<wswan_state>();
 	UINT32 ii, size;
 	const char *sram_str;
 
@@ -1356,13 +1356,13 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	else
 		size = image.get_software_region_length("rom");
 
-	state->ws_ram = (UINT8*) image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0);
+	state->ws_ram = (UINT8*) image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0);
 	memset(state->ws_ram, 0, 0xffff);
 	state->ROMBanks = size / 65536;
 
 	for (ii = 0; ii < state->ROMBanks; ii++)
 	{
-		if ((state->ROMMap[ii] = auto_alloc_array(image.device().machine, UINT8, 0x10000)))
+		if ((state->ROMMap[ii] = auto_alloc_array(image.device().machine(), UINT8, 0x10000)))
 		{
 			if (image.software_entry() == NULL)
 			{
@@ -1413,7 +1413,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 
 	if (state->eeprom.size != 0)
 	{
-		state->eeprom.data = auto_alloc_array(image.device().machine, UINT8, state->eeprom.size);
+		state->eeprom.data = auto_alloc_array(image.device().machine(), UINT8, state->eeprom.size);
 		image.battery_load(state->eeprom.data, state->eeprom.size, 0x00);
 		state->eeprom.page = state->eeprom.data;
 	}
@@ -1431,7 +1431,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 
 static TIMER_CALLBACK(wswan_scanline_interrupt)
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	if( state->vdp.current_line < 144 )
 	{
 		wswan_refresh_scanline(machine);
@@ -1460,7 +1460,7 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	/* Handle Sound DMA */
 	if ( ( state->sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM );
+		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
 		wswan_port_w( space, 0x89, space->read_byte(state->sound_dma.source ) );
 		state->sound_dma.size--;
@@ -1513,11 +1513,11 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 			state->vdp.display_vertical = state->vdp.new_display_vertical;
 			if ( state->vdp.display_vertical )
 			{
-				machine->primary_screen->set_visible_area(5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
+				machine.primary_screen->set_visible_area(5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
 			}
 			else
 			{
-				machine->primary_screen->set_visible_area(0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
+				machine.primary_screen->set_visible_area(0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
 			}
 		}
 	}

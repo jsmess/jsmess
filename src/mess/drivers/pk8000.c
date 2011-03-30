@@ -29,15 +29,15 @@ public:
 
 
 
-static device_t *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine->device("cassette");
+	return machine.device("cassette");
 }
 
-static void pk8000_set_bank(running_machine *machine,UINT8 data)
+static void pk8000_set_bank(running_machine &machine,UINT8 data)
 {
-	UINT8 *rom = machine->region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -95,30 +95,30 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 }
 static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
 {
-	pk8000_set_bank(device->machine,data);
+	pk8000_set_bank(device->machine(),data);
 }
 
 static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 {
-	pk8000_state *state = device->machine->driver_data<pk8000_state>();
+	pk8000_state *state = device->machine().driver_data<pk8000_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	if(state->keyboard_line>9) {
 		return 0xff;
 	}
-	return input_port_read(device->machine,keynames[state->keyboard_line]);
+	return input_port_read(device->machine(),keynames[state->keyboard_line]);
 }
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
-	pk8000_state *state = device->machine->driver_data<pk8000_state>();
+	pk8000_state *state = device->machine().driver_data<pk8000_state>();
 	state->keyboard_line = data & 0x0f;
 
-	speaker_level_w(device->machine->device("speaker"), BIT(data,7));
+	speaker_level_w(device->machine().device("speaker"), BIT(data,7));
 
-	cassette_change_state(cassette_device_image(device->machine),
+	cassette_change_state(cassette_device_image(device->machine()),
 						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 						CASSETTE_MASK_MOTOR);
-	cassette_output(cassette_device_image(device->machine), (BIT(data,6)) ? +1.0 : 0.0);
+	cassette_output(cassette_device_image(device->machine()), (BIT(data,6)) ? +1.0 : 0.0);
 }
 
 static I8255A_INTERFACE( pk8000_ppi8255_interface_1 )
@@ -157,14 +157,14 @@ static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
 
 static READ8_HANDLER(pk8000_joy_1_r)
 {
-	UINT8 retVal = (cassette_input(cassette_device_image(space->machine)) > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(space->machine, "JOY1") & 0x7f;
+	UINT8 retVal = (cassette_input(cassette_device_image(space->machine())) > 0.0038 ? 0x80 : 0);
+	retVal |= input_port_read(space->machine(), "JOY1") & 0x7f;
 	return retVal;
 }
 static READ8_HANDLER(pk8000_joy_2_r)
 {
-	UINT8 retVal = (cassette_input(cassette_device_image(space->machine)) > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(space->machine, "JOY2") & 0x7f;
+	UINT8 retVal = (cassette_input(cassette_device_image(space->machine())) > 0.0038 ? 0x80 : 0);
+	retVal |= input_port_read(space->machine(), "JOY2") & 0x7f;
 	return retVal;
 }
 
@@ -316,7 +316,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 static MACHINE_RESET(pk8000)
 {
 	pk8000_set_bank(machine,0);
-	device_set_irq_callback(machine->device("maincpu"), pk8000_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pk8000_irq_callback);
 }
 
 static VIDEO_START( pk8000 )
@@ -325,7 +325,7 @@ static VIDEO_START( pk8000 )
 
 static SCREEN_UPDATE( pk8000 )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, ram_get_ptr(screen->machine->device(RAM_TAG)));
+	return pk8000_video_update(screen, bitmap, cliprect, ram_get_ptr(screen->machine().device(RAM_TAG)));
 }
 
 /* Machine driver */

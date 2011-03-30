@@ -13,9 +13,9 @@
 #include "cpu/minx/minx.h"
 
 
-static void pokemini_check_irqs( running_machine *machine )
+static void pokemini_check_irqs( running_machine &machine )
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	int irq_set[4] = { 1, 0, 0, 0 };
 	int prio, vector;
 
@@ -167,10 +167,10 @@ static void pokemini_check_irqs( running_machine *machine )
 }
 
 
-static void pokemini_update_sound( running_machine *machine )
+static void pokemini_update_sound( running_machine &machine )
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
-	device_t *speaker = machine->device("speaker");
+	pokemini_state *state = machine.driver_data<pokemini_state>();
+	device_t *speaker = machine.device("speaker");
 	/* Check if sound should be muted */
 	if ( state->pm_reg[0x70] & 0x03 )
 	{
@@ -194,7 +194,7 @@ static void pokemini_update_sound( running_machine *machine )
 
 static TIMER_CALLBACK(pokemini_seconds_timer_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	if ( state->pm_reg[0x08] & 0x01 )
 	{
 		state->pm_reg[0x09] += 1;
@@ -212,7 +212,7 @@ static TIMER_CALLBACK(pokemini_seconds_timer_callback)
 
 static TIMER_CALLBACK(pokemini_256hz_timer_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	if ( state->pm_reg[0x40] & 0x01 )
 	{
 		state->pm_reg[0x41] += 1;
@@ -247,7 +247,7 @@ static TIMER_CALLBACK(pokemini_256hz_timer_callback)
 
 static TIMER_CALLBACK(pokemini_timer1_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	state->pm_reg[0x36] -= 1;
 	/* Check for underflow of timer */
 	if ( state->pm_reg[0x36] == 0xFF )
@@ -276,7 +276,7 @@ static TIMER_CALLBACK(pokemini_timer1_callback)
 
 static TIMER_CALLBACK(pokemini_timer1_hi_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	state->pm_reg[0x37] -= 1;
 	/* Check for underflow of timer */
 	if ( state->pm_reg[0x37] == 0xFF )
@@ -290,7 +290,7 @@ static TIMER_CALLBACK(pokemini_timer1_hi_callback)
 
 static TIMER_CALLBACK(pokemini_timer2_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	state->pm_reg[0x3E] -= 1;
 	/* Check for underflow of timer */
 	if ( state->pm_reg[0x3E] == 0xFF )
@@ -319,7 +319,7 @@ static TIMER_CALLBACK(pokemini_timer2_callback)
 
 static TIMER_CALLBACK(pokemini_timer2_hi_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	state->pm_reg[0x3F] -= 1;
 	/* Check for underfow of timer */
 	if ( state->pm_reg[0x3F] == 0xFF )
@@ -333,7 +333,7 @@ static TIMER_CALLBACK(pokemini_timer2_hi_callback)
 
 static TIMER_CALLBACK(pokemini_timer3_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	state->pm_reg[0x4E] -= 1;
 	/* Check for underflow of timer */
 	if ( state->pm_reg[0x4E] == 0xFF )
@@ -370,7 +370,7 @@ static TIMER_CALLBACK(pokemini_timer3_callback)
 
 static TIMER_CALLBACK(pokemini_timer3_hi_callback)
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	state->pm_reg[0x4F] -= 1;
 	/* Check for underflow of timer */
 	if ( state->pm_reg[0x4F] == 0xFF )
@@ -394,11 +394,11 @@ static TIMER_CALLBACK(pokemini_timer3_hi_callback)
 
 WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 {
-	pokemini_state *state = device->machine->driver_data<pokemini_state>();
+	pokemini_state *state = device->machine().driver_data<pokemini_state>();
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	//logerror( "%0X: Write to hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", cpu_get_pc( &space->device() ), offset, data );
 
 	switch( offset )
 	{
@@ -412,7 +412,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 	case 0x02:	/* CPU related?
                Bit 0-7 R/W Unknown
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine->firstcpu ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine().firstcpu ), offset, data );
 		break;
 	case 0x08:	/* Seconds-timer control
                Bit 0   R/W Timer enable
@@ -444,7 +444,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 5   R   Battery status: 0 - battery OK, 1 - battery low
                Bit 6-7     Unused
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine->firstcpu ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine().firstcpu ), offset, data );
 		break;
 	case 0x18:	/* Timer 1 pre-scale + enable
                Bit 0-2 R/W low timer 1 prescaler select
@@ -466,7 +466,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x19] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer1->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -475,7 +475,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x19] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer1_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1_hi->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer1 low should be enabled */
@@ -516,7 +516,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x18] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer1->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the low counter */
@@ -525,7 +525,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x18] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer1_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1_hi->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		{
@@ -595,7 +595,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x1B] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer2->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -604,7 +604,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x1B] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer2_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2_hi->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -641,7 +641,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x1A] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer2->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1A] & 0x08 ) && ( state->pm_reg[0x38] & 0x04 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
@@ -661,7 +661,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x1A] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer2_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2_hi->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1A] & 0x80 ) && ( state->pm_reg[0x39] & 0x04 ) && ! ( state->pm_reg[0x38] & 0x80 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
@@ -695,7 +695,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x1D] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer3->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -704,7 +704,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x1D] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer3_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3_hi->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -741,7 +741,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x1C] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer3->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1C] & 0x08 ) && ( state->pm_reg[0x48] & 0x04 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
@@ -761,7 +761,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x1C] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			state->timers.timer3_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3_hi->adjust(attotime::zero, 0, device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1C] & 0x80 ) && ( state->pm_reg[0x49] & 0x04 ) && ! ( state->pm_reg[0x48] & 0x80 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
@@ -782,7 +782,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 6-7 R/W VDraw/VBlank trigger Interrupt #1-#2
             */
 		state->pm_reg[0x20] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x21:	/* Event #15-#22 priority
                Bit 0-1 R/W Unknown
@@ -790,14 +790,14 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 4-7 R/W Unknown
             */
 		state->pm_reg[0x21] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x22:	/* Event #9-#14 priority
                Bit 0-1 R/W All #9 - #14 events - Interrupt #9-#14
                Bit 2-7     Unused
             */
 		state->pm_reg[0x22] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x23:	/* Event #1-#8 enable
                Bit 0   R/W Timer 3 overflow (mirror) - Enable Interrupt #8
@@ -810,14 +810,14 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 7   R/W V-Blank trigger - Enable Interrupt #1
             */
 		state->pm_reg[0x23] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x24:	/* Event #9-#12 enable
                Bit 0-5 R/W Unknown
                Bit 6-7     Unused
             */
 		state->pm_reg[0x24] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x25:	/* Event #15-#22 enable
                Bit 0   R/W Press key "A" event - Enable interrupt #22
@@ -830,7 +830,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 7   R/W Press power button event - Enable interrupt #15
             */
 		state->pm_reg[0x25] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x26:	/* Event #13-#14 enable
                Bit 0-2 R/W Unknown
@@ -840,7 +840,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 7   R/W IR receiver - low to high trigger - Enable interrupt #13
             */
 		state->pm_reg[0x26] = data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		break;
 	case 0x27:	/* Interrupt active flag #1-#8
                Bit 0       Timer 3 overflow (mirror) / Clear interrupt #8
@@ -853,7 +853,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 7       VBlank trigger / Clear interrupt #1
             */
 		state->pm_reg[0x27] &= ~data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		return;
 	case 0x28:	/* Interrupt active flag #9-#12
                Bit 0-1     Unknown
@@ -864,7 +864,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 6-7     Unknown
             */
 		state->pm_reg[0x28] &= ~data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		return;
 	case 0x29:	/* Interrupt active flag #15-#22
                Bit 0       Press key "A" event / Clear interrupt #22
@@ -877,7 +877,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 7       Press power button event / Clear interrupt #15
             */
 		state->pm_reg[0x29] &= ~data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		return;
 	case 0x2A:	/* Interrupt active flag #13-#14
                Bit 0-5     Unknown
@@ -885,7 +885,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 7       Unknown / Clear interrupt #13
             */
 		state->pm_reg[0x2A] &= ~data;
-		pokemini_check_irqs( device->machine );
+		pokemini_check_irqs(device->machine());
 		return;
 	case 0x30:	/* Timer 1 control 1
                Bit 0   R/W Unknown
@@ -959,7 +959,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
             */
 	case 0x35:	/* Timer 1 sound-pivot (high, unused)
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine->firstcpu ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine().firstcpu ), offset, data );
 		break;
 	case 0x36:	/* Timer 1 counter (low), read only
             */
@@ -1038,7 +1038,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
             */
 	case 0x3D:	/* Timer 2 sound-pivot (high, unused)
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine->firstcpu ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine().firstcpu ), offset, data );
 		break;
 	case 0x3E:	/* Timer 2 counter (low), read only
                Bit 0-7 R/W Timer 2 counter value bit 0-7
@@ -1098,7 +1098,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			state->timers.timer3_hi->enable( 0 );
 		}
 		state->pm_reg[0x48] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x49:	/* Timer 3 control 2
                Bit 0   R/W Unknown
@@ -1124,25 +1124,25 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			state->timers.timer3_hi->enable( 0 );
 		}
 		state->pm_reg[0x49] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x4A:	/* Timer 3 preset value (low)
                Bit 0-7 R/W Timer 3 preset value bit 0-7
             */
 		state->pm_reg[0x4A] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x4B:	/* Timer 3 preset value (high)
                Bit 0-7 R/W Timer 3 preset value bit 8-15
             */
 		state->pm_reg[0x4B] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x4C:	/* Timer 3 sound-pivot (low)
                Bit 0-7 R/W Timer 3 sound-pivot value bit 0-7
             */
 		state->pm_reg[0x4C] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x4D:	/* Timer 3 sound-pivot (high)
                Bit 0-7 R/W Timer 3 sound-pivot value bit 8-15
@@ -1153,7 +1153,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Pulse-Width of 100% = Same as preset-value
             */
 		state->pm_reg[0x4D] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x4E:	/* Timer 3 counter (low), read only
                Bit 0-7 R/W Timer 3 counter value bit 0-7
@@ -1203,7 +1203,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		break;
 	case 0x70:	/* Sound related */
 		state->pm_reg[0x70] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x71:	/* Sound volume
                Bit 0-1 R/W Sound volume
@@ -1215,7 +1215,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                Bit 3-7     Unused
             */
 		state->pm_reg[0x71] = data;
-		pokemini_update_sound( device->machine );
+		pokemini_update_sound(device->machine());
 		break;
 	case 0x80:	/* LCD control
                Bit 0   R/W Invert colors; 0 - normal, 1 - inverted
@@ -1303,7 +1303,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
                            Map size 2: 0x00 to 0x60
                Bit 7       Unused
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine->firstcpu ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine().firstcpu ), offset, data );
 		break;
 	case 0x87:	/* Sprite tile data memory offset (low)
                Bit 0-5     Always "0"
@@ -1344,7 +1344,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 //      lcd_data_w( data );
 		break;
 	default:
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine->firstcpu ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( device->machine().firstcpu ), offset, data );
 		break;
 	}
 	state->pm_reg[offset] = data;
@@ -1352,12 +1352,12 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 
 READ8_DEVICE_HANDLER( pokemini_hwreg_r )
 {
-	pokemini_state *state = device->machine->driver_data<pokemini_state>();
+	pokemini_state *state = device->machine().driver_data<pokemini_state>();
 	UINT8 data = state->pm_reg[offset];
 
 	switch( offset )
 	{
-	case 0x52:	return input_port_read(device->machine, "INPUTS");
+	case 0x52:	return input_port_read(device->machine(), "INPUTS");
 	case 0x61:
 		if ( ! ( state->pm_reg[0x60] & 0x04 ) )
 		{
@@ -1399,7 +1399,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 		image.fseek(0x2100, SEEK_SET);
 		size -= 0x2100;
 
-		if (size != image.fread( image.device().machine->region("maincpu")->base() + 0x2100, size))
+		if (size != image.fread( image.device().machine().region("maincpu")->base() + 0x2100, size))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image");
 			return IMAGE_INIT_FAIL;
@@ -1409,7 +1409,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 	{
 		UINT8 *cart_rom = image.get_software_region("rom");
 		UINT32 cart_rom_size = image.get_software_region_length("rom");
-		memcpy(image.device().machine->region("maincpu")->base() + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
+		memcpy(image.device().machine().region("maincpu")->base() + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -1418,8 +1418,8 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 
 static TIMER_CALLBACK( pokemini_prc_counter_callback )
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
-	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
+	pokemini_state *state = machine.driver_data<pokemini_state>();
+	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	state->prc.count++;
 
 	/* Check for overflow */
@@ -1536,14 +1536,14 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 					for( x = 0; x < 96; x++ ) {
 						UINT8 data = state->ram[ ( y * 12 ) + x ];
 
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 0, x) = ( data & 0x01 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 1, x) = ( data & 0x02 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 2, x) = ( data & 0x04 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 3, x) = ( data & 0x08 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 4, x) = ( data & 0x10 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 5, x) = ( data & 0x20 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 6, x) = ( data & 0x40 ) ? 3 : 0;
-						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 7, x) = ( data & 0x80 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 0, x) = ( data & 0x01 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 1, x) = ( data & 0x02 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 2, x) = ( data & 0x04 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 3, x) = ( data & 0x08 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 4, x) = ( data & 0x10 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 5, x) = ( data & 0x20 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 6, x) = ( data & 0x40 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 7, x) = ( data & 0x80 ) ? 3 : 0;
 					}
 				}
 
@@ -1561,29 +1561,29 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 
 MACHINE_START( pokemini )
 {
-	pokemini_state *state = machine->driver_data<pokemini_state>();
+	pokemini_state *state = machine.driver_data<pokemini_state>();
 	/* Clear internal structures */
 	memset( &state->prc, 0, sizeof(state->prc) );
 	memset( &state->timers, 0, sizeof(state->timers) );
 	memset( state->pm_reg, 0, sizeof(state->pm_reg) );
 
 	/* Set up timers */
-	state->timers.seconds_timer = machine->scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
+	state->timers.seconds_timer = machine.scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
 	state->timers.seconds_timer->adjust( attotime::zero, 0, attotime::from_seconds( 1 ) );
 
-	state->timers.hz256_timer = machine->scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
+	state->timers.hz256_timer = machine.scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
 	state->timers.hz256_timer->adjust( attotime::zero, 0, attotime::from_hz( 256 ) );
 
-	state->timers.timer1 = machine->scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
-	state->timers.timer1_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
-	state->timers.timer2 = machine->scheduler().timer_alloc(FUNC(pokemini_timer2_callback));
-	state->timers.timer2_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer2_hi_callback));
-	state->timers.timer3 = machine->scheduler().timer_alloc(FUNC(pokemini_timer3_callback));
-	state->timers.timer3_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer3_hi_callback));
+	state->timers.timer1 = machine.scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
+	state->timers.timer1_hi = machine.scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
+	state->timers.timer2 = machine.scheduler().timer_alloc(FUNC(pokemini_timer2_callback));
+	state->timers.timer2_hi = machine.scheduler().timer_alloc(FUNC(pokemini_timer2_hi_callback));
+	state->timers.timer3 = machine.scheduler().timer_alloc(FUNC(pokemini_timer3_callback));
+	state->timers.timer3_hi = machine.scheduler().timer_alloc(FUNC(pokemini_timer3_hi_callback));
 
 	/* Set up the PRC */
 	state->prc.max_frame_count = 2;
-	state->prc.count_timer = machine->scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
-	state->prc.count_timer->adjust( attotime::zero, 0, machine->device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
+	state->prc.count_timer = machine.scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
+	state->prc.count_timer->adjust( attotime::zero, 0, machine.device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
 }
 

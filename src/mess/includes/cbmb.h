@@ -61,8 +61,8 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
 void cbmb_irq(device_t *device, int level);
 
-int cbmb_dma_read(running_machine *machine, int offset);
-int cbmb_dma_read_color(running_machine *machine, int offset);
+int cbmb_dma_read(running_machine &machine, int offset);
+int cbmb_dma_read_color(running_machine &machine, int offset);
 
 WRITE8_DEVICE_HANDLER( cbmb_change_font );
 
@@ -84,11 +84,11 @@ MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
 WRITE_LINE_DEVICE_HANDLER( cbmb_display_enable_changed );
 
-void cbm600_vh_init(running_machine *machine);
-void cbm700_vh_init(running_machine *machine);
+void cbm600_vh_init(running_machine &machine);
+void cbm700_vh_init(running_machine &machine);
 VIDEO_START( cbm700 );
 
-void cbmb_vh_set_font(running_machine *machine, int font);
+void cbmb_vh_set_font(running_machine &machine, int font);
 
 
 #endif /* CBMB_H_ */

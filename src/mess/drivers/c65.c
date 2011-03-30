@@ -215,30 +215,30 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 
 static SCREEN_UPDATE( c65 )
 {
-	device_t *vic3 = screen->machine->device("vic3");
+	device_t *vic3 = screen->machine().device("vic3");
 
 	vic3_video_update(vic3, bitmap, cliprect);
 	return 0;
 }
 
-static UINT8 c65_lightpen_x_cb( running_machine *machine )
+static UINT8 c65_lightpen_x_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTX") & ~0x01;
 }
 
-static UINT8 c65_lightpen_y_cb( running_machine *machine )
+static UINT8 c65_lightpen_y_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTY") & ~0x01;
 }
 
-static UINT8 c65_lightpen_button_cb( running_machine *machine )
+static UINT8 c65_lightpen_button_cb( running_machine &machine )
 {
 	return input_port_read(machine, "OTHER") & 0x04;
 }
 
-static UINT8 c65_c64_mem_r( running_machine *machine, int offset )
+static UINT8 c65_c64_mem_r( running_machine &machine, int offset )
 {
-	c65_state *state = machine->driver_data<c65_state>();
+	c65_state *state = machine.driver_data<c65_state>();
 	return state->memory[offset];
 }
 
@@ -272,7 +272,7 @@ static const vic3_interface c65_vic3_pal_intf = {
 
 static INTERRUPT_GEN( vic3_raster_irq )
 {
-	device_t *vic3 = device->machine->device("vic3");
+	device_t *vic3 = device->machine().device("vic3");
 
 	vic3_raster_interrupt_gen(vic3);
 }

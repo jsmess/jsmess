@@ -503,7 +503,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 
 WRITE32_HANDLER( sh2_internal_w )
 {
-	sh2_state *sh2 = GET_SH2(space->cpu);
+	sh2_state *sh2 = GET_SH2(&space->device());
 	UINT32 old;
 
 #ifdef USE_SH2DRC
@@ -517,7 +517,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
 
 //    if(offset != 0x20)
-//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(space->cpu));
+//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(&space->device()));
 
 	switch( offset )
 	{
@@ -681,7 +681,7 @@ WRITE32_HANDLER( sh2_internal_w )
 
 READ32_HANDLER( sh2_internal_r )
 {
-	sh2_state *sh2 = GET_SH2(space->cpu);
+	sh2_state *sh2 = GET_SH2(&space->device());
 
 #ifdef USE_SH2DRC
 	offset &= 0x7f;
@@ -923,17 +923,17 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
 	int i;
 
-	sh2->timer = device->machine->scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);
+	sh2->timer = device->machine().scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);
 	sh2->timer->adjust(attotime::never);
 
-	sh2->dma_current_active_timer[0] = device->machine->scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
+	sh2->dma_current_active_timer[0] = device->machine().scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
 	sh2->dma_current_active_timer[0]->adjust(attotime::never);
 
-	sh2->dma_current_active_timer[1] = device->machine->scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
+	sh2->dma_current_active_timer[1] = device->machine().scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
 	sh2->dma_current_active_timer[1]->adjust(attotime::never);
 
 
-	sh2->m = auto_alloc_array(device->machine, UINT32, 0x200/4);
+	sh2->m = auto_alloc_array(device->machine(), UINT32, 0x200/4);
 
 	if(conf)
 	{

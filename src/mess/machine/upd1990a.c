@@ -495,24 +495,24 @@ static DEVICE_START( upd1990a )
 	devcb_resolve_write_line(&upd1990a->out_tp_func, &intf->out_tp_func, device);
 
 	/* create the timers */
-	upd1990a->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
+	upd1990a->clock_timer = device->machine().scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
 	upd1990a->clock_timer->adjust(attotime::zero, 0, attotime::from_hz(1));
 
-	upd1990a->tp_timer = device->machine->scheduler().timer_alloc(FUNC(tp_tick), (void *)device);
+	upd1990a->tp_timer = device->machine().scheduler().timer_alloc(FUNC(tp_tick), (void *)device);
 
-	upd1990a->data_out_timer = device->machine->scheduler().timer_alloc(FUNC(data_out_tick), (void *)device);
+	upd1990a->data_out_timer = device->machine().scheduler().timer_alloc(FUNC(data_out_tick), (void *)device);
 
 	/* register for state saving */
-    state_save_register_global_array(device->machine, upd1990a->time_counter);
-    state_save_register_global_array(device->machine, upd1990a->shift_reg);
-    state_save_register_global(device->machine, upd1990a->oe);
-    state_save_register_global(device->machine, upd1990a->cs);
-    state_save_register_global(device->machine, upd1990a->stb);
-	state_save_register_global(device->machine, upd1990a->data_in);
-    state_save_register_global(device->machine, upd1990a->data_out);
-    state_save_register_global(device->machine, upd1990a->c);
-    state_save_register_global(device->machine, upd1990a->clk);
-    state_save_register_global(device->machine, upd1990a->tp);
+    state_save_register_global_array(device->machine(), upd1990a->time_counter);
+    state_save_register_global_array(device->machine(), upd1990a->shift_reg);
+    state_save_register_global(device->machine(), upd1990a->oe);
+    state_save_register_global(device->machine(), upd1990a->cs);
+    state_save_register_global(device->machine(), upd1990a->stb);
+	state_save_register_global(device->machine(), upd1990a->data_in);
+    state_save_register_global(device->machine(), upd1990a->data_out);
+    state_save_register_global(device->machine(), upd1990a->c);
+    state_save_register_global(device->machine(), upd1990a->clk);
+    state_save_register_global(device->machine(), upd1990a->tp);
 }
 
 static DEVICE_RESET( upd1990a )
@@ -521,7 +521,7 @@ static DEVICE_RESET( upd1990a )
 
 	system_time curtime, *systime = &curtime;
 
-	device->machine->current_datetime(curtime);
+	device->machine().current_datetime(curtime);
 
 	/* HACK: load time counter from system time */
 	upd1990a->time_counter[0] = convert_to_bcd(systime->local_time.second);

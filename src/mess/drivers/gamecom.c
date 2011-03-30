@@ -91,7 +91,7 @@ static PALETTE_INIT( gamecom )
 
 static INTERRUPT_GEN( gamecom_interrupt )
 {
-	cputag_set_input_line(device->machine, "maincpu", LCDC_INT, ASSERT_LINE );
+	cputag_set_input_line(device->machine(), "maincpu", LCDC_INT, ASSERT_LINE );
 }
 
 static MACHINE_CONFIG_START( gamecom, gamecom_state )

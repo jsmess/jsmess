@@ -596,7 +596,7 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 	const hash_info *info = NULL;
 	
 	/* open the hash file */
-	hashfile = hashfile_open(image.device().machine->options(), sysname, FALSE, NULL);
+	hashfile = hashfile_open(image.device().machine().options(), sysname, FALSE, NULL);
 	if (!hashfile)
 		return NULL;
 	
@@ -609,7 +609,7 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 		return NULL;
 	}
 	
-	extra_info = auto_strdup(image.device().machine,info->extrainfo);
+	extra_info = auto_strdup(image.device().machine(),info->extrainfo);
 	if (!extra_info)
 	{
 		hashfile_close(hashfile);
@@ -630,7 +630,7 @@ const char *hashfile_extrainfo(device_image_interface &image)
 	/* now read the hash file */
 	image.crc();
 	extra_info = NULL;
-	drv = &image.device().machine->system();
+	drv = &image.device().machine().system();
 	do
 	{
 		rc = read_hash_config(image, drv->name);

@@ -39,7 +39,7 @@ public:
 #define ENABLE_VERBOSE_LOG (1)
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -48,7 +48,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(machine->device("maincpu")), buf);
+		logerror("%08x: %s", cpu_get_pc(machine.device("maincpu")), buf);
 	}
 }
 #else
@@ -75,23 +75,23 @@ static SCREEN_UPDATE( sgi_ip6 )
 
 static READ32_HANDLER( ip6_unk1_r )
 {
-	sgi_ip6_state *state = space->machine->driver_data<sgi_ip6_state>();
+	sgi_ip6_state *state = space->machine().driver_data<sgi_ip6_state>();
 	UINT32 ret = 0;
 	switch(offset)
 	{
 		case 0x0000/4:
 			if(ACCESSING_BITS_16_31)
 			{
-				verboselog(space->machine, 0, "ip6_unk1_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
+				verboselog(space->machine(), 0, "ip6_unk1_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
 			}
 			if(ACCESSING_BITS_0_15)
 			{
-				verboselog(space->machine, 0, "ip6_unk1_r: Unknown Halfword 0: %08x & %08x\n", state->ip6_regs.unknown_half_0, mem_mask );
+				verboselog(space->machine(), 0, "ip6_unk1_r: Unknown Halfword 0: %08x & %08x\n", state->ip6_regs.unknown_half_0, mem_mask );
 				ret |= state->ip6_regs.unknown_half_0;
 			}
 			break;
 		default:
-			verboselog(space->machine, 0, "ip6_unk1_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
+			verboselog(space->machine(), 0, "ip6_unk1_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
 			break;
 	}
 	return ret;
@@ -99,45 +99,45 @@ static READ32_HANDLER( ip6_unk1_r )
 
 static WRITE32_HANDLER( ip6_unk1_w )
 {
-	sgi_ip6_state *state = space->machine->driver_data<sgi_ip6_state>();
+	sgi_ip6_state *state = space->machine().driver_data<sgi_ip6_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 			if(ACCESSING_BITS_16_31)
 			{
-				verboselog(space->machine, 0, "ip6_unk1_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
+				verboselog(space->machine(), 0, "ip6_unk1_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
 			}
 			if(ACCESSING_BITS_0_15)
 			{
-				verboselog(space->machine, 0, "ip6_unk1_w: Unknown Halfword 0 = %04x & %04x\n", data & 0x0000ffff, mem_mask & 0x0000ffff );
+				verboselog(space->machine(), 0, "ip6_unk1_w: Unknown Halfword 0 = %04x & %04x\n", data & 0x0000ffff, mem_mask & 0x0000ffff );
 				state->ip6_regs.unknown_half_0 = data & 0x0000ffff;
 			}
 			break;
 		default:
-			verboselog(space->machine, 0, "ip6_unk1_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
+			verboselog(space->machine(), 0, "ip6_unk1_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
 
 static READ32_HANDLER( ip6_unk2_r )
 {
-	sgi_ip6_state *state = space->machine->driver_data<sgi_ip6_state>();
+	sgi_ip6_state *state = space->machine().driver_data<sgi_ip6_state>();
 	UINT32 ret = 0;
 	switch(offset)
 	{
 		case 0x0000/4:
 			if(!ACCESSING_BITS_24_31)
 			{
-				verboselog(space->machine, 0, "ip6_unk2_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
+				verboselog(space->machine(), 0, "ip6_unk2_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
 			}
 			if(ACCESSING_BITS_24_31)
 			{
-				verboselog(space->machine, 0, "ip6_unk2_r: Unknown Byte 0 = %02x & %02x\n", state->ip6_regs.unknown_byte_0, mem_mask >> 24 );
+				verboselog(space->machine(), 0, "ip6_unk2_r: Unknown Byte 0 = %02x & %02x\n", state->ip6_regs.unknown_byte_0, mem_mask >> 24 );
 				ret |= state->ip6_regs.unknown_byte_0 << 24;
 			}
 			break;
 		default:
-			verboselog(space->machine, 0, "ip6_unk2_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
+			verboselog(space->machine(), 0, "ip6_unk2_r: Unknown address: %08x & %08x\n", 0x1f880000 + (offset << 2), mem_mask );
 			break;
 	}
 	return ret;
@@ -145,45 +145,45 @@ static READ32_HANDLER( ip6_unk2_r )
 
 static WRITE32_HANDLER( ip6_unk2_w )
 {
-	sgi_ip6_state *state = space->machine->driver_data<sgi_ip6_state>();
+	sgi_ip6_state *state = space->machine().driver_data<sgi_ip6_state>();
 	switch(offset)
 	{
 		case 0x0000/4:
 			if(!ACCESSING_BITS_24_31)
 			{
-				verboselog(space->machine, 0, "ip6_unk2_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
+				verboselog(space->machine(), 0, "ip6_unk2_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
 			}
 			if(ACCESSING_BITS_24_31)
 			{
-				verboselog(space->machine, 0, "ip6_unk2_w: Unknown Byte 0 = %02x & %02x\n", data >> 24, mem_mask >> 24 );
+				verboselog(space->machine(), 0, "ip6_unk2_w: Unknown Byte 0 = %02x & %02x\n", data >> 24, mem_mask >> 24 );
 				state->ip6_regs.unknown_byte_0 = (data & 0xff000000) >> 24;
 			}
 			break;
 		default:
-			verboselog(space->machine, 0, "ip6_unk2_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
+			verboselog(space->machine(), 0, "ip6_unk2_w: Unknown address: %08x = %08x & %08x\n", 0x1f880000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
 
 static READ32_HANDLER(ip6_unk3_r)
 {
-	sgi_ip6_state *state = space->machine->driver_data<sgi_ip6_state>();
+	sgi_ip6_state *state = space->machine().driver_data<sgi_ip6_state>();
 	UINT32 ret = 0;
 	if(ACCESSING_BITS_16_23)
 	{
-		verboselog(space->machine, 0, "ip6_unk3_r: Unknown Byte 1: %02x & %02x\n", state->ip6_regs.unknown_byte_1, (mem_mask >> 16) & 0x000000ff);
+		verboselog(space->machine(), 0, "ip6_unk3_r: Unknown Byte 1: %02x & %02x\n", state->ip6_regs.unknown_byte_1, (mem_mask >> 16) & 0x000000ff);
 		ret |= state->ip6_regs.unknown_byte_1 << 16;
 	}
 	else
 	{
-		verboselog(space->machine, 0, "ip6_unk3_r: Unknown address: %08x & %08x\n", 0x1fb00000 + (offset << 2), mem_mask );
+		verboselog(space->machine(), 0, "ip6_unk3_r: Unknown address: %08x & %08x\n", 0x1fb00000 + (offset << 2), mem_mask );
 	}
 	return ret;
 }
 
 static WRITE32_HANDLER(ip6_unk3_w)
 {
-	verboselog(space->machine, 0, "ip6_unk3_w: Unknown address: %08x = %08x & %08x\n", 0x1fb00000 + (offset << 2), data, mem_mask );
+	verboselog(space->machine(), 0, "ip6_unk3_w: Unknown address: %08x = %08x & %08x\n", 0x1fb00000 + (offset << 2), data, mem_mask );
 }
 
 static INTERRUPT_GEN( sgi_ip6_vbl )
@@ -196,7 +196,7 @@ static MACHINE_START( sgi_ip6 )
 
 static MACHINE_RESET( sgi_ip6 )
 {
-	sgi_ip6_state *state = machine->driver_data<sgi_ip6_state>();
+	sgi_ip6_state *state = machine.driver_data<sgi_ip6_state>();
 	state->ip6_regs.unknown_byte_0 = 0x80;
 	state->ip6_regs.unknown_byte_1 = 0x80;
 	state->ip6_regs.unknown_half_0 = 0;

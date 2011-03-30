@@ -42,7 +42,7 @@
     T6834 IMPLEMENTATION
 ***************************************************************************/
 
-void x07_state::t6834_cmd (running_machine *machine, UINT8 cmd)
+void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 {
 	switch (cmd)
 	{
@@ -52,7 +52,7 @@ void x07_state::t6834_cmd (running_machine *machine, UINT8 cmd)
 	case 0x01:	//DATA$ TIME$ read
 		{
 			system_time systime;
-			machine->current_datetime(systime);
+			machine.current_datetime(systime);
 			m_out.data[m_out.write++] = (systime.local_time.year>>8) & 0xff;
 			m_out.data[m_out.write++] = systime.local_time.year & 0xff;
 			m_out.data[m_out.write++] = systime.local_time.month + 1;
@@ -156,7 +156,7 @@ void x07_state::t6834_cmd (running_machine *machine, UINT8 cmd)
 	case 0x0b:	//calendar
 		{
 				system_time systime;
-				machine->current_datetime(systime);
+				machine.current_datetime(systime);
 				m_out.data[m_out.write++] = systime.local_time.weekday;
 		}
 		break;
@@ -342,8 +342,8 @@ void x07_state::t6834_cmd (running_machine *machine, UINT8 cmd)
 		break;
 	case 0x1c:	//UDC Init
 		{
-			memcpy(m_t6834_ram + 0x200, (UINT8*)machine->region("gfx1")->base() + 0x400, 0x100);
-			memcpy(m_t6834_ram + 0x300, (UINT8*)machine->region("gfx1")->base() + 0x700, 0x100);
+			memcpy(m_t6834_ram + 0x200, (UINT8*)machine.region("gfx1")->base() + 0x400, 0x100);
+			memcpy(m_t6834_ram + 0x300, (UINT8*)machine.region("gfx1")->base() + 0x700, 0x100);
 		}
 		break;
 
@@ -579,7 +579,7 @@ void x07_state::t6834_cmd (running_machine *machine, UINT8 cmd)
 }
 
 
-void x07_state::t6834_r (running_machine *machine)
+void x07_state::t6834_r (running_machine &machine)
 {
 	m_out.read++;
 	m_regs_r[2] &= 0xfe;
@@ -594,7 +594,7 @@ void x07_state::t6834_r (running_machine *machine)
 }
 
 
-void x07_state::t6834_w (running_machine *machine)
+void x07_state::t6834_w (running_machine &machine)
 {
 	if (!m_in.write)
 	{
@@ -665,7 +665,7 @@ void x07_state::t6834_w (running_machine *machine)
 }
 
 
-void x07_state::cassette_r(running_machine *machine)
+void x07_state::cassette_r(running_machine &machine)
 {
 	if (m_k7size && m_k7on && (m_k7pos<=m_k7size))
 	{
@@ -679,7 +679,7 @@ void x07_state::cassette_r(running_machine *machine)
 }
 
 
-void x07_state::cassette_w(running_machine *machine)
+void x07_state::cassette_w(running_machine &machine)
 {
 	//TODO
 }
@@ -689,7 +689,7 @@ void x07_state::cassette_w(running_machine *machine)
     this function emulate the color printer X-710
     only the text functions are emulated
 ****************************************************/
-void x07_state::printer_w(running_machine *machine)
+void x07_state::printer_w(running_machine &machine)
 {
 	UINT16 char_pos = 0;
 	UINT16 text_color = 0;
@@ -772,17 +772,17 @@ inline UINT8 x07_state::get_char(UINT16 pos)
 	}
 	else							//charset
 	{
-		return machine->region("gfx1")->base()[pos];
+		return m_machine.region("gfx1")->base()[pos];
 	}
 }
 
-void x07_state::kb_fun_keys(running_machine *machine, UINT8 idx)
+void x07_state::kb_fun_keys(running_machine &machine, UINT8 idx)
 {
 	UINT8 data = 0;
 
 	if (m_kb_on)
 	{
-		UINT8 shift = (input_port_read(machine, "A1") & 0x01);
+		UINT8 shift = (input_port_read(m_machine, "A1") & 0x01);
 		UINT16 udk_s = udk_offset[(shift*6) +  idx - 1];
 
 		/* First 3 chars are used for description */
@@ -800,11 +800,11 @@ void x07_state::kb_fun_keys(running_machine *machine, UINT8 idx)
 	}
 }
 
-void x07_state::kb_scan_keys(running_machine *machine, UINT8 keycode)
+void x07_state::kb_scan_keys(running_machine &machine, UINT8 keycode)
 {
 	UINT8 modifier;
-	UINT8 a1 = input_port_read(machine, "A1");
-	UINT8 bz = input_port_read(machine, "BZ");
+	UINT8 a1 = input_port_read(m_machine, "A1");
+	UINT8 bz = input_port_read(m_machine, "BZ");
 
 	if (m_kb_on)
 	{
@@ -834,7 +834,7 @@ void x07_state::kb_scan_keys(running_machine *machine, UINT8 keycode)
 }
 
 
-void x07_state::kb_irq(running_machine *machine)
+void x07_state::kb_irq(running_machine &machine)
 {
 	if (m_kb_size)
 	{
@@ -853,7 +853,7 @@ void x07_state::kb_irq(running_machine *machine)
     Video
 ***************************************************************************/
 
-inline void x07_state::draw_char(running_machine *machine, UINT8 x, UINT8 y, UINT8 char_pos)
+inline void x07_state::draw_char(running_machine &machine, UINT8 x, UINT8 y, UINT8 char_pos)
 {
 	if(x < 20 && y < 4)
 		for(int cy = 0; cy < 8; cy++)
@@ -862,14 +862,14 @@ inline void x07_state::draw_char(running_machine *machine, UINT8 x, UINT8 y, UIN
 }
 
 
-inline void x07_state::draw_point(running_machine *machine, UINT8 x, UINT8 y, UINT8 color)
+inline void x07_state::draw_point(running_machine &machine, UINT8 x, UINT8 y, UINT8 color)
 {
 	if(x < 120 && y < 32)
 		m_lcd_map[y][x] = color;
 }
 
 
-inline void x07_state::draw_udk(running_machine *machine)
+inline void x07_state::draw_udk(running_machine &machine)
 {
 	UINT8 i, x, j;
 
@@ -886,8 +886,8 @@ inline void x07_state::draw_udk(running_machine *machine)
 
 static DEVICE_IMAGE_LOAD( x07_cass )
 {
-	running_machine *machine = image.device().machine;
-	x07_state *state = machine->driver_data<x07_state>();
+	running_machine &machine = image.device().machine();
+	x07_state *state = machine.driver_data<x07_state>();
 	UINT8 *tmp_data;
 	UINT32 image_size;
 	char *basename = (char*)image.basename();
@@ -953,8 +953,8 @@ static DEVICE_IMAGE_LOAD( x07_cass )
 
 static DEVICE_IMAGE_UNLOAD( x07_cass )
 {
-	running_machine *machine = image.device().machine;
-	x07_state *state = machine->driver_data<x07_state>();
+	running_machine &machine = image.device().machine();
+	x07_state *state = machine.driver_data<x07_state>();
 
 	auto_free(machine, state->m_k7data);
 	state->m_k7size = state->m_k7pos = 0;
@@ -1079,15 +1079,15 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 
 	case 0xf5:
 		if(data & 0x01)
-			t6834_r(space.machine);
+			t6834_r(space.machine());
 		if(data & 0x02)
-			t6834_w(space.machine);
+			t6834_w(space.machine());
 		if(data & 0x04)
-			cassette_r(space.machine);
+			cassette_r(space.machine());
 		if(data & 0x08)
-			cassette_w(space.machine);
+			cassette_w(space.machine());
 		if(data & 0x20)
-			printer_w(space.machine);
+			printer_w(space.machine());
 
 		m_regs_w[5] = data;
 		break;
@@ -1114,30 +1114,30 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( update_udk )
 {
-	x07_state *state = field->port->machine->driver_data<x07_state>();
+	x07_state *state = field->port->machine().driver_data<x07_state>();
 
-	state->draw_udk(field->port->machine);
+	state->draw_udk(field->port->machine());
 }
 
 static INPUT_CHANGED( kb_keys )
 {
-	x07_state *state = field->port->machine->driver_data<x07_state>();
+	x07_state *state = field->port->machine().driver_data<x07_state>();
 
 	if (!newval)
-		state->kb_scan_keys(field->port->machine, (UINT8)(FPTR)param);
+		state->kb_scan_keys(field->port->machine(), (UINT8)(FPTR)param);
 }
 
 static INPUT_CHANGED( kb_func_keys )
 {
-	x07_state *state = field->port->machine->driver_data<x07_state>();
+	x07_state *state = field->port->machine().driver_data<x07_state>();
 
 	if (newval)
-		state->kb_fun_keys(field->port->machine, (UINT8)(FPTR)param);
+		state->kb_fun_keys(field->port->machine(), (UINT8)(FPTR)param);
 }
 
 static INPUT_CHANGED( kb_break )
 {
-	x07_state *state = field->port->machine->driver_data<x07_state>();
+	x07_state *state = field->port->machine().driver_data<x07_state>();
 
 	if (newval)
 	{
@@ -1253,7 +1253,7 @@ INPUT_PORTS_END
 
 static NVRAM_HANDLER( x07 )
 {
-	x07_state *state = machine->driver_data<x07_state>();
+	x07_state *state = machine.driver_data<x07_state>();
 
 	if (read_or_write)
 	{
@@ -1277,8 +1277,8 @@ static NVRAM_HANDLER( x07 )
 				strcpy((char*)state->m_t6834_ram + udk_offset[i], udk_ini[i]);
 
 			//copy default chars in the UDC
-			memcpy(state->m_t6834_ram + 0x200, (UINT8*)machine->region("gfx1")->base() + 0x400, 0x100);
-			memcpy(state->m_t6834_ram + 0x300, (UINT8*)machine->region("gfx1")->base() + 0x700, 0x100);
+			memcpy(state->m_t6834_ram + 0x200, (UINT8*)machine.region("gfx1")->base() + 0x400, 0x100);
+			memcpy(state->m_t6834_ram + 0x300, (UINT8*)machine.region("gfx1")->base() + 0x700, 0x100);
 			state->m_warm_start = 0;
 		}
 	}
@@ -1286,14 +1286,14 @@ static NVRAM_HANDLER( x07 )
 
 static TIMER_DEVICE_CALLBACK( blink_timer )
 {
-	x07_state *state = timer.machine->driver_data<x07_state>();
+	x07_state *state = timer.machine().driver_data<x07_state>();
 
 	state->m_blink = !state->m_blink;
 }
 
 static TIMER_CALLBACK( rsta_clear )
 {
-	x07_state *state = machine->driver_data<x07_state>();
+	x07_state *state = machine.driver_data<x07_state>();
 	device_set_input_line(state->m_maincpu, NSC800_RSTA, CLEAR_LINE);
 
 	if (state->m_kb_size)
@@ -1302,20 +1302,20 @@ static TIMER_CALLBACK( rsta_clear )
 
 static TIMER_CALLBACK( rstb_clear )
 {
-	x07_state *state = machine->driver_data<x07_state>();
+	x07_state *state = machine.driver_data<x07_state>();
 	device_set_input_line(state->m_maincpu, NSC800_RSTB, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( beep_stop )
 {
-	x07_state *state = machine->driver_data<x07_state>();
+	x07_state *state = machine.driver_data<x07_state>();
 
 	beep_set_state(state->m_beep, 0);
 }
 
 static TIMER_CALLBACK( k7_irq )
 {
-	x07_state *state = machine->driver_data<x07_state>();
+	x07_state *state = machine.driver_data<x07_state>();
 
 	device_set_input_line(state->m_maincpu, NSC800_RSTB, ASSERT_LINE);
 
@@ -1339,50 +1339,50 @@ GFXDECODE_END
 
 void x07_state::machine_start()
 {
-	m_rsta_clear = machine->scheduler().timer_alloc(FUNC(rsta_clear));
-	m_rstb_clear = machine->scheduler().timer_alloc(FUNC(rstb_clear));
-	m_beep_stop = machine->scheduler().timer_alloc(FUNC(beep_stop));
-	m_k7irq = machine->scheduler().timer_alloc(FUNC(k7_irq));
+	m_rsta_clear = m_machine.scheduler().timer_alloc(FUNC(rsta_clear));
+	m_rstb_clear = m_machine.scheduler().timer_alloc(FUNC(rstb_clear));
+	m_beep_stop = m_machine.scheduler().timer_alloc(FUNC(beep_stop));
+	m_k7irq = m_machine.scheduler().timer_alloc(FUNC(k7_irq));
 
 	/* Save State */
-	state_save_register_global(machine, m_sleep);
-	state_save_register_global(machine, m_warm_start);
-	state_save_register_global(machine, m_udk_on);
-	state_save_register_global(machine, m_draw_udk);
-	state_save_register_global(machine, m_sp_on);
-	state_save_register_global(machine, m_font_code);
-	state_save_register_global(machine, m_lcd_on);
-	state_save_register_global(machine, m_scroll_min);
-	state_save_register_global(machine, m_scroll_max);
-	state_save_register_global(machine, m_blink);
-	state_save_register_global(machine, m_kb_on);
-	state_save_register_global(machine, m_repeat_key);
-	state_save_register_global(machine, m_kb_size);
-	state_save_register_global(machine, m_prn_sendbit);
-	state_save_register_global(machine, m_prn_char_code);
-	state_save_register_global(machine, m_prn_size);
-	state_save_register_global(machine, m_k7on);
-	state_save_register_global(machine, m_k7size);
-	state_save_register_global(machine, m_k7pos);
-	state_save_register_global_array(machine, m_t6834_ram);
-	state_save_register_global_array(machine, m_regs_r);
-	state_save_register_global_array(machine, m_regs_w);
-	state_save_register_global_array(machine, m_alarm);
-	state_save_register_global_2d_array(machine, m_lcd_map);
-	state_save_register_global_array(machine, m_prn_buffer);
-	state_save_register_global_pointer(machine, m_k7data, m_k7size);
-	state_save_register_global(machine, m_in.read);
-	state_save_register_global(machine, m_in.write);
-	state_save_register_global_array(machine, m_in.data);
-	state_save_register_global(machine, m_out.read);
-	state_save_register_global(machine, m_out.write);
-	state_save_register_global_array(machine, m_out.data);
-	state_save_register_global(machine, m_locate.x);
-	state_save_register_global(machine, m_locate.y);
-	state_save_register_global(machine, m_locate.on);
-	state_save_register_global(machine, m_cursor.x);
-	state_save_register_global(machine, m_cursor.y);
-	state_save_register_global(machine, m_cursor.on);
+	state_save_register_global(m_machine, m_sleep);
+	state_save_register_global(m_machine, m_warm_start);
+	state_save_register_global(m_machine, m_udk_on);
+	state_save_register_global(m_machine, m_draw_udk);
+	state_save_register_global(m_machine, m_sp_on);
+	state_save_register_global(m_machine, m_font_code);
+	state_save_register_global(m_machine, m_lcd_on);
+	state_save_register_global(m_machine, m_scroll_min);
+	state_save_register_global(m_machine, m_scroll_max);
+	state_save_register_global(m_machine, m_blink);
+	state_save_register_global(m_machine, m_kb_on);
+	state_save_register_global(m_machine, m_repeat_key);
+	state_save_register_global(m_machine, m_kb_size);
+	state_save_register_global(m_machine, m_prn_sendbit);
+	state_save_register_global(m_machine, m_prn_char_code);
+	state_save_register_global(m_machine, m_prn_size);
+	state_save_register_global(m_machine, m_k7on);
+	state_save_register_global(m_machine, m_k7size);
+	state_save_register_global(m_machine, m_k7pos);
+	state_save_register_global_array(m_machine, m_t6834_ram);
+	state_save_register_global_array(m_machine, m_regs_r);
+	state_save_register_global_array(m_machine, m_regs_w);
+	state_save_register_global_array(m_machine, m_alarm);
+	state_save_register_global_2d_array(m_machine, m_lcd_map);
+	state_save_register_global_array(m_machine, m_prn_buffer);
+	state_save_register_global_pointer(m_machine, m_k7data, m_k7size);
+	state_save_register_global(m_machine, m_in.read);
+	state_save_register_global(m_machine, m_in.write);
+	state_save_register_global_array(m_machine, m_in.data);
+	state_save_register_global(m_machine, m_out.read);
+	state_save_register_global(m_machine, m_out.write);
+	state_save_register_global_array(m_machine, m_out.data);
+	state_save_register_global(m_machine, m_locate.x);
+	state_save_register_global(m_machine, m_locate.y);
+	state_save_register_global(m_machine, m_locate.on);
+	state_save_register_global(m_machine, m_cursor.x);
+	state_save_register_global(m_machine, m_cursor.y);
+	state_save_register_global(m_machine, m_cursor.on);
 
 	/* install RAM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
@@ -1418,7 +1418,7 @@ void x07_state::machine_reset()
 	m_prn_char_code = 0;
 	m_prn_size = 0;
 
-	m_regs_r[2] = input_port_read(machine, "CARDBATTERY");
+	m_regs_r[2] = input_port_read(m_machine, "CARDBATTERY");
 
 	cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
 }

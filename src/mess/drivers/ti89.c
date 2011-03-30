@@ -24,7 +24,7 @@
 #include "machine/intelfsh.h"
 #include "rendlay.h"
 
-UINT8 ti68k_state::keypad_r (running_machine *machine)
+UINT8 ti68k_state::keypad_r (running_machine &machine)
 {
 	UINT8 port, bit, data = 0xff;
 	static const char *const bitnames[] = {"BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7"};
@@ -93,7 +93,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 			data = m_timer_val;
 			break;
 		case 0x0d:
-			data = ((!m_on_key) << 9) | keypad_r(space.machine);
+			data = ((!m_on_key) << 9) | keypad_r(m_machine);
 			break;
 		default:
 			data= m_io_hw1[offset & 0x0f];
@@ -146,7 +146,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 	}
 	else
 	{
-		UINT16 *rom_base = (UINT16 *)space.machine->region("flash")->base();
+		UINT16 *rom_base = (UINT16 *)space.machine().region("flash")->base();
 
 		return rom_base[offset];
 	}
@@ -155,7 +155,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 
 static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
 {
-	ti68k_state *state = timer.machine->driver_data<ti68k_state>();
+	ti68k_state *state = timer.machine().driver_data<ti68k_state>();
 
 	state->timer++;
 
@@ -182,7 +182,7 @@ static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
 		}
 	}
 
-	if (state->keypad_r(timer.machine) != 0xff)
+	if (state->keypad_r(timer.machine()) != 0xff)
 		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
@@ -236,7 +236,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( ti68k_on_key )
 {
-	ti68k_state *state = field->port->machine->driver_data<ti68k_state>();
+	ti68k_state *state = field->port->machine().driver_data<ti68k_state>();
 
 	state->m_on_key = newval;
 
@@ -421,7 +421,7 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	UINT16 *rom = (UINT16 *)machine->region("flash")->base();
+	UINT16 *rom = (UINT16 *)m_machine.region("flash")->base();
 	int i;
 
 	m_flash_mem = !((rom[0x32] & 0x0f) != 0);

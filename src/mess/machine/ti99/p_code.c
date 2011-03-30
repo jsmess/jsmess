@@ -218,7 +218,7 @@ static DEVICE_RESET( ti99_pcoden )
 	ti99_pcoden_state *pcode = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine, "EXTCARD") & EXT_PCODE)
+	if (input_port_read(device->machine(), "EXTCARD") & EXT_PCODE)
 	{
 		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &pcode_ncard, get_pebcard_config(device)->slot);
@@ -227,7 +227,7 @@ static DEVICE_RESET( ti99_pcoden )
 		astring *region = new astring();
 		astring_assemble_3(region, device->tag(), ":", pcode_region);
 
-		pcode->rom0 = device->machine->region(astring_c(region))->base();
+		pcode->rom0 = device->machine().region(astring_c(region))->base();
 		pcode->rom1 = pcode->rom0 + 0x1000;
 		pcode->rom2 = pcode->rom0 + 0x2000;
 		pcode->grom = pcode->rom0 + 0x3000;

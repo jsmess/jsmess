@@ -70,10 +70,10 @@ struct _mc6847_config
 {
 	m6847_type type;
 
-	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch, int line);
+	UINT8 (*get_char_rom)(running_machine &machine, UINT8 ch, int line);
 
 	/* needed for the CoCo 3 */
-	int (*new_frame_callback)(running_machine *machine);	/* returns whether the M6847 is in charge of this frame */
+	int (*new_frame_callback)(running_machine &machine);	/* returns whether the M6847 is in charge of this frame */
 	void (*custom_prepare_scanline)(int scanline);
 
 	const UINT32 *custom_palette;

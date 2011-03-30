@@ -207,7 +207,7 @@ static astring *assemble_software_path(astring *str, const game_driver *gamedrv,
 
 
 
-static void dump_screenshot(running_machine *machine, int write_file)
+static void dump_screenshot(running_machine &machine, int write_file)
 {
 	file_error filerr;
 	char buf[128];
@@ -219,13 +219,13 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		snprintf(buf, ARRAY_LENGTH(buf),
 			(screenshot_num >= 0) ? "_%s_%d.png" : "_%s.png",
 			current_testcase.name, screenshot_num);
-		emu_file fp(machine->options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+		emu_file fp(machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 		filerr = fp.open(buf);
 		if (filerr == FILERR_NONE)
 		{
 			/* choose a screen */
-			screen_device *screen = machine->first_screen();
-			while((screen != NULL) && !machine->render().is_live(*screen))
+			screen_device *screen = machine.first_screen();
+			while((screen != NULL) && !machine.render().is_live(*screen))
 			{
 				screen = screen->next_screen();
 			}
@@ -233,7 +233,7 @@ static void dump_screenshot(running_machine *machine, int write_file)
 			/* did we find a live screen? */
 			if (screen != NULL)
 			{
-				screen->machine->video().save_snapshot(screen, fp);
+				screen->machine().video().save_snapshot(screen, fp);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else
@@ -512,10 +512,10 @@ static void testmess_exit(running_machine &machine)
 
 
 
-void osd_init(running_machine *machine)
+void osd_init(running_machine &machine)
 {
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, testmess_exit);
-	target = machine->render().target_alloc();
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, testmess_exit);
+	target = machine.render().target_alloc();
 	target->set_orientation(0);
 }
 
@@ -529,13 +529,13 @@ int osd_start_audio_stream(int stereo)
 	if (current_testcase.wavwrite)
 	{
 		snprintf(buf, ARRAY_LENGTH(buf), "snap/_%s.wav", current_testcase.name);
-		wavptr = wav_open(buf, machine->sample_rate(), 2);
+		wavptr = wav_open(buf, machine.sample_rate(), 2);
 	}
 	else
 	{
 		wavptr = NULL;
 	}
-	samples_this_frame = (int) ((double)machine->sample_rate() / (double)machine->screen[0].refresh);
+	samples_this_frame = (int) ((double)machine.sample_rate() / (double)machine.screen[0].refresh);
 	return samples_this_frame;
 }
 
@@ -553,15 +553,15 @@ void osd_stop_audio_stream(void)
 
 
 
-void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
+void osd_update_audio_stream(running_machine &machine, INT16 *buffer, int samples_this_frame)
 {
-	if (wavptr && (machine->sample_rate() != 0))
+	if (wavptr && (machine.sample_rate() != 0))
 		wav_add_data_16((wav_file*)wavptr, buffer, samples_this_frame * 2);
 }
 
 
 
-static const input_setting_config *find_switch(running_machine *machine, const char *switch_name,
+static const input_setting_config *find_switch(running_machine &machine, const char *switch_name,
 	const char *switch_setting, int switch_type, int *found_field)
 {
 	int found = FALSE;
@@ -571,7 +571,7 @@ static const input_setting_config *find_switch(running_machine *machine, const c
 
 	/* find switch with the name */
 	found = FALSE;
-	for (port = machine->m_portlist.first(); !found && (port != NULL); port = port->next())
+	for (port = machine.m_portlist.first(); !found && (port != NULL); port = port->next())
 	{
 		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
 		{
@@ -601,9 +601,9 @@ static const input_setting_config *find_switch(running_machine *machine, const c
 
 /* ----------------------------------------------------------------------- */
 
-static void command_wait(running_machine *machine)
+static void command_wait(running_machine &machine)
 {
-	attotime current_time = machine->time();
+	attotime current_time = machine.time();
 
 	if (state == STATE_READY)
 	{
@@ -620,7 +620,7 @@ static void command_wait(running_machine *machine)
 
 
 
-static void command_input(running_machine *machine)
+static void command_input(running_machine &machine)
 {
 	/* post a set of characters to the emulation */
 	if (state == STATE_READY)
@@ -644,10 +644,10 @@ static void command_input(running_machine *machine)
 
 
 
-static void command_rawinput(running_machine *machine)
+static void command_rawinput(running_machine &machine)
 {
 	//int parts;
-	attotime current_time = machine->time();
+	attotime current_time = machine.time();
 	static const char *position;
 #if 0
 	int i;
@@ -698,21 +698,21 @@ static void command_rawinput(running_machine *machine)
 
 
 
-static void command_screenshot(running_machine *machine)
+static void command_screenshot(running_machine &machine)
 {
 	dump_screenshot(machine, TRUE);
 }
 
 
 
-static void command_checkblank(running_machine *machine)
+static void command_checkblank(running_machine &machine)
 {
 	dump_screenshot(machine, FALSE);
 }
 
 
 
-static void command_switch(running_machine *machine)
+static void command_switch(running_machine &machine)
 {
 	int found_field;
 	const input_setting_config *setting;
@@ -720,7 +720,7 @@ static void command_switch(running_machine *machine)
 	/* special hack until we support video targets natively */
 	if (!strcmp(current_command->u.switch_args.name, "Video type"))
 	{
-		render_target *target = machine->render().target_by_index(0);
+		render_target *target = machine.render().target_by_index(0);
 		int view_index = 0;
 		const char *view_name;
 
@@ -771,7 +771,7 @@ static void command_switch(running_machine *machine)
 }
 
 
-static void command_image_preload(running_machine *machine)
+static void command_image_preload(running_machine &machine)
 {
 	state = STATE_ABORTED;
 	report_message(MSG_FAILURE, "Image preloads must be at the beginning");
@@ -779,7 +779,7 @@ static void command_image_preload(running_machine *machine)
 
 
 
-static device_image_interface *find_device_by_identity(running_machine *machine, const messtest_device_identity *ident)
+static device_image_interface *find_device_by_identity(running_machine &machine, const messtest_device_identity *ident)
 {
 	device_image_interface *device = NULL;
 
@@ -787,7 +787,7 @@ static device_image_interface *find_device_by_identity(running_machine *machine,
 	if (ident->type == IO_UNKNOWN)
 	{
 		/* no device_type was specified; use the new preferred mechanism */
-		device = dynamic_cast<device_image_interface *>(machine->device(ident->tag));
+		device = dynamic_cast<device_image_interface *>(machine.device(ident->tag));
 	}
 
 	/* did the image slot lookup fail? */
@@ -803,7 +803,7 @@ static device_image_interface *find_device_by_identity(running_machine *machine,
 
 
 
-static void command_image_loadcreate(running_machine *machine)
+static void command_image_loadcreate(running_machine &machine)
 {
 	device_image_interface *image;
 	const char *filename;
@@ -854,7 +854,7 @@ static void command_image_loadcreate(running_machine *machine)
 	}
 
 	success = FALSE;
-	for (gamedrv = machine->system(); !success && gamedrv; gamedrv = driver_get_compatible(gamedrv))
+	for (gamedrv = machine.system(); !success && gamedrv; gamedrv = driver_get_compatible(gamedrv))
 	{
 		/* assemble the full path */
 		filepath = assemble_software_path(astring_alloc(), gamedrv, filename);
@@ -886,7 +886,7 @@ static void command_image_loadcreate(running_machine *machine)
 
 
 
-static void command_verify_memory(running_machine *machine)
+static void command_verify_memory(running_machine &machine)
 {
 	int i = 0;
 	offs_t offset, offset_start, offset_end;
@@ -912,8 +912,8 @@ static void command_verify_memory(running_machine *machine)
 	if (region)
 	{
 		/* we're validating a conventional memory region */
-		target_data = machine->region(region)->base();
-		target_data_size = machine->region(region)->bytes();
+		target_data = machine.region(region)->base();
+		target_data_size = machine.region(region)->bytes();
 	}
 
 	/* sanity check the ranges */
@@ -957,7 +957,7 @@ static void command_verify_memory(running_machine *machine)
 				break;
 			}
 		} else {
-			address_space *space = machine->device(cpu_name)->memory().space(AS_PROGRAM);
+			address_space *space = machine.device(cpu_name)->memory().space(AS_PROGRAM);
 
 			if (verify_data[i] != space->read_byte(offset))
 			{
@@ -973,7 +973,7 @@ static void command_verify_memory(running_machine *machine)
 
 
 
-static void command_verify_image(running_machine *machine)
+static void command_verify_image(running_machine &machine)
 {
 	const UINT8 *verify_data;
 	size_t verify_data_size;
@@ -1035,16 +1035,16 @@ static void command_verify_image(running_machine *machine)
 
 
 
-static void command_trace(running_machine *machine)
+static void command_trace(running_machine &machine)
 {
 	device_execute_interface *cpu;
 	int cpunum = 0;
 	FILE *file;
 	char filename[256];
-	for (bool gotone = machine->m_devicelist.first(cpu); gotone; gotone = cpu->next(cpu))
+	for (bool gotone = machine.m_devicelist.first(cpu); gotone; gotone = cpu->next(cpu))
 	{
 		device_execute_interface *first = NULL;
-		machine->m_devicelist.first(first);
+		machine.m_devicelist.first(first);
 		if (!cpu->next(first))
 			snprintf(filename, ARRAY_LENGTH(filename), "_%s.tr", current_testcase.name);
 		else
@@ -1064,26 +1064,26 @@ static void command_trace(running_machine *machine)
 
 
 
-static void command_soft_reset(running_machine *machine)
+static void command_soft_reset(running_machine &machine)
 {
-	machine->schedule_soft_reset();
+	machine.schedule_soft_reset();
 }
 
 
 
-static void command_hard_reset(running_machine *machine)
+static void command_hard_reset(running_machine &machine)
 {
-	machine->schedule_hard_reset();
+	machine.schedule_hard_reset();
 }
 
 
 
-static void command_end(running_machine *machine)
+static void command_end(running_machine &machine)
 {
 	/* at the end of our test */
 	state = STATE_DONE;
-	final_time = machine->time();
-	machine->schedule_exit();
+	final_time = machine.time();
+	machine.schedule_exit();
 }
 
 
@@ -1093,7 +1093,7 @@ static void command_end(running_machine *machine)
 struct command_procmap_entry
 {
 	messtest_command_type_t command_type;
-	void (*proc)(running_machine *machine);
+	void (*proc)(running_machine &machine);
 };
 
 static const struct command_procmap_entry commands[] =
@@ -1115,7 +1115,7 @@ static const struct command_procmap_entry commands[] =
 	{ MESSTEST_COMMAND_END,				command_end }
 };
 
-void osd_update(running_machine *machine, int skip_redraw)
+void osd_update(running_machine &machine, int skip_redraw)
 {
 	int i;
 	attotime time_limit;
@@ -1124,7 +1124,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	target->get_primitives();
 
 	/* don't do anything if we are initializing! */
-	switch(machine->phase())
+	switch(machine.phase())
 	{
 		case MACHINE_PHASE_PREINIT:
 		case MACHINE_PHASE_INIT:
@@ -1136,12 +1136,12 @@ void osd_update(running_machine *machine, int skip_redraw)
 	/* if we have already aborted or completed, our work is done */
 	if ((state == STATE_ABORTED) || (state == STATE_DONE))
 	{
-		machine->schedule_exit();
+		machine.schedule_exit();
 		return;
 	}
 
 	/* have we hit the time limit? */
-	current_time = machine->time();
+	current_time = machine.time();
 	time_limit = (current_testcase.time_limit != attotime::zero) ? current_testcase.time_limit
 		: attotime::from_seconds(600);
 	if (current_time > time_limit)

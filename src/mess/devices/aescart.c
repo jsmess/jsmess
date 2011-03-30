@@ -17,7 +17,7 @@
 #include "imagedev/multcart.h"
 #include "includes/neogeo.h"
 
-typedef int assmfct(running_machine *machine, device_t *);
+typedef int assmfct(running_machine &machine, device_t *);
 
 enum
 {
@@ -115,7 +115,7 @@ static int get_index_from_tagname(device_t *image)
 /*
     Common routine to assemble cartridges from resources.
 */
-static aescartridge_t *assemble_common(running_machine *machine, device_t *cartslot)
+static aescartridge_t *assemble_common(running_machine &machine, device_t *cartslot)
 {
 	/* Pointer to the cartridge structure. */
 	aescartridge_t *cartridge;
@@ -136,7 +136,7 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 	cartridge = &cartslots->cartridge[slotnumber];
 
 	// check for up to 4 program ROMs
-	romrgn = (UINT8 *)machine->region("maincpu")->base();
+	romrgn = (UINT8 *)machine.region("maincpu")->base();
 	blockofs = 0;
 	for (i = 0; i < 4; i++)
 	{
@@ -157,7 +157,7 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 	reslength = cartslot_get_resource_length(cartslot, "m1");
 	if (socketcont != NULL)
 	{
-		romrgn = (UINT8 *)machine->region("audiocpu")->base();
+		romrgn = (UINT8 *)machine.region("audiocpu")->base();
 
 		memcpy(romrgn, socketcont, reslength);
 		// mirror (how does this really work?)
@@ -165,7 +165,7 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 	}
 
 	// up to 8 YM sample ROMs
-	romrgn = (UINT8 *)machine->region("ymsnd")->base();
+	romrgn = (UINT8 *)machine.region("ymsnd")->base();
 	blockofs = 0;
 	for (i = 0; i < 8; i++)
 	{
@@ -182,7 +182,7 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 	}
 
 	// up to 8 YM delta-T sample ROMs
-	romrgn = (UINT8 *)machine->region("ymsnd.deltat")->base();
+	romrgn = (UINT8 *)machine.region("ymsnd.deltat")->base();
 	blockofs = 0;
 	for (i = 0; i < 8; i++)
 	{
@@ -203,13 +203,13 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 	reslength = cartslot_get_resource_length(cartslot, "s1");
 	if (socketcont != NULL)
 	{
-		romrgn = (UINT8 *)machine->region("fixed")->base();
+		romrgn = (UINT8 *)machine.region("fixed")->base();
 
 		memcpy(romrgn, socketcont, reslength);
 	}
 
 	// up to 8 sprite ROMs in byte-interleaved pairs
-	romrgn = (UINT8 *)machine->region("sprites")->base();
+	romrgn = (UINT8 *)machine.region("sprites")->base();
 	blockofs = 0;
 	for (i = 0; i < 8; i+=2)
 	{
@@ -280,7 +280,7 @@ static DEVICE_START(aes_pcb_std)
     The standard cartridge assemble routine. We just call the common
     function here.
 */
-static int assemble_std(running_machine *machine, device_t *image)
+static int assemble_std(running_machine &machine, device_t *image)
 {
 //  aescartridge_t *cart;
 //  printf("assemble_std, %s\n", image->tag);
@@ -426,7 +426,7 @@ static DEVICE_START( aes_cartridge )
 // handle protected carts
 static void install_protection(device_image_interface& image)
 {
-	neogeo_state *state = image.device().machine->driver_data<neogeo_state>();
+	neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
 	const char *crypt_feature = image.get_feature( "crypt" );
 
 	if(crypt_feature == NULL)
@@ -434,110 +434,110 @@ static void install_protection(device_image_interface& image)
 
 	if(strcmp(crypt_feature,"fatfury2_prot") == 0)
 	{
-		fatfury2_install_protection(image.device().machine);
+		fatfury2_install_protection(image.device().machine());
 		logerror("Installed Fatal Fury 2 protection\n");
 	}
 	if(strcmp(crypt_feature,"kof99_crypt") == 0)
 	{
-		kof99_decrypt_68k(image.device().machine);
+		kof99_decrypt_68k(image.device().machine());
 		state->fixed_layer_bank_type = 1;
-		kof99_neogeo_gfx_decrypt(image.device().machine, 0x00);
-		kof99_install_protection(image.device().machine);
+		kof99_neogeo_gfx_decrypt(image.device().machine(), 0x00);
+		kof99_install_protection(image.device().machine());
 		logerror("Decrypted KOF99 code and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"mslug3_crypt") == 0)
 	{
 		state->fixed_layer_bank_type = 1;
-		kof99_neogeo_gfx_decrypt(image.device().machine, 0xad);
+		kof99_neogeo_gfx_decrypt(image.device().machine(), 0xad);
 		logerror("Decrypted Metal Slug 3 graphics\n");
 	}
 	if(strcmp(crypt_feature,"matrim_crypt") == 0)
 	{
-		matrim_decrypt_68k(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 1);
+		matrim_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 1);
 		state->fixed_layer_bank_type = 2;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x6a);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x6a);
 		logerror("Decrypted Matrimelee code, sound and graphics\n");
 	}
 	if(strcmp(crypt_feature,"svc_crypt") == 0)
 	{
-		svc_px_decrypt(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 3);
+		svc_px_decrypt(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 3);
 		state->fixed_layer_bank_type = 2;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x57);
-		install_pvc_protection(image.device().machine);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x57);
+		install_pvc_protection(image.device().machine());
 		logerror("Decrypted SvC code, sound and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"samsho5_crypt") == 0)
 	{
-		samsho5_decrypt_68k(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 4);
+		samsho5_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 4);
 		state->fixed_layer_bank_type = 1;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x0f);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x0f);
 		logerror("Decrypted Samurai Shodown V code, sound and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"kof2000_crypt") == 0)
 	{
-		kof2000_decrypt_68k(image.device().machine);
+		kof2000_decrypt_68k(image.device().machine());
 		state->fixed_layer_bank_type = 2;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x00);
-		kof2000_install_protection(image.device().machine);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x00);
+		kof2000_install_protection(image.device().machine());
 		logerror("Decrypted KOF2000 code, sound and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"kof2001_crypt") == 0)
 	{
 		state->fixed_layer_bank_type = 1;
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x1e);
-		neogeo_cmc50_m1_decrypt(image.device().machine);
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x1e);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
 		logerror("Decrypted KOF2001 code and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"kof2002_crypt") == 0)
 	{
-		kof2002_decrypt_68k(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 0);
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0xec);
+		kof2002_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 0);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0xec);
 		logerror("Decrypted KOF2002 code, sound and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"mslug4_crypt") == 0)
 	{
 		state->fixed_layer_bank_type = 1; /* USA violent content screen is wrong -- not a bug, confirmed on real hardware! */
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x31);
-		neo_pcm2_snk_1999(image.device().machine, 8);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x31);
+		neo_pcm2_snk_1999(image.device().machine(), 8);
 		logerror("Decrypted Metal Slug 4 code, sound and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"mslug5_crypt") == 0)
 	{
-		mslug5_decrypt_68k(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 2);
+		mslug5_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 2);
 		state->fixed_layer_bank_type = 1;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x19);
-		install_pvc_protection(image.device().machine);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x19);
+		install_pvc_protection(image.device().machine());
 		logerror("Decrypted Metal Slug 5 code and graphics, and installed protection routines.\n");
 	}
 	if(strcmp(crypt_feature,"kof2003_crypt") == 0)
 	{
-		kof2003h_decrypt_68k(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 5);
+		kof2003h_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 5);
 		state->fixed_layer_bank_type = 2;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x9d);
-		install_pvc_protection(image.device().machine);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x9d);
+		install_pvc_protection(image.device().machine());
 		logerror("Decrypted KOF2003 code and graphicss, and installed protection routines.\n");
 	}
 	if(strcmp(crypt_feature,"samsho5s_crypt") == 0)
 	{
-		samsh5sp_decrypt_68k(image.device().machine);
-		neo_pcm2_swap(image.device().machine, 6);
+		samsh5sp_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 6);
 		state->fixed_layer_bank_type = 1;
-		neogeo_cmc50_m1_decrypt(image.device().machine);
-		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x0d);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x0d);
 	}
 }
 
@@ -553,52 +553,52 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	cartslot_t *cart;
 	multicart_open_error me;
 	UINT32 size;
-	device_t* ym = image.device().machine->device("ymsnd");
+	device_t* ym = image.device().machine().device("ymsnd");
 
 	// first check software list
 	if(image.software_entry() != NULL)
 	{
 		// create memory regions
 		size = image.get_software_region_length("maincpu");
-		image.device().machine->region_free("maincpu");
-		image.device().machine->region_alloc("maincpu",size,1, ENDIANNESS_LITTLE);
-		memcpy(image.device().machine->region("maincpu")->base(),image.get_software_region("maincpu"),size);
+		image.device().machine().region_free("maincpu");
+		image.device().machine().region_alloc("maincpu",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("maincpu")->base(),image.get_software_region("maincpu"),size);
 		size = image.get_software_region_length("fixed");
-		image.device().machine->region_free("fixed");
-		image.device().machine->region_alloc("fixed",size,1, ENDIANNESS_LITTLE);
-		memcpy(image.device().machine->region("fixed")->base(),image.get_software_region("fixed"),size);
+		image.device().machine().region_free("fixed");
+		image.device().machine().region_alloc("fixed",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("fixed")->base(),image.get_software_region("fixed"),size);
 		size = image.get_software_region_length("audiocpu");
-		image.device().machine->region_free("audiocpu");
-		image.device().machine->region_alloc("audiocpu",size,1, ENDIANNESS_LITTLE);
-		memcpy(image.device().machine->region("audiocpu")->base(),image.get_software_region("audiocpu"),size);
+		image.device().machine().region_free("audiocpu");
+		image.device().machine().region_alloc("audiocpu",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("audiocpu")->base(),image.get_software_region("audiocpu"),size);
 		size = image.get_software_region_length("ymsnd");
-		image.device().machine->region_free("ymsnd");
-		image.device().machine->region_alloc("ymsnd",size,1, ENDIANNESS_LITTLE);
-		memcpy(image.device().machine->region("ymsnd")->base(),image.get_software_region("ymsnd"),size);
+		image.device().machine().region_free("ymsnd");
+		image.device().machine().region_alloc("ymsnd",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("ymsnd")->base(),image.get_software_region("ymsnd"),size);
 		if(image.get_software_region("ymsnd.deltat") != NULL)
 		{
 			size = image.get_software_region_length("ymsnd.deltat");
-			image.device().machine->region_free("ymsnd.deltat");
-			image.device().machine->region_alloc("ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
-			memcpy(image.device().machine->region("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
+			image.device().machine().region_free("ymsnd.deltat");
+			image.device().machine().region_alloc("ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
 		}
 		else
-			image.device().machine->region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
+			image.device().machine().region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
 		ym->reset();
 		size = image.get_software_region_length("sprites");
-		image.device().machine->region_free("sprites");
-		image.device().machine->region_alloc("sprites",size,1, ENDIANNESS_LITTLE);
-		memcpy(image.device().machine->region("sprites")->base(),image.get_software_region("sprites"),size);
+		image.device().machine().region_free("sprites");
+		image.device().machine().region_alloc("sprites",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("sprites")->base(),image.get_software_region("sprites"),size);
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");
-			image.device().machine->region_alloc("audiocrypt",size,1, ENDIANNESS_LITTLE);
-			memcpy(image.device().machine->region("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
+			image.device().machine().region_alloc("audiocrypt",size,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
 		}
 
 		// setup cartridge ROM area
-		image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
-		memory_set_bankptr(image.device().machine,"cart_rom",&image.device().machine->region("maincpu")->base()[0x80]);
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
+		memory_set_bankptr(image.device().machine(),"cart_rom",&image.device().machine().region("maincpu")->base()[0x80]);
 
 		// handle possible protection
 		install_protection(image);
@@ -617,7 +617,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	/* This line requires that cartslot_t be included in cartslot.h,
     otherwise one cannot make use of multicart handling within such a
     custom LOAD function. */
-	me = multicart_open(image.device().machine->options(), image.filename(), image.device().machine->system().name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+	me = multicart_open(image.device().machine().options(), image.filename(), image.device().machine().system().name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 
 	/* Now that we have loaded the image files, let the PCB put them all
     together. This means we put the images in a structure which allows
@@ -626,7 +626,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
     if (me != MCERR_NONE)
 		fatalerror("Error loading multicart: %s", multicart_error_text(me));
 
-	return pcb->assemble(pcbdev->machine, image);
+	return pcb->assemble(pcbdev->machine(), image);
 }
 
 /*
@@ -656,11 +656,11 @@ static DEVICE_IMAGE_UNLOAD( aes_cartridge )
 		if (cart->mc != NULL)
 		{
 			/* Remove pointers and de-big-endianize RAM contents. */
-			pcb->disassemble(pcbdev->machine, image);
+			pcb->disassemble(pcbdev->machine(), image);
 
 			/* Close the multicart; all RAM resources will be
                written to disk */
-			multicart_close(pcbdev->machine->options(), cart->mc);
+			multicart_close(pcbdev->machine().options(), cart->mc);
 			cart->mc = NULL;
 		}
 //      else

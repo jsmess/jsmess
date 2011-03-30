@@ -55,24 +55,24 @@ static TIMER_CALLBACK( argo_boot )
 static MACHINE_RESET(argo)
 {
 	memory_set_bank(machine, "boot", 1);
-	machine->scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
+	machine.scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
 }
 
 DRIVER_INIT( argo )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
 }
 
 static VIDEO_START( argo )
 {
-	argo_state *state = machine->driver_data<argo_state>();
-	state->FNT = machine->region("chargen")->base();
+	argo_state *state = machine.driver_data<argo_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( argo )
 {
-	argo_state *state = screen->machine->driver_data<argo_state>();
+	argo_state *state = screen->machine().driver_data<argo_state>();
 	UINT8 y,ra,chr,gfx,i;
 	UINT16 sy=0,ma=0,x;
 

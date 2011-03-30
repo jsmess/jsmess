@@ -47,9 +47,9 @@ typedef struct
 	UINT16	xfer_offset;
 	UINT8	sector_buffer[CD_MAX_SECTOR_DATA];
 	UINT8	cdda_set;
-	void (*sten_cb)( running_machine *machine, int level );	/* Status enabled callback */
-	void (*stch_cb)( running_machine *machine, int level );	/* Status changed callback */
-	void (*scor_cb)( running_machine *machine, int level );	/* Subcode ready callback */
+	void (*sten_cb)( running_machine &machine, int level );	/* Status enabled callback */
+	void (*stch_cb)( running_machine &machine, int level );	/* Status changed callback */
+	void (*scor_cb)( running_machine &machine, int level );	/* Subcode ready callback */
 	cdrom_file *cdrom;
 	device_t *cdda;
 	emu_timer *frame_timer;
@@ -67,26 +67,26 @@ void matsucd_init( device_t *cdrom_device, const char *cdda_tag )
 	memset(&cd, 0, sizeof( matsucd ) );
 
 	cd.cdrom = cd_get_cdrom_file( cdrom_device );
-	cd.cdda = cdrom_device->machine->device(cdda_tag);
+	cd.cdda = cdrom_device->machine().device(cdda_tag);
 
-	cd.frame_timer = cdrom_device->machine->scheduler().timer_alloc(FUNC(matsu_subcode_proc));
+	cd.frame_timer = cdrom_device->machine().scheduler().timer_alloc(FUNC(matsu_subcode_proc));
 
 	cd.stch_signal = 1;
 }
 
-void matsucd_set_status_enabled_callback( void (*sten_cb)( running_machine *machine, int level ) )
+void matsucd_set_status_enabled_callback( void (*sten_cb)( running_machine &machine, int level ) )
 {
 	/* add the callback for status enabled signal */
 	cd.sten_cb = sten_cb;
 }
 
-void matsucd_set_status_changed_callback( void (*stch_cb)( running_machine *machine, int level ) )
+void matsucd_set_status_changed_callback( void (*stch_cb)( running_machine &machine, int level ) )
 {
 	/* add the callback for status changed signal */
 	cd.stch_cb = stch_cb;
 }
 
-void matsucd_set_subcode_ready_callback( void (*scor_cb)( running_machine *machine, int level ) )
+void matsucd_set_subcode_ready_callback( void (*scor_cb)( running_machine &machine, int level ) )
 {
 	/* add the callback for subcode ready signal */
 	cd.scor_cb = scor_cb;
@@ -135,7 +135,7 @@ int matsucd_get_next_byte( UINT8 *data )
 	return 0;
 }
 
-static void matsucd_cdda_stop( running_machine *machine )
+static void matsucd_cdda_stop( running_machine &machine )
 {
 	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
@@ -146,7 +146,7 @@ static void matsucd_cdda_stop( running_machine *machine )
 	}
 }
 
-static void matsucd_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_blocks )
+static void matsucd_cdda_play( running_machine &machine, UINT32 lba, UINT32 num_blocks )
 {
 	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
 	if (cdda != NULL)
@@ -156,7 +156,7 @@ static void matsucd_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_
 	}
 }
 
-static void matsucd_cdda_pause( running_machine *machine, int pause )
+static void matsucd_cdda_pause( running_machine &machine, int pause )
 {
 	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
 	if (cdda != NULL)
@@ -174,7 +174,7 @@ static void matsucd_cdda_pause( running_machine *machine, int pause )
 	}
 }
 
-static UINT8 matsucd_cdda_getstatus( running_machine *machine, UINT32 *lba )
+static UINT8 matsucd_cdda_getstatus( running_machine &machine, UINT32 *lba )
 {
 	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
@@ -229,7 +229,7 @@ int matsucd_scor_r( void )
 	return cd.scor_signal ? 0 : 1;
 }
 
-static void update_status_enable( running_machine *machine, int level )
+static void update_status_enable( running_machine &machine, int level )
 {
 	cd.sten_signal = level;
 
@@ -239,7 +239,7 @@ static void update_status_enable( running_machine *machine, int level )
 	}
 }
 
-static void update_status_changed( running_machine *machine, int level )
+static void update_status_changed( running_machine &machine, int level )
 {
 	cd.stch_signal = level;
 
@@ -249,7 +249,7 @@ static void update_status_changed( running_machine *machine, int level )
 	}
 }
 
-static void update_subcode_ready( running_machine *machine, int level )
+static void update_subcode_ready( running_machine &machine, int level )
 {
 	cd.scor_signal = level;
 
@@ -264,7 +264,7 @@ static TIMER_CALLBACK(matsucd_set_status_end)
 	update_status_changed( machine, 1 );
 }
 
-static void matsucd_set_status( running_machine *machine, UINT8 status )
+static void matsucd_set_status( running_machine &machine, UINT8 status )
 {
 	if ( status != cd.status )
 	{
@@ -273,7 +273,7 @@ static void matsucd_set_status( running_machine *machine, UINT8 status )
 		if ( cd.stch_signal != 0 )
 		{
 			update_status_changed( machine, 0 );
-			machine->scheduler().timer_set(attotime::from_msec(1), FUNC(matsucd_set_status_end));
+			machine.scheduler().timer_set(attotime::from_msec(1), FUNC(matsucd_set_status_end));
 		}
 	}
 }
@@ -310,7 +310,7 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 	}
 }
 
-static void matsucd_command_error( running_machine *machine )
+static void matsucd_command_error( running_machine &machine )
 {
 	UINT8	newstatus = cd.status;
 
@@ -320,7 +320,7 @@ static void matsucd_command_error( running_machine *machine )
 	matsucd_set_status( machine, newstatus );
 }
 
-static void matsucd_complete_cmd( running_machine *machine, UINT8 len )
+static void matsucd_complete_cmd( running_machine &machine, UINT8 len )
 {
 	UINT8	newstatus = cd.status;
 
@@ -337,7 +337,7 @@ static void matsucd_complete_cmd( running_machine *machine, UINT8 len )
 	update_status_enable( machine, 0 );
 }
 
-UINT8 matsucd_response_r( running_machine *machine )
+UINT8 matsucd_response_r( running_machine &machine )
 {
 	UINT8	v = cd.output[cd.output_pos++];
 
@@ -350,7 +350,7 @@ UINT8 matsucd_response_r( running_machine *machine )
 	return v;
 }
 
-void matsucd_command_w( running_machine *machine, UINT8 data )
+void matsucd_command_w( running_machine &machine, UINT8 data )
 {
 	UINT8	cmd;
 

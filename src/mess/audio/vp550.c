@@ -197,7 +197,7 @@ void vp551_install_write_handlers(device_t *device, address_space *program, int 
 
 static TIMER_DEVICE_CALLBACK( sync_tick )
 {
-	device_set_input_line(timer.machine->firstcpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
+	device_set_input_line(timer.machine().firstcpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 
 	if (LOG) logerror("VP550 Interrupt\n");
 }
@@ -239,9 +239,9 @@ static DEVICE_START( vp550 )
 	vp550_t *vp550 = get_safe_token(device);
 
 	/* look up devices */
-	vp550->cdp1863[CHANNEL_A] = device->machine->device("vp550:u1");
-	vp550->cdp1863[CHANNEL_B] = device->machine->device("vp550:u2");
-	vp550->sync_timer = device->machine->device<timer_device>("vp550:sync");
+	vp550->cdp1863[CHANNEL_A] = device->machine().device("vp550:u1");
+	vp550->cdp1863[CHANNEL_B] = device->machine().device("vp550:u2");
+	vp550->sync_timer = device->machine().device<timer_device>("vp550:sync");
 
 	/* set initial values */
 	vp550->channels = 2;
@@ -282,7 +282,7 @@ static DEVICE_RESET( vp550 )
 	vp550->sync_timer->enable(0);
 
 	/* clear interrupt */
-	device_set_input_line(device->machine->firstcpu, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+	device_set_input_line(device->machine().firstcpu, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 }
 
 /*-------------------------------------------------

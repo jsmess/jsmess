@@ -57,14 +57,14 @@ INLINE apple2_slot_token *get_token(device_t *device)
     apple2_slot - looks up a slot
 -------------------------------------------------*/
 
-device_t *apple2_slot(running_machine *machine, int slotnum)
+device_t *apple2_slot(running_machine &machine, int slotnum)
 {
 	char buffer[7];
 
 	assert((slotnum >= 0) && (slotnum <= 7));
 	snprintf(buffer, ARRAY_LENGTH(buffer), "slot_%d", slotnum);
 
-	return machine->device(buffer);
+	return machine.device(buffer);
 }
 
 
@@ -82,7 +82,7 @@ static DEVICE_START(apple2_slot)
 	if (config->tag != NULL)
 	{
 		/* locate the device */
-		token->slot_device = device->machine->device(config->tag);
+		token->slot_device = device->machine().device(config->tag);
 
 		assert(token->slot_device != NULL);
 	}
@@ -182,10 +182,10 @@ READ8_DEVICE_HANDLER(apple2_slot_ROM_r)
 
 	if (config->slotnum > 0)
 	{
-		return apple2_slotram_r(device->machine, config->slotnum, offset + ((config->slotnum-1)<<8));
+		return apple2_slotram_r(device->machine(), config->slotnum, offset + ((config->slotnum-1)<<8));
 	}
 
-	return apple2_getfloatingbusvalue(device->machine);
+	return apple2_getfloatingbusvalue(device->machine());
 }
 
 /*-------------------------------------------------

@@ -18,25 +18,25 @@ DRIVER_INIT(z1013)
 
 MACHINE_RESET( z1013 )
 {
-	z1013_state *state = machine->driver_data<z1013_state>();
-	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xF000);
+	z1013_state *state = machine.driver_data<z1013_state>();
+	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xF000);
 	state->keyboard_part = 0;
 	state->keyboard_line = 0;
 }
 
 WRITE8_HANDLER(z1013_keyboard_w) {
-	z1013_state *state = space->machine->driver_data<z1013_state>();
+	z1013_state *state = space->machine().driver_data<z1013_state>();
 	state->keyboard_line	= data;
 }
 
 static READ8_DEVICE_HANDLER (z1013_port_b_r)
 {
-	z1013_state *state = device->machine->driver_data<z1013_state>();
+	z1013_state *state = device->machine().driver_data<z1013_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3",
 		"LINE4", "LINE5", "LINE6", "LINE7"
 	};
-	UINT8 data = input_port_read(device->machine, keynames[state->keyboard_line & 7]);
+	UINT8 data = input_port_read(device->machine(), keynames[state->keyboard_line & 7]);
 	if (state->keyboard_part==0x10) {
 		return (data >> 4) & 0x0f;
 	} else {
@@ -46,7 +46,7 @@ static READ8_DEVICE_HANDLER (z1013_port_b_r)
 
 static WRITE8_DEVICE_HANDLER (z1013_port_b_w)
 {
-	z1013_state *state = device->machine->driver_data<z1013_state>();
+	z1013_state *state = device->machine().driver_data<z1013_state>();
 	state->keyboard_part = data;
 }
 const z80pio_interface z1013_z80pio_intf =
@@ -78,7 +78,7 @@ const z80pio_interface z1013k7659_z80pio_intf =
 
 SNAPSHOT_LOAD( z1013 )
 {
-	UINT8* data= auto_alloc_array(image.device().machine, UINT8, snapshot_size);
+	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
 	UINT16 startaddr,endaddr,runaddr;
 
 	image.fread( data, snapshot_size);
@@ -89,10 +89,10 @@ SNAPSHOT_LOAD( z1013 )
 	if (data[12]!='C') return IMAGE_INIT_FAIL;
 	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return IMAGE_INIT_FAIL;
 
-	memcpy (image.device().machine->device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(startaddr),
+	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(startaddr),
 		 data+0x20, endaddr - startaddr + 1);
 
-	cpu_set_reg(image.device().machine->device("maincpu"), Z80_PC, runaddr);
+	cpu_set_reg(image.device().machine().device("maincpu"), Z80_PC, runaddr);
 
 	return IMAGE_INIT_PASS;
 }

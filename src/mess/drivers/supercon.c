@@ -185,9 +185,9 @@ static void update_leds( supercon_state *state )
 	}
 }
 
-static void mouse_update(running_machine *machine)
+static void mouse_update(running_machine &machine)
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
+	supercon_state *state = machine.driver_data<supercon_state>();
 	UINT8 port_input; // m_left;
 	int i;
 
@@ -229,7 +229,7 @@ static void mouse_update(running_machine *machine)
 
 static DRIVER_INIT(supercon)
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
+	supercon_state *state = machine.driver_data<supercon_state>();
 	state->LED_18=0;
 	state->LED_AH=0;
 	state->LED_ST=0;
@@ -260,7 +260,7 @@ static READ8_HANDLER( supercon_port2_r )
 
 static READ8_HANDLER( supercon_port3_r )
 {
-	supercon_state *state = space->machine->driver_data<supercon_state>();
+	supercon_state *state = space->machine().driver_data<supercon_state>();
 	int i;
 	UINT8 key_data=0;
 
@@ -317,7 +317,7 @@ static READ8_HANDLER( supercon_port3_r )
 	if (i==NOT_VALID)
 		return 0xff;
 
-	key_data=input_port_read(space->machine, status_lines[i]);
+	key_data=input_port_read(space->machine(), status_lines[i]);
 
 	if (key_data != 0xc0)
 	{
@@ -350,7 +350,7 @@ static READ8_HANDLER( supercon_port3_r )
 
 static READ8_HANDLER( supercon_port4_r )
 {
-	supercon_state *state = space->machine->driver_data<supercon_state>();
+	supercon_state *state = space->machine().driver_data<supercon_state>();
 	int i_18, i_AH;
 	UINT8 key_data = 0x00;;
 
@@ -375,7 +375,7 @@ static READ8_HANDLER( supercon_port4_r )
 		output_set_value("MOVING",state->moving_piece);
 	}
 
-	key_data=input_port_read(space->machine, board_lines[i_18]);
+	key_data=input_port_read(space->machine(), board_lines[i_18]);
 
 	if (key_data != 0xff)
 	{
@@ -383,7 +383,7 @@ static READ8_HANDLER( supercon_port4_r )
 
 /* Only if valid data and mouse button is pressed */
 
-		if (key_data && input_port_read(space->machine, "BUTTON_L")) 
+		if (key_data && input_port_read(space->machine(), "BUTTON_L")) 
 		{
 
 /* Set or remove pieces */
@@ -419,7 +419,7 @@ static READ8_HANDLER( supercon_port4_r )
 
 static WRITE8_HANDLER( supercon_port1_w )
 {
-	supercon_state *state = space->machine->driver_data<supercon_state>();
+	supercon_state *state = space->machine().driver_data<supercon_state>();
 	LOG(("Write from %04x data: %02x\n",0x1C00,data));
 	state->led_update=FALSE;
 }
@@ -428,7 +428,7 @@ static WRITE8_HANDLER( supercon_port1_w )
 
 static WRITE8_HANDLER( supercon_port2_w )
 {
-	supercon_state *state = space->machine->driver_data<supercon_state>();
+	supercon_state *state = space->machine().driver_data<supercon_state>();
 
 	LOG(("Write from %04x data: %02x\n",0x1D00,data));
 	state->led_update=FALSE;
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( supercon_port2_w )
 
 static WRITE8_HANDLER( supercon_port3_w )
 {
-	supercon_state *state = space->machine->driver_data<supercon_state>();
+	supercon_state *state = space->machine().driver_data<supercon_state>();
 
 	if (data)
 		LOG(("Write from %04x data: %02x\n",0x1E00,data));
@@ -483,8 +483,8 @@ static WRITE8_HANDLER( supercon_port3_w )
 
 static WRITE8_HANDLER( supercon_port4_w )
 {
-	supercon_state *state = space->machine->driver_data<supercon_state>();
-	device_t *speaker = space->machine->device("beep");
+	supercon_state *state = space->machine().driver_data<supercon_state>();
+	device_t *speaker = space->machine().device("beep");
 
 	if (data)
 		LOG(("Write from %04x data: %02x\n",0x1F00,data));
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( supercon_port4_w )
 
 static TIMER_CALLBACK( mouse_click )
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
+	supercon_state *state = machine.driver_data<supercon_state>();
 
 	if (input_port_read_safe(machine, "BUTTON_L",0) )				/* wait for mouse release */
 		state->timer_mouse_click->adjust(state->wait_time, 0);
@@ -516,7 +516,7 @@ static TIMER_CALLBACK( mouse_click )
 
 static TIMER_DEVICE_CALLBACK( update_artwork )
 {
-	mouse_update(timer.machine);
+	mouse_update(timer.machine());
 }
 
 static TIMER_CALLBACK( update_irq )
@@ -529,7 +529,7 @@ static TIMER_CALLBACK( update_irq )
 
 static STATE_PRESAVE( m_board_presave )
 {
-    supercon_state *state = machine->driver_data<supercon_state>();
+    supercon_state *state = machine.driver_data<supercon_state>();
     int i;
     for (i=0;i<64;i++)
         state->save_board[i]=state->m_board[i];
@@ -537,7 +537,7 @@ static STATE_PRESAVE( m_board_presave )
 
 static STATE_POSTLOAD( m_board_postload )
 {
-    supercon_state *state = machine->driver_data<supercon_state>();
+    supercon_state *state = machine.driver_data<supercon_state>();
     int i;
     for (i=0;i<64;i++)
         state->m_board[i]=state->save_board[i];
@@ -547,23 +547,23 @@ static STATE_POSTLOAD( m_board_postload )
 
 static MACHINE_START( supercon )
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
+	supercon_state *state = machine.driver_data<supercon_state>();
 
-	state->timer_update_irq = machine->scheduler().timer_alloc(FUNC(update_irq));
+	state->timer_update_irq = machine.scheduler().timer_alloc(FUNC(update_irq));
 	state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
 
-	state->timer_mouse_click =  machine->scheduler().timer_alloc(FUNC(mouse_click),NULL);
+	state->timer_mouse_click =  machine.scheduler().timer_alloc(FUNC(mouse_click),NULL);
 
 
     state->save_item(NAME(state->save_board));
-    machine->state().register_postload(m_board_postload,NULL);
-    machine->state().register_presave(m_board_presave,NULL);
+    machine.state().register_postload(m_board_postload,NULL);
+    machine.state().register_presave(m_board_presave,NULL);
 
 }
 
 static MACHINE_RESET( supercon )
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
+	supercon_state *state = machine.driver_data<supercon_state>();
 	set_board(state);
 	set_pieces(state);
 	set_boarder_pieces();

@@ -3,11 +3,11 @@
 
 static VIDEO_START( newbrain )
 {
-	newbrain_state *state = machine->driver_data<newbrain_state>();
+	newbrain_state *state = machine.driver_data<newbrain_state>();
 
 	/* find memory regions */
 
-	state->char_rom = machine->region("chargen")->base();
+	state->char_rom = machine.region("chargen")->base();
 
 	/* register for state saving */
 
@@ -17,11 +17,11 @@ static VIDEO_START( newbrain )
 	state->save_item(NAME(state->segment_data));
 }
 
-static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void newbrain_update(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	newbrain_state *state = machine->driver_data<newbrain_state>();
+	newbrain_state *state = machine.driver_data<newbrain_state>();
 
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	int y, sx;
 	int columns = (state->tvctl & NEWBRAIN_VIDEO_80L) ? 80 : 40;
@@ -109,11 +109,11 @@ static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const re
 
 static SCREEN_UPDATE( newbrain )
 {
-	newbrain_state *state = screen->machine->driver_data<newbrain_state>();
+	newbrain_state *state = screen->machine().driver_data<newbrain_state>();
 
 	if (state->enrg1 & NEWBRAIN_ENRG1_TVP)
 	{
-		newbrain_update(screen->machine, bitmap, cliprect);
+		newbrain_update(screen->machine(), bitmap, cliprect);
 	}
 	else
 	{

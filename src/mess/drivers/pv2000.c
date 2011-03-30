@@ -50,64 +50,64 @@ public:
 
 static WRITE8_HANDLER( pv2000_cass_conf_w )
 {
-	pv2000_state *state = space->machine->driver_data<pv2000_state>();
+	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 
-	logerror( "%s: pv2000_cass_conf_w %02x\n", space->machine->describe_context(), data );
+	logerror( "%s: pv2000_cass_conf_w %02x\n", space->machine().describe_context(), data );
 
 	state->cass_conf = data & 0x0f;
 
 	if ( state->cass_conf & 0x01 )
-		cassette_change_state( space->machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+		cassette_change_state( space->machine().device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
 	else
-		cassette_change_state( space->machine->device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+		cassette_change_state( space->machine().device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 }
 
 
 static WRITE8_HANDLER( pv2000_keys_w )
 {
-	pv2000_state *state = space->machine->driver_data<pv2000_state>();
+	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 
-	logerror( "%s: pv2000_keys_w %02x\n", space->machine->describe_context(), data );
+	logerror( "%s: pv2000_keys_w %02x\n", space->machine().describe_context(), data );
 
 	state->keyb_column = data & 0x0f;
 
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
 static READ8_HANDLER( pv2000_keys_hi_r )
 {
-	pv2000_state *state = space->machine->driver_data<pv2000_state>();
+	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 	UINT8 data = 0;
 
 	switch ( state->keyb_column )
 	{
 	case 0:
-		data = input_port_read( space->machine, "IN0" ) >> 4;
+		data = input_port_read( space->machine(), "IN0" ) >> 4;
 		break;
 	case 1:
-		data = input_port_read( space->machine, "IN1" ) >> 4;
+		data = input_port_read( space->machine(), "IN1" ) >> 4;
 		break;
 	case 2:
-		data = input_port_read( space->machine, "IN2" ) >> 4;
+		data = input_port_read( space->machine(), "IN2" ) >> 4;
 		break;
 	case 3:
-		data = input_port_read( space->machine, "IN3" ) >> 4;
+		data = input_port_read( space->machine(), "IN3" ) >> 4;
 		break;
 	case 4:
-		data = input_port_read( space->machine, "IN4" ) >> 4;
+		data = input_port_read( space->machine(), "IN4" ) >> 4;
 		break;
 	case 5:
-		data = input_port_read( space->machine, "IN5" ) >> 4;
+		data = input_port_read( space->machine(), "IN5" ) >> 4;
 		break;
 	case 6:
-		data = input_port_read( space->machine, "IN6" ) >> 4;
+		data = input_port_read( space->machine(), "IN6" ) >> 4;
 		break;
 	case 7:
-		data = input_port_read( space->machine, "IN7" ) >> 4;
+		data = input_port_read( space->machine(), "IN7" ) >> 4;
 		break;
 	case 8:
-		data = input_port_read( space->machine, "IN8" ) >> 4;
+		data = input_port_read( space->machine(), "IN8" ) >> 4;
 		break;
 	}
 
@@ -117,42 +117,42 @@ static READ8_HANDLER( pv2000_keys_hi_r )
 
 static READ8_HANDLER( pv2000_keys_lo_r )
 {
-	pv2000_state *state = space->machine->driver_data<pv2000_state>();
+	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 	UINT8 data = 0;
 
-	logerror("%s: pv2000_keys_r\n", space->machine->describe_context() );
+	logerror("%s: pv2000_keys_r\n", space->machine().describe_context() );
 
 	switch ( state->keyb_column )
 	{
 	case 0:
-		data = input_port_read( space->machine, "IN0" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN0" ) & 0x0f;
 		break;
 	case 1:
-		data = input_port_read( space->machine, "IN1" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN1" ) & 0x0f;
 		break;
 	case 2:
-		data = input_port_read( space->machine, "IN2" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN2" ) & 0x0f;
 		break;
 	case 3:
-		data = input_port_read( space->machine, "IN3" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN3" ) & 0x0f;
 		break;
 	case 4:
-		data = input_port_read( space->machine, "IN4" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN4" ) & 0x0f;
 		break;
 	case 5:
-		data = input_port_read( space->machine, "IN5" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN5" ) & 0x0f;
 		break;
 	case 6:
-		data = input_port_read( space->machine, "IN6" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN6" ) & 0x0f;
 		break;
 	case 7:
-		data = input_port_read( space->machine, "IN7" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN7" ) & 0x0f;
 		break;
 	case 8:
-		data = input_port_read( space->machine, "IN8" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN8" ) & 0x0f;
 		break;
 	case 9:
-		data = input_port_read( space->machine, "IN9" ) & 0x0f;
+		data = input_port_read( space->machine(), "IN9" ) & 0x0f;
 		break;
 	}
 
@@ -162,7 +162,7 @@ static READ8_HANDLER( pv2000_keys_lo_r )
 
 static READ8_HANDLER(pv2000_keys_mod_r)
 {
-	return 0xf0 | input_port_read( space->machine, "MOD" );
+	return 0xf0 | input_port_read( space->machine(), "MOD" );
 }
 
 
@@ -306,12 +306,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( pv2000_interrupt )
 {
-   TMS9928A_interrupt(device->machine);
+   TMS9928A_interrupt(device->machine());
 }
 
-static void pv2000_vdp_interrupt(running_machine *machine, int new_state)
+static void pv2000_vdp_interrupt(running_machine &machine, int new_state)
 {
-	pv2000_state *state = machine->driver_data<pv2000_state>();
+	pv2000_state *state = machine.driver_data<pv2000_state>();
 
     // only if it goes up
 	if (new_state && !state->last_state)
@@ -361,19 +361,19 @@ static MACHINE_START( pv2000 )
 
 static MACHINE_RESET( pv2000 )
 {
-	pv2000_state *state = machine->driver_data<pv2000_state>();
+	pv2000_state *state = machine.driver_data<pv2000_state>();
 
 	state->last_state = 0;
 	state->key_pressed = 0;
 	state->keyb_column = 0;
 
-	device_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
-	memset(&machine->region("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
+	device_set_input_line_vector(machine.device("maincpu"), INPUT_LINE_IRQ0, 0xff);
+	memset(&machine.region("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 
 static DEVICE_IMAGE_LOAD( pv2000_cart )
 {
-	UINT8 *cart = image.device().machine->region("maincpu")->base() + 0xC000;
+	UINT8 *cart = image.device().machine().region("maincpu")->base() + 0xC000;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

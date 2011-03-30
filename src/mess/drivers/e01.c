@@ -66,9 +66,9 @@
     update_interrupts - update interrupt state
 -------------------------------------------------*/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	e01_state *state = machine->driver_data<e01_state>();
+	e01_state *state = machine.driver_data<e01_state>();
 
 	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_IRQ0, (state->via_irq || (state->hdc_ie & state->hdc_irq) || state->rtc_irq) ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_NMI, (state->fdc_drq || (state->adlc_ie & state->adlc_irq)) ? ASSERT_LINE : CLEAR_LINE);
@@ -78,9 +78,9 @@ static void update_interrupts(running_machine *machine)
      network_irq_enable - network interrupt enable
 -------------------------------------------------*/
 
-static void network_irq_enable(running_machine *machine, int enabled)
+static void network_irq_enable(running_machine &machine, int enabled)
 {
-	e01_state *state = machine->driver_data<e01_state>();
+	e01_state *state = machine.driver_data<e01_state>();
 
 	state->adlc_ie = enabled;
 
@@ -91,9 +91,9 @@ static void network_irq_enable(running_machine *machine, int enabled)
      hdc_irq_enable - hard disk interrupt enable
 -------------------------------------------------*/
 
-static void hdc_irq_enable(running_machine *machine, int enabled)
+static void hdc_irq_enable(running_machine &machine, int enabled)
 {
-	e01_state *state = machine->driver_data<e01_state>();
+	e01_state *state = machine.driver_data<e01_state>();
 
 	state->hdc_ie = enabled;
 
@@ -110,8 +110,8 @@ static void hdc_irq_enable(running_machine *machine, int enabled)
 
 static READ8_HANDLER( ram_select_r )
 {
-	memory_set_bank(space->machine, "bank1", 0);
-	memory_set_bank(space->machine, "bank3", 0);
+	memory_set_bank(space->machine(), "bank1", 0);
+	memory_set_bank(space->machine(), "bank3", 0);
 
 	return 0;
 }
@@ -164,54 +164,54 @@ static WRITE8_DEVICE_HANDLER( floppy_w )
 
 static READ8_HANDLER( network_irq_disable_r )
 {
-	network_irq_enable(space->machine, 0);
+	network_irq_enable(space->machine(), 0);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( network_irq_disable_w )
 {
-	network_irq_enable(space->machine, 0);
+	network_irq_enable(space->machine(), 0);
 }
 
 static READ8_HANDLER( network_irq_enable_r )
 {
-	network_irq_enable(space->machine, 1);
+	network_irq_enable(space->machine(), 1);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( network_irq_enable_w )
 {
-	network_irq_enable(space->machine, 1);
+	network_irq_enable(space->machine(), 1);
 }
 
 static WRITE8_HANDLER( hdc_irq_enable_w )
 {
-	hdc_irq_enable(space->machine, BIT(data, 0));
+	hdc_irq_enable(space->machine(), BIT(data, 0));
 }
 
 static READ8_HANDLER( rtc_address_r )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
+	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
 	return rtc->read(*space, 0);
 }
 
 static WRITE8_HANDLER( rtc_address_w )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
+	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
 	rtc->write(*space, 0, data);
 }
 
 static READ8_HANDLER( rtc_data_r )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
+	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
 	return rtc->read(*space, 1);
 }
 
 static WRITE8_HANDLER( rtc_data_w )
 {
-	mc146818_device *rtc = space->machine->device<mc146818_device>(HD146818_TAG);
+	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
 	rtc->write(*space, 1, data);
 }
 
@@ -270,20 +270,20 @@ INPUT_PORTS_END
 /*
 static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
 {
-    e01_state *driver_state = device->machine->driver_data<e01_state>();
+    e01_state *driver_state = device->machine().driver_data<e01_state>();
 
     driver_state->rtc_irq = state;
 
-    update_interrupts(device->machine);
+    update_interrupts(device->machine());
 }
 */
 static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 {
-	e01_state *state = timer.machine->driver_data<e01_state>();
+	e01_state *state = timer.machine().driver_data<e01_state>();
 
 	state->rtc_irq = !state->rtc_irq;
 
-	update_interrupts(timer.machine);
+	update_interrupts(timer.machine());
 }
 
 /*-------------------------------------------------
@@ -292,11 +292,11 @@ static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 /*
 static WRITE_LINE_DEVICE_HANDLER( adlc_irq_w )
 {
-    e01_state *driver_state = device->machine->driver_data<e01_state>();
+    e01_state *driver_state = device->machine().driver_data<e01_state>();
 
     driver_state->adlc_irq = state;
 
-    update_interrupts(device->machine);
+    update_interrupts(device->machine());
 }
 */
 static const mc6854_interface adlc_intf =
@@ -313,11 +313,11 @@ static const mc6854_interface adlc_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 {
-	e01_state *driver_state = device->machine->driver_data<e01_state>();
+	e01_state *driver_state = device->machine().driver_data<e01_state>();
 
 	driver_state->via_irq = state;
 
-	update_interrupts(device->machine);
+	update_interrupts(device->machine());
 }
 
 static const via6522_interface via_intf =
@@ -359,11 +359,11 @@ static const floppy_config e01_floppy_config =
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 {
-	e01_state *driver_state = device->machine->driver_data<e01_state>();
+	e01_state *driver_state = device->machine().driver_data<e01_state>();
 
 	driver_state->fdc_drq = state;
 
-	update_interrupts(device->machine);
+	update_interrupts(device->machine());
 }
 
 static const wd17xx_interface fdc_intf =
@@ -384,10 +384,10 @@ static const wd17xx_interface fdc_intf =
 
 static MACHINE_START( e01 )
 {
-	e01_state *state = machine->driver_data<e01_state>();
+	e01_state *state = machine.driver_data<e01_state>();
 
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
-	UINT8 *rom = machine->region(R65C102_TAG)->base();
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *rom = machine.region(R65C102_TAG)->base();
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 0, 1, ram, 0);

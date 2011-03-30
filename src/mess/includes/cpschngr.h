@@ -41,7 +41,7 @@ public:
 
 /*----------- defined in machine/kabuki.c -----------*/
 
-void wof_decode(running_machine *machine);
+void wof_decode(running_machine &machine);
 
 
 /*----------- defined in video/cpschngr.c -----------*/

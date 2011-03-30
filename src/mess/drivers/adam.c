@@ -258,11 +258,11 @@ void adam_state::bankswitch()
 		if (BIT(m_adamnet, 1))
 		{
 			program->unmap_readwrite(0x0000, 0x5fff);
-			program->install_rom(0x6000, 0x7fff, machine->region("wp")->base() + 0x8000);
+			program->install_rom(0x6000, 0x7fff, m_machine.region("wp")->base() + 0x8000);
 		}
 		else
 		{
-			program->install_rom(0x0000, 0x7fff, machine->region("wp")->base());
+			program->install_rom(0x0000, 0x7fff, m_machine.region("wp")->base());
 		}
 		break;
 
@@ -278,7 +278,7 @@ void adam_state::bankswitch()
 		break;
 
 	case LO_OS7_ROM_INTERNAL_RAM:
-		program->install_rom(0x0000, 0x1fff, machine->region("os7")->base());
+		program->install_rom(0x0000, 0x1fff, m_machine.region("os7")->base());
 		program->install_ram(0x2000, 0x7fff, ram + 0x2000);
 		break;
 	}
@@ -290,13 +290,13 @@ void adam_state::bankswitch()
 		break;
 
 	case HI_ROM_EXPANSION:
-		program->install_rom(0x8000, 0xffff, machine->region("xrom")->base());
+		program->install_rom(0x8000, 0xffff, m_machine.region("xrom")->base());
 		break;
 
 	case HI_RAM_EXPANSION:
 		if (m_game)
 		{
-			program->install_rom(0x8000, 0xffff, machine->region("cart")->base());
+			program->install_rom(0x8000, 0xffff, m_machine.region("cart")->base());
 		}
 		else
 		{
@@ -308,7 +308,7 @@ void adam_state::bankswitch()
 		break;
 
 	case HI_CARTRIDGE_ROM:
-		program->install_rom(0x8000, 0xffff, machine->region("cart")->base());
+		program->install_rom(0x8000, 0xffff, m_machine.region("cart")->base());
 		break;
 	}
 }
@@ -409,13 +409,13 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 	{
 		m_reset = 1;
 
-		machine->device(M6801_KB_TAG)->reset();
-		machine->device(M6801_DDP_TAG)->reset();
-		machine->device(M6801_PRN_TAG)->reset();
-		machine->device(M6801_FDC_TAG)->reset();
+		m_machine.device(M6801_KB_TAG)->reset();
+		m_machine.device(M6801_DDP_TAG)->reset();
+		m_machine.device(M6801_PRN_TAG)->reset();
+		m_machine.device(M6801_FDC_TAG)->reset();
 		wd17xx_mr_w(m_fdc, 0);
 		wd17xx_mr_w(m_fdc, 1);
-		//machine->device(M6801_SPI_TAG)->reset();
+		//m_machine.device(M6801_SPI_TAG)->reset();
 
 		m_reset = 0;
 	}
@@ -605,19 +605,19 @@ READ8_MEMBER( adam_state::kb6801_p1_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_key_y, 0)) data &= input_port_read(machine, "Y0");
-	if (!BIT(m_key_y, 1)) data &= input_port_read(machine, "Y1");
-	if (!BIT(m_key_y, 2)) data &= input_port_read(machine, "Y2");
-	if (!BIT(m_key_y, 3)) data &= input_port_read(machine, "Y3");
-	if (!BIT(m_key_y, 4)) data &= input_port_read(machine, "Y4");
-	if (!BIT(m_key_y, 5)) data &= input_port_read(machine, "Y5");
-	if (!BIT(m_key_y, 6)) data &= input_port_read(machine, "Y6");
-	if (!BIT(m_key_y, 7)) data &= input_port_read(machine, "Y7");
-	if (!BIT(m_key_y, 8)) data &= input_port_read(machine, "Y8");
-	if (!BIT(m_key_y, 9)) data &= input_port_read(machine, "Y9");
-	if (!BIT(m_key_y, 10)) data &= input_port_read(machine, "Y10");
-	if (!BIT(m_key_y, 11)) data &= input_port_read(machine, "Y11");
-	if (!BIT(m_key_y, 12)) data &= input_port_read(machine, "Y12");
+	if (!BIT(m_key_y, 0)) data &= input_port_read(m_machine, "Y0");
+	if (!BIT(m_key_y, 1)) data &= input_port_read(m_machine, "Y1");
+	if (!BIT(m_key_y, 2)) data &= input_port_read(m_machine, "Y2");
+	if (!BIT(m_key_y, 3)) data &= input_port_read(m_machine, "Y3");
+	if (!BIT(m_key_y, 4)) data &= input_port_read(m_machine, "Y4");
+	if (!BIT(m_key_y, 5)) data &= input_port_read(m_machine, "Y5");
+	if (!BIT(m_key_y, 6)) data &= input_port_read(m_machine, "Y6");
+	if (!BIT(m_key_y, 7)) data &= input_port_read(m_machine, "Y7");
+	if (!BIT(m_key_y, 8)) data &= input_port_read(m_machine, "Y8");
+	if (!BIT(m_key_y, 9)) data &= input_port_read(m_machine, "Y9");
+	if (!BIT(m_key_y, 10)) data &= input_port_read(m_machine, "Y10");
+	if (!BIT(m_key_y, 11)) data &= input_port_read(m_machine, "Y11");
+	if (!BIT(m_key_y, 12)) data &= input_port_read(m_machine, "Y12");
 
 	return data;
 }
@@ -1160,9 +1160,9 @@ WRITE8_MEMBER( adam_state::fdc6801_p4_w )
 
 static TIMER_DEVICE_CALLBACK( paddle_tick )
 {
-	adam_state *state = timer.machine->driver_data<adam_state>();
+	adam_state *state = timer.machine().driver_data<adam_state>();
 
-	coleco_scan_paddles(timer.machine, &state->m_joy_status0, &state->m_joy_status1);
+	coleco_scan_paddles(timer.machine(), &state->m_joy_status0, &state->m_joy_status1);
 
     if (state->m_joy_status0 || state->m_joy_status1)
 	{
@@ -1197,7 +1197,7 @@ WRITE8_MEMBER( adam_state::joystick_w )
 
 READ8_MEMBER( adam_state::input1_r )
 {
-	return coleco_paddle1_read(machine, m_joy_mode, m_joy_status0);
+	return coleco_paddle1_read(m_machine, m_joy_mode, m_joy_status0);
 }
 
 
@@ -1207,7 +1207,7 @@ READ8_MEMBER( adam_state::input1_r )
 
 READ8_MEMBER( adam_state::input2_r )
 {
-	return coleco_paddle1_read(machine, m_joy_mode, m_joy_status1);
+	return coleco_paddle1_read(m_machine, m_joy_mode, m_joy_status1);
 }
 
 
@@ -1497,12 +1497,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( adam_interrupt )
 {
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
-static void adam_vdp_interrupt(running_machine *machine, int state)
+static void adam_vdp_interrupt(running_machine &machine, int state)
 {
-	adam_state *driver_state = machine->driver_data<adam_state>();
+	adam_state *driver_state = machine.driver_data<adam_state>();
 
 	if (state && !driver_state->m_vdp_nmi)
 	{
@@ -1617,25 +1617,25 @@ void adam_state::machine_start()
 	TMS9928A_configure(&tms9928a_interface);
 
 	// register for state saving
-	state_save_register_global(machine, m_mioc);
-	state_save_register_global(machine, m_game);
-	state_save_register_global(machine, m_adamnet);
-	state_save_register_global_array(machine, m_txd);
-	state_save_register_global(machine, m_rxd);
-	state_save_register_global(machine, m_reset);
-	state_save_register_global(machine, m_ba);
-	state_save_register_global(machine, m_dma);
-	state_save_register_global(machine, m_bwr);
-	state_save_register_global(machine, m_data_in);
-	state_save_register_global(machine, m_data_out);
-	state_save_register_global(machine, m_key_y);
-	state_save_register_global(machine, m_joy_mode);
-	state_save_register_global(machine, m_joy_status0);
-	state_save_register_global(machine, m_joy_status1);
-	state_save_register_global(machine, m_vdp_nmi);
-	state_save_register_global(machine, m_wr0);
-	state_save_register_global(machine, m_wr1);
-	state_save_register_global(machine, m_track);
+	state_save_register_global(m_machine, m_mioc);
+	state_save_register_global(m_machine, m_game);
+	state_save_register_global(m_machine, m_adamnet);
+	state_save_register_global_array(m_machine, m_txd);
+	state_save_register_global(m_machine, m_rxd);
+	state_save_register_global(m_machine, m_reset);
+	state_save_register_global(m_machine, m_ba);
+	state_save_register_global(m_machine, m_dma);
+	state_save_register_global(m_machine, m_bwr);
+	state_save_register_global(m_machine, m_data_in);
+	state_save_register_global(m_machine, m_data_out);
+	state_save_register_global(m_machine, m_key_y);
+	state_save_register_global(m_machine, m_joy_mode);
+	state_save_register_global(m_machine, m_joy_status0);
+	state_save_register_global(m_machine, m_joy_status1);
+	state_save_register_global(m_machine, m_vdp_nmi);
+	state_save_register_global(m_machine, m_wr0);
+	state_save_register_global(m_machine, m_wr1);
+	state_save_register_global(m_machine, m_track);
 }
 
 
@@ -1645,7 +1645,7 @@ void adam_state::machine_start()
 
 void adam_state::machine_reset()
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(m_machine.device("cart"));
 
     if (image->exists())
 	{

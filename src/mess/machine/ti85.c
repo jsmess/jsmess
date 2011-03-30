@@ -42,7 +42,7 @@ enum
 
 static TIMER_CALLBACK(ti85_timer_callback)
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
+	ti85_state *state = machine.driver_data<ti85_state>();
 	if (input_port_read(machine, "ON") & 0x01)
 	{
 		if (state->ON_interrupt_mask && !state->ON_pressed)
@@ -63,16 +63,16 @@ static TIMER_CALLBACK(ti85_timer_callback)
 	}
 }
 
-static void update_ti85_memory (running_machine *machine)
+static void update_ti85_memory (running_machine &machine)
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	memory_set_bankptr(machine, "bank2",machine->region("maincpu")->base() + 0x010000 + 0x004000*state->ti8x_memory_page_1);
+	ti85_state *state = machine.driver_data<ti85_state>();
+	memory_set_bankptr(machine, "bank2",machine.region("maincpu")->base() + 0x010000 + 0x004000*state->ti8x_memory_page_1);
 }
 
-static void update_ti83p_memory (running_machine *machine)
+static void update_ti83p_memory (running_machine &machine)
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->ti8x_memory_page_1 & 0x40)
 	{
@@ -92,12 +92,12 @@ static void update_ti83p_memory (running_machine *machine)
 	{
 		if (state->ti83p_port4 & 1)
 		{
-			memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x1f));
+			memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x1f));
 			space->unmap_write(0x8000, 0xbfff);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x1f));
+			memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x1f));
 			space->unmap_write(0x4000, 0x7fff);
 		}
 	}
@@ -120,21 +120,21 @@ static void update_ti83p_memory (running_machine *machine)
 	{
 		if (state->ti83p_port4 & 1)
 		{
-			memory_set_bankptr(machine, "bank4", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x1f));
+			memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x1f));
 			space->unmap_write(0xc000, 0xffff);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x1f));
+			memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x1f));
 			space->unmap_write(0x8000, 0xbfff);
 		}
 	}
 }
 
-static void update_ti86_memory (running_machine *machine)
+static void update_ti86_memory (running_machine &machine)
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->ti8x_memory_page_1 & 0x40)
 	{
@@ -143,7 +143,7 @@ static void update_ti86_memory (running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x0f));
+		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_1&0x0f));
 		space->unmap_write(0x4000, 0x7fff);
 	}
 
@@ -154,7 +154,7 @@ static void update_ti86_memory (running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x0f));
+		memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->ti8x_memory_page_2&0x0f));
 		space->unmap_write(0x8000, 0xbfff);
 	}
 
@@ -166,9 +166,9 @@ static void update_ti86_memory (running_machine *machine)
 
 MACHINE_START( ti81 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine->region("maincpu")->base();
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
 	state->timer_interrupt_status = 0;
@@ -191,7 +191,7 @@ MACHINE_START( ti81 )
 
 	state->ti_calculator_model = TI_81;
 
-	machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
@@ -201,9 +201,9 @@ MACHINE_START( ti81 )
 
 MACHINE_START( ti82 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine->region("maincpu")->base();
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
 	state->timer_interrupt_status = 0;
@@ -232,7 +232,7 @@ MACHINE_START( ti82 )
 
 	state->ti_calculator_model = TI_82;
 
-	machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
@@ -243,9 +243,9 @@ MACHINE_START( ti82 )
 
 MACHINE_START( ti85 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine->region("maincpu")->base();
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
 	state->timer_interrupt_status = 0;
@@ -267,7 +267,7 @@ MACHINE_START( ti85 )
 
 	state->ti_calculator_model = TI_85;
 
-	machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
@@ -278,7 +278,7 @@ MACHINE_START( ti85 )
 
 MACHINE_RESET( ti85 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
+	ti85_state *state = machine.driver_data<ti85_state>();
 	state->red_out = 0x00;
 	state->white_out = 0x00;
 	state->PCR = 0xc0;
@@ -287,9 +287,9 @@ MACHINE_RESET( ti85 )
 
 MACHINE_START( ti83p )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine->region("maincpu")->base();
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
 	state->timer_interrupt_status = 0;
@@ -333,16 +333,16 @@ MACHINE_START( ti83p )
 
 		state->ti_calculator_model = TI_83p;
 
-		machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+		machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 	}
 }
 
 
 MACHINE_START( ti86 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine->region("maincpu")->base();
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
 
 	state->timer_interrupt_mask = 0;
 	state->timer_interrupt_status = 0;
@@ -374,7 +374,7 @@ MACHINE_START( ti86 )
 
 		state->ti_calculator_model = TI_86;
 
-		machine->scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+		machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
 	}
 }
 
@@ -388,7 +388,7 @@ READ8_HANDLER ( ti85_port_0000_r )
 
 READ8_HANDLER ( ti8x_keypad_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0xff;
 	int port;
 	int bit;
@@ -402,7 +402,7 @@ READ8_HANDLER ( ti8x_keypad_r )
 		{
 			for (port = 0; port < 8; port++)
 			{
-				data ^= input_port_read(space->machine, bitnames[port]) & (0x01<<bit) ? 0x01<<port : 0x00;
+				data ^= input_port_read(space->machine(), bitnames[port]) & (0x01<<bit) ? 0x01<<port : 0x00;
 			}
 		}
 	}
@@ -416,7 +416,7 @@ READ8_HANDLER ( ti8x_keypad_r )
 
  READ8_HANDLER ( ti85_port_0003_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0;
 
 	if (state->LCD_status)
@@ -439,20 +439,20 @@ READ8_HANDLER ( ti8x_keypad_r )
 
  READ8_HANDLER ( ti85_port_0005_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->ti8x_memory_page_1;
 }
 
 READ8_HANDLER ( ti85_port_0006_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->power_mode;
 }
 
 READ8_HANDLER ( ti85_port_0007_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
-	device_t *ti85serial = space->machine->device("ti85serial");
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *ti85serial = space->machine().device("ti85serial");
 
 	ti85_update_serial(ti85serial);
 	return (state->white_out<<3)
@@ -464,8 +464,8 @@ READ8_HANDLER ( ti85_port_0007_r )
 
 READ8_HANDLER ( ti82_port_0000_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
-	device_t *ti85serial = space->machine->device("ti82serial");;
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *ti85serial = space->machine().device("ti82serial");;
 
 	ti85_update_serial(ti85serial);
 	return (state->white_out<<3)
@@ -477,7 +477,7 @@ READ8_HANDLER ( ti82_port_0000_r )
 
  READ8_HANDLER ( ti82_port_0002_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->ti8x_port2;
 }
 
@@ -488,7 +488,7 @@ READ8_HANDLER ( ti82_port_0000_r )
 
  READ8_HANDLER ( ti82_port_0011_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
     UINT8* ti82_video;
 	UINT8 ti82_port11;
 
@@ -528,31 +528,31 @@ READ8_HANDLER ( ti82_port_0000_r )
 
 READ8_HANDLER ( ti86_port_0005_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->ti8x_memory_page_1;
 }
 
  READ8_HANDLER ( ti86_port_0006_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->ti8x_memory_page_2;
 }
 
 READ8_HANDLER ( ti83_port_0000_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return ((state->ti8x_memory_page_1 & 0x08) << 1) | 0x0C;
 }
 
  READ8_HANDLER ( ti83_port_0002_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->ti8x_port2;
 }
 
  READ8_HANDLER ( ti83_port_0003_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0;
 
 	if (state->LCD_status)
@@ -573,37 +573,37 @@ READ8_HANDLER ( ti83p_port_0000_r )
 
  READ8_HANDLER ( ti83p_port_0002_r )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	return state->ti8x_port2|3;
 }
 
 WRITE8_HANDLER ( ti81_port_0007_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti81_port_7_data = data;
 }
 
 WRITE8_HANDLER ( ti85_port_0000_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->LCD_memory_base = data;
 }
 
 WRITE8_HANDLER ( ti8x_keypad_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->keypad_mask = data&0x7f;
 }
 
 WRITE8_HANDLER ( ti85_port_0002_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->LCD_contrast = data&0x1f;
 }
 
 WRITE8_HANDLER ( ti85_port_0003_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	if (state->LCD_status && !(data&0x08))	state->timer_interrupt_mask = 0;
 	state->ON_interrupt_mask = data&0x01;
 //  state->timer_interrupt_mask = data&0x04;
@@ -613,7 +613,7 @@ WRITE8_HANDLER ( ti85_port_0003_w )
 
 WRITE8_HANDLER ( ti85_port_0004_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->video_buffer_width = (data>>3)&0x03;
 	state->interrupt_speed = (data>>1)&0x03;
 	state->port4_bit0 = data&0x01;
@@ -621,22 +621,22 @@ WRITE8_HANDLER ( ti85_port_0004_w )
 
 WRITE8_HANDLER ( ti85_port_0005_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_1 = data;
-	update_ti85_memory(space->machine);
+	update_ti85_memory(space->machine());
 }
 
 WRITE8_HANDLER ( ti85_port_0006_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->power_mode = data;
 }
 
 WRITE8_HANDLER ( ti85_port_0007_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
-	device_t *speaker = space->machine->device("speaker");
-	device_t *ti85serial = space->machine->device("ti85serial");
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *speaker = space->machine().device("speaker");
+	device_t *ti85serial = space->machine().device("ti85serial");
 
 	speaker_level_w(speaker, ( (data>>2)|(data>>3) ) & 0x01);
 	state->red_out=(data>>2)&0x01;
@@ -649,23 +649,23 @@ WRITE8_HANDLER ( ti85_port_0007_w )
 
 WRITE8_HANDLER ( ti86_port_0005_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_1 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory(space->machine);
+	update_ti86_memory(space->machine());
 }
 
 WRITE8_HANDLER ( ti86_port_0006_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_2 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory(space->machine);
+	update_ti86_memory(space->machine());
 }
 
 WRITE8_HANDLER ( ti82_port_0000_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
-	device_t *speaker = space->machine->device("speaker");
-	device_t *ti85serial = space->machine->device("ti82serial");
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *speaker = space->machine().device("speaker");
+	device_t *ti85serial = space->machine().device("ti82serial");
 
 	speaker_level_w(speaker,( (data>>2)|(data>>3) )&0x01 );
 	state->red_out=(data>>2)&0x01;
@@ -678,15 +678,15 @@ WRITE8_HANDLER ( ti82_port_0000_w )
 
 WRITE8_HANDLER ( ti82_port_0002_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_1 = (data & 0x07);
-	update_ti85_memory(space->machine);
+	update_ti85_memory(space->machine());
 	state->ti8x_port2 = data;
 }
 
 WRITE8_HANDLER ( ti82_port_0010_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	if (data == 0x00 || data == 0x01)
 		state->ti82_video_mode = data;
 	if (data >= 0x04 && data <= 0x07)
@@ -703,7 +703,7 @@ WRITE8_HANDLER ( ti82_port_0010_w )
 
 WRITE8_HANDLER ( ti82_port_0011_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	UINT8* ti82_video;
 
 	if(state->ti82_video_mode)
@@ -734,22 +734,22 @@ WRITE8_HANDLER ( ti82_port_0011_w )
 
 WRITE8_HANDLER ( ti83_port_0000_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_1 = (state->ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
-	update_ti85_memory(space->machine);
+	update_ti85_memory(space->machine());
 }
 
 WRITE8_HANDLER ( ti83_port_0002_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_1 = (state->ti8x_memory_page_1 & 8) | (data & 7);
-	update_ti85_memory(space->machine);
+	update_ti85_memory(space->machine());
 	state->ti8x_port2 = data;
 }
 
 WRITE8_HANDLER ( ti83_port_0003_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 		if (state->LCD_status && !(data&0x08))	state->timer_interrupt_mask = 0;
 		state->ON_interrupt_mask = data&0x01;
 		//state->timer_interrupt_mask = data&0x04;
@@ -764,20 +764,20 @@ WRITE8_HANDLER ( ti83p_port_0000_w )
 
 WRITE8_HANDLER ( ti83p_port_0002_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_port2 = data;
 }
 
 WRITE8_HANDLER ( ti83p_port_0003_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->LCD_mask = (data&0x08) >> 2;
 	state->ON_interrupt_mask = data & 0x01;
 }
 
 WRITE8_HANDLER ( ti83p_port_0004_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	if ((data & 1) && !(state->ti83p_port4 & 1))
 	{
 		state->ti8x_memory_page_1 = 0x1f;
@@ -788,27 +788,27 @@ WRITE8_HANDLER ( ti83p_port_0004_w )
 		state->ti8x_memory_page_1 = 0x1f;
 		state->ti8x_memory_page_2 = 0x40;
 	}
-	update_ti83p_memory(space->machine);
+	update_ti83p_memory(space->machine());
 	state->ti83p_port4 = data;
 }
 
 WRITE8_HANDLER ( ti83p_port_0006_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_1 = data & ((data&0x40) ? 0x41 : 0x5f);
-	update_ti83p_memory(space->machine);
+	update_ti83p_memory(space->machine());
 }
 
 WRITE8_HANDLER ( ti83p_port_0007_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
-	update_ti83p_memory(space->machine);
+	update_ti83p_memory(space->machine());
 }
 
 WRITE8_HANDLER ( ti83p_port_0010_w )
 {
-	ti85_state *state = space->machine->driver_data<ti85_state>();
+	ti85_state *state = space->machine().driver_data<ti85_state>();
 	if (data == 0x00 || data == 0x01)
 		state->ti82_video_mode = data;
 	if (data == 0x02 || data == 0x03)
@@ -829,7 +829,7 @@ WRITE8_HANDLER ( ti83p_port_0010_w )
 /* NVRAM functions */
 NVRAM_HANDLER( ti83p )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
+	ti85_state *state = machine.driver_data<ti85_state>();
 	if (read_or_write)
 	{
 		file->write(state->ti8x_ram, sizeof(unsigned char)*32*1024);
@@ -839,7 +839,7 @@ NVRAM_HANDLER( ti83p )
 			if (file)
 			{
 				file->read(state->ti8x_ram, sizeof(unsigned char)*32*1024);
-				cpu_set_reg(machine->device("maincpu"), Z80_PC,0x0c59);
+				cpu_set_reg(machine.device("maincpu"), Z80_PC,0x0c59);
 			}
 			else
 				memset(state->ti8x_ram, 0, sizeof(unsigned char)*32*1024);
@@ -848,7 +848,7 @@ NVRAM_HANDLER( ti83p )
 
 NVRAM_HANDLER( ti86 )
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
+	ti85_state *state = machine.driver_data<ti85_state>();
 	if (read_or_write)
 	{
 		file->write(state->ti8x_ram, sizeof(unsigned char)*128*1024);
@@ -858,7 +858,7 @@ NVRAM_HANDLER( ti86 )
 			if (file)
 			{
 				file->read(state->ti8x_ram, sizeof(unsigned char)*128*1024);
-				cpu_set_reg(machine->device("maincpu"), Z80_PC,0x0c59);
+				cpu_set_reg(machine.device("maincpu"), Z80_PC,0x0c59);
 			}
 			else
 				memset(state->ti8x_ram, 0, sizeof(unsigned char)*128*1024);
@@ -869,7 +869,7 @@ NVRAM_HANDLER( ti86 )
   TI calculators snapshot files (SAV)
 ***************************************************************************/
 
-static void ti8x_snapshot_setup_registers (running_machine *machine, UINT8 * data)
+static void ti8x_snapshot_setup_registers (running_machine &machine, UINT8 * data)
 {
 	unsigned char lo,hi;
 	unsigned char * reg = data + 0x40;
@@ -877,57 +877,57 @@ static void ti8x_snapshot_setup_registers (running_machine *machine, UINT8 * dat
 	/* Set registers */
 	lo = reg[0x00] & 0x0ff;
 	hi = reg[0x01] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_AF, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_AF, (hi << 8) | lo);
 	lo = reg[0x04] & 0x0ff;
 	hi = reg[0x05] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_BC, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_BC, (hi << 8) | lo);
 	lo = reg[0x08] & 0x0ff;
 	hi = reg[0x09] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_DE, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_DE, (hi << 8) | lo);
 	lo = reg[0x0c] & 0x0ff;
 	hi = reg[0x0d] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_HL, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_HL, (hi << 8) | lo);
 	lo = reg[0x10] & 0x0ff;
 	hi = reg[0x11] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_IX, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_IX, (hi << 8) | lo);
 	lo = reg[0x14] & 0x0ff;
 	hi = reg[0x15] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_IY, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_IY, (hi << 8) | lo);
 	lo = reg[0x18] & 0x0ff;
 	hi = reg[0x19] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_PC, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_PC, (hi << 8) | lo);
 	lo = reg[0x1c] & 0x0ff;
 	hi = reg[0x1d] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_SP, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_SP, (hi << 8) | lo);
 	lo = reg[0x20] & 0x0ff;
 	hi = reg[0x21] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_AF2, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_AF2, (hi << 8) | lo);
 	lo = reg[0x24] & 0x0ff;
 	hi = reg[0x25] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_BC2, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_BC2, (hi << 8) | lo);
 	lo = reg[0x28] & 0x0ff;
 	hi = reg[0x29] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_DE2, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_DE2, (hi << 8) | lo);
 	lo = reg[0x2c] & 0x0ff;
 	hi = reg[0x2d] & 0x0ff;
-	cpu_set_reg(machine->device("maincpu"), Z80_HL2, (hi << 8) | lo);
-	cpu_set_reg(machine->device("maincpu"), Z80_IFF1, reg[0x30]&0x0ff);
-	cpu_set_reg(machine->device("maincpu"), Z80_IFF2, reg[0x34]&0x0ff);
-	cpu_set_reg(machine->device("maincpu"), Z80_HALT, reg[0x38]&0x0ff);
-	cpu_set_reg(machine->device("maincpu"), Z80_IM, reg[0x3c]&0x0ff);
-	cpu_set_reg(machine->device("maincpu"), Z80_I, reg[0x40]&0x0ff);
+	cpu_set_reg(machine.device("maincpu"), Z80_HL2, (hi << 8) | lo);
+	cpu_set_reg(machine.device("maincpu"), Z80_IFF1, reg[0x30]&0x0ff);
+	cpu_set_reg(machine.device("maincpu"), Z80_IFF2, reg[0x34]&0x0ff);
+	cpu_set_reg(machine.device("maincpu"), Z80_HALT, reg[0x38]&0x0ff);
+	cpu_set_reg(machine.device("maincpu"), Z80_IM, reg[0x3c]&0x0ff);
+	cpu_set_reg(machine.device("maincpu"), Z80_I, reg[0x40]&0x0ff);
 
-	cpu_set_reg(machine->device("maincpu"), Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
+	cpu_set_reg(machine.device("maincpu"), Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
 
 	cputag_set_input_line(machine, "maincpu", 0, 0);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, 0);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
 }
 
-static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
+static void ti85_setup_snapshot (running_machine &machine, UINT8 * data)
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	ti85_state *state = machine.driver_data<ti85_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x8000 + 0x94;
@@ -965,9 +965,9 @@ static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 	state->interrupt_speed = 0x03;
 }
 
-static void ti86_setup_snapshot (running_machine *machine, UINT8 * data)
+static void ti86_setup_snapshot (running_machine &machine, UINT8 * data)
 {
-	ti85_state *state = machine->driver_data<ti85_state>();
+	ti85_state *state = machine.driver_data<ti85_state>();
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x20000 + 0x94;
 
@@ -1008,7 +1008,7 @@ static void ti86_setup_snapshot (running_machine *machine, UINT8 * data)
 
 SNAPSHOT_LOAD( ti8x )
 {
-	ti85_state *state = image.device().machine->driver_data<ti85_state>();
+	ti85_state *state = image.device().machine().driver_data<ti85_state>();
 	int expected_snapshot_size = 0;
 	UINT8 *ti8x_snapshot_data;
 
@@ -1033,8 +1033,8 @@ SNAPSHOT_LOAD( ti8x )
 
 	switch (state->ti_calculator_model)
 	{
-		case TI_85: ti85_setup_snapshot(image.device().machine, ti8x_snapshot_data); break;
-		case TI_86: ti86_setup_snapshot(image.device().machine, ti8x_snapshot_data); break;
+		case TI_85: ti85_setup_snapshot(image.device().machine(), ti8x_snapshot_data); break;
+		case TI_86: ti86_setup_snapshot(image.device().machine(), ti8x_snapshot_data); break;
 	}
 	free(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;

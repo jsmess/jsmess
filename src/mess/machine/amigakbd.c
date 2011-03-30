@@ -18,10 +18,10 @@ static int key_buf_pos = 0;
 static int key_cur_pos = 0;
 static emu_timer *kbd_timer;
 
-static void kbd_sendscancode( running_machine *machine, UINT8 scancode )
+static void kbd_sendscancode( running_machine &machine, UINT8 scancode )
 {
 	int j;
-	device_t *cia = machine->device("cia_0");
+	device_t *cia = machine.device("cia_0");
 
 	/* send over to the cia A */
 	for( j = 0; j < 8; j++ )
@@ -51,7 +51,7 @@ static TIMER_CALLBACK( kbd_update_callback )
 	/* if we still have more data, schedule another update */
 	if ( key_buf_pos != key_cur_pos )
 	{
-		kbd_timer->adjust(machine->primary_screen->frame_period() / 4);
+		kbd_timer->adjust(machine.primary_screen->frame_period() / 4);
 	}
 }
 
@@ -64,11 +64,11 @@ static INPUT_CHANGED( kbd_update )
 	/* Special case Page UP, which we will use as Action Replay button */
 	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
 	{
-		const amiga_machine_interface *amiga_intf = amiga_get_interface(field->port->machine);
+		const amiga_machine_interface *amiga_intf = amiga_get_interface(field->port->machine());
 
 		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
 		{
-			(*amiga_intf->nmi_callback)(field->port->machine);
+			(*amiga_intf->nmi_callback)(field->port->machine());
 		}
 	}
 	else
@@ -92,18 +92,18 @@ static INPUT_CHANGED( kbd_update )
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
 		{
-			kbd_timer->adjust(field->port->machine->primary_screen->frame_period() / 4);
+			kbd_timer->adjust(field->port->machine().primary_screen->frame_period() / 4);
 		}
 	}
 }
 
-void amigakbd_init( running_machine *machine )
+void amigakbd_init( running_machine &machine )
 {
 	/* allocate a keyboard buffer */
 	key_buf = auto_alloc_array(machine, UINT8, KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
 	key_cur_pos = 0;
-	kbd_timer = machine->scheduler().timer_alloc(FUNC(kbd_update_callback));
+	kbd_timer = machine.scheduler().timer_alloc(FUNC(kbd_update_callback));
 	kbd_timer->reset(  );
 }
 

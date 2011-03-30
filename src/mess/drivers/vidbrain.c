@@ -88,15 +88,15 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
 	UINT8 data = 0;//input_port_read(machine, "JOY-R");
 
-	if (BIT(m_keylatch, 0)) data |= input_port_read(machine, "IO00");
-	if (BIT(m_keylatch, 1)) data |= input_port_read(machine, "IO01");
-	if (BIT(m_keylatch, 2)) data |= input_port_read(machine, "IO02");
-	if (BIT(m_keylatch, 3)) data |= input_port_read(machine, "IO03");
-	if (BIT(m_keylatch, 4)) data |= input_port_read(machine, "IO04");
-	if (BIT(m_keylatch, 5)) data |= input_port_read(machine, "IO05");
-	if (BIT(m_keylatch, 6)) data |= input_port_read(machine, "IO06");
-	if (BIT(m_keylatch, 7)) data |= input_port_read(machine, "IO07");
-	if (!BIT(m_cmd, 4)) data |= input_port_read(machine, "UV201-31");
+	if (BIT(m_keylatch, 0)) data |= input_port_read(m_machine, "IO00");
+	if (BIT(m_keylatch, 1)) data |= input_port_read(m_machine, "IO01");
+	if (BIT(m_keylatch, 2)) data |= input_port_read(m_machine, "IO02");
+	if (BIT(m_keylatch, 3)) data |= input_port_read(m_machine, "IO03");
+	if (BIT(m_keylatch, 4)) data |= input_port_read(m_machine, "IO04");
+	if (BIT(m_keylatch, 5)) data |= input_port_read(m_machine, "IO05");
+	if (BIT(m_keylatch, 6)) data |= input_port_read(m_machine, "IO06");
+	if (BIT(m_keylatch, 7)) data |= input_port_read(m_machine, "IO07");
+	if (!BIT(m_cmd, 4)) data |= input_port_read(m_machine, "UV201-31");
 
 	return data;
 }
@@ -240,7 +240,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine, F3850_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), F3850_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -365,9 +365,9 @@ DISCRETE_SOUND_END
 /*
 static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 {
-    device_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
+    device_set_input_line_vector(device->machine().device(F3850_TAG), 0, addr);
 
-    cputag_set_input_line(device->machine, F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
+    cputag_set_input_line(device->machine(), F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
 }
 
 static const f3853_interface smi_intf =
@@ -400,7 +400,7 @@ static const cassette_config vidbrain_cassette_config =
 
 static IRQ_CALLBACK( vidbrain_int_ack )
 {
-	vidbrain_state *state = device->machine->driver_data<vidbrain_state>();
+	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
 
 	switch (state->m_int_enable)
 	{
@@ -429,13 +429,13 @@ void vidbrain_state::machine_start()
 	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
 
 	// register for state saving
-	state_save_register_global(machine, m_vector);
-	state_save_register_global(machine, m_int_enable);
-	state_save_register_global(machine, m_ext_int_latch);
-	state_save_register_global(machine, m_timer_int_latch);
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_joy_enable);
-	state_save_register_global(machine, m_sound_clk);
+	state_save_register_global(m_machine, m_vector);
+	state_save_register_global(m_machine, m_int_enable);
+	state_save_register_global(m_machine, m_ext_int_latch);
+	state_save_register_global(m_machine, m_timer_int_latch);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_joy_enable);
+	state_save_register_global(m_machine, m_sound_clk);
 }
 
 

@@ -42,7 +42,7 @@
 static size_t pc_videoram_size;
 static UINT8 *pc_videoram;
 
-static pc_video_update_proc (*pc_choosevideomode)(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc);
+static pc_video_update_proc (*pc_choosevideomode)(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc);
 static struct mscrtc6845 *pc_crtc;
 static int pc_anythingdirty;
 static int pc_current_height;
@@ -60,7 +60,7 @@ static PALETTE_INIT( vga );
 static VIDEO_START( vga );
 static VIDEO_RESET( vga );
 
-static pc_video_update_proc pc_vga_choosevideomode(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc);
+static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc);
 
 /***************************************************************************
 
@@ -100,8 +100,8 @@ static STATE_POSTLOAD( pc_video_postload )
 
 
 
-struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6845_config *config,
-	pc_video_update_proc (*choosevideomode)(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc),
+struct mscrtc6845 *pc_video_start(running_machine &machine, const struct mscrtc6845_config *config,
+	pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc),
 	size_t vramsize)
 {
 	pc_choosevideomode = choosevideomode;
@@ -109,7 +109,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 	pc_anythingdirty = 1;
 	pc_current_height = -1;
 	pc_current_width = -1;
-	machine->generic.tmpbitmap = NULL;
+	machine.generic.tmpbitmap = NULL;
 
 	pc_videoram_size = vramsize;
 	if (config)
@@ -124,7 +124,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 		video_start_generic_bitmapped(machine);
 	}
 
-	machine->state().register_postload(pc_video_postload, NULL);
+	machine.state().register_postload(pc_video_postload, NULL);
 	return pc_crtc;
 }
 
@@ -142,7 +142,7 @@ SCREEN_UPDATE( pc_video )
 		h = mscrtc6845_get_char_height(pc_crtc) * mscrtc6845_get_char_lines(pc_crtc);
 	}
 
-	video_update = pc_choosevideomode(screen->machine, &w, &h, pc_crtc);
+	video_update = pc_choosevideomode(screen->machine(), &w, &h, pc_crtc);
 
 	if (video_update)
 	{
@@ -166,11 +166,11 @@ SCREEN_UPDATE( pc_video )
 			bitmap_fill(bitmap, cliprect, 0);
 		}
 
-		video_update(screen->machine->generic.tmpbitmap ? screen->machine->generic.tmpbitmap : bitmap, pc_crtc);
+		video_update(screen->machine().generic.tmpbitmap ? screen->machine().generic.tmpbitmap : bitmap, pc_crtc);
 
-		if (screen->machine->generic.tmpbitmap)
+		if (screen->machine().generic.tmpbitmap)
 		{
-			copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+			copybitmap(bitmap, screen->machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 			if (!pc_anythingdirty)
 				rc = UPDATE_HAS_NOT_CHANGED;
 			pc_anythingdirty = 0;
@@ -532,9 +532,9 @@ static WRITE64_HANDLER( vga_vga64_w ) { write64be_with_write8_handler(vga_vga_w,
 static READ64_HANDLER( vga_ega64_r ) { return read64be_with_read8_handler(vga_ega_r, space, offset, mem_mask); }
 static WRITE64_HANDLER( vga_ega64_w ) { write64be_with_write8_handler(vga_ega_w, space, offset, data, mem_mask); }
 
-static void vga_cpu_interface(running_machine *machine)
+static void vga_cpu_interface(running_machine &machine)
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 	static int sequencer, gc;
 	read8_space_func read_handler;
 	write8_space_func write_handler;
@@ -613,7 +613,7 @@ static void vga_cpu_interface(running_machine *machine)
 	}
 	else
 	{
-		buswidth = downcast<legacy_cpu_device *>(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+		buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 		switch(buswidth)
 		{
 			case 8:
@@ -719,7 +719,7 @@ static READ8_HANDLER(vga_crtc_r)
 			int clock=vga.monitor.get_clock();
 			int lines=vga.monitor.get_lines();
 			int columns=vga.monitor.get_columns();
-			int diff = (((space->machine->time() - vga.monitor.start_time) * clock).seconds)
+			int diff = (((space->machine().time() - vga.monitor.start_time) * clock).seconds)
 				%(lines*columns);
 			if (diff<columns*vga.monitor.get_sync_lines()) data|=8;
 			diff=diff/lines;
@@ -729,7 +729,7 @@ static READ8_HANDLER(vga_crtc_r)
 		if (vga.monitor.retrace)
 		{
 			data |= 1;
-			if ((space->machine->time() - vga.monitor.start_time) > attotime::from_usec(300))
+			if ((space->machine().time() - vga.monitor.start_time) > attotime::from_usec(300))
 			{
 				data |= 8;
 				vga.monitor.retrace=0;
@@ -737,9 +737,9 @@ static READ8_HANDLER(vga_crtc_r)
 		}
 		else
 		{
-			if ((space->machine->time() - vga.monitor.start_time)  > attotime::from_msec(15))
+			if ((space->machine().time() - vga.monitor.start_time)  > attotime::from_msec(15))
 				vga.monitor.retrace=1;
-			vga.monitor.start_time=space->machine->time();
+			vga.monitor.start_time=space->machine().time();
 		}
 #else
 		// not working with ps2m30
@@ -980,10 +980,10 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		if (vga.sequencer.index < vga.svga_intf.seq_regcount)
 		{
 			vga.sequencer.data[vga.sequencer.index] = data;
-			vga_cpu_interface(space->machine);
+			vga_cpu_interface(space->machine());
 
 			if (vga.sequencer.index == 0)
-				vga.monitor.start_time = space->machine->time();
+				vga.monitor.start_time = space->machine().time();
 		}
 		break;
 	case 6:
@@ -1045,7 +1045,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		if (vga.gc.index < vga.svga_intf.gc_regcount)
 		{
 			vga.gc.data[vga.gc.index] = data;
-			vga_cpu_interface(space->machine);
+			vga_cpu_interface(space->machine());
 		}
 		break;
 	}
@@ -1062,7 +1062,7 @@ WRITE8_HANDLER(vga_port_03d0_w)
 		vga_crtc_w(space, offset, data);
 }
 
-void pc_vga_reset(running_machine *machine)
+void pc_vga_reset(running_machine &machine)
 {
 	/* clear out the VGA structure */
 	memset(vga.pens, 0, sizeof(vga.pens));
@@ -1125,7 +1125,7 @@ static WRITE64_HANDLER( vga_port64be_03b0_w ) { write64be_with_write8_handler(vg
 static WRITE64_HANDLER( vga_port64be_03c0_w ) { write64be_with_write8_handler(vga_port_03c0_w, space, offset, data, mem_mask); }
 static WRITE64_HANDLER( vga_port64be_03d0_w ) { write64be_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
 
-void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
+void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
 {
 	int i, j, k, mask, buswidth;
 	address_space *spacevga;
@@ -1173,8 +1173,8 @@ void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_in
 	memset(vga.crtc.data, '\0', vga.svga_intf.crtc_regcount);
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
-	buswidth = downcast<legacy_cpu_device *>(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	spacevga =machine->firstcpu->memory().space(vga.vga_intf.port_addressspace);
+	buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	spacevga =machine.firstcpu->memory().space(vga.vga_intf.port_addressspace);
 	switch(buswidth)
 	{
 		case 8:
@@ -1232,7 +1232,7 @@ static VIDEO_START( vga )
 	vga.monitor.get_columns=vga_get_crtc_columns;
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
-	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
+	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
 	pc_video_start(machine, NULL, pc_vga_choosevideomode, 0);
 }
 
@@ -1411,7 +1411,7 @@ static void vga_vh_vga(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static pc_video_update_proc pc_vga_choosevideomode(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc)
+static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 	int i;
@@ -1433,7 +1433,7 @@ static pc_video_update_proc pc_vga_choosevideomode(running_machine *machine, int
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i] = machine->pens[(vga.attribute.data[i]&0x0f)
+				vga.pens[i] = machine.pens[(vga.attribute.data[i]&0x0f)
 										 |((vga.attribute.data[0x14]&0xf)<<4)];
 			}
 		}
@@ -1441,7 +1441,7 @@ static pc_video_update_proc pc_vga_choosevideomode(running_machine *machine, int
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i]=machine->pens[(vga.attribute.data[i]&0x3f)
+				vga.pens[i]=machine.pens[(vga.attribute.data[i]&0x3f)
 										 |((vga.attribute.data[0x14]&0xc)<<4)];
 			}
 		}

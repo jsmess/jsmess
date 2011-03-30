@@ -45,7 +45,7 @@ UINT8 hector_flag_hr;
 UINT8 hector_flag_80c;
 
 
-static void Init_Hector_Palette( running_machine  *machine)
+static void Init_Hector_Palette( running_machine &machine)
 {
 	// basic colors !
 	hector_color[0] = 0;  // fond (noir)
@@ -122,7 +122,7 @@ VIDEO_START( hec2hrp )
 
 SCREEN_UPDATE( hec2hrp )
 {
-	hec2hrp_state *state = screen->machine->driver_data<hec2hrp_state>();
+	hec2hrp_state *state = screen->machine().driver_data<hec2hrp_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *videoram_HR = state->hector_videoram;
 	if (hector_flag_hr==1)

@@ -17,7 +17,7 @@
 
 READ8_HANDLER( arkanoid_Z80_mcu_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	/* return the last value the 68705 wrote, and mark that we've read it */
 	state->m68705write = 0;
@@ -26,7 +26,7 @@ READ8_HANDLER( arkanoid_Z80_mcu_r )
 
 static TIMER_CALLBACK( test )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
 	state->z80write = 1;
 	state->fromz80 = param;
@@ -34,28 +34,28 @@ static TIMER_CALLBACK( test )
 
 WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 {
-	space->machine->scheduler().synchronize(FUNC(test), data);
+	space->machine().scheduler().synchronize(FUNC(test), data);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 READ8_HANDLER( arkanoid_68705_port_a_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( arkanoid_68705_port_a_w )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( arkanoid_68705_ddr_a_w )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	state->ddr_a = data;
 }
@@ -63,7 +63,7 @@ WRITE8_HANDLER( arkanoid_68705_ddr_a_w )
 
 READ8_HANDLER( arkanoid_68705_port_c_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	int res = 0;
 
 	/* bit 0 is high on a write strobe; clear it once we've detected it */
@@ -79,7 +79,7 @@ READ8_HANDLER( arkanoid_68705_port_c_r )
 
 WRITE8_HANDLER( arkanoid_68705_port_c_w )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	if ((state->ddr_c & 0x04) && (~data & 0x04) && (state->port_c_out & 0x04))
 	{
@@ -99,14 +99,14 @@ WRITE8_HANDLER( arkanoid_68705_port_c_w )
 
 WRITE8_HANDLER( arkanoid_68705_ddr_c_w )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	state->ddr_c = data;
 }
 
 CUSTOM_INPUT( arkanoid_68705_input_r )
 {
-	arkanoid_state *state = field->port->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = field->port->machine().driver_data<arkanoid_state>();
 	int res = 0;
 
 	/* bit 0x40 of comes from the sticky bit */
@@ -122,10 +122,10 @@ CUSTOM_INPUT( arkanoid_68705_input_r )
 
 CUSTOM_INPUT( arkanoid_input_mux )
 {
-	arkanoid_state *state = field->port->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = field->port->machine().driver_data<arkanoid_state>();
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field->port->machine, (state->paddle_select == 0) ? tag1 : tag2);
+	return input_port_read(field->port->machine(), (state->paddle_select == 0) ? tag1 : tag2);
 }
 
 /*
@@ -182,16 +182,16 @@ TO DO (2006.09.12) :
 */
 
 
-#define LOG_F000_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f000_r - cmd = %02x - val = %02x\n", cpu_get_pc(space->cpu), state->bootleg_cmd, arkanoid_bootleg_val);
-#define LOG_F002_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", cpu_get_pc(space->cpu), state->bootleg_cmd, arkanoid_bootleg_val);
-#define LOG_D018_W if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", cpu_get_pc(space->cpu), data, state->bootleg_cmd);
-#define LOG_D008_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d008_r - val = %02x\n", cpu_get_pc(space->cpu), arkanoid_bootleg_d008_val);
+#define LOG_F000_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f000_r - cmd = %02x - val = %02x\n", cpu_get_pc(&space->device()), state->bootleg_cmd, arkanoid_bootleg_val);
+#define LOG_F002_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", cpu_get_pc(&space->device()), state->bootleg_cmd, arkanoid_bootleg_val);
+#define LOG_D018_W if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", cpu_get_pc(&space->device()), data, state->bootleg_cmd);
+#define LOG_D008_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d008_r - val = %02x\n", cpu_get_pc(&space->device()), arkanoid_bootleg_d008_val);
 
 
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_f000_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	UINT8 arkanoid_bootleg_val = 0x00;
 
 	switch (state->bootleg_id)
@@ -224,7 +224,7 @@ READ8_HANDLER( arkanoid_bootleg_f000_r )
 			LOG_F000_R
 			break;
 		default:
-			logerror("%04x: arkanoid_bootleg_f000_r - cmd = %02x - unknown bootleg !\n", cpu_get_pc(space->cpu), state->bootleg_cmd);
+			logerror("%04x: arkanoid_bootleg_f000_r - cmd = %02x - unknown bootleg !\n", cpu_get_pc(&space->device()), state->bootleg_cmd);
 			break;
 	}
 
@@ -234,7 +234,7 @@ READ8_HANDLER( arkanoid_bootleg_f000_r )
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_f002_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	UINT8 arkanoid_bootleg_val = 0x00;
 
 	switch (state->bootleg_id)
@@ -312,7 +312,7 @@ READ8_HANDLER( arkanoid_bootleg_f002_r )
 			LOG_F002_R
 			break;
 		default:
-			logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - unknown bootleg !\n", cpu_get_pc(space->cpu), state->bootleg_cmd);
+			logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - unknown bootleg !\n", cpu_get_pc(&space->device()), state->bootleg_cmd);
 			break;
 	}
 
@@ -322,7 +322,7 @@ READ8_HANDLER( arkanoid_bootleg_f002_r )
 /* Kludge for some bootlegs that write this address */
 WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	state->bootleg_cmd = 0x00;
 
 	switch (state->bootleg_id)
@@ -332,27 +332,27 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			switch (data)
 			{
 				case 0x36:  /* unneeded value : no call 0x2050, unused A and overwritten HL (0x0313 -> 0x0340) */
-					if (cpu_get_pc(space->cpu) == 0x7c47)
+					if (cpu_get_pc(&space->device()) == 0x7c47)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x38:  /* unneeded value : no call 0x2050, unused A and fixed HL (0x7bd5) */
-					if (cpu_get_pc(space->cpu) == 0x7b87)
+					if (cpu_get_pc(&space->device()) == 0x7b87)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x8a:  /* unneeded value : no call 0x2050, unused A and overwritten HL (0x7b77 -> 0x7c1c) */
-					if (cpu_get_pc(space->cpu) == 0x9661)
+					if (cpu_get_pc(&space->device()) == 0x9661)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xe3:  /* unneeded value : call 0x2050 but fixed A (0x00) and fixed HL (0xed83) */
-					if (cpu_get_pc(space->cpu) == 0x67e3)
+					if (cpu_get_pc(&space->device()) == 0x67e3)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xf7:  /* unneeded value : 3 * 'NOP' at 0x034f + 2 * 'NOP' at 0x35b */
-					if (cpu_get_pc(space->cpu) == 0x0349)
+					if (cpu_get_pc(&space->device()) == 0x0349)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xff:  /* unneeded value : no call 0x2050, unused A and overwritten HL (0x7c4f -> 0x7d31) */
-					if (cpu_get_pc(space->cpu) == 0x9670)
+					if (cpu_get_pc(&space->device()) == 0x9670)
 						state->bootleg_cmd = 0x00;
 					break;
 				default:
@@ -365,37 +365,37 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			switch (data)
 			{
 				case 0x36:  /* unneeded value : call 0x2050 but fixed A (0x2d) */
-					if (cpu_get_pc(space->cpu) == 0x7c4c)
+					if (cpu_get_pc(&space->device()) == 0x7c4c)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x38:  /* unneeded value : call 0x2050 but fixed A (0xf3) */
-					if (cpu_get_pc(space->cpu) == 0x7b87)
+					if (cpu_get_pc(&space->device()) == 0x7b87)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x88:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e3)
+					if (cpu_get_pc(&space->device()) == 0x67e3)
 						state->bootleg_cmd = 0x00;
-					if (cpu_get_pc(space->cpu) == 0x7c47)
+					if (cpu_get_pc(&space->device()) == 0x7c47)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x89:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e5)
+					if (cpu_get_pc(&space->device()) == 0x67e5)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x8a:  /* unneeded value : call 0x2050 but fixed A (0xa5) */
-					if (cpu_get_pc(space->cpu) == 0x9661)
+					if (cpu_get_pc(&space->device()) == 0x9661)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xc0:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e7)
+					if (cpu_get_pc(&space->device()) == 0x67e7)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xe3:  /* unneeded value : call 0x2050 but fixed A (0x61) */
-					if (cpu_get_pc(space->cpu) == 0x67e9)
+					if (cpu_get_pc(&space->device()) == 0x67e9)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xff:  /* unneeded value : call 0x2050 but fixed A (0xe2) */
-					if (cpu_get_pc(space->cpu) == 0x9670)
+					if (cpu_get_pc(&space->device()) == 0x9670)
 						state->bootleg_cmd = 0x00;
 					break;
 				default:
@@ -408,11 +408,11 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			switch (data)
 			{
 				case 0x05:  /* Check 1 */
-					if (cpu_get_pc(space->cpu) == 0x0363)
+					if (cpu_get_pc(&space->device()) == 0x0363)
 						state->bootleg_cmd = 0x05;
 					break;
 				case 0x0a:  /* Check 2 */
-					if (cpu_get_pc(space->cpu) == 0x0372)
+					if (cpu_get_pc(&space->device()) == 0x0372)
 						state->bootleg_cmd = 0x0a;
 					break;
 				default:
@@ -425,41 +425,41 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			switch (data)
 			{
 				case 0x36:  /* unneeded value : call 0x2050 but fixed A (0x2d) */
-					if (cpu_get_pc(space->cpu) == 0x7c4c)
+					if (cpu_get_pc(&space->device()) == 0x7c4c)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x38:  /* unneeded value : call 0x2050 but fixed A (0xf3) */
-					if (cpu_get_pc(space->cpu) == 0x7b87)
+					if (cpu_get_pc(&space->device()) == 0x7b87)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x88:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e3)
+					if (cpu_get_pc(&space->device()) == 0x67e3)
 						state->bootleg_cmd = 0x00;
-					if (cpu_get_pc(space->cpu) == 0x7c47)
+					if (cpu_get_pc(&space->device()) == 0x7c47)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x89:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e5)
+					if (cpu_get_pc(&space->device()) == 0x67e5)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x8a:  /* unneeded value : call 0x2050 but unused HL and fixed DE (0x7c1c) */
-					if (cpu_get_pc(space->cpu) == 0x9661)
+					if (cpu_get_pc(&space->device()) == 0x9661)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xc0:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e7)
+					if (cpu_get_pc(&space->device()) == 0x67e7)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xe3:  /* unneeded value : call 0x2050 but fixed A (0x61) */
-					if (cpu_get_pc(space->cpu) == 0x67e9)
+					if (cpu_get_pc(&space->device()) == 0x67e9)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xf7:  /* unneeded value : call 0x2050 but never called (check code at 0x0340) */
-					if (cpu_get_pc(space->cpu) == 0x0349)
+					if (cpu_get_pc(&space->device()) == 0x0349)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xff:  /* unneeded value : no call 0x2050, unused A and fixed HL (0x7d31) */
-					if (cpu_get_pc(space->cpu) == 0x9670)
+					if (cpu_get_pc(&space->device()) == 0x9670)
 						state->bootleg_cmd = 0x00;
 					break;
 				default:
@@ -472,40 +472,40 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			switch (data)
 			{
 				case 0x36:  /* unneeded value : call 0x2050 but fixed A (0x2d) */
-					if (cpu_get_pc(space->cpu) == 0x7c4c)
+					if (cpu_get_pc(&space->device()) == 0x7c4c)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x38:  /* unneeded value : call 0x2050 but fixed A (0xf3) */
-					if (cpu_get_pc(space->cpu) == 0x7b87)
+					if (cpu_get_pc(&space->device()) == 0x7b87)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x88:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e3)
+					if (cpu_get_pc(&space->device()) == 0x67e3)
 						state->bootleg_cmd = 0x00;
-					if (cpu_get_pc(space->cpu) == 0x7c47)
+					if (cpu_get_pc(&space->device()) == 0x7c47)
 						state->bootleg_cmd = 0x00;
 				case 0x89:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e5)
+					if (cpu_get_pc(&space->device()) == 0x67e5)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x8a:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x9661)
+					if (cpu_get_pc(&space->device()) == 0x9661)
 						state->bootleg_cmd = data;
 					break;
 				case 0xc0:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e7)
+					if (cpu_get_pc(&space->device()) == 0x67e7)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xe3:  /* unneeded value : call 0x2050 but fixed A (0x61) */
-					if (cpu_get_pc(space->cpu) == 0x67e9)
+					if (cpu_get_pc(&space->device()) == 0x67e9)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xf7:  /* unneeded value : 3 * 'NOP' at 0x034f + 'JR NZ,$035D' at 0x35b */
-					if (cpu_get_pc(space->cpu) == 0x0349)
+					if (cpu_get_pc(&space->device()) == 0x0349)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xff:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x9670)
+					if (cpu_get_pc(&space->device()) == 0x9670)
 						state->bootleg_cmd = data;
 					break;
 				default:
@@ -518,48 +518,48 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			switch (data)
 			{
 				case 0x24:  /* A read from 0xf002 (expected to be 0x9b) */
-					if (cpu_get_pc(space->cpu) == 0xbd7a)
+					if (cpu_get_pc(&space->device()) == 0xbd7a)
 						state->bootleg_cmd = data;
 					break;
 				case 0x36:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x7c4c)
+					if (cpu_get_pc(&space->device()) == 0x7c4c)
 						state->bootleg_cmd = data;
 					break;
 				case 0x38:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x7b87)
+					if (cpu_get_pc(&space->device()) == 0x7b87)
 						state->bootleg_cmd = data;
 					break;
 				case 0x88:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e3)
+					if (cpu_get_pc(&space->device()) == 0x67e3)
 						state->bootleg_cmd = 0x00;
-					if (cpu_get_pc(space->cpu) == 0x7c47)
+					if (cpu_get_pc(&space->device()) == 0x7c47)
 						state->bootleg_cmd = 0x00;
 				case 0x89:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e5)
+					if (cpu_get_pc(&space->device()) == 0x67e5)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0x8a:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x9661)
+					if (cpu_get_pc(&space->device()) == 0x9661)
 						state->bootleg_cmd = data;
 					break;
 				case 0xc0:  /* unneeded value : no read back */
-					if (cpu_get_pc(space->cpu) == 0x67e7)
+					if (cpu_get_pc(&space->device()) == 0x67e7)
 						state->bootleg_cmd = 0x00;
 					break;
 				case 0xc3:  /* A read from 0xf002 (expected to be 0x1d) */
-					if (cpu_get_pc(space->cpu) == 0xbd8a)
+					if (cpu_get_pc(&space->device()) == 0xbd8a)
 						state->bootleg_cmd = data;
 					break;
 				case 0xe3:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x67e9)
+					if (cpu_get_pc(&space->device()) == 0x67e9)
 						state->bootleg_cmd = data;
 					break;
 				case 0xf7:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x0349)
+					if (cpu_get_pc(&space->device()) == 0x0349)
 						state->bootleg_cmd = data;
 					break;
 				case 0xff:  /* call 0x2050 with A read from 0xf002 and wrong HL */
-					if (cpu_get_pc(space->cpu) == 0x9670)
+					if (cpu_get_pc(&space->device()) == 0x9670)
 						state->bootleg_cmd = data;
 					break;
 				default:
@@ -570,7 +570,7 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			break;
 
 		default:
-			logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - unknown bootleg !\n", cpu_get_pc(space->cpu), data);
+			logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - unknown bootleg !\n", cpu_get_pc(&space->device()), data);
 			break;
 	}
 }
@@ -578,7 +578,7 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 #ifdef UNUSED_CODE
 READ8_HANDLER( block2_bootleg_f000_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	return state->bootleg_cmd;
 }
 #endif
@@ -586,10 +586,10 @@ READ8_HANDLER( block2_bootleg_f000_r )
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_d008_r )
 {
-	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	UINT8 arkanoid_bootleg_d008_bit[8];
 	UINT8 arkanoid_bootleg_d008_val;
-	UINT8 arkanoid_paddle_value = input_port_read(space->machine, "MUX");
+	UINT8 arkanoid_paddle_value = input_port_read(space->machine(), "MUX");
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */
@@ -639,7 +639,7 @@ READ8_HANDLER( arkanoid_bootleg_d008_r )
 			arkanoid_bootleg_d008_bit[2] = 0;  /* untested bit */
 			arkanoid_bootleg_d008_bit[3] = 0;  /* untested bit */
 			arkanoid_bootleg_d008_bit[5] = 0;  /* untested bit */
-			logerror("%04x: arkanoid_bootleg_d008_r - unknown bootleg !\n",cpu_get_pc(space->cpu));
+			logerror("%04x: arkanoid_bootleg_d008_r - unknown bootleg !\n",cpu_get_pc(&space->device()));
 			break;
 	}
 

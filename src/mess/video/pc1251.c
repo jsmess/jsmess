@@ -97,7 +97,7 @@ static const POCKETC_FIGURE busy={
 
  READ8_HANDLER(pc1251_lcd_read)
 {
-	pc1251_state *state = space->machine->driver_data<pc1251_state>();
+	pc1251_state *state = space->machine().driver_data<pc1251_state>();
 	int data;
 	data = state->reg[offset&0xff];
 	logerror("pc1251 read %.3x %.2x\n",offset,data);
@@ -106,7 +106,7 @@ static const POCKETC_FIGURE busy={
 
 WRITE8_HANDLER(pc1251_lcd_write)
 {
-	pc1251_state *state = space->machine->driver_data<pc1251_state>();
+	pc1251_state *state = space->machine().driver_data<pc1251_state>();
 	logerror("pc1251 write %.3x %.2x\n",offset,data);
 	state->reg[offset&0xff] = data;
 }
@@ -116,10 +116,10 @@ WRITE8_HANDLER(pc1251_lcd_write)
 
 SCREEN_UPDATE( pc1251 )
 {
-	pc1251_state *state = screen->machine->driver_data<pc1251_state>();
+	pc1251_state *state = screen->machine().driver_data<pc1251_state>();
 	int x, y, i, j;
 	int color[2];
-	running_machine *machine = screen->machine;
+	running_machine &machine = screen->machine();
 
 	bitmap_fill(bitmap, cliprect, 11);
 
@@ -130,14 +130,14 @@ SCREEN_UPDATE( pc1251 )
 	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3)
 	{
 		for (j=0; j<5; j++, i++, x+=3)
-			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], state->reg[i],
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}
 	for (i=0x7b; i>=0x40; x+=3)
 	{
 		for (j=0; j<5; j++, i--, x+=3)
-			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], state->reg[i],
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}

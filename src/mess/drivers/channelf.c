@@ -53,34 +53,34 @@ static UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state)
 
 static READ8_HANDLER( channelf_port_0_r )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
-	return port_read_with_latch(input_port_read(space->machine, "PANEL"),state->latch[0]);
+	channelf_state *state = space->machine().driver_data<channelf_state>();
+	return port_read_with_latch(input_port_read(space->machine(), "PANEL"),state->latch[0]);
 }
 
 static READ8_HANDLER( channelf_port_1_r )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 ext_value;
 
 	if ((state->latch[0] & 0x40) == 0)
 	{
-		ext_value = input_port_read(space->machine, "RIGHT_C");
+		ext_value = input_port_read(space->machine(), "RIGHT_C");
 	}
 	else
 	{
-		ext_value = 0xc0 | input_port_read(space->machine, "RIGHT_C");
+		ext_value = 0xc0 | input_port_read(space->machine(), "RIGHT_C");
 	}
 	return port_read_with_latch(ext_value,state->latch[1]);
 }
 
 static READ8_HANDLER( channelf_port_4_r )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 ext_value;
 
 	if ((state->latch[0] & 0x40) == 0)
 	{
-		ext_value = input_port_read(space->machine, "LEFT_C");
+		ext_value = input_port_read(space->machine(), "LEFT_C");
 	}
 	else
 	{
@@ -91,13 +91,13 @@ static READ8_HANDLER( channelf_port_4_r )
 
 static READ8_HANDLER( channelf_port_5_r )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	return port_read_with_latch(0xff,state->latch[3]);
 }
 
 static  READ8_HANDLER( channelf_2102A_r )	/* SKR */
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 pdata;
 
 	if(state->r2102.r_w==0) {
@@ -114,14 +114,14 @@ static  READ8_HANDLER( channelf_2102A_r )	/* SKR */
 
 static  READ8_HANDLER( channelf_2102B_r )  /* SKR */
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	LOG(("rhB\n"));
 	return port_read_with_latch(0xff,state->latch[5]);
 }
 
 static WRITE8_HANDLER( channelf_port_0_w )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 *videoram = state->videoram;
 	int offs;
 
@@ -137,29 +137,29 @@ static WRITE8_HANDLER( channelf_port_0_w )
 
 static WRITE8_HANDLER( channelf_port_1_w )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	state->latch[1] = data;
 	state->val_reg = ((data ^ 0xff) >> 6) & 0x03;
 }
 
 static WRITE8_HANDLER( channelf_port_4_w )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	state->latch[2] = data;
 	state->col_reg = (data | 0x80) ^ 0xff;
 }
 
 static WRITE8_HANDLER( channelf_port_5_w )
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	state->latch[3] = data;
-	channelf_sound_w(space->machine->device("custom"), (data>>6)&3);
+	channelf_sound_w(space->machine().device("custom"), (data>>6)&3);
 	state->row_reg = (data | 0xc0) ^ 0xff;
 }
 
 static WRITE8_HANDLER( channelf_2102A_w )  /* SKR */
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	state->latch[4]=data;
 	state->r2102.a[2]=(data>>2)&1;
 	state->r2102.a[3]=(data>>1)&1;
@@ -173,7 +173,7 @@ static WRITE8_HANDLER( channelf_2102A_w )  /* SKR */
 
 static WRITE8_HANDLER( channelf_2102B_w )  /* SKR */
 {
-	channelf_state *state = space->machine->driver_data<channelf_state>();
+	channelf_state *state = space->machine().driver_data<channelf_state>();
 	state->latch[5]=data;
 	state->r2102.a[9]=(data>>7)&1;
 	state->r2102.a[8]=(data>>6)&1;
@@ -252,7 +252,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( image.device().machine->region("maincpu")->base() + 0x0800, size) != size)
+		if (image.fread( image.device().machine().region("maincpu")->base() + 0x0800, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -262,7 +262,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
-		memcpy(image.device().machine->region("maincpu")->base() + 0x0800, image.get_software_region("rom"), size);
+		memcpy(image.device().machine().region("maincpu")->base() + 0x0800, image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;

@@ -27,14 +27,14 @@ public:
 
 static WRITE8_HANDLER( qtsbc_06_w )
 {
-	device_t *terminal = space->machine->device(TERMINAL_TAG);
+	device_t *terminal = space->machine().device(TERMINAL_TAG);
 
 	terminal_write(terminal, 0, data);
 }
 
 static READ8_HANDLER( qtsbc_06_r )
 {
-	qtsbc_state *state = space->machine->driver_data<qtsbc_state>();
+	qtsbc_state *state = space->machine().driver_data<qtsbc_state>();
 	UINT8 ret = state->term_data;
 	state->term_data = 0;
 	return ret;
@@ -64,14 +64,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(qtsbc)
 {
-	qtsbc_state *state = machine->driver_data<qtsbc_state>();
-	UINT8* bios = machine->region("maincpu")->base()+0x10000;
+	qtsbc_state *state = machine.driver_data<qtsbc_state>();
+	UINT8* bios = machine.region("maincpu")->base()+0x10000;
 	memcpy(state->ram,bios, 0x800);
 }
 
 static WRITE8_DEVICE_HANDLER( qtsbc_kbd_put )
 {
-	qtsbc_state *state = device->machine->driver_data<qtsbc_state>();
+	qtsbc_state *state = device->machine().driver_data<qtsbc_state>();
 	state->term_data = data;
 }
 

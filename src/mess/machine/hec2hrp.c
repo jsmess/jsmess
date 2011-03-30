@@ -56,7 +56,7 @@
 static void Mise_A_Jour_Etat(int Adresse, int Value );
 static void Update_Sound(address_space *space, UINT8 data);
 
-static device_t *cassette_device_image(running_machine *machine);
+static device_t *cassette_device_image(running_machine &machine);
 
 /* Stat for the register in 0x3000*/
 static UINT8 state3000=0;
@@ -98,38 +98,38 @@ static TIMER_CALLBACK( Callback_CK )
 WRITE8_HANDLER( hector_switch_bank_w )
 {
 	if (offset==0x00)	{	/* 0x800 et 0x000=> video page, HR*/
-							memory_set_bank(space->machine, "bank1", HECTOR_BANK_VIDEO);
+							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
 							if (flag_clk ==1)
 							{
 								flag_clk=0;
-								space->machine->device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
 							}
 						}
 	if (offset==0x04)	{	/* 0x804 => video page, BR*/
 							hector_flag_hr=0;
-							memory_set_bank(space->machine, "bank1", HECTOR_BANK_VIDEO);
+							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
 							if (flag_clk ==0)
 							{
 								flag_clk=1;
-								space->machine->device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
 							}
 						}
 	if (offset==0x08)	{	/* 0x808 => base page, HR*/
-							memory_set_bank(space->machine, "bank1", HECTOR_BANK_PROG);
+							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
 							if (flag_clk ==1)
 							{
 								flag_clk=0;
-								space->machine->device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
 							}
 
 						}
 	if (offset==0x0c)	{	/* 0x80c => base page, BR*/
 							hector_flag_hr=0;
-							memory_set_bank(space->machine, "bank1", HECTOR_BANK_PROG);
+							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
 							if (flag_clk ==0)
 							{
 								flag_clk=1;
-								space->machine->device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
 							}
 						}
 }
@@ -142,7 +142,7 @@ WRITE8_HANDLER( hector_keyboard_w )
 READ8_HANDLER( hector_keyboard_r )
 {
 	UINT8 data = 0xff;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
@@ -155,17 +155,17 @@ READ8_HANDLER( hector_keyboard_r )
 		{
 		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 		  hector_flag_hr=1;
-		if (strncmp(machine->system().name , "hec2hrx"  , 7)==0 ||
-				strncmp(machine->system().name , "hec2mx40" , 8)==0 ||
-				strncmp(machine->system().name , "hec2mx80" , 8)==0   ) /* aviable for HRX and up */
+		if (strncmp(machine.system().name , "hec2hrx"  , 7)==0 ||
+				strncmp(machine.system().name , "hec2mx40" , 8)==0 ||
+				strncmp(machine.system().name , "hec2mx80" , 8)==0   ) /* aviable for HRX and up */
 			{
 				memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
 				memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 				hector_disc2_reset(machine);
 
 			}
-		if (strncmp(machine->system().name , "hector1"  , 7)==0 ||
-				strncmp(machine->system().name , "interact" , 8)==0   ) /* aviable for BR machines */
+		if (strncmp(machine.system().name , "hector1"  , 7)==0 ||
+				strncmp(machine.system().name , "interact" , 8)==0   ) /* aviable for BR machines */
 
 					hector_flag_hr=0;
 
@@ -201,7 +201,7 @@ READ8_HANDLER( hector_keyboard_r )
 	}
 
 	/* in all case return the request value*/
-	return input_port_read(space->machine, keynames[offset]);
+	return input_port_read(space->machine(), keynames[offset]);
 }
 
 WRITE8_HANDLER( hector_sn_2000_w )
@@ -239,7 +239,7 @@ else
 	if (write_cassette == 0)
     {
 		/* Accee a la cassette*/
-		level = cassette_input(cassette_device_image(space->machine));
+		level = cassette_input(cassette_device_image(space->machine()));
 
 		/* Travail du 741 en trigger*/
 		if  (level < -0.08)
@@ -281,11 +281,11 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 	{
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
 		if (write_cassette==0)
-			 cassette_set_state(cassette_device_image(space->machine) , (cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
+			 cassette_set_state(cassette_device_image(space->machine()) , (cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
 	}
 	else
 	{	/* stop motor*/
-		cassette_set_state(cassette_device_image(space->machine) , CASSETTE_STOPPED);
+		cassette_set_state(cassette_device_image(space->machine()) , CASSETTE_STOPPED);
 		write_cassette=0;
 		counter_write =0;
 	}
@@ -300,12 +300,12 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 			counter_write = 6;
 			if (write_cassette==0)
 			{	/* C'est la 1er fois => record*/
-				cassette_set_state(cassette_device_image(space->machine) , CASSETTE_RECORD );
+				cassette_set_state(cassette_device_image(space->machine()) , CASSETTE_RECORD );
 				write_cassette=1;
 			}
 		}
 		/* cassette data */
-		cassette_output(cassette_device_image(space->machine), ((data & 0x80) == 0x80) ? -1.0 : +1.0);
+		cassette_output(cassette_device_image(space->machine()), ((data & 0x80) == 0x80) ? -1.0 : +1.0);
 	}
 
         /* Other bit : color definition*/
@@ -316,7 +316,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 }
 WRITE8_HANDLER( hector_color_b_w )
 {
-	device_t *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine().device("discrete");
 	hector_color[1] =  data        & 0x07;
 	hector_color[3] = (data >> 3)  & 0x07;
 
@@ -332,9 +332,9 @@ WRITE8_HANDLER( hector_color_b_w )
  Cassette Handling
 ******************************************************************************/
 
-static device_t *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine->device("cassette");
+	return machine.device("cassette");
 }
 
 
@@ -402,7 +402,7 @@ if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
         So, all what is send to the Disc2 unit will be printed too! */
 
 	if (BIT(hector_port_c_l, 0))		// PC0 (bit X0)= strobe printer !
-		printer_output(space->machine->device("printer"), hector_port_a);
+		printer_output(space->machine().device("printer"), hector_port_a);
 
 	#ifdef DEBUG_TRACE_COM_HECTOR
 		printf("\nEcriture data par Hector %x (dans portA)",data);
@@ -422,7 +422,7 @@ if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 			if (BIT(hector_port_c_l  , 0))		// PC0 (bit X0)= true
 			{
 				/* Port A => to printer*/
-				//printer_output(space->machine->device("printer"), hector_port_a);
+				//printer_output(space->machine().device("printer"), hector_port_a);
 			}
 			// Utilizing bits port C : PC1 // PC2  for the communication with disc2
 			if (!BIT(hector_port_c_l  , 1))		// PC1 (bit X1)= true
@@ -460,14 +460,14 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
 {
 /* Bank switching on several address */
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
+		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
 	{
-		memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE1);
+		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE1);
 		hector_flag_80c=0;
 	}
 	if ((offset &0x0ff) == 0x44) /* Port page 2  => 42 pour MX80*/
-		memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE2);
+		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
 		hector_flag_80c=0;/* No 80c in 40c !*/
 }
@@ -476,14 +476,14 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
 WRITE8_HANDLER( hector_mx80_io_port_w)
 {
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
+		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
 	{
-		memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE1);
+		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE1);
 		hector_flag_80c=0;
 	}
 	if ((offset &0x0ff) == 0x42) /* Port page 2  => port different du MX40*/
-		memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE2);
+		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
 		hector_flag_80c=1;
 }
@@ -684,7 +684,7 @@ static void Init_Value_SN76477_Hector(void)
 void Update_Sound(address_space *space, UINT8 data)
 {
 	/* keep device*/
-	device_t *sn76477 = space->machine->device("sn76477");
+	device_t *sn76477 = space->machine().device("sn76477");
 
 	/* MIXER*/
 	sn76477_mixer_a_w(sn76477, ((ValMixer & 0x04)==4) ? 1 : 0);
@@ -754,7 +754,7 @@ const sn76477_interface hector_sn76477_interface =
 	RES_K(10000)	/* 24  oneshot_res*/
 };
 
-void hector_reset(running_machine *machine, int hr, int with_D2 )
+void hector_reset(running_machine &machine, int hr, int with_D2 )
 {
 	// Initialization Hector
 	hector_flag_hr = hr;
@@ -767,19 +767,19 @@ void hector_reset(running_machine *machine, int hr, int with_D2 )
 
 	{
 		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
-		device_t *fdc = machine->device("upd765");
+		device_t *fdc = machine.device("upd765");
 		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
 		upd765_reset(fdc, 1);
 		upd765_reset_w(fdc, 1);
 	}
 }
 
-void hector_init(running_machine *machine)
+void hector_init(running_machine &machine)
 {
 	pot0 = pot1 = 0x40;
 
 	/* For Cassette synchro*/
-	Cassette_timer = machine->scheduler().timer_alloc(FUNC(Callback_CK));
+	Cassette_timer = machine.scheduler().timer_alloc(FUNC(Callback_CK));
 	Cassette_timer->adjust(attotime::from_msec(100), 0, attotime::from_usec(64));/* => real synchro scan speed for 15,624Khz*/
 
 	/* Sound sn76477*/

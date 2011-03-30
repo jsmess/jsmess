@@ -158,7 +158,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (!c1551->yb)
 		{
 			/* simulate weak bits with randomness */
-			c1551->yb = machine->rand() & 0xff;
+			c1551->yb = machine.rand() & 0xff;
 		}
 
 		c1551->byte = byte;
@@ -720,10 +720,10 @@ static DEVICE_START( c1551 )
 	floppy_install_load_proc(c1551->image, on_disk_change);
 
 	/* allocate data timer */
-	c1551->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
+	c1551->bit_timer = device->machine().scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* map TPI1 to host CPU memory space */
-	address_space *program = device->machine->device(config->cpu_tag)->memory().space(AS_PROGRAM);
+	address_space *program = device->machine().device(config->cpu_tag)->memory().space(AS_PROGRAM);
 	UINT32 start_address = c1551->address ? 0xfec0 : 0xfef0;
 
 	program->install_legacy_readwrite_handler(*c1551->tpi1, start_address, start_address + 7, FUNC(tpi6525_r), FUNC(tpi6525_w));

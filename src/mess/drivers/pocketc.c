@@ -795,8 +795,8 @@ MACHINE_CONFIG_END
 
 static NVRAM_HANDLER( pc1260 )
 {
-	device_t *main_cpu = machine->device("maincpu");
-	UINT8 *ram = machine->region("maincpu")->base() + 0x4000;
+	device_t *main_cpu = machine.device("maincpu");
+	UINT8 *ram = machine.region("maincpu")->base() + 0x4000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)

@@ -92,12 +92,12 @@ void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 void abc800_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine->region(MC6845_TAG)->base();
-	fgctl_prom = machine->region("hru2")->base();
+	m_char_rom = m_machine.region(MC6845_TAG)->base();
+	fgctl_prom = m_machine.region("hru2")->base();
 
 	// register for state saving
-	state_save_register_global(machine, m_hrs);
-	state_save_register_global(machine, m_fgctl);
+	state_save_register_global(m_machine, m_hrs);
+	state_save_register_global(m_machine, m_fgctl);
 }
 
 
@@ -108,7 +108,7 @@ void abc800_state::video_start()
 bool abc800c_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
+	bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
 
 	// draw HR graphics
 	hr_update(&bitmap, &cliprect);
@@ -213,7 +213,7 @@ void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 
 static MC6845_UPDATE_ROW( abc800m_update_row )
 {
-	abc800m_state *state = device->machine->driver_data<abc800m_state>();
+	abc800m_state *state = device->machine().driver_data<abc800m_state>();
 
 	int column;
 
@@ -280,7 +280,7 @@ bool abc800m_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
+	bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
 
 	// draw HR graphics
 	hr_update(&bitmap, &cliprect);

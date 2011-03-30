@@ -23,7 +23,7 @@
 		if(VERBOSE_PIO>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine->time().as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -493,7 +493,7 @@ device_config *ibm5160_mb_device_config::static_alloc_device_config(const machin
  
 device_t *ibm5160_mb_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, ibm5160_mb_device(machine, *this));
+	return auto_alloc(machine, ibm5160_mb_device(machine, *this));
 }
 
 //-------------------------------------------------
@@ -570,7 +570,7 @@ ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb
  
 void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
 {	
-	int buswidth = machine->firstcpu->memory().space_config(AS_IO)->m_databus_width;
+	int buswidth = m_machine.firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -587,7 +587,7 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 
 void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler)
 {	
-	int buswidth = machine->firstcpu->memory().space_config(AS_IO)->m_databus_width;
+	int buswidth = m_machine.firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -643,13 +643,13 @@ void ibm5160_mb_device::device_start()
 	install_device(this,    0x0080, 0x0087, 0, 0, pc_page_r, pc_page_w );	
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, nmi_enable_w);	
 	/* MESS managed RAM */
-	if ( ram_get_ptr(machine->device(RAM_TAG)) )
-		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );	
+	if ( ram_get_ptr(m_machine.device(RAM_TAG)) )
+		memory_set_bankptr( m_machine, "bank10", ram_get_ptr(m_machine.device(RAM_TAG)) );	
 }
  
 IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
 {
-	device_t *pic = device->machine->device("mb:pic8259");
+	device_t *pic = device->machine().device("mb:pic8259");
 	return pic8259_acknowledge( pic );	
 }
 
@@ -731,7 +731,7 @@ device_config *ibm5150_mb_device_config::static_alloc_device_config(const machin
  
 device_t *ibm5150_mb_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, ibm5150_mb_device(machine, *this));
+	return auto_alloc(machine, ibm5150_mb_device(machine, *this));
 }
 
 //-------------------------------------------------
@@ -783,7 +783,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
          * 6-7  The number of floppy disk drives
          */
 		data = input_port_read(this, "DSW0") & 0xF3;
-		switch ( ram_get_size(machine->device(RAM_TAG)) )
+		switch ( ram_get_size(m_machine.device(RAM_TAG)) )
 		{
 		case 16 * 1024:
 			data |= 0x00;
@@ -821,7 +821,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 )
+		switch ( ram_get_size(m_machine.device(RAM_TAG)) - 64 * 1024 )
 		{
 		case 64 * 1024:		data |= 0x00; break;
 		case 128 * 1024:	data |= 0x02; break;
@@ -839,7 +839,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		case 896 * 1024:	data |= 0x0B; break;
 		case 960 * 1024:	data |= 0x0D; break;
 		}
-		if ( ram_get_size(machine->device(RAM_TAG)) > 960 * 1024 )
+		if ( ram_get_size(m_machine.device(RAM_TAG)) > 960 * 1024 )
 			data |= 0x0D;
 
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));

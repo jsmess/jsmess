@@ -116,20 +116,20 @@ typedef enum {
 /* Debugging variables */
 
 /* Debugging commands and handlers. */
-static void execute_beta_vid_log(running_machine *machine, int ref, int params, const char *param[]);
-static void RegLog(running_machine *machine, int offset, int data);
-static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[]);
-static void execute_beta_vid_box(running_machine *machine, int ref, int params, const char *param[]);
-static void execute_beta_vid(running_machine *machine, int ref, int params, const char *param[]);
-static void execute_beta_vid_limits(running_machine *machine, int ref, int params, const char *param[]);
-static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_log(running_machine &machine, int ref, int params, const char *param[]);
+static void RegLog(running_machine &machine, int offset, int data);
+static void execute_beta_vid_fill(running_machine &machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_box(running_machine &machine, int ref, int params, const char *param[]);
+static void execute_beta_vid(running_machine &machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_limits(running_machine &machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_clkmax(running_machine &machine, int ref, int params, const char *param[]);
 
 
 
-static void beta_Set_RA(running_machine *machine, int offset, int data);
-static void beta_Set_HSync(running_machine *machine, int offset, int data);
-static void beta_Set_VSync(running_machine *machine, int offset, int data);
-static void beta_Set_DE(running_machine *machine, int offset, int data);
+static void beta_Set_RA(running_machine &machine, int offset, int data);
+static void beta_Set_HSync(running_machine &machine, int offset, int data);
+static void beta_Set_VSync(running_machine &machine, int offset, int data);
+static void beta_Set_DE(running_machine &machine, int offset, int data);
 
 static const struct m6845_interface beta_m6845_interface = {
 	0,		        // Memory Address register
@@ -184,9 +184,9 @@ typedef enum {
 /* 6821-I28, this allows the 6845 to access the full 64K address range, however    */
 /* since the ram data is addressed as a 16bit wide unit, this allows the 6845      */
 /* access to the first 128K or ram.                                                */
-void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
+void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->GCtrl=data;
 	if (state->LogRegWrites)
 		debug_console_printf(machine, "I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
@@ -198,20 +198,20 @@ void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
 				     data & GCtrlHiLo		? "Hi" : "Lo",
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
-				     cpu_get_pc(machine->device("maincpu")));
+				     cpu_get_pc(machine.device("maincpu")));
 }
 
 // called when the 6845 changes the character row
-static void beta_Set_RA(running_machine *machine, int offset, int data)
+static void beta_Set_RA(running_machine &machine, int offset, int data)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->beta_6845_RA=data;
 }
 
 // called when the 6845 changes the HSync
-static void beta_Set_HSync(running_machine *machine, int offset, int data)
+static void beta_Set_HSync(running_machine &machine, int offset, int data)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int Dots;	/* Pixels per 16 bits */
 
 	state->beta_HSync=data;
@@ -238,9 +238,9 @@ static void beta_Set_HSync(running_machine *machine, int offset, int data)
 }
 
 // called when the 6845 changes the VSync
-static void beta_Set_VSync(running_machine *machine, int offset, int data)
+static void beta_Set_VSync(running_machine &machine, int offset, int data)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->beta_VSync=data;
 	if (!state->beta_VSync)
 	{
@@ -268,9 +268,9 @@ static void beta_Set_VSync(running_machine *machine, int offset, int data)
 	dgn_beta_frame_interrupt(machine, data);
 }
 
-static void beta_Set_DE(running_machine *machine, int offset, int data)
+static void beta_Set_DE(running_machine &machine, int offset, int data)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->beta_DE = data;
 
 	if(state->beta_DE)
@@ -278,9 +278,9 @@ static void beta_Set_DE(running_machine *machine, int offset, int data)
 }
 
 /* Video init */
-void dgnbeta_init_video(running_machine *machine)
+void dgnbeta_init_video(running_machine &machine)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	UINT8 *videoram = state->videoram;
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
@@ -288,7 +288,7 @@ void dgnbeta_init_video(running_machine *machine)
 
 	state->GCtrl=0;
 
-	videoram=ram_get_ptr(machine->device(RAM_TAG));
+	videoram=ram_get_ptr(machine.device(RAM_TAG));
 
 	state->ClkMax=65000;
 	state->FlashCount=0;
@@ -298,7 +298,7 @@ void dgnbeta_init_video(running_machine *machine)
 	state->DrawInterlace=INTERLACE_OFF;	/* No interlace by default */
 
 	/* setup debug commands */
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine, "beta_vid_log", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid_log);
 		debug_console_register_command(machine, "beta_vid_fill", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid_fill);
@@ -322,7 +322,7 @@ void dgnbeta_init_video(running_machine *machine)
 	state->MaxY	        = 0x0000;
 }
 
-void dgnbeta_video_reset(running_machine *machine)
+void dgnbeta_video_reset(running_machine &machine)
 {
     logerror("dgnbeta_video_reset\n");
     m6845_reset();
@@ -374,12 +374,12 @@ static void plot_text_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int 
 	}
 }
 
-static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t *bitmap)
+static void beta_plot_char_line(running_machine &machine, int x,int y, bitmap_t *bitmap)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	UINT8 *videoram = state->videoram;
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
-	unsigned char *data = machine->region("gfx1")->base();		// ptr to char rom
+	unsigned char *data = machine.region("gfx1")->base();		// ptr to char rom
 	int Dot;
 	unsigned char data_byte;
 	int char_code;
@@ -523,9 +523,9 @@ static void plot_gfx_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int y
 
 /* Get and plot a graphics bixel block */
 
-static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *bitmap)
+static void beta_plot_gfx_line(running_machine &machine,int x,int y, bitmap_t *bitmap)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	UINT8 *videoram = state->videoram;
 	int crtcAddr;
 	int Addr;
@@ -630,7 +630,7 @@ static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *b
 /* Update video screen, calls either text or graphics update routine as needed */
 SCREEN_UPDATE( dgnbeta )
 {
-	dgn_beta_state *state = screen->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = screen->machine().driver_data<dgn_beta_state>();
 	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
 
 	state->bit=bitmap;
@@ -641,7 +641,7 @@ SCREEN_UPDATE( dgnbeta )
 	while((state->beta_VSync)&&(c<state->ClkMax))
 	{
 		// Clock the 6845
-		m6845_clock(screen->machine);
+		m6845_clock(screen->machine());
 		c++;
 	}
 
@@ -651,7 +651,7 @@ SCREEN_UPDATE( dgnbeta )
 	{
 		while ((state->beta_HSync)&&(c<state->ClkMax))
 		{
-			m6845_clock(screen->machine);
+			m6845_clock(screen->machine());
 			c++;
 		}
 
@@ -661,9 +661,9 @@ SCREEN_UPDATE( dgnbeta )
 			if ((state->beta_scr_x>=0) && (state->beta_scr_x<699) && (state->beta_scr_y>=0) && (state->beta_scr_y<549))
 			{
 				if(IsTextMode)
-					beta_plot_char_line(screen->machine, state->beta_scr_x, state->beta_scr_y, bitmap);
+					beta_plot_char_line(screen->machine(), state->beta_scr_x, state->beta_scr_y, bitmap);
 				else
-					beta_plot_gfx_line(screen->machine, state->beta_scr_x, state->beta_scr_y, bitmap);
+					beta_plot_gfx_line(screen->machine(), state->beta_scr_x, state->beta_scr_y, bitmap);
 			}
 
 			/* In direct drive mode we have 4bpp, so 4 pixels per word, so increment x by 4 */
@@ -677,7 +677,7 @@ SCREEN_UPDATE( dgnbeta )
 				state->beta_scr_x+=8;
 
 			// Clock the 6845
-			m6845_clock(screen->machine);
+			m6845_clock(screen->machine());
 			c++;
 		}
 	}
@@ -692,7 +692,7 @@ READ8_HANDLER(dgnbeta_6845_r)
 
 WRITE8_HANDLER(dgnbeta_6845_w)
 {
-	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
 	if(offset&0x1)
 	{
 		m6845_register_w(offset,data);
@@ -708,13 +708,13 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 		state->VidAddr=data;				        /* Record reg being written to */
 	}
 	if (state->LogRegWrites)
-		RegLog(space->machine, offset,data);
+		RegLog(space->machine(), offset,data);
 }
 
 /* Write handler for colour, pallate ram */
 WRITE8_HANDLER(dgnbeta_colour_ram_w)
 {
-	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
 	state->ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
 }
 
@@ -724,18 +724,18 @@ WRITE8_HANDLER(dgnbeta_colour_ram_w)
  *
  *************************************/
 
-static void execute_beta_vid_log(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_vid_log(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->LogRegWrites=!state->LogRegWrites;
 
 	debug_console_printf(machine, "6845 register write info set : %d\n",state->LogRegWrites);
 }
 
 
-static void RegLog(running_machine *machine, int offset, int data)
+static void RegLog(running_machine &machine, int offset, int data)
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	char	RegName[16];
 
 	switch (state->VidAddr)
@@ -762,9 +762,9 @@ static void RegLog(running_machine *machine, int offset, int data)
 		debug_console_printf(machine, "6845 write Reg %s Addr=%3d Data=%3d ($%02X) \n",RegName,state->VidAddr,data,data);
 }
 
-static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_vid_fill(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int	x;
 
 	for(x=1;x<899;x++)
@@ -774,9 +774,9 @@ static void execute_beta_vid_fill(running_machine *machine, int ref, int params,
 	state->NoScreen=1;
 }
 
-static void execute_beta_vid_box(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_vid_box(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int	x,y;
 
 	if(params>0)	sscanf(param[0],"%d",&state->BoxMinX);
@@ -800,15 +800,15 @@ static void execute_beta_vid_box(running_machine *machine, int ref, int params, 
 }
 
 
-static void execute_beta_vid(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_vid(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->NoScreen=!state->NoScreen;
 }
 
-static void execute_beta_vid_limits(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_vid_limits(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	debug_console_printf(machine, "Min X     =$%4X, Max X     =$%4X\n",state->MinX,state->MaxX);
 	debug_console_printf(machine, "Min Y     =$%4X, Max Y     =$%4X\n",state->MinY,state->MaxY);
 	debug_console_printf(machine, "MinVidAddr=$%5X, MaxVidAddr=$%5X\n",state->MinAddr,state->MaxAddr);
@@ -823,8 +823,8 @@ static void execute_beta_vid_limits(running_machine *machine, int ref, int param
 		debug_console_printf(machine, "Gfx4/Text\n");
 }
 
-static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[])
+static void execute_beta_vid_clkmax(running_machine &machine, int ref, int params, const char *param[])
 {
-	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
+	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	if(params>0)	sscanf(param[0],"%d",&state->ClkMax);
 }

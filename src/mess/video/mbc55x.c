@@ -86,7 +86,7 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 #define DEBUG_SET(flags)    ((mstate->debug_video & (flags))==(flags))
 
-static void video_debug(running_machine *machine, int ref, int params, const char *param[]);
+static void video_debug(running_machine &machine, int ref, int params, const char *param[]);
 static MC6845_UPDATE_ROW( vid_update_row );
 static WRITE_LINE_DEVICE_HANDLER( vid_hsync_changed );
 static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed );
@@ -105,9 +105,9 @@ const mc6845_interface mb55x_mc6845_intf =
 	NULL
 };
 
-static void video_debug(running_machine *machine, int ref, int params, const char *param[])
+static void video_debug(running_machine &machine, int ref, int params, const char *param[])
 {
-	mbc55x_state *mstate = machine->driver_data<mbc55x_state>();
+	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
     if(params>0)
     {
         sscanf(param[0],"%d",&mstate->debug_video);
@@ -121,9 +121,9 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
 
 static MC6845_UPDATE_ROW( vid_update_row )
 {
-	mbc55x_state *mstate = device->machine->driver_data<mbc55x_state>();
+	mbc55x_state *mstate = device->machine().driver_data<mbc55x_state>();
 
-	UINT8	*ram	= &ram_get_ptr(device->machine->device(RAM_TAG))[0];
+	UINT8	*ram	= &ram_get_ptr(device->machine().device(RAM_TAG))[0];
 	UINT8	*red	= &mstate->video_mem[RED_PLANE_OFFSET];
 	UINT8	*blue	= &mstate->video_mem[BLUE_PLANE_OFFSET];
 	UINT8	*green;
@@ -192,7 +192,7 @@ static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
 
 READ8_HANDLER( mbc55x_video_io_r)
 {
-	device_t *mc6845 = space->machine->device(VID_MC6845_NAME);
+	device_t *mc6845 = space->machine().device(VID_MC6845_NAME);
 
 	switch(offset & 0x03)
 	{
@@ -205,7 +205,7 @@ READ8_HANDLER( mbc55x_video_io_r)
 
 WRITE8_HANDLER( mbc55x_video_io_w )
 {
-	device_t		*mc6845 = space->machine->device(VID_MC6845_NAME);
+	device_t		*mc6845 = space->machine().device(VID_MC6845_NAME);
 
 	switch(offset & 0x03)
 	{
@@ -220,12 +220,12 @@ WRITE8_HANDLER( mbc55x_video_io_w )
 
 VIDEO_START( mbc55x )
 {
-	mbc55x_state *mstate = machine->driver_data<mbc55x_state>();
+	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
     mstate->debug_video=0;
 
     logerror("VIDEO_START\n");
 
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
         debug_console_register_command(machine, "mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
     }
@@ -233,7 +233,7 @@ VIDEO_START( mbc55x )
 
 VIDEO_RESET( mbc55x )
 {
-	mbc55x_state *mstate = machine->driver_data<mbc55x_state>();
+	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
     // When we reset clear the video registers and video memory.
     memset(&mstate->video_mem,0,sizeof(mstate->video_mem));
 
@@ -247,7 +247,7 @@ SCREEN_EOF( mbc55x )
 
 SCREEN_UPDATE( mbc55x )
 {
-	device_t *devconf = screen->machine->device(VID_MC6845_NAME);
+	device_t *devconf = screen->machine().device(VID_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
     return 0;

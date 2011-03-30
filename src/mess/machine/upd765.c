@@ -179,7 +179,7 @@ static device_t *current_image(device_t *device)
 			if (device->owner() != NULL)
 				image = device->owner()->subdevice(fdc->intf->floppy_drive_tags[fdc->drive]);
 			else
-				image = device->machine->device(fdc->intf->floppy_drive_tags[fdc->drive]);
+				image = device->machine().device(fdc->intf->floppy_drive_tags[fdc->drive]);
 		}
 	}
 	else
@@ -779,7 +779,7 @@ READ8_DEVICE_HANDLER( upd765_status_r )
 {
 	upd765_t *fdc = get_safe_token(device);
 	if (LOG_EXTRA)
-		logerror("%s: upd765_status_r: %02x\n", device->machine->describe_context(), fdc->FDC_main);
+		logerror("%s: upd765_status_r: %02x\n", device->machine().describe_context(), fdc->FDC_main);
 	return fdc->FDC_main;
 }
 
@@ -1688,7 +1688,7 @@ void upd765_update_state(device_t *device)
 		fdc->FDC_main |= 0x10;                      /* set BUSY */
 
 		if (LOG_VERBOSE)
-			logerror("%s: upd765(): command=0x%02x\n", device->machine->describe_context(), fdc->upd765_data_reg);
+			logerror("%s: upd765(): command=0x%02x\n", device->machine().describe_context(), fdc->upd765_data_reg);
 
 		/* seek in progress? */
 		if (fdc->upd765_flags & UPD765_SEEK_ACTIVE)
@@ -1720,7 +1720,7 @@ void upd765_update_state(device_t *device)
 
     case UPD765_COMMAND_PHASE_BYTES:
 		if (LOG_VERBOSE)
-			logerror("%s: upd765(): command=0x%02x\n", device->machine->describe_context(), fdc->upd765_data_reg);
+			logerror("%s: upd765(): command=0x%02x\n", device->machine().describe_context(), fdc->upd765_data_reg);
 
 		fdc->upd765_command_bytes[fdc->upd765_transfer_bytes_count] = fdc->upd765_data_reg;
 		fdc->upd765_transfer_bytes_count++;
@@ -2245,7 +2245,7 @@ void upd765_reset(device_t *device, int offset)
 				if (device->owner() != NULL)
 					img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
 				else
-					img = device->machine->device(fdc->intf->floppy_drive_tags[i]);
+					img = device->machine().device(fdc->intf->floppy_drive_tags[i]);
 
 				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
 				if (image->exists())
@@ -2262,7 +2262,7 @@ void upd765_reset(device_t *device, int offset)
 			fdc->upd765_status[0] |= 0x08;
 		}
 
-		device->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(interrupt_callback),0,device);
+		device->machine().scheduler().timer_set(attotime::from_usec(5), FUNC(interrupt_callback),0,device);
 	}
 }
 
@@ -2330,18 +2330,18 @@ static void common_start(device_t *device, int device_type)
 	fdc->intf = (const upd765_interface*)device->baseconfig().static_config();
 
 	fdc->version = (UPD765_VERSION)device_type;
-	fdc->timer = device->machine->scheduler().timer_alloc(FUNC(upd765_timer_callback), (void*)device);
-	fdc->seek_timer = device->machine->scheduler().timer_alloc(FUNC(upd765_seek_timer_callback), (void*)device);
-	fdc->command_timer = device->machine->scheduler().timer_alloc(FUNC(upd765_continue_command), (void*)device);
+	fdc->timer = device->machine().scheduler().timer_alloc(FUNC(upd765_timer_callback), (void*)device);
+	fdc->seek_timer = device->machine().scheduler().timer_alloc(FUNC(upd765_seek_timer_callback), (void*)device);
+	fdc->command_timer = device->machine().scheduler().timer_alloc(FUNC(upd765_continue_command), (void*)device);
 
 	fdc->upd765_flags &= UPD765_FDD_READY;
-	fdc->data_buffer = auto_alloc_array(device->machine, char, 32*1024);
+	fdc->data_buffer = auto_alloc_array(device->machine(), char, 32*1024);
 
 	devcb_resolve_write_line(&fdc->out_int_func, &fdc->intf->out_int_func, device);
 	devcb_resolve_write_line(&fdc->out_drq_func, &fdc->intf->out_drq_func, device);
 
 	// register for state saving
-	//state_save_register_item(device->machine, "upd765", device->tag(), 0, upd765->number);
+	//state_save_register_item(device->machine(), "upd765", device->tag(), 0, upd765->number);
 }
 
 static DEVICE_START( upd765a )
@@ -2376,7 +2376,7 @@ static DEVICE_RESET( upd765 )
 			if (device->owner() != NULL)
 				img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
 			else
-				img = device->machine->device(fdc->intf->floppy_drive_tags[i]);
+				img = device->machine().device(fdc->intf->floppy_drive_tags[i]);
 
 			floppy_drive_set_controller(img, device);
 			floppy_drive_set_ready_state_change_callback(img, upd765_set_ready_change_callback);

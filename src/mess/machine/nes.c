@@ -24,7 +24,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void init_nes_core(running_machine *machine);
+static void init_nes_core(running_machine &machine);
 static void nes_machine_stop(running_machine &machine);
 static READ8_HANDLER(nes_fds_r);
 static WRITE8_HANDLER(nes_fds_w);
@@ -34,25 +34,25 @@ static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
     FUNCTIONS
 ***************************************************************************/
 
-static void init_nes_core( running_machine *machine )
+static void init_nes_core( running_machine &machine )
 {
-	nes_state *state = machine->driver_data<nes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	nes_state *state = machine.driver_data<nes_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int prg_banks = (state->prg_chunks == 1) ? (2 * 2) : (state->prg_chunks * 2);
 	int i;
 
 	/* We set these here in case they weren't set in the cart loader */
-	state->rom = machine->region("maincpu")->base();
-	state->vrom = machine->region("gfx1")->base();
-	state->vram = machine->region("gfx2")->base();
-	state->ciram = machine->region("gfx3")->base();
+	state->rom = machine.region("maincpu")->base();
+	state->vrom = machine.region("gfx1")->base();
+	state->vram = machine.region("gfx2")->base();
+	state->ciram = machine.region("gfx3")->base();
 
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
 	space->install_readwrite_bank(0x0000, 0x07ff, 0, 0x1800, "bank10");
 
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(nes_chr_r), FUNC(nes_chr_w));
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nes_nt_r), FUNC(nes_nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(nes_chr_r), FUNC(nes_chr_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nes_nt_r), FUNC(nes_nt_w));
 
 	memory_set_bankptr(machine, "bank10", state->rom);
 
@@ -64,7 +64,7 @@ static void init_nes_core( running_machine *machine )
          memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
 		if (state->fds_data == NULL)
 		{
-			UINT32 size = machine->region("maincpu")->bytes() - 0x10000;
+			UINT32 size = machine.region("maincpu")->bytes() - 0x10000;
 			state->fds_data = auto_alloc_array_clear(machine, UINT8, size);
 			memcpy(state->fds_data, state->rom, size);	// copy in fds_data the cart PRG
 		}
@@ -96,7 +96,7 @@ static void init_nes_core( running_machine *machine )
 	/* configure banks 1-4 */
 	for (i = 0; i < 4; i++)
 	{
-		memory_configure_bank(machine, bank_names[i], 0, prg_banks, machine->region("maincpu")->base() + 0x10000, 0x2000);
+		memory_configure_bank(machine, bank_names[i], 0, prg_banks, machine.region("maincpu")->base() + 0x10000, 0x2000);
 		// some mappers (e.g. MMC5) can map PRG RAM in  0x8000-0xffff as well
 		if (state->prg_ram)
 			memory_configure_bank(machine, bank_names[i], prg_banks, state->wram_size / 0x2000, state->wram, 0x2000);
@@ -107,7 +107,7 @@ static void init_nes_core( running_machine *machine )
 
 	/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 	/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
-	memory_configure_bank(machine, "bank5", 0, prg_banks, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank5", 0, prg_banks, machine.region("maincpu")->base() + 0x10000, 0x2000);
 	state->battery_bank5_start = prg_banks;
 	state->prgram_bank5_start = prg_banks;
 	state->empty_bank5_start = prg_banks;
@@ -178,7 +178,7 @@ static void init_nes_core( running_machine *machine )
 	}
 
 	if (state->pcb_id == WAIXING_SH2)
-		machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0, 0x1fff, FUNC(waixing_sh2_chr_r));
+		machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0, 0x1fff, FUNC(waixing_sh2_chr_r));
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -189,7 +189,7 @@ int nes_ppu_vidaccess( device_t *device, int address, int data )
 
 MACHINE_RESET( nes )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->disk_expansion && state->pcb_id == NO_BOARD)
@@ -201,19 +201,19 @@ MACHINE_RESET( nes )
 	state->in_0.shift = 0;
 	state->in_1.shift = 0;
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static TIMER_CALLBACK( nes_irq_callback )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	state->irq_timer->adjust(attotime::never);
 }
 
 static STATE_POSTLOAD( nes_banks_restore )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	memory_set_bank(machine, "bank1", state->prg_bank[0]);
 	memory_set_bank(machine, "bank2", state->prg_bank[1]);
@@ -222,9 +222,9 @@ static STATE_POSTLOAD( nes_banks_restore )
 	memory_set_bank(machine, "bank5", state->prg_bank[4]);
 }
 
-static void nes_state_register( running_machine *machine )
+static void nes_state_register( running_machine &machine )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	state->save_item(NAME(state->prg_bank));
 
@@ -272,22 +272,22 @@ static void nes_state_register( running_machine *machine )
 	if (state->battery)
 		state->save_pointer(NAME(state->battery_ram), state->battery_size);
 
-	machine->state().register_postload(nes_banks_restore, NULL);
+	machine.state().register_postload(nes_banks_restore, NULL);
 }
 
 MACHINE_START( nes )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	init_nes_core(machine);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, nes_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, nes_machine_stop);
 
-	state->maincpu = machine->device("maincpu");
-	state->ppu = machine->device("ppu");
-	state->sound = machine->device("nessound");
-	state->cart = machine->device("cart");
+	state->maincpu = machine.device("maincpu");
+	state->ppu = machine.device("ppu");
+	state->sound = machine.device("nessound");
+	state->cart = machine.device("cart");
 
-	state->irq_timer = machine->scheduler().timer_alloc(FUNC(nes_irq_callback));
+	state->irq_timer = machine.scheduler().timer_alloc(FUNC(nes_irq_callback));
 	nes_state_register(machine);
 }
 
@@ -307,8 +307,8 @@ static void nes_machine_stop( running_machine &machine )
 
 READ8_HANDLER( nes_IN0_r )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
-	int cfg = input_port_read(space->machine, "CTRLSEL");
+	nes_state *state = space->machine().driver_data<nes_state>();
+	int cfg = input_port_read(space->machine(), "CTRLSEL");
 	int ret;
 
 	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
@@ -351,7 +351,7 @@ READ8_HANDLER( nes_IN0_r )
 		}
 
 		if (LOG_JOY)
-			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_0.shift, state->in_0.i0);
+			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space->device()), state->in_0.shift, state->in_0.i0);
 
 		state->in_0.shift++;
 	}
@@ -360,13 +360,13 @@ READ8_HANDLER( nes_IN0_r )
 }
 
 // row of the keyboard matrix are read 4-bits at time, and gets returned as bit1->bit4
-static UINT8 nes_read_fc_keyboard_line( running_machine *machine, UINT8 scan, UINT8 mode )
+static UINT8 nes_read_fc_keyboard_line( running_machine &machine, UINT8 scan, UINT8 mode )
 {
 	static const char *const fc_keyport_names[] = { "FCKEY0", "FCKEY1", "FCKEY2", "FCKEY3", "FCKEY4", "FCKEY5", "FCKEY6", "FCKEY7", "FCKEY8" };
 	return ((input_port_read(machine, fc_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
 }
 
-static UINT8 nes_read_subor_keyboard_line( running_machine *machine, UINT8 scan, UINT8 mode )
+static UINT8 nes_read_subor_keyboard_line( running_machine &machine, UINT8 scan, UINT8 mode )
 {
 	static const char *const sub_keyport_names[] = { "SUBKEY0", "SUBKEY1", "SUBKEY2", "SUBKEY3", "SUBKEY4",
 		"SUBKEY5", "SUBKEY6", "SUBKEY7", "SUBKEY8", "SUBKEY9", "SUBKEY10", "SUBKEY11", "SUBKEY12" };
@@ -375,21 +375,21 @@ static UINT8 nes_read_subor_keyboard_line( running_machine *machine, UINT8 scan,
 
 READ8_HANDLER( nes_IN1_r )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
-	int cfg = input_port_read(space->machine, "CTRLSEL");
+	nes_state *state = space->machine().driver_data<nes_state>();
+	int cfg = input_port_read(space->machine(), "CTRLSEL");
 	int ret;
 
 	if ((cfg & 0x000f) == 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		if (state->fck_scan < 9)
-			ret = ~nes_read_fc_keyboard_line(space->machine, state->fck_scan, state->fck_mode) & 0x1e;
+			ret = ~nes_read_fc_keyboard_line(space->machine(), state->fck_scan, state->fck_mode) & 0x1e;
 		else
 			ret = 0x1e;
 	}
 	else if ((cfg & 0x000f) == 0x08)	// for now we treat the Subor keyboard separately from other inputs!
 	{
 		if (state->fck_scan < 12)
-			ret = ~nes_read_subor_keyboard_line(space->machine, state->fck_scan, state->fck_mode) & 0x1e;
+			ret = ~nes_read_subor_keyboard_line(space->machine(), state->fck_scan, state->fck_mode) & 0x1e;
 		else
 			ret = 0x1e;
 	}
@@ -441,7 +441,7 @@ READ8_HANDLER( nes_IN1_r )
 		}
 
 		if (LOG_JOY)
-			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_1.shift, state->in_1.i0);
+			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space->device()), state->in_1.shift, state->in_1.i0);
 
 		state->in_1.shift++;
 	}
@@ -452,9 +452,9 @@ READ8_HANDLER( nes_IN1_r )
 
 // FIXME: this is getting messier and messier (no pun intended). inputs reading should be simplified and port_categories cleaned up
 // to also emulate the fact that nothing should be in Port 2 if there is a Crazy Climber pad, etc.
-static void nes_read_input_device( running_machine *machine, int cfg, nes_input *vals, int pad_port, int supports_zapper )
+static void nes_read_input_device( running_machine &machine, int cfg, nes_input *vals, int pad_port, int supports_zapper )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4", "CC_LEFT", "CC_RIGHT" };
 
 	vals->i0 = 0;
@@ -529,11 +529,11 @@ static TIMER_CALLBACK( lightgun_tick )
 
 WRITE8_HANDLER( nes_IN0_w )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
-	int cfg = input_port_read(space->machine, "CTRLSEL");
+	nes_state *state = space->machine().driver_data<nes_state>();
+	int cfg = input_port_read(space->machine(), "CTRLSEL");
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	space->machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	space->machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
@@ -568,17 +568,17 @@ WRITE8_HANDLER( nes_IN0_w )
 		/* Read the input devices */
 		if ((cfg & 0x000f) != 0x06)
 		{
-			nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE);
-			nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE);
-			nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE);
-			nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE);
+			nes_read_input_device(space->machine(), cfg >>  0, &state->in_0, 0,  TRUE);
+			nes_read_input_device(space->machine(), cfg >>  4, &state->in_1, 1,  TRUE);
+			nes_read_input_device(space->machine(), cfg >>  8, &state->in_2, 2, FALSE);
+			nes_read_input_device(space->machine(), cfg >> 12, &state->in_3, 3, FALSE);
 		}
 		else // crazy climber pad
 		{
-			nes_read_input_device(space->machine, 0, &state->in_1, 1,  TRUE);
-			nes_read_input_device(space->machine, 0, &state->in_2, 2, FALSE);
-			nes_read_input_device(space->machine, 0, &state->in_3, 3, FALSE);
-			nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE);
+			nes_read_input_device(space->machine(), 0, &state->in_1, 1,  TRUE);
+			nes_read_input_device(space->machine(), 0, &state->in_2, 2, FALSE);
+			nes_read_input_device(space->machine(), 0, &state->in_3, 3, FALSE);
+			nes_read_input_device(space->machine(), cfg >>  0, &state->in_0, 0,  TRUE);
 		}
 
 		if (cfg & 0x0f00)
@@ -642,7 +642,7 @@ static int nes_cart_get_line( const char *feature )
 
 DEVICE_IMAGE_LOAD( nes_cart )
 {
-	nes_state *state = image.device().machine->driver_data<nes_state>();
+	nes_state *state = image.device().machine().driver_data<nes_state>();
 	state->pcb_id = NO_BOARD;	// initialization
 
 	if (image.software_entry() == NULL)
@@ -758,27 +758,27 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			/* Free the regions that were allocated by the ROM loader */
-			image.device().machine->region_free("maincpu");
-			image.device().machine->region_free("gfx1");
+			image.device().machine().region_free("maincpu");
+			image.device().machine().region_free("gfx1");
 
 			/* Allocate them again with the proper size */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
+			image.device().machine().region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
 			if (state->chr_chunks)
-				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
+				image.device().machine().region_alloc("gfx1", state->chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
 
-			state->rom = image.device().machine->region("maincpu")->base();
-			state->vrom = image.device().machine->region("gfx1")->base();
+			state->rom = image.device().machine().region("maincpu")->base();
+			state->vrom = image.device().machine().region("gfx1")->base();
 
-			state->vram_chunks = image.device().machine->region("gfx2")->bytes() / 0x2000;
-			state->vram = image.device().machine->region("gfx2")->base();
+			state->vram_chunks = image.device().machine().region("gfx2")->bytes() / 0x2000;
+			state->vram = image.device().machine().region("gfx2")->base();
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
 			// or if there is a trainer, I think
 			state->wram_size = 0x10000;
-			state->wram = auto_alloc_array(image.device().machine, UINT8, state->wram_size);
+			state->wram = auto_alloc_array(image.device().machine(), UINT8, state->wram_size);
 
 			/* Setup PCB type (needed to add proper handlers later) */
-			state->pcb_id = nes_get_mmc_id(image.device().machine, state->mapper);
+			state->pcb_id = nes_get_mmc_id(image.device().machine(), state->mapper);
 
 			// a few mappers correspond to multiple PCBs, so we need a few additional checks
 			switch (state->pcb_id)
@@ -894,19 +894,19 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			/* Allocate internal Mapper RAM for boards which require it */
 			if (state->pcb_id == STD_EXROM)
-				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 0x400);
+				state->mapper_ram = auto_alloc_array(image.device().machine(), UINT8, 0x400);
 
 			if (state->pcb_id == TAITO_X1_005 || state->pcb_id == TAITO_X1_005_A)
-				state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, 0x80);
+				state->mapper_bram = auto_alloc_array(image.device().machine(), UINT8, 0x80);
 
 			if (state->pcb_id == TAITO_X1_017)
-				state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, 0x1400);
+				state->mapper_bram = auto_alloc_array(image.device().machine(), UINT8, 0x1400);
 
 			if (state->pcb_id == NAMCOT_163)
-				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 0x2000);
+				state->mapper_ram = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
 
 			if (state->pcb_id == FUKUTAKE_BOARD)
-				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 2816);
+				state->mapper_ram = auto_alloc_array(image.device().machine(), UINT8, 2816);
 
 			/* Position past the header */
 			image.fseek(16, SEEK_SET);
@@ -984,8 +984,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			UINT32 size = image.length();
 			int mapr_chunk_found = 0;
 			// allocate space to temporarily store PRG & CHR banks
-			UINT8 *temp_prg = auto_alloc_array(image.device().machine, UINT8, 256 * 0x4000);
-			UINT8 *temp_chr = auto_alloc_array(image.device().machine, UINT8, 256 * 0x2000);
+			UINT8 *temp_prg = auto_alloc_array(image.device().machine(), UINT8, 256 * 0x4000);
+			UINT8 *temp_chr = auto_alloc_array(image.device().machine(), UINT8, 256 * 0x2000);
 			UINT8 temp_byte = 0;
 
 			/* init prg/chr chunks to 0: the exact number of chunks will be determined while reading the file */
@@ -1026,7 +1026,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 							image.fread(&unif_mapr, chunk_length);
 
 						// find out prg/chr size, battery, wram, etc.
-						unif_mapr_setup(image.device().machine, unif_mapr);
+						unif_mapr_setup(image.device().machine(), unif_mapr);
 
 						/* now that we found the MAPR chunk, we can go back to load other chunks */
 						image.fseek(0x20, SEEK_SET);
@@ -1229,28 +1229,28 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			if (!mapr_chunk_found)
 			{
-				auto_free(image.device().machine, temp_prg);
-				auto_free(image.device().machine, temp_chr);
+				auto_free(image.device().machine(), temp_prg);
+				auto_free(image.device().machine(), temp_chr);
 				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted");
 			}
 
 			if (!prg_start)
 			{
-				auto_free(image.device().machine, temp_prg);
-				auto_free(image.device().machine, temp_chr);
+				auto_free(image.device().machine(), temp_prg);
+				auto_free(image.device().machine(), temp_chr);
 				fatalerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MESS Board.\n");
 			}
 
 			/* Free the regions that were allocated by the ROM loader */
-			image.device().machine->region_free("maincpu");
-			image.device().machine->region_free("gfx1");
-			image.device().machine->region_free("gfx2");
+			image.device().machine().region_free("maincpu");
+			image.device().machine().region_free("gfx1");
+			image.device().machine().region_free("gfx2");
 
 			/* Allocate them again, and copy PRG/CHR from temp buffers */
 			/* Take care of PRG */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
-			state->rom = image.device().machine->region("maincpu")->base();
+			image.device().machine().region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
+			state->rom = image.device().machine().region("maincpu")->base();
 			memcpy(&state->rom[0x10000], &temp_prg[0x00000], state->prg_chunks * 0x4000);
 			/* If only a single 16K PRG chunk is present, mirror it! */
 			if (state->prg_chunks == 1)
@@ -1259,21 +1259,21 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Take care of CHR ROM */
 			if (state->chr_chunks)
 			{
-				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
-				state->vrom = image.device().machine->region("gfx1")->base();
+				image.device().machine().region_alloc("gfx1", state->chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
+				state->vrom = image.device().machine().region("gfx1")->base();
 				memcpy(&state->vrom[0x00000], &temp_chr[0x00000], state->chr_chunks * 0x2000);
 			}
 
 			/* Take care of CHR RAM */
 			if (state->vram_chunks)
 			{
-				image.device().machine->region_alloc("gfx2", state->vram_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
-				state->vram = image.device().machine->region("gfx2")->base();
+				image.device().machine().region_alloc("gfx2", state->vram_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
+				state->vram = image.device().machine().region("gfx2")->base();
 			}
 
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
 			state->wram_size = 0x10000;
-			state->wram = auto_alloc_array(image.device().machine, UINT8, state->wram_size);
+			state->wram = auto_alloc_array(image.device().machine(), UINT8, state->wram_size);
 
 #if SPLIT_PRG
 			{
@@ -1309,8 +1309,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 #endif
 			// free the temporary copy of PRG/CHR
-			auto_free(image.device().machine, temp_prg);
-			auto_free(image.device().machine, temp_chr);
+			auto_free(image.device().machine(), temp_prg);
+			auto_free(image.device().machine(), temp_chr);
 			logerror("UNIF support is only very preliminary.\n");
 		}
 		else
@@ -1327,12 +1327,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		vram_size += image.get_software_region_length("vram2");
 
 		/* Free the regions that were allocated by the ROM loader */
-		image.device().machine->region_free("maincpu");
-		image.device().machine->region_free("gfx1");
-		image.device().machine->region_free("gfx2");
+		image.device().machine().region_free("maincpu");
+		image.device().machine().region_free("gfx1");
+		image.device().machine().region_free("gfx2");
 
 		/* Allocate them again with the proper size */
-		image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
+		image.device().machine().region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
 
 		// validate the xml fields
 		if (!prg_size)
@@ -1341,14 +1341,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
 
 		if (chr_size)
-			image.device().machine->region_alloc("gfx1", chr_size, 1, ENDIANNESS_LITTLE);
+			image.device().machine().region_alloc("gfx1", chr_size, 1, ENDIANNESS_LITTLE);
 
 		if (vram_size)
-			image.device().machine->region_alloc("gfx2", vram_size, 1, ENDIANNESS_LITTLE);
+			image.device().machine().region_alloc("gfx2", vram_size, 1, ENDIANNESS_LITTLE);
 
-		state->rom = image.device().machine->region("maincpu")->base();
-		state->vrom = image.device().machine->region("gfx1")->base();
-		state->vram = image.device().machine->region("gfx2")->base();
+		state->rom = image.device().machine().region("maincpu")->base();
+		state->vrom = image.device().machine().region("gfx1")->base();
+		state->vram = image.device().machine().region("gfx2")->base();
 
 		memcpy(state->rom + 0x10000, image.get_software_region("prg"), prg_size);
 
@@ -1359,7 +1359,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->chr_chunks = chr_size / 0x2000;
 		state->vram_chunks = vram_size / 0x2000;
 
-		state->pcb_id = nes_get_pcb_id(image.device().machine, image.get_feature("pcb"));
+		state->pcb_id = nes_get_pcb_id(image.device().machine(), image.get_feature("pcb"));
 
 		if (state->pcb_id == STD_TVROM || state->pcb_id == STD_DRROM || state->pcb_id == IREM_LROG017)
 			state->four_screen_vram = 1;
@@ -1389,11 +1389,11 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->mapper_bram_size = image.get_software_region_length("mapper_bram");
 
 		if (state->prg_ram)
-			state->wram = auto_alloc_array(image.device().machine, UINT8, state->wram_size);
+			state->wram = auto_alloc_array(image.device().machine(), UINT8, state->wram_size);
 		if (state->mapper_ram_size)
-			state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, state->mapper_ram_size);
+			state->mapper_ram = auto_alloc_array(image.device().machine(), UINT8, state->mapper_ram_size);
 		if (state->mapper_bram_size)
-			state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, state->mapper_bram_size);
+			state->mapper_bram = auto_alloc_array(image.device().machine(), UINT8, state->mapper_bram_size);
 
 		/* Check for mirroring */
 		if (image.get_feature("mirroring") != NULL)
@@ -1497,17 +1497,17 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 	if (state->battery || state->mapper_bram_size)
 	{
-		UINT8 *temp_nvram = auto_alloc_array(image.device().machine, UINT8, state->battery_size + state->mapper_bram_size);
+		UINT8 *temp_nvram = auto_alloc_array(image.device().machine(), UINT8, state->battery_size + state->mapper_bram_size);
 		image.battery_load(temp_nvram, state->battery_size + state->mapper_bram_size, 0x00);
 		if (state->battery)
 		{
-			state->battery_ram = auto_alloc_array(image.device().machine, UINT8, state->battery_size);
+			state->battery_ram = auto_alloc_array(image.device().machine(), UINT8, state->battery_size);
 			memcpy(state->battery_ram, temp_nvram, state->battery_size);
 		}
 		if (state->mapper_bram_size)
 			memcpy(state->mapper_bram, temp_nvram + state->battery_size, state->mapper_bram_size);
 
-		auto_free(image.device().machine, temp_nvram);
+		auto_free(image.device().machine(), temp_nvram);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -1531,7 +1531,7 @@ void nes_partialhash(hash_collection &dest, const unsigned char *data,
 
 static void fds_irq( device_t *device, int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine->driver_data<nes_state>();
+	nes_state *state = device->machine().driver_data<nes_state>();
 
 	if (state->IRQ_enable_latch)
 		device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
@@ -1551,7 +1551,7 @@ static void fds_irq( device_t *device, int scanline, int vblank, int blanked )
 
 static READ8_HANDLER( nes_fds_r )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 	UINT8 ret = 0x00;
 
 	switch (offset)
@@ -1601,7 +1601,7 @@ static READ8_HANDLER( nes_fds_r )
 
 static WRITE8_HANDLER( nes_fds_w )
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 
 	switch (offset)
 	{
@@ -1629,7 +1629,7 @@ static WRITE8_HANDLER( nes_fds_w )
 				state->fds_head_position = 0;
 
 			state->fds_read_mode = BIT(data, 2);
-			set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 			if ((!(data & 0x40)) && (state->fds_write_reg & 0x40))
 				state->fds_head_position -= 2; // ???
@@ -1642,7 +1642,7 @@ static WRITE8_HANDLER( nes_fds_w )
 
 static void nes_load_proc( device_image_interface &image )
 {
-	nes_state *state = image.device().machine->driver_data<nes_state>();
+	nes_state *state = image.device().machine().driver_data<nes_state>();
 	int header = 0;
 	state->fds_sides = 0;
 
@@ -1663,7 +1663,7 @@ static void nes_load_proc( device_image_interface &image )
 
 static void nes_unload_proc( device_image_interface &image )
 {
-	nes_state *state = image.device().machine->driver_data<nes_state>();
+	nes_state *state = image.device().machine().driver_data<nes_state>();
 
 	/* TODO: should write out changes here as well */
 	state->fds_sides =  0;
@@ -1671,7 +1671,7 @@ static void nes_unload_proc( device_image_interface &image )
 
 DRIVER_INIT( famicom )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 	int i;
 
 	/* clear some of the variables we don't use */
@@ -1701,7 +1701,7 @@ DRIVER_INIT( famicom )
 	state->save_pointer(NAME(state->fds_ram), 0x8000);
 
 	// setup CHR accesses to 8k VRAM
-	state->vram = machine->region("gfx2")->base();
+	state->vram = machine.region("gfx2")->base();
 	for (i = 0; i < 8; i++)
 	{
 		state->chr_map[i].source = CHRRAM;

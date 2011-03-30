@@ -349,9 +349,9 @@ struct dsp_state
 static dsp_state *mpDspState;
 
 static INT32
-ReadPointROMData( running_machine *machine, unsigned offset )
+ReadPointROMData( running_machine &machine, unsigned offset )
 {
-	const INT32 *pPointData = (INT32 *)machine->region( "user2" )->base();
+	const INT32 *pPointData = (INT32 *)machine.region( "user2" )->base();
 	INT32 result = pPointData[offset];
 	return result;
 }
@@ -381,20 +381,20 @@ static READ16_HANDLER(dspcuskey_r)
 	UINT16 result = 0;
 	if( namcos2_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( cpu_get_pc(space->cpu) )
+		switch( cpu_get_pc(&space->device()) )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(space->cpu) );
+			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(&space->device()) );
 			break;
 		}
 	}
 	else if( namcos2_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( cpu_get_pc(space->cpu) )
+		switch( cpu_get_pc(&space->device()) )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -405,7 +405,7 @@ static READ16_HANDLER(dspcuskey_r)
 	}
 	else if( namcos2_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( cpu_get_pc(space->cpu) )
+		switch( cpu_get_pc(&space->device()) )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -432,7 +432,7 @@ TransmitWordToSlave( UINT16 data )
 } /* TransmitWordToSlave */
 
 static void
-TransferDspData( running_machine *machine )
+TransferDspData( running_machine &machine )
 {
 	UINT16 addr = mpDspState->masterSourceAddr;
 	int mode = addr&0x8000;
@@ -532,7 +532,7 @@ static int mbNeedsKickstart;
 static UINT16 *master_dsp_code;
 
 void
-namcos21_kickstart( running_machine *machine, int internal )
+namcos21_kickstart( running_machine &machine, int internal )
 {
 	/* patch dsp watchdog */
 	switch( namcos2_gametype )
@@ -575,13 +575,13 @@ ReadWordFromSlaveInput( address_space *space )
 		{
 			mpDspState->slaveBytesAdvertised--;
 		}
-		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", space->machine->describe_context(), data, mpDspState->slaveBytesAvailable );
+		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", space->machine().describe_context(), data, mpDspState->slaveBytesAvailable );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */
 
 static size_t
-GetInputBytesAdvertisedForSlave( running_machine *machine )
+GetInputBytesAdvertisedForSlave( running_machine &machine )
 {
 	if( mpDspState->slaveBytesAdvertised < mpDspState->slaveBytesAvailable )
 	{
@@ -609,13 +609,13 @@ static WRITE16_HANDLER( dspram16_w )
 			offset == 1+(mpDspState->masterSourceAddr&0x7fff) )
 		{
 			if (ENABLE_LOGGING) logerror( "IDC-CONTINUE\n" );
-			TransferDspData(space->machine);
+			TransferDspData(space->machine());
 		}
 		else if (namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					space->cpu == space->machine->device("maincpu"))
+					&space->device() == space->machine().device("maincpu"))
 		{ /* hack; synchronization for solvalou */
-			device_yield(space->cpu);
+			device_yield(&space->device());
 		}
 	}
 } /* dspram16_w */
@@ -623,9 +623,9 @@ static WRITE16_HANDLER( dspram16_w )
 /************************************************************************************/
 
 static int
-InitDSP( running_machine *machine )
+InitDSP( running_machine &machine )
 {
-	UINT16 *pMem = (UINT16 *)machine->region("dspmaster")->base();
+	UINT16 *pMem = (UINT16 *)machine.region("dspmaster")->base();
 	/**
      * DSP BIOS tests "CPU ID" on startup
      * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -648,7 +648,7 @@ static int mbPointRomDataAvailable;
 
 static READ16_HANDLER( dsp_port0_r )
 {
-	INT32 data = ReadPointROMData(space->machine, pointrom_idx++);
+	INT32 data = ReadPointROMData(space->machine(), pointrom_idx++);
 	mPointRomMSB = (UINT8)(data>>16);
 	mbPointRomDataAvailable = 1;
 	return (UINT16)data;
@@ -683,7 +683,7 @@ static WRITE16_HANDLER( dsp_port2_w )
 {
 	if (ENABLE_LOGGING) logerror( "IDC ADDR INIT(0x%04x)\n", data );
 	mpDspState->masterSourceAddr = data;
-	TransferDspData(space->machine);
+	TransferDspData(space->machine());
 } /* dsp_port2_w */
 
 static READ16_HANDLER( dsp_port3_idc_rcv_enable_r )
@@ -902,7 +902,7 @@ static WRITE16_HANDLER(slave_port0_w)
 
 static READ16_HANDLER(slave_port2_r)
 {
-	return GetInputBytesAdvertisedForSlave(space->machine);
+	return GetInputBytesAdvertisedForSlave(space->machine());
 } /* slave_port2_r */
 
 static READ16_HANDLER(slave_port3_r)
@@ -919,7 +919,7 @@ static WRITE16_HANDLER(slave_port3_w)
 
 static WRITE16_HANDLER( slave_XF_output_w )
 {
-	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(space->cpu), data );
+	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(&space->device()), data );
 } /* slave_XF_output_w */
 
 static READ16_HANDLER( slave_portf_r )
@@ -973,8 +973,8 @@ static WRITE16_HANDLER( pointram_control_w )
 	/* pointram_control&0x20 : bank for depthcue data */
 /*
     logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
-            space->cpu->tag,
-            cpu_get_pc(space->cpu),
+            space->device().tag,
+            cpu_get_pc(&space->device()),
             offset,
             pointram_control );
 
@@ -1087,12 +1087,12 @@ static READ16_HANDLER( data2_r )
 
 static READ16_HANDLER( paletteram16_r )
 {
-	return space->machine->generic.paletteram.u16[offset];
+	return space->machine().generic.paletteram.u16[offset];
 }
 
 static WRITE16_HANDLER( paletteram16_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 }
 
 /******************************************************************************/
@@ -1160,7 +1160,7 @@ static WRITE16_HANDLER( winrun_dspcomram_w )
 
 static READ16_HANDLER( winrun_cuskey_r )
 {
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */
@@ -1260,7 +1260,7 @@ static WRITE16_HANDLER( winrun_dsp_pointrom_addr_w )
 
 static READ16_HANDLER( winrun_dsp_pointrom_data_r )
 {
-	UINT16 *ptrom = (UINT16 *)space->machine->region("user2")->base();
+	UINT16 *ptrom = (UINT16 *)space->machine().region("user2")->base();
 	return ptrom[winrun_pointrom_addr++];
 } /* winrun_dsp_pointrom_data_r */
 
@@ -1269,7 +1269,7 @@ static WRITE16_HANDLER( winrun_dsp_complete_w )
 	if( data )
 	{
 		winrun_flushpoly();
-		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, PULSE_LINE);
 		namcos21_ClearPolyFrameBuffer();
 	}
 }
@@ -1302,7 +1302,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gpu_data_r )
 {
-	const UINT16 *pSrc = (UINT16 *)space->machine->region( "user3" )->base();
+	const UINT16 *pSrc = (UINT16 *)space->machine().region( "user3" )->base();
 	return pSrc[offset];
 }
 
@@ -1320,7 +1320,7 @@ static WRITE16_HANDLER( winrun_dspbios_w )
 	COMBINE_DATA( &winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)space->machine->region("dsp")->base();
+		UINT16 *mem = (UINT16 *)space->machine().region("dsp")->base();
 		memcpy( mem, winrun_dspbios, 0x2000 );
 		winrun_dsp_alive = 1;
 	}
@@ -2201,11 +2201,11 @@ ROM_START( winrun91 )
 	ROM_LOAD("avo3.11e",0x180000,0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
 ROM_END
 
-static void namcos21_init( running_machine *machine, int game_type )
+static void namcos21_init( running_machine &machine, int game_type )
 {
 	namcos2_gametype = game_type;
 	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
-	mpDataROM = (UINT16 *)machine->region( "user1" )->base();
+	mpDataROM = (UINT16 *)machine.region( "user1" )->base();
 	InitDSP(machine);
 	mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2216,7 +2216,7 @@ static void namcos21_init( running_machine *machine, int game_type )
 
 static DRIVER_INIT( winrun )
 {
-	UINT16 *pMem = (UINT16 *)machine->region("dsp")->base();
+	UINT16 *pMem = (UINT16 *)machine.region("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
@@ -2224,7 +2224,7 @@ static DRIVER_INIT( winrun )
 	winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 
 	namcos2_gametype = NAMCOS21_WINRUN91;
-	mpDataROM = (UINT16 *)machine->region( "user1" )->base();
+	mpDataROM = (UINT16 *)machine.region( "user1" )->base();
 	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;
@@ -2248,7 +2248,7 @@ static DRIVER_INIT( cybsled )
 
 static DRIVER_INIT( solvalou )
 {
-	UINT16 *mem = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *mem = (UINT16 *)machine.region("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;
@@ -2259,13 +2259,13 @@ static DRIVER_INIT( solvalou )
 
 static DRIVER_INIT( driveyes )
 {
-	UINT16 *pMem = (UINT16 *)machine->region("dsp")->base();
+	UINT16 *pMem = (UINT16 *)machine.region("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 	winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
-	mpDataROM = (UINT16 *)machine->region( "user1" )->base();
+	mpDataROM = (UINT16 *)machine.region( "user1" )->base();
 	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;

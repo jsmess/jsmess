@@ -89,7 +89,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( update_leds )
 {
-	mk2_state *state = timer.machine->driver_data<mk2_state>();
+	mk2_state *state = timer.machine().driver_data<mk2_state>();
 	int i;
 
 	for (i=0; i<4; i++)
@@ -109,7 +109,7 @@ static MACHINE_START( mk2 )
 static READ8_DEVICE_HANDLER( mk2_read_a )
 {
 	int data=0xff;
-	int help=input_port_read(device->machine, "BLACK")|input_port_read(device->machine, "WHITE"); // looks like white and black keys are the same!
+	int help=input_port_read(device->machine(), "BLACK")|input_port_read(device->machine(), "WHITE"); // looks like white and black keys are the same!
 
 	switch (mos6530_portb_out_get(device)&0x7) {
 	case 4:
@@ -120,17 +120,17 @@ static READ8_DEVICE_HANDLER( mk2_read_a )
 		if (help&2) data&=~0x10; // B
 		if (help&1) data&=~0x20; // A
 #if 0
-		if (input_port_read(device->machine, "???")&1) data&=~0x40; //?
+		if (input_port_read(device->machine(), "???")&1) data&=~0x40; //?
 #endif
 		break;
 	case 5:
 #if 0
-		if (input_port_read(device->machine, "???")&2) data&=~0x1; //?
-		if (input_port_read(device->machine, "???")&4) data&=~0x2; //?
-		if (input_port_read(device->machine, "???")&8) data&=~0x4; //?
+		if (input_port_read(device->machine(), "???")&2) data&=~0x1; //?
+		if (input_port_read(device->machine(), "???")&4) data&=~0x2; //?
+		if (input_port_read(device->machine(), "???")&8) data&=~0x4; //?
 #endif
-		if (input_port_read(device->machine, "EXTRA")&4) data&=~0x8; // Enter
-		if (input_port_read(device->machine, "EXTRA")&2) data&=~0x10; // Clear
+		if (input_port_read(device->machine(), "EXTRA")&4) data&=~0x8; // Enter
+		if (input_port_read(device->machine(), "EXTRA")&2) data&=~0x10; // Clear
 		if (help&0x80) data&=~0x20; // H
 		if (help&0x40) data&=~0x40; // G
 		break;
@@ -140,7 +140,7 @@ static READ8_DEVICE_HANDLER( mk2_read_a )
 
 static WRITE8_DEVICE_HANDLER( mk2_write_a )
 {
-	mk2_state *state = device->machine->driver_data<mk2_state>();
+	mk2_state *state = device->machine().driver_data<mk2_state>();
 	int temp = mos6530_portb_out_get(device);
 
 	switch(temp&0x3) {
@@ -158,14 +158,14 @@ static READ8_DEVICE_HANDLER( mk2_read_b )
 
 static WRITE8_DEVICE_HANDLER( mk2_write_b )
 {
-	mk2_state *state = device->machine->driver_data<mk2_state>();
-	device_t *dac_device = device->machine->device("dac");
+	mk2_state *state = device->machine().driver_data<mk2_state>();
+	device_t *dac_device = device->machine().device("dac");
 
 	if ((data&0x06)==0x06)
 		dac_data_w(dac_device,data&1?80:0);
 	state->led[4]|=data;
 
-	cputag_set_input_line( device->machine, "maincpu", M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line( device->machine(), "maincpu", M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static MOS6530_INTERFACE( mk2_mos6530_interface )

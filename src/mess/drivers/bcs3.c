@@ -28,14 +28,14 @@ public:
 
 static READ8_HANDLER( bcs3_videoram_r )
 {
-	bcs3_state *state = space->machine->driver_data<bcs3_state>();
+	bcs3_state *state = space->machine().driver_data<bcs3_state>();
 
 	return state->videoram[offset];
 }
 
 static WRITE8_HANDLER( bcs3_videoram_w )
 {
-	bcs3_state *state = space->machine->driver_data<bcs3_state>();
+	bcs3_state *state = space->machine().driver_data<bcs3_state>();
 
 	state->videoram[offset] = data;
 }
@@ -45,23 +45,23 @@ static READ8_HANDLER( bcs3_keyboard_r )
 	UINT8 data = 0;
 
 	if (~offset & 0x01)
-		data |= input_port_read(space->machine, "LINE0");
+		data |= input_port_read(space->machine(), "LINE0");
 	if (~offset & 0x02)
-		data |= input_port_read(space->machine, "LINE1");
+		data |= input_port_read(space->machine(), "LINE1");
 	if (~offset & 0x04)
-		data |= input_port_read(space->machine, "LINE2");
+		data |= input_port_read(space->machine(), "LINE2");
 	if (~offset & 0x08)
-		data |= input_port_read(space->machine, "LINE3");
+		data |= input_port_read(space->machine(), "LINE3");
 	if (~offset & 0x10)
-		data |= input_port_read(space->machine, "LINE4");
+		data |= input_port_read(space->machine(), "LINE4");
 	if (~offset & 0x20)
-		data |= input_port_read(space->machine, "LINE5");
+		data |= input_port_read(space->machine(), "LINE5");
 	if (~offset & 0x40)
-		data |= input_port_read(space->machine, "LINE6");
+		data |= input_port_read(space->machine(), "LINE6");
 	if (~offset & 0x80)
-		data |= input_port_read(space->machine, "LINE7");
+		data |= input_port_read(space->machine(), "LINE7");
 	if (~offset & 0x100)
-		data |= input_port_read(space->machine, "LINE8");
+		data |= input_port_read(space->machine(), "LINE8");
 
 	return data;
 }
@@ -220,14 +220,14 @@ static MACHINE_RESET(bcs3)
 
 static VIDEO_START( bcs3 )
 {
-	bcs3_state *state = machine->driver_data<bcs3_state>();
+	bcs3_state *state = machine.driver_data<bcs3_state>();
 
-	state->fnt = machine->region("gfx1")->base();
+	state->fnt = machine.region("gfx1")->base();
 }
 
 static SCREEN_UPDATE( bcs3 )
 {
-	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
+	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0,x;
 
@@ -270,7 +270,7 @@ static SCREEN_UPDATE( bcs3 )
     with the cursor always in sight. */
 static SCREEN_UPDATE( bcs3a )
 {
-	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
+	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
 	UINT16 cursor = (state->videoram[0x7a] | (state->videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
@@ -314,7 +314,7 @@ static SCREEN_UPDATE( bcs3a )
 
 static SCREEN_UPDATE( bcs3b )
 {
-	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
+	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
 	UINT16 cursor = (state->videoram[0x7a] | (state->videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
@@ -358,7 +358,7 @@ static SCREEN_UPDATE( bcs3b )
 
 static SCREEN_UPDATE( bcs3c )
 {
-	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
+	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
 	UINT16 cursor = (state->videoram[0x08] | (state->videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position

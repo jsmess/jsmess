@@ -32,21 +32,21 @@ public:
 
 static WRITE8_HANDLER( uts20_43_w )
 {
-	univac_state *state = space->machine->driver_data<univac_state>();
+	univac_state *state = space->machine().driver_data<univac_state>();
 	state->uts20_screen = data & 1;
 }
 
 static READ8_HANDLER( uts20_vram_r )
 {
-	univac_state *state = space->machine->driver_data<univac_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	univac_state *state = space->machine().driver_data<univac_state>();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	return RAM[offset | ((state->uts20_screen) ? 0xe000 : 0xc000)];
 }
 
 static WRITE8_HANDLER( uts20_vram_w )
 {
-	univac_state *state = space->machine->driver_data<univac_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	univac_state *state = space->machine().driver_data<univac_state>();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	RAM[offset | ((state->uts20_screen) ? 0xe000 : 0xc000)] = data;
 }
 
@@ -72,22 +72,22 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(uts20)
 {
-	univac_state *state = machine->driver_data<univac_state>();
+	univac_state *state = machine.driver_data<univac_state>();
 	state->uts20_screen = 0;
 }
 
 static VIDEO_START( uts20 )
 {
-	univac_state *state = machine->driver_data<univac_state>();
-	state->FNT = machine->region("chargen")->base();
+	univac_state *state = machine.driver_data<univac_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( uts20 )
 {
-	univac_state *state = screen->machine->driver_data<univac_state>();
+	univac_state *state = screen->machine().driver_data<univac_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = screen->machine->region("maincpu")->base()+((state->uts20_screen) ? 0xe000 : 0xc000);
+	UINT8 *videoram = screen->machine().region("maincpu")->base()+((state->uts20_screen) ? 0xe000 : 0xc000);
 
 	state->framecnt++;
 

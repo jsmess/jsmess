@@ -25,7 +25,7 @@ DRIVER_INIT(mz80k)
 
 MACHINE_RESET( mz80k )
 {
-	mz80_state *state = machine->driver_data<mz80_state>();
+	mz80_state *state = machine.driver_data<mz80_state>();
 	state->mz80k_tempo_strobe = 0;
 	state->mz80k_8255_portc = 0;
 	state->mz80k_vertical = 0;
@@ -36,24 +36,24 @@ MACHINE_RESET( mz80k )
 
 static READ8_DEVICE_HANDLER(mz80k_8255_portb_r)
 {
-	mz80_state *state = device->machine->driver_data<mz80_state>();
+	mz80_state *state = device->machine().driver_data<mz80_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	if (state->mz80k_keyboard_line > 9) {
 		return 0xff;
 	} else {
-		return input_port_read(device->machine, keynames[state->mz80k_keyboard_line]);
+		return input_port_read(device->machine(), keynames[state->mz80k_keyboard_line]);
 	}
 }
 
 static READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 {
-	mz80_state *state = device->machine->driver_data<mz80_state>();
+	mz80_state *state = device->machine().driver_data<mz80_state>();
 	UINT8 val = 0;
 	val |= state->mz80k_vertical ? 0x80 : 0x00;
 	val |= (state->mz80k_cursor_cnt > 31) ? 0x40 : 0x00;
-    val |= (cassette_get_state(device->machine->device("cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
+    val |= (cassette_get_state(device->machine().device("cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
 
-    if (cassette_input(device->machine->device("cassette")) > 0.00)
+    if (cassette_input(device->machine().device("cassette")) > 0.00)
         val |= 0x20;
 
 	return val;
@@ -61,7 +61,7 @@ static READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 
 static WRITE8_DEVICE_HANDLER(mz80k_8255_porta_w)
 {
-	mz80_state *state = device->machine->driver_data<mz80_state>();
+	mz80_state *state = device->machine().driver_data<mz80_state>();
 	state->mz80k_keyboard_line = data & 0x0f;
 }
 
@@ -73,8 +73,8 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
-	mz80_state *drvstate = device->machine->driver_data<mz80_state>();
-	device_t *speaker = device->machine->device("speaker");
+	mz80_state *drvstate = device->machine().driver_data<mz80_state>();
+	device_t *speaker = device->machine().device("speaker");
 	if((drvstate->prev_state==0) && (state==1)) {
 		drvstate->speaker_level ^= 1;
 	}
@@ -84,7 +84,7 @@ static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 
 static WRITE_LINE_DEVICE_HANDLER( pit_out2_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 }
 
 I8255A_INTERFACE( mz80k_8255_int )
@@ -109,11 +109,11 @@ const struct pit8253_config mz80k_pit8253_config =
 
 READ8_HANDLER(mz80k_strobe_r)
 {
-	mz80_state *state = space->machine->driver_data<mz80_state>();
+	mz80_state *state = space->machine().driver_data<mz80_state>();
 	return(0x7e | state->mz80k_tempo_strobe);
 }
 WRITE8_HANDLER(mz80k_strobe_w)
 {
-	device_t *pit = space->machine->device("pit8253");
+	device_t *pit = space->machine().device("pit8253");
 	pit8253_gate0_w(pit, BIT(data, 0));
 }

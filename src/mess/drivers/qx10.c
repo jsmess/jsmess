@@ -98,7 +98,7 @@ public:
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	qx10_state *state = device->machine->driver_data<qx10_state>();
+	qx10_state *state = device->machine().driver_data<qx10_state>();
 	int xi,gfx[3];
 	UINT8 pen;
 
@@ -127,7 +127,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
-	qx10_state *state = device->machine->driver_data<qx10_state>();
+	qx10_state *state = device->machine().driver_data<qx10_state>();
 	int x;
 	int xi,yi;
 	int tile;
@@ -153,7 +153,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 
-			if(attr & 0x80 && device->machine->primary_screen->frame_number() & 0x10) //TODO: check for blinking interval
+			if(attr & 0x80 && device->machine().primary_screen->frame_number() & 0x10) //TODO: check for blinking interval
 				tile_data=0;
 
 			for( xi = 0; xi < 8; xi++)
@@ -181,10 +181,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 /*
     Memory
 */
-static void update_memory_mapping(running_machine *machine)
+static void update_memory_mapping(running_machine &machine)
 {
 	int drambank = 0;
-	qx10_state *state = machine->driver_data<qx10_state>();
+	qx10_state *state = machine.driver_data<qx10_state>();
 
 	if (state->membank & 1)
 	{
@@ -205,11 +205,11 @@ static void update_memory_mapping(running_machine *machine)
 
 	if (!state->memprom)
 	{
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + drambank*64*1024);
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + drambank*64*1024);
 	}
 	if (state->memcmos)
 	{
@@ -217,29 +217,29 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + drambank*64*1024 + 32*1024);
 	}
 }
 
 static WRITE8_HANDLER(qx10_18_w)
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 	state->membank = (data >> 4) & 0x0f;
-	update_memory_mapping(space->machine);
+	update_memory_mapping(space->machine());
 }
 
 static WRITE8_HANDLER(prom_sel_w)
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 	state->memprom = data & 1;
-	update_memory_mapping(space->machine);
+	update_memory_mapping(space->machine());
 }
 
 static WRITE8_HANDLER(cmos_sel_w)
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 	state->memcmos = data & 1;
-	update_memory_mapping(space->machine);
+	update_memory_mapping(space->machine());
 }
 
 /*
@@ -260,7 +260,7 @@ static const floppy_config qx10_floppy_config =
 
 static WRITE_LINE_DEVICE_HANDLER(qx10_upd765_interrupt)
 {
-	qx10_state *driver_state = device->machine->driver_data<qx10_state>();
+	qx10_state *driver_state = device->machine().driver_data<qx10_state>();
 	driver_state->fdcint = state;
 
 	//logerror("Interrupt from upd765: %d\n", state);
@@ -284,21 +284,21 @@ static const struct upd765_interface qx10_upd765_interface =
 
 static WRITE8_HANDLER(fdd_motor_w)
 {
-	qx10_state *driver_state = space->machine->driver_data<qx10_state>();
+	qx10_state *driver_state = space->machine().driver_data<qx10_state>();
 	driver_state->fdcmotor = 1;
 
-	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
+	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
 	// motor off controlled by clock
 };
 
 static READ8_HANDLER(qx10_30_r)
 {
-	qx10_state *driver_state = space->machine->driver_data<qx10_state>();
+	qx10_state *driver_state = space->machine().driver_data<qx10_state>();
 	floppy_image *floppy1,*floppy2;
 
-	floppy1 = flopimg_get_image(floppy_get_device(space->machine, 0));
-	floppy2 = flopimg_get_image(floppy_get_device(space->machine, 1));
+	floppy1 = flopimg_get_image(floppy_get_device(space->machine(), 0));
+	floppy2 = flopimg_get_image(floppy_get_device(space->machine(), 1));
 
 	return driver_state->fdcint |
 		   /*driver_state->fdcmotor*/ 0 << 1 |
@@ -328,7 +328,7 @@ static WRITE8_DEVICE_HANDLER( gdc_dack_w )
 
 static WRITE_LINE_DEVICE_HANDLER( tc_w )
 {
-	qx10_state *driver_state = device->machine->driver_data<qx10_state>();
+	qx10_state *driver_state = device->machine().driver_data<qx10_state>();
 
 	/* floppy terminal count */
 	upd765_tc_w(driver_state->upd765, !state);
@@ -390,19 +390,19 @@ static I8255A_INTERFACE(qx10_i8255_interface)
 */
 static READ8_HANDLER(mc146818_data_r)
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
-	return space->machine->device<mc146818_device>("rtc")->read(*space, state->mc146818_offset);
+	qx10_state *state = space->machine().driver_data<qx10_state>();
+	return space->machine().device<mc146818_device>("rtc")->read(*space, state->mc146818_offset);
 };
 
 static WRITE8_HANDLER(mc146818_data_w)
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
-	space->machine->device<mc146818_device>("rtc")->write(*space, state->mc146818_offset, data);
+	qx10_state *state = space->machine().driver_data<qx10_state>();
+	space->machine().device<mc146818_device>("rtc")->write(*space, state->mc146818_offset, data);
 };
 
 static WRITE8_HANDLER(mc146818_offset_w)
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 	state->mc146818_offset = data;
 };
 
@@ -493,7 +493,7 @@ static const struct pit8253_config qx10_pit8253_2_config =
 
 static WRITE_LINE_DEVICE_HANDLER( qx10_pic8259_master_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface qx10_pic8259_master_config =
@@ -522,17 +522,17 @@ static const struct pic8259_interface qx10_pic8259_slave_config =
 static IRQ_CALLBACK( irq_callback )
 {
 	int r = 0;
-	r = pic8259_acknowledge(device->machine->driver_data<qx10_state>()->pic8259_slave );
+	r = pic8259_acknowledge(device->machine().driver_data<qx10_state>()->pic8259_slave );
 	if (r==0)
 	{
-		r = pic8259_acknowledge(device->machine->driver_data<qx10_state>()->pic8259_master );
+		r = pic8259_acknowledge(device->machine().driver_data<qx10_state>()->pic8259_master );
 	}
 	return r;
 }
 
 static READ8_HANDLER( upd7201_r )
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 
 	if((offset & 2) == 0)
 	{
@@ -545,7 +545,7 @@ static READ8_HANDLER( upd7201_r )
 
 static WRITE8_HANDLER( upd7201_w )
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 
 	if((offset & 2) == 0) //keyb TX
 	{
@@ -563,7 +563,7 @@ static WRITE8_HANDLER( upd7201_w )
 				state->keyb.led[(data & 0xe) >> 1] = data & 1;
 				printf("keyb Set led %02x %s\n",((data & 0xe) >> 1),data & 1 ? "on" : "off");
 				state->keyb.rx = (data & 0xf) | 0xc0;
-				pic8259_ir4_w(space->machine->device("pic8259_master"), 1);
+				pic8259_ir4_w(space->machine().device("pic8259_master"), 1);
 				break;
 			case 0x60:
 				printf("keyb Read LED status\n");
@@ -602,14 +602,14 @@ static WRITE8_HANDLER( upd7201_w )
 
 static READ8_HANDLER( vram_bank_r )
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 
 	return state->vram_bank;
 }
 
 static WRITE8_HANDLER( vram_bank_w )
 {
-	qx10_state *state = space->machine->driver_data<qx10_state>();
+	qx10_state *state = space->machine().driver_data<qx10_state>();
 
 	if(state->color_mode)
 	{
@@ -617,9 +617,9 @@ static WRITE8_HANDLER( vram_bank_w )
 		if(data != 1 && data != 2 && data != 4)
 			printf("%02x\n",data);
 
-		if(data & 1) 	  { upd7220_bank_w(space->machine->device("upd7220"),0,0); } // B
-		else if(data & 2) { upd7220_bank_w(space->machine->device("upd7220"),0,2); } // G
-		else if(data & 4) { upd7220_bank_w(space->machine->device("upd7220"),0,4); } // R
+		if(data & 1) 	  { upd7220_bank_w(space->machine().device("upd7220"),0,0); } // B
+		else if(data & 2) { upd7220_bank_w(space->machine().device("upd7220"),0,2); } // G
+		else if(data & 4) { upd7220_bank_w(space->machine().device("upd7220"),0,4); } // R
 	}
 }
 
@@ -661,12 +661,12 @@ ADDRESS_MAP_END
 /* TODO: shift break */
 static INPUT_CHANGED( key_stroke )
 {
-	qx10_state *state = field->port->machine->driver_data<qx10_state>();
+	qx10_state *state = field->port->machine().driver_data<qx10_state>();
 
 	if(newval && !oldval)
 	{
 		state->keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir4_w(field->port->machine->device("pic8259_master"), 1);
+		pic8259_ir4_w(field->port->machine().device("pic8259_master"), 1);
 	}
 
 	if(oldval && !newval)
@@ -873,21 +873,21 @@ INPUT_PORTS_END
 
 static MACHINE_START(qx10)
 {
-	qx10_state *state = machine->driver_data<qx10_state>();
+	qx10_state *state = machine.driver_data<qx10_state>();
 
-	device_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 
 	// find devices
-	state->pic8259_master = machine->device("pic8259_master");
-	state->pic8259_slave = machine->device("pic8259_slave");
-	state->dma8237_1 = machine->device("8237dma_1");
-	state->upd765 = machine->device("upd765");
+	state->pic8259_master = machine.device("pic8259_master");
+	state->pic8259_slave = machine.device("pic8259_slave");
+	state->dma8237_1 = machine.device("8237dma_1");
+	state->upd765 = machine.device("upd765");
 
 }
 
 static MACHINE_RESET(qx10)
 {
-	qx10_state *state = machine->driver_data<qx10_state>();
+	qx10_state *state = machine.driver_data<qx10_state>();
 
 	i8237_dreq0_w(state->dma8237_1, 1);
 
@@ -940,9 +940,9 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine->region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 
-	VIDEO_START_CALL(generic_bitmapped);
+	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -1052,7 +1052,7 @@ ROM_END
 static DRIVER_INIT(qx10)
 {
 	// patch boot rom
-	UINT8 *bootrom = machine->region("maincpu")->base();
+	UINT8 *bootrom = machine.region("maincpu")->base();
 	bootrom[0x250] = 0x00; /* nop */
 	bootrom[0x251] = 0x00; /* nop */
 	bootrom[0x252] = 0x00; /* nop */

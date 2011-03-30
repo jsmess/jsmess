@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 {
 	if (LOG)
-		logerror("%s: phunsy_ctrl_w %02x\n", machine->describe_context(), data);
+		logerror("%s: phunsy_ctrl_w %02x\n", m_machine.describe_context(), data);
 
 	u_bank = data >> 4;
 	q_bank = data & 0x0F;
@@ -73,25 +73,25 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 	switch( u_bank )
 	{
 	case 0x00:	/* RAM */
-		memory_set_bankptr( machine, "bank1", ram_1800 );
+		memory_set_bankptr( m_machine, "bank1", ram_1800 );
 		break;
 	case 0x01:	/* MDCR program */
 	case 0x02:	/* Disassembler */
 	case 0x03:	/* Label handler */
-		memory_set_bankptr( machine, "bank1", machine->region("maincpu")->base() + ( 0x800 * u_bank ) );
+		memory_set_bankptr( m_machine, "bank1", m_machine.region("maincpu")->base() + ( 0x800 * u_bank ) );
 		break;
 	default:	/* Not used */
 		break;
 	}
 
-	memory_set_bankptr( machine, "bank2", machine->region("ram_4000")->base() + 0x4000 * q_bank );
+	memory_set_bankptr( m_machine, "bank2", m_machine.region("ram_4000")->base() + 0x4000 * q_bank );
 }
 
 
 WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 {
 	if (LOG)
-		logerror("%s: phunsy_data_w %02x\n", machine->describe_context(), data);
+		logerror("%s: phunsy_data_w %02x\n", m_machine.describe_context(), data);
 
 	data_out = data;
 
@@ -118,7 +118,7 @@ READ8_MEMBER( phunsy_state::phunsy_data_r )
 	UINT8 data;
 
 	if (LOG)
-		logerror("%s: phunsy_data_r\n", machine->describe_context());
+		logerror("%s: phunsy_data_r\n", m_machine.describe_context());
 
 	if ( data_out & 0x02 )
 	{
@@ -183,10 +183,10 @@ static DRIVER_INIT( phunsy )
 
 static MACHINE_RESET(phunsy)
 {
-	phunsy_state *state = machine->driver_data<phunsy_state>();
+	phunsy_state *state = machine.driver_data<phunsy_state>();
 
 	memory_set_bankptr( machine, "bank1", state->ram_1800 );
-	memory_set_bankptr( machine, "bank2", machine->region("ram_4000")->base() );
+	memory_set_bankptr( machine, "bank2", machine.region("ram_4000")->base() );
 
 	state->u_bank = 0;
 	state->q_bank = 0;
@@ -207,14 +207,14 @@ static PALETTE_INIT( phunsy )
 
 static VIDEO_START( phunsy )
 {
-	phunsy_state *state = machine->driver_data<phunsy_state>();
-	state->FNT = machine->region( "chargen" )->base();
+	phunsy_state *state = machine.driver_data<phunsy_state>();
+	state->FNT = machine.region( "chargen" )->base();
 }
 
 
 static SCREEN_UPDATE( phunsy )
 {
-	phunsy_state *state = screen->machine->driver_data<phunsy_state>();
+	phunsy_state *state = screen->machine().driver_data<phunsy_state>();
 	UINT8 y,ra,chr,gfx,col;
 	UINT16 sy=0,ma=0,x;
 

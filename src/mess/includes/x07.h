@@ -166,21 +166,21 @@ public:
 	DECLARE_READ8_MEMBER( x07_io_r );
 	DECLARE_WRITE8_MEMBER( x07_io_w );
 
-	void kb_scan_keys(running_machine *machine, UINT8 keycode);
-	void kb_fun_keys(running_machine *machine, UINT8 idx);
-	void t6834_cmd(running_machine *machine, UINT8 cmd);
-	void t6834_r(running_machine *machine);
-	void t6834_w(running_machine *machine);
-	void cassette_w(running_machine *machine);
-	void cassette_r(running_machine *machine);
-	void printer_w(running_machine *machine);
-	void kb_irq(running_machine *machine);
+	void kb_scan_keys(running_machine &machine, UINT8 keycode);
+	void kb_fun_keys(running_machine &machine, UINT8 idx);
+	void t6834_cmd(running_machine &machine, UINT8 cmd);
+	void t6834_r(running_machine &machine);
+	void t6834_w(running_machine &machine);
+	void cassette_w(running_machine &machine);
+	void cassette_r(running_machine &machine);
+	void printer_w(running_machine &machine);
+	void kb_irq(running_machine &machine);
 
 	inline UINT8 get_char(UINT16 pos);
 	inline UINT8 kb_get_index(UINT8 char_code);
-	inline void draw_char(running_machine *machine, UINT8 x, UINT8 y, UINT8 char_pos);
-	inline void draw_point(running_machine *machine, UINT8 x, UINT8 y, UINT8 color);
-	inline void draw_udk(running_machine *machine);
+	inline void draw_char(running_machine &machine, UINT8 x, UINT8 y, UINT8 char_pos);
+	inline void draw_point(running_machine &machine, UINT8 x, UINT8 y, UINT8 color);
+	inline void draw_udk(running_machine &machine);
 
 	/* general */
 	UINT8 m_sleep;

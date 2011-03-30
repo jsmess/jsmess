@@ -6,7 +6,7 @@
 
 READ16_HANDLER( intv_stic_r )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
 	{
@@ -29,7 +29,7 @@ READ16_HANDLER( intv_stic_r )
 
 WRITE16_HANDLER( intv_stic_w )
 {
-	intv_state *state = space->machine->driver_data<intv_state>();
+	intv_state *state = space->machine().driver_data<intv_state>();
 	intv_sprite_type *s;
 
 	//logerror("stic_w(%x) = %x\n",offset,data);
@@ -110,7 +110,7 @@ WRITE16_HANDLER( intv_stic_w )
 		case 0x29:
 		case 0x2a:
 		case 0x2b:
-			logerror("Setting color_stack[%x] = %x (%x)\n",offset&0x3,data&0xf,cpu_get_pc(space->cpu));
+			logerror("Setting color_stack[%x] = %x (%x)\n",offset&0x3,data&0xf,cpu_get_pc(&space->device()));
 			state->color_stack[offset&0x3] = data&0xf;
 			break;
 		/* Border Color */

@@ -168,9 +168,9 @@ static TIMER_CALLBACK( mekd2_trace )
 WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
 {
 	if (state)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	else
-		machine->scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
+		m_machine.scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
 }
 
 
@@ -197,7 +197,7 @@ READ8_MEMBER( mekd2_state::mekd2_key_r )
 		if (BIT(m_digit, i))
 		{
 			sprintf(kbdrow,"X%d",i);
-			m_keydata &= input_port_read(machine, kbdrow);
+			m_keydata &= input_port_read(m_machine, kbdrow);
 		}
 	}
 
@@ -300,7 +300,7 @@ static DEVICE_IMAGE_LOAD( mekd2_cart )
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = image.device().machine->region("maincpu")->base();
+	UINT8 ident, *RAM = image.device().machine().region("maincpu")->base();
 
 	image.fread( buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))

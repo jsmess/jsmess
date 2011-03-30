@@ -62,7 +62,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
-	a5105_state *state = device->machine->driver_data<a5105_state>();
+	a5105_state *state = device->machine().driver_data<a5105_state>();
 	int x;
 	int xi,yi;
 	int tile,color;
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pcg_addr_w )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 
 	state->pcg_addr = data << 3;
 	state->pcg_internal_addr = 0;
@@ -117,12 +117,12 @@ static WRITE8_HANDLER( pcg_addr_w )
 
 static WRITE8_HANDLER( pcg_val_w )
 {
-	UINT8 *gfx_data = space->machine->region("pcg")->base();
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	UINT8 *gfx_data = space->machine().region("pcg")->base();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 
 	gfx_data[state->pcg_addr|state->pcg_internal_addr] = data;
 
-	gfx_element_mark_dirty(space->machine->gfx[0], state->pcg_addr >> 3);
+	gfx_element_mark_dirty(space->machine().gfx[0], state->pcg_addr >> 3);
 
 	state->pcg_internal_addr++;
 	state->pcg_internal_addr&=7;
@@ -130,25 +130,25 @@ static WRITE8_HANDLER( pcg_val_w )
 
 static READ8_HANDLER( key_r )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "UNUSED",
 	                                        "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	return input_port_read(space->machine, keynames[state->key_mux & 0x0f]);
+	return input_port_read(space->machine(), keynames[state->key_mux & 0x0f]);
 }
 
 static READ8_HANDLER( key_mux_r )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 
 	return state->key_mux;
 }
 
 static WRITE8_HANDLER( key_mux_w )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 	/*
 		xxxx ---- unknown
 		---- xxxx keyboard mux
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( key_mux_w )
 
 static WRITE8_HANDLER( a5105_ab_w )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 /*port $ab
 		---- 100x tape motor, active low
 		---- 101x tape data
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( a5105_ab_w )
 
 static READ8_HANDLER( a5105_memsel_r )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 	UINT8 res;
 
 	res = (state->memsel[0] & 3) << 0;
@@ -204,7 +204,7 @@ static READ8_HANDLER( a5105_memsel_r )
 
 static WRITE8_HANDLER( a5105_memsel_w )
 {
-	a5105_state *state = space->machine->driver_data<a5105_state>();
+	a5105_state *state = space->machine().driver_data<a5105_state>();
 
 	state->memsel[0] = (data & 0x03) >> 0;
 	state->memsel[1] = (data & 0x0c) >> 2;
@@ -356,8 +356,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(a5105)
 {
-	a5105_state *state = machine->driver_data<a5105_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	a5105_state *state = machine.driver_data<a5105_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
 	beep_set_frequency(state->m_beep, 500);
 }
@@ -402,9 +402,9 @@ static PALETTE_INIT( gdc )
 void a5105_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine->region("pcg")->base();
+	m_char_rom = m_machine.region("pcg")->base();
 
-	VIDEO_START_CALL(generic_bitmapped);
+	VIDEO_START_NAME(generic_bitmapped)(m_machine);
 }
 
 bool a5105_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

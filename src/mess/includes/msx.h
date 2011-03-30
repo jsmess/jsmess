@@ -67,7 +67,7 @@ extern NVRAM_HANDLER( msx2 );
 DEVICE_IMAGE_LOAD( msx_cart );
 DEVICE_IMAGE_UNLOAD( msx_cart );
 
-void msx_vdp_interrupt(running_machine *machine, int i);
+void msx_vdp_interrupt(running_machine &machine, int i);
 
 /* I/O functions */
 READ8_DEVICE_HANDLER( msx_printer_status_r );

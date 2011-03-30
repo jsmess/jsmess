@@ -53,7 +53,7 @@ static void apple2_langcard_touch(device_t *device, offs_t offset)
 		val |= VAR_LCRAM2;
 
 	/* change the flags */
-	apple2_setvar(device->machine, val, mask);
+	apple2_setvar(device->machine(), val, mask);
 }
 
 

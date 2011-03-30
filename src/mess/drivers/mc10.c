@@ -87,14 +87,14 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(space.machine, "pb0");
-	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(space.machine, "pb1");
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(space.machine, "pb2");
-	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(space.machine, "pb3");
-	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(space.machine, "pb4");
-	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(space.machine, "pb5");
-	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(space.machine, "pb6");
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(space.machine, "pb7");
+	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(m_machine, "pb0");
+	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(m_machine, "pb1");
+	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(m_machine, "pb2");
+	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(m_machine, "pb3");
+	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(m_machine, "pb4");
+	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(m_machine, "pb5");
+	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(m_machine, "pb6");
+	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(m_machine, "pb7");
 
 	return result;
 }
@@ -141,9 +141,9 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	UINT8 result = 0xeb;
 
 	/* bit 1, keyboard line pa6 */
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(space.machine, "pb0") >> 5;
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(space.machine, "pb2") >> 5;
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(space.machine, "pb7") >> 5;
+	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(m_machine, "pb0") >> 5;
+	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(m_machine, "pb2") >> 5;
+	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(m_machine, "pb7") >> 5;
 
 	/* bit 2, printer ots input */
 	result |= (printer_is_ready(m_printer) ? 0 : 4);
@@ -212,7 +212,7 @@ bool mc10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 
 static TIMER_DEVICE_CALLBACK( alice32_scanline )
 {
-	mc10_state *state = timer.machine->driver_data<mc10_state>();
+	mc10_state *state = timer.machine().driver_data<mc10_state>();
 
 	state->m_ef9345->update_scanline((UINT16)param);
 }
@@ -223,8 +223,8 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
 
 static DRIVER_INIT( mc10 )
 {
-	mc10_state *mc10 = machine->driver_data<mc10_state>();
-	address_space *prg = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	mc10_state *mc10 = machine.driver_data<mc10_state>();
+	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
 	mc10->m_keyboard_strobe = 0x00;
@@ -248,7 +248,7 @@ static DRIVER_INIT( mc10 )
 	state_save_register_global(machine, mc10->m_keyboard_strobe);
 
 	//for alice32 force port4 DDR to 0xff at startup
-	if (!strcmp(machine->system().name, "alice32") || !strcmp(machine->system().name, "alice90"))
+	if (!strcmp(machine.system().name, "alice32") || !strcmp(machine.system().name, "alice90"))
 		m6801_io_w(prg, 0x05, 0xff);
 }
 

@@ -128,7 +128,7 @@ static DEVICE_RESET( gen_memex )
 	/* Register the card */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "EXTRAM")==1)
+	if (input_port_read(device->machine(), "EXTRAM")==1)
 	{
 		int success = mount_card(peb, device, &memex_card, get_pebcard_config(device)->slot);
 		if (!success) return;
@@ -139,14 +139,14 @@ static DEVICE_RESET( gen_memex )
 			card->memory = (UINT8*)malloc(0x200000);
 		}
 
-		UINT8 dips = input_port_read(device->machine, "MEMEXDIPS");
+		UINT8 dips = input_port_read(device->machine(), "MEMEXDIPS");
 		for (int i=0; i < 8; i++)
 		{
 			card->dip_switch[i] = ((dips & 0x01)!=0x00);
 			dips = dips >> 1;
 		}
 
-		card->genmod = input_port_read(device->machine, "MODE");
+		card->genmod = input_port_read(device->machine(), "MODE");
 	}
 }
 

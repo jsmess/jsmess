@@ -138,7 +138,7 @@ PALETTE_INIT( odyssey2 )
 
 READ8_HANDLER( odyssey2_video_r )
 {
-	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
     UINT8 data = 0;
 
     switch (offset)
@@ -146,9 +146,9 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa1:
 			data = state->control_status;
 			state->iff = 0;
-			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			state->control_status &= ~ 0x08;
-			if ( space->machine->primary_screen->hpos() < I824X_START_ACTIVE_SCAN || space->machine->primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
+			if ( space->machine().primary_screen->hpos() < I824X_START_ACTIVE_SCAN || space->machine().primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
 			{
 				data |= 1;
 			}
@@ -164,7 +164,7 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa4:
 
             if ((state->o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
-                state->y_beam_pos = space->machine->primary_screen->vpos() - state->start_vpos;
+                state->y_beam_pos = space->machine().primary_screen->vpos() - state->start_vpos;
 
             data = state->y_beam_pos;
 
@@ -175,7 +175,7 @@ READ8_HANDLER( odyssey2_video_r )
 
             if ((state->o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
-                state->x_beam_pos = space->machine->primary_screen->hpos();
+                state->x_beam_pos = space->machine().primary_screen->hpos();
 				if ( state->x_beam_pos < I824X_START_ACTIVE_SCAN )
 				{
 					state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
@@ -199,7 +199,7 @@ READ8_HANDLER( odyssey2_video_r )
 
 WRITE8_HANDLER( odyssey2_video_w )
 {
-	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
 	/* Update the sound */
 	if( offset >= 0xa7 && offset <= 0xaa )
 		state->sh_channel->update();
@@ -210,7 +210,7 @@ WRITE8_HANDLER( odyssey2_video_w )
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
             /* Toggling strobe bit, tuck away values */
-            state->x_beam_pos = space->machine->primary_screen->hpos();
+            state->x_beam_pos = space->machine().primary_screen->hpos();
 			if ( state->x_beam_pos < I824X_START_ACTIVE_SCAN )
 			{
 				state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
@@ -220,7 +220,7 @@ WRITE8_HANDLER( odyssey2_video_w )
 				state->x_beam_pos = state->x_beam_pos - I824X_START_ACTIVE_SCAN;
 			}
 
-            state->y_beam_pos = space->machine->primary_screen->vpos() - state->start_vpos;
+            state->y_beam_pos = space->machine().primary_screen->vpos() - state->start_vpos;
 
             /* This is wrong but more games work with it, TODO: Figure
              * out correct change.  Maybe update the screen here??
@@ -237,16 +237,16 @@ WRITE8_HANDLER( odyssey2_video_w )
 
 WRITE8_HANDLER ( odyssey2_lum_w )
 {
-	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
 	state->lum = data;
 }
 
 READ8_HANDLER( odyssey2_t1_r )
 {
-	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
-	if ( space->machine->primary_screen->vpos() > state->start_vpos && space->machine->primary_screen->vpos() < state->start_vblank )
+	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
+	if ( space->machine().primary_screen->vpos() > state->start_vpos && space->machine().primary_screen->vpos() < state->start_vblank )
 	{
-		if ( space->machine->primary_screen->hpos() >= I824X_START_ACTIVE_SCAN && space->machine->primary_screen->hpos() < I824X_END_ACTIVE_SCAN )
+		if ( space->machine().primary_screen->hpos() >= I824X_START_ACTIVE_SCAN && space->machine().primary_screen->hpos() < I824X_END_ACTIVE_SCAN )
 		{
 			return 1;
 		}
@@ -256,9 +256,9 @@ READ8_HANDLER( odyssey2_t1_r )
 
 static TIMER_CALLBACK( i824x_scanline_callback )
 {
-	odyssey2_state *state = machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	UINT8	collision_map[160];
-	int		vpos = machine->primary_screen->vpos();
+	int		vpos = machine.primary_screen->vpos();
 
 	if ( vpos < state->start_vpos )
 		return;
@@ -544,8 +544,8 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 
 static TIMER_CALLBACK( i824x_hblank_callback )
 {
-	odyssey2_state *state = machine->driver_data<odyssey2_state>();
-	int vpos = machine->primary_screen->vpos();
+	odyssey2_state *state = machine.driver_data<odyssey2_state>();
+	int vpos = machine.primary_screen->vpos();
 
 	if ( vpos < state->start_vpos - 1 )
 		return;
@@ -564,8 +564,8 @@ static TIMER_CALLBACK( i824x_hblank_callback )
 
 VIDEO_START( odyssey2 )
 {
-	odyssey2_state *state = machine->driver_data<odyssey2_state>();
-	screen_device *screen = machine->first_screen();
+	odyssey2_state *state = machine.driver_data<odyssey2_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -582,8 +582,8 @@ VIDEO_START( odyssey2 )
 	state->lum = 0;
 	state->lfsr = 0;
 
-	state->o2_snd_shift[0] = machine->sample_rate() / 983;
-	state->o2_snd_shift[1] = machine->sample_rate() / 3933;
+	state->o2_snd_shift[0] = machine.sample_rate() / 983;
+	state->o2_snd_shift[1] = machine.sample_rate() / 3933;
 
 	state->start_vpos = I824X_START_Y;
 	state->start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
@@ -592,11 +592,11 @@ VIDEO_START( odyssey2 )
 
 	state->tmp_bitmap = auto_bitmap_alloc( machine, width, height, screen->format() );
 
-	state->i824x_line_timer = machine->scheduler().timer_alloc(FUNC(i824x_scanline_callback));
-	state->i824x_line_timer->adjust( machine->primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine->primary_screen->scan_period() );
+	state->i824x_line_timer = machine.scheduler().timer_alloc(FUNC(i824x_scanline_callback));
+	state->i824x_line_timer->adjust( machine.primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine.primary_screen->scan_period() );
 
-	state->i824x_hblank_timer = machine->scheduler().timer_alloc(FUNC(i824x_hblank_callback));
-	state->i824x_hblank_timer->adjust( machine->primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine->primary_screen->scan_period() );
+	state->i824x_hblank_timer = machine.scheduler().timer_alloc(FUNC(i824x_hblank_callback));
+	state->i824x_hblank_timer->adjust( machine.primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine.primary_screen->scan_period() );
 }
 
 /***************************************************************************
@@ -607,7 +607,7 @@ VIDEO_START( odyssey2 )
 
 SCREEN_UPDATE( odyssey2 )
 {
-	odyssey2_state *state = screen->machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = screen->machine().driver_data<odyssey2_state>();
 	copybitmap( bitmap, state->tmp_bitmap, 0, 0, 0, 0, cliprect );
 
 	return 0;
@@ -615,8 +615,8 @@ SCREEN_UPDATE( odyssey2 )
 
 static DEVICE_START( odyssey2_sound )
 {
-	odyssey2_state *state = device->machine->driver_data<odyssey2_state>();
-	state->sh_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
+	odyssey2_state *state = device->machine().driver_data<odyssey2_state>();
+	state->sh_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 }
 
 
@@ -635,7 +635,7 @@ DEVICE_GET_INFO( odyssey2_sound )
 
 STREAM_UPDATE( odyssey2_sh_update )
 {
-	odyssey2_state *state = device->machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = device->machine().driver_data<odyssey2_state>();
 	UINT32 signal;
 	int ii;
 	int period;
@@ -679,7 +679,7 @@ STREAM_UPDATE( odyssey2_sh_update )
 			/* Throw an interrupt if enabled */
 			if( state->o2_vdc.s.control & 0x4 )
 			{
-				cputag_set_input_line(device->machine, "maincpu", 1, HOLD_LINE); /* Is this right? */
+				cputag_set_input_line(device->machine(), "maincpu", 1, HOLD_LINE); /* Is this right? */
 			}
 
 			/* Adjust volume */
@@ -723,9 +723,9 @@ INLINE void ef9341_inc_c( odyssey2_state *state )
 	}
 }
 
-void odyssey2_ef9341_w( running_machine *machine, int command, int b, UINT8 data )
+void odyssey2_ef9341_w( running_machine &machine, int command, int b, UINT8 data )
 {
-	odyssey2_state *state = machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
 	if ( command )
@@ -798,9 +798,9 @@ void odyssey2_ef9341_w( running_machine *machine, int command, int b, UINT8 data
 	}
 }
 
-UINT8 odyssey2_ef9341_r( running_machine *machine, int command, int b )
+UINT8 odyssey2_ef9341_r( running_machine &machine, int command, int b )
 {
-	odyssey2_state *state = machine->driver_data<odyssey2_state>();
+	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	UINT8	data = 0xFF;
 
 	logerror("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );

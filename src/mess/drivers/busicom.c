@@ -21,24 +21,24 @@ static UINT8 get_bit_selected(UINT32 val,int num)
 }
 static READ8_HANDLER(keyboard_r)
 {
-	busicom_state *state = space->machine->driver_data<busicom_state>();
+	busicom_state *state = space->machine().driver_data<busicom_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
-	return input_port_read(space->machine,keynames[get_bit_selected(state->keyboard_shifter & 0x3ff,10)]);
+	return input_port_read(space->machine(),keynames[get_bit_selected(state->keyboard_shifter & 0x3ff,10)]);
 }
 
 static READ8_HANDLER(printer_r)
 {
-	busicom_state *state = space->machine->driver_data<busicom_state>();
+	busicom_state *state = space->machine().driver_data<busicom_state>();
 	UINT8 retVal = 0;
 	if (state->drum_index==0) retVal |= 1;
-	retVal |= input_port_read(space->machine,"PAPERADV") & 1 ? 8 : 0;
+	retVal |= input_port_read(space->machine(),"PAPERADV") & 1 ? 8 : 0;
 	return retVal;
 }
 
 
 static WRITE8_HANDLER(shifter_w)
 {
-	busicom_state *state = space->machine->driver_data<busicom_state>();
+	busicom_state *state = space->machine().driver_data<busicom_state>();
 	if (BIT(data,0)) {
 		state->keyboard_shifter <<= 1;
 		state->keyboard_shifter |= BIT(data,1);
@@ -51,7 +51,7 @@ static WRITE8_HANDLER(shifter_w)
 
 static WRITE8_HANDLER(printer_w)
 {
-	busicom_state *state = space->machine->driver_data<busicom_state>();
+	busicom_state *state = space->machine().driver_data<busicom_state>();
 	int i,j;
 	if (BIT(data,0)) {
 		logerror("color : %02x %02x %d\n",BIT(data,0),data,state->drum_index);
@@ -184,11 +184,11 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK(timer_callback)
 {
-	busicom_state *state = timer.machine->driver_data<busicom_state>();
+	busicom_state *state = timer.machine().driver_data<busicom_state>();
 	state->timer ^=1;
 	if (state->timer==1) state->drum_index++;
 	if (state->drum_index==13) state->drum_index=0;
-	i4004_set_test(timer.machine->device("maincpu"),state->timer);
+	i4004_set_test(timer.machine().device("maincpu"),state->timer);
 
 }
 
@@ -198,7 +198,7 @@ static MACHINE_START(busicom)
 
 static MACHINE_RESET(busicom)
 {
-	busicom_state *state = machine->driver_data<busicom_state>();
+	busicom_state *state = machine.driver_data<busicom_state>();
 	int i,j;
 	state->drum_index =0;
 	state->keyboard_shifter = 0;

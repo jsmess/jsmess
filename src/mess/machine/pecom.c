@@ -15,23 +15,23 @@
 
 static TIMER_CALLBACK( reset_tick )
 {
-	pecom_state *state = machine->driver_data<pecom_state>();
+	pecom_state *state = machine.driver_data<pecom_state>();
 
 	state->reset = 1;
 }
 
 MACHINE_START( pecom )
 {
-	pecom_state *state = machine->driver_data<pecom_state>();
-	state->reset_timer = machine->scheduler().timer_alloc(FUNC(reset_tick));
+	pecom_state *state = machine.driver_data<pecom_state>();
+	state->reset_timer = machine.scheduler().timer_alloc(FUNC(reset_tick));
 }
 
 MACHINE_RESET( pecom )
 {
-	UINT8 *rom = machine->region(CDP1802_TAG)->base();
-	address_space *space = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region(CDP1802_TAG)->base();
+	address_space *space = machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
-	pecom_state *state = machine->driver_data<pecom_state>();
+	pecom_state *state = machine.driver_data<pecom_state>();
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->install_write_bank(0x4000, 0x7fff, "bank2");
@@ -40,7 +40,7 @@ MACHINE_RESET( pecom )
 	space->install_read_bank (0xf000, 0xf7ff, "bank3");
 	space->install_read_bank (0xf800, 0xffff, "bank4");
 	memory_set_bankptr(machine, "bank1", rom + 0x8000);
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000);
 	memory_set_bankptr(machine, "bank3", rom + 0xf000);
 	memory_set_bankptr(machine, "bank4", rom + 0xf800);
 
@@ -51,35 +51,35 @@ MACHINE_RESET( pecom )
 
 static READ8_HANDLER( pecom_cdp1869_charram_r )
 {
-	pecom_state *state = space->machine->driver_data<pecom_state>();
+	pecom_state *state = space->machine().driver_data<pecom_state>();
 	return state->cdp1869->char_ram_r(*space, offset);
 }
 
 static WRITE8_HANDLER( pecom_cdp1869_charram_w )
 {
-	pecom_state *state = space->machine->driver_data<pecom_state>();
+	pecom_state *state = space->machine().driver_data<pecom_state>();
 	return state->cdp1869->char_ram_w(*space, offset, data);
 }
 
 static READ8_HANDLER( pecom_cdp1869_pageram_r )
 {
-	pecom_state *state = space->machine->driver_data<pecom_state>();
+	pecom_state *state = space->machine().driver_data<pecom_state>();
 	return state->cdp1869->page_ram_r(*space, offset);
 }
 
 static WRITE8_HANDLER( pecom_cdp1869_pageram_w )
 {
-	pecom_state *state = space->machine->driver_data<pecom_state>();
+	pecom_state *state = space->machine().driver_data<pecom_state>();
 	return state->cdp1869->page_ram_w(*space, offset, data);
 }
 
 WRITE8_HANDLER( pecom_bank_w )
 {
-//  pecom_state *state = space->machine->driver_data<pecom_state>();
-	address_space *space2 = space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *rom = space->machine->region(CDP1802_TAG)->base();
-	space->machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x0000);
+//  pecom_state *state = space->machine().driver_data<pecom_state>();
+	address_space *space2 = space->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	UINT8 *rom = space->machine().region(CDP1802_TAG)->base();
+	space->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
+	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x0000);
 
 	if (data==2)
 	{
@@ -94,8 +94,8 @@ WRITE8_HANDLER( pecom_bank_w )
 		space2->unmap_write(0xf800, 0xffff);
 		space2->install_read_bank (0xf000, 0xf7ff, "bank3");
 		space2->install_read_bank (0xf800, 0xffff, "bank4");
-		memory_set_bankptr(space->machine, "bank3", rom + 0xf000);
-		memory_set_bankptr(space->machine, "bank4", rom + 0xf800);
+		memory_set_bankptr(space->machine(), "bank3", rom + 0xf000);
+		memory_set_bankptr(space->machine(), "bank4", rom + 0xf800);
 	}
 }
 
@@ -112,24 +112,24 @@ READ8_HANDLER (pecom_keyboard_r)
        Address is available on address bus during reading of value from port, and that is
        used to determine keyboard line reading
     */
-	UINT16 addr = cpu_get_reg(space->machine->device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(space->machine->device(CDP1802_TAG), COSMAC_X));
+	UINT16 addr = cpu_get_reg(space->machine().device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(space->machine().device(CDP1802_TAG), COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
-	return input_port_read(space->machine, keynames[addr - 0x7cca]) & 0x03;
+	return input_port_read(space->machine(), keynames[addr - 0x7cca]) & 0x03;
 }
 
 /* CDP1802 Interface */
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	pecom_state *state = device->machine->driver_data<pecom_state>();
+	pecom_state *state = device->machine().driver_data<pecom_state>();
 
 	return state->reset;
 }
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
-	int shift = BIT(input_port_read(device->machine, "CNT"), 1);
+	int shift = BIT(input_port_read(device->machine(), "CNT"), 1);
 	double cas = cassette_input(device);
 
 	return (cas > 0.0) | shift;
@@ -139,8 +139,8 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 static COSMAC_EF_READ( pecom64_ef_r )
 {
     int flags = 0x0f;
-    double valcas = cassette_input(cassette_device_image(device->machine));
-    UINT8 val = input_port_read(device->machine, "CNT");
+    double valcas = cassette_input(cassette_device_image(device->machine()));
+    UINT8 val = input_port_read(device->machine(), "CNT");
 
     if ((val & 0x04)==0x04 && pecom_prev_caps_state==0)
     {
@@ -175,7 +175,7 @@ static COSMAC_SC_WRITE( pecom64_sc_w )
 
 	case COSMAC_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cputag_set_input_line(device->machine, CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		break;

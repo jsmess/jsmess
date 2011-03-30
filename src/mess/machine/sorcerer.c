@@ -15,7 +15,7 @@
 
 static TIMER_CALLBACK(sorcerer_serial_tc)
 {
-	sorcerer_state *state = machine->driver_data<sorcerer_state>();
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
     Transmit and receive clocks are connected to the same clock */
 
@@ -31,20 +31,20 @@ static TIMER_CALLBACK(sorcerer_serial_tc)
 /* timer to read cassette waveforms */
 
 
-static device_t *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine &machine)
 {
-	sorcerer_state *state = machine->driver_data<sorcerer_state>();
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	if (state->m_fe & 0x20)
-		return machine->device("cassette2");
+		return machine.device("cassette2");
 	else
-		return machine->device("cassette1");
+		return machine.device("cassette1");
 }
 
 
 
 static TIMER_CALLBACK(sorcerer_cassette_tc)
 {
-	sorcerer_state *state = machine->driver_data<sorcerer_state>();
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	UINT8 cass_ws = 0;
 	switch (state->m_fe & 0xc0)		/*/ bit 7 low indicates cassette */
 	{
@@ -176,7 +176,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 		m_serial_timer->adjust(attotime::zero);
 #endif
 
-		UINT8 sound = input_port_read(machine, "CONFIG") & 8;
+		UINT8 sound = input_port_read(m_machine, "CONFIG") & 8;
 
 		cassette_change_state(m_cass1,
 			((BIT(data, 4)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -216,7 +216,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 {
 	/* reading the config switch */
-	switch (input_port_read(machine, "CONFIG") & 0x06)
+	switch (input_port_read(m_machine, "CONFIG") & 0x06)
 	{
 		case 0: /* speaker */
 			dac_data_w(m_dac, data);
@@ -275,10 +275,10 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 	};
 
 	/* bit 5 - vsync (inverted) */
-	data |= (((~input_port_read(machine, "VS")) & 0x01)<<5);
+	data |= (((~input_port_read(m_machine, "VS")) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
-	data |= (input_port_read(machine, keynames[m_keyboard_line]) & 0x1f);
+	data |= (input_port_read(m_machine, keynames[m_keyboard_line]) & 0x1f);
 
 	return data;
 }
@@ -305,7 +305,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 
 Z80BIN_EXECUTE( sorcerer )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space->read_byte(0xdffa) != 0xc3))
 		return;					/* can't run a program if the cartridge isn't in */
@@ -341,12 +341,12 @@ Z80BIN_EXECUTE( sorcerer )
 		if ((execute_address != 0xc858) && autorun)
 			space->write_word(0xf028, execute_address);
 
-		cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0xf01f);
+		cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(machine->device("maincpu"), STATE_GENPC, execute_address);
+			cpu_set_reg(machine.device("maincpu"), STATE_GENPC, execute_address);
 	}
 }
 
@@ -356,8 +356,8 @@ Z80BIN_EXECUTE( sorcerer )
 
 SNAPSHOT_LOAD(sorcerer)
 {
-	device_t *cpu = image.device().machine->device("maincpu");
-	UINT8 *RAM = image.device().machine->region(cpu->tag())->base();
+	device_t *cpu = image.device().machine().device("maincpu");
+	UINT8 *RAM = image.device().machine().region(cpu->tag())->base();
 	address_space *space = cpu->memory().space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
@@ -405,10 +405,10 @@ SNAPSHOT_LOAD(sorcerer)
 
 MACHINE_START( sorcerer )
 {
-	sorcerer_state *state = machine->driver_data<sorcerer_state>();
-	state->m_cassette_timer = machine->scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
+	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
 #if SORCERER_USING_RS232
-	state->m_serial_timer = machine->scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
+	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
 #endif
 
 #if SORCERER_USING_DISKS
@@ -437,8 +437,8 @@ MACHINE_START( sorcerer )
 
 MACHINE_RESET( sorcerer )
 {
-	sorcerer_state *state = machine->driver_data<sorcerer_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Initialize cassette interface */
 	state->m_cass_data.output.length = 0;
@@ -450,5 +450,5 @@ MACHINE_RESET( sorcerer )
 	state->sorcerer_fe_w(*space, 0, 0, 0xff);
 
 	memory_set_bank(machine, "boot", 1);
-	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
+	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
 }

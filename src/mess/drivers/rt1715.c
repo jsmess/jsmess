@@ -39,7 +39,7 @@ public:
 
 static WRITE8_HANDLER( rt1715_floppy_enable )
 {
-	logerror("%s: rt1715_floppy_enable %02x\n", space->machine->describe_context(), data);
+	logerror("%s: rt1715_floppy_enable %02x\n", space->machine().describe_context(), data);
 }
 
 
@@ -50,18 +50,18 @@ static WRITE8_HANDLER( rt1715_floppy_enable )
 /* si/so led */
 static READ8_HANDLER( k7658_led1_r )
 {
-	rt1715_state *state = space->machine->driver_data<rt1715_state>();
+	rt1715_state *state = space->machine().driver_data<rt1715_state>();
 	state->led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", space->machine->describe_context(), state->led1_val);
+	logerror("%s: k7658_led1_r %02x\n", space->machine().describe_context(), state->led1_val);
 	return 0xff;
 }
 
 /* caps led */
 static READ8_HANDLER( k7658_led2_r )
 {
-	rt1715_state *state = space->machine->driver_data<rt1715_state>();
+	rt1715_state *state = space->machine().driver_data<rt1715_state>();
 	state->led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", space->machine->describe_context(), state->led2_val);
+	logerror("%s: k7658_led2_r %02x\n", space->machine().describe_context(), state->led2_val);
 	return 0xff;
 }
 
@@ -70,19 +70,19 @@ static READ8_HANDLER( k7658_data_r )
 {
 	UINT8 result = 0xff;
 
-	if (BIT(offset,  0)) result &= input_port_read(space->machine, "row_00");
-	if (BIT(offset,  1)) result &= input_port_read(space->machine, "row_10");
-	if (BIT(offset,  2)) result &= input_port_read(space->machine, "row_20");
-	if (BIT(offset,  3)) result &= input_port_read(space->machine, "row_30");
-	if (BIT(offset,  4)) result &= input_port_read(space->machine, "row_40");
-	if (BIT(offset,  5)) result &= input_port_read(space->machine, "row_50");
-	if (BIT(offset,  6)) result &= input_port_read(space->machine, "row_60");
-	if (BIT(offset,  7)) result &= input_port_read(space->machine, "row_70");
-	if (BIT(offset,  8)) result &= input_port_read(space->machine, "row_08");
-	if (BIT(offset,  9)) result &= input_port_read(space->machine, "row_18");
-	if (BIT(offset, 10)) result &= input_port_read(space->machine, "row_28");
-	if (BIT(offset, 11)) result &= input_port_read(space->machine, "row_38");
-	if (BIT(offset, 12)) result &= input_port_read(space->machine, "row_48");
+	if (BIT(offset,  0)) result &= input_port_read(space->machine(), "row_00");
+	if (BIT(offset,  1)) result &= input_port_read(space->machine(), "row_10");
+	if (BIT(offset,  2)) result &= input_port_read(space->machine(), "row_20");
+	if (BIT(offset,  3)) result &= input_port_read(space->machine(), "row_30");
+	if (BIT(offset,  4)) result &= input_port_read(space->machine(), "row_40");
+	if (BIT(offset,  5)) result &= input_port_read(space->machine(), "row_50");
+	if (BIT(offset,  6)) result &= input_port_read(space->machine(), "row_60");
+	if (BIT(offset,  7)) result &= input_port_read(space->machine(), "row_70");
+	if (BIT(offset,  8)) result &= input_port_read(space->machine(), "row_08");
+	if (BIT(offset,  9)) result &= input_port_read(space->machine(), "row_18");
+	if (BIT(offset, 10)) result &= input_port_read(space->machine(), "row_28");
+	if (BIT(offset, 11)) result &= input_port_read(space->machine(), "row_38");
+	if (BIT(offset, 12)) result &= input_port_read(space->machine(), "row_48");
 
 	return result;
 }
@@ -90,7 +90,7 @@ static READ8_HANDLER( k7658_data_r )
 /* serial output on D0 */
 static WRITE8_HANDLER( k7658_data_w )
 {
-	logerror("%s: k7658_data_w %02x\n", space->machine->describe_context(), BIT(data, 0));
+	logerror("%s: k7658_data_w %02x\n", space->machine().describe_context(), BIT(data, 0));
 }
 
 
@@ -100,22 +100,22 @@ static WRITE8_HANDLER( k7658_data_w )
 
 static MACHINE_START( rt1715 )
 {
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0800);
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x0800);
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)));
 }
 
 static MACHINE_RESET( rt1715 )
 {
 	/* on reset, enable ROM */
-	memory_set_bankptr(machine, "bank1", machine->region("ipl")->base());
+	memory_set_bankptr(machine, "bank1", machine.region("ipl")->base());
 }
 
 static WRITE8_HANDLER( rt1715_rom_disable )
 {
-	logerror("%s: rt1715_set_bank %02x\n", space->machine->describe_context(), data);
+	logerror("%s: rt1715_set_bank %02x\n", space->machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
-	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
+	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)));
 }
 
 /***************************************************************************

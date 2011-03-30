@@ -61,10 +61,10 @@ extern WRITE8_HANDLER(c16_switch_to_rom);
 extern WRITE8_HANDLER(c16_switch_to_ram);
 
 /* ted reads (passed to the device interface) */
-extern UINT8 c16_read_keyboard(running_machine *machine, int databus);
-extern void c16_interrupt(running_machine *machine, int level);
-extern int c16_dma_read(running_machine *machine, int offset);
-extern int c16_dma_read_rom(running_machine *machine, int offset);
+extern UINT8 c16_read_keyboard(running_machine &machine, int databus);
+extern void c16_interrupt(running_machine &machine, int level);
+extern int c16_dma_read(running_machine &machine, int offset);
+extern int c16_dma_read_rom(running_machine &machine, int offset);
 
 extern DRIVER_INIT( c16 );
 extern DRIVER_INIT( plus4 );

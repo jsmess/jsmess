@@ -66,10 +66,10 @@ INLINE const tiboard_config *get_config(device_t *device)
 */
 INTERRUPT_GEN( ti99_vblank_interrupt )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 
 	if (board->handset != NULL)
 		ti99_handset_task(board->handset);
@@ -127,9 +127,9 @@ nota:
 /*
     set the state of int2 (called by the tms9928 core)
 */
-void tms9901_set_int2(running_machine *machine, int state)
+void tms9901_set_int2(running_machine &machine, int state)
 {
-	tms9901_set_single_int(machine->device("tms9901"), 2, state);
+	tms9901_set_single_int(machine.device("tms9901"), 2, state);
 }
 
 /*
@@ -141,11 +141,11 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 	{
 		// On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
 		// but hard-wired to force level 1 interrupts
-		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 1);	/* interrupt it, baby */
+		cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
 	{
-		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -155,7 +155,7 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 */
 static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->handset != NULL)
@@ -173,7 +173,7 @@ static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 {
 	int answer = 0;
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->keyCol == 7)
@@ -188,7 +188,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 			answer = mecmouse_get_values(board->mecmouse);
 		}
 		else
-			answer = ((input_port_read(device->machine, keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) << 3) & 0xF8;
+			answer = ((input_port_read(device->machine(), keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) << 3) & 0xF8;
 	}
 	return answer;
 }
@@ -204,16 +204,16 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 static READ8_DEVICE_HANDLER( ti99_R9901_0a )
 {
 	int answer;
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if ((board->mecmouse != NULL) && (board->keyCol == 7))
 		answer = mecmouse_get_values(board->mecmouse);
 	else
-		answer = ((input_port_read(device->machine, keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) << 3) & 0xF8;
+		answer = ((input_port_read(device->machine(), keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) << 3) & 0xF8;
 
 	if (board->alphaLockLine == FALSE)
-		answer &= ~(input_port_read(device->machine, "ALPHA") << 3);
+		answer &= ~(input_port_read(device->machine(), "ALPHA") << 3);
 
 	return answer;
 }
@@ -231,18 +231,18 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0a )
 static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 {
 	int answer;
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->keyCol == 7)
 		answer = 0x07;
 	else
 	{
-		answer = ((input_port_read(device->machine, keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) >> 5) & 0x07;
+		answer = ((input_port_read(device->machine(), keynames[board->keyCol >> 1]) >> ((board->keyCol & 1) * 8)) >> 5) & 0x07;
 	}
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	//  if (cassette_input(device->machine->device("cassette1")) > 0)
+	//  if (cassette_input(device->machine().device("cassette1")) > 0)
 	//      answer |= 8;
 
 	return answer;
@@ -255,7 +255,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 */
 static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->handset != NULL)
@@ -272,7 +272,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 {
 	int answer = 4;
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
@@ -280,7 +280,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 		if (ti99_handset_get_int(board->handset)) answer = 0;
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	if (cassette_input(device->machine->device("cassette1")) > 0)
+	if (cassette_input(device->machine().device("cassette1")) > 0)
 		answer |= 8;
 
 	return answer;
@@ -295,7 +295,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 static READ8_DEVICE_HANDLER( ti99_8_R9901_3 )
 {
 	int answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
-	if (cassette_input(device->machine->device("cassette")) > 0)
+	if (cassette_input(device->machine().device("cassette")) > 0)
 		answer |= 8;
 	return answer;
 }
@@ -305,7 +305,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_3 )
 */
 static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	int index=5;
@@ -327,7 +327,7 @@ static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 */
 static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 	board->alphaLockLine = data;
 }
@@ -337,7 +337,7 @@ static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS1_motor )
 {
-	device_t *img = device->machine->device("cassette1");
+	device_t *img = device->machine().device("cassette1");
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -346,7 +346,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS1_motor )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS2_motor )
 {
-	device_t *img = device->machine->device("cassette2");
+	device_t *img = device->machine().device("cassette2");
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -355,7 +355,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS2_motor )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 {
-	device_t *img = device->machine->device("cassette");
+	device_t *img = device->machine().device("cassette");
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -378,8 +378,8 @@ static WRITE8_DEVICE_HANDLER( ti99_audio_gate )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS12_output )
 {
-	cassette_output(device->machine->device("cassette1"), data ? +1 : -1);
-	cassette_output(device->machine->device("cassette2"), data ? +1 : -1);
+	cassette_output(device->machine().device("cassette1"), data ? +1 : -1);
+	cassette_output(device->machine().device("cassette2"), data ? +1 : -1);
 }
 
 /*
@@ -388,7 +388,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS12_output )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 {
-	cassette_output(device->machine->device("cassette"), data ? +1 : -1);
+	cassette_output(device->machine().device("cassette"), data ? +1 : -1);
 }
 
 /*
@@ -396,7 +396,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 */
 static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (data)
@@ -410,13 +410,13 @@ static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
 
 static WRITE8_DEVICE_HANDLER( ti99_8_CRUS )
 {
-	device_t *mapper = device->machine->device("mapper");
+	device_t *mapper = device->machine().device("mapper");
 	mapper8_CRUS_w(mapper, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
 {
-	device_t *mapper = device->machine->device("mapper");
+	device_t *mapper = device->machine().device("mapper");
 	mapper8_PTGEN_w(mapper, 0, data);
 }
 
@@ -433,7 +433,7 @@ static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
 static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 {
 	int answer;
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->mecmouse != NULL && (board->keyCol == 15))
@@ -442,7 +442,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 	}
 	else
 	{
-		answer = (input_port_read(device->machine, keynames8[board->keyCol]) << 6) & 0xC0;
+		answer = (input_port_read(device->machine(), keynames8[board->keyCol]) << 6) & 0xC0;
 	}
 
 	return answer;
@@ -460,7 +460,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 */
 static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 {
-	device_t *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 	int answer;
 
@@ -470,7 +470,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 	}
 	else
 	{
-		answer = (input_port_read(device->machine, keynames8[board->keyCol]) >> 2) & 0x07;
+		answer = (input_port_read(device->machine(), keynames8[board->keyCol]) >> 2) & 0x07;
 	}
 
 	return answer;
@@ -605,7 +605,7 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 */
 WRITE_LINE_DEVICE_HANDLER( console_extint )
 {
-	tms9901_set_single_int(device->machine->device("tms9901"), 1, state);
+	tms9901_set_single_int(device->machine().device("tms9901"), 1, state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( console_notconnected )
@@ -652,20 +652,20 @@ static DEVICE_RESET( tiboard )
 		/* reset handset */
 		tms9901_set_single_int(board->tms9901, 12, 0);
 
-		if (input_port_read(device->machine, "HCI") & HCI_IR)
+		if (input_port_read(device->machine(), "HCI") & HCI_IR)
 			board->handset = device->siblingdevice("handset");
 	}
 
-	if (input_port_read(device->machine, "HCI") & HCI_MECMOUSE)
+	if (input_port_read(device->machine(), "HCI") & HCI_MECMOUSE)
 		board->mecmouse = device->siblingdevice("mecmouse");
 
 	if (board->mode != TI998)
 	{
-		set_gk_switches(board->gromport, 1, input_port_read(device->machine, "GKSWITCH1"));
-		set_gk_switches(board->gromport, 2, input_port_read(device->machine, "GKSWITCH2"));
-		set_gk_switches(board->gromport, 3, input_port_read(device->machine, "GKSWITCH3"));
-		set_gk_switches(board->gromport, 4, input_port_read(device->machine, "GKSWITCH4"));
-		set_gk_switches(board->gromport, 5, input_port_read(device->machine, "GKSWITCH5"));
+		set_gk_switches(board->gromport, 1, input_port_read(device->machine(), "GKSWITCH1"));
+		set_gk_switches(board->gromport, 2, input_port_read(device->machine(), "GKSWITCH2"));
+		set_gk_switches(board->gromport, 3, input_port_read(device->machine(), "GKSWITCH3"));
+		set_gk_switches(board->gromport, 4, input_port_read(device->machine(), "GKSWITCH4"));
+		set_gk_switches(board->gromport, 5, input_port_read(device->machine(), "GKSWITCH5"));
 	}
 }
 

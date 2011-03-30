@@ -39,7 +39,7 @@ static WRITE8_HANDLER( pl80_port_a_w )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data<comxpl80_state>();
+	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
 	state->y_motor_phase = data & 0x0f;
 	state->font_addr = (BIT(data, 4) << 12) | (state->font_addr & 0xfff);
@@ -53,9 +53,9 @@ static WRITE8_HANDLER( pl80_port_a_w )
 	else
 	{
 		// read data from font ROM
-		int font_rom = (input_port_read(space->machine, "FONT") & 0x03) * 0x2000;
+		int font_rom = (input_port_read(space->machine(), "FONT") & 0x03) * 0x2000;
 
-		state->plotter_data = space->machine->region("gfx2")->base()[font_rom | state->font_addr];
+		state->plotter_data = space->machine().region("gfx2")->base()[font_rom | state->font_addr];
 	}
 
 	if (!BIT(data, 6))
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( pl80_port_a_w )
 	if (BIT(data, 7))
 	{
 		// read switches
-		state->plotter_data = input_port_read(space->machine, "SW");
+		state->plotter_data = input_port_read(space->machine(), "SW");
 	}
 }
 
@@ -88,7 +88,7 @@ static WRITE8_HANDLER( pl80_port_b_w )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data<comxpl80_state>();
+	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
 	state->z_motor_phase = data & 0x0f;
 
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( pl80_port_c_w )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data<comxpl80_state>();
+	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
 	state->font_addr = (state->font_addr & 0x1f00) | data;
 
@@ -139,7 +139,7 @@ static READ8_HANDLER( pl80_port_d_r )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data<comxpl80_state>();
+	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
 	return state->plotter_data;
 }

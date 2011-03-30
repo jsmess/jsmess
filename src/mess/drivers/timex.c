@@ -171,22 +171,22 @@ static const ay8910_interface spectrum_ay_interface =
 
 static  READ8_HANDLER(ts2068_port_f4_r)
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	return state->port_f4_data;
 }
 
 static WRITE8_HANDLER(ts2068_port_f4_w)
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	state->port_f4_data = data;
-	ts2068_update_memory(space->machine);
+	ts2068_update_memory(space->machine());
 }
 
 static  READ8_HANDLER(ts2068_port_ff_r)
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	return state->port_ff_data;
 }
@@ -199,10 +199,10 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
            Bit  6   17ms Interrupt Inhibit
            Bit  7   Cartridge (0) / EXROM (1) select
         */
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	state->port_ff_data = data;
-	ts2068_update_memory(space->machine);
+	ts2068_update_memory(space->machine());
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
@@ -224,16 +224,16 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
  *      at the same time.
  *
  *******************************************************************/
-void ts2068_update_memory(running_machine *machine)
+void ts2068_update_memory(running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned char *ChosenROM, *ExROM, *DOCK;
 
 	DOCK = timex_cart_data;
 
-	ExROM = machine->region("maincpu")->base() + 0x014000;
+	ExROM = machine.region("maincpu")->base() + 0x014000;
 
 	if (state->port_f4_data & 0x01)
 	{
@@ -267,7 +267,7 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		ChosenROM = machine->region("maincpu")->base() + 0x010000;
+		ChosenROM = machine.region("maincpu")->base() + 0x010000;
 		memory_set_bankptr(machine, "bank1", ChosenROM);
 		space->install_read_bank(0x0000, 0x1fff, "bank1");
 		space->unmap_write(0x0000, 0x1fff);
@@ -305,7 +305,7 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		ChosenROM = machine->region("maincpu")->base() + 0x012000;
+		ChosenROM = machine.region("maincpu")->base() + 0x012000;
 		memory_set_bankptr(machine, "bank2", ChosenROM);
 		space->install_read_bank(0x2000, 0x3fff, "bank2");
 		space->unmap_write(0x2000, 0x3fff);
@@ -561,7 +561,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ts2068 )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 
 	state->port_ff_data = 0;
 	state->port_f4_data = 0;
@@ -577,7 +577,7 @@ static MACHINE_RESET( ts2068 )
 
 static WRITE8_HANDLER( tc2048_port_ff_w )
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	state->port_ff_data = data;
 	logerror("Port %04x write %02x\n", offset, data);
@@ -598,8 +598,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( tc2048 )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 
 	memory_set_bankptr(machine, "bank1", messram);
 	memory_set_bankptr(machine, "bank2", messram);

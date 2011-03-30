@@ -38,7 +38,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 
 static WRITE8_HANDLER(nes_vh_sprite_dma_w)
 {
-	nes_state *state = space->machine->driver_data<nes_state>();
+	nes_state *state = space->machine().driver_data<nes_state>();
 	ppu2c0x_spriteram_dma(space, state->ppu, data);
 }
 
@@ -441,7 +441,7 @@ static const nes_interface nes_apu_interface =
 
 static void ppu_nmi(device_t *device, int *ppu_regs)
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

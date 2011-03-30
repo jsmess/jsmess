@@ -414,7 +414,7 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 		if (!BOOTE && (offset < 0x4000))
 		{
 			// _BOOTCE
-			UINT8 *rom = machine->region(MC68008P8_TAG)->base();
+			UINT8 *rom = m_machine.region(MC68008P8_TAG)->base();
 			data = rom[offset];
 		}
 		else
@@ -545,7 +545,7 @@ READ8_MEMBER( abc1600_state::cause_r )
 	// DMA status
 	data |= m_cause;
 	
-	watchdog_reset(machine);
+	watchdog_reset(m_machine);
 
 	return data;
 }

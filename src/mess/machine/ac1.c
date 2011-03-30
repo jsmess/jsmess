@@ -13,7 +13,7 @@
 
 static READ8_DEVICE_HANDLER (ac1_port_b_r)
 {
-	ac1_state *state = device->machine->driver_data<ac1_state>();
+	ac1_state *state = device->machine().driver_data<ac1_state>();
 	UINT8 data = 0x7f;
 
 	if (cassette_input(state->cassette) > 0.03)
@@ -26,13 +26,13 @@ static READ8_DEVICE_HANDLER (ac1_port_b_r)
 
 static READ8_DEVICE_HANDLER (ac1_port_a_r)
 {
-	UINT8 line0 = input_port_read(device->machine, "LINE0");
-	UINT8 line1 = input_port_read(device->machine, "LINE1");
-	UINT8 line2 = input_port_read(device->machine, "LINE2");
-	UINT8 line3 = input_port_read(device->machine, "LINE3");
-	UINT8 line4 = input_port_read(device->machine, "LINE4");
-	UINT8 line5 = input_port_read(device->machine, "LINE5");
-	UINT8 line6 = input_port_read(device->machine, "LINE6");
+	UINT8 line0 = input_port_read(device->machine(), "LINE0");
+	UINT8 line1 = input_port_read(device->machine(), "LINE1");
+	UINT8 line2 = input_port_read(device->machine(), "LINE2");
+	UINT8 line3 = input_port_read(device->machine(), "LINE3");
+	UINT8 line4 = input_port_read(device->machine(), "LINE4");
+	UINT8 line5 = input_port_read(device->machine(), "LINE5");
+	UINT8 line6 = input_port_read(device->machine(), "LINE6");
 
 	UINT8 SH    = BNOT(BIT(line6,0));
 	UINT8 CTRL  = BNOT(BIT(line6,1));
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
         7       cassette in
 
     */
-	ac1_state *state = device->machine->driver_data<ac1_state>();
+	ac1_state *state = device->machine().driver_data<ac1_state>();
 	cassette_output(state->cassette, (data & 0x40) ? -1.0 : +1.0);
 }
 
@@ -116,6 +116,6 @@ DRIVER_INIT(ac1)
 
 MACHINE_RESET( ac1 )
 {
-	ac1_state *state = machine->driver_data<ac1_state>();
-	state->cassette = machine->device("cassette");
+	ac1_state *state = machine.driver_data<ac1_state>();
+	state->cassette = machine.device("cassette");
 }

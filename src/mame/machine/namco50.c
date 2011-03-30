@@ -171,19 +171,19 @@ static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 
 static READ8_HANDLER( namco_50xx_K_r )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner());
+	namco_50xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_50xx_R0_r )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner());
+	namco_50xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_cmd & 0x0f;
 }
 
 static READ8_HANDLER( namco_50xx_R2_r )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner());
+	namco_50xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_rw & 1;
 }
 
@@ -191,7 +191,7 @@ static READ8_HANDLER( namco_50xx_R2_r )
 
 static WRITE8_HANDLER( namco_50xx_O_w )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner());
+	namco_50xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		state->portO = (state->portO & 0x0f) | (out << 4);
@@ -219,12 +219,12 @@ static void namco_50xx_irq_set(device_t *device)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	device->machine->scheduler().timer_set(attotime::from_usec(21), FUNC(namco_50xx_irq_clear), 0, (void *)device);
+	device->machine().scheduler().timer_set(attotime::from_usec(21), FUNC(namco_50xx_irq_clear), 0, (void *)device);
 }
 
 WRITE8_DEVICE_HANDLER( namco_50xx_write )
 {
-	device->machine->scheduler().synchronize(FUNC(namco_50xx_latch_callback), data, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(namco_50xx_latch_callback), data, (void *)device);
 
 	namco_50xx_irq_set(device);
 }
@@ -232,7 +232,7 @@ WRITE8_DEVICE_HANDLER( namco_50xx_write )
 
 void namco_50xx_read_request(device_t *device)
 {
-	device->machine->scheduler().synchronize(FUNC(namco_50xx_readrequest_callback), 0, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(namco_50xx_readrequest_callback), 0, (void *)device);
 
 	namco_50xx_irq_set(device);
 }

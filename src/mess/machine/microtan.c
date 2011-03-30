@@ -127,10 +127,10 @@ static const char keyboard[8][9][8] = {
     },
 };
 
-static UINT8 read_dsw(running_machine *machine)
+static UINT8 read_dsw(running_machine &machine)
 {
 	UINT8 result;
-	switch(machine->phase())
+	switch(machine.phase())
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
@@ -144,18 +144,18 @@ static UINT8 read_dsw(running_machine *machine)
 	return result;
 }
 
-static void microtan_set_irq_line(running_machine *machine)
+static void microtan_set_irq_line(running_machine &machine)
 {
-	microtan_state *state = machine->driver_data<microtan_state>();
+	microtan_state *state = machine.driver_data<microtan_state>();
     /* The 6502 IRQ line is active low and probably driven
        by open collector outputs (guess). Since MAME/MESS use
        a non-0 value for ASSERT_LINE we OR the signals here */
     cputag_set_input_line(machine, "maincpu", 0, state->via_0_irq_line | state->via_1_irq_line | state->kbd_irq_line);
 }
 
-static device_t *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine->device("cassette");
+	return machine.device("cassette");
 }
 
 /**************************************************************
@@ -163,7 +163,7 @@ static device_t *cassette_device_image(running_machine *machine)
  **************************************************************/
 static READ8_DEVICE_HANDLER (via_0_in_a )
 {
-    int data = input_port_read(device->machine, "JOY");
+    int data = input_port_read(device->machine(), "JOY");
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
@@ -212,7 +212,7 @@ static WRITE8_DEVICE_HANDLER (via_0_out_b )
 {
     LOG(("microtan_via_0_out_b %02X\n", data));
     /* bit #7 is the cassette output signal */
-    cassette_output(cassette_device_image(device->machine), data & 0x80 ? +1.0 : -1.0);
+    cassette_output(cassette_device_image(device->machine()), data & 0x80 ? +1.0 : -1.0);
 }
 
 static WRITE8_DEVICE_HANDLER ( via_0_out_ca2 )
@@ -227,10 +227,10 @@ static WRITE8_DEVICE_HANDLER (via_0_out_cb2 )
 
 static void via_0_irq(device_t *device, int state)
 {
-	microtan_state *drvstate = device->machine->driver_data<microtan_state>();
+	microtan_state *drvstate = device->machine().driver_data<microtan_state>();
     LOG(("microtan_via_0_irq %d\n", state));
     drvstate->via_0_irq_line = state;
-    microtan_set_irq_line(device->machine);
+    microtan_set_irq_line(device->machine());
 }
 
 /**************************************************************
@@ -300,10 +300,10 @@ static WRITE8_DEVICE_HANDLER ( via_1_out_cb2 )
 
 static void via_1_irq(device_t *device, int state)
 {
-	microtan_state *drvstate = device->machine->driver_data<microtan_state>();
+	microtan_state *drvstate = device->machine().driver_data<microtan_state>();
     LOG(("microtan_via_1_irq %d\n", state));
     drvstate->via_1_irq_line = state;
-    microtan_set_irq_line(device->machine);
+    microtan_set_irq_line(device->machine());
 }
 
 /**************************************************************
@@ -336,7 +336,7 @@ const via6522_interface microtan_via6522_1 =
 static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image(machine));
-	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
@@ -360,7 +360,7 @@ WRITE8_HANDLER( microtan_sound_w )
 
  READ8_HANDLER ( microtan_bffx_r )
 {
-	microtan_state *state = space->machine->driver_data<microtan_state>();
+	microtan_state *state = space->machine().driver_data<microtan_state>();
     int data = 0xff;
     switch( offset & 3 )
     {
@@ -390,7 +390,7 @@ static TIMER_CALLBACK(microtan_pulse_nmi)
 
 WRITE8_HANDLER ( microtan_bffx_w )
 {
-	microtan_state *state = space->machine->driver_data<microtan_state>();
+	microtan_state *state = space->machine().driver_data<microtan_state>();
     switch( offset & 3 )
     {
     case 0: /* BFF0: write reset keyboard interrupt flag */
@@ -398,11 +398,11 @@ WRITE8_HANDLER ( microtan_bffx_w )
         LOG(("microtan_bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
         state->keyboard_ascii &= ~0x80;
         state->kbd_irq_line = CLEAR_LINE;
-        microtan_set_irq_line(space->machine);
+        microtan_set_irq_line(space->machine());
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-        space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8), FUNC(microtan_pulse_nmi));
+        space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8), FUNC(microtan_pulse_nmi));
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
@@ -414,9 +414,9 @@ WRITE8_HANDLER ( microtan_bffx_w )
     }
 }
 
-static void store_key(running_machine *machine, int key)
+static void store_key(running_machine &machine, int key)
 {
-	microtan_state *state = machine->driver_data<microtan_state>();
+	microtan_state *state = machine.driver_data<microtan_state>();
     LOG(("microtan: store key '%c'\n", key));
     state->keyboard_ascii = key | 0x80;
     state->kbd_irq_line = ASSERT_LINE;
@@ -425,7 +425,7 @@ static void store_key(running_machine *machine, int key)
 
 INTERRUPT_GEN( microtan_interrupt )
 {
-	microtan_state *state = device->machine->driver_data<microtan_state>();
+	microtan_state *state = device->machine().driver_data<microtan_state>();
     int mod, row, col, chg, newvar;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
@@ -441,12 +441,12 @@ INTERRUPT_GEN( microtan_interrupt )
 
 
     row = 9;
-    newvar = input_port_read(device->machine, "ROW8");
+    newvar = input_port_read(device->machine(), "ROW8");
     chg = state->keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = input_port_read(device->machine, keynames[row - 1]);
+		newvar = input_port_read(device->machine(), keynames[row - 1]);
 		chg = state->keyrows[--row] ^ newvar;
 	}
     if (!chg)
@@ -460,7 +460,7 @@ INTERRUPT_GEN( microtan_interrupt )
         state->lastrow = row;
         /* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(device->machine, 1, (state->keyrows[3] & 0x80) ? 0 : 1);
+			set_led_status(device->machine(), 1, (state->keyrows[3] & 0x80) ? 0 : 1);
 
         if (newvar & chg)  /* key(s) pressed ? */
         {
@@ -493,11 +493,11 @@ INTERRUPT_GEN( microtan_interrupt )
             if( state->key )   /* normal key */
             {
                 state->repeater = 30;
-                store_key(device->machine, state->key);
+                store_key(device->machine(), state->key);
             }
             else
             if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-                store_key(device->machine, 0);
+                store_key(device->machine(), 0);
             state->keyrows[row] |= newvar;
         }
         else
@@ -509,16 +509,16 @@ INTERRUPT_GEN( microtan_interrupt )
     else
     if ( state->key && (state->keyrows[state->lastrow] & state->mask) && state->repeat == 0 )
     {
-        store_key(device->machine, state->key);
+        store_key(device->machine(), state->key);
     }
 }
 
 DRIVER_INIT( microtan )
 {
-	microtan_state *state = machine->driver_data<microtan_state>();
-    UINT8 *dst = machine->region("gfx2")->base();
+	microtan_state *state = machine.driver_data<microtan_state>();
+    UINT8 *dst = machine.region("gfx2")->base();
     int i;
-    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {
@@ -570,12 +570,12 @@ DRIVER_INIT( microtan )
             break;
     }
 
-	state->timer = machine->scheduler().timer_alloc(FUNC(microtan_read_cassette));
+	state->timer = machine.scheduler().timer_alloc(FUNC(microtan_read_cassette));
 }
 
 MACHINE_RESET( microtan )
 {
-	microtan_state *state = machine->driver_data<microtan_state>();
+	microtan_state *state = machine.driver_data<microtan_state>();
 	int i;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 

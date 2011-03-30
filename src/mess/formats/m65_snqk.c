@@ -202,27 +202,27 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
     return IMAGE_INIT_PASS;
 }
 
-static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot_buff, int base)
+static void microtan_set_cpu_regs(running_machine &machine,const UINT8 *snapshot_buff, int base)
 {
     logerror("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
         snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
         snapshot_buff[base+4], snapshot_buff[base+5], snapshot_buff[base+6]);
-    cpu_set_reg(machine->device("maincpu"), M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
-    cpu_set_reg(machine->device("maincpu"), M6502_P, snapshot_buff[base+2]);
-    cpu_set_reg(machine->device("maincpu"), M6502_A, snapshot_buff[base+3]);
-    cpu_set_reg(machine->device("maincpu"), M6502_X, snapshot_buff[base+4]);
-    cpu_set_reg(machine->device("maincpu"), M6502_Y, snapshot_buff[base+5]);
-    cpu_set_reg(machine->device("maincpu"), M6502_S, snapshot_buff[base+6]);
+    cpu_set_reg(machine.device("maincpu"), M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
+    cpu_set_reg(machine.device("maincpu"), M6502_P, snapshot_buff[base+2]);
+    cpu_set_reg(machine.device("maincpu"), M6502_A, snapshot_buff[base+3]);
+    cpu_set_reg(machine.device("maincpu"), M6502_X, snapshot_buff[base+4]);
+    cpu_set_reg(machine.device("maincpu"), M6502_Y, snapshot_buff[base+5]);
+    cpu_set_reg(machine.device("maincpu"), M6502_S, snapshot_buff[base+6]);
 }
 
-static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
+static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buff, int snapshot_size)
 {
-	microtan_state *state = machine->driver_data<microtan_state>();
-    UINT8 *RAM = machine->region("maincpu")->base();
-    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-    via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
-    via6522_device *via_1 = machine->device<via6522_device>("via6522_1");
-    device_t *ay8910 = machine->device("ay8910.1");
+	microtan_state *state = machine.driver_data<microtan_state>();
+    UINT8 *RAM = machine.region("maincpu")->base();
+    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
+    via6522_device *via_1 = machine.device<via6522_device>("via6522_1");
+    device_t *ay8910 = machine.device("ay8910.1");
 
     /* check for .DMP file format */
     if (snapshot_size == 8263)
@@ -330,7 +330,7 @@ SNAPSHOT_LOAD( microtan )
     if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
         return IMAGE_INIT_FAIL;
 
-    microtan_snapshot_copy(image.device().machine, snapshot_buff, snapshot_size);
+    microtan_snapshot_copy(image.device().machine(), snapshot_buff, snapshot_size);
     return IMAGE_INIT_PASS;
 }
 
@@ -366,7 +366,7 @@ QUICKLOAD_LOAD( microtan )
     else
         rc = parse_zillion_hex(snapshot_buff, buff);
     if (rc == IMAGE_INIT_PASS)
-        microtan_snapshot_copy(image.device().machine, snapshot_buff, snapshot_size);
+        microtan_snapshot_copy(image.device().machine(), snapshot_buff, snapshot_size);
     free(snapshot_buff);
     return rc;
 }

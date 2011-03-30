@@ -289,7 +289,7 @@ static DEVICE_START( hd44102 )
 	const hd44102_config *config = get_safe_config(device);
 
 	/* get the screen device */
-	hd44102->screen = device->machine->device<screen_device>(config->screen_tag);
+	hd44102->screen = device->machine().device<screen_device>(config->screen_tag);
 	assert(hd44102->screen != NULL);
 
 	/* register for state saving */

@@ -110,14 +110,14 @@ WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
 {
 	if (data & 0x01)
 	{
-		m_tvdraw_data = input_port_read(machine, "TVDRAW_X");
+		m_tvdraw_data = input_port_read(m_machine, "TVDRAW_X");
 
 		if (m_tvdraw_data < 4) m_tvdraw_data = 4;
 		if (m_tvdraw_data > 251) m_tvdraw_data = 251;
 	}
 	else
 	{
-		m_tvdraw_data = input_port_read(machine, "TVDRAW_Y") + 32;
+		m_tvdraw_data = input_port_read(m_machine, "TVDRAW_Y") + 32;
 	}
 }
 
@@ -127,7 +127,7 @@ WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
 
 READ8_MEMBER( sg1000_state::tvdraw_status_r )
 {
-	return input_port_read(machine, "TVDRAW_PEN");
+	return input_port_read(m_machine, "TVDRAW_PEN");
 }
 
 /*-------------------------------------------------
@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_NMI, (input_port_read(field->port->machine, "NMI") ? CLEAR_LINE : ASSERT_LINE));
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_NMI, (input_port_read(field->port->machine(), "NMI") ? CLEAR_LINE : ASSERT_LINE));
 }
 
 /*-------------------------------------------------
@@ -536,10 +536,10 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( sg1000_int )
 {
-    TMS9928A_interrupt(device->machine);
+    TMS9928A_interrupt(device->machine());
 }
 
-static void sg1000_vdp_interrupt(running_machine *machine, int state)
+static void sg1000_vdp_interrupt(running_machine &machine, int state)
 {
 	cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, state);
 }
@@ -573,7 +573,7 @@ READ8_MEMBER( sc3000_state::ppi_pa_r )
 
 	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
-	return input_port_read(machine, keynames[m_keylatch]);
+	return input_port_read(m_machine, keynames[m_keylatch]);
 }
 
 READ8_MEMBER( sc3000_state::ppi_pb_r )
@@ -594,7 +594,7 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
 	/* keyboard */
-	UINT8 data = input_port_read(machine, keynames[m_keylatch]);
+	UINT8 data = input_port_read(m_machine, keynames[m_keylatch]);
 
 	/* cartridge contact */
 	data |= 0x10;
@@ -711,7 +711,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	}
 
 	/* ROM selection */
-	memory_set_bank(machine, "bank1", BIT(data, 6));
+	memory_set_bank(m_machine, "bank1", BIT(data, 6));
 
 	/* printer strobe */
 	centronics_strobe_w(m_centronics, BIT(data, 7));
@@ -791,15 +791,15 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	case 40 * 1024:
 		program->install_read_bank(0x8000, 0x9fff, "bank1");
 		program->unmap_write(0x8000, 0x9fff);
-		memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
-		memory_set_bank(machine, "bank1", 0);
+		memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(Z80_TAG)->base() + 0x8000, 0);
+		memory_set_bank(m_machine, "bank1", 0);
 		break;
 
 	case 48 * 1024:
 		program->install_read_bank(0x8000, 0xbfff, "bank1");
 		program->unmap_write(0x8000, 0xbfff);
-		memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
-		memory_set_bank(machine, "bank1", 0);
+		memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(Z80_TAG)->base() + 0x8000, 0);
+		memory_set_bank(m_machine, "bank1", 0);
 		break;
 
 	default:
@@ -824,10 +824,10 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 
 static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
-	running_machine *machine = image.device().machine;
-	sg1000_state *state = machine->driver_data<sg1000_state>();
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *ptr = machine->region(Z80_TAG)->base();
+	running_machine &machine = image.device().machine();
+	sg1000_state *state = machine.driver_data<sg1000_state>();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	UINT8 *ptr = machine.region(Z80_TAG)->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -857,10 +857,10 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 
 static DEVICE_IMAGE_LOAD( omv_cart )
 {
-	running_machine *machine = image.device().machine;
-	sg1000_state *state = machine->driver_data<sg1000_state>();
+	running_machine &machine = image.device().machine();
+	sg1000_state *state = machine.driver_data<sg1000_state>();
 	UINT32 size;
-	UINT8 *ptr = machine->region(Z80_TAG)->base();
+	UINT8 *ptr = machine.region(Z80_TAG)->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -914,9 +914,9 @@ void sc3000_state::install_cartridge(UINT8 *ptr, int size)
 
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
-	running_machine *machine = image.device().machine;
-	sc3000_state *state = machine->driver_data<sc3000_state>();
-	UINT8 *ptr = machine->region(Z80_TAG)->base();
+	running_machine &machine = image.device().machine();
+	sc3000_state *state = machine.driver_data<sc3000_state>();
+	UINT8 *ptr = machine.region(Z80_TAG)->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -947,7 +947,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 
 static TIMER_CALLBACK( lightgun_tick )
 {
-	UINT8 *rom = machine->region(Z80_TAG)->base();
+	UINT8 *rom = machine.region(Z80_TAG)->base();
 
 	if (IS_CARTRIDGE_TV_DRAW(rom))
 	{
@@ -971,10 +971,10 @@ void sg1000_state::machine_start()
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* toggle light gun crosshair */
-	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	m_machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* register for state saving */
-	state_save_register_global(machine, m_tvdraw_data);
+	state_save_register_global(m_machine, m_tvdraw_data);
 }
 
 /*-------------------------------------------------
@@ -987,11 +987,11 @@ void sc3000_state::machine_start()
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* toggle light gun crosshair */
-	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	m_machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* register for state saving */
-	state_save_register_global(machine, m_tvdraw_data);
-	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(m_machine, m_tvdraw_data);
+	state_save_register_global(m_machine, m_keylatch);
 }
 
 /*-------------------------------------------------
@@ -1000,7 +1000,7 @@ void sc3000_state::machine_start()
 
 static void sf7000_fdc_index_callback(device_t *controller, device_t *img, int state)
 {
-	sf7000_state *driver_state = img->machine->driver_data<sf7000_state>();
+	sf7000_state *driver_state = img->machine().driver_data<sf7000_state>();
 
 	driver_state->m_fdc_index = state;
 }
@@ -1018,14 +1018,14 @@ void sf7000_state::machine_start()
 	floppy_drive_set_index_pulse_callback(m_floppy0, sf7000_fdc_index_callback);
 
 	/* configure memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, ram_get_ptr(m_ram), 0);
-	memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(Z80_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(m_machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_keylatch);
-	state_save_register_global(machine, m_fdc_irq);
-	state_save_register_global(machine, m_fdc_index);
+	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(m_machine, m_fdc_irq);
+	state_save_register_global(m_machine, m_fdc_index);
 }
 
 /*-------------------------------------------------
@@ -1034,8 +1034,8 @@ void sf7000_state::machine_start()
 
 void sf7000_state::machine_reset()
 {
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	memory_set_bank(m_machine, "bank1", 0);
+	memory_set_bank(m_machine, "bank2", 0);
 }
 
 /***************************************************************************

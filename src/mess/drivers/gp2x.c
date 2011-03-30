@@ -129,7 +129,7 @@ static const char *const gp2x_regnames[0x200] =
 #endif
 static SCREEN_UPDATE( gp2x )
 {
-	gp2x_state *state = screen->machine->driver_data<gp2x_state>();
+	gp2x_state *state = screen->machine().driver_data<gp2x_state>();
 	// display enabled?
 	if (state->vidregs[0] & 1)
 	{
@@ -166,13 +166,13 @@ static SCREEN_UPDATE( gp2x )
 
 static READ32_HANDLER( gp2x_lcdc_r )
 {
-	gp2x_state *state = space->machine->driver_data<gp2x_state>();
+	gp2x_state *state = space->machine().driver_data<gp2x_state>();
 	return state->vidregs[offset*2] | state->vidregs[(offset*2)+1]<<16;
 }
 
 static WRITE32_HANDLER( gp2x_lcdc_w )
 {
-	gp2x_state *state = space->machine->driver_data<gp2x_state>();
+	gp2x_state *state = space->machine().driver_data<gp2x_state>();
 	if (mem_mask == 0xffff)
 	{
 		state->vidregs[offset*2] = data;
@@ -191,8 +191,8 @@ static WRITE32_HANDLER( gp2x_lcdc_w )
 
 static READ32_HANDLER(nand_r)
 {
-	gp2x_state *state = space->machine->driver_data<gp2x_state>();
-	UINT32 *ROM = (UINT32 *)space->machine->region("maincpu")->base();
+	gp2x_state *state = space->machine().driver_data<gp2x_state>();
+	UINT32 *ROM = (UINT32 *)space->machine().region("maincpu")->base();
 	UINT32 ret;
 
 	if (offset == 0)
@@ -240,7 +240,7 @@ static READ32_HANDLER(nand_r)
 				break;
 
 			default:
-				logerror("NAND: read unk command %x (PC %x)\n", state->nand_cmd, cpu_get_pc(space->cpu));
+				logerror("NAND: read unk command %x (PC %x)\n", state->nand_cmd, cpu_get_pc(&space->device()));
 				break;
 		}
 	}
@@ -252,12 +252,12 @@ static READ32_HANDLER(nand_r)
 
 static WRITE32_HANDLER(nand_w)
 {
-	gp2x_state *state = space->machine->driver_data<gp2x_state>();
+	gp2x_state *state = space->machine().driver_data<gp2x_state>();
 	switch (offset)
 	{
 		case 4:	// command
 			state->nand_cmd = data;
-//          printf("NAND: command %x (PC %x0)\n", data, cpu_get_pc(space->cpu));
+//          printf("NAND: command %x (PC %x0)\n", data, cpu_get_pc(&space->device()));
 			state->nand_stage = 0;
 			state->nand_subword_stage = 0;
 			break;
@@ -309,7 +309,7 @@ static WRITE32_HANDLER(tx_xmit_w)
 
 static READ32_HANDLER(timer_r)
 {
-	gp2x_state *state = space->machine->driver_data<gp2x_state>();
+	gp2x_state *state = space->machine().driver_data<gp2x_state>();
 	return state->timer++;
 }
 

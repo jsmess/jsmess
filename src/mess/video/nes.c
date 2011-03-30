@@ -17,7 +17,7 @@ static void nes_vh_reset( running_machine &machine )
 	ppu2c0x_set_vidaccess_callback(machine.device("ppu"), nes_ppu_vidaccess);
 
 	if (state->four_screen_vram)
-		set_nt_mirroring(&machine, PPU_MIRROR_4SCREEN);
+		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
 	else
 	{
 		switch (state->hard_mirroring)
@@ -26,10 +26,10 @@ static void nes_vh_reset( running_machine &machine )
 			case PPU_MIRROR_VERT:
 			case PPU_MIRROR_HIGH:
 			case PPU_MIRROR_LOW:
-				set_nt_mirroring(&machine, state->hard_mirroring);
+				set_nt_mirroring(machine, state->hard_mirroring);
 				break;
 			default:
-				set_nt_mirroring(&machine, PPU_MIRROR_NONE);
+				set_nt_mirroring(machine, PPU_MIRROR_NONE);
 				break;
 		}
 	}
@@ -37,11 +37,11 @@ static void nes_vh_reset( running_machine &machine )
 
 VIDEO_START( nes )
 {
-	nes_state *state = machine->driver_data<nes_state>();
+	nes_state *state = machine.driver_data<nes_state>();
 
 	state->last_frame_flip =  0;
 
-	machine->add_notifier(MACHINE_NOTIFY_RESET, nes_vh_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, nes_vh_reset);
 }
 
 PALETTE_INIT( nes )
@@ -58,7 +58,7 @@ PALETTE_INIT( nes )
 
 SCREEN_UPDATE( nes )
 {
-	nes_state *state = screen->machine->driver_data<nes_state>();
+	nes_state *state = screen->machine().driver_data<nes_state>();
 
 	/* render the ppu */
 	ppu2c0x_render(state->ppu, bitmap, 0, 0, 0, 0);
@@ -67,7 +67,7 @@ SCREEN_UPDATE( nes )
 	if (state->disk_expansion && state->pcb_id == NO_BOARD)
 	{
 		// latch this input so it doesn't go at warp speed
-		if ((input_port_read(screen->machine, "FLIPDISK") & 0x01) && (!state->last_frame_flip))
+		if ((input_port_read(screen->machine(), "FLIPDISK") & 0x01) && (!state->last_frame_flip))
 		{
 			state->last_frame_flip = 1;
 			state->fds_current_side++;
@@ -80,7 +80,7 @@ SCREEN_UPDATE( nes )
 				popmessage("Disk set to side %d", state->fds_current_side);
 		}
 
-		if (!(input_port_read(screen->machine, "FLIPDISK") & 0x01))
+		if (!(input_port_read(screen->machine(), "FLIPDISK") & 0x01))
 			state->last_frame_flip = 0;
 	}
 	return 0;

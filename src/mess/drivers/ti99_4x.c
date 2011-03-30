@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( gk_changed )
 {
-	device_t *cartsys = field->port->machine->device("gromport");
+	device_t *cartsys = field->port->machine().device("gromport");
 	set_gk_switches(cartsys, (UINT8)((UINT64)param&0x07), newval);
 }
 
@@ -995,13 +995,13 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 {
-	v9938_interrupt(device->machine, 0);
+	v9938_interrupt(device->machine(), 0);
 }
 
 // Unused
 TIMER_DEVICE_CALLBACK( ti99_4ev_scanline_interrupt )
 {
-	v9938_interrupt(timer.machine, 0);
+	v9938_interrupt(timer.machine(), 0);
 }
 
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )

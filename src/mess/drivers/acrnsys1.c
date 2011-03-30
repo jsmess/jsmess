@@ -31,19 +31,19 @@ public:
 
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
-	device_t *ttl74145 = device->machine->device("ic8_7445");
+	device_t *ttl74145 = device->machine().device("ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	switch (key_line)
 	{
-	case 1 << 0: return input_port_read(device->machine, "keyboard_0");
-	case 1 << 1: return input_port_read(device->machine, "keyboard_1");
-	case 1 << 2: return input_port_read(device->machine, "keyboard_2");
-	case 1 << 3: return input_port_read(device->machine, "keyboard_3");
-	case 1 << 4: return input_port_read(device->machine, "keyboard_4");
-	case 1 << 5: return input_port_read(device->machine, "keyboard_5");
-	case 1 << 6: return input_port_read(device->machine, "keyboard_6");
-	case 1 << 7: return input_port_read(device->machine, "keyboard_7");
+	case 1 << 0: return input_port_read(device->machine(), "keyboard_0");
+	case 1 << 1: return input_port_read(device->machine(), "keyboard_1");
+	case 1 << 2: return input_port_read(device->machine(), "keyboard_2");
+	case 1 << 3: return input_port_read(device->machine(), "keyboard_3");
+	case 1 << 4: return input_port_read(device->machine(), "keyboard_4");
+	case 1 << 5: return input_port_read(device->machine(), "keyboard_5");
+	case 1 << 6: return input_port_read(device->machine(), "keyboard_6");
+	case 1 << 7: return input_port_read(device->machine(), "keyboard_7");
 	}
 
 	/* should never reach this */
@@ -52,7 +52,7 @@ static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_w(device->machine->device("ic8_7445"), 0, data & 0x07);
+	ttl74145_w(device->machine().device("ic8_7445"), 0, data & 0x07);
 }
 
 
@@ -62,7 +62,7 @@ static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
-	device_t *ttl74145 = device->machine->device("ic8_7445");
+	device_t *ttl74145 = device->machine().device("ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	output_set_digit_value(key_line, data);

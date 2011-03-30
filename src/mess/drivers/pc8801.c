@@ -215,11 +215,11 @@ static VIDEO_START( pc8801 )
 
 }
 
-static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
+static void draw_bitmap_3bpp(running_machine &machine, bitmap_t *bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine->region("gvram")->base();
+	UINT8 *gvram = machine.region("gvram")->base();
 
 	count = 0;
 
@@ -238,7 +238,7 @@ static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
 				pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
 				pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen & 7];
+				*BITMAP_ADDR16(bitmap, y, x+xi) = machine.pens[pen & 7];
 			}
 
 			count++;
@@ -246,11 +246,11 @@ static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
+static void draw_bitmap_1bpp(running_machine &machine, bitmap_t *bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine->region("gvram")->base();
+	UINT8 *gvram = machine.region("gvram")->base();
 
 	count = 0;
 
@@ -266,7 +266,7 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 				/* TODO: dunno if layer_mask is correct here */
 				if(!(layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen ? 7 : 0];
+				*BITMAP_ADDR16(bitmap, y, x+xi) = machine.pens[pen ? 7 : 0];
 			}
 
 			count++;
@@ -289,7 +289,7 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 					/* TODO: dunno if layer_mask is correct here */
 					if(!(layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
 
-					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen ? 7 : 0];
+					*BITMAP_ADDR16(bitmap, y, x+xi) = machine.pens[pen ? 7 : 0];
 				}
 
 				count++;
@@ -300,7 +300,7 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 		popmessage("200 lines B/W mode selected, check me");
 }
 
-static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
+static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
 {
 	if(!(crtc.cursor_on)) // don't bother if cursor is off
 		return 0;
@@ -315,7 +315,7 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 		if(!(crtc.param[0][2] & 0x20))
 			return 1;
 
-		if(((machine->primary_screen->frame_number() / blink_speed) & 1) == 0)
+		if(((machine.primary_screen->frame_number() / blink_speed) & 1) == 0)
 			return 1;
 
 		return 0;
@@ -326,9 +326,9 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 
 
 
-static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int x)
+static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x)
 {
-	UINT8 *vram = machine->region("wram")->base();
+	UINT8 *vram = machine.region("wram")->base();
 	int i;
 	int fifo_size;
 
@@ -354,10 +354,10 @@ static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int 
 	return 0;
 }
 
-static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
+static void pc8801_draw_char(running_machine &machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
 {
 	int xi,yi;
-	UINT8 *vram = machine->region("wram")->base();
+	UINT8 *vram = machine.region("wram")->base();
 	UINT8 is_cursor;
 	UINT8 y_height;
 
@@ -390,7 +390,7 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 				else
 				{
 					UINT8 char_data;
-					UINT8 *gfx_rom = machine->region("gfx1")->base();
+					UINT8 *gfx_rom = machine.region("gfx1")->base();
 
 					if(yi >= 8 || secret)
 						char_data = 0;
@@ -409,40 +409,40 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 						color = char_data ? pal : -1;
 				}
 
-				if((res_x)>machine->primary_screen->visible_area().max_x && (res_y)>machine->primary_screen->visible_area().max_y)
+				if((res_x)>machine.primary_screen->visible_area().max_x && (res_y)>machine.primary_screen->visible_area().max_y)
 					continue;
 
 				if(color != -1)
-					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
+					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine.pens[color];
 
 				if(width)
 				{
-					if((res_x+1)>machine->primary_screen->visible_area().max_x && (res_y)>machine->primary_screen->visible_area().max_y)
+					if((res_x+1)>machine.primary_screen->visible_area().max_x && (res_y)>machine.primary_screen->visible_area().max_y)
 						continue;
 
 					if(color != -1)
-						*BITMAP_ADDR16(bitmap, res_y, res_x+1) = machine->pens[color];
+						*BITMAP_ADDR16(bitmap, res_y, res_x+1) = machine.pens[color];
 				}
 				if(height)
 				{
-					if((res_x)>machine->primary_screen->visible_area().max_x && (res_y+1)>machine->primary_screen->visible_area().max_y)
+					if((res_x)>machine.primary_screen->visible_area().max_x && (res_y+1)>machine.primary_screen->visible_area().max_y)
 						continue;
 
 					if(color != -1)
-						*BITMAP_ADDR16(bitmap, res_y+1, res_x) = machine->pens[color];
+						*BITMAP_ADDR16(bitmap, res_y+1, res_x) = machine.pens[color];
 
-					if((res_x+1)>machine->primary_screen->visible_area().max_x && (res_y+1)>machine->primary_screen->visible_area().max_y)
+					if((res_x+1)>machine.primary_screen->visible_area().max_x && (res_y+1)>machine.primary_screen->visible_area().max_y)
 						continue;
 
 					if(color != -1)
-						*BITMAP_ADDR16(bitmap, res_y+1, res_x+1) = machine->pens[color];
+						*BITMAP_ADDR16(bitmap, res_y+1, res_x+1) = machine.pens[color];
 				}
 			}
 		}
 	}
 }
 
-static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
+static void draw_text_80(running_machine &machine, bitmap_t *bitmap,int y_size)
 {
 	int x,y;
 	UINT8 attr;
@@ -491,7 +491,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	}
 }
 
-static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
+static void draw_text_40(running_machine &machine, bitmap_t *bitmap, int y_size)
 {
 	int x,y;
 	UINT8 attr;
@@ -545,14 +545,14 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 
 static SCREEN_UPDATE( pc8801 )
 {
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
 	if(gfx_ctrl & 8)
 	{
 		if(gfx_ctrl & 0x10)
-			draw_bitmap_3bpp(screen->machine,bitmap);
+			draw_bitmap_3bpp(screen->machine(),bitmap);
 		else
-			draw_bitmap_1bpp(screen->machine,bitmap);
+			draw_bitmap_1bpp(screen->machine(),bitmap);
 	}
 
 	//popmessage("%02x %02x %02x %02x %02x",layer_mask,dmac_mode,crtc.status,crtc.irq_mask,gfx_ctrl);
@@ -569,9 +569,9 @@ static SCREEN_UPDATE( pc8801 )
 		if(y_size > 25) y_size = 25;
 
 		if(txt_width)
-			draw_text_80(screen->machine,bitmap,y_size);
+			draw_text_80(screen->machine(),bitmap,y_size);
 		else
-			draw_text_40(screen->machine,bitmap,y_size);
+			draw_text_40(screen->machine(),bitmap,y_size);
 	}
 
 	return 0;
@@ -580,7 +580,7 @@ static SCREEN_UPDATE( pc8801 )
 static READ8_HANDLER( pc8801_alu_r )
 {
 	int i;
-	UINT8 *gvram = space->machine->region("gvram")->base();
+	UINT8 *gvram = space->machine().region("gvram")->base();
 	UINT8 b,r,g;
 
 	/* store data to ALU regs */
@@ -600,7 +600,7 @@ static READ8_HANDLER( pc8801_alu_r )
 static WRITE8_HANDLER( pc8801_alu_w )
 {
 	int i;
-	UINT8 *gvram = space->machine->region("gvram")->base();
+	UINT8 *gvram = space->machine().region("gvram")->base();
 
 	switch(alu_ctrl2 & 0x30) // alu write mode
 	{
@@ -643,21 +643,21 @@ static WRITE8_HANDLER( pc8801_alu_w )
 
 static READ8_HANDLER( pc8801_wram_r )
 {
-	UINT8 *work_ram = space->machine->region("wram")->base();
+	UINT8 *work_ram = space->machine().region("wram")->base();
 
 	return work_ram[offset];
 }
 
 static WRITE8_HANDLER( pc8801_wram_w )
 {
-	UINT8 *work_ram = space->machine->region("wram")->base();
+	UINT8 *work_ram = space->machine().region("wram")->base();
 
 	work_ram[offset] = data;
 }
 
 static READ8_HANDLER( pc8801_ext_wram_r )
 {
-	UINT8 *ext_work_ram = space->machine->region("ewram")->base();
+	UINT8 *ext_work_ram = space->machine().region("ewram")->base();
 
 	/* TODO: check max range here */
 
@@ -666,7 +666,7 @@ static READ8_HANDLER( pc8801_ext_wram_r )
 
 static WRITE8_HANDLER( pc8801_ext_wram_w )
 {
-	UINT8 *ext_work_ram = space->machine->region("ewram")->base();
+	UINT8 *ext_work_ram = space->machine().region("ewram")->base();
 
 	/* TODO: check max range here */
 
@@ -675,56 +675,56 @@ static WRITE8_HANDLER( pc8801_ext_wram_w )
 
 static READ8_HANDLER( pc8801_nbasic_rom_r )
 {
-	UINT8 *n80_rom = space->machine->region("n80rom")->base();
+	UINT8 *n80_rom = space->machine().region("n80rom")->base();
 
 	return n80_rom[offset];
 }
 
 static READ8_HANDLER( pc8801_n88basic_rom_r )
 {
-	UINT8 *n88_rom = space->machine->region("n88rom")->base();
+	UINT8 *n88_rom = space->machine().region("n88rom")->base();
 
 	return n88_rom[offset];
 }
 
 static READ8_HANDLER( pc8801_gvram_r )
 {
-	UINT8 *gvram = space->machine->region("gvram")->base();
+	UINT8 *gvram = space->machine().region("gvram")->base();
 
 	return gvram[offset];
 }
 
 static WRITE8_HANDLER( pc8801_gvram_w )
 {
-	UINT8 *gvram = space->machine->region("gvram")->base();
+	UINT8 *gvram = space->machine().region("gvram")->base();
 
 	gvram[offset] = data;
 }
 
 static READ8_HANDLER( pc8801_high_wram_r )
 {
-	UINT8 *hi_work_ram = space->machine->region("hiwram")->base();
+	UINT8 *hi_work_ram = space->machine().region("hiwram")->base();
 
 	return hi_work_ram[offset];
 }
 
 static WRITE8_HANDLER( pc8801_high_wram_w )
 {
-	UINT8 *hi_work_ram = space->machine->region("hiwram")->base();
+	UINT8 *hi_work_ram = space->machine().region("hiwram")->base();
 
 	hi_work_ram[offset] = data;
 }
 
 static READ8_HANDLER( pc8801ma_dic_r )
 {
-	UINT8 *dic_rom = space->machine->region("dictionary")->base();
+	UINT8 *dic_rom = space->machine().region("dictionary")->base();
 
 	return dic_rom[offset];
 }
 
 static READ8_HANDLER( pc8801_cdbios_rom_r )
 {
-	UINT8 *cdrom_bios = space->machine->region("cdrom")->base();
+	UINT8 *cdrom_bios = space->machine().region("cdrom")->base();
 
 	return cdrom_bios[offset];
 }
@@ -878,7 +878,7 @@ static READ8_HANDLER( pc8801_ctrl_r )
     ---- --x- monitor refresh rate DIP-SW
     ---- ---x (pbsy?)
     */
-	return input_port_read(space->machine, "CTRL");
+	return input_port_read(space->machine(), "CTRL");
 }
 
 static WRITE8_HANDLER( pc8801_ctrl_w )
@@ -891,18 +891,18 @@ static WRITE8_HANDLER( pc8801_ctrl_w )
     ---- --x- upd1990a strobe bit
     */
 
-	upd1990a_stb_w(space->machine->device("upd1990a"), (data & 2) >> 1);
-	upd1990a_clk_w(space->machine->device("upd1990a"), (data & 4) >> 2);
+	upd1990a_stb_w(space->machine().device("upd1990a"), (data & 2) >> 1);
+	upd1990a_clk_w(space->machine().device("upd1990a"), (data & 4) >> 2);
 
 	if(((device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
-		beep_set_state(space->machine->device("beeper"),1);
+		beep_set_state(space->machine().device("beeper"),1);
 
 	if(((device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
-		beep_set_state(space->machine->device("beeper"),0);
+		beep_set_state(space->machine().device("beeper"),0);
 
 	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
 	if(device_ctrl_data & 0x80)
-		beep_set_state(space->machine->device("beeper"),0);
+		beep_set_state(space->machine().device("beeper"),0);
 
 	device_ctrl_data = data;
 }
@@ -917,7 +917,7 @@ static WRITE8_HANDLER( pc8801_ext_rom_bank_w )
 	ext_rom_bank = data;
 }
 
-static void pc8801_dynamic_res_change(running_machine *machine)
+static void pc8801_dynamic_res_change(running_machine &machine)
 {
 	rectangle visarea;
 
@@ -926,7 +926,7 @@ static void pc8801_dynamic_res_change(running_machine *machine)
 	visarea.max_x = 640 - 1;
 	visarea.max_y = ((monitor_24KHz) ? 400 : 200) - 1;
 
-	machine->primary_screen->configure(640, 480, visarea, machine->primary_screen->frame_period().attoseconds);
+	machine.primary_screen->configure(640, 480, visarea, machine.primary_screen->frame_period().attoseconds);
 }
 
 static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
@@ -942,7 +942,7 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 
 	gfx_ctrl = data;
 
-	pc8801_dynamic_res_change(space->machine);
+	pc8801_dynamic_res_change(space->machine());
 }
 
 static READ8_HANDLER( pc8801_vram_select_r )
@@ -960,9 +960,9 @@ static WRITE8_HANDLER( pc8801_vram_select_w )
 static WRITE8_HANDLER( i8214_irq_level_w )
 {
 	if(data & 8)
-		i8214_b_w(space->machine->device("i8214"), 0, (7));
+		i8214_b_w(space->machine().device("i8214"), 0, (7));
 	else
-		i8214_b_w(space->machine->device("i8214"), 0, (data & 0x07));
+		i8214_b_w(space->machine().device("i8214"), 0, (data & 0x07));
 }
 
 static WRITE8_HANDLER( i8214_irq_mask_w )
@@ -1061,7 +1061,7 @@ static WRITE8_HANDLER( pc8801_palram_w )
 		g[offset] = data & 4 ? 7 : 0;
 	}
 
-	palette_set_color_rgb(space->machine, offset, pal3bit(r[offset]), pal3bit(g[offset]), pal3bit(b[offset]));
+	palette_set_color_rgb(space->machine(), offset, pal3bit(r[offset]), pal3bit(g[offset]), pal3bit(b[offset]));
 }
 
 static WRITE8_HANDLER( pc8801_layer_masking_w )
@@ -1226,7 +1226,7 @@ static UINT32 knj_addr[2];
 
 static READ8_HANDLER( pc8801_kanji_r )
 {
-	UINT8 *knj_rom = space->machine->region("kanji")->base();
+	UINT8 *knj_rom = space->machine().region("kanji")->base();
 	if((offset & 2) == 0)
 		return knj_rom[knj_addr[0]*2+((offset & 1) ^ 1)];
 
@@ -1241,7 +1241,7 @@ static WRITE8_HANDLER( pc8801_kanji_w )
 
 static READ8_HANDLER( pc8801_kanji_lv2_r )
 {
-	UINT8 *knj_rom = space->machine->region("kanji")->base() + 0x20000;
+	UINT8 *knj_rom = space->machine().region("kanji")->base() + 0x20000;
 	if((offset & 2) == 0)
 		return knj_rom[knj_addr[1]*2+((offset & 1) ^ 1)];
 
@@ -1314,10 +1314,10 @@ static WRITE8_HANDLER( pc8801_baudrate_w )
 
 static WRITE8_HANDLER( pc8801_rtc_w )
 {
-	upd1990a_c0_w(space->machine->device("upd1990a"), (data & 1) >> 0);
-	upd1990a_c1_w(space->machine->device("upd1990a"), (data & 2) >> 1);
-	upd1990a_c2_w(space->machine->device("upd1990a"), (data & 4) >> 2);
-	upd1990a_data_in_w(space->machine->device("upd1990a"), (data & 8) >> 3);
+	upd1990a_c0_w(space->machine().device("upd1990a"), (data & 1) >> 0);
+	upd1990a_c1_w(space->machine().device("upd1990a"), (data & 2) >> 1);
+	upd1990a_c2_w(space->machine().device("upd1990a"), (data & 4) >> 2);
+	upd1990a_data_in_w(space->machine().device("upd1990a"), (data & 8) >> 3);
 
 	/* TODO: remaining bits */
 }
@@ -1398,14 +1398,14 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	device->machine->scheduler().synchronize(); // force resync
+	device->machine().scheduler().synchronize(); // force resync
 
 	return i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	device->machine->scheduler().synchronize(); // force resync
+	device->machine().scheduler().synchronize(); // force resync
 
 	i8255_0_pc = data;
 }
@@ -1422,14 +1422,14 @@ static I8255A_INTERFACE( master_fdd_intf )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	device->machine->scheduler().synchronize(); // force resync
+	device->machine().scheduler().synchronize(); // force resync
 
 	return i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	device->machine->scheduler().synchronize(); // force resync
+	device->machine().scheduler().synchronize(); // force resync
 
 	i8255_1_pc = data;
 }
@@ -1451,26 +1451,26 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 {
-//  pc88va_state *state = machine->driver_data<pc88va_state>();
+//  pc88va_state *state = machine.driver_data<pc88va_state>();
 
-	upd765_tc_w(machine->device("upd765"), 0);
+	upd765_tc_w(machine.device("upd765"), 0);
 }
 
 static WRITE8_HANDLER( upd765_mc_w )
 {
-	floppy_mon_w(floppy_get_device(space->machine, 0), (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(space->machine, 1), (data & 2) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 1), 0);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 2), 0);
+	floppy_mon_w(floppy_get_device(space->machine(), 0), (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine(), 1), (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), (data & 1), 0);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), (data & 2), 0);
 }
 
 static READ8_HANDLER( upd765_tc_r )
 {
-	//pc88va_state *state = space->machine->driver_data<pc88va_state>();
+	//pc88va_state *state = space->machine().driver_data<pc88va_state>();
 
-	upd765_tc_w(space->machine->device("upd765"), 1);
+	upd765_tc_w(space->machine().device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	space->machine->scheduler().timer_set(attotime::from_usec(750), FUNC(pc8801fd_upd765_tc_to_zero));
+	space->machine().scheduler().timer_set(attotime::from_usec(750), FUNC(pc8801fd_upd765_tc_to_zero));
 	return 0xff; // value is meaningless
 }
 
@@ -1835,13 +1835,13 @@ static const cassette_config pc88_cassette_config =
 };
 
 #ifdef USE_PROPER_I8214
-void pc8801_raise_irq(running_machine *machine,UINT8 irq,UINT8 state)
+void pc8801_raise_irq(running_machine &machine,UINT8 irq,UINT8 state)
 {
 	if(state)
 	{
 		m_int_state |= irq;
 
-		i8214_r_w(machine->device("i8214"), 0, ~irq);
+		i8214_r_w(machine.device("i8214"), 0, ~irq);
 
 		cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 	}
@@ -1875,10 +1875,10 @@ static I8214_INTERFACE( pic_intf )
 
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
-	UINT8 vector = (7 - i8214_a_r(device->machine->device("i8214"), 0));
+	UINT8 vector = (7 - i8214_a_r(device->machine().device("i8214"), 0));
 
 	m_int_state &= ~(1<<vector);
-	cputag_set_input_line(device->machine,"maincpu",0,CLEAR_LINE);
+	cputag_set_input_line(device->machine(),"maincpu",0,CLEAR_LINE);
 
 	return vector << 1;
 }
@@ -1886,19 +1886,19 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 static void pc8801_sound_irq( device_t *device, int irq )
 {
 	if(sound_irq_mask && irq)
-		pc8801_raise_irq(device->machine,1<<(4),1);
+		pc8801_raise_irq(device->machine(),1<<(4),1);
 }
 
 static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 {
 	if(timer_irq_mask)
-		pc8801_raise_irq(timer.machine,1<<(2),1);
+		pc8801_raise_irq(timer.machine(),1<<(2),1);
 }
 
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
 	if(vblank_irq_mask)
-		pc8801_raise_irq(device->machine,1<<(1),1);
+		pc8801_raise_irq(device->machine(),1<<(1),1);
 }
 
 #else
@@ -1930,7 +1930,7 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	if(sound_irq_mask)
 	{
 		sound_irq_latch = irq;
-		cputag_set_input_line(device->machine,"maincpu",0,irq);
+		cputag_set_input_line(device->machine(),"maincpu",0,irq);
 	}
 }
 
@@ -1939,7 +1939,7 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 	if(timer_irq_mask)
 	{
 		timer_irq_latch = 1;
-		cputag_set_input_line(timer.machine,"maincpu",0,HOLD_LINE);
+		cputag_set_input_line(timer.machine(),"maincpu",0,HOLD_LINE);
 	}
 }
 
@@ -1955,10 +1955,10 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 
 static MACHINE_START( pc8801 )
 {
-	device_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pc8801_irq_callback);
 
-	upd1990a_cs_w(machine->device("upd1990a"), 1);
-	upd1990a_oe_w(machine->device("upd1990a"), 1);
+	upd1990a_cs_w(machine.device("upd1990a"), 1);
+	upd1990a_oe_w(machine.device("upd1990a"), 1);
 }
 
 static MACHINE_RESET( pc8801 )
@@ -1974,7 +1974,7 @@ static MACHINE_RESET( pc8801 )
 
 	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 
-	device_set_input_line_vector(machine->device("fdccpu"), 0, 0);
+	device_set_input_line_vector(machine.device("fdccpu"), 0, 0);
 
 	{
 		txt_color = 2;
@@ -1993,14 +1993,14 @@ static MACHINE_RESET( pc8801 )
 		crtc.status = 0;
 	}
 
-	beep_set_frequency(machine->device("beeper"),2400);
-	beep_set_state(machine->device("beeper"),0);
+	beep_set_frequency(machine.device("beeper"),2400);
+	beep_set_state(machine.device("beeper"),0);
 
 	#ifdef USE_PROPER_I8214
 	{
 		/* initialize I8214 */
-		i8214_etlg_w(machine->device("i8214"), 1);
-		i8214_inte_w(machine->device("i8214"), 1);
+		i8214_etlg_w(machine.device("i8214"), 1);
+		i8214_inte_w(machine.device("i8214"), 1);
 	}
 	#else
 	{
@@ -2042,8 +2042,8 @@ static MACHINE_RESET( pc8801_clock_speed )
 	has_clock_speed = 1;
 	clock_setting = input_port_read(machine, "CFG") & 0x80;
 
-	machine->device("maincpu")->set_unscaled_clock(clock_setting ?  XTAL_4MHz : XTAL_8MHz);
-	machine->device("fdccpu")->set_unscaled_clock(clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	machine.device("maincpu")->set_unscaled_clock(clock_setting ?  XTAL_4MHz : XTAL_8MHz);
+	machine.device("fdccpu")->set_unscaled_clock(clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
 	baudrate_val = 0;
 }
 
@@ -2088,8 +2088,8 @@ static const struct upd765_interface pc8801_upd765_interface =
 /* YM2203 Interface */
 
 /* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
-static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine, "OPN_PA"); }
-static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine, "OPN_PB"); }
+static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine(), "OPN_PA"); }
+static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine(), "OPN_PB"); }
 
 static const ym2203_interface pc88_ym2203_intf =
 {

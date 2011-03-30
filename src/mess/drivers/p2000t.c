@@ -208,13 +208,13 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( p2000_interrupt )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 }
 
 
 static SCREEN_UPDATE( p2000t )
 {
-	device_t *saa5050 = screen->machine->device("saa5050");
+	device_t *saa5050 = screen->machine().device("saa5050");
 
 	saa5050_update(saa5050, bitmap, NULL);
 	return 0;

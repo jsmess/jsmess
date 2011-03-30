@@ -171,7 +171,7 @@ static const ay8910_interface spectrum_ay_interface =
 
 static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
    /* D0-D2: RAM page located at 0x0c000-0x0ffff */
    /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -186,13 +186,13 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 	state->port_7ffd_data = data;
 
 	/* update memory */
-	spectrum_128_update_memory(space->machine);
+	spectrum_128_update_memory(space->machine());
 }
 
-void spectrum_128_update_memory(running_machine *machine)
+void spectrum_128_update_memory(running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 	unsigned char *ChosenROM;
 	int ROMSelection;
 
@@ -221,15 +221,15 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-	ChosenROM = machine->region("maincpu")->base() + 0x010000 + (ROMSelection<<14);
+	ChosenROM = machine.region("maincpu")->base() + 0x010000 + (ROMSelection<<14);
 
 	memory_set_bankptr(machine, "bank1", ChosenROM);
 }
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	spectrum_state *state = space->machine->driver_data<spectrum_state>();
-	int vpos = space->machine->primary_screen->vpos();
+	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	int vpos = space->machine().primary_screen->vpos();
 
 	return vpos<193 ? state->screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
@@ -254,8 +254,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_128 )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 
 	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */

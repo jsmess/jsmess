@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( junior_reset )
 {
 	if (newval == 0)
-		field->port->machine->firstcpu->reset();
+		field->port->machine().firstcpu->reset();
 }
 
 
@@ -92,19 +92,19 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER(junior_riot_a_r)
 {
-	junior_state *state = device->machine->driver_data<junior_state>();
+	junior_state *state = device->machine().driver_data<junior_state>();
 	UINT8	data = 0xff;
 
 	switch( ( state->port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = input_port_read(device->machine, "LINE0");
+		data = input_port_read(device->machine(), "LINE0");
 		break;
 	case 1:
-		data = input_port_read(device->machine, "LINE1");
+		data = input_port_read(device->machine(), "LINE1");
 		break;
 	case 2:
-		data = input_port_read(device->machine, "LINE2");
+		data = input_port_read(device->machine(), "LINE2");
 		break;
 	}
 	return data;
@@ -124,7 +124,7 @@ static READ8_DEVICE_HANDLER(junior_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(junior_riot_a_w)
 {
-	junior_state *state = device->machine->driver_data<junior_state>();
+	junior_state *state = device->machine().driver_data<junior_state>();
 	UINT8 idx = ( state->port_b >> 1 ) & 0x0f;
 
 	state->port_a = data;
@@ -139,7 +139,7 @@ static WRITE8_DEVICE_HANDLER(junior_riot_a_w)
 
 static WRITE8_DEVICE_HANDLER(junior_riot_b_w)
 {
-	junior_state *state = device->machine->driver_data<junior_state>();
+	junior_state *state = device->machine().driver_data<junior_state>();
 	UINT8 newdata = data;
 	UINT8 idx = ( newdata >> 1 ) & 0x0f;
 
@@ -155,7 +155,7 @@ static WRITE8_DEVICE_HANDLER(junior_riot_b_w)
 
 static WRITE_LINE_DEVICE_HANDLER( junior_riot_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -171,7 +171,7 @@ static const riot6532_interface junior_riot_interface =
 
 static TIMER_DEVICE_CALLBACK( junior_update_leds )
 {
-	junior_state *state = timer.machine->driver_data<junior_state>();
+	junior_state *state = timer.machine().driver_data<junior_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )
@@ -186,7 +186,7 @@ static TIMER_DEVICE_CALLBACK( junior_update_leds )
 
 static MACHINE_START( junior )
 {
-	junior_state *state = machine->driver_data<junior_state>();
+	junior_state *state = machine.driver_data<junior_state>();
 	state_save_register_item(machine, "junior", NULL, 0, state->port_a );
 	state_save_register_item(machine, "junior", NULL, 0, state->port_b );
 }
@@ -194,7 +194,7 @@ static MACHINE_START( junior )
 
 static MACHINE_RESET(junior)
 {
-	junior_state *state = machine->driver_data<junior_state>();
+	junior_state *state = machine.driver_data<junior_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )

@@ -21,28 +21,28 @@
 static MACHINE_RESET( eti660 );
 
 #define RX(_machine) \
-	cpu_get_reg(_machine->firstcpu, COSMAC_R0 + cpu_get_reg(_machine->firstcpu, COSMAC_X))
+	cpu_get_reg(_machine.firstcpu, COSMAC_R0 + cpu_get_reg(_machine.firstcpu, COSMAC_X))
 
 /* Read/Write Handlers */
 
 static READ8_DEVICE_HANDLER( pia_r )
 {
-	int pia_offset = RX(device->machine) & 0x03;
+	int pia_offset = RX(device->machine()) & 0x03;
 
 	return pia6821_r(device, pia_offset);
 }
 
 static WRITE8_DEVICE_HANDLER( pia_w )
 {
-	int pia_offset = RX(device->machine) & 0x03;
+	int pia_offset = RX(device->machine()) & 0x03;
 
 	pia6821_w(device, pia_offset, data);
 }
 
 static WRITE8_HANDLER( eti660_colorram_w )
 {
-	eti660_state *state = space->machine->driver_data<eti660_state>();
-	int colorram_offset = RX(space->machine) & 0xff;
+	eti660_state *state = space->machine().driver_data<eti660_state>();
+	int colorram_offset = RX(space->machine()) & 0xff;
 
 	colorram_offset = ((colorram_offset & 0xf8) >> 1) || (colorram_offset & 0x03);
 
@@ -69,7 +69,7 @@ static INPUT_CHANGED( reset_pressed )
 {
 	if (oldval && !newval)
 	{
-		running_machine *machine = field->port->machine;
+		running_machine &machine = field->port->machine();
 		MACHINE_RESET_CALL(eti660);
 	}
 }
@@ -108,21 +108,21 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	eti660_state *state = device->machine().driver_data<eti660_state>();
 
 	return BIT(state->color, 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	eti660_state *state = device->machine().driver_data<eti660_state>();
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	eti660_state *state = device->machine().driver_data<eti660_state>();
 
 	return BIT(state->color, 2);
 }
@@ -146,7 +146,7 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 
 static SCREEN_UPDATE( eti660 )
 {
-	eti660_state *state = screen->machine->driver_data<eti660_state>();
+	eti660_state *state = screen->machine().driver_data<eti660_state>();
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -157,7 +157,7 @@ static SCREEN_UPDATE( eti660 )
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	return BIT(input_port_read(device->machine, "SPECIAL"), 0);
+	return BIT(input_port_read(device->machine(), "SPECIAL"), 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
@@ -167,18 +167,18 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 
 static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	return BIT(input_port_read(device->machine, "SPECIAL"), 1);
+	return BIT(input_port_read(device->machine(), "SPECIAL"), 1);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( eti660_q_w )
 {
-	eti660_state *driver_state = device->machine->driver_data<eti660_state>();
+	eti660_state *driver_state = device->machine().driver_data<eti660_state>();
 
 	/* CDP1864 audio output enable */
 	cdp1864_aoe_w(driver_state->cdp1864, state);
 
 	/* PULSE led */
-	set_led_status(device->machine, LED_PULSE, state);
+	set_led_status(device->machine(), LED_PULSE, state);
 
 	/* tape output */
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
@@ -186,7 +186,7 @@ static WRITE_LINE_DEVICE_HANDLER( eti660_q_w )
 
 static WRITE8_DEVICE_HANDLER( eti660_dma_w )
 {
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	eti660_state *state = device->machine().driver_data<eti660_state>();
 	UINT8 colorram_offset = ((offset & 0xf8) >> 1) || (offset & 0x03);
 
 	state->color = state->color_ram[colorram_offset];
@@ -230,13 +230,13 @@ static READ8_DEVICE_HANDLER( eti660_pia_a_r )
 
     */
 
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	eti660_state *state = device->machine().driver_data<eti660_state>();
 	UINT8 data = 0xf0;
 
-	if (!BIT(state->keylatch, 0)) data &= input_port_read(device->machine, "PA0");
-	if (!BIT(state->keylatch, 1)) data &= input_port_read(device->machine, "PA1");
-	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine, "PA2");
-	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine, "PA3");
+	if (!BIT(state->keylatch, 0)) data &= input_port_read(device->machine(), "PA0");
+	if (!BIT(state->keylatch, 1)) data &= input_port_read(device->machine(), "PA1");
+	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine(), "PA2");
+	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine(), "PA3");
 
 	return data;
 }
@@ -258,7 +258,7 @@ static WRITE8_DEVICE_HANDLER( eti660_pia_a_w )
 
     */
 
-	eti660_state *state = device->machine->driver_data<eti660_state>();
+	eti660_state *state = device->machine().driver_data<eti660_state>();
 
 	state->keylatch = data & 0x0f;
 }
@@ -283,16 +283,16 @@ static const pia6821_interface eti660_mc6821_intf =
 
 static MACHINE_START( eti660 )
 {
-	eti660_state *state = machine->driver_data<eti660_state>();
+	eti660_state *state = machine.driver_data<eti660_state>();
 
 	/* find devices */
-	state->cdp1864 = machine->device(CDP1864_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->cdp1864 = machine.device(CDP1864_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 }
 
 static MACHINE_RESET( eti660 )
 {
-	eti660_state *state = machine->driver_data<eti660_state>();
+	eti660_state *state = machine.driver_data<eti660_state>();
 
 	/* reset CDP1864 */
 	state->cdp1864->reset();

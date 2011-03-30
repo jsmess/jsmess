@@ -33,7 +33,7 @@
 
 
 
-static void x68k_crtc_refresh_mode(running_machine *machine);
+static void x68k_crtc_refresh_mode(running_machine &machine);
 
 INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -104,14 +104,14 @@ static void x68k_crtc_text_copy(x68k_state *state, int src, int dest)
 
 static TIMER_CALLBACK(x68k_crtc_operation_end)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int bit = param;
 	state->crtc.operation &= ~bit;
 }
 
-static void x68k_crtc_refresh_mode(running_machine *machine)
+static void x68k_crtc_refresh_mode(running_machine &machine)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 //  rectangle rect;
 //  double scantime;
 	rectangle scr,visiblescr;
@@ -169,13 +169,13 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 
 //  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",state->crtc.reg[0],state->crtc.reg[1],state->crtc.reg[2],state->crtc.reg[3],
 //      state->crtc.reg[4],state->crtc.reg[5],state->crtc.reg[6],state->crtc.reg[7],state->crtc.reg[8],state->crtc.reg[9]);
-	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
-	machine->primary_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
+	logerror("video_screen_configure(machine.primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
+	machine.primary_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
 
 TIMER_CALLBACK(x68k_hsync)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int hstate = param;
 	attotime hsync_time;
 
@@ -187,31 +187,31 @@ TIMER_CALLBACK(x68k_hsync)
 		{
 			if(state->oddscanline == 1)
 			{
-				int scan = machine->primary_screen->vpos();
+				int scan = machine.primary_screen->vpos();
 				if(scan > state->crtc.vend)
 					scan = state->crtc.vbegin;
-				hsync_time = machine->primary_screen->time_until_pos(scan,(state->crtc.htotal + state->crtc.hend) / 2);
+				hsync_time = machine.primary_screen->time_until_pos(scan,(state->crtc.htotal + state->crtc.hend) / 2);
 				state->scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((input_port_read(machine, "options") & 0x04))
 					{
-						machine->primary_screen->update_partial(scan);
+						machine.primary_screen->update_partial(scan);
 					}
 				}
 			}
 			else
 			{
-				int scan = machine->primary_screen->vpos();
+				int scan = machine.primary_screen->vpos();
 				if(scan > state->crtc.vend)
 					scan = state->crtc.vbegin;
-				hsync_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend / 2);
+				hsync_time = machine.primary_screen->time_until_pos(scan,state->crtc.hend / 2);
 				state->scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((input_port_read(machine, "options") & 0x04))
 					{
-						machine->primary_screen->update_partial(scan);
+						machine.primary_screen->update_partial(scan);
 					}
 				}
 			}
@@ -220,18 +220,18 @@ TIMER_CALLBACK(x68k_hsync)
 		{
 			if(state->oddscanline == 1)
 			{
-				int scan = machine->primary_screen->vpos();
+				int scan = machine.primary_screen->vpos();
 				if(scan > state->crtc.vend)
 					scan = state->crtc.vbegin;
 				else
 					scan++;
-				hsync_time = machine->primary_screen->time_until_pos(scan,state->crtc.hbegin / 2);
+				hsync_time = machine.primary_screen->time_until_pos(scan,state->crtc.hbegin / 2);
 				state->scanline_timer->adjust(hsync_time, 1);
 				state->oddscanline = 0;
 			}
 			else
 			{
-				hsync_time = machine->primary_screen->time_until_pos(machine->primary_screen->vpos(),(state->crtc.htotal + state->crtc.hbegin) / 2);
+				hsync_time = machine.primary_screen->time_until_pos(machine.primary_screen->vpos(),(state->crtc.htotal + state->crtc.hbegin) / 2);
 				state->scanline_timer->adjust(hsync_time, 1);
 				state->oddscanline = 1;
 			}
@@ -241,22 +241,22 @@ TIMER_CALLBACK(x68k_hsync)
 	{
 		if(hstate == 1)
 		{
-			int scan = machine->primary_screen->vpos();
+			int scan = machine.primary_screen->vpos();
 			if(scan > state->crtc.vend)
 				scan = 0;
-			hsync_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend);
+			hsync_time = machine.primary_screen->time_until_pos(scan,state->crtc.hend);
 			state->scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
 				if((input_port_read(machine, "options") & 0x04))
 				{
-					machine->primary_screen->update_partial(scan);
+					machine.primary_screen->update_partial(scan);
 				}
 			}
 		}
 		if(hstate == 0)
 		{
-			hsync_time = machine->primary_screen->time_until_pos(machine->primary_screen->vpos()+1,state->crtc.hbegin);
+			hsync_time = machine.primary_screen->time_until_pos(machine.primary_screen->vpos()+1,state->crtc.hbegin);
 			state->scanline_timer->adjust(hsync_time, 1);
 	//      if(!(state->mfp.gpio & 0x40))  // if GPIP6 is active, clear it
 	//          state->mfp.gpio |= 0x40;
@@ -266,14 +266,14 @@ TIMER_CALLBACK(x68k_hsync)
 
 static TIMER_CALLBACK(x68k_crtc_raster_end)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	state->mfp.gpio |= 0x40;
 	state->m_mfp->i6_w(1);
 }
 
 TIMER_CALLBACK(x68k_crtc_raster_irq)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int scan = param;
 	attotime irq_time;
 	attotime end_time;
@@ -282,20 +282,20 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	{
 		state->mfp.gpio &= ~0x40;  // GPIP6
 		state->m_mfp->i6_w(0);
-		machine->primary_screen->update_partial(scan);
-		irq_time = machine->primary_screen->time_until_pos(scan,state->crtc.hbegin);
+		machine.primary_screen->update_partial(scan);
+		irq_time = machine.primary_screen->time_until_pos(scan,state->crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
-		end_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend);
+		end_time = machine.primary_screen->time_until_pos(scan,state->crtc.hend);
 		state->raster_irq->adjust(irq_time, scan);
-		machine->scheduler().timer_set(end_time, FUNC(x68k_crtc_raster_end));
-		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine->primary_screen->vpos());
+		machine.scheduler().timer_set(end_time, FUNC(x68k_crtc_raster_end));
+		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine.primary_screen->vpos());
 	}
 }
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
-	device_t *x68k_mfp = machine->device(MC68901_TAG);
+	x68k_state *state = machine.driver_data<x68k_state>();
+	device_t *x68k_mfp = machine.device(MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;
@@ -304,7 +304,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	{
 		state->crtc.vblank = 1;
 		vblank_line = state->crtc.vbegin;
-		irq_time = machine->primary_screen->time_until_pos(vblank_line,2);
+		irq_time = machine.primary_screen->time_until_pos(vblank_line,2);
 		state->vblank_irq->adjust(irq_time);
 		logerror("CRTC: VBlank on\n");
 	}
@@ -314,7 +314,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		vblank_line = state->crtc.vend;
 		if(vblank_line > state->crtc.vtotal)
 			vblank_line = state->crtc.vtotal;
-		irq_time = machine->primary_screen->time_until_pos(vblank_line,2);
+		irq_time = machine.primary_screen->time_until_pos(vblank_line,2);
 		state->vblank_irq->adjust(irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
@@ -376,7 +376,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
  */
 WRITE16_HANDLER( x68k_crtc_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	COMBINE_DATA(state->crtc.reg+offset);
 	switch(offset)
 	{
@@ -389,12 +389,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 	case 6:
 	case 7:
 	case 8:
-		x68k_crtc_refresh_mode(space->machine);
+		x68k_crtc_refresh_mode(space->machine());
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			attotime irq_time;
-			irq_time = space->machine->primary_screen->time_until_pos((data) / state->crtc.vmultiple,2);
+			irq_time = space->machine().primary_screen->time_until_pos((data) / state->crtc.vmultiple,2);
 
 			if(irq_time.as_double() > 0)
 				state->raster_irq->adjust(irq_time, (data) / state->crtc.vmultiple);
@@ -441,28 +441,28 @@ WRITE16_HANDLER( x68k_crtc_w )
             if(data & 0x0400)
                 state->crtc.interlace = 1;
         }*/
-		x68k_crtc_refresh_mode(space->machine);
+		x68k_crtc_refresh_mode(space->machine());
 		break;
 	case 576:  // operation register
 		state->crtc.operation = data;
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy(state, (state->crtc.reg[22] & 0xff00) >> 8,(state->crtc.reg[22] & 0x00ff));
-			space->machine->scheduler().timer_set(attotime::from_msec(1), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
+			space->machine().scheduler().timer_set(attotime::from_msec(1), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
 			memset(state->gvram,0,0x40000);
-			space->machine->scheduler().timer_set(attotime::from_msec(10), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
+			space->machine().scheduler().timer_set(attotime::from_msec(10), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(space->machine->device("maincpu")),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(space->machine().device("maincpu")),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 #if 0
 	switch(offset)
 	{
@@ -474,7 +474,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(space->machine->device("maincpu")),state->crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(space->machine().device("maincpu")),state->crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -503,7 +503,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 WRITE16_HANDLER( x68k_gvram_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 //  int xloc,yloc,pageoffset;
 	/*
        G-VRAM usage is determined by colour depth and "real" screen size.
@@ -570,7 +570,7 @@ WRITE16_HANDLER( x68k_gvram_w )
 
 WRITE16_HANDLER( x68k_tvram_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	UINT16 text_mask;
 
 	text_mask = ~(state->crtc.reg[23]) & mem_mask;
@@ -601,7 +601,7 @@ WRITE16_HANDLER( x68k_tvram_w )
 
 READ16_HANDLER( x68k_gvram_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	UINT16 ret = 0;
 
 	if(state->crtc.reg[20] & 0x08)  // G-VRAM set to buffer
@@ -643,7 +643,7 @@ READ16_HANDLER( x68k_gvram_r )
 
 READ16_HANDLER( x68k_tvram_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	return state->tvram[offset];
 }
 
@@ -697,7 +697,7 @@ WRITE32_HANDLER( x68k_gvram32_w )
 
 WRITE16_HANDLER( x68k_spritereg_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	COMBINE_DATA(state->spritereg+offset);
 	switch(offset)
 	{
@@ -734,7 +734,7 @@ WRITE16_HANDLER( x68k_spritereg_w )
 
 READ16_HANDLER( x68k_spritereg_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(offset >= 0x400 && offset < 0x404)
 		return state->spritereg[offset] & 0x3ff;
 	return state->spritereg[offset];
@@ -742,7 +742,7 @@ READ16_HANDLER( x68k_spritereg_r )
 
 WRITE16_HANDLER( x68k_spriteram_w )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	COMBINE_DATA(state->spriteram+offset);
 	state->video.tile8_dirty[offset / 16] = 1;
 	state->video.tile16_dirty[offset / 64] = 1;
@@ -767,13 +767,13 @@ WRITE16_HANDLER( x68k_spriteram_w )
 
 READ16_HANDLER( x68k_spriteram_r )
 {
-	x68k_state *state = space->machine->driver_data<x68k_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	return state->spriteram[offset];
 }
 
-static void x68k_draw_text(running_machine* machine,bitmap_t* bitmap, int xscr, int yscr, rectangle rect)
+static void x68k_draw_text(running_machine &machine,bitmap_t* bitmap, int xscr, int yscr, rectangle rect)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	unsigned int line,pixel; // location on screen
 	UINT32 loc;  // location in TVRAM
 	UINT32 colour;
@@ -812,9 +812,9 @@ static void x68k_draw_text(running_machine* machine,bitmap_t* bitmap, int xscr, 
 	}
 }
 
-static void x68k_draw_gfx_scanline(running_machine *machine, bitmap_t* bitmap, rectangle cliprect, UINT8 priority)
+static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, rectangle cliprect, UINT8 priority)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int pixel;
 	int page;
 	UINT32 loc;  // location in GVRAM
@@ -920,9 +920,9 @@ static void x68k_draw_gfx_scanline(running_machine *machine, bitmap_t* bitmap, r
 	}
 }
 
-static void x68k_draw_gfx(running_machine *machine, bitmap_t* bitmap,rectangle cliprect)
+static void x68k_draw_gfx(running_machine &machine, bitmap_t* bitmap,rectangle cliprect)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int priority;
 	//rectangle rect;
 	//int xscr,yscr;
@@ -938,9 +938,9 @@ static void x68k_draw_gfx(running_machine *machine, bitmap_t* bitmap,rectangle c
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-static void x68k_draw_sprites(running_machine *machine, bitmap_t* bitmap, int priority, rectangle cliprect)
+static void x68k_draw_sprites(running_machine &machine, bitmap_t* bitmap, int priority, rectangle cliprect)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	/*
        0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
            + 00 : b9-0,  Sprite X position
@@ -996,9 +996,9 @@ static void x68k_draw_sprites(running_machine *machine, bitmap_t* bitmap, int pr
 			sx += state->sprite_shift;
 
 			if(state->crtc.interlace != 0)
-				drawgfxzoom_transpen(bitmap,&cliprect,machine->gfx[1],code,colour+0x10,xflip,yflip,state->crtc.hbegin+sx,state->crtc.vbegin+(sy*2),0x10000,0x20000,0x00);
+				drawgfxzoom_transpen(bitmap,&cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->crtc.hbegin+sx,state->crtc.vbegin+(sy*2),0x10000,0x20000,0x00);
 			else
-				drawgfx_transpen(bitmap,&cliprect,machine->gfx[1],code,colour+0x10,xflip,yflip,state->crtc.hbegin+sx,state->crtc.vbegin+sy,0x00);
+				drawgfx_transpen(bitmap,&cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->crtc.hbegin+sx,state->crtc.vbegin+sy,0x00);
 		}
 	}
 }
@@ -1049,7 +1049,7 @@ GFXDECODEINFO_END
 
 static TILE_GET_INFO(x68k_get_bg0_tile)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int code = state->spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (state->spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (state->spriteram[0x3000+tile_index] & 0xc000) >> 14;
@@ -1058,7 +1058,7 @@ static TILE_GET_INFO(x68k_get_bg0_tile)
 
 static TILE_GET_INFO(x68k_get_bg1_tile)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int code = state->spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (state->spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (state->spriteram[0x2000+tile_index] & 0xc000) >> 14;
@@ -1067,7 +1067,7 @@ static TILE_GET_INFO(x68k_get_bg1_tile)
 
 static TILE_GET_INFO(x68k_get_bg0_tile_16)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int code = state->spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (state->spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (state->spriteram[0x3000+tile_index] & 0xc000) >> 14;
@@ -1076,7 +1076,7 @@ static TILE_GET_INFO(x68k_get_bg0_tile_16)
 
 static TILE_GET_INFO(x68k_get_bg1_tile_16)
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int code = state->spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (state->spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (state->spriteram[0x2000+tile_index] & 0xc000) >> 14;
@@ -1085,20 +1085,20 @@ static TILE_GET_INFO(x68k_get_bg1_tile_16)
 
 VIDEO_START( x68000 )
 {
-	x68k_state *state = machine->driver_data<x68k_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	int gfx_index;
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, machine->region("user1")->base(), 32, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, machine.region("user1")->base(), 32, 0);
 
 	gfx_index++;
 
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, machine->region("user1")->base(), 32, 0);
-	machine->gfx[gfx_index]->total_colors = 32;
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, machine.region("user1")->base(), 32, 0);
+	machine.gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
 	state->bg0_8 = tilemap_create(machine, x68k_get_bg0_tile,tilemap_scan_rows,8,8,64,64);
@@ -1116,7 +1116,7 @@ VIDEO_START( x68000 )
 
 SCREEN_UPDATE( x68000 )
 {
-	x68k_state *state = screen->machine->driver_data<x68k_state>();
+	x68k_state *state = screen->machine().driver_data<x68k_state>();
 	rectangle rect = {0,0,0,0};
 	int priority;
 	int xscr,yscr;
@@ -1155,17 +1155,17 @@ SCREEN_UPDATE( x68000 )
 		rect.max_y = cliprect->max_y;
 
 	// update tiles
-	//rom = screen->machine->region("user1")->base();
+	//rom = screen->machine().region("user1")->base();
 	for(x=0;x<256;x++)
 	{
 		if(state->video.tile16_dirty[x] != 0)
 		{
-			gfx_element_mark_dirty(screen->machine->gfx[1], x);
+			gfx_element_mark_dirty(screen->machine().gfx[1], x);
 			state->video.tile16_dirty[x] = 0;
 		}
 		if(state->video.tile8_dirty[x] != 0)
 		{
-			gfx_element_mark_dirty(screen->machine->gfx[0], x);
+			gfx_element_mark_dirty(screen->machine().gfx[0], x);
 			state->video.tile8_dirty[x] = 0;
 		}
 	}
@@ -1174,12 +1174,12 @@ SCREEN_UPDATE( x68000 )
 	{
 		// Graphics screen(s)
 		if(priority == state->video.gfx_pri)
-			x68k_draw_gfx(screen->machine,bitmap,rect);
+			x68k_draw_gfx(screen->machine(),bitmap,rect);
 
 		// Sprite / BG Tiles
 		if(priority == state->video.sprite_pri /*&& (state->spritereg[0x404] & 0x0200)*/ && (state->video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(screen->machine, bitmap,1,rect);
+			x68k_draw_sprites(screen->machine(), bitmap,1,rect);
 			if((state->spritereg[0x404] & 0x0008))
 			{
 				if((state->spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
@@ -1195,7 +1195,7 @@ SCREEN_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(screen->machine,bitmap,2,rect);
+			x68k_draw_sprites(screen->machine(),bitmap,2,rect);
 			if((state->spritereg[0x404] & 0x0001))
 			{
 				if((state->spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
@@ -1211,7 +1211,7 @@ SCREEN_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(screen->machine,bitmap,3,rect);
+			x68k_draw_sprites(screen->machine(),bitmap,3,rect);
 		}
 
 		// Text screen
@@ -1220,24 +1220,24 @@ SCREEN_UPDATE( x68000 )
 			xscr = (state->crtc.reg[10] & 0x3ff);
 			yscr = (state->crtc.reg[11] & 0x3ff);
 			if(!(state->crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
-				x68k_draw_text(screen->machine,bitmap,xscr,yscr,rect);
+				x68k_draw_text(screen->machine(),bitmap,xscr,yscr,rect);
 		}
 	}
 
 #ifdef MAME_DEBUG
-	if(input_code_pressed(screen->machine,KEYCODE_I))
+	if(input_code_pressed(screen->machine(),KEYCODE_I))
 	{
 		state->mfp.isra = 0;
 		state->mfp.isrb = 0;
 //      mfp_trigger_irq(MFP_IRQ_GPIP6);
 //      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
 	}
-	if(input_code_pressed(screen->machine,KEYCODE_9))
+	if(input_code_pressed(screen->machine(),KEYCODE_9))
 	{
 		state->sprite_shift--;
 		popmessage("Sprite shift = %i",state->sprite_shift);
 	}
-	if(input_code_pressed(screen->machine,KEYCODE_0))
+	if(input_code_pressed(screen->machine(),KEYCODE_0))
 	{
 		state->sprite_shift++;
 		popmessage("Sprite shift = %i",state->sprite_shift);
@@ -1265,7 +1265,7 @@ SCREEN_UPDATE( x68000 )
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      state->crtc.reg[12],state->crtc.reg[13],state->crtc.reg[14],state->crtc.reg[15],state->crtc.reg[16],state->crtc.reg[17],state->crtc.reg[18],state->crtc.reg[19]);
 //  popmessage("IOC IRQ status - %02x",state->ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",ram_get_ptr(machine->device(RAM_TAG))[0x931],ram_get_ptr(machine->device(RAM_TAG))[0x930],ram_get_ptr(machine->device(RAM_TAG))[0x933],ram_get_ptr(machine->device(RAM_TAG))[0x932]);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",ram_get_ptr(machine.device(RAM_TAG))[0x931],ram_get_ptr(machine.device(RAM_TAG))[0x930],ram_get_ptr(machine.device(RAM_TAG))[0x933],ram_get_ptr(machine.device(RAM_TAG))[0x932]);
 #endif
 	return 0;
 }

@@ -201,7 +201,7 @@ static void ds1315_fill_raw_data(device_t *device)
 	int raw[8], i, j;
 
 	/* get the current date/time from the core */
-	device->machine->current_datetime(systime);
+	device->machine().current_datetime(systime);
 
 	raw[0] = 0;	/* tenths and hundreths of seconds are always zero */
 	raw[1] = dec_2_bcd(systime.local_time.second);

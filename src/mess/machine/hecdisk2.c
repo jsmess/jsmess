@@ -187,7 +187,7 @@ const upd765_interface hector_disc2_upd765_interface =
 /*****************************************************************************/
 /****  Management of the interrupts (NMI and INT)between uPD765 and Z80 ******/
 /*****************************************************************************/
-static void valid_interrupt( running_machine *machine)
+static void valid_interrupt( running_machine &machine)
 {
 /* Called at each rising state of NMI or RNMI ! */
 
@@ -200,10 +200,10 @@ if ((hector_disc2_RNMI==1) &&  (NMI_current_state==1))
 	}
 }
 
-void hector_disc2_init( running_machine *machine)
+void hector_disc2_init( running_machine &machine)
 {
-	DMA_timer = machine->scheduler().timer_alloc(FUNC(Callback_DMA_irq));
-	INT_timer = machine->scheduler().timer_alloc(FUNC(Callback_INT_irq));
+	DMA_timer = machine.scheduler().timer_alloc(FUNC(Callback_DMA_irq));
+	INT_timer = machine.scheduler().timer_alloc(FUNC(Callback_INT_irq));
 }
 
 static TIMER_CALLBACK( Callback_DMA_irq )
@@ -222,7 +222,7 @@ static TIMER_CALLBACK( Callback_INT_irq )
 /* upd765 INT is connected to interrupt of Z80 within a RNMI hardware authorization*/
 static WRITE_LINE_DEVICE_HANDLER( disc2_fdc_interrupt )
 {
-	cputag_set_input_line(device->machine, "disc2cpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "disc2cpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	if (state)
 		INT_timer->adjust(attotime::from_usec(500) );//a little time to let the Z80 terminate he's previous job !
 }
@@ -240,17 +240,17 @@ static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq )
 
     if (state==1)
 		NMI_current_state = state;
-	valid_interrupt(device->machine);
+	valid_interrupt(device->machine());
 }
 
 // RESET the disc2 Unit !
-void hector_disc2_reset(running_machine *machine)
+void hector_disc2_reset(running_machine &machine)
 {
 	// Initialization Disc2 unit
 	cputag_set_input_line(machine, "disc2cpu" , INPUT_LINE_RESET, PULSE_LINE);
 	//switch ON and OFF the reset line uPD
-	upd765_reset_w(machine->device("upd765"), 1);
-	upd765_reset_w(machine->device("upd765"), 0);
+	upd765_reset_w(machine.device("upd765"), 1);
+	upd765_reset_w(machine.device("upd765"), 0);
 	// Select ROM memory to cold restart
 	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
 
@@ -269,13 +269,13 @@ void hector_disc2_reset(running_machine *machine)
 READ8_HANDLER( hector_disc2_io00_port_r)
 {
 	/* Switch Disc 2 to RAM to let full RAM acces */
-	memory_set_bank(space->machine, "bank3", DISCII_BANK_RAM);
+	memory_set_bank(space->machine(), "bank3", DISCII_BANK_RAM);
 	return 0;
 }
 WRITE8_HANDLER( hector_disc2_io00_port_w)
 {
 	/* Switch Disc 2 to RAM to let full RAM acces */
-	memory_set_bank(space->machine, "bank3", DISCII_BANK_RAM);
+	memory_set_bank(space->machine(), "bank3", DISCII_BANK_RAM);
 }
 READ8_HANDLER( hector_disc2_io20_port_r)
 {
@@ -316,13 +316,13 @@ READ8_HANDLER( hector_disc2_io50_port_r)	/*Read memory info write ready*/
 WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 {
 
-	device_t *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine().device("upd765");
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	floppy_mon_w(floppy_get_device(space->machine, 0), BIT(data, 0));	// Moteur floppy A:
-	floppy_mon_w(floppy_get_device(space->machine, 1), BIT(data, 1));	// Moteur floppy B:
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), FLOPPY_DRIVE_READY,!BIT(data, 0));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), FLOPPY_DRIVE_READY,!BIT(data, 1));
+	floppy_mon_w(floppy_get_device(space->machine(), 0), BIT(data, 0));	// Moteur floppy A:
+	floppy_mon_w(floppy_get_device(space->machine(), 1), BIT(data, 1));	// Moteur floppy B:
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), FLOPPY_DRIVE_READY,!BIT(data, 0));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), FLOPPY_DRIVE_READY,!BIT(data, 1));
 
 	/* Write bit TC uPD765 on D4 of port I/O 50 */
 	upd765_tc_w(fdc, BIT(data, 4));  // Seems not used...
@@ -333,7 +333,7 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 
 	/* if RNMI is OK, try to lauch an NMI*/
 	if (hector_disc2_RNMI)
-		valid_interrupt(space->machine);
+		valid_interrupt(space->machine());
 }
 
 //Here we must take the exchange with uPD against AM_DEVREADWRITE
@@ -343,7 +343,7 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 READ8_HANDLER( hector_disc2_io61_port_r)
 {
 	UINT8 data;
-	device_t *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine().device("upd765");
 	data = upd765_data_r(fdc,0); //Get the result
 
 // if ST0 == 0x28 (drive A:) or 0x29 (drive B:) => add 0x40
@@ -403,7 +403,7 @@ else
 	print=0;
 #endif
 
-device_t *fdc = space->machine->device("upd765");
+device_t *fdc = space->machine().device("upd765");
 upd765_data_w(fdc,0, data);
 }
 
@@ -411,12 +411,12 @@ upd765_data_w(fdc,0, data);
 READ8_HANDLER( hector_disc2_io70_port_r) // Gestion du DMA
 {
 	UINT8 data;
-	device_t *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine().device("upd765");
 	data = upd765_dack_r(fdc,0);
 	return data;
 }
 WRITE8_HANDLER( hector_disc2_io70_port_w)
 {
-	device_t *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine().device("upd765");
 	upd765_dack_w(fdc,0, data);
 }

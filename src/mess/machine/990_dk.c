@@ -28,7 +28,7 @@ static struct
 	UINT16 cmd_reg;
 
 	int interrupt_f_f;
-	void (*interrupt_callback)(running_machine *, int state);
+	void (*interrupt_callback)(running_machine &, int state);
 
 	UINT8 buf[128];
 	int buf_pos;
@@ -92,7 +92,7 @@ FLOPPY_OPTIONS_END
 static void fd800_field_interrupt(void)
 {
 	if (fd800.interrupt_callback)
-		(*fd800.interrupt_callback)(fd800.machine, (fd800.stat_reg & status_interrupt) && ! fd800.interrupt_f_f);
+		(*fd800.interrupt_callback)(*fd800.machine, (fd800.stat_reg & status_interrupt) && ! fd800.interrupt_f_f);
 }
 
 static void fd800_unload_proc(device_image_interface &image)
@@ -102,11 +102,11 @@ static void fd800_unload_proc(device_image_interface &image)
 	fd800.drv[unit].log_cylinder[0] = fd800.drv[unit].log_cylinder[1] = -1;
 }
 
-void fd800_machine_init(running_machine *machine, void (*interrupt_callback)(running_machine *machine, int state))
+void fd800_machine_init(running_machine &machine, void (*interrupt_callback)(running_machine &machine, int state))
 {
 	int i;
 
-	fd800.machine = machine;
+	fd800.machine = &machine;
 	fd800.interrupt_callback = interrupt_callback;
 
 	fd800.stat_reg = 0;

@@ -337,19 +337,19 @@ static DEVICE_START( rp5c01a )
 	devcb_resolve_write_line(&rp5c01a->out_alarm_func, &intf->out_alarm_func, device);
 
 	/* create the timers */
-	rp5c01a->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
+	rp5c01a->clock_timer = device->machine().scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
 	rp5c01a->clock_timer->adjust(attotime::zero, 0, attotime::from_hz(1));
 
-	rp5c01a->alarm_timer = device->machine->scheduler().timer_alloc(FUNC(alarm_tick), (void *)device);
+	rp5c01a->alarm_timer = device->machine().scheduler().timer_alloc(FUNC(alarm_tick), (void *)device);
 	rp5c01a->alarm_timer->adjust(attotime::zero, 0, attotime::from_hz(16));
 	rp5c01a->alarm_timer->enable(0);
 
 	/* register for state saving */
-    state_save_register_global(device->machine, rp5c01a->mode);
-    state_save_register_global_array(device->machine, rp5c01a->reg[0]);
-    state_save_register_global_array(device->machine, rp5c01a->reg[1]);
-    state_save_register_global_array(device->machine, rp5c01a->reg[2]);
-    state_save_register_global_array(device->machine, rp5c01a->reg[3]);
+    state_save_register_global(device->machine(), rp5c01a->mode);
+    state_save_register_global_array(device->machine(), rp5c01a->reg[0]);
+    state_save_register_global_array(device->machine(), rp5c01a->reg[1]);
+    state_save_register_global_array(device->machine(), rp5c01a->reg[2]);
+    state_save_register_global_array(device->machine(), rp5c01a->reg[3]);
 }
 
 /*-------------------------------------------------

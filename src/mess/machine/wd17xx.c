@@ -1238,11 +1238,11 @@ void wd17xx_set_drive(device_t *device, UINT8 drive)
 		if (device->owner() != NULL) {
 			w->drive = device->owner()->subdevice(w->intf->floppy_drive_tags[drive]);
 			if (w->drive == NULL) {
-				w->drive = device->machine->device(w->intf->floppy_drive_tags[drive]);
+				w->drive = device->machine().device(w->intf->floppy_drive_tags[drive]);
 			}
 		}
 		else
-			w->drive = device->machine->device(w->intf->floppy_drive_tags[drive]);
+			w->drive = device->machine().device(w->intf->floppy_drive_tags[drive]);
 	}
 }
 
@@ -2027,10 +2027,10 @@ static DEVICE_START( wd1770 )
     w->complete_command_delay = 12;
 
 	/* allocate timers */
-	w->timer_cmd = device->machine->scheduler().timer_alloc(FUNC(wd17xx_command_callback), (void *)device);
-	w->timer_data = device->machine->scheduler().timer_alloc(FUNC(wd17xx_data_callback), (void *)device);
-	w->timer_rs = device->machine->scheduler().timer_alloc(FUNC(wd17xx_read_sector_callback), (void *)device);
-	w->timer_ws = device->machine->scheduler().timer_alloc(FUNC(wd17xx_write_sector_callback), (void *)device);
+	w->timer_cmd = device->machine().scheduler().timer_alloc(FUNC(wd17xx_command_callback), (void *)device);
+	w->timer_data = device->machine().scheduler().timer_alloc(FUNC(wd17xx_data_callback), (void *)device);
+	w->timer_rs = device->machine().scheduler().timer_alloc(FUNC(wd17xx_read_sector_callback), (void *)device);
+	w->timer_ws = device->machine().scheduler().timer_alloc(FUNC(wd17xx_write_sector_callback), (void *)device);
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&w->in_dden_func, &w->intf->in_dden_func, device);
@@ -2075,11 +2075,11 @@ static DEVICE_RESET( wd1770 )
 			if (device->owner() != NULL)
 				img = device->owner()->subdevice(w->intf->floppy_drive_tags[i]);
 				if (img == NULL) {
-					img = device->machine->device(w->intf->floppy_drive_tags[i]);
+					img = device->machine().device(w->intf->floppy_drive_tags[i]);
 				}
 
 			else
-				img = device->machine->device(w->intf->floppy_drive_tags[i]);
+				img = device->machine().device(w->intf->floppy_drive_tags[i]);
 
 			if (img!=NULL) {
 				floppy_drive_set_controller(img,device);

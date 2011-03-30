@@ -82,9 +82,9 @@ static DEVICE_START( crt )
 	crt->window_height = height;
 
 	/* alloc the arrays */
-	crt->list = auto_alloc_array(device->machine, point, width * height);
+	crt->list = auto_alloc_array(device->machine(), point, width * height);
 
-	crt->list_head = auto_alloc_array(device->machine, int, height);
+	crt->list_head = auto_alloc_array(device->machine(), int, height);
 
 	/* fill with black and set up list as empty */
 	for (i=0; i<(width * height); i++)

@@ -148,20 +148,20 @@ public:
 /* timer to read cassette waveforms */
 
 
-static device_t *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine &machine)
 {
-	sol20_state *state = machine->driver_data<sol20_state>();
+	sol20_state *state = machine.driver_data<sol20_state>();
 	if (state->m_sol20_fa & 0x40)
-		return machine->device("cassette2");
+		return machine.device("cassette2");
 	else
-		return machine->device("cassette1");
+		return machine.device("cassette1");
 }
 
 
 // identical to sorcerer
 static TIMER_CALLBACK(sol20_cassette_tc)
 {
-	sol20_state *state = machine->driver_data<sol20_state>();
+	sol20_state *state = machine.driver_data<sol20_state>();
 	UINT8 cass_ws = 0;
 	switch (state->m_sol20_fa & 0x20)
 	{
@@ -491,13 +491,13 @@ static TIMER_CALLBACK( sol20_boot )
 
 static MACHINE_START( sol20 )
 {
-	sol20_state *state = machine->driver_data<sol20_state>();
-	state->m_cassette_timer = machine->scheduler().timer_alloc(FUNC(sol20_cassette_tc));
+	sol20_state *state = machine.driver_data<sol20_state>();
+	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(sol20_cassette_tc));
 }
 
 static MACHINE_RESET( sol20 )
 {
-	sol20_state *state = machine->driver_data<sol20_state>();
+	sol20_state *state = machine.driver_data<sol20_state>();
 	UINT8 data = 0, s_count = 0;
 	int s_clock;
 	const UINT16 s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
@@ -545,19 +545,19 @@ static MACHINE_RESET( sol20 )
 
 	// boot-bank
 	memory_set_bank(machine, "boot", 1);
-	machine->scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
+	machine.scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
 static DRIVER_INIT( sol20 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
 }
 
 static VIDEO_START( sol20 )
 {
-	sol20_state *state = machine->driver_data<sol20_state>();
-	state->FNT = machine->region("chargen")->base();
+	sol20_state *state = machine.driver_data<sol20_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( sol20 )
@@ -566,9 +566,9 @@ static SCREEN_UPDATE( sol20 )
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT8 s1 = input_port_read(screen->machine, "S1");
-	UINT16 which = (input_port_read(screen->machine, "CONFIG") & 2) << 10;
-	sol20_state *state = screen->machine->driver_data<sol20_state>();
+	UINT8 s1 = input_port_read(screen->machine(), "S1");
+	UINT16 which = (input_port_read(screen->machine(), "CONFIG") & 2) << 10;
+	sol20_state *state = screen->machine().driver_data<sol20_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;

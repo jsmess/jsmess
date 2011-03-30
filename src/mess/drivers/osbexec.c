@@ -63,7 +63,7 @@ public:
 	/* Vblank counter ("RTC") */
 	UINT8	rtc;
 
-	void set_banks(running_machine *machine)
+	void set_banks(running_machine &machine)
 	{
 		UINT8 *ram_ptr = ram_get_ptr( messram );
 
@@ -80,7 +80,7 @@ public:
 
 		if ( pia0_porta & 0x80 )
 		{
-			memory_set_bankptr( machine, "0000", machine->region("maincpu")->base());
+			memory_set_bankptr( machine, "0000", machine.region("maincpu")->base());
 			/* When BIOS is enabled 2000-3FFF is set to the "ROM RAM" */
 			memory_set_bankptr( machine, "2000", ram_ptr + 0x20000 );
 		}
@@ -89,7 +89,7 @@ public:
 			ram_c000 = vram_region->base();
 	}
 
-	void update_irq_state(running_machine *machine)
+	void update_irq_state(running_machine &machine)
 	{
 		if ( pia0_irq_state || pia1_irq_state )
 			device_set_input_line( maincpu, 0, ASSERT_LINE );
@@ -101,7 +101,7 @@ public:
 
 static WRITE8_HANDLER( osbexec_0000_w )
 {
-	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
 	/* Font RAM writing is enabled when ROM bank is enabled */
 	if ( state->pia0_porta & 0x80 )
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( osbexec_0000_w )
 
 static READ8_HANDLER( osbexec_c000_r )
 {
-	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 	UINT8	data = state->ram_c000[offset];
 
 	if ( ( state->pia0_porta & 0x40 ) && offset < 0x1000 )
@@ -132,7 +132,7 @@ static READ8_HANDLER( osbexec_c000_r )
 
 static WRITE8_HANDLER( osbexec_c000_w )
 {
-	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
 	state->ram_c000[offset] = data;
 
@@ -148,28 +148,28 @@ static READ8_HANDLER( osbexec_kbd_r )
 	UINT8 data = 0xFF;
 
 	if ( offset & 0x0100 )
-		data &= input_port_read( space->machine, "ROW0" );
+		data &= input_port_read( space->machine(), "ROW0" );
 
 	if ( offset & 0x0200 )
-		data &= input_port_read( space->machine, "ROW1" );
+		data &= input_port_read( space->machine(), "ROW1" );
 
 	if ( offset & 0x0400 )
-		data &= input_port_read( space->machine, "ROW2" );
+		data &= input_port_read( space->machine(), "ROW2" );
 
 	if ( offset & 0x0800 )
-		data &= input_port_read( space->machine, "ROW3" );
+		data &= input_port_read( space->machine(), "ROW3" );
 
 	if ( offset & 0x1000 )
-		data &= input_port_read( space->machine, "ROW4" );
+		data &= input_port_read( space->machine(), "ROW4" );
 
 	if ( offset & 0x2000 )
-		data &= input_port_read( space->machine, "ROW5" );
+		data &= input_port_read( space->machine(), "ROW5" );
 
 	if ( offset & 0x4000 )
-		data &= input_port_read( space->machine, "ROW6" );
+		data &= input_port_read( space->machine(), "ROW6" );
 
 	if ( offset & 0x8000 )
-		data &= input_port_read( space->machine, "ROW7" );
+		data &= input_port_read( space->machine(), "ROW7" );
 
 	return data;
 }
@@ -177,7 +177,7 @@ static READ8_HANDLER( osbexec_kbd_r )
 
 static READ8_HANDLER( osbexec_rtc_r )
 {
-	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
 	return state->rtc;
 }
@@ -329,7 +329,7 @@ static PALETTE_INIT( osbexec )
 
 static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
 {
-	osbexec_state *state = device->machine->driver_data<osbexec_state>();
+	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
 	return state->pia0_porta;
 }
@@ -337,19 +337,19 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
 
 static WRITE8_DEVICE_HANDLER( osbexec_pia0_a_w )
 {
-	osbexec_state *state = device->machine->driver_data<osbexec_state>();
+	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
 	logerror("osbexec_pia0_a_w: %02x\n", data );
 
 	state->pia0_porta = data;
 
-	state->set_banks( device->machine );
+	state->set_banks(device->machine());
 }
 
 
 static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
 {
-	osbexec_state *state = device->machine->driver_data<osbexec_state>();
+	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
 	return state->pia0_portb;
 }
@@ -357,7 +357,7 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
 
 static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
 {
-	osbexec_state *state = device->machine->driver_data<osbexec_state>();
+	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
 	state->pia0_portb = data;
 
@@ -385,7 +385,7 @@ static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_cb2_w )
 {
-	osbexec_state *st = device->machine->driver_data<osbexec_state>();
+	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
 	st->pia0_cb2 = state;
 }
@@ -393,10 +393,10 @@ static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_cb2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_irq )
 {
-	osbexec_state *st = device->machine->driver_data<osbexec_state>();
+	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
 	st->pia0_irq_state = state;
-	st->update_irq_state( device->machine );
+	st->update_irq_state(device->machine());
 }
 
 
@@ -419,10 +419,10 @@ static const pia6821_interface osbexec_pia0_config =
 
 static WRITE_LINE_DEVICE_HANDLER( osbexec_pia1_irq )
 {
-	osbexec_state *st = device->machine->driver_data<osbexec_state>();
+	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
 	st->pia1_irq_state = state;
-	st->update_irq_state( device->machine );
+	st->update_irq_state(device->machine());
 }
 
 
@@ -532,8 +532,8 @@ static const floppy_config osbexec_floppy_config =
 
 static TIMER_CALLBACK( osbexec_video_callback )
 {
-	osbexec_state *state = machine->driver_data<osbexec_state>();
-	int y = machine->primary_screen->vpos();
+	osbexec_state *state = machine.driver_data<osbexec_state>();
+	int y = machine.primary_screen->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
@@ -550,7 +550,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 	if ( y < 240 )
 	{
 		UINT16 row_addr = ( y / 10 ) * 128;
-		UINT16 *p = BITMAP_ADDR16( machine->generic.tmpbitmap, y, 0 );
+		UINT16 *p = BITMAP_ADDR16( machine.generic.tmpbitmap, y, 0 );
 		UINT8 char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )
@@ -580,16 +580,16 @@ static TIMER_CALLBACK( osbexec_video_callback )
 		}
 	}
 
-	state->video_timer->adjust( machine->primary_screen->time_until_pos( y + 1, 0 ) );
+	state->video_timer->adjust( machine.primary_screen->time_until_pos( y + 1, 0 ) );
 }
 
 
 static DRIVER_INIT( osbexec )
 {
-	osbexec_state *state = machine->driver_data<osbexec_state>();
+	osbexec_state *state = machine.driver_data<osbexec_state>();
 
-	state->fontram_region = machine->region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
-	state->vram_region = machine->region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
+	state->fontram_region = machine.region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
+	state->vram_region = machine.region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
 	state->vram = state->vram_region->base();
 	state->fontram = state->fontram_region->base();
 
@@ -597,19 +597,19 @@ static DRIVER_INIT( osbexec )
 	memset( state->fontram, 0x00, 0x1000 );
 	memset( state->vram, 0x00, 0x2000 );
 
-	state->video_timer = machine->scheduler().timer_alloc(FUNC(osbexec_video_callback));
+	state->video_timer = machine.scheduler().timer_alloc(FUNC(osbexec_video_callback));
 }
 
 
 static MACHINE_RESET( osbexec )
 {
-	osbexec_state *state = machine->driver_data<osbexec_state>();
+	osbexec_state *state = machine.driver_data<osbexec_state>();
 
 	state->pia0_porta = 0xC0;		/* Enable ROM and VRAM on reset */
 
 	state->set_banks( machine );
 
-	state->video_timer->adjust( machine->primary_screen->time_until_pos( 0, 0 ) );
+	state->video_timer->adjust( machine.primary_screen->time_until_pos( 0, 0 ) );
 
 	state->rtc = 0;
 }

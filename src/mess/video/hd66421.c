@@ -113,7 +113,7 @@ PALETTE_INIT( hd66421 )
 	}
 }
 
-static void hd66421_state_save(running_machine *machine)
+static void hd66421_state_save(running_machine &machine)
 {
 	const char *name = "hd66421";
 	state_save_register_item(machine, name, NULL, 0, lcd.idx);
@@ -146,9 +146,9 @@ SCREEN_UPDATE( hd66421 )
 		bright = 1.0 * temp / 31;
 		pen[i] = i;
 		#ifdef BRIGHTNESS_DOES_NOT_WORK
-		palette_set_color( screen->machine, pen[i], 255 * bright, 255 * bright, 255 * bright);
+		palette_set_color(screen->machine(), pen[i], 255 * bright, 255 * bright, 255 * bright);
 		#else
-		palette_set_pen_contrast( screen->machine, pen[i], bright);
+		palette_set_pen_contrast(screen->machine(), pen[i], bright);
 		#endif
 	}
 	// draw bitmap (bottom to top)
@@ -177,7 +177,7 @@ SCREEN_UPDATE( hd66421 )
 		rect.max_x = HD66421_WIDTH - 1;
 		rect.min_y = 0;
 		rect.max_y = HD66421_HEIGHT - 1;
-		bitmap_fill( bitmap, &rect, get_white_pen(screen->machine));
+		bitmap_fill( bitmap, &rect, get_white_pen(screen->machine()));
 	}
 	// flags
 	return 0;

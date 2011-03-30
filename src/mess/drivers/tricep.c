@@ -29,7 +29,7 @@ static READ16_HANDLER(tricep_terminal_r)
 
 static WRITE16_HANDLER(tricep_terminal_w)
 {
-	device_t *devconf = space->machine->device(TERMINAL_TAG);
+	device_t *devconf = space->machine().device(TERMINAL_TAG);
 	terminal_write(devconf,0,data >> 8);
 }
 
@@ -47,12 +47,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(tricep)
 {
-	tricep_state *state = machine->driver_data<tricep_state>();
-	UINT8* user1 = machine->region("user1")->base();
+	tricep_state *state = machine.driver_data<tricep_state>();
+	UINT8* user1 = machine.region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x2000);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static WRITE8_DEVICE_HANDLER( tricep_kbd_put )

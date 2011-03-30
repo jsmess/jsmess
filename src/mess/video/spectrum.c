@@ -21,7 +21,7 @@
 ***************************************************************************/
 VIDEO_START( spectrum )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->LastDisplayedBorderColor = -1;
 	state->frame_invert_count = 25;
 	state->frame_number = 0;
@@ -36,7 +36,7 @@ VIDEO_START( spectrum )
 
 VIDEO_START( spectrum_128 )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->LastDisplayedBorderColor = -1;
 	state->frame_invert_count = 25;
 	state->frame_number = 0;
@@ -61,7 +61,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
    independent of frame skip etc. */
 SCREEN_EOF( spectrum )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	EVENT_LIST_ITEM *pItem;
 	int NumItems;
 
@@ -80,7 +80,7 @@ SCREEN_EOF( spectrum )
 		pItem = spectrum_EventList_GetFirstItem(machine);
 		spectrum_border_set_last_color ( machine, pItem[NumItems-1].Event_Data );
 		spectrum_EventList_Reset(machine);
-		spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(machine->primary_screen->scan_period() * machine->primary_screen->vpos()) );
+		spectrum_EventList_SetOffsetStartTime ( machine, machine.firstcpu->attotime_to_cycles(machine.primary_screen->scan_period() * machine.primary_screen->vpos()) );
 		logerror ("Event log reset in callback fn.\n");
 	}
 }
@@ -118,7 +118,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 SCREEN_UPDATE( spectrum )
 {
 	/* for now do a full-refresh */
-	spectrum_state *state = screen->machine->driver_data<spectrum_state>();
+	spectrum_state *state = screen->machine().driver_data<spectrum_state>();
 	int x, y, b, scrx, scry;
 	unsigned short ink, pap;
 	unsigned char *attr, *scr;
@@ -159,7 +159,7 @@ SCREEN_UPDATE( spectrum )
 		}
 	}
 
-	spectrum_border_draw(screen->machine, bitmap, full_refresh,
+	spectrum_border_draw(screen->machine(), bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
@@ -207,21 +207,21 @@ Changes:
 ***************************************************************************/
 
 /* Force the border to be redrawn on the next frame */
-void spectrum_border_force_redraw (running_machine *machine)
+void spectrum_border_force_redraw (running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->LastDisplayedBorderColor = -1;
 }
 
 /* Set the last border colour to have been displayed. Used when loading snap
    shots and to record the last colour change in a frame that was skipped. */
-void spectrum_border_set_last_color(running_machine *machine, int NewColor)
+void spectrum_border_set_last_color(running_machine &machine, int NewColor)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->CurrBorderColor = NewColor;
 }
 
-void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
+void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 	int full_refresh,               /* Full refresh flag */
 	int TopBorderLines,             /* Border lines before actual screen */
 	int ScreenLines,                /* Screen height in pixels */
@@ -236,7 +236,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 	int VRetraceTime,               /* Cycles taken before start of first border line */
 	int EventID)                    /* Event ID of border messages */
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	EVENT_LIST_ITEM *pItem;
 	int TotalScreenHeight = TopBorderLines+ScreenLines+BottomBorderLines;
 	int TotalScreenWidth = LeftBorderPixels+ScreenPixels+RightBorderPixels;
@@ -281,23 +281,23 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 		r.max_x = TotalScreenWidth-1;
 		r.min_y = 0;
 		r.max_y = TopBorderLines-1;
-		bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+		bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 
 		r.min_x = 0;
 		r.max_x = LeftBorderPixels-1;
 		r.min_y = TopBorderLines;
 		r.max_y = TopBorderLines+ScreenLines-1;
-		bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+		bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 
 		r.min_x = LeftBorderPixels+ScreenPixels;
 		r.max_x = TotalScreenWidth-1;
-		bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+		bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 
 		r.min_x = 0;
 		r.max_x = TotalScreenWidth-1;
 		r.min_y = TopBorderLines+ScreenLines;
 		r.max_y = TotalScreenHeight-1;
-		bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+		bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 
 //          logerror ("Setting border colour to %d (Last = %d, Full Refresh = %d)\n", state->CurrBorderColor, state->LastDisplayedBorderColor, full_refresh);
 		state->LastDisplayedBorderColor = state->CurrBorderColor;
@@ -325,14 +325,14 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 			{
 				/* Single colour on line */
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 			else
 			{
 				/* Multiple colours on a line */
 				ScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 				state->CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -343,7 +343,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+					bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 					ScrX = NextScrX;
 					state->CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -352,7 +352,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 
 			/* Process colour changes during horizontal retrace */
@@ -377,14 +377,14 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 			{
 				/* Single colour */
 				r.max_x = LeftBorderPixels-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 			else
 			{
 				/* Multiple colours */
 				ScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)LeftBorderPixels / (float)LeftBorderCycles;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 				state->CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -395,7 +395,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)LeftBorderPixels / (float)LeftBorderCycles;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+					bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 					ScrX = NextScrX;
 					state->CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -404,7 +404,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = LeftBorderPixels-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 
 			/* Process colour changes during screen draw */
@@ -422,14 +422,14 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 			{
 				/* Single colour */
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 			else
 			{
 				/* Multiple colours */
 				ScrX = LeftBorderPixels + ScreenPixels + (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)RightBorderPixels / (float)RightBorderCycles;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 				state->CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -440,7 +440,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 					NextScrX = LeftBorderPixels + ScreenPixels + (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)RightBorderPixels / (float)RightBorderCycles;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+					bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 					ScrX = NextScrX;
 					state->CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -449,7 +449,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 
 			/* Process colour changes during horizontal retrace */
@@ -472,14 +472,14 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 			{
 				/* Single colour on line */
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 			else
 			{
 				/* Multiple colours on a line */
 				ScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 				state->CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -490,7 +490,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+					bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 					ScrX = NextScrX;
 					state->CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -499,7 +499,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine->pens[state->CurrBorderColor]);
+				bitmap_fill(bitmap, &r, machine.pens[state->CurrBorderColor]);
 			}
 
 			/* Process colour changes during horizontal retrace */
@@ -529,7 +529,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 
 	/* Assume all other routines have processed their data from the list */
 	spectrum_EventList_Reset(machine);
-	spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(machine->primary_screen->scan_period() * machine->primary_screen->vpos()));
+	spectrum_EventList_SetOffsetStartTime ( machine, machine.firstcpu->attotime_to_cycles(machine.primary_screen->scan_period() * machine.primary_screen->vpos()));
 }
 
 
@@ -539,9 +539,9 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 can be setup as:
 
 Number_of_CPU_Cycles_In_A_Frame/Minimum_Number_Of_Cycles_Per_Instruction */
-void spectrum_EventList_Initialise(running_machine *machine, int NumEntries)
+void spectrum_EventList_Initialise(running_machine &machine, int NumEntries)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->pEventListBuffer = auto_alloc_array(machine, char, NumEntries);
 	state->TotalEvents = NumEntries;
 	state->CyclesPerFrame = 0;
@@ -549,9 +549,9 @@ void spectrum_EventList_Initialise(running_machine *machine, int NumEntries)
 }
 
 /* reset the change list */
-void spectrum_EventList_Reset(running_machine *machine)
+void spectrum_EventList_Reset(running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->NumEvents = 0;
 	state->pCurrentItem = (EVENT_LIST_ITEM *)state->pEventListBuffer;
 }
@@ -559,9 +559,9 @@ void spectrum_EventList_Reset(running_machine *machine)
 
 #ifdef UNUSED_FUNCTION
 /* add an event to the buffer */
-void EventList_AddItem(running_machine *machine, int ID, int Data, int Time)
+void EventList_AddItem(running_machine &machine, int ID, int Data, int Time)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	if (state->NumEvents < state->TotalEvents)
 	{
 		/* setup item only if there is space in the buffer */
@@ -577,19 +577,19 @@ void EventList_AddItem(running_machine *machine, int ID, int Data, int Time)
 
 /* set the start time for use with EventList_AddItemOffset usually this will
    be cpu_getcurrentcycles() at the time that the screen is being refreshed */
-void spectrum_EventList_SetOffsetStartTime(running_machine *machine, int StartTime)
+void spectrum_EventList_SetOffsetStartTime(running_machine &machine, int StartTime)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	state->LastFrameStartTime = StartTime;
 }
 
 /* add an event to the buffer with a time index offset from a specified time */
-void spectrum_EventList_AddItemOffset(running_machine *machine, int ID, int Data, int Time)
+void spectrum_EventList_AddItemOffset(running_machine &machine, int ID, int Data, int Time)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 
 	if (!state->CyclesPerFrame)
-		state->CyclesPerFrame = (int)(machine->firstcpu->unscaled_clock() / machine->primary_screen->frame_period().attoseconds);	//totalcycles();    //_(int)(cpunum_get_clock(0) / machine->config()->frames_per_second);
+		state->CyclesPerFrame = (int)(machine.firstcpu->unscaled_clock() / machine.primary_screen->frame_period().attoseconds);	//totalcycles();    //_(int)(cpunum_get_clock(0) / machine.config()->frames_per_second);
 
 	if (state->NumEvents < state->TotalEvents)
 	{
@@ -608,15 +608,15 @@ void spectrum_EventList_AddItemOffset(running_machine *machine, int ID, int Data
 }
 
 /* get number of events */
-int spectrum_EventList_NumEvents(running_machine *machine)
+int spectrum_EventList_NumEvents(running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	return state->NumEvents;
 }
 
 /* get first item in buffer */
-EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine *machine)
+EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine &machine)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = machine.driver_data<spectrum_state>();
 	return (EVENT_LIST_ITEM *)state->pEventListBuffer;
 }

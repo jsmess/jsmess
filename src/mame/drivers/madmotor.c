@@ -20,12 +20,13 @@
 #include "sound/okim6295.h"
 #include "includes/madmotor.h"
 #include "video/decbac06.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
 static WRITE16_HANDLER( madmotor_sound_w )
 {
-	madmotor_state *state = space->machine->driver_data<madmotor_state>();
+	madmotor_state *state = space->machine().driver_data<madmotor_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -221,7 +222,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	madmotor_state *driver_state = device->machine->driver_data<madmotor_state>();
+	madmotor_state *driver_state = device->machine().driver_data<madmotor_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -232,17 +233,17 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( madmotor )
 {
-	madmotor_state *state = machine->driver_data<madmotor_state>();
+	madmotor_state *state = machine.driver_data<madmotor_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( madmotor )
 {
-	madmotor_state *state = machine->driver_data<madmotor_state>();
+	madmotor_state *state = machine.driver_data<madmotor_state>();
 
 	state->flipscreen = 0;
 }
@@ -280,6 +281,10 @@ static MACHINE_CONFIG_START( madmotor, madmotor_state )
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,1,0);
 	MCFG_DEVICE_ADD("tilegen3", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,2,1);
+
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 3);
+
 
 	MCFG_VIDEO_START(madmotor)
 
@@ -348,7 +353,7 @@ ROM_END
 
 static DRIVER_INIT( madmotor )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	for (i = 0x00000;i < 0x80000;i++)

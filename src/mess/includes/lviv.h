@@ -40,7 +40,7 @@ extern VIDEO_START( lviv );
 extern SCREEN_UPDATE( lviv );
 extern const unsigned char lviv_palette[8*3];
 extern PALETTE_INIT( lviv );
-extern void lviv_update_palette(running_machine *, UINT8);
+extern void lviv_update_palette(running_machine &, UINT8);
 
 
 #endif /* LVIV_H_ */

@@ -110,7 +110,7 @@ static int data_cnt = 0;                /* data count */
 static UINT8 *buffer;					/* data buffer */
 static UINT8 *buffer_ptr = 0;			/* data pointer */
 static UINT8 hdc_control;
-static void (*hdc_set_irq)(running_machine *,int,int);
+static void (*hdc_set_irq)(running_machine &,int,int);
 static device_t *pc_hdc_dma8237;
 
 
@@ -177,7 +177,7 @@ static const char *const hdc_command_names[] =
 
 static TIMER_CALLBACK(pc_hdc_command);
 
-int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_machine *,int,int))
+int pc_hdc_setup(running_machine &machine, void (*hdc_set_irq_func)(running_machine &,int,int))
 {
 	int i;
 
@@ -210,7 +210,7 @@ int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_mach
 		error[i] = 0;
 		dip[i] = 0xff;
 		pc_hdc_dma8237 = NULL;
-		timer[i] = machine->scheduler().timer_alloc(FUNC(pc_hdc_command));
+		timer[i] = machine.scheduler().timer_alloc(FUNC(pc_hdc_command));
 		if (!timer[i])
 			return -1;
 	}
@@ -224,23 +224,23 @@ void pc_hdc_set_dma8237_device( device_t *dma8237 )
 }
 
 
-static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
+static hard_disk_file *pc_hdc_file(running_machine &machine, int id)
 {
 	device_image_interface *img = NULL;
 
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<device_image_interface *>(machine->device("harddisk1"));
+		img = dynamic_cast<device_image_interface *>(machine.device("harddisk1"));
 		break;
 	case 1:
-		img = dynamic_cast<device_image_interface *>(machine->device("harddisk2"));
+		img = dynamic_cast<device_image_interface *>(machine.device("harddisk2"));
 		break;
 	case 2:
-		img = dynamic_cast<device_image_interface *>(machine->device("harddisk3"));
+		img = dynamic_cast<device_image_interface *>(machine.device("harddisk3"));
 		break;
 	case 3:
-		img = dynamic_cast<device_image_interface *>(machine->device("harddisk4"));
+		img = dynamic_cast<device_image_interface *>(machine.device("harddisk4"));
 		break;
 	}
 
@@ -253,7 +253,7 @@ static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 	return hd_get_hard_disk_file(&img->device());
 }
 
-static void pc_hdc_result(running_machine *machine,int n, int set_error_info)
+static void pc_hdc_result(running_machine &machine,int n, int set_error_info)
 {
 	int irq;
 
@@ -302,7 +302,7 @@ static int no_dma(void)
 
 
 
-static int get_lbasector(running_machine *machine)
+static int get_lbasector(running_machine &machine)
 {
 	hard_disk_info *info;
 	hard_disk_file *file;
@@ -337,7 +337,7 @@ static int hdcdma_read;
 static int hdcdma_write;
 static int hdcdma_size;
 
-int pc_hdc_dack_r(running_machine *machine)
+int pc_hdc_dack_r(running_machine &machine)
 {
 	UINT8 result;
 	hard_disk_info *info;
@@ -384,7 +384,7 @@ int pc_hdc_dack_r(running_machine *machine)
 
 
 
-void pc_hdc_dack_w(running_machine *machine, int data)
+void pc_hdc_dack_w(running_machine &machine, int data)
 {
 	hard_disk_info *info;
 	hard_disk_file *file;
@@ -424,7 +424,7 @@ void pc_hdc_dack_w(running_machine *machine, int data)
 
 
 
-static void execute_read(running_machine *machine)
+static void execute_read(running_machine &machine)
 {
 	hard_disk_file *disk = pc_hdc_file(machine, idx);
 	int size = sector_cnt[idx] * 512;
@@ -454,7 +454,7 @@ static void execute_read(running_machine *machine)
 
 
 
-static void execute_write(running_machine *machine)
+static void execute_write(running_machine &machine)
 {
 	hard_disk_file *disk = pc_hdc_file(machine, idx);
 	int size = sector_cnt[idx] * 512;
@@ -506,7 +506,7 @@ static void get_chsn(int n)
 	error[n] = 0x80;	/* a potential error has C/H/S/N info */
 }
 
-static int test_ready(running_machine *machine, int n)
+static int test_ready(running_machine &machine, int n)
 {
 	if( !pc_hdc_file(machine, idx) )
 	{
@@ -537,7 +537,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), cmd, command_name, drv);
+			(unsigned) cpu_get_reg(machine.firstcpu, STATE_GENPC), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -575,7 +575,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine.firstcpu, STATE_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -590,7 +590,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine.firstcpu, STATE_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -641,7 +641,7 @@ static TIMER_CALLBACK(pc_hdc_command)
  *  cccccccc write precomp l
  *  eeeeeeee ecc
  */
-static void pc_hdc_data_w(running_machine *machine, int n, int data)
+static void pc_hdc_data_w(running_machine &machine, int n, int data)
 {
 	if( data_cnt == 0 )
 	{
@@ -699,7 +699,7 @@ static void pc_hdc_data_w(running_machine *machine, int n, int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine.firstcpu, STATE_GENPC));
 
             status[n] &= ~STA_COMMAND;
 			status[n] &= ~STA_REQUEST;
@@ -736,12 +736,12 @@ static void pc_hdc_select_w(int n, int data)
 
 
 
-static void pc_hdc_control_w(running_machine *machine, int n, int data)
+static void pc_hdc_control_w(running_machine &machine, int n, int data)
 {
 	int irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), data);
+		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine.firstcpu, STATE_GENPC), data);
 
 	hdc_control = data;
 
@@ -810,7 +810,7 @@ static UINT8 pc_hdc_dipswitch_r(int n)
  *
  *************************************************************************/
 
-static UINT8 pc_HDC_r(running_machine *machine, int chip, offs_t offs)
+static UINT8 pc_HDC_r(running_machine &machine, int chip, offs_t offs)
 {
 	UINT8 data = 0xff;
 
@@ -823,17 +823,17 @@ static UINT8 pc_HDC_r(running_machine *machine, int chip, offs_t offs)
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(machine->firstcpu), chip, offs, data);
+		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(machine.firstcpu), chip, offs, data);
 
 	return data;
 }
 
 
 
-static void pc_HDC_w(running_machine *machine, int chip, offs_t offs, UINT8 data)
+static void pc_HDC_w(running_machine &machine, int chip, offs_t offs, UINT8 data)
 {
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(machine->firstcpu), chip, offs, data);
+		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(machine.firstcpu), chip, offs, data);
 
 	switch( offs )
 	{
@@ -851,10 +851,10 @@ static void pc_HDC_w(running_machine *machine, int chip, offs_t offs, UINT8 data
  *
  *************************************/
 
-READ8_HANDLER ( pc_HDC1_r ) { return pc_HDC_r(space->machine, 0, offset); }
-READ8_HANDLER ( pc_HDC2_r ) { return pc_HDC_r(space->machine, 1, offset); }
-WRITE8_HANDLER ( pc_HDC1_w ) { pc_HDC_w(space->machine, 0, offset, data); }
-WRITE8_HANDLER ( pc_HDC2_w ) { pc_HDC_w(space->machine, 1, offset, data); }
+READ8_HANDLER ( pc_HDC1_r ) { return pc_HDC_r(space->machine(), 0, offset); }
+READ8_HANDLER ( pc_HDC2_r ) { return pc_HDC_r(space->machine(), 1, offset); }
+WRITE8_HANDLER ( pc_HDC1_w ) { pc_HDC_w(space->machine(), 0, offset, data); }
+WRITE8_HANDLER ( pc_HDC2_w ) { pc_HDC_w(space->machine(), 1, offset, data); }
 
 READ16_HANDLER ( pc16le_HDC1_r ) { return read16le_with_read8_handler(pc_HDC1_r, space, offset, mem_mask); }
 READ16_HANDLER ( pc16le_HDC2_r ) { return read16le_with_read8_handler(pc_HDC2_r, space, offset, mem_mask); }

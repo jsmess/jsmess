@@ -680,22 +680,22 @@ static CBM_IEC_DAISY( c128d81_iec_bus )
  *
  *************************************/
 
-static UINT8 c128_lightpen_x_cb( running_machine *machine )
+static UINT8 c128_lightpen_x_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTX") & ~0x01;
 }
 
-static UINT8 c128_lightpen_y_cb( running_machine *machine )
+static UINT8 c128_lightpen_y_cb( running_machine &machine )
 {
 	return input_port_read(machine, "LIGHTY") & ~0x01;
 }
 
-static UINT8 c128_lightpen_button_cb( running_machine *machine )
+static UINT8 c128_lightpen_button_cb( running_machine &machine )
 {
 	return input_port_read(machine, "OTHER") & 0x04;
 }
 
-static UINT8 c128_rdy_cb( running_machine *machine )
+static UINT8 c128_rdy_cb( running_machine &machine )
 {
 	return input_port_read(machine, "CTRLSEL") & 0x08;
 }

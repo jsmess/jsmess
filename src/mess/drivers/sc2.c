@@ -32,7 +32,7 @@ public:
 
 static READ8_HANDLER ( sc2_beep )
 {
-	sc2_state *state = space->machine->driver_data<sc2_state>();
+	sc2_state *state = space->machine().driver_data<sc2_state>();
 
 	if (!space->debugger_access())
 	{
@@ -87,9 +87,9 @@ INPUT_PORTS_END
 
 static MACHINE_START(sc2)
 {
-	sc2_state *state = machine->driver_data<sc2_state>();
+	sc2_state *state = machine.driver_data<sc2_state>();
 
-	state->beep = machine->device("beep");
+	state->beep = machine.device("beep");
 
 	state->save_item(NAME(state->led_7seg_data));
 	state->save_item(NAME(state->kp_matrix));
@@ -100,7 +100,7 @@ static MACHINE_START(sc2)
 
 static MACHINE_RESET(sc2)
 {
-	sc2_state *state = machine->driver_data<sc2_state>();
+	sc2_state *state = machine.driver_data<sc2_state>();
 
 	state->kp_matrix = 0;
 	state->led_selected = 0;
@@ -109,9 +109,9 @@ static MACHINE_RESET(sc2)
 	memset(state->led_7seg_data, 0, ARRAY_LENGTH(state->led_7seg_data));
 }
 
-static void sc2_update_display(running_machine *machine)
+static void sc2_update_display(running_machine &machine)
 {
-	sc2_state *state = machine->driver_data<sc2_state>();
+	sc2_state *state = machine.driver_data<sc2_state>();
 	UINT8 digit_data = BITSWAP8( state->digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
 	if (!(state->led_selected&0x01))
@@ -142,32 +142,32 @@ static void sc2_update_display(running_machine *machine)
 
 static READ8_DEVICE_HANDLER( pio_port_a_r )
 {
-	sc2_state *state = device->machine->driver_data<sc2_state>();
+	sc2_state *state = device->machine().driver_data<sc2_state>();
 
 	return state->digit_data;
 }
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	sc2_state *state = device->machine->driver_data<sc2_state>();
+	sc2_state *state = device->machine().driver_data<sc2_state>();
 
 	UINT8 data = state->led_selected & 0x0f;
 
 	if ((state->kp_matrix&0x01))
 	{
-		data |= input_port_read(device->machine, "LINE1");
+		data |= input_port_read(device->machine(), "LINE1");
 	}
 	if ((state->kp_matrix&0x02))
 	{
-		data |= input_port_read(device->machine, "LINE2");
+		data |= input_port_read(device->machine(), "LINE2");
 	}
 	if ((state->kp_matrix&0x04))
 	{
-		data |= input_port_read(device->machine, "LINE3");
+		data |= input_port_read(device->machine(), "LINE3");
 	}
 	if ((state->kp_matrix&0x08))
 	{
-		data |= input_port_read(device->machine, "LINE4");
+		data |= input_port_read(device->machine(), "LINE4");
 	}
 
 	return data;
@@ -175,19 +175,19 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	sc2_state *state = device->machine->driver_data<sc2_state>();
+	sc2_state *state = device->machine().driver_data<sc2_state>();
 
 	state->digit_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 {
-	sc2_state *state = device->machine->driver_data<sc2_state>();
+	sc2_state *state = device->machine().driver_data<sc2_state>();
 
 	if (data != 0xf1 && data != 0xf2 && data != 0xf4 && data != 0xf8)
 	{
 		state->led_selected = data;
-		sc2_update_display(device->machine);
+		sc2_update_display(device->machine());
 	}
 	else
 		state->kp_matrix = data;

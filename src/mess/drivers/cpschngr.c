@@ -23,22 +23,22 @@
 static READ16_HANDLER( cps1_dsw_r )
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
-	int in = input_port_read(space->machine, dswname[offset]);
+	int in = input_port_read(space->machine(), dswname[offset]);
 	return (in << 8) | 0xff;
 }
 
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("audiocpu")->base();
+	UINT8 *RAM = space->machine().region("audiocpu")->base();
 	int bankaddr;
 
 	bankaddr = ((data & 1) * 0x4000);
-	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000 + bankaddr]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[0x10000 + bankaddr]);
 }
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
 {
-	okim6295_device *oki6295 = device->machine->device<okim6295_device>("oki");
+	okim6295_device *oki6295 = device->machine().device<okim6295_device>("oki");
 	oki6295->set_pin7((data & 1));
 }
 
@@ -58,10 +58,10 @@ static WRITE16_HANDLER( cps1_coinctrl_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine,0,data & 0x0100);
-		coin_counter_w(space->machine,1,data & 0x0200);
-		coin_lockout_w(space->machine,0,~data & 0x0400);
-		coin_lockout_w(space->machine,1,~data & 0x0800);
+		coin_counter_w(space->machine(),0,data & 0x0100);
+		coin_counter_w(space->machine(),1,data & 0x0200);
+		coin_lockout_w(space->machine(),0,~data & 0x0400);
+		coin_lockout_w(space->machine(),1,~data & 0x0800);
 	}
 }
 
@@ -69,10 +69,10 @@ static WRITE16_HANDLER( cpsq_coinctrl2_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine,2,data & 0x01);
-		coin_lockout_w(space->machine,2,~data & 0x02);
-		coin_counter_w(space->machine,3,data & 0x04);
-		coin_lockout_w(space->machine,3,~data & 0x08);
+		coin_counter_w(space->machine(),2,data & 0x01);
+		coin_lockout_w(space->machine(),2,~data & 0x02);
+		coin_counter_w(space->machine(),3,data & 0x04);
+		coin_lockout_w(space->machine(),3,~data & 0x08);
 	}
 }
 
@@ -97,7 +97,7 @@ static INTERRUPT_GEN( cps1_qsound_interrupt )
 
 static READ16_HANDLER( qsound_rom_r )
 {
-	UINT8 *rom = space->machine->region("user1")->base();
+	UINT8 *rom = space->machine().region("user1")->base();
 
 	if (rom)
 		return rom[offset] | 0xff00;
@@ -107,39 +107,39 @@ static READ16_HANDLER( qsound_rom_r )
 
 static READ16_HANDLER( qsound_sharedram1_r )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	return state->qsound_sharedram1[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( qsound_sharedram1_w )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	if (ACCESSING_BITS_0_7)
 		state->qsound_sharedram1[offset] = data;
 }
 
 static READ16_HANDLER( qsound_sharedram2_r )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	return state->qsound_sharedram2[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( qsound_sharedram2_w )
 {
-	cpschngr_state *state = space->machine->driver_data<cpschngr_state>();
+	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	if (ACCESSING_BITS_0_7)
 		state->qsound_sharedram2[offset] = data;
 }
 
 static WRITE8_HANDLER( qsound_banksw_w )
 {
-	UINT8 *RAM = space->machine->region("audiocpu")->base();
+	UINT8 *RAM = space->machine().region("audiocpu")->base();
 	int bankaddress=0x10000+((data&0x0f)*0x4000);
 
-	if (bankaddress >= space->machine->region("audiocpu")->bytes())
+	if (bankaddress >= space->machine().region("audiocpu")->bytes())
 		bankaddress=0x10000;
 
-	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
 }
 
 
@@ -164,13 +164,13 @@ static const eeprom_interface qsound_eeprom_interface =
 
 static READ16_HANDLER( cps1_eeprom_port_r )
 {
-	device_t *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine().device("eeprom");
 	return eeprom_read_bit(eeprom);
 }
 
 static WRITE16_HANDLER( cps1_eeprom_port_w )
 {
-	device_t *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		/*
@@ -343,7 +343,7 @@ GFXDECODE_END
 
 static void cps1_irq_handler_mus(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

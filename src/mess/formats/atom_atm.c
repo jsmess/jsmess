@@ -26,7 +26,7 @@
 
 static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	void *ptr = image.device().machine->firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(addr);
+	void *ptr = image.device().machine().firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(addr);
 
 	image.fread( ptr, count);
 }
@@ -70,7 +70,7 @@ QUICKLOAD_LOAD( atom_atm )
 
 	image_fread_memory(image, start_address, size);
 
-	cpu_set_reg(image.device().machine->firstcpu, STATE_GENPC, run_address);
+	cpu_set_reg(image.device().machine().firstcpu, STATE_GENPC, run_address);
 
 	return IMAGE_INIT_PASS;
 }

@@ -23,7 +23,7 @@
 		if(VERBOSE>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine->time().as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -33,27 +33,27 @@ PALETTE_INIT( mz700 )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 8);
+	machine.colortable = colortable_alloc(machine, 8);
 
 	for (i = 0; i < 8; i++)
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB((i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB((i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00));
 
 	for (i = 0; i < 256; i++)
 	{
-		colortable_entry_set_value(machine->colortable, i*2, i & 7);
-        	colortable_entry_set_value(machine->colortable, i*2+1, (i >> 4) & 7);
+		colortable_entry_set_value(machine.colortable, i*2, i & 7);
+        	colortable_entry_set_value(machine.colortable, i*2+1, (i >> 4) & 7);
 	}
 }
 
 
 SCREEN_UPDATE( mz700 )
 {
-	mz_state *state = screen->machine->driver_data<mz_state>();
+	mz_state *state = screen->machine().driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
 	int offs;
-	mz_state *mz = screen->machine->driver_data<mz_state>();
+	mz_state *mz = screen->machine().driver_data<mz_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	for(offs = 0; offs < 40*25; offs++)
 	{
@@ -65,7 +65,7 @@ SCREEN_UPDATE( mz700 )
 		color = mz->colorram[offs];
 		code = videoram[offs] | (color & 0x80) << 1;
 
-		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], code, color, 0, 0, sx, sy);
+		drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], code, color, 0, 0, sx, sy);
 	}
 
 	return 0;
@@ -78,17 +78,17 @@ SCREEN_UPDATE( mz700 )
 
 VIDEO_START( mz800 )
 {
-	mz_state *mz = machine->driver_data<mz_state>();
-	gfx_element_set_source(machine->gfx[0], mz->cgram);
+	mz_state *mz = machine.driver_data<mz_state>();
+	gfx_element_set_source(machine.gfx[0], mz->cgram);
 }
 
 SCREEN_UPDATE( mz800 )
 {
-	mz_state *state = screen->machine->driver_data<mz_state>();
+	mz_state *state = screen->machine().driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
-	mz_state *mz = screen->machine->driver_data<mz_state>();
+	mz_state *mz = screen->machine().driver_data<mz_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	if (mz->mz700_mode)
 		return SCREEN_UPDATE_CALL(mz700);
@@ -129,8 +129,8 @@ SCREEN_UPDATE( mz800 )
 
 WRITE8_HANDLER( mz800_cgram_w )
 {
-	mz_state *mz = space->machine->driver_data<mz_state>();
+	mz_state *mz = space->machine().driver_data<mz_state>();
 	mz->cgram[offset] = data;
 
-	gfx_element_mark_dirty(space->machine->gfx[0], offset/8);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
 }

@@ -120,15 +120,15 @@ static int char_to_int_conv( char id )
 ***************************************************************************/
 
 /* Loads the battery backed RAM into the appropriate memory area */
-static void snes_load_sram(running_machine *machine)
+static void snes_load_sram(running_machine &machine)
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
 	battery_ram = (UINT8*)malloc(state->cart[0].sram_max);
 	ptr = battery_ram;
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	image->battery_load(battery_ram, state->cart[0].sram_max, 0xff);
 
 	if (state->cart[0].mode == SNES_MODE_20)
@@ -170,9 +170,9 @@ static void snes_load_sram(running_machine *machine)
 }
 
 /* Saves the battery backed RAM from the appropriate memory area */
-static void snes_save_sram(running_machine *machine)
+static void snes_save_sram(running_machine &machine)
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
@@ -205,7 +205,7 @@ static void snes_save_sram(running_machine *machine)
 			ptr += 0x2000;
 		}
 	}
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	image->battery_save(battery_ram, state->cart[0].sram_max);
 
 	free(battery_ram);
@@ -217,17 +217,17 @@ static void snes_machine_stop(running_machine &machine)
 
 	/* Save SRAM */
 	if (state->cart[0].sram > 0)
-		snes_save_sram(&machine);
+		snes_save_sram(machine);
 }
 
 MACHINE_START( snes_mess )
 {
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, snes_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, snes_machine_stop);
 	MACHINE_START_CALL(snes);
 }
 
 
-static void sufami_load_sram(running_machine *machine, const char *cart_tag)
+static void sufami_load_sram(running_machine &machine, const char *cart_tag)
 {
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
@@ -235,7 +235,7 @@ static void sufami_load_sram(running_machine *machine, const char *cart_tag)
 
 	battery_ram = (UINT8*)malloc(0x20000);
 	ptr = battery_ram;
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device(cart_tag));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device(cart_tag));
 	image->battery_load(battery_ram, 0x20000, 0);
 
 	if (strcmp(cart_tag, "slot_a") == 0)
@@ -290,7 +290,7 @@ static void sufami_machine_stop(running_machine &machine)
 
 MACHINE_START( snesst )
 {
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, sufami_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, sufami_machine_stop);
 	MACHINE_START_CALL(snes);
 }
 
@@ -453,7 +453,7 @@ static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_s
  detect BSX and ST carts) */
 static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 offset, int cartid )
 {
-	snes_state *state = image.device().machine->driver_data<snes_state>();
+	snes_state *state = image.device().machine().driver_data<snes_state>();
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 	UINT32 retvalue;
 
@@ -501,10 +501,10 @@ static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer,
 	return retvalue;
 }
 
-static int snes_find_addon_chip( running_machine *machine )
+static int snes_find_addon_chip( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	snes_state *state = machine.driver_data<snes_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int supported_type = 1;
 	int dsp_prg_offset = 0;
 
@@ -642,9 +642,9 @@ static int snes_find_addon_chip( running_machine *machine )
 
 	if ((state->has_addon_chip >= HAS_DSP1) && (state->has_addon_chip <= HAS_DSP4))
 	{
-		UINT8 *dspsrc = (UINT8 *)machine->region("addons")->base();
-		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
-		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base();
+		UINT8 *dspsrc = (UINT8 *)machine.region("addons")->base();
+		UINT32 *dspprg = (UINT32 *)machine.region("dspprg")->base();
+		UINT16 *dspdata = (UINT16 *)machine.region("dspdata")->base();
 
 		// copy DSP program
 		for (int i = 0; i < 0x2000; i+= 4)
@@ -662,9 +662,9 @@ static int snes_find_addon_chip( running_machine *machine )
 
 	if ((state->has_addon_chip == HAS_ST010) || (state->has_addon_chip == HAS_ST011))
 	{
-		UINT8 *dspsrc = (UINT8 *)machine->region("addons")->base();
-		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
-		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base();
+		UINT8 *dspsrc = (UINT8 *)machine.region("addons")->base();
+		UINT32 *dspprg = (UINT32 *)machine.region("dspprg")->base();
+		UINT16 *dspdata = (UINT16 *)machine.region("dspdata")->base();
 
 		// copy DSP program
 		for (int i = 0; i < 0x10000; i+= 4)
@@ -683,10 +683,10 @@ static int snes_find_addon_chip( running_machine *machine )
 	return supported_type;
 }
 
-static void snes_cart_log_info( running_machine *machine, int total_blocks, int supported )
+static void snes_cart_log_info( running_machine &machine, int total_blocks, int supported )
 {
-	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	snes_state *state = machine.driver_data<snes_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	char title[21], rom_id[4], company_id[2];
 	int i, company, has_ram = 0, has_sram = 0;
 
@@ -761,12 +761,12 @@ static void snes_cart_log_info( running_machine *machine, int total_blocks, int 
 static DEVICE_IMAGE_LOAD( snes_cart )
 {
 	int supported_type = 1, i, j;
-	running_machine *machine = image.device().machine;
-	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM );
+	running_machine &machine = image.device().machine();
+	snes_state *state = machine.driver_data<snes_state>();
+	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	int total_blocks, read_blocks, has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = image.device().machine->region("cart")->base();
+	UINT8 *ROM = image.device().machine().region("cart")->base();
 
 	if (image.software_entry() == NULL)
 		state->cart_size = image.length();
@@ -1144,14 +1144,14 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 static DEVICE_IMAGE_LOAD( sufami_cart )
 {
-	running_machine *machine = image.device().machine;
-	snes_state *state = machine->driver_data<snes_state>();
+	running_machine &machine = image.device().machine();
+	snes_state *state = machine.driver_data<snes_state>();
 	int total_blocks, read_blocks;
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset, st_data_offset = 0;
-	UINT8 *ROM = image.device().machine->region(image.device().tag())->base();
+	UINT8 *ROM = image.device().machine().region(image.device().tag())->base();
 
-	snes_ram = machine->region("maincpu")->base();
+	snes_ram = machine.region("maincpu")->base();
 
 	if (strcmp(image.device().tag(), "slot_a") == 0)
 	{
@@ -1242,19 +1242,19 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 
 	state->cart[slot_id].slot_in_use = 1;	// aknowledge the cart in this slot, for saving sram at exit
 
-	auto_free(image.device().machine, ROM);
+	auto_free(image.device().machine(), ROM);
 
 	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( bsx_cart )
 {
-	running_machine *machine = image.device().machine;
-	snes_state *state = machine->driver_data<snes_state>();
+	running_machine &machine = image.device().machine();
+	snes_state *state = machine.driver_data<snes_state>();
 	int total_blocks, read_blocks;
 	int has_bsx_slot = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = image.device().machine->region("cart")->base();
+	UINT8 *ROM = image.device().machine().region("cart")->base();
 
 	if (image.software_entry() == NULL)
 		state->cart_size = image.length();
@@ -1351,10 +1351,10 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 
 static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 {
-	running_machine *machine = image.device().machine;
-	snes_state *state = machine->driver_data<snes_state>();
+	running_machine &machine = image.device().machine();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = image.device().machine->region("flash")->base();
+	UINT8 *ROM = image.device().machine().region("flash")->base();
 
 	if (image.software_entry() == NULL)
 		state->cart_size = image.length();
@@ -1452,14 +1452,14 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT( snes_mess )
 {
-	snes_ram = machine->region("maincpu")->base();
+	snes_ram = machine.region("maincpu")->base();
 	memset(snes_ram, 0, 0x1000000);
 }
 
 DRIVER_INIT( snesst )
 {
-	snes_state *state = machine->driver_data<snes_state>();
-	UINT8 *STBIOS = machine->region("sufami")->base();
+	snes_state *state = machine.driver_data<snes_state>();
+	UINT8 *STBIOS = machine.region("sufami")->base();
 	int i, j;
 
 	state->cart[0].slot_in_use = 0;

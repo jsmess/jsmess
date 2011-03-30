@@ -30,8 +30,8 @@ public:
 };
 
 
-static void apexc_teletyper_init(running_machine *machine);
-static void apexc_teletyper_putchar(running_machine *machine, int character);
+static void apexc_teletyper_init(running_machine &machine);
+static void apexc_teletyper_putchar(running_machine &machine, int character);
 
 
 static MACHINE_START(apexc)
@@ -66,13 +66,13 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
 	cyl->writable = image.is_writable();
 
-	image.fread( image.device().machine->region("maincpu")->base(), /*0x8000*/0x1000);
+	image.fread( image.device().machine().region("maincpu")->base(), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *) image.device().machine->region("maincpu")->base();
+		RAM = (UINT32 *) image.device().machine().region("maincpu")->base();
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -97,14 +97,14 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) image.device().machine->region("maincpu")->base();
+			RAM = (UINT32 *) image.device().machine().region("maincpu")->base();
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image.fwrite(image.device().machine->region("maincpu")->base(), /*0x8000*/0x1000);
+		image.fwrite(image.device().machine().region("maincpu")->base(), /*0x8000*/0x1000);
 	}
 }
 
@@ -276,7 +276,7 @@ static WRITE8_DEVICE_HANDLER(tape_write)
 	if (image->exists())
 		image->fwrite(& data5, 1);
 
-	apexc_teletyper_putchar(device->machine, data & 0x1f);	/* display on screen */
+	apexc_teletyper_putchar(device->machine(), data & 0x1f);	/* display on screen */
 }
 
 /*
@@ -391,8 +391,8 @@ INPUT_PORTS_END
 */
 static INTERRUPT_GEN( apexc_interrupt )
 {
-	apexc_state *state = device->machine->driver_data<apexc_state>();
-	address_space* space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	apexc_state *state = device->machine().driver_data<apexc_state>();
+	address_space* space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -400,7 +400,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = input_port_read(device->machine, "data");
+	edit_keys = input_port_read(device->machine(), "data");
 
 	/* toggle data reg according to transitions */
 	state->panel_data_reg ^= edit_keys & (~state->old_edit_keys);
@@ -410,7 +410,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine, "panel");
+	control_keys = input_port_read(device->machine(), "panel");
 
 	/* compute transitions */
 	control_transitions = control_keys & (~state->old_control_keys);
@@ -551,13 +551,13 @@ static PALETTE_INIT( apexc )
 
 static VIDEO_START( apexc )
 {
-	apexc_state *state = machine->driver_data<apexc_state>();
-	screen_device *screen = machine->first_screen();
+	apexc_state *state = machine.driver_data<apexc_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
 	state->bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(state->bitmap, &/*machine->visible_area*/teletyper_window, 0);
+	bitmap_fill(state->bitmap, &/*machine.visible_area*/teletyper_window, 0);
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
@@ -571,14 +571,14 @@ static void apexc_draw_led(bitmap_t *bitmap, int x, int y, int state)
 }
 
 /* write a single char on screen */
-static void apexc_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
+static void apexc_draw_char(running_machine &machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx_transpen(bitmap, NULL, machine->gfx[0], character-32, color, 0, 0,
+	drawgfx_transpen(bitmap, NULL, machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
 /* write a string on screen */
-static void apexc_draw_string(running_machine *machine, bitmap_t *bitmap, const char *buf, int x, int y, int color)
+static void apexc_draw_string(running_machine &machine, bitmap_t *bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -592,60 +592,60 @@ static void apexc_draw_string(running_machine *machine, bitmap_t *bitmap, const 
 
 static SCREEN_UPDATE( apexc )
 {
-	apexc_state *state = screen->machine->driver_data<apexc_state>();
+	apexc_state *state = screen->machine().driver_data<apexc_state>();
 	int i;
 	char the_char;
 
-	bitmap_fill(bitmap, &/*machine->visible_area*/panel_window, 0);
-	apexc_draw_string(screen->machine, bitmap, "power", 8, 0, 0);
-	apexc_draw_string(screen->machine, bitmap, "running", 8, 8, 0);
-	apexc_draw_string(screen->machine, bitmap, "data :", 0, 24, 0);
+	bitmap_fill(bitmap, &/*machine.visible_area*/panel_window, 0);
+	apexc_draw_string(screen->machine(), bitmap, "power", 8, 0, 0);
+	apexc_draw_string(screen->machine(), bitmap, "running", 8, 8, 0);
+	apexc_draw_string(screen->machine(), bitmap, "data :", 0, 24, 0);
 
 	copybitmap(bitmap, state->bitmap, 0, 0, 0, 0, &teletyper_window);
 
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(screen->machine->device("maincpu"), APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(screen->machine().device("maincpu"), APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{
 		apexc_draw_led(bitmap, i*8, 32, (state->panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
-		apexc_draw_char(screen->machine, bitmap, the_char, i*8, 40, 0);
+		apexc_draw_char(screen->machine(), bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
 		{
 			the_char = '0' + ((i + 1) / 10);
-			apexc_draw_char(screen->machine, bitmap, the_char, i*8, 48, 0);
+			apexc_draw_char(screen->machine(), bitmap, the_char, i*8, 48, 0);
 		}
 	}
 	return 0;
 }
 
-static void apexc_teletyper_init(running_machine *machine)
+static void apexc_teletyper_init(running_machine &machine)
 {
-	apexc_state *state = machine->driver_data<apexc_state>();
+	apexc_state *state = machine.driver_data<apexc_state>();
 
 	state->letters = FALSE;
 	state->pos = 0;
 }
 
-static void apexc_teletyper_linefeed(running_machine *machine)
+static void apexc_teletyper_linefeed(running_machine &machine)
 {
-	apexc_state *state = machine->driver_data<apexc_state>();
+	apexc_state *state = machine.driver_data<apexc_state>();
 	UINT8 buf[teletyper_window_width];
 	int y;
 
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
 	{
 		extract_scanline8(state->bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
-		draw_scanline8(state->bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine->pens);
+		draw_scanline8(state->bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine.pens);
 	}
 
 	bitmap_fill(state->bitmap, &teletyper_scroll_clear_window, 0);
 }
 
-static void apexc_teletyper_putchar(running_machine *machine, int character)
+static void apexc_teletyper_putchar(running_machine &machine, int character)
 {
 	static const char ascii_table[2][32] =
 	{
@@ -671,7 +671,7 @@ static void apexc_teletyper_putchar(running_machine *machine, int character)
 		}
 	};
 
-	apexc_state *state = machine->driver_data<apexc_state>();
+	apexc_state *state = machine.driver_data<apexc_state>();
 	char buffer[2] = "x";
 
 	character &= 0x1f;
@@ -822,7 +822,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = machine->region("gfx1")->base();
+	dst = machine.region("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }

@@ -28,22 +28,22 @@
 static const UINT8 laser_fdc_wrprot[2] = {0x80, 0x80};
 
 /* write to banked memory (handle memory mapped i/o and videoram) */
-static void mwa_bank(running_machine *machine, int bank, int offs, int data);
+static void mwa_bank(running_machine &machine, int bank, int offs, int data);
 
 /* wrappers for bank #1 to #4 */
-static WRITE8_HANDLER ( mwa_bank1 ) { mwa_bank(space->machine, 0,offset,data); }
-static WRITE8_HANDLER ( mwa_bank2 ) { mwa_bank(space->machine, 1,offset,data); }
-static WRITE8_HANDLER ( mwa_bank3 ) { mwa_bank(space->machine, 2,offset,data); }
-static WRITE8_HANDLER ( mwa_bank4 ) { mwa_bank(space->machine, 3,offset,data); }
+static WRITE8_HANDLER ( mwa_bank1 ) { mwa_bank(space->machine(), 0,offset,data); }
+static WRITE8_HANDLER ( mwa_bank2 ) { mwa_bank(space->machine(), 1,offset,data); }
+static WRITE8_HANDLER ( mwa_bank3 ) { mwa_bank(space->machine(), 2,offset,data); }
+static WRITE8_HANDLER ( mwa_bank4 ) { mwa_bank(space->machine(), 3,offset,data); }
 
 /* read from banked memory (handle memory mapped i/o) */
-static int mra_bank(running_machine *machine, int bank, int offs);
+static int mra_bank(running_machine &machine, int bank, int offs);
 
 /* wrappers for bank #1 to #4 */
-static READ8_HANDLER ( mra_bank1 ) { return mra_bank(space->machine,0,offset); }
-static READ8_HANDLER ( mra_bank2 ) { return mra_bank(space->machine,1,offset); }
-static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space->machine,2,offset); }
-static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space->machine,3,offset); }
+static READ8_HANDLER ( mra_bank1 ) { return mra_bank(space->machine(),0,offset); }
+static READ8_HANDLER ( mra_bank2 ) { return mra_bank(space->machine(),1,offset); }
+static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space->machine(),2,offset); }
+static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space->machine(),3,offset); }
 
 /* read banked memory (handle memory mapped i/o) */
 static const read8_space_func mra_bank_soft[4] =
@@ -83,8 +83,8 @@ static const char *const mwa_bank_hard[4] =
 
 DRIVER_INIT(laser)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
-	UINT8 *gfx = machine->region("gfx2")->base();
+	vtech2_state *state = machine.driver_data<vtech2_state>();
+	UINT8 *gfx = machine.region("gfx2")->base();
 	int i;
 
 	state->laser_track_x2[0] = state->laser_track_x2[1] = 80;
@@ -95,7 +95,7 @@ DRIVER_INIT(laser)
 		gfx[i] = i;
 
 	state->laser_latch = -1;
-	state->mem = machine->region("maincpu")->base();
+	state->mem = machine.region("maincpu")->base();
 
 	for (i = 0; i < ARRAY_LENGTH(state->laser_bank); i++)
 		state->laser_bank[i] = -1;
@@ -103,9 +103,9 @@ DRIVER_INIT(laser)
 
 
 
-static void laser_machine_init(running_machine *machine, int bank_mask, int video_mask)
+static void laser_machine_init(running_machine &machine, int bank_mask, int video_mask)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
+	vtech2_state *state = machine.driver_data<vtech2_state>();
     int i;
 
 	state->laser_bank_mask = bank_mask;
@@ -114,7 +114,7 @@ static void laser_machine_init(running_machine *machine, int bank_mask, int vide
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", state->laser_bank_mask, state->laser_video_bank, state->laser_video_bank * 0x04000);
 
 	for (i = 0; i < ARRAY_LENGTH(state->laser_bank); i++)
-		laser_bank_select_w(machine->device("maincpu")->memory().space(AS_PROGRAM), i, 0);
+		laser_bank_select_w(machine.device("maincpu")->memory().space(AS_PROGRAM), i, 0);
 }
 
 MACHINE_RESET( laser350 )
@@ -138,7 +138,7 @@ MACHINE_RESET( laser700 )
 
 WRITE8_HANDLER( laser_bank_select_w )
 {
-	vtech2_state *state = space->machine->driver_data<vtech2_state>();
+	vtech2_state *state = space->machine().driver_data<vtech2_state>();
     static const char *const bank_name[16] = {
         "ROM lo","ROM hi","MM I/O","Video RAM lo",
         "RAM #0","RAM #1","RAM #2","RAM #3",
@@ -157,13 +157,13 @@ WRITE8_HANDLER( laser_bank_select_w )
         /* memory mapped I/O bank selected? */
 		if (data == 2)
 		{
-			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mra_bank_soft[offset]));
-			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mwa_bank_soft[offset]));
+			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mra_bank_soft[offset]));
+			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mwa_bank_soft[offset]));
 		}
 		else
 		{
 			sprintf(bank,"bank%d",offset+1);
-			memory_set_bankptr(space->machine, bank, &state->mem[0x4000*state->laser_bank[offset]]);
+			memory_set_bankptr(space->machine(), bank, &state->mem[0x4000*state->laser_bank[offset]]);
 			if( state->laser_bank_mask & (1 << data) )
 			{
 				/* video RAM bank selected? */
@@ -171,23 +171,23 @@ WRITE8_HANDLER( laser_bank_select_w )
 				{
 					logerror("select bank #%d VIDEO!\n", offset+1);
 				}
-				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
-				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
+				space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
+				space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
 
 			}
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
-				space->machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
+				space->machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
 
 			}
 		}
     }
 }
 
-static device_t *vtech2_cassette_image(running_machine *machine)
+static device_t *vtech2_cassette_image(running_machine &machine)
 {
-	return machine->device("cassette");
+	return machine.device("cassette");
 }
 
 /*************************************************
@@ -202,9 +202,9 @@ static device_t *vtech2_cassette_image(running_machine *machine)
  * 1    column 1
  * 0    column 0
  ************************************************/
-static int mra_bank(running_machine *machine, int bank, int offs)
+static int mra_bank(running_machine &machine, int bank, int offs)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
+	vtech2_state *state = machine.driver_data<vtech2_state>();
     int level, data = 0xff;
 
     /* Laser 500/700 only: keyboard rows A through D */
@@ -289,10 +289,10 @@ static int mra_bank(running_machine *machine, int bank, int offs)
  * 1    cassette out (LSB)
  * 0    speaker A
  ************************************************/
-static void mwa_bank(running_machine *machine, int bank, int offs, int data)
+static void mwa_bank(running_machine &machine, int bank, int offs, int data)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
-	device_t *speaker = machine->device("speaker");
+	vtech2_state *state = machine.driver_data<vtech2_state>();
+	device_t *speaker = machine.device("speaker");
 	offs += 0x4000 * state->laser_bank[bank];
     switch (state->laser_bank[bank])
     {
@@ -328,7 +328,7 @@ static void mwa_bank(running_machine *machine, int bank, int offs, int data)
 
 DEVICE_IMAGE_LOAD( laser_cart )
 {
-	vtech2_state *state = image.device().machine->driver_data<vtech2_state>();
+	vtech2_state *state = image.device().machine().driver_data<vtech2_state>();
 	int size = 0;
 
 	size = image.fread(&state->mem[0x30000], 0x10000);
@@ -347,21 +347,21 @@ DEVICE_IMAGE_LOAD( laser_cart )
 
 DEVICE_IMAGE_UNLOAD( laser_cart )
 {
-	vtech2_state *state = image.device().machine->driver_data<vtech2_state>();
+	vtech2_state *state = image.device().machine().driver_data<vtech2_state>();
 	state->laser_bank_mask &= ~0xf000;
 	/* wipe out the memory contents to be 100% sure */
 	memset(&state->mem[0x30000], 0xff, 0x10000);
 }
 
-static device_t *laser_file(running_machine *machine)
+static device_t *laser_file(running_machine &machine)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
-	return machine->device( state->laser_drive ? FLOPPY_1 : FLOPPY_0 );
+	vtech2_state *state = machine.driver_data<vtech2_state>();
+	return machine.device( state->laser_drive ? FLOPPY_1 : FLOPPY_0 );
 }
 
-static void laser_get_track(running_machine *machine)
+static void laser_get_track(running_machine &machine)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
+	vtech2_state *state = machine.driver_data<vtech2_state>();
     sprintf(state->laser_frame_message, "#%d get track %02d", state->laser_drive, state->laser_track_x2[state->laser_drive]/2);
     state->laser_frame_time = 30;
     /* drive selected or and image file ok? */
@@ -379,9 +379,9 @@ static void laser_get_track(running_machine *machine)
     state->laser_fdc_write = 0;
 }
 
-static void laser_put_track(running_machine *machine)
+static void laser_put_track(running_machine &machine)
 {
-	vtech2_state *state = machine->driver_data<vtech2_state>();
+	vtech2_state *state = machine.driver_data<vtech2_state>();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine));
     /* drive selected and image file ok? */
     if( state->laser_drive >= 0 && laser_file(machine) != NULL )
@@ -401,7 +401,7 @@ static void laser_put_track(running_machine *machine)
 
  READ8_HANDLER( laser_fdc_r )
 {
-	vtech2_state *state = space->machine->driver_data<vtech2_state>();
+	vtech2_state *state = space->machine().driver_data<vtech2_state>();
     int data = 0xff;
     switch( offset )
     {
@@ -446,7 +446,7 @@ static void laser_put_track(running_machine *machine)
 
 WRITE8_HANDLER( laser_fdc_w )
 {
-	vtech2_state *state = space->machine->driver_data<vtech2_state>();
+	vtech2_state *state = space->machine().driver_data<vtech2_state>();
     int drive;
 
     switch( offset )
@@ -457,7 +457,7 @@ WRITE8_HANDLER( laser_fdc_w )
         {
             state->laser_drive = drive;
             if( state->laser_drive >= 0 )
-                laser_get_track(space->machine);
+                laser_get_track(space->machine());
         }
         if( state->laser_drive >= 0 )
         {
@@ -470,7 +470,7 @@ WRITE8_HANDLER( laser_fdc_w )
                     state->laser_track_x2[state->laser_drive]--;
                 logerror("laser_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, state->laser_drive, state->laser_track_x2[state->laser_drive]/2,5*(state->laser_track_x2[state->laser_drive]&1));
                 if( (state->laser_track_x2[state->laser_drive] & 1) == 0 )
-                    laser_get_track(space->machine);
+                    laser_get_track(space->machine());
             }
             else
             if( (PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(state->laser_fdc_latch)) ||
@@ -482,7 +482,7 @@ WRITE8_HANDLER( laser_fdc_w )
                     state->laser_track_x2[state->laser_drive]++;
                 logerror("laser_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, state->laser_drive, state->laser_track_x2[state->laser_drive]/2,5*(state->laser_track_x2[state->laser_drive]&1));
                 if( (state->laser_track_x2[state->laser_drive] & 1) == 0 )
-                    laser_get_track(space->machine);
+                    laser_get_track(space->machine());
             }
             if( (data & 0x40) == 0 )
             {
@@ -526,7 +526,7 @@ WRITE8_HANDLER( laser_fdc_w )
                 {
                     /* data written to track before? */
                     if( state->laser_fdc_write )
-                        laser_put_track(space->machine);
+                        laser_put_track(space->machine());
                 }
                 state->laser_fdc_bits = 8;
                 state->laser_fdc_write = 0;

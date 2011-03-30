@@ -1402,7 +1402,7 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int sx;
 
 	for (sx = 0; sx < upd7220->pitch * 2; sx++)
@@ -1541,13 +1541,13 @@ static DEVICE_START( upd7220 )
 	upd7220->draw_text_func = intf->draw_text_func;
 
 	/* get the screen device */
-	upd7220->screen = device->machine->device<screen_device>(intf->screen_tag);
+	upd7220->screen = device->machine().device<screen_device>(intf->screen_tag);
 	assert(upd7220->screen != NULL);
 
 	/* create the timers */
-	upd7220->vsync_timer = device->machine->scheduler().timer_alloc(FUNC(vsync_tick), (void *)device);
-	upd7220->hsync_timer = device->machine->scheduler().timer_alloc(FUNC(hsync_tick), (void *)device);
-	upd7220->blank_timer = device->machine->scheduler().timer_alloc(FUNC(blank_tick), (void *)device);
+	upd7220->vsync_timer = device->machine().scheduler().timer_alloc(FUNC(vsync_tick), (void *)device);
+	upd7220->hsync_timer = device->machine().scheduler().timer_alloc(FUNC(hsync_tick), (void *)device);
+	upd7220->blank_timer = device->machine().scheduler().timer_alloc(FUNC(blank_tick), (void *)device);
 
 	/* set initial values */
 	upd7220->fifo_ptr = -1;

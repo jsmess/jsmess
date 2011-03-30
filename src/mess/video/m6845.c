@@ -420,7 +420,7 @@ void m6845_frameclock(void)
 }
 
 /* clock the 6845 */
-void m6845_clock(running_machine *machine)
+void m6845_clock(running_machine &machine)
 {
 	/* KT - I think the compiler might generate bogus code when using "%" operator! */
 	/*crtc.Memory_Address=(crtc.Memory_Address+1)%0x4000;*/
@@ -829,7 +829,7 @@ static void m6845_set_new_vsync_set_time(int cycles)
 
 	m6845_remove_vsync_set_timer();
 
-	//crtc.vsync_set_timer = machine->scheduler().timer_alloc(FUNC(m6845_vsync_set_timer_callback));
+	//crtc.vsync_set_timer = machine.scheduler().timer_alloc(FUNC(m6845_vsync_set_timer_callback));
 	if (crtc_cycles_to_vsync_start!=-1)
 	{
 		crtc.vsync_set_timer->adjust(attotime::from_usec(crtc_cycles_to_vsync_start));
@@ -846,7 +846,7 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 	/* get number of cycles to end of vsync */
 	crtc_cycles_to_vsync_end = cycles;
 
-	//crtc.vsync_clear_timer = machine->scheduler().timer_alloc(FUNC(m6845_vsync_clear_timer_callback));
+	//crtc.vsync_clear_timer = machine.scheduler().timer_alloc(FUNC(m6845_vsync_clear_timer_callback));
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
 		crtc.vsync_clear_timer->adjust(attotime::from_usec(crtc_cycles_to_vsync_end));

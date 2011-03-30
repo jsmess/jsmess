@@ -616,7 +616,7 @@ static const cassette_config super80_cassette_config =
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
-	image.fread( image.device().machine->region("maincpu")->base() + 0xc000, 0x3000);
+	image.fread( image.device().machine().region("maincpu")->base() + 0xc000, 0x3000);
 
 	return IMAGE_INIT_PASS;
 }

@@ -45,7 +45,7 @@ static WRITE16_HANDLER( suna16_soundlatch_w )
 	{
 		soundlatch_w( space, 0, data & 0xff );
 	}
-	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
+	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -53,13 +53,13 @@ static WRITE16_HANDLER( bssoccer_leds_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(space->machine, 0, data & 0x01);
-		set_led_status(space->machine, 1, data & 0x02);
-		set_led_status(space->machine, 2, data & 0x04);
-		set_led_status(space->machine, 3, data & 0x08);
-		coin_counter_w(space->machine, 0, data & 0x10);
+		set_led_status(space->machine(), 0, data & 0x01);
+		set_led_status(space->machine(), 1, data & 0x02);
+		set_led_status(space->machine(), 2, data & 0x04);
+		set_led_status(space->machine(), 3, data & 0x08);
+		coin_counter_w(space->machine(), 0, data & 0x10);
 	}
-	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
+	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -67,11 +67,11 @@ static WRITE16_HANDLER( uballoon_leds_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 0x01);
-		set_led_status(space->machine, 0, data & 0x02);
-		set_led_status(space->machine, 1, data & 0x04);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		set_led_status(space->machine(), 0, data & 0x02);
+		set_led_status(space->machine(), 1, data & 0x04);
 	}
-	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
+	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -79,9 +79,9 @@ static WRITE16_HANDLER( bestbest_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 0x04);
+		coin_counter_w(space->machine(), 0, data & 0x04);
 	}
-	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
+	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -148,7 +148,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( bestbest_prot_r )
 {
-	suna16_state *state = space->machine->driver_data<suna16_state>();
+	suna16_state *state = space->machine().driver_data<suna16_state>();
 
 	return state->prot;
 }
@@ -157,14 +157,14 @@ static WRITE16_HANDLER( bestbest_prot_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		suna16_state *state = space->machine->driver_data<suna16_state>();
+		suna16_state *state = space->machine().driver_data<suna16_state>();
 
 		switch (data & 0xff)
 		{
 			case 0x00:	state->prot = state->prot ^ 0x0009;	break;
 			case 0x08:	state->prot = state->prot ^ 0x0002;	break;
 			case 0x0c:	state->prot = state->prot ^ 0x0003;	break;
-			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(space->cpu), data);
+			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(&space->device()), data);
 		}
 	}
 }
@@ -263,18 +263,18 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("pcm1")->base();
+	UINT8 *RAM = space->machine().region("pcm1")->base();
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x10000 + 0x1000]);
+	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space->device()), data);
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bank * 0x10000 + 0x1000]);
 }
 
 static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("pcm2")->base();
+	UINT8 *RAM = space->machine().region("pcm2")->base();
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(space->machine, "bank2", &RAM[bank * 0x10000 + 0x1000]);
+	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space->device()), data);
+	memory_set_bankptr(space->machine(), "bank2", &RAM[bank * 0x10000 + 0x1000]);
 }
 
 
@@ -325,10 +325,10 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("pcm1")->base();
+	UINT8 *RAM = space->machine().region("pcm1")->base();
 	int bank = data & 1;
-	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x10000 + 0x400]);
+	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space->device()), data);
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bank * 0x10000 + 0x400]);
 }
 
 /* Memory maps: Yes, *no* RAM */
@@ -348,7 +348,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(uballoon)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);
 }
 
@@ -913,7 +913,7 @@ MACHINE_CONFIG_END
 
 static void bestbest_ym3526_irqhandler(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface bestbest_ym3526_interface =
@@ -1095,7 +1095,7 @@ ROM_END
 
 static DRIVER_INIT( uballoon )
 {
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
 
 	// Patch out the protection checks
 	RAM[0x0113c/2] = 0x4e71;	// bne $646

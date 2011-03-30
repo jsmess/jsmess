@@ -153,10 +153,10 @@ WRITE8_DEVICE_HANDLER ( uPD7002_w )
 		if (uPD7002->status & 0x08)
 		{
 			// 12 bit conversion takes 10ms
-			device->machine->scheduler().timer_set(attotime::from_msec(10), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
+			device->machine().scheduler().timer_set(attotime::from_msec(10), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
 		} else {
 			// 8 bit conversion takes 4ms
-			device->machine->scheduler().timer_set(attotime::from_msec(4), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
+			device->machine().scheduler().timer_set(attotime::from_msec(4), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
 		}
 		break;
 
@@ -192,11 +192,11 @@ static DEVICE_START( uPD7002 )
 	uPD7002->conversion_counter = 0;
 
 	// register for state saving
-	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->status);
-	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->data1);
-	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->data0);
-	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->digitalvalue);
-	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->conversion_counter);
+	state_save_register_item(device->machine(), "uPD7002", device->tag(), 0, uPD7002->status);
+	state_save_register_item(device->machine(), "uPD7002", device->tag(), 0, uPD7002->data1);
+	state_save_register_item(device->machine(), "uPD7002", device->tag(), 0, uPD7002->data0);
+	state_save_register_item(device->machine(), "uPD7002", device->tag(), 0, uPD7002->digitalvalue);
+	state_save_register_item(device->machine(), "uPD7002", device->tag(), 0, uPD7002->conversion_counter);
 }
 
 static DEVICE_RESET( uPD7002 )

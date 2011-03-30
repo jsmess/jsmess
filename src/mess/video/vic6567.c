@@ -175,7 +175,7 @@ struct _vic2_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", machine->time().as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", machine.time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -283,7 +283,7 @@ INLINE const vic2_interface *get_interface( device_t *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-static void vic2_set_interrupt( running_machine *machine, int mask, vic2_state *vic2 )
+static void vic2_set_interrupt( running_machine &machine, int mask, vic2_state *vic2 )
 {
 	if (((vic2->reg[0x19] ^ mask) & vic2->reg[0x1a] & 0xf))
 	{
@@ -297,7 +297,7 @@ static void vic2_set_interrupt( running_machine *machine, int mask, vic2_state *
 	vic2->reg[0x19] |= mask;
 }
 
-static void vic2_clear_interrupt( running_machine *machine, int mask, vic2_state *vic2 )
+static void vic2_clear_interrupt( running_machine &machine, int mask, vic2_state *vic2 )
 {
 	vic2->reg[0x19] &= ~mask;
 	if ((vic2->reg[0x19] & 0x80) && !(vic2->reg[0x19] & vic2->reg[0x1a] & 0xf))
@@ -338,19 +338,19 @@ static TIMER_CALLBACK( vic2_timer_timeout )
 // modified VIC II emulation by Christian Bauer starts here...
 
 // Idle access
-INLINE void vic2_idle_access( running_machine *machine, vic2_state *vic2 )
+INLINE void vic2_idle_access( running_machine &machine, vic2_state *vic2 )
 {
 	vic2->dma_read(machine, 0x3fff);
 }
 
 // Fetch sprite data pointer
-INLINE void vic2_spr_ptr_access( running_machine *machine, vic2_state *vic2, int num )
+INLINE void vic2_spr_ptr_access( running_machine &machine, vic2_state *vic2, int num )
 {
 	vic2->spr_ptr[num] = vic2->dma_read(machine, SPRITE_ADDR(num)) << 6;
 }
 
 // Fetch sprite data, increment data counter
-INLINE void vic2_spr_data_access( running_machine *machine, vic2_state *vic2, int num, int bytenum )
+INLINE void vic2_spr_data_access( running_machine &machine, vic2_state *vic2, int num, int bytenum )
 {
 	if (vic2->spr_dma_on & (1 << num))
 	{
@@ -370,34 +370,34 @@ INLINE void vic2_display_if_bad_line( vic2_state *vic2 )
 }
 
 // Suspend CPU
-INLINE void vic2_suspend_cpu( running_machine *machine, vic2_state *vic2 )
+INLINE void vic2_suspend_cpu( running_machine &machine, vic2_state *vic2 )
 {
 	if (vic2->device_suspended == 0)
 	{
 		vic2->first_ba_cycle = vic2->cycles_counter;
 		if ((vic2->rdy_workaround_cb != NULL) && (vic2->rdy_workaround_cb(machine) != 7 ))
 		{
-//          device_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0);
+//          device_suspend(machine.firstcpu, SUSPEND_REASON_SPIN, 0);
 		}
 		vic2->device_suspended = 1;
 	}
 }
 
 // Resume CPU
-INLINE void vic2_resume_cpu( running_machine *machine, vic2_state *vic2 )
+INLINE void vic2_resume_cpu( running_machine &machine, vic2_state *vic2 )
 {
 	if (vic2->device_suspended == 1)
 	{
 		if ((vic2->rdy_workaround_cb != NULL))
 		{
-//  device_resume(machine->firstcpu, SUSPEND_REASON_SPIN);
+//  device_resume(machine.firstcpu, SUSPEND_REASON_SPIN);
 		}
 		vic2->device_suspended = 0;
 	}
 }
 
 // Refresh access
-INLINE void vic2_refresh_access( running_machine *machine, vic2_state *vic2 )
+INLINE void vic2_refresh_access( running_machine &machine, vic2_state *vic2 )
 {
 	vic2->dma_read(machine, 0x3f00 | vic2->ref_cnt--);
 }
@@ -449,7 +449,7 @@ INLINE void vic2_check_sprite_dma( vic2_state *vic2 )
 }
 
 // Video matrix access
-INLINE void vic2_matrix_access( running_machine *machine, vic2_state *vic2 )
+INLINE void vic2_matrix_access( running_machine &machine, vic2_state *vic2 )
 {
 //  if (vic2->device_suspended == 1)
 	{
@@ -465,7 +465,7 @@ INLINE void vic2_matrix_access( running_machine *machine, vic2_state *vic2 )
 }
 
 // Graphics data access
-INLINE void vic2_graphics_access( running_machine *machine, vic2_state *vic2 )
+INLINE void vic2_graphics_access( running_machine &machine, vic2_state *vic2 )
 {
 	if (vic2->display_state == 1)
 	{
@@ -699,7 +699,7 @@ static void vic2_draw_graphics( vic2_state *vic2 )
 	}
 }
 
-static void vic2_draw_sprites( running_machine *machine, vic2_state *vic2 )
+static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 {
 	int i;
 	UINT8 snum, sbit;
@@ -1000,7 +1000,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 	UINT8 mask;
 	//static int adjust[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	UINT8 cpu_cycles = machine->device<cpu_device>("maincpu")->total_cycles() & 0xff;
+	UINT8 cpu_cycles = machine.device<cpu_device>("maincpu")->total_cycles() & 0xff;
 	UINT8 vic_cycles = (vic2->cycles_counter + 1) & 0xff;
 	vic2->cycles_counter++;
 
@@ -1046,7 +1046,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 //          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer start */
-				machine->scheduler().timer_set(attotime(0, 0), FUNC(vic2_timer_timeout), 1, vic2);
+				machine.scheduler().timer_set(attotime(0, 0), FUNC(vic2_timer_timeout), 1, vic2);
 			}
 		}
 		else
@@ -1610,12 +1610,12 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 
 	if ((cpu_cycles == vic_cycles) && (vic2->rdy_cycles > 0))
 	{
-		device_spin_until_time (machine->firstcpu, machine->device<cpu_device>("maincpu")->cycles_to_attotime(vic2->rdy_cycles));
+		device_spin_until_time (machine.firstcpu, machine.device<cpu_device>("maincpu")->cycles_to_attotime(vic2->rdy_cycles));
 		vic2->rdy_cycles = 0;
 	}
 
 	vic2->raster_x += 8;
-	machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(pal_timer_callback), 0, vic2);
+	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(pal_timer_callback), 0, vic2);
 }
 
 static TIMER_CALLBACK( ntsc_timer_callback )
@@ -1637,7 +1637,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 //          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer starten */
-				machine->scheduler().timer_set(attotime(0, 0), FUNC(vic2_timer_timeout), 1, vic2);
+				machine.scheduler().timer_set(attotime(0, 0), FUNC(vic2_timer_timeout), 1, vic2);
 			}
 		}
 		else
@@ -2194,7 +2194,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 	}
 
 	vic2->raster_x += 8;
-	machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(ntsc_timer_callback), 0, vic2);
+	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(ntsc_timer_callback), 0, vic2);
 }
 
 
@@ -2230,7 +2230,7 @@ int vic2e_k2_r( device_t *device )
 WRITE8_DEVICE_HANDLER( vic2_port_w )
 {
 	vic2_state *vic2 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
@@ -2455,7 +2455,7 @@ WRITE8_DEVICE_HANDLER( vic2_port_w )
 READ8_DEVICE_HANDLER( vic2_port_r )
 {
 	vic2_state *vic2 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int val = 0;
 
 	offset &= 0x3f;
@@ -2601,13 +2601,13 @@ static DEVICE_START( vic2 )
 	int width, height;
 	int i;
 
-	vic2->cpu = device->machine->device(intf->cpu);
+	vic2->cpu = device->machine().device(intf->cpu);
 
-	vic2->screen = device->machine->device<screen_device>(intf->screen);
+	vic2->screen = device->machine().device<screen_device>(intf->screen);
 	width = vic2->screen->width();
 	height = vic2->screen->height();
 
-	vic2->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+	vic2->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
 
 	vic2->type = intf->type;
 
@@ -2623,9 +2623,9 @@ static DEVICE_START( vic2 )
 
 	// immediately call the timer to handle the first line
 	if (vic2->type == VIC6569 || vic2->type == VIC8566)
-		device->machine->scheduler().timer_set(downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), FUNC(pal_timer_callback), 0, vic2);
+		device->machine().scheduler().timer_set(downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), FUNC(pal_timer_callback), 0, vic2);
 	else
-		device->machine->scheduler().timer_set(downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), FUNC(ntsc_timer_callback), 0, vic2);
+		device->machine().scheduler().timer_set(downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), FUNC(ntsc_timer_callback), 0, vic2);
 
 	for (i = 0; i < 256; i++)
 	{

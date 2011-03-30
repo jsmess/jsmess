@@ -100,13 +100,13 @@ static const mips3_config config =
 
 static INTERRUPT_GEN( n64_vblank )
 {
-	signal_rcp_interrupt(device->machine, VI_INTERRUPT);
+	signal_rcp_interrupt(device->machine(), VI_INTERRUPT);
 }
 
 static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
-	UINT8 *cart = image.device().machine->region("user2")->base();
+	UINT8 *cart = image.device().machine().region("user2")->base();
 
 	if (image.software_entry() == NULL)
 	{

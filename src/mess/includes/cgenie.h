@@ -108,7 +108,7 @@ WRITE8_HANDLER ( cgenie_data_w );
 WRITE8_HANDLER ( cgenie_motor_w );
 
  READ8_HANDLER ( cgenie_keyboard_r );
-int cgenie_videoram_r(running_machine *machine,int offset);
+int cgenie_videoram_r(running_machine &machine,int offset);
 WRITE8_HANDLER ( cgenie_videoram_w );
 
 
@@ -123,8 +123,8 @@ READ8_HANDLER ( cgenie_register_r );
 WRITE8_HANDLER ( cgenie_index_w );
 WRITE8_HANDLER ( cgenie_register_w );
 
-int cgenie_get_register(running_machine *machine, int indx);
-void cgenie_mode_select(running_machine *machine, int graphics);
+int cgenie_get_register(running_machine &machine, int indx);
+void cgenie_mode_select(running_machine &machine, int graphics);
 
 
 #endif /* CGENIE_H_ */

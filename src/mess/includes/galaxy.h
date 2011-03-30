@@ -45,6 +45,6 @@ DRIVER_INIT( galaxyp );
 VIDEO_START( galaxy );
 SCREEN_UPDATE( galaxy );
 
-void galaxy_set_timer(running_machine *machine);
+void galaxy_set_timer(running_machine &machine);
 
 #endif /* GALAXY_H_ */

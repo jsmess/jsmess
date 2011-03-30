@@ -237,8 +237,8 @@ static DEVICE_START( ti99_video )
 	ti99_video_state *video = get_safe_token(device);
 	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
 
-	video->cpu = device->machine->device("maincpu");
-	video->space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	video->cpu = device->machine().device("maincpu");
+	video->space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (conf->chip==TI_TMS991X)
 	{
@@ -246,7 +246,7 @@ static DEVICE_START( ti99_video )
 	}
 	else
 	{
-		running_machine *machine = device->machine;
+		running_machine &machine = device->machine();
 		VIDEO_START_CALL(generic_bitmapped);
 	}
 }
@@ -264,10 +264,10 @@ static DEVICE_RESET( ti99_video )
 	}
 	else
 	{
-		running_machine *machine = device->machine;
+		running_machine &machine = device->machine();
 		int memsize = (input_port_read(machine, "V9938-MEM")==0)? 0x20000 : 0x30000;
 
-		v9938_init(machine, 0, *machine->primary_screen, machine->generic.tmpbitmap,
+		v9938_init(machine, 0, *machine.primary_screen, machine.generic.tmpbitmap,
 			MODEL_V9938, memsize, conf->callback);
 		v9938_reset(0);
 	}

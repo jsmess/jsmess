@@ -88,7 +88,7 @@ device_config *isa8_fdc_device_config::static_alloc_device_config(const machine_
  
 device_t *isa8_fdc_device_config::alloc_device(running_machine &machine) const
 {
-        return auto_alloc(&machine, isa8_fdc_device(machine, *this));
+        return auto_alloc(machine, isa8_fdc_device(machine, *this));
 }
  
 //-------------------------------------------------
@@ -233,10 +233,10 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = floppy_get_count(device->machine);
+	floppy_count = floppy_get_count(device->machine());
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
-		floppy_drive_set_ready_state(floppy_get_device(device->machine, fdc->digital_output_register & 0x03), 1, 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine(), fdc->digital_output_register & 0x03), 1, 0);
 
 	fdc->digital_output_register = data;
 
@@ -244,18 +244,18 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_mon_w(floppy_get_device(device->machine, 0), !BIT(data, 4));
+		floppy_mon_w(floppy_get_device(device->machine(), 0), !BIT(data, 4));
 	if (floppy_count > 1)
-		floppy_mon_w(floppy_get_device(device->machine, 1), !BIT(data, 5));
+		floppy_mon_w(floppy_get_device(device->machine(), 1), !BIT(data, 5));
 	if (floppy_count > 2)
-		floppy_mon_w(floppy_get_device(device->machine, 2), !BIT(data, 6));
+		floppy_mon_w(floppy_get_device(device->machine(), 2), !BIT(data, 6));
 	if (floppy_count > 3)
-		floppy_mon_w(floppy_get_device(device->machine, 3), !BIT(data, 7));
+		floppy_mon_w(floppy_get_device(device->machine(), 3), !BIT(data, 7));
 
 	if ((data>>4) & (1<<selected_drive))
 	{
 		if (floppy_count > selected_drive)
-			floppy_drive_set_ready_state(floppy_get_device(device->machine, selected_drive), 1, 0);
+			floppy_drive_set_ready_state(floppy_get_device(device->machine(), selected_drive), 1, 0);
 	}
 
 	/* changing the DMA enable bit, will affect the terminal count state
@@ -338,7 +338,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(device->machine->firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
 	return data;
 }
 
@@ -349,7 +349,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
 	
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(device->machine->firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
 
 	switch(offset)
 	{

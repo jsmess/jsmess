@@ -191,8 +191,8 @@ public:
 
 static SNAPSHOT_LOAD( vtech1 )
 {
-	vtech1_state *vtech1 = image.device().machine->driver_data<vtech1_state>();
-	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
+	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -239,7 +239,7 @@ static SNAPSHOT_LOAD( vtech1 )
 		space->write_byte(0x788e, start % 256); /* usr subroutine address */
 		space->write_byte(0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, start);				/* start program */
+		cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, start);				/* start program */
 		break;
 
 	default:
@@ -257,7 +257,7 @@ static SNAPSHOT_LOAD( vtech1 )
 ***************************************************************************/
 static void vtech1_load_proc(device_image_interface &image)
 {
-	vtech1_state *vtech1 = image.device().machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
 	int id = floppy_get_drive(&image.device());
 
 	if (image.is_writable())
@@ -266,9 +266,9 @@ static void vtech1_load_proc(device_image_interface &image)
 		vtech1->fdc_wrprot[id] = 0x80;
 }
 
-static void vtech1_get_track(running_machine *machine)
+static void vtech1_get_track(running_machine &machine)
 {
-	vtech1_state *vtech1 = machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine,vtech1->drive));
 
 	/* drive selected or and image file ok? */
@@ -286,9 +286,9 @@ static void vtech1_get_track(running_machine *machine)
 	vtech1->fdc_write = 0;
 }
 
-static void vtech1_put_track(running_machine *machine)
+static void vtech1_put_track(running_machine &machine)
 {
-	vtech1_state *vtech1 = machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
 
 
     /* drive selected and image file ok? */
@@ -306,7 +306,7 @@ static void vtech1_put_track(running_machine *machine)
 
 static READ8_HANDLER( vtech1_fdc_r )
 {
-	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 	int data = 0xff;
 
 	switch (offset)
@@ -354,7 +354,7 @@ static READ8_HANDLER( vtech1_fdc_r )
 
 static WRITE8_HANDLER( vtech1_fdc_w )
 {
-	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 	int drive;
 
 	switch (offset)
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 		{
 			vtech1->drive = drive;
 			if (vtech1->drive >= 0)
-				vtech1_get_track(space->machine);
+				vtech1_get_track(space->machine());
 		}
 		if (vtech1->drive >= 0)
 		{
@@ -379,7 +379,7 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, vtech1->drive, vtech1->fdc_track_x2[vtech1->drive]/2,5*(vtech1->fdc_track_x2[vtech1->drive]&1));
 				if ((vtech1->fdc_track_x2[vtech1->drive] & 1) == 0)
-					vtech1_get_track(space->machine);
+					vtech1_get_track(space->machine());
 			}
 			else
 			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(vtech1->fdc_latch)) ||
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, vtech1->drive, vtech1->fdc_track_x2[vtech1->drive]/2,5*(vtech1->fdc_track_x2[vtech1->drive]&1));
 				if ((vtech1->fdc_track_x2[vtech1->drive] & 1) == 0)
-					vtech1_get_track(space->machine);
+					vtech1_get_track(space->machine());
 			}
 			if ((data & 0x40) == 0)
 			{
@@ -437,7 +437,7 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 				{
 					/* data written to track before? */
 					if (vtech1->fdc_write)
-						vtech1_put_track(space->machine);
+						vtech1_put_track(space->machine());
 				}
 				vtech1->fdc_bits = 8;
 				vtech1->fdc_write = 0;
@@ -530,28 +530,28 @@ static READ8_HANDLER( vtech1_joystick_r )
 {
 	int result = 0xff;
 
-	if (!BIT(offset, 0)) result &= input_port_read(space->machine, "joystick_0");
-	if (!BIT(offset, 1)) result &= input_port_read(space->machine, "joystick_0_arm");
-	if (!BIT(offset, 2)) result &= input_port_read(space->machine, "joystick_1");
-	if (!BIT(offset, 3)) result &= input_port_read(space->machine, "joystick_1_arm");
+	if (!BIT(offset, 0)) result &= input_port_read(space->machine(), "joystick_0");
+	if (!BIT(offset, 1)) result &= input_port_read(space->machine(), "joystick_0_arm");
+	if (!BIT(offset, 2)) result &= input_port_read(space->machine(), "joystick_1");
+	if (!BIT(offset, 3)) result &= input_port_read(space->machine(), "joystick_1_arm");
 
 	return result;
 }
 
 static READ8_HANDLER( vtech1_keyboard_r )
 {
-	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 	UINT8 result = 0x3f;
 
 	/* bit 0 to 5, keyboard input */
-	if (!BIT(offset, 0)) result &= input_port_read(space->machine, "keyboard_0");
-	if (!BIT(offset, 1)) result &= input_port_read(space->machine, "keyboard_1");
-	if (!BIT(offset, 2)) result &= input_port_read(space->machine, "keyboard_2");
-	if (!BIT(offset, 3)) result &= input_port_read(space->machine, "keyboard_3");
-	if (!BIT(offset, 4)) result &= input_port_read(space->machine, "keyboard_4");
-	if (!BIT(offset, 5)) result &= input_port_read(space->machine, "keyboard_5");
-	if (!BIT(offset, 6)) result &= input_port_read(space->machine, "keyboard_6");
-	if (!BIT(offset, 7)) result &= input_port_read(space->machine, "keyboard_7");
+	if (!BIT(offset, 0)) result &= input_port_read(space->machine(), "keyboard_0");
+	if (!BIT(offset, 1)) result &= input_port_read(space->machine(), "keyboard_1");
+	if (!BIT(offset, 2)) result &= input_port_read(space->machine(), "keyboard_2");
+	if (!BIT(offset, 3)) result &= input_port_read(space->machine(), "keyboard_3");
+	if (!BIT(offset, 4)) result &= input_port_read(space->machine(), "keyboard_4");
+	if (!BIT(offset, 5)) result &= input_port_read(space->machine(), "keyboard_5");
+	if (!BIT(offset, 6)) result &= input_port_read(space->machine(), "keyboard_6");
+	if (!BIT(offset, 7)) result &= input_port_read(space->machine(), "keyboard_7");
 
 	/* bit 6, cassette input */
 	result |= (cassette_input(vtech1->cassette) > 0 ? 1 : 0) << 6;
@@ -569,7 +569,7 @@ static READ8_HANDLER( vtech1_keyboard_r )
 
 static WRITE8_HANDLER( vtech1_latch_w )
 {
-	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
@@ -599,19 +599,19 @@ static WRITE8_HANDLER( vtech1_latch_w )
 
 static WRITE8_HANDLER( vtech1_memory_bank_w )
 {
-	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 
 	logerror("vtech1_memory_bank_w $%02X\n", data);
 
 	if (data >= 1)
 		if ((data <= 3 && vtech1->ram_size == 66*1024) || (vtech1->ram_size == 4098*1024))
-			memory_set_bank(space->machine, "bank3", data - 1);
+			memory_set_bank(space->machine(), "bank3", data - 1);
 }
 
 static WRITE8_HANDLER( vtech1_video_bank_w )
 {
 	logerror("vtech1_video_bank_w $%02X\n", data);
-	memory_set_bank(space->machine, "bank4", data & 0x03);
+	memory_set_bank(space->machine(), "bank4", data & 0x03);
 }
 
 
@@ -621,7 +621,7 @@ static WRITE8_HANDLER( vtech1_video_bank_w )
 
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 {
-	vtech1_state *vtech1 = device->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = device->machine().driver_data<vtech1_state>();
 	mc6847_inv_w(device, BIT(vtech1->videoram[offset], 6));
 	mc6847_as_w(device, BIT(vtech1->videoram[offset], 7));
 
@@ -630,7 +630,7 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 
 static SCREEN_UPDATE( vtech1 )
 {
-	vtech1_state *vtech1 = screen->machine->driver_data<vtech1_state>();
+	vtech1_state *vtech1 = screen->machine().driver_data<vtech1_state>();
 	return mc6847_update(vtech1->mc6847, bitmap, cliprect);
 }
 
@@ -641,19 +641,19 @@ static SCREEN_UPDATE( vtech1 )
 
 static DRIVER_INIT( vtech1 )
 {
-	vtech1_state *vtech1 = machine->driver_data<vtech1_state>();
-	address_space *prg = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
+	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int id;
 
 	/* find devices */
-	vtech1->mc6847 = machine->device("mc6847");
-	vtech1->speaker = machine->device("speaker");
-	vtech1->cassette = machine->device("cassette");
-	vtech1->printer = machine->device("printer");
+	vtech1->mc6847 = machine.device("mc6847");
+	vtech1->speaker = machine.device("speaker");
+	vtech1->cassette = machine.device("cassette");
+	vtech1->printer = machine.device("printer");
 
 	/* ram */
-	vtech1->ram = ram_get_ptr(machine->device(RAM_TAG));
-	vtech1->ram_size = ram_get_size(machine->device(RAM_TAG));
+	vtech1->ram = ram_get_ptr(machine.device(RAM_TAG));
+	vtech1->ram_size = ram_get_size(machine.device(RAM_TAG));
 
 	/* setup memory banking */
 	memory_set_bankptr(machine, "bank1", vtech1->ram);
@@ -701,8 +701,8 @@ static DRIVER_INIT( vtech1 )
 
 static DRIVER_INIT( vtech1h )
 {
-	vtech1_state *vtech1 = machine->driver_data<vtech1_state>();
-	address_space *prg = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
+	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 

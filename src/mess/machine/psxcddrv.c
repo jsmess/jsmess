@@ -284,7 +284,7 @@ bool cdrom_driver::read_sector(const unsigned int sec, unsigned char *buf, const
 	}
 }
 
-void cdrom_driver::set_machine(const running_machine &machine)
+void cdrom_driver::set_machine(const running_machine *machine)
 {
 	m_machine = (running_machine *)&machine;
 

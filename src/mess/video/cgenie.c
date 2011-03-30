@@ -20,8 +20,8 @@
 ***************************************************************************/
 VIDEO_START( cgenie )
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
-	screen_device *screen = machine->first_screen();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -62,7 +62,7 @@ static void cgenie_offset_xy(cgenie_state *state)
 ***************************************************************************/
 WRITE8_HANDLER ( cgenie_register_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	//int addr;
 
 	switch (state->crt.idx)
@@ -164,7 +164,7 @@ WRITE8_HANDLER ( cgenie_register_w )
 ***************************************************************************/
 WRITE8_HANDLER ( cgenie_index_w )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	state->crt.idx = data & 15;
 }
 
@@ -173,16 +173,16 @@ WRITE8_HANDLER ( cgenie_index_w )
 ***************************************************************************/
  READ8_HANDLER ( cgenie_register_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
-	return cgenie_get_register(space->machine, state->crt.idx);
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
+	return cgenie_get_register(space->machine(), state->crt.idx);
 }
 
 /***************************************************************************
   Read from a register of the 6845 CRTC
 ***************************************************************************/
-int cgenie_get_register(running_machine *machine, int indx)
+int cgenie_get_register(running_machine &machine, int indx)
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
 	switch (indx)
 	{
 		case 0:
@@ -226,23 +226,23 @@ int cgenie_get_register(running_machine *machine, int indx)
 ***************************************************************************/
  READ8_HANDLER ( cgenie_index_r )
 {
-	cgenie_state *state = space->machine->driver_data<cgenie_state>();
+	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	return state->crt.idx;
 }
 
 /***************************************************************************
   Switch mode between character generator and graphics
 ***************************************************************************/
-void cgenie_mode_select(running_machine *machine, int mode)
+void cgenie_mode_select(running_machine &machine, int mode)
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
 	state->graphics = (mode) ? 1 : 0;
 }
 
 
-static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
+static void cgenie_refresh_monitor(running_machine &machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 *videoram = state->videoram;
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
@@ -274,7 +274,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 			{
 				/* get graphics code */
 				code = videoram[i];
-				drawgfx_opaque(bitmap, &r, machine->gfx[1], code, 0,
+				drawgfx_opaque(bitmap, &r, machine.gfx[1], code, 0,
 					0, 0, r.min_x, r.min_y);
 			}
 			else
@@ -284,7 +284,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 
 				/* translate defined character sets */
 				code += state->font_offset[(code >> 6) & 3];
-				drawgfx_opaque(bitmap, &r, machine->gfx[0], code, state->colorram[i&0x3ff],
+				drawgfx_opaque(bitmap, &r, machine.gfx[0], code, state->colorram[i&0x3ff],
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -313,21 +313,21 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (state->crt.cursor_top & 15);
 				rc.max_y = r.min_y + (state->crt.cursor_bottom & 15);
-				drawgfx_opaque(bitmap, &rc, machine->gfx[0], 0x7f, state->colorram[i&0x3ff],
+				drawgfx_opaque(bitmap, &rc, machine.gfx[0], 0x7f, state->colorram[i&0x3ff],
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}
 	}
 }
 
-static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, const rectangle *cliprect)
+static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, const rectangle *cliprect)
 {
-	cgenie_state *state = machine->driver_data<cgenie_state>();
+	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 *videoram = state->videoram;
 	int i, address, offset, cursor, size, code, x, y;
 	rectangle r;
 
-	bitmap_fill(machine->generic.tmpbitmap, cliprect, get_black_pen(machine));
+	bitmap_fill(machine.generic.tmpbitmap, cliprect, get_black_pen(machine));
 	bitmap_fill(state->dlybitmap, cliprect, get_black_pen(machine));
 
 	if(state->crt.vertical_displayed || state->crt.horizontal_displayed)
@@ -355,9 +355,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 			{
 				/* get graphics code */
 				code = videoram[i];
-				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[1], code, 1,
+				drawgfx_opaque(machine.generic.tmpbitmap, &r, machine.gfx[1], code, 1,
 					0, 0, r.min_x, r.min_y);
-				drawgfx_opaque(state->dlybitmap, &r, machine->gfx[1], code, 2,
+				drawgfx_opaque(state->dlybitmap, &r, machine.gfx[1], code, 2,
 					0, 0, r.min_x, r.min_y);
 			}
 			else
@@ -367,9 +367,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 
 				/* translate defined character sets */
 				code += state->font_offset[(code >> 6) & 3];
-				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[0], code, state->colorram[i&0x3ff] + 16,
+				drawgfx_opaque(machine.generic.tmpbitmap, &r, machine.gfx[0], code, state->colorram[i&0x3ff] + 16,
 					0, 0, r.min_x, r.min_y);
-				drawgfx_opaque(state->dlybitmap, &r, machine->gfx[0], code, state->colorram[i&0x3ff] + 32,
+				drawgfx_opaque(state->dlybitmap, &r, machine.gfx[0], code, state->colorram[i&0x3ff] + 32,
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -399,15 +399,15 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 				rc.min_y = r.min_y + (state->crt.cursor_top & 15);
 				rc.max_y = r.min_y + (state->crt.cursor_bottom & 15);
 
-				drawgfx_opaque(machine->generic.tmpbitmap, &rc, machine->gfx[0], 0x7f, state->colorram[i&0x3ff] + 16,
+				drawgfx_opaque(machine.generic.tmpbitmap, &rc, machine.gfx[0], 0x7f, state->colorram[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y);
-				drawgfx_opaque(state->dlybitmap, &rc, machine->gfx[0], 0x7f, state->colorram[i&0x3ff] + 32,
+				drawgfx_opaque(state->dlybitmap, &rc, machine.gfx[0], 0x7f, state->colorram[i&0x3ff] + 32,
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}
 	}
 
-	copybitmap(bitmap, machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, machine.generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->dlybitmap, 0, 0, 1, 0, cliprect, 0);
 }
 
@@ -416,10 +416,10 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 ***************************************************************************/
 SCREEN_UPDATE( cgenie )
 {
-	cgenie_state *state = screen->machine->driver_data<cgenie_state>();
+	cgenie_state *state = screen->machine().driver_data<cgenie_state>();
     if( state->tv_mode )
-		cgenie_refresh_tv_set(screen->machine, bitmap, cliprect);
+		cgenie_refresh_tv_set(screen->machine(), bitmap, cliprect);
 	else
-		cgenie_refresh_monitor(screen->machine, bitmap, cliprect);
+		cgenie_refresh_monitor(screen->machine(), bitmap, cliprect);
 	return 0;
 }

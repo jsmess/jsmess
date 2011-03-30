@@ -18,7 +18,7 @@ static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 
 static SCREEN_UPDATE( tmc1800 )
 {
-	tmc1800_state *state = screen->machine->driver_data<tmc1800_state>();
+	tmc1800_state *state = screen->machine().driver_data<tmc1800_state>();
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
@@ -29,21 +29,21 @@ static SCREEN_UPDATE( tmc1800 )
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
+	tmc2000_state *state = device->machine().driver_data<tmc2000_state>();
 
 	return BIT(state->color, 2);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
+	tmc2000_state *state = device->machine().driver_data<tmc2000_state>();
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
+	tmc2000_state *state = device->machine().driver_data<tmc2000_state>();
 
 	return BIT(state->color, 0);
 }
@@ -67,7 +67,7 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 
 static SCREEN_UPDATE( tmc2000 )
 {
-	tmc2000_state *state = screen->machine->driver_data<tmc2000_state>();
+	tmc2000_state *state = screen->machine().driver_data<tmc2000_state>();
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -95,7 +95,7 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 
 static SCREEN_UPDATE( nano )
 {
-	nano_state *state = screen->machine->driver_data<nano_state>();
+	nano_state *state = screen->machine().driver_data<nano_state>();
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 

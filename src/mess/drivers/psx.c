@@ -57,7 +57,7 @@ public:
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -66,7 +66,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine->describe_context(), buf );
+		logerror( "%s: %s", machine.describe_context(), buf );
 	}
 }
 
@@ -85,7 +85,7 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 
 static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
-	psx_state *state = cpu->machine->driver_data<psx_state>();
+	psx_state *state = cpu->machine().driver_data<psx_state>();
 	struct PSXEXE_HEADER
 	{
 		UINT8 id[ 8 ];
@@ -221,7 +221,7 @@ static void cpe_set_register( device_t *cpu, int n_reg, int n_value )
 
 static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
-	psx_state *state = cpu->machine->driver_data<psx_state>();
+	psx_state *state = cpu->machine().driver_data<psx_state>();
 	if( n_len >= 4 &&
 		memcmp( p_n_file, "CPE\001", 4 ) == 0 )
 	{
@@ -452,8 +452,8 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 static QUICKLOAD_LOAD( psx_exe_load )
 {
-	psx1_state *state = image.device().machine->driver_data<psx1_state>();
-	address_space *space = image.device().machine->device( "maincpu")->memory().space( AS_PROGRAM );
+	psx1_state *state = image.device().machine().driver_data<psx1_state>();
+	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	state->exe_size = 0;
 	state->exe_buffer = (UINT8*)malloc( quickload_size );
@@ -468,7 +468,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	state->exe_size = quickload_size;
-	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, *image.device().machine));
+	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, image.device().machine()));
 
 	return IMAGE_INIT_PASS;
 }
@@ -492,7 +492,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 
 static TIMER_CALLBACK(psx_pad_ack)
 {
-	psx1_state *state = machine->driver_data<psx1_state>();
+	psx1_state *state = machine.driver_data<psx1_state>();
 	int n_port = param;
 	pad_t *pad = &state->m_pad[ n_port ];
 
@@ -502,14 +502,14 @@ static TIMER_CALLBACK(psx_pad_ack)
 		if( !pad->b_ack )
 		{
 			pad->b_ack = 1;
-			machine->scheduler().timer_set(attotime::from_usec( 2 ), FUNC(psx_pad_ack) , n_port);
+			machine.scheduler().timer_set(attotime::from_usec( 2 ), FUNC(psx_pad_ack) , n_port);
 		}
 	}
 }
 
-static void psx_pad( running_machine *machine, int n_port, int n_data )
+static void psx_pad( running_machine &machine, int n_port, int n_data )
 {
-	psx1_state *state = machine->driver_data<psx1_state>();
+	psx1_state *state = machine.driver_data<psx1_state>();
 	pad_t *pad = &state->m_pad[ n_port ];
 	int b_sel;
 	int b_clock;
@@ -618,7 +618,7 @@ static void psx_pad( running_machine *machine, int n_port, int n_data )
 	if( b_ack )
 	{
 		pad->b_ack = 0;
-		machine->scheduler().timer_set(attotime::from_usec( 10 ), FUNC(psx_pad_ack), n_port);
+		machine.scheduler().timer_set(attotime::from_usec( 10 ), FUNC(psx_pad_ack), n_port);
 	}
 }
 
@@ -627,7 +627,7 @@ static void psx_mcd( int n_port, int n_data )
 	/* todo */
 }
 
-static void psx_sio0( running_machine *machine, int n_data )
+static void psx_sio0( running_machine &machine, int n_data )
 {
 	/* todo: raise data & ack when nothing is driving it low */
 	psx_pad( machine, 0, n_data );
@@ -638,29 +638,29 @@ static void psx_sio0( running_machine *machine, int n_data )
 
 /* ----------------------------------------------------------------------- */
 
-static void cd_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void cd_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	psxcd_device *psxcd = machine->device<psxcd_device>("psxcd");
-	UINT8 *psxram = (UINT8 *)memory_get_shared(*machine, "share1");
+	psxcd_device *psxcd = machine.device<psxcd_device>("psxcd");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(machine, "share1");
 
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
-static void cd_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void cd_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
 
 static READ8_HANDLER( psx_cd_r )
 {
-	psxcd_device *psxcd = space->machine->device<psxcd_device>(PSXCD_TAG);
+	psxcd_device *psxcd = space->machine().device<psxcd_device>(PSXCD_TAG);
 
 	return psxcd->read_byte(offset);
 }
 
 static WRITE8_HANDLER( psx_cd_w )
 {
-	psxcd_device *psxcd = space->machine->device<psxcd_device>(PSXCD_TAG);
+	psxcd_device *psxcd = space->machine().device<psxcd_device>(PSXCD_TAG);
 
 	psxcd->write_byte(offset, data);
 }
@@ -754,7 +754,7 @@ static void spu_irq(device_t *device, UINT32 data)
 {
 	if (data)
 	{
-		psx_irq_set(device->machine, 1<<9);
+		psx_irq_set(device->machine(), 1<<9);
 	}
 }
 

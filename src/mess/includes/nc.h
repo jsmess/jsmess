@@ -63,7 +63,7 @@ extern VIDEO_START( nc );
 extern SCREEN_UPDATE( nc );
 extern PALETTE_INIT( nc );
 
-void nc200_video_set_backlight(running_machine *machine, int state);
+void nc200_video_set_backlight(running_machine &machine, int state);
 
 
 /*----------- defined in drivers/nc.c -----------*/
@@ -72,7 +72,7 @@ void nc200_video_set_backlight(running_machine *machine, int state);
 /* mask used to stop access over end of card ram area */
 
 
-void nc_set_card_present_state(running_machine *machine, int state);
+void nc_set_card_present_state(running_machine &machine, int state);
 
 
 /*----------- defined in machine/nc.c -----------*/

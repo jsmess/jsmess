@@ -19,7 +19,7 @@ typedef struct _ti99_video_config
 {
 	TMS9928a_interface			*tmsparam;
 	int							chip;
-	void						(*callback)(running_machine *, int);
+	void						(*callback)(running_machine &, int);
 
 } ti99_video_config;
 

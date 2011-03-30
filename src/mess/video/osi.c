@@ -24,13 +24,13 @@ static PALETTE_INIT( osi630 )
 
 static VIDEO_START( osi600 )
 {
-	osi_state *state = machine->driver_data<osi_state>();
+	osi_state *state = machine.driver_data<osi_state>();
 	UINT16 addr;
 
 	/* randomize video memory contents */
 	for (addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
 	{
-		state->video_ram[addr] = machine->rand() & 0xff;
+		state->video_ram[addr] = machine.rand() & 0xff;
 	}
 
 	/* randomize color memory contents */
@@ -38,7 +38,7 @@ static VIDEO_START( osi600 )
 	{
 		for (addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 		{
-			state->color_ram[addr] = machine->rand() & 0x0f;
+			state->color_ram[addr] = machine.rand() & 0x0f;
 		}
 	}
 }
@@ -47,7 +47,7 @@ static VIDEO_START( osi600 )
 
 static SCREEN_UPDATE( osi600 )
 {
-	osi_state *state = screen->machine->driver_data<osi_state>();
+	osi_state *state = screen->machine().driver_data<osi_state>();
 
 	int y, bit, sx;
 
@@ -63,7 +63,7 @@ static SCREEN_UPDATE( osi600 )
 			{
 				UINT8 videoram_data = state->video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = screen->machine->region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -96,7 +96,7 @@ static SCREEN_UPDATE( osi600 )
 			{
 				UINT8 videoram_data = state->video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = screen->machine->region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -124,7 +124,7 @@ static SCREEN_UPDATE( osi600 )
 
 static SCREEN_UPDATE( uk101 )
 {
-	osi_state *state = screen->machine->driver_data<osi_state>();
+	osi_state *state = screen->machine().driver_data<osi_state>();
 
 	int y, bit, sx;
 
@@ -138,7 +138,7 @@ static SCREEN_UPDATE( uk101 )
 		{
 			UINT8 videoram_data = state->video_ram[videoram_addr++];
 			UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-			UINT8 charrom_data = screen->machine->region("chargen")->base()[charrom_addr];
+			UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
 
 			for (bit = 0; bit < 8; bit++)
 			{

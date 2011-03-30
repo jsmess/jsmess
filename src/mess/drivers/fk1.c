@@ -164,7 +164,7 @@ static WRITE8_DEVICE_HANDLER (fk1_ppi_3_a_w )
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_b_w )
 {
-	fk1_state *state = device->machine->driver_data<fk1_state>();
+	fk1_state *state = device->machine().driver_data<fk1_state>();
 
 	state->video_rol = data;
 }
@@ -180,7 +180,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_3_a_r )
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_3_b_r )
 {
-	fk1_state *state = device->machine->driver_data<fk1_state>();
+	fk1_state *state = device->machine().driver_data<fk1_state>();
 
 	return state->video_rol;
 }
@@ -253,21 +253,21 @@ static WRITE8_HANDLER( fk1_intr_w )
 
 static READ8_HANDLER( fk1_bank_ram_r )
 {
-	address_space *space_mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
+	address_space *space_mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
 
 	space_mem->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(space->machine, "bank1", ram);
-	memory_set_bankptr(space->machine, "bank2", ram + 0x4000);
+	memory_set_bankptr(space->machine(), "bank1", ram);
+	memory_set_bankptr(space->machine(), "bank2", ram + 0x4000);
 	return 0;
 }
 
 static READ8_HANDLER( fk1_bank_rom_r )
 {
-	address_space *space_mem = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space_mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space_mem->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
-	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x10000);
+	memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base());
+	memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000);
 	return 0;
 }
 
@@ -342,11 +342,11 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	fk1_state *state = timer.machine->driver_data<fk1_state>();
+	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
-	if (input_port_read(timer.machine, "LINE0")) {
+	if (input_port_read(timer.machine(), "LINE0")) {
 		state->int_vector = 6;
-		cputag_set_input_line(timer.machine, "maincpu", 0, HOLD_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 	}
 }
 
@@ -363,7 +363,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 static IRQ_CALLBACK (fk1_irq_callback)
 {
-	fk1_state *state = device->machine->driver_data<fk1_state>();
+	fk1_state *state = device->machine().driver_data<fk1_state>();
 
 	logerror("IRQ %02x\n", state->int_vector*2);
 	return state->int_vector * 2;
@@ -371,25 +371,25 @@ static IRQ_CALLBACK (fk1_irq_callback)
 
 static TIMER_DEVICE_CALLBACK( vsync_callback )
 {
-	fk1_state *state = timer.machine->driver_data<fk1_state>();
+	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
 	state->int_vector = 3;
-	cputag_set_input_line(timer.machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 }
 
 
 static MACHINE_RESET(fk1)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	space->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base()); // ROM
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()); // ROM
 	memory_set_bankptr(machine, "bank2", ram + 0x10000); // VRAM
 	memory_set_bankptr(machine, "bank3", ram + 0x8000);
 	memory_set_bankptr(machine, "bank4", ram + 0xc000);
 
-	device_set_irq_callback(machine->device("maincpu"), fk1_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), fk1_irq_callback);
 }
 
 static MACHINE_START( fk1 )
@@ -398,10 +398,10 @@ static MACHINE_START( fk1 )
 
 static SCREEN_UPDATE( fk1 )
 {
-	fk1_state *state = screen->machine->driver_data<fk1_state>();
+	fk1_state *state = screen->machine().driver_data<fk1_state>();
 	UINT8 code;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
 
 	for (x = 0; x < 64; x++)
 	{

@@ -25,15 +25,15 @@ static READ8_HANDLER( ikki_e000_r )
 {
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
-	if (cpu_getiloops(space->cpu) == 0)
+	if (cpu_getiloops(&space->device()) == 0)
 		return 0;
 	return 2;
 }
 
 static WRITE8_HANDLER( ikki_coin_counters )
 {
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 }
 
 /*************************************
@@ -208,7 +208,7 @@ GFXDECODE_END
 
 static MACHINE_START( ikki )
 {
-	ikki_state *state = machine->driver_data<ikki_state>();
+	ikki_state *state = machine.driver_data<ikki_state>();
 
 	state->save_item(NAME(state->flipscreen));
 	state->save_item(NAME(state->punch_through_pen));
@@ -216,7 +216,7 @@ static MACHINE_START( ikki )
 
 static MACHINE_RESET( ikki )
 {
-	ikki_state *state = machine->driver_data<ikki_state>();
+	ikki_state *state = machine.driver_data<ikki_state>();
 
 	state->flipscreen = 0;
 }

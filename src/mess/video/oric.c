@@ -14,13 +14,13 @@
 #include "includes/oric.h"
 
 static void oric_vh_update_flash(oric_state *state);
-static void oric_vh_update_attribute(running_machine *machine,int c);
+static void oric_vh_update_attribute(running_machine &machine,int c);
 static void oric_refresh_charset(oric_state *state);
 
 
 static TIMER_CALLBACK(oric_vh_timer_callback)
 {
-	oric_state *state = machine->driver_data<oric_state>();
+	oric_state *state = machine.driver_data<oric_state>();
 	/* update flash count */
 	state->vh_state.flash_count++;
 	if (state->vh_state.flash_count == 16)
@@ -33,11 +33,11 @@ static TIMER_CALLBACK(oric_vh_timer_callback)
 
 VIDEO_START( oric )
 {
-	oric_state *state = machine->driver_data<oric_state>();
+	oric_state *state = machine.driver_data<oric_state>();
 	/* initialise flash timer */
 	state->vh_state.flash_count = 0;
 	state->vh_state.flash_state = 0;
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
+	machine.scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
 	/* mode */
 	oric_vh_update_attribute(machine,(1<<3)|(1<<4));
 }
@@ -87,12 +87,12 @@ static void oric_refresh_charset(oric_state *state)
 }
 
 /* update video hardware state depending on the new attribute */
-static void oric_vh_update_attribute(running_machine *machine,int c)
+static void oric_vh_update_attribute(running_machine &machine,int c)
 {
-	oric_state *state = machine->driver_data<oric_state>();
+	oric_state *state = machine.driver_data<oric_state>();
 	/* attribute */
 	int attribute = c & 0x03f;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch ((attribute>>3) & 0x03)
 	{
@@ -206,7 +206,7 @@ static void oric_vh_render_6pixels(bitmap_t *bitmap,int x,int y, int fg, int bg,
 ***************************************************************************/
 SCREEN_UPDATE( oric )
 {
-	oric_state *state = screen->machine->driver_data<oric_state>();
+	oric_state *state = screen->machine().driver_data<oric_state>();
 	unsigned char *RAM;
 	int byte_offset;
 	int y;
@@ -234,11 +234,11 @@ SCREEN_UPDATE( oric )
 		int x = 0;
 
 		/* foreground colour white */
-		oric_vh_update_attribute(screen->machine,7);
+		oric_vh_update_attribute(screen->machine(),7);
 		/* background colour black */
-		oric_vh_update_attribute(screen->machine,(1<<3));
+		oric_vh_update_attribute(screen->machine(),(1<<3));
 
-		oric_vh_update_attribute(screen->machine,(1<<4));
+		oric_vh_update_attribute(screen->machine(),(1<<4));
 
 		for (byte_offset=0; byte_offset<40; byte_offset++)
 		{
@@ -271,12 +271,12 @@ SCREEN_UPDATE( oric )
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : screen->machine->device("maincpu")->memory().space(AS_PROGRAM)->read_byte(read_addr);
+			c = RAM ? RAM[read_addr] : screen->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte(read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
 			if ((c & ((1 << 6) | (1 << 5))) == 0)
 			{
-				oric_vh_update_attribute(screen->machine, c);
+				oric_vh_update_attribute(screen->machine(), c);
 
 				/* display background colour when attribute has been found */
 				oric_vh_render_6pixels(bitmap, x, y, state->vh_state.active_foreground_colour, state->vh_state.active_background_colour, 0, (c & 0x080));

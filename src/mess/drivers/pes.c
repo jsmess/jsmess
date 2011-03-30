@@ -68,7 +68,7 @@ Address map:
 /* Devices */
 static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 {
-	pes_state *state = device->machine->driver_data<pes_state>();
+	pes_state *state = device->machine().driver_data<pes_state>();
 #ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
 #endif
@@ -88,8 +88,8 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 	fprintf(stderr,"kb input fifo fullness: %d\n",(state->infifo_head_ptr-state->infifo_tail_ptr)&0x1F);
 #endif
 	// todo: following two should be set so clear happens after one cpu cycle
-	cputag_set_input_line(device->machine, "maincpu", MCS51_RX_LINE, ASSERT_LINE);
-	cputag_set_input_line(device->machine, "maincpu", MCS51_RX_LINE, CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", MCS51_RX_LINE, ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", MCS51_RX_LINE, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
@@ -100,7 +100,7 @@ static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
 /* Helper Functions */
 static int data_to_i8031(device_t *device)
 {
-	pes_state *state = device->machine->driver_data<pes_state>();
+	pes_state *state = device->machine().driver_data<pes_state>();
 	UINT8 data;
 	data = state->infifo[state->infifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
@@ -114,7 +114,7 @@ static int data_to_i8031(device_t *device)
 
 static void data_from_i8031(device_t *device, int data)
 {
-	pes_state *state = device->machine->driver_data<pes_state>();
+	pes_state *state = device->machine().driver_data<pes_state>();
 	terminal_write(state->m_terminal,0,data);
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
@@ -124,7 +124,7 @@ static void data_from_i8031(device_t *device, int data)
 /* Port Handlers */
 WRITE8_MEMBER( pes_state::rsws_w )
 {
-	pes_state *state = machine->driver_data<pes_state>();
+	pes_state *state = m_machine.driver_data<pes_state>();
 	m_wsstate = data&0x1; // /ws is bit 0
 	m_rsstate = (data&0x2)>>1; // /rs is bit 1
 #ifdef DEBUG_PORTS
@@ -136,7 +136,7 @@ WRITE8_MEMBER( pes_state::rsws_w )
 
 WRITE8_MEMBER( pes_state::port1_w )
 {
-	pes_state *state = machine->driver_data<pes_state>();
+	pes_state *state = m_machine.driver_data<pes_state>();
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
@@ -147,7 +147,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 READ8_MEMBER( pes_state::port1_r )
 {
 	UINT8 data = 0xFF;
-	pes_state *state = machine->driver_data<pes_state>();
+	pes_state *state = m_machine.driver_data<pes_state>();
 	data = tms5220_status_r(state->m_speech, 0);
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
@@ -184,7 +184,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 READ8_MEMBER( pes_state::port3_r )
 {
 	UINT8 data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
-	pes_state *state = machine->driver_data<pes_state>();
+	pes_state *state = m_machine.driver_data<pes_state>();
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared
 	if (state->infifo_tail_ptr != state->infifo_head_ptr)
 	{
@@ -219,7 +219,7 @@ void pes_state::machine_reset()
 
 	m_port3_state = 0; // reset the openbus state of port 3
 	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
-	devtag_reset(machine, "tms5220"); // reset the 5220
+	devtag_reset(m_machine, "tms5220"); // reset the 5220
 }
 
 /******************************************************************************
@@ -227,13 +227,13 @@ void pes_state::machine_reset()
 ******************************************************************************/
 /*static TIMER_CALLBACK( serial_read_cb )
 {
-	machine->scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 }*/
 
 DRIVER_INIT( pes )
 {
-	i8051_set_serial_tx_callback(machine->device("maincpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(machine->device("maincpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine.device("maincpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(machine.device("maincpu"), data_to_i8031);
 }
 
 /******************************************************************************

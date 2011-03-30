@@ -42,7 +42,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pv9234)
 {
-	pv9234_state *state = machine->driver_data<pv9234_state>();
+	pv9234_state *state = machine.driver_data<pv9234_state>();
 	int i;
 
 	for(i=0;i<0x1000/4;i++)

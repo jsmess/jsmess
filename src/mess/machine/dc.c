@@ -70,7 +70,7 @@ extern UINT32 dc_sysctrl_regs[0x200/4];
 
 extern UINT32 g1bus_regs[0x100/4];
 
-static void gdrom_raise_irq(running_machine *machine)
+static void gdrom_raise_irq(running_machine &machine)
 {
 	dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
 	dc_update_interrupt_status(machine);
@@ -104,7 +104,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		ddtdata.channel= -1;	// not used
 		ddtdata.mode= -1;		// copy from/to buffer
 		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
-		sh4_dma_ddt(machine->device("maincpu"), &ddtdata);
+		sh4_dma_ddt(machine.device("maincpu"), &ddtdata);
 
 		atapi_xferbase += 2048;
 	}
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		atapi_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+		atapi_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 	}
 	else
 	{
@@ -147,7 +147,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 
 static READ32_HANDLER( atapi_r )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 	int reg, data;
 
 	if (mem_mask == 0x0000ffff)	// word-wide command read
@@ -261,7 +261,7 @@ static READ32_HANDLER( atapi_r )
 		}
 		#endif
 
-		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(space->cpu));
+		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space->device()));
 	}
 
 //  printf( "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -270,7 +270,7 @@ static READ32_HANDLER( atapi_r )
 
 static WRITE32_HANDLER( atapi_w )
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 	int reg;
 
 //  printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
@@ -369,7 +369,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						atapi_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
+						atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
@@ -420,11 +420,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 #endif
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(space->cpu));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space->device()));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-			printf("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(space->cpu));
+			printf("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space->device()));
 
 			switch (data)
 			{
@@ -491,7 +491,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					gdrom_raise_irq(space->machine);
+					gdrom_raise_irq(space->machine());
 					break;
 
 				case 0xef:	// SET FEATURES
@@ -512,7 +512,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
 
-					gdrom_raise_irq(space->machine);
+					gdrom_raise_irq(space->machine());
 					break;
 
 				default:
@@ -531,7 +531,7 @@ static void dreamcast_atapi_exit(running_machine& machine)
 	}
 }
 
-void dreamcast_atapi_init(running_machine *machine)
+void dreamcast_atapi_init(running_machine &machine)
 {
 	atapi_regs = auto_alloc_array(machine, UINT8,  ATAPI_REG_MAX );
 	memset(atapi_regs, 0, sizeof(atapi_regs));
@@ -545,12 +545,12 @@ void dreamcast_atapi_init(running_machine *machine)
 	atapi_data_len = 0;
 	atapi_cdata_wait = 0;
 
-	atapi_timer = machine->scheduler().timer_alloc(FUNC(atapi_xfer_end));
+	atapi_timer = machine.scheduler().timer_alloc(FUNC(atapi_xfer_end));
 	atapi_timer->adjust(attotime::never);
 
 	gdrom_device = NULL;
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, dreamcast_atapi_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, dreamcast_atapi_exit);
 
 	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 
@@ -564,7 +564,7 @@ void dreamcast_atapi_init(running_machine *machine)
 	state_save_register_global(machine,  atapi_xfermod );
 }
 
-void dreamcast_atapi_reset(running_machine *machine)
+void dreamcast_atapi_reset(running_machine &machine)
 {
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	atapi_regs[ATAPI_REG_ERROR] = 1;
@@ -578,7 +578,7 @@ void dreamcast_atapi_reset(running_machine *machine)
 	atapi_xferlen = 0;
 	atapi_xfermod = 0;
 
-	if ( cd_get_cdrom_file(machine->device( "cdrom" )) != NULL )
+	if ( cd_get_cdrom_file(machine.device( "cdrom" )) != NULL )
 	{
 		SCSIAllocInstance( machine, &SCSIClassGDROM, &gdrom_device, "cdrom" );
 	}
@@ -621,7 +621,7 @@ READ64_HANDLER( dc_mess_gdrom_r )
 		off=offset << 1;
 	}
 
-//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, cpu_get_pc(space->cpu));
+//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, cpu_get_pc(&space->device()));
 
 	if (offset == 3)
 	{
@@ -650,7 +650,7 @@ WRITE64_HANDLER( dc_mess_gdrom_w )
 		off=offset << 1;
 	}
 
-//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, cpu_get_pc(space->cpu));
+//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, cpu_get_pc(&space->device()));
 
 	if (off >= 0x20)
 	{
@@ -661,7 +661,7 @@ WRITE64_HANDLER( dc_mess_gdrom_w )
 // register decode helpers
 
 // this accepts only 32-bit accesses
-INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 {
 	int reg = offset * 2;
 
@@ -670,7 +670,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
+		mame_printf_verbose("%s:Wrong mask!\n", machine.describe_context());
 //      debugger_break(machine);
 	}
 
@@ -688,7 +688,7 @@ READ64_HANDLER( dc_mess_g1_ctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
 	return (UINT64)g1bus_regs[reg] << shift;
 }
@@ -699,7 +699,7 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 	UINT64 shift;
 	UINT32 old,dat;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = g1bus_regs[reg];
 
@@ -717,7 +717,7 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 			}
 
 			atapi_xferbase = g1bus_regs[SB_GDSTAR];
-			atapi_timer->adjust(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+			atapi_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 		}
 		break;
 	}

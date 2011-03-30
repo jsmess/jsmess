@@ -370,7 +370,7 @@ typedef struct {
 //
 // Prototypes
 //
-static hard_disk_file *corvus_hdc_file(running_machine *machine, int id);
+static hard_disk_file *corvus_hdc_file(running_machine &machine, int id);
 static TIMER_CALLBACK(corvus_hdc_callback);
 
 //
@@ -544,7 +544,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 // Returns:
 //      status: Command status
 //
-static UINT8 corvus_write_sector(running_machine *machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
+static UINT8 corvus_write_sector(running_machine &machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -605,7 +605,7 @@ static UINT8 corvus_write_sector(running_machine *machine, UINT8 drv, UINT32 sec
 // Returns:
 //      status: Corvus status
 //
-static UINT8 corvus_write_logical_sector(running_machine *machine, dadr_t *dadr, UINT8 *buffer, int len) {
+static UINT8 corvus_write_logical_sector(running_machine &machine, dadr_t *dadr, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -655,7 +655,7 @@ static UINT8 corvus_write_logical_sector(running_machine *machine, dadr_t *dadr,
 // Returns:
 //      status: Corvus status
 //
-static UINT8 corvus_read_sector(running_machine *machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
+static UINT8 corvus_read_sector(running_machine &machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -705,7 +705,7 @@ static UINT8 corvus_read_sector(running_machine *machine, UINT8 drv, UINT32 sect
 // Returns:
 //      status: Corvus status
 //
-static UINT8 corvus_read_logical_sector(running_machine *machine, dadr_t *dadr, UINT8 *buffer, int len) {
+static UINT8 corvus_read_logical_sector(running_machine &machine, dadr_t *dadr, UINT8 *buffer, int len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -756,7 +756,7 @@ static UINT8 corvus_read_logical_sector(running_machine *machine, dadr_t *dadr, 
 // Side-effects:
 //      Fills in the semaphore result code
 //
-static UINT8 corvus_lock_semaphore(running_machine *machine, UINT8 *name) {
+static UINT8 corvus_lock_semaphore(running_machine &machine, UINT8 *name) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -834,7 +834,7 @@ static UINT8 corvus_lock_semaphore(running_machine *machine, UINT8 *name) {
 // Side-effects:
 //      Fills in the semaphore result code
 //
-static UINT8 corvus_unlock_semaphore(running_machine *machine, UINT8 *name) {
+static UINT8 corvus_unlock_semaphore(running_machine &machine, UINT8 *name) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -902,7 +902,7 @@ static UINT8 corvus_unlock_semaphore(running_machine *machine, UINT8 *name) {
 //      Disk status
 //
 //
-static UINT8 corvus_init_semaphore_table( running_machine *machine ) {
+static UINT8 corvus_init_semaphore_table( running_machine &machine ) {
 
 	semaphore_table_block_t
 			semaphore_table;
@@ -932,7 +932,7 @@ static UINT8 corvus_init_semaphore_table( running_machine *machine ) {
 // Returns:
 //      Status of command
 //
-static UINT8 corvus_get_drive_parameters(running_machine *machine, UINT8 drv) {
+static UINT8 corvus_get_drive_parameters(running_machine &machine, UINT8 drv) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -1041,7 +1041,7 @@ static UINT8 corvus_get_drive_parameters(running_machine *machine, UINT8 drv) {
 // Returns:
 //      status: Status of read operation
 //
-static UINT8 corvus_read_boot_block(running_machine *machine, UINT8 block) {
+static UINT8 corvus_read_boot_block(running_machine &machine, UINT8 block) {
 
 	corvus_hdc_t	*c = &corvus_hdc;			// Pick up global controller structure
 
@@ -1065,7 +1065,7 @@ static UINT8 corvus_read_boot_block(running_machine *machine, UINT8 block) {
 // Returns:
 //      Status of command
 //
-static UINT8 corvus_read_firmware_block(running_machine *machine, UINT8 head, UINT8 sector) {
+static UINT8 corvus_read_firmware_block(running_machine &machine, UINT8 head, UINT8 sector) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;	// Pick up global controller structure
@@ -1096,7 +1096,7 @@ static UINT8 corvus_read_firmware_block(running_machine *machine, UINT8 head, UI
 // Returns:
 //      Status of command
 //
-static UINT8 corvus_write_firmware_block(running_machine *machine, UINT8 head, UINT8 sector, UINT8 *buffer) {
+static UINT8 corvus_write_firmware_block(running_machine &machine, UINT8 head, UINT8 sector, UINT8 *buffer) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;	// Pick up global controller structure
@@ -1125,7 +1125,7 @@ static UINT8 corvus_write_firmware_block(running_machine *machine, UINT8 head, U
 // Returns:
 //      Status of command
 //
-static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT16 len) {
+static UINT8 corvus_format_drive(running_machine &machine, UINT8 *pattern, UINT16 len) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
@@ -1173,7 +1173,7 @@ static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT1
 // Returns:
 //      hard_disk_file object
 //
-static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
+static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
 	static const char *const tags[] = {
 		"harddisk1"
 	};
@@ -1182,7 +1182,7 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 	/* Only one harddisk supported right now */
 	assert ( id == 0 );
 
-	img = dynamic_cast<device_image_interface *>(machine->device(tags[id]));
+	img = dynamic_cast<device_image_interface *>(machine.device(tags[id]));
 
 	if ( !img )
 		return NULL;
@@ -1206,7 +1206,7 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 // Returns:
 //      Nothing
 //
-static void corvus_process_command_packet(running_machine *machine, UINT8 invalid_command_flag) {
+static void corvus_process_command_packet(running_machine &machine, UINT8 invalid_command_flag) {
 
 	corvus_hdc_t	*c = &corvus_hdc;
 
@@ -1356,7 +1356,7 @@ static void corvus_process_command_packet(running_machine *machine, UINT8 invali
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	machine->scheduler().timer_set(attotime::from_usec(c->delay), FUNC(corvus_hdc_callback), CALLBACK_CTH_MODE);
+	machine.scheduler().timer_set(attotime::from_usec(c->delay), FUNC(corvus_hdc_callback), CALLBACK_CTH_MODE);
 	c->timeout_timer->enable(0);			// We've received enough data, disable the timeout timer
 
 	c->delay = 0;									// Reset delay for next function
@@ -1434,7 +1434,7 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 // Returns:
 //      NULL if there's no file to attach to
 //
-UINT8 corvus_hdc_init(running_machine *machine) {
+UINT8 corvus_hdc_init(running_machine &machine) {
 
 	corvus_hdc_t			*c = &corvus_hdc;	// Pick up global controller structure
 	hard_disk_file	*disk;				// Structures for interface to CHD routines
@@ -1455,7 +1455,7 @@ UINT8 corvus_hdc_init(running_machine *machine) {
 	c->xmit_bytes = 0;							// We don't have anything to say to the host
 	c->recv_bytes = 0;							// We aren't waiting on additional data from the host
 
-	c->timeout_timer = machine->scheduler().timer_alloc(FUNC(corvus_hdc_callback));	// Set up a timer to handle the four-second host-to-controller timeout
+	c->timeout_timer = machine.scheduler().timer_alloc(FUNC(corvus_hdc_callback));	// Set up a timer to handle the four-second host-to-controller timeout
 	c->timeout_timer->adjust(attotime::from_seconds(4), CALLBACK_TIMEOUT);
 	c->timeout_timer->enable(0);		// Start this timer out disabled
 
@@ -1623,14 +1623,14 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
 
-		space->machine->scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_HTC_MODE);
+		space->machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_HTC_MODE);
 
 //      c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		space->machine->scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
+		space->machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
 	}
 
 	return result;
@@ -1693,7 +1693,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	// to the user with us Ready for more data and in Host-to-Controller mode.
 	//
 	if(c->offset == c->recv_bytes) {						// We've received enough data to process
-		corvus_process_command_packet(space->machine, c->invalid_command_flag);
+		corvus_process_command_packet(space->machine(), c->invalid_command_flag);
 	} else {
 		//
 		// Reset the four-second timer since we received some data
@@ -1704,6 +1704,6 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		// Make the controller busy for a few microseconds while the command is processed
 		//
 		c->status |= CONTROLLER_BUSY;
-		space->machine->scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
+		space->machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
 	}
 }

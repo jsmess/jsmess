@@ -26,8 +26,8 @@
 
 VIDEO_START(vc4000)
 {
-	vc4000_state *state = machine->driver_data<vc4000_state>();
-	screen_device *screen = machine->first_screen();
+	vc4000_state *state = machine.driver_data<vc4000_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	int i;
@@ -82,7 +82,7 @@ INLINE UINT8 vc4000_joystick_return_to_centre(UINT8 joy)
 
 READ8_HANDLER(vc4000_video_r)
 {
-	vc4000_state *state = space->machine->driver_data<vc4000_state>();
+	vc4000_state *state = space->machine().driver_data<vc4000_state>();
 	UINT8 data=0;
 	if (offset > 0xcf) offset &= 0xcf;	// c0-cf is mirrored at d0-df, e0-ef, f0-ff
 	switch (offset) {
@@ -131,11 +131,11 @@ READ8_HANDLER(vc4000_video_r)
 #else
 
 	case 0xcc:		/* left joystick */
-		if (input_port_read(space->machine, "CONFIG")&1)
+		if (input_port_read(space->machine(), "CONFIG")&1)
 		{		/* paddle */
-			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine().device("maincpu"), S2650_FO))
 			{
-				data = input_port_read(space->machine, "JOYS") & 0x03;
+				data = input_port_read(space->machine(), "JOYS") & 0x03;
 				switch (data)
 				{
 				case 0x01:
@@ -153,7 +153,7 @@ READ8_HANDLER(vc4000_video_r)
 			}
 			else
 			{
-				data = input_port_read(space->machine, "JOYS") & 0x0c;
+				data = input_port_read(space->machine(), "JOYS") & 0x0c;
 				switch (data)
 				{
 				case 0x08:
@@ -172,9 +172,9 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{		/* buttons */
-			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine().device("maincpu"), S2650_FO))
 			{
-				data = input_port_read(space->machine, "JOYS") & 0x03;
+				data = input_port_read(space->machine(), "JOYS") & 0x03;
 				switch (data)
 				{
 				case 0x01:
@@ -190,7 +190,7 @@ READ8_HANDLER(vc4000_video_r)
 			}
 			else
 			{
-				data = input_port_read(space->machine, "JOYS") & 0x0c;
+				data = input_port_read(space->machine(), "JOYS") & 0x0c;
 				switch (data)
 				{
 				case 0x08:
@@ -208,11 +208,11 @@ READ8_HANDLER(vc4000_video_r)
 		break;
 
 	case 0xcd:		/* right joystick */
-		if (input_port_read(space->machine, "CONFIG")&1)
+		if (input_port_read(space->machine(), "CONFIG")&1)
 		{
-			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine().device("maincpu"), S2650_FO))
 			{
-				data = input_port_read(space->machine, "JOYS") & 0x30;
+				data = input_port_read(space->machine(), "JOYS") & 0x30;
 				switch (data)
 				{
 				case 0x10:
@@ -230,7 +230,7 @@ READ8_HANDLER(vc4000_video_r)
 			}
 			else
 			{
-				data = input_port_read(space->machine, "JOYS") & 0xc0;
+				data = input_port_read(space->machine(), "JOYS") & 0xc0;
 				switch (data)
 				{
 				case 0x80:
@@ -249,9 +249,9 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{
-			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine().device("maincpu"), S2650_FO))
 			{
-				data = input_port_read(space->machine, "JOYS") & 0x30;
+				data = input_port_read(space->machine(), "JOYS") & 0x30;
 				switch (data)
 				{
 				case 0x10:
@@ -267,7 +267,7 @@ READ8_HANDLER(vc4000_video_r)
 			}
 			else
 			{
-				data = input_port_read(space->machine, "JOYS") & 0xc0;
+				data = input_port_read(space->machine(), "JOYS") & 0xc0;
 				switch (data)
 				{
 				case 0x80:
@@ -294,7 +294,7 @@ READ8_HANDLER(vc4000_video_r)
 
 WRITE8_HANDLER(vc4000_video_w)
 {
-	vc4000_state *state = space->machine->driver_data<vc4000_state>();
+	vc4000_state *state = space->machine().driver_data<vc4000_state>();
 //  state->video.reg.data[offset]=data;
 	if (offset > 0xcf) offset &= 0xcf;	// c0-cf is mirrored at d0-df, e0-ef, f0-ff
 
@@ -327,7 +327,7 @@ WRITE8_HANDLER(vc4000_video_w)
 
 	case 0xc7:						// Soundregister
 		state->video.reg.data[offset] = data;
-		vc4000_soundport_w(space->machine->device("custom"), 0, data);
+		vc4000_soundport_w(space->machine().device("custom"), 0, data);
 		break;
 
 	case 0xc8:						// Digits 1 and 2
@@ -356,7 +356,7 @@ WRITE8_HANDLER(vc4000_video_w)
 
 READ8_HANDLER(vc4000_vsync_r)
 {
-	vc4000_state *state = space->machine->driver_data<vc4000_state>();
+	vc4000_state *state = space->machine().driver_data<vc4000_state>();
 	return state->video.line >= VC4000_END_LINE ? 0x80 : 0;
 }
 
@@ -515,10 +515,10 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 	}
 }
 
-INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
+INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 {
-	vc4000_state *state = machine->driver_data<vc4000_state>();
-	screen_device *screen = machine->first_screen();
+	vc4000_state *state = machine.driver_data<vc4000_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	int i, j, m, x, line=state->video.line-20;
@@ -574,11 +574,11 @@ INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 
 INTERRUPT_GEN( vc4000_video_line )
 {
-	vc4000_state *state = device->machine->driver_data<vc4000_state>();
+	vc4000_state *state = device->machine().driver_data<vc4000_state>();
 	int x,y,i;
 	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
-	const rectangle &visarea = device->machine->primary_screen->visible_area();
-	assert(ARRAY_LENGTH(collision) >= device->machine->primary_screen->width());
+	const rectangle &visarea = device->machine().primary_screen->visible_area();
+	assert(ARRAY_LENGTH(collision) >= device->machine().primary_screen->width());
 
 	state->video.line++;
 	if (state->irq_pause) state->irq_pause++;
@@ -594,13 +594,13 @@ INTERRUPT_GEN( vc4000_video_line )
 
 	if (state->irq_pause>10)
 	{
-		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
 		state->irq_pause = 0;
 	}
 
 	if (state->video.line <= VC4000_END_LINE)
 	{
-		vc4000_draw_grid(device->machine, collision);
+		vc4000_draw_grid(device->machine(), collision);
 
 		/* init object colours */
 		for (i=visarea.min_x; i<visarea.max_x; i++) state->objects[i]=8;
@@ -640,14 +640,14 @@ INTERRUPT_GEN( vc4000_video_line )
 		(state->video.sprites[1].finished_now) |
 		(state->video.sprites[0].finished_now)) && (!state->irq_pause))
 		{
-			cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 3);
+			cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, ASSERT_LINE, 3);
 			state->irq_pause=1;
 		}
 }
 
 SCREEN_UPDATE( vc4000 )
 {
-	vc4000_state *state = screen->machine->driver_data<vc4000_state>();
+	vc4000_state *state = screen->machine().driver_data<vc4000_state>();
 	copybitmap(bitmap, state->video.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

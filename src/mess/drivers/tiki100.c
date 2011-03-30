@@ -36,7 +36,7 @@
 #include "sound/ay8910.h"
 #include "machine/ram.h"
 
-INLINE device_t *get_floppy_image(running_machine *machine, int drive)
+INLINE device_t *get_floppy_image(running_machine &machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }
@@ -45,7 +45,7 @@ INLINE device_t *get_floppy_image(running_machine *machine, int drive)
 
 static READ8_HANDLER( gfxram_r )
 {
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
@@ -54,17 +54,17 @@ static READ8_HANDLER( gfxram_r )
 
 static WRITE8_HANDLER( gfxram_w )
 {
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
 	state->video_ram[addr] = data;
 }
 
-static void tiki100_bankswitch(running_machine *machine)
+static void tiki100_bankswitch(running_machine &machine)
 {
-	tiki100_state *state = machine->driver_data<tiki100_state>();
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	tiki100_state *state = machine.driver_data<tiki100_state>();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	if (state->vire)
 	{
@@ -116,10 +116,10 @@ static void tiki100_bankswitch(running_machine *machine)
 
 static READ8_HANDLER( keyboard_r )
 {
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11", "ROW12" };
-	UINT8 data = input_port_read(space->machine, keynames[state->keylatch]);
+	UINT8 data = input_port_read(space->machine(), keynames[state->keylatch]);
 
 	state->keylatch++;
 
@@ -130,7 +130,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	state->keylatch = 0;
 }
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( video_mode_w )
 
     */
 
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	state->mode = data;
 
@@ -161,7 +161,7 @@ static WRITE8_HANDLER( video_mode_w )
 		int color = data & 0x0f;
 		UINT8 colordata = ~state->palette;
 
-		palette_set_color_rgb(space->machine, color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
+		palette_set_color_rgb(space->machine(), color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( palette_w )
 
     */
 
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	state->palette = data;
 }
@@ -204,7 +204,7 @@ static WRITE8_HANDLER( system_w )
 
     */
 
-	tiki100_state *state = space->machine->driver_data<tiki100_state>();
+	tiki100_state *state = space->machine().driver_data<tiki100_state>();
 
 	/* drive select */
 	if (BIT(data, 0)) wd17xx_set_drive(state->fd1797, 0);
@@ -214,22 +214,22 @@ static WRITE8_HANDLER( system_w )
 	wd17xx_dden_w(state->fd1797, BIT(data, 4));
 
 	/* floppy motor */
-	floppy_mon_w(get_floppy_image(space->machine, 0), !BIT(data, 6));
-	floppy_mon_w(get_floppy_image(space->machine, 1), !BIT(data, 6));
-	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data, 6), 1);
-	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), BIT(data, 6), 1);
+	floppy_mon_w(get_floppy_image(space->machine(), 0), !BIT(data, 6));
+	floppy_mon_w(get_floppy_image(space->machine(), 1), !BIT(data, 6));
+	floppy_drive_set_ready_state(get_floppy_image(space->machine(), 0), BIT(data, 6), 1);
+	floppy_drive_set_ready_state(get_floppy_image(space->machine(), 1), BIT(data, 6), 1);
 
 	/* GRAFIKK key led */
-	set_led_status(space->machine, 1, BIT(data, 5));
+	set_led_status(space->machine(), 1, BIT(data, 5));
 
 	/* LOCK key led */
-	set_led_status(space->machine, 2, BIT(data, 7));
+	set_led_status(space->machine(), 2, BIT(data, 7));
 
 	/* bankswitch */
 	state->rome = BIT(data, 2);
 	state->vire = BIT(data, 3);
 
-	tiki100_bankswitch(space->machine);
+	tiki100_bankswitch(space->machine());
 }
 
 /* Memory Maps */
@@ -407,7 +407,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( tiki100 )
 {
-	tiki100_state *state = screen->machine->driver_data<tiki100_state>();
+	tiki100_state *state = screen->machine().driver_data<tiki100_state>();
 
 	UINT16 addr = (state->scroll << 7);
 	int sx, y, pixel, mode = (state->mode >> 4) & 0x03;
@@ -517,7 +517,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	tiki100_state *state = timer.machine->driver_data<tiki100_state>();
+	tiki100_state *state = timer.machine().driver_data<tiki100_state>();
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -553,7 +553,7 @@ static const wd17xx_interface tiki100_wd17xx_interface =
 
 static WRITE8_DEVICE_HANDLER( video_scroll_w )
 {
-	tiki100_state *state = device->machine->driver_data<tiki100_state>();
+	tiki100_state *state = device->machine().driver_data<tiki100_state>();
 
 	state->scroll = data;
 }
@@ -582,24 +582,24 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 
 static MACHINE_START( tiki100 )
 {
-	tiki100_state *state = machine->driver_data<tiki100_state>();
+	tiki100_state *state = machine.driver_data<tiki100_state>();
 
 	/* find devices */
-	state->fd1797 = machine->device(FD1797_TAG);
-	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->fd1797 = machine.device(FD1797_TAG);
+	state->z80ctc = machine.device(Z80CTC_TAG);
 
 	/* allocate video RAM */
 	state->video_ram = auto_alloc_array(machine, UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine->region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAM, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
+	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine.region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_RAM, 1, ram_get_ptr(machine.device(RAM_TAG)), 0);
 	memory_configure_bank(machine, "bank1", BANK_VIDEO_RAM, 1, state->video_ram, 0);
 
-	memory_configure_bank(machine, "bank2", BANK_RAM, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", BANK_RAM, 1, ram_get_ptr(machine.device(RAM_TAG)) + 0x4000, 0);
 	memory_configure_bank(machine, "bank2", BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
 
-	memory_configure_bank(machine, "bank3", BANK_RAM, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x8000, 0);
+	memory_configure_bank(machine, "bank3", BANK_RAM, 1, ram_get_ptr(machine.device(RAM_TAG)) + 0x8000, 0);
 
 	tiki100_bankswitch(machine);
 

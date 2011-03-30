@@ -67,7 +67,7 @@ public:
 
 static TIMER_DEVICE_CALLBACK( vg230_timer )
 {
-	pasogo_state *state = timer.machine->driver_data<pasogo_state>();
+	pasogo_state *state = timer.machine().driver_data<pasogo_state>();
 	vg230_t *vg230 = &state->vg230;
 
 	vg230->rtc.seconds+=1;
@@ -96,15 +96,15 @@ static TIMER_DEVICE_CALLBACK( vg230_timer )
 	}
 }
 
-static void vg230_reset(running_machine *machine)
+static void vg230_reset(running_machine &machine)
 {
-	pasogo_state *state = machine->driver_data<pasogo_state>();
+	pasogo_state *state = machine.driver_data<pasogo_state>();
 	vg230_t *vg230 = &state->vg230;
 	system_time systime;
 
 	memset(vg230, 0, sizeof(*vg230));
 	vg230->pmu.write_protected=TRUE;
-	machine->base_datetime(systime);
+	machine.base_datetime(systime);
 
 	vg230->rtc.seconds= systime.local_time.second;
 	vg230->rtc.minutes= systime.local_time.minute;
@@ -114,7 +114,7 @@ static void vg230_reset(running_machine *machine)
 	vg230->bios_timer.data=0x7200; // HACK
 }
 
-static void vg230_init(running_machine *machine)
+static void vg230_init(running_machine &machine)
 {
 	vg230_reset(machine);
 }
@@ -122,7 +122,7 @@ static void vg230_init(running_machine *machine)
 
 static READ8_HANDLER( vg230_io_r )
 {
-	pasogo_state *state = space->machine->driver_data<pasogo_state>();
+	pasogo_state *state = space->machine().driver_data<pasogo_state>();
 	vg230_t *vg230 = &state->vg230;
 	int log=TRUE;
 	UINT8 data=0;
@@ -137,7 +137,7 @@ static READ8_HANDLER( vg230_io_r )
 			case 0x0a:
 				if (vg230->data[9]&1)
 				{
-					data=input_port_read(space->machine, "JOY");
+					data=input_port_read(space->machine(), "JOY");
 				}
 				else
 				{
@@ -175,8 +175,8 @@ static READ8_HANDLER( vg230_io_r )
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x read %.2x\n",(int) cpu_get_pc(space->cpu),vg230->index,data);
-      //    data=machine->region("maincpu")->base()[0x4000+offset];
+			logerror("%.5x vg230 %02x read %.2x\n",(int) cpu_get_pc(&space->device()),vg230->index,data);
+      //    data=machine.region("maincpu")->base()[0x4000+offset];
 	}
 	else
 	{
@@ -187,13 +187,13 @@ static READ8_HANDLER( vg230_io_r )
 
 static WRITE8_HANDLER( vg230_io_w )
 {
-	pasogo_state *state = space->machine->driver_data<pasogo_state>();
+	pasogo_state *state = space->machine().driver_data<pasogo_state>();
 	vg230_t *vg230 = &state->vg230;
 	int log=TRUE;
 
 	if (offset&1)
 	{
-		//  machine->region("maincpu")->base()[0x4000+offset]=data;
+		//  machine.region("maincpu")->base()[0x4000+offset]=data;
 		vg230->data[vg230->index]=data;
 		switch (vg230->index)
 		{
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( vg230_io_w )
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x write %.2x\n",(int)cpu_get_pc(space->cpu),vg230->index,data);
+			logerror("%.5x vg230 %02x write %.2x\n",(int)cpu_get_pc(&space->device()),vg230->index,data);
 	}
 	else
 	{
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( vg230_io_w )
 
 static READ8_HANDLER( ems_r )
 {
-	pasogo_state *state = space->machine->driver_data<pasogo_state>();
+	pasogo_state *state = space->machine().driver_data<pasogo_state>();
 	ems_t *ems = &state->ems;
 	UINT8 data=0;
 
@@ -246,7 +246,7 @@ static READ8_HANDLER( ems_r )
 
 static WRITE8_HANDLER( ems_w )
 {
-	pasogo_state *state = space->machine->driver_data<pasogo_state>();
+	pasogo_state *state = space->machine().driver_data<pasogo_state>();
 	ems_t *ems = &state->ems;
 	char bank[10];
 
@@ -293,14 +293,14 @@ static WRITE8_HANDLER( ems_w )
 		ems->mapper[ems->index].address=(ems->mapper[ems->index].data[0]<<14)|((ems->mapper[ems->index].data[1]&0xf)<<22);
 		ems->mapper[ems->index].on=ems->mapper[ems->index].data[1]&0x80;
 		ems->mapper[ems->index].type=(ems->mapper[ems->index].data[1]&0x70)>>4;
-		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)cpu_get_pc(space->cpu),ems->index, ems->data<<12,
+		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)cpu_get_pc(&space->device()),ems->index, ems->data<<12,
 			ems->mapper[ems->index].on, ems->mapper[ems->index].type, ems->mapper[ems->index].address );
 		switch (ems->mapper[ems->index].type)
 		{
 		case 0: /*external*/
 		case 1: /*ram*/
 		sprintf(bank,"bank%d",ems->index+1);
-		memory_set_bankptr( space->machine, bank, space->machine->region("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
+		memory_set_bankptr( space->machine(), bank, space->machine().region("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
 		break;
 		case 3: /* rom 1 */
 		case 4: /* pc card a */
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( ems_w )
 		break;
 		case 2:
 		sprintf(bank,"bank%d",ems->index+1);
-		memory_set_bankptr( space->machine,  bank, space->machine->region("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
+		memory_set_bankptr( space->machine(),  bank, space->machine().region("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
 		break;
 		}
 		break;
@@ -397,7 +397,7 @@ static PALETTE_INIT( pasogo )
 static SCREEN_UPDATE( pasogo )
 {
 	//static int width=-1,height=-1;
-	UINT8 *rom = screen->machine->region("maincpu")->base()+0xb8000;
+	UINT8 *rom = screen->machine().region("maincpu")->base()+0xb8000;
 	static const UINT16 c[]={ 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
@@ -445,7 +445,7 @@ static SCREEN_UPDATE( pasogo )
 	if (w!=width || h!=height)
 	{
 		width=w; height=h;
-//      machine->primary_screen->set_visible_area(0, width-1, 0, height-1);
+//      machine.primary_screen->set_visible_area(0, width-1, 0, height-1);
 		screen->set_visible_area(0, width-1, 0, height-1);
 	}
 #endif
@@ -459,12 +459,12 @@ static INTERRUPT_GEN( pasogo_interrupt )
 
 static IRQ_CALLBACK(pasogo_irq_callback)
 {
-	return pic8259_acknowledge( device->machine->device("pic8259"));
+	return pic8259_acknowledge( device->machine().device("pic8259"));
 }
 
 static MACHINE_RESET( pasogo )
 {
-	device_set_irq_callback(machine->device("maincpu"), pasogo_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;
@@ -491,7 +491,7 @@ static const struct pit8253_config pc_pit8254_config =
 
 static WRITE_LINE_DEVICE_HANDLER( pasogo_pic8259_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pasogo_pic8259_config =
@@ -548,11 +548,11 @@ ROM_END
 
 static DRIVER_INIT( pasogo )
 {
-	pasogo_state *state = machine->driver_data<pasogo_state>();
+	pasogo_state *state = machine.driver_data<pasogo_state>();
 	vg230_init(machine);
 	memset(&state->ems, 0, sizeof(state->ems));
-	memory_set_bankptr( machine, "bank27", machine->region("user1")->base() + 0x00000 );
-	memory_set_bankptr( machine, "bank28", machine->region("maincpu")->base() + 0xb8000/*?*/ );
+	memory_set_bankptr( machine, "bank27", machine.region("user1")->base() + 0x00000 );
+	memory_set_bankptr( machine, "bank28", machine.region("maincpu")->base() + 0xb8000/*?*/ );
 }
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT

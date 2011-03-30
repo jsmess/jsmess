@@ -128,7 +128,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(votrtnt)
 {
-	votrtnt_state *state = machine->driver_data<votrtnt_state>();
+	votrtnt_state *state = machine.driver_data<votrtnt_state>();
 	state->m_term_data = 0;
 	state->m_term_status = 0xe2;
 }
@@ -146,10 +146,10 @@ static GENERIC_TERMINAL_INTERFACE( votrtnt_terminal_intf )
 
 static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
 {
-	votrtnt_state *state = timer.machine->driver_data<votrtnt_state>();
+	votrtnt_state *state = timer.machine().driver_data<votrtnt_state>();
 	UINT8 status = votrax_status_r(state->m_votrax);
 	//printf("%X ",status);
-	device_set_input_line(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

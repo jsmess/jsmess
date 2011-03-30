@@ -154,16 +154,16 @@ static DEVICE_START( com8116 )
 	/* create the timers */
 	if (com8116->out_fx4_func.target)
 	{
-		com8116->fx4_timer = device->machine->scheduler().timer_alloc(FUNC(fx4_tick), (void *)device);
+		com8116->fx4_timer = device->machine().scheduler().timer_alloc(FUNC(fx4_tick), (void *)device);
 		com8116->fx4_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 4));
 	}
 
-	com8116->fr_timer = device->machine->scheduler().timer_alloc(FUNC(fr_tick), (void *)device);
-	com8116->ft_timer = device->machine->scheduler().timer_alloc(FUNC(ft_tick), (void *)device);
+	com8116->fr_timer = device->machine().scheduler().timer_alloc(FUNC(fr_tick), (void *)device);
+	com8116->ft_timer = device->machine().scheduler().timer_alloc(FUNC(ft_tick), (void *)device);
 
 	/* register for state saving */
-    state_save_register_global(device->machine, com8116->fr);
-    state_save_register_global(device->machine, com8116->ft);
+    state_save_register_global(device->machine(), com8116->fr);
+    state_save_register_global(device->machine(), com8116->ft);
 }
 
 /*-------------------------------------------------

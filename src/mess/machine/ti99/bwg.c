@@ -123,7 +123,7 @@ static void bwg_handle_hold(device_t *device)
 		state = CLEAR_LINE;
 
 	// TODO: use READY
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state);
 }
 
 /*
@@ -151,10 +151,10 @@ the controller. */
 
 static void set_all_geometries(device_t *device, floppy_type_t type)
 {
-	set_geometry(device->machine->device(PFLOPPY_0), type);
-	set_geometry(device->machine->device(PFLOPPY_1), type);
-	set_geometry(device->machine->device(PFLOPPY_2), type);
-	set_geometry(device->machine->device(PFLOPPY_3), type);
+	set_geometry(device->machine().device(PFLOPPY_0), type);
+	set_geometry(device->machine().device(PFLOPPY_1), type);
+	set_geometry(device->machine().device(PFLOPPY_2), type);
+	set_geometry(device->machine().device(PFLOPPY_3), type);
 }
 
 
@@ -486,12 +486,12 @@ static DEVICE_START( ti99_bwg )
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
 
-	card->motor_on_timer = device->machine->scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
+	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 	card->controller = device->subdevice("wd1773");
 	card->clock = device->subdevice("mm58274c");
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", bwg_region);
-	card->rom = device->machine->region(astring_c(region))->base();
+	card->rom = device->machine().region(astring_c(region))->base();
 	card->ram = NULL;
 }
 
@@ -516,7 +516,7 @@ static DEVICE_RESET( ti99_bwg )
 	ti99_bwg_state *card = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine, "DISKCTRL") == DISK_BWG)
+	if (input_port_read(device->machine(), "DISKCTRL") == DISK_BWG)
 	{
 		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &bwg_card, get_pebcard_config(device)->slot);
@@ -529,9 +529,9 @@ static DEVICE_RESET( ti99_bwg )
 			memset(card->ram, 0, 2048);
 		}
 
-		card->dip1 = input_port_read(device->machine, "BWGDIP1");
-		card->dip2 = input_port_read(device->machine, "BWGDIP2");
-		card->dip34 = input_port_read(device->machine, "BWGDIP34");
+		card->dip1 = input_port_read(device->machine(), "BWGDIP1");
+		card->dip2 = input_port_read(device->machine(), "BWGDIP2");
+		card->dip34 = input_port_read(device->machine(), "BWGDIP34");
 
 		card->DSEL = 0;
 		card->SIDE = 0;
@@ -551,7 +551,7 @@ static DEVICE_RESET( ti99_bwg )
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			card->select_mask = 0x1fe000;

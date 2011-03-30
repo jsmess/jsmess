@@ -141,7 +141,7 @@ UINT8 comx35_state::read_expansion()
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
-			result = input_port_read(&m_machine, "EXPANSION");
+			result = input_port_read(m_machine, "EXPANSION");
 			break;
 
 		default:
@@ -171,13 +171,13 @@ bool comx35_state::is_dos_card_active()
 /* Floppy Disc Controller */
 static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_intrq_w )
 {
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
+	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
 	driver_state->m_fdc_irq = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_drq_w )
 {
-	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
+	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
 
 	if (driver_state->m_fdc_drq_enable)
 		driver_state->m_cdp1802_ef4 = state;
@@ -256,7 +256,7 @@ void comx35_state::fdc_w(UINT8 data)
 
 UINT8 comx35_state::printer_r()
 {
-	int printer = input_port_read(machine, "PRINTER") & 0x07;
+	int printer = input_port_read(m_machine, "PRINTER") & 0x07;
 	UINT8 data = 0;
 
 	switch (printer)
@@ -295,7 +295,7 @@ UINT8 comx35_state::printer_r()
 
 void comx35_state::printer_w(UINT8 data)
 {
-	int printer = input_port_read(machine, "PRINTER") & 0x07;
+	int printer = input_port_read(m_machine, "PRINTER") & 0x07;
 
 	switch (printer)
 	{
@@ -347,7 +347,7 @@ void comx35_state::get_active_bank(UINT8 data)
 		}
 
 		if (m_slot > 0)
-			m_bank = input_port_read(&m_machine, slotnames[m_slot]);
+			m_bank = input_port_read(m_machine, slotnames[m_slot]);
 	}
 	else
 	{
@@ -425,7 +425,7 @@ void comx35_state::set_active_bank()
 		break;
 	}
 
-	memory_set_bank(machine, "bank1", bank);
+	memory_set_bank(m_machine, "bank1", bank);
 }
 
 WRITE8_MEMBER( comx35_state::bank_select_w )
@@ -455,7 +455,7 @@ READ8_MEMBER( comx35_state::io_r )
 		break;
 
 	case BANK_JOYCARD:
-		data = input_port_read(&m_machine, "JOY1");
+		data = input_port_read(m_machine, "JOY1");
 		break;
 
 	case BANK_80_COLUMNS:
@@ -487,7 +487,7 @@ READ8_MEMBER( comx35_state::io2_r )
 		break;
 
 	case BANK_JOYCARD:
-		data = input_port_read(&m_machine, "JOY2");
+		data = input_port_read(m_machine, "JOY2");
 		break;
 
 	case BANK_80_COLUMNS:
@@ -533,7 +533,7 @@ WRITE8_MEMBER( comx35_state::io_w )
 
 static TIMER_CALLBACK( reset_tick )
 {
-	comx35_state *state = machine->driver_data<comx35_state>();
+	comx35_state *state = machine.driver_data<comx35_state>();
 
 	state->m_reset = 1;
 }
@@ -557,7 +557,7 @@ DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 
 static STATE_POSTLOAD( comx35_state_save_postload )
 {
-	comx35_state *state = machine->driver_data<comx35_state>();
+	comx35_state *state = machine.driver_data<comx35_state>();
 
 	state->set_active_bank();
 }
@@ -567,41 +567,41 @@ void comx35_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* opbase handling for DOS Card */
-	program->set_direct_update_handler(direct_update_delegate_create_static(comx35_opbase_handler, *machine));
+	program->set_direct_update_handler(direct_update_delegate_create_static(comx35_opbase_handler, m_machine));
 
 	/* BASIC ROM banking */
 	program->install_read_bank(0x1000, 0x17ff, "bank2");
 	program->unmap_write(0x1000, 0x17ff);
-	memory_configure_bank(machine, "bank2", 0, 1, machine->region(CDP1802_TAG)->base() + 0x1000, 0); // normal ROM
-	memory_configure_bank(machine, "bank2", 1, 1, machine->region(CDP1802_TAG)->base() + 0xe000, 0); // expansion box ROM
+	memory_configure_bank(m_machine, "bank2", 0, 1, m_machine.region(CDP1802_TAG)->base() + 0x1000, 0); // normal ROM
+	memory_configure_bank(m_machine, "bank2", 1, 1, m_machine.region(CDP1802_TAG)->base() + 0xe000, 0); // expansion box ROM
 
-	memory_configure_bank(machine, "bank3", 0, 1, machine->region(CDP1802_TAG)->base() + 0xe000, 0);
-	memory_set_bank(machine, "bank3", 0);
+	memory_configure_bank(m_machine, "bank3", 0, 1, m_machine.region(CDP1802_TAG)->base() + 0xe000, 0);
+	memory_set_bank(m_machine, "bank3", 0);
 
 	if (is_expansion_box_installed())
 	{
 		program->install_read_bank(0xe000, 0xefff, "bank3");
 		program->unmap_write(0xe000, 0xefff);
-		memory_set_bank(machine, "bank2", 1);
+		memory_set_bank(m_machine, "bank2", 1);
 	}
 	else
 	{
 		program->unmap_readwrite(0xe000, 0xefff);
-		memory_set_bank(machine, "bank2", 0);
+		memory_set_bank(m_machine, "bank2", 0);
 	}
 
 	/* card slot banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(CDP1802_TAG)->base() + 0xc000, 0);
-	memory_configure_bank(machine, "bank1", BANK_FLOPPY, 1, machine->region("fdc")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_PARALLEL, 1, machine->region("printer")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_PARALLEL_FM, 1, machine->region("printer_fm")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_SERIAL, 1, machine->region("rs232")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_THERMAL, 1, machine->region("thermal")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_JOYCARD, 1, machine->region(CDP1802_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_80_COLUMNS, 1, machine->region("80column")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAMCARD, 4, ram_get_ptr(m_ram), 0x2000);
+	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(CDP1802_TAG)->base() + 0xc000, 0);
+	memory_configure_bank(m_machine, "bank1", BANK_FLOPPY, 1, m_machine.region("fdc")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_PRINTER_PARALLEL, 1, m_machine.region("printer")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_PRINTER_PARALLEL_FM, 1, m_machine.region("printer_fm")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_PRINTER_SERIAL, 1, m_machine.region("rs232")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_PRINTER_THERMAL, 1, m_machine.region("thermal")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_JOYCARD, 1, m_machine.region(CDP1802_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_80_COLUMNS, 1, m_machine.region("80column")->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_RAMCARD, 4, ram_get_ptr(m_ram), 0x2000);
 
-	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(m_machine, "bank1", 0);
 
 	if (!is_expansion_box_installed())
 	{
@@ -609,21 +609,21 @@ void comx35_state::machine_start()
 	}
 
 	/* allocate reset timer */
-	m_reset_timer = machine->scheduler().timer_alloc(FUNC(reset_tick));
+	m_reset_timer = m_machine.scheduler().timer_alloc(FUNC(reset_tick));
 
 	/* register for state saving */
-	machine->state().register_postload(comx35_state_save_postload, NULL);
-	state_save_register_global(machine, m_reset);
-	state_save_register_global(machine, m_cdp1802_q);
-	state_save_register_global(machine, m_cdp1802_ef4);
-	state_save_register_global(machine, m_iden);
-	state_save_register_global(machine, m_slot);
-	state_save_register_global(machine, m_bank);
-	state_save_register_global(machine, m_rambank);
-	state_save_register_global(machine, m_dma);
-	state_save_register_global(machine, m_fdc_addr);
-	state_save_register_global(machine, m_fdc_irq);
-	state_save_register_global(machine, m_fdc_drq_enable);
+	m_machine.state().register_postload(comx35_state_save_postload, NULL);
+	state_save_register_global(m_machine, m_reset);
+	state_save_register_global(m_machine, m_cdp1802_q);
+	state_save_register_global(m_machine, m_cdp1802_ef4);
+	state_save_register_global(m_machine, m_iden);
+	state_save_register_global(m_machine, m_slot);
+	state_save_register_global(m_machine, m_bank);
+	state_save_register_global(m_machine, m_rambank);
+	state_save_register_global(m_machine, m_dma);
+	state_save_register_global(m_machine, m_fdc_addr);
+	state_save_register_global(m_machine, m_fdc_irq);
+	state_save_register_global(m_machine, m_fdc_drq_enable);
 }
 
 void comx35_state::machine_reset()
@@ -639,9 +639,9 @@ void comx35_state::machine_reset()
 
 INPUT_CHANGED( comx35_reset )
 {
-	comx35_state *state = field->port->machine->driver_data<comx35_state>();
+	comx35_state *state = field->port->machine().driver_data<comx35_state>();
 
-	if (BIT(input_port_read(field->port->machine, "RESET"), 0) && BIT(input_port_read(field->port->machine, "D6"), 7))
+	if (BIT(input_port_read(field->port->machine(), "RESET"), 0) && BIT(input_port_read(field->port->machine(), "D6"), 7))
 	{
 		state->machine_reset();
 	}

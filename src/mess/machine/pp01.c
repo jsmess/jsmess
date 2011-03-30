@@ -15,15 +15,15 @@
 
 WRITE8_HANDLER( pp01_video_write_mode_w )
 {
-	pp01_state *state = space->machine->driver_data<pp01_state>();
+	pp01_state *state = space->machine().driver_data<pp01_state>();
 	state->video_write_mode = data & 0x0f;
 }
 
-static void pp01_video_w(running_machine *machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
+static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 {
-	pp01_state *state = machine->driver_data<pp01_state>();
+	pp01_state *state = machine.driver_data<pp01_state>();
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	if (BIT(state->video_write_mode,3)) {
 		// Copy mode
@@ -57,35 +57,35 @@ static void pp01_video_w(running_machine *machine,UINT8 block,UINT16 offset,UINT
 
 static WRITE8_HANDLER (pp01_video_r_1_w)
 {
-	pp01_video_w(space->machine,0,offset,data,0);
+	pp01_video_w(space->machine(),0,offset,data,0);
 }
 static WRITE8_HANDLER (pp01_video_g_1_w)
 {
-	pp01_video_w(space->machine,1,offset,data,0);
+	pp01_video_w(space->machine(),1,offset,data,0);
 }
 static WRITE8_HANDLER (pp01_video_b_1_w)
 {
-	pp01_video_w(space->machine,2,offset,data,0);
+	pp01_video_w(space->machine(),2,offset,data,0);
 }
 
 static WRITE8_HANDLER (pp01_video_r_2_w)
 {
-	pp01_video_w(space->machine,0,offset,data,1);
+	pp01_video_w(space->machine(),0,offset,data,1);
 }
 static WRITE8_HANDLER (pp01_video_g_2_w)
 {
-	pp01_video_w(space->machine,1,offset,data,1);
+	pp01_video_w(space->machine(),1,offset,data,1);
 }
 static WRITE8_HANDLER (pp01_video_b_2_w)
 {
-	pp01_video_w(space->machine,2,offset,data,1);
+	pp01_video_w(space->machine(),2,offset,data,1);
 }
 
 
-static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
+static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 {
-	UINT8 *mem = machine->region("maincpu")->base();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
 	UINT8  blocknum  = block + 1;
@@ -119,7 +119,7 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 					break;
 		}
 
-		memory_set_bankptr(machine, bank, ram_get_ptr(machine->device(RAM_TAG)) + (data & 0x0F)* 0x1000);
+		memory_set_bankptr(machine, bank, ram_get_ptr(machine.device(RAM_TAG)) + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		space->install_read_bank (startaddr, endaddr, bank);
 		space->unmap_write(startaddr, endaddr);
@@ -132,7 +132,7 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 
 MACHINE_RESET( pp01 )
 {
-	pp01_state *state = machine->driver_data<pp01_state>();
+	pp01_state *state = machine.driver_data<pp01_state>();
 	int i;
 	memset(state->memory_block,0xff,16);
 	for(i=0;i<16;i++) {
@@ -143,14 +143,14 @@ MACHINE_RESET( pp01 )
 
 WRITE8_HANDLER (pp01_mem_block_w)
 {
-	pp01_state *state = space->machine->driver_data<pp01_state>();
+	pp01_state *state = space->machine().driver_data<pp01_state>();
 	state->memory_block[offset] = data;
-	pp01_set_memory(space->machine, offset, data);
+	pp01_set_memory(space->machine(), offset, data);
 }
 
 READ8_HANDLER (pp01_mem_block_r)
 {
-	pp01_state *state = space->machine->driver_data<pp01_state>();
+	pp01_state *state = space->machine().driver_data<pp01_state>();
 	return	state->memory_block[offset];
 }
 
@@ -190,24 +190,24 @@ const struct pit8253_config pp01_pit8253_intf =
 
 static READ8_DEVICE_HANDLER (pp01_8255_porta_r )
 {
-	pp01_state *state = device->machine->driver_data<pp01_state>();
+	pp01_state *state = device->machine().driver_data<pp01_state>();
 	return state->video_scroll;
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
 {
-	pp01_state *state = device->machine->driver_data<pp01_state>();
+	pp01_state *state = device->machine().driver_data<pp01_state>();
 	state->video_scroll = data;
 }
 
 static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 {
-	pp01_state *state = device->machine->driver_data<pp01_state>();
+	pp01_state *state = device->machine().driver_data<pp01_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
 
-	return (input_port_read(device->machine,keynames[state->key_line]) & 0x3F) | (input_port_read(device->machine,"LINEALL") & 0xC0);
+	return (input_port_read(device->machine(),keynames[state->key_line]) & 0x3F) | (input_port_read(device->machine(),"LINEALL") & 0xC0);
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 {
@@ -217,7 +217,7 @@ static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 
 static WRITE8_DEVICE_HANDLER (pp01_8255_portc_w )
 {
-	pp01_state *state = device->machine->driver_data<pp01_state>();
+	pp01_state *state = device->machine().driver_data<pp01_state>();
 	state->key_line = data & 0x0f;
 }
 

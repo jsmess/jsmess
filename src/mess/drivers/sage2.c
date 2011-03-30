@@ -42,12 +42,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(sage2)
 {
-	sage2_state *state = machine->driver_data<sage2_state>();
-	UINT8* user1 = machine->region("user1")->base();
+	sage2_state *state = machine.driver_data<sage2_state>();
+	UINT8* user1 = machine.region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x2000);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static WRITE8_DEVICE_HANDLER( sage2_kbd_put )

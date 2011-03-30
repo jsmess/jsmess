@@ -346,8 +346,8 @@ static DEVICE_START( mc6852 )
 	devcb_resolve_write_line(&mc6852->out_tuf_func, &intf->out_tuf_func, device);
 
 	/* allocate timers */
-	mc6852->rx_timer = device->machine->scheduler().timer_alloc(FUNC(receive_tick), (void *) device);
-	mc6852->tx_timer = device->machine->scheduler().timer_alloc(FUNC(transmit_tick), (void *) device);
+	mc6852->rx_timer = device->machine().scheduler().timer_alloc(FUNC(receive_tick), (void *) device);
+	mc6852->tx_timer = device->machine().scheduler().timer_alloc(FUNC(transmit_tick), (void *) device);
 }
 
 /*-------------------------------------------------

@@ -37,9 +37,9 @@ public:
 
 /*----------- defined in machine/kay_kbd.c -----------*/
 
-UINT8 kay_kbd_c_r( running_machine *machine );
-UINT8 kay_kbd_d_r( running_machine *machine );
-void kay_kbd_d_w( running_machine *machine, UINT8 data );
+UINT8 kay_kbd_c_r( running_machine &machine );
+UINT8 kay_kbd_d_r( running_machine &machine );
+void kay_kbd_d_w( running_machine &machine, UINT8 data );
 INTERRUPT_GEN( kay_kbd_interrupt );
 MACHINE_RESET( kay_kbd );
 INPUT_PORTS_EXTERN( kay_kbd );

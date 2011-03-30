@@ -35,7 +35,7 @@ public:
 
 	virtual void machine_reset();
 
-	void update_display(running_machine *machine);
+	void update_display(running_machine &machine);
 	DECLARE_READ8_MEMBER( fidelz80_portc_r );
 	DECLARE_WRITE8_MEMBER( fidelz80_portb_w );
 	DECLARE_WRITE8_MEMBER( fidelz80_portc_w );

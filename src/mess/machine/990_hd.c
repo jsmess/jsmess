@@ -23,7 +23,7 @@
 #include "harddisk.h"
 #include "imagedev/harddriv.h"
 
-static void update_interrupt(running_machine *machine);
+static void update_interrupt(running_machine &machine);
 
 /* max disk units per controller: 4 is the protocol limit, but it may be
 overriden if more than one controller is used */
@@ -98,7 +98,7 @@ typedef struct hdc_t
 {
 	UINT16 w[8];
 
-	void (*interrupt_callback)(running_machine *machine, int state);
+	void (*interrupt_callback)(running_machine &machine, int state);
 
 	hd_unit_t d[MAX_DISK_UNIT];
 } hdc_t;
@@ -336,16 +336,16 @@ MACHINE_START(ti990_hdc)
 }
 
 
-void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(running_machine *machine, int state))
+void ti990_hdc_init(running_machine &machine, void (*interrupt_callback)(running_machine &machine, int state))
 {
 	memset(hdc.w, 0, sizeof(hdc.w));
 	hdc.w[7] = w7_idle;
 
 	/* get references to harddisk devices */
-	hdc.d[0].img = dynamic_cast<device_image_interface *>(machine->device("harddisk1"));
-	hdc.d[1].img = dynamic_cast<device_image_interface *>(machine->device("harddisk2"));
-	hdc.d[2].img = dynamic_cast<device_image_interface *>(machine->device("harddisk3"));
-	hdc.d[3].img = dynamic_cast<device_image_interface *>(machine->device("harddisk4"));
+	hdc.d[0].img = dynamic_cast<device_image_interface *>(machine.device("harddisk1"));
+	hdc.d[1].img = dynamic_cast<device_image_interface *>(machine.device("harddisk2"));
+	hdc.d[2].img = dynamic_cast<device_image_interface *>(machine.device("harddisk3"));
+	hdc.d[3].img = dynamic_cast<device_image_interface *>(machine.device("harddisk4"));
 
 	hdc.interrupt_callback = interrupt_callback;
 
@@ -382,7 +382,7 @@ static int cur_disk_unit(void)
 /*
     Update interrupt state
 */
-static void update_interrupt(running_machine *machine)
+static void update_interrupt(running_machine &machine)
 {
 	if (hdc.interrupt_callback)
 		(*hdc.interrupt_callback)(machine, (hdc.w[7] & w7_idle)
@@ -395,7 +395,7 @@ static void update_interrupt(running_machine *machine)
 
     Terminate current command and return non-zero if the address is invalid.
 */
-static int check_sector_address(running_machine *machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector)
+static int check_sector_address(running_machine &machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector)
 {
 	if ((cylinder > hdc.d[unit].cylinders) || (head > hdc.d[unit].heads) || (sector > hdc.d[unit].sectors_per_track))
 	{	/* invalid address */
@@ -421,7 +421,7 @@ static int check_sector_address(running_machine *machine, int unit, unsigned int
 /*
     Seek to sector whose address is given
 */
-static int sector_to_lba(running_machine *machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector, unsigned int *lba)
+static int sector_to_lba(running_machine &machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector, unsigned int *lba)
 {
 	if (check_sector_address(machine, unit, cylinder, head, sector))
 		return 1;
@@ -494,7 +494,7 @@ static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned
 /*
     Handle the store registers command: read the drive geometry.
 */
-static void store_registers(running_machine *machine)
+static void store_registers(running_machine &machine)
 {
 	int dma_address;
 	int byte_count;
@@ -540,7 +540,7 @@ static void store_registers(running_machine *machine)
 	if (! (hdc.w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			machine->device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, buffer[i]);
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -553,7 +553,7 @@ static void store_registers(running_machine *machine)
 
     The emulation just clears the track data in the disk image.
 */
-static void write_format(running_machine *machine)
+static void write_format(running_machine &machine)
 {
 	unsigned int cylinder, head, sector;
 	unsigned int lba;
@@ -623,7 +623,7 @@ static void write_format(running_machine *machine)
 /*
     Handle the read data command: read a variable number of sectors from disk.
 */
-static void read_data(running_machine *machine)
+static void read_data(running_machine &machine)
 {
 	int dma_address;
 	int byte_count;
@@ -695,7 +695,7 @@ static void read_data(running_machine *machine)
 		if (! (hdc.w[1] & w1_transfer_inhibit))
 			for (i=0; i<bytes_read; i+=2)
 			{
-				machine->device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+				machine.device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 				dma_address = (dma_address + 2) & 0x1ffffe;
 			}
 
@@ -723,7 +723,7 @@ static void read_data(running_machine *machine)
 /*
     Handle the write data command: write a variable number of sectors from disk.
 */
-static void write_data(running_machine *machine)
+static void write_data(running_machine &machine)
 {
 	int dma_address;
 	int byte_count;
@@ -791,7 +791,7 @@ static void write_data(running_machine *machine)
 		/* DMA */
 		for (i=0; (i<byte_count) && (i<hdc.d[dsk_sel].bytes_per_sector); i+=2)
 		{
-			word = machine->device("maincpu")->memory().space(AS_PROGRAM)->read_word(dma_address);
+			word = machine.device("maincpu")->memory().space(AS_PROGRAM)->read_word(dma_address);
 			buffer[i] = word >> 8;
 			buffer[i+1] = word & 0xff;
 
@@ -835,7 +835,7 @@ static void write_data(running_machine *machine)
 /*
     Handle the unformatted read command: read drive geometry information.
 */
-static void unformatted_read(running_machine *machine)
+static void unformatted_read(running_machine &machine)
 {
 	int dma_address;
 	int byte_count;
@@ -898,7 +898,7 @@ static void unformatted_read(running_machine *machine)
 	if (! (hdc.w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			machine->device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, buffer[i]);
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -909,7 +909,7 @@ static void unformatted_read(running_machine *machine)
 /*
     Handle the restore command: return to track 0.
 */
-static void restore(running_machine *machine)
+static void restore(running_machine &machine)
 {
 	int dsk_sel = cur_disk_unit();
 
@@ -941,7 +941,7 @@ static void restore(running_machine *machine)
 /*
     Parse command code and execute the command.
 */
-static void execute_command(running_machine *machine)
+static void execute_command(running_machine &machine)
 {
 	/* hack */
 	hdc.w[0] &= 0xff;
@@ -1025,11 +1025,11 @@ WRITE16_HANDLER(ti990_hdc_w)
 			hdc.w[offset] = (hdc.w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
 
 			if ((offset == 0) || (offset == 7))
-				update_interrupt(space->machine);
+				update_interrupt(space->machine());
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{	/* idle has been cleared: start command execution */
-				execute_command(space->machine);
+				execute_command(space->machine());
 			}
 		}
 	}

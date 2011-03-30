@@ -346,7 +346,7 @@ static PALETTE_INIT( gamegear )
 
 
 
-static void sms_int_callback( running_machine *machine, int state )
+static void sms_int_callback( running_machine &machine, int state )
 {
 	cputag_set_input_line(machine, "maincpu", 0, state);
 }

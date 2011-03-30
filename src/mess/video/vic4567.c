@@ -106,7 +106,7 @@ struct _vic3_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", device->machine->time().as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", device->machine().time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -255,7 +255,7 @@ INLINE int vic3_getforeground16(device_t *device, int y, int x )
 	return ((vic3->screen[y][x >> 3] << 16) | (vic3->screen[y][(x >> 3) + 1] << 8) | (vic3->screen[y][(x >> 3) + 2])) >> (8 - (x & 7));
 }
 
-static void vic3_set_interrupt( running_machine *machine, int mask, vic3_state *vic3 )
+static void vic3_set_interrupt( running_machine &machine, int mask, vic3_state *vic3 )
 {
 	if (((vic3->reg[0x19] ^ mask) & vic3->reg[0x1a] & 0xf))
 	{
@@ -269,7 +269,7 @@ static void vic3_set_interrupt( running_machine *machine, int mask, vic3_state *
 	vic3->reg[0x19] |= mask;
 }
 
-static void vic3_clear_interrupt( running_machine *machine, int mask, vic3_state *vic3 )
+static void vic3_clear_interrupt( running_machine &machine, int mask, vic3_state *vic3 )
 {
 	vic3->reg[0x19] &= ~mask;
 	if ((vic3->reg[0x19] & 0x80) && !(vic3->reg[0x19] & vic3->reg[0x1a] & 0xf))
@@ -305,7 +305,7 @@ static void vic3_draw_character( device_t *device, int ybegin, int yend, int ch,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine, vic3->chargenaddr + ch * 8 + y);
+		code = vic3->dma_read(device->machine(), vic3->chargenaddr + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = code;
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
 		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
@@ -325,7 +325,7 @@ static void vic3_draw_character_multi( device_t *device, int ybegin, int yend, i
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine, vic3->chargenaddr + ch * 8 + y);
+		code = vic3->dma_read(device->machine(), vic3->chargenaddr + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = vic3->foreground[code];
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic3->multi[code >> 6];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic3->multi[code >> 6];
@@ -345,7 +345,7 @@ static void vic3_draw_bitmap( device_t *device, int ybegin, int yend, int ch, in
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine, (vic3->chargenaddr & 0x2000) + ch * 8 + y);
+		code = vic3->dma_read(device->machine(), (vic3->chargenaddr & 0x2000) + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = code;
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic3->c64_bitmap[code >> 7];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic3->c64_bitmap[(code >> 6) & 1];
@@ -365,7 +365,7 @@ static void vic3_draw_bitmap_multi( device_t *device, int ybegin, int yend, int 
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine, (vic3->chargenaddr & 0x2000) + ch * 8 + y);
+		code = vic3->dma_read(device->machine(), (vic3->chargenaddr & 0x2000) + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = vic3->foreground[code];
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic3->bitmapmulti[code >> 6];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic3->bitmapmulti[code >> 6];
@@ -459,7 +459,7 @@ static void vic3_sprite_collision( device_t *device, int nr, int y, int x, int m
 		{
 			SPRITE_SET_COLLISION(i);
 			SPRITE_SET_COLLISION(nr);
-			vic3_set_interrupt(device->machine, 4, vic3);
+			vic3_set_interrupt(device->machine(), 4, vic3);
 		}
 	}
 }
@@ -471,7 +471,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 	int value, value3 = 0;
 
 	xbegin = SPRITE_X_POS(nr);
-	addr = vic3->dma_read(device->machine, SPRITE_ADDR(nr)) << 6;
+	addr = vic3->dma_read(device->machine(), SPRITE_ADDR(nr)) << 6;
 	color = SPRITE_COLOR(nr);
 	prior = SPRITE_PRIORITY(nr);
 	collision = SPRITE_BG_COLLISION(nr);
@@ -483,7 +483,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->expandx[vic3->dma_read(device->machine, addr + vic3->sprites[nr].line * 3 + i)];
+				value = vic3->expandx[vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i)];
 				vic3->sprites[nr].bitmap[y][i * 2] = value >> 8;
 				vic3->sprites[nr].bitmap[y][i * 2 + 1] = value & 0xff;
 				vic3_sprite_collision(device, nr, y, xbegin + i * 16, value >> 8);
@@ -494,7 +494,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION(nr);
-					vic3_set_interrupt(device->machine, 2, vic3);
+					vic3_set_interrupt(device->machine(), 2, vic3);
 				}
 				if (prior)
 					value &= ~value3;
@@ -525,7 +525,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->dma_read(device->machine, addr + vic3->sprites[nr].line * 3 + i);
+				value = vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i);
 				vic3->sprites[nr].bitmap[y][i] = value;
 				vic3_sprite_collision(device, nr, y, xbegin + i * 8, value);
 				if (prior || !collision)
@@ -534,7 +534,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION(nr);
-					vic3_set_interrupt(device->machine, 2, vic3);
+					vic3_set_interrupt(device->machine(), 2, vic3);
 				}
 				if (prior)
 					value &= ~value3;
@@ -566,7 +566,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 	int value, value2, value3 = 0, bg/*, color[2]*/;
 
 	xbegin = SPRITE_X_POS(nr);
-	addr = vic3->dma_read(device->machine, SPRITE_ADDR(nr)) << 6;
+	addr = vic3->dma_read(device->machine(), SPRITE_ADDR(nr)) << 6;
 	vic3->spritemulti[2] = SPRITE_COLOR(nr);
 	prior = SPRITE_PRIORITY(nr);
 	collision = SPRITE_BG_COLLISION(nr);
@@ -580,7 +580,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->expandx_multi[bg = vic3->dma_read(device->machine, addr + vic3->sprites[nr].line * 3 + i)];
+				value = vic3->expandx_multi[bg = vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i)];
 				value2 = vic3->expandx[vic3->multi_collision[bg]];
 				vic3->sprites[nr].bitmap[y][i * 2] = value2 >> 8;
 				vic3->sprites[nr].bitmap[y][i * 2 + 1] = value2 & 0xff;
@@ -594,7 +594,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION(nr);
-					vic3_set_interrupt(device->machine, 2, vic3);
+					vic3_set_interrupt(device->machine(), 2, vic3);
 				}
 				if (prior)
 				{
@@ -631,7 +631,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->dma_read(device->machine, addr + vic3->sprites[nr].line * 3 + i);
+				value = vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i);
 				vic3->sprites[nr].bitmap[y][i] = value2 = vic3->multi_collision[value];
 				vic3_sprite_collision(device, nr, y, xbegin + i * 8, value2);
 				if (prior || !collision)
@@ -642,7 +642,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION(nr);
-					vic3_set_interrupt(device->machine, 2, vic3);
+					vic3_set_interrupt(device->machine(), 2, vic3);
 				}
 				if (prior)
 				{
@@ -757,8 +757,8 @@ static void vic3_drawlines( device_t *device, int first, int last, int start_x, 
 
 		for (xoff = vic3->x_begin + XPOS; xoff < x_end2 + XPOS; xoff += 8, offs++)
 		{
-			ch = vic3->dma_read(device->machine, vic3->videoaddr + offs);
-			attr = vic3->dma_read_color(device->machine, vic3->videoaddr + offs);
+			ch = vic3->dma_read(device->machine(), vic3->videoaddr + offs);
+			attr = vic3->dma_read_color(device->machine(), vic3->videoaddr + offs);
 			if (HIRESON)
 			{
 				vic3->bitmapmulti[1] = vic3->c64_bitmap[1] = ch >> 4;
@@ -997,12 +997,12 @@ static void vic2_drawlines( device_t *device, int first, int last, int start_x, 
 		vic3->shift[line] = HORIZONTALPOS;
 		for (xoff = vic3->x_begin + XPOS; xoff < vic3->x_end + XPOS; xoff += 8, offs++)
 		{
-			ch = vic3->dma_read(device->machine, vic3->videoaddr + offs);
+			ch = vic3->dma_read(device->machine(), vic3->videoaddr + offs);
 #if 0
-			attr = vic3->dma_read_color(device->machine, vic3->videoaddr + offs);
+			attr = vic3->dma_read_color(device->machine(), vic3->videoaddr + offs);
 #else
 			/* temporaery until vic3 finished */
-			attr = vic3->dma_read_color(device->machine, (vic3->videoaddr + offs)&0x3ff)&0x0f;
+			attr = vic3->dma_read_color(device->machine(), (vic3->videoaddr + offs)&0x3ff)&0x0f;
 #endif
 			if (HIRESON)
 			{
@@ -1282,12 +1282,12 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		break;
 
 	case 0x19:
-		vic3_clear_interrupt(device->machine, data & 0x0f, vic3);
+		vic3_clear_interrupt(device->machine(), data & 0x0f, vic3);
 		break;
 
 	case 0x1a:							/* irq mask */
 		vic3->reg[offset] = data;
-		vic3_set_interrupt(device->machine, 0, vic3);	// beamrider needs this
+		vic3_set_interrupt(device->machine(), 0, vic3);	// beamrider needs this
 		break;
 
 	case 0x11:
@@ -1381,7 +1381,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		if (vic3->port_changed!=NULL) {
 			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 			vic3->reg[offset] = data;
-			vic3->port_changed(device->machine, data);
+			vic3->port_changed(device->machine(), data);
 		}
 		break;
 	case 0x31:
@@ -1461,13 +1461,13 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 	case 0x1e:							/* sprite to sprite collision detect */
 		val = vic3->reg[offset];
 		vic3->reg[offset] = 0;
-		vic3_clear_interrupt(device->machine, 4, vic3);
+		vic3_clear_interrupt(device->machine(), 4, vic3);
 		break;
 
 	case 0x1f:							/* sprite to background collision detect */
 		val = vic3->reg[offset];
 		vic3->reg[offset] = 0;
-		vic3_clear_interrupt(device->machine, 2, vic3);
+		vic3_clear_interrupt(device->machine(), 2, vic3);
 		break;
 
 	case 0x20:
@@ -1556,21 +1556,21 @@ READ8_DEVICE_HANDLER( vic3_port_r )
     if (M)                                                      \
     {                                                           \
         if (M & 0x01)                                           \
-            colors[0] = vic3->c64_mem_r(device->machine, VIC3_ADDR(0) + offset);        \
+            colors[0] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(0) + offset);        \
         if (M & 0x02)                                           \
-            colors[1] = vic3->c64_mem_r(device->machine, VIC3_ADDR(1) + offset) << 1;     \
+            colors[1] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(1) + offset) << 1;     \
         if (M & 0x04)                                           \
-            colors[2] = vic3->c64_mem_r(device->machine, VIC3_ADDR(2) + offset) << 2;     \
+            colors[2] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(2) + offset) << 2;     \
         if (M & 0x08)                                           \
-            colors[3] = vic3->c64_mem_r(device->machine, VIC3_ADDR(3) + offset) << 3;     \
+            colors[3] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(3) + offset) << 3;     \
         if (M & 0x10)                                           \
-            colors[4] = vic3->c64_mem_r(device->machine, VIC3_ADDR(4) + offset) << 4;     \
+            colors[4] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(4) + offset) << 4;     \
         if (M & 0x20)                                           \
-            colors[5] = vic3->c64_mem_r(device->machine, VIC3_ADDR(5) + offset) << 5;     \
+            colors[5] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(5) + offset) << 5;     \
         if (M & 0x40)                                           \
-            colors[6] = vic3->c64_mem_r(device->machine, VIC3_ADDR(6) + offset) << 6;     \
+            colors[6] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(6) + offset) << 6;     \
         if (M & 0x80)                                           \
-            colors[7] = vic3->c64_mem_r(device->machine, VIC3_ADDR(7) + offset) << 7;     \
+            colors[7] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(7) + offset) << 7;     \
         for (i = 7; i >= 0; i--)                                \
         {                                                       \
             p = 0;                                              \
@@ -1647,28 +1647,28 @@ static void vic3_interlace_draw_block( device_t *device, int x, int y, int offse
 		break;
 	default:
 		if (VIC3_BITPLANES_MASK & 0x01)
-			colors[0] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(0) + offset);
+			colors[0] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(0) + offset);
 
 		if (VIC3_BITPLANES_MASK & 0x02)
-			colors[1] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(1) + offset) << 1;
+			colors[1] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
-			colors[2] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(2) + offset) << 2;
+			colors[2] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(2) + offset) << 2;
 
 		if (VIC3_BITPLANES_MASK & 0x08)
-			colors[3] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(3) + offset) << 3;
+			colors[3] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(3) + offset) << 3;
 
 		if (VIC3_BITPLANES_MASK & 0x10)
-			colors[4] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(4) + offset) << 4;
+			colors[4] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(4) + offset) << 4;
 
 		if (VIC3_BITPLANES_MASK & 0x20)
-			colors[5] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(5) + offset) << 5;
+			colors[5] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(5) + offset) << 5;
 
 		if (VIC3_BITPLANES_MASK & 0x40)
-			colors[6] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(6) + offset) << 6;
+			colors[6] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(6) + offset) << 6;
 
 		if (VIC3_BITPLANES_MASK & 0x80)
-			colors[7] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_IADDR(7) + offset) << 7;
+			colors[7] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(7) + offset) << 7;
 
 		for (i = 7; i >= 0; i--)
 		{
@@ -1719,28 +1719,28 @@ static void vic3_draw_block( device_t *device, int x, int y, int offset )
 		break;
 	default:
 		if (VIC3_BITPLANES_MASK & 0x01)
-			colors[0] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(0) + offset);
+			colors[0] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(0) + offset);
 
 		if (VIC3_BITPLANES_MASK & 0x02)
-			colors[1] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(1) + offset) << 1;
+			colors[1] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
-			colors[2] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(2) + offset) << 2;
+			colors[2] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(2) + offset) << 2;
 
 		if (VIC3_BITPLANES_MASK & 0x08)
-			colors[3] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(3) + offset) << 3;
+			colors[3] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(3) + offset) << 3;
 
 		if (VIC3_BITPLANES_MASK & 0x10)
-			colors[4] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(4) + offset) << 4;
+			colors[4] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(4) + offset) << 4;
 
 		if (VIC3_BITPLANES_MASK & 0x20)
-			colors[5] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(5) + offset) << 5;
+			colors[5] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(5) + offset) << 5;
 
 		if (VIC3_BITPLANES_MASK & 0x40)
-			colors[6] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(6) + offset) << 6;
+			colors[6] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(6) + offset) << 6;
 
 		if (VIC3_BITPLANES_MASK & 0x80)
-			colors[7] = vic3->c64_mem_r(device->machine, VIC3_BITPLANE_ADDR(7) + offset) << 7;
+			colors[7] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(7) + offset) << 7;
 
 		for (i = 7; i >= 0; i--)
 		{
@@ -1840,7 +1840,7 @@ static void vic3_draw_bitplanes( device_t *device )
 void vic3_raster_interrupt_gen( device_t *device )
 {
 	vic3_state *vic3 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int new_columns, new_rows;
 	int i;
 
@@ -1923,7 +1923,7 @@ void vic3_raster_interrupt_gen( device_t *device )
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer start */
-			machine->scheduler().timer_set(attotime(0, 0), FUNC(vic3_timer_timeout), 1, vic3);
+			machine.scheduler().timer_set(attotime(0, 0), FUNC(vic3_timer_timeout), 1, vic3);
 		}
 
 	}
@@ -1968,13 +1968,13 @@ static DEVICE_START( vic3 )
 	int width, height;
 	int i;
 
-	vic3->cpu = device->machine->device(intf->cpu);
+	vic3->cpu = device->machine().device(intf->cpu);
 
-	vic3->main_screen = device->machine->device<screen_device>(intf->screen);
+	vic3->main_screen = device->machine().device<screen_device>(intf->screen);
 	width = vic3->main_screen->width();
 	height = vic3->main_screen->height();
 
-	vic3->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+	vic3->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
 
 	vic3->type = intf->type;
 
@@ -1990,7 +1990,7 @@ static DEVICE_START( vic3 )
 	vic3->lightpen_x_cb = intf->x_cb;
 	vic3->lightpen_y_cb = intf->y_cb;
 
-	vic3->screen[0] = auto_alloc_array(device->machine, UINT8, 216 * 656 / 8);
+	vic3->screen[0] = auto_alloc_array(device->machine(), UINT8, 216 * 656 / 8);
 
 	for (i = 1; i < 216; i++)
 		vic3->screen[i] = vic3->screen[i - 1] + 656 / 8;

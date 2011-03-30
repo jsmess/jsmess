@@ -50,7 +50,7 @@ device_config *mpc105_device_config::static_alloc_device_config(const machine_co
 
 device_t *mpc105_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, mpc105_device(machine, *this));
+    return auto_alloc(machine, mpc105_device(machine, *this));
 }
 
 
@@ -144,12 +144,12 @@ void mpc105_device::update_memory()
 				|	(((m_bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
 				| 0x000FFFFF;
 
-			end = MIN(end, begin + ram_get_size(machine->device(RAM_TAG)) - 1);
+			end = MIN(end, begin + ram_get_size(m_machine.device(RAM_TAG)) - 1);
 
 			if ((begin + 0x100000) <= end)
 			{
 				if (LOG_MPC105)
-					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, ram_get_ptr(machine->device(RAM_TAG)), ram_get_ptr(machine->device(RAM_TAG)) + (end - begin));
+					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, ram_get_ptr(m_machine.device(RAM_TAG)), ram_get_ptr(m_machine.device(RAM_TAG)) + (end - begin));
 
 				if (m_bank_base > 0)
 				{
@@ -160,7 +160,7 @@ void mpc105_device::update_memory()
 					space->install_legacy_write_handler(begin, end,
 						0, 0, FUNC((write64_space_func)(FPTR)(bank + m_bank_base)));
 					sprintf(bank_str,"bank%d",bank + m_bank_base);
-					memory_set_bankptr(machine, bank_str, ram_get_ptr(machine->device(RAM_TAG)));
+					memory_set_bankptr(m_machine, bank_str, ram_get_ptr(m_machine.device(RAM_TAG)));
 				}
 			}
 		}

@@ -62,12 +62,12 @@ Expansion bus stuff:
 
 
 READ32_HANDLER( _3do_nvarea_r ) {
-	logerror( "%08X: NVRAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
+	logerror( "%08X: NVRAM read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset );
 	return 0;
 }
 
 WRITE32_HANDLER( _3do_nvarea_w ) {
-	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
+	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset, data, mem_mask );
 }
 
 
@@ -98,10 +98,10 @@ WRITE32_HANDLER( _3do_nvarea_w ) {
 */
 
 READ32_HANDLER( _3do_slow2_r ) {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
+	_3do_state *state = space->machine().driver_data<_3do_state>();
 	UINT32 data = 0;
 
-	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
+	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset );
 
 	switch( offset ) {
 	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
@@ -115,15 +115,15 @@ READ32_HANDLER( _3do_slow2_r ) {
 
 WRITE32_HANDLER( _3do_slow2_w )
 {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
-	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
+	_3do_state *state = space->machine().driver_data<_3do_state>();
+	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset, data, mem_mask );
 
 	switch( offset )
 	{
 		case 0:		/* Boot ROM writes 03180000 here and then starts reading some things */
 		{
 			/* disable ROM overlay */
-			memory_set_bank(space->machine, "bank1", 0);
+			memory_set_bank(space->machine(), "bank1", 0);
 		}
 		state->slow2.cg_input = state->slow2.cg_input << 1 | ( data & 0x00000001 );
 		state->slow2.cg_w_count ++;
@@ -135,9 +135,9 @@ WRITE32_HANDLER( _3do_slow2_w )
 }
 
 
-void _3do_slow2_init( running_machine *machine )
+void _3do_slow2_init( running_machine &machine )
 {
-	_3do_state *state = machine->driver_data<_3do_state>();
+	_3do_state *state = machine.driver_data<_3do_state>();
 	state->slow2.cg_input = 0;
 	state->slow2.cg_output = 0x00000005 - 1;
 }
@@ -145,11 +145,11 @@ void _3do_slow2_init( running_machine *machine )
 
 READ32_HANDLER( _3do_svf_r )
 {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
+	_3do_state *state = space->machine().driver_data<_3do_state>();
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	UINT32 *p = state->vram + addr;
 
-	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4 );
 
 	switch( offset & ( 0xE000 / 4 ) )
 	{
@@ -171,11 +171,11 @@ READ32_HANDLER( _3do_svf_r )
 
 WRITE32_HANDLER( _3do_svf_w )
 {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
+	_3do_state *state = space->machine().driver_data<_3do_state>();
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	UINT32 *p = state->vram + addr;
 
-	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset & ( 0xe000 / 4 ) )
 	{
@@ -211,8 +211,8 @@ WRITE32_HANDLER( _3do_svf_w )
 
 
 READ32_HANDLER( _3do_madam_r ) {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
-	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+	_3do_state *state = space->machine().driver_data<_3do_state>();
+	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4 );
 
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
@@ -363,7 +363,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x07f8/4:
 		return state->madam.mult_status;
 	default:
-		logerror( "%08X: unhandled MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+		logerror( "%08X: unhandled MADAM read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4 );
 		break;
 	}
 	return 0;
@@ -371,8 +371,8 @@ READ32_HANDLER( _3do_madam_r ) {
 
 
 WRITE32_HANDLER( _3do_madam_w ) {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
-	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+	_3do_state *state = space->machine().driver_data<_3do_state>();
+	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset ) {
 	case 0x0000/4:
@@ -543,15 +543,15 @@ WRITE32_HANDLER( _3do_madam_w ) {
 		break;
 
 	default:
-		logerror( "%08X: unhandled MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+		logerror( "%08X: unhandled MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4, data, mem_mask );
 		break;
 	}
 }
 
 
-void _3do_madam_init( running_machine *machine )
+void _3do_madam_init( running_machine &machine )
 {
-	_3do_state *state = machine->driver_data<_3do_state>();
+	_3do_state *state = machine.driver_data<_3do_state>();
 	memset( &state->madam, 0, sizeof(MADAM) );
 	state->madam.revision = 0x01020000;
 	state->madam.msysbits = 0x51;
@@ -560,8 +560,8 @@ void _3do_madam_init( running_machine *machine )
 
 READ32_HANDLER( _3do_clio_r )
 {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
-	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
+	_3do_state *state = space->machine().driver_data<_3do_state>();
+	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset * 4 );
 
 	switch( offset )
 	{
@@ -700,7 +700,7 @@ READ32_HANDLER( _3do_clio_r )
 		return state->clio.uncle_rom;
 
 	default:
-		logerror( "%08X: unhandled CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
+		logerror( "%08X: unhandled CLIO read offset = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset * 4 );
 		break;
 	}
 	return 0;
@@ -708,8 +708,8 @@ READ32_HANDLER( _3do_clio_r )
 
 WRITE32_HANDLER( _3do_clio_w )
 {
-	_3do_state *state = space->machine->driver_data<_3do_state>();
-	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+	_3do_state *state = space->machine().driver_data<_3do_state>();
+	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset )
 	{
@@ -953,15 +953,15 @@ WRITE32_HANDLER( _3do_clio_w )
 		break;
 
 	default:
-		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine().device("maincpu")), offset*4, data, mem_mask );
 		break;
 	}
 }
 
 
-void _3do_clio_init( running_machine *machine, screen_device *screen )
+void _3do_clio_init( running_machine &machine, screen_device *screen )
 {
-	_3do_state *state = machine->driver_data<_3do_state>();
+	_3do_state *state = machine.driver_data<_3do_state>();
 	memset( &state->clio, 0, sizeof(CLIO) );
 	state->clio.screen = screen;
 	state->clio.revision = 0x02022000 /* 0x04000000 */;
@@ -975,7 +975,7 @@ void _3do_clio_init( running_machine *machine, screen_device *screen )
 
 VIDEO_START( _3do )
 {
-	_3do_state *state = machine->driver_data<_3do_state>();
+	_3do_state *state = machine.driver_data<_3do_state>();
 	/* We only keep the odd bits and get rid of the even bits */
 	for ( int i = 0; i < 512; i++ )
 	{
@@ -987,7 +987,7 @@ VIDEO_START( _3do )
 /* This is incorrect! Just testing stuff */
 SCREEN_UPDATE( _3do )
 {
-	_3do_state *state = screen->machine->driver_data<_3do_state>();
+	_3do_state *state = screen->machine().driver_data<_3do_state>();
 	UINT32 *source_p = state->vram + 0x1c0000 / 4;
 
 	for ( int i = 0; i < 120; i++ )

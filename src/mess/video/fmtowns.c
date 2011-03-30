@@ -94,11 +94,11 @@
 
 //static UINT32 pshift;  // for debugging
 
-static void draw_sprites(running_machine* machine, const rectangle* rect);
+static void draw_sprites(running_machine &machine, const rectangle* rect);
 
-static void towns_crtc_refresh_mode(running_machine* machine)
+static void towns_crtc_refresh_mode(running_machine &machine)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	rectangle scr;
 	unsigned int width,height;
 
@@ -128,24 +128,24 @@ static void towns_crtc_refresh_mode(running_machine* machine)
 	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
 		return;
 
-	machine->primary_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
+	machine.primary_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
 }
 
 READ8_HANDLER( towns_gfx_high_r )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	return state->towns_gfxvram[offset];
 }
 
 WRITE8_HANDLER( towns_gfx_high_w )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	state->towns_gfxvram[offset] = data;
 }
 
 READ8_HANDLER( towns_gfx_r )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	UINT8 ret = 0;
 
 	if(state->towns_mainmem_enable != 0)
@@ -170,7 +170,7 @@ READ8_HANDLER( towns_gfx_r )
 
 WRITE8_HANDLER( towns_gfx_w )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	if(state->towns_mainmem_enable != 0)
 	{
@@ -226,9 +226,9 @@ WRITE8_HANDLER( towns_gfx_w )
 	}
 }
 
-static void towns_update_kanji_offset(running_machine* machine)
+static void towns_update_kanji_offset(running_machine &machine)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	// this is a little over the top...
 	if(state->video.towns_kanji_code_h < 0x30)
 	{
@@ -257,8 +257,8 @@ static void towns_update_kanji_offset(running_machine* machine)
 
 READ8_HANDLER( towns_video_cff80_r )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
-	UINT8* ROM = space->machine->region("user")->base();
+	towns_state* state = space->machine().driver_data<towns_state>();
+	UINT8* ROM = space->machine().region("user")->base();
 
 	switch(offset)
 	{
@@ -291,7 +291,7 @@ READ8_HANDLER( towns_video_cff80_r )
 
 WRITE8_HANDLER( towns_video_cff80_w )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -313,12 +313,12 @@ WRITE8_HANDLER( towns_video_cff80_w )
 			break;
 		case 0x14:  // Kanji offset (high)
 			state->video.towns_kanji_code_h = data & 0x7f;
-			towns_update_kanji_offset(space->machine);
+			towns_update_kanji_offset(space->machine());
 			//logerror("VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x15:  // Kanji offset (low)
 			state->video.towns_kanji_code_l = data & 0x7f;
-			towns_update_kanji_offset(space->machine);
+			towns_update_kanji_offset(space->machine());
 			//logerror("VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x19:  // ANK CG ROM
@@ -332,7 +332,7 @@ WRITE8_HANDLER( towns_video_cff80_w )
 
 READ8_HANDLER( towns_video_cff80_mem_r )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	if(state->towns_mainmem_enable != 0)
 		return ram_get_ptr(state->messram)[offset+0xcff80];
@@ -342,7 +342,7 @@ READ8_HANDLER( towns_video_cff80_mem_r )
 
 WRITE8_HANDLER( towns_video_cff80_mem_w )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	if(state->towns_mainmem_enable != 0)
 	{
@@ -361,7 +361,7 @@ WRITE8_HANDLER( towns_video_cff80_mem_w )
  */
 READ8_HANDLER(towns_video_440_r)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	UINT8 ret = 0;
 	UINT16 xpos,ypos;
 
@@ -379,8 +379,8 @@ READ8_HANDLER(towns_video_440_r)
 			if(state->video.towns_crtc_sel == 30)
 			{
 				// check video position
-				xpos = space->machine->primary_screen->hpos();
-				ypos = space->machine->primary_screen->vpos();
+				xpos = space->machine().primary_screen->hpos();
+				ypos = space->machine().primary_screen->vpos();
 
 				if(xpos < (state->video.towns_crtc_reg[0] & 0xfe))
 					ret |= 0x02;
@@ -425,7 +425,7 @@ READ8_HANDLER(towns_video_440_r)
 
 WRITE8_HANDLER(towns_video_440_w)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -436,13 +436,13 @@ WRITE8_HANDLER(towns_video_440_w)
 //          logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
 			state->video.towns_crtc_reg[state->video.towns_crtc_sel] =
 				(state->video.towns_crtc_reg[state->video.towns_crtc_sel] & 0xff00) | data;
-			towns_crtc_refresh_mode(space->machine);
+			towns_crtc_refresh_mode(space->machine());
 			break;
 		case 0x03:
 //          logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
 			state->video.towns_crtc_reg[state->video.towns_crtc_sel] =
 				(state->video.towns_crtc_reg[state->video.towns_crtc_sel] & 0x00ff) | (data << 8);
-			towns_crtc_refresh_mode(space->machine);
+			towns_crtc_refresh_mode(space->machine());
 			break;
 		case 0x08:
 			state->video.towns_video_sel = data & 0x01;
@@ -465,7 +465,7 @@ WRITE8_HANDLER(towns_video_440_w)
 
 READ8_HANDLER(towns_video_5c8_r)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	//logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
@@ -484,7 +484,7 @@ READ8_HANDLER(towns_video_5c8_r)
 
 WRITE8_HANDLER(towns_video_5c8_w)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	device_t* dev = state->pic_slave;
 
 	switch(offset)
@@ -506,7 +506,7 @@ WRITE8_HANDLER(towns_video_5c8_w)
  */
 READ8_HANDLER(towns_video_fd90_r)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	UINT8 ret = 0;
 	UINT16 xpos;
 
@@ -532,7 +532,7 @@ READ8_HANDLER(towns_video_fd90_r)
 			return state->video.towns_degipal[offset-0x08];
 		case 0x10:  // "sub status register"
 			// check video position
-			xpos = space->machine->primary_screen->hpos();
+			xpos = space->machine().primary_screen->hpos();
 
 			if(xpos < state->video.towns_crtc_layerscr[0].max_x && xpos > state->video.towns_crtc_layerscr[0].min_x)
 				ret |= 0x02;
@@ -545,7 +545,7 @@ READ8_HANDLER(towns_video_fd90_r)
 
 WRITE8_HANDLER(towns_video_fd90_w)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -581,14 +581,14 @@ WRITE8_HANDLER(towns_video_fd90_w)
 
 READ8_HANDLER(towns_video_ff81_r)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	return ((state->video.towns_vram_rplane << 6) & 0xc0) | state->video.towns_vram_wplane;
 }
 
 WRITE8_HANDLER(towns_video_ff81_w)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	state->video.towns_vram_wplane = data & 0x0f;
 	state->video.towns_vram_rplane = (data & 0xc0) >> 6;
@@ -608,9 +608,9 @@ WRITE8_HANDLER(towns_video_ff81_w)
  */
 READ8_HANDLER(towns_spriteram_low_r)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	UINT8* RAM = ram_get_ptr(state->messram);
-	UINT8* ROM = space->machine->region("user")->base();
+	UINT8* ROM = space->machine().region("user")->base();
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
@@ -647,7 +647,7 @@ READ8_HANDLER(towns_spriteram_low_r)
 
 WRITE8_HANDLER(towns_spriteram_low_w)
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 	UINT8* RAM = ram_get_ptr(state->messram);
 
 	if(offset < 0x1000)
@@ -674,14 +674,14 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 
 READ8_HANDLER( towns_spriteram_r )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	return state->towns_txtvram[offset];
 }
 
 WRITE8_HANDLER( towns_spriteram_w )
 {
-	towns_state* state = space->machine->driver_data<towns_state>();
+	towns_state* state = space->machine().driver_data<towns_state>();
 
 	state->towns_txtvram[offset] = data;
 }
@@ -705,9 +705,9 @@ WRITE8_HANDLER( towns_spriteram_w )
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-static void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+static void render_sprite_4(running_machine &machine, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	UINT16 xpos,ypos;
 	UINT16 col,pixel;
 	UINT32 voffset;
@@ -782,9 +782,9 @@ static void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 cof
 	}
 }
 
-static void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+static void render_sprite_16(running_machine &machine, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	UINT16 xpos,ypos;
 	UINT16 col;
 	UINT32 voffset;
@@ -846,9 +846,9 @@ static void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x,
 	}
 }
 
-static void draw_sprites(running_machine* machine, const rectangle* rect)
+static void draw_sprites(running_machine &machine, const rectangle* rect)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	UINT16 sprite_limit = (state->video.towns_sprite_reg[0] | (state->video.towns_sprite_reg[1] << 8)) & 0x3ff;
 	int n;
 	UINT16 x,y,attr,colour;
@@ -909,12 +909,12 @@ static void draw_sprites(running_machine* machine, const rectangle* rect)
 		state->video.towns_sprite_page = 0;
 
 	state->video.towns_sprite_flag = 1;  // we are now drawing
-	state->video.sprite_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(128 * (1025-sprite_limit)));
+	state->video.sprite_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(128 * (1025-sprite_limit)));
 }
 
-static void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_hicolour(running_machine &machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	UINT32 off = 0;
 	int x;
 	UINT16 colour;
@@ -1105,9 +1105,9 @@ static void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap
 	}
 }
 
-static void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_256(running_machine &machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	int off = 0;
 	int x;
 	UINT8 colour;
@@ -1296,9 +1296,9 @@ static void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* b
 	}
 }
 
-static void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_16(running_machine &machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	int off = 0;
 	int x;
 	UINT8 colour;
@@ -1567,9 +1567,9 @@ static void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bi
 	}
 }
 
-static void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const rectangle* rect,int layer)
+static void towns_crtc_draw_layer(running_machine &machine,bitmap_t* bitmap,const rectangle* rect,int layer)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	int line;
 	int scanline;
 	int height;
@@ -1668,9 +1668,9 @@ static void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,cons
 	}
 }
 
-static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, UINT16 jis, UINT8 attr)
+static void render_text_char(running_machine &machine, UINT8 x, UINT8 y, UINT8 ascii, UINT16 jis, UINT8 attr)
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	UINT32 rom_addr;
 	UINT32 vram_addr;
 	UINT16 linesize = state->video.towns_crtc_reg[24] * 4;
@@ -1678,7 +1678,7 @@ static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 a
 	UINT8 colour;
 	UINT8 data;
 	UINT8 temp;
-	UINT8* font_rom = machine->region("user")->base();
+	UINT8* font_rom = machine.region("user")->base();
 	int a,b;
 
 	// all characters are 16 pixels high
@@ -1749,7 +1749,7 @@ static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 a
 	}
 }
 
-static void draw_text_layer(running_machine* machine)
+static void draw_text_layer(running_machine &machine)
 {
 /*
  *  Text format
@@ -1768,7 +1768,7 @@ static void draw_text_layer(running_machine* machine)
  *
  *  The video hardware renders text to VRAM layer 1, there is no separate text layer
  */
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	int x,y,c = 0;
 
 	for(y=0;y<40;y++)
@@ -1784,7 +1784,7 @@ static void draw_text_layer(running_machine* machine)
 static TIMER_CALLBACK( towns_sprite_done )
 {
 	// sprite drawing is complete, lower flag
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	state->video.towns_sprite_flag = 0;
 	if(state->video.towns_sprite_page != 0)
 		state->video.towns_crtc_reg[21] |= 0x8000;
@@ -1795,7 +1795,7 @@ static TIMER_CALLBACK( towns_sprite_done )
 static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 	device_t* dev = (device_t*)ptr;
 	pic8259_ir3_w(dev, 0);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
@@ -1804,65 +1804,65 @@ static TIMER_CALLBACK( towns_vblank_end )
 
 INTERRUPT_GEN( towns_vsync_irq )
 {
-	towns_state* state = device->machine->driver_data<towns_state>();
+	towns_state* state = device->machine().driver_data<towns_state>();
 	device_t* dev = state->pic_slave;
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	state->video.towns_vblank_flag = 1;
-	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_vblank_end(), FUNC(towns_vblank_end), 0, (void*)dev);
+	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_vblank_end(), FUNC(towns_vblank_end), 0, (void*)dev);
 	if(state->video.towns_tvram_enable)
-		draw_text_layer(dev->machine);
+		draw_text_layer(dev->machine());
 	if(state->video.towns_sprite_reg[1] & 0x80)
-		draw_sprites(dev->machine,&state->video.towns_crtc_layerscr[1]);
+		draw_sprites(dev->machine(),&state->video.towns_crtc_layerscr[1]);
 }
 
 VIDEO_START( towns )
 {
-	towns_state* state = machine->driver_data<towns_state>();
+	towns_state* state = machine.driver_data<towns_state>();
 
 	state->video.towns_vram_wplane = 0x00;
 	state->video.towns_sprite_page = 0;
-	state->video.sprite_timer = machine->scheduler().timer_alloc(FUNC(towns_sprite_done));
+	state->video.sprite_timer = machine.scheduler().timer_alloc(FUNC(towns_sprite_done));
 }
 
 SCREEN_UPDATE( towns )
 {
-	towns_state* state = screen->machine->driver_data<towns_state>();
+	towns_state* state = screen->machine().driver_data<towns_state>();
 
 	bitmap_fill(bitmap,cliprect,0x00000000);
 
 	if(!(state->video.towns_video_reg[1] & 0x01))
 	{
-		if(!input_code_pressed(screen->machine,KEYCODE_Q))
+		if(!input_code_pressed(screen->machine(),KEYCODE_Q))
 		{
 			if((state->video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[1],1);
+				towns_crtc_draw_layer(screen->machine(),bitmap,&state->video.towns_crtc_layerscr[1],1);
 		}
-		if(!input_code_pressed(screen->machine,KEYCODE_W))
+		if(!input_code_pressed(screen->machine(),KEYCODE_W))
 		{
 			if((state->video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[0],0);
+				towns_crtc_draw_layer(screen->machine(),bitmap,&state->video.towns_crtc_layerscr[0],0);
 		}
 	}
 	else
 	{
-		if(!input_code_pressed(screen->machine,KEYCODE_Q))
+		if(!input_code_pressed(screen->machine(),KEYCODE_Q))
 		{
 			if((state->video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[0],0);
+				towns_crtc_draw_layer(screen->machine(),bitmap,&state->video.towns_crtc_layerscr[0],0);
 		}
-		if(!input_code_pressed(screen->machine,KEYCODE_W))
+		if(!input_code_pressed(screen->machine(),KEYCODE_W))
 		{
 			if((state->video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[1],1);
+				towns_crtc_draw_layer(screen->machine(),bitmap,&state->video.towns_crtc_layerscr[1],1);
 		}
 	}
 
 #if 0
 #ifdef SPR_DEBUG
-	if(input_code_pressed(screen->machine,KEYCODE_O))
+	if(input_code_pressed(screen->machine(),KEYCODE_O))
 		pshift+=0x80;
-	if(input_code_pressed(screen->machine,KEYCODE_I))
+	if(input_code_pressed(screen->machine(),KEYCODE_I))
 		pshift-=0x80;
 	popmessage("Pixel shift = %08x",pshift);
 #endif

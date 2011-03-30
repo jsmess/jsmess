@@ -80,13 +80,13 @@ INLINE acia6551_t *get_token(device_t *device)
     has updated state
 -------------------------------------------------*/
 
-static void acia_6551_in_callback(running_machine *machine, int id, unsigned long state)
+static void acia_6551_in_callback(running_machine &machine, int id, unsigned long state)
 {
 	device_t *device;
 	acia6551_t *acia;
 
 	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
-	device = machine->device("acia");
+	device = machine.device("acia");
 	acia = get_token(device);
 
 	acia->connection.input_state = state;
@@ -150,10 +150,10 @@ static DEVICE_START( acia6551 )
 	memset(acia, 0, sizeof(*acia));
 	/* transmit data reg is empty */
 	acia->status_register |= (1<<4);
-	acia->timer = device->machine->scheduler().timer_alloc(FUNC(acia_6551_timer_callback), (void *) device);
+	acia->timer = device->machine().scheduler().timer_alloc(FUNC(acia_6551_timer_callback), (void *) device);
 
-	serial_connection_init(device->machine, &acia->connection);
-	serial_connection_set_in_callback(device->machine, &acia->connection, acia_6551_in_callback);
+	serial_connection_init(device->machine(), &acia->connection);
+	serial_connection_set_in_callback(device->machine(), &acia->connection, acia_6551_in_callback);
 	transmit_register_reset(&acia->transmit_reg);
 	receive_register_reset(&acia->receive_reg);
 }
@@ -398,7 +398,7 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
 				break;
 			}
 
-			serial_connection_out(device->machine, &acia->connection);
+			serial_connection_out(device->machine(), &acia->connection);
 
 			acia_6551_update_data_form(device);
 		}

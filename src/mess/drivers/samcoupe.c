@@ -61,7 +61,7 @@
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	device_t *fdc = space->machine->device("wd1772");
+	device_t *fdc = space->machine().device("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -81,7 +81,7 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	device_t *fdc = space->machine->device("wd1772");
+	device_t *fdc = space->machine().device("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( samcoupe_disk_w )
 
 static READ8_HANDLER( samcoupe_pen_r )
 {
-	screen_device *scr = space->machine->primary_screen;
+	screen_device *scr = space->machine().primary_screen;
 	UINT8 data;
 
 	if (offset & 0x100)
@@ -123,24 +123,24 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 static WRITE8_HANDLER( samcoupe_clut_w )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	state->clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 static READ8_HANDLER( samcoupe_status_r )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
-	if (!BIT(offset,  8)) data &= input_port_read(space->machine, "keyboard_row_fe") & 0xe0;
-	if (!BIT(offset,  9)) data &= input_port_read(space->machine, "keyboard_row_fd") & 0xe0;
-	if (!BIT(offset, 10)) data &= input_port_read(space->machine, "keyboard_row_fb") & 0xe0;
-	if (!BIT(offset, 11)) data &= input_port_read(space->machine, "keyboard_row_f7") & 0xe0;
-	if (!BIT(offset, 12)) data &= input_port_read(space->machine, "keyboard_row_ef") & 0xe0;
-	if (!BIT(offset, 13)) data &= input_port_read(space->machine, "keyboard_row_df") & 0xe0;
-	if (!BIT(offset, 14)) data &= input_port_read(space->machine, "keyboard_row_bf") & 0xe0;
-	if (!BIT(offset, 15)) data &= input_port_read(space->machine, "keyboard_row_7f") & 0xe0;
+	if (!BIT(offset,  8)) data &= input_port_read(space->machine(), "keyboard_row_fe") & 0xe0;
+	if (!BIT(offset,  9)) data &= input_port_read(space->machine(), "keyboard_row_fd") & 0xe0;
+	if (!BIT(offset, 10)) data &= input_port_read(space->machine(), "keyboard_row_fb") & 0xe0;
+	if (!BIT(offset, 11)) data &= input_port_read(space->machine(), "keyboard_row_f7") & 0xe0;
+	if (!BIT(offset, 12)) data &= input_port_read(space->machine(), "keyboard_row_ef") & 0xe0;
+	if (!BIT(offset, 13)) data &= input_port_read(space->machine(), "keyboard_row_df") & 0xe0;
+	if (!BIT(offset, 14)) data &= input_port_read(space->machine(), "keyboard_row_bf") & 0xe0;
+	if (!BIT(offset, 15)) data &= input_port_read(space->machine(), "keyboard_row_7f") & 0xe0;
 
 	/* bit 0-4, interrupt source */
 	data |= state->status;
@@ -150,20 +150,20 @@ static READ8_HANDLER( samcoupe_status_r )
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	state->line_int = data;
 }
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	return state->lmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
 	state->lmpr = data;
 	samcoupe_update_memory(space_program);
@@ -171,14 +171,14 @@ static WRITE8_HANDLER( samcoupe_lmpr_w )
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	return state->hmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
 	state->hmpr = data;
 	samcoupe_update_memory(space_program);
@@ -186,14 +186,14 @@ static WRITE8_HANDLER( samcoupe_hmpr_w )
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	return state->vmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	address_space *space_program = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
 	state->vmpr = data;
 	samcoupe_update_memory(space_program);
@@ -201,37 +201,37 @@ static WRITE8_HANDLER( samcoupe_vmpr_w )
 
 static READ8_HANDLER( samcoupe_midi_r )
 {
-	logerror("%s: read from midi port\n", space->machine->describe_context());
+	logerror("%s: read from midi port\n", space->machine().describe_context());
 	return 0xff;
 }
 
 static WRITE8_HANDLER( samcoupe_midi_w )
 {
-	logerror("%s: write to midi port: 0x%02x\n", space->machine->describe_context(), data);
+	logerror("%s: write to midi port: 0x%02x\n", space->machine().describe_context(), data);
 }
 
 static READ8_HANDLER( samcoupe_keyboard_r )
 {
-	device_t *cassette = space->machine->device("cassette");
+	device_t *cassette = space->machine().device("cassette");
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
-	if (!BIT(offset,  8)) data &= input_port_read(space->machine, "keyboard_row_fe") & 0x1f;
-	if (!BIT(offset,  9)) data &= input_port_read(space->machine, "keyboard_row_fd") & 0x1f;
-	if (!BIT(offset, 10)) data &= input_port_read(space->machine, "keyboard_row_fb") & 0x1f;
-	if (!BIT(offset, 11)) data &= input_port_read(space->machine, "keyboard_row_f7") & 0x1f;
-	if (!BIT(offset, 12)) data &= input_port_read(space->machine, "keyboard_row_ef") & 0x1f;
-	if (!BIT(offset, 13)) data &= input_port_read(space->machine, "keyboard_row_df") & 0x1f;
-	if (!BIT(offset, 14)) data &= input_port_read(space->machine, "keyboard_row_bf") & 0x1f;
-	if (!BIT(offset, 15)) data &= input_port_read(space->machine, "keyboard_row_7f") & 0x1f;
+	if (!BIT(offset,  8)) data &= input_port_read(space->machine(), "keyboard_row_fe") & 0x1f;
+	if (!BIT(offset,  9)) data &= input_port_read(space->machine(), "keyboard_row_fd") & 0x1f;
+	if (!BIT(offset, 10)) data &= input_port_read(space->machine(), "keyboard_row_fb") & 0x1f;
+	if (!BIT(offset, 11)) data &= input_port_read(space->machine(), "keyboard_row_f7") & 0x1f;
+	if (!BIT(offset, 12)) data &= input_port_read(space->machine(), "keyboard_row_ef") & 0x1f;
+	if (!BIT(offset, 13)) data &= input_port_read(space->machine(), "keyboard_row_df") & 0x1f;
+	if (!BIT(offset, 14)) data &= input_port_read(space->machine(), "keyboard_row_bf") & 0x1f;
+	if (!BIT(offset, 15)) data &= input_port_read(space->machine(), "keyboard_row_7f") & 0x1f;
 
 	if (offset == 0xff00)
 	{
-		data &= input_port_read(space->machine, "keyboard_row_ff") & 0x1f;
+		data &= input_port_read(space->machine(), "keyboard_row_ff") & 0x1f;
 
 		/* if no key has been pressed, return the mouse state */
 		if (data == 0x1f)
-			data = samcoupe_mouse_r(space->machine);
+			data = samcoupe_mouse_r(space->machine());
 	}
 
 	/* bit 5, lightpen strobe */
@@ -248,9 +248,9 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	device_t *cassette = space->machine->device("cassette");
-	device_t *speaker = space->machine->device("speaker");
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	device_t *cassette = space->machine().device("cassette");
+	device_t *speaker = space->machine().device("speaker");
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
 	state->border = data;
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
-	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	return state->attribute;
 }
 
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	samcoupe_state *state = machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = machine.driver_data<samcoupe_state>();
 	/* adjust STATUS register */
 	state->status |= param;
 
@@ -337,11 +337,11 @@ static TIMER_CALLBACK( irq_off )
 
 void samcoupe_irq(device_t *device, UINT8 src)
 {
-	samcoupe_state *state = device->machine->driver_data<samcoupe_state>();
+	samcoupe_state *state = device->machine().driver_data<samcoupe_state>();
 
 	/* assert irq and a timer to set it off again */
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(attotime::from_usec(20), FUNC(irq_off), src);
+	device->machine().scheduler().timer_set(attotime::from_usec(20), FUNC(irq_off), src);
 
 	/* adjust STATUS register */
 	state->status &= ~src;
@@ -487,7 +487,7 @@ static PALETTE_INIT( samcoupe )
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
-	palette_normalize_range(machine->palette, 0, 127, 0, 255);
+	palette_normalize_range(machine.palette, 0, 127, 0, 255);
 }
 
 

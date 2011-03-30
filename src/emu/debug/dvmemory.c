@@ -73,9 +73,9 @@ const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[9
 //-------------------------------------------------
 
 debug_view_memory_source::debug_view_memory_source(const char *name, address_space &space)
-	: debug_view_source(name, space.cpu),
+	: debug_view_source(name, &space.device()),
 	  m_space(&space),
-	  m_memintf(dynamic_cast<device_memory_interface *>(space.cpu)),
+	  m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
 	  m_base(NULL),
 	  m_length(0),
 	  m_offsetxor(0),
@@ -160,7 +160,7 @@ void debug_view_memory::enumerate_sources()
 			if (space != NULL)
 			{
 				name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space->name());
-				m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, *space)));
+				m_source_list.append(*auto_alloc(m_machine, debug_view_memory_source(name, *space)));
 			}
 		}
 
@@ -168,7 +168,7 @@ void debug_view_memory::enumerate_sources()
 	for (const memory_region *region = m_machine.first_region(); region != NULL; region = region->next())
 	{
 		name.printf("Region '%s'", region->name());
-		m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, *region)));
+		m_source_list.append(*auto_alloc(m_machine, debug_view_memory_source(name, *region)));
 	}
 
 	// finally add all global array symbols
@@ -185,7 +185,7 @@ void debug_view_memory::enumerate_sources()
 		if (valcount > 1 && strstr(itemname, "globals/"))
 		{
 			name.cpy(strrchr(itemname, '/') + 1);
-			m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, base, valsize, valcount)));
+			m_source_list.append(*auto_alloc(m_machine, debug_view_memory_source(name, base, valsize, valcount)));
 		}
 	}
 
@@ -213,7 +213,7 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		m_chunks_per_row = m_bytes_per_chunk * m_chunks_per_row / source.m_prefsize;
 		m_bytes_per_chunk = source.m_prefsize;
 		if (source.m_space != NULL)
-			m_expression.set_context(&source.m_space->cpu->debug()->symtable());
+			m_expression.set_context(&source.m_space->device().debug()->symtable());
 		else
 			m_expression.set_context(NULL);
 	}
@@ -707,10 +707,10 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 
 // hack for FD1094 editing
 #ifdef FD1094_HACK
-	if (source.m_base == *m_machine.region("user2"))
+	if (source.m_base == m_machine.region("user2"))
 	{
-		extern void fd1094_regenerate_key(running_machine *machine);
-		fd1094_regenerate_key(&m_machine);
+		extern void fd1094_regenerate_key(running_machine &machine);
+		fd1094_regenerate_key(m_machine);
 	}
 #endif
 }

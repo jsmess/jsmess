@@ -62,10 +62,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(applix)
 {
-	applix_state *state = machine->driver_data<applix_state>();
-	UINT8* RAM = machine->region("maincpu")->base();
+	applix_state *state = machine.driver_data<applix_state>();
+	UINT8* RAM = machine.region("maincpu")->base();
 	memcpy(state->m_base, RAM+0x500000, 16);
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static VIDEO_START( applix )
@@ -74,7 +74,7 @@ static VIDEO_START( applix )
 
 static SCREEN_UPDATE( applix )
 {
-	applix_state *state = screen->machine->driver_data<applix_state>();
+	applix_state *state = screen->machine().driver_data<applix_state>();
 	mc6845_update(state->m_crtc, bitmap, cliprect);
 	return 0;
 }
@@ -82,7 +82,7 @@ static SCREEN_UPDATE( applix )
 MC6845_UPDATE_ROW( applix_update_row )
 {
 #if 0
-	applix_state *state = device->machine->driver_data<applix_state>();
+	applix_state *state = device->machine().driver_data<applix_state>();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->_08 & 0x0e) << 7;

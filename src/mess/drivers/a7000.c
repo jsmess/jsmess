@@ -129,9 +129,9 @@ static const char *const vidc20_vert_regnames[] =
 #define VCSR 6
 #define VCER 7
 
-static void vidc20_dynamic_screen_change(running_machine *machine)
+static void vidc20_dynamic_screen_change(running_machine &machine)
 {
-	a7000_state *state = machine->driver_data<a7000_state>();
+	a7000_state *state = machine.driver_data<a7000_state>();
 	/* sanity checks - first pass */
 	/*
     total cycles + border start/end
@@ -150,7 +150,7 @@ static void vidc20_dynamic_screen_change(running_machine *machine)
 		{
 			/* finally ready to change the resolution */
 			int hblank_period,vblank_period;
-			rectangle visarea = machine->primary_screen->visible_area();
+			rectangle visarea = machine.primary_screen->visible_area();
 			hblank_period = (state->vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (state->vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
@@ -159,7 +159,7 @@ static void vidc20_dynamic_screen_change(running_machine *machine)
 			visarea.min_y = (state->vidc20_vert_reg[VBSR] & 0x1fff);
 			visarea.max_y = (state->vidc20_vert_reg[VBER] & 0x1fff)-1;
 
-			machine->primary_screen->configure(hblank_period, vblank_period, visarea, machine->primary_screen->frame_period().attoseconds );
+			machine.primary_screen->configure(hblank_period, vblank_period, visarea, machine.primary_screen->frame_period().attoseconds );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
 			           (state->vidc20_horz_reg[HDER]-state->vidc20_horz_reg[HDSR]),(state->vidc20_vert_reg[VDER]-state->vidc20_vert_reg[VDSR]),
 			           (state->vidc20_horz_reg[HBER]-state->vidc20_horz_reg[HBSR]),(state->vidc20_vert_reg[VBER]-state->vidc20_vert_reg[VBSR]),
@@ -170,7 +170,7 @@ static void vidc20_dynamic_screen_change(running_machine *machine)
 
 static WRITE32_HANDLER( a7000_vidc20_w )
 {
-	a7000_state *state = space->machine->driver_data<a7000_state>();
+	a7000_state *state = space->machine().driver_data<a7000_state>();
 	int reg = data >> 28;
 
 	switch(reg)
@@ -183,7 +183,7 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			g = (data & 0x00ff00) >> 8;
 			b = (data & 0xff0000) >> 16;
 
-			palette_set_color_rgb(space->machine,state->vidc20_pal_index & 0xff,r,g,b);
+			palette_set_color_rgb(space->machine(),state->vidc20_pal_index & 0xff,r,g,b);
 
 			/* auto-increment & wrap-around */
 			state->vidc20_pal_index++;
@@ -208,7 +208,7 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			g = (data & 0x00ff00) >> 8;
 			b = (data & 0xff0000) >> 16;
 
-			palette_set_color_rgb(space->machine,0x100,r,g,b);
+			palette_set_color_rgb(space->machine(),0x100,r,g,b);
 		}
 		break;
 		case 5: // Cursor Palette Logical Colour n
@@ -222,7 +222,7 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			g = (data & 0x00ff00) >> 8;
 			b = (data & 0xff0000) >> 16;
 
-			palette_set_color_rgb(space->machine,cursor_index,r,g,b);
+			palette_set_color_rgb(space->machine(),cursor_index,r,g,b);
 		}
 		break;
 		case 8: // Horizontal
@@ -232,7 +232,7 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			horz_reg = (data >> 24) & 0xf;
 			state->vidc20_horz_reg[horz_reg] = data & 0x3fff;
 			if(horz_reg == 0 || horz_reg == 2 || horz_reg == 5)
-				vidc20_dynamic_screen_change(space->machine);
+				vidc20_dynamic_screen_change(space->machine());
 
 			// logerror("VIDC20: %s Register write = %08x (%d)\n",vidc20_horz_regnames[horz_reg],val,val);
 		}
@@ -244,12 +244,12 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			vert_reg = (data >> 24) & 0xf;
 			state->vidc20_vert_reg[vert_reg] = data & 0x1fff;
 			if(vert_reg == 0 || vert_reg == 2 || vert_reg == 5)
-				vidc20_dynamic_screen_change(space->machine);
+				vidc20_dynamic_screen_change(space->machine());
 
 			if(vert_reg == 4)
 			{
 				if(state->vidc20_vert_reg[VDER] != 0)
-					state->flyback_timer->adjust(space->machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]));
+					state->flyback_timer->adjust(space->machine().primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]));
 				else
 					state->flyback_timer->adjust(attotime::never);
 			}
@@ -273,13 +273,13 @@ static VIDEO_START( a7000 )
 
 static SCREEN_UPDATE( a7000 )
 {
-	a7000_state *state = screen->machine->driver_data<a7000_state>();
+	a7000_state *state = screen->machine().driver_data<a7000_state>();
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *vram = screen->machine->region("vram")->base();
+	UINT8 *vram = screen->machine().region("vram")->base();
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0x100]);
 
 	x_size = (state->vidc20_horz_reg[HDER]-state->vidc20_horz_reg[HDSR]);
 	y_size = (state->vidc20_vert_reg[VDER]-state->vidc20_vert_reg[VDSR]);
@@ -303,7 +303,7 @@ static SCREEN_UPDATE( a7000 )
 				for(x=0;x<x_size;x+=8)
 				{
 					for(xi=0;xi<8;xi++)
-						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine->pens[(vram[count]>>(xi))&1];
+						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine().pens[(vram[count]>>(xi))&1];
 
 					count++;
 				}
@@ -317,7 +317,7 @@ static SCREEN_UPDATE( a7000 )
 				for(x=0;x<x_size;x+=4)
 				{
 					for(xi=0;xi<4;xi++)
-						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine->pens[(vram[count]>>(xi*2))&3];
+						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine().pens[(vram[count]>>(xi*2))&3];
 
 					count++;
 				}
@@ -331,7 +331,7 @@ static SCREEN_UPDATE( a7000 )
 				for(x=0;x<x_size;x+=2)
 				{
 					for(xi=0;xi<2;xi++)
-						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine->pens[(vram[count]>>(xi*4))&0xf];
+						*BITMAP_ADDR32(bitmap, y+y_start, x+xi+x_start) = screen->machine().pens[(vram[count]>>(xi*4))&0xf];
 
 					count++;
 				}
@@ -344,7 +344,7 @@ static SCREEN_UPDATE( a7000 )
 			{
 				for(x=0;x<x_size;x++)
 				{
-					*BITMAP_ADDR32(bitmap, y+y_start, x+x_start) = screen->machine->pens[(vram[count])&0xff];
+					*BITMAP_ADDR32(bitmap, y+y_start, x+x_start) = screen->machine().pens[(vram[count])&0xff];
 
 					count++;
 				}
@@ -584,44 +584,44 @@ static void fire_iomd_timer(a7000_state *state, int timer)
 
 static TIMER_CALLBACK( IOMD_timer0_callback )
 {
-	a7000_state *state = machine->driver_data<a7000_state>();
+	a7000_state *state = machine.driver_data<a7000_state>();
 	state->IRQ_status_A|=0x20;
 	if(state->IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
 	}
 }
 
 static TIMER_CALLBACK( IOMD_timer1_callback )
 {
-	a7000_state *state = machine->driver_data<a7000_state>();
+	a7000_state *state = machine.driver_data<a7000_state>();
 	state->IRQ_status_A|=0x40;
 	if(state->IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
 	}
 }
 
 static TIMER_CALLBACK( flyback_timer_callback )
 {
-	a7000_state *state = machine->driver_data<a7000_state>();
+	a7000_state *state = machine.driver_data<a7000_state>();
 	state->IRQ_status_A|=0x08;
 	if(state->IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
 	}
 
-	state->flyback_timer->adjust(machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]));
+	state->flyback_timer->adjust(machine.primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]));
 }
 
 static void viddma_transfer_start(address_space *space)
 {
-	a7000_state *state = space->machine->driver_data<a7000_state>();
+	a7000_state *state = space->machine().driver_data<a7000_state>();
 	UINT32 src = state->viddma_addr_start;
 	UINT32 dst = 0;
 	UINT32 size = state->viddma_addr_end;
 	UINT32 dma_index;
-	UINT8 *vram = space->machine->region("vram")->base();
+	UINT8 *vram = space->machine().region("vram")->base();
 
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)
@@ -635,7 +635,7 @@ static void viddma_transfer_start(address_space *space)
 
 static READ32_HANDLER( a7000_iomd_r )
 {
-	a7000_state *state = space->machine->driver_data<a7000_state>();
+	a7000_state *state = space->machine().driver_data<a7000_state>();
 //  if(offset != IOMD_KBDCR)
 //      logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
 
@@ -647,7 +647,7 @@ static READ32_HANDLER( a7000_iomd_r )
 			UINT8 flyback;
 			int vert_pos;
 
-			vert_pos = space->machine->primary_screen->vpos();
+			vert_pos = space->machine().primary_screen->vpos();
 			flyback = (vert_pos <= state->vidc20_vert_reg[VDSR] || vert_pos >= state->vidc20_vert_reg[VDER]) ? 0x80 : 0x00;
 
 			return state->IOMD_IO_ctrl | 0x34 | flyback;
@@ -690,7 +690,7 @@ static READ32_HANDLER( a7000_iomd_r )
 
 static WRITE32_HANDLER( a7000_iomd_w )
 {
-	a7000_state *state = space->machine->driver_data<a7000_state>();
+	a7000_state *state = space->machine().driver_data<a7000_state>();
 //  logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 
 	switch(offset)
@@ -782,17 +782,17 @@ INPUT_PORTS_END
 
 static MACHINE_START(a7000)
 {
-	a7000_state *state = machine->driver_data<a7000_state>();
-	state->IOMD_timer[0] = machine->scheduler().timer_alloc(FUNC(IOMD_timer0_callback));
-	state->IOMD_timer[1] = machine->scheduler().timer_alloc(FUNC(IOMD_timer1_callback));
-	state->flyback_timer = machine->scheduler().timer_alloc(FUNC(flyback_timer_callback));
+	a7000_state *state = machine.driver_data<a7000_state>();
+	state->IOMD_timer[0] = machine.scheduler().timer_alloc(FUNC(IOMD_timer0_callback));
+	state->IOMD_timer[1] = machine.scheduler().timer_alloc(FUNC(IOMD_timer1_callback));
+	state->flyback_timer = machine.scheduler().timer_alloc(FUNC(flyback_timer_callback));
 
 	state->io_id = 0xd4e7;
 }
 
 static MACHINE_RESET(a7000)
 {
-	a7000_state *state = machine->driver_data<a7000_state>();
+	a7000_state *state = machine.driver_data<a7000_state>();
 	state->IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
 //  state->IRQ_status_A = 0x10; // set POR bit ON
 	state->IRQ_mask_A = 0x00;

@@ -70,7 +70,7 @@ public:
 
 static WRITE16_HANDLER( glasgow_lcd_w )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 	UINT8 lcd_data = data >> 8;
 
 	if (state->led7 == 0)
@@ -82,8 +82,8 @@ static WRITE16_HANDLER( glasgow_lcd_w )
 
 static WRITE16_HANDLER( glasgow_lcd_flag_w )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
-	device_t *speaker = space->machine->device("beep");
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
+	device_t *speaker = space->machine().device("beep");
 	UINT16 lcd_flag = data & 0x8100;
 
 	beep_set_state(speaker, (lcd_flag & 0x100) ? 1 : 0);
@@ -104,10 +104,10 @@ static READ16_HANDLER( glasgow_keys_r )
 	/* See if any keys pressed */
 	data = 3;
 
-	if (mboard_key_select == input_port_read(space->machine, "LINE0"))
+	if (mboard_key_select == input_port_read(space->machine(), "LINE0"))
 		data &= 1;
 
-	if (mboard_key_select == input_port_read(space->machine, "LINE1"))
+	if (mboard_key_select == input_port_read(space->machine(), "LINE1"))
 		data &= 2;
 
 	return data << 8;
@@ -120,7 +120,7 @@ static WRITE16_HANDLER( glasgow_keys_w )
 
 static WRITE16_HANDLER( write_lcd )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 	UINT8 lcd_data = data >> 8;
 
 	output_set_digit_value(state->lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( write_lcd )
 
 static WRITE16_HANDLER( write_lcd_flag )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 //	UINT8 lcd_flag;
 	mboard_lcd_invert = 0;
 //	lcd_flag=data >> 8;
@@ -155,8 +155,8 @@ static WRITE16_HANDLER( write_lcd_flag )
 
 static WRITE16_HANDLER( write_irq_flag )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
-	device_t *speaker = space->machine->device("beep");
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
+	device_t *speaker = space->machine().device("beep");
 
 	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
@@ -169,9 +169,9 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 	UINT16 data;
 
 	if (mboard_key_selector == 0)
-		data = input_port_read(space->machine, "LINE0");
+		data = input_port_read(space->machine(), "LINE0");
 	else
-		data = input_port_read(space->machine, "LINE1");
+		data = input_port_read(space->machine(), "LINE1");
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, mboard_key_selector);
 	data <<= 8;
@@ -195,7 +195,7 @@ static READ16_HANDLER(read_test)
 
 static WRITE32_HANDLER( write_lcd32 )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 	UINT8 lcd_data = data >> 8;
 
 	output_set_digit_value(state->lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
@@ -206,7 +206,7 @@ static WRITE32_HANDLER( write_lcd32 )
 
 static WRITE32_HANDLER( write_lcd_flag32 )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 //	UINT8 lcd_flag = data >> 24;
 
 	mboard_lcd_invert = 0;
@@ -232,9 +232,9 @@ static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
 	UINT32 data;
 
 	if (mboard_key_selector == 0)
-		data = input_port_read(space->machine, "LINE0");
+		data = input_port_read(space->machine(), "LINE0");
 	else
-		data = input_port_read(space->machine, "LINE1");
+		data = input_port_read(space->machine(), "LINE1");
 	//if (mboard_key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
 	if(data)
 		logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
@@ -252,8 +252,8 @@ static READ16_HANDLER(read_board_amsterd)
 
 static WRITE32_HANDLER ( write_beeper32 )
 {
-	glasgow_state *state = space->machine->driver_data<glasgow_state>();
-	device_t *speaker = space->machine->device("beep");
+	glasgow_state *state = space->machine().driver_data<glasgow_state>();
+	device_t *speaker = space->machine().device("beep");
 	beep_set_state(speaker, data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
 	state->irq_flag = 1;
@@ -262,18 +262,18 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	cputag_set_input_line(timer.machine, "maincpu", 7, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", 7, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( update_nmi32 )
 {
-	cputag_set_input_line(timer.machine, "maincpu", 6, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
 }
 
 static MACHINE_START( glasgow )
 {
-	glasgow_state *state = machine->driver_data<glasgow_state>();
-	device_t *speaker = machine->device("beep");
+	glasgow_state *state = machine.driver_data<glasgow_state>();
+	device_t *speaker = machine.device("beep");
 
 	mboard_key_selector = 0;
 	state->irq_flag = 0;
@@ -286,8 +286,8 @@ static MACHINE_START( glasgow )
 
 static MACHINE_START( dallas32 )
 {
-	glasgow_state *state = machine->driver_data<glasgow_state>();
-	device_t *speaker = machine->device("beep");
+	glasgow_state *state = machine.driver_data<glasgow_state>();
+	device_t *speaker = machine.device("beep");
 
 	state->lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
@@ -298,7 +298,7 @@ static MACHINE_START( dallas32 )
 
 static MACHINE_RESET( glasgow )
 {
-	glasgow_state *state = machine->driver_data<glasgow_state>();
+	glasgow_state *state = machine.driver_data<glasgow_state>();
 	state->lcd_shift_counter = 3;
 
 	mboard_set_border_pieces();

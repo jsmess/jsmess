@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( snes_mouse_speed_input )
 {
-	snes_state *state = field->port->machine->driver_data<snes_state>();
+	snes_state *state = field->port->machine().driver_data<snes_state>();
 	int port = (FPTR)param;
 
 	if (snes_ram[OLDJOY1] & 0x1)
@@ -128,7 +128,7 @@ static CUSTOM_INPUT( snes_mouse_speed_input )
 
 static CUSTOM_INPUT( snes_superscope_offscreen_input )
 {
-	snes_state *state = field->port->machine->driver_data<snes_state>();
+	snes_state *state = field->port->machine().driver_data<snes_state>();
 	int port = (FPTR)param;
 	static const char *const portnames[2][3] =
 			{
@@ -136,8 +136,8 @@ static CUSTOM_INPUT( snes_superscope_offscreen_input )
 				{ "SUPERSCOPE2", "SUPERSCOPE2_X", "SUPERSCOPE2_Y" },
 			};
 
-	INT16 x = input_port_read(field->port->machine, portnames[port][1]);
-	INT16 y = input_port_read(field->port->machine, portnames[port][2]);
+	INT16 x = input_port_read(field->port->machine(), portnames[port][1]);
+	INT16 y = input_port_read(field->port->machine(), portnames[port][2]);
 
 	/* these are the theoretical boundaries, but we currently are always onscreen... */
 	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= snes_ppu.beam.last_visible_line)
@@ -374,7 +374,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void snes_gun_latch( running_machine *machine, INT16 x, INT16 y )
+static void snes_gun_latch( running_machine &machine, INT16 x, INT16 y )
 {
 	/* these are the theoretical boundaries */
 	if (x < 0)
@@ -392,9 +392,9 @@ static void snes_gun_latch( running_machine *machine, INT16 x, INT16 y )
 	snes_ram[STAT78] |= 0x40;
 }
 
-static void snes_input_read_joy( running_machine *machine, int port )
+static void snes_input_read_joy( running_machine &machine, int port )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	static const char *const portnames[2][4] =
 			{
 				{ "SERIAL1_DATA1_L", "SERIAL1_DATA1_H", "SERIAL1_DATA2_L", "SERIAL1_DATA2_H" },
@@ -415,9 +415,9 @@ static void snes_input_read_joy( running_machine *machine, int port )
 	state->joypad[port].buttons = state->data1[port];
 }
 
-static void snes_input_read_mouse( running_machine *machine, int port )
+static void snes_input_read_mouse( running_machine &machine, int port )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	INT16 var;
 	static const char *const portnames[2][3] =
 			{
@@ -478,9 +478,9 @@ static void snes_input_read_mouse( running_machine *machine, int port )
 	state->data2[port] = 0;
 }
 
-static void snes_input_read_superscope( running_machine *machine, int port )
+static void snes_input_read_superscope( running_machine &machine, int port )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	static const char *const portnames[2][3] =
 			{
 				{ "SUPERSCOPE1", "SUPERSCOPE1_X", "SUPERSCOPE1_Y" },
@@ -540,14 +540,14 @@ static void snes_input_read_superscope( running_machine *machine, int port )
 	state->data2[port] = 0;
 }
 
-static void snes_input_read( running_machine *machine )
+static void snes_input_read( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 ctrl1 = input_port_read(machine, "CTRLSEL") & 0x0f;
 	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	switch (ctrl1)
 	{
@@ -605,9 +605,9 @@ static void snes_input_read( running_machine *machine )
 
 }
 
-static UINT8 snes_oldjoy1_read( running_machine *machine )
+static UINT8 snes_oldjoy1_read( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 ctrl1 = input_port_read(machine, "CTRLSEL") & 0x0f;
 	UINT8 res = 0;
 
@@ -645,9 +645,9 @@ static UINT8 snes_oldjoy1_read( running_machine *machine )
 	return res;
 }
 
-static UINT8 snes_oldjoy2_read( running_machine *machine )
+static UINT8 snes_oldjoy2_read( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 	UINT8 res = 0;
 
@@ -693,7 +693,7 @@ static UINT8 snes_oldjoy2_read( running_machine *machine )
 
 static MACHINE_RESET( snes_mess )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 
 	MACHINE_RESET_CALL(snes);
 

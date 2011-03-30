@@ -237,9 +237,9 @@ ADDRESS_MAP_END
   IRQ Handling
 *********************************************/
 
-static void nakajies_update_irqs( running_machine *machine )
+static void nakajies_update_irqs( running_machine &machine )
 {
-	nakajies_state *state = machine->driver_data<nakajies_state>();
+	nakajies_state *state = machine.driver_data<nakajies_state>();
 	UINT8 irq = state->irq_enabled & state->irq_active;
 	UINT8 vector = 0xff;
 
@@ -271,16 +271,16 @@ static READ8_HANDLER( irq_clear_r )
 
 static WRITE8_HANDLER( irq_clear_w )
 {
-	nakajies_state *state = space->machine->driver_data<nakajies_state>();
+	nakajies_state *state = space->machine().driver_data<nakajies_state>();
 
 	state->irq_active &= ~data;
-	nakajies_update_irqs( space->machine );
+	nakajies_update_irqs(space->machine());
 }
 
 
 static READ8_HANDLER( irq_enable_r )
 {
-	nakajies_state *state = space->machine->driver_data<nakajies_state>();
+	nakajies_state *state = space->machine().driver_data<nakajies_state>();
 
 	return state->irq_enabled;
 }
@@ -288,10 +288,10 @@ static READ8_HANDLER( irq_enable_r )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	nakajies_state *state = space->machine->driver_data<nakajies_state>();
+	nakajies_state *state = space->machine().driver_data<nakajies_state>();
 
 	state->irq_enabled = data;
-	nakajies_update_irqs( space->machine );
+	nakajies_update_irqs(space->machine());
 }
 
 
@@ -310,11 +310,11 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_irq )
 {
-	nakajies_state *state = field->port->machine->driver_data<nakajies_state>();
-	UINT8 irqs = input_port_read( field->port->machine, "debug" );
+	nakajies_state *state = field->port->machine().driver_data<nakajies_state>();
+	UINT8 irqs = input_port_read( field->port->machine(), "debug" );
 
 	state->irq_active |= irqs;
-	nakajies_update_irqs( field->port->machine );
+	nakajies_update_irqs(field->port->machine());
 }
 
 
@@ -333,9 +333,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( nakajies )
 {
-	nakajies_state *state = machine->driver_data<nakajies_state>();
+	nakajies_state *state = machine.driver_data<nakajies_state>();
 
-	state->cpu = machine->device( "v20hl" );
+	state->cpu = machine.device( "v20hl" );
 	state->irq_enabled = 0;
 	state->irq_active = 0;
 }

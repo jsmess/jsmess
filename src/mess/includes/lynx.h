@@ -114,7 +114,7 @@ MACHINE_START( lynx );
 
 READ8_HANDLER( lynx_memory_config_r );
 WRITE8_HANDLER( lynx_memory_config_w );
-void lynx_timer_count_down(running_machine *machine, int nr);
+void lynx_timer_count_down(running_machine &machine, int nr);
 
 INTERRUPT_GEN( lynx_frame_int );
 

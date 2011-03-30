@@ -215,13 +215,13 @@ static DEVICE_START( i82439tx )
 	i82439tx_config *config = (i82439tx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	/* get address space we are working on */
-	device_t *cpu = device->machine->device(config->cputag);
+	device_t *cpu = device->machine().device(config->cputag);
 	assert(cpu != NULL);
 
 	i82439tx->space = cpu->memory().space(AS_PROGRAM);
 
 	/* get rom region */
-	i82439tx->rom = device->machine->region(config->rom_region)->base();
+	i82439tx->rom = device->machine().region(config->rom_region)->base();
 
 	/* setup save states */
 	device->save_item(NAME(i82439tx->regs));

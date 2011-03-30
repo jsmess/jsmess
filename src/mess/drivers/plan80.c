@@ -47,19 +47,19 @@ READ8_MEMBER(plan80_state::plan80_04_r)
 	UINT8 data = 0xff;
 
 	if (m_kbd_row == 0xfe)
-		data = input_port_read(machine, "LINE0");
+		data = input_port_read(m_machine, "LINE0");
 	else
 	if (m_kbd_row == 0xfd)
-		data = input_port_read(machine, "LINE1");
+		data = input_port_read(m_machine, "LINE1");
 	else
 	if (m_kbd_row == 0xfb)
-		data = input_port_read(machine, "LINE2");
+		data = input_port_read(m_machine, "LINE2");
 	else
 	if (m_kbd_row == 0xf7)
-		data = input_port_read(machine, "LINE3");
+		data = input_port_read(m_machine, "LINE3");
 	else
 	if (m_kbd_row == 0xef)
-		data = input_port_read(machine, "LINE4");
+		data = input_port_read(m_machine, "LINE4");
 
 	return data;
 }
@@ -144,12 +144,12 @@ static TIMER_CALLBACK( plan80_boot )
 static MACHINE_RESET(plan80)
 {
 	memory_set_bank(machine, "boot", 1);
-	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
+	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
 }
 
 DRIVER_INIT( plan80 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
 }
 
@@ -159,8 +159,8 @@ static VIDEO_START( plan80 )
 
 static SCREEN_UPDATE( plan80 )
 {
-	plan80_state *state = screen->machine->driver_data<plan80_state>();
-	UINT8 *gfx = screen->machine->region("gfx")->base();
+	plan80_state *state = screen->machine().driver_data<plan80_state>();
+	UINT8 *gfx = screen->machine().region("gfx")->base();
 	int x,y,j,b;
 	UINT16 addr;
 

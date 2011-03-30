@@ -207,7 +207,7 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	return BIT(input_port_read(device->machine, "RUN"), 0);
+	return BIT(input_port_read(device->machine(), "RUN"), 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
@@ -217,9 +217,9 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 
 static READ_LINE_DEVICE_HANDLER( ef3_r )
 {
-	tmc600_state *state = device->machine->driver_data<tmc600_state>();
+	tmc600_state *state = device->machine().driver_data<tmc600_state>();
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(device->machine, keynames[state->m_keylatch / 8]);
+	UINT8 data = ~input_port_read(device->machine(), keynames[state->m_keylatch / 8]);
 
 	return BIT(data, state->m_keylatch % 8);
 }
@@ -249,7 +249,7 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void tmc600_state::machine_start()
 {
-	address_space *program = machine->device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = m_machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (ram_get_size(m_ram))
@@ -264,7 +264,7 @@ void tmc600_state::machine_start()
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(m_machine, m_keylatch);
 }
 
 /* Machine Drivers */

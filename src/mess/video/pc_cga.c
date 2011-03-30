@@ -89,7 +89,7 @@
 		if(VERBOSE_CGA>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine->time().as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -310,7 +310,7 @@ static void ntsc_clear(struct ntsc_decoder *ntsc)
 
    The correct value for hue will usually be a multiple of 128.
 */
-static void ntsc_decoder_init(running_machine *machine, struct ntsc_decoder *ntsc, int period, int hue)
+static void ntsc_decoder_init(running_machine &machine, struct ntsc_decoder *ntsc, int period, int hue)
 {
 	int j;
 
@@ -446,19 +446,19 @@ static PALETTE_INIT( pc_cga )
 }
 
 
-static int internal_pc_cga_video_start(running_machine *machine)
+static int internal_pc_cga_video_start(running_machine &machine)
 {
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = machine->region( "gfx1" )->base() + 0x1000;
+	cga.chr_gen = machine.region( "gfx1" )->base() + 0x1000;
 
 	state_save_register_item(machine, "pccga", NULL, 0, cga.mode_control);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.color_select);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.status);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.plantronics);
 
-	cga.config_input_port = machine->m_portlist.find("pcvideo_cga_config" );
+	cga.config_input_port = machine.m_portlist.find("pcvideo_cga_config" );
 
 	return 0;
 }
@@ -468,11 +468,11 @@ static int internal_pc_cga_video_start(running_machine *machine)
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
 
 	space->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
-	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -507,12 +507,12 @@ static VIDEO_START( pc_cga )
 static VIDEO_START( pc_cga32k )
 {
 	int buswidth;
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
 
 
 	space->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
-	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -547,8 +547,8 @@ static VIDEO_START( pc_cga32k )
 
 static SCREEN_UPDATE( mc6845_cga )
 {
-	UINT8 *gfx = screen->machine->region("gfx1")->base();
-	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
+	UINT8 *gfx = screen->machine().region("gfx1")->base();
+	device_t *devconf = screen->machine().device(CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -568,13 +568,13 @@ static SCREEN_UPDATE( mc6845_cga )
 static VIDEO_START( cga_poisk2 )
 {
 	VIDEO_START_CALL(pc_cga);
-	cga.chr_gen = machine->region( "gfx1" )->base() + 0x0000;
+	cga.chr_gen = machine.region( "gfx1" )->base() + 0x0000;
 }
 
 static SCREEN_UPDATE( cga_poisk2 )
 {
-	UINT8 *gfx = screen->machine->region("gfx1")->base();
-	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
+	UINT8 *gfx = screen->machine().region("gfx1")->base();
+	device_t *devconf = screen->machine().device(CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -600,7 +600,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -639,7 +639,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -677,7 +677,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -715,7 +715,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -764,7 +764,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -811,7 +811,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -871,7 +871,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 	int		samp_index = 0;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
 if ( NTSC_FILTER )
@@ -975,7 +975,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -1011,7 +1011,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	fg = cga.color_select & 0x0F;
 	int i;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -1122,9 +1122,9 @@ static void pc_cga_set_palette_luts(void)
  *  x x x 1 1 1 1 0 - 640x200 graphics. Colour on black on RGB monitor, monochrome on composite monitor.
  *  x x x 1 1 1 1 1 - unknown/invalid.
  */
-static void pc_cga_mode_control_w(running_machine *machine, int data)
+static void pc_cga_mode_control_w(running_machine &machine, int data)
 {
-	device_t *devconf = machine->device(CGA_MC6845_NAME);
+	device_t *devconf = machine.device(CGA_MC6845_NAME);
 
 	CGA_LOG(1,"CGA_mode_control_w",("$%02x: columns %d, gfx %d, hires %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>4)&1, (data>>5)&1));
@@ -1227,7 +1227,7 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 /*
  *  ?W  reserved for color select register on color adapter
  */
-static void pc_cga_color_select_w(running_machine *machine, int data)
+static void pc_cga_color_select_w(running_machine &machine, int data)
 {
 	CGA_LOG(1,"CGA_color_select_w",("$%02x\n", data));
 	cga.color_select = data;
@@ -1240,7 +1240,7 @@ static void pc_cga_color_select_w(running_machine *machine, int data)
 /*
  * Select Plantronics modes
  */
-static void pc_cga_plantronics_w(running_machine *machine, int data)
+static void pc_cga_plantronics_w(running_machine &machine, int data)
 {
 	CGA_LOG(1,"CGA_plantronics_w",("$%02x\n", data));
 
@@ -1262,7 +1262,7 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
 
 static WRITE8_HANDLER ( char_ram_w )
 {
-	UINT8 *gfx = space->machine->region("gfx1")->base();
+	UINT8 *gfx = space->machine().region("gfx1")->base();
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
 	gfx[offset + 0x0800] = data;
@@ -1275,7 +1275,7 @@ static WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_r
 
 static READ8_HANDLER ( char_ram_r )
 {
-	UINT8 *gfx = space->machine->region("gfx1")->base();
+	UINT8 *gfx = space->machine().region("gfx1")->base();
 	return gfx[offset];
 }
 
@@ -1284,7 +1284,7 @@ static READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(ch
 
 static READ8_HANDLER( pc_cga8_r )
 {
-	device_t *devconf = space->machine->device(CGA_MC6845_NAME);
+	device_t *devconf = space->machine().device(CGA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -1312,26 +1312,26 @@ static WRITE8_HANDLER( pc_cga8_w )
 
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
-		devconf = space->machine->device(CGA_MC6845_NAME);
+		devconf = space->machine().device(CGA_MC6845_NAME);
 		mc6845_address_w( devconf, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		devconf = space->machine->device(CGA_MC6845_NAME);
+		devconf = space->machine().device(CGA_MC6845_NAME);
 		mc6845_register_w( devconf, offset, data );
 		break;
 	case 8:
-		pc_cga_mode_control_w(space->machine, data);
+		pc_cga_mode_control_w(space->machine(), data);
 		break;
 	case 9:
-		pc_cga_color_select_w(space->machine, data);
+		pc_cga_color_select_w(space->machine(), data);
 		break;
 	case 0x0d:
-		pc_cga_plantronics_w(space->machine, data);
+		pc_cga_plantronics_w(space->machine(), data);
 		break;
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
-		UINT8 buswidth = space->machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
-		address_space *space_prg = space->machine->firstcpu->memory().space(AS_PROGRAM);
+		UINT8 buswidth = space->machine().firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+		address_space *space_prg = space->machine().firstcpu->memory().space(AS_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
 			switch(buswidth)
@@ -1587,7 +1587,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT16	offset_base = ra << 13;
 	int j;
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
 	for ( j = 0; j < x_count; j++ )
@@ -1613,7 +1613,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 static WRITE8_HANDLER ( pc1512_w )
 {
 	UINT8 *videoram = cga.videoram;
-	device_t *devconf = space->machine->device(CGA_MC6845_NAME);
+	device_t *devconf = space->machine().device(CGA_MC6845_NAME);
 
 	switch (offset)
 	{
@@ -1642,7 +1642,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		}
 		else
 		{
-			memory_set_bankptr(space->machine,"bank1", videoram + videoram_offset[0]);
+			memory_set_bankptr(space->machine(),"bank1", videoram + videoram_offset[0]);
 		}
 		cga.mode_control = data;
 		switch( cga.mode_control & 0x3F )
@@ -1700,7 +1700,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		pc1512.read = data;
 		if ( ( cga.mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(space->machine,"bank1", videoram + videoram_offset[data & 3]);
+			memory_set_bankptr(space->machine(),"bank1", videoram + videoram_offset[data & 3]);
 		}
 		break;
 
@@ -1771,8 +1771,8 @@ static VIDEO_START( pc1512 )
 	cga.videoram_size = 0x10000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
 	
-	address_space *space = machine->firstcpu->memory().space( AS_PROGRAM );
-	address_space *io_space = machine->firstcpu->memory().space( AS_IO );
+	address_space *space = machine.firstcpu->memory().space( AS_PROGRAM );
+	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
 
 	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);
@@ -1786,8 +1786,8 @@ static VIDEO_START( pc1512 )
 
 static SCREEN_UPDATE( mc6845_pc1512 )
 {
-	UINT8 *gfx = screen->machine->region("gfx1")->base();
-	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
+	UINT8 *gfx = screen->machine().region("gfx1")->base();
+	device_t *devconf = screen->machine().device(CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */

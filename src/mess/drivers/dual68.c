@@ -25,7 +25,7 @@ public:
 
 static WRITE16_HANDLER(dual68_terminal_w)
 {
-	device_t *devconf = space->machine->device(TERMINAL_TAG);
+	device_t *devconf = space->machine().device(TERMINAL_TAG);
 	terminal_write(devconf,0,data >> 8);
 }
 
@@ -54,12 +54,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(dual68)
 {
-	dual68_state *state = machine->driver_data<dual68_state>();
-	UINT8* user1 = machine->region("user1")->base();
+	dual68_state *state = machine.driver_data<dual68_state>();
+	UINT8* user1 = machine.region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x2000);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static WRITE8_DEVICE_HANDLER( dual68_kbd_put )

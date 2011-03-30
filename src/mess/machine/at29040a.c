@@ -399,7 +399,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 static DEVICE_START( at29c040a )
 {
 	at29c040a_state *feeprom = get_safe_token(device);
-	feeprom->programming_timer = device->machine->scheduler().timer_alloc(FUNC(at29c040a_programming_timer_callback), (void *)device);
+	feeprom->programming_timer = device->machine().scheduler().timer_alloc(FUNC(at29c040a_programming_timer_callback), (void *)device);
 }
 
 static DEVICE_STOP( at29c040a )

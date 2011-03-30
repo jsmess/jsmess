@@ -58,12 +58,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( lc80 )
@@ -156,7 +156,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	lc80_state *state = device->machine->driver_data<lc80_state>();
+	lc80_state *state = device->machine().driver_data<lc80_state>();
 
 	state->segment = BITSWAP8(~data, 4, 3, 1, 6, 7, 5, 0, 2);
 
@@ -180,7 +180,7 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 
     */
 
-	lc80_state *state = device->machine->driver_data<lc80_state>();
+	lc80_state *state = device->machine().driver_data<lc80_state>();
 
 	return (cassette_input(state->cassette) < +0.0);
 }
@@ -202,7 +202,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	lc80_state *state = device->machine->driver_data<lc80_state>();
+	lc80_state *state = device->machine().driver_data<lc80_state>();
 
 	/* tape output */
 	cassette_output(state->cassette, BIT(data, 1) ? +1.0 : -1.0);
@@ -248,7 +248,7 @@ static READ8_DEVICE_HANDLER( pio2_port_b_r )
 
     */
 
-	lc80_state *state = device->machine->driver_data<lc80_state>();
+	lc80_state *state = device->machine().driver_data<lc80_state>();
 	UINT8 data = 0xf0;
 	int i;
 
@@ -256,10 +256,10 @@ static READ8_DEVICE_HANDLER( pio2_port_b_r )
 	{
 		if (!BIT(state->digit, i))
 		{
-			if (!BIT(input_port_read(device->machine, "ROW0"), i)) data &= ~0x10;
-			if (!BIT(input_port_read(device->machine, "ROW1"), i)) data &= ~0x20;
-			if (!BIT(input_port_read(device->machine, "ROW2"), i)) data &= ~0x40;
-			if (!BIT(input_port_read(device->machine, "ROW3"), i)) data &= ~0x80;
+			if (!BIT(input_port_read(device->machine(), "ROW0"), i)) data &= ~0x10;
+			if (!BIT(input_port_read(device->machine(), "ROW1"), i)) data &= ~0x20;
+			if (!BIT(input_port_read(device->machine(), "ROW2"), i)) data &= ~0x40;
+			if (!BIT(input_port_read(device->machine(), "ROW3"), i)) data &= ~0x80;
 		}
 	}
 
@@ -291,35 +291,35 @@ static const z80_daisy_config lc80_daisy_chain[] =
 
 static MACHINE_START( lc80 )
 {
-	lc80_state *state = machine->driver_data<lc80_state>();
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	lc80_state *state = machine.driver_data<lc80_state>();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->z80pio2 = machine->device(Z80PIO2_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->z80pio2 = machine.device(Z80PIO2_TAG);
+	state->speaker = machine.device(SPEAKER_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0); // TODO
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region(Z80_TAG)->base(), 0); // TODO
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region(Z80_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 1);
 
-	memory_configure_bank(machine, "bank2", 0, 1, machine->region(Z80_TAG)->base() + 0x800, 0); // TODO
-	memory_configure_bank(machine, "bank2", 1, 1, machine->region(Z80_TAG)->base() + 0x800, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, machine.region(Z80_TAG)->base() + 0x800, 0); // TODO
+	memory_configure_bank(machine, "bank2", 1, 1, machine.region(Z80_TAG)->base() + 0x800, 0);
 	memory_set_bank(machine, "bank2", 1);
 
-	memory_configure_bank(machine, "bank3", 0, 1, machine->region(Z80_TAG)->base() + 0x1000, 0); // TODO
-	memory_configure_bank(machine, "bank3", 1, 1, machine->region(Z80_TAG)->base() + 0x1000, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, machine.region(Z80_TAG)->base() + 0x1000, 0); // TODO
+	memory_configure_bank(machine, "bank3", 1, 1, machine.region(Z80_TAG)->base() + 0x1000, 0);
 	memory_set_bank(machine, "bank3", 1);
 
-	memory_configure_bank(machine, "bank4", 0, 1, machine->region(Z80_TAG)->base() + 0x2000, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, machine.region(Z80_TAG)->base() + 0x2000, 0);
 	memory_set_bank(machine, "bank4", 0);
 
 	program->install_readwrite_bank(0x0000, 0x07ff, "bank1");
 	program->install_readwrite_bank(0x0800, 0x0fff, "bank2");
 	program->install_readwrite_bank(0x1000, 0x17ff, "bank3");
 
-	switch (ram_get_size(machine->device(RAM_TAG)))
+	switch (ram_get_size(machine.device(RAM_TAG)))
 	{
 	case 1*1024:
 		program->install_readwrite_bank(0x2000, 0x23ff, "bank4");

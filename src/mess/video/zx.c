@@ -36,10 +36,10 @@ int ula_scanline_count = 0;
  * (during tape IO or sound output) zx_ula_bkgnd() is used to
  * simulate the display of a ZX80/ZX81.
  */
-void zx_ula_bkgnd(running_machine *machine, int color)
+void zx_ula_bkgnd(running_machine &machine, int color)
 {
-	zx_state *state = machine->driver_data<zx_state>();
-	screen_device *screen = machine->first_screen();
+	zx_state *state = machine.driver_data<zx_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	const rectangle &visarea = screen->visible_area();
@@ -48,10 +48,10 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 	{
 		int y, new_x, new_y;
 		rectangle r;
-		bitmap_t *bitmap = machine->generic.tmpbitmap;
+		bitmap_t *bitmap = machine.generic.tmpbitmap;
 
-		new_y = machine->primary_screen->vpos();
-		new_x = machine->primary_screen->hpos();
+		new_y = machine.primary_screen->vpos();
+		new_x = machine.primary_screen->hpos();
 /*      logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", state->old_x, state->old_y, new_x, new_y);*/
 		y = state->old_y;
 		for (;;)
@@ -94,22 +94,22 @@ void zx_ula_bkgnd(running_machine *machine, int color)
  */
 static TIMER_CALLBACK(zx_ula_nmi)
 {
-	zx_state *state = machine->driver_data<zx_state>();
+	zx_state *state = machine.driver_data<zx_state>();
 	/*
      * An NMI is issued on the ZX81 every 64us for the blanked
      * scanlines at the top and bottom of the display.
      */
-	screen_device *screen = machine->first_screen();
+	screen_device *screen = machine.first_screen();
 	int height = screen->height();
 	const rectangle r1 = screen->visible_area();
 	rectangle r;
 
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	r.min_x = r1.min_x;
 	r.max_x = r1.max_x;
 	r.min_y = r.max_y = state->ula_scanline_count;
 	bitmap_fill(bitmap, &r, 1);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine->primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine->device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine->device("maincpu"), Z80_PC));
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_PC));
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	if (++state->ula_scanline_count == height)
 		state->ula_scanline_count = 0;
@@ -117,7 +117,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 
 static TIMER_CALLBACK(zx_ula_irq)
 {
-	zx_state *state = machine->driver_data<zx_state>();
+	zx_state *state = machine.driver_data<zx_state>();
 
 	/*
      * An IRQ is issued on the ZX80/81 whenever the R registers
@@ -126,34 +126,34 @@ static TIMER_CALLBACK(zx_ula_irq)
      */
 	if (state->ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine->primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine->device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine->device("maincpu"), Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_PC));
 
 		state->ula_irq_active = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
-void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param)
+void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param)
 {
-	zx_state *state = machine->driver_data<zx_state>();
-	screen_device *screen = machine->first_screen();
+	zx_state *state = machine.driver_data<zx_state>();
+	screen_device *screen = machine.first_screen();
 	int offs0 = offs & 0x7fff;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 chr = rom[offs0];
 
 	if ((!state->ula_irq_active) && (chr == 0x76))
 	{
-		bitmap_t *bitmap = machine->generic.tmpbitmap;
+		bitmap_t *bitmap = machine.generic.tmpbitmap;
 		UINT16 y, *scanline;
-		UINT16 ireg = cpu_get_reg(machine->device("maincpu"), Z80_I) << 8;
+		UINT16 ireg = cpu_get_reg(machine.device("maincpu"), Z80_I) << 8;
 		UINT8 data, *chrgen, creg;
 
 		if (param)
-			creg = cpu_get_reg(machine->device("maincpu"), Z80_B);
+			creg = cpu_get_reg(machine.device("maincpu"), Z80_B);
 		else
-			creg = cpu_get_reg(machine->device("maincpu"), Z80_C);
+			creg = cpu_get_reg(machine.device("maincpu"), Z80_C);
 
-		chrgen = machine->region(region)->base();
+		chrgen = machine.region(region)->base();
 
 		if ((++state->ula_scanline_count == screen->height()) || (creg == 32))
 		{
@@ -173,7 +173,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 		for (y = state->charline_ptr; y < ARRAY_LENGTH(state->charline); y++)
 			state->charline[y] = 0;
 
-		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->charline_ptr) << 2)), FUNC(zx_ula_irq));
+		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->charline_ptr) << 2)), FUNC(zx_ula_irq));
 		state->ula_irq_active++;
 
 		scanline = BITMAP_ADDR16(bitmap, state->ula_scanline_count, 0);
@@ -202,15 +202,15 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 
 VIDEO_START( zx )
 {
-	zx_state *state = machine->driver_data<zx_state>();
-	state->ula_nmi = machine->scheduler().timer_alloc(FUNC(zx_ula_nmi));
+	zx_state *state = machine.driver_data<zx_state>();
+	state->ula_nmi = machine.scheduler().timer_alloc(FUNC(zx_ula_nmi));
 	state->ula_irq_active = 0;
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
 SCREEN_EOF( zx )
 {
-	zx_state *state = machine->driver_data<zx_state>();
+	zx_state *state = machine.driver_data<zx_state>();
 	/* decrement video synchronization counter */
 	if (state->ula_frame_vsync)
 		--state->ula_frame_vsync;

@@ -87,12 +87,12 @@ const upd765_interface pc_fdc_upd765_not_connected_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static device_t* pc_get_device(running_machine *machine)
+static device_t* pc_get_device(running_machine &machine)
 {
 	return (*fdc->fdc_interface.get_device)(machine);
 }
 
-static void pc_fdc_reset(running_machine *machine)
+static void pc_fdc_reset(running_machine &machine)
 {
 	/* setup reset condition */
 	fdc->data_rate_register = 2;
@@ -109,7 +109,7 @@ static void pc_fdc_reset(running_machine *machine)
 
 
 
-void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
+void pc_fdc_init(running_machine &machine, const struct pc_fdc_interface *iface)
 {
 	/* initialize fdc structure */
 	fdc = auto_alloc_clear(machine, struct pc_fdc);
@@ -118,7 +118,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 	if (iface)
 		memcpy(&fdc->fdc_interface, iface, sizeof(fdc->fdc_interface));
 
-	fdc->watchdog = machine->scheduler().timer_alloc(FUNC(watchdog_timeout));
+	fdc->watchdog = machine.scheduler().timer_alloc(FUNC(watchdog_timeout));
 
 	pc_fdc_reset(machine);
 }
@@ -131,18 +131,18 @@ static UPD765_GET_IMAGE ( pc_fdc_get_image )
 
 	if (!fdc->fdc_interface.get_image)
 	{
-		image = floppy_get_device(device->machine, floppy_index);
+		image = floppy_get_device(device->machine(), floppy_index);
 	}
 	else
 	{
-		image = fdc->fdc_interface.get_image(device->machine, floppy_index);
+		image = fdc->fdc_interface.get_image(device->machine(), floppy_index);
 	}
 	return image;
 }
 
 
 
-void pc_fdc_set_tc_state(running_machine *machine, int state)
+void pc_fdc_set_tc_state(running_machine &machine, int state)
 {
 	/* store state */
 	fdc->tc_state = state;
@@ -166,12 +166,12 @@ static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 
 	/* send irq */
 	if (fdc->fdc_interface.pc_fdc_interrupt)
-		fdc->fdc_interface.pc_fdc_interrupt(device->machine, state);
+		fdc->fdc_interface.pc_fdc_interrupt(device->machine(), state);
 }
 
 
 
-int	pc_fdc_dack_r(running_machine *machine)
+int	pc_fdc_dack_r(running_machine &machine)
 {
 	int data;
 
@@ -189,7 +189,7 @@ int	pc_fdc_dack_r(running_machine *machine)
 
 
 
-void pc_fdc_dack_w(running_machine *machine, int data)
+void pc_fdc_dack_w(running_machine &machine, int data)
 {
 	/* if dma is not enabled, dacks are not issued */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
@@ -210,12 +210,12 @@ static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq )
 		return;
 
 	if (fdc->fdc_interface.pc_fdc_dma_drq)
-		fdc->fdc_interface.pc_fdc_dma_drq(device->machine, state);
+		fdc->fdc_interface.pc_fdc_dma_drq(device->machine(), state);
 }
 
 
 
-static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
+static void pc_fdc_data_rate_w(running_machine &machine, UINT8 data)
 {
 	if ((data & 0x080)!=0)
 	{
@@ -247,7 +247,7 @@ static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
      `------------------ 1 = turn floppy drive D motor on
  */
 
-static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
+static void pc_fdc_dor_w(running_machine &machine, UINT8 data)
 {
 	int selected_drive;
 	int floppy_count;
@@ -355,7 +355,7 @@ static TIMER_CALLBACK( watchdog_timeout )
 	}
 }
 
-static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
+static void pcjr_fdc_dor_w(running_machine &machine, UINT8 data)
 {
 	int floppy_count;
 
@@ -443,10 +443,10 @@ READ8_HANDLER ( pc_fdc_r )
 		case 3: /* tape drive select? */
 			break;
 		case 4:
-			data = upd765_status_r(pc_get_device(space->machine), 0);
+			data = upd765_status_r(pc_get_device(space->machine()), 0);
 			break;
 		case 5:
-			data = upd765_data_r(pc_get_device(space->machine), offset);
+			data = upd765_data_r(pc_get_device(space->machine()), offset);
 			break;
 		case 6: /* FDC reserved */
 			break;
@@ -456,7 +456,7 @@ READ8_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(space->machine->firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
 	return data;
 }
 
@@ -465,7 +465,7 @@ READ8_HANDLER ( pc_fdc_r )
 WRITE8_HANDLER ( pc_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
 
 	switch(offset)
 	{
@@ -473,16 +473,16 @@ WRITE8_HANDLER ( pc_fdc_w )
 		case 1:	/* n/a */
 			break;
 		case 2:
-			pc_fdc_dor_w(space->machine, data);
+			pc_fdc_dor_w(space->machine(), data);
 			break;
 		case 3:
 			/* tape drive select? */
 			break;
 		case 4:
-			pc_fdc_data_rate_w(space->machine, data);
+			pc_fdc_data_rate_w(space->machine(), data);
 			break;
 		case 5:
-			upd765_data_w(pc_get_device(space->machine), 0, data);
+			upd765_data_w(pc_get_device(space->machine()), 0, data);
 			break;
 		case 6:
 			/* FDC reserved */
@@ -504,12 +504,12 @@ WRITE8_HANDLER ( pc_fdc_w )
 WRITE8_HANDLER ( pcjr_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->firstcpu,STATE_GENPC), offset, data);
+		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
 
 	switch(offset)
 	{
 		case 2:
-			pcjr_fdc_dor_w( space->machine, data );
+			pcjr_fdc_dor_w( space->machine(), data );
 			break;
 		default:
 			pc_fdc_w( space, offset, data );

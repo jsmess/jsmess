@@ -54,11 +54,11 @@ extern const i8255a_interface ibm5160_ppi8255_interface;
 extern const i8255a_interface pc_ppi8255_interface;
 extern const i8255a_interface pcjr_ppi8255_interface;
 
-UINT8 pc_speaker_get_spk(running_machine *machine);
-void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data);
-void pc_speaker_set_input(running_machine *machine, UINT8 data);
+UINT8 pc_speaker_get_spk(running_machine &machine);
+void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data);
+void pc_speaker_set_input(running_machine &machine, UINT8 data);
 
-void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(running_machine *,int,int));
+void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
 
 WRITE8_HANDLER( pc_nmi_enable_w );
 READ8_HANDLER( pcjr_nmi_enable_r );
@@ -100,7 +100,7 @@ WRITE8_HANDLER( pc_rtc_w );
 READ16_HANDLER( pc16le_rtc_r );
 WRITE16_HANDLER( pc16le_rtc_w );
 
-void pc_rtc_init(running_machine *machine);
+void pc_rtc_init(running_machine &machine);
 
 READ8_HANDLER ( pc_EXP_r );
 WRITE8_HANDLER ( pc_EXP_w );

@@ -29,7 +29,7 @@ public:
 static READ8_HANDLER( k8915_52_r )
 {
 // get data from ascii keyboard
-	k8915_state *state = space->machine->driver_data<k8915_state>();
+	k8915_state *state = space->machine().driver_data<k8915_state>();
 	state->k8915_53 = 0;
 	return state->term_data;
 }
@@ -37,7 +37,7 @@ static READ8_HANDLER( k8915_52_r )
 static READ8_HANDLER( k8915_53_r )
 {
 // keyboard status
-	k8915_state *state = space->machine->driver_data<k8915_state>();
+	k8915_state *state = space->machine().driver_data<k8915_state>();
 	return state->k8915_53;
 }
 
@@ -45,9 +45,9 @@ static WRITE8_HANDLER( k8915_a8_w )
 {
 // seems to switch ram and rom around.
 	if (data == 0x87)
-		memory_set_bank(space->machine, "boot", 0); // ram at 0000
+		memory_set_bank(space->machine(), "boot", 0); // ram at 0000
 	else
-		memory_set_bank(space->machine, "boot", 1); // rom at 0000
+		memory_set_bank(space->machine(), "boot", 1); // rom at 0000
 }
 
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8)
@@ -75,19 +75,19 @@ static MACHINE_RESET(k8915)
 
 static DRIVER_INIT(k8915)
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
 }
 
 static VIDEO_START( k8915 )
 {
-	k8915_state *state = machine->driver_data<k8915_state>();
-	state->charrom = machine->region("chargen")->base();
+	k8915_state *state = machine.driver_data<k8915_state>();
+	state->charrom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( k8915 )
 {
-	k8915_state *state = screen->machine->driver_data<k8915_state>();
+	k8915_state *state = screen->machine().driver_data<k8915_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -140,7 +140,7 @@ PALETTE_INIT( k8915 )
 
 static WRITE8_DEVICE_HANDLER( k8915_kbd_put )
 {
-	k8915_state *state = device->machine->driver_data<k8915_state>();
+	k8915_state *state = device->machine().driver_data<k8915_state>();
 	state->term_data = data;
 	state->k8915_53 = 1;
 }

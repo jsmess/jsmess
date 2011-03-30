@@ -77,17 +77,17 @@ public:
 static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_intrq_w )
 {
 	if (state)
-		archimedes_request_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY);
+		archimedes_request_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY);
 	else
-		archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY);
+		archimedes_clear_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_drq_w )
 {
 	if (state)
-		archimedes_request_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
+		archimedes_request_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY_DRQ);
 	else
-		archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
+		archimedes_clear_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
 static READ32_HANDLER( a310_psy_wram_r )
@@ -103,11 +103,11 @@ static WRITE32_HANDLER( a310_psy_wram_w )
 
 static DRIVER_INIT(a310)
 {
-	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
 
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), FUNC(a310_psy_wram_r), FUNC(a310_psy_wram_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), FUNC(a310_psy_wram_r), FUNC(a310_psy_wram_w) );
 
 	archimedes_driver_init(machine);
 }
@@ -117,7 +117,7 @@ static MACHINE_START( a310 )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	//dac_signed_data_w(machine->device("dac"), 0x80);
+	//dac_signed_data_w(machine.device("dac"), 0x80);
 }
 
 static MACHINE_RESET( a310 )

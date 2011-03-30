@@ -144,7 +144,7 @@ pdp1_reset_param_t pdp1_reset_param =
 
 MACHINE_RESET( pdp1 )
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int cfg;
 
 	cfg = input_port_read(machine, "CFG");
@@ -178,7 +178,7 @@ static void pdp1_machine_stop(running_machine &machine)
 */
 MACHINE_START( pdp1 )
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	UINT8 *dst;
 
 	static const unsigned char fontdata6x8[pdp1_fontdata_size] =
@@ -307,15 +307,15 @@ MACHINE_START( pdp1 )
 	};
 
 	/* set up our font */
-	dst = machine->region("gfx1")->base();
+	dst = machine.region("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, pdp1_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, pdp1_machine_stop);
 
-	state->tape_reader.timer = machine->scheduler().timer_alloc(FUNC(reader_callback));
-	state->tape_puncher.timer = machine->scheduler().timer_alloc(FUNC(puncher_callback));
-	state->typewriter.tyo_timer = machine->scheduler().timer_alloc(FUNC(tyo_callback));
-	state->dpy_timer = machine->scheduler().timer_alloc(FUNC(dpy_callback));
+	state->tape_reader.timer = machine.scheduler().timer_alloc(FUNC(reader_callback));
+	state->tape_puncher.timer = machine.scheduler().timer_alloc(FUNC(puncher_callback));
+	state->typewriter.tyo_timer = machine.scheduler().timer_alloc(FUNC(tyo_callback));
+	state->dpy_timer = machine.scheduler().timer_alloc(FUNC(dpy_callback));
 }
 
 
@@ -355,7 +355,7 @@ DEVICE_START( pdp1_tape )
 */
 DEVICE_IMAGE_LOAD( pdp1_tape )
 {
-	pdp1_state *state = image.device().machine->driver_data<pdp1_state>();
+	pdp1_state *state = image.device().machine().driver_data<pdp1_state>();
 	int id = image_index_in_device(image);
 
 	switch (id)
@@ -396,7 +396,7 @@ DEVICE_IMAGE_LOAD( pdp1_tape )
 
 DEVICE_IMAGE_UNLOAD( pdp1_tape )
 {
-	pdp1_state *state = image.device().machine->driver_data<pdp1_state>();
+	pdp1_state *state = image.device().machine().driver_data<pdp1_state>();
 	int id = image_index_in_device(image);
 
 	switch (id)
@@ -472,7 +472,7 @@ static void begin_tape_read(pdp1_state *state, int binary, int nac)
 */
 static TIMER_CALLBACK(reader_callback)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int not_ready;
 	UINT8 data;
 
@@ -501,8 +501,8 @@ static TIMER_CALLBACK(reader_callback)
 					state->tape_reader.rcl = 0;
 					if (state->tape_reader.rcp)
 					{
-						cpu_set_reg(machine->device("maincpu"), PDP1_IO, state->tape_reader.rb);	/* transfer reader buffer to IO */
-						pdp1_pulse_iot_done(machine->device("maincpu"));
+						cpu_set_reg(machine.device("maincpu"), PDP1_IO, state->tape_reader.rb);	/* transfer reader buffer to IO */
+						pdp1_pulse_iot_done(machine.device("maincpu"));
 					}
 					else
 						state->io_status |= io_st_ptr;
@@ -523,12 +523,12 @@ static TIMER_CALLBACK(reader_callback)
 */
 static TIMER_CALLBACK(puncher_callback)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int nac = param;
 	state->io_status |= io_st_ptp;
 	if (nac)
 	{
-		pdp1_pulse_iot_done(machine->device("maincpu"));
+		pdp1_pulse_iot_done(machine.device("maincpu"));
 	}
 }
 
@@ -537,7 +537,7 @@ static TIMER_CALLBACK(puncher_callback)
 */
 void pdp1_tape_read_binary(device_t *device)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	begin_tape_read(state, 1, 1);
 }
 
@@ -570,9 +570,9 @@ void pdp1_tape_read_binary(device_t *device)
  */
 static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	begin_tape_read(state, 0, nac);
 }
@@ -608,9 +608,9 @@ static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac)
  */
 static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	begin_tape_read(state, 1, nac);
 }
@@ -620,9 +620,9 @@ static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	*io = state->tape_reader.rb;
 	state->io_status &= ~io_st_ptr;
@@ -644,9 +644,9 @@ static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
  */
 static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	tape_write(state, *io & 0377);
 	state->io_status &= ~io_st_ptp;
@@ -654,7 +654,7 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (state->tape_puncher.timer->enable(0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 	}
 
 	state->tape_puncher.timer->adjust(attotime::from_usec(15800), nac);
@@ -673,9 +673,9 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
  */
 static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	tape_write(state, (*io >> 12) | 0200);
 	state->io_status &= ~io_st_ptp;
@@ -683,7 +683,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (state->tape_puncher.timer->enable(0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 	}
 	state->tape_puncher.timer->adjust(attotime::from_usec(15800), nac);
 }
@@ -701,7 +701,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 DEVICE_IMAGE_LOAD(pdp1_typewriter)
 {
-	pdp1_state *state = image.device().machine->driver_data<pdp1_state>();
+	pdp1_state *state = image.device().machine().driver_data<pdp1_state>();
 	/* open file */
 	state->typewriter.fd = &image;
 
@@ -712,16 +712,16 @@ DEVICE_IMAGE_LOAD(pdp1_typewriter)
 
 DEVICE_IMAGE_UNLOAD(pdp1_typewriter)
 {
-	pdp1_state *state = image.device().machine->driver_data<pdp1_state>();
+	pdp1_state *state = image.device().machine().driver_data<pdp1_state>();
 	state->typewriter.fd = NULL;
 }
 
 /*
     Write a character to typewriter
 */
-static void typewriter_out(running_machine *machine, UINT8 data)
+static void typewriter_out(running_machine &machine, UINT8 data)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
 		logerror("typewriter output %o\n", data);
 
@@ -829,12 +829,12 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 */
 static TIMER_CALLBACK(tyo_callback)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int nac = param;
 	state->io_status |= io_st_tyo;
 	if (nac)
 	{
-		pdp1_pulse_iot_done(machine->device("maincpu"));
+		pdp1_pulse_iot_done(machine.device("maincpu"));
 	}
 }
 
@@ -843,15 +843,15 @@ static TIMER_CALLBACK(tyo_callback)
 */
 static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	int ch, delay;
 
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	ch = (*io) & 077;
 
-	typewriter_out(device->machine, ch);
+	typewriter_out(device->machine(), ch);
 	state->io_status &= ~io_st_tyo;
 
 	/* compute completion delay (source: maintainance manual 9-12, 9-13 and 9-14) */
@@ -875,7 +875,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (state->typewriter.tyo_timer->enable(0))
-			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 	}
 
 	state->typewriter.tyo_timer->adjust(attotime::from_msec(delay), nac);
@@ -897,9 +897,9 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
  */
 static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	*io = state->typewriter.tb;
 	if (! (state->io_status & io_st_tyi))
@@ -908,7 +908,7 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	{
 		state->io_status &= ~io_st_tyi;
 		if (USE_SBS)
-			cputag_set_input_line_and_vector(device->machine, "maincpu", 0, CLEAR_LINE, 0);	/* interrupt it, baby */
+			cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, CLEAR_LINE, 0);	/* interrupt it, baby */
 	}
 }
 
@@ -952,7 +952,7 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 static TIMER_CALLBACK(dpy_callback)
 {
-	pdp1_pulse_iot_done(machine->device("maincpu"));
+	pdp1_pulse_iot_done(machine.device("maincpu"));
 }
 
 
@@ -963,14 +963,14 @@ static TIMER_CALLBACK(dpy_callback)
 */
 static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	int x;
 	int y;
 
 
 	x = ((ac+0400000) & 0777777) >> 8;
 	y = (((*io)+0400000) & 0777777) >> 8;
-	pdp1_plot(device->machine, x, y);
+	pdp1_plot(device->machine(), x, y);
 
 	/* light pen 32 support */
 	state->io_status &= ~io_st_pen;
@@ -979,7 +979,7 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	{
 		state->io_status |= io_st_pen;
 
-		cpu_set_reg(device->machine->device("maincpu"), PDP1_PF3, 1);
+		cpu_set_reg(device->machine().device("maincpu"), PDP1_PF3, 1);
 	}
 
 	if (nac)
@@ -990,7 +990,7 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 			/* note that overlap detection is incomplete: it will only work if both DPY
             instructions require a completion pulse */
 			if (state->dpy_timer->enable(0))
-				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 		}
 		state->dpy_timer->adjust(attotime::from_usec(50));
 	}
@@ -1017,7 +1017,7 @@ static void parallel_drum_set_il(pdp1_state *state, int il)
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK(il_timer_callback)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	if (state->parallel_drum.dba)
 	{
 		/* set break request and status bit 5 */
@@ -1027,10 +1027,10 @@ static TIMER_CALLBACK(il_timer_callback)
 
 static void parallel_drum_init(pdp1_state *state)
 {
-	state->parallel_drum.rotation_timer = machine->scheduler().timer_alloc();
+	state->parallel_drum.rotation_timer = machine.scheduler().timer_alloc();
 	state->parallel_drum.rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	state->parallel_drum.il_timer = machine->scheduler().timer_alloc(FUNC(il_timer_callback));
+	state->parallel_drum.il_timer = machine.scheduler().timer_alloc(FUNC(il_timer_callback));
 	parallel_drum_set_il(0);
 }
 #endif
@@ -1040,7 +1040,7 @@ static void parallel_drum_init(pdp1_state *state)
 */
 DEVICE_IMAGE_LOAD(pdp1_drum)
 {
-	pdp1_state *state = image.device().machine->driver_data<pdp1_state>();
+	pdp1_state *state = image.device().machine().driver_data<pdp1_state>();
 	/* open file */
 	state->parallel_drum.fd = &image;
 
@@ -1049,13 +1049,13 @@ DEVICE_IMAGE_LOAD(pdp1_drum)
 
 DEVICE_IMAGE_UNLOAD(pdp1_drum)
 {
-	pdp1_state *state = image.device().machine->driver_data<pdp1_state>();
+	pdp1_state *state = image.device().machine().driver_data<pdp1_state>();
 	state->parallel_drum.fd = NULL;
 }
 
 static void iot_dia(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	state->parallel_drum.wfb = ((*io) & 0370000) >> 12;
 	parallel_drum_set_il(state, (*io) & 0007777);
 
@@ -1064,7 +1064,7 @@ static void iot_dia(device_t *device, int op2, int nac, int mb, int *io, int ac)
 
 static void iot_dba(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	state->parallel_drum.wfb = ((*io) & 0370000) >> 12;
 	parallel_drum_set_il(state, (*io) & 0007777);
 
@@ -1106,7 +1106,7 @@ static void drum_write(pdp1_state *state, int field, int position, UINT32 data)
 
 static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	attotime delay;
 	int dc;
 
@@ -1125,12 +1125,12 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	{
 		if ((state->parallel_drum.wfb >= 1) && (state->parallel_drum.wfb <= 22))
 		{
-			drum_write(state, state->parallel_drum.wfb-1, dc, (signed)device->machine->device("maincpu")->memory().space(AS_PROGRAM)->read_dword(state->parallel_drum.wcl<<2));
+			drum_write(state, state->parallel_drum.wfb-1, dc, (signed)device->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_dword(state->parallel_drum.wcl<<2));
 		}
 
 		if ((state->parallel_drum.rfb >= 1) && (state->parallel_drum.rfb <= 22))
 		{
-			device->machine->device("maincpu")->memory().space(AS_PROGRAM)->write_dword(state->parallel_drum.wcl<<2, drum_read(state, state->parallel_drum.rfb-1, dc));
+			device->machine().device("maincpu")->memory().space(AS_PROGRAM)->write_dword(state->parallel_drum.wcl<<2, drum_read(state, state->parallel_drum.rfb-1, dc));
 		}
 
 		state->parallel_drum.wc = (state->parallel_drum.wc+1) & 07777;
@@ -1139,14 +1139,14 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 		if (state->parallel_drum.wc)
 			delay = delay + PARALLEL_DRUM_WORD_TIME;
 	} while (state->parallel_drum.wc);
-	device_adjust_icount(device->machine->device("maincpu"),-device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(delay));
+	device_adjust_icount(device->machine().device("maincpu"),-device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(delay));
 	/* if no error, skip */
-	cpu_set_reg(device->machine->device("maincpu"), PDP1_PC, cpu_get_reg(device->machine->device("maincpu"), PDP1_PC)+1);
+	cpu_set_reg(device->machine().device("maincpu"), PDP1_PC, cpu_get_reg(device->machine().device("maincpu"), PDP1_PC)+1);
 }
 
 static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	(*io) = (state->parallel_drum.rotation_timer->elapsed() *
 		(ATTOSECONDS_PER_SECOND / (PARALLEL_DRUM_WORD_TIME.as_attoseconds()))).seconds & 0007777;
 
@@ -1168,7 +1168,7 @@ static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 static void iot_011(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	int key_state = input_port_read(device->machine, "SPACEWAR");
+	int key_state = input_port_read(device->machine(), "SPACEWAR");
 	int reply;
 
 
@@ -1207,9 +1207,9 @@ static void iot_011(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
+		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
 	*io = state->io_status;
 }
@@ -1222,7 +1222,7 @@ static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 void pdp1_io_sc_callback(device_t *device)
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	state->tape_reader.rcl = state->tape_reader.rc = 0;
 	if (state->tape_reader.timer)
 		state->tape_reader.timer->enable(0);
@@ -1243,9 +1243,9 @@ void pdp1_io_sc_callback(device_t *device)
 /*
     typewriter keyboard handler
 */
-static void pdp1_keyboard(running_machine *machine)
+static void pdp1_keyboard(running_machine &machine)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int i;
 	int j;
 
@@ -1272,7 +1272,7 @@ static void pdp1_keyboard(running_machine *machine)
 			#if USE_SBS
 				cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
-			cpu_set_reg(machine->device("maincpu"), PDP1_PF1, 1);
+			cpu_set_reg(machine.device("maincpu"), PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(machine, state->typewriter.tb);	/* we want to echo input */
 			break;
 		}
@@ -1282,9 +1282,9 @@ static void pdp1_keyboard(running_machine *machine)
 		state->old_typewriter_keys[i] = typewriter_keys[i];
 }
 
-static void pdp1_lightpen(running_machine *machine)
+static void pdp1_lightpen(running_machine &machine)
 {
-	pdp1_state *state = machine->driver_data<pdp1_state>();
+	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int x_delta, y_delta;
 	int current_state;
 
@@ -1340,8 +1340,8 @@ static void pdp1_lightpen(running_machine *machine)
 */
 INTERRUPT_GEN( pdp1_interrupt )
 {
-	pdp1_state *state = device->machine->driver_data<pdp1_state>();
-	running_machine *machine = device->machine;
+	pdp1_state *state = device->machine().driver_data<pdp1_state>();
+	running_machine &machine = device->machine();
 	int control_keys;
 	int tw_keys;
 	int ta_keys;
@@ -1351,10 +1351,10 @@ INTERRUPT_GEN( pdp1_interrupt )
 	int ta_transitions;
 
 
-	cpu_set_reg(device, PDP1_SS, input_port_read(device->machine, "SENSE"));
+	cpu_set_reg(device, PDP1_SS, input_port_read(device->machine(), "SENSE"));
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine, "CSW");
+	control_keys = input_port_read(device->machine(), "CSW");
 
 	if (control_keys & pdp1_control)
 	{
@@ -1420,7 +1420,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_PC, (  cpu_get_reg(device, PDP1_TA) & 0170000)
 										|  (cpu_get_reg(device, PDP1_PC) & 0007777));	/* transfer ETA to EPC */
-			/*cpu_set_reg(machine->device("maincpu"), PDP1_MA, cpu_get_reg(machine->device("maincpu"), PDP1_PC));*/
+			/*cpu_set_reg(machine.device("maincpu"), PDP1_MA, cpu_get_reg(machine.device("maincpu"), PDP1_PC));*/
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
 			cpu_set_reg(device, PDP1_OV, (UINT64)0);		/* right??? */
 			cpu_set_reg(device, PDP1_RUN, (UINT64)0);

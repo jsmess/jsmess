@@ -33,66 +33,66 @@
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_0_w )
 {
-	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
 	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_1_w )
 {
-	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
 	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 1);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_2_w )
 {
-	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
 	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 2);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_3_w )
 {
-	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
 	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 3);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_4_w )
 {
-	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
 	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 4);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_5_w )
 {
-	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
+	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
 	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 5);
 }
 
 
 static TIMER_CALLBACK( led_refresh )
 {
-	sym1_state *state = machine->driver_data<sym1_state>();
+	sym1_state *state = machine.driver_data<sym1_state>();
 	output_set_digit_value(param, state->riot_port_a);
 }
 
 
 static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 {
-	sym1_state *state = device->machine->driver_data<sym1_state>();
+	sym1_state *state = device->machine().driver_data<sym1_state>();
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(state->riot_port_a & 0x80)) data &= input_port_read(device->machine, "ROW-0");
-	if (!(state->riot_port_b & 0x01)) data &= input_port_read(device->machine, "ROW-1");
-	if (!(state->riot_port_b & 0x02)) data &= input_port_read(device->machine, "ROW-2");
-	if (!(state->riot_port_b & 0x04)) data &= input_port_read(device->machine, "ROW-3");
+	if (!(state->riot_port_a & 0x80)) data &= input_port_read(device->machine(), "ROW-0");
+	if (!(state->riot_port_b & 0x01)) data &= input_port_read(device->machine(), "ROW-1");
+	if (!(state->riot_port_b & 0x02)) data &= input_port_read(device->machine(), "ROW-2");
+	if (!(state->riot_port_b & 0x04)) data &= input_port_read(device->machine(), "ROW-3");
 
 	/* determine column */
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-0") ^ 0xff)) & 0x7f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-0") ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -101,17 +101,17 @@ static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 
 static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 {
-	sym1_state *state = device->machine->driver_data<sym1_state>();
+	sym1_state *state = device->machine().driver_data<sym1_state>();
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-1") ^ 0xff)) & 0x7f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-1") ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-2") ^ 0xff)) & 0x3f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-2") ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-3") ^ 0xff)) & 0x1f )
+	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-3") ^ 0xff)) & 0x1f )
 		data &= ~0x04;
 
 	data &= ~0x80; // else hangs 8b02
@@ -122,8 +122,8 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
-	sym1_state *state = device->machine->driver_data<sym1_state>();
-	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine->device("maincpu") ), data);
+	sym1_state *state = device->machine().driver_data<sym1_state>();
+	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine().device("maincpu") ), data);
 
 	/* save for later use */
 	state->riot_port_a = data;
@@ -132,14 +132,14 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
-	sym1_state *state = device->machine->driver_data<sym1_state>();
-	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine->device("maincpu") ), data);
+	sym1_state *state = device->machine().driver_data<sym1_state>();
+	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine().device("maincpu") ), data);
 
 	/* save for later use */
 	state->riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_w(device->machine->device("ttl74145"), 0, data & 0x0f);
+	ttl74145_w(device->machine().device("ttl74145"), 0, data & 0x0f);
 }
 
 
@@ -174,7 +174,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 
 static void sym1_irq(device_t *device, int level)
 {
-	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
+	cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, level);
 }
 
 
@@ -186,7 +186,7 @@ static READ8_DEVICE_HANDLER( sym1_via0_b_r )
 
 static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
 {
-	logerror("%s: via0_b_w 0x%02x\n", device->machine->describe_context(), data);
+	logerror("%s: via0_b_w 0x%02x\n", device->machine().describe_context(), data);
 }
 
 
@@ -197,26 +197,26 @@ static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
  */
 static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 {
-	address_space *cpu0space = device->machine->device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space *cpu0space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	if ((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) {
+	if ((input_port_read(device->machine(), "WP") & 0x01) && !(data & 0x01)) {
 		cpu0space->nop_write(0xa600, 0xa67f);
 	} else {
 		cpu0space->install_write_bank(0xa600, 0xa67f, "bank5");
 	}
-	if ((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) {
+	if ((input_port_read(device->machine(), "WP") & 0x02) && !(data & 0x02)) {
 		cpu0space->nop_write(0x0400, 0x07ff);
 	} else {
 		cpu0space->install_write_bank(0x0400, 0x07ff, "bank2");
 	}
-	if ((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) {
+	if ((input_port_read(device->machine(), "WP") & 0x04) && !(data & 0x04)) {
 		cpu0space->nop_write(0x0800, 0x0bff);
 	} else {
 		cpu0space->install_write_bank(0x0800, 0x0bff, "bank3");
 	}
-	if ((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) {
+	if ((input_port_read(device->machine(), "WP") & 0x08) && !(data & 0x08)) {
 		cpu0space->nop_write(0x0c00, 0x0fff);
 	} else {
 		cpu0space->install_write_bank(0x0c00, 0x0fff, "bank4");
@@ -286,26 +286,26 @@ const via6522_interface sym1_via2 =
 
 DRIVER_INIT( sym1 )
 {
-	sym1_state *state = machine->driver_data<sym1_state>();
+	sym1_state *state = machine.driver_data<sym1_state>();
 	/* wipe expansion memory banks that are not installed */
-	if (ram_get_size(machine->device(RAM_TAG)) < 4*1024)
+	if (ram_get_size(machine.device(RAM_TAG)) < 4*1024)
 	{
-		machine->device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
-			ram_get_size(machine->device(RAM_TAG)), 0x0fff);
+		machine.device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
+			ram_get_size(machine.device(RAM_TAG)), 0x0fff);
 	}
 
 	/* allocate a timer to refresh the led display */
-	state->led_update = machine->scheduler().timer_alloc(FUNC(led_refresh));
+	state->led_update = machine.scheduler().timer_alloc(FUNC(led_refresh));
 }
 
 
 MACHINE_RESET( sym1 )
 {
-	sym1_state *state = machine->driver_data<sym1_state>();
+	sym1_state *state = machine.driver_data<sym1_state>();
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
        so that the CPU can find its reset vectors */
-	machine->device( "maincpu")->memory().space( AS_PROGRAM )->install_read_bank(0xf800, 0xffff, "bank1");
-	machine->device( "maincpu")->memory().space( AS_PROGRAM )->nop_write(0xf800, 0xffff);
+	machine.device( "maincpu")->memory().space( AS_PROGRAM )->install_read_bank(0xf800, 0xffff, "bank1");
+	machine.device( "maincpu")->memory().space( AS_PROGRAM )->nop_write(0xf800, 0xffff);
 	memory_set_bankptr(machine, "bank1", state->monitor + 0x800);
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }

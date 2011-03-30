@@ -196,11 +196,11 @@ static DEVICE_START( microdrive )
 	devcb_resolve_write_line(&mdv->out_comms_out_func, &config->out_comms_out_func, device);
 
 	// allocate track buffers
-	mdv->left = auto_alloc_array(device->machine, UINT8, MDV_IMAGE_LENGTH / 2);
-	mdv->right = auto_alloc_array(device->machine, UINT8, MDV_IMAGE_LENGTH / 2);
+	mdv->left = auto_alloc_array(device->machine(), UINT8, MDV_IMAGE_LENGTH / 2);
+	mdv->right = auto_alloc_array(device->machine(), UINT8, MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
-	mdv->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_timer_tick), (void *) device);
+	mdv->bit_timer = device->machine().scheduler().timer_alloc(FUNC(bit_timer_tick), (void *) device);
 	mdv->bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
 	mdv->bit_timer->enable(0);
 }

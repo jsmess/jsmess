@@ -110,9 +110,9 @@ static DEVICE_START(coco_cartridge)
 
 	for( i=0; i<TIMER_POOL; i++ )
 	{
-	   cococart->cart_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) device);
-	   cococart->nmi_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *) device);
-	   cococart->halt_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) device);
+	   cococart->cart_line.timer[i]		= device->machine().scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) device);
+	   cococart->nmi_line.timer[i]		= device->machine().scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *) device);
+	   cococart->halt_line.timer[i]		= device->machine().scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) device);
 	}
 
 	cococart->cart_line.timer_index     = 0;
@@ -197,7 +197,7 @@ static void set_line(device_t *device, const char *line_name, coco_cartridge_lin
 		line->value = value;
 
 		if (LOG_LINE)
-			logerror("[%s]: set_line(): %s <= %s\n", device->machine->describe_context(), line_name, line_value_string(value));
+			logerror("[%s]: set_line(): %s <= %s\n", device->machine().describe_context(), line_name, line_value_string(value));
 
 		/* engage in a bit of gymnastics for this odious 'Q' value */
 		switch(line->value)
@@ -267,7 +267,7 @@ static void set_line_timer(device_t *device, coco_cartridge_line *line, cococart
 {
 	/* calculate delay; delay dependant on cycles per second */
 	attotime delay = (line->delay != 0)
-		? device->machine->firstcpu->cycles_to_attotime(line->delay)
+		? device->machine().firstcpu->cycles_to_attotime(line->delay)
 		: attotime::zero;
 
    line->timer[line->timer_index]->adjust(delay, (int) value);

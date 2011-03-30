@@ -35,7 +35,7 @@
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
-    address_space *program = image.device().machine->firstcpu->memory().space(AS_PROGRAM);
+    address_space *program = image.device().machine().firstcpu->memory().space(AS_PROGRAM);
 
 	UINT8 type, length;
 	UINT8 data[0x100];
@@ -67,7 +67,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			image.fread( &addr, 2);
 			UINT16 address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD transfer address %04x\n", address);
-			cpu_set_reg(image.device().machine->firstcpu, Z80_PC, address);
+			cpu_set_reg(image.device().machine().firstcpu, Z80_PC, address);
 			}
 			break;
 

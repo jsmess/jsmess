@@ -25,7 +25,7 @@ Notes:
 static READ8_HANDLER( strnskil_d800_r )
 {
     /* bit0: interrupt type?, bit1: CPU2 busack? */
-	if (cpu_getiloops(space->cpu) == 0)
+	if (cpu_getiloops(&space->device()) == 0)
 		return 0;
 	return 1;
 }
@@ -36,18 +36,18 @@ static READ8_HANDLER( pettanp_protection_r )
 {
 	int res;
 
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x6066:	res = 0xa5;	break;
 		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x615d:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61b9:	res = 0x60|(space->machine->rand()&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61b9:	res = 0x60|(space->machine().rand()&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6219:	res = 0x77;	break;
 		case 0x626c:	res = 0xb4;	break;
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(space->cpu),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(&space->device()),res);
 	return res;
 }
 
@@ -55,24 +55,24 @@ static READ8_HANDLER( banbam_protection_r )
 {
 	int res;
 
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x6094:	res = 0xa5;	break;
 		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x6199:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61f5:	res = 0x60|(space->machine->rand()&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61f5:	res = 0x60|(space->machine().rand()&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6255:	res = 0x77;	break;
 		case 0x62a8:	res = 0xb4;	break;
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(space->cpu),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(&space->device()),res);
 	return res;
 }
 
 static WRITE8_HANDLER( protection_w )
 {
-	logerror("%04x: protection_w %02x\n",cpu_get_pc(space->cpu),data);
+	logerror("%04x: protection_w %02x\n",cpu_get_pc(&space->device()),data);
 }
 
 /****************************************************************************/
@@ -507,16 +507,16 @@ static DRIVER_INIT( pettanp )
 //  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd806, 0xd806, FUNC(pettanp_protection_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd80d, 0xd80d, FUNC(protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd806, 0xd806, FUNC(pettanp_protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd80d, 0xd80d, FUNC(protection_w));
 
 }
 
 static DRIVER_INIT( banbam )
 {
 	/* Fujitsu MB8841 4-Bit MCU */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd806, 0xd806, FUNC(banbam_protection_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd80d, 0xd80d, FUNC(protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd806, 0xd806, FUNC(banbam_protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd80d, 0xd80d, FUNC(protection_w));
 }
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )

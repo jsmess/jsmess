@@ -55,7 +55,7 @@ static WRITE8_HANDLER( port30_w )
 
     */
 
-	pc8001_state *state = space->machine->driver_data<pc8001_state>();
+	pc8001_state *state = space->machine().driver_data<pc8001_state>();
 
 	/* characters per line */
 	state->width80 = BIT(data, 0);
@@ -309,15 +309,15 @@ static PALETTE_INIT( pc8001 )
 
 static VIDEO_START( pc8001 )
 {
-	pc8001_state *state = machine->driver_data<pc8001_state>();
+	pc8001_state *state = machine.driver_data<pc8001_state>();
 
 	/* find memory regions */
-	state->char_rom = machine->region("chargen")->base();
+	state->char_rom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( pc8001 )
 {
-	pc8001_state *state = screen->machine->driver_data<pc8001_state>();
+	pc8001_state *state = screen->machine().driver_data<pc8001_state>();
 
 	upd3301_update(state->upd3301, bitmap, cliprect);
 
@@ -328,7 +328,7 @@ static SCREEN_UPDATE( pc8001 )
 
 static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 {
-	pc8001_state *state = device->machine->driver_data<pc8001_state>();
+	pc8001_state *state = device->machine().driver_data<pc8001_state>();
 
 	UINT8 data = state->char_rom[(cc << 3) | lc];
 	int i;
@@ -406,7 +406,7 @@ static I8255A_INTERFACE( pc8001_8255_intf )
 static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_HALT, state);
+	cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	i8257_hlda_w(device, state);
@@ -439,17 +439,17 @@ static UPD1990A_INTERFACE( pc8001_upd1990a_intf )
 
 static MACHINE_START( pc8001 )
 {
-	pc8001_state *state = machine->driver_data<pc8001_state>();
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
-	device_t *messram = machine->device(RAM_TAG);
+	pc8001_state *state = machine.driver_data<pc8001_state>();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	device_t *messram = machine.device(RAM_TAG);
 
 	/* look up devices */
-	state->i8257 = machine->device(I8257_TAG);
-	state->upd1990a = machine->device(UPD1990A_TAG);
-	state->upd3301 = machine->device(UPD3301_TAG);
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
+	state->i8257 = machine.device(I8257_TAG);
+	state->upd1990a = machine.device(UPD1990A_TAG);
+	state->upd3301 = machine.device(UPD3301_TAG);
+	state->speaker = machine.device(SPEAKER_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
+	state->centronics = machine.device(CENTRONICS_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -459,7 +459,7 @@ static MACHINE_START( pc8001 )
 	i8257_ready_w(state->i8257, 1);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("n80")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("n80")->base(), 0);
 	program->install_read_bank(0x0000, 0x5fff, "bank1");
 	program->unmap_write(0x0000, 0x5fff);
 

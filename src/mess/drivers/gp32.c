@@ -26,7 +26,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -35,7 +35,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt);
 		vsprintf( buf, s_fmt, v);
 		va_end( v);
-		logerror( "%s: %s", machine->describe_context( ), buf);
+		logerror( "%s: %s", machine.describe_context( ), buf);
 	}
 }
 
@@ -52,8 +52,8 @@ static UINT32 s3c240x_get_fclk(gp32_state *state, int reg);
 static UINT32 s3c240x_get_hclk(gp32_state *state, int reg);
 static UINT32 s3c240x_get_pclk(gp32_state *state, int reg);
 
-static void s3c240x_dma_request_iis( running_machine *machine);
-static void s3c240x_dma_request_pwm( running_machine *machine);
+static void s3c240x_dma_request_iis( running_machine &machine);
+static void s3c240x_dma_request_pwm( running_machine &machine);
 
 // LCD CONTROLLER
 
@@ -74,9 +74,9 @@ static rgb_t s3c240x_get_color_5551( UINT16 data)
 	return MAKE_RGB( r | i, g | i, b | i);
 }
 
-static void s3c240x_lcd_dma_reload( running_machine *machine)
+static void s3c240x_lcd_dma_reload( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	state->s3c240x_lcd.vramaddr_cur = state->s3c240x_lcd_regs[5] << 1;
 	state->s3c240x_lcd.vramaddr_max = ((state->s3c240x_lcd_regs[5] & 0xFFE00000) | state->s3c240x_lcd_regs[6]) << 1;
 	state->s3c240x_lcd.offsize = BITS( state->s3c240x_lcd_regs[7], 21, 11);
@@ -85,9 +85,9 @@ static void s3c240x_lcd_dma_reload( running_machine *machine)
 	verboselog( machine, 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", state->s3c240x_lcd.vramaddr_cur, state->s3c240x_lcd.vramaddr_max, state->s3c240x_lcd.offsize, state->s3c240x_lcd.pagewidth_max);
 }
 
-static void s3c240x_lcd_dma_init( running_machine *machine)
+static void s3c240x_lcd_dma_init( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	s3c240x_lcd_dma_reload( machine);
 	state->s3c240x_lcd.bppmode = BITS( state->s3c240x_lcd_regs[0], 4, 1);
 	state->s3c240x_lcd.bswp = BIT( state->s3c240x_lcd_regs[4], 1);
@@ -96,9 +96,9 @@ static void s3c240x_lcd_dma_init( running_machine *machine)
 	state->s3c240x_lcd.hozval = BITS( state->s3c240x_lcd_regs[2], 18, 8);
 }
 
-static UINT32 s3c240x_lcd_dma_read( running_machine *machine)
+static UINT32 s3c240x_lcd_dma_read( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT8 *vram, data[4];
 	int i;
 	for (i = 0; i < 2; i++)
@@ -138,10 +138,10 @@ static UINT32 s3c240x_lcd_dma_read( running_machine *machine)
 	}
 }
 
-static void s3c240x_lcd_render_01( running_machine *machine)
+static void s3c240x_lcd_render_01( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -162,10 +162,10 @@ static void s3c240x_lcd_render_01( running_machine *machine)
 	}
 }
 
-static void s3c240x_lcd_render_02( running_machine *machine)
+static void s3c240x_lcd_render_02( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -186,10 +186,10 @@ static void s3c240x_lcd_render_02( running_machine *machine)
 	}
 }
 
-static void s3c240x_lcd_render_04( running_machine *machine)
+static void s3c240x_lcd_render_04( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -210,10 +210,10 @@ static void s3c240x_lcd_render_04( running_machine *machine)
 	}
 }
 
-static void s3c240x_lcd_render_08( running_machine *machine)
+static void s3c240x_lcd_render_08( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -234,10 +234,10 @@ static void s3c240x_lcd_render_08( running_machine *machine)
 	}
 }
 
-static void s3c240x_lcd_render_16( running_machine *machine)
+static void s3c240x_lcd_render_16( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	bitmap_t *bitmap = machine.generic.tmpbitmap;
 	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -260,8 +260,8 @@ static void s3c240x_lcd_render_16( running_machine *machine)
 
 static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	screen_device *screen = machine->primary_screen;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	screen_device *screen = machine.primary_screen;
 	verboselog( machine, 2, "LCD timer callback\n");
 	state->s3c240x_lcd.vpos = screen->vpos();
 	state->s3c240x_lcd.hpos = screen->hpos();
@@ -294,7 +294,7 @@ static VIDEO_START( gp32 )
 
 static SCREEN_UPDATE( gp32 )
 {
-	running_machine *machine = screen->machine;
+	running_machine &machine = screen->machine();
 	SCREEN_UPDATE_CALL(generic_bitmapped);
 	s3c240x_lcd_dma_init( machine);
 	return 0;
@@ -302,8 +302,8 @@ static SCREEN_UPDATE( gp32 )
 
 static READ32_HANDLER( s3c240x_lcd_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_lcd_regs[offset];
 	switch (offset)
 	{
@@ -312,18 +312,18 @@ static READ32_HANDLER( s3c240x_lcd_r )
 		{
 			// make sure line counter is going
 			UINT32 lineval = BITS( state->s3c240x_lcd_regs[1], 23, 14);
-			data = (data & ~0xFFFC0000) | ((lineval - machine->primary_screen->vpos()) << 18);
+			data = (data & ~0xFFFC0000) | ((lineval - machine.primary_screen->vpos()) << 18);
 		}
 		break;
 	}
-	verboselog( machine, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
-static void s3c240x_lcd_configure( running_machine *machine)
+static void s3c240x_lcd_configure( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	screen_device *screen = machine->primary_screen;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	screen_device *screen = machine.primary_screen;
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
@@ -350,26 +350,26 @@ static void s3c240x_lcd_configure( running_machine *machine)
 	screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
 }
 
-static void s3c240x_lcd_start( running_machine *machine)
+static void s3c240x_lcd_start( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	screen_device *screen = machine->primary_screen;
+	gp32_state *state = machine.driver_data<gp32_state>();
+	screen_device *screen = machine.primary_screen;
 	verboselog( machine, 1, "LCD start\n");
 	s3c240x_lcd_configure( machine);
 	s3c240x_lcd_dma_init( machine);
 	state->s3c240x_lcd_timer->adjust( screen->time_until_pos(0, 0));
 }
 
-static void s3c240x_lcd_stop( running_machine *machine)
+static void s3c240x_lcd_stop( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 1, "LCD stop\n");
 	state->s3c240x_lcd_timer->adjust( attotime::never);
 }
 
-static void s3c240x_lcd_recalc( running_machine *machine)
+static void s3c240x_lcd_recalc( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	if (state->s3c240x_lcd_regs[0] & 1)
 	{
 		s3c240x_lcd_start( machine);
@@ -382,10 +382,10 @@ static void s3c240x_lcd_recalc( running_machine *machine)
 
 static WRITE32_HANDLER( s3c240x_lcd_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 old_value = state->s3c240x_lcd_regs[offset];
-	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_lcd_regs[offset]);
 	switch (offset)
 	{
@@ -406,18 +406,18 @@ static WRITE32_HANDLER( s3c240x_lcd_w )
 
 static READ32_HANDLER( s3c240x_lcd_palette_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_lcd_palette[offset];
-	verboselog( machine, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_lcd_palette_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_lcd_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
@@ -465,25 +465,25 @@ static UINT32 s3c240x_get_pclk(gp32_state *state, int reg)
 
 static READ32_HANDLER( s3c240x_clkpow_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_clkpow_regs[offset];
-	verboselog( machine, 9, "(CLKPOW) %08X -> %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(CLKPOW) %08X -> %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_clkpow_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_clkpow_regs[offset]);
 	switch (offset)
 	{
 		// MPLLCON
 		case 0x04 / 4 :
 		{
-			machine->device("maincpu")->set_unscaled_clock(s3c240x_get_fclk(state, MPLLCON) * CLOCK_MULTIPLIER);
+			machine.device("maincpu")->set_unscaled_clock(s3c240x_get_fclk(state, MPLLCON) * CLOCK_MULTIPLIER);
 		}
 		break;
 	}
@@ -492,9 +492,9 @@ static WRITE32_HANDLER( s3c240x_clkpow_w )
 // INTERRUPT CONTROLLER
 
 
-static void s3c240x_check_pending_irq( running_machine *machine)
+static void s3c240x_check_pending_irq( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	if (state->s3c240x_irq_regs[0] != 0)
 	{
 		UINT32 int_type = 0, temp;
@@ -506,24 +506,24 @@ static void s3c240x_check_pending_irq( running_machine *machine)
 		}
 		state->s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		state->s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		device_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line( machine.device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line( machine.device( "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
-static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
+static void s3c240x_request_irq( running_machine &machine, UINT32 int_type)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 5, "request irq %d\n", int_type);
 	if (state->s3c240x_irq_regs[0] == 0)
 	{
 		state->s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		state->s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		state->s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		device_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line( machine.device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
@@ -535,19 +535,19 @@ static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 
 static READ32_HANDLER( s3c240x_irq_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_irq_regs[offset];
-	verboselog( machine, 9, "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_irq_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 old_value = state->s3c240x_irq_regs[offset];
-	verboselog( machine, 9, "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_irq_regs[offset]);
 	switch (offset)
 	{
@@ -596,16 +596,16 @@ static const char *const timer_reg_names[] =
 
 static READ32_HANDLER( s3c240x_pwm_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_pwm_regs[offset];
-	verboselog( machine, 9, "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
-static void s3c240x_pwm_start( running_machine *machine, int timer)
+static void s3c240x_pwm_start( running_machine &machine, int timer)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	static const int mux_table[] = { 2, 4, 8, 16 };
 	static const int prescaler_shift[] = { 0, 0, 8, 8, 8 };
 	static const int mux_shift[] = { 0, 4, 8, 12, 16 };
@@ -640,16 +640,16 @@ static void s3c240x_pwm_start( running_machine *machine, int timer)
 	}
 }
 
-static void s3c240x_pwm_stop( running_machine *machine, int timer)
+static void s3c240x_pwm_stop( running_machine &machine, int timer)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 1, "PWM %d stop\n", timer);
 	state->s3c240x_pwm_timer[timer]->adjust( attotime::never);
 }
 
-static void s3c240x_pwm_recalc( running_machine *machine, int timer)
+static void s3c240x_pwm_recalc( running_machine &machine, int timer)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
 	if (state->s3c240x_pwm_regs[2] & (1 << tcon_shift[timer]))
 	{
@@ -663,10 +663,10 @@ static void s3c240x_pwm_recalc( running_machine *machine, int timer)
 
 static WRITE32_HANDLER( s3c240x_pwm_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 old_value = state->s3c240x_pwm_regs[offset];
-	verboselog( machine, 9, "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_pwm_regs[offset]);
 	switch (offset)
 	{
@@ -699,7 +699,7 @@ static WRITE32_HANDLER( s3c240x_pwm_w )
 
 static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	int ch = param;
 	static const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
 	verboselog( machine, 2, "PWM %d timer callback\n", ch);
@@ -716,21 +716,21 @@ static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 // DMA
 
 
-static void s3c240x_dma_reload( running_machine *machine, int dma)
+static void s3c240x_dma_reload( running_machine &machine, int dma)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT32 *regs = &state->s3c240x_dma_regs[dma<<3];
 	regs[3] = (regs[3] & ~0x000FFFFF) | BITS( regs[2], 19, 0);
 	regs[4] = (regs[4] & ~0x1FFFFFFF) | BITS( regs[0], 28, 0);
 	regs[5] = (regs[5] & ~0x1FFFFFFF) | BITS( regs[1], 28, 0);
 }
 
-static void s3c240x_dma_trigger( running_machine *machine, int dma)
+static void s3c240x_dma_trigger( running_machine &machine, int dma)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT32 *regs = &state->s3c240x_dma_regs[dma<<3];
 	UINT32 curr_tc, curr_src, curr_dst;
-	address_space *space = machine->device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode;
 	static const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 	verboselog( machine, 5, "DMA %d trigger\n", dma);
@@ -782,9 +782,9 @@ static void s3c240x_dma_trigger( running_machine *machine, int dma)
 	}
 }
 
-static void s3c240x_dma_request_iis( running_machine *machine)
+static void s3c240x_dma_request_iis( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT32 *regs = &state->s3c240x_dma_regs[2<<3];
 	verboselog( machine, 5, "s3c240x_dma_request_iis\n");
 	if ((BIT( regs[6], 1) != 0) && (BIT( regs[2], 23) != 0) && (BITS( regs[2], 25, 24) == 0))
@@ -793,9 +793,9 @@ static void s3c240x_dma_request_iis( running_machine *machine)
 	}
 }
 
-static void s3c240x_dma_request_pwm( running_machine *machine)
+static void s3c240x_dma_request_pwm( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	int i;
 	verboselog( machine, 5, "s3c240x_dma_request_pwm\n");
 	for (i = 0; i < 4; i++)
@@ -811,9 +811,9 @@ static void s3c240x_dma_request_pwm( running_machine *machine)
 	}
 }
 
-static void s3c240x_dma_start( running_machine *machine, int dma)
+static void s3c240x_dma_start( running_machine &machine, int dma)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT32 addr_src, addr_dst, tc;
 	UINT32 *regs = &state->s3c240x_dma_regs[dma<<3];
 	UINT32 dsz, tsz, reload;
@@ -840,14 +840,14 @@ static void s3c240x_dma_start( running_machine *machine, int dma)
 	}
 }
 
-static void s3c240x_dma_stop( running_machine *machine, int dma)
+static void s3c240x_dma_stop( running_machine &machine, int dma)
 {
 	verboselog( machine, 1, "DMA %d stop\n", dma);
 }
 
-static void s3c240x_dma_recalc( running_machine *machine, int dma)
+static void s3c240x_dma_recalc( running_machine &machine, int dma)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	if (state->s3c240x_dma_regs[(dma<<3)+6] & 2)
 	{
 		s3c240x_dma_start( machine, dma);
@@ -860,19 +860,19 @@ static void s3c240x_dma_recalc( running_machine *machine, int dma)
 
 static READ32_HANDLER( s3c240x_dma_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_dma_regs[offset];
-	verboselog( machine, 9, "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_dma_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 old_value = state->s3c240x_dma_regs[offset];
-	verboselog( machine, 9, "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_dma_regs[offset]);
 	switch (offset)
 	{
@@ -947,9 +947,9 @@ static TIMER_CALLBACK( s3c240x_dma_timer_exp )
 
 // SMARTMEDIA
 
-static void smc_reset( running_machine *machine)
+static void smc_reset( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 5, "smc_reset\n");
 	state->smc.add_latch = 0;
 	state->smc.chip = 0;
@@ -961,28 +961,28 @@ static void smc_reset( running_machine *machine)
 	state->smc.busy = 0;
 }
 
-static void smc_init( running_machine *machine)
+static void smc_init( running_machine &machine)
 {
 	verboselog( machine, 5, "smc_init\n");
 	smc_reset( machine);
 }
 
-static UINT8 smc_read( running_machine *machine)
+static UINT8 smc_read( running_machine &machine)
 {
-	device_t *smartmedia = machine->device( "smartmedia");
+	device_t *smartmedia = machine.device( "smartmedia");
 	UINT8 data;
 	data = smartmedia_data_r( smartmedia);
 	verboselog( machine, 5, "smc_read %08X\n", data);
 	return data;
 }
 
-static void smc_write( running_machine *machine, UINT8 data)
+static void smc_write( running_machine &machine, UINT8 data)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 5, "smc_write %08X\n", data);
 	if ((state->smc.chip) && (!state->smc.read))
 	{
-		device_t *smartmedia = machine->device( "smartmedia");
+		device_t *smartmedia = machine.device( "smartmedia");
 		if (state->smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
@@ -1001,9 +1001,9 @@ static void smc_write( running_machine *machine, UINT8 data)
 	}
 }
 
-static void smc_update( running_machine *machine)
+static void smc_update( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	if (!state->smc.chip)
 	{
 		smc_reset( machine);
@@ -1027,24 +1027,24 @@ static void smc_update( running_machine *machine)
 #define I2S_L3M ( 2 )
 #define I2S_L3D ( 3 )
 
-static void i2s_reset( running_machine *machine)
+static void i2s_reset( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 5, "i2s_reset\n");
 	state->i2s.l3d = 0;
 	state->i2s.l3m = 0;
 	state->i2s.l3c = 0;
 }
 
-static void i2s_init( running_machine *machine)
+static void i2s_init( running_machine &machine)
 {
 	verboselog( machine, 5, "i2s_init\n");
 	i2s_reset( machine);
 }
 
-static void i2s_write( running_machine *machine, int line, int data)
+static void i2s_write( running_machine &machine, int line, int data)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	switch (line)
 	{
 		case I2S_L3C :
@@ -1082,8 +1082,8 @@ static void i2s_write( running_machine *machine, int line, int data)
 
 static READ32_HANDLER( s3c240x_gpio_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_gpio[offset];
 	switch (offset)
 	{
@@ -1107,7 +1107,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			device_t *smartmedia = machine->device( "smartmedia");
+			device_t *smartmedia = machine.device( "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!state->smc.busy) data = data | 0x00000200;
@@ -1119,7 +1119,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			device_t *smartmedia = machine->device( "smartmedia");
+			device_t *smartmedia = machine.device( "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (state->smc.cmd_latch) data = data | 0x00000020;
@@ -1131,16 +1131,16 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		}
 		break;
 	}
-	verboselog( machine, 9, "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_gpio_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	COMBINE_DATA(&state->s3c240x_gpio[offset]);
-	verboselog( machine, 9, "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	switch (offset)
 	{
 		// PBCON
@@ -1199,18 +1199,18 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 
 static READ32_HANDLER( s3c240x_memcon_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_memcon_regs[offset];
-	verboselog( machine, 9, "(MEMCON) %08X -> %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(MEMCON) %08X -> %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_memcon_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_memcon_regs[offset]);
 }
 
@@ -1219,18 +1219,18 @@ static WRITE32_HANDLER( s3c240x_memcon_w )
 
 static READ32_HANDLER( s3c240x_usb_host_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_usb_host_regs[offset];
-	verboselog( machine, 9, "(USB H) %08X -> %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(USB H) %08X -> %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_usb_host_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_usb_host_regs[offset]);
 }
 
@@ -1239,8 +1239,8 @@ static WRITE32_HANDLER( s3c240x_usb_host_w )
 
 static READ32_HANDLER( s3c240x_uart_0_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_uart_0_regs[offset];
 	switch (offset)
 	{
@@ -1251,15 +1251,15 @@ static READ32_HANDLER( s3c240x_uart_0_r )
 		}
 		break;
 	}
-	verboselog( machine, 9, "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_uart_0_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_uart_0_regs[offset]);
 }
 
@@ -1268,8 +1268,8 @@ static WRITE32_HANDLER( s3c240x_uart_0_w )
 
 static READ32_HANDLER( s3c240x_uart_1_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_uart_1_regs[offset];
 	switch (offset)
 	{
@@ -1280,15 +1280,15 @@ static READ32_HANDLER( s3c240x_uart_1_r )
 		}
 		break;
 	}
-	verboselog( machine, 9, "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_uart_1_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_uart_1_regs[offset]);
 }
 
@@ -1297,18 +1297,18 @@ static WRITE32_HANDLER( s3c240x_uart_1_w )
 
 static READ32_HANDLER( s3c240x_usb_device_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_usb_device_regs[offset];
-	verboselog( machine, 9, "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_usb_device_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_usb_device_regs[offset]);
 }
 
@@ -1317,35 +1317,35 @@ static WRITE32_HANDLER( s3c240x_usb_device_w )
 
 static READ32_HANDLER( s3c240x_watchdog_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_watchdog_regs[offset];
-	verboselog( machine, 9, "(WDOG) %08X -> %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(WDOG) %08X -> %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_watchdog_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_watchdog_regs[offset]);
 }
 
 // EEPROM
 
-static UINT8 eeprom_read( running_machine *machine, UINT16 address)
+static UINT8 eeprom_read( running_machine &machine, UINT16 address)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT8 data;
 	data = state->eeprom_data[address];
 	verboselog( machine, 5, "EEPROM %04X -> %02X\n", address, data);
 	return data;
 }
 
-static void eeprom_write( running_machine *machine, UINT16 address, UINT8 data)
+static void eeprom_write( running_machine &machine, UINT16 address, UINT8 data)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 5, "EEPROM %04X <- %02X\n", address, data);
 	state->eeprom_data[address] = data;
 }
@@ -1353,7 +1353,7 @@ static void eeprom_write( running_machine *machine, UINT16 address, UINT8 data)
 // IIC
 
 #if 0
-static UINT8 i2cmem_read_byte( running_machine *machine, int last)
+static UINT8 i2cmem_read_byte( running_machine &machine, int last)
 {
 	UINT8 data = 0;
 	int i;
@@ -1372,7 +1372,7 @@ static UINT8 i2cmem_read_byte( running_machine *machine, int last)
 #endif
 
 #if 0
-static void i2cmem_write_byte( running_machine *machine, UINT8 data)
+static void i2cmem_write_byte( running_machine &machine, UINT8 data)
 {
 	int i;
 	for (i = 0; i < 8; i++)
@@ -1389,7 +1389,7 @@ static void i2cmem_write_byte( running_machine *machine, UINT8 data)
 #endif
 
 #if 0
-static void i2cmem_start( running_machine *machine)
+static void i2cmem_start( running_machine &machine)
 {
 	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
@@ -1399,7 +1399,7 @@ static void i2cmem_start( running_machine *machine)
 #endif
 
 #if 0
-static void i2cmem_stop( running_machine *machine)
+static void i2cmem_stop( running_machine &machine)
 {
 	i2cmem_write( machine, 0, I2CMEM_SDA, 0);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
@@ -1408,32 +1408,32 @@ static void i2cmem_stop( running_machine *machine)
 }
 #endif
 
-static void iic_start( running_machine *machine)
+static void iic_start( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 1, "IIC start\n");
 	state->s3c240x_iic.data_index = 0;
 	state->s3c240x_iic_timer->adjust( attotime::from_msec( 1));
 }
 
-static void iic_stop( running_machine *machine)
+static void iic_stop( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 1, "IIC stop\n");
 	state->s3c240x_iic_timer->adjust( attotime::never);
 }
 
-static void iic_resume( running_machine *machine)
+static void iic_resume( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 1, "IIC resume\n");
 	state->s3c240x_iic_timer->adjust( attotime::from_msec( 1));
 }
 
 static READ32_HANDLER( s3c240x_iic_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_iic_regs[offset];
 	switch (offset)
 	{
@@ -1444,15 +1444,15 @@ static READ32_HANDLER( s3c240x_iic_r )
 		}
 		break;
 	}
-	verboselog( machine, 9, "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_iic_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_iic_regs[offset]);
 	switch (offset)
 	{
@@ -1501,7 +1501,7 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 
 static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	int enable_interrupt, mode_selection;
 	verboselog( machine, 2, "IIC timer callback\n");
 	mode_selection = BITS( state->s3c240x_iic_regs[1], 7, 6);
@@ -1550,9 +1550,9 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 
 // IIS
 
-static void s3c240x_iis_start( running_machine *machine)
+static void s3c240x_iis_start( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	static const UINT32 codeclk_table[] = { 256, 384 };
 	double freq;
 	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
@@ -1566,16 +1566,16 @@ static void s3c240x_iis_start( running_machine *machine)
 	state->s3c240x_iis_timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 }
 
-static void s3c240x_iis_stop( running_machine *machine)
+static void s3c240x_iis_stop( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	verboselog( machine, 1, "IIS stop\n");
 	state->s3c240x_iis_timer->adjust( attotime::never);
 }
 
-static void s3c240x_iis_recalc( running_machine *machine)
+static void s3c240x_iis_recalc( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	if (state->s3c240x_iis_regs[0] & 1)
 	{
 		s3c240x_iis_start( machine);
@@ -1588,8 +1588,8 @@ static void s3c240x_iis_recalc( running_machine *machine)
 
 static READ32_HANDLER( s3c240x_iis_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_iis_regs[offset];
 #if 0
 	switch (offset)
@@ -1602,16 +1602,16 @@ static READ32_HANDLER( s3c240x_iis_r )
 		break;
 	}
 #endif
-	verboselog( machine, 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_iis_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 old_value = state->s3c240x_iis_regs[offset];
-	verboselog( machine, 9, "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_iis_regs[offset]);
 	switch (offset)
 	{
@@ -1635,8 +1635,8 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 			if (state->s3c240x_iis.fifo_index == 2)
 			{
 				device_t *dac[2];
-				dac[0] = machine->device( "dac1");
-				dac[1] = machine->device( "dac2");
+				dac[0] = machine.device( "dac1");
+				dac[1] = machine.device( "dac2");
 				state->s3c240x_iis.fifo_index = 0;
 				dac_signed_data_16_w( dac[0], state->s3c240x_iis.fifo[0] + 0x8000);
 				dac_signed_data_16_w( dac[1], state->s3c240x_iis.fifo[1] + 0x8000);
@@ -1657,18 +1657,18 @@ static TIMER_CALLBACK( s3c240x_iis_timer_exp )
 
 static READ32_HANDLER( s3c240x_rtc_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_rtc_regs[offset];
-	verboselog( machine, 9, "(RTC) %08X -> %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(RTC) %08X -> %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_rtc_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_rtc_regs[offset]);
 }
 
@@ -1677,18 +1677,18 @@ static WRITE32_HANDLER( s3c240x_rtc_w )
 
 static READ32_HANDLER( s3c240x_adc_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_adc_regs[offset];
-	verboselog( machine, 9, "(ADC) %08X -> %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(ADC) %08X -> %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_adc_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_adc_regs[offset]);
 }
 
@@ -1697,18 +1697,18 @@ static WRITE32_HANDLER( s3c240x_adc_w )
 
 static READ32_HANDLER( s3c240x_spi_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_spi_regs[offset];
-	verboselog( machine, 9, "(SPI) %08X -> %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(SPI) %08X -> %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_spi_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_spi_regs[offset]);
 }
 
@@ -1717,46 +1717,46 @@ static WRITE32_HANDLER( s3c240x_spi_w )
 
 static READ32_HANDLER( s3c240x_mmc_r )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
 	UINT32 data = state->s3c240x_mmc_regs[offset];
-	verboselog( machine, 9, "(MMC) %08X -> %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(MMC) %08X -> %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_mmc_w )
 {
-	gp32_state *state = space->machine->driver_data<gp32_state>();
-	running_machine *machine = space->machine;
-	verboselog( machine, 9, "(MMC) %08X <- %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	gp32_state *state = space->machine().driver_data<gp32_state>();
+	running_machine &machine = space->machine();
+	verboselog( machine, 9, "(MMC) %08X <- %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( &space->device()));
 	COMBINE_DATA(&state->s3c240x_mmc_regs[offset]);
 }
 
 // ...
 
-static void s3c240x_machine_start( running_machine *machine)
+static void s3c240x_machine_start( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
-	state->s3c240x_pwm_timer[0] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)0);
-	state->s3c240x_pwm_timer[1] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)1);
-	state->s3c240x_pwm_timer[2] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)2);
-	state->s3c240x_pwm_timer[3] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)3);
-	state->s3c240x_pwm_timer[4] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)4);
-	state->s3c240x_dma_timer[0] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)0);
-	state->s3c240x_dma_timer[1] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)1);
-	state->s3c240x_dma_timer[2] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)2);
-	state->s3c240x_dma_timer[3] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)3);
-	state->s3c240x_iic_timer = machine->scheduler().timer_alloc(FUNC(s3c240x_iic_timer_exp), (void *)(FPTR)0);
-	state->s3c240x_iis_timer = machine->scheduler().timer_alloc(FUNC(s3c240x_iis_timer_exp), (void *)(FPTR)0);
-	state->s3c240x_lcd_timer = machine->scheduler().timer_alloc(FUNC(s3c240x_lcd_timer_exp), (void *)(FPTR)0);
+	gp32_state *state = machine.driver_data<gp32_state>();
+	state->s3c240x_pwm_timer[0] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_pwm_timer[1] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)1);
+	state->s3c240x_pwm_timer[2] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)2);
+	state->s3c240x_pwm_timer[3] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)3);
+	state->s3c240x_pwm_timer[4] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)4);
+	state->s3c240x_dma_timer[0] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_dma_timer[1] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)1);
+	state->s3c240x_dma_timer[2] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)2);
+	state->s3c240x_dma_timer[3] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)3);
+	state->s3c240x_iic_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_iic_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_iis_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_iis_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_lcd_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_lcd_timer_exp), (void *)(FPTR)0);
 	state->eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
 	smc_init( machine);
 	i2s_init( machine);
 }
 
-static void s3c240x_machine_reset( running_machine *machine)
+static void s3c240x_machine_reset( running_machine &machine)
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	smc_reset( machine);
 	i2s_reset( machine);
 	state->s3c240x_iis.fifo_index = 0;
@@ -1765,7 +1765,7 @@ static void s3c240x_machine_reset( running_machine *machine)
 
 static NVRAM_HANDLER( gp32 )
 {
-	gp32_state *state = machine->driver_data<gp32_state>();
+	gp32_state *state = machine.driver_data<gp32_state>();
 	if (read_or_write)
 	{
 		if (file)

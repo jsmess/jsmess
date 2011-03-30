@@ -317,7 +317,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( reset_w )
 {
-	vip_state *state = field->port->machine->driver_data<vip_state>();
+	vip_state *state = field->port->machine().driver_data<vip_state>();
 
 	if (oldval && !newval)
 	{
@@ -399,21 +399,21 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 
 static READ_LINE_DEVICE_HANDLER( rd_r )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
+	vip_state *state = device->machine().driver_data<vip_state>();
 
 	return BIT(state->m_color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( bd_r )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
+	vip_state *state = device->machine().driver_data<vip_state>();
 
 	return BIT(state->m_color, 2);
 }
 
 static READ_LINE_DEVICE_HANDLER( gd_r )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
+	vip_state *state = device->machine().driver_data<vip_state>();
 
 	return BIT(state->m_color, 3);
 }
@@ -454,7 +454,7 @@ WRITE8_MEMBER( vip_state::vip_colorram_w )
 
 bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	switch (input_port_read(screen.machine, "VIDEO"))
+	switch (input_port_read(m_machine, "VIDEO"))
 	{
 	case VIDEO_CDP1861:
 		cdp1861_update(m_vdc, &bitmap, &cliprect);
@@ -472,31 +472,31 @@ bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 
 static READ_LINE_DEVICE_HANDLER( clear_r )
 {
-	return BIT(input_port_read(device->machine, "RUN"), 0);
+	return BIT(input_port_read(device->machine(), "RUN"), 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
-	set_led_status(device->machine, LED_TAPE, (cassette_input(device) > 0));
+	set_led_status(device->machine(), LED_TAPE, (cassette_input(device) > 0));
 
 	return cassette_input(device) < 0;
 }
 
 static READ_LINE_DEVICE_HANDLER( ef3_r )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
+	vip_state *state = device->machine().driver_data<vip_state>();
 
-	return BIT(input_port_read(device->machine, "KEYPAD"), state->m_keylatch);
+	return BIT(input_port_read(device->machine(), "KEYPAD"), state->m_keylatch);
 }
 
 static READ_LINE_DEVICE_HANDLER( ef4_r )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
+	vip_state *state = device->machine().driver_data<vip_state>();
 
-	switch (input_port_read(device->machine, "KEYBOARD"))
+	switch (input_port_read(device->machine(), "KEYBOARD"))
 	{
 	case KEYBOARD_VP580:
-		return BIT(input_port_read(device->machine, "VP-580"), state->m_keylatch);
+		return BIT(input_port_read(device->machine(), "VP-580"), state->m_keylatch);
 	}
 
 	return 0;
@@ -504,7 +504,7 @@ static READ_LINE_DEVICE_HANDLER( ef4_r )
 
 static COSMAC_SC_WRITE( vip_sc_w )
 {
-	switch (input_port_read(device->machine, "SOUND"))
+	switch (input_port_read(device->machine(), "SOUND"))
 	{
 	case SOUND_VP550:
 		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls device_set_input_line on it!
@@ -518,10 +518,10 @@ static COSMAC_SC_WRITE( vip_sc_w )
 
 static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 {
-	vip_state *driver_state = device->machine->driver_data<vip_state>();
+	vip_state *driver_state = device->machine().driver_data<vip_state>();
 
 	// sound output
-	switch (input_port_read(device->machine, "SOUND"))
+	switch (input_port_read(device->machine(), "SOUND"))
 	{
 	case SOUND_SPEAKER:
 		discrete_sound_w(driver_state->m_beeper, NODE_01, state);
@@ -544,7 +544,7 @@ static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 	}
 
 	// Q led
-	set_led_status(device->machine, LED_Q, state);
+	set_led_status(device->machine(), LED_Q, state);
 
 	// tape output
 	cassette_output(driver_state->m_cassette, state ? 1.0 : -1.0);
@@ -552,9 +552,9 @@ static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 
 static WRITE8_DEVICE_HANDLER( vip_dma_w )
 {
-	vip_state *state = device->machine->driver_data<vip_state>();
+	vip_state *state = device->machine().driver_data<vip_state>();
 
-	switch (input_port_read(device->machine, "VIDEO"))
+	switch (input_port_read(device->machine(), "VIDEO"))
 	{
 	case VIDEO_CDP1861:
 		cdp1861_dma_w(state->m_vdc, offset, data);
@@ -603,14 +603,14 @@ void vip_state::machine_start()
 	/* randomize RAM contents */
 	for (UINT16 addr = 0; addr < ram_get_size(m_ram); addr++)
 	{
-		ram[addr] = machine->rand() & 0xff;
+		ram[addr] = m_machine.rand() & 0xff;
 	}
 
 	/* allocate color RAM */
-	m_colorram = auto_alloc_array(machine, UINT8, VP590_COLOR_RAM_SIZE);
+	m_colorram = auto_alloc_array(m_machine, UINT8, VP590_COLOR_RAM_SIZE);
 
 	/* enable power LED */
-	set_led_status(machine, LED_POWER, 1);
+	set_led_status(m_machine, LED_POWER, 1);
 
 	/* reset sound */
 	discrete_sound_w(m_beeper, NODE_01, 0);
@@ -619,9 +619,9 @@ void vip_state::machine_start()
 	vp550_q_w(m_vp551, 0);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, m_colorram, VP590_COLOR_RAM_SIZE);
-	state_save_register_global(machine, m_color);
-	state_save_register_global(machine, m_keylatch);
+	state_save_register_global_pointer(m_machine, m_colorram, VP590_COLOR_RAM_SIZE);
+	state_save_register_global(m_machine, m_color);
+	state_save_register_global(m_machine, m_keylatch);
 }
 
 void vip_state::machine_reset()
@@ -639,7 +639,7 @@ void vip_state::machine_reset()
 	m_vp551->reset();
 
 	/* configure video */
-	switch (input_port_read(machine, "VIDEO"))
+	switch (input_port_read(m_machine, "VIDEO"))
 	{
 	case VIDEO_CDP1861:
 		io->unmap_write(0x05, 0x05);
@@ -653,7 +653,7 @@ void vip_state::machine_reset()
 	}
 
 	/* configure audio */
-	switch (input_port_read(machine, "SOUND"))
+	switch (input_port_read(m_machine, "SOUND"))
 	{
 	case SOUND_SPEAKER:
 		vp595_install_write_handlers(m_vp595, io, 0);
@@ -681,7 +681,7 @@ void vip_state::machine_reset()
 	}
 
 	/* enable ROM all thru address space */
-	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, machine->region(CDP1802_TAG)->base());
+	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, m_machine.region(CDP1802_TAG)->base());
 }
 
 /* Machine Drivers */
@@ -760,7 +760,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( vip )
 {
-	UINT8 *ptr = image.device().machine->region(CDP1802_TAG)->base();
+	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
 	UINT8 *chip8_ptr = NULL;
 	int chip8_size = 0;
 	int size = image.length();
@@ -768,17 +768,17 @@ static QUICKLOAD_LOAD( vip )
 	if (strcmp(image.filetype(), "c8") == 0)
 	{
 		/* CHIP-8 program */
-		chip8_ptr = image.device().machine->region("chip8")->base();
-		chip8_size = image.device().machine->region("chip8")->bytes();
+		chip8_ptr = image.device().machine().region("chip8")->base();
+		chip8_size = image.device().machine().region("chip8")->bytes();
 	}
 	else if (strcmp(image.filename(), "c8x") == 0)
 	{
 		/* CHIP-8X program */
-		chip8_ptr = image.device().machine->region("chip8x")->base();
-		chip8_size = image.device().machine->region("chip8x")->bytes();
+		chip8_ptr = image.device().machine().region("chip8x")->base();
+		chip8_size = image.device().machine().region("chip8x")->bytes();
 	}
 
-	if ((size + chip8_size) > ram_get_size(image.device().machine->device(RAM_TAG)))
+	if ((size + chip8_size) > ram_get_size(image.device().machine().device(RAM_TAG)))
 	{
 		return IMAGE_INIT_FAIL;
 	}

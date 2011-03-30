@@ -17,12 +17,12 @@ VIDEO_START( b2m )
 
 SCREEN_UPDATE( b2m )
 {
-	b2m_state *state = screen->machine->driver_data<b2m_state>();
+	b2m_state *state = screen->machine().driver_data<b2m_state>();
 	UINT8 code1;
 	UINT8 code2;
 	UINT8 col;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
 
 	for (x = 0; x < 48; x++)
 	{

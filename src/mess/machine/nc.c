@@ -20,7 +20,7 @@
 /* save card data back */
 static void nc_card_save(device_image_interface &image)
 {
-	nc_state *state = image.device().machine->driver_data<nc_state>();
+	nc_state *state = image.device().machine().driver_data<nc_state>();
 	/* if there is no data to write, quit */
 	if (!state->card_ram || !state->card_size)
 		return;
@@ -56,7 +56,7 @@ static int nc_card_calculate_mask(int size)
 /* load card image */
 static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 {
-	nc_state *state = image.device().machine->driver_data<nc_state>();
+	nc_state *state = image.device().machine().driver_data<nc_state>();
 	int datasize;
 	unsigned char *data;
 
@@ -93,9 +93,9 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 
 DEVICE_START( nc_pcmcia_card )
 {
-	nc_state *state = device->machine->driver_data<nc_state>();
+	nc_state *state = device->machine().driver_data<nc_state>();
 	/* card not present */
-	nc_set_card_present_state(device->machine, 0);
+	nc_set_card_present_state(device->machine(), 0);
 	/* card ram NULL */
 	state->card_ram = NULL;
 	state->card_size = 0;
@@ -104,7 +104,7 @@ DEVICE_START( nc_pcmcia_card )
 /* load pcmcia card */
 DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 {
-	nc_state *state = image.device().machine->driver_data<nc_state>();
+	nc_state *state = image.device().machine().driver_data<nc_state>();
 	/* filename specified */
 
 	/* attempt to load file */
@@ -115,7 +115,7 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 			/* card present! */
 			if (state->membank_card_ram_mask!=0)
 			{
-				nc_set_card_present_state(image.device().machine, 1);
+				nc_set_card_present_state(image.device().machine(), 1);
 			}
 			return IMAGE_INIT_PASS;
 		}
@@ -127,7 +127,7 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 
 DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 {
-	nc_state *state = image.device().machine->driver_data<nc_state>();
+	nc_state *state = image.device().machine().driver_data<nc_state>();
 	/* save card data if there is any */
 	nc_card_save(image);
 
@@ -140,7 +140,7 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 	state->card_size = 0;
 
 	/* set card not present state */
-	nc_set_card_present_state(image.device().machine, 0);
+	nc_set_card_present_state(image.device().machine(), 0);
 }
 
 

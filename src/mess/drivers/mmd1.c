@@ -59,8 +59,8 @@ static WRITE8_HANDLER (mmd1_port2_w)
 
 static READ8_HANDLER (mmd1_keyboard_r)
 {
-	UINT8 line1 = input_port_read(space->machine,"LINE1");
-	UINT8 line2 = input_port_read(space->machine,"LINE2");
+	UINT8 line1 = input_port_read(space->machine(),"LINE1");
+	UINT8 line2 = input_port_read(space->machine(),"LINE2");
 	if (BIT(line1,0)==0) return 0;
 	if (BIT(line1,1)==0) return 1;
 	if (BIT(line1,2)==0) return 2;

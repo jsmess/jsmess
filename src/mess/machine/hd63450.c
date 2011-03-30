@@ -66,7 +66,7 @@ static DEVICE_START(hd63450)
 	// Initialise timers and registers
 	for(x=0;x<4;x++)
 	{
-		dmac->timer[x] = device->machine->scheduler().timer_alloc(FUNC(dma_transfer_timer), (void*)device);
+		dmac->timer[x] = device->machine().scheduler().timer_alloc(FUNC(dma_transfer_timer), (void*)device);
 		dmac->reg[x].niv = 0x0f;  // defaults?
 		dmac->reg[x].eiv = 0x0f;
 		dmac->clock[x] = dmac->intf->clock[x];
@@ -239,7 +239,7 @@ void hd63450_write(device_t* device, int offset, int data, UINT16 mem_mask)
 
 static void dma_transfer_start(device_t* device, int channel, int dir)
 {
-	address_space *space = device->machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
 	hd63450_t* dmac = get_safe_token(device);
 	dmac->in_progress[channel] = 1;
 	dmac->reg[channel].csr &= ~0xe0;
@@ -257,7 +257,7 @@ static void dma_transfer_start(device_t* device, int channel, int dir)
 	// Burst transfers will halt the CPU until the transfer is complete
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
-		device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
+		device_t *cpu = device->machine().device(dmac->intf->cpu_tag);
 		device_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->burst_clock[channel]);
 	}
@@ -316,7 +316,7 @@ static void dma_transfer_continue(device_t* device, int channel)
 
 void hd63450_single_transfer(device_t* device, int x)
 {
-	address_space *space = device->machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
 	int data;
 	int datasize = 1;
 	hd63450_t* dmac = get_safe_token(device);
@@ -327,7 +327,7 @@ void hd63450_single_transfer(device_t* device, int x)
 			{
 				if(dmac->intf->dma_read[x])
 				{
-					data = dmac->intf->dma_read[x](device->machine,dmac->reg[x].mar);
+					data = dmac->intf->dma_read[x](device->machine(),dmac->reg[x].mar);
 					if(data == -1)
 						return;  // not ready to recieve data
 					space->write_byte(dmac->reg[x].mar,data);
@@ -368,7 +368,7 @@ void hd63450_single_transfer(device_t* device, int x)
 				if(dmac->intf->dma_write[x])
 				{
 					data = space->read_byte(dmac->reg[x].mar);
-					dmac->intf->dma_write[x](device->machine, dmac->reg[x].mar,data);
+					dmac->intf->dma_write[x](device->machine(), dmac->reg[x].mar,data);
 					datasize = 1;
 				}
 				else
@@ -439,12 +439,12 @@ void hd63450_single_transfer(device_t* device, int x)
 				// Burst transfer
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)
 				{
-					device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
+					device_t *cpu = device->machine().device(dmac->intf->cpu_tag);
 					device_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 				}
 
 				if(dmac->intf->dma_end)
-					dmac->intf->dma_end(device->machine,x,dmac->reg[x].ccr & 0x08);
+					dmac->intf->dma_end(device->machine(),x,dmac->reg[x].ccr & 0x08);
 			}
 		}
 }

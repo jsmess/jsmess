@@ -301,7 +301,7 @@ void abc800_state::bankswitch()
 	else
 	{
 		// BASIC ROM selected
-		program->install_rom(0x0000, 0x3fff, machine->region(Z80_TAG)->base());
+		program->install_rom(0x0000, 0x3fff, m_machine.region(Z80_TAG)->base());
 	}
 }
 
@@ -317,7 +317,7 @@ void abc802_state::bankswitch()
 	if (m_lrs)
 	{
 		// ROM and video RAM selected
-		program->install_rom(0x0000, 0x77ff, machine->region(Z80_TAG)->base());
+		program->install_rom(0x0000, 0x77ff, m_machine.region(Z80_TAG)->base());
 		program->install_ram(0x7800, 0x7fff, m_char_ram);
 	}
 	else
@@ -356,8 +356,8 @@ void abc806_state::bankswitch()
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
 			program->install_readwrite_bank(start_addr, end_addr, bank_name);
-			memory_configure_bank(machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
-			memory_set_bank(machine, bank_name, 1);
+			memory_configure_bank(m_machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
+			memory_set_bank(m_machine, bank_name, 1);
 		}
 
 		for (bank = 9; bank <= 16; bank++)
@@ -370,7 +370,7 @@ void abc806_state::bankswitch()
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
 			program->install_readwrite_bank(start_addr, end_addr, bank_name);
-			memory_set_bank(machine, bank_name, 0);
+			memory_set_bank(m_machine, bank_name, 0);
 		}
 	}
 	else
@@ -390,8 +390,8 @@ void abc806_state::bankswitch()
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
 				program->install_readwrite_bank(start_addr, end_addr, bank_name);
-				memory_configure_bank(machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
-				memory_set_bank(machine, bank_name, 1);
+				memory_configure_bank(m_machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
+				memory_set_bank(m_machine, bank_name, 1);
 			}
 			else
 			{
@@ -405,7 +405,7 @@ void abc806_state::bankswitch()
 
 					program->install_read_bank(start_addr, end_addr, bank_name);
 					program->unmap_write(start_addr, end_addr);
-					memory_set_bank(machine, bank_name, 0);
+					memory_set_bank(m_machine, bank_name, 0);
 					break;
 
 				case 8:
@@ -415,7 +415,7 @@ void abc806_state::bankswitch()
 					program->install_read_bank(0x7000, 0x77ff, bank_name);
 					program->unmap_write(0x7000, 0x77ff);
 					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
-					memory_set_bank(machine, bank_name, 0);
+					memory_set_bank(m_machine, bank_name, 0);
 					break;
 
 				default:
@@ -423,7 +423,7 @@ void abc806_state::bankswitch()
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
 					program->install_readwrite_bank(start_addr, end_addr, bank_name);
-					memory_set_bank(machine, bank_name, 0);
+					memory_set_bank(m_machine, bank_name, 0);
 					break;
 				}
 			}
@@ -456,8 +456,8 @@ void abc806_state::bankswitch()
 				program->install_readwrite_bank(start_addr, end_addr, bank_name);
 			}
 
-			memory_configure_bank(machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
-			memory_set_bank(machine, bank_name, 1);
+			memory_configure_bank(m_machine, bank_name, 1, 1, m_video_ram + videoram_offset, 0);
+			memory_set_bank(m_machine, bank_name, 1);
 		}
 	}
 }
@@ -515,7 +515,7 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 static TIMER_DEVICE_CALLBACK( keyboard_t1_tick )
 {
-	abc800_state *state = timer.machine->driver_data<abc800_state>();
+	abc800_state *state = timer.machine().driver_data<abc800_state>();
 
 	state->m_kb_clk = !state->m_kb_clk;
 
@@ -554,7 +554,7 @@ READ8_MEMBER( abc800_state::keyboard_col_r )
 
 	if (m_kb_stb && m_kb_row < 12)
 	{
-		data = input_port_read(&m_machine, ABC800_KEY_ROW[m_kb_row]);
+		data = input_port_read(m_machine, ABC800_KEY_ROW[m_kb_row]);
 	}
 
 	return data;
@@ -994,7 +994,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	device_t *z80ctc = timer.machine->device(Z80CTC_TAG);
+	device_t *z80ctc = timer.machine().device(Z80CTC_TAG);
 
 	z80ctc_trg0_w(z80ctc, 1);
 	z80ctc_trg0_w(z80ctc, 0);
@@ -1271,14 +1271,14 @@ void abc800_state::machine_start()
 	m_kb_txd = 1;
 
 	// register for state saving
-	state_save_register_global(machine, m_fetch_charram);
-	state_save_register_global(machine, m_kb_row);
-	state_save_register_global(machine, m_kb_txd);
-	state_save_register_global(machine, m_kb_clk);
-	state_save_register_global(machine, m_kb_stb);
-	state_save_register_global(machine, m_pling);
-	state_save_register_global(machine, m_sio_rxcb);
-	state_save_register_global(machine, m_sio_txcb);
+	state_save_register_global(m_machine, m_fetch_charram);
+	state_save_register_global(m_machine, m_kb_row);
+	state_save_register_global(m_machine, m_kb_txd);
+	state_save_register_global(m_machine, m_kb_clk);
+	state_save_register_global(m_machine, m_kb_stb);
+	state_save_register_global(m_machine, m_pling);
+	state_save_register_global(m_machine, m_sio_rxcb);
+	state_save_register_global(m_machine, m_sio_txcb);
 }
 
 
@@ -1288,7 +1288,7 @@ void abc800_state::machine_start()
 
 void abc800_state::machine_reset()
 {
-	m_sb = input_port_read(machine, "SB");
+	m_sb = input_port_read(m_machine, "SB");
 
 	m_fetch_charram = 0;
 	bankswitch();
@@ -1307,9 +1307,9 @@ void abc800_state::machine_reset()
 void abc802_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(machine, m_lrs);
-	state_save_register_global(machine, m_pling);
-	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(m_machine, m_lrs);
+	state_save_register_global(m_machine, m_pling);
+	state_save_register_global(m_machine, m_keylatch);
 }
 
 
@@ -1319,8 +1319,8 @@ void abc802_state::machine_start()
 
 void abc802_state::machine_reset()
 {
-	UINT8 config = input_port_read(machine, "CONFIG");
-	m_sb = input_port_read(machine, "SB");
+	UINT8 config = input_port_read(m_machine, "CONFIG");
+	m_sb = input_port_read(m_machine, "SB");
 
 	// memory banking
 	m_lrs = 1;
@@ -1346,28 +1346,28 @@ void abc802_state::machine_reset()
 
 void abc806_state::machine_start()
 {
-	UINT8 *mem = machine->region(Z80_TAG)->base();
+	UINT8 *mem = m_machine.region(Z80_TAG)->base();
 	UINT32 videoram_size = ram_get_size(m_ram) - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
 	// setup memory banking
-	m_video_ram = auto_alloc_array(machine, UINT8, videoram_size);
+	m_video_ram = auto_alloc_array(m_machine, UINT8, videoram_size);
 
 	for (bank = 1; bank <= 16; bank++)
 	{
 		sprintf(bank_name,"bank%d",bank);
-		memory_configure_bank(machine, bank_name, 0, 1, mem + (0x1000 * (bank - 1)), 0);
-		memory_configure_bank(machine, bank_name, 1, 1, m_video_ram, 0);
-		memory_set_bank(machine, bank_name, 0);
+		memory_configure_bank(m_machine, bank_name, 0, 1, mem + (0x1000 * (bank - 1)), 0);
+		memory_configure_bank(m_machine, bank_name, 1, 1, m_video_ram, 0);
+		memory_set_bank(m_machine, bank_name, 0);
 	}
 
 	// register for state saving
-	state_save_register_global(machine, m_keydtr);
-	state_save_register_global(machine, m_eme);
-	state_save_register_global(machine, m_fetch_charram);
-	state_save_register_global_array(machine, m_map);
-	state_save_register_global(machine, m_keylatch);
+	state_save_register_global(m_machine, m_keydtr);
+	state_save_register_global(m_machine, m_eme);
+	state_save_register_global(m_machine, m_fetch_charram);
+	state_save_register_global_array(m_machine, m_map);
+	state_save_register_global(m_machine, m_keylatch);
 }
 
 
@@ -1377,7 +1377,7 @@ void abc806_state::machine_start()
 
 void abc806_state::machine_reset()
 {
-	m_sb = input_port_read(machine, "SB");
+	m_sb = input_port_read(m_machine, "SB");
 
 	// setup memory banking
 	int bank;
@@ -1386,7 +1386,7 @@ void abc806_state::machine_reset()
 	for (bank = 1; bank <= 16; bank++)
 	{
 		sprintf(bank_name,"bank%d",bank);
-		memory_set_bank(machine, bank_name, 0);
+		memory_set_bank(m_machine, bank_name, 0);
 	}
 
 	bankswitch();
@@ -1810,8 +1810,8 @@ DIRECT_UPDATE_HANDLER( abc800c_direct_update_handler )
 
 static DRIVER_INIT( abc800c )
 {
-	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc800c_direct_update_handler, *machine));
+	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc800c_direct_update_handler, machine));
 }
 
 
@@ -1847,8 +1847,8 @@ DIRECT_UPDATE_HANDLER( abc800m_direct_update_handler )
 
 static DRIVER_INIT( abc800m )
 {
-	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc800m_direct_update_handler, *machine));
+	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc800m_direct_update_handler, machine));
 }
 
 
@@ -1874,8 +1874,8 @@ DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 
 static DRIVER_INIT( abc802 )
 {
-	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc802_direct_update_handler, *machine));
+	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc802_direct_update_handler, machine));
 }
 
 
@@ -1911,8 +1911,8 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 
 static DRIVER_INIT( abc806 )
 {
-	address_space *program = machine->device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc806_direct_update_handler, *machine));
+	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate_create_static(abc806_direct_update_handler, machine));
 }
 
 

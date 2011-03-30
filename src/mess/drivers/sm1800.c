@@ -55,13 +55,13 @@ static IRQ_CALLBACK(sm1800_irq_callback)
 
 static MACHINE_RESET(sm1800)
 {
-	device_set_irq_callback(machine->device("maincpu"), sm1800_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), sm1800_irq_callback);
 }
 
 
 static SCREEN_UPDATE( sm1800 )
 {
-	device_t *devconf = screen->machine->device("i8275");
+	device_t *devconf = screen->machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;
@@ -69,16 +69,16 @@ static SCREEN_UPDATE( sm1800 )
 
 static INTERRUPT_GEN( sm1800_vblank_interrupt )
 {
-	sm1800_state *state = device->machine->driver_data<sm1800_state>();
-	cputag_set_input_line(device->machine, "maincpu", 0, state->irq_state ?  HOLD_LINE : CLEAR_LINE);
+	sm1800_state *state = device->machine().driver_data<sm1800_state>();
+	cputag_set_input_line(device->machine(), "maincpu", 0, state->irq_state ?  HOLD_LINE : CLEAR_LINE);
 	state->irq_state ^= 1;
 }
 
 static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
-	UINT8 *charmap = device->machine->region("gfx1")->base();
+	bitmap_t *bitmap = device->machine().generic.tmpbitmap;
+	UINT8 *charmap = device->machine().region("gfx1")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;

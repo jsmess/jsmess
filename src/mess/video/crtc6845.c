@@ -103,13 +103,13 @@ static const UINT8 pc1512_defaults[] =
 
 ***************************************************************************/
 
-struct mscrtc6845 *mscrtc6845_init(running_machine *machine, const struct mscrtc6845_config *config)
+struct mscrtc6845 *mscrtc6845_init(running_machine &machine, const struct mscrtc6845_config *config)
 {
 	struct mscrtc6845 *crtc;
 	int idx;
 
 	crtc = auto_alloc_clear(machine, struct mscrtc6845);
-	crtc->cursor_time = machine->time().as_double();
+	crtc->cursor_time = machine.time().as_double();
 	crtc->config = *config;
 	mscrtc6845 = crtc;
 
@@ -147,12 +147,12 @@ void mscrtc6845_set_clock(struct mscrtc6845 *crtc, int freq)
 	crtc->config.freq = freq;
 }
 
-void mscrtc6845_time(running_machine *machine, struct mscrtc6845 *crtc)
+void mscrtc6845_time(running_machine &machine, struct mscrtc6845 *crtc)
 {
 	double neu, ftime;
 	struct mscrtc6845_cursor cursor;
 
-	neu = machine->time().as_double();
+	neu = machine.time().as_double();
 
 	if (mscrtc6845_clocks_in_frame(crtc) == 0.0)
 		return;

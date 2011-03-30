@@ -32,16 +32,16 @@
 
 /* Memory Banking */
 
-static void mc1000_bankswitch(running_machine *machine)
+static void mc1000_bankswitch(running_machine &machine)
 {
-	mc1000_state *state = machine->driver_data<mc1000_state>();
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	mc1000_state *state = machine.driver_data<mc1000_state>();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
 	memory_set_bank(machine, "bank2", state->mc6845_bank);
 
 	/* extended RAM */
-	if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
+	if (ram_get_size(machine.device(RAM_TAG)) > 16*1024)
 	{
 		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 	}
@@ -53,7 +53,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	/* MC6847 video RAM */
 	if (state->mc6847_bank)
 	{
-		if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
+		if (ram_get_size(machine.device(RAM_TAG)) > 16*1024)
 		{
 			program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
 		}
@@ -70,7 +70,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, "bank4", state->mc6847_bank);
 
 	/* extended RAM */
-	if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
+	if (ram_get_size(machine.device(RAM_TAG)) > 16*1024)
 	{
 		program->install_readwrite_bank(0x9800, 0xbfff, "bank5");
 	}
@@ -84,25 +84,25 @@ static void mc1000_bankswitch(running_machine *machine)
 
 static READ8_HANDLER( printer_r )
 {
-	mc1000_state *state = space->machine->driver_data<mc1000_state>();
+	mc1000_state *state = space->machine().driver_data<mc1000_state>();
 
 	return centronics_busy_r(state->centronics);
 }
 
 static WRITE8_HANDLER( printer_w )
 {
-	mc1000_state *state = space->machine->driver_data<mc1000_state>();
+	mc1000_state *state = space->machine().driver_data<mc1000_state>();
 
 	centronics_strobe_w(state->centronics, BIT(data, 0));
 }
 
 static WRITE8_HANDLER( mc6845_ctrl_w )
 {
-	mc1000_state *state = space->machine->driver_data<mc1000_state>();
+	mc1000_state *state = space->machine().driver_data<mc1000_state>();
 
 	state->mc6845_bank = BIT(data, 0);
 
-	mc1000_bankswitch(space->machine);
+	mc1000_bankswitch(space->machine());
 }
 
 static WRITE8_HANDLER( mc6847_attr_w )
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( mc6847_attr_w )
 
     */
 
-	mc1000_state *state = space->machine->driver_data<mc1000_state>();
+	mc1000_state *state = space->machine().driver_data<mc1000_state>();
 
 	state->mc6847_bank = BIT(data, 0);
 	mc6847_css_w(state->mc6847, BIT(data, 1));
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( mc6847_attr_w )
 	mc6847_as_w(state->mc6847, BIT(data, 6));
 	mc6847_ag_w(state->mc6847, BIT(data, 7));
 
-	mc1000_bankswitch(space->machine);
+	mc1000_bankswitch(space->machine());
 }
 
 /* Memory Maps */
@@ -274,19 +274,19 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( mc1000_mc6847_fs_w )
 {
-	mc1000_state *mc1000 = device->machine->driver_data<mc1000_state>();
+	mc1000_state *mc1000 = device->machine().driver_data<mc1000_state>();
 	mc1000->vsync = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mc1000_mc6847_hs_w )
 {
-	mc1000_state *mc1000 = device->machine->driver_data<mc1000_state>();
+	mc1000_state *mc1000 = device->machine().driver_data<mc1000_state>();
 	mc1000->hsync = state;
 }
 
 static READ8_DEVICE_HANDLER( mc1000_mc6847_videoram_r )
 {
-	mc1000_state *state = device->machine->driver_data<mc1000_state>();
+	mc1000_state *state = device->machine().driver_data<mc1000_state>();
 
 	mc6847_inv_w(device, BIT(state->mc6847_video_ram[offset], 7));
 
@@ -295,11 +295,11 @@ static READ8_DEVICE_HANDLER( mc1000_mc6847_videoram_r )
 
 static SCREEN_UPDATE( mc1000 )
 {
-	mc1000_state *state = screen->machine->driver_data<mc1000_state>();
+	mc1000_state *state = screen->machine().driver_data<mc1000_state>();
 	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
 
-static UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch, int line)
+static UINT8 mc1000_get_char_rom(running_machine &machine, UINT8 ch, int line)
 {
 	return ch;
 }
@@ -308,7 +308,7 @@ static UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch, int line)
 
 static WRITE8_DEVICE_HANDLER( keylatch_w )
 {
-	mc1000_state *state = device->machine->driver_data<mc1000_state>();
+	mc1000_state *state = device->machine().driver_data<mc1000_state>();
 
 	state->keylatch = data;
 
@@ -317,30 +317,30 @@ static WRITE8_DEVICE_HANDLER( keylatch_w )
 
 static READ8_DEVICE_HANDLER( keydata_r )
 {
-	mc1000_state *state = device->machine->driver_data<mc1000_state>();
+	mc1000_state *state = device->machine().driver_data<mc1000_state>();
 
 	UINT8 data = 0xff;
 
 	if (!BIT(state->keylatch, 0))
 	{
-	                              data &= input_port_read(device->machine, "ROW0");
-		if (input_port_read(device->machine, "JOYBKEYMAP"))
-	                              data &= input_port_read(device->machine, "JOYB");
+	                              data &= input_port_read(device->machine(), "ROW0");
+		if (input_port_read(device->machine(), "JOYBKEYMAP"))
+	                              data &= input_port_read(device->machine(), "JOYB");
 	}
 	if (!BIT(state->keylatch, 1))
 	{
-	                              data &= input_port_read(device->machine, "ROW1");
-		if (input_port_read(device->machine, "JOYAKEYMAP"))
-	                              data &= input_port_read(device->machine, "JOYA");
+	                              data &= input_port_read(device->machine(), "ROW1");
+		if (input_port_read(device->machine(), "JOYAKEYMAP"))
+	                              data &= input_port_read(device->machine(), "JOYA");
 	}
-	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine, "ROW2");
-	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine, "ROW3");
-	if (!BIT(state->keylatch, 4)) data &= input_port_read(device->machine, "ROW4");
-	if (!BIT(state->keylatch, 5)) data &= input_port_read(device->machine, "ROW5");
-	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine, "ROW6");
-	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine, "ROW7");
+	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine(), "ROW2");
+	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine(), "ROW3");
+	if (!BIT(state->keylatch, 4)) data &= input_port_read(device->machine(), "ROW4");
+	if (!BIT(state->keylatch, 5)) data &= input_port_read(device->machine(), "ROW5");
+	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine(), "ROW6");
+	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine(), "ROW7");
 
-	data = (input_port_read(device->machine, "MODIFIERS") & 0xc0) | (data & 0x3f);
+	data = (input_port_read(device->machine(), "MODIFIERS") & 0xc0) | (data & 0x3f);
 
 	if (cassette_input(state->cassette) < +0.0)	data &= 0x7f;
 
@@ -361,36 +361,36 @@ static const ay8910_interface ay8910_intf =
 
 static MACHINE_START( mc1000 )
 {
-	mc1000_state *state = machine->driver_data<mc1000_state>();
-	address_space *program = machine->device(Z80_TAG)->memory().space(AS_PROGRAM);
+	mc1000_state *state = machine.driver_data<mc1000_state>();
+	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->mc6845 = machine->device(MC6845_TAG);
-	state->mc6847 = machine->device(MC6847_TAG);
-	state->centronics = machine->device(CENTRONICS_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->mc6845 = machine.device(MC6845_TAG);
+	state->mc6847 = machine.device(MC6847_TAG);
+	state->centronics = machine.device(CENTRONICS_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* setup memory banking */
 	program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z80_TAG)->base() + 0xc000, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region(Z80_TAG)->base() + 0xc000, 0);
 	memory_set_bank(machine, "bank1", 1);
 
 	state->rom0000 = 1;
 
 	program->install_readwrite_bank(0x2000, 0x27ff, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 1, machine->region(Z80_TAG)->base() + 0x2000, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, machine.region(Z80_TAG)->base() + 0x2000, 0);
 	memory_configure_bank(machine, "bank2", 1, 1, state->mc6845_video_ram, 0);
 	memory_set_bank(machine, "bank2", 0);
 
-	memory_configure_bank(machine, "bank3", 0, 1, machine->region(Z80_TAG)->base() + 0x4000, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, machine.region(Z80_TAG)->base() + 0x4000, 0);
 	memory_set_bank(machine, "bank3", 0);
 
 	memory_configure_bank(machine, "bank4", 0, 1, state->mc6847_video_ram, 0);
-	memory_configure_bank(machine, "bank4", 1, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
+	memory_configure_bank(machine, "bank4", 1, 1, machine.region(Z80_TAG)->base() + 0x8000, 0);
 	memory_set_bank(machine, "bank4", 0);
 
-	memory_configure_bank(machine, "bank5", 0, 1, machine->region(Z80_TAG)->base() + 0x9800, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, machine.region(Z80_TAG)->base() + 0x9800, 0);
 	memory_set_bank(machine, "bank5", 0);
 
 	mc1000_bankswitch(machine);
@@ -406,7 +406,7 @@ static MACHINE_START( mc1000 )
 
 static MACHINE_RESET( mc1000 )
 {
-	mc1000_state *state = machine->driver_data<mc1000_state>();
+	mc1000_state *state = machine.driver_data<mc1000_state>();
 
 	memory_set_bank(machine, "bank1", 1);
 
@@ -456,12 +456,12 @@ static MACHINE_RESET( mc1000 )
 
 static TIMER_DEVICE_CALLBACK( ne555_tick )
 {
-	mc1000_state *state = timer.machine->driver_data<mc1000_state>();
+	mc1000_state *state = timer.machine().driver_data<mc1000_state>();
 
 	// (state->ne555_int not needed anymore and can be done with?)
 	state->ne555_int = param;
 
-	cputag_set_input_line(timer.machine, Z80_TAG, INPUT_LINE_IRQ0, param);
+	cputag_set_input_line(timer.machine(), Z80_TAG, INPUT_LINE_IRQ0, param);
 }
 
 static const cassette_config mc1000_cassette_config =
@@ -556,7 +556,7 @@ DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 	{
 		if (address >= 0xc000)
 		{
-			memory_set_bank(machine, "bank1", 0);
+			memory_set_bank(*machine, "bank1", 0);
 			state->rom0000 = 0;
 		}
 	}
@@ -566,7 +566,7 @@ DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 
 static DRIVER_INIT( mc1000 )
 {
-	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mc1000_direct_update_handler, *machine));
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mc1000_direct_update_handler, machine));
 }
 
 /* System Drivers */

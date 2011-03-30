@@ -92,7 +92,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
-	vcs80_state *state = timer.machine->driver_data<vcs80_state>();
+	vcs80_state *state = timer.machine().driver_data<vcs80_state>();
 
 	if (state->keyclk)
 	{
@@ -122,7 +122,7 @@ static READ8_DEVICE_HANDLER( pio_port_a_r )
 
     */
 
-	vcs80_state *state = device->machine->driver_data<vcs80_state>();
+	vcs80_state *state = device->machine().driver_data<vcs80_state>();
 
 	UINT8 data = 0;
 
@@ -130,9 +130,9 @@ static READ8_DEVICE_HANDLER( pio_port_a_r )
 	data |= state->keylatch;
 
 	/* keyboard rows */
-	data |= BIT(input_port_read(device->machine, "ROW0"), state->keylatch) << 4;
-	data |= BIT(input_port_read(device->machine, "ROW1"), state->keylatch) << 5;
-	data |= BIT(input_port_read(device->machine, "ROW2"), state->keylatch) << 6;
+	data |= BIT(input_port_read(device->machine(), "ROW0"), state->keylatch) << 4;
+	data |= BIT(input_port_read(device->machine(), "ROW1"), state->keylatch) << 5;
+	data |= BIT(input_port_read(device->machine(), "ROW2"), state->keylatch) << 6;
 
 	/* demultiplexer clock */
 	data |= (state->keyclk << 7);
@@ -157,7 +157,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
     */
 
-	vcs80_state *state = device->machine->driver_data<vcs80_state>();
+	vcs80_state *state = device->machine().driver_data<vcs80_state>();
 
 	UINT8 led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = state->keylatch;
@@ -191,10 +191,10 @@ static const z80_daisy_config vcs80_daisy_chain[] =
 
 static MACHINE_START(vcs80)
 {
-	vcs80_state *state = machine->driver_data<vcs80_state>();
+	vcs80_state *state = machine.driver_data<vcs80_state>();
 
 	/* find devices */
-	state->z80pio = machine->device(Z80PIO_TAG);
+	state->z80pio = machine.device(Z80PIO_TAG);
 
 	z80pio_astb_w(state->z80pio, 1);
 	z80pio_bstb_w(state->z80pio, 1);
@@ -251,8 +251,8 @@ DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 
 static DRIVER_INIT( vcs80 )
 {
-	machine->device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
-	machine->device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, *machine));
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, machine));
+	machine.device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, machine));
 }
 
 /* System Drivers */

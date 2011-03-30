@@ -795,7 +795,7 @@ static UINT8 bit_xor;
 static struct slapstic_data slapstic;
 
 
-static void slapstic_log(running_machine *machine, offs_t offset);
+static void slapstic_log(running_machine &machine, offs_t offset);
 static FILE *slapsticlog;
 
 
@@ -805,9 +805,9 @@ static FILE *slapsticlog;
  *
  *************************************/
 
-void slapstic_init(running_machine *machine, int chip)
+void slapstic_init(running_machine &machine, int chip)
 {
-	device_type cputype = machine->device("maincpu")->type();
+	device_type cputype = machine.device("maincpu")->type();
 
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)
@@ -876,15 +876,15 @@ static int alt2_kludge(address_space *space, offs_t offset)
 	if (access_68k)
 	{
 		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(cpu_get_pc(space->cpu) >> 1, slapstic.alt1))
+		if (MATCHES_MASK_VALUE(cpu_get_pc(&space->device()) >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = space->direct().read_decrypted_word(cpu_get_previouspc(space->cpu) & 0xffffff);
+			UINT16 opcode = space->direct().read_decrypted_word(cpu_get_previouspc(&space->device()) & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */
 				/* if it matches the third alternate */
-				UINT32 regval = cpu_get_reg(space->cpu, M68K_A0 + ((opcode >> 9) & 7)) >> 1;
+				UINT32 regval = cpu_get_reg(&space->device(), M68K_A0 + ((opcode >> 9) & 7)) >> 1;
 				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
 				{
 					alt_bank = (regval >> slapstic.altshift) & 3;
@@ -1121,7 +1121,7 @@ int slapstic_tweak(address_space *space, offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(space->machine, offset);
+		slapstic_log(space->machine(), offset);
 
 	/* return the active bank */
 	return current_bank;
@@ -1135,7 +1135,7 @@ int slapstic_tweak(address_space *space, offs_t offset)
  *
  *************************************/
 
-static void slapstic_log(running_machine *machine, offs_t offset)
+static void slapstic_log(running_machine &machine, offs_t offset)
 {
 	static attotime last_time;
 
@@ -1143,13 +1143,13 @@ static void slapstic_log(running_machine *machine, offs_t offset)
 		slapsticlog = fopen("slapstic.log", "w");
 	if (slapsticlog)
 	{
-		attotime time = machine->time();
+		attotime time = machine.time();
 
 		if ((time - last_time) > attotime::from_seconds(1))
 			fprintf(slapsticlog, "------------------------------------\n");
 		last_time = time;
 
-		fprintf(slapsticlog, "%s: %04X B=%d ", machine->describe_context(), offset, current_bank);
+		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context(), offset, current_bank);
 		switch (state)
 		{
 			case DISABLED:

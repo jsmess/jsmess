@@ -574,7 +574,7 @@ static PALETTE_INIT( pc_ega )
 }
 
 
-static void pc_ega_install_banks( running_machine *machine )
+static void pc_ega_install_banks( running_machine &machine )
 {
 	switch ( ega.graphics_controller.data[6] & 0x0c )
 	{
@@ -608,10 +608,10 @@ static void pc_ega_install_banks( running_machine *machine )
 static VIDEO_START( pc_ega )
 {
 	int buswidth;
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
 
-	buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -661,7 +661,7 @@ static VIDEO_START( pc_ega )
 	memset( &ega, 0, sizeof( ega ) );
 
 	/* Install 256KB Video ram on our EGA card */
-	ega.videoram = machine->region( "gfx2" )->base();
+	ega.videoram = machine.region( "gfx2" )->base();
 
 	memset( ega.videoram + 256 * 1024, 0xFF, 64 * 1024 );
 
@@ -669,7 +669,7 @@ static VIDEO_START( pc_ega )
 
 	pc_ega_install_banks(machine);
 
-	ega.crtc_ega = machine->device(EGA_CRTC_NAME);
+	ega.crtc_ega = machine.device(EGA_CRTC_NAME);
 	ega.update_row = NULL;
 	ega.misc_output = 0;
 	ega.attribute.index_write = 1;
@@ -1101,7 +1101,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		{
 		case 0x06:		/* GR06 */
 			pc_ega_change_mode( ega.crtc_ega );
-			pc_ega_install_banks(space->machine);
+			pc_ega_install_banks(space->machine());
 			break;
 		}
 		break;

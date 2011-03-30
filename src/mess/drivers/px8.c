@@ -83,12 +83,12 @@ enum
     bankswitch - memory bankswitching
 -------------------------------------------------*/
 
-static void bankswitch(running_machine *machine)
+static void bankswitch(running_machine &machine)
 {
-	px8_state *state = machine->driver_data<px8_state>();
-	address_space *program = machine->device(UPD70008_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
-	UINT8 *ipl_rom = machine->region(UPD70008_TAG)->base();
+	px8_state *state = machine.driver_data<px8_state>();
+	address_space *program = machine.device(UPD70008_TAG)->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ipl_rom = machine.region(UPD70008_TAG)->base();
 
 	if (!state->bank0)
 	{
@@ -275,7 +275,7 @@ static READ8_HANDLER( gah40m_r )
 
 static WRITE8_HANDLER( gah40m_w )
 {
-	px8_state *state = space->machine->driver_data<px8_state>();
+	px8_state *state = space->machine().driver_data<px8_state>();
 
 	switch (offset)
 	{
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( gah40m_w )
         */
 
 		state->bank0 = BIT(data, 0);
-		bankswitch(space->machine);
+		bankswitch(space->machine());
 		break;
 
 	case GAH40M_CMDR:
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( gah40m_w )
 
 static READ8_HANDLER( gah40s_r )
 {
-	px8_state *state = space->machine->driver_data<px8_state>();
+	px8_state *state = space->machine().driver_data<px8_state>();
 	UINT8 data = 0xff;
 
 	switch (offset)
@@ -410,7 +410,7 @@ static READ8_HANDLER( gah40s_r )
 
 static WRITE8_HANDLER( gah40s_w )
 {
-	px8_state *state = space->machine->driver_data<px8_state>();
+	px8_state *state = space->machine().driver_data<px8_state>();
 
 	switch (offset)
 	{
@@ -455,7 +455,7 @@ static WRITE8_HANDLER( gah40s_w )
 
 static WRITE8_HANDLER( gah40s_ier_w )
 {
-	px8_state *state = space->machine->driver_data<px8_state>();
+	px8_state *state = space->machine().driver_data<px8_state>();
 
 	state->ier = data;
 }
@@ -464,9 +464,9 @@ static WRITE8_HANDLER( gah40s_ier_w )
 //    krtn_read - read keyboard return
 //-------------------------------------------------*/
 //
-//static UINT8 krtn_read(running_machine *machine)
+//static UINT8 krtn_read(running_machine &machine)
 //{
-//  px8_state *state = machine->driver_data<px8_state>();
+//  px8_state *state = machine.driver_data<px8_state>();
 //  UINT8 data = 0xff;
 //
 //  switch (state->ksc)
@@ -492,7 +492,7 @@ static WRITE8_HANDLER( gah40s_ier_w )
 //
 //static READ8_HANDLER( krtn_0_3_r )
 //{
-//  return krtn_read(space->machine) & 0x0f;
+//  return krtn_read(space->machine()) & 0x0f;
 //}
 //
 ///*-------------------------------------------------
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( gah40s_ier_w )
 //
 //static READ8_HANDLER( krtn_4_7_r )
 //{
-//  return krtn_read(space->machine) >> 4;
+//  return krtn_read(space->machine()) >> 4;
 //}
 //
 ///*-------------------------------------------------
@@ -510,7 +510,7 @@ static WRITE8_HANDLER( gah40s_ier_w )
 //
 //static WRITE8_HANDLER( ksc_w )
 //{
-//  px8_state *state = space->machine->driver_data<px8_state>();
+//  px8_state *state = space->machine().driver_data<px8_state>();
 //
 //  state->ksc = data;
 //}
@@ -709,14 +709,14 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( vd_r )
 {
-	px8_state *state = device->machine->driver_data<px8_state>();
+	px8_state *state = device->machine().driver_data<px8_state>();
 
 	return state->video_ram[offset & PX8_VIDEORAM_MASK];
 }
 
 static WRITE8_DEVICE_HANDLER( vd_w )
 {
-	px8_state *state = device->machine->driver_data<px8_state>();
+	px8_state *state = device->machine().driver_data<px8_state>();
 
 	state->video_ram[offset & PX8_VIDEORAM_MASK] = data;
 }
@@ -752,7 +752,7 @@ static VIDEO_START( px8 )
 
 static SCREEN_UPDATE( px8 )
 {
-	px8_state *state = screen->machine->driver_data<px8_state>();
+	px8_state *state = screen->machine().driver_data<px8_state>();
 
 	sed1330_update(state->sed1320, bitmap, cliprect);
 
@@ -827,11 +827,11 @@ static const cassette_config px8_cassette_config =
 
 static MACHINE_START( px8 )
 {
-	px8_state *state = machine->driver_data<px8_state>();
+	px8_state *state = machine.driver_data<px8_state>();
 
 	/* find devices */
-	state->sed1320 = machine->device(SED1320_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
+	state->sed1320 = machine.device(SED1320_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state->save_item(NAME(state->ier));
@@ -844,7 +844,7 @@ static MACHINE_START( px8 )
 
 static MACHINE_RESET( px8 )
 {
-	px8_state *state = machine->driver_data<px8_state>();
+	px8_state *state = machine.driver_data<px8_state>();
 
 	state->bank0 = 0;
 	state->bk2 = 1;

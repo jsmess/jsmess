@@ -349,9 +349,9 @@ static DEVICE_START( upd1771c )
     /* resolve callbacks */
     devcb_resolve_write_line( &state->ack_out_func, &intf->ack_callback, device );
 
-    state->timer = device->machine->scheduler().timer_alloc(FUNC(upd1771c_callback), (void *)device );
+    state->timer = device->machine().scheduler().timer_alloc(FUNC(upd1771c_callback), (void *)device );
 
-    state->channel = device->machine->sound().stream_alloc( *device, 0, 1, sample_rate, state, upd1771c_update );
+    state->channel = device->machine().sound().stream_alloc( *device, 0, 1, sample_rate, state, upd1771c_update );
 
     device->save_item( NAME(state->packet) );
     device->save_item(NAME(state->index) );

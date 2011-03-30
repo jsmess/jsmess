@@ -149,9 +149,9 @@ struct _mc6847_state
 	unsigned int hs : 1;
 
 	/* to be cleaned up... */
-	int (*new_frame_callback)(running_machine *machine);	/* returns whether the M6847 is in charge of this frame */
+	int (*new_frame_callback)(running_machine &machine);	/* returns whether the M6847 is in charge of this frame */
 	void (*custom_prepare_scanline)(int scanline);
-	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch,int line);
+	UINT8 (*get_char_rom)(running_machine &machine, UINT8 ch,int line);
 
 	/* timers */
 	emu_timer *fs_rise_timer;
@@ -1258,7 +1258,7 @@ static UINT8 update_attributes(mc6847_state *mc6847)
 }
 
 
-INLINE void prepare_scanline(running_machine *machine, mc6847_state *mc6847, int xpos)
+INLINE void prepare_scanline(running_machine &machine, mc6847_state *mc6847, int xpos)
 {
 	UINT8 attrs, data, attr;
 	int scanline;
@@ -1349,7 +1349,7 @@ static TIMER_CALLBACK( hs_fall )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_HS)
-		logerror("hs_fall(): time=%s\n", machine->time().as_string(ATTOTIME_STRING_PRECISION));
+		logerror("hs_fall(): time=%s\n", machine.time().as_string(ATTOTIME_STRING_PRECISION));
 
 	mc6847->hs = ASSERT_LINE;
 	devcb_call_write_line(&mc6847->out_hs_func, mc6847->hs);
@@ -1360,7 +1360,7 @@ static TIMER_CALLBACK( hs_rise )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_HS)
-		logerror("hs_rise(): time=%s\n", machine->time().as_string(ATTOTIME_STRING_PRECISION));
+		logerror("hs_rise(): time=%s\n", machine.time().as_string(ATTOTIME_STRING_PRECISION));
 
 	mc6847->hs_rise_timer->adjust(
 		attotime(0, mc6847->scanline_period), 0);
@@ -1378,7 +1378,7 @@ static TIMER_CALLBACK( fs_fall )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_FS)
-		logerror("fs_fall(): time=%s scanline=%d\n", machine->time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
+		logerror("fs_fall(): time=%s scanline=%d\n", machine.time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
 	mc6847->fs = ASSERT_LINE;
 	devcb_call_write_line(&mc6847->out_fs_func, mc6847->fs);
@@ -1389,7 +1389,7 @@ static TIMER_CALLBACK( fs_rise )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_FS)
-		logerror("fs_rise(): time=%s scanline=%d\n", machine->time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
+		logerror("fs_rise(): time=%s scanline=%d\n", machine.time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
 	/* adjust field sync falling edge timer */
 	mc6847->fs_fall_timer->adjust(
@@ -1462,18 +1462,18 @@ static void execute_m6847_dumpscanline(device_t *device, int ref, int params, co
 
 	for (i = 0; i < beamx; i++)
 	{
-		debug_console_printf(device->machine, "[%02d]: 0x%02X (", i, pixel[i].data);
+		debug_console_printf(device->machine(), "[%02d]: 0x%02X (", i, pixel[i].data);
 
-		if (pixel[i].attr & M6847_AG)		debug_console_printf(device->machine, " AG");
-		if (pixel[i].attr & M6847_AS)		debug_console_printf(device->machine, " AS");
-		if (pixel[i].attr & M6847_INTEXT)	debug_console_printf(device->machine, " INTEXT");
-		if (pixel[i].attr & M6847_INV)		debug_console_printf(device->machine, " INV");
-		if (pixel[i].attr & M6847_CSS)		debug_console_printf(device->machine, " CSS");
-		if (pixel[i].attr & M6847_GM2)		debug_console_printf(device->machine, " GM2");
-		if (pixel[i].attr & M6847_GM1)		debug_console_printf(device->machine, " GM1");
-		if (pixel[i].attr & M6847_GM0)		debug_console_printf(device->machine, " GM0");
+		if (pixel[i].attr & M6847_AG)		debug_console_printf(device->machine(), " AG");
+		if (pixel[i].attr & M6847_AS)		debug_console_printf(device->machine(), " AS");
+		if (pixel[i].attr & M6847_INTEXT)	debug_console_printf(device->machine(), " INTEXT");
+		if (pixel[i].attr & M6847_INV)		debug_console_printf(device->machine(), " INV");
+		if (pixel[i].attr & M6847_CSS)		debug_console_printf(device->machine(), " CSS");
+		if (pixel[i].attr & M6847_GM2)		debug_console_printf(device->machine(), " GM2");
+		if (pixel[i].attr & M6847_GM1)		debug_console_printf(device->machine(), " GM1");
+		if (pixel[i].attr & M6847_GM0)		debug_console_printf(device->machine(), " GM0");
 
-		debug_console_printf(device->machine, " )\n");
+		debug_console_printf(device->machine(), " )\n");
 	}
 }
 #endif
@@ -1718,13 +1718,13 @@ static void text_mode(device_t *device, int scanline, UINT32 *RESTRICT line, con
 
 		if( (!mc6847->has_lowercase) && (attr & M6847_INTEXT) && !(attr & M6847_AS)) {
 			if (mc6847->get_char_rom) {
-				char_data = mc6847->get_char_rom(device->machine,byte,scanline % 12);
+				char_data = mc6847->get_char_rom(device->machine(),byte,scanline % 12);
 			} else {
 				char_data = 0xff;
 			}
 		} else {
 			if ((attr & M6847_INTEXT) && !(attr & M6847_AS) && mc6847->get_char_rom)
-				char_data = mc6847->get_char_rom(device->machine,byte,scanline % 12);
+				char_data = mc6847->get_char_rom(device->machine(),byte,scanline % 12);
 			else
 				char_data = mc6847->fontdata[attr_index][byte][scanline % 12];
 		}
@@ -1865,10 +1865,10 @@ static DEVICE_START( mc6847 )
 	}
 
 	/* allocate timers */
-	mc6847->fs_rise_timer = device->machine->scheduler().timer_alloc(FUNC(fs_rise), mc6847);
-	mc6847->fs_fall_timer = device->machine->scheduler().timer_alloc(FUNC(fs_fall), mc6847);
-	mc6847->hs_rise_timer = device->machine->scheduler().timer_alloc(FUNC(hs_rise), mc6847);
-	mc6847->hs_fall_timer = device->machine->scheduler().timer_alloc(FUNC(hs_fall), mc6847);
+	mc6847->fs_rise_timer = device->machine().scheduler().timer_alloc(FUNC(fs_rise), mc6847);
+	mc6847->fs_fall_timer = device->machine().scheduler().timer_alloc(FUNC(fs_fall), mc6847);
+	mc6847->hs_rise_timer = device->machine().scheduler().timer_alloc(FUNC(hs_rise), mc6847);
+	mc6847->hs_fall_timer = device->machine().scheduler().timer_alloc(FUNC(hs_fall), mc6847);
 
 	/* setup dimensions */
 	mc6847->top_border_scanlines = v->top_border_scanlines;
@@ -1916,8 +1916,8 @@ static DEVICE_START( mc6847 )
 
 #if 0
 	/* setup debug commands */
-	if (device->machine->debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(device->machine, "m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_m6847_dumpscanline);
+	if (device->machine().debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(device->machine(), "m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_m6847_dumpscanline);
 #endif
 
 
@@ -1935,7 +1935,7 @@ static DEVICE_START( mc6847 )
 	devcb_resolve_read_line(&mc6847->in_css_func, &intf->in_css_func, device);
 
 	/* setup save states */
-	device->machine->state().register_postload(mc6847_postload, mc6847);
+	device->machine().state().register_postload(mc6847_postload, mc6847);
 }
 
 static DEVICE_RESET( mc6847 )
@@ -2120,7 +2120,7 @@ static void apply_artifacts(device_t *device, UINT32 *line)
 	int i;
 
 	/* are we artifacting? */
-	artifacting = input_port_read_safe(device->machine, "artifacting", 0x00) & 0x03;
+	artifacting = input_port_read_safe(device->machine(), "artifacting", 0x00) & 0x03;
 	if (artifacting == 0x00)
 		return;
 	artifacting &= 0x01;

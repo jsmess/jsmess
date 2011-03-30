@@ -281,20 +281,20 @@ struct thom_vsignal {
 };
 
 /* current video position */
-extern struct thom_vsignal thom_get_vsignal ( running_machine *machine );
+extern struct thom_vsignal thom_get_vsignal ( running_machine &machine );
 
 
 /************************* lightpen ********************************/
 
 /* specific TO7 / T9000 lightpen code (no video gate-array) */
-extern unsigned to7_lightpen_gpl ( running_machine *machine, int decx, int decy );
+extern unsigned to7_lightpen_gpl ( running_machine &machine, int decx, int decy );
 
 /* video position corresponding to lightpen (with some offset) */
-extern struct thom_vsignal thom_get_lightpen_vsignal ( running_machine *machine, int xdec, int ydec,
+extern struct thom_vsignal thom_get_lightpen_vsignal ( running_machine &machine, int xdec, int ydec,
 						       int xdec2 );
 
 /* specify a lightpencall-back function, called nb times per frame */
-extern void thom_set_lightpen_callback ( running_machine *machine, int nb, void (*cb) ( running_machine *machine, int step ) );
+extern void thom_set_lightpen_callback ( running_machine &machine, int nb, void (*cb) ( running_machine &machine, int step ) );
 
 
 /***************************** commons *****************************/
@@ -305,16 +305,16 @@ extern PALETTE_INIT ( thom );
 extern SCREEN_EOF    ( thom );
 
 /* pass video init signal */
-extern void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_machine *machine, int init ) );
+extern void thom_set_init_callback ( running_machine &machine, void (*cb) ( running_machine &machine, int init ) );
 
 /* TO7 TO7/70 MO5 video bank switch */
-extern void thom_set_mode_point ( running_machine *machine, int point );
+extern void thom_set_mode_point ( running_machine &machine, int point );
 
 /* set the palette index for the border color */
-extern void thom_set_border_color ( running_machine *machine, unsigned color );
+extern void thom_set_border_color ( running_machine &machine, unsigned color );
 
 /* set one of 16 palette indices to one of 4096 colors */
-extern void thom_set_palette ( running_machine *machine, unsigned index, UINT16 color );
+extern void thom_set_palette ( running_machine &machine, unsigned index, UINT16 color );
 
 
 /* video modes */
@@ -333,13 +333,13 @@ extern void thom_set_palette ( running_machine *machine, unsigned index, UINT16 
 #define THOM_VMODE_NB         12
 
 /* change the current video-mode */
-extern void thom_set_video_mode ( running_machine *machine, unsigned mode );
+extern void thom_set_video_mode ( running_machine &machine, unsigned mode );
 
 /* select which video page shown among the 4 available */
-extern void thom_set_video_page ( running_machine *machine, unsigned page );
+extern void thom_set_video_page ( running_machine &machine, unsigned page );
 
 /* to tell there is some floppy activity, stays up for a few frames */
-extern void thom_floppy_active ( running_machine *machine, int write );
+extern void thom_floppy_active ( running_machine &machine, int write );
 
 
 /***************************** TO7 / T9000 *************************/

@@ -10,7 +10,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -19,7 +19,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt);
 		vsprintf( buf, s_fmt, v);
 		va_end( v);
-		logerror( "%s: %s", machine->describe_context( ), buf);
+		logerror( "%s: %s", machine.describe_context( ), buf);
 	}
 }
 
@@ -38,7 +38,7 @@ static struct {
 	int screen_y_min;
 } gf4500;
 
-static void gf4500_init( running_machine *machine)
+static void gf4500_init( running_machine &machine)
 {
 	gf4500.data = auto_alloc_array( machine, UINT32, 0x140000 / 4);
 	gf4500.screen_x = gf4500.screen_y = 0;
@@ -64,7 +64,7 @@ static rgb_t gf4500_get_color_16( UINT16 data)
 	return MAKE_RGB( r, g, b);
 }
 
-static void gf4500_render_screen( running_machine *machine, bitmap_t *bitmap)
+static void gf4500_render_screen( running_machine &machine, bitmap_t *bitmap)
 {
 	UINT16 *vram = (UINT16 *)(gf4500.data + GF4500_FRAMEBUF_OFFSET / 4);
 	int x, y;
@@ -92,7 +92,7 @@ READ32_HANDLER( gf4500_r )
 	}
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))
 	{
-		verboselog( space->machine, 9, "(GFO) %08X -> %08X\n", 0x34000000 + (offset << 2), data);
+		verboselog( space->machine(), 9, "(GFO) %08X -> %08X\n", 0x34000000 + (offset << 2), data);
 	}
 	return data;
 }
@@ -102,7 +102,7 @@ WRITE32_HANDLER( gf4500_w )
 	COMBINE_DATA(&gf4500.data[offset]);
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))
 	{
-		verboselog( space->machine, 9, "(GFO) %08X <- %08X\n", 0x34000000 + (offset << 2), data);
+		verboselog( space->machine(), 9, "(GFO) %08X <- %08X\n", 0x34000000 + (offset << 2), data);
 	}
 	switch (offset)
 	{
@@ -165,6 +165,6 @@ VIDEO_START( gf4500 )
 
 SCREEN_UPDATE( gf4500 )
 {
-	gf4500_render_screen( screen->machine, screen->machine->generic.tmpbitmap);
+	gf4500_render_screen( screen->machine(), screen->machine().generic.tmpbitmap);
 	return SCREEN_UPDATE_CALL(generic_bitmapped);
 }

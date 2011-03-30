@@ -61,9 +61,9 @@ WRITE8_HANDLER( apple1_cassette_w );
 VIDEO_START( apple1 );
 SCREEN_UPDATE( apple1 );
 
-void apple1_vh_dsp_w (running_machine *machine, int data);
-void apple1_vh_dsp_clr (running_machine *machine);
-attotime apple1_vh_dsp_time_to_ready (running_machine *machine);
+void apple1_vh_dsp_w (running_machine &machine, int data);
+void apple1_vh_dsp_clr (running_machine &machine);
+attotime apple1_vh_dsp_time_to_ready (running_machine &machine);
 
 
 

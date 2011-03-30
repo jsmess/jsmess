@@ -14,7 +14,7 @@
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
 
-static void pk8020_set_bank(running_machine *machine,UINT8 data);
+static void pk8020_set_bank(running_machine &machine,UINT8 data);
 
 
 static READ8_HANDLER( keyboard_r )
@@ -27,21 +27,21 @@ static READ8_HANDLER( keyboard_r )
 	UINT8 line = 0;
 	if (offset & 0x100)  line=8;
 
-	if (offset & 0x0001) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0001) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0002) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0002) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0004) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0004) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0008) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0008) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0010) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0010) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0020) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0020) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0040) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0040) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
-	if (offset & 0x0080) retVal|=input_port_read(space->machine,keynames[line]);
+	if (offset & 0x0080) retVal|=input_port_read(space->machine(),keynames[line]);
 	line++;
 
 	return retVal;
@@ -49,13 +49,13 @@ static READ8_HANDLER( keyboard_r )
 
 static READ8_HANDLER(sysreg_r)
 {
-	return ram_get_ptr(space->machine->device(RAM_TAG))[offset];
+	return ram_get_ptr(space->machine().device(RAM_TAG))[offset];
 }
 static WRITE8_HANDLER(sysreg_w)
 {
-	pk8020_state *state = space->machine->driver_data<pk8020_state>();
+	pk8020_state *state = space->machine().driver_data<pk8020_state>();
 	if (BIT(offset,7)==0) {
-		pk8020_set_bank(space->machine,data >> 2);
+		pk8020_set_bank(space->machine(),data >> 2);
 	} else if (BIT(offset,6)==0) {
 		// Color
 		state->color = data;
@@ -67,21 +67,21 @@ static WRITE8_HANDLER(sysreg_w)
 		UINT8 r = ((color & 0x04) ? 0xC0 : 0) + i;
 		UINT8 g = ((color & 0x02) ? 0xC0 : 0) + i;
 		UINT8 b = ((color & 0x01) ? 0xC0 : 0) + i;
-		palette_set_color( space->machine, number, MAKE_RGB(r,g,b) );
+		palette_set_color( space->machine(), number, MAKE_RGB(r,g,b) );
 	}
 }
 
 static READ8_HANDLER(text_r)
 {
-	pk8020_state *state = space->machine->driver_data<pk8020_state>();
-	if (state->attr == 3) state->text_attr=ram_get_ptr(space->machine->device(RAM_TAG))[0x40400+offset];
-	return ram_get_ptr(space->machine->device(RAM_TAG))[0x40000+offset];
+	pk8020_state *state = space->machine().driver_data<pk8020_state>();
+	if (state->attr == 3) state->text_attr=ram_get_ptr(space->machine().device(RAM_TAG))[0x40400+offset];
+	return ram_get_ptr(space->machine().device(RAM_TAG))[0x40000+offset];
 }
 
 static WRITE8_HANDLER(text_w)
 {
-	pk8020_state *state = space->machine->driver_data<pk8020_state>();
-	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
+	pk8020_state *state = space->machine().driver_data<pk8020_state>();
+	UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
 	ram[0x40000+offset] = data;
 	switch (state->attr) {
 		case 0: break;
@@ -93,8 +93,8 @@ static WRITE8_HANDLER(text_w)
 
 static READ8_HANDLER(gzu_r)
 {
-	pk8020_state *state = space->machine->driver_data<pk8020_state>();
-	UINT8 *addr = ram_get_ptr(space->machine->device(RAM_TAG)) + 0x10000 + (state->video_page_access * 0xC000);
+	pk8020_state *state = space->machine().driver_data<pk8020_state>();
+	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->video_page_access * 0xC000);
 	UINT8 p0 = addr[offset];
 	UINT8 p1 = addr[offset + 0x4000];
 	UINT8 p2 = addr[offset + 0x8000];
@@ -128,8 +128,8 @@ static READ8_HANDLER(gzu_r)
 
 static WRITE8_HANDLER(gzu_w)
 {
-	pk8020_state *state = space->machine->driver_data<pk8020_state>();
-	UINT8 *addr = ram_get_ptr(space->machine->device(RAM_TAG)) + 0x10000 + (state->video_page_access * 0xC000);
+	pk8020_state *state = space->machine().driver_data<pk8020_state>();
+	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->video_page_access * 0xC000);
 	UINT8 *plane_0 = addr;
 	UINT8 *plane_1 = addr + 0x4000;
 	UINT8 *plane_2 = addr + 0x8000;
@@ -157,14 +157,14 @@ static WRITE8_HANDLER(gzu_w)
 
 static READ8_HANDLER(devices_r)
 {
-	device_t *ppi1 = space->machine->device("ppi8255_1");
-	device_t *ppi2 = space->machine->device("ppi8255_2");
-	device_t *ppi3 = space->machine->device("ppi8255_3");
-	device_t *pit = space->machine->device("pit8253");
-	device_t *pic = space->machine->device("pic8259");
-	device_t *rs232 = space->machine->device("rs232");
-	device_t *lan = space->machine->device("lan");
-	device_t *fdc = space->machine->device("wd1793");
+	device_t *ppi1 = space->machine().device("ppi8255_1");
+	device_t *ppi2 = space->machine().device("ppi8255_2");
+	device_t *ppi3 = space->machine().device("ppi8255_3");
+	device_t *pit = space->machine().device("pit8253");
+	device_t *pic = space->machine().device("pic8259");
+	device_t *rs232 = space->machine().device("rs232");
+	device_t *lan = space->machine().device("lan");
+	device_t *fdc = space->machine().device("wd1793");
 
 	switch(offset & 0x38)
 	{
@@ -196,14 +196,14 @@ static READ8_HANDLER(devices_r)
 
 static WRITE8_HANDLER(devices_w)
 {
-	device_t *ppi1 = space->machine->device("ppi8255_1");
-	device_t *ppi2 = space->machine->device("ppi8255_2");
-	device_t *ppi3 = space->machine->device("ppi8255_3");
-	device_t *pit = space->machine->device("pit8253");
-	device_t *pic = space->machine->device("pic8259");
-	device_t *rs232 = space->machine->device("rs232");
-	device_t *lan = space->machine->device("lan");
-	device_t *fdc = space->machine->device("wd1793");
+	device_t *ppi1 = space->machine().device("ppi8255_1");
+	device_t *ppi2 = space->machine().device("ppi8255_2");
+	device_t *ppi3 = space->machine().device("ppi8255_3");
+	device_t *pit = space->machine().device("pit8253");
+	device_t *pic = space->machine().device("pic8259");
+	device_t *rs232 = space->machine().device("rs232");
+	device_t *lan = space->machine().device("lan");
+	device_t *fdc = space->machine().device("wd1793");
 
 	switch(offset & 0x38)
 	{
@@ -232,11 +232,11 @@ static WRITE8_HANDLER(devices_w)
 	}
 }
 
-static void pk8020_set_bank(running_machine *machine,UINT8 data)
+static void pk8020_set_bank(running_machine &machine,UINT8 data)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine->region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	switch(data & 0x1F) {
 		case 0x00 :
@@ -851,13 +851,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 
 static READ8_DEVICE_HANDLER(pk8020_porta_r)
 {
-	pk8020_state *state = device->machine->driver_data<pk8020_state>();
+	pk8020_state *state = device->machine().driver_data<pk8020_state>();
 	return 0xf0 | (state->takt <<1) | (state->text_attr)<<3;
 }
 
 static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 {
-	pk8020_state *state = device->machine->driver_data<pk8020_state>();
+	pk8020_state *state = device->machine().driver_data<pk8020_state>();
 	state->video_page_access =(data>>6) & 3;
 	state->attr = (data >> 4) & 3;
 	state->wide = (data >> 3) & 1;
@@ -870,35 +870,35 @@ static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 
 static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 {
-	device_t *fdc = device->machine->device("wd1793");
+	device_t *fdc = device->machine().device("wd1793");
 	// Turn all motors off
-	floppy_mon_w(floppy_get_device(device->machine, 0), 1);
-	floppy_mon_w(floppy_get_device(device->machine, 1), 1);
-	floppy_mon_w(floppy_get_device(device->machine, 2), 1);
-	floppy_mon_w(floppy_get_device(device->machine, 3), 1);
+	floppy_mon_w(floppy_get_device(device->machine(), 0), 1);
+	floppy_mon_w(floppy_get_device(device->machine(), 1), 1);
+	floppy_mon_w(floppy_get_device(device->machine(), 2), 1);
+	floppy_mon_w(floppy_get_device(device->machine(), 3), 1);
 	wd17xx_set_side(fdc,BIT(data,4));
 	if (BIT(data,0)) {
 		wd17xx_set_drive(fdc,0);
-		floppy_mon_w(floppy_get_device(device->machine, 0), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 1);
+		floppy_mon_w(floppy_get_device(device->machine(), 0), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 0), 1, 1);
 	} else if (BIT(data,1)) {
 		wd17xx_set_drive(fdc,1);
-		floppy_mon_w(floppy_get_device(device->machine, 1), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine, 1), 1, 1);
+		floppy_mon_w(floppy_get_device(device->machine(), 1), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 1), 1, 1);
 	} else if (BIT(data,2)) {
 		wd17xx_set_drive(fdc,2);
-		floppy_mon_w(floppy_get_device(device->machine, 2), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine, 2), 1, 1);
+		floppy_mon_w(floppy_get_device(device->machine(), 2), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 2), 1, 1);
 	} else if (BIT(data,3)) {
 		wd17xx_set_drive(fdc,3);
-		floppy_mon_w(floppy_get_device(device->machine, 3), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine, 3), 1, 1);
+		floppy_mon_w(floppy_get_device(device->machine(), 3), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 3), 1, 1);
 	}
 }
 
 static READ8_DEVICE_HANDLER(pk8020_portc_r)
 {
-	pk8020_state *state = device->machine->driver_data<pk8020_state>();
+	pk8020_state *state = device->machine().driver_data<pk8020_state>();
 	return state->portc_data;
 }
 
@@ -915,8 +915,8 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 
 static WRITE8_DEVICE_HANDLER(pk8020_2_portc_w)
 {
-	pk8020_state *state = device->machine->driver_data<pk8020_state>();
-	device_t *speaker = device->machine->device("speaker");
+	pk8020_state *state = device->machine().driver_data<pk8020_state>();
+	device_t *speaker = device->machine().device("speaker");
 
 	state->sound_gate = BIT(data,3);
 
@@ -945,8 +945,8 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
 
 static WRITE_LINE_DEVICE_HANDLER( pk8020_pit_out0 )
 {
-	pk8020_state *drvstate = device->machine->driver_data<pk8020_state>();
-	device_t *speaker = device->machine->device("speaker");
+	pk8020_state *drvstate = device->machine().driver_data<pk8020_state>();
+	device_t *speaker = device->machine().device("speaker");
 
 	drvstate->sound_level = state;
 
@@ -982,7 +982,7 @@ const struct pit8253_config pk8020_pit8253_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( pk8020_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 const struct pic8259_interface pk8020_pic8259_config =
@@ -992,14 +992,14 @@ const struct pic8259_interface pk8020_pic8259_config =
 
 static IRQ_CALLBACK( pk8020_irq_callback )
 {
-	return pic8259_acknowledge(device->machine->device("pic8259"));
+	return pic8259_acknowledge(device->machine().device("pic8259"));
 }
 
 MACHINE_RESET( pk8020 )
 {
-	pk8020_state *state = machine->driver_data<pk8020_state>();
+	pk8020_state *state = machine.driver_data<pk8020_state>();
 	pk8020_set_bank(machine,0);
-	device_set_irq_callback(machine->device("maincpu"), pk8020_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pk8020_irq_callback);
 
 	state->sound_gate = 0;
 	state->sound_level = 0;
@@ -1007,7 +1007,7 @@ MACHINE_RESET( pk8020 )
 
 INTERRUPT_GEN( pk8020_interrupt )
 {
-	pk8020_state *state = device->machine->driver_data<pk8020_state>();
+	pk8020_state *state = device->machine().driver_data<pk8020_state>();
 	state->takt ^= 1;
-	pic8259_ir4_w(device->machine->device("pic8259"), 1);
+	pic8259_ir4_w(device->machine().device("pic8259"), 1);
 }

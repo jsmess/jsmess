@@ -185,7 +185,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 
     */
 
-	vic20_state *state = device->machine->driver_data<vic20_state>();
+	vic20_state *state = device->machine().driver_data<vic20_state>();
 	UINT8 data = 0xfc;
 
 	/* serial clock in */
@@ -195,7 +195,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	data |= cbm_iec_data_r(state->iec) << 1;
 
 	/* joystick */
-	data &= ~(input_port_read(device->machine, "JOY") & 0x3c);
+	data &= ~(input_port_read(device->machine(), "JOY") & 0x3c);
 
 	/* cassette switch */
 	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -223,7 +223,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
     */
 
-	vic20_state *state = device->machine->driver_data<vic20_state>();
+	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	/* serial attention out */
 	cbm_iec_atn_w(state->iec, device, !BIT(data, 7));
@@ -269,7 +269,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 {
-	vic20_state *state = device->machine->driver_data<vic20_state>();
+	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	if (!BIT(data, 0))
 	{
@@ -319,17 +319,17 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	vic20_state *state = device->machine->driver_data<vic20_state>();
+	vic20_state *state = device->machine().driver_data<vic20_state>();
 	UINT8 data = 0xff;
 
-	if (!BIT(state->key_col, 0)) data &= input_port_read(device->machine, "ROW0");
-	if (!BIT(state->key_col, 1)) data &= input_port_read(device->machine, "ROW1");
-	if (!BIT(state->key_col, 2)) data &= input_port_read(device->machine, "ROW2");
-	if (!BIT(state->key_col, 3)) data &= input_port_read(device->machine, "ROW3");
-	if (!BIT(state->key_col, 4)) data &= input_port_read(device->machine, "ROW4");
-	if (!BIT(state->key_col, 5)) data &= input_port_read(device->machine, "ROW5");
-	if (!BIT(state->key_col, 6)) data &= input_port_read(device->machine, "ROW6");
-	if (!BIT(state->key_col, 7)) data &= input_port_read(device->machine, "ROW7");
+	if (!BIT(state->key_col, 0)) data &= input_port_read(device->machine(), "ROW0");
+	if (!BIT(state->key_col, 1)) data &= input_port_read(device->machine(), "ROW1");
+	if (!BIT(state->key_col, 2)) data &= input_port_read(device->machine(), "ROW2");
+	if (!BIT(state->key_col, 3)) data &= input_port_read(device->machine(), "ROW3");
+	if (!BIT(state->key_col, 4)) data &= input_port_read(device->machine(), "ROW4");
+	if (!BIT(state->key_col, 5)) data &= input_port_read(device->machine(), "ROW5");
+	if (!BIT(state->key_col, 6)) data &= input_port_read(device->machine(), "ROW6");
+	if (!BIT(state->key_col, 7)) data &= input_port_read(device->machine(), "ROW7");
 
 	return data;
 }
@@ -354,7 +354,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	UINT8 data = 0xff;
 
 	/* joystick */
-	data &= ~(input_port_read(device->machine, "JOY") & 0x80);
+	data &= ~(input_port_read(device->machine(), "JOY") & 0x80);
 
 	return data;
 }
@@ -376,10 +376,10 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
     */
 
-	vic20_state *state = device->machine->driver_data<vic20_state>();
+	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	/* cassette write */
-	cassette_output(device->machine->device("cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device->machine().device("cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* keyboard column */
 	state->key_col = data;
@@ -387,7 +387,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 {
-	vic20_state *driver_state = device->machine->driver_data<vic20_state>();
+	vic20_state *driver_state = device->machine().driver_data<vic20_state>();
 
 	/* serial clock out */
 	cbm_iec_clk_w(driver_state->iec, device, !state);
@@ -395,7 +395,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 {
-	vic20_state *driver_state = device->machine->driver_data<vic20_state>();
+	vic20_state *driver_state = device->machine().driver_data<vic20_state>();
 
 	/* serial data out */
 	cbm_iec_data_w(driver_state->iec, device, !state);
@@ -424,7 +424,7 @@ static const via6522_interface vic20_via1_intf =
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-	vic20_state *state = timer.machine->driver_data<vic20_state>();
+	vic20_state *state = timer.machine().driver_data<vic20_state>();
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
 
 	state->via1->write_ca1(data);
@@ -454,41 +454,41 @@ static IEEE488_DAISY( ieee488_daisy )
 #define VC20ADDR2MOS6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
 #define MOS6560ADDR2VC20ADDR(a) (((a) > 0x2000) ? ((a) & 0x1fff) : ((a) | 0x8000))
 
-static int vic20_dma_read_color( running_machine *machine, int offset )
+static int vic20_dma_read_color( running_machine &machine, int offset )
 {
-	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	return program->read_byte(0x9400 | (offset & 0x3ff));
 }
 
-static int vic20_dma_read( running_machine *machine, int offset )
+static int vic20_dma_read( running_machine &machine, int offset )
 {
-	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	return program->read_byte(MOS6560ADDR2VC20ADDR(offset));
 }
 
-static UINT8 vic20_lightx_cb( running_machine *machine )
+static UINT8 vic20_lightx_cb( running_machine &machine )
 {
 	return (input_port_read_safe(machine, "LIGHTX", 0) & ~0x01);
 }
 
-static UINT8 vic20_lighty_cb( running_machine *machine )
+static UINT8 vic20_lighty_cb( running_machine &machine )
 {
 	return (input_port_read_safe(machine, "LIGHTY", 0) & ~0x01);
 }
 
-static UINT8 vic20_lightbut_cb( running_machine *machine )
+static UINT8 vic20_lightbut_cb( running_machine &machine )
 {
 	return (((input_port_read(machine, "CTRLSEL") & 0xf0) == 0x20) && (input_port_read(machine, "JOY") & 0x40));
 }
 
-static UINT8 vic20_paddle0_cb( running_machine *machine )
+static UINT8 vic20_paddle0_cb( running_machine &machine )
 {
 	return input_port_read(machine, "PADDLE0");
 }
 
-static UINT8 vic20_paddle1_cb( running_machine *machine )
+static UINT8 vic20_paddle1_cb( running_machine &machine )
 {
 	return input_port_read(machine, "PADDLE1");
 }
@@ -516,23 +516,23 @@ static const mos6560_interface vic20_6561_intf =
 
 static MACHINE_START( vic20 )
 {
-	vic20_state *state = machine->driver_data<vic20_state>();
-	address_space *program = machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
+	vic20_state *state = machine.driver_data<vic20_state>();
+	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->via0 = machine->device<via6522_device>(M6522_0_TAG);
-	state->via1 = machine->device<via6522_device>(M6522_1_TAG);
-	state->iec = machine->device(IEC_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
-	state->cassette_timer = machine->device<timer_device>(TIMER_C1530_TAG);
-	state->mos6560 = machine->device(M6560_TAG);
+	state->via0 = machine.device<via6522_device>(M6522_0_TAG);
+	state->via1 = machine.device<via6522_device>(M6522_1_TAG);
+	state->iec = machine.device(IEC_TAG);
+	state->cassette = machine.device(CASSETTE_TAG);
+	state->cassette_timer = machine.device<timer_device>(TIMER_C1530_TAG);
+	state->mos6560 = machine.device(M6560_TAG);
 
 	/* set VIA clocks */
-	state->via0->set_unscaled_clock(machine->device(M6502_TAG)->unscaled_clock());
-	state->via1->set_unscaled_clock(machine->device(M6502_TAG)->unscaled_clock());
+	state->via0->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
+	state->via1->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
 
 	/* memory expansions */
-	switch (ram_get_size(machine->device(RAM_TAG)))
+	switch (ram_get_size(machine.device(RAM_TAG)))
 	{
 	case 32*1024:
 		program->install_ram(0x6000, 0x7fff, NULL);
@@ -556,11 +556,11 @@ static MACHINE_START( vic20 )
 
 static DEVICE_IMAGE_LOAD( vic20_cart )
 {
-	address_space *program = image.device().machine->device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = image.device().machine().device(M6502_TAG)->memory().space(AS_PROGRAM);
 	const char *filetype = image.filetype();
 	UINT32 address = 0;
 	UINT32 size;
-	UINT8 *ptr = image.device().machine->region(M6502_TAG)->base();
+	UINT8 *ptr = image.device().machine().region(M6502_TAG)->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -667,7 +667,7 @@ static PALETTE_INIT( vic20 )
 
 static SCREEN_UPDATE( vic20 )
 {
-	vic20_state *state = screen->machine->driver_data<vic20_state>();
+	vic20_state *state = screen->machine().driver_data<vic20_state>();
 	mos6560_video_update(state->mos6560, bitmap, cliprect);
 	return 0;
 }
@@ -676,7 +676,7 @@ static SCREEN_UPDATE( vic20 )
 
 static INTERRUPT_GEN( vic20_raster_interrupt )
 {
-	vic20_state *state = device->machine->driver_data<vic20_state>();
+	vic20_state *state = device->machine().driver_data<vic20_state>();
 	mos6560_raster_interrupt_gen(state->mos6560);
 }
 

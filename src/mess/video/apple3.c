@@ -37,10 +37,10 @@ static const UINT32 text_map[] =
 };
 
 
-void apple3_write_charmem(running_machine *machine)
+void apple3_write_charmem(running_machine &machine)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	apple3_state *state = machine.driver_data<apple3_state>();
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	static const UINT32 screen_hole_map[] =
 	{
 		0x478, 0x4f8, 0x578, 0x5f8, 0x678, 0x6f8, 0x778, 0x7f8
@@ -67,7 +67,7 @@ void apple3_write_charmem(running_machine *machine)
 
 VIDEO_START( apple3 )
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	int i, j;
 	UINT32 v;
 
@@ -87,17 +87,17 @@ VIDEO_START( apple3 )
 
 
 
-static void apple3_video_text40(running_machine *machine,bitmap_t *bitmap)
+static void apple3_video_text40(running_machine &machine,bitmap_t *bitmap)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	int x, y, col, row;
 	offs_t offset;
 	UINT8 ch;
 	const UINT8 *char_data;
 	pen_t fg, bg, temp;
 	UINT16 *dest;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
-	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
 
 	for (y = 0; y < 24; y++)
 	{
@@ -145,17 +145,17 @@ static void apple3_video_text40(running_machine *machine,bitmap_t *bitmap)
 
 
 
-static void apple3_video_text80(running_machine *machine,bitmap_t *bitmap)
+static void apple3_video_text80(running_machine &machine,bitmap_t *bitmap)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	int x, y, col, row;
 	offs_t offset;
 	UINT8 ch;
 	const UINT8 *char_data;
 	pen_t fg, bg;
 	UINT16 *dest;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
-	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
 
 	for (y = 0; y < 24; y++)
 	{
@@ -198,15 +198,15 @@ static void apple3_video_text80(running_machine *machine,bitmap_t *bitmap)
 
 
 
-static void apple3_video_graphics_hgr(running_machine *machine,bitmap_t *bitmap)
+static void apple3_video_graphics_hgr(running_machine &machine,bitmap_t *bitmap)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	/* hi-res mode: 280x192x2 */
 	int y, i, x;
 	const UINT8 *pix_info;
 	UINT16 *ptr;
 	UINT8 b;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	for (y = 0; y < 192; y++)
 	{
@@ -242,9 +242,9 @@ static UINT8 swap_bits(UINT8 b)
 
 
 
-static void apple3_video_graphics_chgr(running_machine *machine,bitmap_t *bitmap)
+static void apple3_video_graphics_chgr(running_machine &machine,bitmap_t *bitmap)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	/* color hi-res mode: 280x192x16 */
 	int y, i, x;
 	const UINT8 *pix_info;
@@ -252,7 +252,7 @@ static void apple3_video_graphics_chgr(running_machine *machine,bitmap_t *bitmap
 	UINT16 *ptr;
 	UINT8 b;
 	UINT16 fgcolor, bgcolor;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	for (y = 0; y < 192; y++)
 	{
@@ -289,16 +289,16 @@ static void apple3_video_graphics_chgr(running_machine *machine,bitmap_t *bitmap
 
 
 
-static void apple3_video_graphics_shgr(running_machine *machine,bitmap_t *bitmap)
+static void apple3_video_graphics_shgr(running_machine &machine,bitmap_t *bitmap)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	/* super hi-res mode: 560x192x2 */
 	int y, i, x;
 	const UINT8 *pix_info1;
 	const UINT8 *pix_info2;
 	UINT16 *ptr;
 	UINT8 b1, b2;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	for (y = 0; y < 192; y++)
 	{
@@ -332,13 +332,13 @@ static void apple3_video_graphics_shgr(running_machine *machine,bitmap_t *bitmap
 
 
 
-static void apple3_video_graphics_chires(running_machine *machine,bitmap_t *bitmap)
+static void apple3_video_graphics_chires(running_machine &machine,bitmap_t *bitmap)
 {
-	apple3_state *state = machine->driver_data<apple3_state>();
+	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT16 *pen;
 	PAIR pix;
 	int y, i;
-	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	for (y = 0; y < 192; y++)
 	{
@@ -366,33 +366,33 @@ static void apple3_video_graphics_chires(running_machine *machine,bitmap_t *bitm
 
 SCREEN_UPDATE( apple3 )
 {
-	apple3_state *state = screen->machine->driver_data<apple3_state>();
+	apple3_state *state = screen->machine().driver_data<apple3_state>();
 	switch(state->flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:
 		case VAR_VM0:
-			apple3_video_text40(screen->machine,bitmap);
+			apple3_video_text40(screen->machine(),bitmap);
 			break;
 
 		case VAR_VM1:
 		case VAR_VM1|VAR_VM0:
-			apple3_video_text80(screen->machine,bitmap);
+			apple3_video_text80(screen->machine(),bitmap);
 			break;
 
 		case VAR_VM3:
-			apple3_video_graphics_hgr(screen->machine,bitmap);	/* hgr mode */
+			apple3_video_graphics_hgr(screen->machine(),bitmap);	/* hgr mode */
 			break;
 
 		case VAR_VM3|VAR_VM0:
-			apple3_video_graphics_chgr(screen->machine,bitmap);
+			apple3_video_graphics_chgr(screen->machine(),bitmap);
 			break;
 
 		case VAR_VM3|VAR_VM1:
-			apple3_video_graphics_shgr(screen->machine,bitmap);
+			apple3_video_graphics_shgr(screen->machine(),bitmap);
 			break;
 
 		case VAR_VM3|VAR_VM1|VAR_VM0:
-			apple3_video_graphics_chires(screen->machine,bitmap);
+			apple3_video_graphics_chires(screen->machine(),bitmap);
 			break;
 	}
 	return 0;

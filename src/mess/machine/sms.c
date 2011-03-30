@@ -27,7 +27,7 @@ static void setup_rom(address_space *space);
 
 static TIMER_CALLBACK( rapid_fire_callback )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	state->rapid_fire_state_1 ^= 0xff;
 	state->rapid_fire_state_2 ^= 0xff;
 }
@@ -35,24 +35,24 @@ static TIMER_CALLBACK( rapid_fire_callback )
 
 static WRITE8_HANDLER( sms_input_write )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	switch (offset)
 	{
 	case 0:
-		switch (input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0x0f)
+		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) & 0x0f)
 		{
 		case 0x03:	/* Sports Pad */
 			if (data != state->sports_pad_last_data_1)
 			{
-				UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
+				UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
 
 				state->sports_pad_last_data_1 = data;
 				if (cpu_cycles - state->last_sports_pad_time_1 > 512)
 				{
 					state->sports_pad_state_1 = 3;
-					state->sports_pad_1_x = input_port_read(space->machine, "SPORT0");
-					state->sports_pad_1_y = input_port_read(space->machine, "SPORT1");
+					state->sports_pad_1_x = input_port_read(space->machine(), "SPORT0");
+					state->sports_pad_1_y = input_port_read(space->machine(), "SPORT1");
 				}
 				state->last_sports_pad_time_1 = cpu_cycles;
 				state->sports_pad_state_1 = (state->sports_pad_state_1 + 1) & 3;
@@ -62,19 +62,19 @@ static WRITE8_HANDLER( sms_input_write )
 		break;
 
 	case 1:
-		switch (input_port_read_safe(space->machine, "CTRLSEL", 0x00) >> 4)
+		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) >> 4)
 		{
 		case 0x03:	/* Sports Pad */
 			if (data != state->sports_pad_last_data_2)
 			{
-				UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
+				UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
 
 				state->sports_pad_last_data_2 = data;
 				if (cpu_cycles - state->last_sports_pad_time_2 > 2048)
 				{
 					state->sports_pad_state_2 = 3;
-					state->sports_pad_2_x = input_port_read(space->machine, "SPORT2");
-					state->sports_pad_2_y = input_port_read(space->machine, "SPORT3");
+					state->sports_pad_2_x = input_port_read(space->machine(), "SPORT2");
+					state->sports_pad_2_y = input_port_read(space->machine(), "SPORT3");
 				}
 				state->last_sports_pad_time_2 = cpu_cycles;
 				state->sports_pad_state_2 = (state->sports_pad_state_2 + 1) & 3;
@@ -88,9 +88,9 @@ static WRITE8_HANDLER( sms_input_write )
 /* FIXME: this function is a hack for Light Phaser emulation. Theoretically
    sms_vdp_hcount_latch() should be used instead, but it returns incorrect
    position for unknown reason (timing?) */
-static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos )
+static void sms_vdp_hcount_lphaser( running_machine &machine, int hpos )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	int hpos_tmp = hpos + state->lphaser_x_offs;
 	UINT8 tmp = ((hpos_tmp - 46) >> 1) & 0xff;
 
@@ -121,11 +121,11 @@ static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos )
     - The whole procedure is managed by a timer callback, that always reschedule
       itself to run in some intervals when the beam is at the circular area.
 */
-static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int lgun_x, int lgun_y )
+static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int lgun_x, int lgun_y )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	const int r_x_r = LGUN_RADIUS * LGUN_RADIUS;
-	screen_device *screen = machine->first_screen();
+	screen_device *screen = machine.first_screen();
 	const rectangle &visarea = screen->visible_area();
 	int beam_x = screen->hpos();
 	int beam_y = screen->vpos();
@@ -176,15 +176,15 @@ static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int
 		else
 			break;
 	}
-	timer->adjust(machine->first_screen()->time_until_pos(beam_y, beam_x));
+	timer->adjust(machine.first_screen()->time_until_pos(beam_y, beam_x));
 
 	return result;
 }
 
-static UINT8 sms_vdp_hcount( running_machine *machine )
+static UINT8 sms_vdp_hcount( running_machine &machine )
 {
 	UINT8 tmp;
-	screen_device *screen = machine->first_screen();
+	screen_device *screen = machine.first_screen();
 	int hpos = screen->hpos();
 
 	/* alternative method: pass HCounter test, but some others fail */
@@ -201,7 +201,7 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 		time_end = attotime::zero;
 	else
 		time_end = screen->time_until_pos(vpos, max_hpos);
-	calc_cycles = machine->device<cpu_device>("maincpu")->attotime_to_clocks(time_end);
+	calc_cycles = machine.device<cpu_device>("maincpu")->attotime_to_clocks(time_end);
 
 	/* equation got from SMSPower forum, posted by Flubba. */
 	tmp = ((590 - (calc_cycles * 3)) / 4) & 0xff;
@@ -211,9 +211,9 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 }
 
 
-static void sms_vdp_hcount_latch( running_machine *machine )
+static void sms_vdp_hcount_latch( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	UINT8 value = sms_vdp_hcount(machine);
 
 	sms_vdp_hcount_latch_w(state->vdp, 0, value);
@@ -236,11 +236,11 @@ static UINT16 screen_vpos_nonscaled( screen_device *screen, int scaled_vpos )
 }
 
 
-static void lphaser1_sensor_check( running_machine *machine )
+static void lphaser1_sensor_check( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER0"));
-	const int y = screen_vpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER1"));
+	sms_state *state = machine.driver_data<sms_state>();
+	const int x = screen_hpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER0"));
+	const int y = screen_vpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER1"));
 
 	if (lgun_bright_aim_area(machine, state->lphaser_1_timer, x, y))
 	{
@@ -252,11 +252,11 @@ static void lphaser1_sensor_check( running_machine *machine )
 	}
 }
 
-static void lphaser2_sensor_check( running_machine *machine )
+static void lphaser2_sensor_check( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER2"));
-	const int y = screen_vpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER3"));
+	sms_state *state = machine.driver_data<sms_state>();
+	const int x = screen_hpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER2"));
+	const int y = screen_vpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER3"));
 
 	if (lgun_bright_aim_area(machine, state->lphaser_2_timer, x, y))
 	{
@@ -273,7 +273,7 @@ static void lphaser2_sensor_check( running_machine *machine )
 // if so, we turn on crosshair and the lightgun timer
 static TIMER_CALLBACK( lightgun_tick )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 
 	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f) == 0x01)
 	{
@@ -319,33 +319,33 @@ static TIMER_CALLBACK( lphaser_2_callback )
 
 INPUT_CHANGED( lgun1_changed )
 {
-	sms_state *state = field->port->machine->driver_data<sms_state>();
+	sms_state *state = field->port->machine().driver_data<sms_state>();
 	if (!state->lphaser_1_timer ||
-		(input_port_read_safe(field->port->machine, "CTRLSEL", 0x00) & 0x0f) != 0x01)
+		(input_port_read_safe(field->port->machine(), "CTRLSEL", 0x00) & 0x0f) != 0x01)
 		return;
 
 	if (newval != oldval)
-		lphaser1_sensor_check(field->port->machine);
+		lphaser1_sensor_check(field->port->machine());
 }
 
 INPUT_CHANGED( lgun2_changed )
 {
-	sms_state *state = field->port->machine->driver_data<sms_state>();
+	sms_state *state = field->port->machine().driver_data<sms_state>();
 	if (!state->lphaser_2_timer ||
-		(input_port_read_safe(field->port->machine, "CTRLSEL", 0x00) & 0xf0) != 0x10)
+		(input_port_read_safe(field->port->machine(), "CTRLSEL", 0x00) & 0xf0) != 0x10)
 		return;
 
 	if (newval != oldval)
-		lphaser2_sensor_check(field->port->machine);
+		lphaser2_sensor_check(field->port->machine());
 }
 
 
 static void sms_get_inputs( address_space *space )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	UINT8 data = 0x00;
-	UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
-	running_machine *machine = space->machine;
+	UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
+	running_machine &machine = space->machine();
 
 	state->input_port0 = 0xff;
 	state->input_port1 = 0xff;
@@ -357,7 +357,7 @@ static void sms_get_inputs( address_space *space )
 	}
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* Player 1 */
 	switch (input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f)
@@ -485,7 +485,7 @@ static void sms_get_inputs( address_space *space )
 
 WRITE8_HANDLER( sms_fm_detect_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->has_fm)
 		state->fm_detect = (data & 0x01);
@@ -494,7 +494,7 @@ WRITE8_HANDLER( sms_fm_detect_w )
 
 READ8_HANDLER( sms_fm_detect_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->has_fm)
 	{
@@ -516,14 +516,14 @@ READ8_HANDLER( sms_fm_detect_r )
 
 WRITE8_HANDLER( sms_io_control_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (data & 0x08)
 	{
 		/* check if TH pin level is high (1) and was low last time */
 		if (data & 0x80 && !(state->ctrl_reg & 0x80))
 		{
-			sms_vdp_hcount_latch(space->machine);
+			sms_vdp_hcount_latch(space->machine());
 		}
 		sms_input_write(space, 0, (data & 0x20) >> 5);
 	}
@@ -532,7 +532,7 @@ WRITE8_HANDLER( sms_io_control_w )
 	{
 		if (data & 0x20 && !(state->ctrl_reg & 0x20))
 		{
-			sms_vdp_hcount_latch(space->machine);
+			sms_vdp_hcount_latch(space->machine());
 		}
 		sms_input_write(space, 1, (data & 0x80) >> 7);
 	}
@@ -543,7 +543,7 @@ WRITE8_HANDLER( sms_io_control_w )
 
 READ8_HANDLER( sms_count_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (offset & 0x01)
 		return sms_vdp_hcount_latch_r(state->vdp, offset);
@@ -556,9 +556,9 @@ READ8_HANDLER( sms_count_r )
  Check if the pause button is pressed.
  If the gamegear is in sms mode, check if the start button is pressed.
  */
-void sms_pause_callback( running_machine *machine )
+void sms_pause_callback( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 
 	if (state->is_gamegear && !(state->cartridge[state->current_cartridge].features & CF_GG_SMS_MODE))
 		return;
@@ -583,7 +583,7 @@ void sms_pause_callback( running_machine *machine )
 
 READ8_HANDLER( sms_input_port_0_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->bios_port & IO_CHIP)
 	{
@@ -599,7 +599,7 @@ READ8_HANDLER( sms_input_port_0_r )
 
 READ8_HANDLER( sms_input_port_1_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->bios_port & IO_CHIP)
 		return 0xff;
@@ -607,7 +607,7 @@ READ8_HANDLER( sms_input_port_1_r )
 	sms_get_inputs(space);
 
 	/* Reset Button */
-	state->input_port1 = (state->input_port1 & 0xef) | (input_port_read_safe(space->machine, "RESET", 0x01) & 0x01) << 4;
+	state->input_port1 = (state->input_port1 & 0xef) | (input_port_read_safe(space->machine(), "RESET", 0x01) & 0x01) << 4;
 
 	/* Do region detection if TH of ports A and B are set to output (0) */
 	if (!(state->ctrl_reg & 0x0a))
@@ -641,7 +641,7 @@ READ8_HANDLER( sms_input_port_1_r )
 
 WRITE8_HANDLER( sms_ym2413_register_port_0_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->has_fm)
 		ym2413_w(state->ym, 0, (data & 0x3f));
@@ -650,7 +650,7 @@ WRITE8_HANDLER( sms_ym2413_register_port_0_w )
 
 WRITE8_HANDLER( sms_ym2413_data_port_0_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->has_fm)
 	{
@@ -662,30 +662,30 @@ WRITE8_HANDLER( sms_ym2413_data_port_0_w )
 
 READ8_HANDLER( gg_input_port_2_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((state->is_region_japan ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
-	return ((state->is_region_japan ? 0x00 : 0x40) | (input_port_read(space->machine, "START") & 0x80));
+	return ((state->is_region_japan ? 0x00 : 0x40) | (input_port_read(space->machine(), "START") & 0x80));
 }
 
 
 READ8_HANDLER( sms_sscope_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	return state->sscope_state;
 }
 
 
 WRITE8_HANDLER( sms_sscope_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	state->sscope_state = data;
 }
 
 
 READ8_HANDLER( sms_mapper_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	return state->mapper[offset];
 }
 
@@ -693,38 +693,38 @@ READ8_HANDLER( sms_mapper_r )
 /* The following code comes from sg1000.c. We should eventually merge these TV Draw implementations */
 static WRITE8_HANDLER( sms_tvdraw_axis_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
-	UINT8 tvboard_on = input_port_read_safe(space->machine, "TVDRAW", 0x00);
+	sms_state *state = space->machine().driver_data<sms_state>();
+	UINT8 tvboard_on = input_port_read_safe(space->machine(), "TVDRAW", 0x00);
 
 	if (data & 0x01)
 	{
-		state->tvdraw_data = tvboard_on ? input_port_read(space->machine, "TVDRAW_X") : 0x80;
+		state->tvdraw_data = tvboard_on ? input_port_read(space->machine(), "TVDRAW_X") : 0x80;
 
 		if (state->tvdraw_data < 4) state->tvdraw_data = 4;
 		if (state->tvdraw_data > 251) state->tvdraw_data = 251;
 	}
 	else
 	{
-		state->tvdraw_data = tvboard_on ? input_port_read(space->machine, "TVDRAW_Y") + 0x20 : 0x80;
+		state->tvdraw_data = tvboard_on ? input_port_read(space->machine(), "TVDRAW_Y") + 0x20 : 0x80;
 	}
 }
 
 static READ8_HANDLER( sms_tvdraw_status_r )
 {
-	UINT8 tvboard_on = input_port_read_safe(space->machine, "TVDRAW", 0x00);
-	return tvboard_on ? input_port_read(space->machine, "TVDRAW_PEN") : 0x01;
+	UINT8 tvboard_on = input_port_read_safe(space->machine(), "TVDRAW", 0x00);
+	return tvboard_on ? input_port_read(space->machine(), "TVDRAW_PEN") : 0x01;
 }
 
 static READ8_HANDLER( sms_tvdraw_data_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	return state->tvdraw_data;
 }
 
 
 WRITE8_HANDLER( sms_mapper_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	int page;
 	UINT8 *SOURCE_BIOS;
 	UINT8 *SOURCE_CART;
@@ -794,8 +794,8 @@ WRITE8_HANDLER( sms_mapper_w )
 				LOG(("ram 0 paged.\n"));
 				SOURCE = state->cartridge[state->current_cartridge].cartSRAM;
 			}
-			memory_set_bankptr(space->machine,  "bank5", SOURCE);
-			memory_set_bankptr(space->machine,  "bank6", SOURCE + 0x2000);
+			memory_set_bankptr(space->machine(),  "bank5", SOURCE);
+			memory_set_bankptr(space->machine(),  "bank6", SOURCE + 0x2000);
 		}
 		else /* it's rom */
 		{
@@ -810,8 +810,8 @@ WRITE8_HANDLER( sms_mapper_w )
 				SOURCE = state->banking_bios[5];
 			}
 			LOG(("rom 2 paged in %x.\n", page));
-			memory_set_bankptr(space->machine, "bank5", SOURCE);
-			memory_set_bankptr(space->machine, "bank6", SOURCE + 0x2000);
+			memory_set_bankptr(space->machine(), "bank5", SOURCE);
+			memory_set_bankptr(space->machine(), "bank6", SOURCE + 0x2000);
 		}
 		break;
 
@@ -822,7 +822,7 @@ WRITE8_HANDLER( sms_mapper_w )
 		if (state->is_gamegear)
 			SOURCE = SOURCE_CART;
 
-		memory_set_bankptr(space->machine, "bank2", SOURCE + 0x0400);
+		memory_set_bankptr(space->machine(), "bank2", SOURCE + 0x0400);
 		break;
 
 	case 2: /* Select 16k ROM bank for 4000-7FFF */
@@ -832,8 +832,8 @@ WRITE8_HANDLER( sms_mapper_w )
 		if (state->is_gamegear)
 			SOURCE = SOURCE_CART;
 
-		memory_set_bankptr(space->machine, "bank3", SOURCE);
-		memory_set_bankptr(space->machine, "bank4", SOURCE + 0x2000);
+		memory_set_bankptr(space->machine(), "bank3", SOURCE);
+		memory_set_bankptr(space->machine(), "bank4", SOURCE + 0x2000);
 		break;
 
 	case 3: /* Select 16k ROM bank for 8000-BFFF */
@@ -856,8 +856,8 @@ WRITE8_HANDLER( sms_mapper_w )
 		if (!(state->mapper[0] & 0x08)) /* is RAM disabled? */
 		{
 			LOG(("rom 2 paged in %x.\n", page));
-			memory_set_bankptr(space->machine, "bank5", SOURCE);
-			memory_set_bankptr(space->machine, "bank6", SOURCE + 0x2000);
+			memory_set_bankptr(space->machine(), "bank5", SOURCE);
+			memory_set_bankptr(space->machine(), "bank6", SOURCE + 0x2000);
 		}
 		break;
 	}
@@ -866,7 +866,7 @@ WRITE8_HANDLER( sms_mapper_w )
 #ifdef MESS
 static WRITE8_HANDLER( sms_korean_zemina_banksw_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->cartridge[state->current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER)
 	{
@@ -880,19 +880,19 @@ static WRITE8_HANDLER( sms_korean_zemina_banksw_w )
 		{
 			case 0:
 				state->banking_cart[5] = state->cartridge[state->current_cartridge].ROM + page * 0x2000;
-				memory_set_bankptr(space->machine, "bank5", state->banking_cart[5]);
+				memory_set_bankptr(space->machine(), "bank5", state->banking_cart[5]);
 				break;
 			case 1:
 				state->banking_cart[6] = state->cartridge[state->current_cartridge].ROM + page * 0x2000;
-				memory_set_bankptr(space->machine, "bank6", state->banking_cart[6]);
+				memory_set_bankptr(space->machine(), "bank6", state->banking_cart[6]);
 				break;
 			case 2:
 				state->banking_cart[3] = state->cartridge[state->current_cartridge].ROM + page * 0x2000;
-				memory_set_bankptr(space->machine, "bank3", state->banking_cart[3]);
+				memory_set_bankptr(space->machine(), "bank3", state->banking_cart[3]);
 				break;
 			case 3:
 				state->banking_cart[4] = state->cartridge[state->current_cartridge].ROM + page * 0x2000;
-				memory_set_bankptr(space->machine, "bank4", state->banking_cart[4]);
+				memory_set_bankptr(space->machine(), "bank4", state->banking_cart[4]);
 				break;
 		}
 		LOG(("Zemina mapper write: offset %x data %x.\n", offset, page));
@@ -901,22 +901,22 @@ static WRITE8_HANDLER( sms_korean_zemina_banksw_w )
 
 static WRITE8_HANDLER( sms_codemasters_page0_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->cartridge[state->current_cartridge].ROM && state->cartridge[state->current_cartridge].features & CF_CODEMASTERS_MAPPER)
 	{
 		UINT8 rom_page_count = state->cartridge[state->current_cartridge].size / 0x4000;
 		state->banking_cart[1] = state->cartridge[state->current_cartridge].ROM + ((rom_page_count > 0) ? data % rom_page_count : 0) * 0x4000;
 		state->banking_cart[2] = state->banking_cart[1] + 0x0400;
-		memory_set_bankptr(space->machine, "bank1", state->banking_cart[1]);
-		memory_set_bankptr(space->machine, "bank2", state->banking_cart[2]);
+		memory_set_bankptr(space->machine(), "bank1", state->banking_cart[1]);
+		memory_set_bankptr(space->machine(), "bank2", state->banking_cart[2]);
 	}
 }
 
 
 static WRITE8_HANDLER( sms_codemasters_page1_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->cartridge[state->current_cartridge].ROM && state->cartridge[state->current_cartridge].features & CF_CODEMASTERS_MAPPER)
 	{
@@ -924,15 +924,15 @@ static WRITE8_HANDLER( sms_codemasters_page1_w )
 		if (data & 0x80)
 		{
 			state->cartridge[state->current_cartridge].ram_page = data & 0x07;
-			memory_set_bankptr(space->machine, "bank6", state->cartridge[state->current_cartridge].cartRAM + state->cartridge[state->current_cartridge].ram_page * 0x2000);
+			memory_set_bankptr(space->machine(), "bank6", state->cartridge[state->current_cartridge].cartRAM + state->cartridge[state->current_cartridge].ram_page * 0x2000);
 		}
 		else
 		{
 			UINT8 rom_page_count = state->cartridge[state->current_cartridge].size / 0x4000;
 			state->banking_cart[3] = state->cartridge[state->current_cartridge].ROM + ((rom_page_count > 0) ? data % rom_page_count : 0) * 0x4000;
-			memory_set_bankptr(space->machine, "bank3", state->banking_cart[3]);
-			memory_set_bankptr(space->machine, "bank4", state->banking_cart[3] + 0x2000);
-			memory_set_bankptr(space->machine, "bank6", state->banking_cart[5] + 0x2000);
+			memory_set_bankptr(space->machine(), "bank3", state->banking_cart[3]);
+			memory_set_bankptr(space->machine(), "bank4", state->banking_cart[3] + 0x2000);
+			memory_set_bankptr(space->machine(), "bank6", state->banking_cart[5] + 0x2000);
 		}
 	}
 }
@@ -946,7 +946,7 @@ static READ8_HANDLER( sms_kor_nobank_r )
 
 static WRITE8_HANDLER( sms_kor_nobank_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	UINT8 *SOURCE_BIOS;
 	UINT8 *SOURCE = NULL;
 
@@ -979,29 +979,29 @@ static WRITE8_HANDLER( sms_kor_nobank_w )
 				if (!(state->bios_port & IO_BIOS_ROM) && state->has_bios)
 				{
 					SOURCE = state->banking_bios[5];
-					memory_set_bankptr(space->machine, "bank5", SOURCE);
-					memory_set_bankptr(space->machine, "bank6", SOURCE + 0x2000);
+					memory_set_bankptr(space->machine(), "bank5", SOURCE);
+					memory_set_bankptr(space->machine(), "bank6", SOURCE + 0x2000);
 				}
 			}
 			break;
 
 		case 1: /* Select 16k ROM bank for 0400-3FFF */
 			state->banking_bios[2] = SOURCE_BIOS + 0x0400;
-			memory_set_bankptr(space->machine, "bank2", SOURCE + 0x0400);
+			memory_set_bankptr(space->machine(), "bank2", SOURCE + 0x0400);
 			break;
 
 		case 2: /* Select 16k ROM bank for 4000-7FFF */
 			state->banking_bios[3] = SOURCE_BIOS;
-			memory_set_bankptr(space->machine, "bank3", SOURCE);
-			memory_set_bankptr(space->machine, "bank4", SOURCE + 0x2000);
+			memory_set_bankptr(space->machine(), "bank3", SOURCE);
+			memory_set_bankptr(space->machine(), "bank4", SOURCE + 0x2000);
 			break;
 
 		case 3: /* Select 16k ROM bank for 8000-BFFF */
 			state->banking_bios[5] = SOURCE_BIOS;
 			if (!(state->mapper[0] & 0x08)) /* is RAM disabled? */
 			{
-				memory_set_bankptr(space->machine, "bank5", SOURCE);
-				memory_set_bankptr(space->machine, "bank6", SOURCE + 0x2000);
+				memory_set_bankptr(space->machine(), "bank5", SOURCE);
+				memory_set_bankptr(space->machine(), "bank6", SOURCE + 0x2000);
 			}
 			break;
 	}
@@ -1009,10 +1009,10 @@ static WRITE8_HANDLER( sms_kor_nobank_w )
 
 WRITE8_HANDLER( sms_bios_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	state->bios_port = data;
 
-	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(space->cpu));
+	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(&space->device()));
 
 	setup_rom(space);
 }
@@ -1020,7 +1020,7 @@ WRITE8_HANDLER( sms_bios_w )
 
 WRITE8_HANDLER( sms_cartram2_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (state->mapper[0] & 0x08)
 	{
@@ -1049,8 +1049,8 @@ WRITE8_HANDLER( sms_cartram2_w )
 			return;
 
 		state->banking_cart[5] = state->cartridge[state->current_cartridge].ROM + page * 0x4000;
-		memory_set_bankptr(space->machine, "bank5", state->banking_cart[5]);
-		memory_set_bankptr(space->machine, "bank6", state->banking_cart[5] + 0x2000);
+		memory_set_bankptr(space->machine(), "bank5", state->banking_cart[5]);
+		memory_set_bankptr(space->machine(), "bank6", state->banking_cart[5] + 0x2000);
 		LOG(("rom 2 paged in %x (Korean mapper).\n", page));
 	}
 }
@@ -1058,7 +1058,7 @@ WRITE8_HANDLER( sms_cartram2_w )
 
 WRITE8_HANDLER( sms_cartram_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	int page;
 
 	if (state->mapper[0] & 0x08)
@@ -1082,8 +1082,8 @@ WRITE8_HANDLER( sms_cartram_w )
 			if (!state->cartridge[state->current_cartridge].ROM)
 				return;
 			state->banking_cart[5] = state->cartridge[state->current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr(space->machine, "bank5", state->banking_cart[5]);
-			memory_set_bankptr(space->machine, "bank6", state->banking_cart[5] + 0x2000);
+			memory_set_bankptr(space->machine(), "bank5", state->banking_cart[5]);
+			memory_set_bankptr(space->machine(), "bank6", state->banking_cart[5] + 0x2000);
 			LOG(("rom 2 paged in %x (Codemasters mapper).\n", page));
 		}
 		else if (state->cartridge[state->current_cartridge].features & CF_ONCART_RAM)
@@ -1100,7 +1100,7 @@ WRITE8_HANDLER( sms_cartram_w )
 
 WRITE8_HANDLER( gg_sio_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	logerror("*** write %02X to SIO register #%d\n", data, offset);
 
 	state->gg_sio[offset & 0x07] = data;
@@ -1126,7 +1126,7 @@ WRITE8_HANDLER( gg_sio_w )
 
 READ8_HANDLER( gg_sio_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	logerror("*** read SIO register #%d\n", offset);
 
 	switch (offset & 7)
@@ -1164,8 +1164,8 @@ static void sms_machine_stop( running_machine &machine )
 
 static void setup_rom( address_space *space )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
-	running_machine *machine = space->machine;
+	sms_state *state = space->machine().driver_data<sms_state>();
+	running_machine &machine = space->machine();
 
 	/* 1. set up bank pointers to point to nothing */
 	memory_set_bankptr(machine, "bank1", state->banking_none[1]);
@@ -1364,9 +1364,9 @@ static int detect_tvdraw( UINT8 *rom )
 }
 
 
-static int detect_lphaser_xoffset( running_machine *machine, UINT8 *rom )
+static int detect_lphaser_xoffset( running_machine &machine, UINT8 *rom )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 
 	static const UINT8 signatures[6][16] =
 	{
@@ -1408,7 +1408,7 @@ static int detect_lphaser_xoffset( running_machine *machine, UINT8 *rom )
 
 DEVICE_START( sms_cart )
 {
-	sms_state *state = device->machine->driver_data<sms_state>();
+	sms_state *state = device->machine().driver_data<sms_state>();
 	int i;
 
 	for (i = 0; i < MAX_CARTRIDGES; i++)
@@ -1435,8 +1435,8 @@ DEVICE_START( sms_cart )
 
 DEVICE_IMAGE_LOAD( sms_cart )
 {
-	running_machine *machine = image.device().machine;
-	sms_state *state = machine->driver_data<sms_state>();
+	running_machine &machine = image.device().machine();
+	sms_state *state = machine.driver_data<sms_state>();
 	int size, index = 0, offset = 0;
 	const char *extrainfo = NULL;
 
@@ -1616,7 +1616,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	/* Terebi Oekaki (TV Draw) is a SG1000 game with special input device which is compatible with SG1000 Mark III */
 	if ((detect_tvdraw(state->cartridge[index].ROM)) && state->is_region_japan)
 	{
-		address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
 		program->install_legacy_write_handler(0x6000, 0x6000, FUNC(&sms_tvdraw_axis_w));
 		program->install_legacy_read_handler(0x8000, 0x8000, FUNC(&sms_tvdraw_status_r));
 		program->install_legacy_read_handler(0xa000, 0xa000, FUNC(&sms_tvdraw_data_r));
@@ -1628,7 +1628,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		// FIXME: we should have by default FFFD-FFFF to be only a mirror for DFFD-DFFF (with no bankswitch logic)
 		// and then the handlers should be installed here for all but the KOREAN_NOBANK carts
 		// However, to avoid memory map breakage, we currently go the other way around
-		address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
 		program->install_legacy_readwrite_handler(0xfffc, 0xffff, FUNC(&sms_kor_nobank_r), FUNC(&sms_kor_nobank_w));
 	}
 
@@ -1641,9 +1641,9 @@ DEVICE_IMAGE_LOAD( sms_cart )
 }
 
 
-static void setup_cart_banks( running_machine *machine )
+static void setup_cart_banks( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	if (state->cartridge[state->current_cartridge].ROM)
 	{
 		UINT8 rom_page_count = state->cartridge[state->current_cartridge].size / 0x4000;
@@ -1667,10 +1667,10 @@ static void setup_cart_banks( running_machine *machine )
 }
 
 #ifdef MESS
-static void setup_banks( running_machine *machine )
+static void setup_banks( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	UINT8 *mem = machine->region("maincpu")->base();
+	sms_state *state = machine.driver_data<sms_state>();
+	UINT8 *mem = machine.region("maincpu")->base();
 	state->banking_bios[1] = state->banking_cart[1] = state->banking_none[1] = mem;
 	state->banking_bios[2] = state->banking_cart[2] = state->banking_none[2] = mem;
 	state->banking_bios[3] = state->banking_cart[3] = state->banking_none[3] = mem;
@@ -1678,9 +1678,9 @@ static void setup_banks( running_machine *machine )
 	state->banking_bios[5] = state->banking_cart[5] = state->banking_none[5] = mem;
 	state->banking_bios[6] = state->banking_cart[6] = state->banking_none[6] = mem;
 
-	state->BIOS = machine->region("user1")->base();
+	state->BIOS = machine.region("user1")->base();
 
-	state->bios_page_count = (state->BIOS ? machine->region("user1")->bytes() / 0x4000 : 0);
+	state->bios_page_count = (state->BIOS ? machine.region("user1")->bytes() / 0x4000 : 0);
 
 	setup_cart_banks(machine);
 
@@ -1702,32 +1702,32 @@ static void setup_banks( running_machine *machine )
 
 MACHINE_START( sms )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
-	state->rapid_fire_timer = machine->scheduler().timer_alloc(FUNC(rapid_fire_callback));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
+	state->rapid_fire_timer = machine.scheduler().timer_alloc(FUNC(rapid_fire_callback));
 	state->rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
-	state->lphaser_1_timer = machine->scheduler().timer_alloc(FUNC(lphaser_1_callback));
-	state->lphaser_2_timer = machine->scheduler().timer_alloc(FUNC(lphaser_2_callback));
+	state->lphaser_1_timer = machine.scheduler().timer_alloc(FUNC(lphaser_1_callback));
+	state->lphaser_2_timer = machine.scheduler().timer_alloc(FUNC(lphaser_2_callback));
 
-	state->main_cpu = machine->device("maincpu");
-	state->control_cpu = machine->device("control");
-	state->vdp = machine->device("sms_vdp");
-	state->ym = machine->device("ym2413");
-	state->main_scr = machine->device("screen");
-	state->left_lcd = machine->device("left_lcd");
-	state->right_lcd = machine->device("right_lcd");
+	state->main_cpu = machine.device("maincpu");
+	state->control_cpu = machine.device("control");
+	state->vdp = machine.device("sms_vdp");
+	state->ym = machine.device("ym2413");
+	state->main_scr = machine.device("screen");
+	state->left_lcd = machine.device("left_lcd");
+	state->right_lcd = machine.device("right_lcd");
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 }
 
 #ifdef MESS
 MACHINE_RESET( sms )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	sms_state *state = machine->driver_data<sms_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	sms_state *state = machine.driver_data<sms_state>();
 
 	state->ctrl_reg = 0xff;
 	if (state->has_fm)
@@ -1797,7 +1797,7 @@ READ8_HANDLER( sms_store_cart_select_r )
 
 WRITE8_HANDLER( sms_store_cart_select_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	UINT8 slot = data >> 4;
 	UINT8 slottype = data & 0x08;
 
@@ -1806,8 +1806,8 @@ WRITE8_HANDLER( sms_store_cart_select_w )
 	if (slottype == 0)
 		state->current_cartridge = slot;
 
-	setup_cart_banks(space->machine);
-	memory_set_bankptr(space->machine, "bank10", state->banking_cart[3] + 0x2000);
+	setup_cart_banks(space->machine());
+	memory_set_bankptr(space->machine(), "bank10", state->banking_cart[3] + 0x2000);
 	setup_rom(space);
 }
 
@@ -1826,38 +1826,38 @@ READ8_HANDLER( sms_store_select2 )
 
 READ8_HANDLER( sms_store_control_r )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	return state->store_control;
 }
 
 
 WRITE8_HANDLER( sms_store_control_w )
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
-	logerror("0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(space->cpu), data);
+	sms_state *state = space->machine().driver_data<sms_state>();
+	logerror("0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(&space->device()), data);
 	if (data & 0x02)
 	{
-		space->machine->device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);
+		space->machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);
 	}
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		space->machine->device("maincpu")->reset();
-		space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
+		space->machine().device("maincpu")->reset();
+		space->machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 	}
 	state->store_control = data;
 }
 
-void sms_store_int_callback( running_machine *machine, int state )
+void sms_store_int_callback( running_machine &machine, int state )
 {
-	sms_state *driver_state = machine->driver_data<sms_state>();
+	sms_state *driver_state = machine.driver_data<sms_state>();
 	device_set_input_line(driver_state->store_control & 0x01 ? driver_state->control_cpu : driver_state->main_cpu, 0, state);
 }
 
 
-static void sms_set_zero_flag( running_machine *machine )
+static void sms_set_zero_flag( running_machine &machine )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	state->is_gamegear = 0;
 	state->is_region_japan = 0;
 	state->has_bios_0400 = 0;
@@ -1869,7 +1869,7 @@ static void sms_set_zero_flag( running_machine *machine )
 
 DRIVER_INIT( sg1000m3 )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->is_region_japan = 1;
 	state->has_fm = 1;
@@ -1878,7 +1878,7 @@ DRIVER_INIT( sg1000m3 )
 
 DRIVER_INIT( sms1 )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->has_bios_full = 1;
 }
@@ -1886,7 +1886,7 @@ DRIVER_INIT( sms1 )
 
 DRIVER_INIT( smsj )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->is_region_japan = 1;
 	state->has_bios_2000 = 1;
@@ -1896,7 +1896,7 @@ DRIVER_INIT( smsj )
 
 DRIVER_INIT( sms2kr )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->is_region_japan = 1;
 	state->has_bios_full = 1;
@@ -1912,7 +1912,7 @@ DRIVER_INIT( smssdisp )
 
 DRIVER_INIT( gamegear )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->is_gamegear = 1;
 }
@@ -1920,7 +1920,7 @@ DRIVER_INIT( gamegear )
 
 DRIVER_INIT( gamegeaj )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->is_region_japan = 1;
 	state->is_gamegear = 1;
@@ -1941,8 +1941,8 @@ static void sms_black_bitmap( const screen_device *screen, bitmap_t *bitmap )
 
 VIDEO_START( sms1 )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	screen_device *screen = machine->first_screen();
+	sms_state *state = machine.driver_data<sms_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -1954,9 +1954,9 @@ VIDEO_START( sms1 )
 
 SCREEN_UPDATE( sms1 )
 {
-	sms_state *state = screen->machine->driver_data<sms_state>();
-	UINT8 sscope = input_port_read_safe(screen->machine, "SEGASCOPE", 0x00);
-	UINT8 sscope_binocular_hack = input_port_read_safe(screen->machine, "SSCOPE_BINOCULAR", 0x00);
+	sms_state *state = screen->machine().driver_data<sms_state>();
+	UINT8 sscope = input_port_read_safe(screen->machine(), "SEGASCOPE", 0x00);
+	UINT8 sscope_binocular_hack = input_port_read_safe(screen->machine(), "SSCOPE_BINOCULAR", 0x00);
 	UINT8 occluded_view = 0;
 
 	// without SegaScope, both LCDs for glasses go black
@@ -1999,15 +1999,15 @@ SCREEN_UPDATE( sms1 )
 
 SCREEN_UPDATE( sms )
 {
-	sms_state *state = screen->machine->driver_data<sms_state>();
+	sms_state *state = screen->machine().driver_data<sms_state>();
 	sms_vdp_update(state->vdp, bitmap, cliprect);
 	return 0;
 }
 
 VIDEO_START( gamegear )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	screen_device *screen = machine->first_screen();
+	sms_state *state = machine.driver_data<sms_state>();
+	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -2018,7 +2018,7 @@ VIDEO_START( gamegear )
 
 SCREEN_UPDATE( gamegear )
 {
-	sms_state *state = screen->machine->driver_data<sms_state>();
+	sms_state *state = screen->machine().driver_data<sms_state>();
 	int width = screen->width();
 	int height = screen->height();
 	int x, y;

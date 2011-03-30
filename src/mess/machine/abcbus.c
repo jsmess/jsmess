@@ -135,7 +135,7 @@ void abcbus_device::device_start()
 	for ( ; daisy->devname != NULL; daisy++)
 	{
 		// find the device
-		device_t *target = machine->device(daisy->devname);
+		device_t *target = m_machine.device(daisy->devname);
 		if (target == NULL)
 			fatalerror("Unable to locate device '%s'", daisy->devname);
 
@@ -145,7 +145,7 @@ void abcbus_device::device_start()
 			fatalerror("Device '%s' does not implement the abcbus interface!", daisy->devname);
 
 		// append to the end
-		*tailptr = auto_alloc(machine, daisy_entry(target));
+		*tailptr = auto_alloc(m_machine, daisy_entry(target));
 		tailptr = &(*tailptr)->m_next;
 	}
 }

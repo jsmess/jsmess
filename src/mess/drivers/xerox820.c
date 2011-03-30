@@ -90,13 +90,13 @@ void xerox820_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = -1;
 
-	if (input_port_read(machine, "ROW9") & 0x07)
+	if (input_port_read(m_machine, "ROW9") & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
 	}
 
-	if (input_port_read(machine, "ROW9") & 0x18)
+	if (input_port_read(m_machine, "ROW9") & 0x18)
 	{
 		/* ctrl */
 		table = 2;
@@ -105,7 +105,7 @@ void xerox820_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(machine, keynames[row]);
+		UINT8 data = input_port_read(m_machine, keynames[row]);
 
 		for (col = 0; col < 8; col++)
 		{
@@ -131,7 +131,7 @@ void xerox820_state::scan_keyboard()
 
 static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 {
-	xerox820_state *state = timer.machine->driver_data<xerox820_state>();
+	xerox820_state *state = timer.machine().driver_data<xerox820_state>();
 	state->scan_keyboard();
 }
 
@@ -145,7 +145,7 @@ void xerox820_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x0fff, machine->region("monitor")->base());
+		program->install_rom(0x0000, 0x0fff, m_machine.region("monitor")->base());
 		program->unmap_readwrite(0x1000, 0x1fff);
 		program->install_ram(0x3000, 0x3fff, m_video_ram);
 	}
@@ -164,7 +164,7 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x17ff, machine->region("monitor")->base());
+		program->install_rom(0x0000, 0x17ff, m_machine.region("monitor")->base());
 		program->unmap_readwrite(0x1800, 0x2fff);
 		program->install_ram(0x3000, 0x3fff, m_video_ram);
 		program->unmap_readwrite(0x4000, 0xbfff);
@@ -528,7 +528,7 @@ static Z80DART_INTERFACE( sio_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	xerox820_state *state = timer.machine->driver_data<xerox820_state>();
+	xerox820_state *state = timer.machine().driver_data<xerox820_state>();
 
 	z80ctc_trg0_w(state->m_ctc, 1);
 	z80ctc_trg0_w(state->m_ctc, 0);
@@ -614,7 +614,7 @@ static COM8116_INTERFACE( com8116_intf )
 void xerox820_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine->region("chargen")->base();
+	m_char_rom = m_machine.region("chargen")->base();
 }
 
 
@@ -692,7 +692,7 @@ void xerox820_state::set_floppy_parameters(size_t length)
 
 static void xerox820_load_proc(device_image_interface &image)
 {
-	xerox820_state *state = image.device().machine->driver_data<xerox820_state>();
+	xerox820_state *state = image.device().machine().driver_data<xerox820_state>();
 
 	state->set_floppy_parameters(image.length());
 }
@@ -706,14 +706,14 @@ void xerox820_state::machine_start()
 	floppy_install_load_proc(m_floppy1, xerox820_load_proc);
 
 	/* register for state saving */
-	state_save_register_global(machine, m_keydata);
-	state_save_register_global(machine, m_scroll);
-	state_save_register_global(machine, m_ncset2);
-	state_save_register_global(machine, m_vatt);
-	state_save_register_global(machine, m_fdc_irq);
-	state_save_register_global(machine, m_fdc_drq);
-	state_save_register_global(machine, m_8n5);
-	state_save_register_global(machine, m_dsdd);
+	state_save_register_global(m_machine, m_keydata);
+	state_save_register_global(m_machine, m_scroll);
+	state_save_register_global(m_machine, m_ncset2);
+	state_save_register_global(m_machine, m_vatt);
+	state_save_register_global(m_machine, m_fdc_irq);
+	state_save_register_global(m_machine, m_fdc_drq);
+	state_save_register_global(m_machine, m_8n5);
+	state_save_register_global(m_machine, m_dsdd);
 }
 
 void xerox820_state::machine_reset()

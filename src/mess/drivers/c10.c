@@ -51,21 +51,21 @@ static TIMER_CALLBACK( c10_reset )
 static MACHINE_RESET(c10)
 {
 	memory_set_bank(machine, "boot", 1);
-	machine->scheduler().timer_set(attotime::from_usec(4), FUNC(c10_reset));
+	machine.scheduler().timer_set(attotime::from_usec(4), FUNC(c10_reset));
 }
 
 static VIDEO_START( c10 )
 {
-	c10_state *state = machine->driver_data<c10_state>();
-	state->FNT = machine->region("chargen")->base();
-	state->videoram = machine->region("maincpu")->base()+0xf0a2;
+	c10_state *state = machine.driver_data<c10_state>();
+	state->FNT = machine.region("chargen")->base();
+	state->videoram = machine.region("maincpu")->base()+0xf0a2;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. The word at FAB5 looks like it might be cursor location. */
 static SCREEN_UPDATE( c10 )
 {
-	c10_state *state = screen->machine->driver_data<c10_state>();
+	c10_state *state = screen->machine().driver_data<c10_state>();
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;
@@ -160,7 +160,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT( c10 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 }
 

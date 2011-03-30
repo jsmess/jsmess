@@ -258,7 +258,7 @@ static VIDEO_START( teleprinter )
 
 static SCREEN_UPDATE(teleprinter )
 {
-	device_t *devconf = screen->machine->device(TELEPRINTER_TAG);
+	device_t *devconf = screen->machine().device(TELEPRINTER_TAG);
 	generic_teleprinter_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -291,7 +291,7 @@ static DEVICE_START( teleprinter )
 	devcb_resolve_write8(&term->teleprinter_keyboard_func, &intf->teleprinter_keyboard_func, device);
 
 	if (term->teleprinter_keyboard_func.target)
-		device->machine->scheduler().timer_pulse(attotime::from_hz(240), FUNC(keyboard_callback), 0, (void*)device);
+		device->machine().scheduler().timer_pulse(attotime::from_hz(240), FUNC(keyboard_callback), 0, (void*)device);
 }
 
 /*-------------------------------------------------

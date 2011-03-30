@@ -23,7 +23,7 @@ UINT8 val = 0x00;
 static READ8_HANDLER(status_r)
 {
 	UINT8 old_val = val;	
-	sacstate_state *state = space->machine->driver_data<sacstate_state>();
+	sacstate_state *state = space->machine().driver_data<sacstate_state>();
 	if (state->term_data!=0) old_val |= 0x04; // data in
 	val = val ^ 0x40;
 	return old_val;
@@ -31,14 +31,14 @@ static READ8_HANDLER(status_r)
 
 static READ8_HANDLER(tty_r)
 {
-	sacstate_state *state = space->machine->driver_data<sacstate_state>();
+	sacstate_state *state = space->machine().driver_data<sacstate_state>();
 	UINT8 retVal = state->term_data;
 	state->term_data = 0;
 	return retVal;
 }
 static WRITE8_HANDLER(tty_w)
 {
-	device_t *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine().device("terminal");
 	logerror("TTY : %02x [%c]\n",data,data);
 	terminal_write(devconf,0,data);
 }
@@ -70,7 +70,7 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( sacstate_kbd_put )
 {
-	sacstate_state *state = device->machine->driver_data<sacstate_state>();
+	sacstate_state *state = device->machine().driver_data<sacstate_state>();
 	state->term_data = data;
 }
 

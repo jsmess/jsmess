@@ -38,7 +38,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 
 
 
-int pc_turbo_setup(running_machine *machine, device_t *cpu, const char *port, int mask, double off_speed, double on_speed)
+int pc_turbo_setup(running_machine &machine, device_t *cpu, const char *port, int mask, double off_speed, double on_speed)
 {
 	struct pc_turbo_info *ti;
 
@@ -49,6 +49,6 @@ int pc_turbo_setup(running_machine *machine, device_t *cpu, const char *port, in
 	ti->cur_val = -1;
 	ti->off_speed = off_speed;
 	ti->on_speed = on_speed;
-	machine->scheduler().timer_pulse(attotime::from_msec(100), FUNC(pc_turbo_callback), 0, ti);
+	machine.scheduler().timer_pulse(attotime::from_msec(100), FUNC(pc_turbo_callback), 0, ti);
 	return 0;
 }

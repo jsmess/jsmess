@@ -23,7 +23,7 @@ READ8_DEVICE_HANDLER( geneve_cru_r );
 WRITE8_DEVICE_HANDLER( geneve_cru_w );
 
 extern const tms9901_interface tms9901_wiring_geneve;
-void tms9901_gen_set_int2(running_machine *machine, int state);
+void tms9901_gen_set_int2(running_machine &machine, int state);
 void set_gm_switches(device_t *board, int number, int value);
 
 INTERRUPT_GEN( geneve_hblank_interrupt );

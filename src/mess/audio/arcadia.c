@@ -170,7 +170,7 @@ static STREAM_UPDATE( arcadia_update )
 static DEVICE_START(arcadia_sound)
 {
 	arcadia_sound *token = get_token(device);
-    token->channel = device->machine->sound().stream_alloc(*device, 0, 1, UVI_PAL*OSAMP, 0, arcadia_update);
+    token->channel = device->machine().sound().stream_alloc(*device, 0, 1, UVI_PAL*OSAMP, 0, arcadia_update);
     token->lfsr    = LFSR_INIT;
     token->tval    = 1;
 	logerror("arcadia_sound start\n");

@@ -60,25 +60,25 @@ static READ8_HANDLER(vc4000_key_r)
 	UINT8 data=0;
 	switch(offset & 0x0f) {
 	case 0x08:
-		data = input_port_read(space->machine, "KEYPAD1_1");
+		data = input_port_read(space->machine(), "KEYPAD1_1");
 		break;
 	case 0x09:
-		data = input_port_read(space->machine, "KEYPAD1_2");
+		data = input_port_read(space->machine(), "KEYPAD1_2");
 		break;
 	case 0x0a:
-		data = input_port_read(space->machine, "KEYPAD1_3");
+		data = input_port_read(space->machine(), "KEYPAD1_3");
 		break;
 	case 0x0b:
-		data = input_port_read(space->machine, "PANEL");
+		data = input_port_read(space->machine(), "PANEL");
 		break;
 	case 0x0c:
-		data = input_port_read(space->machine, "KEYPAD2_1");
+		data = input_port_read(space->machine(), "KEYPAD2_1");
 		break;
 	case 0x0d:
-		data = input_port_read(space->machine, "KEYPAD2_2");
+		data = input_port_read(space->machine(), "KEYPAD2_2");
 		break;
 	case 0x0e:
-		data = input_port_read(space->machine, "KEYPAD2_3");
+		data = input_port_read(space->machine(), "KEYPAD2_3");
 		break;
 	}
 	return data;
@@ -193,8 +193,8 @@ static PALETTE_INIT( vc4000 )
 
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
-	running_machine *machine = image.device().machine;
-	address_space *memspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	running_machine &machine = image.device().machine();
+	address_space *memspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -208,34 +208,34 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
 		memspace->install_read_bank(0x0800, 0x15ff, "bank1");	/* extra rom */
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000);
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x1000);
 
 		memspace->install_readwrite_bank(0x1800, 0x1bff, "bank2");	/* ram */
-		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x1800);
+		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x1800);
 	}
 	else if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
 		memspace->install_read_bank(0x0800, 0x0fff, "bank1");	/* extra rom */
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0800);
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0800);
 
 		memspace->install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
-		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x1000);
+		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x1000);
 	}
 	else if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
 		memspace->install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
-		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0800);
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0800);
 	}
 
 	if (size > 0)
 	{
 		if (image.software_entry() == NULL)
 		{
-			if (image.fread( machine->region("maincpu")->base(), size) != size)
+			if (image.fread( machine.region("maincpu")->base(), size) != size)
 				return IMAGE_INIT_FAIL;
 		}
 		else
-			memcpy(machine->region("maincpu")->base(), image.get_software_region("rom"), size);
+			memcpy(machine.region("maincpu")->base(), image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -376,7 +376,7 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	address_space *space = image.device().machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int quick_length;

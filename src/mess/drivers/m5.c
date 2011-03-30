@@ -74,7 +74,7 @@ READ8_MEMBER( m5_state::sts_r )
 	data |= centronics_busy_r(m_centronics) << 1;
 
 	// RESET key
-	data |= input_port_read(machine, "RESET");
+	data |= input_port_read(m_machine, "RESET");
 
 	return data;
 }
@@ -433,9 +433,9 @@ static const cassette_config cassette_intf =
 //  TMS9928a_interface vdp_intf
 //-------------------------------------------------
 
-static void sordm5_video_interrupt_callback(running_machine *machine, int state)
+static void sordm5_video_interrupt_callback(running_machine &machine, int state)
 {
-	m5_state *driver_state = machine->driver_data<m5_state>();
+	m5_state *driver_state = machine.driver_data<m5_state>();
 
 	if (state)
 	{
@@ -446,7 +446,7 @@ static void sordm5_video_interrupt_callback(running_machine *machine, int state)
 
 static INTERRUPT_GEN( sord_interrupt )
 {
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
 static const TMS9928a_interface ntsc_vdp_intf =
@@ -640,11 +640,11 @@ void m5_state::machine_start()
 	}
 
 	// register for state saving
-	state_save_register_global(machine, m_fd5_data);
-	state_save_register_global(machine, m_fd5_com);
-	state_save_register_global(machine, m_intra);
-	state_save_register_global(machine, m_ibfa);
-	state_save_register_global(machine, m_obfa);
+	state_save_register_global(m_machine, m_fd5_data);
+	state_save_register_global(m_machine, m_fd5_com);
+	state_save_register_global(m_machine, m_intra);
+	state_save_register_global(m_machine, m_ibfa);
+	state_save_register_global(m_machine, m_obfa);
 }
 
 
@@ -778,7 +778,7 @@ ROM_END
 
 static DRIVER_INIT( ntsc )
 {
-	m5_state *state = machine->driver_data<m5_state>();
+	m5_state *state = machine.driver_data<m5_state>();
 
 	state->m_vdp_intf = &ntsc_vdp_intf;
 }
@@ -790,7 +790,7 @@ static DRIVER_INIT( ntsc )
 
 static DRIVER_INIT( pal )
 {
-	m5_state *state = machine->driver_data<m5_state>();
+	m5_state *state = machine.driver_data<m5_state>();
 
 	state->m_vdp_intf = &pal_vdp_intf;
 }

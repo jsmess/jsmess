@@ -15,7 +15,7 @@ bit 0 = ? (unused?)
 */
 WRITE8_HANDLER( mexico86_f008_w )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 
 	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -44,9 +44,9 @@ WRITE8_HANDLER( mexico86_f008_w )
 
 ***************************************************************************/
 
-static void mcu_simulate( running_machine *machine )
+static void mcu_simulate( running_machine &machine )
 {
-	mexico86_state *state = machine->driver_data<mexico86_state>();
+	mexico86_state *state = machine.driver_data<mexico86_state>();
 
 	if (!state->mcu_initialised)
 	{
@@ -154,10 +154,10 @@ static void mcu_simulate( running_machine *machine )
 
 INTERRUPT_GEN( kikikai_interrupt )
 {
-	mexico86_state *state = device->machine->driver_data<mexico86_state>();
+	mexico86_state *state = device->machine().driver_data<mexico86_state>();
 
 	if (state->mcu_running)
-		mcu_simulate(device->machine);
+		mcu_simulate(device->machine());
 
 	device_set_input_line_vector(device, 0, state->protection_ram[0]);
 	device_set_input_line(device, 0, HOLD_LINE);
@@ -177,9 +177,9 @@ INTERRUPT_GEN( kikikai_interrupt )
 #define DCWIDTH 0
 #define DCHEIGHT 0
 
-static void kiki_clogic(running_machine *machine, int address, int latch)
+static void kiki_clogic(running_machine &machine, int address, int latch)
 {
-	mexico86_state *state = machine->driver_data<mexico86_state>();
+	mexico86_state *state = machine.driver_data<mexico86_state>();
 	static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
 	int sy, sx, hw, i, qptr, diff1, diff2;
 
@@ -234,23 +234,23 @@ INTERRUPT_GEN( mexico86_m68705_interrupt )
 
 READ8_HANDLER( mexico86_68705_port_a_r )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(space->cpu), state->port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space->device()), state->port_a_in);
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( mexico86_68705_port_a_w )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space->device()), data);
 	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( mexico86_68705_ddr_a_w )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 	state->ddr_a = data;
 }
 
@@ -274,14 +274,14 @@ WRITE8_HANDLER( mexico86_68705_ddr_a_w )
 
 READ8_HANDLER( mexico86_68705_port_b_r )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( mexico86_68705_port_b_w )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
-	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data);
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
+	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(&space->device()), data);
 
 	if (BIT(state->ddr_b, 0) && BIT(~data, 0) && BIT(state->port_b_out, 0))
 	{
@@ -291,7 +291,7 @@ WRITE8_HANDLER( mexico86_68705_port_b_w )
 	if (BIT(state->ddr_b, 1) && BIT(data, 1) && BIT(~state->port_b_out, 1)) /* positive edge trigger */
 	{
 		state->address = state->port_a_out;
-		//if (state->address >= 0x80) logerror("%04x: 68705 address %02x\n", cpu_get_pc(space->cpu), state->port_a_out);
+		//if (state->address >= 0x80) logerror("%04x: 68705 address %02x\n", cpu_get_pc(&space->device()), state->port_a_out);
 	}
 
 	if (BIT(state->ddr_b, 3) && BIT(~data, 3) && BIT(state->port_b_out, 3))
@@ -300,18 +300,18 @@ WRITE8_HANDLER( mexico86_68705_port_b_w )
 		{
 			if (data & 0x04)
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), state->protection_ram[state->address], state->address);
+				//logerror("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(&space->device()), state->protection_ram[state->address], state->address);
 				state->latch = state->protection_ram[state->address];
 			}
 			else
 			{
-				//logerror("%04x: 68705 read input port %04x\n", cpu_get_pc(space->cpu), state->address);
-				state->latch = input_port_read(space->machine, (state->address & 1) ? "IN2" : "IN1");
+				//logerror("%04x: 68705 read input port %04x\n", cpu_get_pc(&space->device()), state->address);
+				state->latch = input_port_read(space->machine(), (state->address & 1) ? "IN2" : "IN1");
 			}
 		}
 		else    /* write */
 		{
-				//logerror("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), port_a_out, state->address);
+				//logerror("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(&space->device()), port_a_out, state->address);
 				state->protection_ram[state->address] = state->port_a_out;
 		}
 	}
@@ -324,12 +324,12 @@ WRITE8_HANDLER( mexico86_68705_port_b_w )
 
 	if (BIT(state->ddr_b, 6) && BIT(~data, 6) && BIT(state->port_b_out, 6))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space->device()), data);
 	}
 
 	if (BIT(state->ddr_b, 7) && BIT(~data, 7) && BIT(state->port_b_out, 7))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space->device()), data);
 	}
 
 	state->port_b_out = data;
@@ -337,6 +337,6 @@ WRITE8_HANDLER( mexico86_68705_port_b_w )
 
 WRITE8_HANDLER( mexico86_68705_ddr_b_w )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 	state->ddr_b = data;
 }

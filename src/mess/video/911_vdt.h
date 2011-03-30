@@ -37,12 +37,12 @@ typedef struct vdt911_init_params_t
 {
 	vdt911_screen_size_t screen_size;
 	vdt911_model_t model;
-	void (*int_callback)(running_machine *machine, int state);
+	void (*int_callback)(running_machine &machine, int state);
 } vdt911_init_params_t;
 
 PALETTE_INIT( vdt911 );
 
-void vdt911_init(running_machine *machine);
+void vdt911_init(running_machine &machine);
 DECLARE_LEGACY_DEVICE(VDT911, vdt911);
 
 #define MCFG_VDT911_VIDEO_ADD(_tag, _intf) \

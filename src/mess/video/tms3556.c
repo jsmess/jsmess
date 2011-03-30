@@ -239,7 +239,7 @@ static PALETTE_INIT( tms3556 )
 
     tms3556 core init (called at video init time)
 */
-void tms3556_init(running_machine *machine, int vram_size)
+void tms3556_init(running_machine &machine, int vram_size)
 {
 	memset(&vdp, 0, sizeof (vdp));
 
@@ -618,7 +618,7 @@ static void tms3556_interrupt_start_vblank(void)
 
     scanline handler
 */
-void tms3556_interrupt(running_machine *machine)
+void tms3556_interrupt(running_machine &machine)
 {
 	/* check for start of vblank */
 	if (vdp.scanline == 310)	/*no idea what the real value is*/
@@ -628,7 +628,7 @@ void tms3556_interrupt(running_machine *machine)
 	if ((vdp.scanline >= 0) && (vdp.scanline < TOTAL_HEIGHT))
 	{
 		//if (!video_skip_this_frame())
-			tms3556_draw_line(machine->generic.tmpbitmap, vdp.scanline);
+			tms3556_draw_line(machine.generic.tmpbitmap, vdp.scanline);
 	}
 
 	if (++vdp.scanline == 313)

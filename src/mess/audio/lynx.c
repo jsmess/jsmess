@@ -151,7 +151,7 @@ static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
     case 0: lynx_audio_count_down(device, 1); break;
     case 1: lynx_audio_count_down(device, 2); break;
     case 2: lynx_audio_count_down(device, 3); break;
-    case 3: lynx_timer_count_down(device->machine, 1); break;
+    case 3: lynx_timer_count_down(device->machine(), 1); break;
     }
 }
 
@@ -225,7 +225,7 @@ UINT8 lynx_audio_read(device_t *device, int offset)
 void lynx_audio_write(device_t *device, int offset, UINT8 data)
 {
 	lynx_sound_state *state = get_safe_token(device);
-//  logerror("%.6f audio write %.2x %.2x\n", machine->time(), offset, data);
+//  logerror("%.6f audio write %.2x %.2x\n", machine.time(), offset, data);
     LYNX_AUDIO *channel=state->audio+((offset>>3)&3);
     state->mixer_channel->update();
     switch (offset) {
@@ -328,10 +328,10 @@ static void lynx_audio_init(device_t *device)
 {
 	lynx_sound_state *state = get_safe_token(device);
 	int i;
-	state->shift_mask = auto_alloc_array(device->machine, int, 512);
+	state->shift_mask = auto_alloc_array(device->machine(), int, 512);
 	assert(state->shift_mask);
 
-	state->shift_xor = auto_alloc_array(device->machine, int, 4096);
+	state->shift_xor = auto_alloc_array(device->machine(), int, 4096);
 	assert(state->shift_xor);
 
 	for (i=0; i<512; i++)
@@ -378,9 +378,9 @@ static DEVICE_RESET( lynx_sound )
 static DEVICE_START(lynx_sound)
 {
 	lynx_sound_state *state = get_safe_token(device);
-	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, lynx_update);
+	state->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, lynx_update);
 
-	state->usec_per_sample = 1000000 / device->machine->sample_rate();
+	state->usec_per_sample = 1000000 / device->machine().sample_rate();
 
 	lynx_audio_init(device);
 }
@@ -389,9 +389,9 @@ static DEVICE_START(lynx_sound)
 static DEVICE_START(lynx2_sound)
 {
 	lynx_sound_state *state = get_safe_token(device);
-	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), 0, lynx2_update);
+	state->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), 0, lynx2_update);
 
-	state->usec_per_sample = 1000000 / device->machine->sample_rate();
+	state->usec_per_sample = 1000000 / device->machine().sample_rate();
 
 	lynx_audio_init(device);
 }

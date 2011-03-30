@@ -80,6 +80,6 @@ READ8_DEVICE_HANDLER(apple2_c800_slot_r);
 WRITE8_DEVICE_HANDLER(apple2_c800_slot_w);
 
 /* slot device lookup */
-device_t *apple2_slot(running_machine *machine, int slotnum);
+device_t *apple2_slot(running_machine &machine, int slotnum);
 
 #endif /* __AP2_SLOT__ */

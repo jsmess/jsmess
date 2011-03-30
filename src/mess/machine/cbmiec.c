@@ -368,10 +368,10 @@ static DEVICE_START( cbm_iec )
 	/* create a linked list of devices */
 	for ( ; daisy->tag != NULL; daisy++)
 	{
-		*tailptr = auto_alloc(device->machine, cbm_iec_daisy_state);
+		*tailptr = auto_alloc(device->machine(), cbm_iec_daisy_state);
 
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = device->machine->device(daisy->tag);
+		(*tailptr)->device = device->machine().device(daisy->tag);
 
 		if ((*tailptr)->device == NULL)
 		{

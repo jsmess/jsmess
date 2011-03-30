@@ -89,7 +89,7 @@ INPUT_PORTS_END
 
 QUICKLOAD_LOAD(altair)
 {
-	altair_state *state = image.device().machine->driver_data<altair_state>();
+	altair_state *state = image.device().machine().driver_data<altair_state>();
 	int quick_length;
 	int read_;
 	quick_length = image.length();
@@ -105,9 +105,9 @@ QUICKLOAD_LOAD(altair)
 
 static MACHINE_RESET(altair)
 {
-	altair_state *state = machine->driver_data<altair_state>();
+	altair_state *state = machine.driver_data<altair_state>();
 	// Set startup addess done by turn-key
-	cpu_set_reg(machine->device("maincpu"), I8085_PC, 0xFD00);
+	cpu_set_reg(machine.device("maincpu"), I8085_PC, 0xFD00);
 
 	state->term_data = 0;
 }

@@ -26,14 +26,14 @@ public:
 
 static WRITE8_HANDLER( mccpm_f0_w )
 {
-	device_t *terminal = space->machine->device(TERMINAL_TAG);
+	device_t *terminal = space->machine().device(TERMINAL_TAG);
 
 	terminal_write(terminal, 0, data);
 }
 
 static READ8_HANDLER( mccpm_f0_r )
 {
-	mccpm_state *state = space->machine->driver_data<mccpm_state>();
+	mccpm_state *state = space->machine().driver_data<mccpm_state>();
 	UINT8 ret = state->term_data;
 	state->term_data = 0;
 	return ret;
@@ -57,15 +57,15 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(mccpm)
 {
-	mccpm_state *state = machine->driver_data<mccpm_state>();
-	UINT8* bios = machine->region("maincpu")->base();
+	mccpm_state *state = machine.driver_data<mccpm_state>();
+	UINT8* bios = machine.region("maincpu")->base();
 
 	memcpy(state->ram,bios, 0x1000);
 }
 
 static WRITE8_DEVICE_HANDLER( mccpm_kbd_put )
 {
-	mccpm_state *state = device->machine->driver_data<mccpm_state>();
+	mccpm_state *state = device->machine().driver_data<mccpm_state>();
 	state->term_data = data;
 }
 

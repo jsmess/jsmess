@@ -62,12 +62,12 @@ const via6522_interface concept_via6522_intf =
 
 /* Expansion slots */
 
-static void concept_fdc_init(running_machine *machine, int slot);
-static void concept_hdc_init(running_machine *machine, int slot);
+static void concept_fdc_init(running_machine &machine, int slot);
+static void concept_hdc_init(running_machine &machine, int slot);
 
 MACHINE_START(concept)
 {
-	concept_state *state = machine->driver_data<concept_state>();
+	concept_state *state = machine.driver_data<concept_state>();
 	/* initialize int state */
 	state->pending_interrupts = 0;
 
@@ -85,11 +85,11 @@ MACHINE_START(concept)
 	concept_fdc_init(machine, 2);	/* Floppy Disk Controller in Slot 3 */
 }
 
-static void install_expansion_slot(running_machine *machine, int slot,
+static void install_expansion_slot(running_machine &machine, int slot,
 	read8_space_func reg_read, write8_space_func reg_write,
 	read8_space_func rom_read, write8_space_func rom_write)
 {
-	concept_state *state = machine->driver_data<concept_state>();
+	concept_state *state = machine.driver_data<concept_state>();
 	state->expansion_slots[slot].reg_read = reg_read;
 	state->expansion_slots[slot].reg_write = reg_write;
 	state->expansion_slots[slot].rom_read = rom_read;
@@ -103,7 +103,7 @@ VIDEO_START(concept)
 SCREEN_UPDATE(concept)
 {
 	/* resolution is 720*560 */
-	concept_state *state = screen->machine->driver_data<concept_state>();
+	concept_state *state = screen->machine().driver_data<concept_state>();
 	UINT16 *videoram = state->videoram;
 	int x, y;
 	UINT16 *line;
@@ -117,9 +117,9 @@ SCREEN_UPDATE(concept)
 	return 0;
 }
 
-static void concept_set_interrupt(running_machine *machine, int level, int state)
+static void concept_set_interrupt(running_machine &machine, int level, int state)
 {
-	concept_state *drvstate = machine->driver_data<concept_state>();
+	concept_state *drvstate = machine.driver_data<concept_state>();
 	int interrupt_mask;
 	int final_level;
 
@@ -145,9 +145,9 @@ INLINE void post_in_KeyQueue(concept_state *state, int keycode)
 	state->KeyQueueLen++;
 }
 
-static void poll_keyboard(running_machine *machine)
+static void poll_keyboard(running_machine &machine)
 {
-	concept_state *state = machine->driver_data<concept_state>();
+	concept_state *state = machine.driver_data<concept_state>();
 	UINT32 keystate;
 	UINT32 key_transitions;
 	int i, j;
@@ -186,7 +186,7 @@ static void poll_keyboard(running_machine *machine)
 
 INTERRUPT_GEN( concept_interrupt )
 {
-	poll_keyboard(device->machine);
+	poll_keyboard(device->machine());
 }
 
 /*
@@ -229,7 +229,7 @@ static READ8_DEVICE_HANDLER(via_in_b)
 {
 	UINT8 status;
 
-	status = ((input_port_read(device->machine, "DSW0") & 0x80) >> 1) | ((input_port_read(device->machine, "DSW0") & 0x40) << 1);
+	status = ((input_port_read(device->machine(), "DSW0") & 0x80) >> 1) | ((input_port_read(device->machine(), "DSW0") & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }
@@ -252,12 +252,12 @@ static WRITE8_DEVICE_HANDLER(via_out_cb2)
 */
 static void via_irq_func(device_t *device, int state)
 {
-	concept_set_interrupt(device->machine, TIMINT_level, state);
+	concept_set_interrupt(device->machine(), TIMINT_level, state);
 }
 
 READ16_HANDLER(concept_io_r)
 {
-	concept_state *state = space->machine->driver_data<concept_state>();
+	concept_state *state = space->machine().driver_data<concept_state>();
 	if (! ACCESSING_BITS_0_7)
 		return 0;
 
@@ -314,7 +314,7 @@ READ16_HANDLER(concept_io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!state->clock_enable)
-			return mm58274c_r(space->machine->device("mm58274c"), state->clock_address);
+			return mm58274c_r(space->machine().device("mm58274c"), state->clock_address);
 		break;
 
 	case 7:
@@ -339,7 +339,7 @@ READ16_HANDLER(concept_io_r)
 				}
 
 				if (!state->KeyQueueLen)
-					concept_set_interrupt(space->machine, KEYINT_level, 0);
+					concept_set_interrupt(space->machine(), KEYINT_level, 0);
 
 				return reply;
 
@@ -362,7 +362,7 @@ READ16_HANDLER(concept_io_r)
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
-				via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
+				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 				return via_0->read(*space, offset & 0xf);
 			}
 			break;
@@ -396,7 +396,7 @@ READ16_HANDLER(concept_io_r)
 
 WRITE16_HANDLER(concept_io_w)
 {
-	concept_state *state = space->machine->driver_data<concept_state>();
+	concept_state *state = space->machine().driver_data<concept_state>();
 	if (! ACCESSING_BITS_0_7)
 		return;
 
@@ -457,7 +457,7 @@ WRITE16_HANDLER(concept_io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!state->clock_enable)
-			mm58274c_w(space->machine->device("mm58274c"), state->clock_address, data & 0xf);
+			mm58274c_w(space->machine().device("mm58274c"), state->clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -476,7 +476,7 @@ WRITE16_HANDLER(concept_io_w)
 		case 3:
 			/* NVIA versatile system interface */
 			{
-				via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
+				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 				via_0->write(*space, offset & 0xf, data);
 			}
 			break;
@@ -555,9 +555,9 @@ static  READ8_HANDLER(concept_fdc_reg_r);
 static WRITE8_HANDLER(concept_fdc_reg_w);
 static  READ8_HANDLER(concept_fdc_rom_r);
 
-static void concept_fdc_init(running_machine *machine, int slot)
+static void concept_fdc_init(running_machine &machine, int slot)
 {
-	concept_state *state = machine->driver_data<concept_state>();
+	concept_state *state = machine.driver_data<concept_state>();
 	state->fdc_local_status = 0;
 	state->fdc_local_command = 0;
 
@@ -566,7 +566,7 @@ static void concept_fdc_init(running_machine *machine, int slot)
 
 static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
 {
-	concept_state *drvstate = device->machine->driver_data<concept_state>();
+	concept_state *drvstate = device->machine().driver_data<concept_state>();
 	if (state)
 		drvstate->fdc_local_status |= LS_INT_mask;
 	else
@@ -575,7 +575,7 @@ static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( concept_fdc_drq_w )
 {
-	concept_state *drvstate = device->machine->driver_data<concept_state>();
+	concept_state *drvstate = device->machine().driver_data<concept_state>();
 	if (state)
 		drvstate->fdc_local_status |= LS_DRQ_mask;
 	else
@@ -592,8 +592,8 @@ const wd17xx_interface concept_wd17xx_interface =
 
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
-	concept_state *state = space->machine->driver_data<concept_state>();
-	device_t *fdc = space->machine->device("wd179x");
+	concept_state *state = space->machine().driver_data<concept_state>();
+	device_t *fdc = space->machine().device("wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -622,9 +622,9 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 static WRITE8_HANDLER(concept_fdc_reg_w)
 {
-	concept_state *state = space->machine->driver_data<concept_state>();
+	concept_state *state = space->machine().driver_data<concept_state>();
 	int current_drive;
-	device_t *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine().device("wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -638,7 +638,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 		// floppy_drive_set_motor_state(floppy_get_device(machine,  current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 		/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
 		wd17xx_dden_w(fdc, BIT(data, 7));
-		floppy_drive_set_ready_state(floppy_get_device(space->machine, current_drive), 1, 0);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine(), current_drive), 1, 0);
 		break;
 
 	case 8:
@@ -681,7 +681,7 @@ static  READ8_HANDLER(concept_hdc_rom_r);
  *  Hook up the Register and ROM R/W routines into the Slot I/O Space
  */
 
-static void concept_hdc_init(running_machine *machine, int slot)
+static void concept_hdc_init(running_machine &machine, int slot)
 {
 	if(corvus_hdc_init(machine))
 		install_expansion_slot(machine, slot, concept_hdc_reg_r, concept_hdc_reg_w, concept_hdc_rom_r, NULL);

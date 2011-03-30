@@ -42,16 +42,16 @@ static MACHINE_RESET(mes)
 
 static VIDEO_START( mes )
 {
-	mes_state *state = machine->driver_data<mes_state>();
-	state->FNT = machine->region("chargen")->base();
-	state->videoram = machine->region("maincpu")->base()+0xf000;
+	mes_state *state = machine.driver_data<mes_state>();
+	state->FNT = machine.region("chargen")->base();
+	state->videoram = machine.region("maincpu")->base()+0xf000;
 }
 
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
 static SCREEN_UPDATE( mes )
 {
-	mes_state *state = screen->machine->driver_data<mes_state>();
+	mes_state *state = screen->machine().driver_data<mes_state>();
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;

@@ -15,7 +15,7 @@
 
 VIDEO_START( apple2gs )
 {
-	apple2gs_state *state = machine->driver_data<apple2gs_state>();
+	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	state->bordercolor = 0;
 	apple2_video_start(machine, state->slowmem, 0x20000, 0, 8);
 	state->legacy_gfx = auto_bitmap_alloc(machine, 560, 192, BITMAP_FORMAT_INDEXED16);
@@ -27,7 +27,7 @@ VIDEO_START( apple2gs )
 
 SCREEN_UPDATE( apple2gs )
 {
-	apple2gs_state *state = screen->machine->driver_data<apple2gs_state>();
+	apple2gs_state *state = screen->machine().driver_data<apple2gs_state>();
 	const UINT8 *vram;
 	UINT16 *scanline;
 	UINT8 scb, b;

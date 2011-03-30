@@ -78,13 +78,13 @@ public:
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
-	device_t *cpu = timer.machine->device( "maincpu" );
+	device_t *cpu = timer.machine().device( "maincpu" );
 	device_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 {
-	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(m_machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
@@ -92,7 +92,7 @@ READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 	UINT8 bit,data = 0xff;
 	for (bit = 0; bit < 8; bit++)
-		if (!BIT(m_kbd_row, bit)) data &= input_port_read(machine, keynames[bit]);
+		if (!BIT(m_kbd_row, bit)) data &= input_port_read(m_machine, keynames[bit]);
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
 	if (m_control_bits & 8) data<<=4;
@@ -308,8 +308,8 @@ static const cassette_config pegasus_cassette_config =
 
 static VIDEO_START( pegasus )
 {
-	pegasus_state *state = machine->driver_data<pegasus_state>();
-	state->FNT = machine->region("chargen")->base();
+	pegasus_state *state = machine.driver_data<pegasus_state>();
+	state->FNT = machine.region("chargen")->base();
 }
 
 static const UINT8 mcm6571a_shift[] =
@@ -327,7 +327,7 @@ static const UINT8 mcm6571a_shift[] =
 
 static SCREEN_UPDATE( pegasus )
 {
-	pegasus_state *state = screen->machine->driver_data<pegasus_state>();
+	pegasus_state *state = screen->machine().driver_data<pegasus_state>();
 	UINT8 y,ra,chr,gfx,inv;
 	UINT16 sy=0,ma=0,x;
 	UINT8 pcg_mode = state->m_control_bits & 2;
@@ -408,9 +408,9 @@ GFXDECODE_END
 
 /* An encrypted single rom starts with 02, decrypted with 20. Not sure what
     multipart roms will have. */
-static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
+static void pegasus_decrypt_rom( running_machine &machine, UINT16 addr )
 {
-	UINT8 b, *ROM = machine->region("maincpu")->base();
+	UINT8 b, *ROM = machine.region("maincpu")->base();
 	UINT16 i, j;
 	UINT8 buff[0x1000];
 	if (ROM[addr] == 0x02)
@@ -429,53 +429,53 @@ static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 {
-	image.fread(image.device().machine->region("maincpu")->base() + 0x0000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine, 0x0000 );
+	image.fread(image.device().machine().region("maincpu")->base() + 0x0000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine(), 0x0000 );
 
 	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 {
-	image.fread(image.device().machine->region("maincpu")->base() + 0x1000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine, 0x1000 );
+	image.fread(image.device().machine().region("maincpu")->base() + 0x1000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine(), 0x1000 );
 
 	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 {
-	image.fread(image.device().machine->region("maincpu")->base() + 0x2000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine, 0x2000 );
+	image.fread(image.device().machine().region("maincpu")->base() + 0x2000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine(), 0x2000 );
 
 	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 {
-	image.fread(image.device().machine->region("maincpu")->base() + 0xc000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine, 0xc000 );
+	image.fread(image.device().machine().region("maincpu")->base() + 0xc000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine(), 0xc000 );
 
 	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 {
-	image.fread( image.device().machine->region("maincpu")->base() + 0xd000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine, 0xd000 );
+	image.fread( image.device().machine().region("maincpu")->base() + 0xd000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine(), 0xd000 );
 
 	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_START( pegasus )
 {
-	pegasus_state *state = machine->driver_data<pegasus_state>();
-	state->m_pcgram = machine->region("pcg")->base();
+	pegasus_state *state = machine.driver_data<pegasus_state>();
+	state->m_pcgram = machine.region("pcg")->base();
 }
 
 static MACHINE_RESET( pegasus )
 {
-	pegasus_state *state = machine->driver_data<pegasus_state>();
+	pegasus_state *state = machine.driver_data<pegasus_state>();
 	state->m_kbd_row = 0;
 	state->m_kbd_irq = 1;
 	state->m_control_bits = 0;

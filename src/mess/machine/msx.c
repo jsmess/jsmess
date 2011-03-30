@@ -32,11 +32,11 @@
 
 #define VERBOSE 0
 
-static void msx_memory_map_all (running_machine *machine);
-static void msx_memory_map_page (running_machine *machine, int page);
-static void msx_memory_init (running_machine *machine);
-static void msx_memory_set_carts (running_machine *machine);
-static void msx_memory_reset (running_machine *machine);
+static void msx_memory_map_all (running_machine &machine);
+static void msx_memory_map_page (running_machine &machine, int page);
+static void msx_memory_init (running_machine &machine);
+static void msx_memory_set_carts (running_machine &machine);
+static void msx_memory_reset (running_machine &machine);
 
 
 
@@ -90,7 +90,7 @@ static int msx_probe_type (UINT8* pmem, int size)
 
 DEVICE_IMAGE_LOAD (msx_cart)
 {
-	msx_state *state = image.device().machine->driver_data<msx_state>();
+	msx_state *state = image.device().machine().driver_data<msx_state>();
 	int size;
 	int size_aligned;
 	UINT8 *mem;
@@ -274,22 +274,22 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		st->sramfile = sramfile;
 	}
 
-	if (msx_slot_list[type].init (image.device().machine, st, 0, mem, size_aligned)) {
+	if (msx_slot_list[type].init (image.device().machine(), st, 0, mem, size_aligned)) {
 		return IMAGE_INIT_FAIL;
 	}
 	if (msx_slot_list[type].loadsram) {
-		msx_slot_list[type].loadsram (image.device().machine, st);
+		msx_slot_list[type].loadsram (image.device().machine(), st);
 	}
 
 	state->cart_state[id] = st;
-	msx_memory_set_carts (image.device().machine);
+	msx_memory_set_carts (image.device().machine());
 
 	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD (msx_cart)
 {
-	msx_state *state = image.device().machine->driver_data<msx_state>();
+	msx_state *state = image.device().machine().driver_data<msx_state>();
 	int id = -1;
 
 	if (strcmp(image.device().tag(),"cart1")==0) {
@@ -306,16 +306,16 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 
 	if (msx_slot_list[state->cart_state[id]->type].savesram)
 	{
-		msx_slot_list[state->cart_state[id]->type].savesram (image.device().machine, state->cart_state[id]);
+		msx_slot_list[state->cart_state[id]->type].savesram (image.device().machine(), state->cart_state[id]);
 	}
 }
 
-void msx_vdp_interrupt(running_machine *machine, int i)
+void msx_vdp_interrupt(running_machine &machine, int i)
 {
 	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static void msx_ch_reset_core (running_machine *machine)
+static void msx_ch_reset_core (running_machine &machine)
 {
 	msx_memory_reset (machine);
 	msx_memory_map_all (machine);
@@ -337,7 +337,7 @@ MACHINE_START( msx )
 
 MACHINE_START( msx2 )
 {
-	msx_state *state = machine->driver_data<msx_state>();
+	msx_state *state = machine.driver_data<msx_state>();
 	state->port_c_old = 0xff;
 	state->dsk_stat = 0x7f;
 }
@@ -487,55 +487,55 @@ static const UINT8 cc_ex[0x100] = {
 
 DRIVER_INIT( msx )
 {
-	device_set_input_line_vector (machine->device("maincpu"), 0, 0xff);
+	device_set_input_line_vector (machine.device("maincpu"), 0, 0xff);
 
 	msx_memory_init (machine);
 
-	z80_set_cycle_tables( machine->device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	z80_set_cycle_tables( machine.device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
 INTERRUPT_GEN( msx2_interrupt )
 {
-	v9938_set_sprite_limit(0, input_port_read(device->machine, "DSW") & 0x20);
-	v9938_set_resolution(0, input_port_read(device->machine, "DSW") & 0x03);
-	v9938_interrupt(device->machine, 0);
+	v9938_set_sprite_limit(0, input_port_read(device->machine(), "DSW") & 0x20);
+	v9938_set_resolution(0, input_port_read(device->machine(), "DSW") & 0x03);
+	v9938_interrupt(device->machine(), 0);
 }
 
 INTERRUPT_GEN( msx_interrupt )
 {
-	msx_state *state = device->machine->driver_data<msx_state>();
+	msx_state *state = device->machine().driver_data<msx_state>();
 	int i;
 
 	for (i=0; i<2; i++)
 	{
-		state->mouse[i] = input_port_read(device->machine, i ? "MOUSE1" : "MOUSE0");
+		state->mouse[i] = input_port_read(device->machine(), i ? "MOUSE1" : "MOUSE0");
 		state->mouse_stat[i] = -1;
 	}
 
-	TMS9928A_set_spriteslimit (input_port_read(device->machine, "DSW") & 0x20);
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_set_spriteslimit (input_port_read(device->machine(), "DSW") & 0x20);
+	TMS9928A_interrupt(device->machine());
 }
 
 /*
 ** The I/O funtions
 */
 
-static device_t *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine->device("cassette");
+	return machine.device("cassette");
 }
 
 READ8_HANDLER ( msx_psg_port_a_r )
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	int data, inp;
 
-	data = (cassette_input(cassette_device_image(space->machine)) > 0.0038 ? 0x80 : 0);
+	data = (cassette_input(cassette_device_image(space->machine())) > 0.0038 ? 0x80 : 0);
 
-	if ( (state->psg_b ^ input_port_read(space->machine, "DSW") ) & 0x40)
+	if ( (state->psg_b ^ input_port_read(space->machine(), "DSW") ) & 0x40)
 		{
 		/* game port 2 */
-		inp = input_port_read(space->machine, "JOY1") & 0x7f;
+		inp = input_port_read(space->machine(), "JOY1") & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -560,7 +560,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 	else
 		{
 		/* game port 1 */
-		inp = input_port_read(space->machine, "JOY0") & 0x7f;
+		inp = input_port_read(space->machine(), "JOY0") & 0x7f;
 #if 0
 		if ( !(inp & 0x80) )
 			{
@@ -588,7 +588,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 
 READ8_HANDLER ( msx_psg_port_b_r )
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	return state->psg_b;
 }
 
@@ -598,10 +598,10 @@ WRITE8_HANDLER ( msx_psg_port_a_w )
 
 WRITE8_HANDLER ( msx_psg_port_b_w )
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	/* Arabic or kana mode led */
 	if ( (data ^ state->psg_b) & 0x80)
-		set_led_status (space->machine, 2, !(data & 0x80) );
+		set_led_status (space->machine(), 2, !(data & 0x80) );
 
 	if ( (state->psg_b ^ data) & 0x10)
 	{
@@ -622,10 +622,10 @@ WRITE8_DEVICE_HANDLER( msx_printer_strobe_w )
 
 WRITE8_DEVICE_HANDLER( msx_printer_data_w )
 {
-	if (input_port_read(device->machine, "DSW") & 0x80)
+	if (input_port_read(device->machine(), "DSW") & 0x80)
 	{
 		/* SIMPL emulation */
-		dac_signed_data_w(device->machine->device("dac"), data);
+		dac_signed_data_w(device->machine().device("dac"), data);
 	}
 	else
 	{
@@ -637,7 +637,7 @@ READ8_DEVICE_HANDLER( msx_printer_status_r )
 {
 	UINT8 result = 0xfd;
 
-	if (input_port_read(device->machine, "DSW") & 0x80)
+	if (input_port_read(device->machine(), "DSW") & 0x80)
 		return 0xff;
 
 	result |= centronics_busy_r(device) << 1;
@@ -647,10 +647,10 @@ READ8_DEVICE_HANDLER( msx_printer_status_r )
 
 WRITE8_HANDLER (msx_fmpac_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	if (state->opll_active)
 	{
-		device_t *ym = space->machine->device("ym2413");
+		device_t *ym = space->machine().device("ym2413");
 
 		if (offset == 1)
 			ym2413_w (ym, 1, data);
@@ -665,27 +665,27 @@ WRITE8_HANDLER (msx_fmpac_w)
 
 WRITE8_HANDLER (msx_rtc_latch_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	state->rtc_latch = data & 15;
 }
 
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
-	device_t *rtc = space->machine->device("rtc");
+	msx_state *state = space->machine().driver_data<msx_state>();
+	device_t *rtc = space->machine().device("rtc");
 	tc8521_w(rtc, state->rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
-	device_t *rtc = space->machine->device("rtc");
+	msx_state *state = space->machine().driver_data<msx_state>();
+	device_t *rtc = space->machine().device("rtc");
 	return tc8521_r(rtc, state->rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
 {
-	device_t *rtc = machine->device("rtc");
+	device_t *rtc = machine.device("rtc");
 	if (file)
 	{
 		if (read_or_write)
@@ -728,7 +728,7 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 static WRITE_LINE_DEVICE_HANDLER( msx_wd179x_intrq_w )
 {
-	msx_state *drvstate = device->machine->driver_data<msx_state>();
+	msx_state *drvstate = device->machine().driver_data<msx_state>();
 	if (state)
 		drvstate->dsk_stat &= ~0x40;
 	else
@@ -737,7 +737,7 @@ static WRITE_LINE_DEVICE_HANDLER( msx_wd179x_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( msx_wd179x_drq_w )
 {
-	msx_state *drvstate = device->machine->driver_data<msx_state>();
+	msx_state *drvstate = device->machine().driver_data<msx_state>();
 	if (state)
 		drvstate->dsk_stat &= ~0x80;
 	else
@@ -773,35 +773,35 @@ FLOPPY_OPTIONS_END
 
 static WRITE8_DEVICE_HANDLER ( msx_ppi_port_a_w )
 {
-	msx_state *state = device->machine->driver_data<msx_state>();
+	msx_state *state = device->machine().driver_data<msx_state>();
 	state->primary_slot = data;
 
 	if (VERBOSE)
 		logerror ("write to primary slot select: %02x\n", state->primary_slot);
-	msx_memory_map_all (device->machine);
+	msx_memory_map_all (device->machine());
 }
 
 static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 {
-	msx_state *state = device->machine->driver_data<msx_state>();
+	msx_state *state = device->machine().driver_data<msx_state>();
 	/* caps lock */
 	if ( (state->port_c_old ^ data) & 0x40)
-		set_led_status (device->machine,1, !(data & 0x40) );
+		set_led_status (device->machine(),1, !(data & 0x40) );
 
 	/* key click */
 	if ( (state->port_c_old ^ data) & 0x80)
-		dac_signed_data_w (device->machine->device("dac"), (data & 0x80 ? 0x7f : 0));
+		dac_signed_data_w (device->machine().device("dac"), (data & 0x80 ? 0x7f : 0));
 
 	/* cassette motor on/off */
 	if ( (state->port_c_old ^ data) & 0x10)
-		cassette_change_state(cassette_device_image(device->machine),
+		cassette_change_state(cassette_device_image(device->machine()),
 						(data & 0x10) ? CASSETTE_MOTOR_DISABLED :
 										CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
 
 	/* cassette signal write */
 	if ( (state->port_c_old ^ data) & 0x20)
-		cassette_output(cassette_device_image(device->machine), (data & 0x20) ? -1.0 : 1.0);
+		cassette_output(cassette_device_image(device->machine()), (data & 0x20) ? -1.0 : 1.0);
 
 	state->port_c_old = data;
 }
@@ -815,7 +815,7 @@ static READ8_DEVICE_HANDLER( msx_ppi_port_b_r )
 	row = i8255a_r(device, 2) & 0x0f;
 	if (row <= 10)
 	{
-		data = input_port_read(device->machine, keynames[row / 2]);
+		data = input_port_read(device->machine(), keynames[row / 2]);
 
 		if (row & 1)
 			data >>= 8;
@@ -830,9 +830,9 @@ static READ8_DEVICE_HANDLER( msx_ppi_port_b_r )
  *
  ***********************************************************************/
 
-static void msx_memory_init (running_machine *machine)
+static void msx_memory_init (running_machine &machine)
 {
-	msx_state *state = machine->driver_data<msx_state>();
+	msx_state *state = machine.driver_data<msx_state>();
 	int	prim, sec, page, extent, option;
 	int size = 0;
 	const msx_slot_layout *layout= (msx_slot_layout*)NULL;
@@ -853,7 +853,7 @@ static void msx_memory_init (running_machine *machine)
 	}
 
 	for (driver = msx_driver_list; driver->name[0]; driver++) {
-		if (!strcmp (driver->name, machine->system().name)) {
+		if (!strcmp (driver->name, machine.system().name)) {
 			layout = driver->layout;
 		}
 	}
@@ -908,8 +908,8 @@ static void msx_memory_init (running_machine *machine)
 					/* Check whether the optional FM-PAC rom is present */
 					option = 0x10000;
 					size = 0x10000;
-					mem = machine->region("maincpu")->base() + option;
-					if (machine->region("maincpu")->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
+					mem = machine.region("maincpu")->base() + option;
+					if (machine.region("maincpu")->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
 						slot = &msx_slot_list[SLOT_FMPAC];
 					}
 					else {
@@ -923,7 +923,7 @@ static void msx_memory_init (running_machine *machine)
 
 				case MSX_MEM_HANDLER:
 				case MSX_MEM_ROM:
-					mem = machine->region("maincpu")->base() + option;
+					mem = machine.region("maincpu")->base() + option;
 					break;
 				case MSX_MEM_RAM:
 					mem = NULL;
@@ -948,7 +948,7 @@ static void msx_memory_init (running_machine *machine)
 			}
 			break;
 		case MSX_LAYOUT_KANJI_ENTRY:
-			state->kanji_mem = machine->region("maincpu")->base() + layout->option;
+			state->kanji_mem = machine.region("maincpu")->base() + layout->option;
 			break;
 		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
 			state->ramio_set_bits = (UINT8)layout->option;
@@ -957,9 +957,9 @@ static void msx_memory_init (running_machine *machine)
 	}
 }
 
-static void msx_memory_reset (running_machine *machine)
+static void msx_memory_reset (running_machine &machine)
 {
-	msx_state *state = machine->driver_data<msx_state>();
+	msx_state *state = machine.driver_data<msx_state>();
 	slot_state *st, *last_st = (slot_state*)NULL;
 	int prim, sec, page;
 
@@ -979,9 +979,9 @@ static void msx_memory_reset (running_machine *machine)
 	}
 }
 
-static void msx_memory_set_carts (running_machine *machine)
+static void msx_memory_set_carts (running_machine &machine)
 {
-	msx_state *state = machine->driver_data<msx_state>();
+	msx_state *state = machine.driver_data<msx_state>();
 	const msx_slot_layout *layout;
 	int page;
 
@@ -1013,9 +1013,9 @@ static void msx_memory_set_carts (running_machine *machine)
 	}
 }
 
-static void msx_memory_map_page (running_machine *machine, int page)
+static void msx_memory_map_page (running_machine &machine, int page)
 {
-	msx_state *state = machine->driver_data<msx_state>();
+	msx_state *state = machine.driver_data<msx_state>();
 	int slot_primary;
 	int slot_secondary;
 	slot_state *st;
@@ -1037,7 +1037,7 @@ static void msx_memory_map_page (running_machine *machine, int page)
 	slot->map (machine, st, page);
 }
 
-static void msx_memory_map_all (running_machine *machine)
+static void msx_memory_map_all (running_machine &machine)
 {
 	int i;
 
@@ -1048,12 +1048,12 @@ static void msx_memory_map_all (running_machine *machine)
 
 WRITE8_HANDLER (msx_page0_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	if ( offset == 0 )
 	{
 		state->superloadrunner_bank = data;
 		if (state->slot[2]->slot_type == SLOT_SUPERLOADRUNNER) {
-			state->slot[2]->map (space->machine, state->state[2], 2);
+			state->slot[2]->map (space->machine(), state->state[2], 2);
 		}
 	}
 
@@ -1062,7 +1062,7 @@ WRITE8_HANDLER (msx_page0_w)
 		state->ram_pages[0][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		state->slot[0]->write (space->machine, state->state[0], offset, data);
+		state->slot[0]->write (space->machine(), state->state[0], offset, data);
 	}
 }
 
@@ -1073,13 +1073,13 @@ WRITE8_HANDLER (msx_page0_1_w)
 
 WRITE8_HANDLER (msx_page1_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	switch (state->slot[1]->mem_type) {
 	case MSX_MEM_RAM:
 		state->ram_pages[1][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		state->slot[1]->write (space->machine, state->state[1], 0x4000 + offset, data);
+		state->slot[1]->write (space->machine(), state->state[1], 0x4000 + offset, data);
 	}
 }
 
@@ -1095,13 +1095,13 @@ WRITE8_HANDLER (msx_page1_2_w)
 
 WRITE8_HANDLER (msx_page2_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	switch (state->slot[2]->mem_type) {
 	case MSX_MEM_RAM:
 		state->ram_pages[2][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		state->slot[2]->write (space->machine, state->state[2], 0x8000 + offset, data);
+		state->slot[2]->write (space->machine(), state->state[2], 0x8000 + offset, data);
 	}
 }
 
@@ -1122,13 +1122,13 @@ WRITE8_HANDLER (msx_page2_3_w)
 
 WRITE8_HANDLER (msx_page3_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	switch (state->slot[3]->mem_type) {
 	case MSX_MEM_RAM:
 		state->ram_pages[3][offset] = data;
 		break;
 	case MSX_MEM_HANDLER:
-		state->slot[3]->write (space->machine, state->state[3], 0xc000 + offset, data);
+		state->slot[3]->write (space->machine(), state->state[3], 0xc000 + offset, data);
 	}
 }
 
@@ -1139,7 +1139,7 @@ WRITE8_HANDLER (msx_page3_1_w)
 
 WRITE8_HANDLER (msx_sec_slot_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	int slot = state->primary_slot >> 6;
 	if (state->slot_expanded[slot])
 	{
@@ -1147,7 +1147,7 @@ WRITE8_HANDLER (msx_sec_slot_w)
 			logerror ("write to secondary slot %d select: %02x\n", slot, data);
 
 		state->secondary_slot[slot] = data;
-		msx_memory_map_all (space->machine);
+		msx_memory_map_all (space->machine());
 	}
 	else {
 		msx_page3_w(space, 0x3fff, data);
@@ -1156,7 +1156,7 @@ WRITE8_HANDLER (msx_sec_slot_w)
 
 READ8_HANDLER (msx_sec_slot_r)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	UINT8 result;
 	int slot = state->primary_slot >> 6;
 
@@ -1170,36 +1170,36 @@ READ8_HANDLER (msx_sec_slot_r)
 
 WRITE8_HANDLER (msx_ram_mapper_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	state->ram_mapper[offset] = data;
 	if (state->slot[offset]->slot_type == SLOT_RAM_MM) {
-		state->slot[offset]->map (space->machine, state->state[offset], offset);
+		state->slot[offset]->map (space->machine(), state->state[offset], offset);
 	}
 }
 
 READ8_HANDLER (msx_ram_mapper_r)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	return state->ram_mapper[offset] | state->ramio_set_bits;
 }
 
 WRITE8_HANDLER (msx_90in1_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	state->korean90in1_bank = data;
 	if (state->slot[1]->slot_type == SLOT_KOREAN_90IN1)
 	{
-		state->slot[1]->map (space->machine, state->state[1], 1);
+		state->slot[1]->map (space->machine(), state->state[1], 1);
 	}
 	if (state->slot[2]->slot_type == SLOT_KOREAN_90IN1)
 	{
-		state->slot[2]->map (space->machine, state->state[2], 2);
+		state->slot[2]->map (space->machine(), state->state[2], 2);
 	}
 }
 
 READ8_HANDLER (msx_kanji_r)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	UINT8 result = 0xff;
 
 	if (offset && state->kanji_mem)
@@ -1220,7 +1220,7 @@ READ8_HANDLER (msx_kanji_r)
 
 WRITE8_HANDLER (msx_kanji_w)
 {
-	msx_state *state = space->machine->driver_data<msx_state>();
+	msx_state *state = space->machine().driver_data<msx_state>();
 	if (offset)
 	{
 		state->kanji_latch =

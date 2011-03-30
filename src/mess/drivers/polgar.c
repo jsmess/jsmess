@@ -104,10 +104,10 @@ static int get_first_cleared_bit(UINT8 data)
 
 static WRITE8_HANDLER ( write_io )
 {
-	polgar_state *state = space->machine->driver_data<polgar_state>();
+	polgar_state *state = space->machine().driver_data<polgar_state>();
 	int i;
-	hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
-	device_t *speaker = space->machine->device("beep");
+	hd44780_device * hd44780 = space->machine().device<hd44780_device>("hd44780");
+	device_t *speaker = space->machine().device("beep");
 
 	if (BIT(data,1)) {
 		if (BIT(data,0)) {
@@ -129,7 +129,7 @@ static WRITE8_HANDLER ( write_io )
 		for (i=0;i<8;i++)
 		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
 	}
-	else if (!data && (!strcmp(space->machine->system().name,"milano")))
+	else if (!data && (!strcmp(space->machine().system().name,"milano")))
 		for (i=0;i<8;i++)
 		{
 			output_set_led_value(i,!BIT(state->latch_data,i));
@@ -144,7 +144,7 @@ static WRITE8_HANDLER ( write_io )
 
 static WRITE8_HANDLER ( write_lcd )
 {
-	polgar_state *state = space->machine->driver_data<polgar_state>();
+	polgar_state *state = space->machine().driver_data<polgar_state>();
 
 	state->lcd_char=data;
 
@@ -165,7 +165,7 @@ static WRITE8_HANDLER ( milano_write_led )
 
 static WRITE8_HANDLER ( write_led )
 {
-	polgar_state *state = space->machine->driver_data<polgar_state>();
+	polgar_state *state = space->machine().driver_data<polgar_state>();
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
@@ -178,7 +178,7 @@ static WRITE8_HANDLER ( write_led )
 #if 0
 static WRITE8_HANDLER ( write_led )
 {
-	polgar_state *state = space->machine->driver_data<polgar_state>();
+	polgar_state *state = space->machine().driver_data<polgar_state>();
 	UINT8 LED_offset=100;
 	if (data==0xff)
 		output_set_led_value(LED_offset+offset,1);
@@ -195,7 +195,7 @@ static WRITE8_HANDLER ( write_led )
 
 static WRITE8_HANDLER ( milano_write_board )
 {
-	polgar_state *state = space->machine->driver_data<polgar_state>();
+	polgar_state *state = space->machine().driver_data<polgar_state>();
 
 	state->latch_data=data;
 }
@@ -203,7 +203,7 @@ static WRITE8_HANDLER ( milano_write_board )
 static READ8_HANDLER(milano_read_board)
 {
 	int line;
-	polgar_state *state = space->machine->driver_data<polgar_state>();
+	polgar_state *state = space->machine().driver_data<polgar_state>();
 	static const char *const board_lines[8] =
 			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
@@ -213,7 +213,7 @@ static READ8_HANDLER(milano_read_board)
 	if (state->latch_data)
 	{
 		line=get_first_cleared_bit(state->latch_data);
-		tmp=input_port_read(space->machine,  board_lines[line]);
+		tmp=input_port_read(space->machine(),  board_lines[line]);
 		
 		if (tmp != 0xff)
 			data=convert_imputmask(tmp);
@@ -226,7 +226,7 @@ static READ8_HANDLER(milano_read_board)
 
 static READ8_HANDLER(read_keys)
 {
-	//polgar_state *state = space->machine->driver_data<polgar_state>();
+	//polgar_state *state = space->machine().driver_data<polgar_state>();
 	UINT8 data;
 	static const char *const keynames[2][8] =
 			{
@@ -237,11 +237,11 @@ static READ8_HANDLER(read_keys)
 	data = 0xff;
 #if 0
 	if (((state->led_status & 0x80) == 0x00))
-		data=input_port_read(space->machine, keynames[0][offset]);
+		data=input_port_read(space->machine(), keynames[0][offset]);
 	else
-		data=input_port_read(space->machine, keynames[1][offset]);
+		data=input_port_read(space->machine(), keynames[1][offset]);
 #endif
-	data=input_port_read(space->machine, keynames[0][offset]);
+	data=input_port_read(space->machine(), keynames[0][offset]);
 
 	// logerror("Keyboard Port = %s Data = %d\n  ", ((state->led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
@@ -256,7 +256,7 @@ static VIDEO_START( polgar )
 
 static SCREEN_UPDATE( polgar )
 {
-	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
+	hd44780_device * hd44780 = screen->machine().device<hd44780_device>("hd44780");
 	return hd44780->video_update( bitmap, cliprect );
 }
 
@@ -432,10 +432,10 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	//polgar_state *state = timer.machine->driver_data<polgar_state>();
-	// running_device *speaker = timer.machine->device("beep");
-	cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
-	// cputag_set_input_line(timer.machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	//polgar_state *state = timer.machine().driver_data<polgar_state>();
+	// running_device *speaker = timer.machine().device("beep");
+	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	// cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 	// dac_data_w(0,state->led_status&64?128:0);
 	// beep_set_state(speaker,state->led_status&64?1:0);
 }
@@ -521,7 +521,7 @@ ROM_END
 
 static DRIVER_INIT( polgar )
 {
-	polgar_state *state = machine->driver_data<polgar_state>();
+	polgar_state *state = machine.driver_data<polgar_state>();
 	state->led_status=0;
 }
 

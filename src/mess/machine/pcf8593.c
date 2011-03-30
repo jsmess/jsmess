@@ -90,7 +90,7 @@ static DEVICE_START( pcf8593 )
 
 	_logerror( 0, ("pcf8593_init\n"));
 	memset( rtc, 0, sizeof(*rtc));
-	rtc->timer = device->machine->scheduler().timer_alloc(FUNC(pcf8593_timer_callback), (void *) device);
+	rtc->timer = device->machine().scheduler().timer_alloc(FUNC(pcf8593_timer_callback), (void *) device);
 	rtc->timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 
@@ -403,7 +403,7 @@ void pcf8593_load(device_t *device, emu_file *file)
 
 	_logerror( 0, ("pcf8593_load (%p)\n", file));
 	file->read(rtc->data, sizeof(rtc->data));
-	device->machine->current_datetime(systime);
+	device->machine().current_datetime(systime);
 	pcf8593_set_date(device, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday);
 	pcf8593_set_time(device, systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
 }

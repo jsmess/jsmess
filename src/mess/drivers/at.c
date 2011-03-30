@@ -155,7 +155,7 @@ static READ8_HANDLER( at_keybc_r )
 {
 	switch (offset)
 	{
-	case 0: return downcast<at_keyboard_controller_device *>(space->machine->device("keybc"))->data_r(*space, 0);
+	case 0: return downcast<at_keyboard_controller_device *>(space->machine().device("keybc"))->data_r(*space, 0);
 	case 1: return at_portb_r(space, 0);
 	}
 
@@ -166,7 +166,7 @@ static WRITE8_HANDLER( at_keybc_w )
 {
 	switch (offset)
 	{
-	case 0: downcast<at_keyboard_controller_device *>(space->machine->device("keybc"))->data_w(*space, 0, data); break;
+	case 0: downcast<at_keyboard_controller_device *>(space->machine().device("keybc"))->data_w(*space, 0, data); break;
 	case 1: at_portb_w(space, 0, data); break;
 	}
 }
@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER( ct486_chipset_r )
 {
-	at_state *state = space->machine->driver_data<at_state>();
+	at_state *state = space->machine().driver_data<at_state>();
 
 	if (ACCESSING_BITS_0_7)
 		return pic8259_r(state->pic8259_master, 0);
@@ -233,14 +233,14 @@ static READ32_HANDLER( ct486_chipset_r )
 		return pic8259_r(state->pic8259_master, 1) << 8;
 
 	if (ACCESSING_BITS_24_31)
-		return downcast<cs4031_device *>(space->machine->device("cs4031"))->data_r(*space, 0, 0) << 24;
+		return downcast<cs4031_device *>(space->machine().device("cs4031"))->data_r(*space, 0, 0) << 24;
 
 	return 0xffffffff;
 }
 
 static WRITE32_HANDLER( ct486_chipset_w )
 {
-	at_state *state = space->machine->driver_data<at_state>();
+	at_state *state = space->machine().driver_data<at_state>();
 
 	if (ACCESSING_BITS_0_7)
 		pic8259_w(state->pic8259_master, 0, data);
@@ -249,10 +249,10 @@ static WRITE32_HANDLER( ct486_chipset_w )
 		pic8259_w(state->pic8259_master, 1, data >> 8);
 
 	if (ACCESSING_BITS_16_23)
-		downcast<cs4031_device *>(space->machine->device("cs4031"))->address_w(*space, 0, data >> 16, 0);
+		downcast<cs4031_device *>(space->machine().device("cs4031"))->address_w(*space, 0, data >> 16, 0);
 
 	if (ACCESSING_BITS_24_31)
-		downcast<cs4031_device *>(space->machine->device("cs4031"))->data_w(*space, 0, data >> 24, 0);
+		downcast<cs4031_device *>(space->machine().device("cs4031"))->data_w(*space, 0, data >> 24, 0);
 }
 
 static ADDRESS_MAP_START( ct486_io, AS_IO, 32 )

@@ -115,7 +115,7 @@ static const int offs_0[96] = {
 
 SCREEN_UPDATE( laser )
 {
-	vtech2_state *state = screen->machine->driver_data<vtech2_state>();
+	vtech2_state *state = screen->machine().driver_data<vtech2_state>();
 	UINT8 *videoram = state->videoram;
 	int offs, x, y;
 	int full_refresh = 1;
@@ -143,7 +143,7 @@ SCREEN_UPDATE( laser )
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[2],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[2],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -163,7 +163,7 @@ SCREEN_UPDATE( laser )
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[offs];
 					color = videoram[offs+1];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[3],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -182,7 +182,7 @@ SCREEN_UPDATE( laser )
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[5],code,0,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[5],code,0,0,0,sx,sy);
 				}
 			}
 			break;
@@ -202,7 +202,7 @@ SCREEN_UPDATE( laser )
 					sy = BORDER_V/2 + y * 2;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[6],code,0,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[6],code,0,0,0,sx,sy);
 				}
 			}
 			break;
@@ -221,7 +221,7 @@ SCREEN_UPDATE( laser )
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[3],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -241,7 +241,7 @@ SCREEN_UPDATE( laser )
 					sx = BORDER_H/2 + x * 32;
 					code = videoram[offs];
 					color = videoram[offs+1];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[4],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[4],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -262,7 +262,7 @@ SCREEN_UPDATE( laser )
 					sy = BORDER_V/2 + y * 8;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[0x3800+offs];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],code,color,0,0,sx,sy);
 				}
 			}
 		}
@@ -279,7 +279,7 @@ SCREEN_UPDATE( laser )
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[0x3800+offs];
 					color = videoram[0x3801+offs];
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[1],code,color,0,0,sx,sy);
 				}
 			}
 		}
@@ -294,7 +294,7 @@ SCREEN_UPDATE( laser )
 
 WRITE8_HANDLER( laser_bg_mode_w )
 {
-	vtech2_state *state = space->machine->driver_data<vtech2_state>();
+	vtech2_state *state = space->machine().driver_data<vtech2_state>();
     if (state->laser_bg_mode != data)
     {
         state->laser_bg_mode = data;
@@ -304,7 +304,7 @@ WRITE8_HANDLER( laser_bg_mode_w )
 
 WRITE8_HANDLER( laser_two_color_w )
 {
-	vtech2_state *state = space->machine->driver_data<vtech2_state>();
+	vtech2_state *state = space->machine().driver_data<vtech2_state>();
 	if (state->laser_two_color != data)
 	{
 		state->laser_two_color = data;

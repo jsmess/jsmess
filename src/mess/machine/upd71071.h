@@ -8,8 +8,8 @@ struct _upd71071_interface
 {
 	const char* cputag;
 	int clock;
-	UINT16 (*dma_read[4])(running_machine* machine);
-	void (*dma_write[4])(running_machine* machine, UINT16 data);
+	UINT16 (*dma_read[4])(running_machine &machine);
+	void (*dma_write[4])(running_machine &machine, UINT16 data);
 };
 
 int upd71071_dmarq(device_t* device,int state,int channel);

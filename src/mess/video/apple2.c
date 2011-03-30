@@ -89,10 +89,10 @@ static void adjust_begin_and_end_row(const rectangle *cliprect, int *beginrow, i
     textual character
 -------------------------------------------------*/
 
-INLINE void apple2_plot_text_character(running_machine *machine, bitmap_t *bitmap, int xpos, int ypos, int xscale, UINT32 code,
+INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t *bitmap, int xpos, int ypos, int xscale, UINT32 code,
 	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int x, y, i;
 	int fg = state->fgcolor;
 	int bg = state->bgcolor;
@@ -137,14 +137,14 @@ INLINE void apple2_plot_text_character(running_machine *machine, bitmap_t *bitma
     column or 80 column)
 -------------------------------------------------*/
 
-static void apple2_text_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_text_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int row, col;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
 	UINT32 address;
-	const UINT8 *textgfx_data = machine->region("gfx1")->base();
-	UINT32 textgfx_datalen = machine->region("gfx1")->bytes();
+	const UINT8 *textgfx_data = machine.region("gfx1")->base();
+	UINT32 textgfx_datalen = machine.region("gfx1")->bytes();
 	UINT32 my_a2 = effective_a2(state);
 
 	/* perform adjustments */
@@ -178,9 +178,9 @@ static void apple2_text_draw(running_machine *machine, bitmap_t *bitmap, const r
     apple2_lores_draw - renders lo-res text
 -------------------------------------------------*/
 
-static void apple2_lores_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_lores_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int row, col, y, x;
 	UINT8 code;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
@@ -219,9 +219,9 @@ static void apple2_lores_draw(running_machine *machine, bitmap_t *bitmap, const 
     HIGH RESOLUTION GRAPHICS
 ***************************************************************************/
 
-static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
+static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	const UINT8 *vram;
 	int row, col, b;
 	int offset;
@@ -311,9 +311,9 @@ static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const 
     VIDEO CORE
 ***************************************************************************/
 
-void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
+void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
+	apple2_state *state = machine.driver_data<apple2_state>();
 	int i, j;
 	UINT16 c;
 	UINT8 *apple2_font;
@@ -335,8 +335,8 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	state->fgcolor = 15;
 	state->bgcolor = 0;
 	state->flash = 0;
-	apple2_font = machine->region("gfx1")->base();
-	state->alt_charset_value = machine->region("gfx1")->bytes() / 16;
+	apple2_font = machine.region("gfx1")->base();
+	state->alt_charset_value = machine.region("gfx1")->bytes() / 16;
 	state->a2_videoram = vram;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
@@ -370,8 +370,8 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	}
 
 	/* Fix for Ivel Ultra */
-	if (!strcmp(machine->system().name, "ivelultr")) {
-		int len = machine->region("gfx1")->bytes();
+	if (!strcmp(machine.system().name, "ivelultr")) {
+		int len = machine.region("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
 			apple2_font[i] = BITSWAP8(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);
@@ -379,14 +379,14 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 	}
 
 	/* do we need to flip the gfx? */
-	if (!strcmp(machine->system().name, "apple2")
-		|| !strcmp(machine->system().name, "apple2p")
-		|| !strcmp(machine->system().name, "prav82")
-		|| !strcmp(machine->system().name, "prav8m")
-		|| !strcmp(machine->system().name, "ace100")
-		|| !strcmp(machine->system().name, "apple2jp"))
+	if (!strcmp(machine.system().name, "apple2")
+		|| !strcmp(machine.system().name, "apple2p")
+		|| !strcmp(machine.system().name, "prav82")
+		|| !strcmp(machine.system().name, "prav8m")
+		|| !strcmp(machine.system().name, "ace100")
+		|| !strcmp(machine.system().name, "apple2jp"))
 	{
-		int len = machine->region("gfx1")->bytes();
+		int len = machine.region("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
 			apple2_font[i] = BITSWAP8(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);
@@ -408,8 +408,8 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 
 VIDEO_START( apple2 )
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
-	apple2_video_start(machine, ram_get_ptr(machine->device(RAM_TAG)), ram_get_size(machine->device(RAM_TAG)), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
+	apple2_state *state = machine.driver_data<apple2_state>();
+	apple2_video_start(machine, ram_get_ptr(machine.device(RAM_TAG)), ram_get_size(machine.device(RAM_TAG)), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
 	state->fgcolor = 0;
@@ -419,8 +419,8 @@ VIDEO_START( apple2 )
 
 VIDEO_START( apple2p )
 {
-	apple2_state *state = machine->driver_data<apple2_state>();
-	apple2_video_start(machine, ram_get_ptr(machine->device(RAM_TAG)), ram_get_size(machine->device(RAM_TAG)), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
+	apple2_state *state = machine.driver_data<apple2_state>();
+	apple2_video_start(machine, ram_get_ptr(machine.device(RAM_TAG)), ram_get_size(machine.device(RAM_TAG)), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
 	state->fgcolor = 0;
@@ -430,19 +430,19 @@ VIDEO_START( apple2p )
 
 VIDEO_START( apple2e )
 {
-	apple2_video_start(machine, ram_get_ptr(machine->device(RAM_TAG)), ram_get_size(machine->device(RAM_TAG)), 0, 8);
+	apple2_video_start(machine, ram_get_ptr(machine.device(RAM_TAG)), ram_get_size(machine.device(RAM_TAG)), 0, 8);
 }
 
 
 SCREEN_UPDATE( apple2 )
 {
-	apple2_state *state = screen->machine->driver_data<apple2_state>();
+	apple2_state *state = screen->machine().driver_data<apple2_state>();
 	int page;
 	UINT32 new_a2;
-	running_machine *machine = screen->machine;
+	running_machine &machine = screen->machine();
 
 	/* calculate the state->flash value */
-	state->flash = ((screen->machine->time() * 4).seconds & 1) ? 1 : 0;
+	state->flash = ((screen->machine().time() * 4).seconds & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2(state);

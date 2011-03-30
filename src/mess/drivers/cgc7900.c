@@ -163,7 +163,7 @@ static WRITE16_HANDLER( interrupt_mask_w )
 
     */
 
-	cgc7900_state *state = space->machine->driver_data<cgc7900_state>();
+	cgc7900_state *state = space->machine().driver_data<cgc7900_state>();
 
 	state->int_mask = data;
 }
@@ -405,7 +405,7 @@ static const ay8910_interface ay8910_intf =
 
 static MACHINE_START( cgc7900 )
 {
-	cgc7900_state *state = machine->driver_data<cgc7900_state>();
+	cgc7900_state *state = machine.driver_data<cgc7900_state>();
 
 	/* register for state saving */
 	state->save_pointer(NAME(state->overlay_ram), 0x4000);
@@ -417,12 +417,12 @@ static MACHINE_START( cgc7900 )
 
 static MACHINE_RESET(cgc7900)
 {
-	cgc7900_state *state = machine->driver_data<cgc7900_state>();
-	UINT8* user1 = machine->region(M68000_TAG)->base();
+	cgc7900_state *state = machine.driver_data<cgc7900_state>();
+	UINT8* user1 = machine.region(M68000_TAG)->base();
 
 	memcpy((UINT8*)state->chrom_ram,user1,8);
 
-	machine->device(M68000_TAG)->reset();
+	machine.device(M68000_TAG)->reset();
 
 	memset((UINT8*)state->chrom_ram,0,8);
 }

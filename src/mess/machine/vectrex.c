@@ -67,8 +67,8 @@ static int vectrex_verify_cart(char *data)
 
 DEVICE_IMAGE_LOAD(vectrex_cart)
 {
-	vectrex_state *state = image.device().machine->driver_data<vectrex_state>();
-	UINT8 *mem = image.device().machine->region("maincpu")->base();
+	vectrex_state *state = image.device().machine().driver_data<vectrex_state>();
+	UINT8 *mem = image.device().machine().region("maincpu")->base();
 	if (image.software_entry() == NULL)
 	{
 		image.fread( mem, 0x8000);
@@ -123,9 +123,9 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 
 *********************************************************************/
 
-void vectrex_configuration(running_machine *machine)
+void vectrex_configuration(running_machine &machine)
 {
-	vectrex_state *state = machine->driver_data<vectrex_state>();
+	vectrex_state *state = machine.driver_data<vectrex_state>();
 	unsigned char cport = input_port_read(machine, "3DCONF");
 
 	/* Vectrex 'dipswitch' configuration */
@@ -215,17 +215,17 @@ void vectrex_configuration(running_machine *machine)
 
 void vectrex_via_irq(device_t *device, int level)
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, level);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, level);
 }
 
 
 READ8_DEVICE_HANDLER(vectrex_via_pb_r)
 {
-	vectrex_state *state = device->machine->driver_data<vectrex_state>();
+	vectrex_state *state = device->machine().driver_data<vectrex_state>();
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = input_port_read(device->machine, ctrlnames[(state->via_out[PORTB] & 0x6) >> 1]) - 0x80;
+	pot = input_port_read(device->machine(), ctrlnames[(state->via_out[PORTB] & 0x6) >> 1]) - 0x80;
 
 	if (pot > (signed char)state->via_out[PORTA])
 		state->via_out[PORTB] |= 0x20;
@@ -238,11 +238,11 @@ READ8_DEVICE_HANDLER(vectrex_via_pb_r)
 
 READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 {
-	vectrex_state *state = device->machine->driver_data<vectrex_state>();
+	vectrex_state *state = device->machine().driver_data<vectrex_state>();
 	if ((!(state->via_out[PORTB] & 0x10)) && (state->via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		device_t *ay = device->machine->device("ay8912");
+		device_t *ay = device->machine().device("ay8912");
 
 		state->via_out[PORTA] = ay8910_r(ay, 0)
 			& ~(state->imager_pinlevel & 0x80);
@@ -253,8 +253,8 @@ READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 
 READ8_DEVICE_HANDLER(vectrex_s1_via_pb_r)
 {
-	vectrex_state *state = device->machine->driver_data<vectrex_state>();
-	return (state->via_out[PORTB] & ~0x40) | (input_port_read(device->machine, "COIN") & 0x40);
+	vectrex_state *state = device->machine().driver_data<vectrex_state>();
+	return (state->via_out[PORTB] & ~0x40) | (input_port_read(device->machine(), "COIN") & 0x40);
 }
 
 
@@ -266,7 +266,7 @@ READ8_DEVICE_HANDLER(vectrex_s1_via_pb_r)
 
 static TIMER_CALLBACK(vectrex_imager_change_color)
 {
-	vectrex_state *state = machine->driver_data<vectrex_state>();
+	vectrex_state *state = machine.driver_data<vectrex_state>();
 	state->beam_color = param;
 }
 
@@ -280,8 +280,8 @@ static TIMER_CALLBACK(update_level)
 
 TIMER_CALLBACK(vectrex_imager_eye)
 {
-	vectrex_state *state = machine->driver_data<vectrex_state>();
-	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
+	vectrex_state *state = machine.driver_data<vectrex_state>();
+	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
 	int coffset;
 	double rtime = (1.0 / state->imager_freq);
 
@@ -289,19 +289,19 @@ TIMER_CALLBACK(vectrex_imager_eye)
 	{
 		state->imager_status = param;
 		coffset = param > 1? 3: 0;
-		machine->scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[0]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset+2]);
-		machine->scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[1]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset+1]);
-		machine->scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[2]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset]);
+		machine.scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[0]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset+2]);
+		machine.scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[1]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset+1]);
+		machine.scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[2]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset]);
 
 		if (param == 2)
 		{
-			machine->scheduler().timer_set (attotime::from_double(rtime * 0.50), FUNC(vectrex_imager_eye), 1);
+			machine.scheduler().timer_set (attotime::from_double(rtime * 0.50), FUNC(vectrex_imager_eye), 1);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_0->write_ca1(1);
 			via_0->write_ca1(0);
 			state->imager_pinlevel |= 0x80;
-			machine->scheduler().timer_set (attotime::from_double(rtime / 360.0), FUNC(update_level), 0, &state->imager_pinlevel);
+			machine.scheduler().timer_set (attotime::from_double(rtime / 360.0), FUNC(update_level), 0, &state->imager_pinlevel);
 		}
 	}
 }
@@ -309,7 +309,7 @@ TIMER_CALLBACK(vectrex_imager_eye)
 
 WRITE8_HANDLER(vectrex_psg_port_w)
 {
-	vectrex_state *state = space->machine->driver_data<vectrex_state>();
+	vectrex_state *state = space->machine().driver_data<vectrex_state>();
 	double wavel, ang_acc, tmp;
 	int mcontrol;
 
@@ -318,7 +318,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (!mcontrol && mcontrol ^ state->old_mcontrol)
 	{
 		state->old_mcontrol = mcontrol;
-		tmp = space->machine->time().as_double();
+		tmp = space->machine().time().as_double();
 		wavel = tmp - state->sl;
 		state->sl = tmp;
 
@@ -345,13 +345,13 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (mcontrol && mcontrol ^ state->old_mcontrol)
 	{
 		state->old_mcontrol = mcontrol;
-		state->pwl = space->machine->time().as_double() - state->sl;
+		state->pwl = space->machine().time().as_double() - state->sl;
 	}
 }
 
 DRIVER_INIT(vectrex)
 {
-	vectrex_state *state = machine->driver_data<vectrex_state>();
+	vectrex_state *state = machine.driver_data<vectrex_state>();
 	int i;
 
 	state->imager_angles = unknown_game_angles;

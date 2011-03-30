@@ -580,7 +580,7 @@ static DEVICE_RESET( hsgpl )
 	hsgpl_state *card = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH))
+	if (input_port_read(device->machine(), "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH))
 	{
 		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &hsgpl_card, get_pebcard_config(device)->slot);
@@ -607,7 +607,7 @@ static DEVICE_RESET( hsgpl )
 		card->mbx_enabled = FALSE;
 		card->ram_enabled = FALSE;
 
-		card->flash_mode = (input_port_read(device->machine, "EXTCARD") & EXT_HSGPL_FLASH);
+		card->flash_mode = (input_port_read(device->machine(), "EXTCARD") & EXT_HSGPL_FLASH);
 		if (card->flash_mode) logerror("hsgpl: flash mode\n");
 		else logerror("hsgpl: full mode\n");
 
@@ -623,14 +623,14 @@ static DEVICE_NVRAM( hsgpl )
 {
 	// Called between START and RESET
 	hsgpl_state *card = get_safe_token(device);
-	astring *hsname = astring_assemble_3(astring_alloc(), device->machine->system().name, PATH_SEPARATOR, "hsgpl.nv");
+	astring *hsname = astring_assemble_3(astring_alloc(), device->machine().system().name, PATH_SEPARATOR, "hsgpl.nv");
 	file_error filerr;
 
 	if (read_or_write==0)
 	{
 		logerror("hsgpl: device nvram load %s\n", astring_c(hsname));
 
-		emu_file nvfile(device->machine->options().nvram_directory(), OPEN_FLAG_READ);
+		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
 		filerr = nvfile.open(astring_c(hsname));
 		if (filerr != FILERR_NONE)
 		{
@@ -661,7 +661,7 @@ static DEVICE_NVRAM( hsgpl )
 		{
 			card->flashrom[0] = NVVERSION;
 			
-			emu_file nvfile(device->machine->options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			filerr = nvfile.open(astring_c(hsname));
 			if (filerr != FILERR_NONE)
 			{

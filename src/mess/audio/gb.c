@@ -358,7 +358,7 @@ static void gb_sound_w_internal(device_t *device, int offset, UINT8 data )
 			gb->snd_4.count = 0;
 			gb->snd_4.env_value = gb->snd_regs[NR42] >> 4;
 			gb->snd_4.env_count = 0;
-			gb->snd_4.signal = device->machine->rand();
+			gb->snd_4.signal = device->machine().rand();
 			gb->snd_4.ply_value = 0x7fff;
 			gb->snd_regs[NR52] |= 0x8;
 		}
@@ -698,8 +698,8 @@ static DEVICE_START( gameboy_sound )
 	memset(&gb->snd_3, 0, sizeof(gb->snd_3));
 	memset(&gb->snd_4, 0, sizeof(gb->snd_4));
 
-	gb->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate(), 0, gameboy_update);
-	gb->rate = device->machine->sample_rate();
+	gb->channel = device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), 0, gameboy_update);
+	gb->rate = device->machine().sample_rate();
 
 	/* Calculate the envelope and sweep tables */
 	for( I = 0; I < 8; I++ )

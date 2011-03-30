@@ -71,7 +71,7 @@ typedef struct
 
 static _dmac_data dmac_data;
 
-static void check_interrupts( running_machine *machine )
+static void check_interrupts( running_machine &machine )
 {
 	/* if interrupts are disabled, bail */
 	if ( (dmac_data.cntr & CNTR_INTEN) == 0 )
@@ -82,12 +82,12 @@ static void check_interrupts( running_machine *machine )
 		return;
 
 	/* otherwise, generate the IRQ */
-	amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 }
 
 static TIMER_CALLBACK(dmac_dma_proc)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	while( dmac_data.wtc > 0 )
 	{
 		UINT16	dat16;
@@ -131,7 +131,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x20:
 		{
 			UINT8	v = dmac_data.istr;
-			LOG(( "DMAC: PC=%08x - ISTR Read(%04x)\n", cpu_get_pc(space->cpu), dmac_data.istr ));
+			LOG(( "DMAC: PC=%08x - ISTR Read(%04x)\n", cpu_get_pc(&space->device()), dmac_data.istr ));
 
 			dmac_data.istr &= ~0x0f;
 			return v;
@@ -140,35 +140,35 @@ static READ16_HANDLER( amiga_dmac_r )
 
 		case 0x21:
 		{
-			LOG(( "DMAC: PC=%08x - CNTR Read(%04x)\n", cpu_get_pc(space->cpu), dmac_data.cntr ));
+			LOG(( "DMAC: PC=%08x - CNTR Read(%04x)\n", cpu_get_pc(&space->device()), dmac_data.cntr ));
 			return dmac_data.cntr;
 		}
 		break;
 
 		case 0x40:	/* wtc hi */
 		{
-			LOG(( "DMAC: PC=%08x - WTC HI Read\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - WTC HI Read\n", cpu_get_pc(&space->device()) ));
 			return (dmac_data.wtc >> 16);
 		}
 		break;
 
 		case 0x41:	/* wtc lo */
 		{
-			LOG(( "DMAC: PC=%08x - WTC LO Read\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - WTC LO Read\n", cpu_get_pc(&space->device()) ));
 			return dmac_data.wtc;
 		}
 		break;
 
 		case 0x42:	/* acr hi */
 		{
-			LOG(( "DMAC: PC=%08x - ACR HI Read\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - ACR HI Read\n", cpu_get_pc(&space->device()) ));
 			return (dmac_data.acr >> 16);
 		}
 		break;
 
 		case 0x43:	/* acr lo */
 		{
-			LOG(( "DMAC: PC=%08x - ACR LO Read\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - ACR LO Read\n", cpu_get_pc(&space->device()) ));
 			return dmac_data.acr;
 		}
 		break;
@@ -176,15 +176,15 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x48:	/* wd33c93 SCSI expansion */
 		case 0x49:
 		{
-			LOG(( "DMAC: PC=%08x - WD33C93 Read(%d)\n", cpu_get_pc(space->cpu), offset & 1 ));
+			LOG(( "DMAC: PC=%08x - WD33C93 Read(%d)\n", cpu_get_pc(&space->device()), offset & 1 ));
 			return 0x00;	/* Not available without SCSI expansion */
 		}
 		break;
 
 		case 0x50:
 		{
-			LOG(( "DMAC: PC=%08x - CDROM RESP Read\n", cpu_get_pc(space->cpu) ));
-			return matsucd_response_r(space->machine);
+			LOG(( "DMAC: PC=%08x - CDROM RESP Read\n", cpu_get_pc(&space->device()) ));
+			return matsucd_response_r(space->machine());
 		}
 		break;
 
@@ -192,7 +192,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x52:
 		case 0x53:
 		{
-			LOG(( "DMAC: PC=%08x - XT IO Read(%d)\n", cpu_get_pc(space->cpu), (offset & 3)-1 ));
+			LOG(( "DMAC: PC=%08x - XT IO Read(%d)\n", cpu_get_pc(&space->device()), (offset & 3)-1 ));
 			return 0xff;
 		}
 		break;
@@ -214,42 +214,42 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x66:
 		case 0x67:
 		{
-			device_t *tpi = space->machine->device("tpi6525");
-			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", cpu_get_pc(space->cpu), (offset - 0x58) ));
+			device_t *tpi = space->machine().device("tpi6525");
+			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", cpu_get_pc(&space->device()), (offset - 0x58) ));
 			return tpi6525_r(tpi, offset - 0x58);
 		}
 		break;
 
 		case 0x70:	/* DMA start strobe */
 		{
-			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.dma_timer->adjust(attotime::from_msec( CD_SECTOR_TIME ));
 		}
 		break;
 
 		case 0x71:	/* DMA stop strobe */
 		{
-			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.dma_timer->reset(  );
 		}
 		break;
 
 		case 0x72:	/* Clear IRQ strobe */
 		{
-			LOG(( "DMAC: PC=%08x - IRQ Clear Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - IRQ Clear Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.istr &= ~ISTR_INT_P;
 		}
 		break;
 
 		case 0x74:	/* Flush strobe */
 		{
-			LOG(( "DMAC: PC=%08x - Flush Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - Flush Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.istr |= ISTR_FE_FLG;
 		}
 		break;
 
 		default:
-			logerror( "DMAC-READ: PC=%08x, offset = %02x\n", cpu_get_pc(space->cpu), offset );
+			logerror( "DMAC-READ: PC=%08x, offset = %02x\n", cpu_get_pc(&space->device()), offset );
 		break;
 	}
 
@@ -264,15 +264,15 @@ static WRITE16_HANDLER( amiga_dmac_w )
 	{
 		case 0x21:	/* control write */
 		{
-			LOG(( "DMAC: PC=%08x - CNTR Write(%04x)\n", cpu_get_pc(space->cpu), data ));
+			LOG(( "DMAC: PC=%08x - CNTR Write(%04x)\n", cpu_get_pc(&space->device()), data ));
 			dmac_data.cntr = data;
-			check_interrupts( space->machine );
+			check_interrupts(space->machine());
 		}
 		break;
 
 		case 0x40:	/* wtc hi */
 		{
-			LOG(( "DMAC: PC=%08x - WTC HI Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
+			LOG(( "DMAC: PC=%08x - WTC HI Write - data = %04x\n", cpu_get_pc(&space->device()), data ));
 			dmac_data.wtc &= 0x0000ffff;
 			dmac_data.wtc |= ((UINT32)data) << 16;
 		}
@@ -280,7 +280,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x41:	/* wtc lo */
 		{
-			LOG(( "DMAC: PC=%08x - WTC LO Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
+			LOG(( "DMAC: PC=%08x - WTC LO Write - data = %04x\n", cpu_get_pc(&space->device()), data ));
 			dmac_data.wtc &= 0xffff0000;
 			dmac_data.wtc |= data;
 		}
@@ -288,7 +288,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x42:	/* acr hi */
 		{
-			LOG(( "DMAC: PC=%08x - ACR HI Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
+			LOG(( "DMAC: PC=%08x - ACR HI Write - data = %04x\n", cpu_get_pc(&space->device()), data ));
 			dmac_data.acr &= 0x0000ffff;
 			dmac_data.acr |= ((UINT32)data) << 16;
 		}
@@ -296,7 +296,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x43:	/* acr lo */
 		{
-			LOG(( "DMAC: PC=%08x - ACR LO Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
+			LOG(( "DMAC: PC=%08x - ACR LO Write - data = %04x\n", cpu_get_pc(&space->device()), data ));
 			dmac_data.acr &= 0xffff0000;
 			dmac_data.acr |= data;
 		}
@@ -304,7 +304,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 		case 0x47:	/* dawr */
 		{
-			LOG(( "DMAC: PC=%08x - DAWR Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
+			LOG(( "DMAC: PC=%08x - DAWR Write - data = %04x\n", cpu_get_pc(&space->device()), data ));
 			dmac_data.dawr = data;
 		}
 		break;
@@ -312,15 +312,15 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x48:	/* wd33c93 SCSI expansion */
 		case 0x49:
 		{
-			LOG(( "DMAC: PC=%08x - WD33C93 Write(%d) - data = %04x\n", cpu_get_pc(space->cpu), offset & 1, data ));
+			LOG(( "DMAC: PC=%08x - WD33C93 Write(%d) - data = %04x\n", cpu_get_pc(&space->device()), offset & 1, data ));
 			/* Not available without SCSI expansion */
 		}
 		break;
 
 		case 0x50:
 		{
-			LOG(( "DMAC: PC=%08x - CDROM CMD Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
-			matsucd_command_w( space->machine, data );
+			LOG(( "DMAC: PC=%08x - CDROM CMD Write - data = %04x\n", cpu_get_pc(&space->device()), data ));
+			matsucd_command_w(space->machine(), data );
 		}
 		break;
 
@@ -341,42 +341,42 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x66:
 		case 0x67:
 		{
-			device_t *tpi = space->machine->device("tpi6525");
-			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", cpu_get_pc(space->cpu), (offset - 0x58), data ));
+			device_t *tpi = space->machine().device("tpi6525");
+			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", cpu_get_pc(&space->device()), (offset - 0x58), data ));
 			tpi6525_w(tpi, offset - 0x58, data);
 		}
 		break;
 
 		case 0x70:	/* DMA start strobe */
 		{
-			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.dma_timer->adjust(attotime::from_msec( CD_SECTOR_TIME ));
 		}
 		break;
 
 		case 0x71:	/* DMA stop strobe */
 		{
-			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.dma_timer->reset(  );
 		}
 		break;
 
 		case 0x72:	/* Clear IRQ strobe */
 		{
-			LOG(( "DMAC: PC=%08x - IRQ Clear Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - IRQ Clear Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.istr &= ~ISTR_INT_P;
 		}
 		break;
 
 		case 0x74:	/* Flush Strobe */
 		{
-			LOG(( "DMAC: PC=%08x - Flush Strobe\n", cpu_get_pc(space->cpu) ));
+			LOG(( "DMAC: PC=%08x - Flush Strobe\n", cpu_get_pc(&space->device()) ));
 			dmac_data.istr |= ISTR_FE_FLG;
 		}
 		break;
 
 		default:
-			logerror( "DMAC-WRITE: PC=%08x, offset = %02x, data = %04x\n", cpu_get_pc(space->cpu), offset, data );
+			logerror( "DMAC-WRITE: PC=%08x, offset = %02x, data = %04x\n", cpu_get_pc(&space->device()), offset, data );
 		break;
 	}
 }
@@ -387,16 +387,16 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 ***************************************************************************/
 
-static void	dmac_install(running_machine *machine, offs_t base)
+static void	dmac_install(running_machine &machine, offs_t base)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_legacy_read_handler(base, base + 0xFFFF, FUNC(amiga_dmac_r));
 	space->install_legacy_write_handler(base, base + 0xFFFF, FUNC(amiga_dmac_w));
 }
 
-static void	dmac_uninstall(running_machine *machine, offs_t base)
+static void	dmac_uninstall(running_machine &machine, offs_t base)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->unmap_readwrite(base, base + 0xFFFF);
 }
 
@@ -452,12 +452,12 @@ static emu_timer *tp6525_delayed_timer;
 
 static TIMER_CALLBACK(tp6525_delayed_irq)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	(void)param;
 
 	if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 	{
-		amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 	else
 	{
@@ -467,14 +467,14 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 
 void amigacd_tpi6525_irq(device_t *device, int level)
 {
-	amiga_state *state = device->machine->driver_data<amiga_state>();
+	amiga_state *state = device->machine().driver_data<amiga_state>();
 	LOG(( "TPI6525 Interrupt: level = %d\n", level ));
 
 	if ( level )
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 		{
-			amiga_custom_w(device->machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+			amiga_custom_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 		}
 		else
 		{
@@ -484,17 +484,17 @@ void amigacd_tpi6525_irq(device_t *device, int level)
 	}
 }
 
-static void cdrom_status_enabled( running_machine *machine, int level )
+static void cdrom_status_enabled( running_machine &machine, int level )
 {
-	device_t *tpi = machine->device("tpi6525");
+	device_t *tpi = machine.device("tpi6525");
 
 	/* PC3 on the 6525 */
 	tpi6525_irq3_level(tpi, level);
 }
 
-static void cdrom_status_change( running_machine *machine, int level )
+static void cdrom_status_change( running_machine &machine, int level )
 {
-	device_t *tpi = machine->device("tpi6525");
+	device_t *tpi = machine.device("tpi6525");
 
 	/* invert */
 	level = level ? 0 : 1;
@@ -503,9 +503,9 @@ static void cdrom_status_change( running_machine *machine, int level )
 	tpi6525_irq2_level(tpi, level);
 }
 
-static void cdrom_subcode_ready( running_machine *machine, int level )
+static void cdrom_subcode_ready( running_machine &machine, int level )
 {
-	device_t *tpi = machine->device("tpi6525");
+	device_t *tpi = machine.device("tpi6525");
 
 	/* PC1 on the 6525 */
 	tpi6525_irq1_level(tpi, level);
@@ -516,13 +516,13 @@ MACHINE_START( amigacd )
 	/* initialize the dmac */
 	memset( &dmac_data, 0, sizeof( dmac_data ) );
 
-	dmac_data.dma_timer = machine->scheduler().timer_alloc(FUNC(dmac_dma_proc));
-	tp6525_delayed_timer = machine->scheduler().timer_alloc(FUNC(tp6525_delayed_irq));
+	dmac_data.dma_timer = machine.scheduler().timer_alloc(FUNC(dmac_dma_proc));
+	tp6525_delayed_timer = machine.scheduler().timer_alloc(FUNC(tp6525_delayed_irq));
 
 	/* set up DMAC with autoconfig */
 	amiga_add_autoconfig( machine, &dmac_device );
 
-	matsucd_init( machine->device("cdrom"), "cdda" );
+	matsucd_init( machine.device("cdrom"), "cdda" );
 }
 
 MACHINE_RESET( amigacd )

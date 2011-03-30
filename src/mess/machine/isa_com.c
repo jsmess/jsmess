@@ -27,7 +27,7 @@ are connected */
 static void pc_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	//if (input_port_read(device->machine, "DSW2") & (0x80>>n))
+	//if (input_port_read(device->machine(), "DSW2") & (0x80>>n))
 		//pc_mouse_handshake_in(device,data);
 }
 
@@ -111,7 +111,7 @@ device_config *isa8_com_device_config::static_alloc_device_config(const machine_
  
 device_t *isa8_com_device_config::alloc_device(running_machine &machine) const
 {
-        return auto_alloc(&machine, isa8_com_device(machine, *this));
+        return auto_alloc(machine, isa8_com_device(machine, *this));
 }
  
 //-------------------------------------------------

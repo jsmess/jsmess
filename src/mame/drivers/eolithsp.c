@@ -20,12 +20,12 @@ static int eolith_scanline = 0;
 void eolith_speedup_read(address_space *space)
 {
 	/* for debug */
-  //if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
-  //    printf("%s:eolith speedup_read data %02x\n",space->machine->describe_context(), eolith_vblank);
+  //if ((cpu_get_pc(&space->device())!=eolith_speedup_address) && (eolith_vblank!=1) )
+  //    printf("%s:eolith speedup_read data %02x\n",space->machine().describe_context(), eolith_vblank);
 
-	if (cpu_get_pc(space->cpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
+	if (cpu_get_pc(&space->device())==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
-		device_spin_until_trigger(space->cpu, 1000);
+		device_spin_until_trigger(&space->device(), 1000);
 	}
 
 }
@@ -60,7 +60,7 @@ static const struct
 };
 
 
-void init_eolith_speedup(running_machine *machine)
+void init_eolith_speedup(running_machine &machine)
 {
 	int n_game = 0;
 	eolith_speedup_address = 0;
@@ -68,7 +68,7 @@ void init_eolith_speedup(running_machine *machine)
 
 	while( eolith_speedup_table[ n_game ].s_name != NULL )
 	{
-		if( strcmp( machine->system().name, eolith_speedup_table[ n_game ].s_name ) == 0 )
+		if( strcmp( machine.system().name, eolith_speedup_table[ n_game ].s_name ) == 0 )
 		{
 			eolith_speedup_address = eolith_speedup_table[ n_game ].speedup_address;
 			eolith_speedup_resume_scanline = eolith_speedup_table[ n_game ].speedup_resume_scanline;
@@ -90,7 +90,7 @@ INTERRUPT_GEN( eolith_speedup )
 
 	if (eolith_scanline==eolith_speedup_resume_scanline)
 	{
-		device->machine->scheduler().trigger(1000);
+		device->machine().scheduler().trigger(1000);
 	}
 
 	if (eolith_scanline==240)

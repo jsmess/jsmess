@@ -23,21 +23,21 @@ READ8_HANDLER( galaxy_keyboard_r )
 
 	if (offset == 0)
 	{
-		double level = cassette_input(space->machine->device("cassette"));
+		double level = cassette_input(space->machine().device("cassette"));
 		return (level >  0) ? 0xfe : 0xff;
 	}
 	else
 	{
-		return input_port_read(space->machine, keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+		return input_port_read(space->machine(), keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 
 WRITE8_HANDLER( galaxy_latch_w )
 {
-	galaxy_state *state = space->machine->driver_data<galaxy_state>();
+	galaxy_state *state = space->machine().driver_data<galaxy_state>();
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	state->latch_value = data;
-	cassette_output(space->machine->device("cassette"), val);
+	cassette_output(space->machine().device("cassette"), val);
 }
 
 
@@ -53,8 +53,8 @@ INTERRUPT_GEN( galaxy_interrupt )
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
 {
-	galaxy_state *state = device->machine->driver_data<galaxy_state>();
-	galaxy_set_timer(device->machine);
+	galaxy_state *state = device->machine().driver_data<galaxy_state>();
+	galaxy_set_timer(device->machine());
 	state->interrupts_enabled = TRUE;
 	return 0xff;
 }
@@ -66,9 +66,9 @@ static IRQ_CALLBACK ( galaxy_irq_callback )
 #define GALAXY_SNAPSHOT_V1_SIZE	8268
 #define GALAXY_SNAPSHOT_V2_SIZE	8244
 
-static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data, UINT32 size)
+static void galaxy_setup_snapshot (running_machine &machine, const UINT8 * data, UINT32 size)
 {
-	device_t *cpu = machine->device("maincpu");
+	device_t *cpu = machine.device("maincpu");
 
 	switch (size)
 	{
@@ -92,7 +92,7 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x40]);
 			cpu_set_reg(cpu, Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
 
-			memcpy (ram_get_ptr(machine->device(RAM_TAG)), data + 0x084c, (ram_get_size(machine->device(RAM_TAG)) < 0x1800) ? ram_get_size(machine->device(RAM_TAG)) : 0x1800);
+			memcpy (ram_get_ptr(machine.device(RAM_TAG)), data + 0x084c, (ram_get_size(machine.device(RAM_TAG)) < 0x1800) ? ram_get_size(machine.device(RAM_TAG)) : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
@@ -119,7 +119,7 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x19]);
 			cpu_set_reg(cpu, Z80_R,    data[0x1a]);
 
-			memcpy (ram_get_ptr(machine->device(RAM_TAG)), data + 0x0834, (ram_get_size(machine->device(RAM_TAG)) < 0x1800) ? ram_get_size(machine->device(RAM_TAG)) : 0x1800);
+			memcpy (ram_get_ptr(machine.device(RAM_TAG)), data + 0x0834, (ram_get_size(machine.device(RAM_TAG)) < 0x1800) ? ram_get_size(machine.device(RAM_TAG)) : 0x1800);
 
 			break;
 	}
@@ -136,7 +136,7 @@ SNAPSHOT_LOAD( galaxy )
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			snapshot_data = auto_alloc_array(image.device().machine, UINT8, snapshot_size);
+			snapshot_data = auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
 			break;
 		default:
 			return IMAGE_INIT_FAIL;
@@ -144,7 +144,7 @@ SNAPSHOT_LOAD( galaxy )
 
 	image.fread( snapshot_data, snapshot_size);
 
-	galaxy_setup_snapshot(image.device().machine, snapshot_data, snapshot_size);
+	galaxy_setup_snapshot(image.device().machine(), snapshot_data, snapshot_size);
 
 	return IMAGE_INIT_PASS;
 }
@@ -156,13 +156,13 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT( galaxy )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_readwrite_bank( 0x2800, 0x2800 + ram_get_size(machine->device(RAM_TAG)) - 1, "bank1");
-	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->install_readwrite_bank( 0x2800, 0x2800 + ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
+	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 
-	if (ram_get_size(machine->device(RAM_TAG)) < (6 + 48) * 1024)
+	if (ram_get_size(machine.device(RAM_TAG)) < (6 + 48) * 1024)
 	{
-		space->nop_readwrite( 0x2800 + ram_get_size(machine->device(RAM_TAG)), 0xffff);
+		space->nop_readwrite( 0x2800 + ram_get_size(machine.device(RAM_TAG)), 0xffff);
 	}
 }
 
@@ -172,8 +172,8 @@ DRIVER_INIT( galaxy )
 
 MACHINE_RESET( galaxy )
 {
-	galaxy_state *state = machine->driver_data<galaxy_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	galaxy_state *state = machine.driver_data<galaxy_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
 	if (input_port_read(machine, "ROM2")) {
@@ -184,9 +184,9 @@ MACHINE_RESET( galaxy )
 	space->nop_write(0x1000, 0x1fff);
 
 	if (input_port_read(machine, "ROM2"))
-		memory_set_bankptr(machine,"bank10", machine->region("maincpu")->base() + 0x1000);
+		memory_set_bankptr(machine,"bank10", machine.region("maincpu")->base() + 0x1000);
 
-	device_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
 	state->interrupts_enabled = TRUE;
 }
 
@@ -197,11 +197,11 @@ DRIVER_INIT( galaxyp )
 
 MACHINE_RESET( galaxyp )
 {
-	galaxy_state *state = machine->driver_data<galaxy_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	galaxy_state *state = machine.driver_data<galaxy_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	device_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;
@@ -210,6 +210,6 @@ MACHINE_RESET( galaxyp )
 
 	space->install_read_bank(0xe000, 0xefff, "bank11");
 	space->nop_write(0xe000, 0xefff);
-	memory_set_bankptr(machine,"bank11", machine->region("maincpu")->base() + 0xe000);
+	memory_set_bankptr(machine,"bank11", machine.region("maincpu")->base() + 0xe000);
 	state->interrupts_enabled = TRUE;
 }

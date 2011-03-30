@@ -13,18 +13,18 @@
 #include "includes/wswan.h"
 
 
-INLINE void wswan_plot_pixel(running_machine *machine,int x, int y, int pen) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+INLINE void wswan_plot_pixel(running_machine &machine,int x, int y, int pen) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	y += 5*8;
 	if ( state->vdp.display_vertical ) {
-		*BITMAP_ADDR16(machine->generic.tmpbitmap, 28*8 - 1 - x, y) = pen;
+		*BITMAP_ADDR16(machine.generic.tmpbitmap, 28*8 - 1 - x, y) = pen;
 	} else {
-		*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x) = pen;
+		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x) = pen;
 	}
 }
 
-INLINE void wswan_fillbitmap( running_machine *machine,int pen, rectangle *rec ) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+INLINE void wswan_fillbitmap( running_machine &machine,int pen, rectangle *rec ) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	/* Fill empty area above line 0 when filling line 0 */
 	if ( state->vdp.current_line != 0 ) {
 		rec->min_y = rec->min_y + 5*8;
@@ -43,9 +43,9 @@ INLINE void wswan_fillbitmap( running_machine *machine,int pen, rectangle *rec )
 		rec2.max_y = 28*8 - 1 - rec->min_x;
 		rec2.min_x = rec->min_y;
 		rec2.max_x = rec->max_y;
-		bitmap_fill( machine->generic.tmpbitmap, &rec2 , pen);
+		bitmap_fill( machine.generic.tmpbitmap, &rec2 , pen);
 	} else {
-		bitmap_fill( machine->generic.tmpbitmap, rec , pen);
+		bitmap_fill( machine.generic.tmpbitmap, rec , pen);
 	}
 }
 
@@ -69,8 +69,8 @@ static void wswan_setup_palettes(wswan_state *state) {
 	}
 }
 
-static void wswan_draw_background( running_machine *machine ) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+static void wswan_draw_background( running_machine &machine ) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -160,8 +160,8 @@ static void wswan_draw_background( running_machine *machine ) {
 	}
 }
 
-static void wswan_draw_foreground_0( running_machine *machine ) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+static void wswan_draw_foreground_0( running_machine &machine ) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -248,8 +248,8 @@ static void wswan_draw_foreground_0( running_machine *machine ) {
 	}
 }
 
-static void wswan_draw_foreground_2( running_machine *machine ) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+static void wswan_draw_foreground_2( running_machine &machine ) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -336,8 +336,8 @@ static void wswan_draw_foreground_2( running_machine *machine ) {
 	}
 }
 
-static void wswan_draw_foreground_3( running_machine *machine ) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+static void wswan_draw_foreground_3( running_machine &machine ) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
@@ -424,8 +424,8 @@ static void wswan_draw_foreground_3( running_machine *machine ) {
 	}
 }
 
-static void wswan_handle_sprites( running_machine *machine, int mask ) {
-	wswan_state *state = machine->driver_data<wswan_state>();
+static void wswan_handle_sprites( running_machine &machine, int mask ) {
+	wswan_state *state = machine.driver_data<wswan_state>();
 	int	i;
 	if ( state->vdp.sprite_count == 0 )
 		return;
@@ -543,9 +543,9 @@ static void wswan_handle_sprites( running_machine *machine, int mask ) {
 	}
 }
 
-void wswan_refresh_scanline( running_machine *machine )
+void wswan_refresh_scanline( running_machine &machine )
 {
-	wswan_state *state = machine->driver_data<wswan_state>();
+	wswan_state *state = machine.driver_data<wswan_state>();
 	rectangle rec;
 
 	wswan_setup_palettes(state);

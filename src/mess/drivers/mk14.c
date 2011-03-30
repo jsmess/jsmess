@@ -44,7 +44,7 @@ static const char *const keynames[] = {
 static READ8_HANDLER(keyboard_r)
 {
 	if (offset < 8) {
-		return input_port_read(space->machine, keynames[offset]);
+		return input_port_read(space->machine(), keynames[offset]);
 	} else {
 		return 0xff;
 	}

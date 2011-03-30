@@ -402,7 +402,7 @@ WRITE16_DEVICE_HANDLER( sgcpu_w )
 */
 WRITE_LINE_DEVICE_HANDLER( card_extint )
 {
-	tms9901_set_single_int(device->machine->device("tms9901"), 1, state);
+	tms9901_set_single_int(device->machine().device("tms9901"), 1, state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( card_notconnected )
@@ -418,9 +418,9 @@ WRITE_LINE_DEVICE_HANDLER( card_ready )
 /*
     set the state of int2 (called by the v9938)
 */
-void tms9901_sg_set_int2(running_machine *machine, int state)
+void tms9901_sg_set_int2(running_machine &machine, int state)
 {
-	tms9901_set_single_int(machine->device("tms9901"), 2, state);
+	tms9901_set_single_int(machine.device("tms9901"), 2, state);
 }
 
 /***************************************************************************
@@ -437,11 +437,11 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 	{
 		// On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
 		// but hard-wired to force level 1 interrupts
-		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 1);
+		cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, ASSERT_LINE, 1);
 	}
 	else
 	{
-		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -456,14 +456,14 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 */
 static READ8_DEVICE_HANDLER( sgcpu_R9901_0 )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	int answer;
 
-	answer = ((input_port_read(device->machine, keynames[sgcpu->keyCol >> 1]) >> ((sgcpu->keyCol & 1) * 8)) << 3) & 0xF8;
+	answer = ((input_port_read(device->machine(), keynames[sgcpu->keyCol >> 1]) >> ((sgcpu->keyCol & 1) * 8)) << 3) & 0xF8;
 
 	if (sgcpu->alphaLockLine == FALSE)
-		answer &= ~(input_port_read(device->machine, "ALPHA") << 3);
+		answer &= ~(input_port_read(device->machine(), "ALPHA") << 3);
 
 	return answer;
 }
@@ -476,7 +476,7 @@ static READ8_DEVICE_HANDLER( sgcpu_R9901_0 )
 */
 static READ8_DEVICE_HANDLER( sgcpu_R9901_1 )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	int answer;
 
@@ -484,7 +484,7 @@ static READ8_DEVICE_HANDLER( sgcpu_R9901_1 )
 		answer = 0x07;
 	else
 	{
-		answer = ((input_port_read(device->machine, keynames[sgcpu->keyCol >> 1]) >> ((sgcpu->keyCol & 1) * 8)) >> 5) & 0x07;
+		answer = ((input_port_read(device->machine(), keynames[sgcpu->keyCol >> 1]) >> ((sgcpu->keyCol & 1) * 8)) >> 5) & 0x07;
 	}
 	return answer;
 }
@@ -497,7 +497,7 @@ static READ8_DEVICE_HANDLER( sgcpu_R9901_1 )
 */
 static READ8_DEVICE_HANDLER( sgcpu_R9901_3 )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	int answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
 	if (cassette_input(sgcpu->cassette) > 0)
@@ -510,7 +510,7 @@ static READ8_DEVICE_HANDLER( sgcpu_R9901_3 )
 */
 static WRITE8_DEVICE_HANDLER( sgcpu_KeyC )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	if (data)
 		sgcpu->keyCol |= 1 << (offset-2);
@@ -523,7 +523,7 @@ static WRITE8_DEVICE_HANDLER( sgcpu_KeyC )
 */
 static WRITE8_DEVICE_HANDLER( sgcpu_AlphaW )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	sgcpu->alphaLockLine = data;
 }
@@ -533,7 +533,7 @@ static WRITE8_DEVICE_HANDLER( sgcpu_AlphaW )
 */
 static WRITE8_DEVICE_HANDLER( sgcpu_CS_motor )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	cassette_change_state(sgcpu->cassette, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
@@ -557,7 +557,7 @@ static WRITE8_DEVICE_HANDLER( sgcpu_audio_gate )
 */
 static WRITE8_DEVICE_HANDLER( sgcpu_CS_output )
 {
-	device_t *dev = device->machine->device("sgcpu_board");
+	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	cassette_output(sgcpu->cassette, data ? +1 : -1);
 }
@@ -609,18 +609,18 @@ static DEVICE_START( sgcpu )
 {
 //  // printf("Starting mapper\n");
 	sgcpu_state *sgcpu = get_safe_token(device);
-	sgcpu->cpu = device->machine->device("maincpu");
-	sgcpu->peribox = device->machine->device("peribox");
-	sgcpu->soundchip = device->machine->device("soundgen");
-	sgcpu->video = device->machine->device("video");
-	sgcpu->cassette = device->machine->device("cassette");
+	sgcpu->cpu = device->machine().device("maincpu");
+	sgcpu->peribox = device->machine().device("peribox");
+	sgcpu->soundchip = device->machine().device("soundgen");
+	sgcpu->video = device->machine().device("video");
+	sgcpu->cassette = device->machine().device("cassette");
 
 	assert(sgcpu->cpu && sgcpu->peribox && sgcpu->soundchip && sgcpu->video && sgcpu->cassette);
 
 	sgcpu->ram = (UINT16*)malloc(0x080000);
 	sgcpu->scratchpad = (UINT16*)malloc(0x0400);
 
-	UINT16 *rom = (UINT16*)device->machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16*)device->machine().region("maincpu")->base();
 	sgcpu->rom0  = rom + 0x2000;
 	sgcpu->dsr   = rom + 0x6000;
 	sgcpu->rom6a = rom + 0x3000;

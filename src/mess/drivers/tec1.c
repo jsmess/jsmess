@@ -130,7 +130,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
 
 READ8_MEMBER( tec1_state::tec1_kbd_r )
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return m_kbd;
 }
 
@@ -156,7 +156,7 @@ UINT8 tec1_state::tec1_convert_col_to_bin( UINT8 col, UINT8 row )
 static TIMER_CALLBACK( tec1_kbd_callback )
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
-	tec1_state *state = machine->driver_data<tec1_state>();
+	tec1_state *state = machine.driver_data<tec1_state>();
     /* 74C923 4 by 5 key encoder. */
     /* if previous key is still held, bail out */
 	if (input_port_read(machine, keynames[state->m_kbd_row]))
@@ -183,14 +183,14 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 
 static MACHINE_START( tec1 )
 {
-	tec1_state *state = machine->driver_data<tec1_state>();
-	state->m_kbd_timer = machine->scheduler().timer_alloc(FUNC(tec1_kbd_callback));
+	tec1_state *state = machine.driver_data<tec1_state>();
+	state->m_kbd_timer = machine.scheduler().timer_alloc(FUNC(tec1_kbd_callback));
 	state->m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
 
 static MACHINE_RESET( tec1 )
 {
-	tec1_state *state = machine->driver_data<tec1_state>();
+	tec1_state *state = machine.driver_data<tec1_state>();
 	state->m_kbd = 0;
 }
 

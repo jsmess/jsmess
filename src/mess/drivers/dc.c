@@ -38,8 +38,8 @@ extern int jvsboard_type;
 #endif
 
 // things from mess/machine/dc.c
-void dreamcast_atapi_init(running_machine *machine);
-void dreamcast_atapi_reset(running_machine *machine);
+void dreamcast_atapi_init(running_machine &machine);
+void dreamcast_atapi_reset(running_machine &machine);
 extern READ64_HANDLER( dc_mess_gdrom_r );
 extern WRITE64_HANDLER( dc_mess_gdrom_w );
 extern READ64_HANDLER( dc_mess_g1_ctrl_r );
@@ -50,18 +50,18 @@ static UINT64 *dc_ram;
 
 static READ64_HANDLER( dcus_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc0ba52a)
-		device_spin_until_time(space->cpu, attotime::from_usec(2500));
-	//  device_spinuntil_int(space->cpu);
+	if (cpu_get_pc(&space->device())==0xc0ba52a)
+		device_spin_until_time(&space->device(), attotime::from_usec(2500));
+	//  device_spinuntil_int(&space->device());
 
 	return dc_ram[0x2303b0/8];
 }
 
 static READ64_HANDLER( dcjp_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc0bac62)
-		device_spin_until_time(space->cpu, attotime::from_usec(2500));
-	//  device_spinuntil_int(space->cpu);
+	if (cpu_get_pc(&space->device())==0xc0bac62)
+		device_spin_until_time(&space->device(), attotime::from_usec(2500));
+	//  device_spinuntil_int(&space->device());
 
 	return dc_ram[0x2302f8/8];
 }
@@ -73,14 +73,14 @@ static DRIVER_INIT(dc)
 
 static DRIVER_INIT(dcus)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }
 
 static DRIVER_INIT(dcjp)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }
@@ -206,7 +206,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
 {
-	device_t *aica = machine->device("aica");
+	device_t *aica = machine.device("aica");
 	MACHINE_RESET_CALL(dc);
 	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
 	dreamcast_atapi_reset(machine);
@@ -214,7 +214,7 @@ static MACHINE_RESET( dc_console )
 
 static void aica_irq(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "soundcpu", ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const aica_interface dc_aica_interface =

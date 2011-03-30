@@ -170,7 +170,7 @@ public:
 
 static TIMER_CALLBACK( ngp_seconds_callback )
 {
-	ngp_state *state = machine->driver_data<ngp_state>();
+	ngp_state *state = machine.driver_data<ngp_state>();
 
 	state->m_io_reg[0x16] += 1;
 	if ( ( state->m_io_reg[0x16] & 0x0f ) == 0x0a )
@@ -210,10 +210,10 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 	switch( offset )
 	{
 	case 0x30:	/* Read controls */
-		data = input_port_read( machine, "Controls" );
+		data = input_port_read( m_machine, "Controls" );
 		break;
 	case 0x31:
-		data = input_port_read( machine, "Power" ) & 0x01;
+		data = input_port_read( m_machine, "Power" ) & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
@@ -554,12 +554,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( power_callback )
 {
-	ngp_state *state = field->port->machine->driver_data<ngp_state>();
+	ngp_state *state = field->port->machine().driver_data<ngp_state>();
 
 	if ( state->m_io_reg[0x33] & 0x04 )
 	{
 		device_set_input_line( state->m_tlcs900, TLCS900_NMI,
-			(input_port_read(field->port->machine, "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+			(input_port_read(field->port->machine(), "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 
@@ -603,7 +603,7 @@ WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 
 void ngp_state::machine_start()
 {
-	seconds_timer = machine->scheduler().timer_alloc(FUNC(ngp_seconds_callback));
+	seconds_timer = m_machine.scheduler().timer_alloc(FUNC(ngp_seconds_callback));
 	seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
 }
 
@@ -611,12 +611,12 @@ void ngp_state::machine_start()
 void ngp_state::machine_reset()
 {
 	m_old_to3 = 0;
-	m_tlcs900 = machine->device( "maincpu" );
-	m_z80 = machine->device( "soundcpu" );
-	m_t6w28 = machine->device( "t6w28" );
-	m_dac_l = machine->device( "dac_l" );
-	m_dac_r = machine->device( "dac_r" );
-	m_k1ge = machine->device( "k1ge" );
+	m_tlcs900 = m_machine.device( "maincpu" );
+	m_z80 = m_machine.device( "soundcpu" );
+	m_t6w28 = m_machine.device( "t6w28" );
+	m_dac_l = m_machine.device( "dac_l" );
+	m_dac_r = m_machine.device( "dac_r" );
+	m_k1ge = m_machine.device( "k1ge" );
 
 	device_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
 	device_set_input_line( m_z80, 0, CLEAR_LINE );
@@ -625,7 +625,7 @@ void ngp_state::machine_reset()
 
 static SCREEN_UPDATE( ngp )
 {
-	ngp_state *state = screen->machine->driver_data<ngp_state>();
+	ngp_state *state = screen->machine().driver_data<ngp_state>();
 
 	k1ge_update( state->m_k1ge, bitmap, cliprect );
 	return 0;
@@ -634,8 +634,8 @@ static SCREEN_UPDATE( ngp )
 
 static DEVICE_START( ngp_cart )
 {
-	ngp_state *state = device->machine->driver_data<ngp_state>();
-	UINT8 *cart = device->machine->region("cart")->base();
+	ngp_state *state = device->machine().driver_data<ngp_state>();
+	UINT8 *cart = device->machine().region("cart")->base();
 
 	state->m_flash_chip[0].present = 0;
 	state->m_flash_chip[0].state = F_READ;
@@ -649,7 +649,7 @@ static DEVICE_START( ngp_cart )
 
 static DEVICE_IMAGE_LOAD( ngp_cart )
 {
-	ngp_state *state = image.device().machine->driver_data<ngp_state>();
+	ngp_state *state = image.device().machine().driver_data<ngp_state>();
 	UINT32 filesize;
 
 	if (image.software_entry() == NULL)
@@ -662,7 +662,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( image.device().machine->region("cart")->base(), filesize) != filesize)
+		if (image.fread( image.device().machine().region("cart")->base(), filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return IMAGE_INIT_FAIL;
@@ -671,7 +671,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 	else
 	{
 		filesize = image.get_software_region_length("rom");
-		memcpy(image.device().machine->region("cart")->base(), image.get_software_region("rom"), filesize);
+		memcpy(image.device().machine().region("cart")->base(), image.get_software_region("rom"), filesize);
 	}
 
 	state->m_flash_chip[0].manufacturer_id = 0x98;
@@ -738,7 +738,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 
 static DEVICE_IMAGE_UNLOAD( ngp_cart )
 {
-	ngp_state *state = image.device().machine->driver_data<ngp_state>();
+	ngp_state *state = image.device().machine().driver_data<ngp_state>();
 
 	state->m_flash_chip[0].present = 0;
 	state->m_flash_chip[0].state = F_READ;

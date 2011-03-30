@@ -13,7 +13,7 @@
 #include "video/cgapal.h"
 
 
-#define CGA_MONITOR		(input_port_read(space->machine, "VIDEO") & 0x1C)
+#define CGA_MONITOR		(input_port_read(space->machine(), "VIDEO") & 0x1C)
 #define CGA_MONITOR_RGB			0x00	/* Colour RGB */
 #define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
@@ -489,7 +489,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
@@ -499,7 +499,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 			data = mc6845_register_r( devconf, offset );
 			break;
 		case 10:
-			data = (input_port_read(space->machine, "IN0") & 0x80 ) | 0x08 | aga.mda_status;
+			data = (input_port_read(space->machine(), "IN0") & 0x80 ) | 0x08 | aga.mda_status;
 			aga.mda_status ^= 0x01;
 			break;
 		/* 12, 13, 14  are the LPT1 ports */
@@ -511,7 +511,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
@@ -544,7 +544,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
@@ -590,7 +590,7 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
@@ -669,9 +669,9 @@ static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_a
 
 /*************************************/
 
-void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
+void pc_aga_set_mode(running_machine &machine, AGA_MODE mode)
 {
-	device_t *devconf = machine->device(AGA_MC6845_NAME);
+	device_t *devconf = machine.device(AGA_MC6845_NAME);
 
 	aga.mode = mode;
 
@@ -690,9 +690,9 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
-	int buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
+	int buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -714,8 +714,8 @@ VIDEO_START( pc_aga )
 
 	memset( &aga, 0, sizeof( aga ) );
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = machine->region("gfx1")->base() + 0x1000;
-	aga.cga_chr_gen = machine->region("gfx1")->base();
+	aga.mda_chr_gen = machine.region("gfx1")->base() + 0x1000;
+	aga.cga_chr_gen = machine.region("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
@@ -724,9 +724,9 @@ WRITE16_HANDLER( pc_aga_videoram16le_w )	{ write16le_with_write8_handler(pc_aga_
 
 VIDEO_START( pc200 )
 {
-	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine->firstcpu->memory().space(AS_IO);
-	int buswidth = machine->firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
+	int buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -748,15 +748,15 @@ VIDEO_START( pc200 )
 	memset( &aga, 0, sizeof( aga ) );
 
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = machine->region("gfx1")->base();
-	aga.cga_chr_gen = machine->region("gfx1")->base() + 0x1000;
+	aga.mda_chr_gen = machine.region("gfx1")->base();
+	aga.cga_chr_gen = machine.region("gfx1")->base() + 0x1000;
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
 
 static SCREEN_UPDATE( mc6845_aga )
 {
-	device_t *devconf = screen->machine->device(AGA_MC6845_NAME);
+	device_t *devconf = screen->machine().device(AGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	return 0;
@@ -853,11 +853,11 @@ WRITE8_HANDLER( pc200_cga_w )
 		if ((pc200.porte & 7) != (data & 7))
 		{
 			if (data & 4)
-				pc_aga_set_mode(space->machine, AGA_OFF);
+				pc_aga_set_mode(space->machine(), AGA_OFF);
 			else if (data & 2)
-				pc_aga_set_mode(space->machine, AGA_MONO);
+				pc_aga_set_mode(space->machine(), AGA_MONO);
 			else
-				pc_aga_set_mode(space->machine, AGA_COLOR);
+				pc_aga_set_mode(space->machine(), AGA_COLOR);
 		}
 		pc200.porte = data;
 		break;
@@ -885,7 +885,7 @@ READ8_HANDLER ( pc200_cga_r )
 	case 0xe:
 		// 0x20 low cga
 		// 0x10 low special
-		result = input_port_read(space->machine, "DSW0") & 0x38;
+		result = input_port_read(space->machine(), "DSW0") & 0x38;
 		break;
 
 	default:

@@ -16,15 +16,16 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "includes/vaportra.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
 static WRITE16_HANDLER( vaportra_sound_w )
 {
-	vaportra_state *state = space->machine->driver_data<vaportra_state>();
+	vaportra_state *state = space->machine().driver_data<vaportra_state>();
 
 	/* Force synchronisation between CPUs with fake timer */
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
@@ -34,11 +35,11 @@ static READ16_HANDLER( vaportra_control_r )
 	switch (offset << 1)
 	{
 		case 4:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 		case 2:
-			return input_port_read(space->machine, "COINS");
+			return input_port_read(space->machine(), "COINS");
 		case 0:
-			return input_port_read(space->machine, "PLAYERS");
+			return input_port_read(space->machine(), "PLAYERS");
 	}
 
 	logerror("Unknown control read at %d\n",offset);
@@ -71,7 +72,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( vaportra_soundlatch_r )
 {
-	vaportra_state *state = space->machine->driver_data<vaportra_state>();
+	vaportra_state *state = space->machine().driver_data<vaportra_state>();
 	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
@@ -202,7 +203,7 @@ GFXDECODE_END
 
 static void sound_irq( device_t *device, int state )
 {
-	vaportra_state *driver_state = device->machine->driver_data<vaportra_state>();
+	vaportra_state *driver_state = device->machine().driver_data<vaportra_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -244,19 +245,19 @@ static const deco16ic_interface vaportra_deco16ic_tilegen2_intf =
 
 static MACHINE_START( vaportra )
 {
-	vaportra_state *state = machine->driver_data<vaportra_state>();
+	vaportra_state *state = machine.driver_data<vaportra_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
-	state->deco_tilegen2 = machine->device("tilegen2");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
+	state->deco_tilegen2 = machine.device("tilegen2");
 
 	state->save_item(NAME(state->priority));
 }
 
 static MACHINE_RESET( vaportra )
 {
-	vaportra_state *state = machine->driver_data<vaportra_state>();
+	vaportra_state *state = machine.driver_data<vaportra_state>();
 
 	state->priority[0] = 0;
 	state->priority[1] = 0;
@@ -292,6 +293,9 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_DECO16IC_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
 
 	MCFG_DECO16IC_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
+
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 4);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -854,7 +858,7 @@ C3D54*
 
 static DRIVER_INIT( vaportra )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	int i;
 
 	for (i = 0x00000; i < 0x80000; i++)

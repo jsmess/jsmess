@@ -32,7 +32,7 @@ VIDEO_START( pmd85 )
 {
 }
 
-static void pmd85_draw_scanline(running_machine *machine,bitmap_t *bitmap, int pmd85_scanline)
+static void pmd85_draw_scanline(running_machine &machine,bitmap_t *bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;
@@ -42,7 +42,7 @@ static void pmd85_draw_scanline(running_machine *machine,bitmap_t *bitmap, int p
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, pmd85_scanline, 0);
 
 	/* address of current line in PMD-85 video memory */
-	UINT8* pmd85_video_ram_line = ram_get_ptr(machine->device(RAM_TAG)) + 0xc000 + 0x40*pmd85_scanline;
+	UINT8* pmd85_video_ram_line = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000 + 0x40*pmd85_scanline;
 
 	for (x=0; x<288; x+=6)
 	{
@@ -61,6 +61,6 @@ SCREEN_UPDATE( pmd85 )
 	int pmd85_scanline;
 
 	for (pmd85_scanline=0; pmd85_scanline<256; pmd85_scanline++)
-		pmd85_draw_scanline (screen->machine,bitmap, pmd85_scanline);
+		pmd85_draw_scanline (screen->machine(),bitmap, pmd85_scanline);
 	return 0;
 }

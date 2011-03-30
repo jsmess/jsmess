@@ -47,7 +47,7 @@ public:
 
 static READ64_HANDLER( unk1_r )
 {
-	pippin_state *state = space->machine->driver_data<pippin_state>();
+	pippin_state *state = space->machine().driver_data<pippin_state>();
 	state->unk1_test ^= 0x0400; //PC=ff808760
 
 	return state->unk1_test << 16 | 0;
@@ -64,7 +64,7 @@ static READ64_HANDLER( unk2_r )
 
 static READ64_HANDLER( adb_portb_r )
 {
-	pippin_state *state = space->machine->driver_data<pippin_state>();
+	pippin_state *state = space->machine().driver_data<pippin_state>();
 	if(ACCESSING_BITS_56_63)
 	{
 		if(state->portb_data == 0x10)
@@ -84,7 +84,7 @@ static READ64_HANDLER( adb_portb_r )
 
 static WRITE64_HANDLER( adb_portb_w )
 {
-	pippin_state *state = space->machine->driver_data<pippin_state>();
+	pippin_state *state = space->machine().driver_data<pippin_state>();
 	if(ACCESSING_BITS_56_63)
 	{
 		state->portb_data = (UINT64)data >> 56;

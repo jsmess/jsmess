@@ -87,28 +87,28 @@ public:
 
 static READ8_HANDLER( paddle_1_r )
 {
-	coleco_state *state = space->machine->driver_data<coleco_state>();
+	coleco_state *state = space->machine().driver_data<coleco_state>();
 
-	return coleco_paddle1_read(space->machine, state->joy_mode, state->joy_status[0]);
+	return coleco_paddle1_read(space->machine(), state->joy_mode, state->joy_status[0]);
 }
 
 static READ8_HANDLER( paddle_2_r )
 {
-	coleco_state *state = space->machine->driver_data<coleco_state>();
+	coleco_state *state = space->machine().driver_data<coleco_state>();
 
-	return coleco_paddle2_read(space->machine, state->joy_mode, state->joy_status[1]);
+	return coleco_paddle2_read(space->machine(), state->joy_mode, state->joy_status[1]);
 }
 
 static WRITE8_HANDLER( paddle_off_w )
 {
-	coleco_state *state = space->machine->driver_data<coleco_state>();
+	coleco_state *state = space->machine().driver_data<coleco_state>();
 
 	state->joy_mode = 0;
 }
 
 static WRITE8_HANDLER( paddle_on_w )
 {
-	coleco_state *state = space->machine->driver_data<coleco_state>();
+	coleco_state *state = space->machine().driver_data<coleco_state>();
 
 	state->joy_mode = 1;
 }
@@ -207,12 +207,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( coleco_interrupt )
 {
-    TMS9928A_interrupt(device->machine);
+    TMS9928A_interrupt(device->machine());
 }
 
-static void coleco_vdp_interrupt(running_machine *machine, int state)
+static void coleco_vdp_interrupt(running_machine &machine, int state)
 {
-	coleco_state *drvstate = machine->driver_data<coleco_state>();
+	coleco_state *drvstate = machine.driver_data<coleco_state>();
     // only if it goes up
 	if (state && !drvstate->last_state)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
@@ -222,12 +222,12 @@ static void coleco_vdp_interrupt(running_machine *machine, int state)
 
 static TIMER_DEVICE_CALLBACK( paddle_callback )
 {
-	coleco_state *state = timer.machine->driver_data<coleco_state>();
+	coleco_state *state = timer.machine().driver_data<coleco_state>();
 
-	coleco_scan_paddles(timer.machine, &state->joy_status[0], &state->joy_status[1]);
+	coleco_scan_paddles(timer.machine(), &state->joy_status[0], &state->joy_status[1]);
 
     if (state->joy_status[0] || state->joy_status[1])
-		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 /* Machine Initialization */
@@ -247,10 +247,10 @@ static MACHINE_START( coleco )
 
 static MACHINE_RESET( coleco )
 {
-	coleco_state *state = machine->driver_data<coleco_state>();
+	coleco_state *state = machine.driver_data<coleco_state>();
 	state->last_state = 0;
-	device_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
-	memset(&machine->region("maincpu")->base()[0x6000], 0xff, 0x400);	// initialize RAM
+	device_set_input_line_vector(machine.device("maincpu"), INPUT_LINE_IRQ0, 0xff);
+	memset(&machine.region("maincpu")->base()[0x6000], 0xff, 0x400);	// initialize RAM
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
@@ -268,7 +268,7 @@ static MACHINE_RESET( coleco )
 
 static DEVICE_IMAGE_LOAD( czz50_cart )
 {
-	UINT8 *ptr = image.device().machine->region("maincpu")->base() + 0x8000;
+	UINT8 *ptr = image.device().machine().region("maincpu")->base() + 0x8000;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

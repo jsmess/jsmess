@@ -94,10 +94,10 @@ static SCREEN_UPDATE( esq1 )
 
 static MACHINE_RESET( esq1 )
 {
-	es5503_set_base(machine->device("es5503"), machine->region("ensoniq")->base());
+	es5503_set_base(machine.device("es5503"), machine.region("ensoniq")->base());
 
 	// set default OSROM banking
-	memory_set_bankptr(machine, "osbank", machine->region("osrom")->base() );
+	memory_set_bankptr(machine, "osbank", machine.region("osrom")->base() );
 }
 
 static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8 )
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 
 static void duart_irq_handler(device_t *device, UINT8 vector)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 };
 
 static UINT8 duart_input(device_t *device)
@@ -139,8 +139,8 @@ static void duart_output(device_t *device, UINT8 data)
 	int bank = ((data >> 1) & 0x7);
 
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-//  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine->firstcpu));
-	memory_set_bankptr(device->machine, "osbank", device->machine->region("osrom")->base() + (bank * 0x1000) );
+//  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine().firstcpu));
+	memory_set_bankptr(device->machine(), "osbank", device->machine().region("osrom")->base() + (bank * 0x1000) );
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

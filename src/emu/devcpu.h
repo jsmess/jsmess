@@ -286,8 +286,8 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define INTERRUPT_GEN(func)		void func(device_t *device)
 
 // helpers for using machine/cputag instead of cpu objects
-#define cputag_set_input_line(mach, tag, line, state)					device_execute((mach)->device(tag))->set_input_line(line, state)
-#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach)->device(tag))->set_input_line_and_vector(line, state, vec)
+#define cputag_set_input_line(mach, tag, line, state)					device_execute((mach).device(tag))->set_input_line(line, state)
+#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach).device(tag))->set_input_line_and_vector(line, state, vec)
 
 
 
@@ -383,13 +383,11 @@ protected:
 	// construction/destruction
 	legacy_cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock, cpu_get_info_func get_info);
 
-public:
 	// basic information getters
-	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
-	virtual machine_config_constructor machine_config_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
-	virtual const input_port_token *input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
+	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
+	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const input_port_token *device_input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
 
-protected:
 	// device_config_execute_interface overrides
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;

@@ -160,7 +160,7 @@ device_config *isa8_hdc_device_config::static_alloc_device_config(const machine_
  
 device_t *isa8_hdc_device_config::alloc_device(running_machine &machine) const
 {
-        return auto_alloc(&machine, isa8_hdc_device(machine, *this));
+        return auto_alloc(machine, isa8_hdc_device(machine, *this));
 }
  
 //-------------------------------------------------
@@ -207,8 +207,8 @@ void isa8_hdc_device::device_start()
 	m_isa->add_isa_card(this, m_config.m_isa_num);
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, pc_HDC_r, pc_HDC_w );	
-	buffer = auto_alloc_array(machine, UINT8, 17*4*512);
-	timer = machine->scheduler().timer_alloc(FUNC(&pc_hdc_command), this);
+	buffer = auto_alloc_array(m_machine, UINT8, 17*4*512);
+	timer = m_machine.scheduler().timer_alloc(FUNC(&pc_hdc_command), this);
 }
 
 //-------------------------------------------------
@@ -251,10 +251,10 @@ hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<device_image_interface *>(machine->device(subtag(tempstring,"primary")));
+		img = dynamic_cast<device_image_interface *>(m_machine.device(subtag(tempstring,"primary")));
 		break;
 	case 1:
-		img = dynamic_cast<device_image_interface *>(machine->device(subtag(tempstring,"slave")));
+		img = dynamic_cast<device_image_interface *>(m_machine.device(subtag(tempstring,"slave")));
 		break;	
 	}
 	if ( img == NULL ) 
@@ -537,7 +537,7 @@ void isa8_hdc_device::hdc_command()
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), cmd, command_name, drv);
+			(unsigned) cpu_get_reg(m_machine.firstcpu, STATE_GENPC), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -575,7 +575,7 @@ void isa8_hdc_device::hdc_command()
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
+					(unsigned) cpu_get_reg(m_machine.firstcpu, STATE_GENPC), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
 			}
 
 			if (test_ready())
@@ -590,7 +590,7 @@ void isa8_hdc_device::hdc_command()
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x  D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
+					(unsigned) cpu_get_reg(m_machine.firstcpu, STATE_GENPC), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
 			}
 
 			if (test_ready())
@@ -704,7 +704,7 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(m_machine.firstcpu, STATE_GENPC));
 
             status &= ~STA_COMMAND;
 			status &= ~STA_REQUEST;
@@ -743,7 +743,7 @@ void isa8_hdc_device::pc_hdc_select_w(int data)
 void isa8_hdc_device::pc_hdc_control_w(int data)
 {
 	if (LOG_HDC_STATUS)
-		logerror("%s: pc_hdc_control_w(): control write %d\n", machine->describe_context(), data);
+		logerror("%s: pc_hdc_control_w(): control write %d\n", m_machine.describe_context(), data);
 
 	hdc_control = data;
 
@@ -827,7 +827,7 @@ static READ8_DEVICE_HANDLER(pc_HDC_r )
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X offs=%d result=0x%02x\n", cpu_get_pc(device->machine->firstcpu), offset, data);
+		logerror("pc_HDC_r(): pc=%06X offs=%d result=0x%02x\n", cpu_get_pc(device->machine().firstcpu), offset, data);
 
 	return data;
 }
@@ -836,7 +836,7 @@ static WRITE8_DEVICE_HANDLER( pc_HDC_w )
 {
 	isa8_hdc_device	*hdc  = downcast<isa8_hdc_device *>(device);
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X offs=%d data=0x%02x\n", cpu_get_pc(device->machine->firstcpu), offset, data);
+		logerror("pc_HDC_w(): pc=%06X offs=%d data=0x%02x\n", cpu_get_pc(device->machine().firstcpu), offset, data);
 
 	switch( offset )
 	{

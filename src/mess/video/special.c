@@ -19,7 +19,7 @@ VIDEO_START( special )
 
 SCREEN_UPDATE( special )
 {
-	special_state *state = screen->machine->driver_data<special_state>();
+	special_state *state = screen->machine().driver_data<special_state>();
   UINT8 code;
 	int y, x, b;
 
@@ -42,7 +42,7 @@ VIDEO_START( specialp )
 
 SCREEN_UPDATE( specialp )
 {
-	special_state *state = screen->machine->driver_data<special_state>();
+	special_state *state = screen->machine().driver_data<special_state>();
   UINT8 code;
 	int y, x, b;
 
@@ -88,14 +88,14 @@ PALETTE_INIT( specimx )
 
 VIDEO_START( specimx )
 {
-	special_state *state = machine->driver_data<special_state>();
+	special_state *state = machine.driver_data<special_state>();
 	state->specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(state->specimx_colorram,0x70,0x3000);
 }
 
 SCREEN_UPDATE( specimx )
 {
-	special_state *state = screen->machine->driver_data<special_state>();
+	special_state *state = screen->machine().driver_data<special_state>();
 	UINT8 code,color;
 	int y, x, b;
 
@@ -103,7 +103,7 @@ SCREEN_UPDATE( specimx )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = ram_get_ptr(screen->machine->device(RAM_TAG))[0x9000 + y + x*256];
+			code = ram_get_ptr(screen->machine().device(RAM_TAG))[0x9000 + y + x*256];
 			color = state->specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
@@ -138,7 +138,7 @@ VIDEO_START( erik )
 
 SCREEN_UPDATE( erik )
 {
-	special_state *state = screen->machine->driver_data<special_state>();
+	special_state *state = screen->machine().driver_data<special_state>();
   UINT8 code1;
   UINT8 code2;
   UINT8 color1,color2;
@@ -146,8 +146,8 @@ SCREEN_UPDATE( erik )
 	UINT8 *erik_video_ram_p1;
 	UINT8 *erik_video_ram_p2;
 
-	erik_video_ram_p1 =  ram_get_ptr(screen->machine->device(RAM_TAG)) + 0x9000;
-	erik_video_ram_p2 =  ram_get_ptr(screen->machine->device(RAM_TAG)) + 0xd000;
+	erik_video_ram_p1 =  ram_get_ptr(screen->machine().device(RAM_TAG)) + 0x9000;
+	erik_video_ram_p2 =  ram_get_ptr(screen->machine().device(RAM_TAG)) + 0xd000;
 
 	for (x = 0; x < 48; x++)
 	{

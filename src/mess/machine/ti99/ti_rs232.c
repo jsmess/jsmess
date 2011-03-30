@@ -508,7 +508,7 @@ static DEVICE_START( ti_rs232 )
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", ser_region);
-	card->rom = device->machine->region(astring_c(region))->base();
+	card->rom = device->machine().region(astring_c(region))->base();
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 	// READY and INTB are not used
 	card->uart0 = device->subdevice("tms9902_0");
@@ -528,7 +528,7 @@ static DEVICE_RESET( ti_rs232 )
 	/* Register the card */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "SERIAL")==SERIAL_TI)
+	if (input_port_read(device->machine(), "SERIAL")==SERIAL_TI)
 	{
 		int success = mount_card(peb, device, &tirs232_card, get_pebcard_config(device)->slot);
 		if (!success) return;
@@ -545,7 +545,7 @@ static DEVICE_RESET( ti_rs232 )
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		if (input_port_read(device->machine, "MODE")==GENMOD)
+		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
 			card->select_mask = 0x1fe000;

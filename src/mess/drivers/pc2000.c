@@ -68,7 +68,7 @@ READ8_MEMBER( pc2000_state::key_matrix_r )
 
 	for (int line=0; line<8; line++)
 		if (m_mux_data & (1<<line))
-			data &= input_port_read(machine, bitnames[offset][line]);
+			data &= input_port_read(m_machine, bitnames[offset][line]);
 
 	return data;
 }
@@ -80,18 +80,18 @@ WRITE8_MEMBER( pc2000_state::key_matrix_w )
 
 WRITE8_MEMBER( pc2000_state::rombank1_w )
 {
-	memory_set_bank(space.machine, "bank1", data & 0x0f);
+	memory_set_bank(m_machine, "bank1", data & 0x0f);
 }
 
 WRITE8_MEMBER( pc2000_state::rombank2_w )
 {
 	if (data == 0x80)
 	{
-		memory_set_bank(space.machine, "bank2", data & 0x10);	//cartridge
+		memory_set_bank(m_machine, "bank2", data & 0x10);	//cartridge
 	}
 	else
 	{
-		memory_set_bank(space.machine, "bank2", data & 0x0f);
+		memory_set_bank(m_machine, "bank2", data & 0x0f);
 	}
 }
 
@@ -286,19 +286,19 @@ INPUT_PORTS_END
 
 void pc2000_state::machine_start()
 {
-	UINT8 *bios = machine->region("bios")->base();
-	UINT8 *cart = machine->region("cart")->base();
+	UINT8 *bios = m_machine.region("bios")->base();
+	UINT8 *cart = m_machine.region("cart")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 0x10, bios, 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 0x10, bios, 0x4000);
-	memory_configure_bank(machine, "bank2", 0x10, 1, cart, 0x4000);
+	memory_configure_bank(m_machine, "bank1", 0, 0x10, bios, 0x4000);
+	memory_configure_bank(m_machine, "bank2", 0, 0x10, bios, 0x4000);
+	memory_configure_bank(m_machine, "bank2", 0x10, 1, cart, 0x4000);
 }
 
 void pc2000_state::machine_reset()
 {
 	//set the initial bank
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	memory_set_bank(m_machine, "bank1", 0);
+	memory_set_bank(m_machine, "bank2", 0);
 }
 
 static PALETTE_INIT( pc2000 )

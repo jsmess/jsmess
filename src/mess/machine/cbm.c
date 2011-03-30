@@ -42,18 +42,18 @@ static TIMER_CALLBACK( lightpen_tick )
 void cbm_common_interrupt( device_t *device )
 {
 	int value, i;
-	int controller1 = input_port_read(device->machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(device->machine, "CTRLSEL") & 0x70;
+	int controller1 = input_port_read(device->machine(), "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(device->machine(), "CTRLSEL") & 0x70;
 	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	/* Lines 0-7 : common keyboard */
 	for (i = 0; i < 8; i++)
 	{
 		value = 0xff;
-		value &= ~input_port_read(device->machine, c64ports[i]);
+		value &= ~input_port_read(device->machine(), c64ports[i]);
 
 		/* Shift Lock is mapped on Left Shift */
-		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x40))
+		if ((i == 1) && (input_port_read(device->machine(), "SPECIAL") & 0x40))
 			value &= ~0x80;
 
 		c64_keyline[i] = value;
@@ -64,30 +64,30 @@ void cbm_common_interrupt( device_t *device )
 	switch(controller1)
 	{
 		case 0x00:
-			value &= ~input_port_read(device->machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
+			value &= ~input_port_read(device->machine(), "JOY1_1B");			/* Joy1 Directions + Button 1 */
 			break;
 
 		case 0x01:
-			if (input_port_read(device->machine, "OTHER") & 0x40)			/* Paddle2 Button */
+			if (input_port_read(device->machine(), "OTHER") & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
-			if (input_port_read(device->machine, "OTHER") & 0x80)			/* Paddle1 Button */
+			if (input_port_read(device->machine(), "OTHER") & 0x80)			/* Paddle1 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x02:
-			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
+			if (input_port_read(device->machine(), "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
+			if (input_port_read(device->machine(), "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 
 		case 0x03:
-			value &= ~(input_port_read(device->machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
+			value &= ~(input_port_read(device->machine(), "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
 			break;
 
 		case 0x04:
 /* was there any input on the lightpen? where is it mapped? */
-//          if (input_port_read(device->machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//          if (input_port_read(device->machine(), "OTHER") & 0x04)           /* Lightpen Signal */
 //              value &= ?? ;
 			break;
 
@@ -106,30 +106,30 @@ void cbm_common_interrupt( device_t *device )
 	switch(controller2)
 	{
 		case 0x00:
-			value &= ~input_port_read(device->machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
+			value &= ~input_port_read(device->machine(), "JOY2_1B");			/* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x10:
-			if (input_port_read(device->machine, "OTHER") & 0x10)			/* Paddle4 Button */
+			if (input_port_read(device->machine(), "OTHER") & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
-			if (input_port_read(device->machine, "OTHER") & 0x20)			/* Paddle3 Button */
+			if (input_port_read(device->machine(), "OTHER") & 0x20)			/* Paddle3 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x20:
-			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
+			if (input_port_read(device->machine(), "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
+			if (input_port_read(device->machine(), "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 
 		case 0x30:
-			value &= ~(input_port_read(device->machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
+			value &= ~(input_port_read(device->machine(), "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x40:
 /* was there any input on the lightpen? where is it mapped? */
-//          if (input_port_read(device->machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//          if (input_port_read(device->machine(), "OTHER") & 0x04)           /* Lightpen Signal */
 //              value &= ?? ;
 			break;
 
@@ -147,10 +147,10 @@ void cbm_common_interrupt( device_t *device )
 //  vic2_frame_interrupt (device);
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
-	device->machine->scheduler().timer_set(attotime::zero, FUNC(lightpen_tick));
+	device->machine().scheduler().timer_set(attotime::zero, FUNC(lightpen_tick));
 
-	set_led_status (device->machine, 1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (device->machine, 0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */
+	set_led_status (device->machine(), 1, input_port_read(device->machine(), "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
+	set_led_status (device->machine(), 0, input_port_read(device->machine(), "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */
 }
 
 
@@ -297,7 +297,7 @@ UINT8 cbm_common_cia0_port_a_r( device_t *device, UINT8 output_b )
 		value &= t;
 	}
 
-	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
+	if ( input_port_read(device->machine(), "CTRLSEL") & 0x80 )
 		value &= c64_keyline[8];
 	else
 		value &= c64_keyline[9];
@@ -318,7 +318,7 @@ UINT8 cbm_common_cia0_port_b_r( device_t *device, UINT8 output_a )
 	if (!(output_a & 0x02)) value &= c64_keyline[1];
 	if (!(output_a & 0x01)) value &= c64_keyline[0];
 
-	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
+	if ( input_port_read(device->machine(), "CTRLSEL") & 0x80 )
 		value &= c64_keyline[9];
 	else
 		value &= c64_keyline[8];

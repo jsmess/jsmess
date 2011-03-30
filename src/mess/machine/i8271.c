@@ -191,7 +191,7 @@ static device_t *current_image(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	if (i8271->intf->floppy_drive_tags[i8271->drive]!=NULL) {
-		return device->machine->device(i8271->intf->floppy_drive_tags[i8271->drive]);
+		return device->machine().device(i8271->intf->floppy_drive_tags[i8271->drive]);
 	} else {
 		return NULL;
 	}
@@ -1065,14 +1065,14 @@ static void i8271_command_execute(device_t *device)
 			/* these two do not appear to be set at all! ?? */
 
 			if (i8271->intf->floppy_drive_tags[0]!=NULL) {
-				if (floppy_drive_get_flag_state(device->machine->device(i8271->intf->floppy_drive_tags[0]), FLOPPY_DRIVE_READY))
+				if (floppy_drive_get_flag_state(device->machine().device(i8271->intf->floppy_drive_tags[0]), FLOPPY_DRIVE_READY))
 				{
 					status |= (1<<2);
 				}
 			}
 
 			if (i8271->intf->floppy_drive_tags[1]!=NULL) {
-				if (floppy_drive_get_flag_state(device->machine->device(i8271->intf->floppy_drive_tags[1]), FLOPPY_DRIVE_READY))
+				if (floppy_drive_get_flag_state(device->machine().device(i8271->intf->floppy_drive_tags[1]), FLOPPY_DRIVE_READY))
 				{
 					status |= (1<<6);
 				}
@@ -1546,13 +1546,13 @@ static DEVICE_START( i8271 )
 
 	i8271->intf = (const i8271_interface*)device->baseconfig().static_config();
 
-	i8271->data_timer = device->machine->scheduler().timer_alloc(FUNC(i8271_data_timer_callback), (void *)device);
-	i8271->command_complete_timer = device->machine->scheduler().timer_alloc(FUNC(i8271_timed_command_complete_callback), (void *)device);
+	i8271->data_timer = device->machine().scheduler().timer_alloc(FUNC(i8271_data_timer_callback), (void *)device);
+	i8271->command_complete_timer = device->machine().scheduler().timer_alloc(FUNC(i8271_timed_command_complete_callback), (void *)device);
 	i8271->drive = 0;
-	i8271->pExecutionPhaseData = auto_alloc_array(device->machine, char, 0x4000);
+	i8271->pExecutionPhaseData = auto_alloc_array(device->machine(), char, 0x4000);
 
 	// register for state saving
-	//state_save_register_item(device->machine, "i8271", device->tag(), 0, i8271->number);
+	//state_save_register_item(device->machine(), "i8271", device->tag(), 0, i8271->number);
 }
 
 static DEVICE_RESET( i8271 )

@@ -113,7 +113,7 @@ static DEVICE_RESET( ti99_myarcmem )
 	/* Register the card */
 	device_t *peb = device->owner();
 
-	if (input_port_read(device->machine, "RAM")==RAM_MYARC512)
+	if (input_port_read(device->machine(), "RAM")==RAM_MYARC512)
 	{
 		int success = mount_card(peb, device, &myarcmem_card, get_pebcard_config(device)->slot);
 		if (!success) return;

@@ -131,22 +131,22 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( 3do )
 {
-	_3do_state *state = machine->driver_data<_3do_state>();
+	_3do_state *state = machine.driver_data<_3do_state>();
 
-	state->maincpu = downcast<legacy_cpu_device*>( machine->device("maincpu") );
+	state->maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
 
-	memory_set_bankptr(machine, "bank2",machine->region("user1")->base());
+	memory_set_bankptr(machine, "bank2",machine.region("user1")->base());
 
 	/* configure overlay */
 	memory_configure_bank(machine, "bank1", 0, 1, state->dram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* start with overlay enabled */
 	memory_set_bank(machine, "bank1", 1);
 
 	_3do_slow2_init(machine);
 	_3do_madam_init(machine);
-	_3do_clio_init(machine, downcast<screen_device *>(machine->device("screen")));
+	_3do_clio_init(machine, downcast<screen_device *>(machine.device("screen")));
 }
 
 

@@ -49,7 +49,7 @@ public:
 
 #define VERBOSE_LEVEL ( 2 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -58,7 +58,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine *machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine.device("maincpu")), buf );
 	}
 }
 
@@ -96,9 +96,9 @@ static const eeprom_interface eeprom_interface_93C56 =
 
 static READ32_HANDLER( hpc_r )
 {
-	ip20_state *state = space->machine->driver_data<ip20_state>();
+	ip20_state *state = space->machine().driver_data<ip20_state>();
 	device_t *scc;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
@@ -140,7 +140,7 @@ static READ32_HANDLER( hpc_r )
 		return state->nHPC_MiscStatus;
 	case 0x01bc:
 //      verboselog(machine, 2, "HPC CPU Serial EEPROM Read\n" );
-		return ( ( eeprom_read_bit(space->machine->device("eeprom")) << 4 ) );
+		return ( ( eeprom_read_bit(space->machine().device("eeprom")) << 4 ) );
 	case 0x01c4:
 		verboselog(machine, 2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", state->nHPC_LocalIOReg0Mask, mem_mask );
 		return state->nHPC_LocalIOReg0Mask;
@@ -160,7 +160,7 @@ static READ32_HANDLER( hpc_r )
 	case 0x0d04:
 		verboselog(machine, 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
-		scc = space->machine->device("scc");
+		scc = space->machine().device("scc");
 		return scc8530_r(scc, 2);
 	case 0x0d08:
 		verboselog(machine, 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
@@ -169,7 +169,7 @@ static READ32_HANDLER( hpc_r )
 	case 0x0d0c:
 		verboselog(machine, 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
-		scc = space->machine->device("scc");
+		scc = space->machine().device("scc");
 		return scc8530_r(scc, 3);
 	case 0x0d10:
 //      verboselog(machine, 2, "HPC DUART1 Channel B Control Read\n" );
@@ -214,12 +214,12 @@ static READ32_HANDLER( hpc_r )
 
 static WRITE32_HANDLER( hpc_w )
 {
-	ip20_state *state = space->machine->driver_data<ip20_state>();
+	ip20_state *state = space->machine().driver_data<ip20_state>();
 	device_t *scc;
 	device_t *eeprom;
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 
-	eeprom = space->machine->device("eeprom");
+	eeprom = space->machine().device("eeprom");
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -354,22 +354,22 @@ static WRITE32_HANDLER( hpc_w )
 		break;
 	case 0x0d00:
 		verboselog(machine, 2, "HPC DUART0 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine->device("scc");
+		scc = space->machine().device("scc");
 		scc8530_w(scc, 0, data);
 		break;
 	case 0x0d04:
 		verboselog(machine, 2, "HPC DUART0 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine->device("scc");
+		scc = space->machine().device("scc");
 		scc8530_w(scc, 2, data);
 		break;
 	case 0x0d08:
 		verboselog(machine, 2, "HPC DUART0 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine->device("scc");
+		scc = space->machine().device("scc");
 		scc8530_w(scc, 1, data);
 		break;
 	case 0x0d0c:
 		verboselog(machine, 2, "HPC DUART0 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine->device("scc");
+		scc = space->machine().device("scc");
 		scc8530_w(scc, 3, data);
 		break;
 	case 0x0d10:
@@ -433,13 +433,13 @@ static WRITE32_HANDLER( hpc_w )
 // INT/INT2/INT3 interrupt controllers
 static READ32_HANDLER( int_r )
 {
-	mame_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, cpu_get_pc(space->cpu));
+	mame_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space->device()));
 	return 0;
 }
 
 static WRITE32_HANDLER( int_w )
 {
-	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32 )
@@ -469,7 +469,7 @@ static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32 )
 	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
 ADDRESS_MAP_END
 
-static void scsi_irq(running_machine *machine, int state)
+static void scsi_irq(running_machine &machine, int state)
 {
 }
 
@@ -492,13 +492,13 @@ static void ip204415_exit(running_machine &machine)
 
 static DRIVER_INIT( ip204415 )
 {
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, ip204415_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, ip204415_exit);
 }
 
 // sgi_mc_update wants once every millisecond (1/1000th of a second)
 static TIMER_CALLBACK(ip20_timer)
 {
-	ip20_state *state = machine->driver_data<ip20_state>();
+	ip20_state *state = machine.driver_data<ip20_state>();
 	sgi_mc_update();
 
 	// update RTC every 10 milliseconds
@@ -553,12 +553,12 @@ static TIMER_CALLBACK(ip20_timer)
 		}
 	}
 
-	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
+	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
 }
 
 static MACHINE_START( ip204415 )
 {
-	ip20_state *state = machine->driver_data<ip20_state>();
+	ip20_state *state = machine.driver_data<ip20_state>();
 	sgi_mc_timer_init(machine);
 
 	wd33c93_init(machine, &scsi_intf);
@@ -574,7 +574,7 @@ static MACHINE_START( ip204415 )
 
 	state->nRTC_Temp = 0;
 
-	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
+	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
 }
 
 static INPUT_PORTS_START( ip204415 )

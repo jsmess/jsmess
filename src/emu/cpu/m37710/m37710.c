@@ -527,7 +527,7 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 
 static READ16_HANDLER( m37710_internal_word_r )
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(space->cpu);
+	m37710i_cpu_struct *cpustate = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -547,7 +547,7 @@ static READ16_HANDLER( m37710_internal_word_r )
 
 static WRITE16_HANDLER( m37710_internal_word_w )
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(space->cpu);
+	m37710i_cpu_struct *cpustate = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -906,7 +906,7 @@ static CPU_INIT( m37710 )
 	cpustate->destination = 0;
 
 	for (i = 0; i < 8; i++)
-		cpustate->timers[i] = device->machine->scheduler().timer_alloc(FUNC(m37710_timer_cb), cpustate);
+		cpustate->timers[i] = device->machine().scheduler().timer_alloc(FUNC(m37710_timer_cb), cpustate);
 
 	device->save_item(NAME(cpustate->a));
 	device->save_item(NAME(cpustate->b));
@@ -949,7 +949,7 @@ static CPU_INIT( m37710 )
 	device->save_item(NAME(cpustate->reload[6]));
 	device->save_item(NAME(cpustate->reload[7]));
 
-	device->machine->state().register_postload(m37710_restore_state, cpustate);
+	device->machine().state().register_postload(m37710_restore_state, cpustate);
 }
 
 /**************************************************************************

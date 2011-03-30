@@ -17,9 +17,9 @@
 
 
 
-void radio86_init_keyboard(running_machine *machine)
+void radio86_init_keyboard(running_machine &machine)
 {
-	radio86_state *state = machine->driver_data<radio86_state>();
+	radio86_state *state = machine.driver_data<radio86_state>();
 	state->keyboard_mask = 0;
 	state->tape_value = 0x10;
 }
@@ -28,7 +28,7 @@ void radio86_init_keyboard(running_machine *machine)
 DRIVER_INIT(radio86)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
 	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
@@ -37,31 +37,31 @@ DRIVER_INIT(radio86)
 
 DRIVER_INIT(radioram)
 {
-	radio86_state *state = machine->driver_data<radio86_state>();
+	radio86_state *state = machine.driver_data<radio86_state>();
 	DRIVER_INIT_CALL(radio86);
 	state->radio_ram_disk = auto_alloc_array(machine, UINT8, 0x20000);
 	memset(state->radio_ram_disk,0,0x20000);
 }
 static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
+	radio86_state *state = device->machine().driver_data<radio86_state>();
 	UINT8 key = 0xff;
-	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }
-	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"LINE1"); }
-	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine,"LINE2"); }
-	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine,"LINE3"); }
-	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine,"LINE4"); }
-	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
-	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
-	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
+	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"LINE0"); }
+	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"LINE1"); }
+	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"LINE2"); }
+	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"LINE3"); }
+	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"LINE4"); }
+	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"LINE5"); }
+	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"LINE6"); }
+	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"LINE7"); }
 	return key;
 }
 
 static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
-	double level = cassette_input(device->machine->device("cassette"));
-	UINT8 dat = input_port_read(device->machine, "LINE8");
+	radio86_state *state = device->machine().driver_data<radio86_state>();
+	double level = cassette_input(device->machine().device("cassette"));
+	UINT8 dat = input_port_read(device->machine(), "LINE8");
 	if (level <  0) {
 		dat ^= state->tape_value;
 	}
@@ -70,13 +70,13 @@ static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 
 static WRITE8_DEVICE_HANDLER (radio86_8255_porta_w2 )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
+	radio86_state *state = device->machine().driver_data<radio86_state>();
 	state->keyboard_mask = data ^ 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 {
-	cassette_output(device->machine->device("cassette"),data & 0x01 ? 1 : -1);
+	cassette_output(device->machine().device("cassette"),data & 0x01 ? 1 : -1);
 }
 
 
@@ -104,17 +104,17 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
 
 static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
-	double level = cassette_input(device->machine->device("cassette"));
+	radio86_state *state = device->machine().driver_data<radio86_state>();
+	double level = cassette_input(device->machine().device("cassette"));
 	UINT8 key = 0xff;
-	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"CLINE0"); }
-	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"CLINE1"); }
-	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine,"CLINE2"); }
-	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine,"CLINE3"); }
-	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine,"CLINE4"); }
-	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"CLINE5"); }
-	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"CLINE6"); }
-	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"CLINE7"); }
+	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"CLINE0"); }
+	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"CLINE1"); }
+	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"CLINE2"); }
+	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"CLINE3"); }
+	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"CLINE4"); }
+	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"CLINE5"); }
+	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"CLINE6"); }
+	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"CLINE7"); }
 	key &= 0xe0;
 	if (level <  0) {
 		key ^= state->tape_value;
@@ -135,7 +135,7 @@ I8255A_INTERFACE( rk7007_ppi8255_interface )
 static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	i8257_hlda_w(device, state);
@@ -164,23 +164,23 @@ static TIMER_CALLBACK( radio86_reset )
 
 READ8_HANDLER (radio_cpu_state_r )
 {
-	return cpu_get_reg(space->cpu, I8085_STATUS);
+	return cpu_get_reg(&space->device(), I8085_STATUS);
 }
 
 READ8_HANDLER (radio_io_r )
 {
-	return space->machine->device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
+	return space->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
 }
 
 WRITE8_HANDLER(radio_io_w )
 {
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
 }
 
 MACHINE_RESET( radio86 )
 {
-	radio86_state *state = machine->driver_data<radio86_state>();
-	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
+	radio86_state *state = machine.driver_data<radio86_state>();
+	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
 	memory_set_bank(machine, "bank1", 1);
 
 	state->keyboard_mask = 0;
@@ -190,14 +190,14 @@ MACHINE_RESET( radio86 )
 
 WRITE8_HANDLER ( radio86_pagesel )
 {
-	radio86_state *state = space->machine->driver_data<radio86_state>();
+	radio86_state *state = space->machine().driver_data<radio86_state>();
 	state->disk_sel = data;
 }
 
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
-	UINT8 *romdisk = device->machine->region("maincpu")->base() + 0x10000;
+	radio86_state *state = device->machine().driver_data<radio86_state>();
+	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x10000;
 	if ((state->disk_sel & 0x0f) ==0) {
 		return romdisk[state->romdisk_msb*256+state->romdisk_lsb];
 	} else {
@@ -211,13 +211,13 @@ static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 
 static WRITE8_DEVICE_HANDLER (radio86_romdisk_portb_w )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
+	radio86_state *state = device->machine().driver_data<radio86_state>();
 	state->romdisk_lsb = data;
 }
 
 static WRITE8_DEVICE_HANDLER (radio86_romdisk_portc_w )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
+	radio86_state *state = device->machine().driver_data<radio86_state>();
 	state->romdisk_msb = data;
 }
 
@@ -233,7 +233,7 @@ I8255A_INTERFACE( radio86_ppi8255_interface_2 )
 
 static WRITE8_DEVICE_HANDLER (mikrosha_8255_font_page_w )
 {
-	radio86_state *state = device->machine->driver_data<radio86_state>();
+	radio86_state *state = device->machine().driver_data<radio86_state>();
 	state->mikrosha_font_page = (data  > 7) & 1;
 }
 

@@ -73,9 +73,9 @@ ADDRESS_MAP_END
 // 7 - Keyboard TBMT H
 static READ8_HANDLER(vt100_flags_r)
 {
-	vt100_state *state = space->machine->driver_data<vt100_state>();
+	vt100_state *state = space->machine().driver_data<vt100_state>();
 	UINT8 retVal = 0;
-	retVal |= vt_video_lba7_r(space->machine->device("vt100_video"),0) * 0x40;
+	retVal |= vt_video_lba7_r(space->machine().device("vt100_video"),0) * 0x40;
 	retVal |= state->keyboard_int * 0x80;
 	return retVal;
 }
@@ -94,7 +94,7 @@ static UINT8 bit_sel(UINT8 data) {
 
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	vt100_state *state = timer.machine->driver_data<vt100_state>();
+	vt100_state *state = timer.machine().driver_data<vt100_state>();
 	int i;
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3",
@@ -106,11 +106,11 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	if (state->key_scan) {
 		for(i = 0; i < 16; i++)
 		{
-			code =	input_port_read(timer.machine, keynames[i]);
+			code =	input_port_read(timer.machine(), keynames[i]);
 			if (code!=0xff) {
 				state->keyboard_int = 1;
 				state->key_code = i | bit_sel(code);
-				cputag_set_input_line(timer.machine, "maincpu", 0, HOLD_LINE);
+				cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 				break;
 			}
 		}
@@ -120,9 +120,9 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 static WRITE8_HANDLER(vt100_keyboard_w)
 {
-	vt100_state *state = space->machine->driver_data<vt100_state>();
+	vt100_state *state = space->machine().driver_data<vt100_state>();
 
-	device_t *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine().device("speaker");
 
 	output_set_value("online_led",BIT(data,5) ? 0 : 1);
 	output_set_value("local_led", BIT(data,5));
@@ -137,12 +137,12 @@ static WRITE8_HANDLER(vt100_keyboard_w)
 
 static READ8_HANDLER(vt100_keyboard_r)
 {
-	vt100_state *state = space->machine->driver_data<vt100_state>();
+	vt100_state *state = space->machine().driver_data<vt100_state>();
 	return state->key_code;
 }
 static WRITE8_HANDLER(vt100_baud_rate_w)
 {
-	vt100_state *state = space->machine->driver_data<vt100_state>();
+	vt100_state *state = space->machine().driver_data<vt100_state>();
 	static const double baud_rate[] = {
 		50, 75, 110, 134.5, 150, 200, 300, 600, 1200,
 		1800, 2000, 2400, 3600, 4800, 9600, 19200
@@ -302,7 +302,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( vt100 )
 {
-	device_t *devconf = screen->machine->device("vt100_video");
+	device_t *devconf = screen->machine().device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -315,7 +315,7 @@ static SCREEN_UPDATE( vt100 )
 //          all other set to 1
 static IRQ_CALLBACK(vt100_irq_callback)
 {
-	vt100_state *state = device->machine->driver_data<vt100_state>();
+	vt100_state *state = device->machine().driver_data<vt100_state>();
 	UINT8 retVal = 0xc7 | (0x08 * state->keyboard_int) | (0x10 * state->receiver_int) | (0x20 * state->vertical_int);
 	state->receiver_int = 0;
 	return retVal;
@@ -327,7 +327,7 @@ static MACHINE_START(vt100)
 
 static MACHINE_RESET(vt100)
 {
-	vt100_state *state = machine->driver_data<vt100_state>();
+	vt100_state *state = machine.driver_data<vt100_state>();
 	state->keyboard_int = 0;
 	state->receiver_int = 0;
 	state->vertical_int = 0;
@@ -341,18 +341,18 @@ static MACHINE_RESET(vt100)
 
 	state->key_scan = 0;
 
-	device_set_irq_callback(machine->device("maincpu"), vt100_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), vt100_irq_callback);
 }
 
 static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )
 {
-	vt100_state *state = device->machine->driver_data<vt100_state>();
+	vt100_state *state = device->machine().driver_data<vt100_state>();
 	return state->ram[offset];
 }
 
 static WRITE8_DEVICE_HANDLER (vt100_clear_video_interrupt)
 {
-	vt100_state *state = device->machine->driver_data<vt100_state>();
+	vt100_state *state = device->machine().driver_data<vt100_state>();
 	state->vertical_int = 0;
 }
 
@@ -365,7 +365,7 @@ static const vt_video_interface vt100_video_interface = {
 
 static INTERRUPT_GEN( vt100_vertical_interrupt )
 {
-	vt100_state *state = device->machine->driver_data<vt100_state>();
+	vt100_state *state = device->machine().driver_data<vt100_state>();
 	state->vertical_int = 1;
 	device_set_input_line(device, 0, HOLD_LINE);
 }

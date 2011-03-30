@@ -163,9 +163,9 @@ static void detect_keypress(device_t *device)
 
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 
-	if (input_port_read(device->machine, keynames[kr2376->ring8]) == (1 << kr2376->ring11))
+	if (input_port_read(device->machine(), keynames[kr2376->ring8]) == (1 << kr2376->ring11))
 	{
-		kr2376->modifiers = input_port_read(device->machine, "MODIFIERS");
+		kr2376->modifiers = input_port_read(device->machine(), "MODIFIERS");
 
 		kr2376->strobe = 1;
 		/*  strobe 0->1 transition, encode char and update parity */
@@ -359,7 +359,7 @@ static DEVICE_START( kr2376 )
 	change_output_lines(device);
 
 	/* create the timers */
-	kr2376->scan_timer = device->machine->scheduler().timer_alloc(FUNC(kr2376_scan_tick), (void *)device);
+	kr2376->scan_timer = device->machine().scheduler().timer_alloc(FUNC(kr2376_scan_tick), (void *)device);
 	kr2376->scan_timer->adjust(attotime::zero, 0, attotime::from_hz(kr2376->intf->clock));
 
 	/* register for state saving */

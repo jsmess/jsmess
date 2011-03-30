@@ -111,7 +111,7 @@ READ8_DEVICE_HANDLER( msm58321_r )
 		{
 			system_time systime;
 
-			device->machine->current_datetime(systime);
+			device->machine().current_datetime(systime);
 
 			switch (msm58321->latch)
 			{
@@ -320,7 +320,7 @@ static DEVICE_START( msm58321 )
 	devcb_resolve_write_line(&msm58321->out_busy_func, &intf->out_busy_func, device);
 
 	/* create busy timer */
-	msm58321->busy_timer = device->machine->scheduler().timer_alloc(FUNC(busy_tick), (void *)device);
+	msm58321->busy_timer = device->machine().scheduler().timer_alloc(FUNC(busy_tick), (void *)device);
 	msm58321->busy_timer->adjust(attotime::zero, 0, attotime::from_hz(2));
 
 	/* register for state saving */

@@ -41,10 +41,10 @@ SCREEN_UPDATE( mac )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *mac = screen->machine->driver_data<mac_state>();
+	mac_state *mac = screen->machine().driver_data<mac_state>();
 
-	video_base = ram_get_size(screen->machine->device(RAM_TAG)) - (mac->screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (ram_get_ptr(screen->machine->device(RAM_TAG)) + video_base);
+	video_base = ram_get_size(screen->machine().device(RAM_TAG)) - (mac->screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (ram_get_ptr(screen->machine().device(RAM_TAG)) + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -69,7 +69,7 @@ SCREEN_UPDATE( macse30 )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *mac = screen->machine->driver_data<mac_state>();
+	mac_state *mac = screen->machine().driver_data<mac_state>();
 
 	video_base = mac->screen_buffer ? 0x8000 : 0;
 	video_ram = (const UINT16 *) &mac->m_se30_vram[video_base/4];
@@ -102,7 +102,7 @@ SCREEN_UPDATE( macse30 )
 
 VIDEO_START( mac_cb264 )
 {
-	mac_state *mac = machine->driver_data<mac_state>();
+	mac_state *mac = machine.driver_data<mac_state>();
 
 	mac->m_cb264_toggle = 0;
 	mac->m_cb264_count = 0;
@@ -115,7 +115,7 @@ VIDEO_START( mac_cb264 )
 // which makes it hard to get accurate timings (or escape the VIA2 IRQ handler)
 INTERRUPT_GEN( mac_cb264_vbl )
 {
-	mac_state *mac = device->machine->driver_data<mac_state>();
+	mac_state *mac = device->machine().driver_data<mac_state>();
 
 	if (!mac->m_cb264_vbl_disable)
 	{
@@ -127,7 +127,7 @@ SCREEN_UPDATE( mac_cb264 )
 {
 	UINT32 *scanline, *base;
 	int x, y;
-	mac_state *mac = screen->machine->driver_data<mac_state>();
+	mac_state *mac = screen->machine().driver_data<mac_state>();
 
 	switch (mac->m_cb264_mode)
 	{
@@ -250,7 +250,7 @@ READ32_MEMBER( mac_state::mac_cb264_r )
 			return m_cb264_toggle;	// bit 0 is vblank?
 
 		default:
-			logerror("cb264_r: reg %x (mask %x PC %x)\n", offset*4, mem_mask, cpu_get_pc(space.cpu));
+			logerror("cb264_r: reg %x (mask %x PC %x)\n", offset*4, mem_mask, cpu_get_pc(&space.device()));
 			break;
 	}
 
@@ -267,7 +267,7 @@ WRITE32_MEMBER( mac_state::mac_cb264_w )
 
 		case 0x14/4:	// VBL ack
 			{
-				mac_state *mac = space.machine->driver_data<mac_state>();
+				mac_state *mac = space.machine().driver_data<mac_state>();
 				mac->nubus_slot_interrupt(0xe, 0);
 			}
 			break;
@@ -277,7 +277,7 @@ WRITE32_MEMBER( mac_state::mac_cb264_w )
 			break;
 
 		default:
-//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, cpu_get_pc(space->cpu));
+//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 }
@@ -296,7 +296,7 @@ WRITE32_MEMBER( mac_state::mac_cb264_ramdac_w )
 
 			if (m_cb264_count == 3)
 			{
-				palette_set_color(space.machine, m_cb264_clutoffs, MAKE_RGB(m_cb264_colors[0], m_cb264_colors[1], m_cb264_colors[2]));
+				palette_set_color(space.machine(), m_cb264_clutoffs, MAKE_RGB(m_cb264_colors[0], m_cb264_colors[1], m_cb264_colors[2]));
 				m_cb264_palette[m_cb264_clutoffs] = MAKE_RGB(m_cb264_colors[0], m_cb264_colors[1], m_cb264_colors[2]);
 				m_cb264_clutoffs++;
 				m_cb264_count = 0;
@@ -317,7 +317,7 @@ VIDEO_START( macrbv )
 
 VIDEO_RESET(maceagle)
 {
-	mac_state *mac = machine->driver_data<mac_state>();
+	mac_state *mac = machine.driver_data<mac_state>();
 
 	mac->m_rbv_montype = 32;
 	mac->m_rbv_palette[0xfe] = 0xffffff;
@@ -326,7 +326,7 @@ VIDEO_RESET(maceagle)
 
 VIDEO_RESET(macrbv)
 {
-	mac_state *mac = machine->driver_data<mac_state>();
+	mac_state *mac = machine.driver_data<mac_state>();
 	rectangle visarea;
 	int htotal, vtotal;
 	double framerate;
@@ -374,12 +374,12 @@ VIDEO_RESET(macrbv)
 	}
 
 //      printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine->primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 }
 
 VIDEO_START( macsonora )
 {
-	mac_state *mac = machine->driver_data<mac_state>();
+	mac_state *mac = machine.driver_data<mac_state>();
 
 	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
 
@@ -400,7 +400,7 @@ VIDEO_START( macsonora )
 
 VIDEO_START( macv8 )
 {
-	mac_state *mac = machine->driver_data<mac_state>();
+	mac_state *mac = machine.driver_data<mac_state>();
 
 	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
 
@@ -419,8 +419,8 @@ SCREEN_UPDATE( macrbv )
 {
 	UINT32 *scanline;
 	int x, y, hres, vres;
-	mac_state *mac = screen->machine->driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)ram_get_ptr(screen->machine->device(RAM_TAG));
+	mac_state *mac = screen->machine().driver_data<mac_state>();
+	UINT8 *vram8 = (UINT8 *)ram_get_ptr(screen->machine().device(RAM_TAG));
 
 	switch (mac->m_rbv_montype)
 	{
@@ -536,7 +536,7 @@ SCREEN_UPDATE( macrbvvram )
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen->machine->driver_data<mac_state>();
+	mac_state *mac = screen->machine().driver_data<mac_state>();
 	UINT8 mode = 0;
 
 	switch (mac->m_rbv_type)

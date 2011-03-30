@@ -120,7 +120,7 @@ device_config *luxor_55_21046_device_config::static_alloc_device_config(const ma
 
 device_t *luxor_55_21046_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, luxor_55_21046_device(machine, *this));
+	return auto_alloc(machine, luxor_55_21046_device(machine, *this));
 }
 
 
@@ -429,8 +429,8 @@ luxor_55_21046_device::luxor_55_21046_device(running_machine &_machine, const lu
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),
-	  m_image0(machine->device(FLOPPY_0)),
-	  m_image1(machine->device(FLOPPY_1)),
+	  m_image0(m_machine.device(FLOPPY_0)),
+	  m_image1(m_machine.device(FLOPPY_1)),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_dma_irq(0),

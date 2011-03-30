@@ -150,15 +150,15 @@ static VIDEO_START( ec65 )
 
 static SCREEN_UPDATE( ec65 )
 {
-	device_t *mc6845 = screen->machine->device(MC6845_TAG);
+	device_t *mc6845 = screen->machine().device(MC6845_TAG);
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
-	ec65_state *state = device->machine->driver_data<ec65_state>();
-	UINT8 *charrom = device->machine->region("chargen")->base();
+	ec65_state *state = device->machine().driver_data<ec65_state>();
+	UINT8 *charrom = device->machine().region("chargen")->base();
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)

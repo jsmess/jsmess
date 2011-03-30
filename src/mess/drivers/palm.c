@@ -36,8 +36,8 @@ static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, cons
 
 static INPUT_CHANGED( pen_check )
 {
-    UINT8 button = input_port_read(field->port->machine, "PENB");
-    device_t *mc68328_device = field->port->machine->device("dragonball");
+    UINT8 button = input_port_read(field->port->machine(), "PENB");
+    device_t *mc68328_device = field->port->machine().device("dragonball");
     if(button)
     {
         mc68328_set_penirq_line(mc68328_device, 1);
@@ -50,15 +50,15 @@ static INPUT_CHANGED( pen_check )
 
 static INPUT_CHANGED( button_check )
 {
-    UINT8 button_state = input_port_read(field->port->machine, "PORTD");
-    device_t *mc68328_device = field->port->machine->device("dragonball");
+    UINT8 button_state = input_port_read(field->port->machine(), "PORTD");
+    device_t *mc68328_device = field->port->machine().device("dragonball");
 
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }
 
 static WRITE8_DEVICE_HANDLER( palm_port_f_out )
 {
-	palm_state *state = device->machine->driver_data<palm_state>();
+	palm_state *state = device->machine().driver_data<palm_state>();
     state->port_f_latch = data;
 }
 
@@ -69,27 +69,27 @@ static READ8_DEVICE_HANDLER( palm_port_c_in )
 
 static READ8_DEVICE_HANDLER( palm_port_f_in )
 {
-	palm_state *state = device->machine->driver_data<palm_state>();
+	palm_state *state = device->machine().driver_data<palm_state>();
     return state->port_f_latch;
 }
 
 static WRITE16_DEVICE_HANDLER( palm_spim_out )
 {
-	palm_state *state = device->machine->driver_data<palm_state>();
+	palm_state *state = device->machine().driver_data<palm_state>();
     state->spim_data = data;
 }
 
 static READ16_DEVICE_HANDLER( palm_spim_in )
 {
-	palm_state *state = device->machine->driver_data<palm_state>();
+	palm_state *state = device->machine().driver_data<palm_state>();
     return state->spim_data;
 }
 
 static void palm_spim_exchange( device_t *device )
 {
-	palm_state *state = device->machine->driver_data<palm_state>();
-    UINT8 x = input_port_read(device->machine, "PENX");
-    UINT8 y = input_port_read(device->machine, "PENY");
+	palm_state *state = device->machine().driver_data<palm_state>();
+    UINT8 x = input_port_read(device->machine(), "PENX");
+    UINT8 y = input_port_read(device->machine(), "PENY");
 
     switch( state->port_f_latch & 0x0f )
     {
@@ -105,27 +105,27 @@ static void palm_spim_exchange( device_t *device )
 
 static MACHINE_START( palm )
 {
-	palm_state *state = machine->driver_data<palm_state>();
-    address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-    space->install_read_bank (0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
-    space->install_write_bank(0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
-    memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+	palm_state *state = machine.driver_data<palm_state>();
+    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    space->install_read_bank (0x000000, ram_get_size(machine.device(RAM_TAG)) - 1, ram_get_size(machine.device(RAM_TAG)) - 1, 0, "bank1");
+    space->install_write_bank(0x000000, ram_get_size(machine.device(RAM_TAG)) - 1, ram_get_size(machine.device(RAM_TAG)) - 1, 0, "bank1");
+    memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 
     state->save_item(NAME(state->port_f_latch));
     state->save_item(NAME(state->spim_data));
-	if (machine->device<cpu_device>("maincpu")->debug()) {
-		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
+	if (machine.device<cpu_device>("maincpu")->debug()) {
+		machine.device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
 	}
 }
 
 static MACHINE_RESET( palm )
 {
     // Copy boot ROM
-    UINT8* bios = machine->region("bios")->base();
-    memset(ram_get_ptr(machine->device(RAM_TAG)), 0, ram_get_size(machine->device(RAM_TAG)));
-    memcpy(ram_get_ptr(machine->device(RAM_TAG)), bios, 0x20000);
+    UINT8* bios = machine.region("bios")->base();
+    memset(ram_get_ptr(machine.device(RAM_TAG)), 0, ram_get_size(machine.device(RAM_TAG)));
+    memcpy(ram_get_ptr(machine.device(RAM_TAG)), bios, 0x20000);
 
-    machine->device("maincpu")->reset();
+    machine.device("maincpu")->reset();
 }
 
 
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
-    dac_data_w( device->machine->device("dac"), 0x7f * data );
+    dac_data_w( device->machine().device("dac"), 0x7f * data );
 }
 
 

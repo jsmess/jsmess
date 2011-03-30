@@ -38,7 +38,7 @@ static SCREEN_UPDATE( pce220 )
 	int x, y, xi,yi;
 	int count = 0;
 //  static int test_x,test_y;
-	UINT8 *vram = screen->machine->region("lcd_vram")->base();
+	UINT8 *vram = screen->machine().region("lcd_vram")->base();
 
 	for (y = 0; y < 4; y++)
 	{
@@ -53,7 +53,7 @@ static SCREEN_UPDATE( pce220 )
 					color = (vram[count]) >> (yi) & 1;
 
 					//if ((x + xi) <= screen->visible_area()->max_x && (y + 0) < screen->visible_area()->max_y)
-						*BITMAP_ADDR32(bitmap, y*8 + yi, x*5 + xi) = screen->machine->pens[color ^ 1];
+						*BITMAP_ADDR32(bitmap, y*8 + yi, x*5 + xi) = screen->machine().pens[color ^ 1];
 				}
 
 				count++;
@@ -70,7 +70,7 @@ static READ8_HANDLER( lcd_status_r )
 
 static WRITE8_HANDLER( lcd_control_w )
 {
-	pce220_state *state = space->machine->driver_data<pce220_state>();
+	pce220_state *state = space->machine().driver_data<pce220_state>();
 	if((data & 0xb8) == 0xb8)
 		state->lcd_index_row = (data & 0x07);
 	if((data & 0x40) == 0x40)
@@ -79,41 +79,41 @@ static WRITE8_HANDLER( lcd_control_w )
 
 static WRITE8_HANDLER( lcd_data_w )
 {
-	pce220_state *state = space->machine->driver_data<pce220_state>();
-	UINT8 *vram = space->machine->region("lcd_vram")->base();
+	pce220_state *state = space->machine().driver_data<pce220_state>();
+	UINT8 *vram = space->machine().region("lcd_vram")->base();
 
 	vram[state->lcd_index_row*0x40|state->lcd_index_col] = data;
 
-	gfx_element_mark_dirty(space->machine->gfx[0], (state->lcd_index_row*0x40|state->lcd_index_col)/5);
+	gfx_element_mark_dirty(space->machine().gfx[0], (state->lcd_index_row*0x40|state->lcd_index_col)/5);
 	state->lcd_index_col++;
 }
 
 static READ8_HANDLER( rom_bank_r )
 {
-	pce220_state *state = space->machine->driver_data<pce220_state>();
+	pce220_state *state = space->machine().driver_data<pce220_state>();
 	return state->bank_num;
 }
 
 static WRITE8_HANDLER( rom_bank_w )
 {
-	pce220_state *state = space->machine->driver_data<pce220_state>();
+	pce220_state *state = space->machine().driver_data<pce220_state>();
 	UINT8 bank2 = data & 0x07; // bits 0,1,2
 	UINT8 bank1 = (data & 0x70) >> 4; // bits 4,5,6
 
 	state->bank_num = data;
 
-	memory_set_bankptr(space->machine, "bank3", space->machine->region("user1")->base() + 0x4000 * bank1);
-	memory_set_bankptr(space->machine, "bank4", space->machine->region("user1")->base() + 0x4000 * bank2);
+	memory_set_bankptr(space->machine(), "bank3", space->machine().region("user1")->base() + 0x4000 * bank1);
+	memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + 0x4000 * bank2);
 }
 
 static WRITE8_HANDLER( ram_bank_w )
 {
-	address_space *space_prg = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space_prg = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = BIT(data,2);
 	space_prg->install_write_bank(0x0000, 0x3fff, "bank1");
 
-	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG))+0x0000+bank*0x8000);
-	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG))+0x4000+bank*0x8000);
+	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG))+0x0000+bank*0x8000);
+	memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(space->machine().device(RAM_TAG))+0x4000+bank*0x8000);
 }
 
 static ADDRESS_MAP_START(pce220_mem, AS_PROGRAM, 8)
@@ -132,12 +132,12 @@ static READ8_HANDLER( battery_status_r )
 
 static READ8_HANDLER( timer_lcd_r )
 {
-	return space->machine->rand() & 1;
+	return space->machine().rand() & 1;
 }
 
 static WRITE8_HANDLER( timer_lcd_w )
 {
-	pce220_state *state = space->machine->driver_data<pce220_state>();
+	pce220_state *state = space->machine().driver_data<pce220_state>();
 	state->lcd_timer = data & 1;
 }
 
@@ -203,9 +203,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pce220)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x0000);
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + 0x0000);
 }
 
 static const gfx_layout test_decode =

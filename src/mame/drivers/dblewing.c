@@ -89,18 +89,18 @@ UINT16 dblwings_pri_callback(UINT16 x)
 
 static SCREEN_UPDATE(dblewing)
 {
-	dblewing_state *state = screen->machine->driver_data<dblewing_state>();
+	dblewing_state *state = screen->machine().driver_data<dblewing_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen->machine, BIT(flip, 7));
+	flip_screen_set(screen->machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 
 	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
-	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0x400);
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram, 0x400);
 	return 0;
 }
 
@@ -116,7 +116,7 @@ static SCREEN_UPDATE(dblewing)
 */
 static READ16_HANDLER ( dblewing_prot_r )
 {
-	dblewing_state *state = space->machine->driver_data<dblewing_state>();
+	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 	switch (offset * 2)
 	{
@@ -135,11 +135,11 @@ static READ16_HANDLER ( dblewing_prot_r )
 		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
 		case 0x1d4: return state->_70c_data;  //controls restart points
 
-		case 0x0ac: return (input_port_read(space->machine, "DSW") & 0x40) << 4;//flip screen
+		case 0x0ac: return (input_port_read(space->machine(), "DSW") & 0x40) << 4;//flip screen
 		case 0x4b0: return state->_608_data;//coinage
 		case 0x068:
 		{
-			switch (input_port_read(space->machine, "DSW") & 0x0300) //I don't know how to relationate this...
+			switch (input_port_read(space->machine(), "DSW") & 0x0300) //I don't know how to relationate this...
 			{
 				case 0x0000: return 0x000;//0
 				case 0x0100: return 0x060;//3
@@ -149,19 +149,19 @@ static READ16_HANDLER ( dblewing_prot_r )
 		}
 		case 0x094: return state->_104_data;// p1 inputs select screen  OK
 		case 0x24c: return state->_008_data;//read DSW (mirror for coinage/territory)
-		case 0x298: return input_port_read(space->machine, "SYSTEM");//vblank
-		case 0x476: return input_port_read(space->machine, "SYSTEM");//mirror for coins
-		case 0x506: return input_port_read(space->machine, "DSW");
+		case 0x298: return input_port_read(space->machine(), "SYSTEM");//vblank
+		case 0x476: return input_port_read(space->machine(), "SYSTEM");//mirror for coins
+		case 0x506: return input_port_read(space->machine(), "DSW");
 		case 0x5d8: return state->_406_data;
-		case 0x2b4: return input_port_read(space->machine, "P1_P2");
-		case 0x1a8: return (input_port_read(space->machine, "DSW") & 0x4000) >> 12;//allow continue
+		case 0x2b4: return input_port_read(space->machine(), "P1_P2");
+		case 0x1a8: return (input_port_read(space->machine(), "DSW") & 0x4000) >> 12;//allow continue
 		case 0x3ec: return state->_70c_data; //score entry
 		case 0x246: return state->_580_data; // these three controls "perfect bonus" I suppose...
 		case 0x52e: return state->_580_data;
 		case 0x532: return state->_580_data;
 	}
 
-//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
+//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask);
 
 	if ((offset*2) == 0x0f8) return 0; // state->_080_data;
 	if ((offset*2) == 0x104) return 0;
@@ -173,17 +173,17 @@ static READ16_HANDLER ( dblewing_prot_r )
 	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
 	if ((offset*2) == 0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask);
 
-	return 0;//space->machine->rand();
+	return 0;//space->machine().rand();
 }
 
 static WRITE16_HANDLER( dblewing_prot_w )
 {
-	dblewing_state *state = space->machine->driver_data<dblewing_state>();
+	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 //  if (offset * 2 != 0x380)
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask, data);
 
 	switch (offset * 2)
 	{
@@ -285,7 +285,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;  // p2 inputs select screen  OK
 	}
 
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask, data);
 
 	if ((offset * 2) == 0x008) { state->_008_data = data; return; }
 	if ((offset * 2) == 0x080) { state->_080_data = data; return; } // p3 3rd boss?
@@ -328,7 +328,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(irq_latch_r)
 {
-	dblewing_state *state = space->machine->driver_data<dblewing_state>();
+	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
 	state->sound_irq &= ~0x02;
@@ -520,7 +520,7 @@ INPUT_PORTS_END
 
 static void sound_irq( device_t *device, int state )
 {
-	dblewing_state *driver_state = device->machine->driver_data<dblewing_state>();
+	dblewing_state *driver_state = device->machine().driver_data<dblewing_state>();
 
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)
@@ -554,11 +554,11 @@ static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
 
 static MACHINE_START( dblewing )
 {
-	dblewing_state *state = machine->driver_data<dblewing_state>();
+	dblewing_state *state = machine.driver_data<dblewing_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
 
 	state->save_item(NAME(state->_008_data));
 	state->save_item(NAME(state->_104_data));
@@ -593,7 +593,7 @@ static MACHINE_START( dblewing )
 
 static MACHINE_RESET( dblewing )
 {
-	dblewing_state *state = machine->driver_data<dblewing_state>();
+	dblewing_state *state = machine.driver_data<dblewing_state>();
 
 	state->_008_data = 0;
 	state->_104_data = 0;

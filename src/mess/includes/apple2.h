@@ -88,7 +88,7 @@ struct _apple2_memmap_entry
 {
 	offs_t begin;
 	offs_t end;
-	void (*get_meminfo)(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo);
+	void (*get_meminfo)(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo);
 	bank_disposition_t bank_disposition;
 };
 
@@ -152,31 +152,31 @@ PALETTE_INIT( apple2 );
 
 extern const applefdc_interface apple2_fdc_interface;
 
-void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data);
-UINT8 apple2_iwm_getdiskreg(running_machine *machine);
+void apple2_iwm_setdiskreg(running_machine &machine, UINT8 data);
+UINT8 apple2_iwm_getdiskreg(running_machine &machine);
 
-void apple2_init_common(running_machine *machine);
+void apple2_init_common(running_machine &machine);
 MACHINE_START( apple2 );
-UINT8 apple2_getfloatingbusvalue(running_machine *machine);
+UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
 
 INTERRUPT_GEN( apple2_interrupt );
 
-INT8 apple2_slotram_r(running_machine *machine, int slotnum, int offset);
+INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset);
 
-void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask);
+void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask);
 
-int apple2_pressed_specialkey(running_machine *machine, UINT8 key);
+int apple2_pressed_specialkey(running_machine &machine, UINT8 key);
 
-void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *config);
-void apple2_update_memory(running_machine *machine);
+void apple2_setup_memory(running_machine &machine, const apple2_memmap_config *config);
+void apple2_update_memory(running_machine &machine);
 
 
 
 /*----------- defined in video/apple2.c -----------*/
 
-void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
+void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
 VIDEO_START( apple2 );
 VIDEO_START( apple2p );
 VIDEO_START( apple2e );

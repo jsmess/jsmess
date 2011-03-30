@@ -88,7 +88,7 @@ static DRIVER_INIT( rvoicepc )
 
 static MACHINE_RESET( rvoicepc )
 {
-	rvoice_state *state = machine->driver_data<rvoice_state>();
+	rvoice_state *state = machine.driver_data<rvoice_state>();
 	/* following is from datasheet at http://datasheets.chipdb.org/Hitachi/63701/HD63701Y0.pdf */
 	state->hd63701y0.P1DDR = 0xFE; // port 1 ddr, W
 	state->hd63701y0.P2DDR = 0x00; // port 2 ddr, W
@@ -128,9 +128,9 @@ static MACHINE_RESET( rvoicepc )
 
 static READ8_HANDLER( main_hd63701_internal_registers_r )
 {
-	rvoice_state *state = space->machine->driver_data<rvoice_state>();
+	rvoice_state *state = space->machine().driver_data<rvoice_state>();
 	UINT8 data = 0;
-	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", cpu_get_pc(space->cpu), offset);
+	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", cpu_get_pc(&space->device()), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -212,8 +212,8 @@ static READ8_HANDLER( main_hd63701_internal_registers_r )
 
 static WRITE8_HANDLER( main_hd63701_internal_registers_w )
 {
-	rvoice_state *state = space->machine->driver_data<rvoice_state>();
-	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", cpu_get_pc(space->cpu), offset);
+	rvoice_state *state = space->machine().driver_data<rvoice_state>();
+	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", cpu_get_pc(&space->device()), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
