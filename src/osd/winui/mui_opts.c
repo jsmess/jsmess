@@ -652,12 +652,13 @@ static void options_set_color_default(winui_options &opts, const char *name, COL
 
 static input_seq *options_get_input_seq(winui_options &opts, const char *name)
 {
-	static input_seq seq;
+/*	static input_seq seq;
 	const char *seq_string;
 
 	seq_string = opts.value( name);
 	input_seq_from_tokens(NULL, seq_string, &seq);	// HACK
-	return &seq;
+	return &seq;*/
+	return NULL;
 }
 
 

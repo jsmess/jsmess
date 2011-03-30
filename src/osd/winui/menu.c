@@ -85,7 +85,7 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //  input_item_from_serial_number
 //============================================================
 
-static int input_item_from_serial_number(running_machine *machine, int serial_number,
+static int input_item_from_serial_number(running_machine &machine, int serial_number,
 	const input_port_config **port, const input_field_config **field, const input_setting_config **setting)
 {
 	int i;
@@ -94,7 +94,7 @@ static int input_item_from_serial_number(running_machine *machine, int serial_nu
 	const input_setting_config *this_setting = NULL;
 
 	i = 0;
-	for (this_port = machine->m_portlist.first(); (i != serial_number) && (this_port != NULL); this_port = this_port->next())
+	for (this_port = machine.m_portlist.first(); (i != serial_number) && (this_port != NULL); this_port = this_port->next())
 	{
 		i++;
 		for (this_field = this_port->fieldlist; (i != serial_number) && (this_field != NULL); this_field = this_field->next)
@@ -127,7 +127,7 @@ static int input_item_from_serial_number(running_machine *machine, int serial_nu
 //  serial_number_from_input_item
 //============================================================
 
-static int serial_number_from_input_item(running_machine *machine, const input_port_config *port,
+static int serial_number_from_input_item(running_machine &machine, const input_port_config *port,
 	const input_field_config *field, const input_setting_config *setting)
 {
 	int i;
@@ -136,7 +136,7 @@ static int serial_number_from_input_item(running_machine *machine, const input_p
 	const input_setting_config *this_setting;
 
 	i = 0;
-	for (this_port = machine->m_portlist.first(); this_port != NULL; this_port = this_port->next())
+	for (this_port = machine.m_portlist.first(); this_port != NULL; this_port = this_port->next())
 	{
 		if ((port == this_port) && (field == NULL) && (setting == NULL))
 			return i;
@@ -166,7 +166,7 @@ static int serial_number_from_input_item(running_machine *machine, const input_p
 //  customize_input
 //============================================================
 
-static void customize_input(running_machine *machine, HWND wnd, const char *title, int player, int inputclass)
+static void customize_input(running_machine &machine, HWND wnd, const char *title, int player, int inputclass)
 {
 	dialog_box *dlg;
 	const input_port_config *port;
@@ -183,7 +183,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 	if (!dlg)
 		goto done;
 
-	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -243,7 +243,7 @@ done:
 //  customize_joystick
 //============================================================
 
-static void customize_joystick(running_machine *machine, HWND wnd, int joystick_num)
+static void customize_joystick(running_machine &machine, HWND wnd, int joystick_num)
 {
 	customize_input(machine, wnd, "Joysticks/Controllers", joystick_num, INPUT_CLASS_CONTROLLER);
 }
@@ -254,7 +254,7 @@ static void customize_joystick(running_machine *machine, HWND wnd, int joystick_
 //  customize_keyboard
 //============================================================
 
-static void customize_keyboard(running_machine *machine, HWND wnd)
+static void customize_keyboard(running_machine &machine, HWND wnd)
 {
 	customize_input(machine, wnd, "Emulated Keyboard", 0, INPUT_CLASS_KEYBOARD);
 }
@@ -265,7 +265,7 @@ static void customize_keyboard(running_machine *machine, HWND wnd)
 //  customize_miscinput
 //============================================================
 
-static void customize_miscinput(running_machine *machine, HWND wnd)
+static void customize_miscinput(running_machine &machine, HWND wnd)
 {
 	customize_input(machine, wnd, "Miscellaneous Input", 0, INPUT_CLASS_MISC);
 }
@@ -276,7 +276,7 @@ static void customize_miscinput(running_machine *machine, HWND wnd)
 //  customize_categorizedinput
 //============================================================
 
-static void customize_categorizedinput(running_machine *machine, HWND wnd, int category)
+static void customize_categorizedinput(running_machine &machine, HWND wnd, int category)
 {
 	assert(category > 0);
 	customize_input(machine, wnd, "Input", category, INPUT_CLASS_CATEGORIZED);
@@ -304,7 +304,7 @@ static void storeval_inputport(void *param, int val)
 //  customize_switches
 //============================================================
 
-static void customize_switches(running_machine *machine, HWND wnd, const char* title_string, UINT32 ipt_name)
+static void customize_switches(running_machine &machine, HWND wnd, const char* title_string, UINT32 ipt_name)
 {
 	dialog_box *dlg;
 	const input_port_config *port;
@@ -319,7 +319,7 @@ static void customize_switches(running_machine *machine, HWND wnd, const char* t
 	if (!dlg)
 		goto done;
 
-	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -359,7 +359,7 @@ done:
 //  customize_dipswitches
 //============================================================
 
-static void customize_dipswitches(running_machine *machine, HWND wnd)
+static void customize_dipswitches(running_machine &machine, HWND wnd)
 {
 	customize_switches(machine, wnd, "Dip Switches", IPT_DIPSWITCH);
 }
@@ -370,7 +370,7 @@ static void customize_dipswitches(running_machine *machine, HWND wnd)
 //  customize_configuration
 //============================================================
 
-static void customize_configuration(running_machine *machine, HWND wnd)
+static void customize_configuration(running_machine &machine, HWND wnd)
 {
 	customize_switches(machine, wnd, "Driver Configuration", IPT_CONFIG);
 }
@@ -445,7 +445,7 @@ static int port_type_is_analog(int type)
 
 
 
-static void customize_analogcontrols(running_machine *machine, HWND wnd)
+static void customize_analogcontrols(running_machine &machine, HWND wnd)
 {
 	dialog_box *dlg;
 	const input_port_config *port;
@@ -459,7 +459,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	if (!dlg)
 		goto done;
 
-	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -548,7 +548,7 @@ static char *win_dirname(const char *filename)
 
 static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 	DWORD fileproc_flags, bool is_load,
-	running_machine *machine)
+	running_machine &machine)
 {
 	win_open_file_name ofn;
 	char *dir = NULL;
@@ -581,9 +581,9 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 			snprintf(state_filename, ARRAY_LENGTH(state_filename), "%s", ofn.filename);
 
 		if (is_load) {
-			machine->schedule_load(state_filename);
+			machine.schedule_load(state_filename);
 		} else {
-			machine->schedule_save(state_filename);
+			machine.schedule_save(state_filename);
 		}
 	}
 	if (dir)
@@ -592,19 +592,19 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 
 
 
-static void state_load(HWND wnd, running_machine *machine)
+static void state_load(HWND wnd, running_machine &machine)
 {
 	state_dialog(wnd, WIN_FILE_DIALOG_OPEN, OFN_FILEMUSTEXIST, TRUE, machine);
 }
 
-static void state_save_as(HWND wnd, running_machine *machine)
+static void state_save_as(HWND wnd, running_machine &machine)
 {
 	state_dialog(wnd, WIN_FILE_DIALOG_SAVE, OFN_OVERWRITEPROMPT, FALSE, machine);
 }
 
-static void state_save(running_machine *machine)
+static void state_save(running_machine &machine)
 {
-	machine->schedule_save(state_filename);
+	machine.schedule_save(state_filename);
 }
 
 
@@ -951,7 +951,7 @@ static void change_device(HWND wnd, device_image_interface *image, int is_save)
 	}
 
 	// display the dialog
-	result = win_file_dialog(image->device().machine, wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
+	result = win_file_dialog(image->device().machine(), wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
 		dialog, filter, initial_dir, filename, ARRAY_LENGTH(filename));
 	if (result)
 	{
@@ -978,12 +978,12 @@ done:
 //  pause
 //============================================================
 
-static void pause(running_machine *machine)
+static void pause(running_machine &machine)
 {
 	if (!winwindow_ui_is_paused(machine)) {
-		machine->pause();
+		machine.pause();
 	} else {
-		machine->resume();
+		machine.resume();
 	}
 }
 
@@ -1110,7 +1110,7 @@ static void remove_menu_items(HMENU menu)
 //  setup_joystick_menu
 //============================================================
 
-static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
+static void setup_joystick_menu(running_machine &machine, HMENU menu_bar)
 {
 	int joystick_count = 0;
 	HMENU joystick_menu;
@@ -1124,7 +1124,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	int child_count = 0;
 
 	use_input_categories = 0;
-	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1143,7 +1143,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	if (use_input_categories)
 	{
 		// using input categories
-		for (port = machine->m_portlist.first(); port != NULL; port = port->next())
+		for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1206,7 +1206,7 @@ static int is_windowed(void)
 //  frameskip_level_count
 //============================================================
 
-static int frameskip_level_count(running_machine *machine)
+static int frameskip_level_count(running_machine &machine)
 {
 	static int count = -1;
 
@@ -1214,7 +1214,7 @@ static int frameskip_level_count(running_machine *machine)
 	{
 		//int frameskip_min = 0;
 		int frameskip_max = 10;
-		//options_get_range_int(&machine->options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
+		//options_get_range_int(&machine.options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
 		count = frameskip_max + 1;
 	}
 	return count;
@@ -1260,23 +1260,23 @@ static void prepare_menus(HWND wnd)
 
 	if (!joystick_menu_setup)
 	{
-		setup_joystick_menu(window->machine, menu_bar);
+		setup_joystick_menu(window->machine(), menu_bar);
 		joystick_menu_setup = 1;
 	}
 
-	frameskip = window->machine->video().frameskip();
+	frameskip = window->machine().video().frameskip();
 
 	orientation = window->target->orientation();
 
-	speed = window->machine->video().throttled() ? window->machine->video().speed_factor() : 0;
+	speed = window->machine().video().throttled() ? window->machine().video().speed_factor() : 0;
 
-	has_config		= input_has_input_class(window->machine, INPUT_CLASS_CONFIG);
-	has_dipswitch	= input_has_input_class(window->machine, INPUT_CLASS_DIPSWITCH);
-	has_keyboard	= input_has_input_class(window->machine, INPUT_CLASS_KEYBOARD);
-	has_misc		= input_has_input_class(window->machine, INPUT_CLASS_MISC);
+	has_config		= input_has_input_class(window->machine(), INPUT_CLASS_CONFIG);
+	has_dipswitch	= input_has_input_class(window->machine(), INPUT_CLASS_DIPSWITCH);
+	has_keyboard	= input_has_input_class(window->machine(), INPUT_CLASS_KEYBOARD);
+	has_misc		= input_has_input_class(window->machine(), INPUT_CLASS_MISC);
 
 	has_analog = 0;
-	for (port = window->machine->m_portlist.first(); port != NULL; port = port->next())
+	for (port = window->machine().m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1290,9 +1290,9 @@ static void prepare_menus(HWND wnd)
 
 	set_command_state(menu_bar, ID_FILE_SAVESTATE,			state_filename[0] != '\0'					? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post(window->machine)			? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post(window->machine())			? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(window->machine)		? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(window->machine())		? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
@@ -1304,9 +1304,9 @@ static void prepare_menus(HWND wnd)
 #endif
 
 	set_command_state(menu_bar, ID_KEYBOARD_EMULATED,		(has_keyboard) ?
-																(!ui_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
+																(!ui_get_use_natural_keyboard(window->machine())					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(window->machine)) ?																(ui_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
+	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(window->machine())) ?																(ui_get_use_natural_keyboard(window->machine())					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
 	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE,		has_keyboard								? MFS_ENABLED : MFS_GRAYED);
 
@@ -1323,13 +1323,13 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_THROTTLE_UNTHROTTLED,	(speed == 0)								? MFS_CHECKED : MFS_ENABLED);
 
 	set_command_state(menu_bar, ID_FRAMESKIP_AUTO,			(frameskip < 0)								? MFS_CHECKED : MFS_ENABLED);
-	for (i = 0; i < frameskip_level_count(window->machine); i++)
+	for (i = 0; i < frameskip_level_count(window->machine()); i++)
 		set_command_state(menu_bar, ID_FRAMESKIP_0 + i,		(frameskip == i)							? MFS_CHECKED : MFS_ENABLED);
 
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
 	{
-		for (port = window->machine->m_portlist.first(); port != NULL; port = port->next())
+		for (port = window->machine().m_portlist.first(); port != NULL; port = port->next())
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1338,7 +1338,7 @@ static void prepare_menus(HWND wnd)
 					input_field_get_user_settings(field, &settings);
 					for (setting = field->settinglist; setting != NULL; setting = setting->next)
 					{
-						command = ID_INPUT_0 + serial_number_from_input_item(window->machine, port, field, setting);
+						command = ID_INPUT_0 + serial_number_from_input_item(window->machine(), port, field, setting);
 						set_command_state(menu_bar, command, (setting->value == settings.value) ? MFS_CHECKED : MFS_ENABLED);
 					}
 				}
@@ -1372,7 +1372,7 @@ static void prepare_menus(HWND wnd)
 
 	int cnt = 0;
 	// then set up the actual devices
-	for (bool gotone = window->machine->m_devicelist.first(img); gotone; gotone = img->next(img))
+	for (bool gotone = window->machine().m_devicelist.first(img); gotone; gotone = img->next(img))
 	{
 		new_item = ID_DEVICE_0 + (cnt * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;
@@ -1418,17 +1418,17 @@ static void prepare_menus(HWND wnd)
 //  set_seped
 //============================================================
 
-static void set_speed(running_machine *machine, int speed)
+static void set_speed(running_machine &machine, int speed)
 {
 	astring error_string;
 	if (speed != 0)
 	{
-		machine->video().set_speed_factor(speed);
-		machine->options().emu_options::set_value(OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE, error_string);
+		machine.video().set_speed_factor(speed);
+		machine.options().emu_options::set_value(OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 
-	machine->video().set_throttled(speed != 0);
-	machine->options().emu_options::set_value(OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE, error_string);
+	machine.video().set_throttled(speed != 0);
+	machine.options().emu_options::set_value(OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 
@@ -1598,10 +1598,10 @@ static void help_about_mess(HWND wnd)
 //  help_about_thissystem
 //============================================================
 
-static void help_about_thissystem(running_machine *machine, HWND wnd)
+static void help_about_thissystem(running_machine &machine, HWND wnd)
 {
 	char buf[256];
-	snprintf(buf, ARRAY_LENGTH(buf), "mess.chm::/sysinfo/%s.htm", machine->system().name);
+	snprintf(buf, ARRAY_LENGTH(buf), "mess.chm::/sysinfo/%s.htm", machine.system().name);
 	help_display(wnd, buf);
 }
 
@@ -1611,7 +1611,7 @@ static void help_about_thissystem(running_machine *machine, HWND wnd)
 //  decode_deviceoption
 //============================================================
 
-static device_image_interface *decode_deviceoption(running_machine *machine, int command, int *devoption)
+static device_image_interface *decode_deviceoption(running_machine &machine, int command, int *devoption)
 {
 	int absolute_index;
 
@@ -1636,9 +1636,9 @@ static void set_window_orientation(win_window_info *window, int orientation)
 	if (window->target->is_ui_target())
 	{
 		render_container::user_settings settings;
-		window->machine->render().ui_container().get_user_settings(settings);
+		window->machine().render().ui_container().get_user_settings(settings);
 		settings.m_orientation = orientation;
-		window->machine->render().ui_container().set_user_settings(settings);
+		window->machine().render().ui_container().set_user_settings(settings);
 	}
 	winwindow_video_window_update(window);
 }
@@ -1677,28 +1677,28 @@ static int invoke_command(HWND wnd, UINT command)
 
 	// pause while invoking certain commands
 	if (pause_for_command(command))
-		winwindow_ui_pause_from_window_thread(window->machine, TRUE);
+		winwindow_ui_pause_from_window_thread(window->machine(), TRUE);
 
 	switch(command)
 	{
 		case ID_FILE_LOADSTATE_NEWUI:
-			state_load(wnd, window->machine);
+			state_load(wnd, window->machine());
 			break;
 
 		case ID_FILE_SAVESTATE:
-			state_save(window->machine);
+			state_save(window->machine());
 			break;
 
 		case ID_FILE_SAVESTATE_AS:
-			state_save_as(wnd, window->machine);
+			state_save_as(wnd, window->machine());
 			break;
 
 		case ID_FILE_SAVESCREENSHOT:
-			window->machine->video().save_active_screen_snapshots();
+			window->machine().video().save_active_screen_snapshots();
 			break;
 
 		case ID_FILE_EXIT_NEWUI:
-			window->machine->schedule_exit();
+			window->machine().schedule_exit();
 			break;
 
 		case ID_EDIT_PASTE:
@@ -1706,15 +1706,15 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_KEYBOARD_NATURAL:
-			ui_set_use_natural_keyboard(window->machine, TRUE);
+			ui_set_use_natural_keyboard(window->machine(), TRUE);
 			break;
 
 		case ID_KEYBOARD_EMULATED:
-			ui_set_use_natural_keyboard(window->machine, FALSE);
+			ui_set_use_natural_keyboard(window->machine(), FALSE);
 			break;
 
 		case ID_KEYBOARD_CUSTOMIZE:
-			customize_keyboard(window->machine, wnd);
+			customize_keyboard(window->machine(), wnd);
 			break;
 
 		case ID_VIDEO_ROTATE_0:
@@ -1734,15 +1734,15 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_OPTIONS_PAUSE:
-			pause(window->machine);
+			pause(window->machine());
 			break;
 
 		case ID_OPTIONS_HARDRESET:
-			window->machine->schedule_hard_reset();
+			window->machine().schedule_hard_reset();
 			break;
 
 		case ID_OPTIONS_SOFTRESET:
-			window->machine->schedule_soft_reset();
+			window->machine().schedule_soft_reset();
 			break;
 
 #if HAS_PROFILER
@@ -1752,23 +1752,23 @@ static int invoke_command(HWND wnd, UINT command)
 #endif // HAS_PROFILER
 
 		case ID_OPTIONS_DEBUGGER:
-			debug_cpu_get_visible_cpu(window->machine)->debug()->halt_on_next_instruction("User-initiated break\n");
+			debug_cpu_get_visible_cpu(window->machine())->debug()->halt_on_next_instruction("User-initiated break\n");
 			break;
 
 		case ID_OPTIONS_CONFIGURATION:
-			customize_configuration(window->machine, wnd);
+			customize_configuration(window->machine(), wnd);
 			break;
 
 		case ID_OPTIONS_DIPSWITCHES:
-			customize_dipswitches(window->machine, wnd);
+			customize_dipswitches(window->machine(), wnd);
 			break;
 
 		case ID_OPTIONS_MISCINPUT:
-			customize_miscinput(window->machine, wnd);
+			customize_miscinput(window->machine(), wnd);
 			break;
 
 		case ID_OPTIONS_ANALOGCONTROLS:
-			customize_analogcontrols(window->machine, wnd);
+			customize_analogcontrols(window->machine(), wnd);
 			break;
 
 		case ID_OPTIONS_FULLSCREEN:
@@ -1792,8 +1792,8 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_FRAMESKIP_AUTO:
-			window->machine->video().set_frameskip(-1);
-			window->machine->options().emu_options::set_value(OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE, error_string);
+			window->machine().video().set_frameskip(-1);
+			window->machine().options().emu_options::set_value(OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE, error_string);
 			break;
 
 		case ID_HELP_ABOUT_NEWUI:
@@ -1801,58 +1801,58 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_HELP_ABOUTSYSTEM:
-			help_about_thissystem(window->machine, wnd);
+			help_about_thissystem(window->machine(), wnd);
 			break;
 
 		case ID_THROTTLE_50:
-			set_speed(window->machine, 50);
+			set_speed(window->machine(), 50);
 			break;
 
 		case ID_THROTTLE_100:
-			set_speed(window->machine, 100);
+			set_speed(window->machine(), 100);
 			break;
 
 		case ID_THROTTLE_200:
-			set_speed(window->machine, 200);
+			set_speed(window->machine(), 200);
 			break;
 
 		case ID_THROTTLE_500:
-			set_speed(window->machine, 500);
+			set_speed(window->machine(), 500);
 			break;
 
 		case ID_THROTTLE_1000:
-			set_speed(window->machine, 1000);
+			set_speed(window->machine(), 1000);
 			break;
 
 		case ID_THROTTLE_UNTHROTTLED:
-			set_speed(window->machine, 0);
+			set_speed(window->machine(), 0);
 			break;
 
 		default:
-			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count(window->machine)))
+			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count(window->machine())))
 			{
 				// change frameskip
-				window->machine->video().set_frameskip(command - ID_FRAMESKIP_0);
-				window->machine->options().emu_options::set_value(OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE, error_string);
-				window->machine->options().emu_options::set_value(OPTION_FRAMESKIP, (int)command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE, error_string);
+				window->machine().video().set_frameskip(command - ID_FRAMESKIP_0);
+				window->machine().options().emu_options::set_value(OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE, error_string);
+				window->machine().options().emu_options::set_value(OPTION_FRAMESKIP, (int)command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (IO_COUNT*DEVOPTION_MAX)))
 			{
 				// change device
-				img = decode_deviceoption(window->machine, command, &dev_command);
+				img = decode_deviceoption(window->machine(), command, &dev_command);
 				device_command(wnd, img, dev_command);
 			}
 			else if ((command >= ID_JOYSTICK_0) && (command < ID_JOYSTICK_0 + MAX_JOYSTICKS))
 			{
 				// customize joystick
-				customize_joystick(window->machine, wnd, command - ID_JOYSTICK_0);
+				customize_joystick(window->machine(), wnd, command - ID_JOYSTICK_0);
 			}
 			else if ((command >= ID_VIDEO_VIEW_0) && (command < ID_VIDEO_VIEW_0 + 1000))
 			{
 				// render views
 				window->target->set_view(command - ID_VIDEO_VIEW_0);
 			}
-			else if (input_item_from_serial_number(window->machine, command - ID_INPUT_0, NULL, &field, &setting))
+			else if (input_item_from_serial_number(window->machine(), command - ID_INPUT_0, NULL, &field, &setting))
 			{
 				if ((field != NULL) && (field->type == IPT_CATEGORY) && (setting != NULL))
 				{
@@ -1875,7 +1875,7 @@ static int invoke_command(HWND wnd, UINT command)
 						}
 					}
 					if (category)
-						customize_categorizedinput(window->machine, wnd, category);
+						customize_categorizedinput(window->machine(), wnd, category);
 				}
 				else
 				{
@@ -1893,7 +1893,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 	// resume emulation
 	if (pause_for_command(command))
-		winwindow_ui_pause_from_window_thread(window->machine, FALSE);
+		winwindow_ui_pause_from_window_thread(window->machine(), FALSE);
 
 	return handled;
 }
@@ -1929,7 +1929,7 @@ static void set_menu_text(HMENU menu_bar, int command, const char *text)
 //  win_setup_menus
 //============================================================
 
-int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
+int win_setup_menus(running_machine &machine, HMODULE module, HMENU menu_bar)
 {
 	HMENU frameskip_menu;
 	char buf[256];
@@ -1948,7 +1948,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	DeleteMenu(menu_bar, ID_OPTIONS_PROFILER, MF_BYCOMMAND);
 #endif
 
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		DeleteMenu(menu_bar, ID_OPTIONS_DEBUGGER, MF_BYCOMMAND);
 
 	// set up frameskip menu
@@ -1962,7 +1962,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	}
 
 	// set the help menu to refer to this machine
-	snprintf(buf, ARRAY_LENGTH(buf), "About %s (%s)...", machine->system().description, machine->system().name);
+	snprintf(buf, ARRAY_LENGTH(buf), "About %s (%s)...", machine.system().description, machine.system().name);
 	set_menu_text(menu_bar, ID_HELP_ABOUTSYSTEM, buf);
 
 	// initialize state_filename for each driver, so we don't carry names in-between them
@@ -1971,7 +1971,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 		char *dst;
 
 		snprintf(state_filename, ARRAY_LENGTH(state_filename),
-			"%s State", machine->system().description);
+			"%s State", machine.system().description);
 
 		src = state_filename;
 		dst = state_filename;
@@ -2010,7 +2010,7 @@ static HMODULE win_resource_module(void)
 //  win_create_menu
 //============================================================
 
-int win_create_menu(running_machine *machine, HMENU *menus)
+int win_create_menu(running_machine &machine, HMENU *menus)
 {
 	HMENU menu_bar = NULL;
 	HMODULE module;
@@ -2050,7 +2050,7 @@ LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM w
 			{
 				LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 				win_window_info *window = (win_window_info *)ptr;
-				ui_paste(window->machine);
+				ui_paste(window->machine());
 			}
 			break;
 

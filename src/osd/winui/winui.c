@@ -5654,7 +5654,7 @@ static void MameLoadState()
 		char fname[MAX_PATH];
 		char bare_fname[_MAX_FNAME];
 		char *state_fname;
-		int rc;
+		//int rc;
 
 		_splitpath(filename, drive, dir, bare_fname, ext);
 
@@ -5695,9 +5695,9 @@ static void MameLoadState()
 		}
 
 		// call the MAME core function to check the save state file
-		rc = state_manager::check_file(NULL, pSaveState, selected_filename, MameMessageBox);
-		if (rc)
-			return;
+		//rc = state_manager::check_file(NULL, pSaveState, selected_filename, MameMessageBox);
+		//if (rc)
+//			return;
 
 		memset(&playopts, 0, sizeof(playopts));
 #ifdef MESS

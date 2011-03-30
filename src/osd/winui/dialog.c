@@ -1064,7 +1064,7 @@ static void seqselect_settext(HWND editwnd)
 		return;	// this should not happen - need to fix this
 
 	// retrieve the seq name
-	input_seq_name(Machine, seqstring, stuff->code);
+	input_seq_name(*Machine, seqstring, stuff->code);
 
 	// change the text - avoid calls to SetWindowText() if we can
 	win_get_window_text_utf8(editwnd, buffer, ARRAY_LENGTH(buffer));
@@ -1110,9 +1110,9 @@ static void seqselect_start_read_from_main_thread(void *param)
 	// the Win32 OSD code thinks that we are paused, we need to temporarily
 	// unpause ourselves or else we will block
 	pause_count = 0;
-	while(Machine->paused() && !winwindow_ui_is_paused(Machine))
+	while(Machine->paused() && !winwindow_ui_is_paused(*Machine))
 	{
-		winwindow_ui_pause_from_main_thread(Machine, FALSE);
+		winwindow_ui_pause_from_main_thread(*Machine, FALSE);
 		pause_count++;
 	}
 
@@ -1123,12 +1123,12 @@ static void seqselect_start_read_from_main_thread(void *param)
 	win_window_list = &fake_window_info;
 
 	// start the polling
-	input_seq_poll_start(Machine, stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
+	input_seq_poll_start(*Machine, stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
 
 	while(stuff->poll_state == SEQSELECT_STATE_POLLING)
 	{
 		// poll
-		/*ret = */input_seq_poll(Machine, stuff->code);
+		/*ret = */input_seq_poll(*Machine, stuff->code);
 		seqselect_settext(editwnd);
 	}
 
@@ -1140,7 +1140,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 
 	// repause the OSD code
 	while(pause_count--)
-		winwindow_ui_pause_from_main_thread(Machine, TRUE);
+		winwindow_ui_pause_from_main_thread(*Machine, TRUE);
 }
 
 
@@ -1596,9 +1596,9 @@ WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
 //  before_display_dialog
 //============================================================
 
-static void before_display_dialog(running_machine *machine)
+static void before_display_dialog(running_machine &machine)
 {
-	Machine = machine;
+	Machine = &machine;
 	winwindow_ui_pause_from_window_thread(machine, TRUE);
 }
 
@@ -1608,7 +1608,7 @@ static void before_display_dialog(running_machine *machine)
 //  after_display_dialog
 //============================================================
 
-static void after_display_dialog(running_machine *machine)
+static void after_display_dialog(running_machine &machine)
 {
 	winwindow_ui_pause_from_window_thread(machine, FALSE);
 	Machine = NULL;
@@ -1620,7 +1620,7 @@ static void after_display_dialog(running_machine *machine)
 //  win_dialog_runmodal
 //============================================================
 
-void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog)
+void win_dialog_runmodal(running_machine &machine, HWND wnd, dialog_box *dialog)
 {
 	assert(dialog);
 
@@ -1693,7 +1693,7 @@ static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wpar
 //  win_file_dialog
 //============================================================
 
-BOOL win_file_dialog(running_machine *machine,
+BOOL win_file_dialog(running_machine &machine,
 	HWND parent, win_file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
 	const char *initial_dir, char *filename, size_t filename_len)
 {
