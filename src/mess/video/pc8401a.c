@@ -9,72 +9,66 @@ static PALETTE_INIT( pc8401a )
 	palette_set_color(machine, 1, MAKE_RGB(16, 37, 84));
 }
 
-static VIDEO_START( pc8401a )
+void pc8401a_state::video_start()
 {
-	pc8401a_state *state = machine.driver_data<pc8401a_state>();
-
 	/* allocate video memory */
-	state->video_ram = auto_alloc_array(machine, UINT8, PC8401A_LCD_VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(m_machine, UINT8, PC8401A_LCD_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state->save_pointer(NAME(state->video_ram), PC8401A_LCD_VIDEORAM_SIZE);
+	save_pointer(NAME(m_video_ram), PC8401A_LCD_VIDEORAM_SIZE);
 }
 
-static SCREEN_UPDATE( pc8401a )
+bool pc8401a_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 /* PC-8500 */
 
-static VIDEO_START( pc8500 )
+void pc8500_state::video_start()
 {
-	pc8401a_state *state = machine.driver_data<pc8401a_state>();
-
 	/* allocate video memory */
-	state->video_ram = auto_alloc_array(machine, UINT8, PC8500_LCD_VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(m_machine, UINT8, PC8500_LCD_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state->save_pointer(NAME(state->video_ram), PC8500_LCD_VIDEORAM_SIZE);
+	save_pointer(NAME(m_video_ram), PC8500_LCD_VIDEORAM_SIZE);
 }
 
-static SCREEN_UPDATE( pc8500 )
+bool pc8500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	pc8401a_state *state = screen->machine().driver_data<pc8401a_state>();
+	sed1330_update(m_lcdc, &bitmap, &cliprect);
 
-	if (screen == state->m_screen_lcd)
+	/*
+	if (strcmp(screen.tag(), SCREEN_TAG) == 0)
 	{
-		sed1330_update(state->m_lcdc, bitmap, cliprect);
+		sed1330_update(m_lcdc, &bitmap, &cliprect);
 	}
 	else
 	{
-		mc6845_update(state->m_crtc, bitmap, cliprect);
+		mc6845_update(m_crtc, &bitmap, &cliprect);
 	}
+	*/
 
 	return 0;
 }
 
 /* SED1330 Interface */
 
-static READ8_HANDLER( pc8500_sed1330_vd_r )
+READ8_MEMBER( pc8500_state::vd_r )
 {
-	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
-
-	return state->video_ram[offset & PC8500_LCD_VIDEORAM_MASK];
+	return m_video_ram[offset & PC8500_LCD_VIDEORAM_MASK];
 }
 
-static WRITE8_HANDLER( pc8500_sed1330_vd_w )
+WRITE8_MEMBER( pc8500_state::vd_w )
 {
-	pc8401a_state *state = space->machine().driver_data<pc8401a_state>();
-
-	state->video_ram[offset & PC8500_LCD_VIDEORAM_MASK] = data;
+	m_video_ram[offset & PC8500_LCD_VIDEORAM_MASK] = data;
 }
 
 static SED1330_INTERFACE( pc8500_sed1330_config )
 {
 	SCREEN_TAG,
-	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, pc8500_sed1330_vd_r),
-	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, pc8500_sed1330_vd_w)
+	DEVCB_DRIVER_MEMBER(pc8500_state, vd_r),
+	DEVCB_DRIVER_MEMBER(pc8500_state, vd_w)
 };
 
 /* MC6845 Interface */
@@ -83,7 +77,8 @@ static MC6845_UPDATE_ROW( pc8441a_update_row )
 {
 }
 
-static const mc6845_interface pc8441a_mc6845_interface = {
+static const mc6845_interface pc8441a_mc6845_interface = 
+{
 	CRT_SCREEN_TAG,
 	6,
 	NULL,
@@ -104,15 +99,12 @@ MACHINE_CONFIG_FRAGMENT( pc8401a_video )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(pc8401a)
 
-	MCFG_VIDEO_START(pc8401a)
-
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(44)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(480, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
-	MCFG_SCREEN_UPDATE(pc8401a)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pc8500_video )
@@ -121,15 +113,12 @@ MACHINE_CONFIG_FRAGMENT( pc8500_video )
 	MCFG_PALETTE_LENGTH(2+8)
 	MCFG_PALETTE_INIT(pc8401a)
 
-	MCFG_VIDEO_START(pc8500)
-
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(44)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(480, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(pc8500)
 	
 	MCFG_SED1330_ADD(SED1330_TAG, 0, pc8500_sed1330_config)
 
@@ -140,7 +129,6 @@ MACHINE_CONFIG_FRAGMENT( pc8500_video )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE(pc8500)
 	
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, 400000, pc8441a_mc6845_interface)
 MACHINE_CONFIG_END
