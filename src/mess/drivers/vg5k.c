@@ -2,10 +2,16 @@
 
     Philips VG-5000mu
 
+    Driver by Sandro Ronco with help from Daniel Coulom
+
     05/2010 (Sandro Ronco)
      - EF9345 video controller
      - keyboard input ports
     05/2009 Skeleton driver.
+
+    Known issues:
+    - 1200 bauds cassette don't works
+    - BASIC games hangs in default BIOS but works in alternative version
 
     Informations ( see the very informative http://vg5k.free.fr/ ):
      - Variants: Radiola VG5000 and Schneider VG5000
@@ -39,6 +45,8 @@
 
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -54,91 +62,95 @@ class vg5k_state : public driver_device
 {
 public:
 	vg5k_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu"),
+		  m_ef9345(*this, "ef9345"),
+		  m_dac(*this, "dac"),
+		  m_printer(*this, "printer"),
+		  m_cassette(*this, "cassette")
+		{ }
 
-	ef9345_device *ef9345;
-	device_t *dac;
-	device_t *printer;
-	device_t *cassette;
+	required_device<cpu_device> m_maincpu;
+	required_device<ef9345_device> m_ef9345;
+	required_device<device_t> m_dac;
+	required_device<device_t> m_printer;
+	required_device<device_t> m_cassette;
 
-	offs_t ef9345_offset;
+	offs_t m_ef9345_offset;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER( printer_r );
+	DECLARE_WRITE8_MEMBER( printer_w );
+	DECLARE_WRITE8_MEMBER ( ef9345_offset_w );
+	DECLARE_READ8_MEMBER ( ef9345_io_r );
+	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
+	DECLARE_READ8_MEMBER ( cassette_r );
+	DECLARE_WRITE8_MEMBER ( cassette_w );
 };
 
 
-static READ8_HANDLER( printer_r )
+READ8_MEMBER( vg5k_state::printer_r )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-
-	return (printer_is_ready(vg5k->printer) ? 0x00 : 0xff);
+	return (printer_is_ready(m_printer) ? 0x00 : 0xff);
 }
 
 
-static WRITE8_HANDLER( printer_w )
+WRITE8_MEMBER( vg5k_state::printer_w )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-
-	printer_output(vg5k->printer, data);
+	printer_output(m_printer, data);
 }
 
 
-static WRITE8_HANDLER ( ef9345_offset_w )
+WRITE8_MEMBER ( vg5k_state::ef9345_offset_w )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-
-	vg5k->ef9345_offset = data;
+	m_ef9345_offset = data;
 }
 
 
-static READ8_HANDLER ( ef9345_io_r )
+READ8_MEMBER ( vg5k_state::ef9345_io_r )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-
-	return vg5k->ef9345->data_r(*space, vg5k->ef9345_offset, 0xff);
+	return m_ef9345->data_r(space, m_ef9345_offset, 0xff);
 }
 
 
-static WRITE8_HANDLER ( ef9345_io_w )
+WRITE8_MEMBER ( vg5k_state::ef9345_io_w )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-
-	vg5k->ef9345->data_w(*space, vg5k->ef9345_offset, data, 0xff);
+	m_ef9345->data_w(space, m_ef9345_offset, data, 0xff);
 }
 
 
-static READ8_HANDLER ( cassette_r )
+READ8_MEMBER ( vg5k_state::cassette_r )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-	double level;
-
-	level = cassette_input(vg5k->cassette);
+	double level = cassette_input(m_cassette);
 
 	return (level > 0.03) ? 0xff : 0x00;
 }
 
 
-static WRITE8_HANDLER ( cassette_w )
+WRITE8_MEMBER ( vg5k_state::cassette_w )
 {
-	vg5k_state *vg5k = space->machine().driver_data<vg5k_state>();
-
-	dac_data_w(vg5k->dac, data <<2);
+	dac_data_w(m_dac, data <<2);
 
 	if (data == 0x03)
-		cassette_output(vg5k->cassette, +1);
+		cassette_output(m_cassette, +1);
 	else if (data == 0x02)
-		cassette_output(vg5k->cassette, -1);
+		cassette_output(m_cassette, -1);
 	else
-		cassette_output(vg5k->cassette, 0);
+		cassette_output(m_cassette, 0);
 }
 
 
-static ADDRESS_MAP_START( vg5k_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( vg5k_mem, AS_PROGRAM, 8, vg5k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_NOP /* messram expansion memory */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vg5k_io , AS_IO, 8)
+static ADDRESS_MAP_START( vg5k_io , AS_IO, 8, vg5k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 
@@ -165,12 +177,11 @@ static ADDRESS_MAP_START( vg5k_io , AS_IO, 8)
 	AM_RANGE( 0xcf, 0xcf ) AM_READWRITE(ef9345_io_r, ef9345_io_w)
 
 	/* cassette */
-	AM_RANGE(0xaf,0xaf) AM_READWRITE( cassette_r, cassette_w)
+	AM_RANGE( 0xaf,0xaf ) AM_READWRITE(cassette_r, cassette_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( vg5k )
-
 	PORT_START("ROW1")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("HOME")
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
@@ -180,7 +191,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("DOWN")
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL)  PORT_NAME("CTRL")
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("INS")
-
 	PORT_START("ROW2")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("RUN")
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
@@ -190,7 +200,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("ENTER")
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_NAME("UP")
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-
 	PORT_START("ROW3")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
@@ -200,7 +209,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR(':')
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-
 	PORT_START("ROW4")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
@@ -210,7 +218,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
-
 	PORT_START("ROW5")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
@@ -220,7 +227,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-
 	PORT_START("ROW6")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -230,7 +236,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-
 	PORT_START("ROW7")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
@@ -240,7 +245,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CHAR('<')
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("PRINT")
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-
 	PORT_START("ROW8")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("<--")
@@ -250,7 +254,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-
 	PORT_START("JOY0")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
@@ -260,7 +263,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
-
 	PORT_START("JOY1")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
@@ -270,7 +272,6 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_UNUSED
-
 INPUT_PORTS_END
 
 
@@ -291,38 +292,23 @@ static TIMER_DEVICE_CALLBACK( vg5k_scanline )
 {
 	vg5k_state *vg5k = timer.machine().driver_data<vg5k_state>();
 
-	vg5k->ef9345->update_scanline((UINT16)param);
+	vg5k->m_ef9345->update_scanline((UINT16)param);
 }
 
 
-static MACHINE_START( vg5k )
+void vg5k_state::machine_start()
 {
-	vg5k_state *vg5k = machine.driver_data<vg5k_state>();
-
-	vg5k->ef9345 = machine.device<ef9345_device>("ef9345");
-	vg5k->dac = machine.device("dac");
-	vg5k->printer = machine.device("printer");
-	vg5k->cassette = machine.device("cassette");
-
-	state_save_register_global(machine, vg5k->ef9345_offset);
+	state_save_register_global(m_machine, m_ef9345_offset);
 }
 
-static MACHINE_RESET( vg5k )
+void vg5k_state::machine_reset()
 {
-	vg5k_state *vg5k = machine.driver_data<vg5k_state>();
-
-	vg5k->ef9345_offset = 0;
+	m_ef9345_offset = 0;
 }
 
-static VIDEO_START( vg5k )
+bool vg5k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-}
-
-static SCREEN_UPDATE( vg5k )
-{
-	vg5k_state *vg5k = screen->machine().driver_data<vg5k_state>();
-
-	vg5k->ef9345->video_update(bitmap, cliprect);
+	m_ef9345->video_update(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -398,10 +384,9 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	MCFG_TIMER_ADD_SCANLINE("vg5k_scanline", vg5k_scanline, "screen", 0, 10)
 
-	MCFG_EF9345_ADD("ef9345", vg5k_ef9345_config)
+	MCFG_TIMER_ADD_PERIODIC("irq_timer", z80_irq, attotime::from_msec(20))
 
-	MCFG_MACHINE_START(vg5k)
-	MCFG_MACHINE_RESET(vg5k)
+	MCFG_EF9345_ADD("ef9345", vg5k_ef9345_config)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,12 +395,9 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
-	MCFG_SCREEN_UPDATE(vg5k)
 
 	MCFG_GFXDECODE(vg5k)
 	MCFG_PALETTE_LENGTH(8)
-
-	MCFG_VIDEO_START(vg5k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -438,8 +420,6 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
-
-	MCFG_TIMER_ADD_PERIODIC("irq_timer", z80_irq, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -458,4 +438,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k, "Philips",  "VG-5000", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k, "Philips",  "VG-5000", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
