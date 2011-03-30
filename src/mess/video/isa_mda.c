@@ -168,7 +168,7 @@ device_t *isa8_mda_device_config::alloc_device(running_machine &machine) const
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_mda_device_config::machine_config_additions() const
+machine_config_constructor isa8_mda_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pcvideo_mda );
 }
@@ -177,7 +177,7 @@ machine_config_constructor isa8_mda_device_config::machine_config_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_mda_device_config::rom_region() const
+const rom_entry *isa8_mda_device_config::device_rom_region() const
 {
 	return ROM_NAME( mda );
 }
@@ -619,7 +619,7 @@ device_t *isa8_hercules_device_config::alloc_device(running_machine &machine) co
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_hercules_device_config::machine_config_additions() const
+machine_config_constructor isa8_hercules_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pcvideo_hercules );
 }
@@ -628,7 +628,7 @@ machine_config_constructor isa8_hercules_device_config::machine_config_additions
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_hercules_device_config::rom_region() const
+const rom_entry *isa8_hercules_device_config::device_rom_region() const
 {
 	return ROM_NAME( hercules );
 }

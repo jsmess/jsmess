@@ -33,7 +33,7 @@ public:
         virtual device_t *alloc_device(running_machine &machine) const;
 		
 		// optional information overrides
-		virtual machine_config_constructor machine_config_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const;
 };
  
  

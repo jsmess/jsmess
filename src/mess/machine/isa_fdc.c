@@ -96,7 +96,7 @@ device_t *isa8_fdc_device_config::alloc_device(running_machine &machine) const
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_fdc_device_config::machine_config_additions() const
+machine_config_constructor isa8_fdc_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( fdc_config );
 }

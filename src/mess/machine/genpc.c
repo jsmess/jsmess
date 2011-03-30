@@ -501,7 +501,7 @@ device_t *ibm5160_mb_device_config::alloc_device(running_machine &machine) const
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor ibm5160_mb_device_config::machine_config_additions() const
+machine_config_constructor ibm5160_mb_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ibm5160_mb_config );
 }
@@ -535,7 +535,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *ibm5160_mb_device_config::input_ports() const
+const input_port_token *ibm5160_mb_device_config::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( ibm5160_mb );
 }
@@ -739,7 +739,7 @@ device_t *ibm5150_mb_device_config::alloc_device(running_machine &machine) const
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor ibm5150_mb_device_config::machine_config_additions() const
+machine_config_constructor ibm5150_mb_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ibm5150_mb_config );
 }

@@ -144,7 +144,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc99_device_config::rom_region() const
+const rom_entry *abc99_device_config::device_rom_region() const
 {
 	return ROM_NAME( abc99 );
 }
@@ -236,7 +236,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor abc99_device_config::machine_config_additions() const
+machine_config_constructor abc99_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( abc99 );
 }
@@ -453,7 +453,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *abc99_device_config::input_ports() const
+const input_port_token *abc99_device_config::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( abc99 );
 }

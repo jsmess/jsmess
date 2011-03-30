@@ -56,8 +56,8 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 	// optional information overrides
-	virtual const rom_entry *rom_region() const;
-	virtual machine_config_constructor machine_config_additions() const;
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
 	// device_config overrides

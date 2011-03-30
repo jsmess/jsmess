@@ -168,7 +168,7 @@ device_t *isa8_hdc_device_config::alloc_device(running_machine &machine) const
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_hdc_device_config::machine_config_additions() const
+machine_config_constructor isa8_hdc_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( hdc_config );
 }
@@ -177,7 +177,7 @@ machine_config_constructor isa8_hdc_device_config::machine_config_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_hdc_device_config::rom_region() const
+const rom_entry *isa8_hdc_device_config::device_rom_region() const
 {
 	return ROM_NAME( hdc );
 }

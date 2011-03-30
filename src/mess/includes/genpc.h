@@ -45,8 +45,8 @@ public:
 	static void static_set_cputag(device_config *device, const char *tag);
  
 	// optional information overrides
-	virtual machine_config_constructor machine_config_additions() const;
-	virtual const input_port_token *input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const input_port_token *device_input_ports() const;
 	
 	const char *m_cputag;
 
@@ -166,7 +166,7 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
   
 	// optional information overrides
-	virtual machine_config_constructor machine_config_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
  
  

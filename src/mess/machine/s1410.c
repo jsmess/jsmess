@@ -108,7 +108,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s1410_device_config::rom_region() const
+const rom_entry *s1410_device_config::device_rom_region() const
 {
 	return ROM_NAME( s1410 );
 }
@@ -159,7 +159,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor s1410_device_config::machine_config_additions() const
+machine_config_constructor s1410_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( s1410 );
 }
