@@ -3,6 +3,8 @@
 #ifndef __PC8001__
 #define __PC8001__
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -51,10 +53,28 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_ram;
 
+	virtual void machine_start();
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE8_MEMBER( port30_w );
+	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	
 	/* video state */
-	UINT8 *char_rom;
-	int width80;
-	int color;
+	UINT8 *m_char_rom;
+	int m_width80;
+	int m_color;
+};
+
+class pc8001mk2_state : public pc8001_state
+{
+public:
+	pc8001mk2_state(running_machine &machine, const driver_device_config_base &config)
+		: pc8001_state(machine, config)
+	{ }
+
+	DECLARE_WRITE8_MEMBER( port31_w );
 };
 
 #endif
