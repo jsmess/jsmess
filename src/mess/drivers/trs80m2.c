@@ -872,7 +872,7 @@ static const floppy_config trs80m2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
-	NULL
+	"floppy_5_25"
 };
 
 WRITE_LINE_MEMBER( trs80m2_state::fdc_intrq_w )
@@ -980,6 +980,9 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trs80m16, trs80m2 )
