@@ -6,18 +6,11 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "includes/jtc.h"
-#include "cpu/z8/z8.h"
-#include "imagedev/cassette.h"
-#include "machine/ctronics.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
-#include "machine/ram.h"
 
 /* Read/Write Handlers */
 
-static WRITE8_HANDLER( p2_w )
+WRITE8_MEMBER( jtc_state::p2_w )
 {
 	/*
 
@@ -34,12 +27,10 @@ static WRITE8_HANDLER( p2_w )
 
     */
 
-	jtc_state *state = space->machine().driver_data<jtc_state>();
-
-	centronics_strobe_w(state->centronics, BIT(data, 5));
+	centronics_strobe_w(m_centronics, BIT(data, 5));
 }
 
-static READ8_HANDLER( p3_r )
+READ8_MEMBER( jtc_state::p3_r )
 {
 	/*
 
@@ -56,17 +47,15 @@ static READ8_HANDLER( p3_r )
 
     */
 
-	jtc_state *state = space->machine().driver_data<jtc_state>();
-
 	UINT8 data = 0;
 
-	data |= (cassette_input(state->cassette) < 0.0) ? 1 : 0;
-	data |= centronics_busy_r(state->centronics) << 3;
+	data |= (cassette_input(m_cassette) < 0.0) ? 1 : 0;
+	data |= centronics_busy_r(m_centronics) << 3;
 
 	return data;
 }
 
-static WRITE8_HANDLER( p3_w )
+WRITE8_MEMBER( jtc_state::p3_w )
 {
 	/*
 
@@ -82,50 +71,42 @@ static WRITE8_HANDLER( p3_w )
         P37     speaker output
 
     */
-
-	jtc_state *state = space->machine().driver_data<jtc_state>();
 
 	/* tape */
-	cassette_output(state->cassette, BIT(data, 6) ? +1.0 : -1.0);
+	cassette_output(m_cassette, BIT(data, 6) ? +1.0 : -1.0);
 
 	/* speaker */
-	speaker_level_w(state->speaker, BIT(data, 7));
+	speaker_level_w(m_speaker, BIT(data, 7));
 }
 
-static READ8_HANDLER( es40_videoram_r )
+READ8_MEMBER( jtces40_state::videoram_r )
 {
-	jtc_state *state = space->machine().driver_data<jtc_state>();
-
 	UINT8 data = 0;
 
-	if (state->video_bank & 0x80) data |= state->color_ram_r[offset];
-	if (state->video_bank & 0x40) data |= state->color_ram_g[offset];
-	if (state->video_bank & 0x20) data |= state->color_ram_b[offset];
-	if (state->video_bank & 0x10) data |= state->video_ram[offset];
+	if (m_video_bank & 0x80) data |= m_color_ram_r[offset];
+	if (m_video_bank & 0x40) data |= m_color_ram_g[offset];
+	if (m_video_bank & 0x20) data |= m_color_ram_b[offset];
+	if (m_video_bank & 0x10) data |= m_video_ram[offset];
 
 	return data;
 }
 
-static WRITE8_HANDLER( es40_videoram_w )
+WRITE8_MEMBER( jtces40_state::videoram_w )
 {
-	jtc_state *state = space->machine().driver_data<jtc_state>();
-
-	if (state->video_bank & 0x80) state->color_ram_r[offset] = data;
-	if (state->video_bank & 0x40) state->color_ram_g[offset] = data;
-	if (state->video_bank & 0x20) state->color_ram_b[offset] = data;
-	if (state->video_bank & 0x10) state->video_ram[offset] = data;
+	if (m_video_bank & 0x80) m_color_ram_r[offset] = data;
+	if (m_video_bank & 0x40) m_color_ram_g[offset] = data;
+	if (m_video_bank & 0x20) m_color_ram_b[offset] = data;
+	if (m_video_bank & 0x10) m_video_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( es40_banksel_w )
+WRITE8_MEMBER( jtces40_state::banksel_w )
 {
-	jtc_state *state = space->machine().driver_data<jtc_state>();
-
-	state->video_bank = offset & 0xf0;
+	m_video_bank = offset & 0xf0;
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8, jtc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
@@ -140,10 +121,10 @@ static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
 	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(jtc_state, video_ram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8, jtces88_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_ROM
@@ -160,10 +141,10 @@ static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
 	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(jtc_state, video_ram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x17ff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff0) AM_READ_PORT("Y0")
@@ -183,14 +164,14 @@ static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x700e, 0x700e) AM_MIRROR(0x0ff0) AM_READ_PORT("Y14")
 	AM_RANGE(0x700f, 0x700f) AM_MIRROR(0x0ff0) AM_READ_PORT("Y15")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(jtc_state, video_ram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8, jtces40_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(es40_videoram_r, es40_videoram_w)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(es40_banksel_w)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(videoram_r, videoram_w)
+	AM_RANGE(0x6000, 0x63ff) AM_WRITE(banksel_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
 	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
@@ -206,7 +187,7 @@ static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_RAM//BANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_io, AS_IO, 8)
+static ADDRESS_MAP_START( jtc_io, AS_IO, 8, jtc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_NOP // A8-A15
 	AM_RANGE(0x01, 0x01) AM_NOP // AD0-AD7
@@ -504,26 +485,24 @@ INPUT_PORTS_END
 
 /* Video */
 
-static VIDEO_START( jtc )
+void jtc_state::video_start()
 {
 }
 
-static SCREEN_UPDATE( jtc )
+bool jtc_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	jtc_state *state = screen->machine().driver_data<jtc_state>();
-
 	int x, y, sx;
 
 	for (y = 0; y < 64; y++)
 	{
 		for (sx = 0; sx < 8; sx++)
 		{
-			UINT8 data = state->video_ram[(y * 8) + sx];
+			UINT8 data = m_video_ram[(y * 8) + sx];
 
 			for (x = 0; x < 8; x++)
 			{
 				int color = BIT(data, x);
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = color;
+				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
 			}
 		}
 	}
@@ -531,26 +510,24 @@ static SCREEN_UPDATE( jtc )
     return 0;
 }
 
-static VIDEO_START( jtc_es23 )
+void jtces23_state::video_start()
 {
 }
 
-static SCREEN_UPDATE( jtc_es23 )
+bool jtces23_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	jtc_state *state = screen->machine().driver_data<jtc_state>();
-
 	int x, y, sx;
 
 	for (y = 0; y < 128; y++)
 	{
 		for (sx = 0; sx < 16; sx++)
 		{
-			UINT8 data = state->video_ram[(y * 16) + sx];
+			UINT8 data = m_video_ram[(y * 16) + sx];
 
 			for (x = 0; x < 8; x++)
 			{
 				int color = BIT(data, x);
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = color;
+				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
 			}
 		}
 	}
@@ -562,44 +539,40 @@ static PALETTE_INIT( jtc_es40 )
 {
 }
 
-static VIDEO_START( jtc_es40 )
+void jtces40_state::video_start()
 {
-	jtc_state *state = machine.driver_data<jtc_state>();
-
 	/* allocate memory */
-	state->video_ram = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
-	state->color_ram_r = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
-	state->color_ram_g = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
-	state->color_ram_b = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(m_machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_r = auto_alloc_array(m_machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_g = auto_alloc_array(m_machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_b = auto_alloc_array(m_machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state->save_item(NAME(state->video_bank));
-	state->save_pointer(NAME(state->video_ram), JTC_ES40_VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->color_ram_r), JTC_ES40_VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->color_ram_g), JTC_ES40_VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->color_ram_b), JTC_ES40_VIDEORAM_SIZE);
+	save_item(NAME(m_video_bank));
+	save_pointer(NAME(m_video_ram), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_r), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_g), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);
 }
 
-static SCREEN_UPDATE( jtc_es40 )
+bool jtces40_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	jtc_state *state = screen->machine().driver_data<jtc_state>();
-
 	int x, y, sx;
 
 	for (y = 0; y < 192; y++)
 	{
 		for (sx = 0; sx < 40; sx++)
 		{
-			UINT8 data = state->video_ram[(y * 40) + sx];
-			UINT8 color_r = state->color_ram_r[(y * 40) + sx];
-			UINT8 color_g = state->color_ram_g[(y * 40) + sx];
-			UINT8 color_b = state->color_ram_b[(y * 40) + sx];
+			UINT8 data = m_video_ram[(y * 40) + sx];
+			UINT8 color_r = m_color_ram_r[(y * 40) + sx];
+			UINT8 color_g = m_color_ram_g[(y * 40) + sx];
+			UINT8 color_b = m_color_ram_b[(y * 40) + sx];
 
 			for (x = 0; x < 8; x++)
 			{
 				int color = (BIT(color_r, x) << 3) | (BIT(color_g, x) << 2) | (BIT(color_b, x) << 1) | BIT(data, x);
 
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = color;
+				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
 			}
 		}
 	}
@@ -609,17 +582,9 @@ static SCREEN_UPDATE( jtc_es40 )
 
 /* Machine Initialization */
 
-static MACHINE_START( jtc )
+void jtc_state::machine_start()
 {
-	jtc_state *state = machine.driver_data<jtc_state>();
-
-	/* find devices */
-	state->cassette = machine.device(CASSETTE_TAG);
-	state->speaker = machine.device(SPEAKER_TAG);
-	state->centronics = machine.device(CENTRONICS_TAG);
-
 	/* register for state saving */
-	//state_save_register_global(machine, state->);
 }
 
 /* Machine Driver */
@@ -668,13 +633,10 @@ static GFXDECODE_START( jtces40 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( basic, jtc_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
     MCFG_CPU_PROGRAM_MAP(jtc_mem)
     MCFG_CPU_IO_MAP(jtc_io)
-
-    MCFG_MACHINE_START(jtc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -692,7 +654,6 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jtc, basic )
-
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -700,20 +661,16 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(64, 64)
     MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
-    MCFG_SCREEN_UPDATE(jtc)
 
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(jtc)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtces88, jtc )
-
+static MACHINE_CONFIG_DERIVED_CLASS( jtces88, jtc, jtces88_state )
     /* basic machine hardware */
     MCFG_CPU_MODIFY(UB8830D_TAG)
     MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
@@ -723,8 +680,7 @@ static MACHINE_CONFIG_DERIVED( jtces88, jtc )
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtces23, basic )
-
+static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
     /* basic machine hardware */
     MCFG_CPU_MODIFY(UB8830D_TAG)
     MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
@@ -736,21 +692,17 @@ static MACHINE_CONFIG_DERIVED( jtces23, basic )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(128, 128)
     MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
-    MCFG_SCREEN_UPDATE(jtc_es23)
 
 	MCFG_GFXDECODE(jtces23)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(jtc_es23)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtces40, basic )
-
+static MACHINE_CONFIG_DERIVED_CLASS( jtces40, basic, jtces40_state )
     /* basic machine hardware */
     MCFG_CPU_MODIFY(UB8830D_TAG)
     MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)
@@ -762,13 +714,10 @@ static MACHINE_CONFIG_DERIVED( jtces40, basic )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(320, 192)
     MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-    MCFG_SCREEN_UPDATE(jtc_es40)
 
 	MCFG_GFXDECODE(jtces40)
     MCFG_PALETTE_LENGTH(16)
     MCFG_PALETTE_INIT(jtc_es40)
-
-    MCFG_VIDEO_START(jtc_es40)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -806,8 +755,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME                    FLAGS */
-COMP( 1987, jtc,	0,       0, 	jtc,	jtc,	 0,		"Jugend+Technik",   "CompJU+TEr",					GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME                    FLAGS */
+COMP( 1987, jtc,		0,       0, 	jtc,	jtc,	 0,		"Jugend+Technik",   "CompJU+TEr",				GAME_NOT_WORKING )
 COMP( 1988, jtces88,	jtc,     0, 	jtces88,jtc,	 0,		"Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)",	GAME_NOT_WORKING )
 COMP( 1989, jtces23,	jtc,     0, 	jtces23,jtces23, 0,		"Jugend+Technik",   "CompJU+TEr (ES 2.3)",		GAME_NOT_WORKING )
 COMP( 1990, jtces40,	jtc,     0, 	jtces40,jtces40, 0,		"Jugend+Technik",   "CompJU+TEr (ES 4.0)",		GAME_NOT_WORKING )
