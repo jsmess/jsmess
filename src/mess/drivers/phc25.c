@@ -41,18 +41,11 @@
 
 */
 
-#include "emu.h"
 #include "includes/phc25.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "machine/ctronics.h"
-#include "video/m6847.h"
-#include "sound/ay8910.h"
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( port40_r )
+READ8_MEMBER( phc25_state::port40_r )
 {
 	/*
 
@@ -69,26 +62,24 @@ static READ8_HANDLER( port40_r )
 
     */
 
-	phc25_state *state = space->machine().driver_data<phc25_state>();
-
 	UINT8 data = 0;
 
 	/* vertical sync */
-	data |= !mc6847_fs_r(state->mc6847) << 4;
+	data |= !mc6847_fs_r(m_vdg) << 4;
 
 	/* cassette read */
-	data |= (cassette_input(state->cassette) < +0.3) << 5;
+	data |= (cassette_input(m_cassette) < +0.3) << 5;
 
 	/* centronics busy */
-	data |= centronics_busy_r(state->centronics) << 6;
+	data |= centronics_busy_r(m_centronics) << 6;
 
 	/* horizontal sync */
-	data |= !mc6847_hs_r(state->mc6847) << 7;
+	data |= !mc6847_hs_r(m_vdg) << 7;
 
 	return data;
 }
 
-static WRITE8_HANDLER( port40_w )
+WRITE8_MEMBER( phc25_state::port40_w )
 {
 	/*
 
@@ -105,37 +96,35 @@ static WRITE8_HANDLER( port40_w )
 
     */
 
-	phc25_state *state = space->machine().driver_data<phc25_state>();
-
 	/* cassette output */
-	cassette_output(state->cassette, BIT(data, 0) ? -1.0 : +1.0);
+	cassette_output(m_cassette, BIT(data, 0) ? -1.0 : +1.0);
 
 	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(m_cassette, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* centronics strobe */
-	centronics_strobe_w(state->centronics, BIT(data, 3));
+	centronics_strobe_w(m_centronics, BIT(data, 3));
 
 	/* MC6847 */
-	mc6847_intext_w(state->mc6847, BIT(data, 2));
-	mc6847_gm0_w(state->mc6847, BIT(data, 5));
-	mc6847_gm1_w(state->mc6847, BIT(data, 6));
-	mc6847_ag_w(state->mc6847, BIT(data, 7));
+	mc6847_intext_w(m_vdg, BIT(data, 2));
+	mc6847_gm0_w(m_vdg, BIT(data, 5));
+	mc6847_gm1_w(m_vdg, BIT(data, 6));
+	mc6847_ag_w(m_vdg, BIT(data, 7));
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( phc25_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( phc25_mem, AS_PROGRAM, 8, phc25_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_BASE_MEMBER(phc25_state, video_ram)
+	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phc25_io, AS_IO, 8 )
+static ADDRESS_MAP_START( phc25_io, AS_IO, 8, phc25_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(port40_r, port40_w)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY0")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("KEY1")
@@ -146,8 +135,8 @@ static ADDRESS_MAP_START( phc25_io, AS_IO, 8 )
 	AM_RANGE(0x86, 0x86) AM_READ_PORT("KEY6")
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("KEY7")
 	AM_RANGE(0x88, 0x88) AM_READ_PORT("KEY8")
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE(AY8910_TAG, ay8910_address_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(AY8910_TAG, ay8910_r, ay8910_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY(AY8910_TAG, ay8910_address_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_LEGACY(AY8910_TAG, ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -270,23 +259,28 @@ INPUT_PORTS_END
 
 /* Video */
 
-static READ8_DEVICE_HANDLER( phc25_video_ram_r )
+READ8_MEMBER( phc25_state::video_ram_r )
 {
-	phc25_state *state = device->machine().driver_data<phc25_state>();
-
-	return state->video_ram[offset & 0x17ff];
+	return m_video_ram[offset & 0x17ff];
 }
 
-static UINT8 phc25_char_rom_r(running_machine &machine, UINT8 ch, int line)
+static UINT8 pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
 {
 	phc25_state *state = machine.driver_data<phc25_state>();
 
-	return state->char_rom[((ch - state->char_substact) * state->char_size) + line + state->char_correct];
+	return state->m_char_rom[((ch - 2) * 12) + line + 4];
 }
 
-static const mc6847_interface mc6847_intf =
+static UINT8 ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line)
 {
-	DEVCB_HANDLER(phc25_video_ram_r),
+	phc25_state *state = machine.driver_data<phc25_state>();
+
+	return state->m_char_rom[(ch * 16) + line];
+}
+
+static const mc6847_interface vdg_intf =
+{
+	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -300,33 +294,15 @@ static const mc6847_interface mc6847_intf =
 	DEVCB_NULL
 };
 
-static VIDEO_START( pal )
+void phc25_state::video_start()
 {
-	phc25_state *state = machine.driver_data<phc25_state>();
-
 	/* find memory regions */
-	state->char_rom = machine.region(Z80_TAG)->base() + 0x5000;
-	state->char_size = 12;
-	state->char_correct = 4;
-	state->char_substact = 2;
+	m_char_rom = m_machine.region(Z80_TAG)->base() + 0x5000;
 }
 
-static VIDEO_START( ntsc )
+bool phc25_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	phc25_state *state = machine.driver_data<phc25_state>();
-
-	/* find memory regions */
-	state->char_rom = machine.region(Z80_TAG)->base() + 0x5000;
-	state->char_size = 16;
-	state->char_correct = 0;
-	state->char_substact = 0;
-}
-
-static SCREEN_UPDATE( phc25 )
-{
-	phc25_state *state = screen->machine().driver_data<phc25_state>();
-
-	return mc6847_update(state->mc6847, bitmap, cliprect);
+	return mc6847_update(m_vdg, &bitmap, &cliprect);
 }
 
 /* AY-3-8910 Interface */
@@ -351,31 +327,13 @@ static const cassette_config phc25_cassette_config =
 	NULL
 };
 
-/* Machine Initialization */
-
-static MACHINE_START( phc25 )
-{
-	phc25_state *state = machine.driver_data<phc25_state>();
-
-	/* find devices */
-	state->mc6847 = machine.device(MC6847_TAG);
-	state->centronics = machine.device(CENTRONICS_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
-
-	/* register for state saving */
-//  state_save_register_global(machine, state->);
-}
-
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( phc25, phc25_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
     MCFG_CPU_PROGRAM_MAP(phc25_mem)
     MCFG_CPU_IO_MAP(phc25_io)
-
-    MCFG_MACHINE_START(phc25)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -393,7 +351,6 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, phc25 )
-
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
@@ -401,19 +358,15 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-    MCFG_SCREEN_UPDATE(phc25)
 
     MCFG_PALETTE_LENGTH(16)
 
-	MCFG_MC6847_ADD(MC6847_TAG, mc6847_intf)
+	MCFG_MC6847_ADD(MC6847_TAG, vdg_intf)
     MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
-	MCFG_MC6847_CHAR_ROM(phc25_char_rom_r)
-
-	MCFG_VIDEO_START(pal)
+	MCFG_MC6847_CHAR_ROM(pal_char_rom_r)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
-
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
@@ -421,15 +374,12 @@ static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-    MCFG_SCREEN_UPDATE(phc25)
 
     MCFG_PALETTE_LENGTH(16)
 
-	MCFG_MC6847_ADD(MC6847_TAG, mc6847_intf)
+	MCFG_MC6847_ADD(MC6847_TAG, vdg_intf)
     MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC) // actually M5C6847P-1
-	MCFG_MC6847_CHAR_ROM(phc25_char_rom_r)
-
-	MCFG_VIDEO_START(ntsc)
+	MCFG_MC6847_CHAR_ROM(ntsc_char_rom_r)
 MACHINE_CONFIG_END
 
 /* ROMs */
