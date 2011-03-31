@@ -23,7 +23,7 @@
 				<rom name="disk 1.xdf" size="1261568" crc="d2aaadc9" sha1="17d072669916ecdc40c171d6e20b1f7e9d218489" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk 2.xdf" size="1261568" crc="6831b09b" sha1="2de753f6f579af6a6954d0df0c29694cdcff9992" offset="0" />
 			</dataarea>
@@ -52,63 +52,30 @@
 		</part>
 	</software>
 
-	<software name="ys1">
-		<description>Ancient Ys Vanished Omen</description>
-		<year>1987</year>
-		<publisher>Nihon Falcom</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ys 1 ancient ys vanished omen (y) (falcom) [xdf].xdf" size="1261568" crc="ab1c66f2" sha1="5b17dd2e11f4c4a2f33a051047fa424841c95a85" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- This is a remake of the one above, not a real clone -->
-	<software name="ys1x">
-		<description>Ancient Ys Vanished Omen X68000</description>
+	<!-- TODO: dim format doesn't work properly, converted to xdf via vfic for now. Some user data inside the floppy that needs to be deleted -->
+	<software name="arcusod">
+		<description>Arcus Odyssey</description>
 		<year>1991</year>
-		<publisher>Nihon Falcom-Dempa</publisher>
+		<publisher>Wolf Team</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="ys 2 ancient ys vanished [disk 1] (y) [xdf].xdf" size="1261568" crc="802815d1" sha1="007a53035c13dc7e4512e9a6d8efce0678e55dd6" offset="0" />
+				<rom name="disk 1.xdf" size="1261568" crc="d88890c1" sha1="33a7bb09644a00201ddd1b83d536b5c399509fb7" offset="0" />
 			</dataarea>
+			<!--
+			<dataarea name="flop" size="1245440">
+				<rom name="disk 1.dim" size="1245440" crc="402f72ac" sha1="cb3d63bdaa7a88acc3eb55971f27d804e2606ac2" offset="0" />
+			</dataarea> 
+			-->
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="ys 2 ancient ys vanished [disk 2] (y) [xdf].xdf" size="1261568" crc="77c6da35" sha1="390a65f076abed6c77206ded3b6bef5ef4c4bb6b" offset="0" />
+				<rom name="disk 2.xdf" size="1261568" crc="db53229c" sha1="2de753f6f579af6a6954d0df0c29694cdcff9992" offset="0" />
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="ys2">
-		<description>Ancient Ys 2 Vanished Omen The Final Chapter (Prototype)</description>
-		<year>1988</year>
-		<publisher>Nihon Falcom?</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ys 2 ancient ys vanished the final chapter - prototype (y) [xdf].xdf" size="1261568" crc="d493c406" sha1="6009e32f60b00f26d8098f9aa2d52a86f68c07e6" offset="0" />
+			<!-- 
+			<dataarea name="flop" size="1261824">
+				<rom name="disk 2.dim" size="1261824" crc="b0c5da9b" sha1="d0a891ca849190bed68351b26a9c71e627182d35" offset="0" />
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="ys3">
-		<description>Ys 3: Wanderers from Ys</description>
-		<year>1990</year>
-		<publisher>Nihon Falcom</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ys 3 wanderers from ys [disk 3] (1990) (falcom) [xdf].xdf" size="1261568" crc="d9ed205d" sha1="7a15e45c0581cf5aec11d519b766fb7ca91cdc9c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ys 3 wanderers from ys [disk 1] (1990) (falcom) [xdf].xdf" size="1261568" crc="04aadf9c" sha1="6a597391c09705218d5f64c828eaaf09edec2d13" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ys 3 wanderers from ys [disk 2] (1990) (falcom) [xdf].xdf" size="1261568" crc="49c5946a" sha1="09e6c1d5db2b0db23c903529394ecc3b66137d0b" offset="0" />
-			</dataarea>
+			-->
 		</part>
 	</software>
 
@@ -124,6 +91,22 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk2.xdf" size="1261568" crc="5c56d54c" sha1="472b3d91410887771ec1f6368ce2e6553ecca512" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dashyar">
+		<description>Dash Yarou</description>
+		<year>1991</year>
+		<publisher>Toaplan-Sharp-SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk1.xdf" size="1261568" crc="ea1211ba" sha1="2aea7bd0f4a03895a57a3e4b8acdd190f8f66f49" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk2.xdf" size="1261568" crc="cbe93214" sha1="e62d089c27bf4109223f49b9257cb28d38a134fd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,6 +204,22 @@
 		</part>
 	</software>
 
+	<software name="pipedrm" supported="no">
+		<description>Pipe Dream</description>
+		<year>1989</year>
+		<publisher>BPS-Lucas Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pipe dream [program disk] (1989) (bps-lucas arts) [xdf].xdf" size="1261568" crc="bcb65823" sha1="a137fa333c6656a4148e940e1f6c208e43d4edd1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pipe dream [data disk] (1989) (bps-lucas arts) [xdf].xdf" size="1261568" crc="24b5104e" sha1="e4a76debc37f9e137a401520b9720484ed0dc0a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prosoc68">
 		<description>Pro Soccer 68</description>
 		<year>1991</year>
@@ -228,6 +227,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro soccer 68 (1991) (anco) [xdf].xdf" size="1261568" crc="47a4313d" sha1="2d95c7b61ac68578b1d4a12501f6e4b7802d722c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puyopuyo">
+		<description>Puyo Puyo</description>
+		<year>1994</year>
+		<publisher>Compile-SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="puyo puyo (1994) (compile-sps) [xdf].xdf" size="1261568" crc="bb1446c0" sha1="a2e5cd9c5d70d4672cecfb5a298f7a3384d10fb6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ryukyu">
+		<description>Ryu Kyu</description>
+		<year>1990?</year>
+		<publisher>Login Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ryu kyu (y) [xdf].xdf" size="1261568" crc="40790703" sha1="86ee44c636999e986db9286d968155bf9d768d93" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -266,5 +287,65 @@
 		</part>
 	</software>
 
+
+	<software name="ys1">
+		<description>Ancient Ys Vanished Omen</description>
+		<year>1987</year>
+		<publisher>Nihon Falcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 1 ancient ys vanished omen (y) (falcom) [xdf].xdf" size="1261568" crc="ab1c66f2" sha1="5b17dd2e11f4c4a2f33a051047fa424841c95a85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is a remake of the one above, not a real clone -->
+	<software name="ys1x">
+		<description>Ancient Ys Vanished Omen X68000</description>
+		<year>1991</year>
+		<publisher>Nihon Falcom-Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 2 ancient ys vanished [disk 1] (y) [xdf].xdf" size="1261568" crc="802815d1" sha1="007a53035c13dc7e4512e9a6d8efce0678e55dd6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 2 ancient ys vanished [disk 2] (y) [xdf].xdf" size="1261568" crc="77c6da35" sha1="390a65f076abed6c77206ded3b6bef5ef4c4bb6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys2">
+		<description>Ancient Ys 2 Vanished Omen The Final Chapter (Prototype)</description>
+		<year>1988</year>
+		<publisher>Nihon Falcom?</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 2 ancient ys vanished the final chapter - prototype (y) [xdf].xdf" size="1261568" crc="d493c406" sha1="6009e32f60b00f26d8098f9aa2d52a86f68c07e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys3">
+		<description>Ys 3: Wanderers from Ys</description>
+		<year>1990</year>
+		<publisher>Nihon Falcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 3 wanderers from ys [disk 3] (1990) (falcom) [xdf].xdf" size="1261568" crc="d9ed205d" sha1="7a15e45c0581cf5aec11d519b766fb7ca91cdc9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 3 wanderers from ys [disk 1] (1990) (falcom) [xdf].xdf" size="1261568" crc="04aadf9c" sha1="6a597391c09705218d5f64c828eaaf09edec2d13" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ys 3 wanderers from ys [disk 2] (1990) (falcom) [xdf].xdf" size="1261568" crc="49c5946a" sha1="09e6c1d5db2b0db23c903529394ecc3b66137d0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
