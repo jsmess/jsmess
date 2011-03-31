@@ -23,52 +23,31 @@
 
 */
 
-#include "emu.h"
 #include "includes/tiki100.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "machine/z80pio.h"
-#include "machine/wd17xx.h"
-#include "sound/ay8910.h"
-#include "machine/ram.h"
-
-INLINE device_t *get_floppy_image(running_machine &machine, int drive)
-{
-	return floppy_get_device(machine, drive);
-}
 
 /* Memory Banking */
 
-static READ8_HANDLER( gfxram_r )
+READ8_MEMBER( tiki100_state::gfxram_r )
 {
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
+	UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
-	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
-
-	return state->video_ram[addr];
+	return m_video_ram[addr];
 }
 
-static WRITE8_HANDLER( gfxram_w )
+WRITE8_MEMBER( tiki100_state::gfxram_w )
 {
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
+	UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
-	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
-
-	state->video_ram[addr] = data;
+	m_video_ram[addr] = data;
 }
 
-static void tiki100_bankswitch(running_machine &machine)
+void tiki100_state::bankswitch()
 {
-	tiki100_state *state = machine.driver_data<tiki100_state>();
-	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	if (state->vire)
+	if (m_vire)
 	{
-		if (!state->rome)
+		if (!m_rome)
 		{
 			/* reserved */
 			program->unmap_readwrite(0x0000, 0xffff);
@@ -76,27 +55,27 @@ static void tiki100_bankswitch(running_machine &machine)
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
-			program->install_legacy_readwrite_handler(0x0000, 0x7fff, FUNC(gfxram_r), FUNC(gfxram_w));
+			program->install_readwrite_handler(0x0000, 0x7fff, read8_delegate_create(tiki100_state, gfxram_r, *this), write8_delegate_create(tiki100_state, gfxram_w, *this));
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(machine, "bank1", BANK_VIDEO_RAM);
-			memory_set_bank(machine, "bank2", BANK_VIDEO_RAM);
-			memory_set_bank(machine, "bank3", BANK_RAM);
+			memory_set_bank(m_machine, "bank1", BANK_VIDEO_RAM);
+			memory_set_bank(m_machine, "bank2", BANK_VIDEO_RAM);
+			memory_set_bank(m_machine, "bank3", BANK_RAM);
 		}
 	}
 	else
 	{
-		if (!state->rome)
+		if (!m_rome)
 		{
 			/* ROM, RAM, RAM */
 			program->install_read_bank(0x0000, 0x3fff, "bank1");
-			program->unmap_write( 0x0000, 0x3fff);
+			program->unmap_write(0x0000, 0x3fff);
 			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(machine, "bank1", BANK_ROM);
-			memory_set_bank(machine, "bank2", BANK_RAM);
-			memory_set_bank(machine, "bank3", BANK_RAM);
+			memory_set_bank(m_machine, "bank1", BANK_ROM);
+			memory_set_bank(m_machine, "bank2", BANK_RAM);
+			memory_set_bank(m_machine, "bank3", BANK_RAM);
 		}
 		else
 		{
@@ -105,37 +84,33 @@ static void tiki100_bankswitch(running_machine &machine)
 			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(machine, "bank1", BANK_RAM);
-			memory_set_bank(machine, "bank2", BANK_RAM);
-			memory_set_bank(machine, "bank3", BANK_RAM);
+			memory_set_bank(m_machine, "bank1", BANK_RAM);
+			memory_set_bank(m_machine, "bank2", BANK_RAM);
+			memory_set_bank(m_machine, "bank3", BANK_RAM);
 		}
 	}
 }
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER( tiki100_state::keyboard_r )
 {
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
-
 	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11", "ROW12" };
-	UINT8 data = input_port_read(space->machine(), keynames[state->keylatch]);
+	UINT8 data = input_port_read(m_machine, keynames[m_keylatch]);
 
-	state->keylatch++;
+	m_keylatch++;
 
-	if (state->keylatch == 12) state->keylatch = 0;
+	if (m_keylatch == 12) m_keylatch = 0;
 
 	return data;
 }
 
-static WRITE8_HANDLER( keyboard_w )
+WRITE8_MEMBER( tiki100_state::keyboard_w )
 {
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
-
-	state->keylatch = 0;
+	m_keylatch = 0;
 }
 
-static WRITE8_HANDLER( video_mode_w )
+WRITE8_MEMBER( tiki100_state::video_mode_w )
 {
 	/*
 
@@ -152,20 +127,18 @@ static WRITE8_HANDLER( video_mode_w )
 
     */
 
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
-
-	state->mode = data;
+	m_mode = data;
 
 	if (BIT(data, 7))
 	{
 		int color = data & 0x0f;
-		UINT8 colordata = ~state->palette;
+		UINT8 colordata = ~m_palette;
 
-		palette_set_color_rgb(space->machine(), color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
+		palette_set_color_rgb(m_machine, color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
 }
 
-static WRITE8_HANDLER( palette_w )
+WRITE8_MEMBER( tiki100_state::palette_w )
 {
 	/*
 
@@ -182,12 +155,10 @@ static WRITE8_HANDLER( palette_w )
 
     */
 
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
-
-	state->palette = data;
+	m_palette = data;
 }
 
-static WRITE8_HANDLER( system_w )
+WRITE8_MEMBER( tiki100_state::system_w )
 {
 	/*
 
@@ -204,55 +175,53 @@ static WRITE8_HANDLER( system_w )
 
     */
 
-	tiki100_state *state = space->machine().driver_data<tiki100_state>();
-
 	/* drive select */
-	if (BIT(data, 0)) wd17xx_set_drive(state->fd1797, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(state->fd1797, 1);
+	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
 
 	/* density select */
-	wd17xx_dden_w(state->fd1797, BIT(data, 4));
+	wd17xx_dden_w(m_fdc, BIT(data, 4));
 
 	/* floppy motor */
-	floppy_mon_w(get_floppy_image(space->machine(), 0), !BIT(data, 6));
-	floppy_mon_w(get_floppy_image(space->machine(), 1), !BIT(data, 6));
-	floppy_drive_set_ready_state(get_floppy_image(space->machine(), 0), BIT(data, 6), 1);
-	floppy_drive_set_ready_state(get_floppy_image(space->machine(), 1), BIT(data, 6), 1);
+	floppy_mon_w(m_floppy0, !BIT(data, 6));
+	floppy_mon_w(m_floppy1, !BIT(data, 6));
+	floppy_drive_set_ready_state(m_floppy0, BIT(data, 6), 1);
+	floppy_drive_set_ready_state(m_floppy1, BIT(data, 6), 1);
 
 	/* GRAFIKK key led */
-	set_led_status(space->machine(), 1, BIT(data, 5));
+	set_led_status(m_machine, 1, BIT(data, 5));
 
 	/* LOCK key led */
-	set_led_status(space->machine(), 2, BIT(data, 7));
+	set_led_status(m_machine, 2, BIT(data, 7));
 
 	/* bankswitch */
-	state->rome = BIT(data, 2);
-	state->vire = BIT(data, 3);
+	m_rome = BIT(data, 2);
+	m_vire = BIT(data, 3);
 
-	tiki100_bankswitch(space->machine());
+	bankswitch();
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tiki100_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_WRITE(video_mode_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(FD1797_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(FD1797_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0x01) AM_WRITE(palette_w)
-	AM_RANGE(0x16, 0x16) AM_DEVWRITE(AY8912_TAG, ay8910_address_w)
-	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE(AY8912_TAG, ay8910_r, ay8910_data_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x16, 0x16) AM_DEVWRITE_LEGACY(AY8912_TAG, ay8910_address_w)
+	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE_LEGACY(AY8912_TAG, ay8910_r, ay8910_data_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
 //  AM_RANGE(0x20, 0x27) winchester controller
 //  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
@@ -405,18 +374,16 @@ INPUT_PORTS_END
 
 /* Video */
 
-static SCREEN_UPDATE( tiki100 )
+bool tiki100_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	tiki100_state *state = screen->machine().driver_data<tiki100_state>();
-
-	UINT16 addr = (state->scroll << 7);
-	int sx, y, pixel, mode = (state->mode >> 4) & 0x03;
+	UINT16 addr = (m_scroll << 7);
+	int sx, y, pixel, mode = (m_mode >> 4) & 0x03;
 
 	for (y = 0; y < 256; y++)
 	{
 		for (sx = 0; sx < 128; sx++)
 		{
-			UINT8 data = state->video_ram[addr & TIKI100_VIDEORAM_MASK];
+			UINT8 data = m_video_ram[addr & TIKI100_VIDEORAM_MASK];
 
 			switch (mode)
 			{
@@ -425,7 +392,7 @@ static SCREEN_UPDATE( tiki100 )
 				{
 					int x = (sx * 8) + pixel;
 
-					*BITMAP_ADDR16(bitmap, y, x) = 0;
+					*BITMAP_ADDR16(&bitmap, y, x) = 0;
 				}
 				break;
 
@@ -435,7 +402,7 @@ static SCREEN_UPDATE( tiki100 )
 					int x = (sx * 8) + pixel;
 					int color = BIT(data, 0);
 
-					*BITMAP_ADDR16(bitmap, y, x) = color;
+					*BITMAP_ADDR16(&bitmap, y, x) = color;
 
 					data >>= 1;
 				}
@@ -447,8 +414,8 @@ static SCREEN_UPDATE( tiki100 )
 					int x = (sx * 8) + (pixel * 2);
 					int color = data & 0x03;
 
-					*BITMAP_ADDR16(bitmap, y, x) = color;
-					*BITMAP_ADDR16(bitmap, y, x + 1) = color;
+					*BITMAP_ADDR16(&bitmap, y, x) = color;
+					*BITMAP_ADDR16(&bitmap, y, x + 1) = color;
 
 					data >>= 2;
 				}
@@ -460,10 +427,10 @@ static SCREEN_UPDATE( tiki100 )
 					int x = (sx * 8) + (pixel * 4);
 					int color = data & 0x0f;
 
-					*BITMAP_ADDR16(bitmap, y, x) = color;
-					*BITMAP_ADDR16(bitmap, y, x + 1) = color;
-					*BITMAP_ADDR16(bitmap, y, x + 2) = color;
-					*BITMAP_ADDR16(bitmap, y, x + 3) = color;
+					*BITMAP_ADDR16(&bitmap, y, x) = color;
+					*BITMAP_ADDR16(&bitmap, y, x + 1) = color;
+					*BITMAP_ADDR16(&bitmap, y, x + 2) = color;
+					*BITMAP_ADDR16(&bitmap, y, x + 3) = color;
 
 					data >>= 4;
 				}
@@ -519,14 +486,14 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	tiki100_state *state = timer.machine().driver_data<tiki100_state>();
 
-	z80ctc_trg0_w(state->z80ctc, 1);
-	z80ctc_trg0_w(state->z80ctc, 0);
+	z80ctc_trg0_w(state->m_ctc, 1);
+	z80ctc_trg0_w(state->m_ctc, 0);
 
-	z80ctc_trg1_w(state->z80ctc, 1);
-	z80ctc_trg1_w(state->z80ctc, 0);
+	z80ctc_trg1_w(state->m_ctc, 1);
+	z80ctc_trg1_w(state->m_ctc, 0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
+WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
 {
 }
 
@@ -535,13 +502,13 @@ static Z80CTC_INTERFACE( ctc_intf )
 	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_z1_w),		/* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z1_w),		/* ZC/TO1 callback */
 	DEVCB_LINE(z80ctc_trg3_w)	/* ZC/TO2 callback */
 };
 
 /* FD1797 Interface */
 
-static const wd17xx_interface tiki100_wd17xx_interface =
+static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -551,11 +518,9 @@ static const wd17xx_interface tiki100_wd17xx_interface =
 
 /* AY-3-8912 Interface */
 
-static WRITE8_DEVICE_HANDLER( video_scroll_w )
+WRITE8_MEMBER( tiki100_state::video_scroll_w )
 {
-	tiki100_state *state = device->machine().driver_data<tiki100_state>();
-
-	state->scroll = data;
+	m_scroll = data;
 }
 
 static const ay8910_interface ay8910_intf =
@@ -564,7 +529,7 @@ static const ay8910_interface ay8910_intf =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(video_scroll_w),
+	DEVCB_DRIVER_MEMBER(tiki100_state, video_scroll_w),
 	DEVCB_NULL
 };
 
@@ -580,37 +545,33 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 
 /* Machine Start */
 
-static MACHINE_START( tiki100 )
+void tiki100_state::machine_start()
 {
-	tiki100_state *state = machine.driver_data<tiki100_state>();
-
-	/* find devices */
-	state->fd1797 = machine.device(FD1797_TAG);
-	state->z80ctc = machine.device(Z80CTC_TAG);
-
 	/* allocate video RAM */
-	state->video_ram = auto_alloc_array(machine, UINT8, TIKI100_VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(m_machine, UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine.region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAM, 1, ram_get_ptr(machine.device(RAM_TAG)), 0);
-	memory_configure_bank(machine, "bank1", BANK_VIDEO_RAM, 1, state->video_ram, 0);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
-	memory_configure_bank(machine, "bank2", BANK_RAM, 1, ram_get_ptr(machine.device(RAM_TAG)) + 0x4000, 0);
-	memory_configure_bank(machine, "bank2", BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
+	memory_configure_bank(m_machine, "bank1", BANK_ROM, 1, m_machine.region(Z80_TAG)->base(), 0);
+	memory_configure_bank(m_machine, "bank1", BANK_RAM, 1, ram, 0);
+	memory_configure_bank(m_machine, "bank1", BANK_VIDEO_RAM, 1, m_video_ram, 0);
 
-	memory_configure_bank(machine, "bank3", BANK_RAM, 1, ram_get_ptr(machine.device(RAM_TAG)) + 0x8000, 0);
+	memory_configure_bank(m_machine, "bank2", BANK_RAM, 1, ram + 0x4000, 0);
+	memory_configure_bank(m_machine, "bank2", BANK_VIDEO_RAM, 1, m_video_ram + 0x4000, 0);
 
-	tiki100_bankswitch(machine);
+	memory_configure_bank(m_machine, "bank3", BANK_RAM, 1, ram + 0x8000, 0);
+
+	bankswitch();
 
 	/* register for state saving */
-	state->save_item(NAME(state->rome));
-	state->save_item(NAME(state->vire));
-	state->save_pointer(NAME(state->video_ram), TIKI100_VIDEORAM_SIZE);
-	state->save_item(NAME(state->scroll));
-	state->save_item(NAME(state->mode));
-	state->save_item(NAME(state->palette));
-	state->save_item(NAME(state->keylatch));
+	save_item(NAME(m_rome));
+	save_item(NAME(m_vire));
+	save_pointer(NAME(m_video_ram), TIKI100_VIDEORAM_SIZE);
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_palette));
+	save_item(NAME(m_keylatch));
 }
 
 static FLOPPY_OPTIONS_START(tiki100)
@@ -655,14 +616,11 @@ static const floppy_config tiki100_floppy_config =
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( tiki100, tiki100_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(Z80_TAG, Z80, 2000000)
     MCFG_CPU_PROGRAM_MAP(tiki100_mem)
     MCFG_CPU_IO_MAP(tiki100_io)
 	MCFG_CPU_CONFIG(tiki100_daisy_chain)
-
-    MCFG_MACHINE_START(tiki100)
 
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -671,7 +629,6 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(1024, 256)
     MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
-    MCFG_SCREEN_UPDATE(tiki100)
 
 	MCFG_PALETTE_LENGTH(16)
 
@@ -680,7 +637,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, 2000000, pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(2000000))
-	MCFG_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
+	MCFG_WD179X_ADD(FD1797_TAG, fdc_intf) // FD1767PL-02 or FD1797-PL
 	MCFG_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
 
 	/* sound hardware */
