@@ -149,8 +149,8 @@ void SetHashDirs(const char *paths)
 
 void SetSelectedSoftware(int driver_index, const machine_config *config, const device_config_image_interface *dev, const char *software)
 {
-/*	const char *opt_name = dev->instance_name();
-	winui_options *o;
+	const char *opt_name = dev->instance_name();
+	windows_options o;
 
 	if (LOG_SOFTWARE)
 	{
@@ -158,24 +158,22 @@ void SetSelectedSoftware(int driver_index, const machine_config *config, const d
 			dev, drivers[driver_index]->name, software);
 	}
 
-	o = load_options(OPTIONS_GAME, driver_index);
+	load_options(o,OPTIONS_GAME, driver_index);
 	astring error_string;
-	o->set_value(opt_name, software, OPTION_PRIORITY_CMDLINE,error_string);
+	o.set_value(opt_name, software, OPTION_PRIORITY_CMDLINE,error_string);
 	assert(!error_string);
-//	save_options(OPTIONS_GAME, o, driver_index);
-//	options_free(o);*/
+	save_options(OPTIONS_GAME, o, driver_index);
 }
 
 const char *GetSelectedSoftware(int driver_index, const machine_config *config, const device_config_image_interface *dev)
 {
-	/*const char *opt_name = dev->instance_name();
+	const char *opt_name = dev->instance_name();
 	const char *software;
-	winui_options *o;
+	windows_options o;
 
-	o = load_options(OPTIONS_GAME, driver_index);
-	software = o->value(opt_name);
-	return software ? software : "";*/
-	return "";
+	load_options(o,OPTIONS_GAME, driver_index);
+	software = o.value(opt_name);
+	return software ? software : "";
 }
 
 void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
