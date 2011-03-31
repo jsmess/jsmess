@@ -6,27 +6,21 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "includes/c80.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "c80.lh"
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( c80_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( c80_mem, AS_PROGRAM, 8, c80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c80_io, AS_IO, 8 )
+static ADDRESS_MAP_START( c80_io, AS_IO, 8, c80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE_LEGACY(Z80PIO2_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE_LEGACY(Z80PIO1_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -79,7 +73,7 @@ INPUT_PORTS_END
 
 /* Z80-PIO Interface */
 
-static READ8_DEVICE_HANDLER( pio1_port_a_r )
+READ8_MEMBER( c80_state::pio1_pa_r )
 {
 	/*
 
@@ -96,28 +90,26 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 
     */
 
-	c80_state *state = device->machine().driver_data<c80_state>();
-
-	UINT8 data = !state->pio1_brdy << 4 | 0x07;
+	UINT8 data = !m_pio1_brdy << 4 | 0x07;
 
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (!BIT(state->keylatch, i))
+		if (!BIT(m_keylatch, i))
 		{
-			if (!BIT(input_port_read(device->machine(), "ROW0"), i)) data &= ~0x01;
-			if (!BIT(input_port_read(device->machine(), "ROW1"), i)) data &= ~0x02;
-			if (!BIT(input_port_read(device->machine(), "ROW2"), i)) data &= ~0x04;
+			if (!BIT(input_port_read(m_machine, "ROW0"), i)) data &= ~0x01;
+			if (!BIT(input_port_read(m_machine, "ROW1"), i)) data &= ~0x02;
+			if (!BIT(input_port_read(m_machine, "ROW2"), i)) data &= ~0x04;
 		}
 	}
 
-	data |= (cassette_input(state->cassette) < +0.0) << 7;
+	data |= (cassette_input(m_cassette) < +0.0) << 7;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
+WRITE8_MEMBER( c80_state::pio1_pa_w )
 {
 	/*
 
@@ -134,19 +126,17 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	c80_state *state = device->machine().driver_data<c80_state>();
-
-	state->pio1_a5 = BIT(data, 5);
+	m_pio1_a5 = BIT(data, 5);
 
 	if (!BIT(data, 5))
 	{
-		state->digit = 0;
+		m_digit = 0;
 	}
 
-	cassette_output(state->cassette, BIT(data, 6) ? +1.0 : -1.0);
+	cassette_output(m_cassette, BIT(data, 6) ? +1.0 : -1.0);
 }
 
-static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
+WRITE8_MEMBER( c80_state::pio1_pb_w )
 {
 	/*
 
@@ -163,43 +153,39 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	c80_state *state = device->machine().driver_data<c80_state>();
-
-	if (!state->pio1_a5)
+	if (!m_pio1_a5)
 	{
-		output_set_digit_value(state->digit, data);
+		output_set_digit_value(m_digit, data);
 	}
 
-	state->keylatch = data;
+	m_keylatch = data;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pio1_brdy_w )
+WRITE_LINE_MEMBER( c80_state::pio1_brdy_w )
 {
-	c80_state *driver_state = device->machine().driver_data<c80_state>();
-
-	driver_state->pio1_brdy = state;
+	m_pio1_brdy = state;
 
 	if (state)
 	{
-		if (!driver_state->pio1_a5)
+		if (!m_pio1_a5)
 		{
-			driver_state->digit++;
+			m_digit++;
 		}
 
-		z80pio_bstb_w(device, 1);
-		z80pio_bstb_w(device, 0);
+		z80pio_bstb_w(m_pio1, 1);
+		z80pio_bstb_w(m_pio1, 0);
 	}
 }
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_HANDLER(pio1_port_a_r),	/* port A read callback */
-	DEVCB_HANDLER(pio1_port_a_w),	/* port A write callback */
+	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_r),	/* port A read callback */
+	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_w),	/* port A write callback */
 	DEVCB_NULL,						/* portA ready active callback */
 	DEVCB_NULL,						/* port B read callback */
-	DEVCB_HANDLER(pio1_port_b_w),	/* port B write callback */
-	DEVCB_LINE(pio1_brdy_w)			/* portB ready active callback */
+	DEVCB_DRIVER_MEMBER(c80_state, pio1_pb_w),	/* port B write callback */
+	DEVCB_DRIVER_LINE_MEMBER(c80_state, pio1_brdy_w)			/* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio2_intf )
@@ -224,18 +210,13 @@ static const z80_daisy_config c80_daisy_chain[] =
 
 /* Machine Initialization */
 
-static MACHINE_START( c80 )
+void c80_state::machine_start()
 {
-	c80_state *state = machine.driver_data<c80_state>();
-
-	/* find devices */
-	state->cassette = machine.device(CASSETTE_TAG);
-
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
-	state->save_item(NAME(state->digit));
-	state->save_item(NAME(state->pio1_a5));
-	state->save_item(NAME(state->pio1_brdy));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_pio1_a5));
+	save_item(NAME(m_pio1_brdy));
 }
 
 /* Machine Driver */
@@ -249,14 +230,11 @@ static const cassette_config c80_cassette_config =
 };
 
 static MACHINE_CONFIG_START( c80, c80_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
     MCFG_CPU_PROGRAM_MAP(c80_mem)
     MCFG_CPU_IO_MAP(c80_io)
 	MCFG_CPU_CONFIG(c80_daisy_chain)
-
-    MCFG_MACHINE_START(c80)
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_c80 )
