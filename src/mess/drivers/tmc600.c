@@ -79,18 +79,7 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "machine/ctronics.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
 #include "includes/tmc600.h"
-#include "machine/ram.h"
 
 /* Read/Write Handlers */
 
@@ -205,39 +194,38 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static READ_LINE_DEVICE_HANDLER( clear_r )
+READ_LINE_MEMBER( tmc600_state::clear_r )
 {
-	return BIT(input_port_read(device->machine(), "RUN"), 0);
+	return BIT(input_port_read(m_machine, "RUN"), 0);
 }
 
-static READ_LINE_DEVICE_HANDLER( ef2_r )
+READ_LINE_MEMBER( tmc600_state::ef2_r )
 {
-	return cassette_input(device) < 0;
+	return cassette_input(m_cassette) < 0;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef3_r )
+READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
-	tmc600_state *state = device->machine().driver_data<tmc600_state>();
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(device->machine(), keynames[state->m_keylatch / 8]);
+	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
 
-	return BIT(data, state->m_keylatch % 8);
+	return BIT(data, m_keylatch % 8);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( q_w )
+WRITE_LINE_MEMBER( tmc600_state::q_w )
 {
-	cassette_output(device, state ? +1.0 : -1.0);
+	cassette_output(m_cassette, state ? +1.0 : -1.0);
 }
 
 static COSMAC_INTERFACE( cosmac_intf )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
-	DEVCB_LINE(ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, ef3_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, q_w),
+	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, q_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL,
@@ -249,7 +237,7 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void tmc600_state::machine_start()
 {
-	address_space *program = m_machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (ram_get_size(m_ram))

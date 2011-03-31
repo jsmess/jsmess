@@ -3,8 +3,17 @@
 #ifndef __TMC600__
 #define __TMC600__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
+#include "formats/basicdsk.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/ctronics.h"
 #include "machine/ram.h"
+#include "sound/cdp1869.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"cdp1802"
@@ -36,10 +45,14 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(&bitmap, &cliprect); return false; }
 
-	DECLARE_WRITE8_MEMBER(keyboard_latch_w);
-	DECLARE_WRITE8_MEMBER(vismac_register_w);
-	DECLARE_WRITE8_MEMBER(vismac_data_w);
-	DECLARE_WRITE8_MEMBER(page_ram_w);
+	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
+	DECLARE_WRITE8_MEMBER( vismac_register_w );
+	DECLARE_WRITE8_MEMBER( vismac_data_w );
+	DECLARE_WRITE8_MEMBER( page_ram_w );
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef2_r );
+	DECLARE_READ_LINE_MEMBER( ef3_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	UINT8 get_color(UINT16 pma);
 
