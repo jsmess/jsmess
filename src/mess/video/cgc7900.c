@@ -18,9 +18,9 @@
 #define OVERLAY_FB					BIT(cell, 8)	/* turns on Blue in background if SET */
 #define OVERLAY_DATA				(cell & 0xff)	/* ASCII or Plot Dot character */
 
-#define IMAGE_SELECT				BIT(state->roll_overlay, 13)
-#define OVERLAY_CURSOR_BLINK		BIT(state->roll_overlay, 12)
-#define OVERLAY_CHARACTER_BLINK		BIT(state->roll_overlay, 11)
+#define IMAGE_SELECT				BIT(m_roll_overlay, 13)
+#define OVERLAY_CURSOR_BLINK		BIT(m_roll_overlay, 12)
+#define OVERLAY_CHARACTER_BLINK		BIT(m_roll_overlay, 11)
 
 /***************************************************************************
     READ/WRITE HANDLERS
@@ -30,7 +30,7 @@
     cgc7900_z_mode_r - Z mode read
 -------------------------------------------------*/
 
-READ16_HANDLER( cgc7900_z_mode_r )
+READ16_MEMBER( cgc7900_state::z_mode_r )
 {
 	return 0;
 }
@@ -39,7 +39,7 @@ READ16_HANDLER( cgc7900_z_mode_r )
     cgc7900_z_mode_w - Z mode write
 -------------------------------------------------*/
 
-WRITE16_HANDLER( cgc7900_z_mode_w )
+WRITE16_MEMBER( cgc7900_state::z_mode_w )
 {
 }
 
@@ -47,7 +47,7 @@ WRITE16_HANDLER( cgc7900_z_mode_w )
     cgc7900_color_status_w - color status write
 -------------------------------------------------*/
 
-WRITE16_HANDLER( cgc7900_color_status_w )
+WRITE16_MEMBER( cgc7900_state::color_status_w )
 {
 }
 
@@ -55,7 +55,7 @@ WRITE16_HANDLER( cgc7900_color_status_w )
     cgc7900_sync_r - sync information read
 -------------------------------------------------*/
 
-READ16_HANDLER( cgc7900_sync_r )
+READ16_MEMBER( cgc7900_state::sync_r )
 {
 	/*
 
@@ -91,19 +91,17 @@ READ16_HANDLER( cgc7900_sync_r )
     update_clut - update color lookup table
 -------------------------------------------------*/
 
-static void update_clut(running_machine &machine)
+void cgc7900_state::update_clut()
 {
-	cgc7900_state *state = machine.driver_data<cgc7900_state>();
-
 	for (int i = 0; i < 256; i++)
 	{
 		UINT16 addr = i * 2;
-		UINT32 data = (state->clut_ram[addr + 1] << 16) | state->clut_ram[addr];
+		UINT32 data = (m_clut_ram[addr + 1] << 16) | m_clut_ram[addr];
 		UINT8 b = data & 0xff;
 		UINT8 g = (data >> 8) & 0xff;
 		UINT8 r = (data >> 16) & 0xff;
 
-		palette_set_color_rgb(machine, i + 8, r, g, b);
+		palette_set_color_rgb(m_machine, i + 8, r, g, b);
 	}
 }
 
@@ -111,7 +109,7 @@ static void update_clut(running_machine &machine)
     draw_bitmap - draw bitmap image
 -------------------------------------------------*/
 
-static void draw_bitmap(screen_device *screen, bitmap_t *bitmap)
+void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_t *bitmap)
 {
 }
 
@@ -119,10 +117,8 @@ static void draw_bitmap(screen_device *screen, bitmap_t *bitmap)
     draw_overlay - draw text overlay
 -------------------------------------------------*/
 
-static void draw_overlay(screen_device *screen, bitmap_t *bitmap)
+void cgc7900_state::draw_overlay(screen_device *screen, bitmap_t *bitmap)
 {
-	cgc7900_state *state = screen->machine().driver_data<cgc7900_state>();
-
 	for (int y = 0; y < 768; y++)
 	{
 		int sy = y / 8;
@@ -131,8 +127,8 @@ static void draw_overlay(screen_device *screen, bitmap_t *bitmap)
 		for (int sx = 0; sx < 85; sx++)
 		{
 			UINT16 addr = (sy * 170) + (sx * 2);
-			UINT32 cell = (state->overlay_ram[addr] << 16) | state->overlay_ram[addr + 1];
-			UINT8 data = state->char_rom[(OVERLAY_DATA << 3) | line];
+			UINT32 cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
+			UINT8 data = m_char_rom[(OVERLAY_DATA << 3) | line];
 			int fg = (cell >> 8) & 0x07;
 			int bg = (cell >> 16) & 0x07;
 
@@ -140,14 +136,14 @@ static void draw_overlay(screen_device *screen, bitmap_t *bitmap)
 			{
 				if (OVERLAY_CUR)
 				{
-					if (!OVERLAY_CURSOR_BLINK || state->blink)
+					if (!OVERLAY_CURSOR_BLINK || m_blink)
 					{
 						*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = 7;
 					}
 				}
 				else
 				{
-					if (BIT(data, x) && (!OVERLAY_CHARACTER_BLINK || state->blink))
+					if (BIT(data, x) && (!OVERLAY_CHARACTER_BLINK || m_blink))
 					{
 						if (OVERLAY_VF) *BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = fg;
 					}
@@ -169,7 +165,7 @@ static TIMER_DEVICE_CALLBACK( blink_tick )
 {
 	cgc7900_state *state = timer.machine().driver_data<cgc7900_state>();
 
-	state->blink = !state->blink;
+	state->m_blink = !state->m_blink;
 }
 
 /*-------------------------------------------------
@@ -192,23 +188,21 @@ static PALETTE_INIT( cgc7900 )
     VIDEO_START( cgc7900 )
 -------------------------------------------------*/
 
-static VIDEO_START( cgc7900 )
+void cgc7900_state::video_start()
 {
-	cgc7900_state *state = machine.driver_data<cgc7900_state>();
-
 	/* find memory regions */
-	state->char_rom = machine.region("gfx1")->base();
+	m_char_rom = m_machine.region("gfx1")->base();
 }
 
 /*-------------------------------------------------
     SCREEN_UPDATE( cgc7900 )
 -------------------------------------------------*/
 
-static SCREEN_UPDATE( cgc7900 )
+bool cgc7900_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	update_clut(screen->machine());
-	draw_bitmap(screen, bitmap);
-	draw_overlay(screen, bitmap);
+	update_clut();
+	draw_bitmap(&screen, &bitmap);
+	draw_overlay(&screen, &bitmap);
 
     return 0;
 }
@@ -251,14 +245,11 @@ MACHINE_CONFIG_FRAGMENT( cgc7900_video )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(1024, 768)
     MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-    MCFG_SCREEN_UPDATE(cgc7900)
 
 	MCFG_GFXDECODE(cgc7900)
 
 	MCFG_PALETTE_LENGTH(8+256) /* 8 overlay colors + 256 bitmap colors */
 	MCFG_PALETTE_INIT(cgc7900)
-
-	MCFG_VIDEO_START(cgc7900)
 
 	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, attotime::from_hz(XTAL_28_48MHz/7500000))
 MACHINE_CONFIG_END

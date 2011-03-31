@@ -33,15 +33,7 @@
 
 */
 
-#include "emu.h"
 #include "includes/cgc7900.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/mcs48/mcs48.h"
-#include "formats/basicdsk.h"
-#include "machine/ram.h"
-#include "machine/msm8251.h"
-#include "sound/ay8910.h"
-
 
 
 
@@ -76,7 +68,7 @@ static const int INT_LEVEL[] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 
     keyboard_r - keyboard data read
 -------------------------------------------------*/
 
-static READ16_HANDLER( keyboard_r )
+READ16_MEMBER( cgc7900_state::keyboard_r )
 {
 	/*
 
@@ -108,7 +100,7 @@ static READ16_HANDLER( keyboard_r )
     keyboard_w - keyboard data write
 -------------------------------------------------*/
 
-static WRITE16_HANDLER( keyboard_w )
+WRITE16_MEMBER( cgc7900_state::keyboard_w )
 {
 	/*
 
@@ -138,7 +130,7 @@ static WRITE16_HANDLER( keyboard_w )
     interrupt_mask_w - interrupt mask write
 -------------------------------------------------*/
 
-static WRITE16_HANDLER( interrupt_mask_w )
+WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 {
 	/*
 
@@ -163,16 +155,14 @@ static WRITE16_HANDLER( interrupt_mask_w )
 
     */
 
-	cgc7900_state *state = space->machine().driver_data<cgc7900_state>();
-
-	state->int_mask = data;
+	m_int_mask = data;
 }
 
 /*-------------------------------------------------
     disk_data_r - disk data read
 -------------------------------------------------*/
 
-static READ16_HANDLER( disk_data_r )
+READ16_MEMBER( cgc7900_state::disk_data_r )
 {
 	return 0;
 }
@@ -181,14 +171,15 @@ static READ16_HANDLER( disk_data_r )
     disk_data_w - disk data write
 -------------------------------------------------*/
 
-static WRITE16_HANDLER( disk_data_w )
+WRITE16_MEMBER( cgc7900_state::disk_data_w )
 {
 }
+
 /*-------------------------------------------------
     disk_status_r - disk status read
 -------------------------------------------------*/
 
-static READ16_HANDLER( disk_status_r )
+READ16_MEMBER( cgc7900_state::disk_status_r )
 {
 	/*
 
@@ -220,7 +211,7 @@ static READ16_HANDLER( disk_status_r )
     disk_command_w - disk command write
 -------------------------------------------------*/
 
-static WRITE16_HANDLER( disk_command_w )
+WRITE16_MEMBER( cgc7900_state::disk_command_w )
 {
 }
 
@@ -232,28 +223,28 @@ static WRITE16_HANDLER( disk_command_w )
     ADDRESS_MAP( cgc7900_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, chrom_ram)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(m_chrom_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cgc7900_z_mode_r, cgc7900_z_mode_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_ram)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(cgc7900_color_status_w)
+	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(z_mode_r, z_mode_w)
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE(m_plane_ram)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(color_status_w)
 //  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
-	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_BASE_MEMBER(cgc7900_state, clut_ram)
-	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_BASE_MEMBER(cgc7900_state, overlay_ram)
-	AM_RANGE(0xe40000, 0xe40001) AM_RAM AM_BASE_MEMBER(cgc7900_state, roll_bitmap)
-	AM_RANGE(0xe40002, 0xe40003) AM_RAM AM_BASE_MEMBER(cgc7900_state, pan_x)
-	AM_RANGE(0xe40004, 0xe40005) AM_RAM AM_BASE_MEMBER(cgc7900_state, pan_y)
-	AM_RANGE(0xe40006, 0xe40007) AM_RAM AM_BASE_MEMBER(cgc7900_state, zoom)
+	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_BASE(m_clut_ram)
+	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_BASE(m_overlay_ram)
+	AM_RANGE(0xe40000, 0xe40001) AM_RAM AM_BASE(m_roll_bitmap)
+	AM_RANGE(0xe40002, 0xe40003) AM_RAM AM_BASE(m_pan_x)
+	AM_RANGE(0xe40004, 0xe40005) AM_RAM AM_BASE(m_pan_y)
+	AM_RANGE(0xe40006, 0xe40007) AM_RAM AM_BASE(m_zoom)
 	AM_RANGE(0xe40008, 0xe40009) AM_RAM
 	AM_RANGE(0xe4000a, 0xe4000f) AM_RAM // Raster Processor
-	AM_RANGE(0xe40010, 0xe40011) AM_RAM AM_BASE_MEMBER(cgc7900_state, blink_select)
-	AM_RANGE(0xe40012, 0xe40013) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_select)
-	AM_RANGE(0xe40014, 0xe40015) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_switch)
-	AM_RANGE(0xe40016, 0xe40017) AM_RAM AM_BASE_MEMBER(cgc7900_state, color_status_fg)
-	AM_RANGE(0xe40018, 0xe40019) AM_RAM AM_BASE_MEMBER(cgc7900_state, color_status_bg)
-	AM_RANGE(0xe4001a, 0xe4001b) AM_RAM AM_BASE_MEMBER(cgc7900_state, roll_overlay)
+	AM_RANGE(0xe40010, 0xe40011) AM_RAM AM_BASE(m_blink_select)
+	AM_RANGE(0xe40012, 0xe40013) AM_RAM AM_BASE(m_plane_select)
+	AM_RANGE(0xe40014, 0xe40015) AM_RAM AM_BASE(m_plane_switch)
+	AM_RANGE(0xe40016, 0xe40017) AM_RAM AM_BASE(m_color_status_fg)
+	AM_RANGE(0xe40018, 0xe40019) AM_RAM AM_BASE(m_color_status_bg)
+	AM_RANGE(0xe4001a, 0xe4001b) AM_RAM AM_BASE(m_roll_overlay)
 	AM_RANGE(0xe4001c, 0xe40fff) AM_RAM
 //  AM_RANGE(0xefc440, 0xefc441) HVG Load X
 //  AM_RANGE(0xefc442, 0xefc443) HVG Load Y
@@ -261,10 +252,10 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16 )
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(INS8251_0_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(INS8251_0_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
-	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8(INS8251_1_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
-	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8(INS8251_1_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_LEGACY(INS8251_0_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_LEGACY(INS8251_0_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
+	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8_LEGACY(INS8251_1_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
+	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8_LEGACY(INS8251_1_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
 	AM_RANGE(0xff8080, 0xff8081) AM_READWRITE(keyboard_r, keyboard_w)
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
@@ -280,10 +271,10 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16 )
 //  AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
 //  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
 //  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
-	AM_RANGE(0xff824a, 0xff824b) AM_READ(cgc7900_sync_r)
-	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8(AY8910_TAG, ay8910_address_w, 0xff00)
-	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8(AY8910_TAG, ay8910_r, 0xff00)
-	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8(AY8910_TAG, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff824a, 0xff824b) AM_READ(sync_r)
+	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8_LEGACY(AY8910_TAG, ay8910_address_w, 0xff00)
+	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8_LEGACY(AY8910_TAG, ay8910_r, 0xff00)
+	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8_LEGACY(AY8910_TAG, ay8910_data_w, 0xff00)
 //  AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
 //  AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
 //  AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
@@ -293,7 +284,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8, cgc7900_state )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -301,7 +292,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_io, AS_IO, 8 )
+static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, cgc7900_state )
 /*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
     AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
     AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
@@ -403,28 +394,25 @@ static const ay8910_interface ay8910_intf =
     MACHINE_START( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_START( cgc7900 )
+void cgc7900_state::machine_start()
 {
-	cgc7900_state *state = machine.driver_data<cgc7900_state>();
-
 	/* register for state saving */
-	state->save_pointer(NAME(state->overlay_ram), 0x4000);
+	save_pointer(NAME(m_overlay_ram), 0x4000);
 }
 
 /*-------------------------------------------------
     MACHINE_RESET( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_RESET(cgc7900)
+void cgc7900_state::machine_reset()
 {
-	cgc7900_state *state = machine.driver_data<cgc7900_state>();
-	UINT8* user1 = machine.region(M68000_TAG)->base();
+	UINT8* user1 = m_machine.region(M68000_TAG)->base();
 
-	memcpy((UINT8*)state->chrom_ram,user1,8);
+	memcpy((UINT8*)m_chrom_ram,user1,8);
 
-	machine.device(M68000_TAG)->reset();
+	m_maincpu->reset();
 
-	memset((UINT8*)state->chrom_ram,0,8);
+	memset((UINT8*)m_chrom_ram,0,8);
 }
 
 /***************************************************************************
@@ -436,7 +424,6 @@ static MACHINE_RESET(cgc7900)
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
     MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
@@ -448,9 +435,6 @@ static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
 
 /*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
     MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
-
-	MCFG_MACHINE_START(cgc7900)
-    MCFG_MACHINE_RESET(cgc7900)
 
     /* video hardware */
 	MCFG_FRAGMENT_ADD(cgc7900_video)
