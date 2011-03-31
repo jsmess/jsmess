@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/v810/v810.h"
 #include "video/vdc.h"
@@ -17,10 +19,11 @@ public:
 	pcfx_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM	/* RAM */
 	AM_RANGE( 0x80700000, 0x807FFFFF ) AM_NOP	/* EXTIO */
 	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP
@@ -30,7 +33,7 @@ static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pcfx_io, AS_IO, 32 )
+static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x000000FF ) AM_NOP	/* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP	/* HuC6230 */
 	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP	/* HuC6271 */
@@ -44,13 +47,14 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32 )
 	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP	/* HuC6273 */
 ADDRESS_MAP_END
 
+
 static INPUT_PORTS_START( pcfx )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( pcfx )
+void pcfx_state::machine_reset()
 {
-	memory_set_bankptr( machine, "bank1", machine.region("user1")->base() );
+	memory_set_bankptr( m_machine, "bank1", m_machine.region("user1")->base() );
 }
 
 
@@ -58,8 +62,6 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_CPU_ADD( "maincpu", V810, 21477270 )
 	MCFG_CPU_PROGRAM_MAP( pcfx_mem)
 	MCFG_CPU_IO_MAP( pcfx_io)
-
-	MCFG_MACHINE_RESET( pcfx )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
