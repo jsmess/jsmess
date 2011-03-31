@@ -73,7 +73,7 @@
 #include <string.h>
 
 // MAME output header file
-typedef void running_machine;
+typedef int running_machine;
 #include "osdcomm.h"
 #include "output.h"
 
