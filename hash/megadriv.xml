@@ -1131,7 +1131,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bugsbune" cloneof="bugsbun">
+	<software name="bugsbun">
 		<description>Bugs Bunny in Double Trouble (Euro)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -3897,6 +3897,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 				<rom name="budokan - the martial spirit (usa).bin" size="524288" crc="acd9f5fc" sha1="93bc8242106bc9b2e0a8a974a3f65b559dd2941d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
+	</software>
+
+	<software name="bugsbunu" cloneof="bugsbun">
+		<description>Bugs Bunny in Double Trouble (USA)</description>
+			<year>1996</year>
+			<publisher>Sega</publisher>
+			<part name="cart" interface="megadriv_cart">
+				<dataarea name="rom" size="2097152">
+					<rom name="bugs bunny in double trouble (usa).bin" size="2097152" crc="365305a2" sha1="50b18d9f9935a46854641c9cfc5b3d3b230edd5e" offset="000000" loadflag="load16_word_swap" />
+				</dataarea>
+			</part>
 	</software>
 
 	<software name="bullvsbl">
