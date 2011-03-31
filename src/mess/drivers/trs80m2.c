@@ -870,9 +870,9 @@ static const floppy_config trs80m2_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_8_DSDD, // Shugart SA-800
 	FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25"
+	"floppy_8"
 };
 
 WRITE_LINE_MEMBER( trs80m2_state::fdc_intrq_w )
