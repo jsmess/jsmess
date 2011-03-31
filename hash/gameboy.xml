@@ -3350,7 +3350,7 @@
 		</part>
 	</software>
 
-	<software name="darkwing">
+	<software name="darkwingg" cloneof="darkwing">
 		<!-- Serial: DMG-DC? - Release Date:  -->
 		<description>Disney's Darkwing Duck (Ger)</description>
 		<year>1993</year>
