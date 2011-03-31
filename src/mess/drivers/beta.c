@@ -14,20 +14,14 @@
 
 */
 
-#include "emu.h"
 #include "includes/beta.h"
-#include "cpu/m6502/m6502.h"
-#include "imagedev/cartslot.h"
-#include "machine/6532riot.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 #include "beta.lh"
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START(beta_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( beta_mem, AS_PROGRAM, 8, beta_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_RAM // 6532 RAM
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6532_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVREADWRITE_LEGACY(M6532_TAG, riot6532_r, riot6532_w)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM
 ADDRESS_MAP_END
 
@@ -81,14 +75,13 @@ static TIMER_CALLBACK( led_refresh )
 {
 	beta_state *state = machine.driver_data<beta_state>();
 
-	if (state->ls145_p < 6)
+	if (state->m_ls145_p < 6)
 	{
-		output_set_digit_value(state->ls145_p, state->segment);
-		//logerror("update display %u with %02x\n", state->ls145_p, state->segment);
+		output_set_digit_value(state->m_ls145_p, state->m_segment);
 	}
 }
 
-static READ8_DEVICE_HANDLER( beta_riot_a_r )
+READ8_MEMBER( beta_state::riot_pa_r )
 {
 	/*
 
@@ -105,28 +98,26 @@ static READ8_DEVICE_HANDLER( beta_riot_a_r )
 
     */
 
-	beta_state *state = device->machine().driver_data<beta_state>();
-
 	UINT8 data = 0xff;
 
-	switch (state->ls145_p)
+	switch (m_ls145_p)
 	{
-	case 6: data &= input_port_read(device->machine(), "Q6"); break;
-	case 7: data &= input_port_read(device->machine(), "Q7"); break;
-	case 8: data &= input_port_read(device->machine(), "Q8"); break;
-	case 9: data &= input_port_read(device->machine(), "Q9"); break;
+	case 6: data &= input_port_read(m_machine, "Q6"); break;
+	case 7: data &= input_port_read(m_machine, "Q7"); break;
+	case 8: data &= input_port_read(m_machine, "Q8"); break;
+	case 9: data &= input_port_read(m_machine, "Q9"); break;
 	default:
-		if (!state->eprom_oe && !state->eprom_ce)
+		if (!m_eprom_oe && !m_eprom_ce)
 		{
-			data = device->machine().region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff];
-			popmessage("EPROM read %04x = %02x\n", state->eprom_addr & 0x7ff, data);
+			data = m_machine.region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff];
+			popmessage("EPROM read %04x = %02x\n", m_eprom_addr & 0x7ff, data);
 		}
 	}
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
+WRITE8_MEMBER( beta_state::riot_pa_w )
 {
 	/*
 
@@ -143,24 +134,22 @@ static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
 
     */
 
-	beta_state *state = device->machine().driver_data<beta_state>();
-
 //  logerror("PA %02x\n", data);
 
 	/* display */
-	state->segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
-	state->led_refresh_timer->adjust(attotime::from_usec(70));
+	m_segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
+	m_led_refresh_timer->adjust(attotime::from_usec(70));
 
 	/* EPROM data */
-	state->eprom_data = data;
+	m_eprom_data = data;
 }
 
-static READ8_DEVICE_HANDLER( beta_riot_b_r )
+READ8_MEMBER( beta_state::riot_pb_r )
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
+WRITE8_MEMBER( beta_state::riot_pb_w )
 {
 	/*
 
@@ -177,15 +166,13 @@ static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 
     */
 
-	beta_state *state = device->machine().driver_data<beta_state>();
-
 	//logerror("PB %02x %02x\n", data, olddata);
 
 	/* display */
-	state->ls145_p = data & 0x0f;
+	m_ls145_p = data & 0x0f;
 
 	/* speaker */
-	speaker_level_w(state->speaker, !BIT(data, 4));
+	speaker_level_w(m_speaker, !BIT(data, 4));
 
 	/* address led */
 	output_set_led_value(0, BIT(data, 5));
@@ -194,33 +181,33 @@ static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 	output_set_led_value(1, !BIT(data, 5));
 
 	/* EPROM address shift */
-	if (!BIT(state->old_data, 5) && BIT(data, 5))
+	if (!BIT(m_old_data, 5) && BIT(data, 5))
 	{
-		state->eprom_addr <<= 1;
-		state->eprom_addr |= BIT(state->old_data, 3);
+		m_eprom_addr <<= 1;
+		m_eprom_addr |= BIT(m_old_data, 3);
 	}
 
 	/* EPROM output enable */
-	state->eprom_oe = BIT(data, 6);
+	m_eprom_oe = BIT(data, 6);
 
 	/* EPROM chip enable */
-	state->eprom_ce = BIT(data, 7);
+	m_eprom_ce = BIT(data, 7);
 
-	if (BIT(data, 6) && (!BIT(state->old_data, 7) && BIT(data, 7)))
+	if (BIT(data, 6) && (!BIT(m_old_data, 7) && BIT(data, 7)))
 	{
-		popmessage("EPROM write %04x = %02x\n", state->eprom_addr & 0x7ff, state->eprom_data);
-		device->machine().region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff] &= state->eprom_data;
+		popmessage("EPROM write %04x = %02x\n", m_eprom_addr & 0x7ff, m_eprom_data);
+		m_machine.region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
 	}
 
-	state->old_data = data;
+	m_old_data = data;
 }
 
 static const riot6532_interface beta_riot_interface =
 {
-	DEVCB_HANDLER(beta_riot_a_r),
-	DEVCB_HANDLER(beta_riot_b_r),
-	DEVCB_HANDLER(beta_riot_a_w),
-	DEVCB_HANDLER(beta_riot_b_w),
+	DEVCB_DRIVER_MEMBER(beta_state, riot_pa_r),
+	DEVCB_DRIVER_MEMBER(beta_state, riot_pb_r),
+	DEVCB_DRIVER_MEMBER(beta_state, riot_pa_w),
+	DEVCB_DRIVER_MEMBER(beta_state, riot_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_IRQ_LINE)
 };
 
@@ -235,34 +222,26 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 
 /* Machine Initialization */
 
-static MACHINE_START( beta )
+void beta_state::machine_start()
 {
-	beta_state *state = machine.driver_data<beta_state>();
-
-	/* find devices */
-	state->speaker = machine.device(SPEAKER_TAG);
-
-	state->led_refresh_timer = machine.scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_refresh_timer = m_machine.scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
-	state->save_item(NAME(state->eprom_oe));
-	state->save_item(NAME(state->eprom_ce));
-	state->save_item(NAME(state->eprom_addr));
-	state->save_item(NAME(state->eprom_data));
-	state->save_item(NAME(state->old_data));
-	state->save_item(NAME(state->ls145_p));
-	state->save_item(NAME(state->segment));
+	save_item(NAME(m_eprom_oe));
+	save_item(NAME(m_eprom_ce));
+	save_item(NAME(m_eprom_addr));
+	save_item(NAME(m_eprom_data));
+	save_item(NAME(m_old_data));
+	save_item(NAME(m_ls145_p));
+	save_item(NAME(m_segment));
 }
 
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( beta, beta_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
     MCFG_CPU_PROGRAM_MAP(beta_mem)
-
-    MCFG_MACHINE_START(beta)
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_beta )
@@ -295,7 +274,6 @@ ROM_START( beta )
 	ROM_REGION( 0x800, EPROM_TAG, ROMREGION_ERASEFF )
 	ROM_CART_LOAD( EPROM_TAG, 0x0000, 0x0800, ROM_FULLSIZE )
 ROM_END
-
 
 /* System Drivers */
 
