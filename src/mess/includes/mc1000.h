@@ -29,16 +29,16 @@ public:
 	mc1000_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, Z80_TAG),
-		  m_crtc0(*this, MC6847_TAG),
-		  m_crtc1(*this, MC6845_TAG),
+		  m_vdg(*this, MC6847_TAG),
+		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc0;
-	optional_device<device_t> m_crtc1;
+	required_device<device_t> m_vdg;
+	optional_device<device_t> m_crtc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_ram;

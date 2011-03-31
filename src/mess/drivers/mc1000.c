@@ -108,13 +108,13 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
     */
 
 	m_mc6847_bank = BIT(data, 0);
-	mc6847_css_w(m_crtc0, BIT(data, 1));
-	mc6847_gm0_w(m_crtc0, BIT(data, 2));
-	mc6847_gm1_w(m_crtc0, BIT(data, 3));
-	mc6847_gm2_w(m_crtc0, BIT(data, 4));
-	mc6847_intext_w(m_crtc0, BIT(data, 5));
-	mc6847_as_w(m_crtc0, BIT(data, 6));
-	mc6847_ag_w(m_crtc0, BIT(data, 7));
+	mc6847_css_w(m_vdg, BIT(data, 1));
+	mc6847_gm0_w(m_vdg, BIT(data, 2));
+	mc6847_gm1_w(m_vdg, BIT(data, 3));
+	mc6847_gm2_w(m_vdg, BIT(data, 4));
+	mc6847_intext_w(m_vdg, BIT(data, 5));
+	mc6847_as_w(m_vdg, BIT(data, 6));
+	mc6847_ag_w(m_vdg, BIT(data, 7));
 
 	bankswitch();
 }
@@ -267,14 +267,14 @@ WRITE_LINE_MEMBER( mc1000_state::hs_w )
 
 READ8_MEMBER( mc1000_state::videoram_r )
 {
-	mc6847_inv_w(m_crtc0, BIT(m_mc6847_video_ram[offset], 7));
+	mc6847_inv_w(m_vdg, BIT(m_mc6847_video_ram[offset], 7));
 
 	return m_mc6847_video_ram[offset];
 }
 
 bool mc1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return mc6847_update(m_crtc0, &bitmap, &cliprect);
+	return mc6847_update(m_vdg, &bitmap, &cliprect);
 }
 
 static UINT8 mc1000_get_char_rom(running_machine &machine, UINT8 ch, int line)
