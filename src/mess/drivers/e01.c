@@ -46,16 +46,7 @@
 
 */
 
-#include "emu.h"
 #include "includes/e01.h"
-#include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/ctronics.h"
-#include "machine/6522via.h"
-#include "machine/mc146818.h"
-#include "machine/mc6854.h"
-#include "machine/wd17xx.h"
 #include "e01.lh"
 
 /***************************************************************************
@@ -66,38 +57,32 @@
     update_interrupts - update interrupt state
 -------------------------------------------------*/
 
-static void update_interrupts(running_machine &machine)
+void e01_state::update_interrupts()
 {
-	e01_state *state = machine.driver_data<e01_state>();
-
-	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_IRQ0, (state->via_irq || (state->hdc_ie & state->hdc_irq) || state->rtc_irq) ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_NMI, (state->fdc_drq || (state->adlc_ie & state->adlc_irq)) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via_irq || (m_hdc_ie & m_hdc_irq) || m_rtc_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_fdc_drq || (m_adlc_ie & m_adlc_irq)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*-------------------------------------------------
      network_irq_enable - network interrupt enable
 -------------------------------------------------*/
 
-static void network_irq_enable(running_machine &machine, int enabled)
+void e01_state::network_irq_enable(int enabled)
 {
-	e01_state *state = machine.driver_data<e01_state>();
+	m_adlc_ie = enabled;
 
-	state->adlc_ie = enabled;
-
-	update_interrupts(machine);
+	update_interrupts();
 }
 
 /*-------------------------------------------------
      hdc_irq_enable - hard disk interrupt enable
 -------------------------------------------------*/
 
-static void hdc_irq_enable(running_machine &machine, int enabled)
+void e01_state::hdc_irq_enable(int enabled)
 {
-	e01_state *state = machine.driver_data<e01_state>();
+	m_hdc_ie = enabled;
 
-	state->hdc_ie = enabled;
-
-	update_interrupts(machine);
+	update_interrupts();
 }
 
 /***************************************************************************
@@ -108,10 +93,10 @@ static void hdc_irq_enable(running_machine &machine, int enabled)
      eprom_r - ROM/RAM select read
 -------------------------------------------------*/
 
-static READ8_HANDLER( ram_select_r )
+READ8_MEMBER( e01_state::ram_select_r )
 {
-	memory_set_bank(space->machine(), "bank1", 0);
-	memory_set_bank(space->machine(), "bank3", 0);
+	memory_set_bank(m_machine, "bank1", 0);
+	memory_set_bank(m_machine, "bank3", 0);
 
 	return 0;
 }
@@ -120,7 +105,7 @@ static READ8_HANDLER( ram_select_r )
      floppy_w - floppy control write
 -------------------------------------------------*/
 
-static WRITE8_DEVICE_HANDLER( floppy_w )
+WRITE8_MEMBER( e01_state::floppy_w )
 {
 	/*
 
@@ -138,81 +123,77 @@ static WRITE8_DEVICE_HANDLER( floppy_w )
     */
 
 	/* floppy 1 select */
-	if (!BIT(data, 0)) wd17xx_set_drive(device, 0);
+	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
 
 	/* floppy 2 select */
-	if (!BIT(data, 1)) wd17xx_set_drive(device, 1);
+	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
 
 	/* floppy side select */
-	wd17xx_set_side(device, BIT(data, 2));
+	wd17xx_set_side(m_fdc, BIT(data, 2));
 
 	/* TODO NVRAM select */
-	//mc146818_stby_w(state->rtc, BIT(data, 3));
+	//mc146818_stby_w(m_rtc, BIT(data, 3));
 
 	/* floppy density */
-	wd17xx_dden_w(device, BIT(data, 4));
+	wd17xx_dden_w(m_fdc, BIT(data, 4));
 
 	/* floppy master reset */
-	wd17xx_mr_w(device, BIT(data, 5));
+	wd17xx_mr_w(m_fdc, BIT(data, 5));
 
 	/* TODO floppy test */
-	//wd17xx_test_w(device, BIT(data, 6));
+	//wd17xx_test_w(m_fdc, BIT(data, 6));
 
 	/* mode LED */
 	output_set_value("led_0", BIT(data, 7));
 }
 
-static READ8_HANDLER( network_irq_disable_r )
+READ8_MEMBER( e01_state::network_irq_disable_r )
 {
-	network_irq_enable(space->machine(), 0);
+	network_irq_enable(0);
 
 	return 0;
 }
 
-static WRITE8_HANDLER( network_irq_disable_w )
+WRITE8_MEMBER( e01_state::network_irq_disable_w )
 {
-	network_irq_enable(space->machine(), 0);
+	network_irq_enable(0);
 }
 
-static READ8_HANDLER( network_irq_enable_r )
+READ8_MEMBER( e01_state::network_irq_enable_r )
 {
-	network_irq_enable(space->machine(), 1);
+	network_irq_enable(1);
 
 	return 0;
 }
 
-static WRITE8_HANDLER( network_irq_enable_w )
+WRITE8_MEMBER( e01_state::network_irq_enable_w )
 {
-	network_irq_enable(space->machine(), 1);
+	network_irq_enable(1);
 }
 
-static WRITE8_HANDLER( hdc_irq_enable_w )
+WRITE8_MEMBER( e01_state::hdc_irq_enable_w )
 {
-	hdc_irq_enable(space->machine(), BIT(data, 0));
+	hdc_irq_enable(BIT(data, 0));
 }
 
-static READ8_HANDLER( rtc_address_r )
+READ8_MEMBER( e01_state::rtc_address_r )
 {
-	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
-	return rtc->read(*space, 0);
+	return m_rtc->read(space, 0);
 }
 
-static WRITE8_HANDLER( rtc_address_w )
+WRITE8_MEMBER( e01_state::rtc_address_w )
 {
-	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
-	rtc->write(*space, 0, data);
+	m_rtc->write(space, 0, data);
 }
 
-static READ8_HANDLER( rtc_data_r )
+READ8_MEMBER( e01_state::rtc_data_r )
 {
-	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
-	return rtc->read(*space, 1);
+	return m_rtc->read(space, 1);
 }
 
-static WRITE8_HANDLER( rtc_data_w )
+WRITE8_MEMBER( e01_state::rtc_data_w )
 {
-	mc146818_device *rtc = space->machine().device<mc146818_device>(HD146818_TAG);
-	rtc->write(*space, 1, data);
+	m_rtc->write(space, 1, data);
 }
 
 /***************************************************************************
@@ -223,14 +204,14 @@ static WRITE8_HANDLER( rtc_data_w )
     ADDRESS_MAP( e01_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( e01_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( e01_mem, AS_PROGRAM, 8, e01_state )
 	AM_RANGE(0x0000, 0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00c3) AM_READWRITE(rtc_address_r, rtc_address_w)
 	AM_RANGE(0xfc04, 0xfc04) AM_MIRROR(0x00c3) AM_READWRITE(rtc_data_r, rtc_data_w)
-	AM_RANGE(0xfc08, 0xfc08) AM_MIRROR(0x00c0) AM_READ(ram_select_r) AM_DEVWRITE(WD2793_TAG, floppy_w)
-	AM_RANGE(0xfc0c, 0xfc0f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(WD2793_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0xfc10, 0xfc1f) AM_MIRROR(0x00c0) AM_DEVREADWRITE_MODERN(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE(MC6854_TAG, mc6854_r, mc6854_w)
+	AM_RANGE(0xfc08, 0xfc08) AM_MIRROR(0x00c0) AM_READ(ram_select_r) AM_WRITE(floppy_w)
+	AM_RANGE(0xfc0c, 0xfc0f) AM_MIRROR(0x00c0) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xfc10, 0xfc1f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
+	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE_LEGACY(MC6854_TAG, mc6854_r, mc6854_w)
 	AM_RANGE(0xfc24, 0xfc24) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_disable_r, network_irq_disable_w)
 	AM_RANGE(0xfc28, 0xfc28) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_enable_r, network_irq_enable_w)
 	AM_RANGE(0xfc2c, 0xfc2c) AM_MIRROR(0x00c3) AM_READ_PORT("FLAP")
@@ -267,38 +248,34 @@ INPUT_PORTS_END
 /*-------------------------------------------------
     MC146818_INTERFACE( rtc_intf )
 -------------------------------------------------*/
-/*
-static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
+
+WRITE_LINE_MEMBER( e01_state::rtc_irq_w )
 {
-    e01_state *driver_state = device->machine().driver_data<e01_state>();
+    m_rtc_irq = state;
 
-    driver_state->rtc_irq = state;
-
-    update_interrupts(device->machine());
+    update_interrupts();
 }
-*/
+
 static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 {
 	e01_state *state = timer.machine().driver_data<e01_state>();
 
-	state->rtc_irq = !state->rtc_irq;
+	state->m_rtc_irq = !state->m_rtc_irq;
 
-	update_interrupts(timer.machine());
+	state->update_interrupts();
 }
 
 /*-------------------------------------------------
     mc6854_interface adlc_intf
 -------------------------------------------------*/
-/*
-static WRITE_LINE_DEVICE_HANDLER( adlc_irq_w )
+
+WRITE_LINE_MEMBER( e01_state::adlc_irq_w )
 {
-    e01_state *driver_state = device->machine().driver_data<e01_state>();
+    m_adlc_irq = state;
 
-    driver_state->adlc_irq = state;
-
-    update_interrupts(device->machine());
+    update_interrupts();
 }
-*/
+
 static const mc6854_interface adlc_intf =
 {
 	NULL,
@@ -311,13 +288,11 @@ static const mc6854_interface adlc_intf =
     via6522_interface via_intf
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
+WRITE_LINE_MEMBER( e01_state::via_irq_w )
 {
-	e01_state *driver_state = device->machine().driver_data<e01_state>();
+	m_via_irq = state;
 
-	driver_state->via_irq = state;
-
-	update_interrupts(device->machine());
+	update_interrupts();
 }
 
 static const via6522_interface via_intf =
@@ -334,7 +309,7 @@ static const via6522_interface via_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(via_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(e01_state, via_irq_w)
 };
 
 /*-------------------------------------------------
@@ -357,20 +332,18 @@ static const floppy_config e01_floppy_config =
     wd17xx_interface fdc_intf
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+WRITE_LINE_MEMBER( e01_state::fdc_drq_w )
 {
-	e01_state *driver_state = device->machine().driver_data<e01_state>();
+	m_fdc_drq = state;
 
-	driver_state->fdc_drq = state;
-
-	update_interrupts(device->machine());
+	update_interrupts();
 }
 
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE( fdc_drq_w ),
+	DEVCB_DRIVER_LINE_MEMBER(e01_state, fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
@@ -382,46 +355,44 @@ static const wd17xx_interface fdc_intf =
     MACHINE_START( e01 )
 -------------------------------------------------*/
 
-static MACHINE_START( e01 )
+void e01_state::machine_start()
 {
-	e01_state *state = machine.driver_data<e01_state>();
-
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
-	UINT8 *rom = machine.region(R65C102_TAG)->base();
+	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *rom = m_machine.region(R65C102_TAG)->base();
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, rom, 0);
-	memory_set_bank(machine, "bank1", 1);
+	memory_configure_bank(m_machine, "bank1", 0, 1, ram, 0);
+	memory_configure_bank(m_machine, "bank1", 1, 1, rom, 0);
+	memory_set_bank(m_machine, "bank1", 1);
 
-	memory_configure_bank(machine, "bank2", 0, 1, ram, 0);
-	memory_set_bank(machine, "bank2", 0);
+	memory_configure_bank(m_machine, "bank2", 0, 1, ram, 0);
+	memory_set_bank(m_machine, "bank2", 0);
 
-	memory_configure_bank(machine, "bank3", 0, 1, ram + 0xfd00, 0);
-	memory_configure_bank(machine, "bank3", 1, 1, rom + 0xfd00, 0);
-	memory_set_bank(machine, "bank3", 1);
+	memory_configure_bank(m_machine, "bank3", 0, 1, ram + 0xfd00, 0);
+	memory_configure_bank(m_machine, "bank3", 1, 1, rom + 0xfd00, 0);
+	memory_set_bank(m_machine, "bank3", 1);
 
-	memory_configure_bank(machine, "bank4", 0, 1, ram + 0xfd00, 0);
-	memory_set_bank(machine, "bank4", 0);
+	memory_configure_bank(m_machine, "bank4", 0, 1, ram + 0xfd00, 0);
+	memory_set_bank(m_machine, "bank4", 0);
 
 	/* register for state saving */
-	state->save_item(NAME(state->adlc_ie));
-	state->save_item(NAME(state->hdc_ie));
-	state->save_item(NAME(state->rtc_irq));
-	state->save_item(NAME(state->via_irq));
-	state->save_item(NAME(state->hdc_irq));
-	state->save_item(NAME(state->fdc_drq));
-	state->save_item(NAME(state->adlc_irq));
+	save_item(NAME(m_adlc_ie));
+	save_item(NAME(m_hdc_ie));
+	save_item(NAME(m_rtc_irq));
+	save_item(NAME(m_via_irq));
+	save_item(NAME(m_hdc_irq));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_adlc_irq));
 }
 
 /*-------------------------------------------------
     MACHINE_RESET( e01 )
 -------------------------------------------------*/
 
-static MACHINE_RESET( e01 )
+void e01_state::machine_reset()
 {
-	memory_set_bank(machine, "bank1", 1);
-	memory_set_bank(machine, "bank3", 1);
+	memory_set_bank(m_machine, "bank1", 1);
+	memory_set_bank(m_machine, "bank3", 1);
 }
 
 /***************************************************************************
@@ -436,9 +407,6 @@ static MACHINE_CONFIG_START( e01, e01_state )
     /* basic machine hardware */
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, 1000000) // Rockwell R65C102P3
     MCFG_CPU_PROGRAM_MAP(e01_mem)
-
-    MCFG_MACHINE_START(e01)
-    MCFG_MACHINE_RESET(e01)
 
 	MCFG_MC146818_ADD(HD146818_TAG, MC146818_STANDARD)
 
