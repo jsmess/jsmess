@@ -5930,7 +5930,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="970925">
+			<dataarea name="rom" size="970926">
 				<rom name="desert demolition (prototype - dec 06, 1994).bin" size="970925" crc="d27fe9e5" sha1="355c55039490a4ed882506327d61ec40e583ca12" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -14218,7 +14218,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097145">
+			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - nov 09, 1994).bin" size="2097145" crc="82624073" sha1="668a8453bf88e8d27a6f6d123198aadda05215c5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -14318,7 +14318,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097145">
+			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - oct 01, 1994).bin" size="2097145" crc="b1c0fbb2" sha1="2529a10980dea625a3ea386dec05ee3f1c5e5ee8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -14351,7 +14351,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097145">
+			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - sep 29, 1994).bin" size="2097145" crc="96bae44f" sha1="edae68144c9b90764e7591be23e27ff1a34b2ab2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -24282,7 +24282,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3151445">
+			<dataarea name="rom" size="3151446">
 				<rom name="world series baseball '95 (prototype - jan 14, 1995 - rm).bin" size="3151445" crc="f70b07cf" sha1="b301931fdee91cf8b67f9de4e6935310e643078b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -24307,7 +24307,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3154899">
+			<dataarea name="rom" size="3154900">
 				<rom name="world series baseball '95 (prototype - jan 18, 1995 - rm).bin" size="3154899" crc="5ce70f8f" sha1="f9e1e8424e12ca7c95e926e3bb4d24233eb09c5d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -24402,7 +24402,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2080861">
+			<dataarea name="rom" size="2080862">
 				<rom name="world series baseball (prototype - dec 22, 1993).bin" size="2080861" crc="0dc0558d" sha1="a6a3c1a6b04f6318876412a47a8e7c6a92910187" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -25167,7 +25167,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1024239">
+			<dataarea name="rom" size="1024240">
 				<rom name="zombie high (usa) (prototype).bin" size="1024239" crc="7bea6194" sha1="56f1a0b616e178315bdb9f2e43ddc942dcf3780e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
