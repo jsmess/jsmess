@@ -3350,6 +3350,18 @@
 		</part>
 	</software>
 
+	<software name="darkwing">
+		<!-- Serial: DMG-DC? - Release Date:  -->
+		<description>Disney's Darkwing Duck (Ger)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="darkwing duck (germany).bin" size="131072" crc="176c1fa2" sha1="5960dc01e06f19e166646504bc3097248f4a22cb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkwingu" cloneof="darkwing">
 		<!-- Serial: DMG-DC-USA - Release Date:  -->
 		<description>Disney's Darkwing Duck (USA)</description>
@@ -19020,7 +19032,7 @@
 		</part>
 	</software>
 
-	<software name="sonic3db">
+	<software name="sonic3db" supported="no">
 		<!-- Serial:  - Release Date:  - Alt. Title:  -->
 		<description>Sonic 3D Blast 5 (Chi)</description>
 		<year>1998</year>
@@ -19172,7 +19184,7 @@
 
 <!-- Non game cartridges -->
 
-	<software name="gamegeni">
+	<software name="gamegeni" supported="no">
 		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Game Genie BIOS (USA) (v2.1)</description>
 		<year>19??</year>
@@ -19209,7 +19221,7 @@
 	</software>
 
 
-	<software name="gboycam">
+	<software name="gboycam" supported="no">
 		<!-- Serial: GBD-USA? / ?? - Release Date:  -->
 		<description>Game Boy Camera (Euro, USA)</description>
 		<year>1998</year>
@@ -19221,7 +19233,7 @@
 		</part>
 	</software>
 
-	<software name="pockcam" cloneof="gboycam">
+	<software name="pockcam" cloneof="gboycam" supported="no">
 		<!-- Serial: MGB-006 - Release Date: 1998-02-21 - Alt. Title: ポケットカメラ -->
 		<description>Pocket Camera (Jpn, Rev. A)</description>
 		<year>1998</year>
@@ -19233,7 +19245,7 @@
 		</part>
 	</software>
 
-	<software name="gboycamg">
+	<software name="gboycamg" supported="no">
 		<!-- Serial: DMG- - Release Date: - Alt. Title:  -->
 		<description>Game Boy Camera Gold (USA)</description>
 		<year>19??</year>

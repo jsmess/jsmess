@@ -13,7 +13,6 @@ Undumped GBC protos:
 
 
 Undumped Pirates:
-  -  Sachen EB-001 Beast Fighter
   -  Sachen EB-004 Street Hero
 
 -->
@@ -715,7 +714,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="atvrackja" cloneof="atvrackj">
+	<software name="atvrackja" cloneof="atvrackj" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro, Alt)</description>
 		<year>19??</year>
@@ -727,7 +726,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="atvrackj">
+	<software name="atvrackj" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro)</description>
 		<year>19??</year>
@@ -739,7 +738,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="atvracin">
+	<software name="atvracin" supported="no">
 		<!-- Serial: ??? - Release Date:  -->
 		<description>ATV Racing (Euro)</description>
 		<year>2001</year>
@@ -2407,7 +2406,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="commandm">
+	<software name="commandm" supported="no">
 		<!-- Serial: CGB-KCEJ - Release Date: 2000-11-22 - Alt. Title: コマンドマスター - Notes: GBC only -->
 		<description>Command Master (Jpn)</description>
 		<year>2000</year>
@@ -4527,7 +4526,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="fullhang">
+	<software name="fullhang" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Full Time Soccer &amp; Hang Time Basketball (Euro)</description>
 		<year>19??</year>
@@ -4539,7 +4538,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="fulltime">
+	<software name="fulltime" supported="no">
 		<!-- Serial: ?? - Release Date:  -->
 		<description>Full Time Soccer (Euro)</description>
 		<year>2000</year>
@@ -5545,7 +5544,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="hangtime">
+	<software name="hangtime" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Hang Time Basketball (Euro)</description>
 		<year>19??</year>
@@ -6637,7 +6636,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="karatej">
+	<software name="karatej" supported="no">
 		<!-- Serial: ??? - Release Date:  -->
 		<description>Karate Joe (Euro)</description>
 		<year>19??</year>
@@ -6865,7 +6864,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="kirbytlt">
+	<software name="kirbytlt" supported="no">
 		<!-- Serial: CGB-KTNE - Release Date:  - Notes: GBC only -->
 		<description>Kirby Tilt 'n' Tumble (USA)</description>
 		<year>2001</year>
@@ -7081,7 +7080,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="korokoro" cloneof="kirbytlt">
+	<software name="korokoro" cloneof="kirbytlt" supported="no">
 		<!-- Serial: CGB-KKKJ - Release Date: 2000-08-23 - Alt. Title: コロコロカービィ - Notes: GBC only -->
 		<description>Korokoro Kirby (Jpn)</description>
 		<year>2000</year>
@@ -10404,7 +10403,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="painter">
+	<software name="painter" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Painter (Euro)</description>
 		<year>19??</year>
@@ -10908,7 +10907,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="pocksmrt">
+	<software name="pocksmrt" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Pocket Smash Out &amp; Race Time (Euro)</description>
 		<year>19??</year>
@@ -10920,7 +10919,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="pocksm">
+	<software name="pocksm" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Pocket Smash Out (Euro)</description>
 		<year>19??</year>
@@ -12012,7 +12011,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="racetime">
+	<software name="racetime" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Race Time (Euro)</description>
 		<year>19??</year>
@@ -13512,7 +13511,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sinkj">
+	<software name="sinkj" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Space Invasion &amp; Karate Joe (Euro)</description>
 		<year>19??</year>
@@ -13524,7 +13523,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sinpntr">
+	<software name="sinpntr" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Space Invasion &amp; Painter (Euro)</description>
 		<year>19??</year>
@@ -13536,7 +13535,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sinvasn">
+	<software name="sinvasn" supported="no">
 		<!-- Serial:  - Release Date:  - Notes: GBC only -->
 		<description>Space Invasion (Euro)</description>
 		<year>19??</year>
@@ -16597,6 +16596,18 @@ Undumped Pirates:
 
 <!-- Sachen games -->
 
+	<software name="beastfgt">
+		<!-- Serial: EB-001 -->
+		<description>Beast Fighter (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="beast fighter (asia) (unl).bin" size="262144" crc="018c5819" sha1="f57db0fcf9dbfc40bd1971467b46f6cacc90a3a3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jboy2">
 		<!-- Serial: EB-002 -->
 		<description>Jurassic Boy 2 (World)</description>
@@ -17304,6 +17315,18 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="donkey kong 5 (bad).bin" size="262144" crc="e097ce67" sha1="e9670cac5a943f75e0e0a3ffd31f1eb6d94d7008" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sm3sp" supported="no">
+		<!-- Serial:  - Release Date:  - Alt. Title:  -->
+		<description>Super Mario 3 Special (Chi, Bad? Protected?)</description>
+		<year>200?</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super mario 3 special (unl).bin" size="262144" crc="791f8c86" sha1="c5632ea968398d3a342f2639aad7e11122d561ef" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
