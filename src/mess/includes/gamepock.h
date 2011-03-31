@@ -15,23 +15,26 @@ public:
 	gamepock_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 port_a;
-	UINT8 port_b;
-	HD44102CH hd44102ch[3];
+	virtual void machine_reset();
+
+	UINT8 m_port_a;
+	UINT8 m_port_b;
+	HD44102CH m_hd44102ch[3];
+
+	void hd44102ch_w( int which, int c_d, UINT8 data );
+	void hd44102ch_init( int which );
+	void lcd_update();
+
+	DECLARE_WRITE8_MEMBER( port_a_w );
+	DECLARE_READ8_MEMBER( port_b_r );
+	DECLARE_WRITE8_MEMBER( port_b_w );
+	DECLARE_READ8_MEMBER( port_c_r );
 };
 
 
 /*----------- defined in machine/gamepock.c -----------*/
 
-MACHINE_RESET( gamepock );
-
 SCREEN_UPDATE( gamepock );
-
-WRITE8_HANDLER( gamepock_port_a_w );
-WRITE8_HANDLER( gamepock_port_b_w );
-
-READ8_HANDLER( gamepock_port_b_r );
-READ8_HANDLER( gamepock_port_c_r );
 
 int gamepock_io_callback( device_t *device, int ioline, int state );
 

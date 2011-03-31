@@ -1,3 +1,6 @@
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "softlist.h"
 #include "cpu/upd7810/upd7810.h"
@@ -6,7 +9,8 @@
 #include "includes/gamepock.h"
 #include "rendlay.h"
 
-static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8)
+
+static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 	AM_RANGE(0x1000,0x3fff) AM_NOP
@@ -15,11 +19,13 @@ static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xff80,0xffff) AM_RAM				/* 128 bytes microcontroller RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gamepock_io, AS_IO, 8 )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE( gamepock_port_a_w )
-	AM_RANGE( 0x01, 0x01 ) AM_READWRITE( gamepock_port_b_r, gamepock_port_b_w )
-	AM_RANGE( 0x02, 0x02 ) AM_READ( gamepock_port_c_r )
+
+static ADDRESS_MAP_START(gamepock_io, AS_IO, 8, gamepock_state )
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE( port_a_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READWRITE( port_b_r, port_b_w )
+	AM_RANGE( 0x02, 0x02 ) AM_READ( port_c_r )
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( gamepock )
 	PORT_START("IN0")
@@ -37,12 +43,15 @@ static INPUT_PORTS_START( gamepock )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
+
 static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_callback };
+
 
 static DEVICE_START(gamepock_cart)
 {
 	memory_set_bankptr( device->machine(), "bank1", device->machine().region("user1" )->base() );
 }
+
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	UINT8 *cart = image.device().machine().region("user1" )->base();
@@ -65,13 +74,12 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	return IMAGE_INIT_PASS;
 }
 
+
 static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
 	MCFG_CPU_IO_MAP( gamepock_io)
 	MCFG_CPU_CONFIG( gamepock_cpu_config )
-
-	MCFG_MACHINE_RESET( gamepock )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
