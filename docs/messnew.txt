@@ -98,6 +98,8 @@ System Driver Changes:
 
 - [MEKD2] Fixed keyboard. System is usable except for cassette. [Robbbert]
 
+- [PCFX] Added BIOS v1.01.  [trap15]
+
 - [PDP1] Made the CRT implementation a device.[Atari Ace]   Made papertape,
   cylinder and printer into devices and added back in (not working) [Robbbert]
 
