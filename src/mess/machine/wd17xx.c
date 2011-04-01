@@ -133,6 +133,10 @@
 	- Triggering intrq now clears the DRQ bit in the status as well as the busy bit.
 	  Execution of the READ_DAM command now correctly sets w->command.
 
+	2011-Apr-01 Curt Coder
+	- Set complete command delay to 16 usec (DD) / 32 usec (SD) and removed
+	  the external delay setting hack.
+
     TODO:
         - What happens if a track is read that doesn't have any id's on it?
          (e.g. unformatted disc)
@@ -353,9 +357,6 @@ struct _wd1770_state
 
 	/* pause time when writing/reading sector */
 	int pause_time;
-
-	/* complete command delay */
-	int complete_command_delay;
 
 	/* Were we busy when we received a FORCE_INT command */
 	UINT8	was_busy;
@@ -1021,27 +1022,14 @@ or bytes missed */
 */
 static void wd17xx_complete_command(device_t *device, int delay)
 {
-	int usecs;
 	wd1770_state *w = get_safe_token(device);
 
 	w->data_count = 0;
 
 	w->hld_count = 2;
 
-#if 0
-	/* clear busy bit */
-	/* RL - removed, busy bit must be on until wd17xx_misc_timer_callback() is fired */
-	/* Robbbert - adjusted delay value (see notes above) to fix the osborne1 */
-	w->status &= ~STA_2_BUSY;
-
-	usecs = wd17xx_get_datarate_in_us(w->density);
-	usecs *= delay;
-#endif
-
-	//usecs = 12;
-    usecs   = w->complete_command_delay;
-
 	/* set new timer */
+	int usecs = wd17xx_dden(device) ? 32 : 16;
 	w->timer_cmd->adjust(attotime::from_usec(usecs));
 
 	/* Kill onshot read/write sector timers */
@@ -1263,12 +1251,6 @@ void wd17xx_set_pause_time(device_t *device, int usec)
 {
 	wd1770_state *w = get_safe_token(device);
 	w->pause_time = usec;
-}
-
-void wd17xx_set_complete_command_delay(device_t *device, int usec)
-{
-	wd1770_state *w = get_safe_token(device);
-    w->complete_command_delay=usec;
 }
 
 
@@ -2024,7 +2006,6 @@ static DEVICE_START( wd1770 )
 
 	w->status = STA_1_TRACK0;
 	w->pause_time = 1000;
-    w->complete_command_delay = 12;
 
 	/* allocate timers */
 	w->timer_cmd = device->machine().scheduler().timer_alloc(FUNC(wd17xx_command_callback), (void *)device);

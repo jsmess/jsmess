@@ -58,7 +58,6 @@ void wd17xx_set_drive(device_t *device, UINT8);		/* set drive wd179x is accessin
 void wd17xx_set_side(device_t *device, UINT8);		/* set side wd179x is accessing */
 
 void wd17xx_set_pause_time(device_t *device, int usec);       /* default is 40 usec if not set */
-void wd17xx_set_complete_command_delay(device_t *device, int usec);   /* default is 12 usec if not set */
 
 READ8_DEVICE_HANDLER( wd17xx_status_r );
 READ8_DEVICE_HANDLER( wd17xx_track_r );

@@ -534,7 +534,7 @@ static void machine_reset_common_disk(running_machine &machine)
 	state->m_fdc = machine.device("fdc");
 	/* These values need to be fine tuned or the fdc repaired */
 	wd17xx_set_pause_time(state->m_fdc, 45);       /* default is 40 usec if not set */
-	wd17xx_set_complete_command_delay(state->m_fdc, 50);   /* default is 12 usec if not set */
+//	wd17xx_set_complete_command_delay(state->m_fdc, 50);   /* default is 12 usec if not set */
 }
 
 MACHINE_RESET( mbee )
