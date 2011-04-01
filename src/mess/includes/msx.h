@@ -19,34 +19,34 @@ public:
 		: driver_device(machine, config) { }
 
 	/* PSG */
-	int psg_b;
-	int opll_active;
+	int m_psg_b;
+	int m_opll_active;
 	/* mouse */
-	UINT16 mouse[2];
-	int mouse_stat[2];
+	UINT16 m_mouse[2];
+	int m_mouse_stat[2];
 	/* rtc */
-	int rtc_latch;
+	int m_rtc_latch;
 	/* disk */
-	UINT8 dsk_stat;
+	UINT8 m_dsk_stat;
 	/* kanji */
-	UINT8 *kanji_mem;
-	int kanji_latch;
+	UINT8 *m_kanji_mem;
+	int m_kanji_latch;
 	/* memory */
 	const msx_slot_layout *layout;
-	slot_state *cart_state[MSX_MAX_CARTS];
-	slot_state *state[4];
-	const msx_slot *slot[4];
-	UINT8 *ram_pages[4];
-	UINT8 *empty, ram_mapper[4];
-	UINT8 ramio_set_bits;
-	slot_state *all_state[4][4][4];
-	int slot_expanded[4];
-	UINT8 primary_slot;
-	UINT8 secondary_slot[4];
-	UINT8 superloadrunner_bank;
-	UINT8 korean90in1_bank;
-	UINT8 *top_page;
-	int port_c_old;
+	slot_state *m_cart_state[MSX_MAX_CARTS];
+	slot_state *m_state[4];
+	const msx_slot *m_slot[4];
+	UINT8 *m_ram_pages[4];
+	UINT8 *m_empty, m_ram_mapper[4];
+	UINT8 m_ramio_set_bits;
+	slot_state *m_all_state[4][4][4];
+	int m_slot_expanded[4];
+	UINT8 m_primary_slot;
+	UINT8 m_secondary_slot[4];
+	UINT8 m_superloadrunner_bank;
+	UINT8 m_korean90in1_bank;
+	UINT8 *m_top_page;
+	int m_port_c_old;
 };
 
 

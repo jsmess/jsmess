@@ -18,9 +18,9 @@ READ16_HANDLER( intv_stic_r )
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-            return state->collision_registers[offset & 0x07];
+            return state->m_collision_registers[offset & 0x07];
 		case 0x21:
-			state->color_stack_mode = 1;
+			state->m_color_stack_mode = 1;
 			//logerror("Setting color stack mode\n");
 			break;
 	}
@@ -44,7 +44,7 @@ WRITE16_HANDLER( intv_stic_w )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			s =  &state->sprite[offset & 0x07];
+			s =  &state->m_sprite[offset & 0x07];
 			s->doublex = !!(data & 0x0400);
 			s->visible = !!(data & 0x0200);
 			s->coll = !!(data & 0x0100);
@@ -59,7 +59,7 @@ WRITE16_HANDLER( intv_stic_w )
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			s =  &state->sprite[offset & 0x07];
+			s =  &state->m_sprite[offset & 0x07];
 			s->yflip = !!(data & 0x0800);
 			s->xflip = !!(data & 0x0400);
 			s->quady = !!(data & 0x0200);
@@ -76,7 +76,7 @@ WRITE16_HANDLER( intv_stic_w )
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			s =  &state->sprite[offset & 0x07];
+			s =  &state->m_sprite[offset & 0x07];
             s->behind_foreground = !!(data & 0x2000);
             s->grom = !(data & 0x0800);
 			s->card = ((data >> 3) & 0xFF);
@@ -94,16 +94,16 @@ WRITE16_HANDLER( intv_stic_w )
             //a MOB's own collision bit is *always* zero, even if a
             //one is poked into it
             data &= (~(1 << (offset & 0x07))) & 0x03FF;
-            state->collision_registers[offset & 0x07] = data;
+            state->m_collision_registers[offset & 0x07] = data;
 			break;
 		/* Display enable */
 		case 0x20:
 			//logerror("***Writing a %x to the STIC handshake\n",data);
-			state->stic_handshake = 1;
+			state->m_stic_handshake = 1;
 			break;
 		/* Graphics Mode */
 		case 0x21:
-			state->color_stack_mode = 0;
+			state->m_color_stack_mode = 0;
 			break;
 		/* Color Stack */
 		case 0x28:
@@ -111,23 +111,23 @@ WRITE16_HANDLER( intv_stic_w )
 		case 0x2a:
 		case 0x2b:
 			logerror("Setting color_stack[%x] = %x (%x)\n",offset&0x3,data&0xf,cpu_get_pc(&space->device()));
-			state->color_stack[offset&0x3] = data&0xf;
+			state->m_color_stack[offset&0x3] = data&0xf;
 			break;
 		/* Border Color */
 		case 0x2c:
 			//logerror("***Writing a %x to the border color\n",data);
-			state->border_color = data & 0xf;
+			state->m_border_color = data & 0xf;
 			break;
 		/* Framing */
 		case 0x30:
-			state->col_delay = data & 0x7;
+			state->m_col_delay = data & 0x7;
 			break;
 		case 0x31:
-			state->row_delay = data & 0x7;
+			state->m_row_delay = data & 0x7;
 			break;
 		case 0x32:
-			state->left_edge_inhibit = (data & 0x01);
-			state->top_edge_inhibit = (data & 0x02)>>1;
+			state->m_left_edge_inhibit = (data & 0x01);
+			state->m_top_edge_inhibit = (data & 0x02)>>1;
 			break;
 	}
 }

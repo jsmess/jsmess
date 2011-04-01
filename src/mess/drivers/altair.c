@@ -37,15 +37,15 @@ public:
 	DECLARE_READ8_MEMBER( sio_key_status_r );
 	DECLARE_WRITE8_MEMBER( sio_command_w );
 	DECLARE_WRITE8_MEMBER( altair_kbd_put );
-	UINT8 term_data;
-	UINT8* ram;
+	UINT8 m_term_data;
+	UINT8* m_ram;
 };
 
 
 
 READ8_MEMBER(altair_state::sio_status_r)
 {
-	if (term_data!=0) return 0x01; // data in
+	if (m_term_data!=0) return 0x01; // data in
 	return 0x02; // ready
 }
 
@@ -56,19 +56,19 @@ WRITE8_MEMBER(altair_state::sio_command_w)
 
 READ8_MEMBER(altair_state::sio_data_r)
 {
-	UINT8 retVal = term_data;
-	term_data = 0;
+	UINT8 retVal = m_term_data;
+	m_term_data = 0;
 	return retVal;
 }
 
 READ8_MEMBER(altair_state::sio_key_status_r)
 {
-	return (term_data!=0) ? 0x40 : 0x01;
+	return (m_term_data!=0) ? 0x40 : 0x01;
 }
 
 static ADDRESS_MAP_START(altair_mem, AS_PROGRAM, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_BASE(ram)
+	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_BASE(m_ram)
 	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
 	AM_RANGE( 0xff00, 0xffff ) AM_ROM
 ADDRESS_MAP_END
@@ -95,7 +95,7 @@ QUICKLOAD_LOAD(altair)
 	quick_length = image.length();
 	if (quick_length >= 0xfd00)
 		return IMAGE_INIT_FAIL;
-	read_ = image.fread(state->ram, quick_length);
+	read_ = image.fread(state->m_ram, quick_length);
 	if (read_ != quick_length)
 		return IMAGE_INIT_FAIL;
 
@@ -109,12 +109,12 @@ static MACHINE_RESET(altair)
 	// Set startup addess done by turn-key
 	cpu_set_reg(machine.device("maincpu"), I8085_PC, 0xFD00);
 
-	state->term_data = 0;
+	state->m_term_data = 0;
 }
 
 WRITE8_MEMBER( altair_state::altair_kbd_put )
 {
-	term_data = data;
+	m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )

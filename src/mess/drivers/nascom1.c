@@ -74,7 +74,7 @@ Nascom Memory map
 
 static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(nascom1_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(nascom1_state, m_videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM	/* 1Kb */
 	AM_RANGE(0x1400, 0x4fff) AM_RAM	/* 16Kb */

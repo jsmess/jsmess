@@ -43,20 +43,20 @@ public:
 	c65_state(running_machine &machine, const driver_device_config_base &config)
 		: c64_state(machine, config) { }
 
-	UINT8 *chargen;
-	UINT8 *interface;
-	int charset_select;
-	int c64mode;
-	UINT8 _6511_port;
-	UINT8 keyline;
-	int old_value;
-	int nmilevel;
-	dma_t dma;
-	int dump_dma;
-	fdc_t fdc;
-	expansion_ram_t expansion_ram;
-	int io_on;
-	int io_dc00_on;
+	UINT8 *m_chargen;
+	UINT8 *m_interface;
+	int m_charset_select;
+	int m_c64mode;
+	UINT8 m_6511_port;
+	UINT8 m_keyline;
+	int m_old_value;
+	int m_nmilevel;
+	dma_t m_dma;
+	int m_dump_dma;
+	fdc_t m_fdc;
+	expansion_ram_t m_expansion_ram;
+	int m_io_on;
+	int m_io_dc00_on;
 };
 
 

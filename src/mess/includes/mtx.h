@@ -27,23 +27,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* keyboard state */
-	UINT8 key_sense;
+	UINT8 m_key_sense;
 
 	/* video state */
-	UINT8 *video_ram;
-	UINT8 *attr_ram;
+	UINT8 *m_video_ram;
+	UINT8 *m_attr_ram;
 
 	/* sound state */
-	UINT8 sound_latch;
+	UINT8 m_sound_latch;
 
 	/* devices */
-	device_t *z80ctc;
-	device_t *z80dart;
-	device_t *cassette;
-	device_t *centronics;
+	device_t *m_z80ctc;
+	device_t *m_z80dart;
+	device_t *m_cassette;
+	device_t *m_centronics;
 
 	/* timers */
-	device_t *cassette_timer;
+	device_t *m_cassette_timer;
 };
 
 /*----------- defined in machine/mtx.c -----------*/

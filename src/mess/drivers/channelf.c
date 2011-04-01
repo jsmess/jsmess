@@ -40,7 +40,7 @@
  * should not be latched in this way. (See mk1 driver)
  *
  * The f8 cannot determine how its ports are mapped at runtime,
- * so it can't easily decide to state->latch or not.
+ * so it can't easily decide to state->m_latch or not.
  *
  * ...so it stays here for now.
  */
@@ -54,7 +54,7 @@ static UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state)
 static READ8_HANDLER( channelf_port_0_r )
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	return port_read_with_latch(input_port_read(space->machine(), "PANEL"),state->latch[0]);
+	return port_read_with_latch(input_port_read(space->machine(), "PANEL"),state->m_latch[0]);
 }
 
 static READ8_HANDLER( channelf_port_1_r )
@@ -62,7 +62,7 @@ static READ8_HANDLER( channelf_port_1_r )
 	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 ext_value;
 
-	if ((state->latch[0] & 0x40) == 0)
+	if ((state->m_latch[0] & 0x40) == 0)
 	{
 		ext_value = input_port_read(space->machine(), "RIGHT_C");
 	}
@@ -70,7 +70,7 @@ static READ8_HANDLER( channelf_port_1_r )
 	{
 		ext_value = 0xc0 | input_port_read(space->machine(), "RIGHT_C");
 	}
-	return port_read_with_latch(ext_value,state->latch[1]);
+	return port_read_with_latch(ext_value,state->m_latch[1]);
 }
 
 static READ8_HANDLER( channelf_port_4_r )
@@ -78,7 +78,7 @@ static READ8_HANDLER( channelf_port_4_r )
 	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 ext_value;
 
-	if ((state->latch[0] & 0x40) == 0)
+	if ((state->m_latch[0] & 0x40) == 0)
 	{
 		ext_value = input_port_read(space->machine(), "LEFT_C");
 	}
@@ -86,13 +86,13 @@ static READ8_HANDLER( channelf_port_4_r )
 	{
 		ext_value = 0xff;
 	}
-	return port_read_with_latch(ext_value,state->latch[2]);
+	return port_read_with_latch(ext_value,state->m_latch[2]);
 }
 
 static READ8_HANDLER( channelf_port_5_r )
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	return port_read_with_latch(0xff,state->latch[3]);
+	return port_read_with_latch(0xff,state->m_latch[3]);
 }
 
 static  READ8_HANDLER( channelf_2102A_r )	/* SKR */
@@ -100,90 +100,90 @@ static  READ8_HANDLER( channelf_2102A_r )	/* SKR */
 	channelf_state *state = space->machine().driver_data<channelf_state>();
 	UINT8 pdata;
 
-	if(state->r2102.r_w==0) {
-		state->r2102.addr=(state->r2102.a[0]&1)+((state->r2102.a[1]<<1)&2)+((state->r2102.a[2]<<2)&4)+((state->r2102.a[3]<<3)&8)+((state->r2102.a[4]<<4)&16)+((state->r2102.a[5]<<5)&32)+((state->r2102.a[6]<<6)&64)+((state->r2102.a[7]<<7)&128)+((state->r2102.a[8]<<8)&256)+((state->r2102.a[9]<<9)&512);
-		state->r2102.d=state->r2102.ram[state->r2102.addr]&1;
-		pdata=state->latch[4]&0x7f;
-		pdata|=(state->r2102.d<<7);
-		LOG(("rhA: addr=%d, d=%d, r_w=%d, ram[%d]=%d,  a[9]=%d, a[8]=%d, a[7]=%d, a[6]=%d, a[5]=%d, a[4]=%d, a[3]=%d, a[2]=%d, a[1]=%d, a[0]=%d\n",state->r2102.addr,state->r2102.d,state->r2102.r_w,state->r2102.addr,state->r2102.ram[state->r2102.addr],state->r2102.a[9],state->r2102.a[8],state->r2102.a[7],state->r2102.a[6],state->r2102.a[5],state->r2102.a[4],state->r2102.a[3],state->r2102.a[2],state->r2102.a[1],state->r2102.a[0]));
+	if(state->m_r2102.r_w==0) {
+		state->m_r2102.addr=(state->m_r2102.a[0]&1)+((state->m_r2102.a[1]<<1)&2)+((state->m_r2102.a[2]<<2)&4)+((state->m_r2102.a[3]<<3)&8)+((state->m_r2102.a[4]<<4)&16)+((state->m_r2102.a[5]<<5)&32)+((state->m_r2102.a[6]<<6)&64)+((state->m_r2102.a[7]<<7)&128)+((state->m_r2102.a[8]<<8)&256)+((state->m_r2102.a[9]<<9)&512);
+		state->m_r2102.d=state->m_r2102.ram[state->m_r2102.addr]&1;
+		pdata=state->m_latch[4]&0x7f;
+		pdata|=(state->m_r2102.d<<7);
+		LOG(("rhA: addr=%d, d=%d, r_w=%d, ram[%d]=%d,  a[9]=%d, a[8]=%d, a[7]=%d, a[6]=%d, a[5]=%d, a[4]=%d, a[3]=%d, a[2]=%d, a[1]=%d, a[0]=%d\n",state->m_r2102.addr,state->m_r2102.d,state->m_r2102.r_w,state->m_r2102.addr,state->m_r2102.ram[state->m_r2102.addr],state->m_r2102.a[9],state->m_r2102.a[8],state->m_r2102.a[7],state->m_r2102.a[6],state->m_r2102.a[5],state->m_r2102.a[4],state->m_r2102.a[3],state->m_r2102.a[2],state->m_r2102.a[1],state->m_r2102.a[0]));
 		return port_read_with_latch(0xff,pdata);
 	} else
-		LOG(("rhA: r_w=%d\n",state->r2102.r_w));
-		return port_read_with_latch(0xff,state->latch[4]);
+		LOG(("rhA: r_w=%d\n",state->m_r2102.r_w));
+		return port_read_with_latch(0xff,state->m_latch[4]);
 }
 
 static  READ8_HANDLER( channelf_2102B_r )  /* SKR */
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
 	LOG(("rhB\n"));
-	return port_read_with_latch(0xff,state->latch[5]);
+	return port_read_with_latch(0xff,state->m_latch[5]);
 }
 
 static WRITE8_HANDLER( channelf_port_0_w )
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int offs;
 
-	state->latch[0] = data;
+	state->m_latch[0] = data;
 
 	if (data & 0x20)
 	{
-		offs = state->row_reg*128+state->col_reg;
-		if (videoram[offs] != state->val_reg)
-			videoram[offs] = state->val_reg;
+		offs = state->m_row_reg*128+state->m_col_reg;
+		if (videoram[offs] != state->m_val_reg)
+			videoram[offs] = state->m_val_reg;
 	}
 }
 
 static WRITE8_HANDLER( channelf_port_1_w )
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	state->latch[1] = data;
-	state->val_reg = ((data ^ 0xff) >> 6) & 0x03;
+	state->m_latch[1] = data;
+	state->m_val_reg = ((data ^ 0xff) >> 6) & 0x03;
 }
 
 static WRITE8_HANDLER( channelf_port_4_w )
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	state->latch[2] = data;
-	state->col_reg = (data | 0x80) ^ 0xff;
+	state->m_latch[2] = data;
+	state->m_col_reg = (data | 0x80) ^ 0xff;
 }
 
 static WRITE8_HANDLER( channelf_port_5_w )
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	state->latch[3] = data;
+	state->m_latch[3] = data;
 	channelf_sound_w(space->machine().device("custom"), (data>>6)&3);
-	state->row_reg = (data | 0xc0) ^ 0xff;
+	state->m_row_reg = (data | 0xc0) ^ 0xff;
 }
 
 static WRITE8_HANDLER( channelf_2102A_w )  /* SKR */
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	state->latch[4]=data;
-	state->r2102.a[2]=(data>>2)&1;
-	state->r2102.a[3]=(data>>1)&1;
-	state->r2102.r_w=data&1;
-	state->r2102.addr=(state->r2102.a[0]&1)+((state->r2102.a[1]<<1)&2)+((state->r2102.a[2]<<2)&4)+((state->r2102.a[3]<<3)&8)+((state->r2102.a[4]<<4)&16)+((state->r2102.a[5]<<5)&32)+((state->r2102.a[6]<<6)&64)+((state->r2102.a[7]<<7)&128)+((state->r2102.a[8]<<8)&256)+((state->r2102.a[9]<<9)&512);
-	state->r2102.d=(data>>3)&1;
-	if(state->r2102.r_w==1)
-		state->r2102.ram[state->r2102.addr]=state->r2102.d;
-	LOG(("whA: data=%d, addr=%d, d=%d, r_w=%d, ram[%d]=%d\n",data,state->r2102.addr,state->r2102.d,state->r2102.r_w,state->r2102.addr,state->r2102.ram[state->r2102.addr]));
+	state->m_latch[4]=data;
+	state->m_r2102.a[2]=(data>>2)&1;
+	state->m_r2102.a[3]=(data>>1)&1;
+	state->m_r2102.r_w=data&1;
+	state->m_r2102.addr=(state->m_r2102.a[0]&1)+((state->m_r2102.a[1]<<1)&2)+((state->m_r2102.a[2]<<2)&4)+((state->m_r2102.a[3]<<3)&8)+((state->m_r2102.a[4]<<4)&16)+((state->m_r2102.a[5]<<5)&32)+((state->m_r2102.a[6]<<6)&64)+((state->m_r2102.a[7]<<7)&128)+((state->m_r2102.a[8]<<8)&256)+((state->m_r2102.a[9]<<9)&512);
+	state->m_r2102.d=(data>>3)&1;
+	if(state->m_r2102.r_w==1)
+		state->m_r2102.ram[state->m_r2102.addr]=state->m_r2102.d;
+	LOG(("whA: data=%d, addr=%d, d=%d, r_w=%d, ram[%d]=%d\n",data,state->m_r2102.addr,state->m_r2102.d,state->m_r2102.r_w,state->m_r2102.addr,state->m_r2102.ram[state->m_r2102.addr]));
 }
 
 static WRITE8_HANDLER( channelf_2102B_w )  /* SKR */
 {
 	channelf_state *state = space->machine().driver_data<channelf_state>();
-	state->latch[5]=data;
-	state->r2102.a[9]=(data>>7)&1;
-	state->r2102.a[8]=(data>>6)&1;
-	state->r2102.a[7]=(data>>5)&1;
-	state->r2102.a[1]=(data>>4)&1;
-	state->r2102.a[6]=(data>>3)&1;
-	state->r2102.a[5]=(data>>2)&1;
-	state->r2102.a[4]=(data>>1)&1;
-	state->r2102.a[0]=data&1;
-	LOG(("whB: data=%d, a[9]=%d,a[8]=%d,a[0]=%d\n",data,state->r2102.a[9],state->r2102.a[8],state->r2102.a[0]));
+	state->m_latch[5]=data;
+	state->m_r2102.a[9]=(data>>7)&1;
+	state->m_r2102.a[8]=(data>>6)&1;
+	state->m_r2102.a[7]=(data>>5)&1;
+	state->m_r2102.a[1]=(data>>4)&1;
+	state->m_r2102.a[6]=(data>>3)&1;
+	state->m_r2102.a[5]=(data>>2)&1;
+	state->m_r2102.a[4]=(data>>1)&1;
+	state->m_r2102.a[0]=data&1;
+	LOG(("whB: data=%d, a[9]=%d,a[8]=%d,a[0]=%d\n",data,state->m_r2102.a[9],state->m_r2102.a[8],state->m_r2102.a[0]));
 }
 
 static ADDRESS_MAP_START( channelf_map, AS_PROGRAM, 8 )

@@ -25,7 +25,7 @@ MACHINE_RESET( gamecom )
 	memory_set_bankptr( machine, "bank3", rom );
 	memory_set_bankptr( machine, "bank4", rom );
 
-	state->cartridge = NULL;
+	state->m_cartridge = NULL;
 }
 
 static void gamecom_set_mmu( running_machine &machine, int mmu, UINT8 data )
@@ -41,8 +41,8 @@ static void gamecom_set_mmu( running_machine &machine, int mmu, UINT8 data )
 	else
 	{
 		/* select cartridge bank */
-		if ( state->cartridge )
-			memory_set_bankptr( machine, bank, state->cartridge + ( data << 13 ) );
+		if ( state->m_cartridge )
+			memory_set_bankptr( machine, bank, state->m_cartridge + ( data << 13 ) );
 	}
 }
 
@@ -56,20 +56,20 @@ static void handle_stylus_press( running_machine &machine, UINT8 column )
 	{
 		if ( ! ( input_port_read(machine, "IN2") & 0x04 ) )
 		{
-			state->stylus_x = input_port_read(machine, "STYX") >> 4;
-			state->stylus_y = input_port_read(machine, "STYY") >> 4;
+			state->m_stylus_x = input_port_read(machine, "STYX") >> 4;
+			state->m_stylus_y = input_port_read(machine, "STYY") >> 4;
 		}
 		else
 		{
-			state->stylus_x = 16;
-			state->stylus_y = 16;
+			state->m_stylus_x = 16;
+			state->m_stylus_y = 16;
 		}
 	}
 
-	if ( state->stylus_x == column )
+	if ( state->m_stylus_x == column )
 	{
-		RAM[SM8521_P0] = row_data[state->stylus_y];
-		RAM[SM8521_P1] = ( RAM[SM8521_P1] & 0xFC ) | ( ( row_data[state->stylus_y] >> 8 ) & 3 );
+		RAM[SM8521_P0] = row_data[state->m_stylus_y];
+		RAM[SM8521_P1] = ( RAM[SM8521_P1] & 0xFC ) | ( ( row_data[state->m_stylus_y] >> 8 ) & 3 );
 	}
 	else
 	{
@@ -172,9 +172,9 @@ WRITE8_HANDLER( gamecom_pio_w )
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
 				switch( data & 0xc0 )
 				{
-				case 0x40: state->cartridge = state->cartridge1; break;
-				case 0x80: state->cartridge = state->cartridge2; break;
-				default:   state->cartridge = NULL;       break;
+				case 0x40: state->m_cartridge = state->m_cartridge1; break;
+				case 0x80: state->m_cartridge = state->m_cartridge2; break;
+				default:   state->m_cartridge = NULL;       break;
 				}
 				return;
 	}
@@ -220,21 +220,21 @@ WRITE8_HANDLER( gamecom_internal_w )
 		data &= 0x7f;
 		break;
 	case SM8521_TM0D:
-		state->timer[0].check_value = data;
+		state->m_timer[0].check_value = data;
 		return;
 	case SM8521_TM0C:
-		state->timer[0].enabled = data & 0x80;
-		state->timer[0].state_limit = gamecom_timer_limit[data & 0x07];
-		state->timer[0].state_count = 0;
+		state->m_timer[0].enabled = data & 0x80;
+		state->m_timer[0].state_limit = gamecom_timer_limit[data & 0x07];
+		state->m_timer[0].state_count = 0;
 		RAM[SM8521_TM0D] = 0;
 		break;
 	case SM8521_TM1D:
-		state->timer[1].check_value = data;
+		state->m_timer[1].check_value = data;
 		return;
 	case SM8521_TM1C:
-		state->timer[1].enabled = data & 0x80;
-		state->timer[1].state_limit = gamecom_timer_limit[data & 0x07];
-		state->timer[1].state_count = 0;
+		state->m_timer[1].enabled = data & 0x80;
+		state->m_timer[1].state_limit = gamecom_timer_limit[data & 0x07];
+		state->m_timer[1].state_count = 0;
 		RAM[SM8521_TM1D] = 0;
 		break;
 	case SM8521_CLKT:	/* bit 6-7 */
@@ -244,55 +244,55 @@ WRITE8_HANDLER( gamecom_internal_w )
 			if ( data & 0x40 )
 			{
 				/* timer resolution 1 minute */
-				state->clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(60));
+				state->m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(60));
 			}
 			else
 			{
 				/* TImer resolution 1 second */
-				state->clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+				state->m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 			}
 		}
 		else
 		{
 			/* disable timer reset */
-			state->clock_timer->enable( 0 );
+			state->m_clock_timer->enable( 0 );
 			data &= 0xC0;
 		}
 		break;
 
 	/* Sound */
 	case SM8521_SGC:
-		state->sound.sgc = data;
+		state->m_sound.sgc = data;
 		break;
 	case SM8521_SG0L:
-		state->sound.sg0l = data;
+		state->m_sound.sg0l = data;
 		break;
 	case SM8521_SG1L:
-		state->sound.sg1l = data;
+		state->m_sound.sg1l = data;
 		break;
 	case SM8521_SG0TH:
-		state->sound.sg0t = ( state->sound.sg0t & 0xFF ) | ( data << 8 );
+		state->m_sound.sg0t = ( state->m_sound.sg0t & 0xFF ) | ( data << 8 );
 		break;
 	case SM8521_SG0TL:
-		state->sound.sg0t = ( state->sound.sg0t & 0xFF00 ) | data;
+		state->m_sound.sg0t = ( state->m_sound.sg0t & 0xFF00 ) | data;
 		break;
 	case SM8521_SG1TH:
-		state->sound.sg1t = ( state->sound.sg1t & 0xFF ) | ( data << 8 );
+		state->m_sound.sg1t = ( state->m_sound.sg1t & 0xFF ) | ( data << 8 );
 		break;
 	case SM8521_SG1TL:
-		state->sound.sg1t = ( state->sound.sg1t & 0xFF00 ) | data;
+		state->m_sound.sg1t = ( state->m_sound.sg1t & 0xFF00 ) | data;
 		break;
 	case SM8521_SG2L:
-		state->sound.sg2l = data;
+		state->m_sound.sg2l = data;
 		break;
 	case SM8521_SG2TH:
-		state->sound.sg2t = ( state->sound.sg2t & 0xFF ) | ( data << 8 );
+		state->m_sound.sg2t = ( state->m_sound.sg2t & 0xFF ) | ( data << 8 );
 		break;
 	case SM8521_SG2TL:
-		state->sound.sg2t = ( state->sound.sg2t & 0xFF00 ) | data;
+		state->m_sound.sg2t = ( state->m_sound.sg2t & 0xFF00 ) | data;
 		break;
 	case SM8521_SGDA:
-		state->sound.sgda = data;
+		state->m_sound.sgda = data;
 		break;
 
 	case SM8521_SG0W0:
@@ -311,7 +311,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_SG0W13:
 	case SM8521_SG0W14:
 	case SM8521_SG0W15:
-		state->sound.sg0w[offset - SM8521_SG0W0] = data;
+		state->m_sound.sg0w[offset - SM8521_SG0W0] = data;
 		break;
 	case SM8521_SG1W0:
 	case SM8521_SG1W1:
@@ -329,7 +329,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_SG1W13:
 	case SM8521_SG1W14:
 	case SM8521_SG1W15:
-		state->sound.sg1w[offset - SM8521_SG1W0] = data;
+		state->m_sound.sg1w[offset - SM8521_SG1W0] = data;
 		break;
 
 	/* Reserved addresses */
@@ -359,167 +359,167 @@ void gamecom_handle_dma( device_t *device, int cycles )
 	gamecom_state *state = device->machine().driver_data<gamecom_state>();
 	UINT8 * RAM = device->machine().region("maincpu")->base();
 	UINT8 data = RAM[SM8521_DMC];
-	state->dma.overwrite_mode = data & 0x01;
-	state->dma.transfer_mode = data & 0x06;
-	state->dma.decrement_x = data & 0x08;
-	state->dma.decrement_y = data & 0x10;
-	state->dma.enabled = data & 0x80;
-	if ( !state->dma.enabled ) return;
+	state->m_dma.overwrite_mode = data & 0x01;
+	state->m_dma.transfer_mode = data & 0x06;
+	state->m_dma.decrement_x = data & 0x08;
+	state->m_dma.decrement_y = data & 0x10;
+	state->m_dma.enabled = data & 0x80;
+	if ( !state->m_dma.enabled ) return;
 
 
-	if ( state->dma.decrement_x || state->dma.decrement_y )
+	if ( state->m_dma.decrement_x || state->m_dma.decrement_y )
 	{
 		logerror( "TODO: Decrement-x and decrement-y are not supported yet\n" );
 	}
-	state->dma.width_x = RAM[SM8521_DMDX];
-	state->dma.width_x_count = 0;
-	state->dma.width_y = RAM[SM8521_DMDY];
-	state->dma.width_y_count = 0;
-	state->dma.source_x = RAM[SM8521_DMX1];
-	state->dma.source_x_current = state->dma.source_x;
-	state->dma.source_y = RAM[SM8521_DMY1];
-	state->dma.source_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	state->dma.dest_x = RAM[SM8521_DMX2];
-	state->dma.dest_x_current = state->dma.dest_x;
-	state->dma.dest_y = RAM[SM8521_DMY2];
-	state->dma.dest_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	state->dma.palette[0] = ( RAM[SM8521_DMPL] & 0x03 );
-	state->dma.palette[1] = ( RAM[SM8521_DMPL] & 0x0C ) >> 2;
-	state->dma.palette[2] = ( RAM[SM8521_DMPL] & 0x30 ) >> 4;
-	state->dma.palette[3] = ( RAM[SM8521_DMPL] & 0xC0 ) >> 6;
-	state->dma.source_mask = 0x1FFF;
-	state->dma.dest_mask = 0x1FFF;
-//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", state->dma.width_x, state->dma.width_y, state->dma.source_x, state->dma.source_y, state->dma.dest_x, state->dma.dest_y, state->dma.transfer_mode, RAM[SM8521_DMVP] );
-//  logerror( "   Palette: %d, %d, %d, %d\n", state->dma.palette[0], state->dma.palette[1], state->dma.palette[2], state->dma.palette[3] );
-	switch( state->dma.transfer_mode )
+	state->m_dma.width_x = RAM[SM8521_DMDX];
+	state->m_dma.width_x_count = 0;
+	state->m_dma.width_y = RAM[SM8521_DMDY];
+	state->m_dma.width_y_count = 0;
+	state->m_dma.source_x = RAM[SM8521_DMX1];
+	state->m_dma.source_x_current = state->m_dma.source_x;
+	state->m_dma.source_y = RAM[SM8521_DMY1];
+	state->m_dma.source_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	state->m_dma.dest_x = RAM[SM8521_DMX2];
+	state->m_dma.dest_x_current = state->m_dma.dest_x;
+	state->m_dma.dest_y = RAM[SM8521_DMY2];
+	state->m_dma.dest_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	state->m_dma.palette[0] = ( RAM[SM8521_DMPL] & 0x03 );
+	state->m_dma.palette[1] = ( RAM[SM8521_DMPL] & 0x0C ) >> 2;
+	state->m_dma.palette[2] = ( RAM[SM8521_DMPL] & 0x30 ) >> 4;
+	state->m_dma.palette[3] = ( RAM[SM8521_DMPL] & 0xC0 ) >> 6;
+	state->m_dma.source_mask = 0x1FFF;
+	state->m_dma.dest_mask = 0x1FFF;
+//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", state->m_dma.width_x, state->m_dma.width_y, state->m_dma.source_x, state->m_dma.source_y, state->m_dma.dest_x, state->m_dma.dest_y, state->m_dma.transfer_mode, RAM[SM8521_DMVP] );
+//  logerror( "   Palette: %d, %d, %d, %d\n", state->m_dma.palette[0], state->m_dma.palette[1], state->m_dma.palette[2], state->m_dma.palette[3] );
+	switch( state->m_dma.transfer_mode )
 	{
 	case 0x00:
 		/* VRAM->VRAM */
-		state->dma.source_bank = &state->vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
-		state->dma.dest_bank = &state->vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		state->m_dma.source_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		state->m_dma.dest_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x02:
 		/* ROM->VRAM */
 //      logerror( "DMA DMBR = %X\n", RAM[SM8521_DMBR] );
-		state->dma.source_width = 64;
-		state->dma.source_mask = 0x3FFF;
+		state->m_dma.source_width = 64;
+		state->m_dma.source_mask = 0x3FFF;
 		if ( RAM[SM8521_DMBR] < 16 )
 		{
-			state->dma.source_bank = device->machine().region("kernel")->base() + (RAM[SM8521_DMBR] << 14);
+			state->m_dma.source_bank = device->machine().region("kernel")->base() + (RAM[SM8521_DMBR] << 14);
 		}
 		else
 		{
-			if (state->cartridge)
-				state->dma.source_bank = state->cartridge + (RAM[SM8521_DMBR] << 14);
+			if (state->m_cartridge)
+				state->m_dma.source_bank = state->m_cartridge + (RAM[SM8521_DMBR] << 14);
 		}
-		state->dma.dest_bank = &state->vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		state->m_dma.dest_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x04:
 		/* Extend RAM->VRAM */
-		state->dma.source_width = 64;
-		state->dma.source_bank = &state->vram[0x4000];
-		state->dma.dest_bank = &state->vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		state->m_dma.source_width = 64;
+		state->m_dma.source_bank = &state->m_vram[0x4000];
+		state->m_dma.dest_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
-		state->dma.source_bank = &state->vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
-		state->dma.dest_width = 64;
-		state->dma.dest_bank = &state->vram[0x4000];
+		state->m_dma.source_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		state->m_dma.dest_width = 64;
+		state->m_dma.dest_bank = &state->m_vram[0x4000];
 		break;
 	}
-	state->dma.source_current = state->dma.source_width * state->dma.source_y;
-	state->dma.source_current += state->dma.source_x >> 2;
-	state->dma.dest_current = state->dma.dest_width * state->dma.dest_y;
-	state->dma.dest_current += state->dma.dest_x >> 2;
-	state->dma.source_line = state->dma.source_current;
-	state->dma.dest_line = state->dma.dest_current;
-	state->dma.state_count = 0;
+	state->m_dma.source_current = state->m_dma.source_width * state->m_dma.source_y;
+	state->m_dma.source_current += state->m_dma.source_x >> 2;
+	state->m_dma.dest_current = state->m_dma.dest_width * state->m_dma.dest_y;
+	state->m_dma.dest_current += state->m_dma.dest_x >> 2;
+	state->m_dma.source_line = state->m_dma.source_current;
+	state->m_dma.dest_line = state->m_dma.dest_current;
+	state->m_dma.state_count = 0;
 
 	unsigned y_count, x_count;
 
-	for( y_count = 0; y_count <= state->dma.width_y; y_count++ )
+	for( y_count = 0; y_count <= state->m_dma.width_y; y_count++ )
 	{
-		for( x_count = 0; x_count <= state->dma.width_x; x_count++ )
+		for( x_count = 0; x_count <= state->m_dma.width_x; x_count++ )
 		{
 			int source_pixel = 0;
 			int dest_pixel = 0;
-			int src_addr = state->dma.source_current & state->dma.source_mask;
-			int dest_addr = state->dma.dest_current & state->dma.dest_mask;
+			int src_addr = state->m_dma.source_current & state->m_dma.source_mask;
+			int dest_addr = state->m_dma.dest_current & state->m_dma.dest_mask;
 			/* handle DMA for 1 pixel */
 			/* Read pixel data */
-			switch ( state->dma.source_x_current & 0x03 )
+			switch ( state->m_dma.source_x_current & 0x03 )
 			{
-			case 0x00: source_pixel = ( state->dma.source_bank[src_addr] & 0xC0 ) >> 6; break;
-			case 0x01: source_pixel = ( state->dma.source_bank[src_addr] & 0x30 ) >> 4; break;
-			case 0x02: source_pixel = ( state->dma.source_bank[src_addr] & 0x0C ) >> 2; break;
-			case 0x03: source_pixel = ( state->dma.source_bank[src_addr] & 0x03 );      break;
+			case 0x00: source_pixel = ( state->m_dma.source_bank[src_addr] & 0xC0 ) >> 6; break;
+			case 0x01: source_pixel = ( state->m_dma.source_bank[src_addr] & 0x30 ) >> 4; break;
+			case 0x02: source_pixel = ( state->m_dma.source_bank[src_addr] & 0x0C ) >> 2; break;
+			case 0x03: source_pixel = ( state->m_dma.source_bank[src_addr] & 0x03 );      break;
 			}
 
-			if ( !state->dma.overwrite_mode && source_pixel == 0 )
+			if ( !state->m_dma.overwrite_mode && source_pixel == 0 )
 			{
-				switch ( state->dma.dest_x_current & 0x03 )
+				switch ( state->m_dma.dest_x_current & 0x03 )
 				{
-				case 0x00: dest_pixel = ( state->dma.dest_bank[dest_addr] & 0xC0 ) >> 6; break;
-				case 0x01: dest_pixel = ( state->dma.dest_bank[dest_addr] & 0x30 ) >> 4; break;
-				case 0x02: dest_pixel = ( state->dma.dest_bank[dest_addr] & 0x0C ) >> 2; break;
-				case 0x03: dest_pixel = ( state->dma.dest_bank[dest_addr] & 0x03 );      break;
+				case 0x00: dest_pixel = ( state->m_dma.dest_bank[dest_addr] & 0xC0 ) >> 6; break;
+				case 0x01: dest_pixel = ( state->m_dma.dest_bank[dest_addr] & 0x30 ) >> 4; break;
+				case 0x02: dest_pixel = ( state->m_dma.dest_bank[dest_addr] & 0x0C ) >> 2; break;
+				case 0x03: dest_pixel = ( state->m_dma.dest_bank[dest_addr] & 0x03 );      break;
 				}
 				source_pixel = dest_pixel;
 			}
 
 			/* Translate pixel data using DMA palette. */
 			/* Not sure if this should be done before the compound stuff - WP */
-			source_pixel = state->dma.palette[ source_pixel ];
+			source_pixel = state->m_dma.palette[ source_pixel ];
 			/* Write pixel data */
-			switch( state->dma.dest_x_current & 0x03 )
+			switch( state->m_dma.dest_x_current & 0x03 )
 			{
 			case 0x00:
-				state->dma.dest_bank[dest_addr] = ( state->dma.dest_bank[dest_addr] & 0x3F ) | ( source_pixel << 6 );
+				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0x3F ) | ( source_pixel << 6 );
 				break;
 			case 0x01:
-				state->dma.dest_bank[dest_addr] = ( state->dma.dest_bank[dest_addr] & 0xCF ) | ( source_pixel << 4 );
+				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0xCF ) | ( source_pixel << 4 );
 				break;
 			case 0x02:
-				state->dma.dest_bank[dest_addr] = ( state->dma.dest_bank[dest_addr] & 0xF3 ) | ( source_pixel << 2 );
+				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0xF3 ) | ( source_pixel << 2 );
 				break;
 			case 0x03:
-				state->dma.dest_bank[dest_addr] = ( state->dma.dest_bank[dest_addr] & 0xFC ) | source_pixel;
+				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0xFC ) | source_pixel;
 				break;
 			}
 
 			/* Advance a pixel */
-			if ( state->dma.decrement_x )
+			if ( state->m_dma.decrement_x )
 			{
-				state->dma.source_x_current--;
-				if ( ( state->dma.source_x_current & 0x03 ) == 0x03 )
+				state->m_dma.source_x_current--;
+				if ( ( state->m_dma.source_x_current & 0x03 ) == 0x03 )
 				{
-					state->dma.source_current--;
+					state->m_dma.source_current--;
 				}
 			}
 			else
 			{
-				state->dma.source_x_current++;
-				if ( ( state->dma.source_x_current & 0x03 ) == 0x00 )
+				state->m_dma.source_x_current++;
+				if ( ( state->m_dma.source_x_current & 0x03 ) == 0x00 )
 				{
-					state->dma.source_current++;
+					state->m_dma.source_current++;
 				}
 			}
-			state->dma.dest_x_current++;
-			if ( ( state->dma.dest_x_current & 0x03 ) == 0x00 )
+			state->m_dma.dest_x_current++;
+			if ( ( state->m_dma.dest_x_current & 0x03 ) == 0x00 )
 			{
-				state->dma.dest_current++;
+				state->m_dma.dest_current++;
 			}
 		}
 
 		/* Advance a line */
-		state->dma.source_x_current = state->dma.source_x;
-		state->dma.dest_x_current = state->dma.dest_x;
-		state->dma.source_line += state->dma.source_width;
-		state->dma.source_current = state->dma.source_line;
-		state->dma.dest_line += state->dma.dest_width;
-		state->dma.dest_current = state->dma.dest_line;
+		state->m_dma.source_x_current = state->m_dma.source_x;
+		state->m_dma.dest_x_current = state->m_dma.dest_x;
+		state->m_dma.source_line += state->m_dma.source_width;
+		state->m_dma.source_current = state->m_dma.source_line;
+		state->m_dma.dest_line += state->m_dma.dest_width;
+		state->m_dma.dest_current = state->m_dma.dest_line;
 	}
-	state->dma.enabled = 0;
+	state->m_dma.enabled = 0;
 	cputag_set_input_line(device->machine(), "maincpu", DMA_INT, ASSERT_LINE );
 }
 
@@ -527,28 +527,28 @@ void gamecom_update_timers( device_t *device, int cycles )
 {
 	gamecom_state *state = device->machine().driver_data<gamecom_state>();
 	UINT8 * RAM = device->machine().region("maincpu")->base();
-	if ( state->timer[0].enabled )
+	if ( state->m_timer[0].enabled )
 	{
-		state->timer[0].state_count += cycles;
-		while ( state->timer[0].state_count >= state->timer[0].state_limit )
+		state->m_timer[0].state_count += cycles;
+		while ( state->m_timer[0].state_count >= state->m_timer[0].state_limit )
 		{
-			state->timer[0].state_count -= state->timer[0].state_limit;
+			state->m_timer[0].state_count -= state->m_timer[0].state_limit;
 			RAM[SM8521_TM0D]++;
-			if ( RAM[SM8521_TM0D] >= state->timer[0].check_value )
+			if ( RAM[SM8521_TM0D] >= state->m_timer[0].check_value )
 			{
 				RAM[SM8521_TM0D] = 0;
 				cputag_set_input_line(device->machine(), "maincpu", TIM0_INT, ASSERT_LINE );
 			}
 		}
 	}
-	if ( state->timer[1].enabled )
+	if ( state->m_timer[1].enabled )
 	{
-		state->timer[1].state_count += cycles;
-		while ( state->timer[1].state_count >= state->timer[1].state_limit )
+		state->m_timer[1].state_count += cycles;
+		while ( state->m_timer[1].state_count >= state->m_timer[1].state_limit )
 		{
-			state->timer[1].state_count -= state->timer[1].state_limit;
+			state->m_timer[1].state_count -= state->m_timer[1].state_limit;
 			RAM[SM8521_TM1D]++;
-			if ( RAM[SM8521_TM1D] >= state->timer[1].check_value )
+			if ( RAM[SM8521_TM1D] >= state->m_timer[1].check_value )
 			{
 				RAM[SM8521_TM1D] = 0;
 				cputag_set_input_line(device->machine(), "maincpu", TIM1_INT, ASSERT_LINE );
@@ -560,7 +560,7 @@ void gamecom_update_timers( device_t *device, int cycles )
 DRIVER_INIT( gamecom )
 {
 	gamecom_state *state = machine.driver_data<gamecom_state>();
-	state->clock_timer = machine.scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
+	state->m_clock_timer = machine.scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart1 )
@@ -569,7 +569,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart1 )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->cartridge1 = image.device().machine().region("cart1")->base();
+	state->m_cartridge1 = image.device().machine().region("cart1")->base();
 
 	if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -592,21 +592,21 @@ DEVICE_IMAGE_LOAD( gamecom_cart1 )
 
 	if (image.software_entry() == NULL)
 	{
-		if (image.fread( state->cartridge1 + load_offset, filesize) != filesize)
+		if (image.fread( state->m_cartridge1 + load_offset, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
-		memcpy(state->cartridge1 + load_offset, image.get_software_region("rom"), filesize);
+		memcpy(state->m_cartridge1 + load_offset, image.get_software_region("rom"), filesize);
 
-	if (filesize < 0x010000) { memcpy(state->cartridge1 + 0x008000, state->cartridge1, 0x008000); } /* ->64KB */
-	if (filesize < 0x020000) { memcpy(state->cartridge1 + 0x010000, state->cartridge1, 0x010000); } /* ->128KB */
-	if (filesize < 0x040000) { memcpy(state->cartridge1 + 0x020000, state->cartridge1, 0x020000); } /* ->256KB */
-	if (filesize < 0x080000) { memcpy(state->cartridge1 + 0x040000, state->cartridge1, 0x040000); } /* ->512KB */
-	if (filesize < 0x100000) { memcpy(state->cartridge1 + 0x080000, state->cartridge1, 0x080000); } /* ->1MB */
-	if (filesize < 0x1c0000) { memcpy(state->cartridge1 + 0x100000, state->cartridge1, 0x100000); } /* -> >=1.8MB */
+	if (filesize < 0x010000) { memcpy(state->m_cartridge1 + 0x008000, state->m_cartridge1, 0x008000); } /* ->64KB */
+	if (filesize < 0x020000) { memcpy(state->m_cartridge1 + 0x010000, state->m_cartridge1, 0x010000); } /* ->128KB */
+	if (filesize < 0x040000) { memcpy(state->m_cartridge1 + 0x020000, state->m_cartridge1, 0x020000); } /* ->256KB */
+	if (filesize < 0x080000) { memcpy(state->m_cartridge1 + 0x040000, state->m_cartridge1, 0x040000); } /* ->512KB */
+	if (filesize < 0x100000) { memcpy(state->m_cartridge1 + 0x080000, state->m_cartridge1, 0x080000); } /* ->1MB */
+	if (filesize < 0x1c0000) { memcpy(state->m_cartridge1 + 0x100000, state->m_cartridge1, 0x100000); } /* -> >=1.8MB */
 	return IMAGE_INIT_PASS;
 }
 
@@ -616,7 +616,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->cartridge2 = image.device().machine().region("cart2")->base();
+	state->m_cartridge2 = image.device().machine().region("cart2")->base();
 
 //  if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -639,21 +639,21 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 
 //  if (image.software_entry() == NULL)
 	{
-		if (image.fread( state->cartridge2 + load_offset, filesize) != filesize)
+		if (image.fread( state->m_cartridge2 + load_offset, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
 			return IMAGE_INIT_FAIL;
 		}
 	}
 //  else
-//      memcpy(state->cartridge2 + load_offset, image.get_software_region("rom"), filesize);
+//      memcpy(state->m_cartridge2 + load_offset, image.get_software_region("rom"), filesize);
 
-	if (filesize < 0x010000) { memcpy(state->cartridge2 + 0x008000, state->cartridge2, 0x008000); } /* ->64KB */
-	if (filesize < 0x020000) { memcpy(state->cartridge2 + 0x010000, state->cartridge2, 0x010000); } /* ->128KB */
-	if (filesize < 0x040000) { memcpy(state->cartridge2 + 0x020000, state->cartridge2, 0x020000); } /* ->256KB */
-	if (filesize < 0x080000) { memcpy(state->cartridge2 + 0x040000, state->cartridge2, 0x040000); } /* ->512KB */
-	if (filesize < 0x100000) { memcpy(state->cartridge2 + 0x080000, state->cartridge2, 0x080000); } /* ->1MB */
-	if (filesize < 0x1c0000) { memcpy(state->cartridge2 + 0x100000, state->cartridge2, 0x100000); } /* -> >=1.8MB */
+	if (filesize < 0x010000) { memcpy(state->m_cartridge2 + 0x008000, state->m_cartridge2, 0x008000); } /* ->64KB */
+	if (filesize < 0x020000) { memcpy(state->m_cartridge2 + 0x010000, state->m_cartridge2, 0x010000); } /* ->128KB */
+	if (filesize < 0x040000) { memcpy(state->m_cartridge2 + 0x020000, state->m_cartridge2, 0x020000); } /* ->256KB */
+	if (filesize < 0x080000) { memcpy(state->m_cartridge2 + 0x040000, state->m_cartridge2, 0x040000); } /* ->512KB */
+	if (filesize < 0x100000) { memcpy(state->m_cartridge2 + 0x080000, state->m_cartridge2, 0x080000); } /* ->1MB */
+	if (filesize < 0x1c0000) { memcpy(state->m_cartridge2 + 0x100000, state->m_cartridge2, 0x100000); } /* -> >=1.8MB */
 	return IMAGE_INIT_PASS;
 }
 

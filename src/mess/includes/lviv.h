@@ -16,10 +16,10 @@ public:
 	lviv_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	unsigned char * video_ram;
-	unsigned short colortable[1][4];
-	UINT8 ppi_port_outputs[2][3];
-	UINT8 startup_mem_map;
+	unsigned char * m_video_ram;
+	unsigned short m_colortable[1][4];
+	UINT8 m_ppi_port_outputs[2][3];
+	UINT8 m_startup_mem_map;
 };
 
 

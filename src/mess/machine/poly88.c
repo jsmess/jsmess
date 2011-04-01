@@ -15,7 +15,7 @@
 static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	state->int_vector = 0xe7;
+	state->m_int_vector = 0xe7;
 	device_set_input_line(machine.device("maincpu"), 0, HOLD_LINE);
 }
 
@@ -23,8 +23,8 @@ WRITE8_HANDLER(poly88_baud_rate_w)
 {
 	poly88_state *state = space->machine().driver_data<poly88_state>();
 	logerror("poly88_baud_rate_w %02x\n",data);
-	state->usart_timer = space->machine().scheduler().timer_alloc(FUNC(poly88_usart_timer_callback));
-	state->usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
+	state->m_usart_timer = space->machine().scheduler().timer_alloc(FUNC(poly88_usart_timer_callback));
+	state->m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
 
 }
 
@@ -118,18 +118,18 @@ static TIMER_CALLBACK(keyboard_callback)
 			}
 		}
 	}
-	if (key_code==0 && state->last_code !=0){
-		state->int_vector = 0xef;
+	if (key_code==0 && state->m_last_code !=0){
+		state->m_int_vector = 0xef;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	} else {
-		state->last_code = key_code;
+		state->m_last_code = key_code;
 	}
 }
 
 static IRQ_CALLBACK (poly88_irq_callback)
 {
 	poly88_state *state = device->machine().driver_data<poly88_state>();
-	return state->int_vector;
+	return state->m_int_vector;
 }
 
 
@@ -137,7 +137,7 @@ static IRQ_CALLBACK (poly88_irq_callback)
 static void poly88_cassette_write(running_machine &machine, int id, unsigned long state)
 {
 	poly88_state *drvstate = machine.driver_data<poly88_state>();
-	drvstate->cassette_serial_connection.input_state = state;
+	drvstate->m_cassette_serial_connection.input_state = state;
 }
 
 static TIMER_CALLBACK(poly88_cassette_timer_callback)
@@ -152,24 +152,24 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		/* tape reading */
 		if (cassette_get_state(machine.device("cassette"))&CASSETTE_PLAY)
 		{
-					if (state->clk_level_tape)
+					if (state->m_clk_level_tape)
 					{
-						state->previous_level = (cassette_input(machine.device("cassette")) > 0.038) ? 1 : 0;
-						state->clk_level_tape = 0;
+						state->m_previous_level = (cassette_input(machine.device("cassette")) > 0.038) ? 1 : 0;
+						state->m_clk_level_tape = 0;
 					}
 					else
 					{
 						current_level = (cassette_input(machine.device("cassette")) > 0.038) ? 1 : 0;
 
-						if (state->previous_level!=current_level)
+						if (state->m_previous_level!=current_level)
 						{
-							data = (!state->previous_level && current_level) ? 1 : 0;
+							data = (!state->m_previous_level && current_level) ? 1 : 0;
 //data = current_level;
-							set_out_data_bit(state->cassette_serial_connection.State, data);
-							serial_connection_out(machine, &state->cassette_serial_connection);
+							set_out_data_bit(state->m_cassette_serial_connection.State, data);
+							serial_connection_out(machine, &state->m_cassette_serial_connection);
 							msm8251_receive_clock(machine.device("uart"));
 
-							state->clk_level_tape = 1;
+							state->m_clk_level_tape = 1;
 						}
 					}
 		}
@@ -177,23 +177,23 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		/* tape writing */
 		if (cassette_get_state(machine.device("cassette"))&CASSETTE_RECORD)
 		{
-			data = get_in_data_bit(state->cassette_serial_connection.input_state);
-			data ^= state->clk_level_tape;
+			data = get_in_data_bit(state->m_cassette_serial_connection.input_state);
+			data ^= state->m_clk_level_tape;
 			cassette_output(machine.device("cassette"), data&0x01 ? 1 : -1);
 
-			if (!state->clk_level_tape)
+			if (!state->m_clk_level_tape)
 				msm8251_transmit_clock(machine.device("uart"));
 
-			state->clk_level_tape = state->clk_level_tape ? 0 : 1;
+			state->m_clk_level_tape = state->m_clk_level_tape ? 0 : 1;
 
 			return;
 		}
 
-		state->clk_level_tape = 1;
+		state->m_clk_level_tape = 1;
 
-		if (!state->clk_level)
+		if (!state->m_clk_level)
 			msm8251_transmit_clock(machine.device("uart"));
-		state->clk_level = state->clk_level ? 0 : 1;
+		state->m_clk_level = state->m_clk_level ? 0 : 1;
 //  }
 }
 
@@ -201,19 +201,19 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 static TIMER_CALLBACK( setup_machine_state )
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	msm8251_connect(machine.device("uart"), &state->cassette_serial_connection);
+	msm8251_connect(machine.device("uart"), &state->m_cassette_serial_connection);
 }
 
 DRIVER_INIT ( poly88 )
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	state->previous_level = 0;;
-	state->clk_level = state->clk_level_tape = 1;
-	state->cassette_timer = machine.scheduler().timer_alloc(FUNC(poly88_cassette_timer_callback));
-	state->cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(600));
+	state->m_previous_level = 0;;
+	state->m_clk_level = state->m_clk_level_tape = 1;
+	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(poly88_cassette_timer_callback));
+	state->m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(600));
 
-	serial_connection_init(machine, &state->cassette_serial_connection);
-	serial_connection_set_in_callback(machine, &state->cassette_serial_connection, poly88_cassette_write);
+	serial_connection_init(machine, &state->m_cassette_serial_connection);
+	serial_connection_set_in_callback(machine, &state->m_cassette_serial_connection, poly88_cassette_write);
 
 	machine.scheduler().timer_pulse(attotime::from_hz(24000), FUNC(keyboard_callback));
 }
@@ -222,8 +222,8 @@ MACHINE_RESET(poly88)
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
 	device_set_irq_callback(machine.device("maincpu"), poly88_irq_callback);
-	state->intr = 0;
-	state->last_code = 0;
+	state->m_intr = 0;
+	state->m_last_code = 0;
 
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 }
@@ -231,14 +231,14 @@ MACHINE_RESET(poly88)
 INTERRUPT_GEN( poly88_interrupt )
 {
 	poly88_state *state = device->machine().driver_data<poly88_state>();
-	state->int_vector = 0xf7;
+	state->m_int_vector = 0xf7;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )
 {
 	//poly88_state *drvstate = device->machine().driver_data<poly88_state>();
-	//drvstate->int_vector = 0xe7;
+	//drvstate->m_int_vector = 0xe7;
 	//device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -258,9 +258,9 @@ const msm8251_interface poly88_usart_interface=
 READ8_HANDLER(poly88_keyboard_r)
 {
 	poly88_state *state = space->machine().driver_data<poly88_state>();
-	UINT8 retVal = state->last_code;
+	UINT8 retVal = state->m_last_code;
 	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	state->last_code = 0x00;
+	state->m_last_code = 0x00;
 	return retVal;
 }
 

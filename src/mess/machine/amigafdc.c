@@ -394,7 +394,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 
 			cur_pos %= ( fdc->fdc_status[drive].tracklen );
 
-			(*state->chip_ram_w)(state, offset, dat);
+			(*state->m_chip_ram_w)(state, offset, dat);
 
 			offset += 2;
 		}

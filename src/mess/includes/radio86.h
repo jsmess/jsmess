@@ -17,13 +17,13 @@ public:
 	radio86_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 tape_value;
-	UINT8 mikrosha_font_page;
-	int keyboard_mask;
-	UINT8* radio_ram_disk;
-	UINT8 romdisk_lsb;
-	UINT8 romdisk_msb;
-	UINT8 disk_sel;
+	UINT8 m_tape_value;
+	UINT8 m_mikrosha_font_page;
+	int m_keyboard_mask;
+	UINT8* m_radio_ram_disk;
+	UINT8 m_romdisk_lsb;
+	UINT8 m_romdisk_msb;
+	UINT8 m_disk_sel;
 };
 
 

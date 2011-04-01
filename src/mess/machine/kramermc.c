@@ -22,13 +22,13 @@ static READ8_DEVICE_HANDLER (kramermc_port_b_r)
 	kramermc_state *state = device->machine().driver_data<kramermc_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(device->machine(), keynames[state->key_row]);
+	return input_port_read(device->machine(), keynames[state->m_key_row]);
 }
 
 static WRITE8_DEVICE_HANDLER (kramermc_port_a_w)
 {
 	kramermc_state *state = device->machine().driver_data<kramermc_state>();
-	state->key_row = ((data >> 1) & 0x07);
+	state->m_key_row = ((data >> 1) & 0x07);
 }
 
 Z80PIO_INTERFACE( kramermc_z80pio_intf )
@@ -50,5 +50,5 @@ DRIVER_INIT(kramermc)
 MACHINE_RESET( kramermc )
 {
 	kramermc_state *state = machine.driver_data<kramermc_state>();
-	state->key_row = 0;
+	state->m_key_row = 0;
 }

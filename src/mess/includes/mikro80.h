@@ -15,10 +15,10 @@ public:
 	mikro80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	UINT8 *cursor_ram;
-	int keyboard_mask;
-	int key_mask;
+	UINT8 *m_video_ram;
+	UINT8 *m_cursor_ram;
+	int m_keyboard_mask;
+	int m_key_mask;
 };
 
 

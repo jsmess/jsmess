@@ -14,8 +14,8 @@ public:
 	orao_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *memory;
-	UINT8 *video_ram;
+	UINT8 *m_memory;
+	UINT8 *m_video_ram;
 };
 
 

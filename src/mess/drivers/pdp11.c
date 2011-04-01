@@ -16,8 +16,8 @@ public:
 	pdp11_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 		
-	UINT8 term_data;
-	UINT16 term_status;
+	UINT8 m_term_data;
+	UINT16 m_term_status;
 };
 
 static WRITE16_HANDLER(term_w)
@@ -29,8 +29,8 @@ static WRITE16_HANDLER(term_w)
 static READ16_HANDLER(term_r)
 {
 	pdp11_state *state = space->machine().driver_data<pdp11_state>();
-	state->term_status = 0x0000;
-	return state->term_data;
+	state->m_term_status = 0x0000;
+	return state->m_term_data;
 }
 
 static READ16_HANDLER(term_tx_status_r)
@@ -41,7 +41,7 @@ static READ16_HANDLER(term_tx_status_r)
 static READ16_HANDLER(term_rx_status_r)
 { 	
 	pdp11_state *state = space->machine().driver_data<pdp11_state>();
-	return state->term_status;
+	return state->m_term_status;
 }
 
 static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16)
@@ -136,8 +136,8 @@ static const struct t11_setup mxv11_data =
 static WRITE8_DEVICE_HANDLER( pdp_kbd_put )
 {
 	pdp11_state *state = device->machine().driver_data<pdp11_state>();
-	state->term_data = data;
-	state->term_status = 0xffff;
+	state->m_term_data = data;
+	state->m_term_status = 0xffff;
 }
 
 static GENERIC_TERMINAL_INTERFACE( pdp_terminal_intf )

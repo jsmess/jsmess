@@ -22,21 +22,21 @@ public:
 	cfx9850_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	UINT8 *display_ram;
+	UINT8 *m_video_ram;
+	UINT8 *m_display_ram;
 
-	UINT16 ko;				/* KO lines KO1 - KO14 */
+	UINT16 m_ko;				/* KO lines KO1 - KO14 */
 };
 
 
 static ADDRESS_MAP_START( cfx9850, AS_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_BASE_MEMBER( cfx9850_state, video_ram )
+	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_BASE_MEMBER( cfx9850_state, m_video_ram )
 //  AM_RANGE( 0x100000, 0x10ffff ) /* some memory mapped i/o? */
 //  AM_RANGE( 0x110000, 0x11ffff ) /* some memory mapped i/o? */
 	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
 	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xf800) AM_RAM AM_BASE_MEMBER( cfx9850_state, display_ram )
+	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xf800) AM_RAM AM_BASE_MEMBER( cfx9850_state, m_display_ram )
 //  AM_RANGE( 0xe10000, 0xe1ffff ) /* some memory mapped i/o? */
 ADDRESS_MAP_END
 
@@ -45,14 +45,14 @@ static WRITE8_HANDLER( cfx9850_kol_w )
 {
 	cfx9850_state *state = space->machine().driver_data<cfx9850_state>();
 
-	state->ko = ( state->ko & 0xff00 ) | data;
+	state->m_ko = ( state->m_ko & 0xff00 ) | data;
 }
 
 static WRITE8_HANDLER( cfx9850_koh_w )
 {
 	cfx9850_state *state = space->machine().driver_data<cfx9850_state>();
 
-	state->ko = ( state->ko & 0x00ff ) | ( data << 8 );
+	state->m_ko = ( state->m_ko & 0x00ff ) | ( data << 8 );
 }
 
 
@@ -61,28 +61,28 @@ static READ8_HANDLER( cfx9850_ki_r )
 	cfx9850_state *state = space->machine().driver_data<cfx9850_state>();
 	UINT8 data = 0;
 
-	if ( state->ko & 0x0001 )
+	if ( state->m_ko & 0x0001 )
 		data |= input_port_read( space->machine(), "KO1" );
-	if ( state->ko & 0x0002 )
+	if ( state->m_ko & 0x0002 )
 		data |= input_port_read( space->machine(), "KO2" );
-	if ( state->ko & 0x0004 )
+	if ( state->m_ko & 0x0004 )
 		data |= input_port_read( space->machine(), "KO3" );
-	if ( state->ko & 0x0008 )
+	if ( state->m_ko & 0x0008 )
 		data |= input_port_read( space->machine(), "KO4" );
-	if ( state->ko & 0x0010 )
+	if ( state->m_ko & 0x0010 )
 		data |= input_port_read( space->machine(), "KO5" );
-	if ( state->ko & 0x0020 )
+	if ( state->m_ko & 0x0020 )
 		data |= input_port_read( space->machine(), "KO6" );
-	if ( state->ko & 0x0040 )
+	if ( state->m_ko & 0x0040 )
 		data |= input_port_read( space->machine(), "KO7" );
-	if ( state->ko & 0x0080 )
+	if ( state->m_ko & 0x0080 )
 		data |= input_port_read( space->machine(), "KO8" );
-	if ( state->ko & 0x0100 )
+	if ( state->m_ko & 0x0100 )
 		data |= input_port_read( space->machine(), "KO9" );
-	if ( state->ko & 0x0200 )
+	if ( state->m_ko & 0x0200 )
 		data |= input_port_read( space->machine(), "KO10" );
 	/* KO11 is not connected */
-	if ( state->ko & 0x0800 )
+	if ( state->m_ko & 0x0800 )
 		data |= input_port_read( space->machine(), "KO12" );
 	/* KO13 is not connected */
 	/* KO14 is not connected */
@@ -203,8 +203,8 @@ static SCREEN_UPDATE( cfx9850 )
 
 		for ( int j = 0; j < 64; j++ )
 		{
-			UINT8 data1 = state->display_ram[ offset ];
-			UINT8 data2 = state->display_ram[ offset + 0x400 ];
+			UINT8 data1 = state->m_display_ram[ offset ];
+			UINT8 data2 = state->m_display_ram[ offset + 0x400 ];
 
 			for ( int b = 0; b < 8; b++ )
 			{

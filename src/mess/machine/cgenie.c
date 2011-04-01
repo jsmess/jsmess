@@ -37,10 +37,10 @@ static TIMER_CALLBACK( handle_cassette_input )
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 new_level = ( cassette_input( machine.device("cassette") ) > 0.0 ) ? 1 : 0;
 
-	if ( new_level != state->cass_level )
+	if ( new_level != state->m_cass_level )
 	{
-		state->cass_level = new_level;
-		state->cass_bit ^= 1;
+		state->m_cass_level = new_level;
+		state->m_cass_bit ^= 1;
 	}
 }
 
@@ -119,8 +119,8 @@ MACHINE_RESET( cgenie )
 		memset(&machine.region("maincpu")->base()[0x0e000], 0x00, 0x1000);
 	}
 
-	state->cass_level = 0;
-	state->cass_bit = 1;
+	state->m_cass_level = 0;
+	state->m_cass_bit = 1;
 }
 
 MACHINE_START( cgenie )
@@ -131,11 +131,11 @@ MACHINE_START( cgenie )
 	int i;
 
 	/* initialize static variables */
-	state->irq_status = 0;
-	state->motor_drive = 0;
-	state->head = 0;
-	state->tv_mode = -1;
-	state->port_ff = 0xff;
+	state->m_irq_status = 0;
+	state->m_motor_drive = 0;
+	state->m_head = 0;
+	state->m_tv_mode = -1;
+	state->m_port_ff = 0xff;
 
 	/*
      * Every fifth cycle is a wait cycle, so I reduced
@@ -151,7 +151,7 @@ MACHINE_START( cgenie )
 	/* set up RAM */
 	space->install_read_bank(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
 	space->install_legacy_write_handler(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 1, FUNC(cgenie_videoram_w));
-	state->videoram = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_videoram = ram_get_ptr(machine.device(RAM_TAG));
 	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 	machine.scheduler().timer_pulse(attotime::from_hz(11025), FUNC(handle_cassette_input));
 }
@@ -176,7 +176,7 @@ MACHINE_START( cgenie )
 WRITE8_HANDLER( cgenie_port_ff_w )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	int port_ff_changed = state->port_ff ^ data;
+	int port_ff_changed = state->m_port_ff ^ data;
 
 	cassette_output ( space->machine().device("cassette"), data & 0x01 ? -1.0 : 1.0 );
 
@@ -193,7 +193,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 		}
 		else
 		{
-			if( state->tv_mode == 0 )
+			if( state->m_tv_mode == 0 )
 			{
 				switch( data & (FF_BGD1 + FF_BGD2) )
 				{
@@ -232,8 +232,8 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	/* character mode changed ? */
 	if( port_ff_changed & FF_CHR )
 	{
-		state->font_offset[2] = (data & FF_CHR0) ? 0x00 : 0x80;
-		state->font_offset[3] = (data & FF_CHR1) ? 0x00 : 0x80;
+		state->m_font_offset[2] = (data & FF_CHR0) ? 0x00 : 0x80;
+		state->m_font_offset[3] = (data & FF_CHR1) ? 0x00 : 0x80;
 	}
 
 	/* graphics mode changed ? */
@@ -242,16 +242,16 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 		cgenie_mode_select(space->machine(), data & FF_FGR);
 	}
 
-	state->port_ff = data;
+	state->m_port_ff = data;
 }
 
 
 READ8_HANDLER( cgenie_port_ff_r )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	UINT8	data = state->port_ff & ~0x01;
+	UINT8	data = state->m_port_ff & ~0x01;
 
-	data |= state->cass_bit;
+	data |= state->m_cass_bit;
 
 	return data;
 }
@@ -271,65 +271,65 @@ int cgenie_port_xx_r( int offset )
 READ8_HANDLER( cgenie_psg_port_a_r )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	return state->psg_a_inp;
+	return state->m_psg_a_inp;
 }
 
 READ8_HANDLER( cgenie_psg_port_b_r )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	if( state->psg_a_out < 0xd0 )
+	if( state->m_psg_a_out < 0xd0 )
 	{
 		/* comparator value */
-		state->psg_b_inp = 0x00;
+		state->m_psg_b_inp = 0x00;
 
-		if( input_port_read(space->machine(), "JOY0") > state->psg_a_out )
-			state->psg_b_inp |= 0x80;
+		if( input_port_read(space->machine(), "JOY0") > state->m_psg_a_out )
+			state->m_psg_b_inp |= 0x80;
 
-		if( input_port_read(space->machine(), "JOY1") > state->psg_a_out )
-			state->psg_b_inp |= 0x40;
+		if( input_port_read(space->machine(), "JOY1") > state->m_psg_a_out )
+			state->m_psg_b_inp |= 0x40;
 
-		if( input_port_read(space->machine(), "JOY2") > state->psg_a_out )
-			state->psg_b_inp |= 0x20;
+		if( input_port_read(space->machine(), "JOY2") > state->m_psg_a_out )
+			state->m_psg_b_inp |= 0x20;
 
-		if( input_port_read(space->machine(), "JOY3") > state->psg_a_out )
-			state->psg_b_inp |= 0x10;
+		if( input_port_read(space->machine(), "JOY3") > state->m_psg_a_out )
+			state->m_psg_b_inp |= 0x10;
 	}
 	else
 	{
 		/* read keypad matrix */
-		state->psg_b_inp = 0xFF;
+		state->m_psg_b_inp = 0xFF;
 
-		if( !(state->psg_a_out & 0x01) )
-			state->psg_b_inp &= ~input_port_read(space->machine(), "KP0");
+		if( !(state->m_psg_a_out & 0x01) )
+			state->m_psg_b_inp &= ~input_port_read(space->machine(), "KP0");
 
-		if( !(state->psg_a_out & 0x02) )
-			state->psg_b_inp &= ~input_port_read(space->machine(), "KP1");
+		if( !(state->m_psg_a_out & 0x02) )
+			state->m_psg_b_inp &= ~input_port_read(space->machine(), "KP1");
 
-		if( !(state->psg_a_out & 0x04) )
-			state->psg_b_inp &= ~input_port_read(space->machine(), "KP2");
+		if( !(state->m_psg_a_out & 0x04) )
+			state->m_psg_b_inp &= ~input_port_read(space->machine(), "KP2");
 
-		if( !(state->psg_a_out & 0x08) )
-			state->psg_b_inp &= ~input_port_read(space->machine(), "KP3");
+		if( !(state->m_psg_a_out & 0x08) )
+			state->m_psg_b_inp &= ~input_port_read(space->machine(), "KP3");
 
-		if( !(state->psg_a_out & 0x10) )
-			state->psg_b_inp &= ~input_port_read(space->machine(), "KP4");
+		if( !(state->m_psg_a_out & 0x10) )
+			state->m_psg_b_inp &= ~input_port_read(space->machine(), "KP4");
 
-		if( !(state->psg_a_out & 0x20) )
-			state->psg_b_inp &= ~input_port_read(space->machine(), "KP5");
+		if( !(state->m_psg_a_out & 0x20) )
+			state->m_psg_b_inp &= ~input_port_read(space->machine(), "KP5");
 	}
-	return state->psg_b_inp;
+	return state->m_psg_b_inp;
 }
 
 WRITE8_HANDLER( cgenie_psg_port_a_w )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	state->psg_a_out = data;
+	state->m_psg_a_out = data;
 }
 
 WRITE8_HANDLER( cgenie_psg_port_b_w )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	state->psg_b_out = data;
+	state->m_psg_b_out = data;
 }
 
  READ8_HANDLER( cgenie_status_r )
@@ -407,18 +407,18 @@ WRITE8_HANDLER( cgenie_data_w )
  READ8_HANDLER( cgenie_irq_status_r )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-int result = state->irq_status;
+int result = state->m_irq_status;
 
-	state->irq_status &= ~(IRQ_TIMER | IRQ_FDC);
+	state->m_irq_status &= ~(IRQ_TIMER | IRQ_FDC);
 	return result;
 }
 
 INTERRUPT_GEN( cgenie_timer_interrupt )
 {
 	cgenie_state *state = device->machine().driver_data<cgenie_state>();
-	if( (state->irq_status & IRQ_TIMER) == 0 )
+	if( (state->m_irq_status & IRQ_TIMER) == 0 )
 	{
-		state->irq_status |= IRQ_TIMER;
+		state->m_irq_status |= IRQ_TIMER;
 		cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 	}
 }
@@ -432,15 +432,15 @@ static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
 
 	if (state)
 	{
-		if( (drvstate->irq_status & IRQ_FDC) == 0 )
+		if( (drvstate->m_irq_status & IRQ_FDC) == 0 )
 		{
-			drvstate->irq_status |= IRQ_FDC;
+			drvstate->m_irq_status |= IRQ_FDC;
 			cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 		}
 	}
 	else
 	{
-		drvstate->irq_status &= ~IRQ_FDC;
+		drvstate->m_irq_status &= ~IRQ_FDC;
 	}
 }
 
@@ -473,13 +473,13 @@ WRITE8_HANDLER( cgenie_motor_w )
 		return;
 
 	/* mask head select bit */
-		state->head = (data >> 4) & 1;
+		state->m_head = (data >> 4) & 1;
 
 	/* currently selected drive */
-	state->motor_drive = drive;
+	state->m_motor_drive = drive;
 
 	wd17xx_set_drive(fdc,drive);
-	wd17xx_set_side(fdc,state->head);
+	wd17xx_set_side(fdc,state->m_head);
 }
 
 /*************************************
@@ -523,14 +523,14 @@ WRITE8_HANDLER( cgenie_motor_w )
 int cgenie_videoram_r( running_machine &machine, int offset )
 {
 	cgenie_state *state = machine.driver_data<cgenie_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	return videoram[offset];
 }
 
 WRITE8_HANDLER( cgenie_videoram_w )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	/* write to video RAM */
 	if( data == videoram[offset] )
 		return; 			   /* no change */
@@ -540,7 +540,7 @@ WRITE8_HANDLER( cgenie_videoram_w )
  READ8_HANDLER( cgenie_colorram_r )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	return state->colorram[offset] | 0xf0;
+	return state->m_colorram[offset] | 0xf0;
 }
 
 WRITE8_HANDLER( cgenie_colorram_w )
@@ -549,11 +549,11 @@ WRITE8_HANDLER( cgenie_colorram_w )
 	/* only bits 0 to 3 */
 	data &= 15;
 	/* nothing changed ? */
-	if( data == state->colorram[offset] )
+	if( data == state->m_colorram[offset] )
 		return;
 
 	/* set new value */
-	state->colorram[offset] = data;
+	state->m_colorram[offset] = data;
 	/* make offset relative to video frame buffer offset */
 	offset = (offset + (cgenie_get_register(space->machine(), 12) << 8) + cgenie_get_register(space->machine(), 13)) & 0x3ff;
 }
@@ -561,7 +561,7 @@ WRITE8_HANDLER( cgenie_colorram_w )
  READ8_HANDLER( cgenie_fontram_r )
 {
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
-	return state->fontram[offset];
+	return state->m_fontram[offset];
 }
 
 WRITE8_HANDLER( cgenie_fontram_w )
@@ -569,11 +569,11 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	cgenie_state *state = space->machine().driver_data<cgenie_state>();
 	UINT8 *dp;
 
-	if( data == state->fontram[offset] )
+	if( data == state->m_fontram[offset] )
 		return; 			   /* no change */
 
 	/* store data */
-	state->fontram[offset] = data;
+	state->m_fontram[offset] = data;
 
 	/* convert eight pixels */
 	dp = &space->machine().gfx[0]->gfxdata[(256 * 8 + offset) * space->machine().gfx[0]->width];
@@ -596,12 +596,12 @@ WRITE8_HANDLER( cgenie_fontram_w )
 INTERRUPT_GEN( cgenie_frame_interrupt )
 {
 	cgenie_state *state = device->machine().driver_data<cgenie_state>();
-	if( state->tv_mode != (input_port_read(device->machine(), "DSW0") & 0x10) )
+	if( state->m_tv_mode != (input_port_read(device->machine(), "DSW0") & 0x10) )
 	{
-		state->tv_mode = input_port_read(device->machine(), "DSW0") & 0x10;
+		state->m_tv_mode = input_port_read(device->machine(), "DSW0") & 0x10;
 		/* force setting of background color */
-		state->port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->port_ff ^ FF_BGD0);
+		state->m_port_ff ^= FF_BGD0;
+		cgenie_port_ff_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_port_ff ^ FF_BGD0);
 	}
 }
 
@@ -609,12 +609,12 @@ INTERRUPT_GEN( cgenie_frame_interrupt )
 READ8_DEVICE_HANDLER( cgenie_sh_control_port_r )
 {
 	cgenie_state *state = device->machine().driver_data<cgenie_state>();
-	return state->control_port;
+	return state->m_control_port;
 }
 
 WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w )
 {
 	cgenie_state *state = device->machine().driver_data<cgenie_state>();
-	state->control_port = data;
+	state->m_control_port = data;
 	ay8910_address_w(device, offset, data);
 }

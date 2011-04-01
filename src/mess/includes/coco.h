@@ -77,37 +77,37 @@ public:
 	coco_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *cococart_device;
-	device_t *cassette_device;
-	device_t *bitbanger_device;
-	device_t *printer_device;
-	device_t *dac;
-	device_t *sam;
-	device_t *pia_0;
-	device_t *pia_1;
-	device_t *pia_2;
-	UINT8 *rom;
-	int dclg_state;
-	int dclg_output_h;
-	int dclg_output_v;
-	int dclg_timer;
+	device_t *m_cococart_device;
+	device_t *m_cassette_device;
+	device_t *m_bitbanger_device;
+	device_t *m_printer_device;
+	device_t *m_dac;
+	device_t *m_sam;
+	device_t *m_pia_0;
+	device_t *m_pia_1;
+	device_t *m_pia_2;
+	UINT8 *m_rom;
+	int m_dclg_state;
+	int m_dclg_output_h;
+	int m_dclg_output_v;
+	int m_dclg_timer;
 	UINT8 (*update_keyboard)(running_machine &machine);
-	emu_timer *update_keyboard_timer;
-	emu_timer *mux_sel1_timer;
-	emu_timer *mux_sel2_timer;
-	UINT8 mux_sel1;
-	UINT8 mux_sel2;
-	UINT8 bitbanger_output_value;
-	UINT8 bitbanger_input_value;
-	UINT8 dac_value;
-	int dgnalpha_just_reset;
-	UINT8 *bas_rom_bank;
-	UINT8 *bottom_32k;
-	timer_expired_func recalc_interrupts;
-	int hiresjoy_ca;
-	attotime hiresjoy_xtransitiontime;
-	attotime hiresjoy_ytransitiontime;
-	int dclg_previous_bit;
+	emu_timer *m_update_keyboard_timer;
+	emu_timer *m_mux_sel1_timer;
+	emu_timer *m_mux_sel2_timer;
+	UINT8 m_mux_sel1;
+	UINT8 m_mux_sel2;
+	UINT8 m_bitbanger_output_value;
+	UINT8 m_bitbanger_input_value;
+	UINT8 m_dac_value;
+	int m_dgnalpha_just_reset;
+	UINT8 *m_bas_rom_bank;
+	UINT8 *m_bottom_32k;
+	timer_expired_func m_recalc_interrupts;
+	int m_hiresjoy_ca;
+	attotime m_hiresjoy_xtransitiontime;
+	attotime m_hiresjoy_ytransitiontime;
+	int m_dclg_previous_bit;
 	void (*printer_out)(running_machine &machine, int data);
 };
 
@@ -117,14 +117,14 @@ public:
 	coco3_state(running_machine &machine, const driver_device_config_base &config)
 		: coco_state(machine, config) { }
 
-	int enable_64k;
-	UINT8 mmu[16];
-	UINT8 interupt_line;
-	emu_timer *gime_timer;
-	UINT8 gimereg[16];
-	UINT8 gime_firq;
-	UINT8 gime_irq;
-	coco3_video *video;
+	int m_enable_64k;
+	UINT8 m_mmu[16];
+	UINT8 m_interupt_line;
+	emu_timer *m_gime_timer;
+	UINT8 m_gimereg[16];
+	UINT8 m_gime_firq;
+	UINT8 m_gime_irq;
+	coco3_video *m_video;
 };
 
 
@@ -228,16 +228,16 @@ void coco_set_halt_line(running_machine &machine, int halt_line);
 /* CoCo 3 video vars; controlling key aspects of the emulation */
 struct coco3_video_vars
 {
-	UINT8 bordertop_192;
-	UINT8 bordertop_199;
-	UINT8 bordertop_0;
-	UINT8 bordertop_225;
+	UINT8 m_bordertop_192;
+	UINT8 m_bordertop_199;
+	UINT8 m_bordertop_0;
+	UINT8 m_bordertop_225;
 	unsigned int hs_gime_flip : 1;
 	unsigned int fs_gime_flip : 1;
 	unsigned int hs_pia_flip : 1;
 	unsigned int fs_pia_flip : 1;
-	UINT16 rise_scanline;
-	UINT16 fall_scanline;
+	UINT16 m_rise_scanline;
+	UINT16 m_fall_scanline;
 };
 
 extern const struct coco3_video_vars coco3_vidvars;

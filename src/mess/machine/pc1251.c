@@ -11,13 +11,13 @@
 void pc1251_outa(device_t *device, int data)
 {
 	pc1251_state *state = device->machine().driver_data<pc1251_state>();
-	state->outa = data;
+	state->m_outa = data;
 }
 
 void pc1251_outb(device_t *device, int data)
 {
 	pc1251_state *state = device->machine().driver_data<pc1251_state>();
-	state->outb = data;
+	state->m_outb = data;
 }
 
 void pc1251_outc(device_t *device, int data)
@@ -27,43 +27,43 @@ void pc1251_outc(device_t *device, int data)
 int pc1251_ina(device_t *device)
 {
 	pc1251_state *state = device->machine().driver_data<pc1251_state>();
-	int data = state->outa;
+	int data = state->m_outa;
 	running_machine &machine = device->machine();
 
-	if (state->outb & 0x01)
+	if (state->m_outb & 0x01)
 	{
 		data |= input_port_read(machine, "KEY0");
 
 		/* At Power Up we fake a 'CL' pressure */
-		if (state->power)
+		if (state->m_power)
 			data |= 0x02;		// problem with the deg lcd
 	}
 
-	if (state->outb & 0x02)
+	if (state->m_outb & 0x02)
 		data |= input_port_read(machine, "KEY1");
 
-	if (state->outb & 0x04)
+	if (state->m_outb & 0x04)
 		data |= input_port_read(machine, "KEY2");
 
-	if (state->outa & 0x01)
+	if (state->m_outa & 0x01)
 		data |= input_port_read(machine, "KEY3");
 
-	if (state->outa & 0x02)
+	if (state->m_outa & 0x02)
 		data |= input_port_read(machine, "KEY4");
 
-	if (state->outa & 0x04)
+	if (state->m_outa & 0x04)
 		data |= input_port_read(machine, "KEY5");
 
-	if (state->outa & 0x08)
+	if (state->m_outa & 0x08)
 		data |= input_port_read(machine, "KEY6");
 
-	if (state->outa & 0x10)
+	if (state->m_outa & 0x10)
 		data |= input_port_read(machine, "KEY7");
 
-	if (state->outa & 0x20)
+	if (state->m_outa & 0x20)
 		data |= input_port_read(machine, "KEY8");
 
-	if (state->outa & 0x40)
+	if (state->m_outa & 0x40)
 		data |= input_port_read(machine, "KEY9");
 
 	return data;
@@ -72,9 +72,9 @@ int pc1251_ina(device_t *device)
 int pc1251_inb(device_t *device)
 {
 	pc1251_state *state = device->machine().driver_data<pc1251_state>();
-	int data = state->outb;
+	int data = state->m_outb;
 
-	if (state->outb & 0x08)
+	if (state->m_outb & 0x08)
 		data |= (input_port_read(device->machine(), "MODE") & 0x07);
 
 	return data;
@@ -117,7 +117,7 @@ NVRAM_HANDLER( pc1251 )
 static TIMER_CALLBACK(pc1251_power_up)
 {
 	pc1251_state *state = machine.driver_data<pc1251_state>();
-	state->power = 0;
+	state->m_power = 0;
 }
 
 DRIVER_INIT( pc1251 )
@@ -127,7 +127,7 @@ DRIVER_INIT( pc1251 )
 	UINT8 *gfx = machine.region("gfx1")->base();
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	state->power = 1;
+	state->m_power = 1;
 	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1251_power_up));
 }
 

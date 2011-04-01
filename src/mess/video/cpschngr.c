@@ -155,15 +155,15 @@ static MACHINE_RESET( cps )
 		}
 		pCFG++;
 	}
-	state->cps1_game_config=pCFG;
+	state->m_cps1_game_config=pCFG;
 }
 
 
 INLINE UINT16 *cps1_base(cpschngr_state *state, int offset, int boundary)
 {
-	int base = state->cps1_cps_a_regs[offset]*256;
+	int base = state->m_cps1_cps_a_regs[offset]*256;
 	base &= ~(boundary-1);
-	return &state->cps1_gfxram[(base&0x3ffff)/2];
+	return &state->m_cps1_gfxram[(base&0x3ffff)/2];
 }
 
 
@@ -171,7 +171,7 @@ INLINE UINT16 *cps1_base(cpschngr_state *state, int offset, int boundary)
 WRITE16_HANDLER( cps1_cps_a_w )
 {
 	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
-	data = COMBINE_DATA(&state->cps1_cps_a_regs[offset]);
+	data = COMBINE_DATA(&state->m_cps1_cps_a_regs[offset]);
 
 	if (offset == CPS1_PALETTE_BASE)
 		cps1_build_palette(space->machine(), cps1_base(state, CPS1_PALETTE_BASE, cps1_palette_align));
@@ -184,23 +184,23 @@ READ16_HANDLER( cps1_cps_b_r )
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
 	/* game. */
-	if (offset == state->cps1_game_config->cpsb_addr/2)
-		return state->cps1_game_config->cpsb_value;
+	if (offset == state->m_cps1_game_config->cpsb_addr/2)
+		return state->m_cps1_game_config->cpsb_value;
 
 	/* some games use as a protection check the ability to do 16-bit multiplications */
 	/* with a 32-bit result, by writing the factors to two ports and reading the */
 	/* result from two other ports. */
-	if (offset == state->cps1_game_config->mult_result_lo/2)
-		return (state->cps1_cps_b_regs[state->cps1_game_config->mult_factor1/2] *
-				state->cps1_cps_b_regs[state->cps1_game_config->mult_factor2/2]) & 0xffff;
-	if (offset == state->cps1_game_config->mult_result_hi/2)
-		return (state->cps1_cps_b_regs[state->cps1_game_config->mult_factor1/2] *
-				state->cps1_cps_b_regs[state->cps1_game_config->mult_factor2/2]) >> 16;
+	if (offset == state->m_cps1_game_config->mult_result_lo/2)
+		return (state->m_cps1_cps_b_regs[state->m_cps1_game_config->mult_factor1/2] *
+				state->m_cps1_cps_b_regs[state->m_cps1_game_config->mult_factor2/2]) & 0xffff;
+	if (offset == state->m_cps1_game_config->mult_result_hi/2)
+		return (state->m_cps1_cps_b_regs[state->m_cps1_game_config->mult_factor1/2] *
+				state->m_cps1_cps_b_regs[state->m_cps1_game_config->mult_factor2/2]) >> 16;
 
-	if (offset == state->cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
+	if (offset == state->m_cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
 		return input_port_read(space->machine(), "IN2");
 
-	if (offset == state->cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
+	if (offset == state->m_cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
 		return input_port_read(space->machine(), "IN3");
 
 	return 0xffff;
@@ -210,14 +210,14 @@ READ16_HANDLER( cps1_cps_b_r )
 WRITE16_HANDLER( cps1_cps_b_w )
 {
 	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
-	data = COMBINE_DATA(&state->cps1_cps_b_regs[offset]);
+	data = COMBINE_DATA(&state->m_cps1_cps_b_regs[offset]);
 
 	// additional outputs on C-board
-	if (offset == state->cps1_game_config->out2_addr/2)
+	if (offset == state->m_cps1_game_config->out2_addr/2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			if (state->cps1_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
+			if (state->m_cps1_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
 			{
 				coin_lockout_w(space->machine(),2,~data & 0x01);
 				set_led_status(space->machine(),0,data & 0x02);
@@ -304,60 +304,60 @@ static void cps1_get_video_base(cpschngr_state *state)
 	int layercontrol, videocontrol, scroll1xoff, scroll2xoff, scroll3xoff;
 
 	/* Re-calculate the VIDEO RAM base */
-	if (state->cps1_scroll1 != cps1_base(state, CPS1_SCROLL1_BASE, cps1_scroll_size))
+	if (state->m_cps1_scroll1 != cps1_base(state, CPS1_SCROLL1_BASE, cps1_scroll_size))
 	{
-		state->cps1_scroll1 = cps1_base(state, CPS1_SCROLL1_BASE, cps1_scroll_size);
-		tilemap_mark_all_tiles_dirty(state->cps1_bg_tilemap[0]);
+		state->m_cps1_scroll1 = cps1_base(state, CPS1_SCROLL1_BASE, cps1_scroll_size);
+		tilemap_mark_all_tiles_dirty(state->m_cps1_bg_tilemap[0]);
 	}
-	if (state->cps1_scroll2 != cps1_base(state, CPS1_SCROLL2_BASE, cps1_scroll_size))
+	if (state->m_cps1_scroll2 != cps1_base(state, CPS1_SCROLL2_BASE, cps1_scroll_size))
 	{
-		state->cps1_scroll2 = cps1_base(state, CPS1_SCROLL2_BASE, cps1_scroll_size);
-		tilemap_mark_all_tiles_dirty(state->cps1_bg_tilemap[1]);
+		state->m_cps1_scroll2 = cps1_base(state, CPS1_SCROLL2_BASE, cps1_scroll_size);
+		tilemap_mark_all_tiles_dirty(state->m_cps1_bg_tilemap[1]);
 	}
-	if (state->cps1_scroll3 != cps1_base(state, CPS1_SCROLL3_BASE, cps1_scroll_size))
+	if (state->m_cps1_scroll3 != cps1_base(state, CPS1_SCROLL3_BASE, cps1_scroll_size))
 	{
-		state->cps1_scroll3 = cps1_base(state, CPS1_SCROLL3_BASE, cps1_scroll_size);
-		tilemap_mark_all_tiles_dirty(state->cps1_bg_tilemap[2]);
+		state->m_cps1_scroll3 = cps1_base(state, CPS1_SCROLL3_BASE, cps1_scroll_size);
+		tilemap_mark_all_tiles_dirty(state->m_cps1_bg_tilemap[2]);
 	}
 
 	/* Some of the sf2 hacks use only sprite port 0x9100 and the scroll layers are offset */
-	if (state->cps1_game_config->bootleg_kludge == 1)
+	if (state->m_cps1_game_config->bootleg_kludge == 1)
 	{
-		state->cps1_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
-		state->cps1_obj = cps1_base(state, CPS1_OBJ_BASE, cps1_obj_size);
+		state->m_cps1_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
+		state->m_cps1_obj = cps1_base(state, CPS1_OBJ_BASE, cps1_obj_size);
 		scroll1xoff = -0x0c;
 		scroll2xoff = -0x0e;
 		scroll3xoff = -0x10;
 	}
 	else
 	{
-		state->cps1_obj = cps1_base(state, CPS1_OBJ_BASE, cps1_obj_size);
+		state->m_cps1_obj = cps1_base(state, CPS1_OBJ_BASE, cps1_obj_size);
 		scroll1xoff = 0;
 		scroll2xoff = 0;
 		scroll3xoff = 0;
 	}
-	state->cps1_other = cps1_base(state, CPS1_OTHER_BASE, cps1_other_size);
+	state->m_cps1_other = cps1_base(state, CPS1_OTHER_BASE, cps1_other_size);
 
 	/* Get scroll values */
-	state->cps1_scroll1x = state->cps1_cps_a_regs[CPS1_SCROLL1_SCROLLX] + scroll1xoff;
-	state->cps1_scroll1y = state->cps1_cps_a_regs[CPS1_SCROLL1_SCROLLY];
-	state->cps1_scroll2x = state->cps1_cps_a_regs[CPS1_SCROLL2_SCROLLX] + scroll2xoff;
-	state->cps1_scroll2y = state->cps1_cps_a_regs[CPS1_SCROLL2_SCROLLY];
-	state->cps1_scroll3x = state->cps1_cps_a_regs[CPS1_SCROLL3_SCROLLX] + scroll3xoff;
-	state->cps1_scroll3y = state->cps1_cps_a_regs[CPS1_SCROLL3_SCROLLY];
-	state->stars1x = state->cps1_cps_a_regs[CPS1_STARS1_SCROLLX];
-	state->stars1y = state->cps1_cps_a_regs[CPS1_STARS1_SCROLLY];
-	state->stars2x = state->cps1_cps_a_regs[CPS1_STARS2_SCROLLX];
-	state->stars2y = state->cps1_cps_a_regs[CPS1_STARS2_SCROLLY];
+	state->m_cps1_scroll1x = state->m_cps1_cps_a_regs[CPS1_SCROLL1_SCROLLX] + scroll1xoff;
+	state->m_cps1_scroll1y = state->m_cps1_cps_a_regs[CPS1_SCROLL1_SCROLLY];
+	state->m_cps1_scroll2x = state->m_cps1_cps_a_regs[CPS1_SCROLL2_SCROLLX] + scroll2xoff;
+	state->m_cps1_scroll2y = state->m_cps1_cps_a_regs[CPS1_SCROLL2_SCROLLY];
+	state->m_cps1_scroll3x = state->m_cps1_cps_a_regs[CPS1_SCROLL3_SCROLLX] + scroll3xoff;
+	state->m_cps1_scroll3y = state->m_cps1_cps_a_regs[CPS1_SCROLL3_SCROLLY];
+	state->m_stars1x = state->m_cps1_cps_a_regs[CPS1_STARS1_SCROLLX];
+	state->m_stars1y = state->m_cps1_cps_a_regs[CPS1_STARS1_SCROLLY];
+	state->m_stars2x = state->m_cps1_cps_a_regs[CPS1_STARS2_SCROLLX];
+	state->m_stars2y = state->m_cps1_cps_a_regs[CPS1_STARS2_SCROLLY];
 
 	/* Get layer enable bits */
-	layercontrol = state->cps1_cps_b_regs[state->cps1_game_config->layer_control/2];
-	videocontrol = state->cps1_cps_a_regs[CPS1_VIDEOCONTROL];
-	tilemap_set_enable(state->cps1_bg_tilemap[0],layercontrol & state->cps1_game_config->layer_enable_mask[0]);
-	tilemap_set_enable(state->cps1_bg_tilemap[1],(layercontrol & state->cps1_game_config->layer_enable_mask[1]) && (videocontrol & 4));
-	tilemap_set_enable(state->cps1_bg_tilemap[2],(layercontrol & state->cps1_game_config->layer_enable_mask[2]) && (videocontrol & 8));
-	state->cps1_stars_enabled[0] = layercontrol & state->cps1_game_config->layer_enable_mask[3];
-	state->cps1_stars_enabled[1] = layercontrol & state->cps1_game_config->layer_enable_mask[4];
+	layercontrol = state->m_cps1_cps_b_regs[state->m_cps1_game_config->layer_control/2];
+	videocontrol = state->m_cps1_cps_a_regs[CPS1_VIDEOCONTROL];
+	tilemap_set_enable(state->m_cps1_bg_tilemap[0],layercontrol & state->m_cps1_game_config->layer_enable_mask[0]);
+	tilemap_set_enable(state->m_cps1_bg_tilemap[1],(layercontrol & state->m_cps1_game_config->layer_enable_mask[1]) && (videocontrol & 4));
+	tilemap_set_enable(state->m_cps1_bg_tilemap[2],(layercontrol & state->m_cps1_game_config->layer_enable_mask[2]) && (videocontrol & 8));
+	state->m_cps1_stars_enabled[0] = layercontrol & state->m_cps1_game_config->layer_enable_mask[3];
+	state->m_cps1_stars_enabled[1] = layercontrol & state->m_cps1_game_config->layer_enable_mask[4];
 }
 
 
@@ -365,14 +365,14 @@ WRITE16_HANDLER( cps1_gfxram_w )
 {
 	cpschngr_state *state = space->machine().driver_data<cpschngr_state>();
 	int page = (offset >> 7) & 0x3c0;
-	COMBINE_DATA(&state->cps1_gfxram[offset]);
+	COMBINE_DATA(&state->m_cps1_gfxram[offset]);
 
-	if (page == (state->cps1_cps_a_regs[CPS1_SCROLL1_BASE] & 0x3c0))
-		tilemap_mark_tile_dirty(state->cps1_bg_tilemap[0],offset/2 & 0x0fff);
-	if (page == (state->cps1_cps_a_regs[CPS1_SCROLL2_BASE] & 0x3c0))
-		tilemap_mark_tile_dirty(state->cps1_bg_tilemap[1],offset/2 & 0x0fff);
-	if (page == (state->cps1_cps_a_regs[CPS1_SCROLL3_BASE] & 0x3c0))
-		tilemap_mark_tile_dirty(state->cps1_bg_tilemap[2],offset/2 & 0x0fff);
+	if (page == (state->m_cps1_cps_a_regs[CPS1_SCROLL1_BASE] & 0x3c0))
+		tilemap_mark_tile_dirty(state->m_cps1_bg_tilemap[0],offset/2 & 0x0fff);
+	if (page == (state->m_cps1_cps_a_regs[CPS1_SCROLL2_BASE] & 0x3c0))
+		tilemap_mark_tile_dirty(state->m_cps1_bg_tilemap[1],offset/2 & 0x0fff);
+	if (page == (state->m_cps1_cps_a_regs[CPS1_SCROLL3_BASE] & 0x3c0))
+		tilemap_mark_tile_dirty(state->m_cps1_bg_tilemap[2],offset/2 & 0x0fff);
 }
 
 
@@ -380,7 +380,7 @@ WRITE16_HANDLER( cps1_gfxram_w )
 static int gfxrom_bank_mapper(running_machine &machine, int type, int code)
 {
 	cpschngr_state *state = machine.driver_data<cpschngr_state>();
-	const struct gfx_range *range = state->cps1_game_config->bank_mapper;
+	const struct gfx_range *range = state->m_cps1_game_config->bank_mapper;
 	int shift = 0;
 
 	assert(range);
@@ -405,9 +405,9 @@ static int gfxrom_bank_mapper(running_machine &machine, int type, int code)
 				int i;
 
 				for (i = 0; i < range->bank; ++i)
-					base += state->cps1_game_config->bank_sizes[i];
+					base += state->m_cps1_game_config->bank_sizes[i];
 
-				return (base + (code & (state->cps1_game_config->bank_sizes[range->bank] - 1))) >> shift;
+				return (base + (code & (state->m_cps1_game_config->bank_sizes[range->bank] - 1))) >> shift;
 			}
 		}
 
@@ -446,8 +446,8 @@ static TILEMAP_MAPPER( tilemap2_scan )
 static TILE_GET_INFO( get_tile0_info )
 {
 	cpschngr_state *state = machine.driver_data<cpschngr_state>();
-	int code = state->cps1_scroll1[2*tile_index];
-	int attr = state->cps1_scroll1[2*tile_index+1];
+	int code = state->m_cps1_scroll1[2*tile_index];
+	int attr = state->m_cps1_scroll1[2*tile_index+1];
 	int gfxset;
 
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL1, code);
@@ -467,14 +467,14 @@ static TILE_GET_INFO( get_tile0_info )
 	// for out of range tiles, switch to fully transparent data
 	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo->pen_data = state->empty_tile8x8;
+		tileinfo->pen_data = state->m_empty_tile8x8;
 }
 
 static TILE_GET_INFO( get_tile1_info )
 {
 	cpschngr_state *state = machine.driver_data<cpschngr_state>();
-	int code = state->cps1_scroll2[2*tile_index];
-	int attr = state->cps1_scroll2[2*tile_index+1];
+	int code = state->m_cps1_scroll2[2*tile_index];
+	int attr = state->m_cps1_scroll2[2*tile_index+1];
 
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL2, code);
 
@@ -487,14 +487,14 @@ static TILE_GET_INFO( get_tile1_info )
 
 	// for out of range tiles, switch to fully transparent data
 	if (code == -1)
-		tileinfo->pen_data = state->empty_tile;
+		tileinfo->pen_data = state->m_empty_tile;
 }
 
 static TILE_GET_INFO( get_tile2_info )
 {
 	cpschngr_state *state = machine.driver_data<cpschngr_state>();
-	int code = state->cps1_scroll3[2*tile_index] & 0x3fff;
-	int attr = state->cps1_scroll3[2*tile_index+1];
+	int code = state->m_cps1_scroll3[2*tile_index] & 0x3fff;
+	int attr = state->m_cps1_scroll3[2*tile_index+1];
 
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL3, code);
 
@@ -508,7 +508,7 @@ static TILE_GET_INFO( get_tile2_info )
 	// for out of range tiles, switch to fully transparent data
 	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo->pen_data = state->empty_tile;
+		tileinfo->pen_data = state->m_empty_tile;
 }
 
 
@@ -522,13 +522,13 @@ static void cps1_update_transmasks(cpschngr_state *state)
 		int mask;
 
 		/* Get transparency registers */
-		if (state->cps1_game_config->priority[i] != -1)
-			mask = state->cps1_cps_b_regs[state->cps1_game_config->priority[i]/2] ^ 0xffff;
+		if (state->m_cps1_game_config->priority[i] != -1)
+			mask = state->m_cps1_cps_b_regs[state->m_cps1_game_config->priority[i]/2] ^ 0xffff;
 		else mask = 0xffff;	/* completely transparent if priority masks not defined (qad) */
 
-		tilemap_set_transmask(state->cps1_bg_tilemap[0],i,mask,0x8000);
-		tilemap_set_transmask(state->cps1_bg_tilemap[1],i,mask,0x8000);
-		tilemap_set_transmask(state->cps1_bg_tilemap[2],i,mask,0x8000);
+		tilemap_set_transmask(state->m_cps1_bg_tilemap[0],i,mask,0x8000);
+		tilemap_set_transmask(state->m_cps1_bg_tilemap[1],i,mask,0x8000);
+		tilemap_set_transmask(state->m_cps1_bg_tilemap[2],i,mask,0x8000);
 	}
 }
 
@@ -539,35 +539,35 @@ VIDEO_START( cps1 )
 
 	MACHINE_RESET_CALL(cps);
 
-	state->cps1_bg_tilemap[0] = tilemap_create(machine, get_tile0_info,tilemap0_scan, 8, 8,64,64);
-	state->cps1_bg_tilemap[1] = tilemap_create(machine, get_tile1_info,tilemap1_scan,16,16,64,64);
-	state->cps1_bg_tilemap[2] = tilemap_create(machine, get_tile2_info,tilemap2_scan,32,32,64,64);
+	state->m_cps1_bg_tilemap[0] = tilemap_create(machine, get_tile0_info,tilemap0_scan, 8, 8,64,64);
+	state->m_cps1_bg_tilemap[1] = tilemap_create(machine, get_tile1_info,tilemap1_scan,16,16,64,64);
+	state->m_cps1_bg_tilemap[2] = tilemap_create(machine, get_tile2_info,tilemap2_scan,32,32,64,64);
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks(state);
 
-	memset(state->empty_tile8x8,0x0f,sizeof(state->empty_tile8x8));
-	memset(state->empty_tile,0xff,sizeof(state->empty_tile));	// 16x16 and 32x32 use packed graphics, 8x8 does not
+	memset(state->m_empty_tile8x8,0x0f,sizeof(state->m_empty_tile8x8));
+	memset(state->m_empty_tile,0xff,sizeof(state->m_empty_tile));	// 16x16 and 32x32 use packed graphics, 8x8 does not
 
 	for (i = 0;i < cps1_palette_entries*16;i++)
 	{
 		palette_set_color(machine,i,MAKE_RGB(0,0,0));
 	}
 
-	state->cps1_buffered_obj = auto_alloc_array_clear(machine, UINT16, cps1_obj_size / sizeof(UINT16));
+	state->m_cps1_buffered_obj = auto_alloc_array_clear(machine, UINT16, cps1_obj_size / sizeof(UINT16));
 
-	memset(state->cps1_gfxram, 0, state->cps1_gfxram_size);   /* Clear GFX RAM */
-	memset(state->cps1_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
-	memset(state->cps1_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
+	memset(state->m_cps1_gfxram, 0, state->m_cps1_gfxram_size);   /* Clear GFX RAM */
+	memset(state->m_cps1_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
+	memset(state->m_cps1_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
 
 	/* Put in some defaults */
-	state->cps1_cps_a_regs[CPS1_OBJ_BASE]     = 0x9200;
-	state->cps1_cps_a_regs[CPS1_SCROLL1_BASE] = 0x9000;
-	state->cps1_cps_a_regs[CPS1_SCROLL2_BASE] = 0x9040;
-	state->cps1_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9080;
-	state->cps1_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
+	state->m_cps1_cps_a_regs[CPS1_OBJ_BASE]     = 0x9200;
+	state->m_cps1_cps_a_regs[CPS1_SCROLL1_BASE] = 0x9000;
+	state->m_cps1_cps_a_regs[CPS1_SCROLL2_BASE] = 0x9040;
+	state->m_cps1_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9080;
+	state->m_cps1_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
 
-	assert_always(state->cps1_game_config, "state->cps1_game_config hasn't been set up yet");
+	assert_always(state->m_cps1_game_config, "state->m_cps1_game_config hasn't been set up yet");
 
 	/* Set up old base */
 	cps1_get_video_base(state);   /* Calculate base pointers */
@@ -590,7 +590,7 @@ static void cps1_build_palette(running_machine &machine, const UINT16* const pal
 	int offset, page;
 	const UINT16 *palette_ram = palette_base;
 
-	int ctrl = state->cps1_cps_b_regs[state->cps1_game_config->palette_control/2];
+	int ctrl = state->m_cps1_cps_b_regs[state->m_cps1_game_config->palette_control/2];
 
 	for (page = 0; page < 6; ++page)
 	{
@@ -628,17 +628,17 @@ static void cps1_find_last_sprite(cpschngr_state *state)    /* Find the offset o
 	/* Locate the end of table marker */
 	while (offset < cps1_obj_size/2)
 	{
-        int colour=state->cps1_buffered_obj[offset+3];
+        int colour=state->m_cps1_buffered_obj[offset+3];
 		if ((colour & 0xff00) == 0xff00)
 		{
 			/* Marker found. This is the last sprite. */
-			state->cps1_last_sprite_offset=offset-4;
+			state->m_cps1_last_sprite_offset=offset-4;
 			return;
 		}
         offset+=4;
 	}
 	/* Sprites must use full sprite RAM */
-	state->cps1_last_sprite_offset=cps1_obj_size/2-4;
+	state->m_cps1_last_sprite_offset=cps1_obj_size/2-4;
 }
 
 
@@ -665,12 +665,12 @@ static void cps1_render_sprites(running_machine &machine, bitmap_t *bitmap, cons
 
 
 	int i, baseadd;
-	UINT16 *base=state->cps1_buffered_obj;
+	UINT16 *base=state->m_cps1_buffered_obj;
 
 	/* some sf2 hacks draw the sprites in reverse order */
-	if (state->cps1_game_config->bootleg_kludge == 1)
+	if (state->m_cps1_game_config->bootleg_kludge == 1)
 	{
-		base += state->cps1_last_sprite_offset;
+		base += state->m_cps1_last_sprite_offset;
 		baseadd = -4;
 	}
 	else
@@ -678,7 +678,7 @@ static void cps1_render_sprites(running_machine &machine, bitmap_t *bitmap, cons
 		baseadd = 4;
 	}
 
-	for (i=state->cps1_last_sprite_offset; i>=0; i-=4)
+	for (i=state->m_cps1_last_sprite_offset; i>=0; i-=4)
 	{
 		int x=*(base+0);
 		int y=*(base+1);
@@ -797,12 +797,12 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 	int offs;
 	UINT8 *stars_rom = screen->machine().region("stars")->base();
 
-	if (!stars_rom && (state->cps1_stars_enabled[0] || state->cps1_stars_enabled[1]))
+	if (!stars_rom && (state->m_cps1_stars_enabled[0] || state->m_cps1_stars_enabled[1]))
 	{
 		return;
 	}
 
-	if (state->cps1_stars_enabled[0])
+	if (state->m_cps1_stars_enabled[0])
 	{
 		for (offs = 0;offs < cps1_stars_rom_size/2;offs++)
 		{
@@ -811,8 +811,8 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 			{
 				int sx = (offs / 256) * 32;
 				int sy = (offs % 256);
-				sx = (sx - state->stars2x + (col & 0x1f)) & 0x1ff;
-				sy = (sy - state->stars2y) & 0xff;
+				sx = (sx - state->m_stars2x + (col & 0x1f)) & 0x1ff;
+				sy = (sy - state->m_stars2y) & 0xff;
 				if (flip_screen_get(screen->machine()))
 				{
 					sx = 511 - sx;
@@ -828,7 +828,7 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 		}
 	}
 
-	if (state->cps1_stars_enabled[1])
+	if (state->m_cps1_stars_enabled[1])
 	{
 		for (offs = 0;offs < cps1_stars_rom_size/2;offs++)
 		{
@@ -837,8 +837,8 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 			{
 				int sx = (offs / 256) * 32;
 				int sy = (offs % 256);
-				sx = (sx - state->stars1x + (col & 0x1f)) & 0x1ff;
-				sy = (sy - state->stars1y) & 0xff;
+				sx = (sx - state->m_stars1x + (col & 0x1f)) & 0x1ff;
+				sy = (sy - state->m_stars1y) & 0xff;
 				if (flip_screen_get(screen->machine()))
 				{
 					sx = 511 - sx;
@@ -867,7 +867,7 @@ static void cps1_render_layer(running_machine &machine, bitmap_t *bitmap, const 
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(bitmap,cliprect,state->cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER1,primask);
+			tilemap_draw(bitmap,cliprect,state->m_cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER1,primask);
 			break;
 	}
 }
@@ -883,7 +883,7 @@ static void cps1_render_high_layer(running_machine &machine, bitmap_t *bitmap, c
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(NULL,cliprect,state->cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER0,1);
+			tilemap_draw(NULL,cliprect,state->m_cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER0,1);
 			break;
 	}
 }
@@ -899,12 +899,12 @@ SCREEN_UPDATE( cps1 )
 {
 	cpschngr_state *state = screen->machine().driver_data<cpschngr_state>();
 	int layercontrol,l0,l1,l2,l3;
-	int videocontrol = state->cps1_cps_a_regs[CPS1_VIDEOCONTROL];
+	int videocontrol = state->m_cps1_cps_a_regs[CPS1_VIDEOCONTROL];
 
 
 	flip_screen_set(screen->machine(), videocontrol & 0x8000);
 
-	layercontrol = state->cps1_cps_b_regs[state->cps1_game_config->layer_control/2];
+	layercontrol = state->m_cps1_cps_b_regs[state->m_cps1_game_config->layer_control/2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(state);
@@ -913,29 +913,29 @@ SCREEN_UPDATE( cps1 )
 	cps1_find_last_sprite(state);
 	cps1_update_transmasks(state);
 
-	tilemap_set_scrollx(state->cps1_bg_tilemap[0],0,state->cps1_scroll1x);
-	tilemap_set_scrolly(state->cps1_bg_tilemap[0],0,state->cps1_scroll1y);
+	tilemap_set_scrollx(state->m_cps1_bg_tilemap[0],0,state->m_cps1_scroll1x);
+	tilemap_set_scrolly(state->m_cps1_bg_tilemap[0],0,state->m_cps1_scroll1y);
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
-		int scrly=-state->cps1_scroll2y;
+		int scrly=-state->m_cps1_scroll2y;
 		int i;
 		int otheroffs;
 
-		tilemap_set_scroll_rows(state->cps1_bg_tilemap[1],1024);
+		tilemap_set_scroll_rows(state->m_cps1_bg_tilemap[1],1024);
 
-		otheroffs = state->cps1_cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		otheroffs = state->m_cps1_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0;i < 256;i++)
-			tilemap_set_scrollx(state->cps1_bg_tilemap[1],(i - scrly) & 0x3ff,state->cps1_scroll2x + state->cps1_other[(i + otheroffs) & 0x3ff]);
+			tilemap_set_scrollx(state->m_cps1_bg_tilemap[1],(i - scrly) & 0x3ff,state->m_cps1_scroll2x + state->m_cps1_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->cps1_bg_tilemap[1],1);
-		tilemap_set_scrollx(state->cps1_bg_tilemap[1],0,state->cps1_scroll2x);
+		tilemap_set_scroll_rows(state->m_cps1_bg_tilemap[1],1);
+		tilemap_set_scrollx(state->m_cps1_bg_tilemap[1],0,state->m_cps1_scroll2x);
 	}
-	tilemap_set_scrolly(state->cps1_bg_tilemap[1],0,state->cps1_scroll2y);
-	tilemap_set_scrollx(state->cps1_bg_tilemap[2],0,state->cps1_scroll3x);
-	tilemap_set_scrolly(state->cps1_bg_tilemap[2],0,state->cps1_scroll3y);
+	tilemap_set_scrolly(state->m_cps1_bg_tilemap[1],0,state->m_cps1_scroll2y);
+	tilemap_set_scrollx(state->m_cps1_bg_tilemap[2],0,state->m_cps1_scroll3x);
+	tilemap_set_scrolly(state->m_cps1_bg_tilemap[2],0,state->m_cps1_scroll3y);
 
 
 	/* Blank screen */
@@ -968,5 +968,5 @@ SCREEN_EOF( cps1 )
 	cps1_get_video_base(state);
 
 	/* CPS1 sprites have to be delayed one frame */
-	memcpy(state->cps1_buffered_obj, state->cps1_obj, cps1_obj_size);
+	memcpy(state->m_cps1_buffered_obj, state->m_cps1_obj, cps1_obj_size);
 }

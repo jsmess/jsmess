@@ -166,18 +166,18 @@ static const UINT16 fm7_key_list[0x60][7] =
 static void main_irq_set_flag(running_machine &machine, UINT8 flag)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	state->irq_flags |= flag;
+	state->m_irq_flags |= flag;
 
-	if(state->irq_flags != 0)
+	if(state->m_irq_flags != 0)
 		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static void main_irq_clear_flag(running_machine &machine, UINT8 flag)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	state->irq_flags &= ~flag;
+	state->m_irq_flags &= ~flag;
 
-	if(state->irq_flags == 0)
+	if(state->m_irq_flags == 0)
 		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
 }
 
@@ -200,8 +200,8 @@ static void main_irq_clear_flag(running_machine &machine, UINT8 flag)
 static WRITE8_HANDLER( fm7_irq_mask_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->irq_mask = data;
-	logerror("IRQ mask set: 0x%02x\n",state->irq_mask);
+	state->m_irq_mask = data;
+	logerror("IRQ mask set: 0x%02x\n",state->m_irq_mask);
 }
 
 /*
@@ -220,14 +220,14 @@ static WRITE8_HANDLER( fm7_irq_mask_w )
 static READ8_HANDLER( fm7_irq_cause_r )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8 ret = ~state->irq_flags;
+	UINT8 ret = ~state->m_irq_flags;
 
 	// Timer and Printer IRQ flags are cleared when this port is read
 	// Keyboard IRQ flag is cleared when the scancode is read from
 	// either keyboard data port (main CPU 0xfd01 or sub CPU 0xd401)
-	if(state->irq_flags & 0x04)
+	if(state->m_irq_flags & 0x04)
 		main_irq_clear_flag(space->machine(),IRQ_FLAG_TIMER);
-	if(state->irq_flags & 0x02)
+	if(state->m_irq_flags & 0x02)
 		main_irq_clear_flag(space->machine(),IRQ_FLAG_PRINTER);
 
 	logerror("IRQ flags read: 0x%02x\n",ret);
@@ -243,9 +243,9 @@ static TIMER_CALLBACK( fm7_beeper_off )
 static WRITE8_HANDLER( fm7_beeper_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->speaker_active = data & 0x01;
+	state->m_speaker_active = data & 0x01;
 
-	if(!state->speaker_active)  // speaker not active, disable all beeper sound
+	if(!state->m_speaker_active)  // speaker not active, disable all beeper sound
 	{
 		beep_set_state(space->machine().device("beeper"),0);
 		return;
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( fm7_beeper_w )
 
 	if(data & 0x80)
 	{
-		if(state->speaker_active)
+		if(state->m_speaker_active)
 			beep_set_state(space->machine().device("beeper"),1);
 	}
 	else
@@ -261,7 +261,7 @@ static WRITE8_HANDLER( fm7_beeper_w )
 
 	if(data & 0x40)
 	{
-		if(state->speaker_active)
+		if(state->m_speaker_active)
 		{
 			beep_set_state(space->machine().device("beeper"),1);
 			logerror("timed beeper on\n");
@@ -279,7 +279,7 @@ static WRITE8_HANDLER( fm7_beeper_w )
 READ8_HANDLER( fm7_sub_beeper_r )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(state->speaker_active)
+	if(state->m_speaker_active)
 	{
 		beep_set_state(space->machine().device("beeper"),1);
 		logerror("timed beeper on\n");
@@ -294,11 +294,11 @@ static READ8_HANDLER( vector_r )
 	UINT8* RAM = space->machine().region("maincpu")->base();
 	UINT8* ROM = space->machine().region("init")->base();
 
-	if(state->init_rom_en)
+	if(state->m_init_rom_en)
 		return ROM[0x1ff0+offset];
 	else
 	{
-		if(state->type == SYS_FM7)
+		if(state->m_type == SYS_FM7)
 			return RAM[0xfff0+offset];
 		else
 			return RAM[0x3fff0+offset];
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( vector_w )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8* RAM = space->machine().region("maincpu")->base();
 
-	if(state->type == SYS_FM7)
+	if(state->m_type == SYS_FM7)
 		RAM[0xfff0+offset] = data;
 	else
 		RAM[0x3fff0+offset] = data;
@@ -327,12 +327,12 @@ static READ8_HANDLER( fm7_fd04_r )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0xff;
 
-	if(state->video.attn_irq != 0)
+	if(state->m_video.attn_irq != 0)
 	{
 		ret &= ~0x01;
-		state->video.attn_irq = 0;
+		state->m_video.attn_irq = 0;
 	}
-	if(state->break_flag != 0)
+	if(state->m_break_flag != 0)
 	{
 		ret &= ~0x02;
 	}
@@ -350,8 +350,8 @@ static READ8_HANDLER( fm7_rom_en_r )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8* RAM = space->machine().region("maincpu")->base();
 
-	state->basic_rom_en = 1;
-	if(state->type == SYS_FM7)
+	state->m_basic_rom_en = 1;
+	if(state->m_type == SYS_FM7)
 	{
 		space->install_read_bank(0x8000,0xfbff,"bank1");
 		space->nop_write(0x8000,0xfbff);
@@ -368,8 +368,8 @@ static WRITE8_HANDLER( fm7_rom_en_w )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8* RAM = space->machine().region("maincpu")->base();
 
-	state->basic_rom_en = 0;
-	if(state->type == SYS_FM7)
+	state->m_basic_rom_en = 0;
+	if(state->m_type == SYS_FM7)
 	{
 		space->install_readwrite_bank(0x8000,0xfbff,"bank1");
 		memory_set_bankptr(space->machine(),"bank1",RAM+0x8000);
@@ -390,12 +390,12 @@ static WRITE8_HANDLER( fm7_init_en_w )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(data & 0x02)
 	{
-		state->init_rom_en = 0;
+		state->m_init_rom_en = 0;
 		fm7_mmr_refresh(space);
 	}
 	else
 	{
-		state->init_rom_en = 1;
+		state->m_init_rom_en = 1;
 		fm7_mmr_refresh(space);
 	}
 }
@@ -407,13 +407,13 @@ static WRITE8_HANDLER( fm7_init_en_w )
 static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_intrq_w )
 {
 	fm7_state *drvstate = device->machine().driver_data<fm7_state>();
-	drvstate->fdc_irq_flag = state;
+	drvstate->m_fdc_irq_flag = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
 {
 	fm7_state *drvstate = device->machine().driver_data<fm7_state>();
-	drvstate->fdc_drq_flag = state;
+	drvstate->m_fdc_drq_flag = state;
 }
 
 static READ8_HANDLER( fm7_fdc_r )
@@ -433,16 +433,16 @@ static READ8_HANDLER( fm7_fdc_r )
 		case 3:
 			return wd17xx_data_r(dev,offset);
 		case 4:
-			return state->fdc_side | 0xfe;
+			return state->m_fdc_side | 0xfe;
 		case 5:
-			return state->fdc_drive;
+			return state->m_fdc_drive;
 		case 6:
 			// FM-7 always returns 0xff for this register
 			return 0xff;
 		case 7:
-			if(state->fdc_irq_flag != 0)
+			if(state->m_fdc_irq_flag != 0)
 				ret |= 0x40;
-			if(state->fdc_drq_flag != 0)
+			if(state->m_fdc_drq_flag != 0)
 				ret |= 0x80;
 			return ret;
 	}
@@ -470,15 +470,15 @@ static WRITE8_HANDLER( fm7_fdc_w )
 			wd17xx_data_w(dev,offset,data);
 			break;
 		case 4:
-			state->fdc_side = data & 0x01;
+			state->m_fdc_side = data & 0x01;
 			wd17xx_set_side(dev,data & 0x01);
 			logerror("FDC: wrote %02x to 0x%04x (side)\n",data,offset+0xfd18);
 			break;
 		case 5:
-			state->fdc_drive = data;
+			state->m_fdc_drive = data;
 			if((data & 0x03) > 0x01)
 			{
-				state->fdc_drive = 0;
+				state->m_fdc_drive = 0;
 			}
 			else
 			{
@@ -515,12 +515,12 @@ static READ8_HANDLER( fm7_keyboard_r )
 	switch(offset)
 	{
 		case 0:
-			ret = (state->current_scancode >> 1) & 0x80;
+			ret = (state->m_current_scancode >> 1) & 0x80;
 			ret |= 0x01; // 1 = 2MHz, 0 = 1.2MHz
 			return ret;
 		case 1:
 			main_irq_clear_flag(space->machine(),IRQ_FLAG_KEY);
-			return state->current_scancode & 0xff;
+			return state->m_current_scancode & 0xff;
 		default:
 			return 0x00;
 	}
@@ -533,11 +533,11 @@ READ8_HANDLER( fm7_sub_keyboard_r )
 	switch(offset)
 	{
 		case 0:
-			ret = (state->current_scancode >> 1) & 0x80;
+			ret = (state->m_current_scancode >> 1) & 0x80;
 			return ret;
 		case 1:
 			main_irq_clear_flag(space->machine(),IRQ_FLAG_KEY);
-			return state->current_scancode & 0xff;
+			return state->m_current_scancode & 0xff;
 		default:
 			return 0x00;
 	}
@@ -575,20 +575,20 @@ READ8_HANDLER( fm77av_key_encoder_r )
 	switch(offset)
 	{
 		case 0x00:  // data register
-			if(state->encoder.rx_count > 0)
+			if(state->m_encoder.rx_count > 0)
 			{
-				ret = state->encoder.buffer[state->encoder.position];
-				state->encoder.position++;
-				state->encoder.rx_count--;
-				state->encoder.latch = 0;
+				ret = state->m_encoder.buffer[state->m_encoder.position];
+				state->m_encoder.position++;
+				state->m_encoder.rx_count--;
+				state->m_encoder.latch = 0;
 			}
-			if(state->encoder.rx_count > 0)
-				state->encoder.latch = 1;  // more data to receive
+			if(state->m_encoder.rx_count > 0)
+				state->m_encoder.latch = 1;  // more data to receive
 			break;
 		case 0x01:  // status register
-			if(state->encoder.latch != 0)
+			if(state->m_encoder.latch != 0)
 				ret &= ~0x80;
-			if(state->encoder.ack == 0)
+			if(state->m_encoder.ack == 0)
 				ret &= ~0x01;
 			break;
 	}
@@ -598,141 +598,141 @@ READ8_HANDLER( fm77av_key_encoder_r )
 
 static void fm77av_encoder_setup_command(fm7_state *state)
 {
-	switch(state->encoder.buffer[0])
+	switch(state->m_encoder.buffer[0])
 	{
 		case 0:  // set scancode format
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		case 1:  // get scancode format
-			state->encoder.tx_count = 1;
+			state->m_encoder.tx_count = 1;
 			break;
 		case 2:  // set LED
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		case 3:  // get LED
-			state->encoder.tx_count = 1;
+			state->m_encoder.tx_count = 1;
 			break;
 		case 4:  // enable repeat
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		case 5:  // set repeat rate
-			state->encoder.tx_count = 3;
+			state->m_encoder.tx_count = 3;
 			break;
 		case 0x80:  // get/set RTC (at least two bytes, 9 if byte two = 0x01)
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		case 0x81:  // digitise
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		case 0x82:  // set screen mode
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		case 0x83:  // get screen mode
-			state->encoder.tx_count = 1;
+			state->m_encoder.tx_count = 1;
 			break;
 		case 0x84:  // set monitor brightness
-			state->encoder.tx_count = 2;
+			state->m_encoder.tx_count = 2;
 			break;
 		default:
-			state->encoder.tx_count = 0;
-			state->encoder.rx_count = 0;
-			state->encoder.position = 0;
-			logerror("ENC: Unknown command 0x%02x sent, ignoring\n",state->encoder.buffer[0]);
+			state->m_encoder.tx_count = 0;
+			state->m_encoder.rx_count = 0;
+			state->m_encoder.position = 0;
+			logerror("ENC: Unknown command 0x%02x sent, ignoring\n",state->m_encoder.buffer[0]);
 	}
 }
 
 static TIMER_CALLBACK( fm77av_encoder_ack )
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	state->encoder.ack = 1;
+	state->m_encoder.ack = 1;
 }
 
 static void fm77av_encoder_handle_command(fm7_state *state)
 {
-	switch(state->encoder.buffer[0])
+	switch(state->m_encoder.buffer[0])
 	{
 		case 0:  // set keyboard scancode mode
-			state->key_scan_mode = state->encoder.buffer[1];
-			state->encoder.rx_count = 0;
-			logerror("ENC: Keyboard set to mode %i\n",state->encoder.buffer[1]);
+			state->m_key_scan_mode = state->m_encoder.buffer[1];
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Keyboard set to mode %i\n",state->m_encoder.buffer[1]);
 			break;
 		case 1:  // get keyboard scancode mode
-			state->encoder.buffer[0] = state->key_scan_mode;
-			state->encoder.rx_count = 1;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.buffer[0] = state->m_key_scan_mode;
+			state->m_encoder.rx_count = 1;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 2:  // set LEDs
-			state->encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 3:  // get LEDs
-			state->encoder.rx_count = 1;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 1;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 4:  // enable key repeat
-			state->encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 5:  // set key repeat rate
-			state->key_repeat = state->encoder.buffer[2] * 10;
-			state->key_delay = state->encoder.buffer[1] * 10;
-			state->encoder.rx_count = 0;
-			logerror("ENC: Keyboard repeat rate set to %i/%i\n",state->encoder.buffer[1],state->encoder.buffer[2]);
+			state->m_key_repeat = state->m_encoder.buffer[2] * 10;
+			state->m_key_delay = state->m_encoder.buffer[1] * 10;
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Keyboard repeat rate set to %i/%i\n",state->m_encoder.buffer[1],state->m_encoder.buffer[2]);
 			break;
 		case 0x80:  // get/set RTC
-			if(state->encoder.buffer[1] == 0x01)
-				state->encoder.rx_count = 0;
+			if(state->m_encoder.buffer[1] == 0x01)
+				state->m_encoder.rx_count = 0;
 			else
-				state->encoder.rx_count = 7;
-			logerror("ENC: Command %02x %02x recieved\n",state->encoder.buffer[0],state->encoder.buffer[1]);
+				state->m_encoder.rx_count = 7;
+			logerror("ENC: Command %02x %02x recieved\n",state->m_encoder.buffer[0],state->m_encoder.buffer[1]);
 			break;
 		case 0x81:  // digitise
-			state->encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 0x82:  // set screen mode
-			state->encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 0x83:  // get screen mode
-			state->encoder.rx_count = 1;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 1;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 		case 0x84:  // set monitor brightness
-			state->encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->encoder.buffer[0]);
+			state->m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
 			break;
 	}
-	state->encoder.position = 0;
+	state->m_encoder.position = 0;
 }
 
 WRITE8_HANDLER( fm77av_key_encoder_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->encoder.ack = 0;
+	state->m_encoder.ack = 0;
 	if(offset == 0) // data register
 	{
-		if(state->encoder.position == 0)  // first byte
+		if(state->m_encoder.position == 0)  // first byte
 		{
 			fm77av_encoder_setup_command(state);
 		}
-		if(state->encoder.position == 1)  // second byte
+		if(state->m_encoder.position == 1)  // second byte
 		{
-			if(state->encoder.buffer[0] == 0x80 || state->encoder.buffer[1] == 0x01)
+			if(state->m_encoder.buffer[0] == 0x80 || state->m_encoder.buffer[1] == 0x01)
 			{
-				state->encoder.tx_count = 8; // 80 01 command is 9 bytes
+				state->m_encoder.tx_count = 8; // 80 01 command is 9 bytes
 			}
 		}
-		state->encoder.buffer[state->encoder.position] = data;
-		state->encoder.position++;
-		state->encoder.tx_count--;
-		if(state->encoder.tx_count == 0)  // last byte
+		state->m_encoder.buffer[state->m_encoder.position] = data;
+		state->m_encoder.position++;
+		state->m_encoder.tx_count--;
+		if(state->m_encoder.tx_count == 0)  // last byte
 			fm77av_encoder_handle_command(state);
 
 		// wait 5us to set ACK flag
 		space->machine().scheduler().timer_set(attotime::from_usec(5), FUNC(fm77av_encoder_ack));
 
-		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,state->encoder.position);
+		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,state->m_encoder.position);
 	}
 }
 
@@ -800,12 +800,12 @@ static WRITE8_HANDLER( fm7_cassette_printer_w )
 		// bit 6: printer strobe
 		// bit 1: cassette motor
 		// bit 0: cassette output
-			if((data & 0x01) != (state->cp_prev & 0x01))
+			if((data & 0x01) != (state->m_cp_prev & 0x01))
 				cassette_output(space->machine().device("cass"),(data & 0x01) ? +1.0 : -1.0);
-			if((data & 0x02) != (state->cp_prev & 0x02))
+			if((data & 0x02) != (state->m_cp_prev & 0x02))
 				cassette_change_state(space->machine().device("cass" ),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 			centronics_strobe_w(space->machine().device("lpt"),!(data & 0x40));
-			state->cp_prev = data;
+			state->m_cp_prev = data;
 			break;
 		case 1:
 		// Printer data
@@ -840,55 +840,55 @@ static void fm7_update_psg(running_machine &machine)
 	fm7_state *state = machine.driver_data<fm7_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	if(state->type == SYS_FM7)
+	if(state->m_type == SYS_FM7)
 	{
-		switch(state->psg_regsel)
+		switch(state->m_psg_regsel)
 		{
 			case 0x00:
 				// High impedance
 				break;
 			case 0x01:
 				// Data read
-				state->psg_data = ay8910_r(space->machine().device("psg"),0);
+				state->m_psg_data = ay8910_r(space->machine().device("psg"),0);
 				break;
 			case 0x02:
 				// Data write
-				ay8910_data_w(space->machine().device("psg"),0,state->psg_data);
+				ay8910_data_w(space->machine().device("psg"),0,state->m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ay8910_address_w(space->machine().device("psg"),0,state->psg_data);
+				ay8910_address_w(space->machine().device("psg"),0,state->m_psg_data);
 				break;
 		}
 	}
 	else
 	{	// FM-77AV and later use a YM2203
-		switch(state->psg_regsel)
+		switch(state->m_psg_regsel)
 		{
 			case 0x00:
 				// High impedance
 				break;
 			case 0x01:
 				// Data read
-				state->psg_data = ym2203_r(space->machine().device("ym"),1);
+				state->m_psg_data = ym2203_r(space->machine().device("ym"),1);
 				break;
 			case 0x02:
 				// Data write
-				ym2203_w(space->machine().device("ym"),1,state->psg_data);
-				logerror("YM: data write 0x%02x\n",state->psg_data);
+				ym2203_w(space->machine().device("ym"),1,state->m_psg_data);
+				logerror("YM: data write 0x%02x\n",state->m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ym2203_w(space->machine().device("ym"),0,state->psg_data);
-				logerror("YM: address latch 0x%02x\n",state->psg_data);
+				ym2203_w(space->machine().device("ym"),0,state->m_psg_data);
+				logerror("YM: address latch 0x%02x\n",state->m_psg_data);
 				break;
 			case 0x04:
 				// Status register
-				state->psg_data = ym2203_r(space->machine().device("ym"),0);
+				state->m_psg_data = ym2203_r(space->machine().device("ym"),0);
 				break;
 			case 0x09:
 				// Joystick port read
-				state->psg_data = input_port_read(space->machine(),"joy1");
+				state->m_psg_data = input_port_read(space->machine(),"joy1");
 				break;
 		}
 	}
@@ -902,14 +902,14 @@ static READ8_HANDLER( fm7_psg_select_r )
 static WRITE8_HANDLER( fm7_psg_select_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->psg_regsel = data & 0x03;
+	state->m_psg_regsel = data & 0x03;
 	fm7_update_psg(space->machine());
 }
 
 static WRITE8_HANDLER( fm77av_ym_select_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->psg_regsel = data & 0x0f;
+	state->m_psg_regsel = data & 0x0f;
 	fm7_update_psg(space->machine());
 }
 
@@ -917,30 +917,30 @@ static READ8_HANDLER( fm7_psg_data_r )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 //  fm7_update_psg(space->machine());
-	return state->psg_data;
+	return state->m_psg_data;
 }
 
 static WRITE8_HANDLER( fm7_psg_data_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->psg_data = data;
+	state->m_psg_data = data;
 //  fm7_update_psg(space->machine());
 }
 
 static WRITE8_HANDLER( fm77av_bootram_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(!(state->mmr.mode & 0x01))
+	if(!(state->m_mmr.mode & 0x01))
 		return;
-	state->boot_ram[offset] = data;
+	state->m_boot_ram[offset] = data;
 }
 
 // Shared RAM is only usable on the main CPU if the sub CPU is halted
 static READ8_HANDLER( fm7_main_shared_r )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(state->video.sub_halt != 0)
-		return state->shared_ram[offset];
+	if(state->m_video.sub_halt != 0)
+		return state->m_shared_ram[offset];
 	else
 		return 0xff;
 }
@@ -948,8 +948,8 @@ static READ8_HANDLER( fm7_main_shared_r )
 static WRITE8_HANDLER( fm7_main_shared_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(state->video.sub_halt != 0)
-		state->shared_ram[offset] = data;
+	if(state->m_video.sub_halt != 0)
+		state->m_shared_ram[offset] = data;
 }
 
 static READ8_HANDLER( fm7_fmirq_r )
@@ -957,7 +957,7 @@ static READ8_HANDLER( fm7_fmirq_r )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0xff;
 
-	if(state->fm77av_ym_irq != 0)
+	if(state->m_fm77av_ym_irq != 0)
 		ret &= ~0x08;
 
 	return ret;
@@ -1001,10 +1001,10 @@ static READ8_HANDLER( fm7_mmr_r )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(offset < 0x10)
 	{
-		return state->mmr.bank_addr[state->mmr.segment][offset];
+		return state->m_mmr.bank_addr[state->m_mmr.segment][offset];
 	}
 	if(offset == 0x13)
-		return state->mmr.mode;
+		return state->m_mmr.mode;
 	return 0xff;
 }
 
@@ -1076,7 +1076,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical == 0x36 || physical == 0x37)
 	{
-		if(state->init_rom_en)
+		if(state->m_init_rom_en)
 		{
 			RAM = space->machine().region("init")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
@@ -1087,7 +1087,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical > 0x37 && physical <= 0x3f)
 	{
-		if(state->basic_rom_en)
+		if(state->m_basic_rom_en)
 		{
 			RAM = space->machine().region("fbasic")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
@@ -1107,10 +1107,10 @@ static void fm7_mmr_refresh(address_space* space)
 	UINT16 window_addr;
 	UINT8* RAM = space->machine().region("maincpu")->base();
 
-	if(state->mmr.enabled)
+	if(state->m_mmr.enabled)
 	{
 		for(x=0;x<16;x++)
-			fm7_update_bank(space,x,state->mmr.bank_addr[state->mmr.segment][x]);
+			fm7_update_bank(space,x,state->m_mmr.bank_addr[state->m_mmr.segment][x]);
 	}
 	else
 	{
@@ -1119,12 +1119,12 @@ static void fm7_mmr_refresh(address_space* space)
 			fm7_update_bank(space,x,0x30+x);
 	}
 
-	if(state->mmr.mode & 0x40)
+	if(state->m_mmr.mode & 0x40)
 	{
 		// Handle window offset - 0x7c00-0x7fff will show the area of extended
 		// memory (0x00000-0x0ffff) defined by the window address register
 		// 0x00 = 0x07c00, 0x04 = 0x08000 ... 0xff = 0x07400.
-		window_addr = ((state->mmr.window_offset << 8) + 0x7c00) & 0xffff;
+		window_addr = ((state->m_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 //      if(window_addr < 0xfc00)
 		{
 			space->install_readwrite_bank(0x7c00,0x7fff,"bank24");
@@ -1138,27 +1138,27 @@ static WRITE8_HANDLER( fm7_mmr_w )
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(offset < 0x10)
 	{
-		state->mmr.bank_addr[state->mmr.segment][offset] = data;
-		if(state->mmr.enabled)
+		state->m_mmr.bank_addr[state->m_mmr.segment][offset] = data;
+		if(state->m_mmr.enabled)
 			fm7_update_bank(space,offset,data);
-		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",state->mmr.segment,offset,data);
+		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",state->m_mmr.segment,offset,data);
 		return;
 	}
 	switch(offset)
 	{
 		case 0x10:
-			state->mmr.segment = data & 0x07;
+			state->m_mmr.segment = data & 0x07;
 			fm7_mmr_refresh(space);
-			logerror("MMR: Active segment set to %i\n",state->mmr.segment);
+			logerror("MMR: Active segment set to %i\n",state->m_mmr.segment);
 			break;
 		case 0x12:
-			state->mmr.window_offset = data;
+			state->m_mmr.window_offset = data;
 			fm7_mmr_refresh(space);
 			logerror("MMR: Window offset set to %02x\n",data);
 			break;
 		case 0x13:
-			state->mmr.mode = data;
-			state->mmr.enabled = data & 0x80;
+			state->m_mmr.mode = data;
+			state->m_mmr.enabled = data & 0x80;
 			fm7_mmr_refresh(space);
 			logerror("MMR: Mode register set to %02x\n",data);
 			break;
@@ -1179,7 +1179,7 @@ static READ8_HANDLER( fm7_kanji_r )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8* KROM = space->machine().region("kanji1")->base();
-	UINT32 addr = state->kanji_address << 1;
+	UINT32 addr = state->m_kanji_address << 1;
 
 	switch(offset)
 	{
@@ -1205,12 +1205,12 @@ static WRITE8_HANDLER( fm7_kanji_w )
 	switch(offset)
 	{
 		case 0:
-			addr = ((data & 0xff) << 8) | (state->kanji_address & 0x00ff);
-			state->kanji_address = addr;
+			addr = ((data & 0xff) << 8) | (state->m_kanji_address & 0x00ff);
+			state->m_kanji_address = addr;
 			break;
 		case 1:
-			addr = (data & 0xff) | (state->kanji_address & 0xff00);
-			state->kanji_address = addr;
+			addr = (data & 0xff) | (state->m_kanji_address & 0xff00);
+			state->m_kanji_address = addr;
 			break;
 		case 2:
 		case 3:
@@ -1222,7 +1222,7 @@ static WRITE8_HANDLER( fm7_kanji_w )
 static TIMER_CALLBACK( fm7_timer_irq )
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	if(state->irq_mask & IRQ_FLAG_TIMER)
+	if(state->m_irq_mask & IRQ_FLAG_TIMER)
 	{
 		main_irq_set_flag(machine,IRQ_FLAG_TIMER);
 	}
@@ -1231,7 +1231,7 @@ static TIMER_CALLBACK( fm7_timer_irq )
 static TIMER_CALLBACK( fm7_subtimer_irq )
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	if(state->video.nmi_mask == 0 && state->video.sub_halt == 0)
+	if(state->m_video.nmi_mask == 0 && state->m_video.sub_halt == 0)
 		cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -1241,12 +1241,12 @@ static TIMER_CALLBACK( fm7_subtimer_irq )
 static void key_press(running_machine &machine, UINT16 scancode)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	state->current_scancode = scancode;
+	state->m_current_scancode = scancode;
 
 	if(scancode == 0)
 		return;
 
-	if(state->irq_mask & IRQ_FLAG_KEY)
+	if(state->m_irq_mask & IRQ_FLAG_KEY)
 	{
 		main_irq_set_flag(machine,IRQ_FLAG_KEY);
 	}
@@ -1273,34 +1273,34 @@ static void fm7_keyboard_poll_scan(running_machine &machine)
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
-			if((keys & (1<<y)) != 0 && (state->key_data[x] & (1<<y)) == 0)
+			if((keys & (1<<y)) != 0 && (state->m_key_data[x] & (1<<y)) == 0)
 			{
 				key_press(machine,fm7_key_list[bit][6]); // key press
 			}
-			if((keys & (1<<y)) == 0 && (state->key_data[x] & (1<<y)) != 0)
+			if((keys & (1<<y)) == 0 && (state->m_key_data[x] & (1<<y)) != 0)
 			{
 				key_press(machine,fm7_key_list[bit][6] | 0x80); // key release
 			}
 			bit++;
 		}
 
-		state->key_data[x] = keys;
+		state->m_key_data[x] = keys;
 	}
 	// check modifier keys
 	bit = 0;
 	for(y=0;x<7;x++)
 	{
-		if((modifiers & (1<<y)) != 0 && (state->mod_data & (1<<y)) == 0)
+		if((modifiers & (1<<y)) != 0 && (state->m_mod_data & (1<<y)) == 0)
 		{
 			key_press(machine,modscancodes[bit]); // key press
 		}
-		if((modifiers & (1<<y)) == 0 && (state->mod_data & (1<<y)) != 0)
+		if((modifiers & (1<<y)) == 0 && (state->m_mod_data & (1<<y)) != 0)
 		{
 			key_press(machine,modscancodes[bit] | 0x80); // key release
 		}
 		bit++;
 	}
-	state->mod_data = modifiers;
+	state->m_mod_data = modifiers;
 }
 
 static TIMER_CALLBACK( fm7_keyboard_poll )
@@ -1315,13 +1315,13 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 
 	if(input_port_read(machine,"key3") & 0x40000)
 	{
-		state->break_flag = 1;
+		state->m_break_flag = 1;
 		cputag_set_input_line(machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
 	}
 	else
-		state->break_flag = 0;
+		state->m_break_flag = 0;
 
-	if(state->key_scan_mode == KEY_MODE_SCAN)
+	if(state->m_key_scan_mode == KEY_MODE_SCAN)
 	{
 		// handle scancode mode
 		fm7_keyboard_poll_scan(machine);
@@ -1346,14 +1346,14 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
-			if((keys & (1<<y)) != 0 && (state->key_data[x] & (1<<y)) == 0)
+			if((keys & (1<<y)) != 0 && (state->m_key_data[x] & (1<<y)) == 0)
 			{
 				key_press(machine,fm7_key_list[bit][mod]); // key press
 			}
 			bit++;
 		}
 
-		state->key_data[x] = keys;
+		state->m_key_data[x] = keys;
 	}
 }
 
@@ -1377,13 +1377,13 @@ static void fm77av_fmirq(device_t* device,int irq)
 	{
 		// cannot be masked
 		main_irq_set_flag(device->machine(),IRQ_FLAG_OTHER);
-		state->fm77av_ym_irq = 1;
+		state->m_fm77av_ym_irq = 1;
 		logerror("YM: IRQ on\n");
 	}
 	else
 	{
 		main_irq_clear_flag(device->machine(),IRQ_FLAG_OTHER);
-		state->fm77av_ym_irq = 0;
+		state->m_fm77av_ym_irq = 0;
 		logerror("YM: IRQ off\n");
 	}
 }
@@ -1441,7 +1441,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE_MEMBER(fm7_state, shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
@@ -1504,7 +1504,7 @@ static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
 	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE_MEMBER(fm7_state, boot_ram)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE_MEMBER(fm7_state, m_boot_ram)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
@@ -1513,7 +1513,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE_MEMBER(fm7_state, shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
@@ -1693,13 +1693,13 @@ INPUT_PORTS_END
 static DRIVER_INIT(fm7)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-//  state->shared_ram = auto_alloc_array(machine,UINT8,0x80);
-	state->video_ram = auto_alloc_array(machine,UINT8,0x18000);  // 2 pages on some systems
-	state->timer = machine.scheduler().timer_alloc(FUNC(fm7_timer_irq));
-	state->subtimer = machine.scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
-	state->keyboard_timer = machine.scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
-	if(state->type != SYS_FM7)
-		state->fm77av_vsync_timer = machine.scheduler().timer_alloc(FUNC(fm77av_vsync));
+//  state->m_shared_ram = auto_alloc_array(machine,UINT8,0x80);
+	state->m_video_ram = auto_alloc_array(machine,UINT8,0x18000);  // 2 pages on some systems
+	state->m_timer = machine.scheduler().timer_alloc(FUNC(fm7_timer_irq));
+	state->m_subtimer = machine.scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
+	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
+	if(state->m_type != SYS_FM7)
+		state->m_fm77av_vsync_timer = machine.scheduler().timer_alloc(FUNC(fm77av_vsync));
 	device_set_irq_callback(machine.device("maincpu"),fm7_irq_ack);
 	device_set_irq_callback(machine.device("sub"),fm7_sub_irq_ack);
 }
@@ -1714,8 +1714,8 @@ static MACHINE_START(fm7)
 	RAM[0xfffe] = 0xfe;
 	RAM[0xffff] = 0x00;
 
-	memset(state->shared_ram,0xff,0x80);
-	state->type = SYS_FM7;
+	memset(state->m_shared_ram,0xff,0x80);
+	state->m_type = SYS_FM7;
 
 	beep_set_frequency(machine.device("beeper"),1200);
 	beep_set_state(machine.device("beeper"),0);
@@ -1727,18 +1727,18 @@ static MACHINE_START(fm77av)
 	UINT8* RAM = machine.region("maincpu")->base();
 	UINT8* ROM = machine.region("init")->base();
 
-	memset(state->shared_ram,0xff,0x80);
+	memset(state->m_shared_ram,0xff,0x80);
 
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 
-	state->video.subrom = 0;  // default sub CPU ROM is type C.
+	state->m_video.subrom = 0;  // default sub CPU ROM is type C.
 	RAM = machine.region("subsyscg")->base();
 	memory_set_bankptr(machine,"bank20",RAM);
 	RAM = machine.region("subsys_c")->base();
 	memory_set_bankptr(machine,"bank21",RAM+0x800);
 
-	state->type = SYS_FM77AV;
+	state->m_type = SYS_FM77AV;
 	beep_set_frequency(machine.device("beeper"),1200);
 	beep_set_state(machine.device("beeper"),0);
 }
@@ -1749,43 +1749,43 @@ static MACHINE_RESET(fm7)
 	UINT8* RAM = machine.region("maincpu")->base();
 	UINT8* ROM = machine.region("init")->base();
 
-	state->timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
-	state->subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
-	state->keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
-	if(state->type != SYS_FM7)
-		state->fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
+	state->m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
+	state->m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
+	state->m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
+	if(state->m_type != SYS_FM7)
+		state->m_fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
 
-	state->irq_mask = 0x00;
-	state->irq_flags = 0x00;
-	state->video.attn_irq = 0;
-	state->video.sub_busy = 0x80;  // busy at reset
-	state->basic_rom_en = 1;  // enabled at reset
-	if(state->type == SYS_FM7)
-		state->init_rom_en = 0;
+	state->m_irq_mask = 0x00;
+	state->m_irq_flags = 0x00;
+	state->m_video.attn_irq = 0;
+	state->m_video.sub_busy = 0x80;  // busy at reset
+	state->m_basic_rom_en = 1;  // enabled at reset
+	if(state->m_type == SYS_FM7)
+		state->m_init_rom_en = 0;
 	else
 	{
-		state->init_rom_en = 1;
+		state->m_init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 		memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 	}
-	if(state->type == SYS_FM7)
+	if(state->m_type == SYS_FM7)
 		memory_set_bankptr(machine,"bank1",RAM+0x38000);
-	state->key_delay = 700;  // 700ms on FM-7
-	state->key_repeat = 70;  // 70ms on FM-7
-	state->break_flag = 0;
-	state->key_scan_mode = KEY_MODE_FM7;
-	state->psg_regsel = 0;
-	state->psg_data = 0;
-	state->fdc_side = 0;
-	state->fdc_drive = 0;
-	state->mmr.mode = 0;
-	state->mmr.segment = 0;
-	state->mmr.enabled = 0;
-	state->fm77av_ym_irq = 0;
-	state->encoder.latch = 1;
-	state->encoder.ack = 1;
+	state->m_key_delay = 700;  // 700ms on FM-7
+	state->m_key_repeat = 70;  // 70ms on FM-7
+	state->m_break_flag = 0;
+	state->m_key_scan_mode = KEY_MODE_FM7;
+	state->m_psg_regsel = 0;
+	state->m_psg_data = 0;
+	state->m_fdc_side = 0;
+	state->m_fdc_drive = 0;
+	state->m_mmr.mode = 0;
+	state->m_mmr.segment = 0;
+	state->m_mmr.enabled = 0;
+	state->m_fm77av_ym_irq = 0;
+	state->m_encoder.latch = 1;
+	state->m_encoder.ack = 1;
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
-	if(state->type == SYS_FM7)
+	if(state->m_type == SYS_FM7)
 	{
 		if(!(input_port_read(machine,"DSW") & 0x02))
 		{  // DOS mode
@@ -1796,7 +1796,7 @@ static MACHINE_RESET(fm7)
 			memory_set_bankptr(machine,"bank17",machine.region("basic")->base());
 		}
 	}
-	if(state->type != SYS_FM7)  // set default RAM banks
+	if(state->m_type != SYS_FM7)  // set default RAM banks
 	{
 		fm7_mmr_refresh(machine.device("maincpu")->memory().space(AS_PROGRAM));
 	}

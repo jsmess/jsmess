@@ -573,13 +573,13 @@ static WRITE8_DEVICE_HANDLER( pia_pa_w )
 	crvision_state *state = device->machine().driver_data<crvision_state>();
 
 	/* keyboard raster */
-	state->keylatch = ~data & 0x0f;
+	state->m_keylatch = ~data & 0x0f;
 
 	/* cassette motor */
-	cassette_change_state(state->cassette, BIT(data, 6) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->m_cassette, BIT(data, 6) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette data output */
-	cassette_output(state->cassette, BIT(data, 7) ? +1.0 : -1.0);
+	cassette_output(state->m_cassette, BIT(data, 7) ? +1.0 : -1.0);
 }
 
 static UINT8 read_keyboard(running_machine &machine, int pa)
@@ -627,7 +627,7 @@ static READ8_DEVICE_HANDLER( pia_pa_r )
 
 	UINT8 data = 0x7f;
 
-	if (cassette_input(state->cassette) > -0.1469) data |= 0x80;
+	if (cassette_input(state->m_cassette) > -0.1469) data |= 0x80;
 
 	return data;
 }
@@ -651,10 +651,10 @@ static READ8_DEVICE_HANDLER( pia_pb_r )
 
 	UINT8 data = 0xff;
 
-	if (BIT(state->keylatch, 0)) data &= read_keyboard(device->machine(), 0);
-	if (BIT(state->keylatch, 1)) data &= read_keyboard(device->machine(), 1);
-	if (BIT(state->keylatch, 2)) data &= read_keyboard(device->machine(), 2);
-	if (BIT(state->keylatch, 3)) data &= read_keyboard(device->machine(), 3);
+	if (BIT(state->m_keylatch, 0)) data &= read_keyboard(device->machine(), 0);
+	if (BIT(state->m_keylatch, 1)) data &= read_keyboard(device->machine(), 1);
+	if (BIT(state->m_keylatch, 2)) data &= read_keyboard(device->machine(), 2);
+	if (BIT(state->m_keylatch, 3)) data &= read_keyboard(device->machine(), 3);
 
 	return data;
 }
@@ -698,14 +698,14 @@ static READ8_DEVICE_HANDLER( lasr2001_pia_pa_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(state->keylatch, 0)) data &= input_port_read(device->machine(), "ROW0");
-	if (!BIT(state->keylatch, 1)) data &= input_port_read(device->machine(), "ROW1");
-	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine(), "ROW2");
-	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine(), "ROW3");
-	if (!BIT(state->keylatch, 4)) data &= input_port_read(device->machine(), "ROW4");
-	if (!BIT(state->keylatch, 5)) data &= input_port_read(device->machine(), "ROW5");
-	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine(), "ROW6");
-	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine(), "ROW7");
+	if (!BIT(state->m_keylatch, 0)) data &= input_port_read(device->machine(), "ROW0");
+	if (!BIT(state->m_keylatch, 1)) data &= input_port_read(device->machine(), "ROW1");
+	if (!BIT(state->m_keylatch, 2)) data &= input_port_read(device->machine(), "ROW2");
+	if (!BIT(state->m_keylatch, 3)) data &= input_port_read(device->machine(), "ROW3");
+	if (!BIT(state->m_keylatch, 4)) data &= input_port_read(device->machine(), "ROW4");
+	if (!BIT(state->m_keylatch, 5)) data &= input_port_read(device->machine(), "ROW5");
+	if (!BIT(state->m_keylatch, 6)) data &= input_port_read(device->machine(), "ROW6");
+	if (!BIT(state->m_keylatch, 7)) data &= input_port_read(device->machine(), "ROW7");
 
 	return data;
 }
@@ -725,7 +725,7 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pa_w )
 
 	crvision_state *state = device->machine().driver_data<crvision_state>();
 
-	state->joylatch = data;
+	state->m_joylatch = data;
 }
 
 static READ8_DEVICE_HANDLER( lasr2001_pia_pb_r )
@@ -734,10 +734,10 @@ static READ8_DEVICE_HANDLER( lasr2001_pia_pb_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(state->joylatch, 0)) data &= input_port_read(device->machine(), "JOY0");
-	if (!BIT(state->joylatch, 1)) data &= input_port_read(device->machine(), "JOY1");
-	if (!BIT(state->joylatch, 2)) data &= input_port_read(device->machine(), "JOY2");
-	if (!BIT(state->joylatch, 3)) data &= input_port_read(device->machine(), "JOY3");
+	if (!BIT(state->m_joylatch, 0)) data &= input_port_read(device->machine(), "JOY0");
+	if (!BIT(state->m_joylatch, 1)) data &= input_port_read(device->machine(), "JOY1");
+	if (!BIT(state->m_joylatch, 2)) data &= input_port_read(device->machine(), "JOY2");
+	if (!BIT(state->m_joylatch, 3)) data &= input_port_read(device->machine(), "JOY3");
 
 	return data;
 }
@@ -760,7 +760,7 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
 	crvision_state *state = device->machine().driver_data<crvision_state>();
 
 	/* keyboard latch */
-	state->keylatch = data;
+	state->m_keylatch = data;
 
 	/* centronics data */
 	centronics_data_w(device, 0, data);
@@ -781,7 +781,7 @@ static READ_LINE_DEVICE_HANDLER( lasr2001_pia_cb1_r )
 	crvision_state *state = device->machine().driver_data<crvision_state>();
 
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
-	return sn76496_ready_r(state->psg) & (centronics_not_busy_r(state->centronics) | pia6821_get_output_ca2_z(device));
+	return sn76496_ready_r(state->m_psg) & (centronics_not_busy_r(state->m_centronics) | pia6821_get_output_ca2_z(device));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
@@ -790,11 +790,11 @@ static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
 
 	if (pia6821_get_output_ca2_z(device))
 	{
-		if (!state) sn76496_w(driver_state->psg, 0, driver_state->keylatch);
+		if (!state) sn76496_w(driver_state->m_psg, 0, driver_state->m_keylatch);
 	}
 	else
 	{
-		centronics_strobe_w(driver_state->centronics, state);
+		centronics_strobe_w(driver_state->m_centronics, state);
 	}
 }
 
@@ -879,12 +879,12 @@ static MACHINE_START( creativision )
 	crvision_state *state = machine.driver_data<crvision_state>();
 
 	/* find devices */
-	state->psg = machine.device(SN76489_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
-	state->centronics = machine.device(CENTRONICS_TAG);
+	state->m_psg = machine.device(SN76489_TAG);
+	state->m_cassette = machine.device(CASSETTE_TAG);
+	state->m_centronics = machine.device(CENTRONICS_TAG);
 
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->m_keylatch));
 }
 
 /*-------------------------------------------------

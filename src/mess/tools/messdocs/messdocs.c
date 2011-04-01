@@ -176,11 +176,11 @@ static void ATTR_PRINTF(3,4) process_error(struct messdocs_state *state, const c
 	}
 	else
 	{
-		msg = XML_ErrorString(XML_GetErrorCode(state->parser));
+		msg = XML_ErrorString(XML_GetErrorCode(state->m_parser));
 	}
 
-	fprintf(stderr, "%u:%s:%s\n", (unsigned) XML_GetCurrentLineNumber(state->parser), tag ? tag : "", msg);
-	state->error = 1;
+	fprintf(stderr, "%u:%s:%s\n", (unsigned) XML_GetCurrentLineNumber(state->m_parser), tag ? tag : "", msg);
+	state->m_error = 1;
 }
 
 
@@ -354,7 +354,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 
 	struct messdocs_state *state = (struct messdocs_state *) data;
 
-	if (state->depth == 0)
+	if (state->m_depth == 0)
 	{
 		/* help tag */
 		if (strcmp(tagname, "help"))
@@ -365,7 +365,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 
 		title = find_attribute(attributes, "title");
 		if (title)
-			state->title = pool_strdup_lib(state->pool, title);
+			state->m_title = pool_strdup_lib(state->m_pool, title);
 	}
 	else if (!strcmp(tagname, "topic"))
 	{
@@ -374,31 +374,31 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 		filepath = find_attribute(attributes, "filepath");
 
 		/* output TOC info */
-		fprintf(state->chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
-		fprintf(state->chm_toc, "\t\t<param name=\"Name\"  value=\"%s\">\n", name);
-		fprintf(state->chm_toc, "\t\t<param name=\"Local\" value=\"%s\">\n", filepath);
-		fprintf(state->chm_toc, "\t\t</OBJECT>\n");
+		fprintf(state->m_chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
+		fprintf(state->m_chm_toc, "\t\t<param name=\"Name\"  value=\"%s\">\n", name);
+		fprintf(state->m_chm_toc, "\t\t<param name=\"Local\" value=\"%s\">\n", filepath);
+		fprintf(state->m_chm_toc, "\t\t</OBJECT>\n");
 
 		/* copy file */
-		copy_file_to_dest(state->dest_dir, state->toc_dir, filepath);
+		copy_file_to_dest(state->m_dest_dir, state->m_toc_dir, filepath);
 
-		if (!state->default_topic)
-			state->default_topic = pool_strdup_lib(state->pool, filepath);
+		if (!state->m_default_topic)
+			state->m_default_topic = pool_strdup_lib(state->m_pool, filepath);
 	}
 	else if (!strcmp(tagname, "folder"))
 	{
 		/* folder tag */
 		name = find_attribute(attributes, "text");
-		fprintf(state->chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
-		fprintf(state->chm_toc, "\t\t<param name=\"Name\" value=\"%s\">\n", name);
-		fprintf(state->chm_toc, "\t\t</OBJECT>\n");
-		fprintf(state->chm_toc, "\t\t<UL>\n");
+		fprintf(state->m_chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
+		fprintf(state->m_chm_toc, "\t\t<param name=\"Name\" value=\"%s\">\n", name);
+		fprintf(state->m_chm_toc, "\t\t</OBJECT>\n");
+		fprintf(state->m_chm_toc, "\t\t<UL>\n");
 	}
 	else if (!strcmp(tagname, "file"))
 	{
 		/* file tag */
 		filepath = find_attribute(attributes, "filepath");
-		copy_file_to_dest(state->dest_dir, state->toc_dir, filepath);
+		copy_file_to_dest(state->m_dest_dir, state->m_toc_dir, filepath);
 	}
 	else if (!strcmp(tagname, "datfile"))
 	{
@@ -407,7 +407,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 		destpath = find_attribute(attributes, "destpath");
 		datfile_foldername = find_attribute(attributes, "text");
 
-		datfile_path = make_path(state->toc_dir, srcpath);
+		datfile_path = make_path(state->m_toc_dir, srcpath);
 		datfile = fopen(datfile_path, "r");
 		if (!datfile)
 		{
@@ -415,7 +415,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 			return;
 		}
 
-		snprintf(buf, ARRAY_LENGTH(buf), "%s", state->dest_dir);
+		snprintf(buf, ARRAY_LENGTH(buf), "%s", state->m_dest_dir);
 		combine_path(buf, ARRAY_LENGTH(buf), destpath);
 		osd_mkdir(buf);
 
@@ -439,16 +439,16 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 					s = strchr(buf, '=');
 					s = s ? s + 1 : &buf[strlen(buf)];
 
-					sysinfo_array = (system_info*)pool_realloc_lib(state->pool, sysinfo_array, sizeof(*sysinfo_array) * (sys_count + 1));
+					sysinfo_array = (system_info*)pool_realloc_lib(state->m_pool, sysinfo_array, sizeof(*sysinfo_array) * (sys_count + 1));
 					if (!sysinfo_array)
 						goto outofmemory;
-					sysinfo_array[sys_count].name = pool_strdup_lib(state->pool, s);
+					sysinfo_array[sys_count].name = pool_strdup_lib(state->m_pool, s);
 					sysinfo_array[sys_count].desc = NULL;
 
 					sysname = sysinfo_array[sys_count].name;
 					sys_count++;
 
-					snprintf(sysfilename, sizeof(sysfilename), "%s%s%s%s%s.htm", state->dest_dir, PATH_SEPARATOR, destpath, PATH_SEPARATOR, s);
+					snprintf(sysfilename, sizeof(sysfilename), "%s%s%s%s%s.htm", state->m_dest_dir, PATH_SEPARATOR, destpath, PATH_SEPARATOR, s);
 
 					if (sysfile)
 						fclose(sysfile);
@@ -484,7 +484,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 					fprintf(sysfile, "<p><i>(directory: %s)</i></p>\n", sysname);
 
 					if (!sysinfo_array[sys_count-1].desc)
-						sysinfo_array[sys_count-1].desc = pool_strdup_lib(state->pool, heading);
+						sysinfo_array[sys_count-1].desc = pool_strdup_lib(state->m_pool, heading);
 
 					free(heading);
 				}
@@ -534,23 +534,23 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 		/* now write out all toc */
 		qsort(sysinfo_array, sys_count, sizeof(*sysinfo_array), str_compare);
 
-		fprintf(state->chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
-		fprintf(state->chm_toc, "\t\t<param name=\"Name\" value=\"%s\">\n", datfile_foldername);
-		fprintf(state->chm_toc, "\t\t</OBJECT>\n");
-		fprintf(state->chm_toc, "\t\t<UL>\n");
+		fprintf(state->m_chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
+		fprintf(state->m_chm_toc, "\t\t<param name=\"Name\" value=\"%s\">\n", datfile_foldername);
+		fprintf(state->m_chm_toc, "\t\t</OBJECT>\n");
+		fprintf(state->m_chm_toc, "\t\t<UL>\n");
 
 		for (i = 0; i < sys_count; i++)
 		{
-			fprintf(state->chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
-			fprintf(state->chm_toc, "\t\t<param name=\"Name\" value=\"%s\">\n", sysinfo_array[i].desc);
-			fprintf(state->chm_toc, "\t\t<param name=\"Local\" value=\"%s%s%s.htm\">\n", destpath, PATH_SEPARATOR, sysinfo_array[i].name);
-			fprintf(state->chm_toc, "\t\t</OBJECT>\n");
+			fprintf(state->m_chm_toc, "\t<LI> <OBJECT type=\"text/sitemap\">\n");
+			fprintf(state->m_chm_toc, "\t\t<param name=\"Name\" value=\"%s\">\n", sysinfo_array[i].desc);
+			fprintf(state->m_chm_toc, "\t\t<param name=\"Local\" value=\"%s%s%s.htm\">\n", destpath, PATH_SEPARATOR, sysinfo_array[i].name);
+			fprintf(state->m_chm_toc, "\t\t</OBJECT>\n");
 		}
 
-		fprintf(state->chm_toc, "\t\t</UL>\n");
+		fprintf(state->m_chm_toc, "\t\t</UL>\n");
 	}
 
-	state->depth++;
+	state->m_depth++;
 
 outofmemory:
 	if (datfile_path)
@@ -567,11 +567,11 @@ static void end_handler(void *data, const XML_Char *name)
 {
 	struct messdocs_state *state = (struct messdocs_state *) data;
 
-	state->depth--;
+	state->m_depth--;
 
 	if (!strcmp(name, "folder"))
 	{
-		fprintf(state->chm_toc, "\t</UL>\n");
+		fprintf(state->m_chm_toc, "\t</UL>\n");
 	}
 }
 

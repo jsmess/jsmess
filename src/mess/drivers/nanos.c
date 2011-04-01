@@ -24,10 +24,10 @@ public:
 	nanos_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	const UINT8 *FNT;
-	UINT8 key_command;
-	UINT8 last_code;
-	UINT8 key_pressed;
+	const UINT8 *m_FNT;
+	UINT8 m_key_command;
+	UINT8 m_last_code;
+	UINT8 m_key_pressed;
 };
 
 
@@ -241,7 +241,7 @@ INPUT_PORTS_END
 static VIDEO_START( nanos )
 {
 	nanos_state *state = machine.driver_data<nanos_state>();
-	state->FNT = machine.region("gfx1")->base();
+	state->m_FNT = machine.region("gfx1")->base();
 }
 
 static SCREEN_UPDATE( nanos )
@@ -266,7 +266,7 @@ static SCREEN_UPDATE( nanos )
 					chr = ram_get_ptr(screen->machine().device(RAM_TAG))[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->FNT[(chr<<3) | ra ];
+					gfx = state->m_FNT[(chr<<3) | ra ];
 				}
 				else
 					gfx = 0;
@@ -291,11 +291,11 @@ static READ8_DEVICE_HANDLER (nanos_port_a_r)
 {
 	nanos_state *state = device->machine().driver_data<nanos_state>();
 	UINT8 retVal;
-	if (state->key_command==0)  {
-		return state->key_pressed;
+	if (state->m_key_command==0)  {
+		return state->m_key_pressed;
 	} else {
-		retVal = state->last_code;
-		state->last_code = 0;
+		retVal = state->m_last_code;
+		state->m_last_code = 0;
 		return retVal;
 	}
 }
@@ -309,7 +309,7 @@ static READ8_DEVICE_HANDLER (nanos_port_b_r)
 static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 {
 	nanos_state *state = device->machine().driver_data<nanos_state>();
-	state->key_command = BIT(data,1);
+	state->m_key_command = BIT(data,1);
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine(), "bank1", device->machine().region("maincpu")->base());
 	} else {
@@ -338,7 +338,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	UINT8 key_code = 0;
 	UINT8 shift = input_port_read(timer.machine(), "LINEC") & 0x02 ? 1 : 0;
 	UINT8 ctrl =  input_port_read(timer.machine(), "LINEC") & 0x01 ? 1 : 0;
-	state->key_pressed = 0xff;
+	state->m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
 
@@ -404,18 +404,18 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 					case 7: key_code = 0x0A; break; // LF
 				}
 			}
-			state->last_code = key_code;
+			state->m_last_code = key_code;
 		}
 	}
 	if (key_code==0){
-		state->key_pressed = 0xf7;
+		state->m_key_pressed = 0xf7;
 	}
 }
 
 static MACHINE_START(nanos)
 {
 	nanos_state *state = machine.driver_data<nanos_state>();
-	state->key_pressed = 0xff;
+	state->m_key_pressed = 0xff;
 }
 
 static MACHINE_RESET(nanos)

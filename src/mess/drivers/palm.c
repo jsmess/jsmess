@@ -23,8 +23,8 @@ public:
 	palm_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 port_f_latch;
-	UINT16 spim_data;
+	UINT8 m_port_f_latch;
+	UINT16 m_spim_data;
 };
 
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -59,7 +59,7 @@ static INPUT_CHANGED( button_check )
 static WRITE8_DEVICE_HANDLER( palm_port_f_out )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-    state->port_f_latch = data;
+    state->m_port_f_latch = data;
 }
 
 static READ8_DEVICE_HANDLER( palm_port_c_in )
@@ -70,19 +70,19 @@ static READ8_DEVICE_HANDLER( palm_port_c_in )
 static READ8_DEVICE_HANDLER( palm_port_f_in )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-    return state->port_f_latch;
+    return state->m_port_f_latch;
 }
 
 static WRITE16_DEVICE_HANDLER( palm_spim_out )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-    state->spim_data = data;
+    state->m_spim_data = data;
 }
 
 static READ16_DEVICE_HANDLER( palm_spim_in )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-    return state->spim_data;
+    return state->m_spim_data;
 }
 
 static void palm_spim_exchange( device_t *device )
@@ -91,14 +91,14 @@ static void palm_spim_exchange( device_t *device )
     UINT8 x = input_port_read(device->machine(), "PENX");
     UINT8 y = input_port_read(device->machine(), "PENY");
 
-    switch( state->port_f_latch & 0x0f )
+    switch( state->m_port_f_latch & 0x0f )
     {
         case 0x06:
-            state->spim_data = (0xff - x) * 2;
+            state->m_spim_data = (0xff - x) * 2;
             break;
 
         case 0x09:
-            state->spim_data = (0xff - y) * 2;
+            state->m_spim_data = (0xff - y) * 2;
             break;
     }
 }
@@ -111,8 +111,8 @@ static MACHINE_START( palm )
     space->install_write_bank(0x000000, ram_get_size(machine.device(RAM_TAG)) - 1, ram_get_size(machine.device(RAM_TAG)) - 1, 0, "bank1");
     memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 
-    state->save_item(NAME(state->port_f_latch));
-    state->save_item(NAME(state->spim_data));
+    state->save_item(NAME(state->m_port_f_latch));
+    state->save_item(NAME(state->m_spim_data));
 	if (machine.device<cpu_device>("maincpu")->debug()) {
 		machine.device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
 	}

@@ -43,7 +43,7 @@
 
 INLINE UINT32 effective_a2(apple2_state *state)
 {
-	return state->flags & state->a2_videomask;
+	return state->m_flags & state->m_a2_videomask;
 }
 
 
@@ -94,17 +94,17 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t *bitma
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int x, y, i;
-	int fg = state->fgcolor;
-	int bg = state->bgcolor;
+	int fg = state->m_fgcolor;
+	int bg = state->m_bgcolor;
 	const UINT8 *chardata;
 	UINT16 color;
 
 	if (my_a2 & VAR_ALTCHARSET)
 	{
 		/* we're using an alternate charset */
-		code |= state->alt_charset_value;
+		code |= state->m_alt_charset_value;
 	}
-	else if (state->flash && (code >= 0x40) && (code <= 0x7f))
+	else if (state->m_flash && (code >= 0x40) && (code <= 0x7f))
 	{
 		/* we're flashing; swap */
 		i = fg;
@@ -159,14 +159,14 @@ static void apple2_text_draw(running_machine &machine, bitmap_t *bitmap, const r
 
 			if (my_a2 & VAR_80COL)
 			{
-				apple2_plot_text_character(machine, bitmap, col * 14 + 0, row, 1, state->a2_videoram[address + 0x10000],
+				apple2_plot_text_character(machine, bitmap, col * 14 + 0, row, 1, state->m_a2_videoram[address + 0x10000],
 					textgfx_data, textgfx_datalen, my_a2);
-				apple2_plot_text_character(machine, bitmap, col * 14 + 7, row, 1, state->a2_videoram[address + 0x00000],
+				apple2_plot_text_character(machine, bitmap, col * 14 + 7, row, 1, state->m_a2_videoram[address + 0x00000],
 					textgfx_data, textgfx_datalen, my_a2);
 			}
 			else
 			{
-				apple2_plot_text_character(machine, bitmap, col * 14, row, 2, state->a2_videoram[address],
+				apple2_plot_text_character(machine, bitmap, col * 14, row, 2, state->m_a2_videoram[address],
 					textgfx_data, textgfx_datalen, my_a2);
 			}
 		}
@@ -197,7 +197,7 @@ static void apple2_lores_draw(running_machine &machine, bitmap_t *bitmap, const 
 			address = start_address + compute_video_address(col, row / 8);
 
 			/* perform the lookup */
-			code = state->a2_videoram[address];
+			code = state->m_a2_videoram[address];
 
 			/* and now draw */
 			for (y = 0; y < 4; y++)
@@ -240,7 +240,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 	if (endrow < beginrow)
 		return;
 
-	vram		= state->a2_videoram + (page ? 0x4000 : 0x2000);
+	vram		= state->m_a2_videoram + (page ? 0x4000 : 0x2000);
 	columns		= ((effective_a2(state) & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
 	vram_row[0] = 0;
@@ -280,7 +280,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 			switch(columns)
 			{
 				case 40:
-					artifact_map_ptr = &state->hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+					artifact_map_ptr = &state->m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
 					for (b = 0; b < 7; b++)
 					{
 						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
@@ -292,7 +292,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 				case 80:
 					for (b = 0; b < 7; b++)
 					{
-						v = state->dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+						v = state->m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 						*(p++) = v;
 					}
 					break;
@@ -332,18 +332,18 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 		PURPLE,		LTBLUE,		PINK,	WHITE
 	};
 
-	state->fgcolor = 15;
-	state->bgcolor = 0;
-	state->flash = 0;
+	state->m_fgcolor = 15;
+	state->m_bgcolor = 0;
+	state->m_flash = 0;
 	apple2_font = machine.region("gfx1")->base();
-	state->alt_charset_value = machine.region("gfx1")->bytes() / 16;
-	state->a2_videoram = vram;
+	state->m_alt_charset_value = machine.region("gfx1")->bytes() / 16;
+	state->m_a2_videoram = vram;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	state->hires_artifact_map = auto_alloc_array(machine, UINT16, 8 * 2 * 2);
+	state->m_hires_artifact_map = auto_alloc_array(machine, UINT16, 8 * 2 * 2);
 
 	/* 2^4 dependent pixels */
-	state->dhires_artifact_map = auto_alloc_array(machine, UINT16, 16);
+	state->m_dhires_artifact_map = auto_alloc_array(machine, UINT16, 16);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)
@@ -364,8 +364,8 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 				else
 					c = 0;
 			}
-			state->hires_artifact_map[ 0 + j*8 + i] = hires_artifact_color_table[(c + 0) % hires_modulo];
-			state->hires_artifact_map[16 + j*8 + i] = hires_artifact_color_table[(c + 4) % hires_modulo];
+			state->m_hires_artifact_map[ 0 + j*8 + i] = hires_artifact_color_table[(c + 0) % hires_modulo];
+			state->m_hires_artifact_map[16 + j*8 + i] = hires_artifact_color_table[(c + 4) % hires_modulo];
 		}
 	}
 
@@ -397,11 +397,11 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 	/* build double hires artifact map */
 	for (i = 0; i < 16; i++)
 	{
-		state->dhires_artifact_map[i] = dhires_artifact_color_table[i];
+		state->m_dhires_artifact_map[i] = dhires_artifact_color_table[i];
 	}
 
-	memset(&state->old_a2, 0, sizeof(state->old_a2));
-	state->a2_videomask = ~ignored_softswitches;
+	memset(&state->m_old_a2, 0, sizeof(state->m_old_a2));
+	state->m_a2_videomask = ~ignored_softswitches;
 }
 
 
@@ -412,8 +412,8 @@ VIDEO_START( apple2 )
 	apple2_video_start(machine, ram_get_ptr(machine.device(RAM_TAG)), ram_get_size(machine.device(RAM_TAG)), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
-	state->fgcolor = 0;
-	state->bgcolor = 15;
+	state->m_fgcolor = 0;
+	state->m_bgcolor = 15;
 }
 
 
@@ -423,8 +423,8 @@ VIDEO_START( apple2p )
 	apple2_video_start(machine, ram_get_ptr(machine.device(RAM_TAG)), ram_get_size(machine.device(RAM_TAG)), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
-	state->fgcolor = 0;
-	state->bgcolor = 15;
+	state->m_fgcolor = 0;
+	state->m_bgcolor = 15;
 }
 
 
@@ -441,8 +441,8 @@ SCREEN_UPDATE( apple2 )
 	UINT32 new_a2;
 	running_machine &machine = screen->machine();
 
-	/* calculate the state->flash value */
-	state->flash = ((screen->machine().time() * 4).seconds & 1) ? 1 : 0;
+	/* calculate the state->m_flash value */
+	state->m_flash = ((screen->machine().time() * 4).seconds & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2(state);
@@ -450,9 +450,9 @@ SCREEN_UPDATE( apple2 )
 		new_a2 &= ~VAR_PAGE2;
 	new_a2 &= VAR_TEXT | VAR_MIXED | VAR_HIRES | VAR_DHIRES | VAR_80COL | VAR_PAGE2 | VAR_ALTCHARSET;
 
-	if (ALWAYS_REFRESH || (new_a2 != state->old_a2))
+	if (ALWAYS_REFRESH || (new_a2 != state->m_old_a2))
 	{
-		state->old_a2 = new_a2;
+		state->m_old_a2 = new_a2;
 	}
 
 	/* choose which page to use */

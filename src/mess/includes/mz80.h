@@ -13,13 +13,13 @@ public:
 	mz80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 mz80k_vertical;
-	UINT8 mz80k_cursor_cnt;
-	UINT8 mz80k_tempo_strobe;
-	UINT8 mz80k_8255_portc;
-	UINT8 mz80k_keyboard_line;
-	UINT8 speaker_level;
-	UINT8 prev_state;
+	UINT8 m_mz80k_vertical;
+	UINT8 m_mz80k_cursor_cnt;
+	UINT8 m_mz80k_tempo_strobe;
+	UINT8 m_mz80k_8255_portc;
+	UINT8 m_mz80k_keyboard_line;
+	UINT8 m_speaker_level;
+	UINT8 m_prev_state;
 };
 
 

@@ -17,17 +17,17 @@ public:
 	poly88_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	UINT8 *FNT;
-	UINT8 intr;
-	UINT8 last_code;
-	UINT8 int_vector;
-	emu_timer * cassette_timer;
-	emu_timer * usart_timer;
-	int previous_level;
-	int clk_level;
-	int clk_level_tape;
-	serial_connection cassette_serial_connection;
+	UINT8 *m_video_ram;
+	UINT8 *m_FNT;
+	UINT8 m_intr;
+	UINT8 m_last_code;
+	UINT8 m_int_vector;
+	emu_timer * m_cassette_timer;
+	emu_timer * m_usart_timer;
+	int m_previous_level;
+	int m_clk_level;
+	int m_clk_level_tape;
+	serial_connection m_cassette_serial_connection;
 };
 
 

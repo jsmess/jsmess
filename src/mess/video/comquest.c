@@ -13,7 +13,7 @@ SCREEN_UPDATE( comquest )
 	for (y=0; y<128;y++) {
 		for (x=0, j=0; j<8;j++,x+=8*4) {
 #if 0
-			drawgfx_opaque(bitmap, 0, machine.gfx[0], state->data[y][j],0,
+			drawgfx_opaque(bitmap, 0, machine.gfx[0], state->m_data[y][j],0,
 					0,0,x,y);
 #endif
 		}

@@ -34,7 +34,7 @@
 INTERRUPT_GEN( primo_vblank_interrupt )
 {
 	primo_state *state = device->machine().driver_data<primo_state>();
-	if (state->nmi)
+	if (state->m_nmi)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -48,7 +48,7 @@ static void primo_update_memory(running_machine &machine)
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	switch (state->port_FD & 0x03)
+	switch (state->m_port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
 			space->unmap_write(0x0000, 0x3fff);
@@ -67,7 +67,7 @@ static void primo_update_memory(running_machine &machine)
 			memory_set_bankptr(machine,"bank1", machine.region("maincpu")->base()+0x18000);
 			break;
 	}
-	logerror ("Memory update: %02x\n", state->port_FD);
+	logerror ("Memory update: %02x\n", state->m_port_FD);
 }
 
 /*******************************************************************************
@@ -138,7 +138,7 @@ WRITE8_HANDLER( primo_ki_1_w )
 	primo_state *state = space->machine().driver_data<primo_state>();
 	device_t *speaker = space->machine().device("speaker");
 	// bit 7 - NMI generator enable/disable
-	state->nmi = (data & 0x80) ? 1 : 0;
+	state->m_nmi = (data & 0x80) ? 1 : 0;
 
 	// bit 6 - joystick register shift (not emulated)
 
@@ -149,9 +149,9 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 	// bit 3 - display buffer
 	if (data & 0x08)
-		state->video_memory_base |= 0x2000;
+		state->m_video_memory_base |= 0x2000;
 	else
-		state->video_memory_base &= 0xdfff;
+		state->m_video_memory_base &= 0xdfff;
 
 	// bit 2 - V.24 (1) / tape control (not emulated)
 
@@ -201,7 +201,7 @@ WRITE8_HANDLER( primo_FD_w )
 	primo_state *state = space->machine().driver_data<primo_state>();
 	if (!input_port_read(space->machine(), "MEMORY_EXPANSION"))
 	{
-		state->port_FD = data;
+		state->m_port_FD = data;
 		primo_update_memory(space->machine());
 	}
 }
@@ -214,28 +214,28 @@ WRITE8_HANDLER( primo_FD_w )
 
 static void primo_common_driver_init (primo_state *state)
 {
-	state->port_FD = 0x00;
+	state->m_port_FD = 0x00;
 }
 
 DRIVER_INIT( primo32 )
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	primo_common_driver_init(state);
-	state->video_memory_base = 0x6800;
+	state->m_video_memory_base = 0x6800;
 }
 
 DRIVER_INIT( primo48 )
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	primo_common_driver_init(state);
-	state->video_memory_base = 0xa800;
+	state->m_video_memory_base = 0xa800;
 }
 
 DRIVER_INIT( primo64 )
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	primo_common_driver_init(state);
-	state->video_memory_base = 0xe800;
+	state->m_video_memory_base = 0xe800;
 }
 
 /*******************************************************************************
@@ -248,7 +248,7 @@ static void primo_common_machine_init (running_machine &machine)
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	if (input_port_read(machine, "MEMORY_EXPANSION"))
-		state->port_FD = 0x00;
+		state->m_port_FD = 0x00;
 	primo_update_memory(machine);
 	machine.device("maincpu")->set_clock_scale(input_port_read(machine, "CPU_CLOCK") ? 1.5 : 1.0);
 }
@@ -299,7 +299,7 @@ static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UIN
 	/* IO ports */
 
 	// KI-1 bit 7 - NMI generator enable/disable
-	state->nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
+	state->m_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
 
 	// KI-1 bit 4 - speaker
 	speaker_level_w(speaker, (snapshot_data[30]&0x10)>>4);

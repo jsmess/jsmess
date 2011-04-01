@@ -33,14 +33,14 @@ public:
 	apple1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int vh_clrscrn_pressed;
-	int kbd_data;
-	UINT32 kbd_last_scan[4];
-	int reset_flag;
-	int cassette_output_flipflop;
-	terminal_t *current_terminal;
-	terminal_t *terminal;
-	int blink_on;
+	int m_vh_clrscrn_pressed;
+	int m_kbd_data;
+	UINT32 m_kbd_last_scan[4];
+	int m_reset_flag;
+	int m_cassette_output_flipflop;
+	terminal_t *m_current_terminal;
+	terminal_t *m_terminal;
+	int m_blink_on;
 };
 
 

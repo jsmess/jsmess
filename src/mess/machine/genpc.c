@@ -47,13 +47,13 @@ WRITE8_DEVICE_HANDLER(pc_page_w)
 	switch(offset % 4)
 	{
 	case 1:
-		board->dma_offset[2] = data;
+		board->m_dma_offset[2] = data;
 		break;
 	case 2:
-		board->dma_offset[3] = data;
+		board->m_dma_offset[3] = data;
 		break;
 	case 3:
-		board->dma_offset[0] = board->dma_offset[1] = data;
+		board->m_dma_offset[0] = board->m_dma_offset[1] = data;
 		break;
 	}
 }
@@ -61,25 +61,25 @@ WRITE8_DEVICE_HANDLER(pc_page_w)
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
 {
-	device_set_input_line(maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( dma8237, state );
+	i8237_hlda_w( m_dma8237, state );
 }
 
 
 READ8_MEMBER( ibm5160_mb_device::pc_dma_read_byte )
 {	
-	address_space *spaceio = maincpu->space(AS_PROGRAM);
-	offs_t page_offset = (((offs_t) dma_offset[dma_channel]) << 16) & 0x0F0000;
+	address_space *spaceio = m_maincpu->space(AS_PROGRAM);
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
 	return spaceio->read_byte( page_offset + offset);
 }
 
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma_write_byte )
 {
-	address_space *spaceio = maincpu->space(AS_PROGRAM);
-	offs_t page_offset = (((offs_t) dma_offset[dma_channel]) << 16) & 0x0F0000;
+	address_space *spaceio = m_maincpu->space(AS_PROGRAM);
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
 
 	spaceio->write_byte( page_offset + offset, data);
 }
@@ -87,54 +87,54 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_dma_write_byte )
 
 READ8_MEMBER( ibm5160_mb_device::pc_dma8237_1_dack_r )
 {
-	return isabus->dack_r(1);
+	return m_isabus->dack_r(1);
 }
 
 READ8_MEMBER( ibm5160_mb_device::pc_dma8237_2_dack_r )
 {
-	return isabus->dack_r(2);
+	return m_isabus->dack_r(2);
 }
 
 
 READ8_MEMBER( ibm5160_mb_device::pc_dma8237_3_dack_r )
 {
-	return isabus->dack_r(3);
+	return m_isabus->dack_r(3);
 }
 
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_1_dack_w )
 {
-	isabus->dack_w(1,data);
+	m_isabus->dack_w(1,data);
 }
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_2_dack_w )
 {
-	isabus->dack_w(2,data);
+	m_isabus->dack_w(2,data);
 }
 
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_3_dack_w )
 {
-	isabus->dack_w(3,data);
+	m_isabus->dack_w(3,data);
 }
 
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_0_dack_w )
 {
-	u73_q2 = 0;
-	i8237_dreq0_w( dma8237, u73_q2 );
+	m_u73_q2 = 0;
+	i8237_dreq0_w( m_dma8237, m_u73_q2 );
 }
 
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
 {
-	return isabus->eop_w(state == ASSERT_LINE ? 0 : 1 );
+	return m_isabus->eop_w(state == ASSERT_LINE ? 0 : 1 );
 }
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack0_w ) { if (!state) dma_channel = 0; }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack1_w ) { if (!state) dma_channel = 1; }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack2_w ) { if (!state) dma_channel = 2; }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { if (!state) dma_channel = 3; }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack0_w ) { if (!state) m_dma_channel = 0; }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack1_w ) { if (!state) m_dma_channel = 1; }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack2_w ) { if (!state) m_dma_channel = 2; }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { if (!state) m_dma_channel = 3; }
 
 I8237_INTERFACE( pc_dma8237_config )
 {
@@ -169,7 +169,7 @@ I8237_INTERFACE( pc_dma8237_config )
  *************************************************************/
 WRITE_LINE_MEMBER(ibm5160_mb_device::pc_cpu_line)
 {
-	maincpu->set_input_line(INPUT_LINE_IRQ0, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 const struct pic8259_interface pc_pic8259_config =
@@ -180,8 +180,8 @@ const struct pic8259_interface pc_pic8259_config =
 
 WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 {
-	pc_spkrdata = state ? 1 : 0;
-	speaker_level_w( speaker, pc_spkrdata & pc_input );
+	m_pc_spkrdata = state ? 1 : 0;
+	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
 }
 
 
@@ -194,19 +194,19 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out1_changed )
 {
 	/* Trigger DMA channel #0 */
-	if ( out1 == 0 && state == 1 && u73_q2 == 0 )
+	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
 	{
-		u73_q2 = 1;
-		i8237_dreq0_w( dma8237, u73_q2 );
+		m_u73_q2 = 1;
+		i8237_dreq0_w( m_dma8237, m_u73_q2 );
 	}
-	out1 = state;
+	m_out1 = state;
 }
 
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 {
-	pc_input = state ? 1 : 0;
-	speaker_level_w( speaker, pc_spkrdata & pc_input );	
+	m_pc_input = state ? 1 : 0;
+	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );	
 }
 
 
@@ -287,47 +287,47 @@ const struct pit8253_config pc_pit8253_config =
  **********************************************************/
 WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 {
-	if ( ppi_clock_signal != state )
+	if ( m_ppi_clock_signal != state )
 	{
-		if ( ppi_keyb_clock && ppi_shift_enable )
+		if ( m_ppi_keyb_clock && m_ppi_shift_enable )
 		{
-			ppi_clock_signal = state;
-			if ( ! ppi_keyboard_clear )
+			m_ppi_clock_signal = state;
+			if ( ! m_ppi_keyboard_clear )
 			{
 				/* Data is clocked in on a high->low transition */
 				if ( ! state )
 				{
-					UINT8	trigger_irq = ppi_shift_register & 0x01;
+					UINT8	trigger_irq = m_ppi_shift_register & 0x01;
 
-					ppi_shift_register = ( ppi_shift_register >> 1 ) | ( ppi_data_signal << 7 );
+					m_ppi_shift_register = ( m_ppi_shift_register >> 1 ) | ( m_ppi_data_signal << 7 );
 					if ( trigger_irq )
 					{
-						pic8259_ir1_w(pic8259, 1);
-						ppi_shift_enable = 0;
-						ppi_clock_signal = 0;
-						devcb_call_write_line(&m_kb_set_clock_signal_func, ppi_clock_signal);
+						pic8259_ir1_w(m_pic8259, 1);
+						m_ppi_shift_enable = 0;
+						m_ppi_clock_signal = 0;
+						devcb_call_write_line(&m_kb_set_clock_signal_func, m_ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
 
-	devcb_call_write_line(&m_kb_set_clock_signal_func,ppi_clock_signal);
+	devcb_call_write_line(&m_kb_set_clock_signal_func,m_ppi_clock_signal);
 }
 
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_data_w )
 {
-	ppi_data_signal = state;
+	m_ppi_data_signal = state;
 
-	devcb_call_write_line(&m_kb_set_data_signal_func,ppi_data_signal);
+	devcb_call_write_line(&m_kb_set_data_signal_func,m_ppi_data_signal);
 }
 
 READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 {
 	int data = 0xFF;
 	/* KB port A */
-	if (ppi_keyboard_clear)
+	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
          *   1  Not used
@@ -342,7 +342,7 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 	}
 	else
 	{
-		data = ppi_shift_register;
+		data = m_ppi_shift_register;
 	}
     PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
     return data;
@@ -351,13 +351,13 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 
 READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( pit8253, 2 );
+	int timer2_output = pit8253_get_output( m_pit8253, 2 );
 	int data=0xff;
 
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
 	/* KB port C: equipment flags */
-	if (ppi_portc_switch_high)
+	if (m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
 		data = (data & 0xf0) | ((input_port_read(this, "DSW0") >> 4) & 0x0f);
@@ -370,7 +370,7 @@ READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
-	if ( ppi_portb & 0x01 )
+	if ( m_ppi_portb & 0x01 )
 	{
 		data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
 	}
@@ -383,22 +383,22 @@ READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 {
 	/* PPI controller port B*/
-	ppi_portb = data;
-	ppi_portc_switch_high = data & 0x08;
-	ppi_keyboard_clear = data & 0x80;
-	ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(pit8253, BIT(data, 0));
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x08;
+	m_ppi_keyboard_clear = data & 0x80;
+	m_ppi_keyb_clock = data & 0x40;
+	pit8253_gate2_w(m_pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	ppi_clock_signal = ( ppi_keyb_clock ) ? 1 : 0;
-	devcb_call_write_line(&m_kb_set_clock_signal_func,ppi_clock_signal);
+	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
+	devcb_call_write_line(&m_kb_set_clock_signal_func,m_ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
-	if ( ppi_keyboard_clear )
+	if ( m_ppi_keyboard_clear )
 	{
-		pic8259_ir1_w(pic8259, 0);
-		ppi_shift_register = 0;
-		ppi_shift_enable = 1;
+		pic8259_ir1_w(m_pic8259, 0);
+		m_ppi_shift_register = 0;
+		m_ppi_shift_enable = 1;
 	}
 }
 
@@ -439,7 +439,7 @@ static WRITE8_DEVICE_HANDLER( nmi_enable_w )
 {
 	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device);
 
-	board->nmi_enabled = data & 0x80;
+	board->m_nmi_enabled = data & 0x80;
 }
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -558,13 +558,13 @@ void ibm5160_mb_device_config::static_set_cputag(device_config *device, const ch
 ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb_device_config &config) :
         device_t(_machine, config),
         m_config(config),
-		maincpu(*(owner()), config.m_cputag),
-		pic8259(*this, "pic8259"),
-		dma8237(*this, "dma8237"),
-		pit8253(*this, "pit8253"),
-		ppi8255(*this, "ppi8255"),
-		speaker(*this, "speaker"),
-		isabus(*this, "isa")
+		m_maincpu(*(owner()), config.m_cputag),
+		m_pic8259(*this, "pic8259"),
+		m_dma8237(*this, "dma8237"),
+		m_pit8253(*this, "pit8253"),
+		m_ppi8255(*this, "ppi8255"),
+		m_speaker(*this, "speaker"),
+		m_isabus(*this, "isa")
 {
 }
  
@@ -574,10 +574,10 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 	switch(buswidth)
 	{
 		case 8:
-			maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0);
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0);
 			break;
 		case 16:
-			maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0xffff);
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0xffff);
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -591,10 +591,10 @@ void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t
 	switch(buswidth)
 	{
 		case 8:
-			maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0);
+			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0);
 			break;
 		case 16:
-			maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0xffff);
+			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0xffff);
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -636,10 +636,10 @@ void ibm5160_mb_device::device_start()
 	devcb_resolve_write_line(&m_kb_set_clock_signal_func, &m_config.m_kb_set_clock_signal_func, this);
 	devcb_resolve_write_line(&m_kb_set_data_signal_func,  &m_config.m_kb_set_data_signal_func,  this);
 
-	install_device(dma8237, 0x0000, 0x000f, 0, 0, i8237_r, i8237_w );	
-	install_device(pic8259, 0x0020, 0x0021, 0, 0, pic8259_r, pic8259_w );	
-	install_device(pit8253, 0x0040, 0x0043, 0, 0, pit8253_r, pit8253_w );	
-	install_device(ppi8255, 0x0060, 0x0063, 0, 0, i8255a_r, i8255a_w );	
+	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, i8237_r, i8237_w );	
+	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, pic8259_r, pic8259_w );	
+	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, pit8253_r, pit8253_w );	
+	install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, i8255a_r, i8255a_w );	
 	install_device(this,    0x0080, 0x0087, 0, 0, pc_page_r, pc_page_w );	
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, nmi_enable_w);	
 	/* MESS managed RAM */
@@ -660,25 +660,25 @@ IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
   
 void ibm5160_mb_device::device_reset()
 {
-	device_set_irq_callback(maincpu, pc_irq_callback);
+	device_set_irq_callback(m_maincpu, pc_irq_callback);
 
-	u73_q2 = 0;
-	out1 = 0;
-	pc_spkrdata = 0;
-	pc_input = 0;
-	dma_channel = 0;
-	memset(dma_offset,0,sizeof(dma_offset));
-	ppi_portc_switch_high = 0;
-	ppi_speaker = 0;
-	ppi_keyboard_clear = 0;
-	ppi_keyb_clock = 0;
-	ppi_portb = 0;
-	ppi_clock_signal = 0;
-	ppi_data_signal = 0;
-	ppi_shift_register = 0;
-	ppi_shift_enable = 0;
-	nmi_enabled = 0;
-	speaker_level_w( speaker, 0 );
+	m_u73_q2 = 0;
+	m_out1 = 0;
+	m_pc_spkrdata = 0;
+	m_pc_input = 0;
+	m_dma_channel = 0;
+	memset(m_dma_offset,0,sizeof(m_dma_offset));
+	m_ppi_portc_switch_high = 0;
+	m_ppi_speaker = 0;
+	m_ppi_keyboard_clear = 0;
+	m_ppi_keyb_clock = 0;
+	m_ppi_portb = 0;
+	m_ppi_clock_signal = 0;
+	m_ppi_data_signal = 0;
+	m_ppi_shift_register = 0;
+	m_ppi_shift_enable = 0;
+	m_nmi_enabled = 0;
+	speaker_level_w( m_speaker, 0 );
 }
 
 
@@ -771,7 +771,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 {
 	int data = 0xFF;
 	/* KB port A */
-	if (ppi_keyboard_clear)
+	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
          *   1  Not used
@@ -801,7 +801,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 	}
 	else
 	{
-		data = ppi_shift_register;
+		data = m_ppi_shift_register;
 	}
     PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
     return data;
@@ -810,13 +810,13 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 
 READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( pit8253, 2 );
+	int timer2_output = pit8253_get_output( m_pit8253, 2 );
 	int data=0xff;
 
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
 	/* KB port C: equipment flags */
-	if (ppi_portc_switch_high)
+	if (m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
@@ -851,7 +851,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
-	if ( ! ( ppi_portb & 0x08 ) )
+	if ( ! ( m_ppi_portb & 0x08 ) )
 	{
 		double tap_val = cassette_input(m_cassette);
 
@@ -866,7 +866,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 	}
 	else
 	{
-		if ( ppi_portb & 0x01 )
+		if ( m_ppi_portb & 0x01 )
 		{
 			data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
 		}
@@ -880,24 +880,24 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 {
 	/* KB controller port B */
-	ppi_portb = data;
-	ppi_portc_switch_high = data & 0x08;
-	ppi_keyboard_clear = data & 0x80;
-	ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(pit8253, BIT(data, 0));
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x08;
+	m_ppi_keyboard_clear = data & 0x80;
+	m_ppi_keyb_clock = data & 0x40;
+	pit8253_gate2_w(m_pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	cassette_change_state( m_cassette, ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
-	ppi_clock_signal = ( ppi_keyb_clock ) ? 1 : 0;
-		devcb_call_write_line(&m_kb_set_clock_signal_func,ppi_clock_signal);
+	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
+		devcb_call_write_line(&m_kb_set_clock_signal_func,m_ppi_clock_signal);
 
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
-	if ( ppi_keyboard_clear )
+	if ( m_ppi_keyboard_clear )
 	{
-		pic8259_ir1_w(pic8259, 0);
-		ppi_shift_register = 0;
-		ppi_shift_enable = 1;
+		pic8259_ir1_w(m_pic8259, 0);
+		m_ppi_shift_register = 0;
+		m_ppi_shift_enable = 1;
 	}
 }

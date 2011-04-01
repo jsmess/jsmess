@@ -29,10 +29,10 @@ public:
 	required_device<device_t> m_uart;
 	required_device<device_t> m_pic;
 
-	UINT8 infifo[32];			// input fifo
-	UINT8 infifo_tail_ptr;		// " tail
-	UINT8 infifo_head_ptr;		// " head
-	UINT8 paramReg;			// status leds and resets and etc
+	UINT8 m_infifo[32];			// input fifo
+	UINT8 m_infifo_tail_ptr;		// " tail
+	UINT8 m_infifo_head_ptr;		// " head
+	UINT8 m_paramReg;			// status leds and resets and etc
 
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(i8251_rxd);

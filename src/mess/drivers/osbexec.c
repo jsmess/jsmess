@@ -25,76 +25,76 @@ class osbexec_state : public driver_device
 public:
 	osbexec_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-			maincpu( *this, "maincpu" ),
-			mb8877( *this, "mb8877" ),
-			messram( *this, RAM_TAG ),
-			pia_0( *this, "pia_0" ),
-			pia_1( *this, "pia_1" ),
-			sio( *this, "sio" ),
-			speaker( *this, "speaker" )
+			m_maincpu( *this, "maincpu" ),
+			m_mb8877( *this, "mb8877" ),
+			m_messram( *this, RAM_TAG ),
+			m_pia_0( *this, "pia_0" ),
+			m_pia_1( *this, "pia_1" ),
+			m_sio( *this, "sio" ),
+			m_speaker( *this, "speaker" )
 	{ }
 
-	required_device<cpu_device>	maincpu;
-	required_device<device_t>	mb8877;
-	required_device<device_t>	messram;
-	required_device<pia6821_device>	pia_0;
-	required_device<pia6821_device>	pia_1;
-	required_device<z80dart_device>	sio;
-	required_device<device_t>	speaker;
+	required_device<cpu_device>	m_maincpu;
+	required_device<device_t>	m_mb8877;
+	required_device<device_t>	m_messram;
+	required_device<pia6821_device>	m_pia_0;
+	required_device<pia6821_device>	m_pia_1;
+	required_device<z80dart_device>	m_sio;
+	required_device<device_t>	m_speaker;
 
-	memory_region	*fontram_region;
-	memory_region *vram_region;
-	UINT8	*fontram;
-	UINT8	*vram;
-	UINT8	*ram_0000;
-	UINT8	*ram_c000;
-	UINT8	temp_attr;
-	emu_timer *video_timer;
+	memory_region	*m_fontram_region;
+	memory_region *m_vram_region;
+	UINT8	*m_fontram;
+	UINT8	*m_vram;
+	UINT8	*m_ram_0000;
+	UINT8	*m_ram_c000;
+	UINT8	m_temp_attr;
+	emu_timer *m_video_timer;
 
 	/* PIA 0 (UD12) */
-	UINT8	pia0_porta;
-	UINT8	pia0_portb;
-	int		pia0_irq_state;
-	int		pia0_cb2;			/* 60/50 */
+	UINT8	m_pia0_porta;
+	UINT8	m_pia0_portb;
+	int		m_pia0_irq_state;
+	int		m_pia0_cb2;			/* 60/50 */
 
 	/* PIA 1 (UD8) */
-	int		pia1_irq_state;
+	int		m_pia1_irq_state;
 
 	/* Vblank counter ("RTC") */
-	UINT8	rtc;
+	UINT8	m_rtc;
 
 	void set_banks(running_machine &machine)
 	{
-		UINT8 *ram_ptr = ram_get_ptr( messram );
+		UINT8 *ram_ptr = ram_get_ptr( m_messram );
 
-		ram_0000 = ram_ptr;
+		m_ram_0000 = ram_ptr;
 
-		if ( pia0_porta & 0x01 )
-			ram_0000 += 0x10000;
+		if ( m_pia0_porta & 0x01 )
+			m_ram_0000 += 0x10000;
 
-		memory_set_bankptr( machine, "0000", ram_0000 + 0x0000 );
-		memory_set_bankptr( machine, "2000", ram_0000 + 0x2000 );
-		memory_set_bankptr( machine, "4000", ram_0000 + 0x4000 );
-		ram_c000 = ram_0000 + 0xc000;
-		memory_set_bankptr( machine, "e000", ram_0000 + 0xe000 );
+		memory_set_bankptr( machine, "0000", m_ram_0000 + 0x0000 );
+		memory_set_bankptr( machine, "2000", m_ram_0000 + 0x2000 );
+		memory_set_bankptr( machine, "4000", m_ram_0000 + 0x4000 );
+		m_ram_c000 = m_ram_0000 + 0xc000;
+		memory_set_bankptr( machine, "e000", m_ram_0000 + 0xe000 );
 
-		if ( pia0_porta & 0x80 )
+		if ( m_pia0_porta & 0x80 )
 		{
 			memory_set_bankptr( machine, "0000", machine.region("maincpu")->base());
 			/* When BIOS is enabled 2000-3FFF is set to the "ROM RAM" */
 			memory_set_bankptr( machine, "2000", ram_ptr + 0x20000 );
 		}
 
-		if ( pia0_porta & 0x40 )
-			ram_c000 = vram_region->base();
+		if ( m_pia0_porta & 0x40 )
+			m_ram_c000 = m_vram_region->base();
 	}
 
 	void update_irq_state(running_machine &machine)
 	{
-		if ( pia0_irq_state || pia1_irq_state )
-			device_set_input_line( maincpu, 0, ASSERT_LINE );
+		if ( m_pia0_irq_state || m_pia1_irq_state )
+			device_set_input_line( m_maincpu, 0, ASSERT_LINE );
 		else
-			device_set_input_line( maincpu, 0, CLEAR_LINE );
+			device_set_input_line( m_maincpu, 0, CLEAR_LINE );
 	}
 };
 
@@ -104,14 +104,14 @@ static WRITE8_HANDLER( osbexec_0000_w )
 	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
 	/* Font RAM writing is enabled when ROM bank is enabled */
-	if ( state->pia0_porta & 0x80 )
+	if ( state->m_pia0_porta & 0x80 )
 	{
 		if ( offset < 0x1000 )
-			state->fontram[ offset ] = data;
+			state->m_fontram[ offset ] = data;
 	}
 	else
 	{
-		state->ram_0000[ offset ] = data;
+		state->m_ram_0000[ offset ] = data;
 	}
 }
 
@@ -119,11 +119,11 @@ static WRITE8_HANDLER( osbexec_0000_w )
 static READ8_HANDLER( osbexec_c000_r )
 {
 	osbexec_state *state = space->machine().driver_data<osbexec_state>();
-	UINT8	data = state->ram_c000[offset];
+	UINT8	data = state->m_ram_c000[offset];
 
-	if ( ( state->pia0_porta & 0x40 ) && offset < 0x1000 )
+	if ( ( state->m_pia0_porta & 0x40 ) && offset < 0x1000 )
 	{
-		state->temp_attr = state->ram_c000[ 0x1000 + offset ];
+		state->m_temp_attr = state->m_ram_c000[ 0x1000 + offset ];
 	}
 
 	return data;
@@ -134,11 +134,11 @@ static WRITE8_HANDLER( osbexec_c000_w )
 {
 	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
-	state->ram_c000[offset] = data;
+	state->m_ram_c000[offset] = data;
 
-	if ( ( state->pia0_porta & 0x40 ) && offset < 0x1000 )
+	if ( ( state->m_pia0_porta & 0x40 ) && offset < 0x1000 )
 	{
-		state->ram_c000[ 0x1000 + offset ] = state->temp_attr;
+		state->m_ram_c000[ 0x1000 + offset ] = state->m_temp_attr;
 	}
 }
 
@@ -179,7 +179,7 @@ static READ8_HANDLER( osbexec_rtc_r )
 {
 	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
-	return state->rtc;
+	return state->m_rtc;
 }
 
 
@@ -331,7 +331,7 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
 {
 	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
-	return state->pia0_porta;
+	return state->m_pia0_porta;
 }
 
 
@@ -341,7 +341,7 @@ static WRITE8_DEVICE_HANDLER( osbexec_pia0_a_w )
 
 	logerror("osbexec_pia0_a_w: %02x\n", data );
 
-	state->pia0_porta = data;
+	state->m_pia0_porta = data;
 
 	state->set_banks(device->machine());
 }
@@ -351,7 +351,7 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
 {
 	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
-	return state->pia0_portb;
+	return state->m_pia0_portb;
 }
 
 
@@ -359,21 +359,21 @@ static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
 {
 	osbexec_state *state = device->machine().driver_data<osbexec_state>();
 
-	state->pia0_portb = data;
+	state->m_pia0_portb = data;
 
-	speaker_level_w( state->speaker, ( data & 0x08 ) ? 0 : 1 );
+	speaker_level_w( state->m_speaker, ( data & 0x08 ) ? 0 : 1 );
 
 	switch ( data & 0x06 )
 	{
 	case 0x02:
-		wd17xx_set_drive( state->mb8877, 1 );
+		wd17xx_set_drive( state->m_mb8877, 1 );
 		break;
 	case 0x04:
-		wd17xx_set_drive( state->mb8877, 0 );
+		wd17xx_set_drive( state->m_mb8877, 0 );
 		break;
 	}
 
-	wd17xx_dden_w( state->mb8877, ( data & 0x01 ) ? 1 : 0 );
+	wd17xx_dden_w( state->m_mb8877, ( data & 0x01 ) ? 1 : 0 );
 }
 
 
@@ -387,7 +387,7 @@ static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_cb2_w )
 {
 	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
-	st->pia0_cb2 = state;
+	st->m_pia0_cb2 = state;
 }
 
 
@@ -395,7 +395,7 @@ static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_irq )
 {
 	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
-	st->pia0_irq_state = state;
+	st->m_pia0_irq_state = state;
 	st->update_irq_state(device->machine());
 }
 
@@ -421,7 +421,7 @@ static WRITE_LINE_DEVICE_HANDLER( osbexec_pia1_irq )
 {
 	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
-	st->pia1_irq_state = state;
+	st->m_pia1_irq_state = state;
 	st->update_irq_state(device->machine());
 }
 
@@ -539,13 +539,13 @@ static TIMER_CALLBACK( osbexec_video_callback )
 	if ( y == 0 )
 	{
 		/* Clear CB1 on PIA @ UD12 */
-		pia6821_cb1_w( state->pia_0, 0 );
+		pia6821_cb1_w( state->m_pia_0, 0 );
 	}
 	else if ( y == 240 )
 	{
 		/* Set CB1 on PIA @ UD12 */
-		pia6821_cb1_w( state->pia_0, 1 );
-		state->rtc++;
+		pia6821_cb1_w( state->m_pia_0, 1 );
+		state->m_rtc++;
 	}
 	if ( y < 240 )
 	{
@@ -555,17 +555,17 @@ static TIMER_CALLBACK( osbexec_video_callback )
 
 		for ( int x = 0; x < 80; x++ )
 		{
-			UINT8 ch = state->vram[ row_addr + x ];
-			UINT8 attr = state->vram[ 0x1000 + row_addr + x ];
+			UINT8 ch = state->m_vram[ row_addr + x ];
+			UINT8 attr = state->m_vram[ 0x1000 + row_addr + x ];
 			UINT8 fg_col = ( attr & 0x80 ) ? 1 : 2;
-			UINT8 font_bits = state->fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
+			UINT8 font_bits = state->m_fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
 
 			/* Check for underline */
 			if ( ( attr & 0x40 ) && char_line == 9 )
 				font_bits = 0xFF;
 
 			/* Check for blink */
-			if ( ( attr & 0x20 ) && ( state->rtc & 0x10 ) )
+			if ( ( attr & 0x20 ) && ( state->m_rtc & 0x10 ) )
 				font_bits = 0;
 
 			/* Check for inverse video */
@@ -580,7 +580,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 		}
 	}
 
-	state->video_timer->adjust( machine.primary_screen->time_until_pos( y + 1, 0 ) );
+	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( y + 1, 0 ) );
 }
 
 
@@ -588,16 +588,16 @@ static DRIVER_INIT( osbexec )
 {
 	osbexec_state *state = machine.driver_data<osbexec_state>();
 
-	state->fontram_region = machine.region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
-	state->vram_region = machine.region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
-	state->vram = state->vram_region->base();
-	state->fontram = state->fontram_region->base();
+	state->m_fontram_region = machine.region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
+	state->m_vram_region = machine.region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
+	state->m_vram = state->m_vram_region->base();
+	state->m_fontram = state->m_fontram_region->base();
 
 
-	memset( state->fontram, 0x00, 0x1000 );
-	memset( state->vram, 0x00, 0x2000 );
+	memset( state->m_fontram, 0x00, 0x1000 );
+	memset( state->m_vram, 0x00, 0x2000 );
 
-	state->video_timer = machine.scheduler().timer_alloc(FUNC(osbexec_video_callback));
+	state->m_video_timer = machine.scheduler().timer_alloc(FUNC(osbexec_video_callback));
 }
 
 
@@ -605,13 +605,13 @@ static MACHINE_RESET( osbexec )
 {
 	osbexec_state *state = machine.driver_data<osbexec_state>();
 
-	state->pia0_porta = 0xC0;		/* Enable ROM and VRAM on reset */
+	state->m_pia0_porta = 0xC0;		/* Enable ROM and VRAM on reset */
 
 	state->set_banks( machine );
 
-	state->video_timer->adjust( machine.primary_screen->time_until_pos( 0, 0 ) );
+	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( 0, 0 ) );
 
-	state->rtc = 0;
+	state->m_rtc = 0;
 }
 
 

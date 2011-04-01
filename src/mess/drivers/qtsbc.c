@@ -19,8 +19,8 @@ public:
 	qtsbc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 term_data;
+	UINT8 *m_ram;
+	UINT8 m_term_data;
 };
 
 
@@ -35,8 +35,8 @@ static WRITE8_HANDLER( qtsbc_06_w )
 static READ8_HANDLER( qtsbc_06_r )
 {
 	qtsbc_state *state = space->machine().driver_data<qtsbc_state>();
-	UINT8 ret = state->term_data;
-	state->term_data = 0;
+	UINT8 ret = state->m_term_data;
+	state->m_term_data = 0;
 	return ret;
 }
 
@@ -47,7 +47,7 @@ static READ8_HANDLER( qtsbc_43_r )
 
 static ADDRESS_MAP_START(qtsbc_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE_MEMBER(qtsbc_state, ram) AM_REGION("maincpu",0)
+	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE_MEMBER(qtsbc_state, m_ram) AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qtsbc_io , AS_IO, 8)
@@ -66,13 +66,13 @@ static MACHINE_RESET(qtsbc)
 {
 	qtsbc_state *state = machine.driver_data<qtsbc_state>();
 	UINT8* bios = machine.region("maincpu")->base()+0x10000;
-	memcpy(state->ram,bios, 0x800);
+	memcpy(state->m_ram,bios, 0x800);
 }
 
 static WRITE8_DEVICE_HANDLER( qtsbc_kbd_put )
 {
 	qtsbc_state *state = device->machine().driver_data<qtsbc_state>();
-	state->term_data = data;
+	state->m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( qtsbc_terminal_intf )

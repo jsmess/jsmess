@@ -80,30 +80,30 @@ public:
 	lynx_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *mem_0000;
-	UINT8 *mem_fc00;
-	UINT8 *mem_fd00;
-	UINT8 *mem_fe00;
-	UINT8 *mem_fffa;
-	size_t mem_fe00_size;
-	UINT16 granularity;
-	int line;
-	int line_y;
-	int sign_AB;
-	int sign_CD;
-	UINT32 palette[0x10];
-	int rotate0;
-	int rotate;
-	device_t *audio;
-	SUZY suzy;
-	BLITTER blitter;
-	UINT8 memory_config;
-	UINT8 sprite_collide;
-	MIKEY mikey;
-	int height;
-	int width;
-	LYNX_TIMER timer[NR_LYNX_TIMERS];
-	UART uart;
+	UINT8 *m_mem_0000;
+	UINT8 *m_mem_fc00;
+	UINT8 *m_mem_fd00;
+	UINT8 *m_mem_fe00;
+	UINT8 *m_mem_fffa;
+	size_t m_mem_fe00_size;
+	UINT16 m_granularity;
+	int m_line;
+	int m_line_y;
+	int m_sign_AB;
+	int m_sign_CD;
+	UINT32 m_palette[0x10];
+	int m_rotate0;
+	int m_rotate;
+	device_t *m_audio;
+	SUZY m_suzy;
+	BLITTER m_blitter;
+	UINT8 m_memory_config;
+	UINT8 m_sprite_collide;
+	MIKEY m_mikey;
+	int m_height;
+	int m_width;
+	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
+	UART m_uart;
 };
 
 

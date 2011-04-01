@@ -184,7 +184,7 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
  READ8_HANDLER(kc85_disc_hw_input_gate_r)
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	return state->kc85_disc_hw_input_gate;
+	return state->m_kc85_disc_hw_input_gate;
 }
 
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
@@ -199,18 +199,18 @@ WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_interrupt )
 {
 	kc_state *drvstate = device->machine().driver_data<kc_state>();
-	drvstate->kc85_disc_hw_input_gate &=~(1<<6);
+	drvstate->m_kc85_disc_hw_input_gate &=~(1<<6);
 	if (state)
-		drvstate->kc85_disc_hw_input_gate |=(1<<6);
+		drvstate->m_kc85_disc_hw_input_gate |=(1<<6);
 }
 
 /* callback for /DRQ output from FDC */
 static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_dma_drq )
 {
 	kc_state *drvstate = device->machine().driver_data<kc_state>();
-	drvstate->kc85_disc_hw_input_gate &=~(1<<7);
+	drvstate->m_kc85_disc_hw_input_gate &=~(1<<7);
 	if (state)
-		drvstate->kc85_disc_hw_input_gate |=(1<<7);
+		drvstate->m_kc85_disc_hw_input_gate |=(1<<7);
 }
 
 const upd765_interface kc_fdc_interface=
@@ -330,9 +330,9 @@ static const struct kc85_module kc85_disk_interface_device=
 
 	module_index = (port_upper>>2) & 0x03f;
 
-	if (state->modules[module_index])
+	if (state->m_modules[module_index])
 	{
-		return state->modules[module_index]->id;
+		return state->m_modules[module_index]->id;
 	}
 
 	return 0x0ff;
@@ -348,13 +348,13 @@ static void kc85_module_system_init(kc_state *state)
 {
 	int i;
 
-	state->kc85_module_rom = NULL;
+	state->m_kc85_module_rom = NULL;
 	for (i=0; i<64; i++)
 	{
-		state->modules[i] = NULL;
+		state->m_modules[i] = NULL;
 	}
 
-	state->modules[30] = &kc85_disk_interface_device;
+	state->m_modules[30] = &kc85_disk_interface_device;
 }
 
 
@@ -397,20 +397,20 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 		bit = 1;
 
 	/* update astb with bit */
-	z80pio_astb_w(state->kc85_z80pio,bit & state->ardy);
+	z80pio_astb_w(state->m_kc85_z80pio,bit & state->m_ardy);
 }
 
 static void	kc_cassette_init(running_machine &machine)
 {
 	kc_state *state = machine.driver_data<kc_state>();
-	state->cassette_timer = machine.scheduler().timer_alloc(FUNC(kc_cassette_timer_callback));
+	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(kc_cassette_timer_callback));
 }
 
 static void	kc_cassette_set_motor(running_machine &machine, int motor_state)
 {
 	kc_state *state = machine.driver_data<kc_state>();
 	/* state changed? */
-	if (((state->cassette_motor_state^motor_state)&0x01)!=0)
+	if (((state->m_cassette_motor_state^motor_state)&0x01)!=0)
 	{
 		/* set new motor state in cassette device */
 		cassette_change_state(machine.device("cassette"),
@@ -420,17 +420,17 @@ static void	kc_cassette_set_motor(running_machine &machine, int motor_state)
 		if (motor_state)
 		{
 			/* start timer */
-			state->cassette_timer->adjust(attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
+			state->m_cassette_timer->adjust(attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 		}
 		else
 		{
 			/* stop timer */
-			state->cassette_timer->reset();
+			state->m_cassette_timer->reset();
 		}
 	}
 
 	/* store new state */
-	state->cassette_motor_state = motor_state;
+	state->m_cassette_motor_state = motor_state;
 }
 
 /*
@@ -812,49 +812,49 @@ static TIMER_CALLBACK(kc_keyboard_update);
 static TIMER_CALLBACK(kc_keyboard_transmit_timer_callback)
 {
 	kc_state *state = machine.driver_data<kc_state>();
-	if (state->keyboard_data.transmit_pulse_count_remaining!=0)
+	if (state->m_keyboard_data.transmit_pulse_count_remaining!=0)
 	{
 		int pulse_state;
 		/* byte containing pulse state */
-		int pulse_byte_count = state->keyboard_data.transmit_pulse_count>>3;
+		int pulse_byte_count = state->m_keyboard_data.transmit_pulse_count>>3;
 		/* bit within byte containing pulse state */
-		int pulse_bit_count = 7-(state->keyboard_data.transmit_pulse_count & 0x07);
+		int pulse_bit_count = 7-(state->m_keyboard_data.transmit_pulse_count & 0x07);
 
 		/* get current pulse state */
-		pulse_state = (state->keyboard_data.transmit_buffer[pulse_byte_count]>>pulse_bit_count) & 0x01;
+		pulse_state = (state->m_keyboard_data.transmit_buffer[pulse_byte_count]>>pulse_bit_count) & 0x01;
 
 		LOG_KBD(("kc keyboard sending pulse: %02x\n",pulse_state));
 
 		/* set pulse */
-		z80pio_bstb_w(state->kc85_z80pio,pulse_state & state->brdy);
+		z80pio_bstb_w(state->m_kc85_z80pio,pulse_state & state->m_brdy);
 
 		/* update counts */
-		state->keyboard_data.transmit_pulse_count_remaining--;
-		state->keyboard_data.transmit_pulse_count++;
+		state->m_keyboard_data.transmit_pulse_count_remaining--;
+		state->m_keyboard_data.transmit_pulse_count++;
 
 	}
 	else
 	{
-		state->keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
+		state->m_keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
 	}
 }
 
 /* add a pulse */
 static void kc_keyboard_add_pulse_to_transmit_buffer(kc_state *state, int pulse_state)
 {
-	int pulse_byte_count = state->keyboard_data.transmit_pulse_count_remaining>>3;
-	int pulse_bit_count = 7-(state->keyboard_data.transmit_pulse_count_remaining & 0x07);
+	int pulse_byte_count = state->m_keyboard_data.transmit_pulse_count_remaining>>3;
+	int pulse_bit_count = 7-(state->m_keyboard_data.transmit_pulse_count_remaining & 0x07);
 
 	if (pulse_state)
 	{
-		state->keyboard_data.transmit_buffer[pulse_byte_count] |= (1<<pulse_bit_count);
+		state->m_keyboard_data.transmit_buffer[pulse_byte_count] |= (1<<pulse_bit_count);
 	}
 	else
 	{
-		state->keyboard_data.transmit_buffer[pulse_byte_count] &= ~(1<<pulse_bit_count);
+		state->m_keyboard_data.transmit_buffer[pulse_byte_count] &= ~(1<<pulse_bit_count);
 	}
 
-	state->keyboard_data.transmit_pulse_count_remaining++;
+	state->m_keyboard_data.transmit_pulse_count_remaining++;
 }
 
 
@@ -866,23 +866,23 @@ static void kc_keyboard_init(running_machine &machine)
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	/* head and tail of list is at beginning */
-	state->keyboard_data.head = (state->keyboard_data.tail = 0);
+	state->m_keyboard_data.head = (state->m_keyboard_data.tail = 0);
 
 	/* kc keyboard is not transmitting */
-	state->keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
+	state->m_keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
 
 	/* setup transmit parameters */
-	state->keyboard_data.transmit_pulse_count_remaining = 0;
-	state->keyboard_data.transmit_pulse_count = 0;
+	state->m_keyboard_data.transmit_pulse_count_remaining = 0;
+	state->m_keyboard_data.transmit_pulse_count = 0;
 
 	/* set initial state */
-	z80pio_bstb_w(state->kc85_z80pio,0);
+	z80pio_bstb_w(state->m_kc85_z80pio,0);
 
 
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
 	{
 		/* read input port */
-		state->previous_keyboard[i] = input_port_read(machine, keynames[i]);
+		state->m_previous_keyboard[i] = input_port_read(machine, keynames[i]);
 	}
 }
 
@@ -891,9 +891,9 @@ static void kc_keyboard_init(running_machine &machine)
 static void kc_keyboard_queue_scancode(kc_state *state, int scan_code)
 {
 	/* add a key */
-	state->keyboard_data.keycodes[state->keyboard_data.tail] = scan_code;
+	state->m_keyboard_data.keycodes[state->m_keyboard_data.tail] = scan_code;
 	/* update next insert position */
-	state->keyboard_data.tail = (state->keyboard_data.tail + 1) % KC_KEYCODE_QUEUE_LENGTH;
+	state->m_keyboard_data.tail = (state->m_keyboard_data.tail + 1) % KC_KEYCODE_QUEUE_LENGTH;
 }
 
 /* fill transmit buffer with pulse for 0 or 1 bit */
@@ -929,8 +929,8 @@ static void kc_keyboard_begin_transmit(running_machine &machine, int scan_code)
 	int i;
 	int scan;
 
-	state->keyboard_data.transmit_pulse_count_remaining = 0;
-	state->keyboard_data.transmit_pulse_count = 0;
+	state->m_keyboard_data.transmit_pulse_count_remaining = 0;
+	state->m_keyboard_data.transmit_pulse_count = 0;
 
 	/* initial pulse -> start of code */
 	kc_keyboard_add_pulse_to_transmit_buffer(state, 1);
@@ -974,19 +974,19 @@ static void kc_keyboard_attempt_transmit(running_machine &machine)
 {
 	kc_state *state = machine.driver_data<kc_state>();
 	/* is the keyboard transmit is idle */
-	if (state->keyboard_data.transmit_state == KC_KEYBOARD_TRANSMIT_IDLE)
+	if (state->m_keyboard_data.transmit_state == KC_KEYBOARD_TRANSMIT_IDLE)
 	{
 		/* keycode available? */
-		if (state->keyboard_data.head!=state->keyboard_data.tail)
+		if (state->m_keyboard_data.head!=state->m_keyboard_data.tail)
 		{
 			int code;
 
-			state->keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_ACTIVE;
+			state->m_keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_ACTIVE;
 
 			/* get code */
-			code = state->keyboard_data.keycodes[state->keyboard_data.head];
+			code = state->m_keyboard_data.keycodes[state->m_keyboard_data.head];
 			/* update start of list */
-			state->keyboard_data.head = (state->keyboard_data.head + 1) % KC_KEYCODE_QUEUE_LENGTH;
+			state->m_keyboard_data.head = (state->m_keyboard_data.head + 1) % KC_KEYCODE_QUEUE_LENGTH;
 
 			/* setup transmit buffer with scan-code */
 			kc_keyboard_begin_transmit(machine, code);
@@ -1013,9 +1013,9 @@ static TIMER_CALLBACK(kc_keyboard_update)
 		/* read input port */
 		keyboard_line_data = input_port_read(machine, keynames[i]);
 		/* identify keys that have changed */
-		changed_keys = keyboard_line_data ^ state->previous_keyboard[i];
+		changed_keys = keyboard_line_data ^ state->m_previous_keyboard[i];
 		/* store input port for next time */
-		state->previous_keyboard[i] = keyboard_line_data;
+		state->m_previous_keyboard[i] = keyboard_line_data;
 
 		/* scan through each bit */
 		for (b=0; b<8; b++)
@@ -1093,13 +1093,13 @@ static void kc85_4_update_0x08000(running_machine &machine)
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	unsigned char *ram_page;
 
-    if (state->kc85_pio_data[1] & (1<<5))
+    if (state->m_kc85_pio_data[1] & (1<<5))
     {
 		int ram8_block;
 		unsigned char *mem_ptr;
 
 		/* ram8 block chosen */
-		ram8_block = ((state->kc85_84_data)>>4) & 0x01;
+		ram8_block = ((state->m_kc85_84_data)>>4) & 0x01;
 
 		mem_ptr = ram_get_ptr(machine.device(RAM_TAG))+0x08000+(ram8_block<<14);
 
@@ -1109,7 +1109,7 @@ static void kc85_4_update_0x08000(running_machine &machine)
 		space->install_read_bank(0xa800, 0xbfff, "bank4");
 
 		/* write protect RAM8 ? */
-		if ((state->kc85_pio_data[1] & (1<<6))==0)
+		if ((state->m_kc85_pio_data[1] & (1<<6))==0)
 		{
 			/* ram8 is enabled and write protected */
 			space->nop_write(0x8000, 0xa7ff);
@@ -1135,10 +1135,10 @@ static void kc85_4_update_0x08000(running_machine &machine)
     }
 
 	/* if IRM is enabled override block 3/9 settings */
-	if (state->kc85_pio_data[0] & (1<<2))
+	if (state->m_kc85_pio_data[0] & (1<<2))
 	{
 		/* IRM enabled - has priority over RAM8 enabled */
-		ram_page = kc85_4_get_video_ram_base(machine, (state->kc85_84_data & 0x04), (state->kc85_84_data & 0x02));
+		ram_page = kc85_4_get_video_ram_base(machine, (state->m_kc85_84_data & 0x04), (state->m_kc85_84_data & 0x02));
 
 		memory_set_bankptr(machine, "bank3", ram_page);
 		memory_set_bankptr(machine, "bank9", ram_page);
@@ -1161,7 +1161,7 @@ static void kc85_4_update_0x00000(running_machine &machine)
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* access ram? */
-	if (state->kc85_pio_data[0] & (1<<1))
+	if (state->m_kc85_pio_data[0] & (1<<1))
 	{
 		LOG(("ram0 enabled\n"));
 
@@ -1170,7 +1170,7 @@ static void kc85_4_update_0x00000(running_machine &machine)
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 
 		/* write protect ram? */
-		if ((state->kc85_pio_data[0] & (1<<3))==0)
+		if ((state->m_kc85_pio_data[0] & (1<<3))==0)
 		{
 			/* yes */
 			LOG(("ram0 write protected\n"));
@@ -1204,7 +1204,7 @@ static void kc85_4_update_0x04000(running_machine &machine)
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* access ram? */
-	if (state->kc85_86_data & (1<<0))
+	if (state->m_kc85_86_data & (1<<0))
 	{
 		UINT8 *mem_ptr;
 
@@ -1216,7 +1216,7 @@ static void kc85_4_update_0x04000(running_machine &machine)
 		memory_set_bankptr(machine, "bank2", mem_ptr);
 
 		/* write protect ram? */
-		if ((state->kc85_86_data & (1<<1))==0)
+		if ((state->m_kc85_86_data & (1<<1))==0)
 		{
 			/* yes */
 			LOG(("ram4 write protected\n"));
@@ -1251,7 +1251,7 @@ static void kc85_4_update_0x0c000(running_machine &machine)
 	kc_state *state = machine.driver_data<kc_state>();
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
-	if (state->kc85_86_data & (1<<7))
+	if (state->m_kc85_86_data & (1<<7))
 	{
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
@@ -1259,7 +1259,7 @@ static void kc85_4_update_0x0c000(running_machine &machine)
 		memory_set_bankptr(machine, "bank5",machine.region("maincpu")->base() + 0x012000);
 		space->install_read_bank(0xc000, 0xdfff, "bank5");
 	}
-	else if (state->kc85_pio_data[0] & (1<<7))
+	else if (state->m_kc85_pio_data[0] & (1<<7))
 	{
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
@@ -1269,11 +1269,11 @@ static void kc85_4_update_0x0c000(running_machine &machine)
 	}
 	else
 	{
-		if (state->kc85_module_rom)
+		if (state->m_kc85_module_rom)
 		{
 			LOG(("module rom at 0xc000\n"));
 
-			memory_set_bankptr(machine, "bank5", state->kc85_module_rom);
+			memory_set_bankptr(machine, "bank5", state->m_kc85_module_rom);
 			space->install_read_bank(0xc000, 0xdfff, "bank5");
 		}
 		else
@@ -1290,7 +1290,7 @@ static void kc85_4_update_0x0e000(running_machine &machine)
 {
 	kc_state *state = machine.driver_data<kc_state>();
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
-	if (state->kc85_pio_data[0] & (1<<0))
+	if (state->m_kc85_pio_data[0] & (1<<0))
 	{
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
@@ -1331,8 +1331,8 @@ WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
 	device_t *speaker = space->machine().device("speaker");
-	state->kc85_pio_data[offset] = data;
-	z80pio_d_w(state->kc85_z80pio, offset, data);
+	state->m_kc85_pio_data[offset] = data;
+	z80pio_d_w(state->m_kc85_z80pio, offset, data);
 
 	switch (offset)
 	{
@@ -1371,7 +1371,7 @@ WRITE8_HANDLER ( kc85_4_86_w )
 	kc_state *state = space->machine().driver_data<kc_state>();
 	LOG(("0x086 W: %02x\n",data));
 
-	state->kc85_86_data = data;
+	state->m_kc85_86_data = data;
 
 	kc85_4_update_0x0c000(space->machine());
 	kc85_4_update_0x04000(space->machine());
@@ -1380,7 +1380,7 @@ WRITE8_HANDLER ( kc85_4_86_w )
  READ8_HANDLER ( kc85_4_86_r )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	return state->kc85_86_data;
+	return state->m_kc85_86_data;
 }
 
 
@@ -1389,7 +1389,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
 	kc_state *state = space->machine().driver_data<kc_state>();
 	LOG(("0x084 W: %02x\n",data));
 
-	state->kc85_84_data = data;
+	state->m_kc85_84_data = data;
 
 	kc85_4_video_ram_select_bank(space->machine(), data & 0x01);
 
@@ -1399,7 +1399,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
  READ8_HANDLER ( kc85_4_84_r )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	return state->kc85_84_data;
+	return state->m_kc85_84_data;
 }
 /*****************************************************************/
 
@@ -1409,7 +1409,7 @@ static void kc85_3_update_0x0c000(running_machine &machine)
 	kc_state *state = machine.driver_data<kc_state>();
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
-	if (state->kc85_pio_data[0] & (1<<7))
+	if (state->m_kc85_pio_data[0] & (1<<7))
 	{
 		/* BASIC takes next priority */
 		LOG(("BASIC rom 0x0c000\n"));
@@ -1431,7 +1431,7 @@ static void kc85_3_update_0x0e000(running_machine &machine)
 	kc_state *state = machine.driver_data<kc_state>();
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
-	if (state->kc85_pio_data[0] & (1<<0))
+	if (state->m_kc85_pio_data[0] & (1<<0))
 	{
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
@@ -1455,7 +1455,7 @@ static void kc85_3_update_0x00000(running_machine &machine)
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* access ram? */
-	if (state->kc85_pio_data[0] & (1<<1))
+	if (state->m_kc85_pio_data[0] & (1<<1))
 	{
 		LOG(("ram0 enabled\n"));
 
@@ -1465,7 +1465,7 @@ static void kc85_3_update_0x00000(running_machine &machine)
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
 
 		/* write protect ram? */
-		if ((state->kc85_pio_data[0] & (1<<3))==0)
+		if ((state->m_kc85_pio_data[0] & (1<<3))==0)
 		{
 			/* yes */
 			LOG(("ram0 write protected\n"));
@@ -1500,7 +1500,7 @@ static void kc85_3_update_0x08000(running_machine &machine)
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	unsigned char *ram_page;
 
-    if (state->kc85_pio_data[0] & (1<<2))
+    if (state->m_kc85_pio_data[0] & (1<<2))
     {
         /* IRM enabled */
         LOG(("IRM enabled\n"));
@@ -1511,7 +1511,7 @@ static void kc85_3_update_0x08000(running_machine &machine)
 		space->install_read_bank(0x8000, 0xbfff, "bank3");
 		space->install_write_bank(0x8000, 0xbfff, "bank8");
     }
-    else if (state->kc85_pio_data[1] & (1<<5))
+    else if (state->m_kc85_pio_data[1] & (1<<5))
     {
 		/* RAM8 ACCESS */
 		LOG(("RAM8 enabled\n"));
@@ -1521,7 +1521,7 @@ static void kc85_3_update_0x08000(running_machine &machine)
 		space->install_read_bank(0x8000, 0xbfff, "bank3");
 
 		/* write protect RAM8 ? */
-		if ((state->kc85_pio_data[1] & (1<<6))==0)
+		if ((state->m_kc85_pio_data[1] & (1<<6))==0)
 		{
 			LOG(("RAM8 write protected\n"));
 			/* ram8 is enabled and write protected */
@@ -1569,8 +1569,8 @@ WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
 	device_t *speaker = space->machine().device("speaker");
-	state->kc85_pio_data[offset] = data;
-	z80pio_d_w(state->kc85_z80pio, offset, data);
+	state->m_kc85_pio_data[offset] = data;
+	z80pio_d_w(state->m_kc85_z80pio, offset, data);
 
 	switch (offset)
 	{
@@ -1642,13 +1642,13 @@ static TIMER_CALLBACK(kc85_reset_timer_callback)
  READ8_HANDLER ( kc85_pio_data_r )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	return z80pio_d_r(state->kc85_z80pio,offset);
+	return z80pio_d_r(state->m_kc85_z80pio,offset);
 }
 
  READ8_HANDLER ( kc85_pio_control_r )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	return z80pio_c_r(state->kc85_z80pio,offset);
+	return z80pio_c_r(state->m_kc85_z80pio,offset);
 }
 
 
@@ -1656,7 +1656,7 @@ static TIMER_CALLBACK(kc85_reset_timer_callback)
 WRITE8_HANDLER ( kc85_pio_control_w )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-   z80pio_c_w(state->kc85_z80pio, offset, data);
+   z80pio_c_w(state->m_kc85_z80pio, offset, data);
 }
 
 
@@ -1686,7 +1686,7 @@ static void kc85_pio_interrupt(device_t *device, int state)
 static void kc85_pio_ardy_callback(device_t *device, int state)
 {
 	kc_state *drvstate = device->machine().driver_data<kc_state>();
-	drvstate->ardy = state & 0x01;
+	drvstate->m_ardy = state & 0x01;
 
 	if (state)
 	{
@@ -1699,7 +1699,7 @@ static void kc85_pio_ardy_callback(device_t *device, int state)
 static void kc85_pio_brdy_callback(device_t *device, int state)
 {
 	kc_state *drvstate = device->machine().driver_data<kc_state>();
-	drvstate->brdy = state & 0x01;
+	drvstate->m_brdy = state & 0x01;
 
 	if (state)
 	{
@@ -1739,24 +1739,24 @@ static TIMER_CALLBACK(kc85_15khz_timer_callback)
 	kc_state *state = device->machine().driver_data<kc_state>();
 
 	/* toggle state of square wave */
-	state->kc85_15khz_state^=1;
+	state->m_kc85_15khz_state^=1;
 
 	/* set clock input for channel 2 and 3 to ctc */
-	z80ctc_trg0_w(device, state->kc85_15khz_state);
-	z80ctc_trg1_w(device, state->kc85_15khz_state);
+	z80ctc_trg0_w(device, state->m_kc85_15khz_state);
+	z80ctc_trg1_w(device, state->m_kc85_15khz_state);
 
-	state->kc85_15khz_count++;
+	state->m_kc85_15khz_count++;
 
-	if (state->kc85_15khz_count>=312)
+	if (state->m_kc85_15khz_count>=312)
 	{
-		state->kc85_15khz_count = 0;
+		state->m_kc85_15khz_count = 0;
 
 		/* toggle state of square wave */
-		state->kc85_50hz_state^=1;
+		state->m_kc85_50hz_state^=1;
 
 		/* set clock input for channel 2 and 3 to ctc */
-		z80ctc_trg2_w(device, state->kc85_50hz_state);
-		z80ctc_trg3_w(device, state->kc85_50hz_state);
+		z80ctc_trg2_w(device, state->m_kc85_50hz_state);
+		z80ctc_trg3_w(device, state->m_kc85_50hz_state);
 	}
 }
 
@@ -1765,7 +1765,7 @@ static WRITE_LINE_DEVICE_HANDLER( kc85_zc2_callback )
 {
 	kc_state *drvstate = device->machine().driver_data<kc_state>();
 	/* is blink enabled? */
-	if (drvstate->kc85_pio_data[1] & (1<<7))
+	if (drvstate->m_kc85_pio_data[1] & (1<<7))
 	{
 		/* yes */
 		/* toggle state of blink to video hardware */
@@ -1806,9 +1806,9 @@ static void	kc85_common_init(running_machine &machine)
 	/* channel 2 this controls the video colour flash */
 	/* kc85 has a 15 kHz (?) input to the ctc channel 0 and 1 */
 	/* channel 0 and channel 1 are used for cassette write */
-	state->kc85_50hz_state = 0;
-	state->kc85_15khz_state = 0;
-	state->kc85_15khz_count = 0;
+	state->m_kc85_50hz_state = 0;
+	state->m_kc85_15khz_state = 0;
+	state->m_kc85_15khz_count = 0;
 	kc85_module_system_init(state);
 }
 
@@ -1817,14 +1817,14 @@ static void	kc85_common_init(running_machine &machine)
 MACHINE_RESET( kc85_4 )
 {
 	kc_state *state = machine.driver_data<kc_state>();
-	state->kc85_84_data = 0x0828;
-	state->kc85_86_data = 0x063;
+	state->m_kc85_84_data = 0x0828;
+	state->m_kc85_86_data = 0x063;
 	/* enable CAOS rom in range 0x0e000-0x0ffff */
 	/* ram0 enable, irm enable */
-	state->kc85_pio_data[0] = 0x0f;
-	state->kc85_pio_data[1] = 0x0f1;
+	state->m_kc85_pio_data[0] = 0x0f;
+	state->m_kc85_pio_data[1] = 0x0f1;
 
-	state->kc85_z80pio = machine.device("z80pio");
+	state->m_kc85_z80pio = machine.device("z80pio");
 
 	kc85_4_update_0x04000(machine);
 	kc85_4_update_0x08000(machine);
@@ -1855,13 +1855,13 @@ MACHINE_RESET( kc85_4d )
 MACHINE_RESET( kc85_3 )
 {
 	kc_state *state = machine.driver_data<kc_state>();
-	state->kc85_pio_data[0] = 0x0f;
-	state->kc85_pio_data[1] = 0x0f1;
+	state->m_kc85_pio_data[0] = 0x0f;
+	state->m_kc85_pio_data[1] = 0x0f1;
 
 	memory_set_bankptr(machine, "bank2",ram_get_ptr(machine.device(RAM_TAG))+0x0c000);
 	memory_set_bankptr(machine, "bank7",ram_get_ptr(machine.device(RAM_TAG))+0x0c000);
 
-	state->kc85_z80pio = machine.device("z80pio");
+	state->m_kc85_z80pio = machine.device("z80pio");
 
 	kc85_3_update_0x08000(machine);
 	kc85_3_update_0x0c000(machine);

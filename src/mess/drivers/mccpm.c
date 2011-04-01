@@ -18,8 +18,8 @@ public:
 	mccpm_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 term_data;
+	UINT8 *m_ram;
+	UINT8 m_term_data;
 };
 
 
@@ -34,14 +34,14 @@ static WRITE8_HANDLER( mccpm_f0_w )
 static READ8_HANDLER( mccpm_f0_r )
 {
 	mccpm_state *state = space->machine().driver_data<mccpm_state>();
-	UINT8 ret = state->term_data;
-	state->term_data = 0;
+	UINT8 ret = state->m_term_data;
+	state->m_term_data = 0;
 	return ret;
 }
 
 static ADDRESS_MAP_START(mccpm_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(mccpm_state, ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(mccpm_state, m_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mccpm_io , AS_IO, 8)
@@ -60,13 +60,13 @@ static MACHINE_RESET(mccpm)
 	mccpm_state *state = machine.driver_data<mccpm_state>();
 	UINT8* bios = machine.region("maincpu")->base();
 
-	memcpy(state->ram,bios, 0x1000);
+	memcpy(state->m_ram,bios, 0x1000);
 }
 
 static WRITE8_DEVICE_HANDLER( mccpm_kbd_put )
 {
 	mccpm_state *state = device->machine().driver_data<mccpm_state>();
-	state->term_data = data;
+	state->m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( mccpm_terminal_intf )

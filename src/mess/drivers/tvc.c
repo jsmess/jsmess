@@ -18,10 +18,10 @@ public:
 	tvc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 video_mode;
-	UINT8 keyline;
-	UINT8 flipflop;
-	UINT8 col[4];
+	UINT8 m_video_mode;
+	UINT8 m_keyline;
+	UINT8 m_flipflop;
+	UINT8 m_col[4];
 };
 
 
@@ -86,7 +86,7 @@ static WRITE8_HANDLER( tvc_bank_w )
 static WRITE8_HANDLER( tvc_video_mode_w )
 {
 	tvc_state *state = space->machine().driver_data<tvc_state>();
-	state->video_mode = data & 0x03;
+	state->m_video_mode = data & 0x03;
 }
 
 
@@ -97,13 +97,13 @@ static WRITE8_HANDLER( tvc_palette_w )
 	//  0 0 0 0 | I R G B
 	int i = ((data&0x40)>>3) | ((data&0x10)>>2) | ((data&0x04)>>1) | (data&0x01);
 
-	state->col[offset] = i;
+	state->m_col[offset] = i;
 }
 
 static WRITE8_HANDLER( tvc_keyboard_w )
 {
 	tvc_state *state = space->machine().driver_data<tvc_state>();
-	state->keyline = data;
+	state->m_keyline = data;
 }
 
 static READ8_HANDLER( tvc_keyboard_r )
@@ -113,19 +113,19 @@ static READ8_HANDLER( tvc_keyboard_r )
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
-	return input_port_read(space->machine(), keynames[state->keyline & 0x0f]);
+	return input_port_read(space->machine(), keynames[state->m_keyline & 0x0f]);
 }
 
 static READ8_HANDLER( tvc_flipflop_r )
 {
 	tvc_state *state = space->machine().driver_data<tvc_state>();
-	return state->flipflop;
+	return state->m_flipflop;
 }
 
 static WRITE8_HANDLER( tvc_flipflop_w )
 {
 	tvc_state *state = space->machine().driver_data<tvc_state>();
-	state->flipflop |= 0x10;
+	state->m_flipflop |= 0x10;
 }
 static READ8_HANDLER( tvc_port59_r )
 {
@@ -257,9 +257,9 @@ static MACHINE_START(tvc)
 	int i;
 
 	for (i=0; i<4; i++)
-		state->col[i] = i;
+		state->m_col[i] = i;
 
-	state->flipflop = 0xff;
+	state->m_flipflop = 0xff;
 }
 
 static MACHINE_RESET(tvc)
@@ -267,7 +267,7 @@ static MACHINE_RESET(tvc)
 	tvc_state *state = machine.driver_data<tvc_state>();
 	memset(ram_get_ptr(machine.device(RAM_TAG)),0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
-	state->video_mode = 0;
+	state->m_video_mode = 0;
 }
 
 static VIDEO_START( tvc )
@@ -287,20 +287,20 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-	switch(state->video_mode) {
+	switch(state->m_video_mode) {
 		case 0 :
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
-					*p++ = state->col[(data >> 7)];
-					*p++ = state->col[(data >> 6)];
-					*p++ = state->col[(data >> 5)];
-					*p++ = state->col[(data >> 4)];
-					*p++ = state->col[(data >> 3)];
-					*p++ = state->col[(data >> 2)];
-					*p++ = state->col[(data >> 1)];
-					*p++ = state->col[(data >> 0)];
+					*p++ = state->m_col[(data >> 7)];
+					*p++ = state->m_col[(data >> 6)];
+					*p++ = state->m_col[(data >> 5)];
+					*p++ = state->m_col[(data >> 4)];
+					*p++ = state->m_col[(data >> 3)];
+					*p++ = state->m_col[(data >> 2)];
+					*p++ = state->m_col[(data >> 1)];
+					*p++ = state->m_col[(data >> 0)];
 				}
 				break;
 		case 1 :
@@ -308,14 +308,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
-					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
-					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
-					*p++ = state->col[BIT(data,6)*2 + BIT(data,2)];
-					*p++ = state->col[BIT(data,6)*2 + BIT(data,2)];
-					*p++ = state->col[BIT(data,5)*2 + BIT(data,1)];
-					*p++ = state->col[BIT(data,5)*2 + BIT(data,1)];
-					*p++ = state->col[BIT(data,4)*2 + BIT(data,0)];
-					*p++ = state->col[BIT(data,4)*2 + BIT(data,0)];
+					*p++ = state->m_col[BIT(data,7)*2 + BIT(data,3)];
+					*p++ = state->m_col[BIT(data,7)*2 + BIT(data,3)];
+					*p++ = state->m_col[BIT(data,6)*2 + BIT(data,2)];
+					*p++ = state->m_col[BIT(data,6)*2 + BIT(data,2)];
+					*p++ = state->m_col[BIT(data,5)*2 + BIT(data,1)];
+					*p++ = state->m_col[BIT(data,5)*2 + BIT(data,1)];
+					*p++ = state->m_col[BIT(data,4)*2 + BIT(data,0)];
+					*p++ = state->m_col[BIT(data,4)*2 + BIT(data,0)];
 				}
 				break;
 		default:
@@ -323,14 +323,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
-					*p++ = state->col[(data >> 4) & 0xf];
-					*p++ = state->col[(data >> 4) & 0xf];
-					*p++ = state->col[(data >> 4) & 0xf];
-					*p++ = state->col[(data >> 4) & 0xf];
-					*p++ = state->col[(data >> 0) & 0xf];
-					*p++ = state->col[(data >> 0) & 0xf];
-					*p++ = state->col[(data >> 0) & 0xf];
-					*p++ = state->col[(data >> 0) & 0xf];
+					*p++ = state->m_col[(data >> 4) & 0xf];
+					*p++ = state->m_col[(data >> 4) & 0xf];
+					*p++ = state->m_col[(data >> 4) & 0xf];
+					*p++ = state->m_col[(data >> 4) & 0xf];
+					*p++ = state->m_col[(data >> 0) & 0xf];
+					*p++ = state->m_col[(data >> 0) & 0xf];
+					*p++ = state->m_col[(data >> 0) & 0xf];
+					*p++ = state->m_col[(data >> 0) & 0xf];
 				}
 				break;
 
@@ -381,7 +381,7 @@ static const mc6845_interface tvc_crtc6845_interface =
 static INTERRUPT_GEN( tvc_interrupt )
 {
 	tvc_state *state = device->machine().driver_data<tvc_state>();
-	state->flipflop  &= ~0x10;
+	state->m_flipflop  &= ~0x10;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 

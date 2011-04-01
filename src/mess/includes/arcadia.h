@@ -24,21 +24,21 @@ public:
 	arcadia_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-    int line;
-    int charline;
-    int shift;
-    int ad_delay;
-    int ad_select;
-    int ypos;
-    int graphics;
-    int doublescan;
-    int lines26;
-    int multicolor;
-    struct { int x, y; } pos[4];
-    UINT8 bg[262][16+2*XPOS/8];
-    UINT8 rectangle[0x40][8];
-    UINT8 chars[0x40][8];
-    int breaker;
+    int m_line;
+    int m_charline;
+    int m_shift;
+    int m_ad_delay;
+    int m_ad_select;
+    int m_ypos;
+    int m_graphics;
+    int m_doublescan;
+    int m_lines26;
+    int m_multicolor;
+    struct { int x, y; } m_pos[4];
+    UINT8 m_bg[262][16+2*XPOS/8];
+    UINT8 m_rectangle[0x40][8];
+    UINT8 m_chars[0x40][8];
+    int m_breaker;
     union {
 	UINT8 data[0x400];
 	struct	{
@@ -66,8 +66,8 @@ public:
 			UINT8 chars2[13][16];
 			UINT8 ram3[3][16];
 	} d;
-    } reg;
-    bitmap_t *bitmap;
+    } m_reg;
+    bitmap_t *m_bitmap;
 };
 
 

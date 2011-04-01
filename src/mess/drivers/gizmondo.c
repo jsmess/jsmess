@@ -58,8 +58,8 @@ public:
 	gizmondo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 port[9];
-	device_t *s3c2440;
+	UINT32 m_port[9];
+	device_t *m_s3c2440;
 };
 
 /*******************************************************************************
@@ -71,7 +71,7 @@ public:
 static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 {
 	gizmondo_state *gizmondo = device->machine().driver_data<gizmondo_state>();
-	UINT32 data = gizmondo->port[port];
+	UINT32 data = gizmondo->m_port[port];
 	switch (port)
 	{
 		case S3C2440_GPIO_PORT_D :
@@ -82,7 +82,7 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 		break;
 		case S3C2440_GPIO_PORT_F :
 		{
-			UINT32 port_c = gizmondo->port[S3C2440_GPIO_PORT_C];
+			UINT32 port_c = gizmondo->m_port[S3C2440_GPIO_PORT_C];
 			data = data & ~0x000000F2;
 			// keys
 			data |= 0x00F2;
@@ -111,13 +111,13 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	gizmondo_state *gizmondo = device->machine().driver_data<gizmondo_state>();
-	gizmondo->port[port] = data;
+	gizmondo->m_port[port] = data;
 }
 
 static INPUT_CHANGED( port_changed )
 {
 	gizmondo_state *gizmondo = field->port->machine().driver_data<gizmondo_state>();
-	s3c2440_request_eint( gizmondo->s3c2440, 4);
+	s3c2440_request_eint( gizmondo->m_s3c2440, 4);
 	//s3c2440_request_irq( device, S3C2440_INT_EINT1);
 }
 
@@ -136,10 +136,10 @@ static QUICKLOAD_LOAD( gizmondo )
 static MACHINE_START( gizmondo )
 {
 	gizmondo_state *gizmondo = machine.driver_data<gizmondo_state>();
-	gizmondo->s3c2440 = machine.device( "s3c2440");
-	gizmondo->port[S3C2440_GPIO_PORT_B] = 0x055E;
-	gizmondo->port[S3C2440_GPIO_PORT_C] = 0x5F20;
-	gizmondo->port[S3C2440_GPIO_PORT_D] = 0x4F60;
+	gizmondo->m_s3c2440 = machine.device( "s3c2440");
+	gizmondo->m_port[S3C2440_GPIO_PORT_B] = 0x055E;
+	gizmondo->m_port[S3C2440_GPIO_PORT_C] = 0x5F20;
+	gizmondo->m_port[S3C2440_GPIO_PORT_D] = 0x4F60;
 }
 
 static MACHINE_RESET( gizmondo )

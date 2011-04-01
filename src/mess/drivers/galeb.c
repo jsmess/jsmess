@@ -34,7 +34,7 @@ static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
     AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ ( galeb_keyboard_r )
     AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE("dac", galeb_dac_data_w )
-    AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_BASE_MEMBER(galeb_state, video_ram) // video ram
+    AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_BASE_MEMBER(galeb_state, m_video_ram) // video ram
     AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
     AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM
     AM_RANGE( 0xd000, 0xd7ff ) AM_ROM  // BASIC 03 ROM

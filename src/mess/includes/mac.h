@@ -228,8 +228,8 @@ public:
 	int m_mouse_bit_y;
 	int last_mx, last_my;
 	int count_x, count_y;
-	int last_was_x;
-	int screen_buffer;
+	int m_last_was_x;
+	int m_screen_buffer;
 
 	int irq_count, ca1_data, ca2_data;
 
@@ -359,8 +359,8 @@ private:
 	int m_adb_keybaddr;
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
 public:
-	emu_timer *scanline_timer;
-	emu_timer *adb_timer;
+	emu_timer *m_scanline_timer;
+	emu_timer *m_adb_timer;
 };
 
 #endif /* MAC_H_ */

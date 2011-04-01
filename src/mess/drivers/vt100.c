@@ -27,14 +27,14 @@ public:
 	vt100_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 keyboard_int;
-	UINT8 receiver_int;
-	UINT8 vertical_int;
-	double send_baud_rate;
-	double recv_baud_rate;
-	UINT8 key_scan;
-	UINT8 key_code;
+	UINT8 *m_ram;
+	UINT8 m_keyboard_int;
+	UINT8 m_receiver_int;
+	UINT8 m_vertical_int;
+	double m_send_baud_rate;
+	double m_recv_baud_rate;
+	UINT8 m_key_scan;
+	UINT8 m_key_code;
 };
 
 
@@ -43,7 +43,7 @@ public:
 static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
-    AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_BASE_MEMBER(vt100_state, ram) // Screen and scratch RAM
+    AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_BASE_MEMBER(vt100_state, m_ram) // Screen and scratch RAM
     AM_RANGE( 0x2c00, 0x2fff ) AM_RAM  // AVO Screen RAM
     AM_RANGE( 0x3000, 0x3fff ) AM_RAM  // AVO Attribute RAM (4 bits wide)
     // 0x4000, 0x7fff is unassigned
@@ -76,7 +76,7 @@ static READ8_HANDLER(vt100_flags_r)
 	vt100_state *state = space->machine().driver_data<vt100_state>();
 	UINT8 retVal = 0;
 	retVal |= vt_video_lba7_r(space->machine().device("vt100_video"),0) * 0x40;
-	retVal |= state->keyboard_int * 0x80;
+	retVal |= state->m_keyboard_int * 0x80;
 	return retVal;
 }
 
@@ -103,13 +103,13 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 		"LINEC", "LINED", "LINEE", "LINEF"
 	};
 	UINT8 code;
-	if (state->key_scan) {
+	if (state->m_key_scan) {
 		for(i = 0; i < 16; i++)
 		{
 			code =	input_port_read(timer.machine(), keynames[i]);
 			if (code!=0xff) {
-				state->keyboard_int = 1;
-				state->key_code = i | bit_sel(code);
+				state->m_keyboard_int = 1;
+				state->m_key_code = i | bit_sel(code);
 				cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 				break;
 			}
@@ -131,14 +131,14 @@ static WRITE8_HANDLER(vt100_keyboard_w)
 	output_set_value("l2_led",	  BIT(data,2) ? 0 : 1);
 	output_set_value("l3_led",	  BIT(data,1) ? 0 : 1);
 	output_set_value("l4_led",	  BIT(data,0) ? 0 : 1);
-	state->key_scan = BIT(data,6);
+	state->m_key_scan = BIT(data,6);
 	speaker_level_w(speaker, BIT(data,7));
 }
 
 static READ8_HANDLER(vt100_keyboard_r)
 {
 	vt100_state *state = space->machine().driver_data<vt100_state>();
-	return state->key_code;
+	return state->m_key_code;
 }
 static WRITE8_HANDLER(vt100_baud_rate_w)
 {
@@ -148,8 +148,8 @@ static WRITE8_HANDLER(vt100_baud_rate_w)
 		1800, 2000, 2400, 3600, 4800, 9600, 19200
 	};
 
-	state->send_baud_rate = baud_rate[(data >>4) & 0x0f];
-	state->recv_baud_rate = baud_rate[data & 0x0f];
+	state->m_send_baud_rate = baud_rate[(data >>4) & 0x0f];
+	state->m_recv_baud_rate = baud_rate[data & 0x0f];
 }
 
 static WRITE8_HANDLER(vt100_nvr_latch_w)
@@ -316,8 +316,8 @@ static SCREEN_UPDATE( vt100 )
 static IRQ_CALLBACK(vt100_irq_callback)
 {
 	vt100_state *state = device->machine().driver_data<vt100_state>();
-	UINT8 retVal = 0xc7 | (0x08 * state->keyboard_int) | (0x10 * state->receiver_int) | (0x20 * state->vertical_int);
-	state->receiver_int = 0;
+	UINT8 retVal = 0xc7 | (0x08 * state->m_keyboard_int) | (0x10 * state->m_receiver_int) | (0x20 * state->m_vertical_int);
+	state->m_receiver_int = 0;
 	return retVal;
 }
 
@@ -328,9 +328,9 @@ static MACHINE_START(vt100)
 static MACHINE_RESET(vt100)
 {
 	vt100_state *state = machine.driver_data<vt100_state>();
-	state->keyboard_int = 0;
-	state->receiver_int = 0;
-	state->vertical_int = 0;
+	state->m_keyboard_int = 0;
+	state->m_receiver_int = 0;
+	state->m_vertical_int = 0;
 	output_set_value("online_led",1);
 	output_set_value("local_led", 1);
 	output_set_value("locked_led",1);
@@ -339,7 +339,7 @@ static MACHINE_RESET(vt100)
 	output_set_value("l3_led",	  1);
 	output_set_value("l4_led",	  1);
 
-	state->key_scan = 0;
+	state->m_key_scan = 0;
 
 	device_set_irq_callback(machine.device("maincpu"), vt100_irq_callback);
 }
@@ -347,13 +347,13 @@ static MACHINE_RESET(vt100)
 static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )
 {
 	vt100_state *state = device->machine().driver_data<vt100_state>();
-	return state->ram[offset];
+	return state->m_ram[offset];
 }
 
 static WRITE8_DEVICE_HANDLER (vt100_clear_video_interrupt)
 {
 	vt100_state *state = device->machine().driver_data<vt100_state>();
-	state->vertical_int = 0;
+	state->m_vertical_int = 0;
 }
 
 static const vt_video_interface vt100_video_interface = {
@@ -366,7 +366,7 @@ static const vt_video_interface vt100_video_interface = {
 static INTERRUPT_GEN( vt100_vertical_interrupt )
 {
 	vt100_state *state = device->machine().driver_data<vt100_state>();
-	state->vertical_int = 1;
+	state->m_vertical_int = 1;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 

@@ -63,18 +63,18 @@ public:
 	z80ne_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 lx383_scan_counter;
-	UINT8 lx383_key[LX383_KEYS];
-	int lx383_downsampler;
-	int nmi_delay_counter;
-	int reset_delay_counter;
-	device_t *ay31015;
-	UINT8 lx385_ctrl;
-	device_t *lx388_kr2376;
-	emu_timer *cassette_timer;
-	cass_data_t cass_data;
-	wd17xx_state_t wd17xx_state;
+	UINT8 *m_videoram;
+	UINT8 m_lx383_scan_counter;
+	UINT8 m_lx383_key[LX383_KEYS];
+	int m_lx383_downsampler;
+	int m_nmi_delay_counter;
+	int m_reset_delay_counter;
+	device_t *m_ay31015;
+	UINT8 m_lx385_ctrl;
+	device_t *m_lx388_kr2376;
+	emu_timer *m_cassette_timer;
+	cass_data_t m_cass_data;
+	wd17xx_state_t m_wd17xx_state;
 };
 
 

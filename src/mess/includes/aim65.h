@@ -27,16 +27,16 @@ public:
 	aim65_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 pia_a;
-	UINT8 pia_b;
-	UINT8 riot_port_a;
-	int printer_x;
-	int printer_y;
-	int printer_dir;
-	int flag_a;
-	int flag_b;
-	emu_timer *print_timer;
-	int printer_level;
+	UINT8 m_pia_a;
+	UINT8 m_pia_b;
+	UINT8 m_riot_port_a;
+	int m_printer_x;
+	int m_printer_y;
+	int m_printer_dir;
+	int m_flag_a;
+	int m_flag_b;
+	emu_timer *m_print_timer;
+	int m_printer_level;
 };
 
 

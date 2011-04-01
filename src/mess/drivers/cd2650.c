@@ -37,17 +37,17 @@ public:
 	cd2650_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	const UINT8 *charrom;
-	const UINT8 *videoram;
-	UINT8 term_data;
+	const UINT8 *m_charrom;
+	const UINT8 *m_videoram;
+	UINT8 m_term_data;
 };
 
 
 static READ8_HANDLER( cd2650_keyin_r )
 {
 	cd2650_state *state = space->machine().driver_data<cd2650_state>();
-	UINT8 ret = state->term_data;
-	state->term_data = 0x80;
+	UINT8 ret = state->m_term_data;
+	state->m_term_data = 0x80;
 	if ((ret > 0x60) && (ret < 0x7b))
 		ret -= 0x20; // upper case only
 	return ret;
@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(cd2650_state, videoram)
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(cd2650_state, m_videoram)
 	AM_RANGE( 0x1800, 0x7fff) AM_RAM // expansion ram? the system doesn't use it
 ADDRESS_MAP_END
 
@@ -75,13 +75,13 @@ INPUT_PORTS_END
 static MACHINE_RESET(cd2650)
 {
 	cd2650_state *state = machine.driver_data<cd2650_state>();
-	state->term_data = 0x80;
+	state->m_term_data = 0x80;
 }
 
 static VIDEO_START( cd2650 )
 {
 	cd2650_state *state = machine.driver_data<cd2650_state>();
-	state->charrom = machine.region("chargen")->base();
+	state->m_charrom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( cd2650 )
@@ -113,12 +113,12 @@ static SCREEN_UPDATE( cd2650 )
 					if (mem > 0x4ff)
 						mem -= 0x500;
 
-					chr = state->videoram[mem];
+					chr = state->m_videoram[mem];
 
 					if (chr < 0x20)
 						chr |= 0x40;
 
-					gfx = state->charrom[(chr<<4) | ra ];
+					gfx = state->m_charrom[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */
@@ -139,7 +139,7 @@ static SCREEN_UPDATE( cd2650 )
 static WRITE8_DEVICE_HANDLER( cd2650_kbd_put )
 {
 	cd2650_state *state = device->machine().driver_data<cd2650_state>();
-	state->term_data = data;
+	state->m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( cd2650_terminal_intf )

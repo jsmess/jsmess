@@ -16,24 +16,24 @@ public:
 	orion_state(running_machine &machine, const driver_device_config_base &config)
 		: radio86_state(machine, config) { }
 
-	UINT8 orion128_video_mode;
-	UINT8 orion128_video_page;
-	UINT8 orion128_video_width;
-	UINT8 video_mode_mask;
-	UINT8 orionpro_pseudo_color;
-	UINT8 romdisk_lsb;
-	UINT8 romdisk_msb;
-	UINT8 orion128_memory_page;
-	UINT8 orionz80_memory_page;
-	UINT8 orionz80_dispatcher;
-	UINT8 speaker;
-	UINT8 orionpro_ram0_segment;
-	UINT8 orionpro_ram1_segment;
-	UINT8 orionpro_ram2_segment;
-	UINT8 orionpro_page;
-	UINT8 orionpro_128_page;
-	UINT8 orionpro_rom2_segment;
-	UINT8 orionpro_dispatcher;
+	UINT8 m_orion128_video_mode;
+	UINT8 m_orion128_video_page;
+	UINT8 m_orion128_video_width;
+	UINT8 m_video_mode_mask;
+	UINT8 m_orionpro_pseudo_color;
+	UINT8 m_romdisk_lsb;
+	UINT8 m_romdisk_msb;
+	UINT8 m_orion128_memory_page;
+	UINT8 m_orionz80_memory_page;
+	UINT8 m_orionz80_dispatcher;
+	UINT8 m_speaker;
+	UINT8 m_orionpro_ram0_segment;
+	UINT8 m_orionpro_ram1_segment;
+	UINT8 m_orionpro_ram2_segment;
+	UINT8 m_orionpro_page;
+	UINT8 m_orionpro_128_page;
+	UINT8 m_orionpro_rom2_segment;
+	UINT8 m_orionpro_dispatcher;
 };
 
 

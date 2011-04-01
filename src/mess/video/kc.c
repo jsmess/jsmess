@@ -138,7 +138,7 @@ static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, un
     background_pen = (colour_byte&7) + 16;
     foreground_pen = ((colour_byte>>3) & 0x0f);
 
-	if (colour_byte & state->kc85_blink_state)
+	if (colour_byte & state->m_kc85_blink_state)
 	{
 		foreground_pen = background_pen;
 	}
@@ -533,7 +533,7 @@ static void kc85_common_process_frame(running_machine &machine, bitmap_t *bitmap
 		/* update number of cycles remaining in frame */
 		cycles_remaining_in_frame -= delta_cycles;
 		/* set new blink state */
-		state->kc85_blink_state = pItem->Event_Data;
+		state->m_kc85_blink_state = pItem->Event_Data;
 
 		/* set new cycles into frame */
 		cycles_offset = pItem->Event_Time;
@@ -558,7 +558,7 @@ static void kc85_common_process_frame(running_machine &machine, bitmap_t *bitmap
 static void kc85_common_vh_start(running_machine &machine)
 {
 	kc_state *state = machine.driver_data<kc_state>();
-	state->kc85_blink_state = 0;
+	state->m_kc85_blink_state = 0;
 	//spectrum_EventList_Initialise(machine, 30000);
 }
 
@@ -569,11 +569,11 @@ VIDEO_START( kc85_4 )
 	kc_state *state = machine.driver_data<kc_state>();
 	kc85_common_vh_start(machine);
 
-    state->kc85_4_video_ram = auto_alloc_array(machine, UINT8,
+    state->m_kc85_4_video_ram = auto_alloc_array(machine, UINT8,
         (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) +
         (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
 
-	state->kc85_4_display_video_ram = state->kc85_4_video_ram;
+	state->m_kc85_4_display_video_ram = state->m_kc85_4_video_ram;
 }
 
 void kc85_4_video_ram_select_bank(running_machine &machine, int bank)
@@ -582,7 +582,7 @@ void kc85_4_video_ram_select_bank(running_machine &machine, int bank)
     /* calculate address of video ram to display */
     unsigned char *video_ram;
 
-    video_ram = state->kc85_4_video_ram;
+    video_ram = state->m_kc85_4_video_ram;
 
     if (bank!=0)
     {
@@ -591,14 +591,14 @@ void kc85_4_video_ram_select_bank(running_machine &machine, int bank)
 				   KC85_4_SCREEN_COLOUR_RAM_SIZE);
 	}
 
-    state->kc85_4_display_video_ram = video_ram;
+    state->m_kc85_4_display_video_ram = video_ram;
 }
 
 unsigned char *kc85_4_get_video_ram_base(running_machine &machine, int bank, int colour)
 {
 	kc_state *state = machine.driver_data<kc_state>();
     /* base address: screen 0 pixel data */
-	unsigned char *addr = state->kc85_4_video_ram;
+	unsigned char *addr = state->m_kc85_4_video_ram;
 
 	if (bank!=0)
 	{
@@ -637,7 +637,7 @@ SCREEN_UPDATE( kc85_4 )
 {
 	kc_state *state = screen->machine().driver_data<kc_state>();
 #if 0
-    unsigned char *pixel_ram = state->kc85_4_display_video_ram;
+    unsigned char *pixel_ram = state->m_kc85_4_display_video_ram;
     unsigned char *colour_ram = pixel_ram + 0x04000;
 
     int x,y;
@@ -661,8 +661,8 @@ SCREEN_UPDATE( kc85_4 )
 #endif
 	struct grab_info grab_data;
 
-	grab_data.pixel_ram = state->kc85_4_display_video_ram;
-	grab_data.colour_ram = state->kc85_4_display_video_ram + 0x04000;
+	grab_data.pixel_ram = state->m_kc85_4_display_video_ram;
+	grab_data.colour_ram = state->m_kc85_4_display_video_ram + 0x04000;
 
 	kc85_common_process_frame(screen->machine(), bitmap, kc85_4_pixel_grab_callback,&grab_data);
 

@@ -22,10 +22,10 @@ public:
 	tk80bs_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram;
-	UINT8 keyb_press;
-	UINT8 keyb_press_flag;
-	UINT8 shift_press_flag;
+	UINT8 *m_vram;
+	UINT8 m_keyb_press;
+	UINT8 m_keyb_press_flag;
+	UINT8 m_shift_press_flag;
 };
 
 
@@ -77,7 +77,7 @@ static SCREEN_UPDATE( tk80bs )
 	{
 		for(x=0;x<32;x++)
 		{
-			int tile = state->vram[count];
+			int tile = state->m_vram[count];
 
 			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
 
@@ -96,9 +96,9 @@ static READ8_HANDLER( ppi_custom_r )
 
 	switch(offset+0x7dfc)
 	{
-		case 0x7dfc: state->keyb_press_flag = 0; return state->keyb_press;
+		case 0x7dfc: state->m_keyb_press_flag = 0; return state->m_keyb_press;
 		case 0x7dfd: return 0xff;
-		case 0x7dfe: return state->keyb_press_flag << 5; //keyboard flag
+		case 0x7dfe: return state->m_keyb_press_flag << 5; //keyboard flag
 	}
 
 	return 0xff;
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START(tk80bs_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x7df8, 0x7df9) AM_NOP // i8251 sio
 //  AM_RANGE(0x7dfc, 0x7dff) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE(0x7dfc, 0x7dff) AM_READWRITE(ppi_custom_r,ppi_custom_w)
-	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_BASE_MEMBER(tk80bs_state, vram) // video ram
+	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_BASE_MEMBER(tk80bs_state, m_vram) // video ram
 	AM_RANGE(0x8000, 0xcfff) AM_RAM // RAM
 	AM_RANGE(0xd000, 0xefff) AM_ROM // BASIC
 	AM_RANGE(0xf000, 0xffff) AM_ROM // BSMON
@@ -250,7 +250,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	UINT8 keymod = input_port_read(timer.machine(),"key_modifiers") & 0x1f;
 	scancode = 0;
 
-	state->shift_press_flag = ((keymod & 0x02) >> 1);
+	state->m_shift_press_flag = ((keymod & 0x02) >> 1);
 
 	for(port_i=0;port_i<3;port_i++)
 	{
@@ -262,7 +262,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 				{
 					scancode |= 0x80;
 				}
-				if(!state->shift_press_flag)  // shift not pressed
+				if(!state->m_shift_press_flag)  // shift not pressed
 				{
 					//if(scancode >= 0x41 && scancode < 0x5b)
 					//  scancode += 0x20;  // lowercase doesn't exist here
@@ -284,8 +284,8 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 					if(scancode == 0x3c)
 						scancode = 0x3e;
 				}
-				state->keyb_press = scancode;
-				state->keyb_press_flag = 1;
+				state->m_keyb_press = scancode;
+				state->m_keyb_press_flag = 1;
 				return;
 			}
 			scancode++;

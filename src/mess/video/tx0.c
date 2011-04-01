@@ -41,18 +41,18 @@ static void tx0_draw_panel(running_machine &machine, bitmap_t *bitmap);
 VIDEO_START( tx0 )
 {
 	tx0_state *state = machine.driver_data<tx0_state>();
-	state->typewriter_color = color_typewriter_black;
+	state->m_typewriter_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
-	state->panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
-	state->typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
+	state->m_panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
+	state->m_typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up out bitmaps */
-	tx0_draw_panel_backdrop(machine, state->panel_bitmap);
+	tx0_draw_panel_backdrop(machine, state->m_panel_bitmap);
 
-	bitmap_fill(state->typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
+	bitmap_fill(state->m_typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
-	state->crt = machine.device("crt");
+	state->m_crt = machine.device("crt");
 }
 
 
@@ -60,7 +60,7 @@ SCREEN_EOF( tx0 )
 {
 	tx0_state *state = machine.driver_data<tx0_state>();
 
-	crt_eof(state->crt);
+	crt_eof(state->m_crt);
 }
 
 
@@ -74,7 +74,7 @@ void tx0_plot(running_machine &machine, int x, int y)
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/0777;
 	y = y*crt_window_height/0777;
-	crt_plot(state->crt, x, y);
+	crt_plot(state->m_crt, x, y);
 }
 
 
@@ -84,12 +84,12 @@ void tx0_plot(running_machine &machine, int x, int y)
 SCREEN_UPDATE( tx0 )
 {
 	tx0_state *state = screen->machine().driver_data<tx0_state>();
-	crt_update(state->crt, bitmap);
+	crt_update(state->m_crt, bitmap);
 
-	tx0_draw_panel(screen->machine(), state->panel_bitmap);
-	copybitmap(bitmap, state->panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
+	tx0_draw_panel(screen->machine(), state->m_panel_bitmap);
+	copybitmap(bitmap, state->m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, state->typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
+	copybitmap(bitmap, state->m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 
@@ -258,7 +258,7 @@ static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap)
 	char buf[3];
 
 	/* fill with black */
-	bitmap_fill(state->panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
+	bitmap_fill(state->m_panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
 
 	/* column 1: registers, test accumulator, test buffer, toggle switch storage */
 	tx0_draw_string(machine, bitmap, "program counter", x_panel_col1b_offset, y_panel_pc_offset, color_panel_caption);
@@ -373,11 +373,11 @@ static void tx0_typewriter_linefeed(running_machine &machine)
 
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
-		extract_scanline8(state->typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(state->typewriter_bitmap, 0, y, typewriter_window_width, buf, machine.pens);
+		extract_scanline8(state->m_typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
+		draw_scanline8(state->m_typewriter_bitmap, 0, y, typewriter_window_width, buf, machine.pens);
 	}
 
-	bitmap_fill(state->typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
+	bitmap_fill(state->m_typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
 }
 
 void tx0_typewriter_drawchar(running_machine &machine, int character)
@@ -432,25 +432,25 @@ void tx0_typewriter_drawchar(running_machine &machine, int character)
 	case 020:
 #if 0
 		/* color shift */
-		state->typewriter_color = color_typewriter_black;
-		state->typewriter_color = color_typewriter_red;
+		state->m_typewriter_color = color_typewriter_black;
+		state->m_typewriter_color = color_typewriter_red;
 #endif
 		break;
 
 	case 043:
 		/* Backspace */
-		if (state->pos)
-			state->pos--;
+		if (state->m_pos)
+			state->m_pos--;
 		break;
 
 	case 045:
 		/* Tab */
-		state->pos = state->pos + tab_step - (state->pos % tab_step);
+		state->m_pos = state->m_pos + tab_step - (state->m_pos % tab_step);
 		break;
 
 	case 051:
 		/* Carriage Return */
-		state->pos = 0;
+		state->m_pos = 0;
 		tx0_typewriter_linefeed( machine );
 		break;
 
@@ -461,12 +461,12 @@ void tx0_typewriter_drawchar(running_machine &machine, int character)
 
 	case 071:
 		/* Upper case */
-		state->case_shift = 1;
+		state->m_case_shift = 1;
 		break;
 
 	case 075:
 		/* Lower case */
-		state->case_shift = 0;
+		state->m_case_shift = 0;
 		break;
 
 	case 077:
@@ -477,18 +477,18 @@ void tx0_typewriter_drawchar(running_machine &machine, int character)
 	default:
 		/* Any printable character... */
 
-		if (state->pos >= 80)
+		if (state->m_pos >= 80)
 		{	/* if past right border, wrap around. (Right???) */
 			tx0_typewriter_linefeed( machine );	/* next line */
-			state->pos = 0;					/* return to start of line */
+			state->m_pos = 0;					/* return to start of line */
 		}
 
 		/* print character (lookup ASCII equivalent in table) */
-		tx0_draw_char(machine, state->typewriter_bitmap, ascii_table[state->case_shift][character],
-						8*state->pos, typewriter_write_offset_y,
-						state->typewriter_color);	/* print char */
+		tx0_draw_char(machine, state->m_typewriter_bitmap, ascii_table[state->m_case_shift][character],
+						8*state->m_pos, typewriter_write_offset_y,
+						state->m_typewriter_color);	/* print char */
 
-		state->pos++;		/* step carriage forward */
+		state->m_pos++;		/* step carriage forward */
 		break;
 	}
 }

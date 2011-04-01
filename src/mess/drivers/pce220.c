@@ -21,10 +21,10 @@ public:
 	pce220_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 bank_num;
-	UINT16 lcd_index_row;
-	UINT16 lcd_index_col;
-	UINT8 lcd_timer;
+	UINT8 m_bank_num;
+	UINT16 m_lcd_index_row;
+	UINT16 m_lcd_index_col;
+	UINT8 m_lcd_timer;
 };
 
 
@@ -72,9 +72,9 @@ static WRITE8_HANDLER( lcd_control_w )
 {
 	pce220_state *state = space->machine().driver_data<pce220_state>();
 	if((data & 0xb8) == 0xb8)
-		state->lcd_index_row = (data & 0x07);
+		state->m_lcd_index_row = (data & 0x07);
 	if((data & 0x40) == 0x40)
-		state->lcd_index_col = (data & 0x3f);
+		state->m_lcd_index_col = (data & 0x3f);
 }
 
 static WRITE8_HANDLER( lcd_data_w )
@@ -82,16 +82,16 @@ static WRITE8_HANDLER( lcd_data_w )
 	pce220_state *state = space->machine().driver_data<pce220_state>();
 	UINT8 *vram = space->machine().region("lcd_vram")->base();
 
-	vram[state->lcd_index_row*0x40|state->lcd_index_col] = data;
+	vram[state->m_lcd_index_row*0x40|state->m_lcd_index_col] = data;
 
-	gfx_element_mark_dirty(space->machine().gfx[0], (state->lcd_index_row*0x40|state->lcd_index_col)/5);
-	state->lcd_index_col++;
+	gfx_element_mark_dirty(space->machine().gfx[0], (state->m_lcd_index_row*0x40|state->m_lcd_index_col)/5);
+	state->m_lcd_index_col++;
 }
 
 static READ8_HANDLER( rom_bank_r )
 {
 	pce220_state *state = space->machine().driver_data<pce220_state>();
-	return state->bank_num;
+	return state->m_bank_num;
 }
 
 static WRITE8_HANDLER( rom_bank_w )
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( rom_bank_w )
 	UINT8 bank2 = data & 0x07; // bits 0,1,2
 	UINT8 bank1 = (data & 0x70) >> 4; // bits 4,5,6
 
-	state->bank_num = data;
+	state->m_bank_num = data;
 
 	memory_set_bankptr(space->machine(), "bank3", space->machine().region("user1")->base() + 0x4000 * bank1);
 	memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + 0x4000 * bank2);
@@ -138,7 +138,7 @@ static READ8_HANDLER( timer_lcd_r )
 static WRITE8_HANDLER( timer_lcd_w )
 {
 	pce220_state *state = space->machine().driver_data<pce220_state>();
-	state->lcd_timer = data & 1;
+	state->m_lcd_timer = data & 1;
 }
 
 static READ8_HANDLER( port15_r )

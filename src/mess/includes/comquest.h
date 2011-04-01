@@ -14,12 +14,12 @@ public:
 	comquest_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 data[128][8];
-	void *timer;
-	int line;
-	int dma_activ;
-	int state;
-	int count;
+	UINT8 m_data[128][8];
+	void *m_timer;
+	int m_line;
+	int m_dma_activ;
+	int m_state;
+	int m_count;
 };
 
 

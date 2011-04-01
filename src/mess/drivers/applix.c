@@ -85,18 +85,18 @@ MC6845_UPDATE_ROW( applix_update_row )
 	applix_state *state = device->machine().driver_data<applix_state>();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
-	UINT16 colourm = (state->_08 & 0x0e) << 7;
+	UINT16 colourm = (state->m_08 & 0x0e) << 7;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{
 		UINT8 inv=0;
 		mem = (ma + x) & 0x7ff;
-		chr = state->videoram[mem];
-		col = state->colorram[mem] | colourm;					// read a byte of colour
+		chr = state->m_videoram[mem];
+		col = state->m_colorram[mem] | colourm;					// read a byte of colour
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->gfxram[(chr<<4) | ra] ^ inv;
+		gfx = state->m_gfxram[(chr<<4) | ra] ^ inv;
 		fg = (col & 0x001f) | 64;					// map to foreground palette
 		bg = (col & 0x07e0) >> 5;					// and background palette
 

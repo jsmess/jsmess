@@ -28,7 +28,7 @@ public:
 	ec65_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
+	UINT8 *m_video_ram;
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8)
@@ -43,7 +43,7 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r , mc6845_register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ec65_state,video_ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ec65_state,m_video_ram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -163,7 +163,7 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = state->video_ram[ma + column];
+		UINT8 code = state->m_video_ram[ma + column];
 		UINT16 addr = code << 4 | (ra & 0x0f);
 		UINT8 data = charrom[(addr & 0xfff)];
 		if (column == cursor_x)

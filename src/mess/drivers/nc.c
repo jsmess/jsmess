@@ -265,7 +265,7 @@ static void nc200_machine_stop(running_machine &machine);
 void nc_set_card_present_state(running_machine &machine, int state)
 {
 	nc_state *drvstate = machine.driver_data<nc_state>();
-	drvstate->card_status = state;
+	drvstate->m_card_status = state;
 }
 
 
@@ -278,15 +278,15 @@ nc200 */
 static void nc_update_interrupts(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	state->irq_status &= ~state->irq_latch_mask;
-	state->irq_status |= state->irq_latch;
+	state->m_irq_status &= ~state->m_irq_latch_mask;
+	state->m_irq_status |= state->m_irq_latch;
 
 	/* any ints set and they are not masked? */
 	if (
-			(((state->irq_status & state->irq_mask) & 0x3f)!=0)
+			(((state->m_irq_status & state->m_irq_mask) & 0x3f)!=0)
 			)
 	{
-		logerror("int set %02x\n", state->irq_status & state->irq_mask);
+		logerror("int set %02x\n", state->m_irq_status & state->m_irq_mask);
 		/* set int */
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
@@ -303,13 +303,13 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
 		LOG(("keyboard int\n"));
 
         /* set int */
-        state->irq_status |= (1<<3);
+        state->m_irq_status |= (1<<3);
 
         /* update ints */
         nc_update_interrupts(machine);
 
         /* don't trigger again, but don't free it */
-        state->keyboard_timer->reset();
+        state->m_keyboard_timer->reset();
 }
 
 
@@ -330,8 +330,8 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 	sprintf(bank1,"bank%d",bank+1);
 	sprintf(bank5,"bank%d",bank+5);
 
-	mem_type = (state->memory_config[bank]>>6) & 0x03;
-	mem_bank = state->memory_config[bank] & 0x03f;
+	mem_type = (state->m_memory_config[bank]>>6) & 0x03;
+	mem_bank = state->m_memory_config[bank] & 0x03f;
 
 	space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_r[bank]);
 
@@ -343,7 +343,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 		{
 			unsigned char *addr;
 
-			mem_bank = mem_bank & state->membank_rom_mask;
+			mem_bank = mem_bank & state->m_membank_rom_mask;
 
 			addr = (machine.region("maincpu")->base()+0x010000) + (mem_bank<<14);
 
@@ -359,7 +359,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 		{
 			unsigned char *addr;
 
-			mem_bank = mem_bank & state->membank_internal_ram_mask;
+			mem_bank = mem_bank & state->m_membank_internal_ram_mask;
 
 			addr = ram_get_ptr(machine.device(RAM_TAG)) + (mem_bank<<14);
 
@@ -375,12 +375,12 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 		case 2:
 		{
 			/* card connected? */
-			if ((state->card_status) && (state->card_ram!=NULL))
+			if ((state->m_card_status) && (state->m_card_ram!=NULL))
 			{
 				unsigned char *addr;
 
-				mem_bank = mem_bank & state->membank_card_ram_mask;
-				addr = state->card_ram + (mem_bank<<14);
+				mem_bank = mem_bank & state->m_membank_card_ram_mask;
+				addr = state->m_card_ram + (mem_bank<<14);
 
 				memory_set_bankptr(machine, bank1, addr);
 
@@ -427,12 +427,12 @@ static void nc_common_restore_memory_from_stream(running_machine &machine)
 	unsigned long stored_size;
 	unsigned long restore_size;
 
-	if (!state->file)
+	if (!state->m_file)
 		return;
 
 	LOG(("restoring nc memory\n"));
 	/* get size of memory data stored */
-	state->file->read(&stored_size, sizeof(unsigned long));
+	state->m_file->read(&stored_size, sizeof(unsigned long));
 
 	if (stored_size > ram_get_size(machine.device(RAM_TAG)))
 		restore_size = ram_get_size(machine.device(RAM_TAG));
@@ -440,9 +440,9 @@ static void nc_common_restore_memory_from_stream(running_machine &machine)
 		restore_size = stored_size;
 
 	/* read as much as will fit into memory */
-	state->file->read(ram_get_ptr(machine.device(RAM_TAG)), restore_size);
+	state->m_file->read(ram_get_ptr(machine.device(RAM_TAG)), restore_size);
 	/* seek over remaining data */
-	state->file->seek(SEEK_CUR,stored_size - restore_size);
+	state->m_file->seek(SEEK_CUR,stored_size - restore_size);
 }
 
 /* store a block of memory to the nvram file */
@@ -450,15 +450,15 @@ static void nc_common_store_memory_to_stream(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
 	UINT32 size = ram_get_size(machine.device(RAM_TAG));
-	if (!state->file)
+	if (!state->m_file)
 		return;
 
 	LOG(("storing nc memory\n"));
 	/* write size of memory data */
-	state->file->write(&size, sizeof(UINT32));
+	state->m_file->write(&size, sizeof(UINT32));
 
 	/* write data block */
-	state->file->write(ram_get_ptr(machine.device(RAM_TAG)), size);
+	state->m_file->write(ram_get_ptr(machine.device(RAM_TAG)), size);
 }
 
 static void nc_common_open_stream_for_reading(running_machine &machine)
@@ -468,8 +468,8 @@ static void nc_common_open_stream_for_reading(running_machine &machine)
 
 	sprintf(filename,"%s.nv", machine.system().name);
 
-	state->file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
-	state->file->open(filename);
+	state->m_file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
+	state->m_file->open(filename);
 }
 
 static void nc_common_open_stream_for_writing(running_machine &machine)
@@ -479,16 +479,16 @@ static void nc_common_open_stream_for_writing(running_machine &machine)
 
 	sprintf(filename,"%s.nv", machine.system().name);
 	
-	state->file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
-	state->file->open(filename);
+	state->m_file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
+	state->m_file->open(filename);
 }
 
 
 static void nc_common_close_stream(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	if (state->file)
-		global_free(state->file);
+	if (state->m_file)
+		global_free(state->m_file);
 }
 
 
@@ -502,7 +502,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 
 	inputport_10_state = input_port_read(timer.machine(), "EXTRA");
 
-	changed_bits = inputport_10_state^state->previous_inputport_10_state;
+	changed_bits = inputport_10_state^state->m_previous_inputport_10_state;
 
 	/* on/off button changed state? */
 	if (changed_bits & 0x01)
@@ -511,7 +511,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
         {
 			/* on NC100 on/off button causes a nmi, on
             nc200 on/off button causes an int */
-			switch (state->type)
+			switch (state->m_type)
 			{
 				case NC_TYPE_1xx:
 				{
@@ -522,7 +522,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 
 				case NC_TYPE_200:
 				{
-					state->irq_status |= (1 << 4);
+					state->m_irq_status |= (1 << 4);
 					nc_update_interrupts(timer.machine());
 				}
 				break;
@@ -537,7 +537,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 		nc_refresh_memory_config(timer.machine());
 	}
 
-	state->previous_inputport_10_state = inputport_10_state;
+	state->m_previous_inputport_10_state = inputport_10_state;
 }
 
 static TIMER_CALLBACK(nc_serial_timer_callback);
@@ -546,36 +546,36 @@ static void nc_common_init_machine(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
 	/* setup reset state */
-	state->display_memory_start = 0;
+	state->m_display_memory_start = 0;
 
 	/* setup reset state */
-	state->memory_config[0] = 0;
-	state->memory_config[1] = 0;
-	state->memory_config[2] = 0;
-	state->memory_config[3] = 0;
+	state->m_memory_config[0] = 0;
+	state->m_memory_config[1] = 0;
+	state->m_memory_config[2] = 0;
+	state->m_memory_config[3] = 0;
 
-	state->previous_inputport_10_state = input_port_read(machine, "EXTRA");
+	state->m_previous_inputport_10_state = input_port_read(machine, "EXTRA");
 
 	/* setup reset state ints are masked */
-	state->irq_mask = 0;
+	state->m_irq_mask = 0;
 	/* setup reset state no ints wanting servicing */
-	state->irq_status = 0;
+	state->m_irq_status = 0;
 	/* at reset set to 0x0ffff */
 
-	state->irq_latch = 0;
-	state->irq_latch_mask = 0;
+	state->m_irq_latch = 0;
+	state->m_irq_latch_mask = 0;
 
 	/* setup reset state */
-	state->sound_channel_periods[0] = (state->sound_channel_periods[1] = 0x0ffff);
+	state->m_sound_channel_periods[0] = (state->m_sound_channel_periods[1] = 0x0ffff);
 
 	/* at reset set to 1 */
-	state->poweroff_control = 1;
+	state->m_poweroff_control = 1;
 
 	nc_refresh_memory_config(machine);
 	nc_update_interrupts(machine);
 
 	/* at reset set to 0x0ff */
-	state->uart_control = 0x0ff;
+	state->m_uart_control = 0x0ff;
 }
 
 static ADDRESS_MAP_START(nc_map, AS_PROGRAM, 8 )
@@ -589,14 +589,14 @@ ADDRESS_MAP_END
 static  READ8_HANDLER(nc_memory_management_r)
 {
 	nc_state *state = space->machine().driver_data<nc_state>();
-	return state->memory_config[offset];
+	return state->m_memory_config[offset];
 }
 
 static WRITE8_HANDLER(nc_memory_management_w)
 {
 	nc_state *state = space->machine().driver_data<nc_state>();
 	LOG(("Memory management W: %02x %02x\n",offset,data));
-        state->memory_config[offset] = data;
+        state->m_memory_config[offset] = data;
 
         nc_refresh_memory_config(space->machine());
 }
@@ -608,7 +608,7 @@ static WRITE8_HANDLER(nc_irq_mask_w)
 	LOG_DEBUG(("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7))));
 
 	/* writing mask clears ints that are to be masked? */
-	state->irq_mask = data;
+	state->m_irq_mask = data;
 
 	nc_update_interrupts(space->machine());
 }
@@ -619,14 +619,14 @@ static WRITE8_HANDLER(nc_irq_status_w)
 	LOG(("irq status w: %02x\n", data));
 	data = data^0x0ff;
 
-	if (state->type == NC_TYPE_200)
+	if (state->m_type == NC_TYPE_200)
 	{
 		/* Russell Marks confirms that on the NC200, the key scan interrupt must be explicitly
         cleared. It is not automatically cleared when reading 0x0b9 */
 		if ((data & (1<<3))!=0)
 		{
 			/* set timer to occur again */
-			state->keyboard_timer->reset(attotime::from_msec(10));
+			state->m_keyboard_timer->reset(attotime::from_msec(10));
 
 			nc_update_interrupts(space->machine());
 		}
@@ -639,14 +639,14 @@ static WRITE8_HANDLER(nc_irq_status_w)
                 /* clearing keyboard int? */
                 ((data & (1<<3))!=0) &&
                 /* keyboard int request? */
-                ((state->irq_status & (1<<3))!=0)
+                ((state->m_irq_status & (1<<3))!=0)
            )
         {
 			/* set timer to occur again */
-			state->keyboard_timer->reset(attotime::from_msec(10));
+			state->m_keyboard_timer->reset(attotime::from_msec(10));
         }
 #endif
-        state->irq_status &=~data;
+        state->m_irq_status &=~data;
 
         nc_update_interrupts(space->machine());
 }
@@ -654,7 +654,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 static READ8_HANDLER(nc_irq_status_r)
 {
 	nc_state *state = space->machine().driver_data<nc_state>();
-        return ~((state->irq_status & (~state->irq_latch_mask)) | state->irq_latch);
+        return ~((state->m_irq_status & (~state->m_irq_latch_mask)) | state->m_irq_latch);
 }
 
 
@@ -669,10 +669,10 @@ static READ8_HANDLER(nc_key_data_in_r)
 	if (offset==9)
 	{
 		/* reading 0x0b9 will clear int and re-start scan procedure! */
-		state->irq_status &= ~(1<<3);
+		state->m_irq_status &= ~(1<<3);
 
 		/* set timer to occur again */
-		state->keyboard_timer->reset(attotime::from_msec(10));
+		state->m_keyboard_timer->reset(attotime::from_msec(10));
 
 		nc_update_interrupts(space->machine());
 	}
@@ -699,7 +699,7 @@ static void nc_sound_update(running_machine &machine, int channel)
 			break;
 	}
 
-	period = state->sound_channel_periods[channel];
+	period = state->m_sound_channel_periods[channel];
 
 	/* if top bit is 0, sound is on */
 	on = ((period & (1<<15))==0);
@@ -723,8 +723,8 @@ static WRITE8_HANDLER(nc_sound_w)
 		case 0x0:
 		{
 		   /* update period value */
-		   state->sound_channel_periods[0]  =
-				(state->sound_channel_periods[0] & 0x0ff00) | (data & 0x0ff);
+		   state->m_sound_channel_periods[0]  =
+				(state->m_sound_channel_periods[0] & 0x0ff00) | (data & 0x0ff);
 
 		   nc_sound_update(space->machine(), 0);
 		}
@@ -732,8 +732,8 @@ static WRITE8_HANDLER(nc_sound_w)
 
 		case 0x01:
 		{
-		   state->sound_channel_periods[0] =
-				(state->sound_channel_periods[0] & 0x0ff) | ((data & 0x0ff)<<8);
+		   state->m_sound_channel_periods[0] =
+				(state->m_sound_channel_periods[0] & 0x0ff) | ((data & 0x0ff)<<8);
 
 		   nc_sound_update(space->machine(), 0);
 		}
@@ -742,8 +742,8 @@ static WRITE8_HANDLER(nc_sound_w)
 		case 0x02:
 		{
 		   /* update period value */
-		   state->sound_channel_periods[1]  =
-				(state->sound_channel_periods[1] & 0x0ff00) | (data & 0x0ff);
+		   state->m_sound_channel_periods[1]  =
+				(state->m_sound_channel_periods[1] & 0x0ff00) | (data & 0x0ff);
 
 		   nc_sound_update(space->machine(), 1);
 		}
@@ -751,8 +751,8 @@ static WRITE8_HANDLER(nc_sound_w)
 
 		case 0x03:
 		{
-		   state->sound_channel_periods[1] =
-				(state->sound_channel_periods[1] & 0x0ff) | ((data & 0x0ff)<<8);
+		   state->m_sound_channel_periods[1] =
+				(state->m_sound_channel_periods[1] & 0x0ff) | ((data & 0x0ff)<<8);
 
 		   nc_sound_update(space->machine(), 1);
 		}
@@ -790,7 +790,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 	nc_printer_update(space->machine(), data);
 
 	/* on/off changed state? */
-	if (((state->uart_control ^ data) & (1<<3))!=0)
+	if (((state->m_uart_control ^ data) & (1<<3))!=0)
 	{
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
@@ -799,9 +799,9 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		}
 	}
 
-	state->serial_timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
+	state->m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
 
-	state->uart_control = data;
+	state->m_uart_control = data;
 }
 
 /* NC100 printer emulation */
@@ -829,9 +829,9 @@ static WRITE8_HANDLER(nc100_display_memory_start_w)
 	/* bit 5: A13 */
 	/* bit 4: A12 */
 	/* bit 3-0: not used */
-	state->display_memory_start = (data & 0x0f0)<<(12-4);
+	state->m_display_memory_start = (data & 0x0f0)<<(12-4);
 
-	LOG(("disp memory w: %04x\n", (int) state->display_memory_start));
+	LOG(("disp memory w: %04x\n", (int) state->m_display_memory_start));
 }
 
 
@@ -844,7 +844,7 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 //  if (data & (1<<3))
 //  {
 //      /* clear latched irq's */
-//      state->irq_latch &= ~3;
+//      state->m_irq_latch &= ~3;
 //      nc_update_interrupts(machine);
 //  }
 }
@@ -859,7 +859,7 @@ static void nc100_tc8521_alarm_callback(device_t *device, int state)
     is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state != drvstate->previous_alarm_state)
+	if (state != drvstate->m_previous_alarm_state)
 	{
 		if (state)
 		{
@@ -869,21 +869,21 @@ static void nc100_tc8521_alarm_callback(device_t *device, int state)
 		}
 	}
 
-	drvstate->previous_alarm_state = state;
+	drvstate->m_previous_alarm_state = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nc100_txrdy_callback )
 {
 	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	drvstate->irq_latch &= ~(1 << 1);
+	drvstate->m_irq_latch &= ~(1 << 1);
 
 	/* uart on? */
-	if ((drvstate->uart_control & (1 << 3)) == 0)
+	if ((drvstate->m_uart_control & (1 << 3)) == 0)
 	{
 		if (state)
 		{
 			logerror("tx ready\n");
-			drvstate->irq_latch |= (1 << 1);
+			drvstate->m_irq_latch |= (1 << 1);
 		}
 	}
 
@@ -893,14 +893,14 @@ static WRITE_LINE_DEVICE_HANDLER( nc100_txrdy_callback )
 static WRITE_LINE_DEVICE_HANDLER( nc100_rxrdy_callback )
 {
 	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	drvstate->irq_latch &= ~(1<<0);
+	drvstate->m_irq_latch &= ~(1<<0);
 
-	if ((drvstate->uart_control & (1<<3))==0)
+	if ((drvstate->m_uart_control & (1<<3))==0)
 	{
 		if (state)
 		{
 			logerror("rx ready\n");
-			drvstate->irq_latch |= (1<<0);
+			drvstate->m_irq_latch |= (1<<0);
 		}
 	}
 
@@ -931,9 +931,9 @@ static WRITE_LINE_DEVICE_HANDLER( nc100_centronics_ack_w )
 {
 	nc_state *drvstate = device->machine().driver_data<nc_state>();
 	if (state)
-		drvstate->irq_status |= 0x04;
+		drvstate->m_irq_status |= 0x04;
 	else
-		drvstate->irq_status &= ~0x04;
+		drvstate->m_irq_status &= ~0x04;
 
 	/* trigger an int if the irq is set */
 	nc_update_interrupts(device->machine());
@@ -952,11 +952,11 @@ static MACHINE_RESET( nc100 )
 {
 	nc_state *state = machine.driver_data<nc_state>();
 	/* 256k of rom */
-	state->membank_rom_mask = 0x0f;
+	state->m_membank_rom_mask = 0x0f;
 
-	state->membank_internal_ram_mask = 3;
+	state->m_membank_internal_ram_mask = 3;
 
-	state->membank_card_ram_mask = 0x03f;
+	state->m_membank_card_ram_mask = 0x03f;
 
 	nc_common_init_machine(machine);
 
@@ -964,7 +964,7 @@ static MACHINE_RESET( nc100 )
 
 	{
 		device_t *rtc = machine.device("rtc");
-		tc8521_load_stream(rtc, state->file);
+		tc8521_load_stream(rtc, state->m_file);
 	}
 
 	nc_common_restore_memory_from_stream(machine);
@@ -972,7 +972,7 @@ static MACHINE_RESET( nc100 )
 	nc_common_close_stream(machine);
 
 	/* serial */
-	state->irq_latch_mask = (1<<0) | (1<<1);
+	state->m_irq_latch_mask = (1<<0) | (1<<1);
 }
 
 static void nc100_machine_stop(running_machine &machine)
@@ -981,7 +981,7 @@ static void nc100_machine_stop(running_machine &machine)
 	nc_common_open_stream_for_writing(machine);
 	{
 		device_t *rtc = machine.device("rtc");
-		tc8521_save_stream(rtc, state->file);
+		tc8521_save_stream(rtc, state->m_file);
 	}
 	nc_common_store_memory_to_stream(machine);
 	nc_common_close_stream(machine);
@@ -990,16 +990,16 @@ static void nc100_machine_stop(running_machine &machine)
 static MACHINE_START( nc100 )
 {
 	nc_state *state = machine.driver_data<nc_state>();
-    state->type = NC_TYPE_1xx;
+    state->m_type = NC_TYPE_1xx;
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, nc100_machine_stop);
 
 	/* keyboard timer */
-	state->keyboard_timer = machine.scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
-	state->keyboard_timer->adjust(attotime::from_msec(10));
+	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
+	state->m_keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
-	state->serial_timer = machine.scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
+	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
 }
 
 
@@ -1008,7 +1008,7 @@ static WRITE8_HANDLER(nc100_poweroff_control_w)
 	nc_state *state = space->machine().driver_data<nc_state>();
 	/* bits 7-1: not used */
 	/* bit 0: 1 = no effect, 0 = power off */
-	state->poweroff_control = data;
+	state->m_poweroff_control = data;
 	LOG(("nc poweroff control: %02x\n",data));
 }
 
@@ -1024,7 +1024,7 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 	nc_card_battery_status |= centronics_ack_r(printer);
 	nc_card_battery_status |= centronics_busy_r(printer) << 1;
 
-	if (state->card_status)
+	if (state->m_card_status)
 	{
 		/* card present */
 		nc_card_battery_status &=~(1<<7);
@@ -1203,9 +1203,9 @@ INPUT_PORTS_END
 void nc150_init_machine(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-        state->membank_internal_ram_mask = 7;
+        state->m_membank_internal_ram_mask = 7;
 
-        state->membank_card_ram_mask = 0x03f;
+        state->m_membank_card_ram_mask = 0x03f;
 
         nc_common_init_machine(machine);
 }
@@ -1224,9 +1224,9 @@ static WRITE8_HANDLER(nc200_display_memory_start_w)
 	/* bit 6: A14 */
 	/* bit 5: A13 */
 	/* bit 4-0: not used */
-	state->display_memory_start = (data & 0x0e0)<<(12-4);
+	state->m_display_memory_start = (data & 0x0e0)<<(12-4);
 
-	LOG(("disp memory w: %04x\n", (int) state->display_memory_start));
+	LOG(("disp memory w: %04x\n", (int) state->m_display_memory_start));
 }
 #endif
 
@@ -1235,9 +1235,9 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_centronics_ack_w )
 {
 	nc_state *drvstate = device->machine().driver_data<nc_state>();
 	if (state)
-		drvstate->irq_status |= 0x01;
+		drvstate->m_irq_status |= 0x01;
 	else
-		drvstate->irq_status &= ~0x01;
+		drvstate->m_irq_status &= ~0x01;
 
 	/* trigger an int if the irq is set */
 	nc_update_interrupts(device->machine());
@@ -1258,14 +1258,14 @@ together with a or to generate a single interrupt */
 static void nc200_refresh_uart_interrupt(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	state->irq_latch &=~(1<<2);
+	state->m_irq_latch &=~(1<<2);
 
 	/* uart enabled? */
-	if ((state->uart_control & (1<<3))==0)
+	if ((state->m_uart_control & (1<<3))==0)
 	{
-		if ((state->nc200_uart_interrupt_irq & 0x03)!=0)
+		if ((state->m_nc200_uart_interrupt_irq & 0x03)!=0)
 		{
-			state->irq_latch |= (1<<2);
+			state->m_irq_latch |= (1<<2);
 		}
 	}
 	nc_update_interrupts(machine);
@@ -1274,11 +1274,11 @@ static void nc200_refresh_uart_interrupt(running_machine &machine)
 static WRITE_LINE_DEVICE_HANDLER( nc200_txrdy_callback )
 {
 	//nc_state *drvstate = machine.driver_data<nc_state>();
-//  drvstate->nc200_uart_interrupt_irq &=~(1<<0);
+//  drvstate->m_nc200_uart_interrupt_irq &=~(1<<0);
 //
 //  if (state)
 //  {
-//      drvstate->nc200_uart_interrupt_irq |=(1<<0);
+//      drvstate->m_nc200_uart_interrupt_irq |=(1<<0);
 //  }
 //
 //  nc200_refresh_uart_interrupt(device->machine());
@@ -1287,11 +1287,11 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_txrdy_callback )
 static WRITE_LINE_DEVICE_HANDLER( nc200_rxrdy_callback )
 {
 	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	drvstate->nc200_uart_interrupt_irq &=~(1<<1);
+	drvstate->m_nc200_uart_interrupt_irq &=~(1<<1);
 
 	if (state)
 	{
-		drvstate->nc200_uart_interrupt_irq |=(1<<1);
+		drvstate->m_nc200_uart_interrupt_irq |=(1<<1);
 	}
 
 	nc200_refresh_uart_interrupt(device->machine());
@@ -1315,18 +1315,18 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_fdc_interrupt )
 {
 	nc_state *drvstate = device->machine().driver_data<nc_state>();
 #if 0
-    drvstate->irq_latch &=~(1<<5);
+    drvstate->m_irq_latch &=~(1<<5);
 
     if (state)
     {
-            drvstate->irq_latch |=(1<<5);
+            drvstate->m_irq_latch |=(1<<5);
     }
 #endif
-    drvstate->irq_status &=~(1<<5);
+    drvstate->m_irq_status &=~(1<<5);
 
     if (state)
     {
-            drvstate->irq_status |=(1<<5);
+            drvstate->m_irq_status |=(1<<5);
     }
 
     nc_update_interrupts(device->machine());
@@ -1346,7 +1346,7 @@ static void nc200_floppy_drive_index_callback(int drive_id)
 {
 	nc_state *state = machine.driver_data<nc_state>();
 	LOG_DEBUG(("nc200 index pulse\n"));
-//  state->irq_status |= (1<<4);
+//  state->m_irq_status |= (1<<4);
 
 //  nc_update_interrupts(Machine);
 }
@@ -1356,22 +1356,22 @@ static MACHINE_RESET( nc200 )
 {
 	nc_state *state = machine.driver_data<nc_state>();
 	/* 512k of rom */
-	state->membank_rom_mask = 0x1f;
+	state->m_membank_rom_mask = 0x1f;
 
-	state->membank_internal_ram_mask = 7;
+	state->m_membank_internal_ram_mask = 7;
 
-	state->membank_card_ram_mask = 0x03f;
+	state->m_membank_card_ram_mask = 0x03f;
 
 	nc_common_init_machine(machine);
 
-	state->nc200_uart_interrupt_irq = 0;
+	state->m_nc200_uart_interrupt_irq = 0;
 
 	nc_common_open_stream_for_reading(machine);
 	nc_common_restore_memory_from_stream(machine);
 	nc_common_close_stream(machine);
 
 	/* fdc, serial */
-	state->irq_latch_mask = /*(1<<5) |*/ (1<<2);
+	state->m_irq_latch_mask = /*(1<<5) |*/ (1<<2);
 
 	nc200_video_set_backlight(machine, 0);
 }
@@ -1386,16 +1386,16 @@ static void nc200_machine_stop(running_machine &machine)
 static MACHINE_START( nc200 )
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	state->type = NC_TYPE_200;
+	state->m_type = NC_TYPE_200;
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, nc200_machine_stop);
 
 	/* keyboard timer */
-	state->keyboard_timer = machine.scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
-	state->keyboard_timer->adjust(attotime::from_msec(10));
+	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
+	state->m_keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
-	state->serial_timer = machine.scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
+	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
 }
 
 /*
@@ -1426,7 +1426,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
     and there is enough power for disk usage */
 	nc_card_battery_status &=~((1<<5) | (1<<2) | (1<<0));
 
-	if (state->card_status)
+	if (state->m_card_status)
 	{
 		/* card present */
 		nc_card_battery_status&=~(1<<7);
@@ -1461,13 +1461,13 @@ static READ8_HANDLER(nc200_printer_status_r)
 static WRITE8_HANDLER(nc200_uart_control_w)
 {
 	nc_state *state = space->machine().driver_data<nc_state>();
-	/* int reset_fdc = (state->uart_control^data) & (1<<5); */
+	/* int reset_fdc = (state->m_uart_control^data) & (1<<5); */
 
 	nc_uart_control_w(space, offset,data);
 
 	if (data & (1<<3))
 	{
-		state->nc200_uart_interrupt_irq &=~3;
+		state->m_nc200_uart_interrupt_irq &=~3;
 
 		nc200_refresh_uart_interrupt(space->machine());
 	}

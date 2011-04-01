@@ -81,27 +81,27 @@ MACHINE_RESET ( zx80 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, machine));
-	state->tape_bit = 0x80;
+	state->m_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pow3000 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pow3000_setdirect, machine));
-	state->tape_bit = 0x80;
+	state->m_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pc8300 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pc8300_setdirect, machine));
-	state->tape_bit = 0x80;
+	state->m_tape_bit = 0x80;
 }
 
 static TIMER_CALLBACK(zx_tape_pulse)
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	state->tape_bit = 0x80;
+	state->m_tape_bit = 0x80;
 }
 
 READ8_HANDLER ( zx80_io_r )
@@ -139,28 +139,28 @@ READ8_HANDLER ( zx80_io_r )
 
 		cassette_output(space->machine().device("cassette"), +0.75);
 
-		if (state->ula_irq_active)
+		if (state->m_ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine(), 0);
-			state->ula_irq_active = 0;
+			state->m_ula_irq_active = 0;
 
 //          LOG_ZX81_IOR("ULA IRQs off");
 		}
 //      else
 //      {
-			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->tape_bit)
+			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->m_tape_bit)
 			{
-				state->tape_bit = 0x00;
+				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->tape_bit;
+			data &= ~state->m_tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 //      }
-		if (state->ula_frame_vsync == 3)
+		if (state->m_ula_frame_vsync == 3)
 		{
-			state->ula_frame_vsync = 2;
+			state->m_ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -204,28 +204,28 @@ READ8_HANDLER ( zx81_io_r )
 
 		cassette_output(space->machine().device("cassette"), +0.75);
 
-		if (state->ula_irq_active)
+		if (state->m_ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine(), 0);
-			state->ula_irq_active = 0;
+			state->m_ula_irq_active = 0;
 
 //          LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
-			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->tape_bit)
+			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->m_tape_bit)
 			{
-				state->tape_bit = 0x00;
+				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->tape_bit;
+			data &= ~state->m_tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 		}
-		if (state->ula_frame_vsync == 3)
+		if (state->m_ula_frame_vsync == 3)
 		{
-			state->ula_frame_vsync = 2;
+			state->m_ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -251,8 +251,8 @@ READ8_HANDLER ( pc8300_io_r )
 
 	if (offs == 0xf5)
 	{
-		state->speaker_state ^= 1;
-		speaker_level_w(speaker, state->speaker_state);
+		state->m_speaker_state ^= 1;
+		speaker_level_w(speaker, state->m_speaker_state);
 	}
 	else
 	if (offs == 0xfe)
@@ -276,28 +276,28 @@ READ8_HANDLER ( pc8300_io_r )
 
 		cassette_output(space->machine().device("cassette"), +0.75);
 
-		if (state->ula_irq_active)
+		if (state->m_ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine(), 0);
-			state->ula_irq_active = 0;
+			state->m_ula_irq_active = 0;
 
 //          LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
-			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->tape_bit)
+			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->m_tape_bit)
 			{
-				state->tape_bit = 0x00;
+				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->tape_bit;
+			data &= ~state->m_tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 		}
-		if (state->ula_frame_vsync == 3)
+		if (state->m_ula_frame_vsync == 3)
 		{
-			state->ula_frame_vsync = 2;
+			state->m_ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -328,8 +328,8 @@ READ8_HANDLER ( pow3000_io_r )
 	else
 	if (offs == 0xf5)
 	{
-		state->speaker_state ^= 1;
-		speaker_level_w(speaker, state->speaker_state);
+		state->m_speaker_state ^= 1;
+		speaker_level_w(speaker, state->m_speaker_state);
 	}
 	else
 	if (offs == 0xfe)
@@ -353,27 +353,27 @@ READ8_HANDLER ( pow3000_io_r )
 
 		cassette_output(space->machine().device("cassette"), +0.75);
 
-		if (state->ula_irq_active)
+		if (state->m_ula_irq_active)
 		{
 			zx_ula_bkgnd(space->machine(), 0);
-			state->ula_irq_active = 0;
+			state->m_ula_irq_active = 0;
 			LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
-			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->tape_bit)
+			if ((cassette_input(space->machine().device("cassette")) < -0.75) && state->m_tape_bit)
 			{
-				state->tape_bit = 0x00;
+				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->tape_bit;
+			data &= ~state->m_tape_bit;
 
 //          LOG_ZX81_IOR("Tape");
 		}
-		if (state->ula_frame_vsync == 3)
+		if (state->m_ula_frame_vsync == 3)
 		{
-			state->ula_frame_vsync = 2;
+			state->m_ula_frame_vsync = 2;
 //          LOG_ZX81_VSYNC;
 		}
 	}
@@ -411,29 +411,29 @@ WRITE8_HANDLER ( zx81_io_w )
 
 	if (offs == 0xfd)
 	{
-		state->ula_nmi->reset();
+		state->m_ula_nmi->reset();
 
 		LOG_ZX81_IOW("ULA NMIs off");
 	}
 	else
 	if (offs == 0xfe)
 	{
-		state->ula_nmi->adjust(attotime::zero, 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(207));
+		state->m_ula_nmi->adjust(attotime::zero, 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(207));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 
 		/* remove the IRQ */
-		state->ula_irq_active = 0;
+		state->m_ula_irq_active = 0;
 	}
 	else
 	if (offs == 0xff)
 	{
 		cassette_output(space->machine().device("cassette"), -0.75);
 		zx_ula_bkgnd(space->machine(), 1);
-		if (state->ula_frame_vsync == 2)
+		if (state->m_ula_frame_vsync == 2)
 		{
 			device_spin_until_time(&space->device(),space->machine().primary_screen->time_until_pos(height - 1, 0));
-			state->ula_scanline_count = height - 1;
+			state->m_ula_scanline_count = height - 1;
 			logerror ("S: %d B: %d\n", space->machine().primary_screen->vpos(), space->machine().primary_screen->hpos());
 		}
 

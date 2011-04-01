@@ -35,7 +35,7 @@ public:
 	cybiko_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	CYBIKO_RS232 rs232;
+	CYBIKO_RS232 m_rs232;
 };
 
 

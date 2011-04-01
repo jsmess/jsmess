@@ -36,17 +36,17 @@ public:
 	concept_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT8 pending_interrupts;
-	char clock_enable;
-	char clock_address;
-	UINT8 KeyQueue[KeyQueueSize];
-	int KeyQueueHead;
-	int KeyQueueLen;
-	UINT32 KeyStateSave[3];
-	UINT8 fdc_local_status;
-	UINT8 fdc_local_command;
-	expansion_slot_t expansion_slots[4];
+	UINT16 *m_videoram;
+	UINT8 m_pending_interrupts;
+	char m_clock_enable;
+	char m_clock_address;
+	UINT8 m_KeyQueue[KeyQueueSize];
+	int m_KeyQueueHead;
+	int m_KeyQueueLen;
+	UINT32 m_KeyStateSave[3];
+	UINT8 m_fdc_local_status;
+	UINT8 m_fdc_local_command;
+	expansion_slot_t m_expansion_slots[4];
 };
 
 

@@ -133,9 +133,9 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 
-	i186_state i186;
-	compis_devices_t devices;
-	TYP_COMPIS compis;
+	i186_state m_i186;
+	compis_devices_t m_devices;
+	TYP_COMPIS m_compis;
 };
 
 

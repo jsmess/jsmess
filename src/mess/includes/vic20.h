@@ -23,17 +23,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* keyboard state */
-	int key_col;
+	int m_key_col;
 
 	/* devices */
-	via6522_device *via0;
-	via6522_device *via1;
-	device_t *iec;
-	device_t *cassette;
-	device_t *mos6560;
+	via6522_device *m_via0;
+	via6522_device *m_via1;
+	device_t *m_iec;
+	device_t *m_cassette;
+	device_t *m_mos6560;
 
 	/* timers */
-	timer_device *cassette_timer;
+	timer_device *m_cassette_timer;
 };
 
 #endif

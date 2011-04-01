@@ -29,7 +29,7 @@ static void lviv_update_memory (running_machine &machine)
 	lviv_state *state = machine.driver_data<lviv_state>();
 	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
-	if (state->ppi_port_outputs[0][2] & 0x02)
+	if (state->m_ppi_port_outputs[0][2] & 0x02)
 	{
 		memory_set_bankptr(machine,"bank1", ram);
 		memory_set_bankptr(machine,"bank2", ram + 0x4000);
@@ -66,10 +66,10 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_0_portb_r )
 static READ8_DEVICE_HANDLER ( lviv_ppi_0_portc_r )
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	UINT8 data = state->ppi_port_outputs[0][2] & 0x0f;
+	UINT8 data = state->m_ppi_port_outputs[0][2] & 0x0f;
 	if (cassette_input(device->machine().device("cassette")) > 0.038)
 		data |= 0x10;
-	if (state->ppi_port_outputs[0][0] & input_port_read(device->machine(), "JOY"))
+	if (state->m_ppi_port_outputs[0][0] & input_port_read(device->machine(), "JOY"))
 		data |= 0x80;
 	return data;
 }
@@ -77,13 +77,13 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_0_portc_r )
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_porta_w )
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	state->ppi_port_outputs[0][0] = data;
+	state->m_ppi_port_outputs[0][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portb_w )
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	state->ppi_port_outputs[0][1] = data;
+	state->m_ppi_port_outputs[0][1] = data;
 	lviv_update_palette(device->machine(), data&0x7f);
 }
 
@@ -91,8 +91,8 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
 	device_t *speaker = device->machine().device("speaker");
-	state->ppi_port_outputs[0][2] = data;
-	if (state->ppi_port_outputs[0][1]&0x80)
+	state->m_ppi_port_outputs[0][2] = data;
+	if (state->m_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(speaker, data&0x01);
 	cassette_output(device->machine().device("cassette"), (data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory(device->machine());
@@ -106,41 +106,41 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_1_porta_r )
 static READ8_DEVICE_HANDLER ( lviv_ppi_1_portb_r )	/* keyboard reading */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	return	((state->ppi_port_outputs[1][0] & 0x01) ? 0xff : input_port_read(device->machine(), "KEY0")) &
-		((state->ppi_port_outputs[1][0] & 0x02) ? 0xff : input_port_read(device->machine(), "KEY1")) &
-		((state->ppi_port_outputs[1][0] & 0x04) ? 0xff : input_port_read(device->machine(), "KEY2")) &
-		((state->ppi_port_outputs[1][0] & 0x08) ? 0xff : input_port_read(device->machine(), "KEY3")) &
-		((state->ppi_port_outputs[1][0] & 0x10) ? 0xff : input_port_read(device->machine(), "KEY4")) &
-		((state->ppi_port_outputs[1][0] & 0x20) ? 0xff : input_port_read(device->machine(), "KEY5")) &
-		((state->ppi_port_outputs[1][0] & 0x40) ? 0xff : input_port_read(device->machine(), "KEY6")) &
-		((state->ppi_port_outputs[1][0] & 0x80) ? 0xff : input_port_read(device->machine(), "KEY7"));
+	return	((state->m_ppi_port_outputs[1][0] & 0x01) ? 0xff : input_port_read(device->machine(), "KEY0")) &
+		((state->m_ppi_port_outputs[1][0] & 0x02) ? 0xff : input_port_read(device->machine(), "KEY1")) &
+		((state->m_ppi_port_outputs[1][0] & 0x04) ? 0xff : input_port_read(device->machine(), "KEY2")) &
+		((state->m_ppi_port_outputs[1][0] & 0x08) ? 0xff : input_port_read(device->machine(), "KEY3")) &
+		((state->m_ppi_port_outputs[1][0] & 0x10) ? 0xff : input_port_read(device->machine(), "KEY4")) &
+		((state->m_ppi_port_outputs[1][0] & 0x20) ? 0xff : input_port_read(device->machine(), "KEY5")) &
+		((state->m_ppi_port_outputs[1][0] & 0x40) ? 0xff : input_port_read(device->machine(), "KEY6")) &
+		((state->m_ppi_port_outputs[1][0] & 0x80) ? 0xff : input_port_read(device->machine(), "KEY7"));
 }
 
 static READ8_DEVICE_HANDLER ( lviv_ppi_1_portc_r )     /* keyboard reading */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	return	((state->ppi_port_outputs[1][2] & 0x01) ? 0xff : input_port_read(device->machine(), "KEY8")) &
-		((state->ppi_port_outputs[1][2] & 0x02) ? 0xff : input_port_read(device->machine(), "KEY9" )) &
-		((state->ppi_port_outputs[1][2] & 0x04) ? 0xff : input_port_read(device->machine(), "KEY10")) &
-		((state->ppi_port_outputs[1][2] & 0x08) ? 0xff : input_port_read(device->machine(), "KEY11"));
+	return	((state->m_ppi_port_outputs[1][2] & 0x01) ? 0xff : input_port_read(device->machine(), "KEY8")) &
+		((state->m_ppi_port_outputs[1][2] & 0x02) ? 0xff : input_port_read(device->machine(), "KEY9" )) &
+		((state->m_ppi_port_outputs[1][2] & 0x04) ? 0xff : input_port_read(device->machine(), "KEY10")) &
+		((state->m_ppi_port_outputs[1][2] & 0x08) ? 0xff : input_port_read(device->machine(), "KEY11"));
 }
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_porta_w )	/* kayboard scaning */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	state->ppi_port_outputs[1][0] = data;
+	state->m_ppi_port_outputs[1][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portb_w )
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	state->ppi_port_outputs[1][1] = data;
+	state->m_ppi_port_outputs[1][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	state->ppi_port_outputs[1][2] = data;
+	state->m_ppi_port_outputs[1][2] = data;
 }
 
 
@@ -148,7 +148,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
  READ8_HANDLER ( lviv_io_r )
 {
 	lviv_state *state = space->machine().driver_data<lviv_state>();
-	if (state->startup_mem_map)
+	if (state->m_startup_mem_map)
 	{
 		return 0;	/* ??? */
 	}
@@ -175,11 +175,11 @@ WRITE8_HANDLER ( lviv_io_w )
 {
 	lviv_state *state = space->machine().driver_data<lviv_state>();
 	address_space *cpuspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	if (state->startup_mem_map)
+	if (state->m_startup_mem_map)
 	{
 		UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
 
-		state->startup_mem_map = 0;
+		state->m_startup_mem_map = 0;
 
 		cpuspace->install_write_bank(0x0000, 0x3fff, "bank1");
 		cpuspace->install_write_bank(0x4000, 0x7fff, "bank2");
@@ -240,9 +240,9 @@ MACHINE_RESET( lviv )
 
 	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, machine));
 
-	state->video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
+	state->m_video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
 
-	state->startup_mem_map = 1;
+	state->m_startup_mem_map = 1;
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
@@ -306,10 +306,10 @@ static void lviv_setup_snapshot (running_machine &machine,UINT8 * data)
 	memcpy (ram_get_ptr(machine.device(RAM_TAG))+0xc000, data+0x10011, 0x4000);
 
 	/* Ports */
-	state->ppi_port_outputs[0][0] = data[0x14011+0xc0];
-	state->ppi_port_outputs[0][1] = data[0x14011+0xc1];
-	lviv_update_palette(machine, state->ppi_port_outputs[0][1]&0x7f);
-	state->ppi_port_outputs[0][2] = data[0x14011+0xc2];
+	state->m_ppi_port_outputs[0][0] = data[0x14011+0xc0];
+	state->m_ppi_port_outputs[0][1] = data[0x14011+0xc1];
+	lviv_update_palette(machine, state->m_ppi_port_outputs[0][1]&0x7f);
+	state->m_ppi_port_outputs[0][2] = data[0x14011+0xc2];
 	lviv_update_memory(machine);
 }
 

@@ -12,7 +12,7 @@
 SCREEN_UPDATE( nascom1 )
 {
 	nascom1_state *state = screen->machine().driver_data<nascom1_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int	sy, sx;
 
 	for (sx = 0; sx < 48; sx++)
@@ -37,7 +37,7 @@ SCREEN_UPDATE( nascom1 )
 SCREEN_UPDATE( nascom2 )
 {
 	nascom1_state *state = screen->machine().driver_data<nascom1_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int	sy, sx;
 
 	for (sx = 0; sx < 48; sx++)

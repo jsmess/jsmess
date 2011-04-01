@@ -15,37 +15,37 @@ public:
 	a7800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int lines;
-	int ispal;
-	unsigned char *cart_bkup;
-	unsigned char *bios_bkup;
-	int ctrl_lock;
-	int ctrl_reg;
-	int maria_flag;
-	unsigned char *cartridge_rom;
-	UINT16 cart_type;
-	UINT32 cart_size;
-	unsigned char stick_type;
-	UINT8 *ROM;
-	int maria_palette[8][4];
-	int maria_write_mode;
-	int maria_scanline;
-	unsigned int maria_dll;
-	unsigned int maria_dl;
-	int maria_holey;
-	int maria_offset;
-	int maria_vblank;
-	int maria_dli;
-	int maria_dmaon;
-	int maria_dodma;
-	int maria_wsync;
-	int maria_backcolor;
-	int maria_color_kill;
-	int maria_cwidth;
-	int maria_bcntl;
-	int maria_kangaroo;
-	int maria_rm;
-	unsigned int maria_charbase;
+	int m_lines;
+	int m_ispal;
+	unsigned char *m_cart_bkup;
+	unsigned char *m_bios_bkup;
+	int m_ctrl_lock;
+	int m_ctrl_reg;
+	int m_maria_flag;
+	unsigned char *m_cartridge_rom;
+	UINT16 m_cart_type;
+	UINT32 m_cart_size;
+	unsigned char m_stick_type;
+	UINT8 *m_ROM;
+	int m_maria_palette[8][4];
+	int m_maria_write_mode;
+	int m_maria_scanline;
+	unsigned int m_maria_dll;
+	unsigned int m_maria_dl;
+	int m_maria_holey;
+	int m_maria_offset;
+	int m_maria_vblank;
+	int m_maria_dli;
+	int m_maria_dmaon;
+	int m_maria_dodma;
+	int m_maria_wsync;
+	int m_maria_backcolor;
+	int m_maria_color_kill;
+	int m_maria_cwidth;
+	int m_maria_bcntl;
+	int m_maria_kangaroo;
+	int m_maria_rm;
+	unsigned int m_maria_charbase;
 };
 
 

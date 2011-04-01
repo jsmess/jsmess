@@ -33,7 +33,7 @@ public:
 	DECLARE_READ8_MEMBER( uts20_vram_r );
 	DECLARE_WRITE8_MEMBER( uts20_vram_w );
 	DECLARE_WRITE8_MEMBER( uts20_43_w );
-	const UINT8 *FNT;
+	const UINT8 *m_FNT;
 	UINT8 m_uts20_screen;
 	UINT8 m_framecnt;
 	virtual void machine_reset();
@@ -87,7 +87,7 @@ UTS20_MACHINE_RESET
 
 UTS20_VIDEO_START
 {
-	FNT = m_machine.region("chargen")->base();
+	m_FNT = m_machine.region("chargen")->base();
 }
 
 UTS20_SCREEN_UPDATE
@@ -118,7 +118,7 @@ UTS20_SCREEN_UPDATE
 
 					chr &= 0x7f;
 
-					gfx = FNT[(chr<<4) | ra ];
+					gfx = m_FNT[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */

@@ -157,11 +157,11 @@ static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
 {
 	ti68k_state *state = timer.machine().driver_data<ti68k_state>();
 
-	state->timer++;
+	state->m_timer++;
 
 	if (state->m_timer_on)
 	{
-		if (!(state->timer & state->m_timer_mask) && BIT(state->m_io_hw1[0x0a], 3))
+		if (!(state->m_timer & state->m_timer_mask) && BIT(state->m_io_hw1[0x0a], 3))
 		{
 			if (state->m_timer_val)
 				state->m_timer_val++;
@@ -169,15 +169,15 @@ static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
 				state->m_timer_val = (state->m_io_hw1[0x0b]) & 0xff;
 		}
 
-		if (!BIT(state->m_io_hw1[0x0a], 7) && ((state->m_hw_version == state->HW1) || (!BIT(state->m_io_hw1[0x0f], 2) && !BIT(state->m_io_hw1[0x0f], 1))))
+		if (!BIT(state->m_io_hw1[0x0a], 7) && ((state->m_hw_version == state->m_HW1) || (!BIT(state->m_io_hw1[0x0f], 2) && !BIT(state->m_io_hw1[0x0f], 1))))
 		{
-			if (!(state->timer & 0x003f))
+			if (!(state->m_timer & 0x003f))
 				state->m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
 
-			if (!(state->timer & 0x3fff) && !BIT(state->m_io_hw1[0x0a], 3))
+			if (!(state->m_timer & 0x3fff) && !BIT(state->m_io_hw1[0x0a], 3))
 				state->m_maincpu->set_input_line(M68K_IRQ_3, HOLD_LINE);
 
-			if (!(state->timer & state->m_timer_mask) && BIT(state->m_io_hw1[0x0a], 3) && state->m_timer_val == 0)
+			if (!(state->m_timer & state->m_timer_mask) && BIT(state->m_io_hw1[0x0a], 3) && state->m_timer_val == 0)
 				state->m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 		}
 	}
@@ -434,7 +434,7 @@ void ti68k_state::machine_start()
 			m_hw_version = ((rom[base + 0x0b]) << 16) | rom[base + 0x0c];
 
 		if (!m_hw_version)
-			m_hw_version = HW1;
+			m_hw_version = m_HW1;
 
 		for (i = 0x9000; i < 0x100000; i++)
 			if (rom[i] == 0xcccc && rom[i + 1] == 0xcccc)
@@ -444,7 +444,7 @@ void ti68k_state::machine_start()
 	}
 	else
 	{
-		m_hw_version = HW1;
+		m_hw_version = m_HW1;
 		m_initial_pc = ((rom[2]) << 16) | rom[3];
 
 		m_maincpu->space(AS_PROGRAM)->unmap_read(0x200000, 0x5fffff);

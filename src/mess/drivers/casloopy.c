@@ -150,7 +150,7 @@ public:
 	casloopy_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *bios_rom;
+	UINT32 *m_bios_rom;
 };
 
 
@@ -166,7 +166,7 @@ static SCREEN_UPDATE( casloopy )
 }
 
 static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE_MEMBER(casloopy_state, bios_rom)
+	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE_MEMBER(casloopy_state, m_bios_rom)
 //  AM_RANGE(0x01000000, 0x017fffff) - i/o?
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
@@ -244,8 +244,8 @@ static DRIVER_INIT( casloopy )
 {
 	casloopy_state *state = machine.driver_data<casloopy_state>();
 	/* load hand made bios data*/
-	state->bios_rom[0/4] = 0x6000964; //SPC
-	state->bios_rom[4/4] = 0xffffff0; //SSP
+	state->m_bios_rom[0/4] = 0x6000964; //SPC
+	state->m_bios_rom[4/4] = 0xffffff0; //SSP
 }
 
 GAME( 1995, casloopy,  0,   casloopy,  casloopy,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )

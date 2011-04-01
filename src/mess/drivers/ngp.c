@@ -130,7 +130,7 @@ public:
 
 	UINT8 m_io_reg[0x40];
 	UINT8 m_old_to3;
-	emu_timer* seconds_timer;
+	emu_timer* m_seconds_timer;
 
 	struct {
 		int		present;
@@ -603,8 +603,8 @@ WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 
 void ngp_state::machine_start()
 {
-	seconds_timer = m_machine.scheduler().timer_alloc(FUNC(ngp_seconds_callback));
-	seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
+	m_seconds_timer = m_machine.scheduler().timer_alloc(FUNC(ngp_seconds_callback));
+	m_seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
 }
 
 

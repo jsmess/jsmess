@@ -39,11 +39,11 @@ public:
 
 	/* for elwro800 */
 	/* RAM mapped at 0 */
-	UINT8 ram_at_0000;
+	UINT8 m_ram_at_0000;
 
 	/* NR signal */
-	UINT8 NR;
-	UINT8 df_on_databus;
+	UINT8 m_NR;
+	UINT8 m_df_on_databus;
 };
 
 
@@ -57,9 +57,9 @@ public:
 DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
 	elwro800_state *state = machine->driver_data<elwro800_state>();
-	if (state->ram_at_0000 && address == 0x66)
+	if (state->m_ram_at_0000 && address == 0x66)
 	{
-		direct.explicit_configure(0x66, 0x66, 0, &state->df_on_databus);
+		direct.explicit_configure(0x66, 0x66, 0, &state->m_df_on_databus);
 		return ~0;
 	}
 	return address;
@@ -116,21 +116,21 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 		// rom BAS0
 		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0000); /* BAS0 ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
-		state->ram_at_0000 = 0;
+		state->m_ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
 		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000); /* BOOT ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
-		state->ram_at_0000 = 0;
+		state->m_ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
 		memory_set_bankptr(machine, "bank1", messram);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
-		state->ram_at_0000 = 1;
+		state->m_ram_at_0000 = 1;
 	}
 
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
@@ -148,14 +148,14 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	if (BIT(ls175,2))
 	{
 		// relok
-		state->screen_location = messram + 0xe000;
+		state->m_screen_location = messram + 0xe000;
 	}
 	else
 	{
-		state->screen_location = messram + 0x4000;
+		state->m_screen_location = messram + 0x4000;
 	}
 
-	state->NR = BIT(ls175,3);
+	state->m_NR = BIT(ls175,3);
 	if (BIT(ls175,3))
 	{
 		logerror("Reading network number\n");
@@ -234,7 +234,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 		int i;
 		char port_name[6] = "LINE0";
 
-		if ( !state->NR )
+		if ( !state->m_NR )
 		{
 			for (i = 0; i < 9; mask >>= 1, i++)
 			{
@@ -510,13 +510,13 @@ static MACHINE_RESET(elwro800)
 	elwro800_state *state = machine.driver_data<elwro800_state>();
 	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 
-	state->df_on_databus = 0xdf;
+	state->m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
 
 	memory_set_bankptr(machine, "bank3", messram + 0x4000);
 
-	state->port_7ffd_data = 0;
-	state->port_1ffd_data = -1;
+	state->m_port_7ffd_data = 0;
+	state->m_port_1ffd_data = -1;
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);

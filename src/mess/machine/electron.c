@@ -20,22 +20,22 @@ static device_t *cassette_device_image( running_machine &machine )
 
 static void electron_tape_start( electron_state *state )
 {
-	if ( state->ula.tape_running )
+	if ( state->m_ula.tape_running )
 	{
 		return;
 	}
-	state->ula.tape_steps = 0;
-	state->ula.tape_value = 0x80808080;
-	state->ula.high_tone_set = 0;
-	state->ula.bit_count = 0;
-	state->ula.tape_running = 1;
-	state->tape_timer->adjust(attotime::zero, 0, attotime::from_hz(4800));
+	state->m_ula.tape_steps = 0;
+	state->m_ula.tape_value = 0x80808080;
+	state->m_ula.high_tone_set = 0;
+	state->m_ula.bit_count = 0;
+	state->m_ula.tape_running = 1;
+	state->m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(4800));
 }
 
 static void electron_tape_stop( electron_state *state )
 {
-	state->ula.tape_running = 0;
-	state->tape_timer->reset(  );
+	state->m_ula.tape_running = 0;
+	state->m_tape_timer->reset(  );
 }
 
 #define TAPE_LOW	0x00;
@@ -44,72 +44,72 @@ static void electron_tape_stop( electron_state *state )
 static TIMER_CALLBACK(electron_tape_timer_handler)
 {
 	electron_state *state = machine.driver_data<electron_state>();
-	if ( state->ula.cassette_motor_mode )
+	if ( state->m_ula.cassette_motor_mode )
 	{
 		double tap_val;
 		tap_val = cassette_input( cassette_device_image( machine ) );
 		if ( tap_val < -0.5 )
 		{
-			state->ula.tape_value = ( state->ula.tape_value << 8 ) | TAPE_LOW;
-			state->ula.tape_steps++;
+			state->m_ula.tape_value = ( state->m_ula.tape_value << 8 ) | TAPE_LOW;
+			state->m_ula.tape_steps++;
 		}
 		else if ( tap_val > 0.5 )
 		{
-			state->ula.tape_value = ( state->ula.tape_value << 8 ) | TAPE_HIGH;
-			state->ula.tape_steps++;
+			state->m_ula.tape_value = ( state->m_ula.tape_value << 8 ) | TAPE_HIGH;
+			state->m_ula.tape_steps++;
 		}
 		else
 		{
-			state->ula.tape_steps = 0;
-			state->ula.bit_count = 0;
-			state->ula.high_tone_set = 0;
-			state->ula.tape_value = 0x80808080;
+			state->m_ula.tape_steps = 0;
+			state->m_ula.bit_count = 0;
+			state->m_ula.high_tone_set = 0;
+			state->m_ula.tape_value = 0x80808080;
 		}
-		if ( state->ula.tape_steps > 2 && ( state->ula.tape_value == 0x0000FFFF || state->ula.tape_value == 0x00FF00FF ) )
+		if ( state->m_ula.tape_steps > 2 && ( state->m_ula.tape_value == 0x0000FFFF || state->m_ula.tape_value == 0x00FF00FF ) )
 		{
-			state->ula.tape_steps = 0;
-			switch( state->ula.bit_count )
+			state->m_ula.tape_steps = 0;
+			switch( state->m_ula.bit_count )
 			{
 			case 0:	/* start bit */
-				state->ula.start_bit = ( ( state->ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
-				//logerror( "++ Read start bit: %d\n", state->ula.start_bit );
-				if ( state->ula.start_bit )
+				state->m_ula.start_bit = ( ( state->m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
+				//logerror( "++ Read start bit: %d\n", state->m_ula.start_bit );
+				if ( state->m_ula.start_bit )
 				{
-					if ( state->ula.high_tone_set )
+					if ( state->m_ula.high_tone_set )
 					{
-						state->ula.bit_count--;
+						state->m_ula.bit_count--;
 					}
 				}
 				else
 				{
-					state->ula.high_tone_set = 0;
+					state->m_ula.high_tone_set = 0;
 				}
 				break;
 			case 1: case 2: case 3: case 4:
 			case 5: case 6: case 7: case 8:
-				//logerror( "++ Read regular bit: %d\n", state->ula.tape_value == 0x0000FFFF ? 0 : 1 );
-				state->ula.tape_byte = ( state->ula.tape_byte >> 1 ) | ( state->ula.tape_value == 0x0000FFFF ? 0 : 0x80 );
+				//logerror( "++ Read regular bit: %d\n", state->m_ula.tape_value == 0x0000FFFF ? 0 : 1 );
+				state->m_ula.tape_byte = ( state->m_ula.tape_byte >> 1 ) | ( state->m_ula.tape_value == 0x0000FFFF ? 0 : 0x80 );
 				break;
 			case 9: /* stop bit */
-				state->ula.stop_bit = ( ( state->ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
-				//logerror( "++ Read stop bit: %d\n", state->ula.stop_bit );
-				if ( state->ula.start_bit && state->ula.stop_bit && state->ula.tape_byte == 0xFF && ! state->ula.high_tone_set )
+				state->m_ula.stop_bit = ( ( state->m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
+				//logerror( "++ Read stop bit: %d\n", state->m_ula.stop_bit );
+				if ( state->m_ula.start_bit && state->m_ula.stop_bit && state->m_ula.tape_byte == 0xFF && ! state->m_ula.high_tone_set )
 				{
 					electron_interrupt_handler( machine, INT_SET, INT_HIGH_TONE );
-					state->ula.high_tone_set = 1;
+					state->m_ula.high_tone_set = 1;
 				}
-				else if ( ! state->ula.start_bit && state->ula.stop_bit )
+				else if ( ! state->m_ula.start_bit && state->m_ula.stop_bit )
 				{
-					//logerror( "-- Byte read from tape: %02x\n", state->ula.tape_byte );
+					//logerror( "-- Byte read from tape: %02x\n", state->m_ula.tape_byte );
 					electron_interrupt_handler( machine, INT_SET, INT_RECEIVE_FULL );
 				}
 				else
 				{
-					logerror( "Invalid start/stop bit combination detected: %d,%d\n", state->ula.start_bit, state->ula.stop_bit );
+					logerror( "Invalid start/stop bit combination detected: %d,%d\n", state->m_ula.start_bit, state->m_ula.stop_bit );
 				}
 				break;
 			}
-			state->ula.bit_count = ( state->ula.bit_count + 1 ) % 10;
+			state->m_ula.bit_count = ( state->m_ula.bit_count + 1 ) % 10;
 		}
 	}
 }
@@ -160,14 +160,14 @@ READ8_HANDLER( electron_ula_r )
 	switch ( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt status */
-		data = state->ula.interrupt_status;
-		state->ula.interrupt_status &= ~0x02;
+		data = state->m_ula.interrupt_status;
+		state->m_ula.interrupt_status &= ~0x02;
 		break;
 	case 0x01:	/* Unknown */
 		break;
 	case 0x04:	/* Casette data shift register */
 		electron_interrupt_handler(space->machine(), INT_CLEAR, INT_RECEIVE_FULL );
-		data = state->ula.tape_byte;
+		data = state->m_ula.tape_byte;
 		break;
 	}
 	logerror( "ULA: read offset %02x: %02x\n", offset, data );
@@ -186,17 +186,17 @@ WRITE8_HANDLER( electron_ula_w )
 	switch( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt control */
-		state->ula.interrupt_control = data;
+		state->m_ula.interrupt_control = data;
 		break;
 	case 0x01:	/* Unknown */
 		break;
 	case 0x02:	/* Screen start address #1 */
-		state->ula.screen_start = ( state->ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
-		logerror( "screen_start changed to %04x\n", state->ula.screen_start );
+		state->m_ula.screen_start = ( state->m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
+		logerror( "screen_start changed to %04x\n", state->m_ula.screen_start );
 		break;
 	case 0x03:	/* Screen start addres #2 */
-		state->ula.screen_start = ( state->ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
-		logerror( "screen_start changed to %04x\n", state->ula.screen_start );
+		state->m_ula.screen_start = ( state->m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
+		logerror( "screen_start changed to %04x\n", state->m_ula.screen_start );
 		break;
 	case 0x04:	/* Cassette data shift register */
 		break;
@@ -207,19 +207,19 @@ WRITE8_HANDLER( electron_ula_w )
          * Rompages 10 and 11 both select the Basic ROM.
          * Rompages 8 and 9 both select the keyboard.
          */
-		if ( ( ( state->ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) )
+		if ( ( ( state->m_ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) )
 		{
-			state->ula.rompage = data & 0x0f;
-			if ( state->ula.rompage == 8 || state->ula.rompage == 9 )
+			state->m_ula.rompage = data & 0x0f;
+			if ( state->m_ula.rompage == 8 || state->m_ula.rompage == 9 )
 			{
-				state->ula.rompage = 8;
+				state->m_ula.rompage = 8;
 				space->install_legacy_read_handler( 0x8000, 0xbfff, FUNC(electron_read_keyboard) );
 			}
 			else
 			{
 				space->install_read_bank( 0x8000, 0xbfff, "bank2");
 			}
-			memory_set_bank(space->machine(), "bank2", state->ula.rompage);
+			memory_set_bank(space->machine(), "bank2", state->m_ula.rompage);
 		}
 		if ( data & 0x10 )
 		{
@@ -238,14 +238,14 @@ WRITE8_HANDLER( electron_ula_w )
 		}
 		break;
 	case 0x06:	/* Counter divider */
-		if ( state->ula.communication_mode == 0x01)
+		if ( state->m_ula.communication_mode == 0x01)
 		{
 			beep_set_frequency( speaker, 1000000 / ( 16 * ( data + 1 ) ) );
 		}
 		break;
 	case 0x07:	/* Misc. */
-		state->ula.communication_mode = ( data >> 1 ) & 0x03;
-		switch( state->ula.communication_mode )
+		state->m_ula.communication_mode = ( data >> 1 ) & 0x03;
+		switch( state->m_ula.communication_mode )
 		{
 		case 0x00:	/* cassette input */
 			beep_set_state( speaker, 0 );
@@ -264,28 +264,28 @@ WRITE8_HANDLER( electron_ula_w )
 			electron_tape_stop(state);
 			break;
 		}
-		state->ula.screen_mode = ( data >> 3 ) & 0x07;
-		state->ula.screen_base = electron_screen_base[ state->ula.screen_mode ];
-		state->ula.screen_size = 0x8000 - state->ula.screen_base;
-		state->ula.vram = (UINT8 *)space->get_read_ptr(state->ula.screen_base );
-		logerror( "ULA: screen mode set to %d\n", state->ula.screen_mode );
-		state->ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
-		cassette_change_state( cassette_device_image( space->machine() ), state->ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
-		state->ula.capslock_mode = ( data >> 7 ) & 0x01;
+		state->m_ula.screen_mode = ( data >> 3 ) & 0x07;
+		state->m_ula.screen_base = electron_screen_base[ state->m_ula.screen_mode ];
+		state->m_ula.screen_size = 0x8000 - state->m_ula.screen_base;
+		state->m_ula.vram = (UINT8 *)space->get_read_ptr(state->m_ula.screen_base );
+		logerror( "ULA: screen mode set to %d\n", state->m_ula.screen_mode );
+		state->m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
+		cassette_change_state( cassette_device_image( space->machine() ), state->m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
+		state->m_ula.capslock_mode = ( data >> 7 ) & 0x01;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:
 		// video_update
-		state->ula.current_pal[i+10] = (state->ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
-		state->ula.current_pal[i+8] = (state->ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
-		state->ula.current_pal[i+2] = (state->ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
-		state->ula.current_pal[i] = (state->ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
+		state->m_ula.current_pal[i+10] = (state->m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+		state->m_ula.current_pal[i+8] = (state->m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
+		state->m_ula.current_pal[i+2] = (state->m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
+		state->m_ula.current_pal[i] = (state->m_ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
 		break;
 	case 0x09: case 0x0B: case 0x0D: case 0x0F:
 		// video_update
-		state->ula.current_pal[i+10] = (state->ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
-		state->ula.current_pal[i+8] = (state->ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
-		state->ula.current_pal[i+2] = (state->ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
-		state->ula.current_pal[i] = (state->ula.current_pal[i] & 0x04) | (((data & 0x10) >> 3) | ((data & 0x01)));
+		state->m_ula.current_pal[i+10] = (state->m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
+		state->m_ula.current_pal[i+8] = (state->m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
+		state->m_ula.current_pal[i+2] = (state->m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
+		state->m_ula.current_pal[i] = (state->m_ula.current_pal[i] & 0x04) | (((data & 0x10) >> 3) | ((data & 0x01)));
 		break;
 	}
 }
@@ -295,20 +295,20 @@ void electron_interrupt_handler(running_machine &machine, int mode, int interrup
 	electron_state *state = machine.driver_data<electron_state>();
 	if ( mode == INT_SET )
 	{
-		state->ula.interrupt_status |= interrupt;
+		state->m_ula.interrupt_status |= interrupt;
 	}
 	else
 	{
-		state->ula.interrupt_status &= ~interrupt;
+		state->m_ula.interrupt_status &= ~interrupt;
 	}
-	if ( state->ula.interrupt_status & state->ula.interrupt_control & ~0x83 )
+	if ( state->m_ula.interrupt_status & state->m_ula.interrupt_control & ~0x83 )
 	{
-		state->ula.interrupt_status |= 0x01;
+		state->m_ula.interrupt_status |= 0x01;
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE );
 	}
 	else
 	{
-		state->ula.interrupt_status &= ~0x01;
+		state->m_ula.interrupt_status &= ~0x01;
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE );
 	}
 }
@@ -329,17 +329,17 @@ static void electron_reset(running_machine &machine)
 	electron_state *state = machine.driver_data<electron_state>();
 	memory_set_bank(machine, "bank2", 0);
 
-	state->ula.communication_mode = 0x04;
-	state->ula.screen_mode = 0;
-	state->ula.cassette_motor_mode = 0;
-	state->ula.capslock_mode = 0;
-	state->ula.screen_mode = 0;
-	state->ula.screen_start = 0x3000;
-	state->ula.screen_base = 0x3000;
-	state->ula.screen_size = 0x8000 - 0x3000;
-	state->ula.screen_addr = 0;
-	state->ula.tape_running = 0;
-	state->ula.vram = (UINT8 *)machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(state->ula.screen_base);
+	state->m_ula.communication_mode = 0x04;
+	state->m_ula.screen_mode = 0;
+	state->m_ula.cassette_motor_mode = 0;
+	state->m_ula.capslock_mode = 0;
+	state->m_ula.screen_mode = 0;
+	state->m_ula.screen_start = 0x3000;
+	state->m_ula.screen_base = 0x3000;
+	state->m_ula.screen_size = 0x8000 - 0x3000;
+	state->m_ula.screen_addr = 0;
+	state->m_ula.tape_running = 0;
+	state->m_ula.vram = (UINT8 *)machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(state->m_ula.screen_base);
 }
 
 MACHINE_START( electron )
@@ -347,10 +347,10 @@ MACHINE_START( electron )
 	electron_state *state = machine.driver_data<electron_state>();
 	memory_configure_bank(machine, "bank2", 0, 16, machine.region("user1")->base(), 0x4000);
 
-	state->ula.interrupt_status = 0x82;
-	state->ula.interrupt_control = 0x00;
+	state->m_ula.interrupt_status = 0x82;
+	state->m_ula.interrupt_control = 0x00;
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_beep));
-	state->tape_timer = machine.scheduler().timer_alloc(FUNC(electron_tape_timer_handler));
+	state->m_tape_timer = machine.scheduler().timer_alloc(FUNC(electron_tape_timer_handler));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, electron_reset);
 }
 

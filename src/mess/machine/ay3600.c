@@ -315,7 +315,7 @@ int AY3600_init(running_machine &machine)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	/* Init the key remapping table */
-	state->ay3600_keys = auto_alloc_array_clear(machine, unsigned int, AY3600_KEYS_LENGTH);
+	state->m_ay3600_keys = auto_alloc_array_clear(machine, unsigned int, AY3600_KEYS_LENGTH);
 
 	/* We poll the keyboard periodically to scan the keys.  This is
     actually consistent with how the AY-3600 keyboard controller works. */
@@ -324,14 +324,14 @@ int AY3600_init(running_machine &machine)
 	/* Set Caps Lock light to ON, since that's how we default it. */
 	set_led_status(machine,1,1);
 
-	state->keywaiting = 0;
-	state->keycode = 0;
-	state->keystilldown = 0;
-	state->keymodreg = A2_KEYMOD_CAPSLOCK;	// caps lock on
+	state->m_keywaiting = 0;
+	state->m_keycode = 0;
+	state->m_keystilldown = 0;
+	state->m_keymodreg = A2_KEYMOD_CAPSLOCK;	// caps lock on
 
-	state->last_key = 0xff; 	/* necessary for special repeat key behaviour */
-	state->last_key_unmodified = 0xff;	/* necessary for special repeat key behaviour */
-	state->time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+	state->m_last_key = 0xff; 	/* necessary for special repeat key behaviour */
+	state->m_last_key_unmodified = 0xff;	/* necessary for special repeat key behaviour */
+	state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
 
 	inputx_setup_natural_keyboard(machine,
 		AY3600_keyboard_queue_chars,
@@ -367,20 +367,20 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	/* only repeat keys on a 2/2+ if special REPT key is pressed */
 	if (a2_has_repeat(machine))
-		state->time_until_repeat = input_port_read(machine, "keyb_repeat") & 0x01 ? 0 : ~0;
+		state->m_time_until_repeat = input_port_read(machine, "keyb_repeat") & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_CAPSLOCK))
 	{
 		caps_lock = 1;
 		set_led_status(machine,1,1);
-		state->keymodreg |= A2_KEYMOD_CAPSLOCK;
+		state->m_keymodreg |= A2_KEYMOD_CAPSLOCK;
 	}
 	else
 	{
 		caps_lock = 0;
 		set_led_status(machine,1,0);
-		state->keymodreg &= ~A2_KEYMOD_CAPSLOCK;
+		state->m_keymodreg &= ~A2_KEYMOD_CAPSLOCK;
 	}
 
 	switchkey = A2_KEY_NORMAL;
@@ -389,59 +389,59 @@ static TIMER_CALLBACK(AY3600_poll)
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_SHIFT))
 	{
 		switchkey |= A2_KEY_SHIFT;
-		state->keymodreg |= A2_KEYMOD_SHIFT;
+		state->m_keymodreg |= A2_KEYMOD_SHIFT;
 	}
 	else
 	{
-		state->keymodreg &= ~A2_KEYMOD_SHIFT;
+		state->m_keymodreg &= ~A2_KEYMOD_SHIFT;
 	}
 
 	/* control key check - only one control key on the left side on the Apple */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_CONTROL))
 	{
 		switchkey |= A2_KEY_CONTROL;
-		state->keymodreg |= A2_KEYMOD_CONTROL;
+		state->m_keymodreg |= A2_KEYMOD_CONTROL;
 	}
 	else
 	{
-		state->keymodreg &= ~A2_KEYMOD_CONTROL;
+		state->m_keymodreg &= ~A2_KEYMOD_CONTROL;
 	}
 
 	/* apple key check */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON0))
 	{
-		state->keymodreg |= A2_KEYMOD_COMMAND;
+		state->m_keymodreg |= A2_KEYMOD_COMMAND;
 	}
 	else
 	{
-		state->keymodreg &= ~A2_KEYMOD_COMMAND;
+		state->m_keymodreg &= ~A2_KEYMOD_COMMAND;
 	}
 
 	/* option key check */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON1))
 	{
-		state->keymodreg |= A2_KEYMOD_OPTION;
+		state->m_keymodreg |= A2_KEYMOD_OPTION;
 	}
 	else
 	{
-		state->keymodreg &= ~A2_KEYMOD_OPTION;
+		state->m_keymodreg &= ~A2_KEYMOD_OPTION;
 	}
 
 	/* reset key check */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_RESET) &&
 		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL))
 	{
-			if (!state->reset_flag)
+			if (!state->m_reset_flag)
 			{
-				state->reset_flag = 1;
+				state->m_reset_flag = 1;
 				/* using PULSE_LINE does not allow us to press and hold key */
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			return;
 	}
-	if (state->reset_flag)
+	if (state->m_reset_flag)
 	{
-		state->reset_flag = 0;
+		state->m_reset_flag = 0;
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 		machine.schedule_soft_reset();
 	}
@@ -449,7 +449,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	/* run through real keys and see what's being pressed */
 	num_ports = a2_has_keypad(machine) ? 9 : 7;
 
-	state->keymodreg &= ~A2_KEYMOD_KEYPAD;
+	state->m_keymodreg &= ~A2_KEYMOD_KEYPAD;
 
 	for (port = 0; port < num_ports; port++)
 	{
@@ -473,55 +473,55 @@ static TIMER_CALLBACK(AY3600_poll)
 
 				if (port == 8)
 				{
-					state->keymodreg |= A2_KEYMOD_KEYPAD;
+					state->m_keymodreg |= A2_KEYMOD_KEYPAD;
 				}
 
 				/* prevent overflow */
-				if (state->ay3600_keys[port*8+bit] < 65000)
-					state->ay3600_keys[port*8+bit]++;
+				if (state->m_ay3600_keys[port*8+bit] < 65000)
+					state->m_ay3600_keys[port*8+bit]++;
 
 				/* on every key press, reset the time until repeat and the key to repeat */
-				if ((state->ay3600_keys[port*8+bit] == 1) && (curkey_unmodified != state->last_key_unmodified))
+				if ((state->m_ay3600_keys[port*8+bit] == 1) && (curkey_unmodified != state->m_last_key_unmodified))
 				{
-					state->time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
-					state->last_key = curkey;
-					state->last_key_unmodified = curkey_unmodified;
+					state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+					state->m_last_key = curkey;
+					state->m_last_key_unmodified = curkey_unmodified;
 				}
 			}
 			else
 			{
-				state->ay3600_keys[port*8+bit] = 0;
+				state->m_ay3600_keys[port*8+bit] = 0;
 			}
 		}
 	}
 
-	state->keymodreg &= ~A2_KEYMOD_REPEAT;
+	state->m_keymodreg &= ~A2_KEYMOD_REPEAT;
 
 	if (!any_key_pressed)
 	{
 		/* If no keys have been pressed, reset the repeat time and return */
-		state->time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
-		state->last_key = 0xff;
-		state->last_key_unmodified = 0xff;
+		state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+		state->m_last_key = 0xff;
+		state->m_last_key_unmodified = 0xff;
 	}
 	else
 	{
 		/* Otherwise, count down the repeat time */
-		if (state->time_until_repeat > 0)
-			state->time_until_repeat--;
+		if (state->m_time_until_repeat > 0)
+			state->m_time_until_repeat--;
 
 		/* Even if a key has been released, repeat it if it was the last key pressed */
 		/* If we should output a key, set the appropriate Apple II data lines */
-		if (state->time_until_repeat == 0 ||
-			state->time_until_repeat == MAGIC_KEY_REPEAT_NUMBER-1)
+		if (state->m_time_until_repeat == 0 ||
+			state->m_time_until_repeat == MAGIC_KEY_REPEAT_NUMBER-1)
 		{
-			state->keywaiting = 1;
-			state->keycode = state->last_key;
-			state->keycode_unmodified = state->last_key_unmodified;
-			state->keymodreg |= A2_KEYMOD_REPEAT;
+			state->m_keywaiting = 1;
+			state->m_keycode = state->m_last_key;
+			state->m_keycode_unmodified = state->m_last_key_unmodified;
+			state->m_keymodreg |= A2_KEYMOD_REPEAT;
 		}
 	}
-	state->keystilldown = (state->last_key_unmodified == state->keycode_unmodified);
+	state->m_keystilldown = (state->m_last_key_unmodified == state->m_keycode_unmodified);
 }
 
 
@@ -534,7 +534,7 @@ int AY3600_keydata_strobe_r(running_machine &machine)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int rc;
-	rc = state->keycode | (state->keywaiting ? 0x80 : 0x00);
+	rc = state->m_keycode | (state->m_keywaiting ? 0x80 : 0x00);
 	LOG(("AY3600_keydata_strobe_r(): rc=0x%02x\n", rc));
 	return rc;
 }
@@ -549,8 +549,8 @@ int AY3600_anykey_clearstrobe_r(running_machine &machine)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int rc;
-	state->keywaiting = 0;
-	rc = state->keycode | (state->keystilldown ? 0x80 : 0x00);
+	state->m_keywaiting = 0;
+	rc = state->m_keycode | (state->m_keystilldown ? 0x80 : 0x00);
 	LOG(("AY3600_anykey_clearstrobe_r(): rc=0x%02x\n", rc));
 	return rc;
 }
@@ -563,7 +563,7 @@ int AY3600_anykey_clearstrobe_r(running_machine &machine)
 int AY3600_keymod_r(running_machine &machine)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	return state->keymodreg;
+	return state->m_keymodreg;
 }
 
 /***************************************************************************
@@ -606,10 +606,10 @@ static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_c
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 
-	if (state->keywaiting)
+	if (state->m_keywaiting)
 		return 0;
-	state->keycode = AY3600_get_keycode(text[0]);
-	state->keywaiting = 1;
+	state->m_keycode = AY3600_get_keycode(text[0]);
+	state->m_keywaiting = 1;
 	return 1;
 }
 

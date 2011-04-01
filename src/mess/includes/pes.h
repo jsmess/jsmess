@@ -28,9 +28,9 @@ public:
 	UINT8 m_wsstate;			// /WS
 	UINT8 m_rsstate;			// /RS
 	UINT8 m_port3_state;		// Port3 state as last written
-	UINT8 infifo[32];			// input fifo
-	UINT8 infifo_tail_ptr;		// " tail
-	UINT8 infifo_head_ptr;		// " head
+	UINT8 m_infifo[32];			// input fifo
+	UINT8 m_infifo_tail_ptr;		// " tail
+	UINT8 m_infifo_head_ptr;		// " head
 
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(rsws_w);

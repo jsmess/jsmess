@@ -83,29 +83,29 @@
 
 typedef struct {
 
-	UINT8   pin[1024];     /* packet received */
-	UINT8   pout[1024];    /* packet sent */
-	UINT32  seq;           /* sequence number, starting at 0 */
-	UINT16  posin;         /* position in pin */
-	UINT16  posout;        /* position in pout */
-	UINT16  nbout;         /* size of pout */
+	UINT8   m_pin[1024];     /* packet received */
+	UINT8   m_pout[1024];    /* packet sent */
+	UINT32  m_seq;           /* sequence number, starting at 0 */
+	UINT16  m_posin;         /* position in pin */
+	UINT16  m_posout;        /* position in pout */
+	UINT16  m_nbout;         /* size of pout */
 
-	UINT8   state;         /* current protocol state */
-	UINT8   retries;       /* packet retries remaining */
+	UINT8   m_state;         /* current protocol state */
+	UINT8   m_retries;       /* packet retries remaining */
 
 	/* (relevant) configuration information, sent in S and D packet */
-	UINT8   maxl; /* max packet length (value of <len>) */
-	UINT8   npad; /* number of padding characters before packet */
-	UINT8   padc; /* padding character */
-	UINT8   eol;  /* character to add after packet */
-	UINT8   qctl; /* escape character */
+	UINT8   m_maxl; /* max packet length (value of <len>) */
+	UINT8   m_npad; /* number of padding characters before packet */
+	UINT8   m_padc; /* padding character */
+	UINT8   m_eol;  /* character to add after packet */
+	UINT8   m_qctl; /* escape character */
 
-	emu_timer* resend;           /* auto-resend packet */
+	emu_timer* m_resend;           /* auto-resend packet */
 
-	device_image_interface* image;  /* underlying image */
+	device_image_interface* m_image;  /* underlying image */
 
-	running_machine *machine;
-	kermit_config* conf;
+	running_machine *m_machine;
+	kermit_config* m_conf;
 
 } kermit;
 
@@ -165,51 +165,51 @@ static void kermit_start_sending( kermit* state )
 {
 	int i;
 
-	for (i=1;i<state->nbout;i++)
-		if (kermit_is_ctl(state->pout[i]))
-			logerror( "send: not char %i at pos %i\n", state->pout[i], i  );
+	for (i=1;i<state->m_nbout;i++)
+		if (kermit_is_ctl(state->m_pout[i]))
+			logerror( "send: not char %i at pos %i\n", state->m_pout[i], i  );
 
-	if ( state->nbout <= 0 ) return;
+	if ( state->m_nbout <= 0 ) return;
 
 	/* prepend padding and append eol */
-	if ( state->npad > 0 )
+	if ( state->m_npad > 0 )
 	{
-		memmove( state->pout + state->npad, state->pout, state->nbout );
-		memset( state->pout, state->padc, state->npad );
-		state->nbout += state->npad;
+		memmove( state->m_pout + state->m_npad, state->m_pout, state->m_nbout );
+		memset( state->m_pout, state->m_padc, state->m_npad );
+		state->m_nbout += state->m_npad;
 	}
-	state->pout[ state->nbout ] = state->eol;
-	state->nbout++;
+	state->m_pout[ state->m_nbout ] = state->m_eol;
+	state->m_nbout++;
 
-	if ( state->conf && state->conf->send )
+	if ( state->m_conf && state->m_conf->send )
 	{
-		state->conf->send( *state->machine, state->pout[ 0 ] );
+		state->m_conf->send( *state->m_machine, state->m_pout[ 0 ] );
 	}
-	state->posout = 1;
+	state->m_posout = 1;
 
-	state->retries = KERMIT_MAX_RETRIES;
-	state->resend->adjust( KERMIT_RETRY_DELAY, 0, KERMIT_RETRY_DELAY );
+	state->m_retries = KERMIT_MAX_RETRIES;
+	state->m_resend->adjust( KERMIT_RETRY_DELAY, 0, KERMIT_RETRY_DELAY );
 }
 
 static void kermit_reset( kermit* state );
 
 static void kermit_resend( kermit* state )
 {
-	if ( state->conf && state->conf->send )
+	if ( state->m_conf && state->m_conf->send )
 	{
 		/* retry */
-		if ( state->nbout == 0 ) return;
-		if ( state->retries <= 0 )
+		if ( state->m_nbout == 0 ) return;
+		if ( state->m_retries <= 0 )
 		{
 			kermit_reset( state );
 			return;
 		}
 
-		state->conf->send( *state->machine, state->pout[ 0 ] );
+		state->m_conf->send( *state->m_machine, state->m_pout[ 0 ] );
 
-		state->posout = 1;
-		state->retries--;
-		LOG(( "kermit: resend packet (%i tries left)\n", state->retries ));
+		state->m_posout = 1;
+		state->m_retries--;
+		LOG(( "kermit: resend packet (%i tries left)\n", state->m_retries ));
 	}
 }
 
@@ -217,7 +217,7 @@ static void kermit_resend( kermit* state )
 static TIMER_CALLBACK( kermit_resend_cb )
 {
 	kermit* state = (kermit*) ptr;
-	if ( state->posout >= state->nbout)
+	if ( state->m_posout >= state->m_nbout)
 	{
 		kermit_resend( state );
 	}
@@ -228,58 +228,58 @@ static void kermit_send_data_packet( kermit* state )
 {
 	int len;
 	LOG(( "kermit: send data packet\n" ));
-	for ( len = 2; len < state->maxl-2; len++ )
+	for ( len = 2; len < state->m_maxl-2; len++ )
 	{
 		UINT8 c;
-		if ( state->image->image_feof() ) break;
-		c = state->image->fgetc();
+		if ( state->m_image->image_feof() ) break;
+		c = state->m_image->fgetc();
 		if ( kermit_is_ctl( c ) )
 		{
 			/* escape control char */
-			state->pout[ 2 + len ] = state->qctl;
+			state->m_pout[ 2 + len ] = state->m_qctl;
 			len++;
-			state->pout[ 2 + len ] = kermit_ctl( c );
+			state->m_pout[ 2 + len ] = kermit_ctl( c );
 		}
-		else if ( (c & 0x7f) == state->qctl )
+		else if ( (c & 0x7f) == state->m_qctl )
 		{
 			/* escape escape char */
-			state->pout[ 2 + len ] = state->qctl;
+			state->m_pout[ 2 + len ] = state->m_qctl;
 			len++;
-			state->pout[ 2 + len ] = c;
+			state->m_pout[ 2 + len ] = c;
 		}
 		else
 		{
-			state->pout[ 2 + len ] = c;
+			state->m_pout[ 2 + len ] = c;
 		}
 	}
-	state->pout[ 0 ] = KERMIT_SOH;
-	state->pout[ 1 ] = kermit_tochar( len + 1 );
-	state->pout[ 2 ] = kermit_tochar( state->seq & 63 );
-	state->pout[ 3 ] = KERMIT_DATA;
-	state->pout[ 2 + len ] = kermit_checksum( state->pout );
-	state->nbout = len + 3;
+	state->m_pout[ 0 ] = KERMIT_SOH;
+	state->m_pout[ 1 ] = kermit_tochar( len + 1 );
+	state->m_pout[ 2 ] = kermit_tochar( state->m_seq & 63 );
+	state->m_pout[ 3 ] = KERMIT_DATA;
+	state->m_pout[ 2 + len ] = kermit_checksum( state->m_pout );
+	state->m_nbout = len + 3;
 	kermit_start_sending( state );
 }
 
 /* write data from packet to the image */
 static void kermit_write_data_packet( kermit* state )
 {
-	int i, len = kermit_unchar( state->pin[1] );
+	int i, len = kermit_unchar( state->m_pin[1] );
 	LOG(( "kermit: received data pack, len=%i\n", len ));
 	for ( i = 4; i <= len; i++ )
 	{
-		UINT8 c = state->pin[i];
-		if ( (c /*& 0x7f*/) == state->qctl )
+		UINT8 c = state->m_pin[i];
+		if ( (c /*& 0x7f*/) == state->m_qctl )
 		{
 			/* unescape */
 			i++;
-			c = state->pin[i];
+			c = state->m_pin[i];
 			if ( kermit_is_ctl( kermit_ctl( c ) ) )
 			{
 				c = kermit_ctl( c );
 			}
 		}
-		state->image->fwrite(&c, 1 );
+		state->m_image->fwrite(&c, 1 );
 	}
 }
 
@@ -287,29 +287,29 @@ static void kermit_write_data_packet( kermit* state )
 static int kermit_validate_packet( kermit* state )
 {
 	int len;
-	if ( state->pin[ 0 ] != KERMIT_SOH ) return -1;
-	if ( !kermit_is_char( state->pin[1] ) ) return -1;
-	if ( !kermit_is_char( state->pin[2] ) ) return -1;
-	len = kermit_unchar( state->pin[1] );
-	if ( state->pin[ 1 + len ] != kermit_checksum( state->pin ) ) return -1;
+	if ( state->m_pin[ 0 ] != KERMIT_SOH ) return -1;
+	if ( !kermit_is_char( state->m_pin[1] ) ) return -1;
+	if ( !kermit_is_char( state->m_pin[2] ) ) return -1;
+	len = kermit_unchar( state->m_pin[1] );
+	if ( state->m_pin[ 1 + len ] != kermit_checksum( state->m_pin ) ) return -1;
 	return 0;
 }
 
 /* interpret configuration packet, <0 if error */
 static int kermit_get_conf( kermit* state )
 {
-	int len = kermit_unchar( state->pin[1] );
-	if ( len >= 4 ) state->maxl = kermit_unchar( state->pin[ 4 ] );
-	if ( len >= 6 ) state->npad = kermit_unchar( state->pin[ 6 ] );
-	if ( len >= 7 ) state->padc = kermit_ctl( state->pin[ 7 ] );
-	if ( len >= 8 ) state->eol  = kermit_unchar( state->pin[ 8 ] );
-	if ( len >= 9 ) state->qctl = state->pin[ 9 ];
+	int len = kermit_unchar( state->m_pin[1] );
+	if ( len >= 4 ) state->m_maxl = kermit_unchar( state->m_pin[ 4 ] );
+	if ( len >= 6 ) state->m_npad = kermit_unchar( state->m_pin[ 6 ] );
+	if ( len >= 7 ) state->m_padc = kermit_ctl( state->m_pin[ 7 ] );
+	if ( len >= 8 ) state->m_eol  = kermit_unchar( state->m_pin[ 8 ] );
+	if ( len >= 9 ) state->m_qctl = state->m_pin[ 9 ];
 
 	LOG(( "kermit: get conf: len=%i, maxl=%i, npad=%i, padc=%i, eol=%i, qctl=%i\n",
-	      len, state->maxl, state->npad, state->padc, state->eol, state->qctl ));
+	      len, state->m_maxl, state->m_npad, state->m_padc, state->m_eol, state->m_qctl ));
 
 	/* validation */
-	if ( state->maxl < 10 || state->maxl > 94 ) return -1;
+	if ( state->m_maxl < 10 || state->m_maxl > 94 ) return -1;
 	return 0;
 }
 
@@ -317,36 +317,36 @@ static int kermit_get_conf( kermit* state )
 static void kermit_send_conf_packet( kermit* state, UINT8 h )
 {
 	LOG(( "kermit: send conf packet of type %c\n", h ));
-	state->seq = 0;
-	state->pout[  0 ] = KERMIT_SOH;
-	state->pout[  1 ] = kermit_tochar( 13 );
-	state->pout[  2 ] = kermit_tochar( state->seq & 63 );
-	state->pout[  3 ] = h;
-	state->pout[  4 ] = kermit_tochar( state->maxl );   /* maxl */
-	state->pout[  5 ] = kermit_tochar( 1 );             /* time: 1 sec */
-	state->pout[  6 ] = kermit_tochar( state->npad );   /* npad */
-	state->pout[  7 ] = kermit_ctl( state->padc );      /* padc */
-	state->pout[  8 ] = kermit_tochar( state->eol );    /* eol */
-	state->pout[  9 ] = state->qctl;                    /* qtcl */
-	state->pout[ 10 ] = 'N';                            /* qbin: no 8-bit quoting */
-	state->pout[ 11 ] = '1';                            /* chkt: single character checksum */
-	state->pout[ 12 ] = ' ';                            /* rept: no repeat count */
-	state->pout[ 13 ] = kermit_tochar( 0 );             /* capas: no capabilities */
-	state->pout[ 14 ] = kermit_checksum( state->pout );
-	state->nbout = 15;
+	state->m_seq = 0;
+	state->m_pout[  0 ] = KERMIT_SOH;
+	state->m_pout[  1 ] = kermit_tochar( 13 );
+	state->m_pout[  2 ] = kermit_tochar( state->m_seq & 63 );
+	state->m_pout[  3 ] = h;
+	state->m_pout[  4 ] = kermit_tochar( state->m_maxl );   /* maxl */
+	state->m_pout[  5 ] = kermit_tochar( 1 );             /* time: 1 sec */
+	state->m_pout[  6 ] = kermit_tochar( state->m_npad );   /* npad */
+	state->m_pout[  7 ] = kermit_ctl( state->m_padc );      /* padc */
+	state->m_pout[  8 ] = kermit_tochar( state->m_eol );    /* eol */
+	state->m_pout[  9 ] = state->m_qctl;                    /* qtcl */
+	state->m_pout[ 10 ] = 'N';                            /* qbin: no 8-bit quoting */
+	state->m_pout[ 11 ] = '1';                            /* chkt: single character checksum */
+	state->m_pout[ 12 ] = ' ';                            /* rept: no repeat count */
+	state->m_pout[ 13 ] = kermit_tochar( 0 );             /* capas: no capabilities */
+	state->m_pout[ 14 ] = kermit_checksum( state->m_pout );
+	state->m_nbout = 15;
 	kermit_start_sending( state );
 }
 
 /* sends a packet with no data */
 static void kermit_send_simple_packet( kermit* state, UINT8 h  )
 {
-	LOG(( "kermit: send empty packet of type %c, seq=%i\n", h, state->seq & 63 ));
-	state->pout[ 0 ] = KERMIT_SOH;
-	state->pout[ 1 ] = kermit_tochar( 3 );
-	state->pout[ 2 ] = kermit_tochar( state->seq & 63 );
-	state->pout[ 3 ] = h;
-	state->pout[ 4 ] = kermit_checksum( state->pout );
-	state->nbout = 5;
+	LOG(( "kermit: send empty packet of type %c, seq=%i\n", h, state->m_seq & 63 ));
+	state->m_pout[ 0 ] = KERMIT_SOH;
+	state->m_pout[ 1 ] = kermit_tochar( 3 );
+	state->m_pout[ 2 ] = kermit_tochar( state->m_seq & 63 );
+	state->m_pout[ 3 ] = h;
+	state->m_pout[ 4 ] = kermit_checksum( state->m_pout );
+	state->m_nbout = 5;
 	kermit_start_sending( state );
 }
 
@@ -354,55 +354,55 @@ static void kermit_send_simple_packet( kermit* state, UINT8 h  )
 static void kermit_send_string_packet( kermit* state, UINT8 h, const char* data )
 {
 	int i, len;
-	LOG(( "kermit: send string packet of type %c, data=%s, seq=%i\n", h, data, state->seq & 63 ));
-	for ( len = i = 0; (len < state->maxl - 5) && data[i]; i++  )
+	LOG(( "kermit: send string packet of type %c, data=%s, seq=%i\n", h, data, state->m_seq & 63 ));
+	for ( len = i = 0; (len < state->m_maxl - 5) && data[i]; i++  )
 	{
 		char c = data[i];
 		if ( kermit_is_char( c ) && ( c != '_' ) && ( c != ' ' ) )
 		{
-		  state->pout[ 4 + len ] = c;
+		  state->m_pout[ 4 + len ] = c;
 		  len++;
 		}
 	}
-	state->pout[ 0 ] = KERMIT_SOH;
-	state->pout[ 1 ] = kermit_tochar( len + 3 );
-	state->pout[ 2 ] = kermit_tochar( state->seq & 63 );
-	state->pout[ 3 ] = h;
-	state->pout[ 4 + len ] = kermit_checksum( state->pout );
-	state->nbout = len + 5;
+	state->m_pout[ 0 ] = KERMIT_SOH;
+	state->m_pout[ 1 ] = kermit_tochar( len + 3 );
+	state->m_pout[ 2 ] = kermit_tochar( state->m_seq & 63 );
+	state->m_pout[ 3 ] = h;
+	state->m_pout[ 4 + len ] = kermit_checksum( state->m_pout );
+	state->m_nbout = len + 5;
 	kermit_start_sending( state );
 }
 
 /* extract the string contained in received packet */
 static char* kermit_string_in_packet( kermit* state )
 {
-	int len = kermit_unchar( state->pin[1] );
-	state->pin[ len + 1 ] = 0;
-	return (char*) state->pin + 4;
+	int len = kermit_unchar( state->m_pin[1] );
+	state->m_pin[ len + 1 ] = 0;
+	return (char*) state->m_pin + 4;
 }
 
 static void kermit_reset( kermit* state )
 {
 	/* default config */
-	state->maxl = KERMIT_MAXL;
-	state->npad = 0;
-	state->padc = 0;
-	state->eol  = KERMIT_EOL;
-	state->qctl = KERMIT_QCTL;
+	state->m_maxl = KERMIT_MAXL;
+	state->m_npad = 0;
+	state->m_padc = 0;
+	state->m_eol  = KERMIT_EOL;
+	state->m_qctl = KERMIT_QCTL;
 
-	state->retries = KERMIT_MAX_RETRIES;
-	state->posin   = 0;
-	state->posout  = 0;
-	state->nbout   = 0;
-	state->state   = KERMIT_IDLE;
-	state->seq     = 0;
+	state->m_retries = KERMIT_MAX_RETRIES;
+	state->m_posin   = 0;
+	state->m_posout  = 0;
+	state->m_nbout   = 0;
+	state->m_state   = KERMIT_IDLE;
+	state->m_seq     = 0;
 
-	if ( state->image )
+	if ( state->m_image )
 	{
-		state->image->fseek( SEEK_SET, 0 );
+		state->m_image->fseek( SEEK_SET, 0 );
 	}
 
-	state->resend->adjust( attotime::never, 0, attotime::never );
+	state->m_resend->adjust( attotime::never, 0, attotime::never );
 }
 
 
@@ -411,50 +411,50 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 {
 	kermit* state = get_safe_token(device);
 
-	LOG(( "get %i %2x %c (%i)\n", data, data, data, state->posin ));
+	LOG(( "get %i %2x %c (%i)\n", data, data, data, state->m_posin ));
 
 	/* get SOH */
-	if ( (data == KERMIT_SOH) && (state->posin <= 1) )
+	if ( (data == KERMIT_SOH) && (state->m_posin <= 1) )
 	{
-		state->pin[ 0 ] = data;
-		state->posin = 1;
+		state->m_pin[ 0 ] = data;
+		state->m_posin = 1;
 	}
 
 	/* get packet contents */
-	else if ( state->posin > 0 )
+	else if ( state->m_posin > 0 )
 	{
-		if ( state->posin >= sizeof( state->pout ) )
+		if ( state->m_posin >= sizeof( state->m_pout ) )
 		{
 			LOG(( "kermit: too many bytes received\n" ));
-			state->posin = 0;
+			state->m_posin = 0;
 			kermit_send_simple_packet( state, KERMIT_NAK );
 			return;
 		}
 
 		if (kermit_is_ctl(data))
-			logerror( "received: not char %i at pos %i\n", data, state->posin  );
+			logerror( "received: not char %i at pos %i\n", data, state->m_posin  );
 
-		state->pin[ state->posin ] = data;
-		state->posin++;
+		state->m_pin[ state->m_posin ] = data;
+		state->m_posin++;
 
-		if ( state->posin > 5 )
+		if ( state->m_posin > 5 )
 		{
 			int len, seq, typ;
-			if ( !kermit_is_char( state->pin[1] ) ||
-			     (kermit_unchar( state->pin[1] ) < 3) ||
-			     (kermit_unchar( state->pin[1] ) > state->maxl) )
+			if ( !kermit_is_char( state->m_pin[1] ) ||
+			     (kermit_unchar( state->m_pin[1] ) < 3) ||
+			     (kermit_unchar( state->m_pin[1] ) > state->m_maxl) )
 			{
-				LOG(( "kermit: invalid packet size %i-32, not in 3-%i\n", state->pin[1], state->maxl ));
+				LOG(( "kermit: invalid packet size %i-32, not in 3-%i\n", state->m_pin[1], state->m_maxl ));
 				kermit_resend( state );
 				return;
 			}
 
-			len = kermit_unchar( state->pin[1] );
+			len = kermit_unchar( state->m_pin[1] );
 
-			if ( state->posin >= len + 2 )
+			if ( state->m_posin >= len + 2 )
 			{
 				/* got packet! */
-				state->posin = 0;
+				state->m_posin = 0;
 				if ( kermit_validate_packet( state ) )
 				{
 					LOG(( "kermit: invalid packet\n" ));
@@ -462,12 +462,12 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 					return;
 				}
 
-				typ = state->pin[3];
-				seq = kermit_unchar( state->pin[2] );
+				typ = state->m_pin[3];
+				seq = kermit_unchar( state->m_pin[2] );
 
 				LOG(( "kermit: received packet type=%c, seq=%i, len=%i\n",  typ, seq, len ));
 
-				if ( !state->image )
+				if ( !state->m_image )
 				{
 					kermit_send_string_packet( state, KERMIT_ERR, "NO IMAGE" );
 					return;
@@ -481,33 +481,33 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 
 				case KERMIT_SEND:
 					kermit_get_conf( state );
-					if ( state->maxl >= KERMIT_MAXL )
+					if ( state->m_maxl >= KERMIT_MAXL )
 					{
-						state->maxl = KERMIT_MAXL;
+						state->m_maxl = KERMIT_MAXL;
 					}
 					kermit_send_conf_packet( state, KERMIT_ACK );
-					state->state = KERMIT_RECEIVE;
+					state->m_state = KERMIT_RECEIVE;
 					break;
 
 				case KERMIT_FILE:
 					LOG(( "kermit: got file name '%s'\n", kermit_string_in_packet( state ) ));
-					state->seq = seq;
+					state->m_seq = seq;
 					kermit_send_simple_packet( state, KERMIT_ACK );
 					break;
 
 				case KERMIT_DATA:
 				case KERMIT_EOF:
-					if ( seq == ((state->seq + 1) & 63) )
+					if ( seq == ((state->m_seq + 1) & 63) )
 					{
 						/* next packet */
 						if ( typ == KERMIT_DATA )
 						{
 							kermit_write_data_packet( state );
 						}
-						state->seq = seq;
+						state->m_seq = seq;
 						kermit_send_simple_packet( state, KERMIT_ACK );
 					}
-					else if ( seq == (state->seq & 63) )
+					else if ( seq == (state->m_seq & 63) )
 					{
 						/* same packet */
 						kermit_send_simple_packet( state, KERMIT_ACK );
@@ -515,18 +515,18 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 					else
 					{
 						/* unexpected sequence number */
-						LOG(( "kermit: got seq=%i, expected %i\n", seq, (state->seq + 1) & 63 ));
-						state->seq++;
+						LOG(( "kermit: got seq=%i, expected %i\n", seq, (state->m_seq + 1) & 63 ));
+						state->m_seq++;
 						kermit_send_simple_packet( state, KERMIT_NAK );
-						state->seq--;
+						state->m_seq--;
 					}
 					break;
 
 				case KERMIT_EOT:
 					/* send ack and reset */
-					state->seq = seq;
+					state->m_seq = seq;
 					kermit_send_simple_packet( state, KERMIT_ACK );
-					state->state = KERMIT_RESET;
+					state->m_state = KERMIT_RESET;
 					break;
 
 
@@ -535,35 +535,35 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 				case KERMIT_NAK:
 				case KERMIT_ACK:
 
-					if ( (typ == KERMIT_NAK) && (seq == 0) && (state->state == KERMIT_IDLE) )
+					if ( (typ == KERMIT_NAK) && (seq == 0) && (state->m_state == KERMIT_IDLE) )
 					{
 						/* transfer start */
 						kermit_send_conf_packet( state, KERMIT_SEND );
 						break;
 					}
 
-					if ( ((seq == (state->seq & 63)) && (typ == KERMIT_ACK)) ||
-					     ((seq == ((state->seq + 1) & 63)) && (typ == KERMIT_NAK)) )
+					if ( ((seq == (state->m_seq & 63)) && (typ == KERMIT_ACK)) ||
+					     ((seq == ((state->m_seq + 1) & 63)) && (typ == KERMIT_NAK)) )
 					{
 						/* send next packet */
 
-						state->seq = state->seq + 1;
+						state->m_seq = state->m_seq + 1;
 
-						switch ( state->state )
+						switch ( state->m_state )
 						{
 						case KERMIT_IDLE:
 							/* get conf & send file name */
 							kermit_get_conf( state );
-							kermit_send_string_packet( state, KERMIT_FILE, state->image->basename() );
-							state->state = KERMIT_SEND_DATA;;
+							kermit_send_string_packet( state, KERMIT_FILE, state->m_image->basename() );
+							state->m_state = KERMIT_SEND_DATA;;
 							break;
 
 						case KERMIT_SEND_DATA:
 							/* send next data packet or EOF */
-							if ( state->image->image_feof() )
+							if ( state->m_image->image_feof() )
 							{
 								kermit_send_simple_packet( state, KERMIT_EOF );
-								state->state = KERMIT_SEND_EOF;
+								state->m_state = KERMIT_SEND_EOF;
 							}
 							else
 							{
@@ -574,19 +574,19 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 						case KERMIT_SEND_EOF:
 						        /* send EOT */
 							kermit_send_simple_packet( state, KERMIT_EOT );
-							state->state = KERMIT_SEND_EOT;
+							state->m_state = KERMIT_SEND_EOT;
 							break;
 
 						case KERMIT_SEND_EOT:
 							/* reset */
 							kermit_reset( state );
-							state->state = KERMIT_RESET;
+							state->m_state = KERMIT_RESET;
 							break;
 
 						}
 					}
 
-					else if ( (seq == (state->seq & 63)) && (typ == KERMIT_NAK) )
+					else if ( (seq == (state->m_seq & 63)) && (typ == KERMIT_NAK) )
 					{
 						/* resend last packet */
 						kermit_resend( state );
@@ -594,7 +594,7 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 					else
 					{
 						/* bad */
-						LOG(( "kermit: expected to send %i, got seq=%i\n", (state->seq + 1) & 63, seq ));
+						LOG(( "kermit: expected to send %i, got seq=%i\n", (state->m_seq + 1) & 63, seq ));
 						kermit_reset( state );
 					}
 					break;
@@ -603,12 +603,12 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 
 				case KERMIT_ERR:
 					LOG(( "kermit: got error '%s'\n", kermit_string_in_packet( state ) ));
-					state->seq = seq;
+					state->m_seq = seq;
 					kermit_reset( state );
 					break;
 
 				default:
-					LOG(( "kermit: ignoring packet type %c\n", state->pin[ 3 ] ));
+					LOG(( "kermit: ignoring packet type %c\n", state->m_pin[ 3 ] ));
 					/* no abort, just ignoring */
 				}
 			}
@@ -620,33 +620,33 @@ void kermit_byte_transmitted( device_t *device )
 {
 	kermit* state = get_safe_token(device);
 
-	LOG(( "transmitted %i %2x %c, %i / %i\n", state->pout[ state->posout-1 ], state->pout[ state->posout-1 ], state->pout[ state->posout-1 ], state->posout - 1, state->nbout - 1 ));
+	LOG(( "transmitted %i %2x %c, %i / %i\n", state->m_pout[ state->m_posout-1 ], state->m_pout[ state->m_posout-1 ], state->m_pout[ state->m_posout-1 ], state->m_posout - 1, state->m_nbout - 1 ));
 
 	/* at end of packet */
-	if ( state->posout >= state->nbout )
+	if ( state->m_posout >= state->m_nbout )
 	{
-		if ( state->state == KERMIT_RESET )
+		if ( state->m_state == KERMIT_RESET )
 		{
 			kermit_reset( state );
 		}
 		return;
 	}
 
-	if ( state->conf && state->conf->send )
+	if ( state->m_conf && state->m_conf->send )
 	{
-		state->conf->send(*state->machine, state->pout[ state->posout ] );
+		state->m_conf->send(*state->m_machine, state->m_pout[ state->m_posout ] );
 	}
-	state->posout++;
+	state->m_posout++;
 }
 
 static DEVICE_START( kermit )
 {
 	kermit* state = get_safe_token(device);
 	LOG(( "kermit: start\n" ));
-	state->image = NULL;
-	state->conf = (kermit_config*) device->baseconfig().static_config();
-	state->machine = &device->machine();
-	state->resend = device->machine().scheduler().timer_alloc(FUNC(kermit_resend_cb), state );
+	state->m_image = NULL;
+	state->m_conf = (kermit_config*) device->baseconfig().static_config();
+	state->m_machine = &device->machine();
+	state->m_resend = device->machine().scheduler().timer_alloc(FUNC(kermit_resend_cb), state );
 	kermit_reset( state );
 }
 
@@ -661,7 +661,7 @@ static DEVICE_IMAGE_LOAD( kermit )
 {
 	kermit* state = get_safe_token(&image.device());
 	LOG(( "kermit: image load\n" ));
-	state->image = &image;
+	state->m_image = &image;
 	kermit_reset( state );
 	return IMAGE_INIT_PASS;
 }
@@ -670,7 +670,7 @@ static DEVICE_IMAGE_CREATE( kermit )
 {
 	kermit* state = get_safe_token(&image.device());
 	LOG(( "kermit: image create\n" ));
-	state->image = &image;
+	state->m_image = &image;
 	kermit_reset( state );
 	return IMAGE_INIT_PASS;
 }
@@ -679,7 +679,7 @@ static DEVICE_IMAGE_UNLOAD( kermit )
 {
 	kermit* state = get_safe_token(&image.device());
 	LOG(( "kermit: image unload\n" ));
-	state->image = NULL;
+	state->m_image = NULL;
 	kermit_reset( state );
 }
 

@@ -51,25 +51,25 @@ public:
 	pc88va_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *palram;
-	UINT16 bank_reg;
-	UINT16 screen_ctrl_reg;
-	UINT8 timer3_io_reg;
-	emu_timer *t3_mouse_timer;
-	tsp_t tsp;
-	UINT16 video_pri_reg[2];
-	UINT8 backupram_wp;
-	UINT8 cmd;
-	UINT8 buf_size;
-	UINT8 buf_index;
-	UINT8 buf_ram[16];
-	UINT8 portc_test;
+	UINT16 *m_palram;
+	UINT16 m_bank_reg;
+	UINT16 m_screen_ctrl_reg;
+	UINT8 m_timer3_io_reg;
+	emu_timer *m_t3_mouse_timer;
+	tsp_t m_tsp;
+	UINT16 m_video_pri_reg[2];
+	UINT8 m_backupram_wp;
+	UINT8 m_cmd;
+	UINT8 m_buf_size;
+	UINT8 m_buf_index;
+	UINT8 m_buf_ram[16];
+	UINT8 m_portc_test;
 
 	/* floppy state */
-	UINT8 i8255_0_pc;
-	UINT8 i8255_1_pc;
-	UINT8 fdc_mode;
-	UINT8 fdc_irq_opcode;
+	UINT8 m_i8255_0_pc;
+	UINT8 m_i8255_1_pc;
+	UINT8 m_fdc_mode;
+	UINT8 m_fdc_irq_opcode;
 };
 
 
@@ -85,7 +85,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	UINT16 *tvram = (UINT16 *)machine.region("tvram")->base();
 	int offs,i;
 
-	offs = state->tsp.spr_offset;
+	offs = state->m_tsp.spr_offset;
 	for(i=0;i<(0x100);i+=(8))
 	{
 		int xp,yp,sw,md,xsize,ysize,spda,fg_col,bc;
@@ -206,12 +206,12 @@ static void draw_text(running_machine &machine, bitmap_t *bitmap, const rectangl
 	UINT8 fg_col,bg_col,secret,reverse,blink,dwidc,dwid,uline,hline;
 	UINT8 screen_fg_col,screen_bg_col;
 
-	count = (tvram[state->tsp.tvram_vreg_offset+0] | tvram[state->tsp.tvram_vreg_offset+1] << 8);
+	count = (tvram[state->m_tsp.tvram_vreg_offset+0] | tvram[state->m_tsp.tvram_vreg_offset+1] << 8);
 
-	attr_mode = tvram[state->tsp.tvram_vreg_offset+0xa] & 0x1f;
+	attr_mode = tvram[state->m_tsp.tvram_vreg_offset+0xa] & 0x1f;
 	/* Note: bug in docs has the following two reversed */
-	screen_fg_col = (tvram[state->tsp.tvram_vreg_offset+0xb] & 0xf0) >> 4;
-	screen_bg_col = tvram[state->tsp.tvram_vreg_offset+0xb] & 0x0f;
+	screen_fg_col = (tvram[state->m_tsp.tvram_vreg_offset+0xb] & 0xf0) >> 4;
+	screen_bg_col = tvram[state->m_tsp.tvram_vreg_offset+0xb] & 0x0f;
 
 	for(y=0;y<13;y++)
 	{
@@ -223,7 +223,7 @@ static void draw_text(running_machine &machine, bitmap_t *bitmap, const rectangl
 
 			tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
 
-			attr = (tvram[count+state->tsp.attr_offset] & 0x00ff);
+			attr = (tvram[count+state->m_tsp.attr_offset] & 0x00ff);
 
 			fg_col = bg_col = reverse = blink = secret = dwidc = dwid = uline = hline = 0;
 
@@ -377,28 +377,28 @@ static SCREEN_UPDATE( pc88va )
 	UINT32 screen_pri;
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if(state->tsp.disp_on == 0) // don't bother if we are under DSPOFF command
+	if(state->m_tsp.disp_on == 0) // don't bother if we are under DSPOFF command
 		return 0;
 
 	/*
-    state->video_pri_reg[0]
+    state->m_video_pri_reg[0]
     xxxx ---- ---- ---- priority 3
     ---- xxxx ---- ---- priority 2
     ---- ---- xxxx ---- priority 1
     ---- ---- ---- xxxx priority 0
-    state->video_pri_reg[1]
+    state->m_video_pri_reg[1]
     ---- ---- xxxx ---- priority 5
     ---- ---- ---- xxxx priority 4
 
     Note that orthogonality level is actually REVERSED than the level number it indicates, so we have to play a little with the data for an easier usage ...
     */
 
-	screen_pri = (state->video_pri_reg[1] & 0x00f0) >> 4; // priority 5
-	screen_pri|= (state->video_pri_reg[1] & 0x000f) << 4; // priority 4
-	screen_pri|= (state->video_pri_reg[0] & 0xf000) >> 4; // priority 3
-	screen_pri|= (state->video_pri_reg[0] & 0x0f00) << 4; // priority 2
-	screen_pri|= (state->video_pri_reg[0] & 0x00f0) << 12; // priority 1
-	screen_pri|= (state->video_pri_reg[0] & 0x000f) << 20; // priority 0
+	screen_pri = (state->m_video_pri_reg[1] & 0x00f0) >> 4; // priority 5
+	screen_pri|= (state->m_video_pri_reg[1] & 0x000f) << 4; // priority 4
+	screen_pri|= (state->m_video_pri_reg[0] & 0xf000) >> 4; // priority 3
+	screen_pri|= (state->m_video_pri_reg[0] & 0x0f00) << 4; // priority 2
+	screen_pri|= (state->m_video_pri_reg[0] & 0x00f0) << 12; // priority 1
+	screen_pri|= (state->m_video_pri_reg[0] & 0x000f) << 20; // priority 0
 
 	for(pri=0;pri<6;pri++)
 	{
@@ -416,7 +416,7 @@ static SCREEN_UPDATE( pc88va )
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
 					case 0: draw_text(screen->machine(),bitmap,cliprect); break;
-					case 1: if(state->tsp.spr_on) { draw_sprites(screen->machine(),bitmap,cliprect); } break;
+					case 1: if(state->m_tsp.spr_on) { draw_sprites(screen->machine(),bitmap,cliprect); } break;
 					case 2: /* A = graphic 0 */ break;
 					case 3: /* B = graphic 1 */ break;
 				}
@@ -430,7 +430,7 @@ static SCREEN_UPDATE( pc88va )
 static READ16_HANDLER( sys_mem_r )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	switch((state->bank_reg & 0xf00) >> 8)
+	switch((state->m_bank_reg & 0xf00) >> 8)
 	{
 		case 0: // select bus slot
 			return 0xffff;
@@ -455,7 +455,7 @@ static READ16_HANDLER( sys_mem_r )
 			UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji")->base();
 			UINT32 knj_offset;
 
-			knj_offset = (offset + (((state->bank_reg & 0x100) >> 8)*0x20000));
+			knj_offset = (offset + (((state->m_bank_reg & 0x100) >> 8)*0x20000));
 
 			/* 0x00000 - 0x3ffff Kanji ROM 1*/
 			/* 0x40000 - 0x4ffff Kanji ROM 2*/
@@ -471,7 +471,7 @@ static READ16_HANDLER( sys_mem_r )
 			UINT16 *dic_rom = (UINT16 *)space->machine().region("dictionary")->base();
 			UINT32 dic_offset;
 
-			dic_offset = (offset + (((state->bank_reg & 0x100) >> 8)*0x20000));
+			dic_offset = (offset + (((state->m_bank_reg & 0x100) >> 8)*0x20000));
 
 			return dic_rom[dic_offset];
 		}
@@ -483,7 +483,7 @@ static READ16_HANDLER( sys_mem_r )
 static WRITE16_HANDLER( sys_mem_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	switch((state->bank_reg & 0xf00) >> 8)
+	switch((state->m_bank_reg & 0xf00) >> 8)
 	{
 		case 0: // select bus slot
 			break;
@@ -508,7 +508,7 @@ static WRITE16_HANDLER( sys_mem_w )
 			UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji")->base();
 			UINT32 knj_offset;
 
-			knj_offset = ((offset) + (((state->bank_reg & 0x100) >> 8)*0x20000));
+			knj_offset = ((offset) + (((state->m_bank_reg & 0x100) >> 8)*0x20000));
 
 			if(knj_offset >= 0x50000/2 && knj_offset <= 0x53fff/2) // TODO: there's an area that can be write protected
 			{
@@ -571,40 +571,40 @@ static WRITE8_HANDLER( idp_command_w )
 	switch(data)
 	{
 		/* 0x10 - SYNC: sets CRTC values */
-		case SYNC:   state->cmd = SYNC;  state->buf_size = 14; state->buf_index = 0; break;
+		case SYNC:   state->m_cmd = SYNC;  state->m_buf_size = 14; state->m_buf_index = 0; break;
 
 		/* 0x12 - DSPON: set DiSPlay ON and set up tvram table vreg */
-		case DSPON:  state->cmd = DSPON; state->buf_size = 3;  state->buf_index = 0; break;
+		case DSPON:  state->m_cmd = DSPON; state->m_buf_size = 3;  state->m_buf_index = 0; break;
 
 		/* 0x13 - DSPOFF: set DiSPlay OFF */
-		case DSPOFF: state->cmd = DSPOFF; state->tsp.disp_on = 0; break;
+		case DSPOFF: state->m_cmd = DSPOFF; state->m_tsp.disp_on = 0; break;
 
 		/* 0x14 - DSPDEF: set DiSPlay DEFinitions */
-		case DSPDEF: state->cmd = DSPDEF; state->buf_size = 6; state->buf_index = 0; break;
+		case DSPDEF: state->m_cmd = DSPDEF; state->m_buf_size = 6; state->m_buf_index = 0; break;
 
 		/* 0x15 - CURDEF: set CURsor DEFinition */
-		case CURDEF: state->cmd = CURDEF; state->buf_size = 1; state->buf_index = 0; break;
+		case CURDEF: state->m_cmd = CURDEF; state->m_buf_size = 1; state->m_buf_index = 0; break;
 
 		/* 0x16 - ACTSCR: ??? */
-		case ACTSCR: state->cmd = ACTSCR; state->buf_size = 1; state->buf_index = 0; break;
+		case ACTSCR: state->m_cmd = ACTSCR; state->m_buf_size = 1; state->m_buf_index = 0; break;
 
 		/* 0x15 - CURS: set CURSor position */
-		case CURS:   state->cmd = CURS;   state->buf_size = 4; state->buf_index = 0; break;
+		case CURS:   state->m_cmd = CURS;   state->m_buf_size = 4; state->m_buf_index = 0; break;
 
 		/* 0x8c - EMUL: set 3301 EMULation */
-		case EMUL:   state->cmd = EMUL;   state->buf_size = 4; state->buf_index = 0; break;
+		case EMUL:   state->m_cmd = EMUL;   state->m_buf_size = 4; state->m_buf_index = 0; break;
 
 		/* 0x88 - EXIT: ??? */
-		case EXIT:   state->cmd = EXIT; break;
+		case EXIT:   state->m_cmd = EXIT; break;
 
 		/* 0x82 - SPRON: set SPRite ON */
-		case SPRON:  state->cmd = SPRON;  state->buf_size = 3; state->buf_index = 0; break;
+		case SPRON:  state->m_cmd = SPRON;  state->m_buf_size = 3; state->m_buf_index = 0; break;
 
 		/* 0x83 - SPROFF: set SPRite OFF */
-		case SPROFF: state->cmd = SPROFF; state->tsp.spr_on = 0; break;
+		case SPROFF: state->m_cmd = SPROFF; state->m_tsp.spr_on = 0; break;
 
 		/* 0x85 - SPRSW: ??? */
-		case SPRSW:  state->cmd = SPRSW;  state->buf_size = 1; state->buf_index = 0; break;
+		case SPRSW:  state->m_cmd = SPRSW;  state->m_buf_size = 1; state->m_buf_index = 0; break;
 
 		/* 0x81 - SPROV: set SPRite OVerflow information */
 		/*
@@ -612,10 +612,10 @@ static WRITE8_HANDLER( idp_command_w )
         --x- ---- Sprite Collision flag
         ---x xxxx First sprite that caused Sprite Over event
         */
-		case SPROV:  state->cmd = SPROV; /* TODO: where it returns the info? */ break;
+		case SPROV:  state->m_cmd = SPROV; /* TODO: where it returns the info? */ break;
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
-		default:   state->cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",cpu_get_pc(&space->device()),data); break;
+		default:   state->m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",cpu_get_pc(&space->device()),data); break;
 	}
 }
 
@@ -658,8 +658,8 @@ static void execute_sync_cmd(running_machine &machine)
 	//printf("V border end: %d\n",(sync_cmd[0xc]));
 	//printf("V blank end: %d\n",(sync_cmd[0xd]));
 
-	x_vis_area = state->buf_ram[4] * 4;
-	y_vis_area = (state->buf_ram[0xa])|((state->buf_ram[0xb] & 0x40)<<2);
+	x_vis_area = state->m_buf_ram[4] * 4;
+	y_vis_area = (state->m_buf_ram[0xa])|((state->m_buf_ram[0xb] & 0x40)<<2);
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
@@ -684,8 +684,8 @@ static void execute_dspon_cmd(running_machine &machine)
     [1] unknown
     [2] unknown
     */
-	state->tsp.tvram_vreg_offset = state->buf_ram[0] << 8;
-	state->tsp.disp_on = 1;
+	state->m_tsp.tvram_vreg_offset = state->m_buf_ram[0] << 8;
+	state->m_tsp.disp_on = 1;
 }
 
 static void execute_dspdef_cmd(running_machine &machine)
@@ -699,11 +699,11 @@ static void execute_dspdef_cmd(running_machine &machine)
     [4] hline vertical position
     [5] blink number
     */
-	state->tsp.attr_offset = state->buf_ram[0] | state->buf_ram[1] << 8;
-	state->tsp.pitch = (state->buf_ram[2] & 0xf0) >> 4;
-	state->tsp.line_height = state->buf_ram[3] + 1;
-	state->tsp.h_line_pos = state->buf_ram[4];
-	state->tsp.blink = (state->buf_ram[5] & 0xf8) >> 3;
+	state->m_tsp.attr_offset = state->m_buf_ram[0] | state->m_buf_ram[1] << 8;
+	state->m_tsp.pitch = (state->m_buf_ram[2] & 0xf0) >> 4;
+	state->m_tsp.line_height = state->m_buf_ram[3] + 1;
+	state->m_tsp.h_line_pos = state->m_buf_ram[4];
+	state->m_tsp.blink = (state->m_buf_ram[5] & 0xf8) >> 3;
 }
 
 static void execute_curdef_cmd(running_machine &machine)
@@ -716,10 +716,10 @@ static void execute_curdef_cmd(running_machine &machine)
     */
 
 	/* TODO: needs basic sprite emulation */
-	state->tsp.curn = (state->buf_ram[0] & 0xf8);
-	state->tsp.curn_blink = (state->buf_ram[0] & 1);
+	state->m_tsp.curn = (state->m_buf_ram[0] & 0xf8);
+	state->m_tsp.curn_blink = (state->m_buf_ram[0] & 1);
 
-	tsp_sprite_enable(machine, 0xa0000 + state->tsp.spr_offset + state->tsp.curn, (state->buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(machine, 0xa0000 + state->m_tsp.spr_offset + state->m_tsp.curn, (state->m_buf_ram[0] & 2) << 8);
 }
 
 static void execute_actscr_cmd(running_machine &machine)
@@ -731,7 +731,7 @@ static void execute_actscr_cmd(running_machine &machine)
     */
 
 	/* TODO: no idea about this command */
-	//printf("ACTSCR: %02x\n",state->buf_ram[0]);
+	//printf("ACTSCR: %02x\n",state->m_buf_ram[0]);
 }
 
 static void execute_curs_cmd(running_machine &machine)
@@ -744,8 +744,8 @@ static void execute_curs_cmd(running_machine &machine)
     [3] Cursor Position X (hi word)
     */
 
-	state->tsp.cur_pos_y = state->buf_ram[0] | state->buf_ram[1] << 8;
-	state->tsp.cur_pos_x = state->buf_ram[2] | state->buf_ram[3] << 8;
+	state->m_tsp.cur_pos_y = state->m_buf_ram[0] | state->m_buf_ram[1] << 8;
+	state->m_tsp.cur_pos_x = state->m_buf_ram[2] | state->m_buf_ram[3] << 8;
 }
 
 static void execute_emul_cmd(running_machine &machine)
@@ -771,9 +771,9 @@ static void execute_spron_cmd(running_machine &machine)
     ---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
     ---- ---x [2] GR: 1 to enable the group collision detection
     */
-	state->tsp.spr_offset = state->buf_ram[0] << 8;
-	state->tsp.spr_on = 1;
-	printf("SPR TABLE %02x %02x %02x\n",state->buf_ram[0],state->buf_ram[1],state->buf_ram[2]);
+	state->m_tsp.spr_offset = state->m_buf_ram[0] << 8;
+	state->m_tsp.spr_on = 1;
+	printf("SPR TABLE %02x %02x %02x\n",state->m_buf_ram[0],state->m_buf_ram[1],state->m_buf_ram[2]);
 }
 
 static void execute_sprsw_cmd(running_machine &machine)
@@ -785,22 +785,22 @@ static void execute_sprsw_cmd(running_machine &machine)
     [0] ---- --x- sprite off/on switch
     */
 
-	tsp_sprite_enable(machine, 0xa0000 + state->tsp.spr_offset + (state->buf_ram[0] & 0xf8), (state->buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(machine, 0xa0000 + state->m_tsp.spr_offset + (state->m_buf_ram[0] & 0xf8), (state->m_buf_ram[0] & 2) << 8);
 }
 
 static WRITE8_HANDLER( idp_param_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	if(state->cmd == DSPOFF || state->cmd == EXIT || state->cmd == SPROFF || state->cmd == SPROV) // no param commands
+	if(state->m_cmd == DSPOFF || state->m_cmd == EXIT || state->m_cmd == SPROFF || state->m_cmd == SPROV) // no param commands
 		return;
 
-	state->buf_ram[state->buf_index] = data;
-	state->buf_index++;
+	state->m_buf_ram[state->m_buf_index] = data;
+	state->m_buf_index++;
 
-	if(state->buf_index >= state->buf_size)
+	if(state->m_buf_index >= state->m_buf_size)
 	{
-		state->buf_index = 0;
-		switch(state->cmd)
+		state->m_buf_index = 0;
+		switch(state->m_cmd)
 		{
 			case SYNC:		execute_sync_cmd(space->machine());	break;
 			case DSPON: 	execute_dspon_cmd(space->machine());	break;
@@ -823,11 +823,11 @@ static WRITE16_HANDLER( palette_ram_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
 	int r,g,b;
-	COMBINE_DATA(&state->palram[offset]);
+	COMBINE_DATA(&state->m_palram[offset]);
 
-	b = (state->palram[offset] & 0x001e) >> 1;
-	r = (state->palram[offset] & 0x03c0) >> 6;
-	g = (state->palram[offset] & 0x7800) >> 11;
+	b = (state->m_palram[offset] & 0x001e) >> 1;
+	r = (state->m_palram[offset] & 0x03c0) >> 6;
+	g = (state->m_palram[offset] & 0x7800) >> 11;
 
 	palette_set_color_rgb(space->machine(),offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
@@ -845,7 +845,7 @@ static READ16_HANDLER( sys_port4_r )
 static READ16_HANDLER( bios_bank_r )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	return state->bank_reg;
+	return state->m_bank_reg;
 }
 
 static WRITE16_HANDLER( bios_bank_w )
@@ -859,26 +859,26 @@ static WRITE16_HANDLER( bios_bank_w )
     ---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
     */
 	if ((mem_mask&0xffff) == 0xffff)
-		state->bank_reg = data;
+		state->m_bank_reg = data;
 	else if ((mem_mask & 0xffff) == 0xff00)
-		state->bank_reg = (data & 0xff00) | (state->bank_reg & 0x00ff);
+		state->m_bank_reg = (data & 0xff00) | (state->m_bank_reg & 0x00ff);
 	else if ((mem_mask & 0xffff) == 0x00ff)
-		state->bank_reg = (data & 0x00ff) | (state->bank_reg & 0xff00);
+		state->m_bank_reg = (data & 0x00ff) | (state->m_bank_reg & 0xff00);
 
 
 	/* RBC1 */
 	{
 		UINT8 *ROM10 = space->machine().region("rom10")->base();
 
-		if((state->bank_reg & 0xe0) == 0x00)
-			memory_set_bankptr(space->machine(), "rom10_bank", &ROM10[(state->bank_reg & 0x10) ? 0x10000 : 0x00000]);
+		if((state->m_bank_reg & 0xe0) == 0x00)
+			memory_set_bankptr(space->machine(), "rom10_bank", &ROM10[(state->m_bank_reg & 0x10) ? 0x10000 : 0x00000]);
 	}
 
 	/* RBC0 */
 	{
 		UINT8 *ROM00 = space->machine().region("rom00")->base();
 
-		memory_set_bankptr(space->machine(), "rom00_bank", &ROM00[(state->bank_reg & 0xf)*0x10000]); // TODO: docs says that only 0 - 5 are used, dunno why ...
+		memory_set_bankptr(space->machine(), "rom00_bank", &ROM00[(state->m_bank_reg & 0xf)*0x10000]); // TODO: docs says that only 0 - 5 are used, dunno why ...
 	}
 }
 
@@ -901,13 +901,13 @@ static READ8_HANDLER( key_r )
 static WRITE16_HANDLER( backupram_wp_1_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	state->backupram_wp = 1;
+	state->m_backupram_wp = 1;
 }
 
 static WRITE16_HANDLER( backupram_wp_0_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	state->backupram_wp = 0;
+	state->m_backupram_wp = 0;
 }
 
 static READ8_HANDLER( hdd_status_r )
@@ -965,8 +965,8 @@ static WRITE8_HANDLER( pc88va_fdc_w )
         ---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
         */
 		case 0x00: // FDC mode register
-			state->fdc_mode = data & 1;
-			cputag_set_input_line(space->machine(), "fdccpu", INPUT_LINE_HALT, (state->fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
+			state->m_fdc_mode = data & 1;
+			cputag_set_input_line(space->machine(), "fdccpu", INPUT_LINE_HALT, (state->m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 		/*
         --x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
@@ -1009,22 +1009,22 @@ static READ16_HANDLER( sysop_r )
 static READ16_HANDLER( screen_ctrl_r )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	return state->screen_ctrl_reg;
+	return state->m_screen_ctrl_reg;
 }
 
 static WRITE16_HANDLER( screen_ctrl_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	state->screen_ctrl_reg = data;
+	state->m_screen_ctrl_reg = data;
 }
 
 static TIMER_CALLBACK( t3_mouse_callback )
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
-	if(state->timer3_io_reg & 0x80)
+	if(state->m_timer3_io_reg & 0x80)
 	{
 		pic8259_ir5_w(machine.device("pic8259_slave"), 1);
-		state->t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->timer3_io_reg & 3)));
+		state->m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->m_timer3_io_reg & 3)));
 	}
 }
 
@@ -1035,21 +1035,21 @@ static WRITE8_HANDLER( timer3_ctrl_reg_w )
     x--- ---- MINTEN (TCU irq enable)
     ---- --xx general purpose timer 3 interval (120, 60, 30, 15)
     */
-	state->timer3_io_reg = data;
+	state->m_timer3_io_reg = data;
 
 	if(data & 0x80)
-		state->t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->timer3_io_reg & 3)));
+		state->m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->m_timer3_io_reg & 3)));
 	else
 	{
 		pic8259_ir5_w(space->machine().device("pic8259_slave"), 0);
-		state->t3_mouse_timer->adjust(attotime::never);
+		state->m_t3_mouse_timer->adjust(attotime::never);
 	}
 }
 
 static WRITE16_HANDLER( video_pri_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	COMBINE_DATA(&state->video_pri_reg[offset]);
+	COMBINE_DATA(&state->m_video_pri_reg[offset]);
 }
 
 static READ8_HANDLER( backupram_dsw_r )
@@ -1131,7 +1131,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16 )
 	AM_RANGE(0x0220, 0x023f) AM_RAM // Frame buffer 1 control parameter
 	AM_RANGE(0x0240, 0x025f) AM_RAM // Frame buffer 2 control parameter
 	AM_RANGE(0x0260, 0x027f) AM_RAM // Frame buffer 3 control parameter
-	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE(palette_ram_w) AM_BASE_MEMBER(pc88va_state, palram) // Palette RAM (xBBBBxRRRRxGGGG format)
+	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE(palette_ram_w) AM_BASE_MEMBER(pc88va_state, m_palram) // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  AM_RANGE(0x0500, 0x05ff) GVRAM
 //  AM_RANGE(0x1000, 0xfeff) user area (???)
@@ -1148,7 +1148,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fdc_irq_vector_w )
 {
 	pc88va_state *state = space->machine().driver_data<pc88va_state>();
-	state->fdc_irq_opcode = data;
+	state->m_fdc_irq_opcode = data;
 }
 
 static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8 )
@@ -1383,14 +1383,14 @@ static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
 	pc88va_state *state = device->machine().driver_data<pc88va_state>();
 
-	return state->i8255_1_pc >> 4;
+	return state->m_i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
 	pc88va_state *state = device->machine().driver_data<pc88va_state>();
 
-	state->i8255_0_pc = data;
+	state->m_i8255_0_pc = data;
 }
 
 static I8255A_INTERFACE( master_fdd_intf )
@@ -1407,14 +1407,14 @@ static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
 	pc88va_state *state = device->machine().driver_data<pc88va_state>();
 
-	return state->i8255_0_pc >> 4;
+	return state->m_i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
 	pc88va_state *state = device->machine().driver_data<pc88va_state>();
 
-	state->i8255_1_pc = data;
+	state->m_i8255_1_pc = data;
 }
 
 static I8255A_INTERFACE( slave_fdd_intf )
@@ -1511,8 +1511,8 @@ static MACHINE_START( pc88va )
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	device_set_irq_callback(machine.device("maincpu"), pc88va_irq_callback);
 
-	state->t3_mouse_timer = machine.scheduler().timer_alloc(FUNC(t3_mouse_callback));
-	state->t3_mouse_timer->adjust(attotime::never);
+	state->m_t3_mouse_timer = machine.scheduler().timer_alloc(FUNC(t3_mouse_callback));
+	state->m_t3_mouse_timer->adjust(attotime::never);
 }
 
 static MACHINE_RESET( pc88va )
@@ -1524,8 +1524,8 @@ static MACHINE_RESET( pc88va )
 	memory_set_bankptr(machine, "rom10_bank", &ROM10[0x00000]);
 	memory_set_bankptr(machine, "rom00_bank", &ROM00[0x00000]);
 
-	state->bank_reg = 0x4100;
-	state->backupram_wp = 1;
+	state->m_bank_reg = 0x4100;
+	state->m_backupram_wp = 1;
 
 	/* default palette */
 	{
@@ -1534,10 +1534,10 @@ static MACHINE_RESET( pc88va )
 			palette_set_color_rgb(machine,i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
 	}
 
-	state->tsp.tvram_vreg_offset = 0;
+	state->m_tsp.tvram_vreg_offset = 0;
 
-	state->fdc_mode = 0;
-	state->fdc_irq_opcode = 0x00; //0x7f ld a,a !
+	state->m_fdc_mode = 0;
+	state->m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
 	device_set_input_line_vector(machine.device("fdccpu"), 0, 0);
 }
@@ -1594,7 +1594,7 @@ static const struct pit8253_config pc88va_pit8253_config =
 static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
 {
 	pc88va_state *drvstate = device->machine().driver_data<pc88va_state>();
-	if(drvstate->fdc_mode)
+	if(drvstate->m_fdc_mode)
 		pic8259_ir3_w(device->machine().device( "pic8259_slave"), state);
 	else
 		cputag_set_input_line(device->machine(), "fdccpu", 0, HOLD_LINE);

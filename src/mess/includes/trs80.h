@@ -20,35 +20,35 @@ public:
 	trs80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 model4;
-	UINT8 *gfxram;
-	UINT8 mode;
-	UINT8 irq;
-	UINT8 mask;
-	UINT8 nmi_mask;
-	UINT8 port_ec;
-	UINT8 tape_unit;
-	UINT8 reg_load;
-	UINT8 nmi_data;
+	UINT8 *m_videoram;
+	UINT8 m_model4;
+	UINT8 *m_gfxram;
+	UINT8 m_mode;
+	UINT8 m_irq;
+	UINT8 m_mask;
+	UINT8 m_nmi_mask;
+	UINT8 m_port_ec;
+	UINT8 m_tape_unit;
+	UINT8 m_reg_load;
+	UINT8 m_nmi_data;
 #ifdef USE_TRACK
-	UINT8 track[4];
+	UINT8 m_track[4];
 #endif
-	UINT8 head;
+	UINT8 m_head;
 #ifdef USE_SECTOR
-	UINT8 sector[4];
+	UINT8 m_sector[4];
 #endif
-	UINT8 cassette_data;
-	emu_timer *cassette_data_timer;
-	device_t *printer;
-	device_t *ay31015;
-	device_t *cass;
-	device_t *speaker;
-	device_t *fdc;
-	double old_cassette_val;
-	UINT16 start_address;
-	UINT8 crtc_reg;
-	UINT8 size_store;
+	UINT8 m_cassette_data;
+	emu_timer *m_cassette_data_timer;
+	device_t *m_printer;
+	device_t *m_ay31015;
+	device_t *m_cass;
+	device_t *m_speaker;
+	device_t *m_fdc;
+	double m_old_cassette_val;
+	UINT16 m_start_address;
+	UINT8 m_crtc_reg;
+	UINT8 m_size_store;
 };
 
 

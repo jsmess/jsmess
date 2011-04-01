@@ -16,7 +16,7 @@
 WRITE8_HANDLER( pp01_video_write_mode_w )
 {
 	pp01_state *state = space->machine().driver_data<pp01_state>();
-	state->video_write_mode = data & 0x0f;
+	state->m_video_write_mode = data & 0x0f;
 }
 
 static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
@@ -25,19 +25,19 @@ static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
 	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
-	if (BIT(state->video_write_mode,3)) {
+	if (BIT(state->m_video_write_mode,3)) {
 		// Copy mode
-		if(BIT(state->video_write_mode,0)) {
+		if(BIT(state->m_video_write_mode,0)) {
 			ram[0x6000+offset+addroffset] = data;
 		} else {
 			ram[0x6000+offset+addroffset] = 0;
 		}
-		if(BIT(state->video_write_mode,1)) {
+		if(BIT(state->m_video_write_mode,1)) {
 			ram[0xa000+offset+addroffset] = data;
 		} else {
 			ram[0xa000+offset+addroffset] = 0;
 		}
-		if(BIT(state->video_write_mode,2)) {
+		if(BIT(state->m_video_write_mode,2)) {
 			ram[0xe000+offset+addroffset] = data;
 		} else {
 			ram[0xe000+offset+addroffset] = 0;
@@ -134,9 +134,9 @@ MACHINE_RESET( pp01 )
 {
 	pp01_state *state = machine.driver_data<pp01_state>();
 	int i;
-	memset(state->memory_block,0xff,16);
+	memset(state->m_memory_block,0xff,16);
 	for(i=0;i<16;i++) {
-		state->memory_block[i] = 0xff;
+		state->m_memory_block[i] = 0xff;
 		pp01_set_memory(machine, i, 0xff);
 	}
 }
@@ -144,14 +144,14 @@ MACHINE_RESET( pp01 )
 WRITE8_HANDLER (pp01_mem_block_w)
 {
 	pp01_state *state = space->machine().driver_data<pp01_state>();
-	state->memory_block[offset] = data;
+	state->m_memory_block[offset] = data;
 	pp01_set_memory(space->machine(), offset, data);
 }
 
 READ8_HANDLER (pp01_mem_block_r)
 {
 	pp01_state *state = space->machine().driver_data<pp01_state>();
-	return	state->memory_block[offset];
+	return	state->m_memory_block[offset];
 }
 
 MACHINE_START(pp01)
@@ -191,12 +191,12 @@ const struct pit8253_config pp01_pit8253_intf =
 static READ8_DEVICE_HANDLER (pp01_8255_porta_r )
 {
 	pp01_state *state = device->machine().driver_data<pp01_state>();
-	return state->video_scroll;
+	return state->m_video_scroll;
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
 {
 	pp01_state *state = device->machine().driver_data<pp01_state>();
-	state->video_scroll = data;
+	state->m_video_scroll = data;
 }
 
 static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
@@ -207,7 +207,7 @@ static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
 
-	return (input_port_read(device->machine(),keynames[state->key_line]) & 0x3F) | (input_port_read(device->machine(),"LINEALL") & 0xC0);
+	return (input_port_read(device->machine(),keynames[state->m_key_line]) & 0x3F) | (input_port_read(device->machine(),"LINEALL") & 0xC0);
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 {
@@ -218,7 +218,7 @@ static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 static WRITE8_DEVICE_HANDLER (pp01_8255_portc_w )
 {
 	pp01_state *state = device->machine().driver_data<pp01_state>();
-	state->key_line = data & 0x0f;
+	state->m_key_line = data & 0x0f;
 }
 
 static READ8_DEVICE_HANDLER (pp01_8255_portc_r )

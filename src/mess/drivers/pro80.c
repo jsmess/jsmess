@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER( segment_w );
 	DECLARE_READ8_MEMBER( kp_r );
 
-	UINT8 digit_sel;
+	UINT8 m_digit_sel;
 };
 
 
@@ -39,21 +39,21 @@ WRITE8_MEMBER( pro80_state::digit_w )
 	// --xx xxxx digit select
 	// -x-- ---- cassette out
 	// x--- ---- ???
-	digit_sel = data & 0x3f;
+	m_digit_sel = data & 0x3f;
 }
 
 WRITE8_MEMBER( pro80_state::segment_w )
 {
-	if (digit_sel)
+	if (m_digit_sel)
 	{
-		if (!BIT(digit_sel, 0)) output_set_digit_value(0, data);
-		if (!BIT(digit_sel, 1)) output_set_digit_value(1, data);
-		if (!BIT(digit_sel, 2)) output_set_digit_value(2, data);
-		if (!BIT(digit_sel, 3)) output_set_digit_value(3, data);
-		if (!BIT(digit_sel, 4)) output_set_digit_value(4, data);
-		if (!BIT(digit_sel, 5)) output_set_digit_value(5, data);
+		if (!BIT(m_digit_sel, 0)) output_set_digit_value(0, data);
+		if (!BIT(m_digit_sel, 1)) output_set_digit_value(1, data);
+		if (!BIT(m_digit_sel, 2)) output_set_digit_value(2, data);
+		if (!BIT(m_digit_sel, 3)) output_set_digit_value(3, data);
+		if (!BIT(m_digit_sel, 4)) output_set_digit_value(4, data);
+		if (!BIT(m_digit_sel, 5)) output_set_digit_value(5, data);
 
-		digit_sel = 0;
+		m_digit_sel = 0;
 	}
 }
 
@@ -61,12 +61,12 @@ READ8_MEMBER( pro80_state::kp_r )
 {
 	UINT8 data = 0x0f;
 
-	if (!BIT(digit_sel, 0)) data &= input_port_read(m_machine, "LINE0");
-	if (!BIT(digit_sel, 1)) data &= input_port_read(m_machine, "LINE1");
-	if (!BIT(digit_sel, 2)) data &= input_port_read(m_machine, "LINE2");
-	if (!BIT(digit_sel, 3)) data &= input_port_read(m_machine, "LINE3");
-	if (!BIT(digit_sel, 4)) data &= input_port_read(m_machine, "LINE4");
-	if (!BIT(digit_sel, 5)) data &= input_port_read(m_machine, "LINE5");
+	if (!BIT(m_digit_sel, 0)) data &= input_port_read(m_machine, "LINE0");
+	if (!BIT(m_digit_sel, 1)) data &= input_port_read(m_machine, "LINE1");
+	if (!BIT(m_digit_sel, 2)) data &= input_port_read(m_machine, "LINE2");
+	if (!BIT(m_digit_sel, 3)) data &= input_port_read(m_machine, "LINE3");
+	if (!BIT(m_digit_sel, 4)) data &= input_port_read(m_machine, "LINE4");
+	if (!BIT(m_digit_sel, 5)) data &= input_port_read(m_machine, "LINE5");
 
 	return data;
 }
@@ -123,7 +123,7 @@ INPUT_PORTS_END
 
 void pro80_state::machine_reset()
 {
-	digit_sel = 0;
+	m_digit_sel = 0;
 }
 
 static MACHINE_CONFIG_START( pro80, pro80_state )

@@ -15,9 +15,9 @@ public:
 	irisha_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int keyboard_mask;
-	UINT8 keypressed;
-	UINT8 keyboard_cnt;
+	int m_keyboard_mask;
+	UINT8 m_keypressed;
+	UINT8 m_keyboard_cnt;
 };
 
 

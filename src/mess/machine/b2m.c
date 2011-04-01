@@ -145,7 +145,7 @@ static void b2m_set_bank(running_machine &machine,int bank)
 static WRITE_LINE_DEVICE_HANDLER(bm2_pit_out1)
 {
 	b2m_state *st =  device->machine().driver_data<b2m_state>();
-	speaker_level_w(st->speaker, state);
+	speaker_level_w(st->m_speaker, state);
 }
 
 const struct pit8253_config b2m_pit8253_intf =
@@ -172,27 +172,27 @@ const struct pit8253_config b2m_pit8253_intf =
 static WRITE8_DEVICE_HANDLER (b2m_8255_porta_w )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	state->b2m_8255_porta = data;
+	state->m_b2m_8255_porta = data;
 }
 static WRITE8_DEVICE_HANDLER (b2m_8255_portb_w )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	state->b2m_video_scroll = data;
+	state->m_b2m_video_scroll = data;
 }
 
 static WRITE8_DEVICE_HANDLER (b2m_8255_portc_w )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
 
-	state->b2m_8255_portc = data;
-	b2m_set_bank(device->machine(), state->b2m_8255_portc & 7);
-	state->b2m_video_page = (state->b2m_8255_portc >> 7) & 1;
+	state->m_b2m_8255_portc = data;
+	b2m_set_bank(device->machine(), state->m_b2m_8255_portc & 7);
+	state->m_b2m_video_page = (state->m_b2m_8255_portc >> 7) & 1;
 }
 
 static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	return state->b2m_video_scroll;
+	return state->m_b2m_video_scroll;
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_1 )
@@ -215,19 +215,19 @@ static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 	floppy_mon_w(floppy_get_device(device->machine(), 0), 1);
 	floppy_mon_w(floppy_get_device(device->machine(), 1), 1);
 
-	if (state->b2m_drive!=drive) {
-		wd17xx_set_drive(state->fdc,drive);
+	if (state->m_b2m_drive!=drive) {
+		wd17xx_set_drive(state->m_fdc,drive);
 		floppy_mon_w(floppy_get_device(device->machine(), 0), 0);
 		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 0), 1, 1);
-		state->b2m_drive = drive;
+		state->m_b2m_drive = drive;
 	}
-	if (state->b2m_side!=side) {
-		wd17xx_set_side(state->fdc,side);
+	if (state->m_b2m_side!=side) {
+		wd17xx_set_side(state->m_fdc,side);
 		floppy_mon_w(floppy_get_device(device->machine(), 1), 0);
 		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 1), 1, 1);
-		state->b2m_side = side;
+		state->m_b2m_side = side;
 	}
-	wd17xx_dden_w(state->fdc, 0);
+	wd17xx_dden_w(state->m_fdc, 0);
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_2 )
@@ -245,19 +245,19 @@ static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
 	b2m_state *state = device->machine().driver_data<b2m_state>();
 
 	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x12000;
-	return romdisk[state->b2m_romdisk_msb*256+state->b2m_romdisk_lsb];
+	return romdisk[state->m_b2m_romdisk_msb*256+state->m_b2m_romdisk_lsb];
 }
 
 static WRITE8_DEVICE_HANDLER (b2m_romdisk_portb_w )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	state->b2m_romdisk_lsb = data;
+	state->m_b2m_romdisk_lsb = data;
 }
 
 static WRITE8_DEVICE_HANDLER (b2m_romdisk_portc_w )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	state->b2m_romdisk_msb = data & 0x7f;
+	state->m_b2m_romdisk_msb = data & 0x7f;
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_3 )
@@ -279,7 +279,7 @@ static WRITE_LINE_DEVICE_HANDLER( b2m_pic_set_int_line )
 DRIVER_INIT( b2m )
 {
 	b2m_state *state = machine.driver_data<b2m_state>();
-	state->vblank_state = 0;
+	state->m_vblank_state = 0;
 }
 
 WRITE8_HANDLER ( b2m_palette_w )
@@ -292,7 +292,7 @@ WRITE8_HANDLER ( b2m_palette_w )
 
 	UINT8 bw = (3 - (data & 3)) * 0x55;
 
-	state->b2m_color[offset & 3] = data;
+	state->m_b2m_color[offset & 3] = data;
 
 	if (input_port_read(space->machine(),"MONITOR")==1) {
 		palette_set_color_rgb(space->machine(),offset, r, g, b);
@@ -304,48 +304,48 @@ WRITE8_HANDLER ( b2m_palette_w )
 READ8_HANDLER ( b2m_palette_r )
 {
 	b2m_state *state = space->machine().driver_data<b2m_state>();
-	return state->b2m_color[offset];
+	return state->m_b2m_color[offset];
 }
 
 WRITE8_HANDLER ( b2m_localmachine_w )
 {
 	b2m_state *state = space->machine().driver_data<b2m_state>();
-	state->b2m_localmachine = data;
+	state->m_b2m_localmachine = data;
 }
 
 READ8_HANDLER ( b2m_localmachine_r )
 {
 	b2m_state *state = space->machine().driver_data<b2m_state>();
-	return state->b2m_localmachine;
+	return state->m_b2m_localmachine;
 }
 
 static STATE_POSTLOAD( b2m_postload )
 {
 	b2m_state *state = machine.driver_data<b2m_state>();
-	b2m_set_bank(machine, state->b2m_8255_portc & 7);
+	b2m_set_bank(machine, state->m_b2m_8255_portc & 7);
 }
 
 MACHINE_START(b2m)
 {
 	b2m_state *state = machine.driver_data<b2m_state>();
-	state->pic = machine.device("pic8259");
-	state->fdc = machine.device("wd1793");
-	state->speaker = machine.device("speaker");
+	state->m_pic = machine.device("pic8259");
+	state->m_fdc = machine.device("wd1793");
+	state->m_speaker = machine.device("speaker");
 
-	wd17xx_set_pause_time(state->fdc,10);
+	wd17xx_set_pause_time(state->m_fdc,10);
 
 	/* register for state saving */
-	state->save_item(NAME(state->b2m_8255_porta));
-	state->save_item(NAME(state->b2m_video_scroll));
-	state->save_item(NAME(state->b2m_8255_portc));
-	state->save_item(NAME(state->b2m_video_page));
-	state->save_item(NAME(state->b2m_drive));
-	state->save_item(NAME(state->b2m_side));
-	state->save_item(NAME(state->b2m_romdisk_lsb));
-	state->save_item(NAME(state->b2m_romdisk_msb));
-	state->save_pointer(NAME(state->b2m_color), 4);
-	state->save_item(NAME(state->b2m_localmachine));
-	state->save_item(NAME(state->vblank_state));
+	state->save_item(NAME(state->m_b2m_8255_porta));
+	state->save_item(NAME(state->m_b2m_video_scroll));
+	state->save_item(NAME(state->m_b2m_8255_portc));
+	state->save_item(NAME(state->m_b2m_video_page));
+	state->save_item(NAME(state->m_b2m_drive));
+	state->save_item(NAME(state->m_b2m_side));
+	state->save_item(NAME(state->m_b2m_romdisk_lsb));
+	state->save_item(NAME(state->m_b2m_romdisk_msb));
+	state->save_pointer(NAME(state->m_b2m_color), 4);
+	state->save_item(NAME(state->m_b2m_localmachine));
+	state->save_item(NAME(state->m_vblank_state));
 
 	machine.state().register_postload(b2m_postload, NULL);
 }
@@ -353,7 +353,7 @@ MACHINE_START(b2m)
 static IRQ_CALLBACK(b2m_irq_callback)
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	return pic8259_acknowledge(state->pic);
+	return pic8259_acknowledge(state->m_pic);
 }
 
 const struct pic8259_interface b2m_pic8259_config =
@@ -364,16 +364,16 @@ const struct pic8259_interface b2m_pic8259_config =
 INTERRUPT_GEN( b2m_vblank_interrupt )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
-	state->vblank_state++;
-	if (state->vblank_state>1) state->vblank_state=0;
-	pic8259_ir0_w(state->pic, state->vblank_state);
+	state->m_vblank_state++;
+	if (state->m_vblank_state>1) state->m_vblank_state=0;
+	pic8259_ir0_w(state->m_pic, state->m_vblank_state);
 }
 
 MACHINE_RESET(b2m)
 {
 	b2m_state *state = machine.driver_data<b2m_state>();
-	state->b2m_side = 0;
-	state->b2m_drive = 0;
+	state->m_b2m_side = 0;
+	state->m_b2m_drive = 0;
 
 	device_set_irq_callback(machine.device("maincpu"), b2m_irq_callback);
 	b2m_set_bank(machine, 7);

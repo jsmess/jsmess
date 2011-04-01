@@ -22,24 +22,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* keyboard lines */
-	int cbmb_keyline_a;
-	int cbmb_keyline_b;
-	int cbmb_keyline_c;
+	int m_cbmb_keyline_a;
+	int m_cbmb_keyline_b;
+	int m_cbmb_keyline_c;
 
-	int p500;
-	int cbm700;
-	int cbm_ntsc;
-	UINT8 *videoram;
-	UINT8 *basic;
-	UINT8 *kernal;
-	UINT8 *colorram;
-	int keyline_a;
-	int keyline_b;
-	int keyline_c;
-	UINT8 *chargen;
-	int old_level;
-	int irq_level;
-	int font;
+	int m_p500;
+	int m_cbm700;
+	int m_cbm_ntsc;
+	UINT8 *m_videoram;
+	UINT8 *m_basic;
+	UINT8 *m_kernal;
+	UINT8 *m_colorram;
+	int m_keyline_a;
+	int m_keyline_b;
+	int m_keyline_c;
+	UINT8 *m_chargen;
+	int m_old_level;
+	int m_irq_level;
+	int m_font;
 };
 
 /*----------- defined in machine/cbmb.c -----------*/

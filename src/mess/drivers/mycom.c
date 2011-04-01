@@ -63,19 +63,19 @@ public:
 	mycom_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *mc6845;
-	device_t *audio;
-	device_t *cassette;
-	device_t *fdc;
-	UINT8 *vram;
-	UINT8 *gfx_rom;
-	UINT16 vram_addr;
-	UINT8 keyb_press;
-	UINT8 keyb_press_flag;
-	UINT8 _0a;
-	UINT8 sn_we;
-	UINT32 upper_sw;
-	UINT8 *RAM;
+	device_t *m_mc6845;
+	device_t *m_audio;
+	device_t *m_cassette;
+	device_t *m_fdc;
+	UINT8 *m_vram;
+	UINT8 *m_gfx_rom;
+	UINT16 m_vram_addr;
+	UINT8 m_keyb_press;
+	UINT8 m_keyb_press_flag;
+	UINT8 m_0a;
+	UINT8 m_sn_we;
+	UINT32 m_upper_sw;
+	UINT8 *m_RAM;
 };
 
 
@@ -83,15 +83,15 @@ public:
 static VIDEO_START( mycom )
 {
 	mycom_state *state = machine.driver_data<mycom_state>();
-	state->mc6845 = machine.device("crtc");
-	state->vram = machine.region("vram")->base();
-	state->gfx_rom = machine.region("gfx")->base();
+	state->m_mc6845 = machine.device("crtc");
+	state->m_vram = machine.region("vram")->base();
+	state->m_gfx_rom = machine.region("gfx")->base();
 }
 
 static SCREEN_UPDATE( mycom )
 {
 	mycom_state *state = screen->machine().driver_data<mycom_state>();
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	mc6845_update(state->m_mc6845, bitmap, cliprect);
 	return 0;
 }
 
@@ -102,14 +102,14 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	if (state->_0a & 0x40)
+	if (state->m_0a & 0x40)
 	{
 		for (x = 0; x < x_count; x++)					// lores pixels
 		{
 			UINT8 dbit=1;
 			if (x == cursor_x) dbit=0;
 			mem = (ma + x) & 0x7ff;
-			chr = state->vram[mem];
+			chr = state->m_vram[mem];
 			z = ra / 3;
 			*p++ = BIT( chr, z ) ? dbit: dbit^1;
 			*p++ = BIT( chr, z ) ? dbit: dbit^1;
@@ -133,8 +133,8 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 				gfx = inv;	// some blank spacing lines
 			else
 			{
-				chr = state->vram[mem];
-				gfx = state->gfx_rom[(chr<<3) | ra] ^ inv;
+				chr = state->m_vram[mem];
+				gfx = state->m_gfx_rom[(chr<<3) | ra] ^ inv;
 			}
 
 			/* Display a scanline of a character */
@@ -157,33 +157,33 @@ static WRITE8_HANDLER( mycom_00_w )
 	{
 		case 0x00: memory_set_bank(space->machine(), "boot", 1); break;
 		case 0x01: memory_set_bank(space->machine(), "boot", 0); break;
-		case 0x02: state->upper_sw = 0x10000; break;
-		case 0x03: state->upper_sw = 0x0c000; break;
+		case 0x02: state->m_upper_sw = 0x10000; break;
+		case 0x03: state->m_upper_sw = 0x0c000; break;
 	}
 }
 
 static READ8_HANDLER( mycom_upper_r )
 {
 	mycom_state *state = space->machine().driver_data<mycom_state>();
-	return state->RAM[offset | state->upper_sw];
+	return state->m_RAM[offset | state->m_upper_sw];
 }
 
 static WRITE8_HANDLER( mycom_upper_w )
 {
 	mycom_state *state = space->machine().driver_data<mycom_state>();
-	state->RAM[offset | 0xc000] = data;
+	state->m_RAM[offset | 0xc000] = data;
 }
 
 static READ8_HANDLER( vram_data_r )
 {
 	mycom_state *state = space->machine().driver_data<mycom_state>();
-	return state->vram[state->vram_addr];
+	return state->m_vram[state->m_vram_addr];
 }
 
 static WRITE8_HANDLER( vram_data_w )
 {
 	mycom_state *state = space->machine().driver_data<mycom_state>();
-	state->vram[state->vram_addr] = data;
+	state->m_vram[state->m_vram_addr] = data;
 }
 
 static ADDRESS_MAP_START(mycom_map, AS_PROGRAM, 8)
@@ -333,19 +333,19 @@ static const mc6845_interface mc6845_intf =
 static WRITE8_DEVICE_HANDLER( mycom_04_w )
 {
 	mycom_state *state = device->machine().driver_data<mycom_state>();
-	state->vram_addr = (state->vram_addr & 0x700) | data;
+	state->m_vram_addr = (state->m_vram_addr & 0x700) | data;
 
-	state->sn_we = data;
+	state->m_sn_we = data;
 	/* doesn't work? */
 	//printf(":%X ",data);
-	//if(state->sn_we)
-	  //sn76496_w(state->audio, 0, data);
+	//if(state->m_sn_we)
+	  //sn76496_w(state->m_audio, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( mycom_06_w )
 {
 	mycom_state *state = device->machine().driver_data<mycom_state>();
-	state->vram_addr = (state->vram_addr & 0x0ff) | ((data & 0x007) << 8);
+	state->m_vram_addr = (state->m_vram_addr & 0x0ff) | ((data & 0x007) << 8);
 }
 
 static READ8_DEVICE_HANDLER( mycom_08_r )
@@ -358,9 +358,9 @@ static READ8_DEVICE_HANDLER( mycom_08_r )
     */
 	UINT8 data = 0;
 
-	data = state->keyb_press_flag; //~state->keyb_press_flag & 1;
+	data = state->m_keyb_press_flag; //~state->m_keyb_press_flag & 1;
 
-	if (cassette_input(state->cassette) > 0.03) // not working
+	if (cassette_input(state->m_cassette) > 0.03) // not working
 		data+=4;
 
 	return data;
@@ -380,7 +380,7 @@ static READ8_DEVICE_HANDLER( mycom_06_r )
 static READ8_DEVICE_HANDLER( mycom_05_r )
 {
 	mycom_state *state = device->machine().driver_data<mycom_state>();
-	return state->keyb_press;
+	return state->m_keyb_press;
 }
 
 static WRITE8_DEVICE_HANDLER( mycom_0a_w )
@@ -397,17 +397,17 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
     ---- ---x printer strobe
     */
 
-	if ((state->_0a & 8) != (data & 8))
-		cassette_change_state(state->cassette,
+	if ((state->m_0a & 8) != (data & 8))
+		cassette_change_state(state->m_cassette,
 		(data & 8) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (data & 8) // motor on
-		cassette_output(state->cassette, (data & 4) ? -1.0 : +1.0);
+		cassette_output(state->m_cassette, (data & 4) ? -1.0 : +1.0);
 
-	if ((data & 0x80) != (state->_0a & 0x80))
-		mc6845_set_clock(state->mc6845, (data & 0x80) ? 1008000 : 2016000);
+	if ((data & 0x80) != (state->m_0a & 0x80))
+		mc6845_set_clock(state->m_mc6845, (data & 0x80) ? 1008000 : 2016000);
 
-	state->_0a = data;
+	state->m_0a = data;
 
 	/* Info about sound
     - uses a SN76489N chip at an unknown clock
@@ -419,7 +419,7 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
 
 	// no sound comes out
 	if ((data & 0x30)==0)
-		sn76496_w(state->audio, 0, state->sn_we);
+		sn76496_w(state->m_audio, 0, state->m_sn_we);
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -472,7 +472,7 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 	char kbdrow[2];
 	UINT8 modifiers = input_port_read(timer.machine(), "XX");
 	UINT8 shift_pressed = (modifiers & 2) >> 1;
-	state->keyb_press_flag = 0;
+	state->m_keyb_press_flag = 0;
 
 	/* see what is pressed */
 	for (x = 0; x < 9; x++)
@@ -492,35 +492,35 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 				if (BIT(pressed[x], y))
 				{
 					scancode = ((x + y * 9) << 1) + shift_pressed + 1;
-					state->keyb_press_flag = 1;
-					state->keyb_press = mycom_keyval[scancode];
+					state->m_keyb_press_flag = 1;
+					state->m_keyb_press = mycom_keyval[scancode];
 				}
 			}
 		}
 	}
 
-	if (state->keyb_press_flag)
+	if (state->m_keyb_press_flag)
 	{
-		if (modifiers & 1) state->keyb_press &= 0xbf;
-		if (modifiers & 4) state->keyb_press |= 0x80;
+		if (modifiers & 1) state->m_keyb_press &= 0xbf;
+		if (modifiers & 4) state->m_keyb_press |= 0x80;
 	}
 }
 
 static MACHINE_START(mycom)
 {
 	mycom_state *state = machine.driver_data<mycom_state>();
-	state->audio = machine.device("sn1");
-	state->cassette = machine.device("cassette");
-	state->fdc = machine.device("fdc");
-	state->RAM = machine.region("maincpu")->base();
+	state->m_audio = machine.device("sn1");
+	state->m_cassette = machine.device("cassette");
+	state->m_fdc = machine.device("fdc");
+	state->m_RAM = machine.region("maincpu")->base();
 }
 
 static MACHINE_RESET(mycom)
 {
 	mycom_state *state = machine.driver_data<mycom_state>();
 	memory_set_bank(machine, "boot", 1);
-	state->upper_sw = 0x10000;
-	state->_0a = 0;
+	state->m_upper_sw = 0x10000;
+	state->m_0a = 0;
 }
 
 static DRIVER_INIT( mycom )

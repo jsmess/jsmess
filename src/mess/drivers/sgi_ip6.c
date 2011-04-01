@@ -30,7 +30,7 @@ public:
 	sgi_ip6_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	ip6_regs_t ip6_regs;
+	ip6_regs_t m_ip6_regs;
 };
 
 
@@ -86,8 +86,8 @@ static READ32_HANDLER( ip6_unk1_r )
 			}
 			if(ACCESSING_BITS_0_15)
 			{
-				verboselog(space->machine(), 0, "ip6_unk1_r: Unknown Halfword 0: %08x & %08x\n", state->ip6_regs.unknown_half_0, mem_mask );
-				ret |= state->ip6_regs.unknown_half_0;
+				verboselog(space->machine(), 0, "ip6_unk1_r: Unknown Halfword 0: %08x & %08x\n", state->m_ip6_regs.unknown_half_0, mem_mask );
+				ret |= state->m_ip6_regs.unknown_half_0;
 			}
 			break;
 		default:
@@ -110,7 +110,7 @@ static WRITE32_HANDLER( ip6_unk1_w )
 			if(ACCESSING_BITS_0_15)
 			{
 				verboselog(space->machine(), 0, "ip6_unk1_w: Unknown Halfword 0 = %04x & %04x\n", data & 0x0000ffff, mem_mask & 0x0000ffff );
-				state->ip6_regs.unknown_half_0 = data & 0x0000ffff;
+				state->m_ip6_regs.unknown_half_0 = data & 0x0000ffff;
 			}
 			break;
 		default:
@@ -132,8 +132,8 @@ static READ32_HANDLER( ip6_unk2_r )
 			}
 			if(ACCESSING_BITS_24_31)
 			{
-				verboselog(space->machine(), 0, "ip6_unk2_r: Unknown Byte 0 = %02x & %02x\n", state->ip6_regs.unknown_byte_0, mem_mask >> 24 );
-				ret |= state->ip6_regs.unknown_byte_0 << 24;
+				verboselog(space->machine(), 0, "ip6_unk2_r: Unknown Byte 0 = %02x & %02x\n", state->m_ip6_regs.unknown_byte_0, mem_mask >> 24 );
+				ret |= state->m_ip6_regs.unknown_byte_0 << 24;
 			}
 			break;
 		default:
@@ -156,7 +156,7 @@ static WRITE32_HANDLER( ip6_unk2_w )
 			if(ACCESSING_BITS_24_31)
 			{
 				verboselog(space->machine(), 0, "ip6_unk2_w: Unknown Byte 0 = %02x & %02x\n", data >> 24, mem_mask >> 24 );
-				state->ip6_regs.unknown_byte_0 = (data & 0xff000000) >> 24;
+				state->m_ip6_regs.unknown_byte_0 = (data & 0xff000000) >> 24;
 			}
 			break;
 		default:
@@ -171,8 +171,8 @@ static READ32_HANDLER(ip6_unk3_r)
 	UINT32 ret = 0;
 	if(ACCESSING_BITS_16_23)
 	{
-		verboselog(space->machine(), 0, "ip6_unk3_r: Unknown Byte 1: %02x & %02x\n", state->ip6_regs.unknown_byte_1, (mem_mask >> 16) & 0x000000ff);
-		ret |= state->ip6_regs.unknown_byte_1 << 16;
+		verboselog(space->machine(), 0, "ip6_unk3_r: Unknown Byte 1: %02x & %02x\n", state->m_ip6_regs.unknown_byte_1, (mem_mask >> 16) & 0x000000ff);
+		ret |= state->m_ip6_regs.unknown_byte_1 << 16;
 	}
 	else
 	{
@@ -197,9 +197,9 @@ static MACHINE_START( sgi_ip6 )
 static MACHINE_RESET( sgi_ip6 )
 {
 	sgi_ip6_state *state = machine.driver_data<sgi_ip6_state>();
-	state->ip6_regs.unknown_byte_0 = 0x80;
-	state->ip6_regs.unknown_byte_1 = 0x80;
-	state->ip6_regs.unknown_half_0 = 0;
+	state->m_ip6_regs.unknown_byte_0 = 0x80;
+	state->m_ip6_regs.unknown_byte_1 = 0x80;
+	state->m_ip6_regs.unknown_half_0 = 0;
 }
 
 /***************************************************************************

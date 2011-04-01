@@ -37,24 +37,24 @@ public:
 	samcoupe_state(running_machine &machine, const driver_device_config_base &config)
 			: driver_device(machine, config) { }
 
-	emu_timer *video_update_timer;
+	emu_timer *m_video_update_timer;
 
-	UINT8 lmpr, hmpr, vmpr; /* memory pages */
-	UINT8 lext, hext;       /* extended memory page */
-	UINT8 border;           /* border */
-	UINT8 clut[16];         /* color lookup table, 16 entries */
-	UINT8 line_int;         /* line interrupt */
-	UINT8 status;           /* status register */
+	UINT8 m_lmpr, m_hmpr, m_vmpr; /* memory pages */
+	UINT8 m_lext, m_hext;       /* extended memory page */
+	UINT8 m_border;           /* border */
+	UINT8 m_clut[16];         /* color lookup table, 16 entries */
+	UINT8 m_line_int;         /* line interrupt */
+	UINT8 m_status;           /* status register */
 
 	/* attribute */
-	UINT8 attribute;
+	UINT8 m_attribute;
 
 	/* mouse */
-	int mouse_index;
-	emu_timer *mouse_reset;
-	UINT8 mouse_data[9];
-	int mouse_x, mouse_y;
-	UINT8 *videoram;
+	int m_mouse_index;
+	emu_timer *m_mouse_reset;
+	UINT8 m_mouse_data[9];
+	int m_mouse_x, m_mouse_y;
+	UINT8 *m_videoram;
 };
 
 

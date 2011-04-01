@@ -18,7 +18,7 @@ public:
 	isbc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 received_char;
+	UINT8 m_received_char;
 };
 
 
@@ -32,15 +32,15 @@ static WRITE16_HANDLER(isbc_terminal_w)
 static READ16_HANDLER(isbc_terminal_status_r)
 {
 	isbc_state *state = space->machine().driver_data<isbc_state>();
-	if (state->received_char!=0) return 3; // char received
+	if (state->m_received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
 static READ16_HANDLER(isbc_terminal_r)
 {
 	isbc_state *state = space->machine().driver_data<isbc_state>();
-	UINT8 retVal = state->received_char;
-	state->received_char = 0;
+	UINT8 retVal = state->m_received_char;
+	state->m_received_char = 0;
 	return retVal;
 }
 
@@ -94,13 +94,13 @@ INPUT_PORTS_END
 static MACHINE_RESET(isbc)
 {
 	isbc_state *state = machine.driver_data<isbc_state>();
-	state->received_char = 0;
+	state->m_received_char = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( isbc_kbd_put )
 {
 	isbc_state *state = device->machine().driver_data<isbc_state>();
-	state->received_char = data;
+	state->m_received_char = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( isbc_terminal_intf )

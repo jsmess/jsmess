@@ -17,13 +17,13 @@ static TIMER_CALLBACK( reset_tick )
 {
 	pecom_state *state = machine.driver_data<pecom_state>();
 
-	state->reset = 1;
+	state->m_reset = 1;
 }
 
 MACHINE_START( pecom )
 {
 	pecom_state *state = machine.driver_data<pecom_state>();
-	state->reset_timer = machine.scheduler().timer_alloc(FUNC(reset_tick));
+	state->m_reset_timer = machine.scheduler().timer_alloc(FUNC(reset_tick));
 }
 
 MACHINE_RESET( pecom )
@@ -44,33 +44,33 @@ MACHINE_RESET( pecom )
 	memory_set_bankptr(machine, "bank3", rom + 0xf000);
 	memory_set_bankptr(machine, "bank4", rom + 0xf800);
 
-	state->reset = 0;
-	state->dma = 0;
-	state->reset_timer->adjust(attotime::from_msec(5));
+	state->m_reset = 0;
+	state->m_dma = 0;
+	state->m_reset_timer->adjust(attotime::from_msec(5));
 }
 
 static READ8_HANDLER( pecom_cdp1869_charram_r )
 {
 	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->cdp1869->char_ram_r(*space, offset);
+	return state->m_cdp1869->char_ram_r(*space, offset);
 }
 
 static WRITE8_HANDLER( pecom_cdp1869_charram_w )
 {
 	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->cdp1869->char_ram_w(*space, offset, data);
+	return state->m_cdp1869->char_ram_w(*space, offset, data);
 }
 
 static READ8_HANDLER( pecom_cdp1869_pageram_r )
 {
 	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->cdp1869->page_ram_r(*space, offset);
+	return state->m_cdp1869->page_ram_r(*space, offset);
 }
 
 static WRITE8_HANDLER( pecom_cdp1869_pageram_w )
 {
 	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->cdp1869->page_ram_w(*space, offset, data);
+	return state->m_cdp1869->page_ram_w(*space, offset, data);
 }
 
 WRITE8_HANDLER( pecom_bank_w )
@@ -124,7 +124,7 @@ static READ_LINE_DEVICE_HANDLER( clear_r )
 {
 	pecom_state *state = device->machine().driver_data<pecom_state>();
 
-	return state->reset;
+	return state->m_reset;
 }
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )

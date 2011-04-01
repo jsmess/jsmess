@@ -18,7 +18,7 @@ public:
 	dual68_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16* ram;
+	UINT16* m_ram;
 };
 
 
@@ -31,7 +31,7 @@ static WRITE16_HANDLER(dual68_terminal_w)
 
 static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_BASE_MEMBER(dual68_state, ram)
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_BASE_MEMBER(dual68_state, m_ram)
 	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(dual68_terminal_w)
 	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
@@ -57,7 +57,7 @@ static MACHINE_RESET(dual68)
 	dual68_state *state = machine.driver_data<dual68_state>();
 	UINT8* user1 = machine.region("user1")->base();
 
-	memcpy((UINT8*)state->ram,user1,0x2000);
+	memcpy((UINT8*)state->m_ram,user1,0x2000);
 
 	machine.device("maincpu")->reset();
 }

@@ -1093,12 +1093,12 @@ void mac_state::scc_mouse_irq(int x, int y)
 	device_t *scc = machine().device("scc");
 	if (x && y)
 	{
-		if (last_was_x)
+		if (m_last_was_x)
 			scc8530_set_status(scc, 0x0a);
 		else
 			scc8530_set_status(scc, 0x02);
 
-		last_was_x ^= 1;
+		m_last_was_x ^= 1;
 	}
 	else
 	{
@@ -1909,7 +1909,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 	mac->m_adb_timer_ticks--;
 	if (!mac->m_adb_timer_ticks)
 	{
-		mac->adb_timer->adjust(attotime::never);
+		mac->m_adb_timer->adjust(attotime::never);
 
 		if ((mac->m_adb_direction) && (ADB_IS_BITBANG))
 		{
@@ -1957,7 +1957,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 				}
 
 //              mac->m_adb_timer_ticks = 8;
-//              mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+//              mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 
 				if ((mac->m_adb_datasize == 0) && (mac->m_adb_streaming == MCU_STREAMING_NONE))
 				{
@@ -1983,7 +1983,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 	}
 	else
 	{
-		mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+		mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 	}
 }
 
@@ -2027,7 +2027,7 @@ static void mac_adb_newaction(mac_state *mac, int state)
 				mac->m_adb_direction = 1;	// Mac is shifting us a command
 				mac->m_adb_waiting_cmd = 1;	// we're going to get a command
 				mac->m_adb_irq_pending = 0;
-				mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				break;
 
 			case ADB_STATE_XFER_EVEN:
@@ -2057,7 +2057,7 @@ static void mac_adb_newaction(mac_state *mac, int state)
 					mac->m_adb_irq_pending = 1;
 				}
 
-				mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				break;
 
 			case ADB_STATE_IDLE:
@@ -2076,7 +2076,7 @@ static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
 	mac->m_adb_datasize = 3;
-	mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 }
 
 static void mac_egret_response_adb(mac_state *mac, int type, int flag, int cmd, int extra)
@@ -2089,7 +2089,7 @@ static void mac_egret_response_adb(mac_state *mac, int type, int flag, int cmd, 
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
 	mac->m_adb_datasize = 4;
-	mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 }
 
 static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
@@ -2104,7 +2104,7 @@ static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
 
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
-	mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 
 	// read PRAM is a "streaming" command, don't drop the state line when we're out of data
 	mac->m_adb_streaming = MCU_STREAMING_PRAMRD;
@@ -2126,7 +2126,7 @@ static void mac_egret_response_read_rtc(mac_state *mac)
 
 	mac->m_adb_state |= 1;
 	mac->m_adb_timer_ticks = 8;
-	mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 }
 
 static void mac_egret_mcu_exec(mac_state *mac)
@@ -2229,7 +2229,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			mac->m_adb_buffer[1] = 0;	// spare
 			mac->m_adb_state |= 1;
 			mac->m_adb_timer_ticks = 8;
-			mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			break;
 
 		case 0x0e: // send to DFAC
@@ -2299,21 +2299,21 @@ static void mac_egret_newaction(mac_state *mac, int state)
 		{
 			mac->m_adb_command = 0;
 			mac->m_adb_timer_ticks = 8;
-			mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 		}
 
 		// if bit 2 is high and stays high, the falling edge of bit 1, and we're in send phase, the MCU should clock out a byte
 		if ((state & 0x04) && (mac->m_adb_state & 0x04) && !(state & 0x02) && (mac->m_adb_state & 0x02) && (mac->m_adb_state & 0x01))
 		{
 			mac->m_adb_timer_ticks = 8;
-			mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 		}
 
 		// if bit 2 rises, bit 1 is 0, and MCU XS is high, the MCU should clock out a byte
 		if ((state & 0x04) && !(mac->m_adb_state & 0x04) && !(state & 0x02) && (mac->m_adb_state & 0x01))
 		{
 			mac->m_adb_timer_ticks = 8;
-			mac->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 		}
 
 		// if bit 2 drops and bit 1 is 1, terminate the command
@@ -2517,14 +2517,14 @@ void mac_state::adb_vblank()
 				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				this->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
 			else
 			{
 				m_adb_irq_pending = 1;
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
-				this->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				m_adb_srq_switch = 1;
 			}
 		}
@@ -2537,14 +2537,14 @@ void mac_state::adb_vblank()
 				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				this->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
 			else
 			{
 				m_adb_irq_pending = 1;
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
-				this->adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				m_adb_srq_switch = 1;
 			}
 		}
@@ -2755,7 +2755,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	}
 
 	set_scc_waitrequest((data & 0x80) >> 7);
-	mac->screen_buffer = (data & 0x40) >> 6;
+	mac->m_screen_buffer = (data & 0x40) >> 6;
 	sony_set_sel_line(fdc,(data & 0x20) >> 5);
 	if (mac->m_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
@@ -3031,19 +3031,19 @@ void mac_state::machine_start()
 {
 	if (has_adb())
 	{
-		this->adb_timer = machine().scheduler().timer_alloc(FUNC(mac_adb_tick));
-		this->adb_timer->adjust(attotime::never);
+		this->m_adb_timer = machine().scheduler().timer_alloc(FUNC(mac_adb_tick));
+		this->m_adb_timer->adjust(attotime::never);
 
 		// also allocate PMU timer
 		if (ADB_IS_PM_CLASS)
 		{
 			m_pmu_send_timer = machine().scheduler().timer_alloc(FUNC(mac_pmu_tick));
-			this->adb_timer->adjust(attotime::never);
+			this->m_adb_timer->adjust(attotime::never);
 		}
 
 	}
-	this->scanline_timer = machine().scheduler().timer_alloc(FUNC(mac_scanline_tick));
-	this->scanline_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+	this->m_scanline_timer = machine().scheduler().timer_alloc(FUNC(mac_scanline_tick));
+	this->m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 
 	m_6015_timer = machine().scheduler().timer_alloc(FUNC(mac_6015_tick));
 	m_6015_timer->adjust(attotime::never);
@@ -3063,7 +3063,7 @@ void mac_state::machine_reset()
 	// clear PMU response timer
 	if (ADB_IS_PM_CLASS)
 	{
-		this->adb_timer->adjust(attotime::never);
+		this->m_adb_timer->adjust(attotime::never);
 	}
 
 	// default to 32-bit mode on LC
@@ -3085,7 +3085,7 @@ void mac_state::machine_reset()
 	}
 
 	/* setup videoram */
-	this->screen_buffer = 1;
+	this->m_screen_buffer = 1;
 
 	/* setup sound */
 	if (AUDIO_IS_CLASSIC_CLASS)
@@ -3400,7 +3400,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 			mac->mouse_callback();
 	}
 
-	mac->scanline_timer->adjust(machine.primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	mac->m_scanline_timer->adjust(machine.primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
 

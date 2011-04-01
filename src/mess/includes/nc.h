@@ -31,29 +31,29 @@ public:
 	nc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	emu_timer *serial_timer;
-	char memory_config[4];
-	emu_timer *keyboard_timer;
-	int membank_rom_mask;
-	int membank_internal_ram_mask;
-	UINT8 poweroff_control;
-	int card_status;
-	unsigned char uart_control;
-	int irq_mask;
-	int irq_status;
-	int irq_latch;
-	int irq_latch_mask;
-	int sound_channel_periods[2];
-	emu_file *file;
-	int previous_inputport_10_state;
-	int previous_alarm_state;
-	UINT8 nc200_uart_interrupt_irq;
-	unsigned char *card_ram;
-	int membank_card_ram_mask;
-	unsigned long display_memory_start;
-	UINT8 type;
-	int card_size;
-	int nc200_backlight;
+	emu_timer *m_serial_timer;
+	char m_memory_config[4];
+	emu_timer *m_keyboard_timer;
+	int m_membank_rom_mask;
+	int m_membank_internal_ram_mask;
+	UINT8 m_poweroff_control;
+	int m_card_status;
+	unsigned char m_uart_control;
+	int m_irq_mask;
+	int m_irq_status;
+	int m_irq_latch;
+	int m_irq_latch_mask;
+	int m_sound_channel_periods[2];
+	emu_file *m_file;
+	int m_previous_inputport_10_state;
+	int m_previous_alarm_state;
+	UINT8 m_nc200_uart_interrupt_irq;
+	unsigned char *m_card_ram;
+	int m_membank_card_ram_mask;
+	unsigned long m_display_memory_start;
+	UINT8 m_type;
+	int m_card_size;
+	int m_nc200_backlight;
 };
 
 

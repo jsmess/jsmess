@@ -65,10 +65,10 @@
 static void dl1416_update(device_t *device, int index)
 {
 	aim65_state *state = device->machine().driver_data<aim65_state>();
-	dl1416_ce_w(device, state->pia_a & (0x04 << index));
-	dl1416_wr_w(device, BIT(state->pia_a, 7));
-	dl1416_cu_w(device, BIT(state->pia_b, 7));
-	dl1416_data_w(device, state->pia_a & 0x03, state->pia_b & 0x7f);
+	dl1416_ce_w(device, state->m_pia_a & (0x04 << index));
+	dl1416_wr_w(device, BIT(state->m_pia_a, 7));
+	dl1416_cu_w(device, BIT(state->m_pia_b, 7));
+	dl1416_data_w(device, state->m_pia_a & 0x03, state->m_pia_b & 0x7f);
 }
 
 static void aim65_pia(running_machine &machine)
@@ -84,7 +84,7 @@ static void aim65_pia(running_machine &machine)
 WRITE8_DEVICE_HANDLER(aim65_pia_a_w)
 {
 	aim65_state *state = device->machine().driver_data<aim65_state>();
-	state->pia_a = data;
+	state->m_pia_a = data;
 	aim65_pia(device->machine());
 }
 
@@ -92,7 +92,7 @@ WRITE8_DEVICE_HANDLER(aim65_pia_a_w)
 WRITE8_DEVICE_HANDLER(aim65_pia_b_w)
 {
 	aim65_state *state = device->machine().driver_data<aim65_state>();
-	state->pia_b = data;
+	state->m_pia_b = data;
 	aim65_pia(device->machine());
 }
 
@@ -143,7 +143,7 @@ READ8_DEVICE_HANDLER(aim65_riot_b_r)
 	/* scan keyboard rows */
 	for (row = 0; row < 8; row++)
 	{
-		if (!(state->riot_port_a & (1 << row)))
+		if (!(state->m_riot_port_a & (1 << row)))
 			data &= input_port_read(device->machine(), keynames[row]);
 	}
 
@@ -154,7 +154,7 @@ READ8_DEVICE_HANDLER(aim65_riot_b_r)
 WRITE8_DEVICE_HANDLER(aim65_riot_a_w)
 {
 	aim65_state *state = device->machine().driver_data<aim65_state>();
-	state->riot_port_a = data;
+	state->m_riot_port_a = data;
 }
 
 

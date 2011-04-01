@@ -27,7 +27,7 @@ SCREEN_UPDATE( special )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->specialist_video_ram[y + x*256];
+			code = state->m_specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
@@ -50,7 +50,7 @@ SCREEN_UPDATE( specialp )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->specialist_video_ram[y + x*256];
+			code = state->m_specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
@@ -89,8 +89,8 @@ PALETTE_INIT( specimx )
 VIDEO_START( specimx )
 {
 	special_state *state = machine.driver_data<special_state>();
-	state->specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(state->specimx_colorram,0x70,0x3000);
+	state->m_specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
+	memset(state->m_specimx_colorram,0x70,0x3000);
 }
 
 SCREEN_UPDATE( specimx )
@@ -104,7 +104,7 @@ SCREEN_UPDATE( specimx )
 		for (y = 0; y < 256; y++)
 		{
 			code = ram_get_ptr(screen->machine().device(RAM_TAG))[0x9000 + y + x*256];
-			color = state->specimx_colorram[y + x*256];
+			color = state->m_specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
 
@@ -158,8 +158,8 @@ SCREEN_UPDATE( erik )
 
 			for (b = 7; b >= 0; b--)
 			{
-				color1 = ((code1 >> b) & 0x01)==0 ? state->erik_background : state->erik_color_1;
-				color2 = ((code2 >> b) & 0x01)==0 ? state->erik_background : state->erik_color_2;
+				color1 = ((code1 >> b) & 0x01)==0 ? state->m_erik_background : state->m_erik_color_1;
+				color2 = ((code2 >> b) & 0x01)==0 ? state->m_erik_background : state->m_erik_color_2;
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  color1 | color2;
 			}
 		}

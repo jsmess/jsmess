@@ -28,7 +28,7 @@
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, specialist_video_ram) // Video RAM
+    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
     AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
@@ -37,7 +37,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, specialist_video_ram) // Video RAM
+    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
     AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard

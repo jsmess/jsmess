@@ -16,9 +16,9 @@ public:
 	llc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	UINT8 s_code;
-	UINT8 llc1_key_state;
+	UINT8 *m_video_ram;
+	UINT8 m_s_code;
+	UINT8 m_llc1_key_state;
 };
 
 

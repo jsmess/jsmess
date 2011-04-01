@@ -16,28 +16,28 @@ WRITE8_HANDLER( pecom_cdp1869_w )
 {
 	pecom_state *state = space->machine().driver_data<pecom_state>();
 
-	UINT16 ma = state->cdp1802->get_memory_address();
+	UINT16 ma = state->m_cdp1802->get_memory_address();
 
 	switch (offset + 3)
 	{
 	case 3:
-		state->cdp1869->out3_w(*space, ma, data);
+		state->m_cdp1869->out3_w(*space, ma, data);
 		break;
 
 	case 4:
-		state->cdp1869->out4_w(*space, ma, data);
+		state->m_cdp1869->out4_w(*space, ma, data);
 		break;
 
 	case 5:
-		state->cdp1869->out5_w(*space, ma, data);
+		state->m_cdp1869->out5_w(*space, ma, data);
 		break;
 
 	case 6:
-		state->cdp1869->out6_w(*space, ma, data);
+		state->m_cdp1869->out6_w(*space, ma, data);
 		break;
 
 	case 7:
-		state->cdp1869->out7_w(*space, ma, data);
+		state->m_cdp1869->out7_w(*space, ma, data);
 		break;
 	}
 }
@@ -53,7 +53,7 @@ static CDP1869_CHAR_RAM_READ( pecom_char_ram_r )
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	return state->charram[charaddr];
+	return state->m_charram[charaddr];
 }
 
 static CDP1869_CHAR_RAM_WRITE( pecom_char_ram_w )
@@ -63,7 +63,7 @@ static CDP1869_CHAR_RAM_WRITE( pecom_char_ram_w )
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	state->charram[charaddr] = data;
+	state->m_charram[charaddr] = data;
 }
 
 static CDP1869_PCB_READ( pecom_pcb_r )
@@ -76,12 +76,12 @@ static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 	pecom_state *driver_state = device->machine().driver_data<pecom_state>();
 
 	// every other PRD triggers a DMAOUT request
-	if (driver_state->dma)
+	if (driver_state->m_dma)
 	{
 		cputag_set_input_line(device->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 
-	driver_state->dma = !driver_state->dma;
+	driver_state->m_dma = !driver_state->m_dma;
 }
 
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
@@ -100,19 +100,19 @@ static VIDEO_START( pecom )
 	pecom_state *state = machine.driver_data<pecom_state>();
 
 	/* allocate memory */
-	state->charram = auto_alloc_array(machine, UINT8, PECOM_CHAR_RAM_SIZE);
+	state->m_charram = auto_alloc_array(machine, UINT8, PECOM_CHAR_RAM_SIZE);
 
 	/* register for state saving */
-	state->save_item(NAME(state->reset));
-	state->save_item(NAME(state->dma));
-	state->save_pointer(NAME(state->charram), PECOM_CHAR_RAM_SIZE);
+	state->save_item(NAME(state->m_reset));
+	state->save_item(NAME(state->m_dma));
+	state->save_pointer(NAME(state->m_charram), PECOM_CHAR_RAM_SIZE);
 }
 
 static SCREEN_UPDATE( pecom )
 {
 	pecom_state *state = screen->machine().driver_data<pecom_state>();
 
-	state->cdp1869->update_screen(bitmap, cliprect);
+	state->m_cdp1869->update_screen(bitmap, cliprect);
 
 	return 0;
 }

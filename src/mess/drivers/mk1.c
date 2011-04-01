@@ -52,8 +52,8 @@ public:
 	mk1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 f8[2];
-	UINT8 led[4];
+	UINT8 m_f8[2];
+	UINT8 m_led[4];
 };
 
 
@@ -62,7 +62,7 @@ public:
 
 static READ8_HANDLER( mk1_f8_r ) {
 	mk1_state *state = space->machine().driver_data<mk1_state>();
-    UINT8 data = state->f8[offset];
+    UINT8 data = state->m_f8[offset];
 
     if ( offset == 0 ) {
 		if ( data & 1 ) data |= input_port_read(space->machine(), "LINE1");
@@ -100,12 +100,12 @@ static READ8_HANDLER( mk1_f8_r ) {
 static WRITE8_HANDLER( mk1_f8_w ) {
 	mk1_state *state = space->machine().driver_data<mk1_state>();
 	/* 0 is high and allows also input */
-	state->f8[offset] = data;
+	state->m_f8[offset] = data;
 
-	if ( ! ( state->f8[1] & 1 ) ) state->led[0] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( state->f8[1] & 2 ) ) state->led[1] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( state->f8[1] & 4 ) ) state->led[2] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( state->f8[1] & 8 ) ) state->led[3] = BITSWAP8( state->f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->m_f8[1] & 1 ) ) state->m_led[0] = BITSWAP8( state->m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->m_f8[1] & 2 ) ) state->m_led[1] = BITSWAP8( state->m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->m_f8[1] & 4 ) ) state->m_led[2] = BITSWAP8( state->m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( state->m_f8[1] & 8 ) ) state->m_led[3] = BITSWAP8( state->m_f8[0],2,1,3,4,5,6,7,0 );
 }
 
 static ADDRESS_MAP_START( mk1_mem, AS_PROGRAM, 8 )
@@ -162,9 +162,9 @@ static TIMER_DEVICE_CALLBACK( mk1_update_leds )
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
-		output_set_digit_value( i, state->led[i] >> 1 );
-		output_set_led_value( i, state->led[i] & 0x01 );
-		state->led[i] = 0;
+		output_set_digit_value( i, state->m_led[i] >> 1 );
+		output_set_led_value( i, state->m_led[i] & 0x01 );
+		state->m_led[i] = 0;
 	}
 }
 

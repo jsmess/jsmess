@@ -45,15 +45,15 @@ static READ8_HANDLER( data_r )
 {
 	elf2_state *state = space->machine().driver_data<elf2_state>();
 
-	return state->data;
+	return state->m_data;
 }
 
 static WRITE8_HANDLER( data_w )
 {
 	elf2_state *state = space->machine().driver_data<elf2_state>();
 
-	dm9368_w(state->dm9368_l, 0, data & 0x0f);
-	dm9368_w(state->dm9368_h, 0, data >> 4);
+	dm9368_w(state->m_dm9368_l, 0, data & 0x0f);
+	dm9368_w(state->m_dm9368_h, 0, data >> 4);
 }
 
 static WRITE8_HANDLER( memory_w )
@@ -74,8 +74,8 @@ static WRITE8_HANDLER( memory_w )
 		}
 
 		/* write data to 7 segment displays */
-		dm9368_w(state->dm9368_l, 0, data & 0x0f);
-		dm9368_w(state->dm9368_h, 0, data >> 4);
+		dm9368_w(state->m_dm9368_l, 0, data & 0x0f);
+		dm9368_w(state->m_dm9368_h, 0, data >> 4);
 	}
 }
 
@@ -181,7 +181,7 @@ static READ8_DEVICE_HANDLER( elf2_dma_r )
 {
 	elf2_state *state = device->machine().driver_data<elf2_state>();
 
-	return state->data;
+	return state->m_data;
 }
 
 static COSMAC_INTERFACE( elf2_config )
@@ -209,14 +209,14 @@ static WRITE_LINE_DEVICE_HANDLER( mm74c923_da_w )
 	if (state)
 	{
 		/* shift keyboard data to latch */
-		driver_state->data <<= 4;
-		driver_state->data |= mm74c922_r(device, 0) & 0x0f;
+		driver_state->m_data <<= 4;
+		driver_state->m_data |= mm74c922_r(device, 0) & 0x0f;
 
 		if (LOAD(device->machine()))
 		{
 			/* write data to 7 segment displays */
-			dm9368_w(driver_state->dm9368_l, 0, driver_state->data & 0x0f);
-			dm9368_w(driver_state->dm9368_h, 0, driver_state->data >> 4);
+			dm9368_w(driver_state->m_dm9368_l, 0, driver_state->m_data & 0x0f);
+			dm9368_w(driver_state->m_dm9368_h, 0, driver_state->m_data >> 4);
 		}
 	}
 }
@@ -239,7 +239,7 @@ static SCREEN_UPDATE( elf2 )
 {
 	elf2_state *state = screen->machine().driver_data<elf2_state>();
 
-	cdp1861_update(state->cdp1861, bitmap, cliprect);
+	cdp1861_update(state->m_cdp1861, bitmap, cliprect);
 
 	return 0;
 }
@@ -261,15 +261,15 @@ static MACHINE_START( elf2 )
 	address_space *program = machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->cdp1861 = machine.device(CDP1861_TAG);
-	state->mm74c923 = machine.device(MM74C923_TAG);
-	state->dm9368_l = machine.device(DM9368_L_TAG);
-	state->dm9368_h = machine.device(DM9368_H_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
+	state->m_cdp1861 = machine.device(CDP1861_TAG);
+	state->m_mm74c923 = machine.device(MM74C923_TAG);
+	state->m_dm9368_l = machine.device(DM9368_L_TAG);
+	state->m_dm9368_h = machine.device(DM9368_H_TAG);
+	state->m_cassette = machine.device(CASSETTE_TAG);
 
 	/* initialize LED displays */
-	dm9368_rbi_w(state->dm9368_l, 1);
-	dm9368_rbi_w(state->dm9368_h, 1);
+	dm9368_rbi_w(state->m_dm9368_l, 1);
+	dm9368_rbi_w(state->m_dm9368_h, 1);
 
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
@@ -278,7 +278,7 @@ static MACHINE_START( elf2 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
-	state->save_item(NAME(state->data));
+	state->save_item(NAME(state->m_data));
 }
 
 /* Machine Driver */

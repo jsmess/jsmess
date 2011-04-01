@@ -139,7 +139,7 @@ static void bankswitch(running_machine &machine)
 	atom_state *state = machine.driver_data<atom_state>();
 	address_space *program = machine.device(SY6502_TAG)->memory().space(AS_PROGRAM);
 
-	UINT8 *eprom = machine.region("a000")->base() + (state->eprom << 12);
+	UINT8 *eprom = machine.region("a000")->base() + (state->m_eprom << 12);
 
 	program->install_rom(0xa000, 0xafff, eprom);
 }
@@ -152,7 +152,7 @@ static READ8_HANDLER( eprom_r )
 {
 	atom_state *state = space->machine().driver_data<atom_state>();
 
-	return state->eprom;
+	return state->m_eprom;
 }
 
 /*-------------------------------------------------
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( eprom_w )
 	atom_state *state = space->machine().driver_data<atom_state>();
 
 	/* block A */
-	state->eprom = data & 0x0f;
+	state->m_eprom = data & 0x0f;
 
 	/* TODO block E */
 
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_r, i8271_w)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_MEMBER(atom_state, video_ram)
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_MEMBER(atom_state, m_video_ram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("a000", 0)
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
@@ -368,7 +368,7 @@ static SCREEN_UPDATE( atom )
 {
 	atom_state *state = screen->machine().driver_data<atom_state>();
 
-	return mc6847_update(state->mc6847, bitmap, cliprect);
+	return mc6847_update(state->m_mc6847, bitmap, cliprect);
 }
 
 /***************************************************************************
@@ -399,13 +399,13 @@ static WRITE8_DEVICE_HANDLER( ppi_pa_w )
 	atom_state *state = device->machine().driver_data<atom_state>();
 
 	/* keyboard column */
-	state->keylatch = data & 0x0f;
+	state->m_keylatch = data & 0x0f;
 
 	/* MC6847 */
-	mc6847_ag_w(state->mc6847, BIT(data, 4));
-	mc6847_gm0_w(state->mc6847, BIT(data, 5));
-	mc6847_gm1_w(state->mc6847, BIT(data, 6));
-	mc6847_gm2_w(state->mc6847, BIT(data, 7));
+	mc6847_ag_w(state->m_mc6847, BIT(data, 4));
+	mc6847_gm0_w(state->m_mc6847, BIT(data, 5));
+	mc6847_gm1_w(state->m_mc6847, BIT(data, 6));
+	mc6847_gm2_w(state->m_mc6847, BIT(data, 7));
 }
 
 static READ8_DEVICE_HANDLER( ppi_pb_r )
@@ -428,7 +428,7 @@ static READ8_DEVICE_HANDLER( ppi_pb_r )
 	atom_state *state = device->machine().driver_data<atom_state>();
 	UINT8 data = 0xff;
 
-	switch (state->keylatch)
+	switch (state->m_keylatch)
 	{
 	case 0: data &= input_port_read(device->machine(), "KEY0"); break;
 	case 1: data &= input_port_read(device->machine(), "KEY1"); break;
@@ -469,16 +469,16 @@ static READ8_DEVICE_HANDLER( ppi_pc_r )
 	UINT8 data = 0;
 
 	/* 2400 Hz input */
-	data |= state->hz2400 << 4;
+	data |= state->m_hz2400 << 4;
 
 	/* cassette input */
-	data |= (cassette_input(state->cassette) > 0.0) << 5;
+	data |= (cassette_input(state->m_cassette) > 0.0) << 5;
 
 	/* keyboard RPT */
 	data |= BIT(input_port_read(device->machine(), "RPT"), 0) << 6;
 
 	/* MC6847 FS */
-	data |= mc6847_fs_r(state->mc6847) << 7;
+	data |= mc6847_fs_r(state->m_mc6847) << 7;
 
 	return data;
 }
@@ -503,14 +503,14 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 	atom_state *state = device->machine().driver_data<atom_state>();
 
 	/* cassette output */
-	state->pc0 = BIT(data, 0);
-	state->pc1 = BIT(data, 1);
+	state->m_pc0 = BIT(data, 0);
+	state->m_pc1 = BIT(data, 1);
 
 	/* speaker output */
 	speaker_level_w(device, BIT(data, 2));
 
 	/* MC6847 CSS */
-	mc6847_css_w(state->mc6847, BIT(data, 3));
+	mc6847_css_w(state->m_mc6847, BIT(data, 3));
 }
 
 static I8255A_INTERFACE( ppi_intf )
@@ -568,7 +568,7 @@ static void atom_8271_interrupt_callback(device_t *device, int state)
     is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=drvstate->previous_i8271_int_state)
+	if (state!=drvstate->m_previous_i8271_int_state)
 	{
 		if (state)
 		{
@@ -578,7 +578,7 @@ static void atom_8271_interrupt_callback(device_t *device, int state)
 		}
 	}
 
-	drvstate->previous_i8271_int_state = state;
+	drvstate->m_previous_i8271_int_state = state;
 }
 
 static const i8271_interface fdc_intf =
@@ -637,11 +637,11 @@ static TIMER_DEVICE_CALLBACK( cassette_output_tick )
 {
 	atom_state *state = timer.machine().driver_data<atom_state>();
 
-	int level = !(!(!state->hz2400 & state->pc1) & state->pc0);
+	int level = !(!(!state->m_hz2400 & state->m_pc1) & state->m_pc0);
 
-	cassette_output(state->cassette, level ? -1.0 : +1.0);
+	cassette_output(state->m_cassette, level ? -1.0 : +1.0);
 
-	state->hz2400 = !state->hz2400;
+	state->m_hz2400 = !state->m_hz2400;
 }
 
 static CASSETTE_FORMATLIST_START( atom_cassette_formats )
@@ -665,11 +665,11 @@ static READ8_DEVICE_HANDLER( atom_mc6847_videoram_r )
 {
 	atom_state *state = device->machine().driver_data<atom_state>();
 
-	mc6847_as_w(device, BIT(state->video_ram[offset], 6));
-	mc6847_intext_w(device, BIT(state->video_ram[offset], 6));
-	mc6847_inv_w(device, BIT(state->video_ram[offset], 7));
+	mc6847_as_w(device, BIT(state->m_video_ram[offset], 6));
+	mc6847_intext_w(device, BIT(state->m_video_ram[offset], 6));
+	mc6847_inv_w(device, BIT(state->m_video_ram[offset], 7));
 
-	return state->video_ram[offset];
+	return state->m_video_ram[offset];
 }
 
 static const mc6847_interface atom_mc6847_intf =
@@ -711,8 +711,8 @@ static MACHINE_START( atom )
 	machine.region(SY6502_TAG)->base()[0x0b] = machine.rand() & 0x0ff;
 
 	/* find devices */
-	state->mc6847 = machine.device(MC6847_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
+	state->m_mc6847 = machine.device(MC6847_TAG);
+	state->m_cassette = machine.device(CASSETTE_TAG);
 }
 
 /*-------------------------------------------------

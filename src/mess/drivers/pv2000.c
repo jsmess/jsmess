@@ -39,12 +39,12 @@ class pv2000_state : public driver_device
 {
 public:
 	pv2000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { last_state = 0; }
+		: driver_device(machine, config) { m_last_state = 0; }
 
-	int		last_state;
-	UINT8	keyb_column;
-	UINT8	cass_conf;
-	UINT8	key_pressed;
+	int		m_last_state;
+	UINT8	m_keyb_column;
+	UINT8	m_cass_conf;
+	UINT8	m_key_pressed;
 };
 
 
@@ -54,9 +54,9 @@ static WRITE8_HANDLER( pv2000_cass_conf_w )
 
 	logerror( "%s: pv2000_cass_conf_w %02x\n", space->machine().describe_context(), data );
 
-	state->cass_conf = data & 0x0f;
+	state->m_cass_conf = data & 0x0f;
 
-	if ( state->cass_conf & 0x01 )
+	if ( state->m_cass_conf & 0x01 )
 		cassette_change_state( space->machine().device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
 	else
 		cassette_change_state( space->machine().device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( pv2000_keys_w )
 
 	logerror( "%s: pv2000_keys_w %02x\n", space->machine().describe_context(), data );
 
-	state->keyb_column = data & 0x0f;
+	state->m_keyb_column = data & 0x0f;
 
 	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -80,7 +80,7 @@ static READ8_HANDLER( pv2000_keys_hi_r )
 	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 	UINT8 data = 0;
 
-	switch ( state->keyb_column )
+	switch ( state->m_keyb_column )
 	{
 	case 0:
 		data = input_port_read( space->machine(), "IN0" ) >> 4;
@@ -122,7 +122,7 @@ static READ8_HANDLER( pv2000_keys_lo_r )
 
 	logerror("%s: pv2000_keys_r\n", space->machine().describe_context() );
 
-	switch ( state->keyb_column )
+	switch ( state->m_keyb_column )
 	{
 	case 0:
 		data = input_port_read( space->machine(), "IN0" ) & 0x0f;
@@ -314,13 +314,13 @@ static void pv2000_vdp_interrupt(running_machine &machine, int new_state)
 	pv2000_state *state = machine.driver_data<pv2000_state>();
 
     // only if it goes up
-	if (new_state && !state->last_state)
+	if (new_state && !state->m_last_state)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	state->last_state = new_state;
+	state->m_last_state = new_state;
 
 	/* Check if irq triggering from keyboard presses is enabled */
-	if ( state->keyb_column == 0x0f )
+	if ( state->m_keyb_column == 0x0f )
 	{
 		/* Check if a key is pressed */
 		UINT8 key_pressed;
@@ -335,10 +335,10 @@ static void pv2000_vdp_interrupt(running_machine &machine, int new_state)
 			| input_port_read( machine, "IN7" )
 			| input_port_read( machine, "IN8" );
 
-		if ( key_pressed && state->key_pressed != key_pressed )
+		if ( key_pressed && state->m_key_pressed != key_pressed )
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
-		state->key_pressed = key_pressed;
+		state->m_key_pressed = key_pressed;
 	}
 }
 
@@ -363,9 +363,9 @@ static MACHINE_RESET( pv2000 )
 {
 	pv2000_state *state = machine.driver_data<pv2000_state>();
 
-	state->last_state = 0;
-	state->key_pressed = 0;
-	state->keyb_column = 0;
+	state->m_last_state = 0;
+	state->m_key_pressed = 0;
+	state->m_keyb_column = 0;
 
 	device_set_input_line_vector(machine.device("maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&machine.region("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM

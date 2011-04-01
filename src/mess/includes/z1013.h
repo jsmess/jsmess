@@ -17,9 +17,9 @@ public:
 	z1013_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	UINT8 keyboard_line;
-	UINT8 keyboard_part;
+	UINT8 *m_video_ram;
+	UINT8 m_keyboard_line;
+	UINT8 m_keyboard_part;
 };
 
 

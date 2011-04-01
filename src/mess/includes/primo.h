@@ -16,9 +16,9 @@ public:
 	primo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 video_memory_base;
-	UINT8 port_FD;
-	int nmi;
+	UINT16 m_video_memory_base;
+	UINT8 m_port_FD;
+	int m_nmi;
 };
 
 

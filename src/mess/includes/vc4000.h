@@ -71,15 +71,15 @@ public:
 	vc4000_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	vc4000_video_t video;
-	UINT8 sprite_collision[0x20];
-	UINT8 background_collision[0x20];
-	UINT8 joy1_x;
-	UINT8 joy1_y;
-	UINT8 joy2_x;
-	UINT8 joy2_y;
-	UINT8 objects[256];
-	UINT8 irq_pause;
+	vc4000_video_t m_video;
+	UINT8 m_sprite_collision[0x20];
+	UINT8 m_background_collision[0x20];
+	UINT8 m_joy1_x;
+	UINT8 m_joy1_y;
+	UINT8 m_joy2_x;
+	UINT8 m_joy2_y;
+	UINT8 m_objects[256];
+	UINT8 m_irq_pause;
 };
 
 

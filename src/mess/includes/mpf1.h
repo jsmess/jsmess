@@ -56,9 +56,7 @@ public:
 	emu_timer *m_led_refresh_timer;
 
 	/* devices */
-	device_t *z80ctc;
-	device_t *speaker;
-	device_t *cassette;
+	device_t *m_z80ctc;
 };
 
 #endif

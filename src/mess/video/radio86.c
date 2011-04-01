@@ -37,7 +37,7 @@ I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	int i;
 	bitmap_t *bitmap = device->machine().generic.tmpbitmap;
-	UINT8 *charmap = device->machine().region("gfx1")->base() + (state->mikrosha_font_page & 1) * 0x400;
+	UINT8 *charmap = device->machine().region("gfx1")->base() + (state->m_mikrosha_font_page & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;

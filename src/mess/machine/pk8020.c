@@ -58,7 +58,7 @@ static WRITE8_HANDLER(sysreg_w)
 		pk8020_set_bank(space->machine(),data >> 2);
 	} else if (BIT(offset,6)==0) {
 		// Color
-		state->color = data;
+		state->m_color = data;
 	} else if (BIT(offset,2)==0) {
 		// Palette set
 		UINT8 number = data & 0x0f;
@@ -74,7 +74,7 @@ static WRITE8_HANDLER(sysreg_w)
 static READ8_HANDLER(text_r)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	if (state->attr == 3) state->text_attr=ram_get_ptr(space->machine().device(RAM_TAG))[0x40400+offset];
+	if (state->m_attr == 3) state->m_text_attr=ram_get_ptr(space->machine().device(RAM_TAG))[0x40400+offset];
 	return ram_get_ptr(space->machine().device(RAM_TAG))[0x40000+offset];
 }
 
@@ -83,43 +83,43 @@ static WRITE8_HANDLER(text_w)
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
 	UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
 	ram[0x40000+offset] = data;
-	switch (state->attr) {
+	switch (state->m_attr) {
 		case 0: break;
 		case 1: ram[0x40400+offset]=0x01;break;
 		case 2: ram[0x40400+offset]=0x00;break;
-		case 3: ram[0x40400+offset]=state->text_attr;break;
+		case 3: ram[0x40400+offset]=state->m_text_attr;break;
 	}
 }
 
 static READ8_HANDLER(gzu_r)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->video_page_access * 0xC000);
+	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->m_video_page_access * 0xC000);
 	UINT8 p0 = addr[offset];
 	UINT8 p1 = addr[offset + 0x4000];
 	UINT8 p2 = addr[offset + 0x8000];
 	UINT8 retVal = 0;
-	if(state->color & 0x80) {
+	if(state->m_color & 0x80) {
 		// Color mode
-		if (!(state->color & 0x10)) {
+		if (!(state->m_color & 0x10)) {
 			p0 ^= 0xff;
 		}
-		if (!(state->color & 0x20)) {
+		if (!(state->m_color & 0x20)) {
 			p1 ^= 0xff;
 		}
-		if (!(state->color & 0x40)) {
+		if (!(state->m_color & 0x40)) {
 			p2 ^= 0xff;
 		}
 		retVal = (p0 & p1 & p2) ^ 0xff;
 	} else {
 		// Plane mode
-		if (state->color & 0x10) {
+		if (state->m_color & 0x10) {
 			retVal |= p0;
 		}
-		if (state->color & 0x20) {
+		if (state->m_color & 0x20) {
 			retVal |= p1;
 		}
-		if (state->color & 0x40) {
+		if (state->m_color & 0x40) {
 			retVal |= p2;
 		}
 	}
@@ -129,27 +129,27 @@ static READ8_HANDLER(gzu_r)
 static WRITE8_HANDLER(gzu_w)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->video_page_access * 0xC000);
+	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->m_video_page_access * 0xC000);
 	UINT8 *plane_0 = addr;
 	UINT8 *plane_1 = addr + 0x4000;
 	UINT8 *plane_2 = addr + 0x8000;
 
-	if(state->color & 0x80)
+	if(state->m_color & 0x80)
 	{
 		// Color mode
-		plane_0[offset] = (plane_0[offset] & ~data) | ((state->color & 2) ? data : 0);
-		plane_1[offset] = (plane_1[offset] & ~data) | ((state->color & 4) ? data : 0);
-		plane_2[offset] = (plane_2[offset] & ~data) | ((state->color & 8) ? data : 0);
+		plane_0[offset] = (plane_0[offset] & ~data) | ((state->m_color & 2) ? data : 0);
+		plane_1[offset] = (plane_1[offset] & ~data) | ((state->m_color & 4) ? data : 0);
+		plane_2[offset] = (plane_2[offset] & ~data) | ((state->m_color & 8) ? data : 0);
 	} else {
 		// Plane mode
-		UINT8 mask = (state->color & 1) ? data : 0;
-		if (!(state->color & 0x02)) {
+		UINT8 mask = (state->m_color & 1) ? data : 0;
+		if (!(state->m_color & 0x02)) {
 			plane_0[offset] = (plane_0[offset] & ~data) | mask;
 		}
-		if (!(state->color & 0x04)) {
+		if (!(state->m_color & 0x04)) {
 			plane_1[offset] = (plane_1[offset] & ~data) | mask;
 		}
-		if (!(state->color & 0x08)) {
+		if (!(state->m_color & 0x08)) {
 			plane_2[offset] = (plane_2[offset] & ~data) | mask;
 		}
 	}
@@ -852,20 +852,20 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 static READ8_DEVICE_HANDLER(pk8020_porta_r)
 {
 	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	return 0xf0 | (state->takt <<1) | (state->text_attr)<<3;
+	return 0xf0 | (state->m_takt <<1) | (state->m_text_attr)<<3;
 }
 
 static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 {
 	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	state->video_page_access =(data>>6) & 3;
-	state->attr = (data >> 4) & 3;
-	state->wide = (data >> 3) & 1;
-	state->font = (data >> 2) & 1;
-	state->video_page = (data & 3);
+	state->m_video_page_access =(data>>6) & 3;
+	state->m_attr = (data >> 4) & 3;
+	state->m_wide = (data >> 3) & 1;
+	state->m_font = (data >> 2) & 1;
+	state->m_video_page = (data & 3);
 
 
-	state->portc_data = data;
+	state->m_portc_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
@@ -899,7 +899,7 @@ static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 static READ8_DEVICE_HANDLER(pk8020_portc_r)
 {
 	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	return state->portc_data;
+	return state->m_portc_data;
 }
 
 
@@ -918,9 +918,9 @@ static WRITE8_DEVICE_HANDLER(pk8020_2_portc_w)
 	pk8020_state *state = device->machine().driver_data<pk8020_state>();
 	device_t *speaker = device->machine().device("speaker");
 
-	state->sound_gate = BIT(data,3);
+	state->m_sound_gate = BIT(data,3);
 
-	speaker_level_w(speaker, state->sound_gate ? state->sound_level : 0);
+	speaker_level_w(speaker, state->m_sound_gate ? state->m_sound_level : 0);
 }
 
 I8255A_INTERFACE( pk8020_ppi8255_interface_2 )
@@ -948,9 +948,9 @@ static WRITE_LINE_DEVICE_HANDLER( pk8020_pit_out0 )
 	pk8020_state *drvstate = device->machine().driver_data<pk8020_state>();
 	device_t *speaker = device->machine().device("speaker");
 
-	drvstate->sound_level = state;
+	drvstate->m_sound_level = state;
 
-	speaker_level_w(speaker, drvstate->sound_gate ? drvstate->sound_level : 0);
+	speaker_level_w(speaker, drvstate->m_sound_gate ? drvstate->m_sound_level : 0);
 }
 
 
@@ -1001,13 +1001,13 @@ MACHINE_RESET( pk8020 )
 	pk8020_set_bank(machine,0);
 	device_set_irq_callback(machine.device("maincpu"), pk8020_irq_callback);
 
-	state->sound_gate = 0;
-	state->sound_level = 0;
+	state->m_sound_gate = 0;
+	state->m_sound_level = 0;
 }
 
 INTERRUPT_GEN( pk8020_interrupt )
 {
 	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	state->takt ^= 1;
+	state->m_takt ^= 1;
 	pic8259_ir4_w(device->machine().device("pic8259"), 1);
 }

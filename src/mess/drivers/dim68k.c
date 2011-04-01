@@ -63,8 +63,8 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
-	UINT16* ram;
-	UINT8 *FNT;
+	UINT16* m_ram;
+	UINT8 *m_FNT;
 	UINT8 m_speaker_bit;
 	UINT8 m_video_control;
 };
@@ -165,7 +165,7 @@ WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
 
 static ADDRESS_MAP_START(dim68k_mem, AS_PROGRAM, 16, dim68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(ram) // 16MB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(m_ram) // 16MB RAM / ROM at boot
 	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x00ff2000, 0x00ff7fff) AM_RAM // Graphics Video RAM
 	AM_RANGE(0x00ff8000, 0x00ff8001) AM_DEVREADWRITE8_LEGACY("crtc", mc6845_status_r, mc6845_address_w, 0xff)
@@ -200,7 +200,7 @@ static MACHINE_RESET(dim68k)
 	dim68k_state *state = machine.driver_data<dim68k_state>();
 	UINT8* ROM = machine.region("bootrom")->base();
 
-	memcpy((UINT8*)state->ram, ROM, 0x2000);
+	memcpy((UINT8*)state->m_ram, ROM, 0x2000);
 
 	machine.device("maincpu")->reset();
 }
@@ -208,7 +208,7 @@ static MACHINE_RESET(dim68k)
 static VIDEO_START( dim68k )
 {
 	dim68k_state *state = machine.driver_data<dim68k_state>();
-	state->FNT = machine.region("chargen")->base();
+	state->m_FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( dim68k )
@@ -236,14 +236,14 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		if (screen_on)
-			chr16 = state->ram[ma+x]; // reads 2 characters
+			chr16 = state->m_ram[ma+x]; // reads 2 characters
 
 		inv=0;
 		if (xx == cursor_x && screen_on) inv=0xff;
 		xx++;
 
 		chr = chr16>>8;
-		gfx = state->FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+		gfx = state->m_FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
 		*p++ = ( gfx & 0x80 ) ? 1 : 0;
 		*p++ = ( gfx & 0x40 ) ? 1 : 0;
 		*p++ = ( gfx & 0x20 ) ? 1 : 0;
@@ -258,7 +258,7 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 		xx++;
 
 		chr = chr16;
-		gfx = state->FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+		gfx = state->m_FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
 		*p++ = ( gfx & 0x80 ) ? 1 : 0;
 		*p++ = ( gfx & 0x40 ) ? 1 : 0;
 		*p++ = ( gfx & 0x20 ) ? 1 : 0;

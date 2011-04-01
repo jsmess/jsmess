@@ -265,7 +265,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 	UINT8	result = 0;
 
 	if(LOG_DISK_READ)
-		logerror("%s DiskIO:Read of %08X\n",m_machine.describe_context(),disk_io_base+offset);
+		logerror("%s DiskIO:Read of %08X\n",m_machine.describe_context(),m_disk_io_base+offset);
 		
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 		case 0x0001	: result=wd17xx_r(m_fdc, offset); break; 
 		case 0x0002	: result=wd17xx_r(m_fdc, offset); break;
 		case 0x0003	: result=wd17xx_r(m_fdc, offset); break;
-		default		: logerror("%s DiskIO undefined read : from %08X\n",m_machine.describe_context(),disk_io_base+offset); break;	
+		default		: logerror("%s DiskIO undefined read : from %08X\n",m_machine.describe_context(),m_disk_io_base+offset); break;	
 	}
 	
 	return result;
@@ -282,7 +282,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 WRITE8_MEMBER( ql_state::disk_io_w )
 {
 	if(LOG_DISK_WRITE)
-		logerror("%s DiskIO:Write %02X to %08X\n",m_machine.describe_context(),data,disk_io_base+offset);
+		logerror("%s DiskIO:Write %02X to %08X\n",m_machine.describe_context(),data,m_disk_io_base+offset);
 
 	switch (offset)
 	{
@@ -290,13 +290,13 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 		case 0x0001	: wd17xx_w(m_fdc, offset, data); break; 
 		case 0x0002	: wd17xx_w(m_fdc, offset, data); break;
 		case 0x0003	: wd17xx_w(m_fdc, offset, data); break;
-		case 0x0004 : if(disk_type==DISK_TYPE_SANDY)
+		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
 						sandy_set_control(data);break;
-		case 0x0008 : if(disk_type==DISK_TYPE_SANDY)
-					    printer_char=data;
-		case 0x2000	: if(disk_type==DISK_TYPE_TRUMP)
+		case 0x0008 : if(m_disk_type==DISK_TYPE_SANDY)
+					    m_printer_char=data;
+		case 0x2000	: if(m_disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
-		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",m_machine.describe_context(),data,disk_io_base+offset); break;		
+		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",m_machine.describe_context(),data,m_disk_io_base+offset); break;		
 	}
 }
 
@@ -341,7 +341,7 @@ void ql_state::sandy_set_control(UINT8 data)
 {
 	//logerror("sandy_set_control:%02X\n",data);
 
-	disk_io_byte=data;
+	m_disk_io_byte=data;
 
 	if(data & SANDY_DRIVE0_MASK)
 		wd17xx_set_drive(m_fdc,0);
@@ -358,7 +358,7 @@ void ql_state::sandy_set_control(UINT8 data)
 	if (printer_is_ready(m_printer))
 	{
 		if(data & SANDY_PRINTER_STROBE)
-			printer_output(m_printer,printer_char);
+			printer_output(m_printer,m_printer_char);
 			
 		if(data & SANDY_PRINTER_INTMASK) 
 			m_zx8302->extint_w(ASSERT_LINE);
@@ -369,8 +369,8 @@ static READ_LINE_DEVICE_HANDLER( disk_io_dden_r )
 {
 	ql_state *state = device->machine().driver_data<ql_state>();
 	
-	if(state->disk_type==DISK_TYPE_SANDY)
-		return ((state->disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
+	if(state->m_disk_type==DISK_TYPE_SANDY)
+		return ((state->m_disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
 	else
 		return 0;
 }
@@ -931,19 +931,19 @@ void ql_state::machine_start()
 	state_save_register_global(m_machine, m_ipl);
 	state_save_register_global(m_machine, m_comdata);
 	state_save_register_global(m_machine, m_baudx4);
-	state_save_register_global(m_machine, printer_char);
-	state_save_register_global(m_machine, disk_io_byte);
+	state_save_register_global(m_machine, m_printer_char);
+	state_save_register_global(m_machine, m_disk_io_byte);
 }
 
 void ql_state::machine_reset()
 {
 	address_space 	*program 	= m_maincpu->memory().space(AS_PROGRAM);
 
-	disk_type=input_port_read(m_machine,QL_CONFIG_PORT) & DISK_TYPE_MASK;
-	logerror("disktype=%d\n",disk_type);
+	m_disk_type=input_port_read(m_machine,QL_CONFIG_PORT) & DISK_TYPE_MASK;
+	logerror("disktype=%d\n",m_disk_type);
 
-	printer_char=0;
-	disk_io_byte=0;
+	m_printer_char=0;
+	m_disk_io_byte=0;
 
 	logerror("Configuring RAM\n");
 	// configure RAM
@@ -970,14 +970,14 @@ void ql_state::machine_reset()
 			break;
 	}	
 
-	switch (disk_type)
+	switch (m_disk_type)
 	{
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
 			program->install_rom(0x0c0000, 0x0c3fff, &m_machine.region(M68008_TAG)->base()[SANDY_ROM_BASE]);
 			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
 			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
-			disk_io_base=SANDY_IO_BASE;
+			m_disk_io_base=SANDY_IO_BASE;
 			break;
 		case DISK_TYPE_TRUMP :
 			logerror("Configuring TrumpCard\n");
@@ -985,7 +985,7 @@ void ql_state::machine_reset()
 			program->install_read_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate_create(ql_state, trump_card_rom_r, *this));
 			program->install_read_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
 			program->install_write_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
-			disk_io_base=TRUMP_IO_BASE;
+			m_disk_io_base=TRUMP_IO_BASE;
 			break;
 	}
 }

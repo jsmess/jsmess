@@ -295,40 +295,40 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	/* The RESET switch resets the CPU and the 6820 PIA. */
 	if (input_port_read(machine, "KEY5") & 0x0001)
 	{
-		if (!state->reset_flag) {
-			state->reset_flag = 1;
+		if (!state->m_reset_flag) {
+			state->m_reset_flag = 1;
 			/* using PULSE_LINE does not allow us to press and hold key */
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 			pia->reset();
 		}
 	}
-	else if (state->reset_flag) {
+	else if (state->m_reset_flag) {
 		/* RESET released--allow the processor to continue. */
-		state->reset_flag = 0;
+		state->m_reset_flag = 0;
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	/* The CLEAR SCREEN switch clears the video hardware. */
 	if (input_port_read(machine, "KEY5") & 0x0002)
 	{
-		if (!state->vh_clrscrn_pressed)
+		if (!state->m_vh_clrscrn_pressed)
 		{
 			/* Ignore further video writes, and clear the screen. */
-			state->vh_clrscrn_pressed = 1;
+			state->m_vh_clrscrn_pressed = 1;
 			apple1_vh_dsp_clr(machine);
 		}
 	}
-	else if (state->vh_clrscrn_pressed)
+	else if (state->m_vh_clrscrn_pressed)
 	{
 		/* CLEAR SCREEN released--pay attention to video writes again. */
-		state->vh_clrscrn_pressed = 0;
+		state->m_vh_clrscrn_pressed = 0;
 	}
 
 	/* Now we scan all the input ports for ordinary keys, recording
        new keypresses while ignoring keys that were already pressed in
        the last scan. */
 
-	state->kbd_data = 0;
+	state->m_kbd_data = 0;
 	key_pressed = 0;
 
 	/* The keyboard strobe line should always be low when a scan starts. */
@@ -342,7 +342,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 		UINT32 portval, newkeys;
 
 		portval = input_port_read(machine, keynames[port]);
-		newkeys = portval & ~(state->kbd_last_scan[port]);
+		newkeys = portval & ~(state->m_kbd_last_scan[port]);
 
 		if (newkeys)
 		{
@@ -350,7 +350,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 			for (bit = 0; bit < 16; bit++) {
 				if (newkeys & 1)
 				{
-					state->kbd_data = (ctrlkeys)
+					state->m_kbd_data = (ctrlkeys)
 					  ? apple1_control_keymap[port*16 + bit]
 					  : (shiftkeys)
 					  ? apple1_shifted_keymap[port*16 + bit]
@@ -359,7 +359,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 				newkeys >>= 1;
 			}
 		}
-		state->kbd_last_scan[port] = portval;
+		state->m_kbd_last_scan[port] = portval;
 	}
 
 	if (key_pressed)
@@ -388,7 +388,7 @@ static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
 	apple1_state *state = device->machine().driver_data<apple1_state>();
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
        what the ROM Monitor software expects. */
-	return state->kbd_data | 0x80;
+	return state->m_kbd_data | 0x80;
 }
 
 static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout )
@@ -502,9 +502,9 @@ static device_t *cassette_device_image(running_machine &machine)
 static void cassette_toggle_output(running_machine &machine)
 {
 	apple1_state *state = machine.driver_data<apple1_state>();
-	state->cassette_output_flipflop = !state->cassette_output_flipflop;
+	state->m_cassette_output_flipflop = !state->m_cassette_output_flipflop;
 	cassette_output(cassette_device_image(machine),
-					state->cassette_output_flipflop ? 1.0 : -1.0);
+					state->m_cassette_output_flipflop ? 1.0 : -1.0);
 }
 
 READ8_HANDLER( apple1_cassette_r )

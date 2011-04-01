@@ -179,11 +179,11 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
    /* D5 - Disable paging */
 
 	/* disable paging? */
-	if (state->port_7ffd_data & 0x20)
+	if (state->m_port_7ffd_data & 0x20)
 			return;
 
 	/* store new state */
-	state->port_7ffd_data = data;
+	state->m_port_7ffd_data = data;
 
 	/* update memory */
 	spectrum_128_update_memory(space->machine());
@@ -196,13 +196,13 @@ void spectrum_128_update_memory(running_machine &machine)
 	unsigned char *ChosenROM;
 	int ROMSelection;
 
-	if (state->port_7ffd_data & 8)
+	if (state->m_port_7ffd_data & 8)
 	{
-		state->screen_location = messram + (7<<14);
+		state->m_screen_location = messram + (7<<14);
 	}
 	else
 	{
-		state->screen_location = messram + (5<<14);
+		state->m_screen_location = messram + (5<<14);
 	}
 
 	/* select ram at 0x0c000-0x0ffff */
@@ -210,14 +210,14 @@ void spectrum_128_update_memory(running_machine &machine)
 		int ram_page;
 		unsigned char *ram_data;
 
-		ram_page = state->port_7ffd_data & 0x07;
+		ram_page = state->m_port_7ffd_data & 0x07;
 		ram_data = messram + (ram_page<<14);
 
 		memory_set_bankptr(machine, "bank4", ram_data);
 	}
 
 	/* ROM switching */
-	ROMSelection = ((state->port_7ffd_data>>4) & 0x01);
+	ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01);
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
@@ -231,7 +231,7 @@ static  READ8_HANDLER ( spectrum_128_ula_r )
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 	int vpos = space->machine().primary_screen->vpos();
 
-	return vpos<193 ? state->screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
+	return vpos<193 ? state->m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
 static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8)
@@ -269,8 +269,8 @@ static MACHINE_RESET( spectrum_128 )
 	MACHINE_RESET_CALL(spectrum);
 
 	/* set initial ram config */
-	state->port_7ffd_data = 0;
-	state->port_1ffd_data = -1;
+	state->m_port_7ffd_data = 0;
+	state->m_port_1ffd_data = -1;
 	spectrum_128_update_memory(machine);
 }
 

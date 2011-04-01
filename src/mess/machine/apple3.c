@@ -55,25 +55,25 @@ static UINT8 apple3_profile_r(apple3_state *state, offs_t offset)
 	offset %= 4;
 	apple3_profile_statemachine();
 
-	state->profile_lastaddr = offset;
+	state->m_profile_lastaddr = offset;
 
 	switch(offset)
 	{
 		case 1:
-			state->profile_gotstrobe = 1;
+			state->m_profile_gotstrobe = 1;
 			apple3_profile_statemachine();
-			result = state->profile_readdata;
+			result = state->m_profile_readdata;
 			break;
 
 		case 2:
-			if (state->profile_busycount > 0)
+			if (state->m_profile_busycount > 0)
 			{
-				state->profile_busycount--;
+				state->m_profile_busycount--;
 				result = 0xFF;
 			}
 			else
 			{
-				result = state->profile_busy | state->profile_online;
+				result = state->m_profile_busy | state->m_profile_online;
 			}
 			break;
 	}
@@ -85,13 +85,13 @@ static UINT8 apple3_profile_r(apple3_state *state, offs_t offset)
 static void apple3_profile_w(apple3_state *state, offs_t offset, UINT8 data)
 {
 	offset %= 4;
-	state->profile_lastaddr = -1;
+	state->m_profile_lastaddr = -1;
 
 	switch(offset)
 	{
 		case 0:
-			state->profile_writedata = data;
-			state->profile_gotstrobe = 1;
+			state->m_profile_writedata = data;
+			state->m_profile_gotstrobe = 1;
 			break;
 	}
 	apple3_profile_statemachine();
@@ -132,9 +132,9 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0x54: case 0x55: case 0x56: case 0x57:
 			/* graphics softswitches */
 			if (offset & 1)
-				state->flags |= 1 << ((offset - 0x50) / 2);
+				state->m_flags |= 1 << ((offset - 0x50) / 2);
 			else
-				state->flags &= ~(1 << ((offset - 0x50) / 2));
+				state->m_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
 
 		case 0x60: case 0x61: case 0x62: case 0x63:
@@ -157,9 +157,9 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
 			if (offset & 1)
-				state->flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
+				state->m_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
-				state->flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
+				state->m_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
 			apple3_update_drives(space->machine().device("fdc"));
 			result = 0x00;
 			break;
@@ -205,9 +205,9 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0x54: case 0x55: case 0x56: case 0x57:
 			/* graphics softswitches */
 			if (offset & 1)
-				state->flags |= 1 << ((offset - 0x50) / 2);
+				state->m_flags |= 1 << ((offset - 0x50) / 2);
 			else
-				state->flags &= ~(1 << ((offset - 0x50) / 2));
+				state->m_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
 
 		case 0xC0: case 0xC1: case 0xC2: case 0xC3:
@@ -222,9 +222,9 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
 			if (offset & 1)
-				state->flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
+				state->m_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
-				state->flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
+				state->m_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
 			apple3_update_drives(space->machine().device("fdc"));
 			break;
 
@@ -296,14 +296,14 @@ static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT1
 static UINT8 *apple3_get_zpa_addr(running_machine &machine,offs_t offset)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
-	state->zpa = (((offs_t) state->via_0_b) * 0x100) + offset;
+	state->m_zpa = (((offs_t) state->m_via_0_b) * 0x100) + offset;
 
-	if (state->via_0_b < 0x20)
-		return apple3_bankaddr(machine,~0, state->zpa);
-	else if (state->via_0_b > 0x9F)
-		return apple3_bankaddr(machine,~0, state->zpa - 0x8000);
+	if (state->m_via_0_b < 0x20)
+		return apple3_bankaddr(machine,~0, state->m_zpa);
+	else if (state->m_via_0_b > 0x9F)
+		return apple3_bankaddr(machine,~0, state->m_zpa - 0x8000);
 	else
-		return apple3_bankaddr(machine,state->via_1_a, state->zpa - 0x2000);
+		return apple3_bankaddr(machine,state->m_via_1_a, state->m_zpa - 0x2000);
 }
 
 
@@ -331,28 +331,28 @@ static void apple3_update_memory(running_machine &machine)
 
 	if (LOG_MEMORY)
 	{
-		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", state->via_0_b, state->via_1_a);
+		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", state->m_via_0_b, state->m_via_1_a);
 	}
 
-	machine.device("maincpu")->set_unscaled_clock((state->via_0_a & 0x80) ? 1000000 : 2000000);
+	machine.device("maincpu")->set_unscaled_clock((state->m_via_0_a & 0x80) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
-	if (!(state->via_0_a & 0x04))
+	if (!(state->m_via_0_a & 0x04))
 	{
-		if (state->via_0_b < 0x20)
+		if (state->m_via_0_b < 0x20)
 		{
 			bank = ~0;	/* system bank */
-			page = state->via_0_b ^ 0x01;
+			page = state->m_via_0_b ^ 0x01;
 		}
-		else if (state->via_0_b >= 0xA0)
+		else if (state->m_via_0_b >= 0xA0)
 		{
 			bank = ~0;	/* system bank */
-			page = (state->via_0_b ^ 0x01) - 0x80;
+			page = (state->m_via_0_b ^ 0x01) - 0x80;
 		}
 		else
 		{
-			bank = state->via_1_a;
-			page = (state->via_0_b ^ 0x01) - 0x20;
+			bank = state->m_via_1_a;
+			page = (state->m_via_0_b ^ 0x01) - 0x20;
 		}
 	}
 	else
@@ -366,13 +366,13 @@ static void apple3_update_memory(running_machine &machine)
 	apple3_setbank(machine,"bank3", ~0, 0x0200);
 
 	/* bank 4 (2000-9FFF) */
-	apple3_setbank(machine,"bank4", state->via_1_a, 0x0000);
+	apple3_setbank(machine,"bank4", state->m_via_1_a, 0x0000);
 
 	/* bank 5 (A000-BFFF) */
 	apple3_setbank(machine,"bank5", ~0, 0x2000);
 
 	/* install bank 8 (C000-CFFF) */
-	if (state->via_0_a & 0x40)
+	if (state->m_via_0_a & 0x40)
 	{
 		space->install_legacy_read_handler(0xC000, 0xC0FF, FUNC(apple3_c0xx_r));
 		space->install_legacy_write_handler(0xC000, 0xC0FF, FUNC(apple3_c0xx_w));
@@ -380,7 +380,7 @@ static void apple3_update_memory(running_machine &machine)
 	else
 	{
 		space->install_read_bank(0xC000, 0xC0FF, "bank8");
-		if (state->via_0_a & 0x08)
+		if (state->m_via_0_a & 0x08)
 			space->unmap_write(0xC000, 0xC0FF);
 		else
 			space->install_write_bank(0xC000, 0xC0FF, "bank8");
@@ -388,14 +388,14 @@ static void apple3_update_memory(running_machine &machine)
 	}
 
 	/* install bank 9 (C100-C4FF) */
-	if (state->via_0_a & 0x40)
+	if (state->m_via_0_a & 0x40)
 	{
 		space->nop_readwrite(0xC100, 0xC4FF);
 	}
 	else
 	{
 		space->install_read_bank(0xC100, 0xC4FF, "bank9");
-		if (state->via_0_a & 0x08)
+		if (state->m_via_0_a & 0x08)
 			space->unmap_write(0xC100, 0xC4FF);
 		else
 			space->install_write_bank(0xC100, 0xC4FF, "bank9");
@@ -404,21 +404,21 @@ static void apple3_update_memory(running_machine &machine)
 
 	/* install bank 10 (C500-C7FF) */
 	space->install_read_bank(0xC500, 0xC7FF, "bank10");
-	if (state->via_0_a & 0x08)
+	if (state->m_via_0_a & 0x08)
 		space->unmap_write(0xC500, 0xC7FF);
 	else
 		space->install_write_bank(0xC500, 0xC7FF, "bank10");
 	apple3_setbank(machine,"bank10", ~0, 0x4500);
 
 	/* install bank 11 (C800-CFFF) */
-	if (state->via_0_a & 0x40)
+	if (state->m_via_0_a & 0x40)
 	{
 		space->nop_readwrite(0xC800, 0xCFFF);
 	}
 	else
 	{
 		space->install_read_bank(0xC800, 0xCFFF, "bank11");
-		if (state->via_0_a & 0x08)
+		if (state->m_via_0_a & 0x08)
 			space->unmap_write(0xC800, 0xCFFF);
 		else
 			space->install_write_bank(0xC800, 0xCFFF, "bank11");
@@ -427,7 +427,7 @@ static void apple3_update_memory(running_machine &machine)
 
 	/* install bank 6 (D000-EFFF) */
 	space->install_read_bank(0xD000, 0xEFFF, "bank6");
-	if (state->via_0_a & 0x08)
+	if (state->m_via_0_a & 0x08)
 		space->unmap_write(0xD000, 0xEFFF);
 	else
 		space->install_write_bank(0xD000, 0xEFFF, "bank6");
@@ -435,11 +435,11 @@ static void apple3_update_memory(running_machine &machine)
 
 	/* install bank 7 (F000-FFFF) */
 	space->install_read_bank(0xF000, 0xFFFF, "bank7");
-	if (state->via_0_a & 0x09)
+	if (state->m_via_0_a & 0x09)
 		space->unmap_write(0xF000, 0xFFFF);
 	else
 		space->install_write_bank(0xF000, 0xFFFF, "bank7");
-	if (state->via_0_a & 0x01)
+	if (state->m_via_0_a & 0x01)
 		memory_set_bankptr(machine,"bank7", machine.region("maincpu")->base());
 	else
 		apple3_setbank(machine,"bank7", ~0, 0x7000);
@@ -473,36 +473,36 @@ static READ8_DEVICE_HANDLER(apple3_via_1_in_b) { return ~0; }
 static WRITE8_DEVICE_HANDLER(apple3_via_0_out_a)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->via_0_a, data);
+	apple3_via_out(device->machine(), &state->m_via_0_a, data);
 }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->via_0_b, data);
+	apple3_via_out(device->machine(), &state->m_via_0_b, data);
 }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->via_1_a, data);
+	apple3_via_out(device->machine(), &state->m_via_1_a, data);
 }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->via_1_b, data);
+	apple3_via_out(device->machine(), &state->m_via_1_b, data);
 }
 
 static void apple2_via_1_irq_func(device_t *device, int state)
 {
 	apple3_state *drvstate = device->machine().driver_data<apple3_state>();
-	if (!drvstate->via_1_irq && state)
+	if (!drvstate->m_via_1_irq && state)
 	{
 		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 	}
-	drvstate->via_1_irq = state;
+	drvstate->m_via_1_irq = state;
 }
 
 const via6522_interface apple3_via_0_intf =
@@ -553,16 +553,16 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 	UINT8 n;
 	UINT8 *result = NULL;
 
-	if ((state->via_0_b >= 0x18) && (state->via_0_b <= 0x1F))
+	if ((state->m_via_0_b >= 0x18) && (state->m_via_0_b <= 0x1F))
 	{
-		n = *apple3_bankaddr(machine,~0, state->zpa ^ 0x0C00);
+		n = *apple3_bankaddr(machine,~0, state->m_zpa ^ 0x0C00);
 
 		if (LOG_INDXADDR)
 		{
-			if (state->last_n != n)
+			if (state->m_last_n != n)
 			{
-				logerror("indxaddr: zpa=0x%04x n=0x%02x\n", state->zpa, n);
-				state->last_n = n;
+				logerror("indxaddr: zpa=0x%04x n=0x%02x\n", state->m_zpa, n);
+				state->m_last_n = n;
 			}
 		}
 
@@ -581,7 +581,7 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 		else if ((n >= 0x80) && (n <= 0x8E))
 		{
 			if (offset < 0x0100)
-				result = apple3_bankaddr(machine,~0, ((offs_t) state->via_0_b) * 0x100 + offset);
+				result = apple3_bankaddr(machine,~0, ((offs_t) state->m_via_0_b) * 0x100 + offset);
 			else
 				result = apple3_bankaddr(machine,n, offset);
 		}
@@ -590,7 +590,7 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 			if (offset < 0x2000)
 				result = apple3_bankaddr(machine,~0, offset - 0x2000);
 			else if (offset < 0xA000)
-				result = apple3_bankaddr(machine,state->via_1_a, offset - 0x2000);
+				result = apple3_bankaddr(machine,state->m_via_1_a, offset - 0x2000);
 			else if (offset < 0xC000)
 				result = apple3_bankaddr(machine,~0, offset - 0x8000);
 			else if (offset < 0xD000)
@@ -602,10 +602,10 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 		}
 		else if (offset < 0x0100)
 		{
-			result = apple3_bankaddr(machine,~0, ((offs_t) state->via_0_b) * 0x100 + offset);
+			result = apple3_bankaddr(machine,~0, ((offs_t) state->m_via_0_b) * 0x100 + offset);
 		}
 	}
-	else if ((offset >= 0xF000) && (state->via_0_a & 0x01))
+	else if ((offset >= 0xF000) && (state->m_via_0_a & 0x01))
 	{
 #if 0
 		/* The Apple /// Diagnostics seems to expect that indexed writes
@@ -673,12 +673,12 @@ static void apple3_update_drives(device_t *device)
 	apple3_state *state = device->machine().driver_data<apple3_state>();
 	int enable_mask = 0x00;
 
-	if (state->enable_mask & 0x01)
+	if (state->m_enable_mask & 0x01)
 		enable_mask |= 0x01;
 
-	if (state->enable_mask & 0x02)
+	if (state->m_enable_mask & 0x02)
 	{
-		switch(state->flags & (VAR_EXTA0 | VAR_EXTA1))
+		switch(state->m_flags & (VAR_EXTA0 | VAR_EXTA1))
 		{
 			case VAR_EXTA0:
 				enable_mask |= 0x02;
@@ -700,7 +700,7 @@ static void apple3_update_drives(device_t *device)
 static void apple3_set_enable_lines(device_t *device,int enable_mask)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
-	state->enable_mask = enable_mask;
+	state->m_enable_mask = enable_mask;
 	apple3_update_drives(device);
 }
 
@@ -722,17 +722,17 @@ DRIVER_INIT( apple3 )
 	/* hack to get around VIA problem */
 	machine.region("maincpu")->base()[0x0685] = 0x00;
 
-	state->enable_mask = 0;
+	state->m_enable_mask = 0;
 	apple3_update_drives(machine.device("fdc"));
 
 	AY3600_init(machine);
 
 	apple3_profile_init();
 
-	state->flags = 0;
-	state->via_0_a = ~0;
-	state->via_1_a = ~0;
-	state->via_1_irq = 0;
+	state->m_flags = 0;
+	state->m_via_0_a = ~0;
+	state->m_via_1_a = ~0;
+	state->m_via_1_irq = 0;
 	apple3_update_memory(machine);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, machine));

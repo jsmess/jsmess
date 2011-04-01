@@ -21,8 +21,8 @@ public:
 	beehive_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	const UINT8 *FNT;
-	const UINT8 *videoram;
+	const UINT8 *m_FNT;
+	const UINT8 *m_videoram;
 };
 
 
@@ -49,8 +49,8 @@ static MACHINE_RESET(beehive)
 static VIDEO_START( beehive )
 {
 	beehive_state *state = machine.driver_data<beehive_state>();
-	state->FNT = machine.region("chargen")->base();
-	state->videoram = machine.region("maincpu")->base()+0x81fa;
+	state->m_FNT = machine.region("chargen")->base();
+	state->m_videoram = machine.region("maincpu")->base()+0x81fa;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
@@ -76,7 +76,7 @@ static SCREEN_UPDATE( beehive )
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = state->videoram[xx++];
+					chr = state->m_videoram[xx++];
 
 				//  /* Take care of flashing characters */
 				//  if ((chr < 0x80) && (framecnt & 0x08))
@@ -86,7 +86,7 @@ static SCREEN_UPDATE( beehive )
 						x--;
 					else
 					{
-						gfx = state->FNT[(chr<<4) | ra ];
+						gfx = state->m_FNT[(chr<<4) | ra ];
 
 						/* Display a scanline of a character */
 						*p++ = ( gfx & 0x80 ) ? 1 : 0;

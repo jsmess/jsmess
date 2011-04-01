@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(ut88_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  // Video RAM (not used)
-    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE_MEMBER(ut88_state, video_ram) // Video RAM
+    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE_MEMBER(ut88_state, m_video_ram) // Video RAM
     AM_RANGE( 0xf400, 0xf7ff ) AM_RAM  // System RAM
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END

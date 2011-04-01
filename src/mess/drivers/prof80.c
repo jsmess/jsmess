@@ -104,27 +104,27 @@ static void prof80_keyboard_scan(running_machine &machine)
 				/* latch key data */
 				keydata = prof80_keycodes[table][row][col];
 
-				if (state->keydata != keydata)
+				if (state->m_keydata != keydata)
 				{
-					state->keydata = keydata;
+					state->m_keydata = keydata;
 
 					/* trigger GRIP 8255 port C bit 2 (_STBB) */
-					i8255a_pc2_w(state->ppi8255, 0);
-					i8255a_pc2_w(state->ppi8255, 1);
+					i8255a_pc2_w(state->m_ppi8255, 0);
+					i8255a_pc2_w(state->m_ppi8255, 1);
 					return;
 				}
 			}
 		}
 	}
 
-	state->keydata = keydata;
+	state->m_keydata = keydata;
 }
 
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
 	prof80_state *state = timer.machine().driver_data<prof80_state>();
 
-	if (!state->kbf) prof80_keyboard_scan(timer.machine());
+	if (!state->m_kbf) prof80_keyboard_scan(timer.machine());
 }
 
 /* PROF-80 */
@@ -147,7 +147,7 @@ static void prof80_bankswitch(running_machine &machine)
 	{
 		UINT16 start_addr = bank * 0x1000;
 		UINT16 end_addr = start_addr + 0xfff;
-		int block = state->init ? state->mmu[bank] : BLK_EPROM;
+		int block = state->m_init ? state->m_mmu[bank] : BLK_EPROM;
 
 		switch (block)
 		{
@@ -188,7 +188,7 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 0, 1);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 0, 1);
 
-	state->motor = 0;
+	state->m_motor = 0;
 }
 
 static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
@@ -200,17 +200,17 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 	case 0: /* C0/TDI */
 		state->m_rtc->data_in_w(fa);
 		state->m_rtc->c0_w(fa);
-		state->c0 = fa;
+		state->m_c0 = fa;
 		break;
 
 	case 1: /* C1 */
 		state->m_rtc->c1_w(fa);
-		state->c1 = fa;
+		state->m_c1 = fa;
 		break;
 
 	case 2: /* C2 */
 		state->m_rtc->c2_w(fa);
-		state->c2 = fa;
+		state->m_c2 = fa;
 		break;
 
 	case 3:	/* READY */
@@ -230,7 +230,7 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 			/* trigger floppy motor off NE555 timer */
 			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-			state->floppy_motor_off_timer->adjust(attotime::from_msec(t));
+			state->m_floppy_motor_off_timer->adjust(attotime::from_msec(t));
 		}
 		else
 		{
@@ -240,10 +240,10 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 			floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);
 			floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1, 1);
 
-			state->motor = 1;
+			state->m_motor = 1;
 
 			/* reset floppy motor off NE555 timer */
-			state->floppy_motor_off_timer->enable(0);
+			state->m_floppy_motor_off_timer->enable(0);
 		}
 		break;
 
@@ -270,7 +270,7 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 		if (!fb)
 		{
 			/* immediately turn off floppy motor */
-			state->floppy_motor_off_timer->adjust(attotime::zero);
+			state->m_floppy_motor_off_timer->adjust(attotime::zero);
 		}
 		break;
 
@@ -283,7 +283,7 @@ static void ls259_w(running_machine &machine, int fa, int sa, int fb, int sb)
 
 	case 7: /* MME */
 		//logerror("INIT %u\n", fb);
-		state->init = fb;
+		state->m_init = fb;
 		prof80_bankswitch(machine);
 		break;
 	}
@@ -334,7 +334,7 @@ static READ8_HANDLER( status_r )
 
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	return (state->fdc_index << 5) | 0x01;
+	return (state->m_fdc_index << 5) | 0x01;
 }
 
 static READ8_HANDLER( status2_r )
@@ -359,16 +359,16 @@ static READ8_HANDLER( status2_r )
 	int js4 = 0, js5 = 0;
 
 	/* floppy motor */
-	data |= !state->motor;
+	data |= !state->m_motor;
 
 	/* JS4 */
 	switch (input_port_read(space->machine(), "J4"))
 	{
 	case 0: js4 = 0; break;
 	case 1: js4 = 1; break;
-	case 2: js4 = !state->c0; break;
-	case 3: js4 = !state->c1; break;
-	case 4: js4 = !state->c2; break;
+	case 2: js4 = !state->m_c0; break;
+	case 3: js4 = !state->m_c1; break;
+	case 4: js4 = !state->m_c2; break;
 	}
 
 	data |= js4 << 4;
@@ -378,9 +378,9 @@ static READ8_HANDLER( status2_r )
 	{
 	case 0: js5 = 0; break;
 	case 1: js5 = 1; break;
-	case 2: js5 = !state->c0; break;
-	case 3: js5 = !state->c1; break;
-	case 4: js5 = !state->c2; break;
+	case 2: js5 = !state->m_c0; break;
+	case 3: js5 = !state->m_c1; break;
+	case 4: js5 = !state->m_c2; break;
 	}
 
 	data |= js5 << 4;
@@ -397,7 +397,7 @@ static WRITE8_HANDLER( par_w )
 
 	int bank = offset >> 12;
 
-	state->mmu[bank] = data & 0x0f;
+	state->m_mmu[bank] = data & 0x0f;
 
 	//logerror("MMU bank %u block %u\n", bank, data & 0x0f);
 
@@ -408,34 +408,34 @@ static READ8_HANDLER( gripc_r )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	//logerror("GRIP status read %02x\n", state->gripc);
+	//logerror("GRIP status read %02x\n", state->m_gripc);
 
-	return state->gripc;
+	return state->m_gripc;
 }
 
 static READ8_HANDLER( gripd_r )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	//logerror("GRIP data read %02x\n", state->gripd);
+	//logerror("GRIP data read %02x\n", state->m_gripd);
 
 	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
-	i8255a_pc6_w(state->ppi8255, 0);
-	i8255a_pc6_w(state->ppi8255, 1);
+	i8255a_pc6_w(state->m_ppi8255, 0);
+	i8255a_pc6_w(state->m_ppi8255, 1);
 
-	return state->gripd;
+	return state->m_gripd;
 }
 
 static WRITE8_HANDLER( gripd_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->gripd = data;
+	state->m_gripd = data;
 	//logerror("GRIP data write %02x\n", data);
 
 	/* trigger GRIP 8255 port C bit 4 (_STBA) */
-	i8255a_pc4_w(state->ppi8255, 0);
-	i8255a_pc4_w(state->ppi8255, 1);
+	i8255a_pc4_w(state->m_ppi8255, 0);
+	i8255a_pc4_w(state->m_ppi8255, 1);
 }
 
 /* GRIP */
@@ -444,30 +444,30 @@ static WRITE8_HANDLER( vol0_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->vol0 = BIT(data, 7);
+	state->m_vol0 = BIT(data, 7);
 }
 
 static WRITE8_HANDLER( vol1_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->vol1 = BIT(data, 7);
+	state->m_vol1 = BIT(data, 7);
 }
 
 static WRITE8_HANDLER( flash_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->flash = BIT(data, 7);
+	state->m_flash = BIT(data, 7);
 }
 
 static WRITE8_HANDLER( page_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->page = BIT(data, 7);
+	state->m_page = BIT(data, 7);
 
-	memory_set_bank(space->machine(), "videoram", state->page);
+	memory_set_bank(space->machine(), "videoram", state->m_page);
 }
 
 static READ8_HANDLER( stat_r )
@@ -496,9 +496,9 @@ static READ8_HANDLER( stat_r )
 	{
 	case 0: js0 = 0; break;
 	case 1: js0 = 1; break;
-	case 2: js0 = state->vol0; break;
-	case 3: js0 = state->vol1; break;
-	case 4: js0 = state->page; break;
+	case 2: js0 = state->m_vol0; break;
+	case 3: js0 = state->m_vol1; break;
+	case 4: js0 = state->m_page; break;
 	}
 
 	data |= js0 << 4;
@@ -508,18 +508,18 @@ static READ8_HANDLER( stat_r )
 	{
 	case 0: js1 = 0; break;
 	case 1: js1 = 1; break;
-	case 2: js1 = state->vol0; break;
-	case 3: js1 = state->vol1; break;
-	case 4: js1 = state->page; break;
+	case 2: js1 = state->m_vol0; break;
+	case 3: js1 = state->m_vol1; break;
+	case 4: js1 = state->m_page; break;
 	}
 
 	data |= js1 << 5;
 
 	/* centronics fault */
-	data |= centronics_fault_r(state->centronics) << 6;
+	data |= centronics_fault_r(state->m_centronics) << 6;
 
 	/* light pen strobe */
-	data |= state->lps << 7;
+	data |= state->m_lps << 7;
 
 	return data;
 }
@@ -528,7 +528,7 @@ static READ8_HANDLER( lrs_r )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->lps = 0;
+	state->m_lps = 0;
 
 	return 0;
 }
@@ -537,15 +537,15 @@ static WRITE8_HANDLER( lrs_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	state->lps = 0;
+	state->m_lps = 0;
 }
 
 static READ8_HANDLER( cxstb_r )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	centronics_strobe_w(state->centronics, 0);
-	centronics_strobe_w(state->centronics, 1);
+	centronics_strobe_w(state->m_centronics, 0);
+	centronics_strobe_w(state->m_centronics, 1);
 
 	return 0;
 }
@@ -554,8 +554,8 @@ static WRITE8_HANDLER( cxstb_w )
 {
 	prof80_state *state = space->machine().driver_data<prof80_state>();
 
-	centronics_strobe_w(state->centronics, 0);
-	centronics_strobe_w(state->centronics, 1);
+	centronics_strobe_w(state->m_centronics, 0);
+	centronics_strobe_w(state->m_centronics, 1);
 }
 
 /* UNIO */
@@ -935,13 +935,13 @@ static MC6845_UPDATE_ROW( grip_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT16 address = (state->page << 12) | ((ma + column) << 3) | (ra & 0x07);
-		UINT8 data = state->video_ram[address];
+		UINT16 address = (state->m_page << 12) | ((ma + column) << 3) | (ra & 0x07);
+		UINT8 data = state->m_video_ram[address];
 
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = state->flash ? 0 : BIT(data, bit);
+			int color = state->m_flash ? 0 : BIT(data, bit);
 
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 		}
@@ -970,7 +970,7 @@ static SCREEN_UPDATE( grip )
 {
 	prof80_state *state = screen->machine().driver_data<prof80_state>();
 
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	mc6845_update(state->m_mc6845, bitmap, cliprect);
 
 	return 0;
 }
@@ -989,7 +989,7 @@ static void prof80_fdc_index_callback(device_t *controller, device_t *img, int s
 {
 	prof80_state *driver_state = img->machine().driver_data<prof80_state>();
 
-	driver_state->fdc_index = state;
+	driver_state->m_fdc_index = state;
 }
 
 static const struct upd765_interface prof80_upd765_interface =
@@ -1022,7 +1022,7 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_a_r )
 
 	prof80_state *state = device->machine().driver_data<prof80_state>();
 
-	return state->gripd;
+	return state->m_gripd;
 }
 
 static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
@@ -1044,7 +1044,7 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
 
 	prof80_state *state = device->machine().driver_data<prof80_state>();
 
-	state->gripd = data;
+	state->m_gripd = data;
 }
 
 static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
@@ -1066,7 +1066,7 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
 
 	prof80_state *state = device->machine().driver_data<prof80_state>();
 
-	return state->keydata;
+	return state->m_keydata;
 }
 
 static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
@@ -1089,16 +1089,16 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 	prof80_state *state = device->machine().driver_data<prof80_state>();
 
 	/* keyboard interrupt */
-	z80sti_i4_w(state->z80sti, BIT(data, 0));
+	z80sti_i4_w(state->m_z80sti, BIT(data, 0));
 
 	/* keyboard buffer full */
-	state->kbf = BIT(data, 1);
+	state->m_kbf = BIT(data, 1);
 
 	/* PROF-80 interrupt */
-	z80sti_i7_w(state->z80sti, BIT(data, 3));
+	z80sti_i7_w(state->m_z80sti, BIT(data, 3));
 
 	/* PROF-80 handshaking */
-	state->gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (i8255a_pa_r(state->ppi8255, 0) & 0x3f);
+	state->m_gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (i8255a_pa_r(state->m_ppi8255, 0) & 0x3f);
 }
 
 static I8255A_INTERFACE( grip_ppi8255_interface )
@@ -1132,13 +1132,13 @@ static READ8_DEVICE_HANDLER( grip_z80sti_gpio_r )
 
 	prof80_state *state = device->machine().driver_data<prof80_state>();
 
-	return centronics_busy_r(state->centronics) << 3;
+	return centronics_busy_r(state->m_centronics) << 3;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( grip_speaker_w )
 {
 	prof80_state *driver_state = device->machine().driver_data<prof80_state>();
-	int level = state && ((driver_state->vol1 << 1) | driver_state->vol0);
+	int level = state && ((driver_state->m_vol1 << 1) | driver_state->m_vol0);
 
 	speaker_level_w(device, level);
 }
@@ -1180,20 +1180,20 @@ static MACHINE_START( prof80 )
 	floppy_drive_set_index_pulse_callback(floppy_get_device(machine, 0), prof80_fdc_index_callback);
 
 	/* allocate floppy motor off timer */
-	state->floppy_motor_off_timer = machine.scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
+	state->m_floppy_motor_off_timer = machine.scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
 
 	/* bank switch */
 	prof80_bankswitch(machine);
 
 	/* register for state saving */
-	state->save_item(NAME(state->c0));
-	state->save_item(NAME(state->c1));
-	state->save_item(NAME(state->c2));
-	state->save_item(NAME(state->mmu));
-	state->save_item(NAME(state->init));
-	state->save_item(NAME(state->fdc_index));
-	state->save_item(NAME(state->gripd));
-	state->save_item(NAME(state->gripc));
+	state->save_item(NAME(state->m_c0));
+	state->save_item(NAME(state->m_c1));
+	state->save_item(NAME(state->m_c2));
+	state->save_item(NAME(state->m_mmu));
+	state->save_item(NAME(state->m_init));
+	state->save_item(NAME(state->m_fdc_index));
+	state->save_item(NAME(state->m_gripd));
+	state->save_item(NAME(state->m_gripc));
 }
 
 static MACHINE_RESET( prof80 )
@@ -1207,7 +1207,7 @@ static MACHINE_RESET( prof80 )
 		ls259_w(machine, 0, i, 0, i);
 	}
 
-	state->gripc = 0x40;
+	state->m_gripc = 0x40;
 }
 
 static MACHINE_START( grip )
@@ -1217,27 +1217,27 @@ static MACHINE_START( grip )
 	MACHINE_START_CALL(prof80);
 
 	/* find devices */
-	state->mc6845 = machine.device(MC6845_TAG);
-	state->ppi8255 = machine.device(I8255A_TAG);
-	state->z80sti = machine.device(Z80STI_TAG);
-	state->centronics = machine.device(CENTRONICS_TAG);
+	state->m_mc6845 = machine.device(MC6845_TAG);
+	state->m_ppi8255 = machine.device(I8255A_TAG);
+	state->m_z80sti = machine.device(Z80STI_TAG);
+	state->m_centronics = machine.device(CENTRONICS_TAG);
 
 	/* allocate video RAM */
-	state->video_ram = auto_alloc_array(machine, UINT8, GRIP_VIDEORAM_SIZE);
+	state->m_video_ram = auto_alloc_array(machine, UINT8, GRIP_VIDEORAM_SIZE);
 
 	/* setup GRIP memory banking */
-	memory_configure_bank(machine, "videoram", 0, 2, state->video_ram, 0x8000);
+	memory_configure_bank(machine, "videoram", 0, 2, state->m_video_ram, 0x8000);
 	memory_set_bank(machine, "videoram", 0);
 
 	/* register for state saving */
-	state->save_item(NAME(state->vol0));
-	state->save_item(NAME(state->vol1));
-	state->save_item(NAME(state->keydata));
-	state->save_item(NAME(state->kbf));
-	state->save_pointer(NAME(state->video_ram), GRIP_VIDEORAM_SIZE);
-	state->save_item(NAME(state->lps));
-	state->save_item(NAME(state->page));
-	state->save_item(NAME(state->flash));
+	state->save_item(NAME(state->m_vol0));
+	state->save_item(NAME(state->m_vol1));
+	state->save_item(NAME(state->m_keydata));
+	state->save_item(NAME(state->m_kbf));
+	state->save_pointer(NAME(state->m_video_ram), GRIP_VIDEORAM_SIZE);
+	state->save_item(NAME(state->m_lps));
+	state->save_item(NAME(state->m_page));
+	state->save_item(NAME(state->m_flash));
 }
 
 static const floppy_config prof80_floppy_config =

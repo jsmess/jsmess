@@ -73,7 +73,7 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 	fprintf(stderr,"keyboard input: %c, ", data);
 #endif
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
-	if (((state->infifo_tail_ptr-1)&0x1F) == state->infifo_head_ptr)
+	if (((state->m_infifo_tail_ptr-1)&0x1F) == state->m_infifo_head_ptr)
 	{
 		logerror("infifo was full, write ignored!\n");
 #ifdef DEBUG_FIFO
@@ -81,11 +81,11 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 #endif
 		return;
 	}
-	state->infifo[state->infifo_head_ptr] = data;
-	state->infifo_head_ptr++;
-	state->infifo_head_ptr&=0x1F;
+	state->m_infifo[state->m_infifo_head_ptr] = data;
+	state->m_infifo_head_ptr++;
+	state->m_infifo_head_ptr&=0x1F;
 #ifdef DEBUG_FIFO
-	fprintf(stderr,"kb input fifo fullness: %d\n",(state->infifo_head_ptr-state->infifo_tail_ptr)&0x1F);
+	fprintf(stderr,"kb input fifo fullness: %d\n",(state->m_infifo_head_ptr-state->m_infifo_tail_ptr)&0x1F);
 #endif
 	// todo: following two should be set so clear happens after one cpu cycle
 	cputag_set_input_line(device->machine(), "maincpu", MCS51_RX_LINE, ASSERT_LINE);
@@ -102,10 +102,10 @@ static int data_to_i8031(device_t *device)
 {
 	pes_state *state = device->machine().driver_data<pes_state>();
 	UINT8 data;
-	data = state->infifo[state->infifo_tail_ptr];
+	data = state->m_infifo[state->m_infifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	if (state->infifo_tail_ptr != state->infifo_head_ptr) state->infifo_tail_ptr++; 
-	state->infifo_tail_ptr&=0x1F;
+	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr) state->m_infifo_tail_ptr++; 
+	state->m_infifo_tail_ptr&=0x1F;
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: input to i8031/pes from pc/terminal: %02X\n",data);
 #endif
@@ -186,7 +186,7 @@ READ8_MEMBER( pes_state::port3_r )
 	UINT8 data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
 	pes_state *state = m_machine.driver_data<pes_state>();
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared
-	if (state->infifo_tail_ptr != state->infifo_head_ptr)
+	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr)
 	{
 		data |= 0x10; // set RTS bit
 	}
@@ -212,8 +212,8 @@ void pes_state::machine_reset()
 {
 	// clear fifos (TODO: memset would work better here...)
 	int i;
-	for (i=0; i<32; i++) infifo[i] = 0;
-	infifo_tail_ptr = infifo_head_ptr = 0;
+	for (i=0; i<32; i++) m_infifo[i] = 0;
+	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
 	m_wsstate = 1;
 	m_rsstate = 1;
 

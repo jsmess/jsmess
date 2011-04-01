@@ -67,7 +67,7 @@ class interact_state : public driver_device
 public:
 	interact_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-	UINT8 *videoram;
+	UINT8 *m_videoram;
 };
 
 
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8)
 	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(interact_state, videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(interact_state, m_videoram)
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xffff) AM_RAM
 
@@ -127,7 +127,7 @@ static MACHINE_START(interact)
 static SCREEN_UPDATE( interact )
 {
 	interact_state *state = screen->machine().driver_data<interact_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	screen->set_visible_area(0, 113, 0, 75);
 	hector_hr( bitmap, videoram,  77, 32);
 	return 0;

@@ -16,17 +16,17 @@ public:
 	apexc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 panel_data_reg;	/* value of a data register on the control panel which can
+	UINT32 m_panel_data_reg;	/* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
                                 guess */
 
-	bitmap_t *bitmap;
+	bitmap_t *m_bitmap;
 
-	UINT32 old_edit_keys;
-	int old_control_keys;
+	UINT32 m_old_edit_keys;
+	int m_old_control_keys;
 
-	int letters;
-	int pos;
+	int m_letters;
+	int m_pos;
 };
 
 
@@ -403,17 +403,17 @@ static INTERRUPT_GEN( apexc_interrupt )
 	edit_keys = input_port_read(device->machine(), "data");
 
 	/* toggle data reg according to transitions */
-	state->panel_data_reg ^= edit_keys & (~state->old_edit_keys);
+	state->m_panel_data_reg ^= edit_keys & (~state->m_old_edit_keys);
 
 	/* remember new state of edit keys */
-	state->old_edit_keys = edit_keys;
+	state->m_old_edit_keys = edit_keys;
 
 
 	/* read new state of control keys */
 	control_keys = input_port_read(device->machine(), "panel");
 
 	/* compute transitions */
-	control_transitions = control_keys & (~state->old_control_keys);
+	control_transitions = control_keys & (~state->m_old_control_keys);
 
 	/* process commands */
 
@@ -461,10 +461,10 @@ static INTERRUPT_GEN( apexc_interrupt )
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				cpu_set_reg(device, reg_id, state->panel_data_reg);
+				cpu_set_reg(device, reg_id, state->m_panel_data_reg);
 			else
 				/* read reg */
-				state->panel_data_reg = cpu_get_reg(device, reg_id);
+				state->m_panel_data_reg = cpu_get_reg(device, reg_id);
 		}
 	}
 
@@ -473,16 +473,16 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space->write_dword(cpu_get_reg(device, APEXC_ML_FULL)<<2, state->panel_data_reg);
+			space->write_dword(cpu_get_reg(device, APEXC_ML_FULL)<<2, state->m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			state->panel_data_reg = space->read_dword(cpu_get_reg(device, APEXC_ML_FULL)<<2);
+			state->m_panel_data_reg = space->read_dword(cpu_get_reg(device, APEXC_ML_FULL)<<2);
 		}
 	}
 
 	/* remember new state of control keys */
-	state->old_control_keys = control_keys;
+	state->m_old_control_keys = control_keys;
 }
 
 /*
@@ -556,8 +556,8 @@ static VIDEO_START( apexc )
 	int width = screen->width();
 	int height = screen->height();
 
-	state->bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(state->bitmap, &/*machine.visible_area*/teletyper_window, 0);
+	state->m_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	bitmap_fill(state->m_bitmap, &/*machine.visible_area*/teletyper_window, 0);
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
@@ -601,7 +601,7 @@ static SCREEN_UPDATE( apexc )
 	apexc_draw_string(screen->machine(), bitmap, "running", 8, 8, 0);
 	apexc_draw_string(screen->machine(), bitmap, "data :", 0, 24, 0);
 
-	copybitmap(bitmap, state->bitmap, 0, 0, 0, 0, &teletyper_window);
+	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, &teletyper_window);
 
 
 	apexc_draw_led(bitmap, 0, 0, 1);
@@ -610,7 +610,7 @@ static SCREEN_UPDATE( apexc )
 
 	for (i=0; i<32; i++)
 	{
-		apexc_draw_led(bitmap, i*8, 32, (state->panel_data_reg << i) & 0x80000000UL);
+		apexc_draw_led(bitmap, i*8, 32, (state->m_panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
 		apexc_draw_char(screen->machine(), bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
@@ -626,8 +626,8 @@ static void apexc_teletyper_init(running_machine &machine)
 {
 	apexc_state *state = machine.driver_data<apexc_state>();
 
-	state->letters = FALSE;
-	state->pos = 0;
+	state->m_letters = FALSE;
+	state->m_pos = 0;
 }
 
 static void apexc_teletyper_linefeed(running_machine &machine)
@@ -638,11 +638,11 @@ static void apexc_teletyper_linefeed(running_machine &machine)
 
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
 	{
-		extract_scanline8(state->bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
-		draw_scanline8(state->bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine.pens);
+		extract_scanline8(state->m_bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
+		draw_scanline8(state->m_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine.pens);
 	}
 
-	bitmap_fill(state->bitmap, &teletyper_scroll_clear_window, 0);
+	bitmap_fill(state->m_bitmap, &teletyper_scroll_clear_window, 0);
 }
 
 static void apexc_teletyper_putchar(running_machine &machine, int character)
@@ -685,33 +685,33 @@ static void apexc_teletyper_putchar(running_machine &machine, int character)
 
 	case 24:
 		/* Carriage Return */
-		state->pos = 0;
+		state->m_pos = 0;
 		break;
 
 	case 27:
 		/* Figures */
-		state->letters = FALSE;
+		state->m_letters = FALSE;
 		break;
 
 	case 31:
 		/* Letters */
-		state->letters = TRUE;
+		state->m_letters = TRUE;
 		break;
 
 	default:
 		/* Any printable character... */
 
-		if (state->pos >= 32)
+		if (state->m_pos >= 32)
 		{	/* if past right border, wrap around */
 			apexc_teletyper_linefeed(machine);	/* next line */
-			state->pos = 0;					/* return to start of line */
+			state->m_pos = 0;					/* return to start of line */
 		}
 
 		/* print character */
-		buffer[0] = ascii_table[state->letters][character];	/* lookup ASCII equivalent in table */
+		buffer[0] = ascii_table[state->m_letters][character];	/* lookup ASCII equivalent in table */
 		buffer[1] = '\0';								/* terminate string */
-		apexc_draw_string(machine, state->bitmap, buffer, 8*state->pos, 176, 0);	/* print char */
-		state->pos++;											/* step carriage forward */
+		apexc_draw_string(machine, state->m_bitmap, buffer, 8*state->m_pos, 176, 0);	/* print char */
+		state->m_pos++;											/* step carriage forward */
 
 		break;
 	}

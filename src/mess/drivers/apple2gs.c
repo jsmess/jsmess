@@ -378,8 +378,8 @@ ROM_END
 static DRIVER_INIT(apple2gs)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	es5503_set_base(machine.device("es5503"), state->docram);
-	state->save_item(NAME(state->docram));
+	es5503_set_base(machine.device("es5503"), state->m_docram);
+	state->save_item(NAME(state->m_docram));
 }
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */

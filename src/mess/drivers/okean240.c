@@ -14,7 +14,7 @@ class okean240_state : public driver_device
 public:
 	okean240_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-	UINT8 *videoram;
+	UINT8 *m_videoram;
 };
 
 
@@ -27,7 +27,7 @@ static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(okean240_state, videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(okean240_state, m_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -78,7 +78,7 @@ static SCREEN_UPDATE( okean240 )
 
 		for (x = ma; x < ma+64; x++)
 		{
-			gfx = state->videoram[x];
+			gfx = state->m_videoram[x];
 
 			*p++ = ( gfx & 0x80 ) ? 1 : 0;
 			*p++ = ( gfx & 0x40 ) ? 1 : 0;

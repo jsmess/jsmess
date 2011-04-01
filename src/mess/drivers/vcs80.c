@@ -94,15 +94,15 @@ static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
 	vcs80_state *state = timer.machine().driver_data<vcs80_state>();
 
-	if (state->keyclk)
+	if (state->m_keyclk)
 	{
-		state->keylatch++;
-		state->keylatch &= 7;
+		state->m_keylatch++;
+		state->m_keylatch &= 7;
 	}
 
-	z80pio_pa_w(state->z80pio, 0, state->keyclk << 7);
+	z80pio_pa_w(state->m_z80pio, 0, state->m_keyclk << 7);
 
-	state->keyclk = !state->keyclk;
+	state->m_keyclk = !state->m_keyclk;
 }
 
 static READ8_DEVICE_HANDLER( pio_port_a_r )
@@ -127,15 +127,15 @@ static READ8_DEVICE_HANDLER( pio_port_a_r )
 	UINT8 data = 0;
 
 	/* keyboard and led latch */
-	data |= state->keylatch;
+	data |= state->m_keylatch;
 
 	/* keyboard rows */
-	data |= BIT(input_port_read(device->machine(), "ROW0"), state->keylatch) << 4;
-	data |= BIT(input_port_read(device->machine(), "ROW1"), state->keylatch) << 5;
-	data |= BIT(input_port_read(device->machine(), "ROW2"), state->keylatch) << 6;
+	data |= BIT(input_port_read(device->machine(), "ROW0"), state->m_keylatch) << 4;
+	data |= BIT(input_port_read(device->machine(), "ROW1"), state->m_keylatch) << 5;
+	data |= BIT(input_port_read(device->machine(), "ROW2"), state->m_keylatch) << 6;
 
 	/* demultiplexer clock */
-	data |= (state->keyclk << 7);
+	data |= (state->m_keyclk << 7);
 
 	return data;
 }
@@ -160,7 +160,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 	vcs80_state *state = device->machine().driver_data<vcs80_state>();
 
 	UINT8 led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
-	int digit = state->keylatch;
+	int digit = state->m_keylatch;
 
 	/* skip middle digit */
 	if (digit > 3) digit++;
@@ -194,14 +194,14 @@ static MACHINE_START(vcs80)
 	vcs80_state *state = machine.driver_data<vcs80_state>();
 
 	/* find devices */
-	state->z80pio = machine.device(Z80PIO_TAG);
+	state->m_z80pio = machine.device(Z80PIO_TAG);
 
-	z80pio_astb_w(state->z80pio, 1);
-	z80pio_bstb_w(state->z80pio, 1);
+	z80pio_astb_w(state->m_z80pio, 1);
+	z80pio_bstb_w(state->m_z80pio, 1);
 
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
-	state->save_item(NAME(state->keyclk));
+	state->save_item(NAME(state->m_keylatch));
+	state->save_item(NAME(state->m_keyclk));
 }
 
 /* Machine Driver */
@@ -244,7 +244,7 @@ DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 	vcs80_state *state = machine->driver_data<vcs80_state>();
 
 	/* _A0 is connected to PIO PB7 */
-	z80pio_pb_w(state->z80pio, 0, (!BIT(address, 0)) << 7);
+	z80pio_pb_w(state->m_z80pio, 0, (!BIT(address, 0)) << 7);
 
 	return address;
 }

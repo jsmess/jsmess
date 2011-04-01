@@ -62,11 +62,11 @@ public:
 	UINT16 m_vidpg;
 	UINT8 m_current_palette;
 	UINT8 m_current_charset;
-	const UINT8 *FNT;
+	const UINT8 *m_FNT;
 	UINT8 m_s_options;
-	UINT8 mc6845_cursor[16];
-	UINT8 mc6845_reg[32];
-	UINT8 mc6845_ind;
+	UINT8 m_mc6845_cursor[16];
+	UINT8 m_mc6845_reg[32];
+	UINT8 m_mc6845_ind;
 	UINT8 m_framecnt;
 	UINT8 m_speed;
 	UINT8 m_flash;

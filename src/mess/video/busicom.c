@@ -1823,10 +1823,10 @@ SCREEN_UPDATE( busicom )
 	//34x44
 	for (y = 0; y < 11; y++)
 	{
-		UINT8 col = 8 * state->printer_line_color[y];
+		UINT8 col = 8 * state->m_printer_line_color[y];
 		for (x = 0; x < 17; x++)
 		{
-			UINT8 chr = state->printer_line[y][x];
+			UINT8 chr = state->m_printer_line[y][x];
 			for (j = 0; j < 44; j++) {
 				for (b = 0; b < 34; b++)
 				{

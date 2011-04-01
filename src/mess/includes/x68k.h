@@ -40,10 +40,10 @@ class x68k_state : public driver_device
 public:
 	x68k_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  m_mfp(*this, MC68901_TAG),
+		  m_mfpdev(*this, MC68901_TAG),
 		  m_nvram(*this, "nvram") { }
 
-	required_device<mc68901_device> m_mfp;
+	required_device<mc68901_device> m_mfpdev;
 	required_shared_ptr<UINT32>	m_nvram;
 
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
@@ -56,7 +56,7 @@ public:
 		int contrast;
 		int keyctrl;
 		UINT16 cputype;
-	} sysport;
+	} m_sysport;
 	struct
 	{
 		int led_ctrl[4];
@@ -67,20 +67,20 @@ public:
 		int disk_inserted[4];
 		int selected_drive;
 		int drq_state;
-	} fdc;
+	} m_fdc;
 	struct
 	{
 		int ioc7;  // "Function B operation of joystick # one option"
 		int ioc6;  // "Function A operation of joystick # one option"
 		int joy1_enable;  // IOC4
 		int joy2_enable;  // IOC5
-	} joy;
+	} m_joy;
 	struct
 	{
 		int rate;  // ADPCM sample rate
 		int pan;  // ADPCM output switch
 		int clock;  // ADPCM clock speed
-	} adpcm;
+	} m_adpcm;
 	struct
 	{
 		int gpdr;  // [0]  GPIP data register.  Typically all inputs.
@@ -124,7 +124,7 @@ public:
 		int eoi_mode;
 		int current_irq;
 		unsigned char gpio;
-	} mfp;  // MC68901 Multifunction Peripheral (4MHz)
+	} m_mfp;  // MC68901 Multifunction Peripheral (4MHz)
 	struct
 	{
 		unsigned short reg[24];  // registers
@@ -155,7 +155,7 @@ public:
 		int bg_hshift;
 		int bg_vshift;
 		int interlace;  // 1024 vertical resolution is interlaced
-	} crtc;  // CRTC
+	} m_crtc;  // CRTC
 	struct
 	{   // video controller at 0xe82000
 		unsigned short text_pal[0x100];
@@ -167,7 +167,7 @@ public:
 		int gfxlayer_pri[4];  // block displayed for each priority level
 		int tile8_dirty[1024];
 		int tile16_dirty[256];
-	} video;
+	} m_video;
 	struct
 	{
 		int delay;  // keypress delay after initial press
@@ -181,7 +181,7 @@ public:
 		int keytime[0x80];  // time until next keypress
 		int keyon[0x80];  // is 1 if key is pressed, used to determine if the key state has changed from 1 to 0
 		int last_pressed;  // last key pressed, for repeat key handling
-	} keyboard;
+	} m_keyboard;
 	struct
 	{
 		int irqstatus;
@@ -189,7 +189,7 @@ public:
 		int fddvector;
 		int hdcvector;
 		int prnvector;
-	} ioc;
+	} m_ioc;
 	struct
 	{
 		int inputtype;  // determines which input is to be received
@@ -197,7 +197,7 @@ public:
 		char last_mouse_x;  // previous mouse x-axis value
 		char last_mouse_y;  // previous mouse y-axis value
 		int bufferempty;  // non-zero if buffer is empty
-	} mouse;
+	} m_mouse;
 	struct
 	{
 		// port A
@@ -208,32 +208,32 @@ public:
 		int mux2;  // multiplexer value
 		int seq2;  // part of 6-button input sequence.
 		emu_timer* io_timeout2;
-	} mdctrl;
-	UINT16* sram;
-	UINT8 ppi_port[3];
-	int current_vector[8];
-	UINT8 current_irq_line;
-	unsigned int scanline;
-	int led_state;
-	emu_timer* kb_timer;
-	emu_timer* mouse_timer;
-	emu_timer* led_timer;
-	unsigned char scc_prev;
-	UINT16 ppi_prev;
-	int mfp_prev;
-	emu_timer* scanline_timer;
-	emu_timer* raster_irq;
-	emu_timer* vblank_irq;
-	UINT16* gvram;
-	UINT16* tvram;
-	UINT16* spriteram;
-	UINT16* spritereg;
-	tilemap_t* bg0_8;
-	tilemap_t* bg1_8;
-	tilemap_t* bg0_16;
-	tilemap_t* bg1_16;
-	int sprite_shift;
-	int oddscanline;
+	} m_mdctrl;
+	UINT16* m_sram;
+	UINT8 m_ppi_port[3];
+	int m_current_vector[8];
+	UINT8 m_current_irq_line;
+	unsigned int m_scanline;
+	int m_led_state;
+	emu_timer* m_kb_timer;
+	emu_timer* m_mouse_timer;
+	emu_timer* m_led_timer;
+	unsigned char m_scc_prev;
+	UINT16 m_ppi_prev;
+	int m_mfp_prev;
+	emu_timer* m_scanline_timer;
+	emu_timer* m_raster_irq;
+	emu_timer* m_vblank_irq;
+	UINT16* m_gvram;
+	UINT16* m_tvram;
+	UINT16* m_spriteram;
+	UINT16* m_spritereg;
+	tilemap_t* m_bg0_8;
+	tilemap_t* m_bg1_8;
+	tilemap_t* m_bg0_16;
+	tilemap_t* m_bg1_16;
+	int m_sprite_shift;
+	int m_oddscanline;
 };
 
 

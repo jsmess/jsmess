@@ -131,11 +131,11 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, m_videoram)
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, hector_videoram)
+	AM_RANGE(0xc000,0xffff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, m_hector_videoram)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -155,11 +155,11 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, m_videoram)
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_BASE_MEMBER(hec2hrp_state, hector_videoram)
+	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_BASE_MEMBER(hec2hrp_state, m_hector_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8)
@@ -323,7 +323,7 @@ static MACHINE_START( hec2hrx )
 
 	// As video HR ram is in bank, use extern memory
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	state->hector_videoram  = hector_videoram;
+	state->m_hector_videoram  = hector_videoram;
 
 	hector_init(machine);
 	hector_disc2_init(machine); // Init of the Disc II !

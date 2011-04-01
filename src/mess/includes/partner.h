@@ -17,8 +17,8 @@ public:
 	partner_state(running_machine &machine, const driver_device_config_base &config)
 		: radio86_state(machine, config) { }
 
-	UINT8 mem_page;
-	UINT8 win_mem_page;
+	UINT8 m_mem_page;
+	UINT8 m_win_mem_page;
 };
 
 

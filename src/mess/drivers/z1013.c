@@ -15,7 +15,7 @@
 /* Address maps */
 static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0xefff ) AM_RAM
-    AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z1013_state, video_ram)
+    AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z1013_state, m_video_ram)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 

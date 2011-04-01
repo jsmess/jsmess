@@ -22,22 +22,22 @@ public:
 	bcs3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	const UINT8 *fnt;
-	UINT8 *videoram;
+	const UINT8 *m_fnt;
+	UINT8 *m_videoram;
 };
 
 static READ8_HANDLER( bcs3_videoram_r )
 {
 	bcs3_state *state = space->machine().driver_data<bcs3_state>();
 
-	return state->videoram[offset];
+	return state->m_videoram[offset];
 }
 
 static WRITE8_HANDLER( bcs3_videoram_w )
 {
 	bcs3_state *state = space->machine().driver_data<bcs3_state>();
 
-	state->videoram[offset] = data;
+	state->m_videoram[offset] = data;
 }
 
 static READ8_HANDLER( bcs3_keyboard_r )
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c50, 0x3d9f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
+	AM_RANGE( 0x3c50, 0x3d9f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5a7f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
+	AM_RANGE( 0x3c00, 0x5a7f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START(bcs3b_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x657f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
+	AM_RANGE( 0x3c00, 0x657f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START(bcs3c_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5ab3 ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
+	AM_RANGE( 0x3c00, 0x5ab3 ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bcs3_io, AS_IO, 8)
@@ -222,7 +222,7 @@ static VIDEO_START( bcs3 )
 {
 	bcs3_state *state = machine.driver_data<bcs3_state>();
 
-	state->fnt = machine.region("gfx1")->base();
+	state->m_fnt = machine.region("gfx1")->base();
 }
 
 static SCREEN_UPDATE( bcs3 )
@@ -242,10 +242,10 @@ static SCREEN_UPDATE( bcs3 )
 			{
 				if (ra < 8)
 				{
-					chr = state->videoram[x] & 0x7f;
+					chr = state->m_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->fnt[(chr<<3) | rat ];
+					gfx = state->m_fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -273,7 +273,7 @@ static SCREEN_UPDATE( bcs3a )
 	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (state->videoram[0x7a] | (state->videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->m_videoram[0x7a] | (state->m_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 128;
 
@@ -288,10 +288,10 @@ static SCREEN_UPDATE( bcs3a )
 			{
 				if (ra < 8)
 				{
-					chr = state->videoram[x] & 0x7f;
+					chr = state->m_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->fnt[(chr<<3) | rat ];
+					gfx = state->m_fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -317,7 +317,7 @@ static SCREEN_UPDATE( bcs3b )
 	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (state->videoram[0x7a] | (state->videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->m_videoram[0x7a] | (state->m_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 41;
 	if (rat > 23) ma = (rat-23) * 41 + 128;
 
@@ -332,10 +332,10 @@ static SCREEN_UPDATE( bcs3b )
 			{
 				if (ra < 8)
 				{
-					chr = state->videoram[x] & 0x7f;
+					chr = state->m_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->fnt[(chr<<3) | rat ];
+					gfx = state->m_fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -361,7 +361,7 @@ static SCREEN_UPDATE( bcs3c )
 	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
-	UINT16 cursor = (state->videoram[0x08] | (state->videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->m_videoram[0x08] | (state->m_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 0xb4;
 
@@ -376,10 +376,10 @@ static SCREEN_UPDATE( bcs3c )
 			{
 				if (ra < 8)
 				{
-					chr = state->videoram[x] & 0x7f;
+					chr = state->m_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->fnt[(chr<<3) | rat ];
+					gfx = state->m_fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;

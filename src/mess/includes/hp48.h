@@ -46,25 +46,25 @@ public:
 	hp48_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 io[64];
-	hp48_models model;
-	UINT16 out;
-	UINT8 kdn;
-	hp48_module modules[6];
-	UINT32 port_size[2];
-	UINT8 port_write[2];
-	UINT8* port_data[2];
-	UINT32 bank_switch;
-	UINT32 io_addr;
-	UINT16 crc;
-	UINT8 timer1;
-	UINT32 timer2;
+	UINT8 *m_videoram;
+	UINT8 m_io[64];
+	hp48_models m_model;
+	UINT16 m_out;
+	UINT8 m_kdn;
+	hp48_module m_modules[6];
+	UINT32 m_port_size[2];
+	UINT8 m_port_write[2];
+	UINT8* m_port_data[2];
+	UINT32 m_bank_switch;
+	UINT32 m_io_addr;
+	UINT16 m_crc;
+	UINT8 m_timer1;
+	UINT32 m_timer2;
 #ifdef CHARDEV
-	chardev* chardev;
+	chardev* m_chardev;
 #endif
-	UINT8 screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
-	int cur_screen;
+	UINT8 m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
+	int m_cur_screen;
 };
 
 
@@ -73,11 +73,11 @@ public:
 ***************************************************************************/
 
 /* read from I/O memory */
-#define HP48_IO_4(x)   (state->io[(x)])
-#define HP48_IO_8(x)   (state->io[(x)] | (state->io[(x)+1] << 4))
-#define HP48_IO_12(x)  (state->io[(x)] | (state->io[(x)+1] << 4) | (state->io[(x)+2] << 8))
-#define HP48_IO_20(x)  (state->io[(x)] | (state->io[(x)+1] << 4) | (state->io[(x)+2] << 8) | \
-	               (state->io[(x)+3] << 12) | (state->io[(x)+4] << 16))
+#define HP48_IO_4(x)   (state->m_io[(x)])
+#define HP48_IO_8(x)   (state->m_io[(x)] | (state->m_io[(x)+1] << 4))
+#define HP48_IO_12(x)  (state->m_io[(x)] | (state->m_io[(x)+1] << 4) | (state->m_io[(x)+2] << 8))
+#define HP48_IO_20(x)  (state->m_io[(x)] | (state->m_io[(x)+1] << 4) | (state->m_io[(x)+2] << 8) | \
+	               (state->m_io[(x)+3] << 12) | (state->m_io[(x)+4] << 16))
 
 
 /*----------- defined in machine/hp48.c -----------*/

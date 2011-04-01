@@ -150,7 +150,7 @@ static void microtan_set_irq_line(running_machine &machine)
     /* The 6502 IRQ line is active low and probably driven
        by open collector outputs (guess). Since MAME/MESS use
        a non-0 value for ASSERT_LINE we OR the signals here */
-    cputag_set_input_line(machine, "maincpu", 0, state->via_0_irq_line | state->via_1_irq_line | state->kbd_irq_line);
+    cputag_set_input_line(machine, "maincpu", 0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
 }
 
 static device_t *cassette_device_image(running_machine &machine)
@@ -229,7 +229,7 @@ static void via_0_irq(device_t *device, int state)
 {
 	microtan_state *drvstate = device->machine().driver_data<microtan_state>();
     LOG(("microtan_via_0_irq %d\n", state));
-    drvstate->via_0_irq_line = state;
+    drvstate->m_via_0_irq_line = state;
     microtan_set_irq_line(device->machine());
 }
 
@@ -302,7 +302,7 @@ static void via_1_irq(device_t *device, int state)
 {
 	microtan_state *drvstate = device->machine().driver_data<microtan_state>();
     LOG(("microtan_via_1_irq %d\n", state));
-    drvstate->via_1_irq_line = state;
+    drvstate->m_via_1_irq_line = state;
     microtan_set_irq_line(device->machine());
 }
 
@@ -365,7 +365,7 @@ WRITE8_HANDLER( microtan_sound_w )
     switch( offset & 3 )
     {
     case  0: /* BFF0: read enables chunky graphics */
-        state->chunky_graphics = 1;
+        state->m_chunky_graphics = 1;
         LOG(("microtan_bff0_r: -> %02x (chunky graphics on)\n", data));
         break;
     case  1: /* BFF1: read undefined (?) */
@@ -375,7 +375,7 @@ WRITE8_HANDLER( microtan_sound_w )
         LOG(("microtan_bff2_r: -> %02x\n", data));
         break;
     default: /* BFF3: read keyboard ASCII value */
-        data = state->keyboard_ascii;
+        data = state->m_keyboard_ascii;
         LOG(("microtan_bff3_r: -> %02x (keyboard ASCII)\n", data));
     }
     return data;
@@ -396,8 +396,8 @@ WRITE8_HANDLER ( microtan_bffx_w )
     case 0: /* BFF0: write reset keyboard interrupt flag */
         /* This removes bit 7 from the ASCII value of the last key pressed. */
         LOG(("microtan_bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
-        state->keyboard_ascii &= ~0x80;
-        state->kbd_irq_line = CLEAR_LINE;
+        state->m_keyboard_ascii &= ~0x80;
+        state->m_kbd_irq_line = CLEAR_LINE;
         microtan_set_irq_line(space->machine());
         break;
     case 1: /* BFF1: write delayed NMI */
@@ -406,11 +406,11 @@ WRITE8_HANDLER ( microtan_bffx_w )
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
-        state->keypad_column = data;
+        state->m_keypad_column = data;
         break;
     default: /* BFF3: write disable chunky graphics */
         LOG(("microtan_bff3_w: %d <- %02x (chunky graphics off)\n", offset, data));
-        state->chunky_graphics = 0;
+        state->m_chunky_graphics = 0;
     }
 }
 
@@ -418,8 +418,8 @@ static void store_key(running_machine &machine, int key)
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
     LOG(("microtan: store key '%c'\n", key));
-    state->keyboard_ascii = key | 0x80;
-    state->kbd_irq_line = ASSERT_LINE;
+    state->m_keyboard_ascii = key | 0x80;
+    state->m_kbd_irq_line = ASSERT_LINE;
     microtan_set_irq_line(machine);
 }
 
@@ -429,87 +429,87 @@ INTERRUPT_GEN( microtan_interrupt )
     int mod, row, col, chg, newvar;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
-    if( state->repeat )
+    if( state->m_repeat )
     {
-        if( !--state->repeat )
-            state->repeater = 4;
+        if( !--state->m_repeat )
+            state->m_repeater = 4;
     }
-    else if( state->repeater )
+    else if( state->m_repeater )
     {
-        state->repeat = state->repeater;
+        state->m_repeat = state->m_repeater;
     }
 
 
     row = 9;
     newvar = input_port_read(device->machine(), "ROW8");
-    chg = state->keyrows[--row] ^ newvar;
+    chg = state->m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
 		newvar = input_port_read(device->machine(), keynames[row - 1]);
-		chg = state->keyrows[--row] ^ newvar;
+		chg = state->m_keyrows[--row] ^ newvar;
 	}
     if (!chg)
 		--row;
 
     if (row >= 0)
     {
-        state->repeater = 0x00;
-        state->mask = 0x00;
-        state->key = 0x00;
-        state->lastrow = row;
+        state->m_repeater = 0x00;
+        state->m_mask = 0x00;
+        state->m_key = 0x00;
+        state->m_lastrow = row;
         /* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(device->machine(), 1, (state->keyrows[3] & 0x80) ? 0 : 1);
+			set_led_status(device->machine(), 1, (state->m_keyrows[3] & 0x80) ? 0 : 1);
 
         if (newvar & chg)  /* key(s) pressed ? */
         {
             mod = 0;
 
             /* Shift modifier */
-            if ( (state->keyrows[5] & 0x10) || (state->keyrows[6] & 0x80) )
+            if ( (state->m_keyrows[5] & 0x10) || (state->m_keyrows[6] & 0x80) )
                 mod |= 1;
 
             /* Control modifier */
-            if (state->keyrows[3] & 0x40)
+            if (state->m_keyrows[3] & 0x40)
                 mod |= 2;
 
             /* CapsLock modifier */
-            if (state->keyrows[3] & 0x80)
+            if (state->m_keyrows[3] & 0x80)
                 mod |= 4;
 
             /* find newvar key */
-            state->mask = 0x01;
+            state->m_mask = 0x01;
             for (col = 0; col < 8; col ++)
             {
-                if (chg & state->mask)
+                if (chg & state->m_mask)
                 {
-                    newvar &= state->mask;
-                    state->key = keyboard[mod][row][col];
+                    newvar &= state->m_mask;
+                    state->m_key = keyboard[mod][row][col];
                     break;
                 }
-                state->mask <<= 1;
+                state->m_mask <<= 1;
             }
-            if( state->key )   /* normal key */
+            if( state->m_key )   /* normal key */
             {
-                state->repeater = 30;
-                store_key(device->machine(), state->key);
+                state->m_repeater = 30;
+                store_key(device->machine(), state->m_key);
             }
             else
             if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
                 store_key(device->machine(), 0);
-            state->keyrows[row] |= newvar;
+            state->m_keyrows[row] |= newvar;
         }
         else
         {
-            state->keyrows[row] = newvar;
+            state->m_keyrows[row] = newvar;
         }
-        state->repeat = state->repeater;
+        state->m_repeat = state->m_repeater;
     }
     else
-    if ( state->key && (state->keyrows[state->lastrow] & state->mask) && state->repeat == 0 )
+    if ( state->m_key && (state->m_keyrows[state->m_lastrow] & state->m_mask) && state->m_repeat == 0 )
     {
-        store_key(device->machine(), state->key);
+        store_key(device->machine(), state->m_key);
     }
 }
 
@@ -570,7 +570,7 @@ DRIVER_INIT( microtan )
             break;
     }
 
-	state->timer = machine.scheduler().timer_alloc(FUNC(microtan_read_cassette));
+	state->m_timer = machine.scheduler().timer_alloc(FUNC(microtan_read_cassette));
 }
 
 MACHINE_RESET( microtan )
@@ -581,7 +581,7 @@ MACHINE_RESET( microtan )
 
 	for (i = 1; i < 10;  i++)
 	{
-		state->keyrows[i] = input_port_read(machine, keynames[i-1]);
+		state->m_keyrows[i] = input_port_read(machine, keynames[i-1]);
 	}
-	set_led_status(machine, 1, (state->keyrows[3] & 0x80) ? 0 : 1);
+	set_led_status(machine, 1, (state->m_keyrows[3] & 0x80) ? 0 : 1);
 }

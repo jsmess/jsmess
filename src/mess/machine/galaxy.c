@@ -36,7 +36,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 {
 	galaxy_state *state = space->machine().driver_data<galaxy_state>();
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
-	state->latch_value = data;
+	state->m_latch_value = data;
 	cassette_output(space->machine().device("cassette"), val);
 }
 
@@ -55,7 +55,7 @@ static IRQ_CALLBACK ( galaxy_irq_callback )
 {
 	galaxy_state *state = device->machine().driver_data<galaxy_state>();
 	galaxy_set_timer(device->machine());
-	state->interrupts_enabled = TRUE;
+	state->m_interrupts_enabled = TRUE;
 	return 0xff;
 }
 
@@ -187,7 +187,7 @@ MACHINE_RESET( galaxy )
 		memory_set_bankptr(machine,"bank10", machine.region("maincpu")->base() + 0x1000);
 
 	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
-	state->interrupts_enabled = TRUE;
+	state->m_interrupts_enabled = TRUE;
 }
 
 DRIVER_INIT( galaxyp )
@@ -211,5 +211,5 @@ MACHINE_RESET( galaxyp )
 	space->install_read_bank(0xe000, 0xefff, "bank11");
 	space->nop_write(0xe000, 0xefff);
 	memory_set_bankptr(machine,"bank11", machine.region("maincpu")->base() + 0xe000);
-	state->interrupts_enabled = TRUE;
+	state->m_interrupts_enabled = TRUE;
 }

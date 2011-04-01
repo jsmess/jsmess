@@ -74,37 +74,37 @@ private:
         // internal state
         const ibm5160_mb_device_config &m_config;
 public:
-        required_device<cpu_device>  maincpu;
-		required_device<device_t>  pic8259;
-		required_device<device_t>  dma8237;
-		required_device<device_t>  pit8253;
-		required_device<device_t>  ppi8255;
-		required_device<device_t>  speaker;
-		required_device<isa8_device>  isabus;
+        required_device<cpu_device>  m_maincpu;
+		required_device<device_t>  m_pic8259;
+		required_device<device_t>  m_dma8237;
+		required_device<device_t>  m_pit8253;
+		required_device<device_t>  m_ppi8255;
+		required_device<device_t>  m_speaker;
+		required_device<isa8_device>  m_isabus;
 		
     	devcb_resolved_write_line	m_kb_set_clock_signal_func;
     	devcb_resolved_write_line	m_kb_set_data_signal_func;
 		
 		/* U73 is an LS74 - dual flip flop */
 		/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
-		UINT8	u73_q2;
-		UINT8	out1;
-		int dma_channel;
-		UINT8 dma_offset[4];
-		UINT8 pc_spkrdata;
-		UINT8 pc_input;
+		UINT8	m_u73_q2;
+		UINT8	m_out1;
+		int m_dma_channel;
+		UINT8 m_dma_offset[4];
+		UINT8 m_pc_spkrdata;
+		UINT8 m_pc_input;
 		
-		UINT8 nmi_enabled;
+		UINT8 m_nmi_enabled;
 
-		int						ppi_portc_switch_high;
-		int						ppi_speaker;
-		int						ppi_keyboard_clear;
-		UINT8					ppi_keyb_clock;
-		UINT8					ppi_portb;
-		UINT8					ppi_clock_signal;
-		UINT8					ppi_data_signal;
-		UINT8					ppi_shift_register;
-		UINT8					ppi_shift_enable;
+		int						m_ppi_portc_switch_high;
+		int						m_ppi_speaker;
+		int						m_ppi_keyboard_clear;
+		UINT8					m_ppi_keyb_clock;
+		UINT8					m_ppi_portb;
+		UINT8					m_ppi_clock_signal;
+		UINT8					m_ppi_data_signal;
+		UINT8					m_ppi_shift_register;
+		UINT8					m_ppi_shift_enable;
 		
 		static IRQ_CALLBACK(pc_irq_callback);
 		

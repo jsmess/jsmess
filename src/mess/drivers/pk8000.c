@@ -24,7 +24,7 @@ public:
 	pk8000_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 keyboard_line;
+	UINT8 m_keyboard_line;
 };
 
 
@@ -102,16 +102,16 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 {
 	pk8000_state *state = device->machine().driver_data<pk8000_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	if(state->keyboard_line>9) {
+	if(state->m_keyboard_line>9) {
 		return 0xff;
 	}
-	return input_port_read(device->machine(),keynames[state->keyboard_line]);
+	return input_port_read(device->machine(),keynames[state->m_keyboard_line]);
 }
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
 	pk8000_state *state = device->machine().driver_data<pk8000_state>();
-	state->keyboard_line = data & 0x0f;
+	state->m_keyboard_line = data & 0x0f;
 
 	speaker_level_w(device->machine().device("speaker"), BIT(data,7));
 

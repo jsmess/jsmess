@@ -23,8 +23,8 @@ public:
 	gmaster_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	GMASTER_VIDEO video;
-	GMASTER_MACHINE machine;
+	GMASTER_VIDEO m_video;
+	GMASTER_MACHINE m_machine;
 };
 
 

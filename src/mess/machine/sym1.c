@@ -34,49 +34,49 @@
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_0_w )
 {
 	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
-	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY);
+	if (state) drvstate->m_led_update->adjust(LED_REFRESH_DELAY);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_1_w )
 {
 	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
-	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 1);
+	if (state) drvstate->m_led_update->adjust(LED_REFRESH_DELAY, 1);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_2_w )
 {
 	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
-	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 2);
+	if (state) drvstate->m_led_update->adjust(LED_REFRESH_DELAY, 2);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_3_w )
 {
 	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
-	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 3);
+	if (state) drvstate->m_led_update->adjust(LED_REFRESH_DELAY, 3);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_4_w )
 {
 	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
-	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 4);
+	if (state) drvstate->m_led_update->adjust(LED_REFRESH_DELAY, 4);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_5_w )
 {
 	sym1_state *drvstate = device->machine().driver_data<sym1_state>();
-	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 5);
+	if (state) drvstate->m_led_update->adjust(LED_REFRESH_DELAY, 5);
 }
 
 
 static TIMER_CALLBACK( led_refresh )
 {
 	sym1_state *state = machine.driver_data<sym1_state>();
-	output_set_digit_value(param, state->riot_port_a);
+	output_set_digit_value(param, state->m_riot_port_a);
 }
 
 
@@ -86,13 +86,13 @@ static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(state->riot_port_a & 0x80)) data &= input_port_read(device->machine(), "ROW-0");
-	if (!(state->riot_port_b & 0x01)) data &= input_port_read(device->machine(), "ROW-1");
-	if (!(state->riot_port_b & 0x02)) data &= input_port_read(device->machine(), "ROW-2");
-	if (!(state->riot_port_b & 0x04)) data &= input_port_read(device->machine(), "ROW-3");
+	if (!(state->m_riot_port_a & 0x80)) data &= input_port_read(device->machine(), "ROW-0");
+	if (!(state->m_riot_port_b & 0x01)) data &= input_port_read(device->machine(), "ROW-1");
+	if (!(state->m_riot_port_b & 0x02)) data &= input_port_read(device->machine(), "ROW-2");
+	if (!(state->m_riot_port_b & 0x04)) data &= input_port_read(device->machine(), "ROW-3");
 
 	/* determine column */
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-0") ^ 0xff)) & 0x7f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-0") ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -105,13 +105,13 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-1") ^ 0xff)) & 0x7f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-1") ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-2") ^ 0xff)) & 0x3f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-2") ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
-	if ( ((state->riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-3") ^ 0xff)) & 0x1f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-3") ^ 0xff)) & 0x1f )
 		data &= ~0x04;
 
 	data &= ~0x80; // else hangs 8b02
@@ -126,7 +126,7 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine().device("maincpu") ), data);
 
 	/* save for later use */
-	state->riot_port_a = data;
+	state->m_riot_port_a = data;
 }
 
 
@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine().device("maincpu") ), data);
 
 	/* save for later use */
-	state->riot_port_b = data;
+	state->m_riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
 	ttl74145_w(device->machine().device("ttl74145"), 0, data & 0x0f);
@@ -295,7 +295,7 @@ DRIVER_INIT( sym1 )
 	}
 
 	/* allocate a timer to refresh the led display */
-	state->led_update = machine.scheduler().timer_alloc(FUNC(led_refresh));
+	state->m_led_update = machine.scheduler().timer_alloc(FUNC(led_refresh));
 }
 
 
@@ -306,6 +306,6 @@ MACHINE_RESET( sym1 )
        so that the CPU can find its reset vectors */
 	machine.device( "maincpu")->memory().space( AS_PROGRAM )->install_read_bank(0xf800, 0xffff, "bank1");
 	machine.device( "maincpu")->memory().space( AS_PROGRAM )->nop_write(0xf800, 0xffff);
-	memory_set_bankptr(machine, "bank1", state->monitor + 0x800);
+	memory_set_bankptr(machine, "bank1", state->m_monitor + 0x800);
 	machine.device("maincpu")->reset();
 }

@@ -18,22 +18,22 @@ static READ8_DEVICE_HANDLER (llc1_port_b_r)
 {
 	llc_state *state = device->machine().driver_data<llc_state>();
 	UINT8 retVal = 0;
-	if (state->s_code!=0) {
-		if (state->llc1_key_state==0) {
-			state->llc1_key_state = 1;
+	if (state->m_s_code!=0) {
+		if (state->m_llc1_key_state==0) {
+			state->m_llc1_key_state = 1;
 			retVal = 0x5F;
 		} else {
-			if (state->llc1_key_state == 1) {
-				state->llc1_key_state = 2;
+			if (state->m_llc1_key_state == 1) {
+				state->m_llc1_key_state = 2;
 				retVal = 0;
 			} else {
-				state->llc1_key_state = 0;
-				retVal = state->s_code;
-				state->s_code =0;
+				state->m_llc1_key_state = 0;
+				retVal = state->m_s_code;
+				state->m_s_code =0;
 			}
 		}
 	} else {
-		state->llc1_key_state = 0;
+		state->m_llc1_key_state = 0;
 		retVal = 0;
 	}
 	return retVal;
@@ -82,7 +82,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				if (c == (1 << j))
 				{
-					state->s_code = j + i*8;
+					state->m_s_code = j + i*8;
 					break;
 				}
 			}
@@ -107,7 +107,7 @@ MACHINE_START(llc1)
 DRIVER_INIT(llc2)
 {
 	llc_state *state = machine.driver_data<llc_state>();
-	state->video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
+	state->m_video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
 }
 
 MACHINE_RESET( llc2 )

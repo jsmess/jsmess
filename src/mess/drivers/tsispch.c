@@ -211,7 +211,7 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 	   See notes at beginning of file for more info.
 	*/
 	tsispch_state *state = m_machine.driver_data<tsispch_state>();
-	state->paramReg = data;
+	state->m_paramReg = data;
 	cputag_set_input_line(m_machine, "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
 #ifdef DEBUG_PARAM
 	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
@@ -272,8 +272,8 @@ void tsispch_state::machine_reset()
 {
 	// clear fifos (TODO: memset would work better here...)
 	int i;
-	for (i=0; i<32; i++) infifo[i] = 0;
-	infifo_tail_ptr = infifo_head_ptr = 0;
+	for (i=0; i<32; i++) m_infifo[i] = 0;
+	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
 	device_set_irq_callback(m_machine.device("maincpu"), irq_callback);
 	fprintf(stderr,"machine reset\n");
 }
@@ -322,7 +322,7 @@ DRIVER_INIT( prose2k )
             dspprg++;
         }
     tsispch_state *state = machine.driver_data<tsispch_state>();
-    state->paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
+    state->m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
     cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 

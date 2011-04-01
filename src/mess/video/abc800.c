@@ -74,7 +74,7 @@ void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 			for (dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				int color = fgctl_prom[fgctl_addr] & 0x07;
+				int color = m_fgctl_prom[fgctl_addr] & 0x07;
 
 				*BITMAP_ADDR16(bitmap, y, x++) = color;
 
@@ -93,7 +93,7 @@ void abc800_state::video_start()
 {
 	// find memory regions
 	m_char_rom = m_machine.region(MC6845_TAG)->base();
-	fgctl_prom = m_machine.region("hru2")->base();
+	m_fgctl_prom = m_machine.region("hru2")->base();
 
 	// register for state saving
 	state_save_register_global(m_machine, m_hrs);
@@ -195,7 +195,7 @@ void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 			for (dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				int color = (fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;
+				int color = (m_fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;
 
 				*BITMAP_ADDR16(bitmap, y, x++) = color;
 				*BITMAP_ADDR16(bitmap, y, x++) = color;

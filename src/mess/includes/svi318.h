@@ -52,10 +52,10 @@ public:
 	svi318_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	SVI_318 svi;
-	UINT8 *pcart;
-	UINT32 pcart_rom_size;
-	SVI318_FDC_STRUCT fdc;
+	SVI_318 m_svi;
+	UINT8 *m_pcart;
+	UINT32 m_pcart_rom_size;
+	SVI318_FDC_STRUCT m_fdc;
 };
 
 

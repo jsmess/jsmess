@@ -130,21 +130,21 @@ public:
 	tx0_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tape_reader_t tape_reader;
-	tape_puncher_t tape_puncher;
-	typewriter_t typewriter;
-	emu_timer *dis_timer;
-	magtape_t magtape;
-	int old_typewriter_keys[4];
-	int old_control_keys;
-	int old_tsr_keys;
-	int tsr_index;
-	int typewriter_color;
-	bitmap_t *panel_bitmap;
-	bitmap_t *typewriter_bitmap;
-	int pos;
-	int case_shift;
-	device_t *crt;
+	tape_reader_t m_tape_reader;
+	tape_puncher_t m_tape_puncher;
+	typewriter_t m_typewriter;
+	emu_timer *m_dis_timer;
+	magtape_t m_magtape;
+	int m_old_typewriter_keys[4];
+	int m_old_control_keys;
+	int m_old_tsr_keys;
+	int m_tsr_index;
+	int m_typewriter_color;
+	bitmap_t *m_panel_bitmap;
+	bitmap_t *m_typewriter_bitmap;
+	int m_pos;
+	int m_case_shift;
+	device_t *m_crt;
 };
 
 

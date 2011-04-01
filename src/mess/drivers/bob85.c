@@ -19,8 +19,8 @@ public:
 	bob85_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 prev_key;
-	UINT8 count_key;
+	UINT8 m_prev_key;
+	UINT8 m_count_key;
 };
 
 
@@ -69,13 +69,13 @@ static READ8_HANDLER(bob85_keyboard_r)
 			default :  break;
 		}
 	}
-	if (retVal != state->prev_key) {
-		state->prev_key = retVal;
-		state->count_key = 0;
+	if (retVal != state->m_prev_key) {
+		state->m_prev_key = retVal;
+		state->m_count_key = 0;
 		return retVal;
 	} else {
-		if (state->count_key <1) {
-			state->count_key++;
+		if (state->m_count_key <1) {
+			state->m_count_key++;
 			return retVal;
 		} else {
 			return 0;
@@ -83,8 +83,8 @@ static READ8_HANDLER(bob85_keyboard_r)
 	}
 
 	if (retVal == 0) {
-		state->prev_key = 0;
-		state->count_key = 0;
+		state->m_prev_key = 0;
+		state->m_count_key = 0;
 	}
 
 	return retVal;

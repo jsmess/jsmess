@@ -18,7 +18,7 @@
 static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE_MEMBER(bk_state, bk0010_video_ram) // Video RAM
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE_MEMBER(bk_state, m_bk0010_video_ram) // Video RAM
     AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
     AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // ROM
     AM_RANGE( 0xc000, 0xdfff ) AM_ROM  // ROM
@@ -32,7 +32,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(bk0010fd_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE_MEMBER(bk_state, bk0010_video_ram) // Video RAM
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_BASE_MEMBER(bk_state, m_bk0010_video_ram) // Video RAM
     AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
     AM_RANGE( 0xa000, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xfdff ) AM_ROM  // ROM

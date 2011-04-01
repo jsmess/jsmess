@@ -18,19 +18,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* keyboard state */
-	UINT8 keylatch;
+	UINT8 m_keylatch;
 
 	/* video state */
-	int _32;
-	int coloren;
-	UINT8 *video_ram;
-	UINT8 *color_ram;
+	int m_32;
+	int m_coloren;
+	UINT8 *m_video_ram;
+	UINT8 *m_color_ram;
 
 	/* floppy state */
-	int fdc_index;
+	int m_fdc_index;
 
 	/* devices */
-	device_t *cassette;
+	device_t *m_cassette;
 };
 
 /* ---------- defined in video/osi.c ---------- */

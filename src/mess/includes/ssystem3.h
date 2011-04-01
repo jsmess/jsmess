@@ -40,10 +40,10 @@ public:
 	ssystem3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 porta;
-	UINT8 *videoram;
-	playfield_t playfield;
-	lcd_t lcd;
+	UINT8 m_porta;
+	UINT8 *m_videoram;
+	playfield_t m_playfield;
+	lcd_t m_lcd;
 };
 
 

@@ -15,25 +15,25 @@ public:
 	osborne1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8	bank2_enabled;
-	UINT8	bank3_enabled;
-	UINT8	*bank4_ptr;
-	UINT8	*empty_4K;
+	UINT8	m_bank2_enabled;
+	UINT8	m_bank3_enabled;
+	UINT8	*m_bank4_ptr;
+	UINT8	*m_empty_4K;
 	/* IRQ states */
-	int		pia_0_irq_state;
-	int		pia_1_irq_state;
+	int		m_pia_0_irq_state;
+	int		m_pia_1_irq_state;
 	/* video related */
-	UINT8	new_start_x;
-	UINT8	new_start_y;
-	emu_timer	*video_timer;
-	UINT8	*charrom;
-	UINT8	charline;
-	UINT8	start_y;
+	UINT8	m_new_start_x;
+	UINT8	m_new_start_y;
+	emu_timer	*m_video_timer;
+	UINT8	*m_charrom;
+	UINT8	m_charline;
+	UINT8	m_start_y;
 	/* bankswitch setting */
-	UINT8	bankswitch;
-	UINT8	in_irq_handler;
+	UINT8	m_bankswitch;
+	UINT8	m_in_irq_handler;
 	/* beep state */
-	UINT8	beep;
+	UINT8	m_beep;
 };
 
 

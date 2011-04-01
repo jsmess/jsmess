@@ -227,10 +227,10 @@ static READ32_HANDLER( ct486_chipset_r )
 	at_state *state = space->machine().driver_data<at_state>();
 
 	if (ACCESSING_BITS_0_7)
-		return pic8259_r(state->pic8259_master, 0);
+		return pic8259_r(state->m_pic8259_master, 0);
 
 	if (ACCESSING_BITS_8_15)
-		return pic8259_r(state->pic8259_master, 1) << 8;
+		return pic8259_r(state->m_pic8259_master, 1) << 8;
 
 	if (ACCESSING_BITS_24_31)
 		return downcast<cs4031_device *>(space->machine().device("cs4031"))->data_r(*space, 0, 0) << 24;
@@ -243,10 +243,10 @@ static WRITE32_HANDLER( ct486_chipset_w )
 	at_state *state = space->machine().driver_data<at_state>();
 
 	if (ACCESSING_BITS_0_7)
-		pic8259_w(state->pic8259_master, 0, data);
+		pic8259_w(state->m_pic8259_master, 0, data);
 
 	if (ACCESSING_BITS_8_15)
-		pic8259_w(state->pic8259_master, 1, data >> 8);
+		pic8259_w(state->m_pic8259_master, 1, data >> 8);
 
 	if (ACCESSING_BITS_16_23)
 		downcast<cs4031_device *>(space->machine().device("cs4031"))->address_w(*space, 0, data >> 16, 0);

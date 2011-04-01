@@ -13,9 +13,9 @@ public:
 	ondra_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 video_enable;
-	UINT8 bank1_status;
-	UINT8 bank2_status;
+	UINT8 m_video_enable;
+	UINT8 m_bank1_status;
+	UINT8 m_bank2_status;
 };
 
 

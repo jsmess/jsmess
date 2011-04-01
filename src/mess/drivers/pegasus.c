@@ -72,7 +72,7 @@ public:
 	UINT8 m_kbd_irq;
 	UINT8 *m_pcgram;
 	UINT8 *m_videoram;
-	UINT8 *FNT;
+	UINT8 *m_FNT;
 	UINT8 m_control_bits;
 };
 
@@ -309,7 +309,7 @@ static const cassette_config pegasus_cassette_config =
 static VIDEO_START( pegasus )
 {
 	pegasus_state *state = machine.driver_data<pegasus_state>();
-	state->FNT = machine.region("chargen")->base();
+	state->m_FNT = machine.region("chargen")->base();
 }
 
 static const UINT8 mcm6571a_shift[] =
@@ -360,12 +360,12 @@ static SCREEN_UPDATE( pegasus )
 					if (ra < 3)
 						gfx = inv;
 					else
-						gfx = state->FNT[(chr<<4) | (ra-3) ] ^ inv;
+						gfx = state->m_FNT[(chr<<4) | (ra-3) ] ^ inv;
 				}
 				else
 				{
 					if (ra < 10)
-						gfx = state->FNT[(chr<<4) | ra ] ^ inv;
+						gfx = state->m_FNT[(chr<<4) | ra ] ^ inv;
 					else
 						gfx = inv;
 				}

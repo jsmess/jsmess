@@ -189,16 +189,16 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	UINT8 data = 0xfc;
 
 	/* serial clock in */
-	data |= cbm_iec_clk_r(state->iec);
+	data |= cbm_iec_clk_r(state->m_iec);
 
 	/* serial data in */
-	data |= cbm_iec_data_r(state->iec) << 1;
+	data |= cbm_iec_data_r(state->m_iec) << 1;
 
 	/* joystick */
 	data &= ~(input_port_read(device->machine(), "JOY") & 0x3c);
 
 	/* cassette switch */
-	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(state->m_cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x40;
 	else
 		data |=  0x40;
@@ -226,7 +226,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	/* serial attention out */
-	cbm_iec_atn_w(state->iec, device, !BIT(data, 7));
+	cbm_iec_atn_w(state->m_iec, device, !BIT(data, 7));
 }
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
@@ -273,13 +273,13 @@ static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 
 	if (!BIT(data, 0))
 	{
-		cassette_change_state(state->cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		state->cassette_timer->enable(true);
+		cassette_change_state(state->m_cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		state->m_cassette_timer->enable(true);
 	}
 	else
 	{
-		cassette_change_state(state->cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		state->cassette_timer->enable(false);
+		cassette_change_state(state->m_cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		state->m_cassette_timer->enable(false);
 	}
 }
 
@@ -322,14 +322,14 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 	vic20_state *state = device->machine().driver_data<vic20_state>();
 	UINT8 data = 0xff;
 
-	if (!BIT(state->key_col, 0)) data &= input_port_read(device->machine(), "ROW0");
-	if (!BIT(state->key_col, 1)) data &= input_port_read(device->machine(), "ROW1");
-	if (!BIT(state->key_col, 2)) data &= input_port_read(device->machine(), "ROW2");
-	if (!BIT(state->key_col, 3)) data &= input_port_read(device->machine(), "ROW3");
-	if (!BIT(state->key_col, 4)) data &= input_port_read(device->machine(), "ROW4");
-	if (!BIT(state->key_col, 5)) data &= input_port_read(device->machine(), "ROW5");
-	if (!BIT(state->key_col, 6)) data &= input_port_read(device->machine(), "ROW6");
-	if (!BIT(state->key_col, 7)) data &= input_port_read(device->machine(), "ROW7");
+	if (!BIT(state->m_key_col, 0)) data &= input_port_read(device->machine(), "ROW0");
+	if (!BIT(state->m_key_col, 1)) data &= input_port_read(device->machine(), "ROW1");
+	if (!BIT(state->m_key_col, 2)) data &= input_port_read(device->machine(), "ROW2");
+	if (!BIT(state->m_key_col, 3)) data &= input_port_read(device->machine(), "ROW3");
+	if (!BIT(state->m_key_col, 4)) data &= input_port_read(device->machine(), "ROW4");
+	if (!BIT(state->m_key_col, 5)) data &= input_port_read(device->machine(), "ROW5");
+	if (!BIT(state->m_key_col, 6)) data &= input_port_read(device->machine(), "ROW6");
+	if (!BIT(state->m_key_col, 7)) data &= input_port_read(device->machine(), "ROW7");
 
 	return data;
 }
@@ -382,7 +382,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	cassette_output(device->machine().device("cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* keyboard column */
-	state->key_col = data;
+	state->m_key_col = data;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
@@ -390,7 +390,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 	vic20_state *driver_state = device->machine().driver_data<vic20_state>();
 
 	/* serial clock out */
-	cbm_iec_clk_w(driver_state->iec, device, !state);
+	cbm_iec_clk_w(driver_state->m_iec, device, !state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
@@ -398,7 +398,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 	vic20_state *driver_state = device->machine().driver_data<vic20_state>();
 
 	/* serial data out */
-	cbm_iec_data_w(driver_state->iec, device, !state);
+	cbm_iec_data_w(driver_state->m_iec, device, !state);
 }
 
 static const via6522_interface vic20_via1_intf =
@@ -425,9 +425,9 @@ static const via6522_interface vic20_via1_intf =
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
 	vic20_state *state = timer.machine().driver_data<vic20_state>();
-	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
+	int data = (cassette_input(state->m_cassette) > +0.0) ? 1 : 0;
 
-	state->via1->write_ca1(data);
+	state->m_via1->write_ca1(data);
 }
 
 /* IEC Serial Bus */
@@ -520,16 +520,16 @@ static MACHINE_START( vic20 )
 	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->via0 = machine.device<via6522_device>(M6522_0_TAG);
-	state->via1 = machine.device<via6522_device>(M6522_1_TAG);
-	state->iec = machine.device(IEC_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
-	state->cassette_timer = machine.device<timer_device>(TIMER_C1530_TAG);
-	state->mos6560 = machine.device(M6560_TAG);
+	state->m_via0 = machine.device<via6522_device>(M6522_0_TAG);
+	state->m_via1 = machine.device<via6522_device>(M6522_1_TAG);
+	state->m_iec = machine.device(IEC_TAG);
+	state->m_cassette = machine.device(CASSETTE_TAG);
+	state->m_cassette_timer = machine.device<timer_device>(TIMER_C1530_TAG);
+	state->m_mos6560 = machine.device(M6560_TAG);
 
 	/* set VIA clocks */
-	state->via0->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
-	state->via1->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
+	state->m_via0->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
+	state->m_via1->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
 
 	/* memory expansions */
 	switch (ram_get_size(machine.device(RAM_TAG)))
@@ -548,7 +548,7 @@ static MACHINE_START( vic20 )
 	}
 
 	/* register for state saving */
-	state->save_item(NAME(state->key_col));
+	state->save_item(NAME(state->m_key_col));
 }
 
 
@@ -668,7 +668,7 @@ static PALETTE_INIT( vic20 )
 static SCREEN_UPDATE( vic20 )
 {
 	vic20_state *state = screen->machine().driver_data<vic20_state>();
-	mos6560_video_update(state->mos6560, bitmap, cliprect);
+	mos6560_video_update(state->m_mos6560, bitmap, cliprect);
 	return 0;
 }
 
@@ -677,7 +677,7 @@ static SCREEN_UPDATE( vic20 )
 static INTERRUPT_GEN( vic20_raster_interrupt )
 {
 	vic20_state *state = device->machine().driver_data<vic20_state>();
-	mos6560_raster_interrupt_gen(state->mos6560);
+	mos6560_raster_interrupt_gen(state->m_mos6560);
 }
 
 static MACHINE_CONFIG_START( vic20_common, vic20_state )

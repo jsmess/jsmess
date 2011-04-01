@@ -60,27 +60,27 @@ public:
 	oric_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	int is_telestrat;
-	unsigned char irqs;
-	char *ram_0x0c000;
-	int keyboard_line;
-	char key_sense_bit;
-	char keyboard_mask;
-	unsigned char via_port_a_data;
-	char psg_control;
-	unsigned char previous_portb_data;
-	unsigned char port_3fa_w;
-	unsigned char port_3fb_w;
-	unsigned char wd179x_int_state;
-	unsigned char port_314_r;
-	unsigned char port_318_r;
-	unsigned char port_314_w;
-	unsigned char telestrat_bank_selection;
-	unsigned char telestrat_via2_port_a_data;
-	unsigned char telestrat_via2_port_b_data;
-	telestrat_mem_block telestrat_blocks[8];
-	oric_vh_state vh_state;
+	UINT8 *m_ram;
+	int m_is_telestrat;
+	unsigned char m_irqs;
+	char *m_ram_0x0c000;
+	int m_keyboard_line;
+	char m_key_sense_bit;
+	char m_keyboard_mask;
+	unsigned char m_via_port_a_data;
+	char m_psg_control;
+	unsigned char m_previous_portb_data;
+	unsigned char m_port_3fa_w;
+	unsigned char m_port_3fb_w;
+	unsigned char m_wd179x_int_state;
+	unsigned char m_port_314_r;
+	unsigned char m_port_318_r;
+	unsigned char m_port_314_w;
+	unsigned char m_telestrat_bank_selection;
+	unsigned char m_telestrat_via2_port_a_data;
+	unsigned char m_telestrat_via2_port_b_data;
+	telestrat_mem_block m_telestrat_blocks[8];
+	oric_vh_state m_vh_state;
 };
 
 

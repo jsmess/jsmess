@@ -399,17 +399,17 @@ C64DTV TODO:
  *************************************/
 
 static ADDRESS_MAP_START(ultimax_mem , AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(c64_state, memory)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(c64_state, c64_roml)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(c64_state, m_memory)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(c64_state, m_c64_roml)
 	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE_MEMBER(c64_state, colorram) /* colorram  */
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE_MEMBER(c64_state, m_colorram) /* colorram  */
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(c64_state, c64_romh)				/* ram or kernel rom */
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(c64_state, m_c64_romh)				/* ram or kernel rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(c64_state, memory)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(c64_state, m_memory)
 	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")		/* ram or external roml */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3") AM_WRITEONLY				/* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -592,33 +592,33 @@ static UINT8 c64_lightpen_button_cb( running_machine &machine )
 static int c64_dma_read( running_machine &machine, int offset )
 {
 	c64_state *state = machine.driver_data<c64_state>();
-	if (!state->game && state->exrom)
+	if (!state->m_game && state->m_exrom)
 	{
 		if (offset < 0x3000)
-			return state->memory[offset];
+			return state->m_memory[offset];
 
-		return state->c64_romh[offset & 0x1fff];
+		return state->m_c64_romh[offset & 0x1fff];
 	}
 
-	if (((state->vicaddr - state->memory + offset) & 0x7000) == 0x1000)
-		return state->chargen[offset & 0xfff];
+	if (((state->m_vicaddr - state->m_memory + offset) & 0x7000) == 0x1000)
+		return state->m_chargen[offset & 0xfff];
 
-	return state->vicaddr[offset];
+	return state->m_vicaddr[offset];
 }
 
 static int c64_dma_read_ultimax( running_machine &machine, int offset )
 {
 	c64_state *state = machine.driver_data<c64_state>();
 	if (offset < 0x3000)
-		return state->memory[offset];
+		return state->m_memory[offset];
 
-	return state->c64_romh[offset & 0x1fff];
+	return state->m_c64_romh[offset & 0x1fff];
 }
 
 static int c64_dma_read_color( running_machine &machine, int offset )
 {
 	c64_state *state = machine.driver_data<c64_state>();
-	return state->colorram[offset & 0x3ff] & 0xf;
+	return state->m_colorram[offset & 0x3ff] & 0xf;
 }
 
 static UINT8 c64_rdy_cb( running_machine &machine )

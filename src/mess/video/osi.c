@@ -30,15 +30,15 @@ static VIDEO_START( osi600 )
 	/* randomize video memory contents */
 	for (addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
 	{
-		state->video_ram[addr] = machine.rand() & 0xff;
+		state->m_video_ram[addr] = machine.rand() & 0xff;
 	}
 
 	/* randomize color memory contents */
-	if (state->color_ram)
+	if (state->m_color_ram)
 	{
 		for (addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 		{
-			state->color_ram[addr] = machine.rand() & 0x0f;
+			state->m_color_ram[addr] = machine.rand() & 0x0f;
 		}
 	}
 }
@@ -51,7 +51,7 @@ static SCREEN_UPDATE( osi600 )
 
 	int y, bit, sx;
 
-	if (state->_32)
+	if (state->m_32)
 	{
 		for (y = 0; y < 256; y++)
 		{
@@ -61,7 +61,7 @@ static SCREEN_UPDATE( osi600 )
 
 			for (sx = 0; sx < 64; sx++)
 			{
-				UINT8 videoram_data = state->video_ram[videoram_addr];
+				UINT8 videoram_data = state->m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
 				UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
 
@@ -69,9 +69,9 @@ static SCREEN_UPDATE( osi600 )
 				{
 					int color = BIT(charrom_data, 7);
 
-					if (state->coloren)
+					if (state->m_coloren)
 					{
-						UINT8 colorram_data = state->color_ram[videoram_addr];
+						UINT8 colorram_data = state->m_color_ram[videoram_addr];
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
@@ -94,7 +94,7 @@ static SCREEN_UPDATE( osi600 )
 
 			for (sx = 0; sx < 32; sx++)
 			{
-				UINT8 videoram_data = state->video_ram[videoram_addr];
+				UINT8 videoram_data = state->m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
 				UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
 
@@ -102,9 +102,9 @@ static SCREEN_UPDATE( osi600 )
 				{
 					int color = BIT(charrom_data, 7);
 
-					if (state->coloren)
+					if (state->m_coloren)
 					{
-						UINT8 colorram_data = state->color_ram[videoram_addr];
+						UINT8 colorram_data = state->m_color_ram[videoram_addr];
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
@@ -136,7 +136,7 @@ static SCREEN_UPDATE( uk101 )
 
 		for (sx = 0; sx < 64; sx++)
 		{
-			UINT8 videoram_data = state->video_ram[videoram_addr++];
+			UINT8 videoram_data = state->m_video_ram[videoram_addr++];
 			UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
 			UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
 

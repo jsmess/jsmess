@@ -17,8 +17,8 @@ public:
 	k1003_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 disp_1;
-	UINT8 disp_2;
+	UINT8 m_disp_1;
+	UINT8 m_disp_2;
 };
 
 
@@ -45,13 +45,13 @@ static READ8_HANDLER (key_r)
 static WRITE8_HANDLER (disp_1_w)
 {
 	k1003_state *state = space->machine().driver_data<k1003_state>();
-	state->disp_1 = data;
+	state->m_disp_1 = data;
 }
 
 static WRITE8_HANDLER (disp_2_w)
 {
 	k1003_state *state = space->machine().driver_data<k1003_state>();
-	state->disp_2 = data;
+	state->m_disp_2 = data;
 }
 
 static UINT8 bit_to_dec(UINT8 val) {
@@ -68,8 +68,8 @@ static UINT8 bit_to_dec(UINT8 val) {
 static WRITE8_HANDLER (disp_w)
 {
 	k1003_state *state = space->machine().driver_data<k1003_state>();
-	output_set_digit_value(bit_to_dec(data)*2,   state->disp_1);
-	output_set_digit_value(bit_to_dec(data)*2+1, state->disp_2);
+	output_set_digit_value(bit_to_dec(data)*2,   state->m_disp_1);
+	output_set_digit_value(bit_to_dec(data)*2+1, state->m_disp_2);
 }
 
 static ADDRESS_MAP_START( k1003_io , AS_IO, 8)

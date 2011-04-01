@@ -124,7 +124,7 @@ static READ8_HANDLER( samcoupe_pen_r )
 static WRITE8_HANDLER( samcoupe_clut_w )
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	state->clut[(offset >> 8) & 0x0f] = data & 0x7f;
+	state->m_clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 static READ8_HANDLER( samcoupe_status_r )
@@ -143,7 +143,7 @@ static READ8_HANDLER( samcoupe_status_r )
 	if (!BIT(offset, 15)) data &= input_port_read(space->machine(), "keyboard_row_7f") & 0xe0;
 
 	/* bit 0-4, interrupt source */
-	data |= state->status;
+	data |= state->m_status;
 
 	return data;
 }
@@ -151,13 +151,13 @@ static READ8_HANDLER( samcoupe_status_r )
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	state->line_int = data;
+	state->m_line_int = data;
 }
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->lmpr;
+	return state->m_lmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
@@ -165,14 +165,14 @@ static WRITE8_HANDLER( samcoupe_lmpr_w )
 	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
-	state->lmpr = data;
+	state->m_lmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->hmpr;
+	return state->m_hmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
@@ -180,14 +180,14 @@ static WRITE8_HANDLER( samcoupe_hmpr_w )
 	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
-	state->hmpr = data;
+	state->m_hmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->vmpr;
+	return state->m_vmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( samcoupe_vmpr_w )
 	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
-	state->vmpr = data;
+	state->m_vmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
@@ -252,7 +252,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 	device_t *speaker = space->machine().device("speaker");
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
-	state->border = data;
+	state->m_border = data;
 
 	/* bit 3, cassette output */
 	cassette_output(cassette, BIT(data, 3) ? -1.0 : +1.0);
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 static READ8_HANDLER( samcoupe_attributes_r )
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->attribute;
+	return state->m_attribute;
 }
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
@@ -327,10 +327,10 @@ static TIMER_CALLBACK( irq_off )
 {
 	samcoupe_state *state = machine.driver_data<samcoupe_state>();
 	/* adjust STATUS register */
-	state->status |= param;
+	state->m_status |= param;
 
 	/* clear interrupt */
-	if ((state->status & 0x1f) == 0x1f)
+	if ((state->m_status & 0x1f) == 0x1f)
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 
 }
@@ -344,7 +344,7 @@ void samcoupe_irq(device_t *device, UINT8 src)
 	device->machine().scheduler().timer_set(attotime::from_usec(20), FUNC(irq_off), src);
 
 	/* adjust STATUS register */
-	state->status &= ~src;
+	state->m_status &= ~src;
 }
 
 static INTERRUPT_GEN( samcoupe_frame_interrupt )

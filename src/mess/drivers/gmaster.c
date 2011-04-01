@@ -16,7 +16,7 @@ static READ8_HANDLER( gmaster_io_r )
 {
 	gmaster_state *state = space->machine().driver_data<gmaster_state>();
     UINT8 data = 0;
-    if (state->machine.ports[2] & 1)
+    if (state->m_machine.ports[2] & 1)
 	{
 		data = space->machine().region("maincpu")->base()[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -26,11 +26,11 @@ static READ8_HANDLER( gmaster_io_r )
 		switch (offset)
 		{
 		case 1:
-			data=state->video.pixels[state->video.y][state->video.x];
-			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), state->video.x, state->video.y, 0x4000 + offset, data);
-			if (!(state->video.mode) && state->video.delayed)
-				state->video.x++;
-			state->video.delayed = TRUE;
+			data=state->m_video.pixels[state->m_video.y][state->m_video.x];
+			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), state->m_video.x, state->m_video.y, 0x4000 + offset, data);
+			if (!(state->m_video.mode) && state->m_video.delayed)
+				state->m_video.x++;
+			state->m_video.delayed = TRUE;
 			break;
 		default:
 			logerror("%.4x memory %.4x read %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -39,12 +39,12 @@ static READ8_HANDLER( gmaster_io_r )
     return data;
 }
 
-#define BLITTER_Y ((state->machine.ports[2]&4)|(state->video.data[0]&3))
+#define BLITTER_Y ((state->m_machine.ports[2]&4)|(state->m_video.data[0]&3))
 
 static WRITE8_HANDLER( gmaster_io_w )
 {
 	gmaster_state *state = space->machine().driver_data<gmaster_state>();
-    if (state->machine.ports[2] & 1)
+    if (state->m_machine.ports[2] & 1)
 	{
 		space->machine().region("maincpu")->base()[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -54,33 +54,33 @@ static WRITE8_HANDLER( gmaster_io_w )
 		switch (offset)
 		{
 		case 0:
-			state->video.delayed=FALSE;
+			state->m_video.delayed=FALSE;
 			logerror("%.4x lcd %.4x written %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), 0x4000 + offset, data);
 			// e2 af a4 a0 a9 falling block init for both halves
 			if ((data & 0xfc) == 0xb8)
 			{
-				state->video.index = 0;
-				state->video.data[state->video.index] = data;
-				state->video.y = BLITTER_Y;
+				state->m_video.index = 0;
+				state->m_video.data[state->m_video.index] = data;
+				state->m_video.y = BLITTER_Y;
 			}
 			else if ((data & 0xc0) == 0)
 			{
-				state->video.x = data;
+				state->m_video.x = data;
 			}
 			else if ((data & 0xf0) == 0xe0)
 			{
-				state->video.mode = (data & 0xe) ? FALSE : TRUE;
+				state->m_video.mode = (data & 0xe) ? FALSE : TRUE;
 			}
-			state->video.data[state->video.index] = data;
-			state->video.index = (state->video.index + 1) & 7;
+			state->m_video.data[state->m_video.index] = data;
+			state->m_video.index = (state->m_video.index + 1) & 7;
 			break;
 		case 1:
-			state->video.delayed = FALSE;
-			if (state->video.x < ARRAY_LENGTH(state->video.pixels[0])) // continental galaxy flutlicht
-				state->video.pixels[state->video.y][state->video.x] = data;
+			state->m_video.delayed = FALSE;
+			if (state->m_video.x < ARRAY_LENGTH(state->m_video.pixels[0])) // continental galaxy flutlicht
+				state->m_video.pixels[state->m_video.y][state->m_video.x] = data;
 			logerror("%.4x lcd x:%.2x y:%.2x %.4x written %.2x\n",
-				(int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), state->video.x, state->video.y, 0x4000 + offset, data);
-			state->video.x++;
+				(int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), state->m_video.x, state->m_video.y, 0x4000 + offset, data);
+			state->m_video.x++;
 /* 02 b8 1a
    02 bb 1a
    02 bb 22
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 static READ8_HANDLER( gmaster_port_r )
 {
 	//gmaster_state *state = space->machine().driver_data<gmaster_state>();
-//  UINT8 data = state->machine.ports[offset];
+//  UINT8 data = state->m_machine.ports[offset];
     UINT8 data = 0xff;
     switch (offset)
 	{
@@ -121,12 +121,12 @@ static READ8_HANDLER( gmaster_port_r )
 static WRITE8_HANDLER( gmaster_port_w )
 {
 	gmaster_state *state = space->machine().driver_data<gmaster_state>();
-    state->machine.ports[offset] = data;
+    state->m_machine.ports[offset] = data;
     logerror("%.4x port %d written %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), offset, data);
     switch (offset)
 	{
 		case UPD7810_PORTC:
-			state->video.y = BLITTER_Y;
+			state->m_video.y = BLITTER_Y;
 			break;
     }
 }
@@ -181,11 +181,11 @@ static SCREEN_UPDATE( gmaster )
 	gmaster_state *state = screen->machine().driver_data<gmaster_state>();
     int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
-    for (y = 0; y < ARRAY_LENGTH(state->video.pixels); y++)
+    for (y = 0; y < ARRAY_LENGTH(state->m_video.pixels); y++)
 	{
-		for (x = 0; x < ARRAY_LENGTH(state->video.pixels[0]); x++)
+		for (x = 0; x < ARRAY_LENGTH(state->m_video.pixels[0]); x++)
 		{
-			UINT8 d = state->video.pixels[y][x];
+			UINT8 d = state->m_video.pixels[y][x];
 			UINT16 *line;
 
 			line = BITMAP_ADDR16(bitmap, (y * 8), x);
@@ -260,7 +260,7 @@ ROM_END
 static DRIVER_INIT( gmaster )
 {
 	gmaster_state *state = machine.driver_data<gmaster_state>();
-	memset(&state->video, 0, sizeof(state->video));
+	memset(&state->m_video, 0, sizeof(state->m_video));
 }
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT  COMPANY                 FULLNAME */

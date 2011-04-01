@@ -121,10 +121,10 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 
 static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cd32_state, chip_ram, chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cd32_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cd32_state, custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cd32_state, m_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
@@ -138,8 +138,8 @@ static void cd32_potgo_w(running_machine &machine, UINT16 data)
 	ami1200_state *state = machine.driver_data<ami1200_state>();
 	int i;
 
-	state->potgo_value = state->potgo_value & 0x5500;
-	state->potgo_value |= data & 0xaa00;
+	state->m_potgo_value = state->m_potgo_value & 0x5500;
+	state->m_potgo_value |= data & 0xaa00;
 
     for (i = 0; i < 8; i += 2)
 	{
@@ -147,16 +147,16 @@ static void cd32_potgo_w(running_machine &machine, UINT16 data)
 		if (data & dir)
 		{
 			UINT16 d = 0x0100 << i;
-			state->potgo_value &= ~d;
-			state->potgo_value |= data & d;
+			state->m_potgo_value &= ~d;
+			state->m_potgo_value |= data & d;
 		}
     }
     for (i = 0; i < 2; i++)
 	{
 	    UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 	    UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-	    if ((state->potgo_value & p5dir) && (state->potgo_value & p5dat))
-		state->cd32_shifter[i] = 8;
+	    if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
+		state->m_cd32_shifter[i] = 8;
     }
 
 }
@@ -170,19 +170,19 @@ static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
 		UINT8 but = 0x40 << i;
 		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-		if (!(state->potgo_value & p5dir) || !(state->potgo_value & p5dat))
+		if (!(state->m_potgo_value & p5dir) || !(state->m_potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != state->oldstate[i])
+			if ((dra & but) && (pra & but) != state->m_oldstate[i])
 			{
 				if (!(pra & but))
 				{
-					state->cd32_shifter[i]--;
-					if (state->cd32_shifter[i] < 0)
-						state->cd32_shifter[i] = 0;
+					state->m_cd32_shifter[i]--;
+					if (state->m_cd32_shifter[i] < 0)
+						state->m_cd32_shifter[i] = 0;
 				}
 			}
 		}
-		state->oldstate[i] = pra & but;
+		state->m_oldstate[i] = pra & but;
     }
 }
 
@@ -407,7 +407,7 @@ static DRIVER_INIT( a1200 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* initialize keyboard */

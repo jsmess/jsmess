@@ -88,10 +88,10 @@ public:
 	ti99_2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int ROM_paged;
-	int irq_state;
-	int KeyRow;
+	UINT8 *m_videoram;
+	int m_ROM_paged;
+	int m_irq_state;
+	int m_KeyRow;
 };
 
 
@@ -100,14 +100,14 @@ static DRIVER_INIT( ti99_2_24 )
 {
 	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	/* no ROM paging */
-	state->ROM_paged = 0;
+	state->m_ROM_paged = 0;
 }
 
 static DRIVER_INIT( ti99_2_32 )
 {
 	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	/* ROM paging enabled */
-	state->ROM_paged = 1;
+	state->m_ROM_paged = 1;
 }
 
 #define TI99_2_32_ROMPAGE0 (space->machine().region("maincpu")->base()+0x4000)
@@ -116,8 +116,8 @@ static DRIVER_INIT( ti99_2_32 )
 static MACHINE_RESET( ti99_2 )
 {
 	ti99_2_state *state = machine.driver_data<ti99_2_state>();
-	state->irq_state = ASSERT_LINE;
-	if (! state->ROM_paged)
+	state->m_irq_state = ASSERT_LINE;
+	if (! state->m_ROM_paged)
 		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()+0x4000);
 	else
 		memory_set_bankptr(machine, "bank1", (machine.region("maincpu")->base()+0x4000));
@@ -126,8 +126,8 @@ static MACHINE_RESET( ti99_2 )
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
 	ti99_2_state *state = device->machine().driver_data<ti99_2_state>();
-	device_set_input_line(device, 1, state->irq_state);
-	state->irq_state = (state->irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
+	device_set_input_line(device, 1, state->m_irq_state);
+	state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
@@ -154,7 +154,7 @@ static PALETTE_INIT(ti99_2)
 static SCREEN_UPDATE(ti99_2)
 {
 	ti99_2_state *state = screen->machine().driver_data<ti99_2_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int i, sx, sy;
 
 
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( ti99_2_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")	/* system ROM, banked on 32kb ROMs protos */
 	AM_RANGE(0x6000, 0xdfff) AM_NOP		    /* free for expansion */
 	AM_RANGE(0xe000, 0xebff) AM_RAM		    /* system RAM */
-	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_MEMBER(ti99_2_state, videoram)
+	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_MEMBER(ti99_2_state, m_videoram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM		    /* system RAM */
 	AM_RANGE(0xf000, 0xffff) AM_NOP		    /* free for expansion (and internal processor RAM) */
 ADDRESS_MAP_END
@@ -226,14 +226,14 @@ static WRITE8_HANDLER ( ti99_2_write_kbd )
 	{
 		/* this implementation is just a guess */
 		if (data)
-			state->KeyRow |= 1 << offset;
+			state->m_KeyRow |= 1 << offset;
 		else
-			state->KeyRow &= ~ (1 << offset);
+			state->m_KeyRow &= ~ (1 << offset);
 	}
 	/* now, we handle ROM paging */
-	if (state->ROM_paged)
+	if (state->m_ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(space->machine(), "bank1", (state->KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(space->machine(), "bank1", (state->m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 
@@ -270,7 +270,7 @@ static  READ8_HANDLER ( ti99_2_read_kbd )
 	ti99_2_state *state = space->machine().driver_data<ti99_2_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(space->machine(), keynames[state->KeyRow]);
+	return input_port_read(space->machine(), keynames[state->m_KeyRow]);
 }
 
 static  READ8_HANDLER ( ti99_2_read_misc_cru )

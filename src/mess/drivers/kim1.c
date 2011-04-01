@@ -94,10 +94,10 @@ public:
 	kim1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 u2_port_b;
-	UINT8 _311_output;
-	UINT32 cassette_high_count;
-	UINT8 led_time[6];
+	UINT8 m_u2_port_b;
+	UINT8 m_311_output;
+	UINT32 m_cassette_high_count;
+	UINT8 m_led_time[6];
 };
 
 
@@ -172,7 +172,7 @@ static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 	kim1_state *state = device->machine().driver_data<kim1_state>();
 	UINT8	data = 0xff;
 
-	switch( ( state->u2_port_b >> 1 ) & 0x0f )
+	switch( ( state->m_u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
 		data = input_port_read(device->machine(), "LINE0");
@@ -191,14 +191,14 @@ static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 static WRITE8_DEVICE_HANDLER( kim1_u2_write_a )
 {
 	kim1_state *state = device->machine().driver_data<kim1_state>();
-	UINT8 idx = ( state->u2_port_b >> 1 ) & 0x0f;
+	UINT8 idx = ( state->m_u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
 	{
 		if ( data & 0x80 )
 		{
 			output_set_digit_value( idx-4, data & 0x7f );
-			state->led_time[idx - 4] = 15;
+			state->m_led_time[idx - 4] = 15;
 		}
 	}
 }
@@ -209,14 +209,14 @@ static READ8_DEVICE_HANDLER( kim1_u2_read_b )
 	if ( mos6530_portb_out_get(device) & 0x20 )
 		return 0xFF;
 
-	return 0x7F | ( state->_311_output ^ 0x80 );
+	return 0x7F | ( state->m_311_output ^ 0x80 );
 }
 
 
 static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 {
 	kim1_state *state = device->machine().driver_data<kim1_state>();
-	state->u2_port_b = data;
+	state->m_u2_port_b = data;
 
 	if ( data & 0x20 )
 	{
@@ -252,16 +252,16 @@ static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 
 	if ( tap_val <= 0 )
 	{
-		if ( state->cassette_high_count )
+		if ( state->m_cassette_high_count )
 		{
-			state->_311_output = ( state->cassette_high_count < 8 ) ? 0x80 : 0;
-			state->cassette_high_count = 0;
+			state->m_311_output = ( state->m_cassette_high_count < 8 ) ? 0x80 : 0;
+			state->m_cassette_high_count = 0;
 		}
 	}
 
 	if ( tap_val > 0 )
 	{
-		state->cassette_high_count++;
+		state->m_cassette_high_count++;
 	}
 }
 
@@ -273,8 +273,8 @@ static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 
 	for ( i = 0; i < 6; i++ )
 	{
-		if ( state->led_time[i] )
-			state->led_time[i]--;
+		if ( state->m_led_time[i] )
+			state->m_led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}
@@ -284,9 +284,9 @@ static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 static MACHINE_START( kim1 )
 {
 	kim1_state *state = machine.driver_data<kim1_state>();
-	state_save_register_item(machine, "kim1", NULL, 0, state->u2_port_b );
-	state_save_register_item(machine, "kim1", NULL, 0, state->_311_output );
-	state_save_register_item(machine, "kim1", NULL, 0, state->cassette_high_count );
+	state_save_register_item(machine, "kim1", NULL, 0, state->m_u2_port_b );
+	state_save_register_item(machine, "kim1", NULL, 0, state->m_311_output );
+	state_save_register_item(machine, "kim1", NULL, 0, state->m_cassette_high_count );
 }
 
 
@@ -298,11 +298,11 @@ static MACHINE_RESET( kim1 )
 
 	for ( i = 0; i < 6; i++ )
 	{
-		state->led_time[i] = 0;
+		state->m_led_time[i] = 0;
 	}
 
-	state->_311_output = 0;
-	state->cassette_high_count = 0;
+	state->m_311_output = 0;
+	state->m_cassette_high_count = 0;
 }
 
 

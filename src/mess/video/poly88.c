@@ -24,7 +24,7 @@ static const UINT8 mcm6571a_shift[] =
 VIDEO_START( poly88 )
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	state->FNT = machine.region("chargen")->base();
+	state->m_FNT = machine.region("chargen")->base();
 }
 
 SCREEN_UPDATE( poly88 )
@@ -41,7 +41,7 @@ SCREEN_UPDATE( poly88 )
 		xpos = 0;
 		for(x = 0; x < 64; x++ )
 		{
-			UINT8 code = state->video_ram[addr + x];
+			UINT8 code = state->m_video_ram[addr + x];
 			if ((code & 0x80)==0)
 			{
 				for(j = 0; j < 15; j++ )
@@ -79,12 +79,12 @@ SCREEN_UPDATE( poly88 )
 					if (mcm6571a_shift[code]==0)
 					{
 						if (j < 9)
-							l = state->FNT[code*16 + j];
+							l = state->m_FNT[code*16 + j];
 					}
 					else
 					{
 						if ((j > 2) && (j < 12))
-							l = state->FNT[code*16 + j - 3];
+							l = state->m_FNT[code*16 + j - 3];
 					}
 
 					for(b = 0; b < 7; b++ )

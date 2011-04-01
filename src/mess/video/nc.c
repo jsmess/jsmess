@@ -44,7 +44,7 @@ PALETTE_INIT( nc )
 void nc200_video_set_backlight(running_machine &machine, int state)
 {
 	nc_state *drvstate = machine.driver_data<nc_state>();
-	drvstate->nc200_backlight = state;
+	drvstate->m_nc200_backlight = state;
 }
 
 
@@ -62,12 +62,12 @@ SCREEN_UPDATE( nc )
 	int height, width;
 	int pens[2];
 
-    if (state->type==NC_TYPE_200)
+    if (state->m_type==NC_TYPE_200)
     {
         height = NC200_SCREEN_HEIGHT;
         width = NC200_SCREEN_WIDTH;
 
-		if (state->nc200_backlight)
+		if (state->m_nc200_backlight)
 		{
 			pens[0] = 2;
 			pens[1] = 3;
@@ -91,7 +91,7 @@ SCREEN_UPDATE( nc )
     {
 		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)ram_get_ptr(screen->machine().device(RAM_TAG))) + state->display_memory_start + (y<<6);
+		char *line_ptr = ((char*)ram_get_ptr(screen->machine().device(RAM_TAG))) + state->m_display_memory_start + (y<<6);
 
 		x = 0;
 		for (by=0; by<width>>3; by++)

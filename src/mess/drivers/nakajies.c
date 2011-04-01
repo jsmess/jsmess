@@ -204,11 +204,11 @@ public:
 		: driver_device(machine, config) { }
 
 	/* Device lookups */
-	device_t *cpu;
+	device_t *m_cpu;
 
 	/* IRQ handling */
-	UINT8	irq_enabled;
-	UINT8	irq_active;
+	UINT8	m_irq_enabled;
+	UINT8	m_irq_active;
 };
 
 
@@ -240,10 +240,10 @@ ADDRESS_MAP_END
 static void nakajies_update_irqs( running_machine &machine )
 {
 	nakajies_state *state = machine.driver_data<nakajies_state>();
-	UINT8 irq = state->irq_enabled & state->irq_active;
+	UINT8 irq = state->m_irq_enabled & state->m_irq_active;
 	UINT8 vector = 0xff;
 
-	logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", state->irq_enabled, state->irq_active );
+	logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", state->m_irq_enabled, state->m_irq_active );
 
 	/* Assuming irq 0xFF has the highest priority and 0xF8 the lowest */
 	while( vector >= 0xf8 && ! ( irq & 0x01 ) )
@@ -254,11 +254,11 @@ static void nakajies_update_irqs( running_machine &machine )
 
 	if ( vector >= 0xf8 )
 	{
-		device_set_input_line_and_vector( state->cpu, 0, ASSERT_LINE, vector );
+		device_set_input_line_and_vector( state->m_cpu, 0, ASSERT_LINE, vector );
 	}
 	else
 	{
-		device_set_input_line( state->cpu, 0, CLEAR_LINE );
+		device_set_input_line( state->m_cpu, 0, CLEAR_LINE );
 	}
 }
 
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( irq_clear_w )
 {
 	nakajies_state *state = space->machine().driver_data<nakajies_state>();
 
-	state->irq_active &= ~data;
+	state->m_irq_active &= ~data;
 	nakajies_update_irqs(space->machine());
 }
 
@@ -282,7 +282,7 @@ static READ8_HANDLER( irq_enable_r )
 {
 	nakajies_state *state = space->machine().driver_data<nakajies_state>();
 
-	return state->irq_enabled;
+	return state->m_irq_enabled;
 }
 
 
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	nakajies_state *state = space->machine().driver_data<nakajies_state>();
 
-	state->irq_enabled = data;
+	state->m_irq_enabled = data;
 	nakajies_update_irqs(space->machine());
 }
 
@@ -313,7 +313,7 @@ static INPUT_CHANGED( trigger_irq )
 	nakajies_state *state = field->port->machine().driver_data<nakajies_state>();
 	UINT8 irqs = input_port_read( field->port->machine(), "debug" );
 
-	state->irq_active |= irqs;
+	state->m_irq_active |= irqs;
 	nakajies_update_irqs(field->port->machine());
 }
 
@@ -335,9 +335,9 @@ static MACHINE_RESET( nakajies )
 {
 	nakajies_state *state = machine.driver_data<nakajies_state>();
 
-	state->cpu = machine.device( "v20hl" );
-	state->irq_enabled = 0;
-	state->irq_active = 0;
+	state->m_cpu = machine.device( "v20hl" );
+	state->m_irq_enabled = 0;
+	state->m_irq_active = 0;
 }
 
 /* F4 Character Displayer */

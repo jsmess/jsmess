@@ -21,14 +21,14 @@
 {
 	pc1401_state *state = space->machine().driver_data<pc1401_state>();
 	offset&=0xff;
-	return state->reg[offset];
+	return state->m_reg[offset];
 }
 
 WRITE8_HANDLER(pc1401_lcd_write)
 {
 	pc1401_state *state = space->machine().driver_data<pc1401_state>();
 	offset&=0xff;
-	state->reg[offset]=data;
+	state->m_reg[offset]=data;
 }
 
 static const POCKETC_FIGURE	line={ /* simple line */
@@ -149,64 +149,64 @@ SCREEN_UPDATE( pc1401 )
 	color[0] = 7;
 	color[1] = 8;
 
-	if (state->portc&1)
+	if (state->m_portc&1)
 	{
 		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2)
 		{
 			for (j=0; j<5;j++,i++,x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,x,y);
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,x,y);
 		}
 		for (i=0x67; i>=0x40;x+=2)
 		{
 			for (j=0; j<5;j++,i--,x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,x,y);
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,x,y);
 		}
 	}
 
 	pocketc_draw_special(bitmap, RIGHT+149, DOWN+24, line,
-			state->reg[0x3c] & 0x08 ? color[1] : color[0]);
+			state->m_reg[0x3c] & 0x08 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT, DOWN-10, busy,
-			state->reg[0x3d] & 0x01 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x01 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+18, DOWN-10, def,
-			state->reg[0x3d] & 0x02 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x02 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+43, DOWN-10,shift,
-			state->reg[0x3d] & 0x04 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x04 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+63, DOWN-10,hyp,
-			state->reg[0x3d] & 0x08 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x08 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+38, DOWN+24,line,
-			state->reg[0x3d] & 0x10 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x10 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+23, DOWN+24,line,
-			state->reg[0x3d] & 0x20 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x20 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+8, DOWN+24,line,
-			state->reg[0x3d] & 0x40 ? color[1] : color[0]);
+			state->m_reg[0x3d] & 0x40 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+183, DOWN-10,e,
-			state->reg[0x7c] & 0x01 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x01 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+176, DOWN-10,m,
-			state->reg[0x7c] & 0x02 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x02 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+168, DOWN-10,braces,
-			state->reg[0x7c] & 0x04 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x04 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+138, DOWN-10,rad,
-			state->reg[0x7c] & 0x08 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x08 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+134, DOWN-10,g,
-			state->reg[0x7c] & 0x10 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x10 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+126, DOWN-10,de,
-			state->reg[0x7c] & 0x20 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x20 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+165, DOWN+24,line,
-			state->reg[0x7c] & 0x40 ? color[1] : color[0]);
+			state->m_reg[0x7c] & 0x40 ? color[1] : color[0]);
 
 /*
   603c: 3 STAT

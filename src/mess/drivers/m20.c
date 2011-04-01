@@ -45,7 +45,7 @@ public:
 	m20_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *vram;
+	UINT16 *m_vram;
 };
 
 
@@ -74,7 +74,7 @@ static SCREEN_UPDATE( m20 )
 		{
 			for (i = 0; i < 16; i++)
 			{
-				pen = (state->vram[count]) >> (15 - i) & 1;
+				pen = (state->m_vram[count]) >> (15 - i) & 1;
 
 				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine().pens[pen];
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16)
 	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_REGION("maincpu",0x10000)
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu",0x10000) //mirror
 
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_BASE_MEMBER(m20_state, vram)//base vram
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_BASE_MEMBER(m20_state, m_vram)//base vram
 //  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
 //  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 //

@@ -130,10 +130,10 @@ public:
 	void trump_card_set_control(UINT8 data);
 	void sandy_set_control(UINT8 data);
 	
-	int		disk_type;
-	int		disk_io_base;
-	UINT8	disk_io_byte;
-	UINT8	printer_char;
+	int		m_disk_type;
+	int		m_disk_io_base;
+	UINT8	m_disk_io_byte;
+	UINT8	m_printer_char;
 };
 
 #endif

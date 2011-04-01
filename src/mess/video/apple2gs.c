@@ -16,11 +16,11 @@
 VIDEO_START( apple2gs )
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	state->bordercolor = 0;
-	apple2_video_start(machine, state->slowmem, 0x20000, 0, 8);
-	state->legacy_gfx = auto_bitmap_alloc(machine, 560, 192, BITMAP_FORMAT_INDEXED16);
+	state->m_bordercolor = 0;
+	apple2_video_start(machine, state->m_slowmem, 0x20000, 0, 8);
+	state->m_legacy_gfx = auto_bitmap_alloc(machine, 560, 192, BITMAP_FORMAT_INDEXED16);
 
-	state_save_register_item(machine, "BORDERCLR", NULL, 0, state->bordercolor);
+	state_save_register_item(machine, "BORDERCLR", NULL, 0, state->m_bordercolor);
 }
 
 
@@ -37,7 +37,7 @@ SCREEN_UPDATE( apple2gs )
 
 	beamy = cliprect->min_y;
 
-	if (state->newvideo & 0x80)
+	if (state->m_newvideo & 0x80)
 	{
 		// in top or bottom border?
 		if ((beamy < BORDER_TOP) || (beamy >= 200+BORDER_TOP))
@@ -51,24 +51,24 @@ SCREEN_UPDATE( apple2gs )
 			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
-				scanline[col] = state->bordercolor;
+				scanline[col] = state->m_bordercolor;
 			}
 		}
 		else	// regular screen area
 		{
 			int shrline = beamy - BORDER_TOP;
 
-			scb = state->slowmem[0x19D00 + shrline];
+			scb = state->m_slowmem[0x19D00 + shrline];
 			palette = ((scb & 0x0f) << 4) + 16;
 
-			vram = &state->slowmem[0x12000 + (shrline * 160)];
+			vram = &state->m_slowmem[0x12000 + (shrline * 160)];
 			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT; col++)
 			{
-				scanline[col] = state->bordercolor;
-				scanline[col+BORDER_LEFT+640] = state->bordercolor;
+				scanline[col] = state->m_bordercolor;
+				scanline[col+BORDER_LEFT+640] = state->m_bordercolor;
 			}
 
 			if (scb & 0x80)	// 640 mode
@@ -122,7 +122,7 @@ SCREEN_UPDATE( apple2gs )
 			new_cliprect.min_y = 0;
 			new_cliprect.max_x = 559;
 			new_cliprect.max_y = 191;
-			SCREEN_UPDATE_NAME(apple2)(screen, state->legacy_gfx, &new_cliprect);
+			SCREEN_UPDATE_NAME(apple2)(screen, state->m_legacy_gfx, &new_cliprect);
 		}
 
 		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
@@ -135,7 +135,7 @@ SCREEN_UPDATE( apple2gs )
 			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
-				scanline[col] = state->bordercolor;
+				scanline[col] = state->m_bordercolor;
 			}
 		}
 		else
@@ -145,11 +145,11 @@ SCREEN_UPDATE( apple2gs )
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT + 40; col++)
 			{
-				scanline[col] = state->bordercolor;
-				scanline[col+BORDER_LEFT+600] = state->bordercolor;
+				scanline[col] = state->m_bordercolor;
+				scanline[col+BORDER_LEFT+600] = state->m_bordercolor;
 			}
 
-			memcpy(scanline + 40 + BORDER_LEFT, BITMAP_ADDR16(state->legacy_gfx, beamy-(BORDER_TOP+4), 0), 560 * sizeof(UINT16));
+			memcpy(scanline + 40 + BORDER_LEFT, BITMAP_ADDR16(state->m_legacy_gfx, beamy-(BORDER_TOP+4), 0), 560 * sizeof(UINT16));
 		}
 	}
 	return 0;

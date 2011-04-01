@@ -433,14 +433,14 @@ static CBM_IEC_DAISY( c16_iec_1541 )
 static SCREEN_UPDATE( c16 )
 {
 	c16_state *state = screen->machine().driver_data<c16_state>();
-	ted7360_video_update(state->ted7360, bitmap, cliprect);
+	ted7360_video_update(state->m_ted7360, bitmap, cliprect);
 	return 0;
 }
 
 static INTERRUPT_GEN( c16_raster_interrupt )
 {
 	c16_state *state = device->machine().driver_data<c16_state>();
-	ted7360_raster_interrupt_gen(state->ted7360);
+	ted7360_raster_interrupt_gen(state->m_ted7360);
 }
 
 
@@ -448,18 +448,18 @@ static MACHINE_START( c16 )
 {
 	c16_state *state = machine.driver_data<c16_state>();
 
-	state->maincpu = machine.device<legacy_cpu_device>("maincpu");
-	state->ted7360 = machine.device("ted7360");
-	state->serbus = machine.device("iec");
-	state->cassette = machine.device("cassette");
-	state->messram = machine.device(RAM_TAG);
-	state->sid = machine.device("sid");
+	state->m_maincpu = machine.device<legacy_cpu_device>("maincpu");
+	state->m_ted7360 = machine.device("ted7360");
+	state->m_serbus = machine.device("iec");
+	state->m_cassette = machine.device("cassette");
+	state->m_messram = machine.device(RAM_TAG);
+	state->m_sid = machine.device("sid");
 
-	state->save_item(NAME(state->old_level));
-	state->save_item(NAME(state->lowrom));
-	state->save_item(NAME(state->highrom));
-	state->save_item(NAME(state->port6529));
-	state->save_item(NAME(state->keyline));
+	state->save_item(NAME(state->m_old_level));
+	state->save_item(NAME(state->m_lowrom));
+	state->save_item(NAME(state->m_highrom));
+	state->save_item(NAME(state->m_port6529));
+	state->save_item(NAME(state->m_keyline));
 }
 
 static MACHINE_CONFIG_START( c16, c16_state )

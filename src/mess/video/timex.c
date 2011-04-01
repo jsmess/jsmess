@@ -27,7 +27,7 @@ VIDEO_START( ts2068 )
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	VIDEO_START_CALL( spectrum );
-	state->frame_invert_count = 30;
+	state->m_frame_invert_count = 30;
 }
 
 
@@ -70,7 +70,7 @@ static void ts2068_hires_scanline(running_machine &machine,bitmap_t *bitmap, int
 	for (x=0;x<32;x++)
 	{
 		/* Get ink and paper colour with bright */
-		if (state->flash_invert && (*attr & 0x80))
+		if (state->m_flash_invert && (*attr & 0x80))
 		{
 			ink=((*attr)>>3) & 0x0f;
 			pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -150,7 +150,7 @@ static void ts2068_lores_scanline(running_machine &machine,bitmap_t *bitmap, int
 	for (x=0;x<32;x++)
 	{
 		/* Get ink and paper colour with bright */
-		if (state->flash_invert && (*attr & 0x80))
+		if (state->m_flash_invert && (*attr & 0x80))
 		{
 			ink=((*attr)>>3) & 0x0f;
 			pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -186,20 +186,20 @@ SCREEN_UPDATE( ts2068 )
 	int count;
 	int full_refresh = 1;
 
-	if ((state->port_ff_data & 7) == 6)
+	if ((state->m_port_ff_data & 7) == 6)
 	{
 		/* 64 Column mode */
-		unsigned short inkcolor = (state->port_ff_data & 0x38) >> 3;
+		unsigned short inkcolor = (state->m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
 			ts2068_64col_scanline(screen->machine(),bitmap, count, TS2068_TOP_BORDER, inkcolor);
 	}
-	else if ((state->port_ff_data & 7) == 2)
+	else if ((state->m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
 			ts2068_hires_scanline(screen->machine(),bitmap, count, TS2068_TOP_BORDER);
 	}
-	else if ((state->port_ff_data & 7) == 1)
+	else if ((state->m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
@@ -227,20 +227,20 @@ SCREEN_UPDATE( tc2048 )
 	int count;
 	int full_refresh = 1;
 
-	if ((state->port_ff_data & 7) == 6)
+	if ((state->m_port_ff_data & 7) == 6)
 	{
 		/* 64 Column mode */
-		unsigned short inkcolor = (state->port_ff_data & 0x38) >> 3;
+		unsigned short inkcolor = (state->m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
 			ts2068_64col_scanline(screen->machine(),bitmap, count, SPEC_TOP_BORDER, inkcolor);
 	}
-	else if ((state->port_ff_data & 7) == 2)
+	else if ((state->m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
 			ts2068_hires_scanline(screen->machine(),bitmap, count, SPEC_TOP_BORDER);
 	}
-	else if ((state->port_ff_data & 7) == 1)
+	else if ((state->m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)

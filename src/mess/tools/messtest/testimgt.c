@@ -119,7 +119,7 @@ static void node_createimage(struct imgtooltest_state *state, xml_data_node *nod
 		option_resolution_add_param(opts, param_name, param_value);
 	}
 
-	err = imgtool_image_create_byname(driver, tempfile_name(), opts, &state->image);
+	err = imgtool_image_create_byname(driver, tempfile_name(), opts, &state->m_image);
 	if (opts)
 	{
 		option_resolution_close(opts);
@@ -127,15 +127,15 @@ static void node_createimage(struct imgtooltest_state *state, xml_data_node *nod
 	}
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
 
-	err = imgtool_partition_open(state->image, 0, &state->partition);
+	err = imgtool_partition_open(state->m_image, 0, &state->m_partition);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
@@ -185,9 +185,9 @@ static void node_putfile(struct imgtooltest_state *state, xml_data_node *node)
 	imgtool_stream *stream = NULL;
 	mess_pile pile;
 
-	if (state->partition == NULL)
+	if (state->m_partition == NULL)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		goto done;
 	}
@@ -202,7 +202,7 @@ static void node_putfile(struct imgtooltest_state *state, xml_data_node *node)
 	stream = stream_open_mem(NULL, 0);
 	if (stream == NULL)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_outofmemory();
 		goto done;
 	}
@@ -211,10 +211,10 @@ static void node_putfile(struct imgtooltest_state *state, xml_data_node *node)
 	stream_seek(stream, 0, SEEK_SET);
 	pile_delete(&pile);
 
-	err = imgtool_partition_write_file(state->partition, filename, fork, stream, NULL, filter);
+	err = imgtool_partition_write_file(state->m_partition, filename, fork, stream, NULL, filter);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		goto done;
 	}
@@ -222,7 +222,7 @@ static void node_putfile(struct imgtooltest_state *state, xml_data_node *node)
 	if (VERBOSE_FILECHAIN)
 	{
 		char buf[1024];
-		err = imgtool_partition_get_chain_string(state->partition, filename, buf, ARRAY_LENGTH(buf));
+		err = imgtool_partition_get_chain_string(state->m_partition, filename, buf, ARRAY_LENGTH(buf));
 		if (err == IMGTOOLERR_SUCCESS)
 			report_message(MSG_INFO, "Filechain '%s': %s", filename, buf);
 	}
@@ -245,9 +245,9 @@ static void node_checkfile(struct imgtooltest_state *state, xml_data_node *node)
 	const void *stream_ptr;
 	mess_pile pile;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		goto done;
 	}
@@ -259,15 +259,15 @@ static void node_checkfile(struct imgtooltest_state *state, xml_data_node *node)
 	stream = stream_open_mem(NULL, 0);
 	if (!stream)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_outofmemory();
 		goto done;
 	}
 
-	err = imgtool_partition_read_file(state->partition, filename, fork, stream, filter);
+	err = imgtool_partition_read_file(state->m_partition, filename, fork, stream, filter);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		goto done;
 	}
@@ -318,9 +318,9 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 	expected_dirent entries[256];
 	int entry_count;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		return;
 	}
@@ -364,7 +364,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 
 	memset(&ent, 0, sizeof(ent));
 
-	err = imgtool_directory_open(state->partition, filename, &imageenum);
+	err = imgtool_directory_open(state->m_partition, filename, &imageenum);
 	if (err)
 		goto done;
 
@@ -393,7 +393,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 
 	if (mismatch)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "File listing mismatch: {%s} expected {%s}",
 			actual_listing, expected_listing);
 		goto done;
@@ -404,7 +404,7 @@ done:
 		imgtool_directory_close(imageenum);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 	}
 }
@@ -416,9 +416,9 @@ static void node_deletefile(struct imgtooltest_state *state, xml_data_node *node
 	imgtoolerr_t err;
 	xml_attribute_node *attr_node;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		return;
 	}
@@ -426,15 +426,15 @@ static void node_deletefile(struct imgtooltest_state *state, xml_data_node *node
 	attr_node = xml_get_attribute(node, "name");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("name");
 		return;
 	}
 
-	err = imgtool_partition_delete_file(state->partition, attr_node->value);
+	err = imgtool_partition_delete_file(state->m_partition, attr_node->value);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
@@ -447,9 +447,9 @@ static void node_createdirectory(struct imgtooltest_state *state, xml_data_node 
 	imgtoolerr_t err;
 	xml_attribute_node *attr_node;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		return;
 	}
@@ -457,15 +457,15 @@ static void node_createdirectory(struct imgtooltest_state *state, xml_data_node 
 	attr_node = xml_get_attribute(node, "path");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("path");
 		return;
 	}
 
-	err = imgtool_partition_create_directory(state->partition, attr_node->value);
+	err = imgtool_partition_create_directory(state->m_partition, attr_node->value);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
@@ -478,9 +478,9 @@ static void node_deletedirectory(struct imgtooltest_state *state, xml_data_node 
 	imgtoolerr_t err;
 	xml_attribute_node *attr_node;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		return;
 	}
@@ -488,15 +488,15 @@ static void node_deletedirectory(struct imgtooltest_state *state, xml_data_node 
 	attr_node = xml_get_attribute(node, "path");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("path");
 		return;
 	}
 
-	err = imgtool_partition_delete_directory(state->partition, attr_node->value);
+	err = imgtool_partition_delete_directory(state->m_partition, attr_node->value);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
@@ -508,17 +508,17 @@ static void node_recordfreespace(struct imgtooltest_state *state, xml_data_node 
 {
 	imgtoolerr_t err;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		return;
 	}
 
-	err = imgtool_partition_get_free_space(state->partition, &state->recorded_freespace);
+	err = imgtool_partition_get_free_space(state->m_partition, &state->m_recorded_freespace);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
@@ -533,24 +533,24 @@ static void node_checkfreespace(struct imgtooltest_state *state, xml_data_node *
 	INT64 leaked_space;
 	const char *verb;
 
-	if (!state->partition)
+	if (!state->m_partition)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Partition not loaded");
 		return;
 	}
 
-	err = imgtool_partition_get_free_space(state->partition, &current_freespace);
+	err = imgtool_partition_get_free_space(state->m_partition, &current_freespace);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
 
-	if (state->recorded_freespace != current_freespace)
+	if (state->m_recorded_freespace != current_freespace)
 	{
-		leaked_space = state->recorded_freespace - current_freespace;
+		leaked_space = state->m_recorded_freespace - current_freespace;
 		if (leaked_space > 0)
 		{
 			verb = "Leaked";
@@ -561,7 +561,7 @@ static void node_checkfreespace(struct imgtooltest_state *state, xml_data_node *
 			verb = "Reverse leaked";
 		}
 
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "%s %u bytes of space", verb, (unsigned int) leaked_space);
 	}
 }
@@ -576,7 +576,7 @@ static UINT32 identify_attribute(struct imgtooltest_state *state, xml_data_node 
 	attr_node = xml_get_attribute(node, "name");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("name");
 		return 0;
 	}
@@ -594,7 +594,7 @@ static UINT32 identify_attribute(struct imgtooltest_state *state, xml_data_node 
 	attr_node = xml_get_attribute(node, "value");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("value");
 		return 0;
 	}
@@ -605,7 +605,7 @@ static UINT32 identify_attribute(struct imgtooltest_state *state, xml_data_node 
 		case IMGTOOLATTR_INT_MAC_CREATOR:
 			if (strlen(attr_node->value) != 4)
 			{
-				state->failed = 1;
+				state->m_failed = 1;
 				error_missingattribute("value");
 				return 0;
 			}
@@ -627,7 +627,7 @@ static void node_setattr(struct imgtooltest_state *state, xml_data_node *node)
 	attr_node = xml_get_attribute(node, "path");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("path");
 		return;
 	}
@@ -636,10 +636,10 @@ static void node_setattr(struct imgtooltest_state *state, xml_data_node *node)
 	if (!attribute)
 		return;
 
-	err = imgtool_partition_put_file_attribute(state->partition, attr_node->value, attribute, value);
+	err = imgtool_partition_put_file_attribute(state->m_partition, attr_node->value, attribute, value);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
@@ -661,7 +661,7 @@ static void node_checkattr(struct imgtooltest_state *state, xml_data_node *node)
 	attr_node = xml_get_attribute(node, "path");
 	if (!attr_node)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		error_missingattribute("path");
 		return;
 	}
@@ -670,17 +670,17 @@ static void node_checkattr(struct imgtooltest_state *state, xml_data_node *node)
 	if (!attribute)
 		return;
 
-	err = imgtool_partition_get_file_attribute(state->partition, attr_node->value, attribute, &value);
+	err = imgtool_partition_get_file_attribute(state->m_partition, attr_node->value, attribute, &value);
 	if (err)
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_imgtoolerr(err);
 		return;
 	}
 
 	if (memcmp(&value, &expected_value, sizeof(value)))
 	{
-		state->failed = 1;
+		state->m_failed = 1;
 		report_message(MSG_FAILURE, "Comparison failed");
 		return;
 	}

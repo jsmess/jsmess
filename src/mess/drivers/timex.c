@@ -173,14 +173,14 @@ static  READ8_HANDLER(ts2068_port_f4_r)
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
-	return state->port_f4_data;
+	return state->m_port_f4_data;
 }
 
 static WRITE8_HANDLER(ts2068_port_f4_w)
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
-	state->port_f4_data = data;
+	state->m_port_f4_data = data;
 	ts2068_update_memory(space->machine());
 }
 
@@ -188,7 +188,7 @@ static  READ8_HANDLER(ts2068_port_ff_r)
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
-	return state->port_ff_data;
+	return state->m_port_ff_data;
 }
 
 static WRITE8_HANDLER(ts2068_port_ff_w)
@@ -201,7 +201,7 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
         */
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
-	state->port_ff_data = data;
+	state->m_port_ff_data = data;
 	ts2068_update_memory(space->machine());
 	logerror("Port %04x write %02x\n", offset, data);
 }
@@ -235,9 +235,9 @@ void ts2068_update_memory(running_machine &machine)
 
 	ExROM = machine.region("maincpu")->base() + 0x014000;
 
-	if (state->port_f4_data & 0x01)
+	if (state->m_port_f4_data & 0x01)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 				space->install_read_bank(0x0000, 0x1fff, "bank1");
 				space->unmap_write(0x0000, 0x1fff);
@@ -274,9 +274,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("0000-1fff HOME\n");
 	}
 
-	if (state->port_f4_data & 0x02)
+	if (state->m_port_f4_data & 0x02)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank2", ExROM);
 			space->install_read_bank(0x2000, 0x3fff, "bank2");
@@ -312,9 +312,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("2000-3fff HOME\n");
 	}
 
-	if (state->port_f4_data & 0x04)
+	if (state->m_port_f4_data & 0x04)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank3", ExROM);
 			space->install_read_bank(0x4000, 0x5fff, "bank3");
@@ -349,9 +349,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("4000-5fff RAM\n");
 	}
 
-	if (state->port_f4_data & 0x08)
+	if (state->m_port_f4_data & 0x08)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank4", ExROM);
 			space->install_read_bank(0x6000, 0x7fff, "bank4");
@@ -386,9 +386,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("6000-7fff RAM\n");
 	}
 
-	if (state->port_f4_data & 0x10)
+	if (state->m_port_f4_data & 0x10)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank5", ExROM);
 			space->install_read_bank(0x8000, 0x9fff, "bank5");
@@ -423,9 +423,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("8000-9fff RAM\n");
 	}
 
-	if (state->port_f4_data & 0x20)
+	if (state->m_port_f4_data & 0x20)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank6", ExROM);
 			space->install_read_bank(0xa000, 0xbfff, "bank6");
@@ -461,9 +461,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("a000-bfff RAM\n");
 	}
 
-	if (state->port_f4_data & 0x40)
+	if (state->m_port_f4_data & 0x40)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank7", ExROM);
 			space->install_read_bank(0xc000, 0xdfff, "bank7");
@@ -498,9 +498,9 @@ void ts2068_update_memory(running_machine &machine)
 		logerror("c000-dfff RAM\n");
 	}
 
-	if (state->port_f4_data & 0x80)
+	if (state->m_port_f4_data & 0x80)
 	{
-		if (state->port_ff_data & 0x80)
+		if (state->m_port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank8", ExROM);
 			space->install_read_bank(0xe000, 0xffff, "bank8");
@@ -563,8 +563,8 @@ static MACHINE_RESET( ts2068 )
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 
-	state->port_ff_data = 0;
-	state->port_f4_data = 0;
+	state->m_port_ff_data = 0;
+	state->m_port_f4_data = 0;
 	ts2068_update_memory(machine);
 	MACHINE_RESET_CALL(spectrum);
 
@@ -579,7 +579,7 @@ static WRITE8_HANDLER( tc2048_port_ff_w )
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
-	state->port_ff_data = data;
+	state->m_port_ff_data = data;
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
@@ -603,8 +603,8 @@ static MACHINE_RESET( tc2048 )
 
 	memory_set_bankptr(machine, "bank1", messram);
 	memory_set_bankptr(machine, "bank2", messram);
-	state->port_ff_data = 0;
-	state->port_f4_data = -1;
+	state->m_port_ff_data = 0;
+	state->m_port_f4_data = -1;
 	MACHINE_RESET_CALL(spectrum);
 }
 

@@ -118,7 +118,7 @@ PALETTE_INIT ( hp48 )
 
 
 #define draw_pixel							\
-	state->screens[ state->cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
+	state->m_screens[ state->m_cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
 	xp++;								\
 	data >>= 1
 
@@ -189,14 +189,14 @@ SCREEN_UPDATE ( hp48 )
 			int acc = 0;
 			for ( i = 0; i < HP48_NB_SCREENS; i++ )
 			{
-				acc += state->screens[ i ][ y ][ x+8 ];
+				acc += state->m_screens[ i ][ y ][ x+8 ];
 			}
 			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
 			*BITMAP_ADDR16( bitmap, y, x ) = acc;
 		}
 	}
 
-	state->cur_screen = (state->cur_screen + 1) % HP48_NB_SCREENS;
+	state->m_cur_screen = (state->m_cur_screen + 1) % HP48_NB_SCREENS;
 
 	return 0;
 }

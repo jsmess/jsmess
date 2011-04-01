@@ -39,13 +39,13 @@ VIDEO_START( pc1403 )
 	pc1403_state *state = machine.driver_data<pc1403_state>();
 	if (strcmp(machine.system().name, "pc1403h") == 0)
 	{
-		state->DOWN = 69;
-		state->RIGHT = 155;
+		state->m_DOWN = 69;
+		state->m_RIGHT = 155;
 	}
 	else
 	{
-		state->DOWN = 67;
-		state->RIGHT = 152;
+		state->m_DOWN = 67;
+		state->m_RIGHT = 152;
 	}
 }
 
@@ -53,13 +53,13 @@ VIDEO_START( pc1403 )
 READ8_HANDLER(pc1403_lcd_read)
 {
 	pc1403_state *state = space->machine().driver_data<pc1403_state>();
-	return state->reg[offset];
+	return state->m_reg[offset];
 }
 
 WRITE8_HANDLER(pc1403_lcd_write)
 {
 	pc1403_state *state = space->machine().driver_data<pc1403_state>();
-	state->reg[offset]=data;
+	state->m_reg[offset]=data;
 }
 
 static const POCKETC_FIGURE	line={ /* simple line */
@@ -159,104 +159,104 @@ SCREEN_UPDATE( pc1403 )
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = 7; // pocketc_colortable[CONTRAST][0];
 	color[2] = 8; // pocketc_colortable[CONTRAST][1];
-	color[1] = (state->portc & 1) ? color[2] : color[0];
+	color[1] = (state->m_portc & 1) ? color[2] : color[0];
 
-	if (state->portc & 1)
+	if (state->m_portc & 1)
 	{
-		for (x=state->RIGHT, y=state->DOWN, i=0; i<6*5; x+=2) {
+		for (x=state->m_RIGHT, y=state->m_DOWN, i=0; i<6*5; x+=2) {
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=9*5; i<12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=6*5; i<9*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b-3*5; i>0x7b-6*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-				drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,
+				drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b; i>0x7b-3*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b-6*5; i>0x7b-12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 	}
 	/* if display is off, busy is always visible? it seems to behave like that. */
 	/* But if computer is off, busy is hidden. */
-	if(!(state->portc&8))
+	if(!(state->m_portc&8))
 	{
-		if (state->portc&1)
-			pocketc_draw_special(bitmap, state->RIGHT, state->DOWN-13, busy,
-				state->reg[0x3d] & 1 ? color[2] : color[0]);
+		if (state->m_portc&1)
+			pocketc_draw_special(bitmap, state->m_RIGHT, state->m_DOWN-13, busy,
+				state->m_reg[0x3d] & 1 ? color[2] : color[0]);
 
-		else pocketc_draw_special(bitmap, state->RIGHT, state->DOWN-13, busy, color[2]);
+		else pocketc_draw_special(bitmap, state->m_RIGHT, state->m_DOWN-13, busy, color[2]);
 	}
 	else
-		pocketc_draw_special(bitmap, state->RIGHT, state->DOWN-13, busy, color[0]);
+		pocketc_draw_special(bitmap, state->m_RIGHT, state->m_DOWN-13, busy, color[0]);
 
-	pocketc_draw_special(bitmap, state->RIGHT+18, state->DOWN-13, def,
-			 state->reg[0x3d] & 0x02 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+43, state->DOWN-13, shift,
-			 state->reg[0x3d] & 0x04 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+63, state->DOWN-13, hyp,
-			 state->reg[0x3d] & 0x08 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+18, state->m_DOWN-13, def,
+			 state->m_reg[0x3d] & 0x02 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+43, state->m_DOWN-13, shift,
+			 state->m_reg[0x3d] & 0x04 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+63, state->m_DOWN-13, hyp,
+			 state->m_reg[0x3d] & 0x08 ? color[1] : color[0]);
 
-	pocketc_draw_special(bitmap, state->RIGHT+155, state->DOWN-13, kana,
-			 state->reg[0x3c] & 0x01 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+167, state->DOWN-13, shoo,
-			 state->reg[0x3c] & 0x02 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+178, state->DOWN-13, sml,
-			 state->reg[0x3c] & 0x04 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+155, state->m_DOWN-13, kana,
+			 state->m_reg[0x3c] & 0x01 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+167, state->m_DOWN-13, shoo,
+			 state->m_reg[0x3c] & 0x02 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+178, state->m_DOWN-13, sml,
+			 state->m_reg[0x3c] & 0x04 ? color[1] : color[0]);
 
-	pocketc_draw_special(bitmap, state->RIGHT+191, state->DOWN-13, de,
-			 state->reg[0x7c] & 0x20 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+199, state->DOWN-13, g,
-			 state->reg[0x7c] & 0x10 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+203, state->DOWN-13, rad,
-			 state->reg[0x7c] & 0x08 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+191, state->m_DOWN-13, de,
+			 state->m_reg[0x7c] & 0x20 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+199, state->m_DOWN-13, g,
+			 state->m_reg[0x7c] & 0x10 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+203, state->m_DOWN-13, rad,
+			 state->m_reg[0x7c] & 0x08 ? color[1] : color[0]);
 
-	pocketc_draw_special(bitmap, state->RIGHT+266, state->DOWN-13, braces,
-			 state->reg[0x7c] & 0x04 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+274, state->DOWN-13, m,
-			 state->reg[0x7c] & 0x02 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+281, state->DOWN-13, e,
-			 state->reg[0x7c] & 0x01 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+266, state->m_DOWN-13, braces,
+			 state->m_reg[0x7c] & 0x04 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+274, state->m_DOWN-13, m,
+			 state->m_reg[0x7c] & 0x02 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+281, state->m_DOWN-13, e,
+			 state->m_reg[0x7c] & 0x01 ? color[1] : color[0]);
 
-	pocketc_draw_special(bitmap, state->RIGHT+10, state->DOWN+27, line /* empty */,
-			 state->reg[0x3c] & 0x40 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+31, state->DOWN+27, line /*calc*/,
-			 state->reg[0x3d] & 0x40 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+52, state->DOWN+27, line/*run*/,
-			 state->reg[0x3d] & 0x20 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+73, state->DOWN+27, line/*prog*/,
-			 state->reg[0x3d] & 0x10 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+94, state->DOWN+27, line /* empty */,
-			 state->reg[0x3c] & 0x20 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+10, state->m_DOWN+27, line /* empty */,
+			 state->m_reg[0x3c] & 0x40 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+31, state->m_DOWN+27, line /*calc*/,
+			 state->m_reg[0x3d] & 0x40 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+52, state->m_DOWN+27, line/*run*/,
+			 state->m_reg[0x3d] & 0x20 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+73, state->m_DOWN+27, line/*prog*/,
+			 state->m_reg[0x3d] & 0x10 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+94, state->m_DOWN+27, line /* empty */,
+			 state->m_reg[0x3c] & 0x20 ? color[1] : color[0]);
 
-	pocketc_draw_special(bitmap, state->RIGHT+232, state->DOWN+27, line/*matrix*/,
-			 state->reg[0x3c] & 0x10 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+253, state->DOWN+27, line/*stat*/,
-			 state->reg[0x3c] & 0x08 ? color[1] : color[0]);
-	pocketc_draw_special(bitmap, state->RIGHT+274, state->DOWN+27, line/*print*/,
-			 state->reg[0x7c] & 0x40 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+232, state->m_DOWN+27, line/*matrix*/,
+			 state->m_reg[0x3c] & 0x10 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+253, state->m_DOWN+27, line/*stat*/,
+			 state->m_reg[0x3c] & 0x08 ? color[1] : color[0]);
+	pocketc_draw_special(bitmap, state->m_RIGHT+274, state->m_DOWN+27, line/*print*/,
+			 state->m_reg[0x7c] & 0x40 ? color[1] : color[0]);
 
 	return 0;
 }

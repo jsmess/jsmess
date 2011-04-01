@@ -99,7 +99,7 @@ static const POCKETC_FIGURE busy={
 {
 	pc1350_state *state = space->machine().driver_data<pc1350_state>();
 	int data;
-	data = state->reg[offset&0xfff];
+	data = state->m_reg[offset&0xfff];
 	logerror("pc1350 read %.3x %.2x\n",offset,data);
 	return data;
 }
@@ -108,13 +108,13 @@ WRITE8_HANDLER(pc1350_lcd_write)
 {
 	pc1350_state *state = space->machine().driver_data<pc1350_state>();
 	logerror("pc1350 write %.3x %.2x\n",offset,data);
-	state->reg[offset&0xfff] = data;
+	state->m_reg[offset&0xfff] = data;
 }
 
 int pc1350_keyboard_line_r(running_machine &machine)
 {
 	pc1350_state *state = machine.driver_data<pc1350_state>();
-	return state->reg[0xe00];
+	return state->m_reg[0xe00];
 }
 
 /* pc1350
@@ -148,23 +148,23 @@ SCREEN_UPDATE( pc1350 )
 		for (x=RIGHT, i=pc1350_addr[k]; i<0xa00; i+=0x200)
 			for (j=0; j<=0x1d; j++, x+=2)
 				for (b = 0; b < 8; b++)
-					plot_box(bitmap, x, y + b * 2, 2, 2, color[(state->reg[j+i] >> b) & 1]);
+					plot_box(bitmap, x, y + b * 2, 2, 2, color[(state->m_reg[j+i] >> b) & 1]);
 
 
 	/* 783c: 0 SHIFT 1 DEF 4 RUN 5 PRO 6 JAPAN 7 SML */
 	/* I don't know how they really look like in the lcd */
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+45, shift,
-						state->reg[0x83c] & 0x01 ? color[2] : color[3]);
+						state->m_reg[0x83c] & 0x01 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+55, def,
-						state->reg[0x83c] & 0x02 ? color[2] : color[3]);
+						state->m_reg[0x83c] & 0x02 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+5, run,
-						state->reg[0x83c] & 0x10 ? color[2] : color[3]);
+						state->m_reg[0x83c] & 0x10 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+15, pro,
-						state->reg[0x83c] & 0x20 ? color[2] : color[3]);
+						state->m_reg[0x83c] & 0x20 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+25, japan,
-						state->reg[0x83c] & 0x40 ? color[2] : color[3]);
+						state->m_reg[0x83c] & 0x40 ? color[2] : color[3]);
 	pocketc_draw_special(bitmap, RIGHT-30, DOWN+35, sml,
-						state->reg[0x83c] & 0x80 ? color[2] : color[3]);
+						state->m_reg[0x83c] & 0x80 ? color[2] : color[3]);
 
 	return 0;
 }

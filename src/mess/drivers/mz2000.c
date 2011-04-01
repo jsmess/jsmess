@@ -37,21 +37,21 @@ public:
 	mz2000_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 ipl_enable;
-	UINT8 tvram_enable;
-	UINT8 gvram_enable;
-	UINT8 gvram_bank;
+	UINT8 m_ipl_enable;
+	UINT8 m_tvram_enable;
+	UINT8 m_gvram_enable;
+	UINT8 m_gvram_bank;
 
-	UINT8 key_mux,pio_latchb;
+	UINT8 m_key_mux,m_pio_latchb;
 
-	UINT8 old_portc;
-	UINT8 width80;
-	UINT8 tvram_attr;
-	UINT8 gvram_mask;
+	UINT8 m_old_portc;
+	UINT8 m_width80;
+	UINT8 m_tvram_attr;
+	UINT8 m_gvram_mask;
 
-	UINT8 color_mode;
-	UINT8 has_fdc;
-	UINT8 hi_mode;
+	UINT8 m_color_mode;
+	UINT8 m_has_fdc;
+	UINT8 m_hi_mode;
 };
 
 static VIDEO_START( mz2000 )
@@ -80,7 +80,7 @@ static SCREEN_UPDATE( mz2000 )
 				pen  = ((gvram[count+0x4000] >> (xi)) & 1) ? 1 : 0; //B
 				pen |= ((gvram[count+0x8000] >> (xi)) & 1) ? 2 : 0; //R
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
-				pen &= state->gvram_mask;
+				pen &= state->m_gvram_mask;
 
 				*BITMAP_ADDR16(bitmap, y*2+0, x+xi) = screen->machine().pens[pen];
 				*BITMAP_ADDR16(bitmap, y*2+1, x+xi) = screen->machine().pens[pen];
@@ -89,16 +89,16 @@ static SCREEN_UPDATE( mz2000 )
 		}
 	}
 
-	x_size = (state->width80+1)*40;
+	x_size = (state->m_width80+1)*40;
 
 	for(y=0;y<25;y++)
 	{
 		for(x=0;x<x_size;x++)
 		{
 			UINT8 tile = tvram[y*x_size+x];
-			UINT8 color = state->tvram_attr & 7;
+			UINT8 color = state->m_tvram_attr & 7;
 
-			for(yi=0;yi<8*(state->hi_mode+1);yi++)
+			for(yi=0;yi<8*(state->m_hi_mode+1);yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
@@ -107,21 +107,21 @@ static SCREEN_UPDATE( mz2000 )
 					UINT16 tile_offset;
 
 					res_x = x * 8 + xi;
-					res_y = y * (8 *(state->hi_mode+1)) + yi;
+					res_y = y * (8 *(state->m_hi_mode+1)) + yi;
 
-					if(res_x > 640-1 || res_y > (200*(state->hi_mode+1))-1)
+					if(res_x > 640-1 || res_y > (200*(state->m_hi_mode+1))-1)
 						continue;
 
-					tile_offset = tile*(8*(state->hi_mode+1))+yi + (state->hi_mode * 0x800);
+					tile_offset = tile*(8*(state->m_hi_mode+1))+yi + (state->m_hi_mode * 0x800);
 
 					pen = ((gfx_data[tile_offset] >> (7-xi)) & 1) ? color : -1;
 
 					/* TODO: clean this up */
 					if(pen != -1)
 					{
-						if(state->hi_mode)
+						if(state->m_hi_mode)
 						{
-							if(state->width80 == 0)
+							if(state->m_width80 == 0)
 							{
 								*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen->machine().pens[pen];
 								*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen->machine().pens[pen];
@@ -133,7 +133,7 @@ static SCREEN_UPDATE( mz2000 )
 						}
 						else
 						{
-							if(state->width80 == 0)
+							if(state->m_width80 == 0)
 							{
 								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+0) = screen->machine().pens[pen];
 								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+1) = screen->machine().pens[pen];
@@ -195,7 +195,7 @@ static READ8_HANDLER( mz2000_gvram_r )
 	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	UINT8 *gvram = space->machine().region("gvram")->base();
 
-	return gvram[offset+state->gvram_bank*0x4000];
+	return gvram[offset+state->m_gvram_bank*0x4000];
 }
 
 static WRITE8_HANDLER( mz2000_gvram_w )
@@ -203,7 +203,7 @@ static WRITE8_HANDLER( mz2000_gvram_w )
 	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	UINT8 *gvram = space->machine().region("gvram")->base();
 
-	gvram[offset+state->gvram_bank*0x4000] = data;
+	gvram[offset+state->m_gvram_bank*0x4000] = data;
 }
 
 
@@ -214,21 +214,21 @@ static READ8_HANDLER( mz2000_mem_r )
 
 	page_mem = (offset & 0xf000) >> 12;
 
-	if(page_mem == 0 && state->ipl_enable)
+	if(page_mem == 0 && state->m_ipl_enable)
 		return mz2000_ipl_r(space,offset & 0xfff);
 
-	if(((page_mem & 8) == 0) && state->ipl_enable == 0) // if ipl is enabled, 0x1000 - 0x7fff accesses to dummy region
+	if(((page_mem & 8) == 0) && state->m_ipl_enable == 0) // if ipl is enabled, 0x1000 - 0x7fff accesses to dummy region
 		return mz2000_wram_r(space,offset);
 
 	if(page_mem & 8)
 	{
-		if(page_mem == 0xd && state->tvram_enable)
+		if(page_mem == 0xd && state->m_tvram_enable)
 			return mz2000_tvram_r(space,offset & 0xfff);
-		else if(page_mem >= 0xc && state->gvram_enable)
+		else if(page_mem >= 0xc && state->m_gvram_enable)
 			return mz2000_gvram_r(space,offset & 0x3fff);
 		else
 		{
-			UINT16 wram_mask = (state->ipl_enable) ? 0x7fff : 0xffff;
+			UINT16 wram_mask = (state->m_ipl_enable) ? 0x7fff : 0xffff;
 			return mz2000_wram_r(space,offset & wram_mask);
 		}
 	}
@@ -243,18 +243,18 @@ static WRITE8_HANDLER( mz2000_mem_w )
 
 	page_mem = (offset & 0xf000) >> 12;
 
-	if((page_mem & 8) == 0 && state->ipl_enable == 0)
+	if((page_mem & 8) == 0 && state->m_ipl_enable == 0)
 		mz2000_wram_w(space,offset,data);
 
 	if(page_mem & 8)
 	{
-		if(page_mem == 0xd && state->tvram_enable)
+		if(page_mem == 0xd && state->m_tvram_enable)
 			mz2000_tvram_w(space,offset & 0xfff,data);
-		else if(page_mem >= 0xc && state->gvram_enable)
+		else if(page_mem >= 0xc && state->m_gvram_enable)
 			mz2000_gvram_w(space,offset & 0x3fff,data);
 		else
 		{
-			UINT16 wram_mask = (state->ipl_enable) ? 0x7fff : 0xffff;
+			UINT16 wram_mask = (state->m_ipl_enable) ? 0x7fff : 0xffff;
 
 			mz2000_wram_w(space,offset & wram_mask,data);
 		}
@@ -265,14 +265,14 @@ static WRITE8_HANDLER( mz2000_gvram_bank_w )
 {
 	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 
-	state->gvram_bank = data & 3;
+	state->m_gvram_bank = data & 3;
 }
 
 static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
 {
 	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
-	if(state->has_fdc)
+	if(state->m_has_fdc)
 		return wd17xx_r(device, offset) ^ 0xff;
 
 	return 0xff;
@@ -282,7 +282,7 @@ static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
 {
 	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
-	if(state->has_fdc)
+	if(state->m_has_fdc)
 		wd17xx_w(device, offset, data ^ 0xff);
 }
 
@@ -318,13 +318,13 @@ static WRITE8_HANDLER( timer_w )
 static WRITE8_HANDLER( mz2000_tvram_attr_w )
 {
 	mz2000_state *state = space->machine().driver_data<mz2000_state>();
-	state->tvram_attr = data;
+	state->m_tvram_attr = data;
 }
 
 static WRITE8_HANDLER( mz2000_gvram_mask_w )
 {
 	mz2000_state *state = space->machine().driver_data<mz2000_state>();
-	state->gvram_mask = data;
+	state->m_gvram_mask = data;
 }
 
 static ADDRESS_MAP_START(mz2000_map, AS_PROGRAM, 8)
@@ -494,16 +494,16 @@ static MACHINE_RESET(mz2000)
 {
 	mz2000_state *state = machine.driver_data<mz2000_state>();
 
-	state->ipl_enable = 1;
-	state->tvram_enable = 0;
-	state->gvram_enable = 0;
+	state->m_ipl_enable = 1;
+	state->m_tvram_enable = 0;
+	state->m_gvram_enable = 0;
 
 	beep_set_frequency(machine.device("beeper"),4096);
 	beep_set_state(machine.device("beeper"),0);
 
-	state->color_mode = input_port_read(machine,"CONFIG") & 1;
-	state->has_fdc = (input_port_read(machine,"CONFIG") & 2) >> 1;
-	state->hi_mode = (input_port_read(machine,"CONFIG") & 4) >> 2;
+	state->m_color_mode = input_port_read(machine,"CONFIG") & 1;
+	state->m_has_fdc = (input_port_read(machine,"CONFIG") & 2) >> 1;
+	state->m_hi_mode = (input_port_read(machine,"CONFIG") & 4) >> 2;
 
 	{
 		int i;
@@ -511,9 +511,9 @@ static MACHINE_RESET(mz2000)
 
 		for(i=0;i<8;i++)
 		{
-			r = (state->color_mode) ? (i & 2)>>1 : 0;
-			g = (state->color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
-			b = (state->color_mode) ? (i & 1)>>0 : 0;
+			r = (state->m_color_mode) ? (i & 2)>>1 : 0;
+			g = (state->m_color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
+			b = (state->m_color_mode) ? (i & 1)>>0 : 0;
 
 			palette_set_color_rgb(machine, i,pal1bit(r),pal1bit(g),pal1bit(b));
 		}
@@ -618,19 +618,19 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
     */
 	printf("C W %02x\n",data);
 
-	if(((state->old_portc & 8) == 0) && data & 8)
-		state->ipl_enable = 1;
+	if(((state->m_old_portc & 8) == 0) && data & 8)
+		state->m_ipl_enable = 1;
 
-	if(((state->old_portc & 2) == 0) && data & 2)
+	if(((state->m_old_portc & 2) == 0) && data & 2)
 	{
-		state->ipl_enable = 0;
+		state->m_ipl_enable = 0;
 		/* correct? */
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	beep_set_state(device->machine().device("beeper"),data & 0x04);
 
-	state->old_portc = data;
+	state->m_old_portc = data;
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -646,10 +646,10 @@ static I8255A_INTERFACE( ppi8255_intf )
 static WRITE8_DEVICE_HANDLER( mz2000_pio1_porta_w )
 {
 	mz2000_state *state = device->machine().driver_data<mz2000_state>();
-	state->tvram_enable = ((data & 0xc0) == 0xc0);
-	state->gvram_enable = ((data & 0xc0) == 0x80);
-	state->width80 = ((data & 0x20) >> 5);
-	state->key_mux = data & 0x1f;
+	state->m_tvram_enable = ((data & 0xc0) == 0xc0);
+	state->m_gvram_enable = ((data & 0xc0) == 0x80);
+	state->m_width80 = ((data & 0x20) >> 5);
+	state->m_key_mux = data & 0x1f;
 }
 
 static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
@@ -660,7 +660,7 @@ static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
 	                                        "KEYC", "KEYD", "UNUSED", "UNUSED" };
 
-	if(((state->key_mux & 0x10) == 0x00) || ((state->key_mux & 0x0f) == 0x0f)) //status read
+	if(((state->m_key_mux & 0x10) == 0x00) || ((state->m_key_mux & 0x0f) == 0x0f)) //status read
 	{
 		int res,i;
 
@@ -668,14 +668,14 @@ static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
 		for(i=0;i<0xe;i++)
 			res &= input_port_read(device->machine(), keynames[i]);
 
-		state->pio_latchb = res;
+		state->m_pio_latchb = res;
 
 		return res;
 	}
 
-	state->pio_latchb = input_port_read(device->machine(), keynames[state->key_mux & 0xf]);
+	state->m_pio_latchb = input_port_read(device->machine(), keynames[state->m_key_mux & 0xf]);
 
-	return input_port_read(device->machine(), keynames[state->key_mux & 0xf]);
+	return input_port_read(device->machine(), keynames[state->m_key_mux & 0xf]);
 }
 
 static Z80PIO_INTERFACE( mz2000_pio1_intf )

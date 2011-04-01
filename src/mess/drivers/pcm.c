@@ -95,9 +95,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	DECLARE_WRITE8_MEMBER( pcm_kbd_put );
-	UINT8 *videoram;
-	UINT8 term_data;
-	UINT8 step;
+	UINT8 *m_videoram;
+	UINT8 m_term_data;
+	UINT8 m_step;
 	UINT8 m_85;
 };
 
@@ -129,11 +129,11 @@ There is also a HALT LED, connected directly to the processor.
 
 READ8_MEMBER( pcm_state::pcm_84_r )
 {
-	UINT8 ret = term_data;
-	if (step < 2)
+	UINT8 ret = m_term_data;
+	if (m_step < 2)
 	{
 		ret |= 0x80;
-		step++;
+		m_step++;
 	}
 	return ret;
 }
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START(pcm_mem, AS_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
 	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(videoram) // Video RAM
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(m_videoram) // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcm_io, AS_IO, 8, pcm_state)
@@ -188,8 +188,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( pcm_state::pcm_kbd_put )
 {
-	term_data = data;
-	step = 0;
+	m_term_data = data;
+	m_step = 0;
 }
 
 static GENERIC_TERMINAL_INTERFACE( pcm_terminal_intf )
@@ -218,7 +218,7 @@ static SCREEN_UPDATE( pcm )
 	{
 		for (x = 0; x < 64; x++)
 		{
-			code = state->videoram[(0x400 + y*64 + x) & 0x7ff];
+			code = state->m_videoram[(0x400 + y*64 + x) & 0x7ff];
 			for(j = 0; j < 8; j++ )
 			{
 				line = gfx[code*8 + j];

@@ -124,19 +124,19 @@ public:
 	wswan_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	VDP vdp;
-	UINT8 ws_portram[256];
-	UINT8 *ROMMap[256];
-	UINT32 ROMBanks;
-	UINT8 internal_eeprom[INTERNAL_EEPROM_SIZE];
-	UINT8 system_type;
-	EEPROM eeprom;
-	RTC rtc;
-	SoundDMA sound_dma;
-	UINT8 *ws_ram;
-	UINT8 *ws_bios_bank;
-	UINT8 bios_disabled;
-	int pal[16][16];
+	VDP m_vdp;
+	UINT8 m_ws_portram[256];
+	UINT8 *m_ROMMap[256];
+	UINT32 m_ROMBanks;
+	UINT8 m_internal_eeprom[INTERNAL_EEPROM_SIZE];
+	UINT8 m_system_type;
+	EEPROM m_eeprom;
+	RTC m_rtc;
+	SoundDMA m_sound_dma;
+	UINT8 *m_ws_ram;
+	UINT8 *m_ws_bios_bank;
+	UINT8 m_bios_disabled;
+	int m_pal[16][16];
 };
 
 

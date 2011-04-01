@@ -27,8 +27,8 @@ VIDEO_START( pcw )
 	rect.max_x = PCW_PRINTER_WIDTH - 1;
 	rect.max_y = PCW_PRINTER_HEIGHT - 1;
 
-	state->prn_output = auto_bitmap_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT,BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(state->prn_output,&rect,1);
+	state->m_prn_output = auto_bitmap_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT,BITMAP_FORMAT_INDEXED16);
+	bitmap_fill(state->m_prn_output,&rect,1);
 }
 
 /* two colours */
@@ -68,7 +68,7 @@ SCREEN_UPDATE( pcw )
 	pen1 = 1;
 
 	/* invert? */
-	if (state->vdu_video_control_register & (1<<7))
+	if (state->m_vdu_video_control_register & (1<<7))
 	{
 		/* yes */
 		pen1^=1;
@@ -76,7 +76,7 @@ SCREEN_UPDATE( pcw )
 	}
 
 	/* video enable? */
-	if ((state->vdu_video_control_register & (1<<6))!=0)
+	if ((state->m_vdu_video_control_register & (1<<6))!=0)
 	{
 		rectangle rect;
 
@@ -95,7 +95,7 @@ SCREEN_UPDATE( pcw )
 		bitmap_fill(bitmap, &rect, pen0);
 
 		/* offset to start in table */
-		roller_ram_offs = (state->roller_ram_offset<<1);
+		roller_ram_offs = (state->m_roller_ram_offset<<1);
 
 		for (y=0; y<256; y++)
 		{
@@ -105,7 +105,7 @@ SCREEN_UPDATE( pcw )
 
 			x = PCW_BORDER_WIDTH;
 
-			roller_ram_ptr = ram_get_ptr(screen->machine().device(RAM_TAG)) + state->roller_ram_addr + roller_ram_offs;
+			roller_ram_ptr = ram_get_ptr(screen->machine().device(RAM_TAG)) + state->m_roller_ram_addr + roller_ram_offs;
 
 			/* get line address */
 			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */
@@ -195,15 +195,15 @@ SCREEN_UPDATE( pcw_printer )
 	rect.min_x = rect.min_y = 0;
 	rect.max_x = PCW_PRINTER_WIDTH - 1;
 	rect.max_y = PCW_PRINTER_HEIGHT - 1;
-	feed = -(state->paper_feed / 2);
-	copyscrollbitmap(bitmap,state->prn_output,0,NULL,1,&feed,&rect);
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->printer_headpos) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->printer_headpos) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-3,state->printer_headpos) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->printer_headpos-1) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->printer_headpos-1) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->printer_headpos+1) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->printer_headpos+1) = 0;
+	feed = -(state->m_paper_feed / 2);
+	copyscrollbitmap(bitmap,state->m_prn_output,0,NULL,1,&feed,&rect);
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->m_printer_headpos) = 0;
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->m_printer_headpos) = 0;
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-3,state->m_printer_headpos) = 0;
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->m_printer_headpos-1) = 0;
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->m_printer_headpos-1) = 0;
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->m_printer_headpos+1) = 0;
+	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->m_printer_headpos+1) = 0;
 	return 0;
 }
 

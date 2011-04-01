@@ -22,13 +22,13 @@ static void nc_card_save(device_image_interface &image)
 {
 	nc_state *state = image.device().machine().driver_data<nc_state>();
 	/* if there is no data to write, quit */
-	if (!state->card_ram || !state->card_size)
+	if (!state->m_card_ram || !state->m_card_size)
 		return;
 
 	logerror("attempting card save\n");
 
 	/* write data */
-	image.fwrite(state->card_ram, state->card_size);
+	image.fwrite(state->m_card_ram, state->m_card_size);
 
 	logerror("write succeeded!\r\n");
 }
@@ -70,7 +70,7 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 
 		if (data!=NULL)
 		{
-			state->card_size = datasize;
+			state->m_card_size = datasize;
 
 			/* read whole file */
 			image.fread(data, datasize);
@@ -79,9 +79,9 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 
 			logerror("File loaded!\r\n");
 
-			state->membank_card_ram_mask = nc_card_calculate_mask(datasize);
+			state->m_membank_card_ram_mask = nc_card_calculate_mask(datasize);
 
-			logerror("Mask: %02x\n",state->membank_card_ram_mask);
+			logerror("Mask: %02x\n",state->m_membank_card_ram_mask);
 
 			/* ok! */
 			return 1;
@@ -97,8 +97,8 @@ DEVICE_START( nc_pcmcia_card )
 	/* card not present */
 	nc_set_card_present_state(device->machine(), 0);
 	/* card ram NULL */
-	state->card_ram = NULL;
-	state->card_size = 0;
+	state->m_card_ram = NULL;
+	state->m_card_size = 0;
 }
 
 /* load pcmcia card */
@@ -108,12 +108,12 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 	/* filename specified */
 
 	/* attempt to load file */
-	if (nc_card_load(image, &state->card_ram))
+	if (nc_card_load(image, &state->m_card_ram))
 	{
-		if (state->card_ram!=NULL)
+		if (state->m_card_ram!=NULL)
 		{
 			/* card present! */
-			if (state->membank_card_ram_mask!=0)
+			if (state->m_membank_card_ram_mask!=0)
 			{
 				nc_set_card_present_state(image.device().machine(), 1);
 			}
@@ -132,12 +132,12 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 	nc_card_save(image);
 
 	/* free ram allocated to card */
-	if (state->card_ram!=NULL)
+	if (state->m_card_ram!=NULL)
 	{
-		free(state->card_ram);
-		state->card_ram = NULL;
+		free(state->m_card_ram);
+		state->m_card_ram = NULL;
 	}
-	state->card_size = 0;
+	state->m_card_size = 0;
 
 	/* set card not present state */
 	nc_set_card_present_state(image.device().machine(), 0);

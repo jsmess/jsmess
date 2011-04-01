@@ -34,14 +34,14 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	device_t *cassette;
+	device_t *m_cassette;
 	UINT8 *m_char_rom;
 
 
-	UINT16 pcg_addr;
-	UINT16 pcg_internal_addr;
-	UINT8 key_mux;
-	UINT8 memsel[4];
+	UINT16 m_pcg_addr;
+	UINT16 m_pcg_internal_addr;
+	UINT8 m_key_mux;
+	UINT8 m_memsel[4];
 };
 
 /* TODO */
@@ -111,8 +111,8 @@ static WRITE8_HANDLER( pcg_addr_w )
 {
 	a5105_state *state = space->machine().driver_data<a5105_state>();
 
-	state->pcg_addr = data << 3;
-	state->pcg_internal_addr = 0;
+	state->m_pcg_addr = data << 3;
+	state->m_pcg_internal_addr = 0;
 }
 
 static WRITE8_HANDLER( pcg_val_w )
@@ -120,12 +120,12 @@ static WRITE8_HANDLER( pcg_val_w )
 	UINT8 *gfx_data = space->machine().region("pcg")->base();
 	a5105_state *state = space->machine().driver_data<a5105_state>();
 
-	gfx_data[state->pcg_addr|state->pcg_internal_addr] = data;
+	gfx_data[state->m_pcg_addr|state->m_pcg_internal_addr] = data;
 
-	gfx_element_mark_dirty(space->machine().gfx[0], state->pcg_addr >> 3);
+	gfx_element_mark_dirty(space->machine().gfx[0], state->m_pcg_addr >> 3);
 
-	state->pcg_internal_addr++;
-	state->pcg_internal_addr&=7;
+	state->m_pcg_internal_addr++;
+	state->m_pcg_internal_addr&=7;
 }
 
 static READ8_HANDLER( key_r )
@@ -136,14 +136,14 @@ static READ8_HANDLER( key_r )
 	                                        "KEY8", "KEY9", "KEYA", "UNUSED",
 	                                        "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	return input_port_read(space->machine(), keynames[state->key_mux & 0x0f]);
+	return input_port_read(space->machine(), keynames[state->m_key_mux & 0x0f]);
 }
 
 static READ8_HANDLER( key_mux_r )
 {
 	a5105_state *state = space->machine().driver_data<a5105_state>();
 
-	return state->key_mux;
+	return state->m_key_mux;
 }
 
 static WRITE8_HANDLER( key_mux_w )
@@ -154,7 +154,7 @@ static WRITE8_HANDLER( key_mux_w )
 		---- xxxx keyboard mux
 	*/
 
-	state->key_mux = data;
+	state->m_key_mux = data;
 }
 
 static WRITE8_HANDLER( a5105_ab_w )
@@ -194,10 +194,10 @@ static READ8_HANDLER( a5105_memsel_r )
 	a5105_state *state = space->machine().driver_data<a5105_state>();
 	UINT8 res;
 
-	res = (state->memsel[0] & 3) << 0;
-	res|= (state->memsel[1] & 3) << 2;
-	res|= (state->memsel[2] & 3) << 4;
-	res|= (state->memsel[3] & 3) << 6;
+	res = (state->m_memsel[0] & 3) << 0;
+	res|= (state->m_memsel[1] & 3) << 2;
+	res|= (state->m_memsel[2] & 3) << 4;
+	res|= (state->m_memsel[3] & 3) << 6;
 
 	return res;
 }
@@ -206,12 +206,12 @@ static WRITE8_HANDLER( a5105_memsel_w )
 {
 	a5105_state *state = space->machine().driver_data<a5105_state>();
 
-	state->memsel[0] = (data & 0x03) >> 0;
-	state->memsel[1] = (data & 0x0c) >> 2;
-	state->memsel[2] = (data & 0x30) >> 4;
-	state->memsel[3] = (data & 0xc0) >> 6;
+	state->m_memsel[0] = (data & 0x03) >> 0;
+	state->m_memsel[1] = (data & 0x0c) >> 2;
+	state->m_memsel[2] = (data & 0x30) >> 4;
+	state->m_memsel[3] = (data & 0xc0) >> 6;
 
-	//printf("Memsel change to %02x %02x %02x %02x\n",state->memsel[0],state->memsel[1],state->memsel[2],state->memsel[3]);
+	//printf("Memsel change to %02x %02x %02x %02x\n",state->m_memsel[0],state->m_memsel[1],state->m_memsel[2],state->m_memsel[3]);
 }
 
 static ADDRESS_MAP_START( a5105_io , AS_IO, 8)

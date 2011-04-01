@@ -40,17 +40,17 @@ public:
 	pippin_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 unk1_test;
-	UINT8 portb_data;
+	UINT16 m_unk1_test;
+	UINT8 m_portb_data;
 };
 
 
 static READ64_HANDLER( unk1_r )
 {
 	pippin_state *state = space->machine().driver_data<pippin_state>();
-	state->unk1_test ^= 0x0400; //PC=ff808760
+	state->m_unk1_test ^= 0x0400; //PC=ff808760
 
-	return state->unk1_test << 16 | 0;
+	return state->m_unk1_test << 16 | 0;
 }
 
 static READ64_HANDLER( unk2_r )
@@ -67,13 +67,13 @@ static READ64_HANDLER( adb_portb_r )
 	pippin_state *state = space->machine().driver_data<pippin_state>();
 	if(ACCESSING_BITS_56_63)
 	{
-		if(state->portb_data == 0x10)
+		if(state->m_portb_data == 0x10)
 			return (UINT64)0x08 << 56;
 
-		if(state->portb_data == 0x38)	//fff04c80
+		if(state->m_portb_data == 0x38)	//fff04c80
 			return (UINT64)0x20 << 56; //almost sure this is wrong
 
-		//printf("PORTB R %02x\n",state->portb_data);
+		//printf("PORTB R %02x\n",state->m_portb_data);
 
 
 		return 0;
@@ -87,7 +87,7 @@ static WRITE64_HANDLER( adb_portb_w )
 	pippin_state *state = space->machine().driver_data<pippin_state>();
 	if(ACCESSING_BITS_56_63)
 	{
-		state->portb_data = (UINT64)data >> 56;
+		state->m_portb_data = (UINT64)data >> 56;
 	}
 }
 

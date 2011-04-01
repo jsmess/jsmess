@@ -26,15 +26,15 @@ public:
 	scv_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8	*vram;
-	UINT8	porta;
-	UINT8	portc;
-	emu_timer	*vb_timer;
-	UINT8	*cart_rom;
-	UINT32	cart_rom_size;
-	UINT8	*cart_ram;
-	UINT32	cart_ram_size;
-	bool	cart_ram_enabled;
+	UINT8	*m_vram;
+	UINT8	m_porta;
+	UINT8	m_portc;
+	emu_timer	*m_vb_timer;
+	UINT8	*m_cart_rom;
+	UINT32	m_cart_rom_size;
+	UINT8	*m_cart_ram;
+	UINT32	m_cart_ram_size;
+	bool	m_cart_ram_enabled;
 };
 
 
@@ -43,7 +43,7 @@ public:
 static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE_MEMBER(scv_state, vram )	/* VRAM + 4 registers */
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE_MEMBER(scv_state, m_vram )	/* VRAM + 4 registers */
 
 	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE( "upd1771c", upd1771_w )
 
@@ -154,9 +154,9 @@ static WRITE8_HANDLER( scv_cart_ram_w )
 	scv_state *state = space->machine().driver_data<scv_state>();
 
 	/* Check if cartridge ram is enabled */
-	if ( state->cart_ram_enabled )
+	if ( state->m_cart_ram_enabled )
 	{
-		state->cart_ram[offset] = data;
+		state->m_cart_ram[offset] = data;
 	}
 }
 
@@ -166,12 +166,12 @@ static WRITE8_HANDLER( scv_cart_ram2_w )
 	scv_state *state = space->machine().driver_data<scv_state>();
 
 	/* Check if cartridge ram is enabled */
-	if ( state->cart_ram_enabled )
+	if ( state->m_cart_ram_enabled )
 	{
-		if ( state->cart_ram_size > 0x1000 )
+		if ( state->m_cart_ram_size > 0x1000 )
 			offset += 0x1000;
 
-		state->cart_ram[offset] = data;
+		state->m_cart_ram[offset] = data;
 	}
 }
 
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( scv_porta_w )
 {
 	scv_state *state = space->machine().driver_data<scv_state>();
 
-	state->porta = data;
+	state->m_porta = data;
 }
 
 
@@ -189,28 +189,28 @@ static READ8_HANDLER( scv_portb_r )
 	scv_state *state = space->machine().driver_data<scv_state>();
 	UINT8 data = 0xff;
 
-	if ( ! ( state->porta & 0x01 ) )
+	if ( ! ( state->m_porta & 0x01 ) )
 		data &= input_port_read( space->machine(), "PA0" );
 
-	if ( ! ( state->porta & 0x02 ) )
+	if ( ! ( state->m_porta & 0x02 ) )
 		data &= input_port_read( space->machine(), "PA1" );
 
-	if ( ! ( state->porta & 0x04 ) )
+	if ( ! ( state->m_porta & 0x04 ) )
 		data &= input_port_read( space->machine(), "PA2" );
 
-	if ( ! ( state->porta & 0x08 ) )
+	if ( ! ( state->m_porta & 0x08 ) )
 		data &= input_port_read( space->machine(), "PA3" );
 
-	if ( ! ( state->porta & 0x10 ) )
+	if ( ! ( state->m_porta & 0x10 ) )
 		data &= input_port_read( space->machine(), "PA4" );
 
-	if ( ! ( state->porta & 0x20 ) )
+	if ( ! ( state->m_porta & 0x20 ) )
 		data &= input_port_read( space->machine(), "PA5" );
 
-	if ( ! ( state->porta & 0x40 ) )
+	if ( ! ( state->m_porta & 0x40 ) )
 		data &= input_port_read( space->machine(), "PA6" );
 
-	if ( ! ( state->porta & 0x80 ) )
+	if ( ! ( state->m_porta & 0x80 ) )
 		data &= input_port_read( space->machine(), "PA7" );
 
 	return data;
@@ -220,7 +220,7 @@ static READ8_HANDLER( scv_portb_r )
 static READ8_HANDLER( scv_portc_r )
 {
 	scv_state *state = space->machine().driver_data<scv_state>();
-	UINT8 data = state->portc;
+	UINT8 data = state->m_portc;
 
 	data = ( data & 0xfe ) | ( input_port_read( space->machine(), "PC0" ) & 0x01 );
 
@@ -232,68 +232,68 @@ static void scv_set_banks( running_machine &machine )
 {
 	scv_state *state = machine.driver_data<scv_state>();
 
-	state->cart_ram_enabled = false;
+	state->m_cart_ram_enabled = false;
 
-	switch( state->cart_rom_size )
+	switch( state->m_cart_rom_size )
 	{
 	case 0:
 	case 0x2000:
-		memory_set_bankptr( machine, "bank0", state->cart_rom );
-		memory_set_bankptr( machine, "bank1", state->cart_rom );
-		memory_set_bankptr( machine, "bank2", state->cart_rom );
-		memory_set_bankptr( machine, "bank3", state->cart_rom );
-		memory_set_bankptr( machine, "bank4", state->cart_rom + 0x1000 );
+		memory_set_bankptr( machine, "bank0", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank1", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank2", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank3", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank4", state->m_cart_rom + 0x1000 );
 		break;
 	case 0x4000:
-		memory_set_bankptr( machine, "bank0", state->cart_rom );
-		memory_set_bankptr( machine, "bank1", state->cart_rom + 0x2000 );
-		memory_set_bankptr( machine, "bank2", state->cart_rom );
-		memory_set_bankptr( machine, "bank3", state->cart_rom + 0x2000 );
-		memory_set_bankptr( machine, "bank4", state->cart_rom + 0x3000 );
+		memory_set_bankptr( machine, "bank0", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank1", state->m_cart_rom + 0x2000 );
+		memory_set_bankptr( machine, "bank2", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank3", state->m_cart_rom + 0x2000 );
+		memory_set_bankptr( machine, "bank4", state->m_cart_rom + 0x3000 );
 		break;
 	case 0x8000:
-		memory_set_bankptr( machine, "bank0", state->cart_rom );
-		memory_set_bankptr( machine, "bank1", state->cart_rom + 0x2000 );
-		memory_set_bankptr( machine, "bank2", state->cart_rom + 0x4000 );
-		memory_set_bankptr( machine, "bank3", state->cart_rom + 0x6000 );
-		memory_set_bankptr( machine, "bank4", state->cart_rom + 0x7000 );
+		memory_set_bankptr( machine, "bank0", state->m_cart_rom );
+		memory_set_bankptr( machine, "bank1", state->m_cart_rom + 0x2000 );
+		memory_set_bankptr( machine, "bank2", state->m_cart_rom + 0x4000 );
+		memory_set_bankptr( machine, "bank3", state->m_cart_rom + 0x6000 );
+		memory_set_bankptr( machine, "bank4", state->m_cart_rom + 0x7000 );
 		break;
 	case 0x10000:
-		memory_set_bankptr( machine, "bank0", state->cart_rom + ( ( state->portc & 0x20 ) ? 0x8000 : 0 ) );
-		memory_set_bankptr( machine, "bank1", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xa000 : 0x2000 ) );
-		memory_set_bankptr( machine, "bank2", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xc000 : 0x4000 ) );
-		memory_set_bankptr( machine, "bank3", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xe000 : 0x6000 ) );
-		memory_set_bankptr( machine, "bank4", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xf000 : 0x7000 ) );
+		memory_set_bankptr( machine, "bank0", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0x8000 : 0 ) );
+		memory_set_bankptr( machine, "bank1", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xa000 : 0x2000 ) );
+		memory_set_bankptr( machine, "bank2", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xc000 : 0x4000 ) );
+		memory_set_bankptr( machine, "bank3", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
+		memory_set_bankptr( machine, "bank4", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
 		break;
 	case 0x20000:	/* Pole Position 2 */
-		int base = ( ( state->portc >> 5 ) & 0x03 ) * 0x8000 ;
-		memory_set_bankptr( machine, "bank0", state->cart_rom + base + 0 );
-		memory_set_bankptr( machine, "bank1", state->cart_rom + base + 0x2000 );
-		memory_set_bankptr( machine, "bank2", state->cart_rom + base + 0x4000 );
-		memory_set_bankptr( machine, "bank3", state->cart_rom + base + 0x6000 );
-		memory_set_bankptr( machine, "bank4", state->cart_rom + base + 0x7000 );
+		int base = ( ( state->m_portc >> 5 ) & 0x03 ) * 0x8000 ;
+		memory_set_bankptr( machine, "bank0", state->m_cart_rom + base + 0 );
+		memory_set_bankptr( machine, "bank1", state->m_cart_rom + base + 0x2000 );
+		memory_set_bankptr( machine, "bank2", state->m_cart_rom + base + 0x4000 );
+		memory_set_bankptr( machine, "bank3", state->m_cart_rom + base + 0x6000 );
+		memory_set_bankptr( machine, "bank4", state->m_cart_rom + base + 0x7000 );
 		/* On-cart RAM is enabled when PC6 is high */
-		if ( state->cart_ram && state->portc & 0x40 )
+		if ( state->m_cart_ram && state->m_portc & 0x40 )
 		{
-			state->cart_ram_enabled = true;
-			memory_set_bankptr( machine, "bank4", state->cart_ram );
+			state->m_cart_ram_enabled = true;
+			memory_set_bankptr( machine, "bank4", state->m_cart_ram );
 		}
 		break;
 	}
 
 	/* Check if cartridge RAM is available and should be enabled */
-	if ( state->cart_rom_size < 0x20000 && state->cart_ram && state->cart_ram_size && ( state->portc & 0x20 ) )
+	if ( state->m_cart_rom_size < 0x20000 && state->m_cart_ram && state->m_cart_ram_size && ( state->m_portc & 0x20 ) )
 	{
-		if ( state->cart_ram_size == 0x1000 )
+		if ( state->m_cart_ram_size == 0x1000 )
 		{
-			memory_set_bankptr( machine, "bank4", state->cart_ram );
+			memory_set_bankptr( machine, "bank4", state->m_cart_ram );
 		}
 		else
 		{
-			memory_set_bankptr( machine, "bank3", state->cart_ram );
-			memory_set_bankptr( machine, "bank4", state->cart_ram + 0x1000 );
+			memory_set_bankptr( machine, "bank3", state->m_cart_ram );
+			memory_set_bankptr( machine, "bank4", state->m_cart_ram + 0x1000 );
 		}
-		state->cart_ram_enabled = true;
+		state->m_cart_ram_enabled = true;
 	}
 
 }
@@ -304,10 +304,10 @@ static WRITE8_HANDLER( scv_portc_w )
 	scv_state *state = space->machine().driver_data<scv_state>();
 
 	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(space->machine().device("maincpu")), data );
-	state->portc = data;
+	state->m_portc = data;
 
 	scv_set_banks( space->machine() );
-	upd1771_pcm_w( space->machine().device( "upd1771c" ), state->portc & 0x08 );
+	upd1771_pcm_w( space->machine().device( "upd1771c" ), state->m_portc & 0x08 );
 }
 
 
@@ -315,10 +315,10 @@ static DEVICE_START( scv_cart )
 {
 	scv_state *state = device->machine().driver_data<scv_state>();
 
-	state->cart_rom = device->machine().region( "cart" )->base();
-	state->cart_rom_size = 0;
-	state->cart_ram = NULL;
-	state->cart_ram_size = 0;
+	state->m_cart_rom = device->machine().region( "cart" )->base();
+	state->m_cart_rom_size = 0;
+	state->m_cart_ram = NULL;
+	state->m_cart_ram_size = 0;
 
 	scv_set_banks( device->machine() );
 }
@@ -345,17 +345,17 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		state->cart_rom = cart;
-		state->cart_rom_size = size;
-		state->cart_ram = NULL;
-		state->cart_ram_size = 0;
+		state->m_cart_rom = cart;
+		state->m_cart_rom_size = size;
+		state->m_cart_ram = NULL;
+		state->m_cart_ram_size = 0;
 	}
 	else
 	{
-		state->cart_rom = image.get_software_region( "rom" );
-		state->cart_rom_size = image.get_software_region_length( "rom" );
-		state->cart_ram = image.get_software_region( "ram" );
-		state->cart_ram_size = image.get_software_region_length( "ram" );
+		state->m_cart_rom = image.get_software_region( "rom" );
+		state->m_cart_rom_size = image.get_software_region_length( "rom" );
+		state->m_cart_ram = image.get_software_region( "ram" );
+		state->m_cart_ram_size = image.get_software_region_length( "ram" );
 	}
 
 	scv_set_banks( image.device().machine() );
@@ -431,7 +431,7 @@ static TIMER_CALLBACK( scv_vb_callback )
 		break;
 	}
 
-	state->vb_timer->adjust( machine.primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
+	state->m_vb_timer->adjust( machine.primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
 }
 
 
@@ -455,10 +455,10 @@ INLINE void draw_sprite( scv_state *state, bitmap_t *bitmap, UINT8 x, UINT8 y, U
 	y += clip_y * 2;
 	for ( j = clip_y * 4; j < 32; j += 4 )
 	{
-		UINT8 pat0 = state->vram[ tile_idx * 32 + j + 0 ];
-		UINT8 pat1 = state->vram[ tile_idx * 32 + j + 1 ];
-		UINT8 pat2 = state->vram[ tile_idx * 32 + j + 2 ];
-		UINT8 pat3 = state->vram[ tile_idx * 32 + j + 3 ];
+		UINT8 pat0 = state->m_vram[ tile_idx * 32 + j + 0 ];
+		UINT8 pat1 = state->m_vram[ tile_idx * 32 + j + 1 ];
+		UINT8 pat2 = state->m_vram[ tile_idx * 32 + j + 2 ];
+		UINT8 pat3 = state->m_vram[ tile_idx * 32 + j + 3 ];
 
 		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
 		{
@@ -562,12 +562,12 @@ static SCREEN_UPDATE( scv )
 {
 	scv_state *state = screen->machine().driver_data<scv_state>();
 	int x, y;
-	UINT8 fg = state->vram[0x1403] >> 4;
-	UINT8 bg = state->vram[0x1403] & 0x0f;
-	UINT8 gr_fg = state->vram[0x1401] >> 4;
-	UINT8 gr_bg = state->vram[0x1401] & 0x0f;
-	int clip_x = ( state->vram[0x1402] & 0x0f ) * 2;
-	int clip_y = state->vram[0x1402] >> 4;
+	UINT8 fg = state->m_vram[0x1403] >> 4;
+	UINT8 bg = state->m_vram[0x1403] & 0x0f;
+	UINT8 gr_fg = state->m_vram[0x1401] >> 4;
+	UINT8 gr_bg = state->m_vram[0x1401] & 0x0f;
+	int clip_x = ( state->m_vram[0x1402] & 0x0f ) * 2;
+	int clip_y = state->m_vram[0x1402] >> 4;
 
 	/* Clear the screen */
 	bitmap_fill( bitmap, cliprect, gr_bg );
@@ -578,19 +578,19 @@ static SCREEN_UPDATE( scv )
 		int text_y = 0;
 
 		if ( y < clip_y )
-			text_y = ( state->vram[0x1400] & 0x80 ) ? 0 : 1;
+			text_y = ( state->m_vram[0x1400] & 0x80 ) ? 0 : 1;
 		else
-			text_y = ( state->vram[0x1400] & 0x80 ) ? 1 : 0;
+			text_y = ( state->m_vram[0x1400] & 0x80 ) ? 1 : 0;
 
 		for ( x = 0; x < 32; x++ )
 		{
 			int text_x = 0;
-			UINT8 d = state->vram[ 0x1000 + y * 32 + x ];
+			UINT8 d = state->m_vram[ 0x1000 + y * 32 + x ];
 
 			if ( x < clip_x )
-				text_x = ( state->vram[0x1400] & 0x40 ) ? 0 : 1;
+				text_x = ( state->m_vram[0x1400] & 0x40 ) ? 0 : 1;
 			else
-				text_x = ( state->vram[0x1400] & 0x40 ) ? 1 : 0;
+				text_x = ( state->m_vram[0x1400] & 0x40 ) ? 1 : 0;
 
 			if ( text_x && text_y )
 			{
@@ -600,7 +600,7 @@ static SCREEN_UPDATE( scv )
 			}
 			else
 			{
-				switch ( state->vram[0x1400] & 0x03 )
+				switch ( state->m_vram[0x1400] & 0x03 )
 				{
 				case 0x01:		/* Semi graphics mode */
 					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg );
@@ -624,20 +624,20 @@ static SCREEN_UPDATE( scv )
 	}
 
 	/* Draw sprites if enabled */
-	if ( state->vram[0x1400] & 0x10 )
+	if ( state->m_vram[0x1400] & 0x10 )
 	{
 		int i;
 
 		for ( i = 0; i < 128; i++ )
 		{
-			UINT8 spr_y = state->vram[ 0x1200 + i * 4 ] & 0xfe;
-			UINT8 y_32 = state->vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
-			UINT8 clip = state->vram[ 0x1201 + i * 4 ] >> 4;
-			UINT8 col = state->vram[ 0x1201 + i * 4 ] & 0x0f;
-			UINT8 spr_x = state->vram[ 0x1202 + i * 4 ] & 0xfe;
-			UINT8 x_32 = state->vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
-			UINT8 tile_idx = state->vram[ 0x1203 + i * 4 ] & 0x7f;
-			UINT8 half = state->vram[ 0x1203 + i * 4] & 0x80;
+			UINT8 spr_y = state->m_vram[ 0x1200 + i * 4 ] & 0xfe;
+			UINT8 y_32 = state->m_vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
+			UINT8 clip = state->m_vram[ 0x1201 + i * 4 ] >> 4;
+			UINT8 col = state->m_vram[ 0x1201 + i * 4 ] & 0x0f;
+			UINT8 spr_x = state->m_vram[ 0x1202 + i * 4 ] & 0xfe;
+			UINT8 x_32 = state->m_vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
+			UINT8 tile_idx = state->m_vram[ 0x1203 + i * 4 ] & 0x7f;
+			UINT8 half = state->m_vram[ 0x1203 + i * 4] & 0x80;
 			UINT8 left = 1;
 			UINT8 right = 1;
 			UINT8 top = 1;
@@ -681,7 +681,7 @@ static SCREEN_UPDATE( scv )
 			}
 
 			/* Check if 2 color sprites are enabled */
-			if ( ( state->vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
+			if ( ( state->m_vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
 				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
@@ -728,7 +728,7 @@ static MACHINE_START( scv )
 {
 	scv_state *state = machine.driver_data<scv_state>();
 
-	state->vb_timer = machine.scheduler().timer_alloc(FUNC(scv_vb_callback));
+	state->m_vb_timer = machine.scheduler().timer_alloc(FUNC(scv_vb_callback));
 }
 
 
@@ -736,7 +736,7 @@ static MACHINE_RESET( scv )
 {
 	scv_state *state = machine.driver_data<scv_state>();
 
-	state->vb_timer->adjust( machine.primary_screen->time_until_pos(0, 0 ) );
+	state->m_vb_timer->adjust( machine.primary_screen->time_until_pos(0, 0 ) );
 }
 
 

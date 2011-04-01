@@ -242,7 +242,7 @@ static READ8_HANDLER( osi600_keyboard_r )
 
 	for (bit = 0; bit < 8; bit++)
 	{
-		if (!BIT(state->keylatch, bit)) data &= input_port_read(space->machine(), keynames[bit]);
+		if (!BIT(state->m_keylatch, bit)) data &= input_port_read(space->machine(), keynames[bit]);
 	}
 
 	return data;
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( osi600_keyboard_w )
 	device_t *discrete = space->machine().device("discrete");
 	osi_state *state = space->machine().driver_data<osi_state>();
 
-	state->keylatch = data;
+	state->m_keylatch = data;
 
 	discrete_sound_w(discrete, NODE_01, (data >> 2) & 0x0f);
 }
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( uk101_keyboard_w )
 {
 	osi_state *state = space->machine().driver_data<osi_state>();
 
-	state->keylatch = data;
+	state->m_keylatch = data;
 }
 
 static WRITE8_HANDLER( osi600_ctrl_w )
@@ -285,8 +285,8 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 	device_t *discrete = space->machine().device("discrete");
 	osi_state *state = space->machine().driver_data<osi_state>();
 
-	state->_32 = BIT(data, 0);
-	state->coloren = BIT(data, 1);
+	state->m_32 = BIT(data, 0);
+	state->m_coloren = BIT(data, 1);
 
 	discrete_sound_w(discrete, NODE_10, BIT(data, 4));
 }
@@ -358,7 +358,7 @@ static void osi470_index_callback(device_t *controller, device_t *img, int state
 {
 	osi_state *driver_state = img->machine().driver_data<osi_state>();
 
-	driver_state->fdc_index = state;
+	driver_state->m_fdc_index = state;
 }
 
 static READ8_DEVICE_HANDLER( osi470_pia_a_r )
@@ -381,7 +381,7 @@ static READ8_DEVICE_HANDLER( osi470_pia_a_r )
 
 	osi_state *state = device->machine().driver_data<osi_state>();
 
-	return (state->fdc_index << 7);
+	return (state->m_fdc_index << 7);
 }
 
 static WRITE8_DEVICE_HANDLER( osi470_pia_a_w )
@@ -461,7 +461,7 @@ static const pia6821_interface pia_dummy_intf =
 static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, m_video_ram)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi600_keyboard_r, osi600_keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_data_r, acia6850_data_w)
@@ -471,7 +471,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, m_video_ram)
 	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READWRITE(osi600_keyboard_r, uk101_keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_data_r, acia6850_data_w)
@@ -484,8 +484,8 @@ static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
 	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
 	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_r, pia6821_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(osi_state, color_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, m_video_ram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(osi_state, m_color_ram)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(osi600_ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi600_keyboard_r, osi600_keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_stat_r, acia6850_ctrl_w)
@@ -504,8 +504,8 @@ static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
 	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
 	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_r, pia6821_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(osi_state, color_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, m_video_ram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(osi_state, m_color_ram)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(osi600_ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi600_keyboard_r, osi600_keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_stat_r, acia6850_ctrl_w)
@@ -617,14 +617,14 @@ static READ_LINE_DEVICE_HANDLER( cassette_rx )
 {
 	osi_state *driver_state = device->machine().driver_data<osi_state>();
 
-	return (cassette_input(driver_state->cassette) > 0.0) ? 1 : 0;
+	return (cassette_input(driver_state->m_cassette) > 0.0) ? 1 : 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cassette_tx )
 {
 	osi_state *driver_state = device->machine().driver_data<osi_state>();
 
-	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
+	cassette_output(driver_state->m_cassette, state ? +1.0 : -1.0);
 }
 
 static ACIA6850_INTERFACE( osi600_acia_intf )
@@ -670,7 +670,7 @@ static MACHINE_START( osi600 )
 	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->cassette = machine.device(CASSETTE_TAG);
+	state->m_cassette = machine.device(CASSETTE_TAG);
 
 	/* configure RAM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine.region(M6502_TAG)->base(), 0);
@@ -689,8 +689,8 @@ static MACHINE_START( osi600 )
 	}
 
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
-	state->save_pointer(NAME(state->video_ram), OSI600_VIDEORAM_SIZE);
+	state->save_item(NAME(state->m_keylatch));
+	state->save_pointer(NAME(state->m_video_ram), OSI600_VIDEORAM_SIZE);
 }
 
 static MACHINE_START( c1p )
@@ -700,7 +700,7 @@ static MACHINE_START( c1p )
 	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->cassette = machine.device(CASSETTE_TAG);
+	state->m_cassette = machine.device(CASSETTE_TAG);
 
 	/* configure RAM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine.region(M6502_TAG)->base(), 0);
@@ -719,11 +719,11 @@ static MACHINE_START( c1p )
 	}
 
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
-	state->save_item(NAME(state->_32));
-	state->save_item(NAME(state->coloren));
-	state->save_pointer(NAME(state->video_ram), OSI600_VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->color_ram), OSI630_COLORRAM_SIZE);
+	state->save_item(NAME(state->m_keylatch));
+	state->save_item(NAME(state->m_32));
+	state->save_item(NAME(state->m_coloren));
+	state->save_pointer(NAME(state->m_video_ram), OSI600_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->m_color_ram), OSI630_COLORRAM_SIZE);
 }
 
 static MACHINE_START( c1pmf )

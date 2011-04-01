@@ -34,15 +34,15 @@ static void ffe_irq( device_t *device, int scanline, int vblank, int blanked )
 
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
-	if (state->IRQ_enable)
+	if (state->m_IRQ_enable)
 	{
-		if ((0xffff - state->IRQ_count) < 114)
+		if ((0xffff - state->m_IRQ_count) < 114)
 		{
-			device_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-			state->IRQ_count = 0xffff;
-			state->IRQ_enable = 0;
+			device_set_input_line(state->m_maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			state->m_IRQ_count = 0xffff;
+			state->m_IRQ_enable = 0;
 		}
-		state->IRQ_count -= 114;
+		state->m_IRQ_count -= 114;
 	}
 }
 
@@ -54,7 +54,7 @@ static WRITE8_HANDLER( mapper6_l_w )
 	switch (offset)
 	{
 		case 0x1fe:
-			state->mmc_latch1 = data & 0x80;
+			state->m_mmc_latch1 = data & 0x80;
 			set_nt_mirroring(space->machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
@@ -62,14 +62,14 @@ static WRITE8_HANDLER( mapper6_l_w )
 			break;
 
 		case 0x401:
-			state->IRQ_enable = data & 0x01;
+			state->m_IRQ_enable = data & 0x01;
 			break;
 		case 0x402:
-			state->IRQ_count = (state->IRQ_count & 0xff00) | data;
+			state->m_IRQ_count = (state->m_IRQ_count & 0xff00) | data;
 			break;
 		case 0x403:
-			state->IRQ_enable = 1;
-			state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
+			state->m_IRQ_enable = 1;
+			state->m_IRQ_count = (state->m_IRQ_count & 0x00ff) | (data << 8);
 			break;
 	}
 }
@@ -79,15 +79,15 @@ static WRITE8_HANDLER( mapper6_w )
 	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!state->mmc_latch1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
+	if (!state->m_mmc_latch1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
 		prg16_89ab(space->machine(), data >> 2);
 		// chr8(space->machine(), data & 0x03, ???);
 		// due to lack of info on the exact behavior, we simply act as if mmc_latch1=1
-		if (state->mmc_chr_source == CHRROM)
+		if (state->m_mmc_chr_source == CHRROM)
 			chr8(space->machine(), data & 0x03, CHRROM);
 	}
-	else if (state->mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
+	else if (state->m_mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
 		chr8(space->machine(), data, CHRROM);
 }
 
@@ -137,14 +137,14 @@ static WRITE8_HANDLER( mapper17_l_w )
 			break;
 
 		case 0x401:
-			state->IRQ_enable = data & 0x01;
+			state->m_IRQ_enable = data & 0x01;
 			break;
 		case 0x402:
-			state->IRQ_count = (state->IRQ_count & 0xff00) | data;
+			state->m_IRQ_count = (state->m_IRQ_count & 0xff00) | data;
 			break;
 		case 0x403:
-			state->IRQ_enable = 1;
-			state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
+			state->m_IRQ_enable = 1;
+			state->m_IRQ_count = (state->m_IRQ_count & 0x00ff) | (data << 8);
 			break;
 
 		case 0x404:

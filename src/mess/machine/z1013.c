@@ -20,13 +20,13 @@ MACHINE_RESET( z1013 )
 {
 	z1013_state *state = machine.driver_data<z1013_state>();
 	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xF000);
-	state->keyboard_part = 0;
-	state->keyboard_line = 0;
+	state->m_keyboard_part = 0;
+	state->m_keyboard_line = 0;
 }
 
 WRITE8_HANDLER(z1013_keyboard_w) {
 	z1013_state *state = space->machine().driver_data<z1013_state>();
-	state->keyboard_line	= data;
+	state->m_keyboard_line	= data;
 }
 
 static READ8_DEVICE_HANDLER (z1013_port_b_r)
@@ -36,8 +36,8 @@ static READ8_DEVICE_HANDLER (z1013_port_b_r)
 		"LINE0", "LINE1", "LINE2", "LINE3",
 		"LINE4", "LINE5", "LINE6", "LINE7"
 	};
-	UINT8 data = input_port_read(device->machine(), keynames[state->keyboard_line & 7]);
-	if (state->keyboard_part==0x10) {
+	UINT8 data = input_port_read(device->machine(), keynames[state->m_keyboard_line & 7]);
+	if (state->m_keyboard_part==0x10) {
 		return (data >> 4) & 0x0f;
 	} else {
 		return data & 0x0f;
@@ -47,7 +47,7 @@ static READ8_DEVICE_HANDLER (z1013_port_b_r)
 static WRITE8_DEVICE_HANDLER (z1013_port_b_w)
 {
 	z1013_state *state = device->machine().driver_data<z1013_state>();
-	state->keyboard_part = data;
+	state->m_keyboard_part = data;
 }
 const z80pio_interface z1013_z80pio_intf =
 {

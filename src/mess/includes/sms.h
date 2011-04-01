@@ -23,86 +23,86 @@ public:
 	: driver_device(machine, config) { }
 
 	// device_ts
-	device_t *main_cpu;
-	device_t *control_cpu;
-	device_t *vdp;
-	device_t *ym;
-	device_t *main_scr;
-	device_t *left_lcd;
-	device_t *right_lcd;
+	device_t *m_main_cpu;
+	device_t *m_control_cpu;
+	device_t *m_vdp;
+	device_t *m_ym;
+	device_t *m_main_scr;
+	device_t *m_left_lcd;
+	device_t *m_right_lcd;
 
-	UINT8 bios_page_count;
-	UINT8 fm_detect;
-	UINT8 ctrl_reg;
-	int paused;
-	UINT8 bios_port;
-	UINT8 *BIOS;
-	UINT8 *mapper_ram;
-	UINT8 mapper[4];
+	UINT8 m_bios_page_count;
+	UINT8 m_fm_detect;
+	UINT8 m_ctrl_reg;
+	int m_paused;
+	UINT8 m_bios_port;
+	UINT8 *m_BIOS;
+	UINT8 *m_mapper_ram;
+	UINT8 m_mapper[4];
 	// we are going to use 1-6, same as bank numbers. Notice, though, that most mappers
 	// only work on 16K banks and, hence, banks 4-6 are not always directly set
 	// (they often use bank3 + 0x2000 and bank5 + 0x2000)
-	UINT8 *banking_bios[7];
-	UINT8 *banking_cart[7];
-	UINT8 *banking_none[7];
-	UINT8 gg_sio[5];
-	UINT8 store_control;
-	UINT8 input_port0;
-	UINT8 input_port1;
+	UINT8 *m_banking_bios[7];
+	UINT8 *m_banking_cart[7];
+	UINT8 *m_banking_none[7];
+	UINT8 m_gg_sio[5];
+	UINT8 m_store_control;
+	UINT8 m_input_port0;
+	UINT8 m_input_port1;
 
 	// for gamegear LCD persistence hack
-	bitmap_t *tmp_bitmap;
-	bitmap_t *prev_bitmap;
+	bitmap_t *m_tmp_bitmap;
+	bitmap_t *m_prev_bitmap;
 
 	// for 3D glass binocular hack
-	bitmap_t *prevleft_bitmap;
-	bitmap_t *prevright_bitmap;
+	bitmap_t *m_prevleft_bitmap;
+	bitmap_t *m_prevright_bitmap;
 
 	/* Model identifiers */
-	UINT8 is_gamegear;
-	UINT8 is_region_japan;
-	UINT8 has_bios_0400;
-	UINT8 has_bios_2000;
-	UINT8 has_bios_full;
-	UINT8 has_bios;
-	UINT8 has_fm;
+	UINT8 m_is_gamegear;
+	UINT8 m_is_region_japan;
+	UINT8 m_has_bios_0400;
+	UINT8 m_has_bios_2000;
+	UINT8 m_has_bios_full;
+	UINT8 m_has_bios;
+	UINT8 m_has_fm;
 
 	/* Data needed for Rapid Fire Unit support */
-	emu_timer *rapid_fire_timer;
-	UINT8 rapid_fire_state_1;
-	UINT8 rapid_fire_state_2;
+	emu_timer *m_rapid_fire_timer;
+	UINT8 m_rapid_fire_state_1;
+	UINT8 m_rapid_fire_state_2;
 
 	/* Data needed for Paddle Control controller */
-	UINT32 last_paddle_read_time;
-	UINT8 paddle_read_state;
+	UINT32 m_last_paddle_read_time;
+	UINT8 m_paddle_read_state;
 
 	/* Data needed for Sports Pad controller */
-	UINT32 last_sports_pad_time_1;
-	UINT32 last_sports_pad_time_2;
-	UINT8 sports_pad_state_1;
-	UINT8 sports_pad_state_2;
-	UINT8 sports_pad_last_data_1;
-	UINT8 sports_pad_last_data_2;
-	UINT8 sports_pad_1_x;
-	UINT8 sports_pad_1_y;
-	UINT8 sports_pad_2_x;
-	UINT8 sports_pad_2_y;
+	UINT32 m_last_sports_pad_time_1;
+	UINT32 m_last_sports_pad_time_2;
+	UINT8 m_sports_pad_state_1;
+	UINT8 m_sports_pad_state_2;
+	UINT8 m_sports_pad_last_data_1;
+	UINT8 m_sports_pad_last_data_2;
+	UINT8 m_sports_pad_1_x;
+	UINT8 m_sports_pad_1_y;
+	UINT8 m_sports_pad_2_x;
+	UINT8 m_sports_pad_2_y;
 
 	/* Data needed for Light Phaser */
-	emu_timer *lphaser_1_timer;
-	emu_timer *lphaser_2_timer;
-	UINT8 lphaser_1_latch;
-	UINT8 lphaser_2_latch;
-	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
+	emu_timer *m_lphaser_1_timer;
+	emu_timer *m_lphaser_2_timer;
+	UINT8 m_lphaser_1_latch;
+	UINT8 m_lphaser_2_latch;
+	int m_lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
 
 	/* Data needed for SegaScope (3D glasses) */
-	UINT8 sscope_state;
+	UINT8 m_sscope_state;
 
 	/* Data needed for Terebi Oekaki (TV Draw) */
-	UINT8 tvdraw_data;
+	UINT8 m_tvdraw_data;
 
 	/* Cartridge slot info */
-	UINT8 current_cartridge;
+	UINT8 m_current_cartridge;
 	struct
 	{
 		UINT8 *ROM;        /* Pointer to ROM image data */
@@ -113,7 +113,7 @@ public:
 		UINT8 *cartRAM;    /* additional on-cartridge RAM (64KB for Ernie Els Golf) */
 		UINT32 ram_size;   /* size of the on-cartridge RAM */
 		UINT8 ram_page;    /* currently swapped in cartridge RAM */
-	} cartridge[MAX_CARTRIDGES];
+	} m_cartridge[MAX_CARTRIDGES];
 };
 
 

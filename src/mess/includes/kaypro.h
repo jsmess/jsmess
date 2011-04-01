@@ -13,25 +13,25 @@ public:
 	kaypro_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	device_t *kayproii_z80pio_g;
-	device_t *kayproii_z80pio_s;
-	device_t *z80sio;
-	device_t *kaypro2x_z80sio;
-	device_t *printer;
-	device_t *fdc;
-	UINT8 system_port;
-	UINT8 mc6845_cursor[16];
-	UINT8 mc6845_reg[32];
-	UINT8 mc6845_ind;
-	device_t *mc6845;
-	const UINT8 *FNT;
-	UINT8 speed;
-	UINT8 flash;
-	UINT8 framecnt;
-	UINT16 cursor;
-	UINT16 mc6845_video_address;
-	struct _kay_kbd_t *kbd;
+	UINT8 *m_videoram;
+	device_t *m_kayproii_z80pio_g;
+	device_t *m_kayproii_z80pio_s;
+	device_t *m_z80sio;
+	device_t *m_kaypro2x_z80sio;
+	device_t *m_printer;
+	device_t *m_fdc;
+	UINT8 m_system_port;
+	UINT8 m_mc6845_cursor[16];
+	UINT8 m_mc6845_reg[32];
+	UINT8 m_mc6845_ind;
+	device_t *m_mc6845;
+	const UINT8 *m_FNT;
+	UINT8 m_speed;
+	UINT8 m_flash;
+	UINT8 m_framecnt;
+	UINT16 m_cursor;
+	UINT16 m_mc6845_video_address;
+	struct _kay_kbd_t *m_kbd;
 };
 
 

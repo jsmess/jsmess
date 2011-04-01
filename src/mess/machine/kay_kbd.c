@@ -283,7 +283,7 @@ static const UINT8 keyboard[8][10][8] = {
 MACHINE_RESET( kay_kbd )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd = auto_alloc_clear(machine, kay_kbd_t);
+	kay_kbd_t *kbd = state->m_kbd = auto_alloc_clear(machine, kay_kbd_t);
 
 	/* disable CapsLock LED initially */
 	set_led_status(machine, 1, 1);
@@ -306,7 +306,7 @@ MACHINE_RESET( kay_kbd )
 INTERRUPT_GEN( kay_kbd_interrupt )
 {
 	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd;
+	kay_kbd_t *kbd = state->m_kbd;
 	int mod, row, col, chg, newval;
 	UINT8 *keyrows = kbd->keyrows;
 
@@ -419,7 +419,7 @@ static WRITE8_HANDLER ( kaypro2_const_w )
 static void kay_kbd_in( running_machine &machine, UINT8 data )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd;
+	kay_kbd_t *kbd = state->m_kbd;
 	UINT8 kbd_head_old;
 
 	kbd_head_old = kbd->head;
@@ -443,7 +443,7 @@ UINT8 kay_kbd_c_r( running_machine &machine )
     d0 keyboard buffer empty - 1=key waiting to be used */
 
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd;
+	kay_kbd_t *kbd = state->m_kbd;
 	UINT8 data = kbd->control_status;
 
 	if( kbd->head != kbd->tail )
@@ -457,7 +457,7 @@ UINT8 kay_kbd_d_r( running_machine &machine )
 /* return next key in buffer */
 
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd;
+	kay_kbd_t *kbd = state->m_kbd;
 	UINT8 data = 0;
 
 	if (kbd->tail != kbd->head)
@@ -472,7 +472,7 @@ UINT8 kay_kbd_d_r( running_machine &machine )
 static TIMER_CALLBACK( kay_kbd_beepoff )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd;
+	kay_kbd_t *kbd = state->m_kbd;
 	beep_set_state(kbd->beeper, 0);
 	kbd->control_status |= 4;
 }
@@ -487,7 +487,7 @@ void kay_kbd_d_w( running_machine &machine, UINT8 data )
     16 - unmute */
 
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->kbd;
+	kay_kbd_t *kbd = state->m_kbd;
 	UINT16 length = 0;
 
 	if (data & 0x10)

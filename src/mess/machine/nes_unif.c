@@ -158,15 +158,15 @@ void unif_mapr_setup( running_machine &machine, const char *board )
 	if (unif_board == NULL)
 		fatalerror("Unknown UNIF board %s.", board);
 
-	state->pcb_id = unif_board->board_idx;
-	state->battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...
-	state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
-	state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
+	state->m_pcb_id = unif_board->board_idx;
+	state->m_battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...
+	state->m_battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
+	state->m_prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
 
 	if (unif_board->chrram <= CHRRAM_8)
-		state->vram_chunks = 1;
+		state->m_vram_chunks = 1;
 	else if (unif_board->chrram == CHRRAM_16)
-		state->vram_chunks = 2;
+		state->m_vram_chunks = 2;
 	else if (unif_board->chrram == CHRRAM_32)
-		state->vram_chunks = 4;
+		state->m_vram_chunks = 4;
 }

@@ -14,22 +14,22 @@ public:
 	micronic_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 kp_matrix;
-	UINT8 lcd_contrast;
-	UINT8 lcd_light;
-	UINT8 status_flag;
+	UINT8 *m_ram;
+	UINT8 m_kp_matrix;
+	UINT8 m_lcd_contrast;
+	UINT8 m_lcd_light;
+	UINT8 m_status_flag;
 
 	/* rtc-146818 */
-	UINT8 rtc_address;
-	UINT8 periodic_irq;
-	UINT8 irq_flags;
+	UINT8 m_rtc_address;
+	UINT8 m_periodic_irq;
+	UINT8 m_irq_flags;
 
-	emu_timer *rtc_periodic_irq;
+	emu_timer *m_rtc_periodic_irq;
 
 	/* devices */
-	hd61830_device *hd61830;
-	device_t *speaker;
+	hd61830_device *m_hd61830;
+	device_t *m_speaker;
 
 };
 

@@ -95,9 +95,9 @@ static void at_speaker_set_input(running_machine &machine, UINT8 data)
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
 	at_state *st = device->machine().driver_data<at_state>();
-	if (st->pic8259_master)
+	if (st->m_pic8259_master)
 	{
-		pic8259_ir0_w(st->pic8259_master, state);
+		pic8259_ir0_w(st->m_pic8259_master, state);
 	}
 }
 
@@ -134,14 +134,14 @@ static void at_set_irq_line(running_machine &machine,int irq, int state)
 
 	switch (irq)
 	{
-	case 0: pic8259_ir0_w(st->pic8259_master, state); break;
-	case 1: pic8259_ir1_w(st->pic8259_master, state); break;
-	case 2: pic8259_ir2_w(st->pic8259_master, state); break;
-	case 3: pic8259_ir3_w(st->pic8259_master, state); break;
-	case 4: pic8259_ir4_w(st->pic8259_master, state); break;
-	case 5: pic8259_ir5_w(st->pic8259_master, state); break;
-	case 6: pic8259_ir6_w(st->pic8259_master, state); break;
-	case 7: pic8259_ir7_w(st->pic8259_master, state); break;
+	case 0: pic8259_ir0_w(st->m_pic8259_master, state); break;
+	case 1: pic8259_ir1_w(st->m_pic8259_master, state); break;
+	case 2: pic8259_ir2_w(st->m_pic8259_master, state); break;
+	case 3: pic8259_ir3_w(st->m_pic8259_master, state); break;
+	case 4: pic8259_ir4_w(st->m_pic8259_master, state); break;
+	case 5: pic8259_ir5_w(st->m_pic8259_master, state); break;
+	case 6: pic8259_ir6_w(st->m_pic8259_master, state); break;
+	case 7: pic8259_ir7_w(st->m_pic8259_master, state); break;
 	}
 }
 
@@ -210,7 +210,7 @@ WRITE8_HANDLER(at_page8_w)
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
 	at_state *st = device->machine().driver_data<at_state>();
-	device_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(st->m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -305,13 +305,13 @@ I8237_INTERFACE( at_dma8237_2_config )
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
 	at_state *st = device->machine().driver_data<at_state>();
-	pic8259_ir4_w(st->pic8259_master, state);
+	pic8259_ir4_w(st->m_pic8259_master, state);
 }
 
 static INS8250_INTERRUPT( at_com_interrupt_2 )
 {
 	at_state *st = device->machine().driver_data<at_state>();
-	pic8259_ir3_w(st->pic8259_master, state);
+	pic8259_ir3_w(st->m_pic8259_master, state);
 }
 
 /* called when com registers read/written - used to update peripherals that
@@ -374,7 +374,7 @@ const ins8250_interface ibm5170_com_interface[4]=
 static void at_fdc_interrupt(running_machine &machine, int state)
 {
 	at_state *st = machine.driver_data<at_state>();
-	pic8259_ir6_w(st->pic8259_master, state);
+	pic8259_ir6_w(st->m_pic8259_master, state);
 //if ( ram_get_ptr(machine.device(RAM_TAG))[0x0490] == 0x74 )
 //  ram_get_ptr(machine.device(RAM_TAG))[0x0490] = 0x54;
 }
@@ -383,7 +383,7 @@ static void at_fdc_interrupt(running_machine &machine, int state)
 static void at_fdc_dma_drq(running_machine &machine, int state)
 {
 	at_state *st = machine.driver_data<at_state>();
-	i8237_dreq2_w( st->dma8237_1, state);
+	i8237_dreq2_w( st->m_dma8237_1, state);
 }
 
 static device_t *at_get_device(running_machine &machine)
@@ -421,7 +421,7 @@ READ8_HANDLER( at_portb_r )
 	}
 	data = (data & ~0x10) | ( at_offset1 & 0x10 );
 
-	if ( pit8253_get_output(st->pit8254, 2 ) )
+	if ( pit8253_get_output(st->m_pit8254, 2 ) )
 		data |= 0x20;
 	else
 		data &= ~0x20; /* ps2m30 wants this */
@@ -433,7 +433,7 @@ WRITE8_HANDLER( at_portb_w )
 {
 	at_state *st = space->machine().driver_data<at_state>();
 	at_speaker = data;
-	pit8253_gate2_w(st->pit8254, BIT(data, 0));
+	pit8253_gate2_w(st->m_pit8254, BIT(data, 0));
 	at_speaker_set_spkrdata( space->machine(), data & 0x02 );
 }
 
@@ -536,7 +536,7 @@ DRIVER_INIT( ps2m30286 )
 static IRQ_CALLBACK(at_irq_callback)
 {
 	at_state *st = device->machine().driver_data<at_state>();
-	return pic8259_acknowledge(st->pic8259_master);
+	return pic8259_acknowledge(st->m_pic8259_master);
 }
 
 static void pc_set_irq_line(running_machine &machine,int irq, int state)
@@ -545,14 +545,14 @@ static void pc_set_irq_line(running_machine &machine,int irq, int state)
 
 	switch (irq)
 	{
-	case 0: pic8259_ir0_w(st->pic8259_master, state); break;
-	case 1: pic8259_ir1_w(st->pic8259_master, state); break;
-	case 2: pic8259_ir2_w(st->pic8259_master, state); break;
-	case 3: pic8259_ir3_w(st->pic8259_master, state); break;
-	case 4: pic8259_ir4_w(st->pic8259_master, state); break;
-	case 5: pic8259_ir5_w(st->pic8259_master, state); break;
-	case 6: pic8259_ir6_w(st->pic8259_master, state); break;
-	case 7: pic8259_ir7_w(st->pic8259_master, state); break;
+	case 0: pic8259_ir0_w(st->m_pic8259_master, state); break;
+	case 1: pic8259_ir1_w(st->m_pic8259_master, state); break;
+	case 2: pic8259_ir2_w(st->m_pic8259_master, state); break;
+	case 3: pic8259_ir3_w(st->m_pic8259_master, state); break;
+	case 4: pic8259_ir4_w(st->m_pic8259_master, state); break;
+	case 5: pic8259_ir5_w(st->m_pic8259_master, state); break;
+	case 6: pic8259_ir6_w(st->m_pic8259_master, state); break;
+	case 7: pic8259_ir7_w(st->m_pic8259_master, state); break;
 	}
 }
 
@@ -569,13 +569,13 @@ MACHINE_START( at )
 MACHINE_RESET( at )
 {
 	at_state *st = machine.driver_data<at_state>();
-	st->maincpu = machine.device("maincpu");
-	st->pic8259_master = machine.device("pic8259_master");
-	st->pic8259_slave = machine.device("pic8259_slave");
-	st->dma8237_1 = machine.device("dma8237_1");
-	st->dma8237_2 = machine.device("dma8237_2");
-	st->pit8254 = machine.device("pit8254");
+	st->m_maincpu = machine.device("maincpu");
+	st->m_pic8259_master = machine.device("m_pic8259_master");
+	st->m_pic8259_slave = machine.device("m_pic8259_slave");
+	st->m_dma8237_1 = machine.device("m_dma8237_1");
+	st->m_dma8237_2 = machine.device("dma8237_2");
+	st->m_pit8254 = machine.device("pit8254");
 	pc_mouse_set_serial_port( machine.device("ns16450_0") );
-	pc_hdc_set_dma8237_device( st->dma8237_1 );
+	pc_hdc_set_dma8237_device( st->m_dma8237_1 );
 	poll_delay = 4;
 }

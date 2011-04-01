@@ -28,11 +28,11 @@ SCREEN_UPDATE( pk8020 )
 			UINT8 chr = ram[x +(y*64) + 0x40000];
 			UINT8 attr= ram[x +(y*64) + 0x40400];
 			for (j = 0; j < 16; j++) {
-				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (state->video_page * 0xC000);
+				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (state->m_video_page * 0xC000);
 				UINT8 code1 = ram[addr];
 				UINT8 code2 = ram[addr + 0x4000];
 				UINT8 code3 = ram[addr + 0x8000];
-				UINT8 code4 = gfx[((chr<<4) + j) + (state->font*0x1000)];
+				UINT8 code4 = gfx[((chr<<4) + j) + (state->m_font*0x1000)];
 				if (attr) code4 ^= 0xff;
 				for (b = 0; b < 8; b++)
 				{

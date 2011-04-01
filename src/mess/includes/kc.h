@@ -56,25 +56,25 @@ public:
 	kc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int kc85_pio_data[2];
-	device_t *kc85_z80pio;
-	unsigned char kc85_disc_hw_input_gate;
-	unsigned char *kc85_module_rom;
-	emu_timer *cassette_timer;
-	int cassette_motor_state;
-	unsigned char ardy;
-	int previous_keyboard[KC_KEYBOARD_NUM_LINES-1];
-	unsigned char brdy;
-	kc_keyboard keyboard_data;
-	int kc85_84_data;
-	int kc85_86_data;
-	int kc85_50hz_state;
-	int kc85_15khz_state;
-	int kc85_15khz_count;
-	int kc85_blink_state;
-	unsigned char *kc85_4_display_video_ram;
-	unsigned char *kc85_4_video_ram;
-	const struct kc85_module *modules[256>>2];
+	int m_kc85_pio_data[2];
+	device_t *m_kc85_z80pio;
+	unsigned char m_kc85_disc_hw_input_gate;
+	unsigned char *m_kc85_module_rom;
+	emu_timer *m_cassette_timer;
+	int m_cassette_motor_state;
+	unsigned char m_ardy;
+	int m_previous_keyboard[KC_KEYBOARD_NUM_LINES-1];
+	unsigned char m_brdy;
+	kc_keyboard m_keyboard_data;
+	int m_kc85_84_data;
+	int m_kc85_86_data;
+	int m_kc85_50hz_state;
+	int m_kc85_15khz_state;
+	int m_kc85_15khz_count;
+	int m_kc85_blink_state;
+	unsigned char *m_kc85_4_display_video_ram;
+	unsigned char *m_kc85_4_video_ram;
+	const struct kc85_module *m_modules[256>>2];
 };
 
 

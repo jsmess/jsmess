@@ -12,11 +12,11 @@ public:
 		: driver_device(machine, config) { }
 
 	/* keyboard state */
-	int keylatch;
-	int keyclk;
+	int m_keylatch;
+	int m_keyclk;
 
 	/* devices */
-	device_t *z80pio;
+	device_t *m_z80pio;
 };
 
 #endif

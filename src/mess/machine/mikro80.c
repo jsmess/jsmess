@@ -22,29 +22,29 @@ DRIVER_INIT(mikro80)
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
 	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
-	state->key_mask = 0x7f;
+	state->m_key_mask = 0x7f;
 }
 
 DRIVER_INIT(radio99)
 {
 	mikro80_state *state = machine.driver_data<mikro80_state>();
 	DRIVER_INIT_CALL(mikro80);
-	state->key_mask = 0xff;
+	state->m_key_mask = 0xff;
 }
 
 READ8_HANDLER (mikro80_8255_portb_r )
 {
 	mikro80_state *state = space->machine().driver_data<mikro80_state>();
 	UINT8 key = 0xff;
-	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(space->machine(),"LINE0"); }
-	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(space->machine(),"LINE1"); }
-	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(space->machine(),"LINE2"); }
-	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(space->machine(),"LINE3"); }
-	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(space->machine(),"LINE4"); }
-	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(space->machine(),"LINE5"); }
-	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(space->machine(),"LINE6"); }
-	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(space->machine(),"LINE7"); }
-	return key & state->key_mask;
+	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(space->machine(),"LINE0"); }
+	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(space->machine(),"LINE1"); }
+	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(space->machine(),"LINE2"); }
+	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(space->machine(),"LINE3"); }
+	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(space->machine(),"LINE4"); }
+	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(space->machine(),"LINE5"); }
+	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(space->machine(),"LINE6"); }
+	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(space->machine(),"LINE7"); }
+	return key & state->m_key_mask;
 }
 
 READ8_HANDLER (mikro80_8255_portc_r )
@@ -55,7 +55,7 @@ READ8_HANDLER (mikro80_8255_portc_r )
 WRITE8_HANDLER (mikro80_8255_porta_w )
 {
 	mikro80_state *state = space->machine().driver_data<mikro80_state>();
-	state->keyboard_mask = data ^ 0xff;
+	state->m_keyboard_mask = data ^ 0xff;
 }
 
 WRITE8_HANDLER (mikro80_8255_portc_w )
@@ -87,7 +87,7 @@ MACHINE_RESET( mikro80 )
 	mikro80_state *state = machine.driver_data<mikro80_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(mikro80_reset));
 	memory_set_bank(machine, "bank1", 1);
-	state->keyboard_mask = 0;
+	state->m_keyboard_mask = 0;
 }
 
 

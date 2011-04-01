@@ -51,31 +51,31 @@ static TIMER_CALLBACK( cassette_data_callback )
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
     1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
-	double new_val = cassette_input(state->cass);
+	double new_val = cassette_input(state->m_cass);
 
 	/* Check for HI-LO transition */
-	if ( state->old_cassette_val > -0.2 && new_val < -0.2 )
+	if ( state->m_old_cassette_val > -0.2 && new_val < -0.2 )
 	{
-		state->cassette_data |= 0x80;		/* 500 baud */
-		if (state->mask & CASS_FALL)	/* see if 1500 baud */
+		state->m_cassette_data |= 0x80;		/* 500 baud */
+		if (state->m_mask & CASS_FALL)	/* see if 1500 baud */
 		{
-			state->cassette_data = 0;
-			state->irq |= CASS_FALL;
+			state->m_cassette_data = 0;
+			state->m_irq |= CASS_FALL;
 			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		}
 	}
 	else
-	if ( state->old_cassette_val < -0.2 && new_val > -0.2 )
+	if ( state->m_old_cassette_val < -0.2 && new_val > -0.2 )
 	{
-		if (state->mask & CASS_RISE)	/* 1500 baud */
+		if (state->m_mask & CASS_RISE)	/* 1500 baud */
 		{
-			state->cassette_data = 1;
-			state->irq |= CASS_RISE;
+			state->m_cassette_data = 1;
+			state->m_irq |= CASS_RISE;
 			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		}
 	}
 
-	state->old_cassette_val = new_val;
+	state->m_old_cassette_val = new_val;
 }
 
 
@@ -104,7 +104,7 @@ READ8_HANDLER( trs80m4_e0_r )
     d0 Cass 1500 baud Rising */
 
 	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	return ~(state->mask & state->irq);
+	return ~(state->m_mask & state->m_irq);
 }
 
 READ8_HANDLER( trs80m4_e4_r )
@@ -122,7 +122,7 @@ READ8_HANDLER( trs80m4_e4_r )
 
 	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
-	return ~(state->nmi_mask & state->nmi_data);
+	return ~(state->m_nmi_mask & state->m_nmi_data);
 }
 
 READ8_HANDLER( trs80m4_e8_r )
@@ -150,13 +150,13 @@ READ8_HANDLER( trs80m4_ea_r )
     d2..d0 Not used */
 
 	UINT8 data=7;
-	ay31015_set_input_pin( state->ay31015, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_TBMT ) ? 0x40 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_DAV  ) ? 0x80 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_OR   ) ? 0x20 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_FE   ) ? 0x10 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_PE   ) ? 0x08 : 0;
-	ay31015_set_input_pin( state->ay31015, AY31015_SWE, 1 );
+	ay31015_set_input_pin( state->m_ay31015, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_TBMT ) ? 0x40 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_DAV  ) ? 0x80 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_OR   ) ? 0x20 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_FE   ) ? 0x10 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_PE   ) ? 0x08 : 0;
+	ay31015_set_input_pin( state->m_ay31015, AY31015_SWE, 1 );
 
 	return data;
 }
@@ -165,9 +165,9 @@ READ8_HANDLER( trs80m4_eb_r )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* UART received data */
-	UINT8 data = ay31015_get_received_data( state->ay31015 );
-	ay31015_set_input_pin( state->ay31015, AY31015_RDAV, 0 );
-	ay31015_set_input_pin( state->ay31015, AY31015_RDAV, 1 );
+	UINT8 data = ay31015_get_received_data( state->m_ay31015 );
+	ay31015_set_input_pin( state->m_ay31015, AY31015_RDAV, 0 );
+	ay31015_set_input_pin( state->m_ay31015, AY31015_RDAV, 1 );
 	return data;
 }
 
@@ -175,7 +175,7 @@ READ8_HANDLER( trs80m4_ec_r )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* Reset the RTC interrupt */
-	state->irq &= ~IRQ_M4_RTC;
+	state->m_irq &= ~IRQ_M4_RTC;
 	return 0;
 }
 
@@ -193,13 +193,13 @@ READ8_HANDLER( sys80_f9_r )
     d0 Data Available */
 
 	UINT8 data=70;
-	ay31015_set_input_pin( state->ay31015, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_TBMT ) ? 0 : 0x80;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_DAV  ) ? 0x01 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_OR   ) ? 0x02 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_FE   ) ? 0x04 : 0;
-	data |= ay31015_get_output_pin( state->ay31015, AY31015_PE   ) ? 0x08 : 0;
-	ay31015_set_input_pin( state->ay31015, AY31015_SWE, 1 );
+	ay31015_set_input_pin( state->m_ay31015, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_TBMT ) ? 0 : 0x80;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_DAV  ) ? 0x01 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_OR   ) ? 0x02 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_FE   ) ? 0x04 : 0;
+	data |= ay31015_get_output_pin( state->m_ay31015, AY31015_PE   ) ? 0x08 : 0;
+	ay31015_set_input_pin( state->m_ay31015, AY31015_SWE, 1 );
 
 	return data;
 }
@@ -207,7 +207,7 @@ READ8_HANDLER( sys80_f9_r )
 READ8_HANDLER( lnw80_fe_r )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
-	return ((state->mode & 0x78) >> 3) | 0xf0;
+	return ((state->m_mode & 0x78) >> 3) | 0xf0;
 }
 
 READ8_HANDLER( trs80_ff_r )
@@ -217,8 +217,8 @@ READ8_HANDLER( trs80_ff_r )
     d7 cassette data from tape
     d2 modesel setting */
 
-	UINT8 data = (~state->mode & 1) << 5;
-	return data | state->cassette_data;
+	UINT8 data = (~state->m_mode & 1) << 5;
+	return data | state->m_cassette_data;
 }
 
 READ8_HANDLER( trs80m4_ff_r )
@@ -229,9 +229,9 @@ READ8_HANDLER( trs80m4_ff_r )
     d6..d1 info from write of port EC
     d0 High-speed data */
 
-	state->irq &= 0xfc;	/* clear cassette interrupts */
+	state->m_irq &= 0xfc;	/* clear cassette interrupts */
 
-	return state->port_ec | state->cassette_data;
+	return state->m_port_ec | state->m_cassette_data;
 }
 
 
@@ -252,18 +252,18 @@ WRITE8_HANDLER( trs80m4_84_w )
 	address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *base = space->machine().region("maincpu")->base();
 
-	state->mode = (state->mode & 0x73) | (data & 0x8c);
+	state->m_mode = (state->m_mode & 0x73) | (data & 0x8c);
 
-	state->model4 &= 0xce;
-	state->model4 |= (data & 3) << 4;
+	state->m_model4 &= 0xce;
+	state->m_model4 |= (data & 3) << 4;
 
 	switch (data & 3)
 	{
 		case 0:	/* normal operation */
 
-			if (state->model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
+			if (state->m_model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
 			{
-				if (state->model4 & 8)
+				if (state->m_model4 & 8)
 					memory_set_bankptr(space->machine(), "bank1", base);
 				else
 					memory_set_bankptr(space->machine(), "bank1", base + 0x10000);
@@ -295,9 +295,9 @@ WRITE8_HANDLER( trs80m4_84_w )
 
 		case 1:	/* write-only ram backs up the rom */
 
-			if (state->model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
+			if (state->m_model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
 			{
-				if (state->model4 & 8)
+				if (state->m_model4 & 8)
 					memory_set_bankptr(space->machine(), "bank1", base);
 				else
 					memory_set_bankptr(space->machine(), "bank1", base + 0x10000);
@@ -347,7 +347,7 @@ WRITE8_HANDLER( trs80m4_84_w )
 			memory_set_bankptr(space->machine(), "bank18", base + 0x0a000);
 			mem->install_legacy_read_handler (0xf400, 0xf7ff, FUNC(trs80_keyboard_r));	/* 8 */
 			mem->install_legacy_readwrite_handler (0xf800, 0xffff, FUNC(trs80_videoram_r), FUNC(trs80_videoram_w));	/* 9 & 19 */
-			state->model4++;
+			state->m_model4++;
 			break;
 
 		case 3:	/* 64k of ram */
@@ -376,7 +376,7 @@ WRITE8_HANDLER( trs80m4_84_w )
 WRITE8_HANDLER( trs80m4_90_w )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
-	speaker_level_w(state->speaker, ~data & 1);
+	speaker_level_w(state->m_speaker, ~data & 1);
 }
 
 WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only RAM */
@@ -392,12 +392,12 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
 	/* get address space instead of io space */
 	//address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->model4 &= 0xf7;
-	state->model4 |= (data << 3);
+	state->m_model4 &= 0xf7;
+	state->m_model4 |= (data << 3);
 
-	if ((state->model4) && (~state->model4 & 0x20))
+	if ((state->m_model4) && (~state->m_model4 & 0x20))
 	{
-		switch (state->model4 & 8)
+		switch (state->m_model4 & 8)
 		{
 			case 0:		/* Read-only RAM replaces rom */
 				memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000);
@@ -421,7 +421,7 @@ WRITE8_HANDLER( trs80m4_e0_w )
     d1 C fall Int
     d0 C Rise Int */
 
-	state->mask = data;
+	state->m_mask = data;
 }
 
 WRITE8_HANDLER( trs80m4_e4_w )
@@ -431,7 +431,7 @@ WRITE8_HANDLER( trs80m4_e4_w )
     d7 1=enable disk INTRQ to generate NMI
     d6 1=enable disk Motor Timeout to generate NMI */
 
-	state->nmi_mask = data;
+	state->m_nmi_mask = data;
 }
 
 WRITE8_HANDLER( trs80m4_e8_w )
@@ -439,7 +439,7 @@ WRITE8_HANDLER( trs80m4_e8_w )
 	trs80_state *state = space->machine().driver_data<trs80_state>();
 /* d1 when '1' enables control register load (see below) */
 
-	state->reg_load = data & 2;
+	state->m_reg_load = data & 2;
 }
 
 WRITE8_HANDLER( trs80m4_e9_w )
@@ -464,14 +464,14 @@ WRITE8_HANDLER( trs80m4_e9_w )
     FFh    19200 */
 
 	static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
-	ay31015_set_receiver_clock( state->ay31015, baud_clock[data & 0x0f]);
-	ay31015_set_transmitter_clock( state->ay31015, baud_clock[data>>4]);
+	ay31015_set_receiver_clock( state->m_ay31015, baud_clock[data & 0x0f]);
+	ay31015_set_transmitter_clock( state->m_ay31015, baud_clock[data>>4]);
 }
 
 WRITE8_HANDLER( trs80m4_ea_w )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
-	if (state->reg_load)
+	if (state->m_reg_load)
 
 /* d2..d0 not emulated
     d7 Even Parity Enable ('1'=even, '0'=odd)
@@ -486,13 +486,13 @@ WRITE8_HANDLER( trs80m4_ea_w )
     d0 Data-Terminal-Ready (DTR), pin 20 */
 
 	{
-		ay31015_set_input_pin( state->ay31015, AY31015_CS, 0 );
-		ay31015_set_input_pin( state->ay31015, AY31015_NB1, ( data & 0x40 ) ? 1 : 0 );
-		ay31015_set_input_pin( state->ay31015, AY31015_NB2, ( data & 0x20 ) ? 1 : 0 );
-		ay31015_set_input_pin( state->ay31015, AY31015_TSB, ( data & 0x10 ) ? 1 : 0 );
-		ay31015_set_input_pin( state->ay31015, AY31015_EPS, ( data & 0x80 ) ? 1 : 0 );
-		ay31015_set_input_pin( state->ay31015, AY31015_NP,  ( data & 0x08 ) ? 1 : 0 );
-		ay31015_set_input_pin( state->ay31015, AY31015_CS, 1 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_CS, 0 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_NB1, ( data & 0x40 ) ? 1 : 0 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_NB2, ( data & 0x20 ) ? 1 : 0 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_TSB, ( data & 0x10 ) ? 1 : 0 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_EPS, ( data & 0x80 ) ? 1 : 0 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_NP,  ( data & 0x08 ) ? 1 : 0 );
+		ay31015_set_input_pin( state->m_ay31015, AY31015_CS, 1 );
 	}
 	else
 	{
@@ -512,7 +512,7 @@ WRITE8_HANDLER( trs80m4_ea_w )
 WRITE8_HANDLER( trs80m4_eb_w )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
-	ay31015_set_transmit_data( state->ay31015, data );
+	ay31015_set_transmit_data( state->m_ay31015, data );
 }
 
 WRITE8_HANDLER( trs80m4_ec_w )
@@ -528,11 +528,11 @@ WRITE8_HANDLER( trs80m4_ec_w )
 
 	space->machine().device("maincpu")->set_unscaled_clock(data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
-	state->mode = (state->mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
+	state->m_mode = (state->m_mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
 
-	cassette_change_state( state->cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	cassette_change_state( state->m_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
-	state->port_ec = data & 0x7e;
+	state->m_port_ec = data & 0x7e;
 }
 
 WRITE8_HANDLER( trs80m4_f4_w )
@@ -564,15 +564,15 @@ WRITE8_HANDLER( trs80m4_f4_w )
 	if (data & 8)
 		drive = 3;
 
-	state->head = (data & 16) ? 1 : 0;
+	state->m_head = (data & 16) ? 1 : 0;
 
 	if (drive < 4)
 	{
-		wd17xx_set_drive(state->fdc,drive);
-		wd17xx_set_side(state->fdc,state->head);
+		wd17xx_set_drive(state->m_fdc,drive);
+		wd17xx_set_side(state->m_fdc,state->m_head);
 	}
 
-	wd17xx_dden_w(state->fdc, !BIT(data, 7));
+	wd17xx_dden_w(state->m_fdc, !BIT(data, 7));
 
 	/* CLEAR_LINE means to turn motors on */
 	floppy_mon_w(floppy_get_device(space->machine(), 0), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
@@ -595,7 +595,7 @@ WRITE8_HANDLER( sys80_fe_w )
 /* not emulated
     d4 select internal or external cassette player */
 
-	state->tape_unit = (data & 0x10) ? 2 : 1;
+	state->m_tape_unit = (data & 0x10) ? 2 : 1;
 }
 
 /* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
@@ -611,7 +611,7 @@ WRITE8_HANDLER( lnw80_fe_w )
 	/* get address space instead of io space */
 	address_space *mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->mode = (state->mode & 0x87) | ((data & 0x0f) << 3);
+	state->m_mode = (state->m_mode & 0x87) | ((data & 0x0f) << 3);
 
 	if (data & 8)
 	{
@@ -625,10 +625,10 @@ WRITE8_HANDLER( lnw80_fe_w )
 		memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base());
 		mem->install_legacy_readwrite_handler (0x37e0, 0x37e3, FUNC(trs80_irq_status_r), FUNC(trs80_motor_w));
 		mem->install_legacy_readwrite_handler (0x37e8, 0x37eb, FUNC(trs80_printer_r), FUNC(trs80_printer_w));
-		mem->install_legacy_readwrite_handler (*state->fdc, 0x37ec, 0x37ec, FUNC(trs80_wd179x_r), FUNC(wd17xx_command_w));
-		mem->install_legacy_readwrite_handler (*state->fdc, 0x37ed, 0x37ed, FUNC(wd17xx_track_r), FUNC(wd17xx_track_w));
-		mem->install_legacy_readwrite_handler (*state->fdc, 0x37ee, 0x37ee, FUNC(wd17xx_sector_r), FUNC(wd17xx_sector_w));
-		mem->install_legacy_readwrite_handler (*state->fdc, 0x37ef, 0x37ef, FUNC(wd17xx_data_r), FUNC(wd17xx_data_w));
+		mem->install_legacy_readwrite_handler (*state->m_fdc, 0x37ec, 0x37ec, FUNC(trs80_wd179x_r), FUNC(wd17xx_command_w));
+		mem->install_legacy_readwrite_handler (*state->m_fdc, 0x37ed, 0x37ed, FUNC(wd17xx_track_r), FUNC(wd17xx_track_w));
+		mem->install_legacy_readwrite_handler (*state->m_fdc, 0x37ee, 0x37ee, FUNC(wd17xx_sector_r), FUNC(wd17xx_sector_w));
+		mem->install_legacy_readwrite_handler (*state->m_fdc, 0x37ef, 0x37ef, FUNC(wd17xx_data_r), FUNC(wd17xx_data_w));
 		mem->install_legacy_read_handler (0x3800, 0x38ff, 0, 0x0300, FUNC(trs80_keyboard_r));
 		mem->install_legacy_readwrite_handler (0x3c00, 0x3fff, FUNC(trs80_videoram_r), FUNC(trs80_videoram_w));
 	}
@@ -644,15 +644,15 @@ WRITE8_HANDLER( trs80_ff_w )
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 
-	cassette_change_state( state->cass, ( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
-	cassette_output( state->cass, levels[data & 3]);
-	state->cassette_data &= ~0x80;
+	cassette_change_state( state->m_cass, ( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	cassette_output( state->m_cass, levels[data & 3]);
+	state->m_cassette_data &= ~0x80;
 
-	state->mode = (state->mode & 0xfe) | ((data & 8) >> 3);
+	state->m_mode = (state->m_mode & 0xfe) | ((data & 8) >> 3);
 
 	/* Speaker for System-80 MK II - only sounds if relay is off */
 	if (~data & 4)
-		speaker_level_w(state->speaker, data & 3);
+		speaker_level_w(state->m_speaker, data & 3);
 }
 
 WRITE8_HANDLER( trs80m4_ff_w )
@@ -662,8 +662,8 @@ WRITE8_HANDLER( trs80m4_ff_w )
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	cassette_output( state->cass, levels[data & 3]);
-	state->cassette_data &= ~0x80;
+	cassette_output( state->m_cass, levels[data & 3]);
+	state->m_cassette_data &= ~0x80;
 }
 
 
@@ -680,17 +680,17 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
     The OS counts one tick for each interrupt. The Model I has 40 ticks per
     second, while the Model III/4 has 30. */
 
-	if (state->model4)	// Model 4
+	if (state->m_model4)	// Model 4
 	{
-		if (state->mask & IRQ_M4_RTC)
+		if (state->m_mask & IRQ_M4_RTC)
 		{
-			state->irq |= IRQ_M4_RTC;
+			state->m_irq |= IRQ_M4_RTC;
 			device_set_input_line(device, 0, HOLD_LINE);
 		}
 	}
 	else		// Model 1
 	{
-		state->irq |= IRQ_M1_RTC;
+		state->m_irq |= IRQ_M1_RTC;
 		device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
@@ -698,17 +698,17 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 static void trs80_fdc_interrupt_internal(running_machine &machine)
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	if (state->model4)
+	if (state->m_model4)
 	{
-		if (state->nmi_mask & 0x80)	// Model 4 does a NMI
+		if (state->m_nmi_mask & 0x80)	// Model 4 does a NMI
 		{
-			state->nmi_data = 0x80;
+			state->m_nmi_data = 0x80;
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else		// Model 1 does a IRQ
 	{
-		state->irq |= IRQ_M1_FDC;
+		state->m_irq |= IRQ_M1_FDC;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
@@ -727,10 +727,10 @@ static WRITE_LINE_DEVICE_HANDLER( trs80_fdc_intrq_w )
 	}
 	else
 	{
-		if (drvstate->model4)
-			drvstate->nmi_data = 0;
+		if (drvstate->m_model4)
+			drvstate->m_nmi_data = 0;
 		else
-			drvstate->irq &= ~IRQ_M1_FDC;
+			drvstate->m_irq &= ~IRQ_M1_FDC;
 	}
 }
 
@@ -767,10 +767,10 @@ READ8_HANDLER ( trs80_printer_r )
        Bits 3..0 - Not used */
 
 	UINT8 data = 0;
-	data |= centronics_busy_r(state->printer) << 7;
-	data |= centronics_pe_r(state->printer) << 6;
-	data |= centronics_vcc_r(state->printer) << 5;
-	data |= centronics_fault_r(state->printer) << 4;
+	data |= centronics_busy_r(state->m_printer) << 7;
+	data |= centronics_pe_r(state->m_printer) << 6;
+	data |= centronics_vcc_r(state->m_printer) << 5;
+	data |= centronics_fault_r(state->m_printer) << 4;
 
 	return data;
 }
@@ -778,9 +778,9 @@ READ8_HANDLER ( trs80_printer_r )
 WRITE8_HANDLER( trs80_printer_w )
 {
 	trs80_state *state = space->machine().driver_data<trs80_state>();
-	centronics_strobe_w(state->printer, 1);
-	centronics_data_w(state->printer, 0, data);
-	centronics_strobe_w(state->printer, 0);
+	centronics_strobe_w(state->m_printer, 1);
+	centronics_data_w(state->m_printer, 0, data);
+	centronics_strobe_w(state->m_printer, 0);
 }
 
 WRITE8_HANDLER( trs80_cassunit_w )
@@ -790,7 +790,7 @@ WRITE8_HANDLER( trs80_cassunit_w )
     01 for unit 1 (default
     02 for unit 2 */
 
-	state->tape_unit = data;
+	state->m_tape_unit = data;
 }
 
 READ8_HANDLER( trs80_irq_status_r )
@@ -803,9 +803,9 @@ READ8_HANDLER( trs80_irq_status_r )
     All interrupting devices are serviced in a single interrupt. There is a mask byte,
     which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
-	int result = state->irq;
+	int result = state->m_irq;
 	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	state->irq = 0;
+	state->m_irq = 0;
 	return result;
 }
 
@@ -821,33 +821,33 @@ WRITE8_HANDLER( trs80_motor_w )
 	{
 	case 1:
 		drive = 0;
-		state->head = 0;
+		state->m_head = 0;
 		break;
 	case 2:
 		drive = 1;
-		state->head = 0;
+		state->m_head = 0;
 		break;
 	case 4:
 		drive = 2;
-		state->head = 0;
+		state->m_head = 0;
 		break;
 	case 8:
 		drive = 3;
-		state->head = 0;
+		state->m_head = 0;
 		break;
 	/* These 3 combinations aren't official. Some manufacturers of double-sided disks
         used drive select 4 to indicate the other side. */
 	case 9:
 		drive = 0;
-		state->head = 1;
+		state->m_head = 1;
 		break;
 	case 10:
 		drive = 1;
-		state->head = 1;
+		state->m_head = 1;
 		break;
 	case 12:
 		drive = 2;
-		state->head = 1;
+		state->m_head = 1;
 		break;
 	}
 
@@ -860,8 +860,8 @@ WRITE8_HANDLER( trs80_motor_w )
 		return;
 	}
 
-	wd17xx_set_drive(state->fdc,drive);
-	wd17xx_set_side(state->fdc,state->head);
+	wd17xx_set_drive(state->m_fdc,drive);
+	wd17xx_set_side(state->m_fdc,state->m_head);
 
 	/* Turn motors on */
 	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
@@ -905,30 +905,30 @@ READ8_HANDLER( trs80_keyboard_r )
 MACHINE_START( trs80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->tape_unit=1;
-	state->reg_load=1;
-	state->nmi_data=0xff;
+	state->m_tape_unit=1;
+	state->m_reg_load=1;
+	state->m_nmi_data=0xff;
 
-	state->cassette_data_timer = machine.scheduler().timer_alloc(FUNC(cassette_data_callback));
-	state->cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
-	state->printer = machine.device("centronics");
-	state->ay31015 = machine.device("tr1602");
-	state->cass = machine.device("cassette");
-	state->speaker = machine.device("speaker");
-	state->fdc = machine.device("wd179x");
+	state->m_cassette_data_timer = machine.scheduler().timer_alloc(FUNC(cassette_data_callback));
+	state->m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	state->m_printer = machine.device("centronics");
+	state->m_ay31015 = machine.device("tr1602");
+	state->m_cass = machine.device("cassette");
+	state->m_speaker = machine.device("speaker");
+	state->m_fdc = machine.device("wd179x");
 }
 
 MACHINE_RESET( trs80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->cassette_data = 0;
+	state->m_cassette_data = 0;
 }
 
 MACHINE_RESET( trs80m4 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
 	address_space *mem = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->cassette_data = 0;
+	state->m_cassette_data = 0;
 
 	mem->install_read_bank (0x0000, 0x0fff, "bank1");
 	mem->install_read_bank (0x1000, 0x37e7, "bank2");
@@ -957,8 +957,8 @@ MACHINE_RESET( lnw80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->cassette_data = 0;
-	state->reg_load = 1;
+	state->m_cassette_data = 0;
+	state->m_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);
 }
 

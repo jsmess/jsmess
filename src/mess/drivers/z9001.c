@@ -15,13 +15,13 @@ public:
 	z9001_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
+	UINT8 *m_videoram;
 };
 
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z9001_state,videoram)
+	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z9001_state,m_videoram)
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -57,7 +57,7 @@ static SCREEN_UPDATE( z9001 )
 	{
 		for (x = 0; x < 40; x++)
 		{
-			code = state->videoram[y*40 + x];
+			code = state->m_videoram[y*40 + x];
 			for(j = 0; j < 8; j++ )
 			{
 				line = gfx[code*8 + j];

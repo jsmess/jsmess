@@ -27,11 +27,11 @@ public:
 	h8_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 digit;
-	UINT8 segment;
-	UINT8 irq_ctl;
-	device_t *beeper;
-	UINT8 ff_b;
+	UINT8 m_digit;
+	UINT8 m_segment;
+	UINT8 m_irq_ctl;
+	device_t *m_beeper;
+	UINT8 m_ff_b;
 };
 
 
@@ -43,7 +43,7 @@ public:
 static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
 {
 	h8_state *state = timer.machine().driver_data<h8_state>();
-	if (state->irq_ctl & 1)
+	if (state->m_irq_ctl & 1)
 		device_set_input_line_and_vector(timer.machine().device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
@@ -87,16 +87,16 @@ static WRITE8_HANDLER( h8_f0_w )
     // d6 = int10 is allowed
     // d7 = beeper enable
 
-	state->digit = data & 15;
-	if (state->digit) output_set_digit_value(state->digit, state->segment);
+	state->m_digit = data & 15;
+	if (state->m_digit) output_set_digit_value(state->m_digit, state->m_segment);
 
 	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
-	beep_set_state(state->beeper, (data & 0x80) ? 0 : 1);
+	beep_set_state(state->m_beeper, (data & 0x80) ? 0 : 1);
 
 	device_set_input_line(space->machine().device("maincpu"), INPUT_LINE_IRQ0, CLEAR_LINE);
-	state->irq_ctl &= 0xf0;
-	if (data & 0x40) state->irq_ctl |= 1;
-	if (~data & 0x10) state->irq_ctl |= 2;
+	state->m_irq_ctl &= 0xf0;
+	if (data & 0x40) state->m_irq_ctl |= 1;
+	if (~data & 0x10) state->m_irq_ctl |= 2;
 }
 
 static WRITE8_HANDLER( h8_f1_w )
@@ -111,8 +111,8 @@ static WRITE8_HANDLER( h8_f1_w )
     //d1 segment a
     //d0 segment g
 
-	state->segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (state->digit) output_set_digit_value(state->digit, state->segment);
+	state->m_segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
+	if (state->m_digit) output_set_digit_value(state->m_digit, state->m_segment);
 }
 
 static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8)
@@ -159,10 +159,10 @@ INPUT_PORTS_END
 static MACHINE_RESET(h8)
 {
 	h8_state *state = machine.driver_data<h8_state>();
-	state->beeper = machine.device("beep");
-	beep_set_frequency(state->beeper, H8_BEEP_FRQ);
+	state->m_beeper = machine.device("beep");
+	beep_set_frequency(state->m_beeper, H8_BEEP_FRQ);
 	output_set_value("pwr_led", 0);
-	state->irq_ctl = 1;
+	state->m_irq_ctl = 1;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
@@ -170,7 +170,7 @@ static WRITE_LINE_DEVICE_HANDLER( h8_inte_callback )
 	h8_state *drvstate = device->machine().driver_data<h8_state>();
         // operate the ION LED
 	output_set_value("ion_led",(state) ? 0 : 1);
-	drvstate->irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
+	drvstate->m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
 static WRITE8_DEVICE_HANDLER( h8_status_callback )
@@ -182,14 +182,14 @@ a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the runni
 But, all of this can only occur if bit 5 of port F0 is low. */
 
 	UINT8 state = (data & I8085_STATUS_M1) ? 0 : 1;
-	UINT8 c,a = (drvstate->irq_ctl & 0x80) ? 1 : 0;
+	UINT8 c,a = (drvstate->m_irq_ctl & 0x80) ? 1 : 0;
 
-	if (drvstate->irq_ctl & 2)
+	if (drvstate->m_irq_ctl & 2)
 	{
 		if (!state) // rising pulse to push data through flipflops
 		{
-			c=drvstate->ff_b^1; // from /Q of 2nd flipflop
-			drvstate->ff_b=a; // from Q of 1st flipflop
+			c=drvstate->m_ff_b^1; // from /Q of 2nd flipflop
+			drvstate->m_ff_b=a; // from Q of 1st flipflop
 			if (c)
 				device_set_input_line_and_vector(device->machine().device("maincpu"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
 		}
@@ -197,7 +197,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 	else
 	{ // flipflops are 'set'
 		c=0;
-		drvstate->ff_b=1;
+		drvstate->m_ff_b=1;
 	}
 
 

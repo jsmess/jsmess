@@ -165,14 +165,14 @@ public:
 	_3do_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	legacy_cpu_device* maincpu;
-	UINT32 *dram;
-	UINT32 *vram;
-	SLOW2 slow2;
-	MADAM madam;
-	CLIO clio;
-	SVF svf;
-	UINT8 video_bits[512];
+	legacy_cpu_device* m_maincpu;
+	UINT32 *m_dram;
+	UINT32 *m_vram;
+	SLOW2 m_slow2;
+	MADAM m_madam;
+	CLIO m_clio;
+	SVF m_svf;
+	UINT8 m_video_bits[512];
 };
 
 /*----------- defined in machine/3do.c -----------*/

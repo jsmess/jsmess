@@ -16,7 +16,7 @@ public:
 	pv9234_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *powervu_ram;
+	UINT32 *m_powervu_ram;
 };
 
 
@@ -28,7 +28,7 @@ static WRITE32_HANDLER( debug_w )
 
 static ADDRESS_MAP_START(pv9234_map, AS_PROGRAM, 32)
 	AM_RANGE(0x000080cc, 0x000080cf) AM_WRITE(debug_w)
-	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_BASE_MEMBER(pv9234_state, powervu_ram)
+	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_BASE_MEMBER(pv9234_state, m_powervu_ram)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
 	AM_RANGE(0x00080000, 0x00087fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("share1")//mirror is a guess, writes a prg at 0xc0200 then it jumps at b0200 (!)
 	AM_RANGE(0xe0000000, 0xe0007fff) AM_MIRROR(0x0fff8000) AM_RAM AM_SHARE("share1")
@@ -46,7 +46,7 @@ static MACHINE_RESET(pv9234)
 	int i;
 
 	for(i=0;i<0x1000/4;i++)
-		state->powervu_ram[i] = 0;
+		state->m_powervu_ram[i] = 0;
 }
 
 static VIDEO_START( pv9234 )

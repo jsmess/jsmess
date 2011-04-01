@@ -15,16 +15,16 @@ public:
 	terak_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 unit;
-	UINT8 cmd;
-	UINT16 data;
+	UINT8 m_unit;
+	UINT8 m_cmd;
+	UINT16 m_data;
 };
 
 static READ16_HANDLER(terak_fdc_status_r)
 {
 	terak_state *state = space->machine().driver_data<terak_state>();
 	logerror("terak_fdc_status_r\n");
-	if (state->cmd==3) {
+	if (state->m_cmd==3) {
 		logerror("cmd is 3\n");
 		return 0xffff;
 	}
@@ -34,9 +34,9 @@ static READ16_HANDLER(terak_fdc_status_r)
 static WRITE16_HANDLER(terak_fdc_command_w)
 {
 	terak_state *state = space->machine().driver_data<terak_state>();
-	state->unit = (data >> 8) & 0x03;
-	state->cmd  = (data >> 1) & 0x07;
-	logerror("terak_fdc_command_w %04x [%d %d]\n",data,state->unit,state->cmd);	
+	state->m_unit = (data >> 8) & 0x03;
+	state->m_cmd  = (data >> 1) & 0x07;
+	logerror("terak_fdc_command_w %04x [%d %d]\n",data,state->m_unit,state->m_cmd);	
 }
 
 static READ16_HANDLER(terak_fdc_data_r)

@@ -21,11 +21,11 @@ public:
 	act_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *paletteram;
-	UINT16 *vram;
-	UINT16 *scrollram;
+	UINT16 *m_paletteram;
+	UINT16 *m_vram;
+	UINT16 *m_scrollram;
 
-	UINT8 fdrv_num;
+	UINT8 m_fdrv_num;
 };
 
 static VIDEO_START( act_f1 )
@@ -48,8 +48,8 @@ static SCREEN_UPDATE( act_f1 )
 
 				for (i=0;i<8;i++)
 				{
-					pen[0] = (state->vram[state->scrollram[y]+x_count])>>(7-i) & 1;
-					pen[1] = (state->vram[state->scrollram[y]+x_count])>>(15-i) & 1;
+					pen[0] = (state->m_vram[state->m_scrollram[y]+x_count])>>(7-i) & 1;
+					pen[1] = (state->m_vram[state->m_scrollram[y]+x_count])>>(15-i) & 1;
 
 					color = pen[0]|pen[1]<<1;
 
@@ -78,8 +78,8 @@ static READ8_HANDLER( act_fdc_r )
 
 //  printf("%02x\n",offset);
 
-	floppy_mon_w(floppy_get_device(space->machine(), state->fdrv_num), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), state->fdrv_num), 1,0);
+	floppy_mon_w(floppy_get_device(space->machine(), state->m_fdrv_num), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), state->m_fdrv_num), 1,0);
 
 	switch(offset)
 	{
@@ -106,8 +106,8 @@ static WRITE8_HANDLER( act_fdc_w )
 
 //  printf("%02x %02x\n",offset,data);
 
-	floppy_mon_w(floppy_get_device(space->machine(), state->fdrv_num), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), state->fdrv_num), 1,0);
+	floppy_mon_w(floppy_get_device(space->machine(), state->m_fdrv_num), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine(), state->m_fdrv_num), 1,0);
 
 	switch(offset)
 	{
@@ -133,21 +133,21 @@ static READ16_HANDLER( act_pal_r )
 {
 	act_state *state = space->machine().driver_data<act_state>();
 
-	return state->paletteram[offset];
+	return state->m_paletteram[offset];
 }
 
 static WRITE16_HANDLER( act_pal_w )
 {
 	act_state *state = space->machine().driver_data<act_state>();
 	UINT8 i,r,g,b;
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
 	{
-		i = state->paletteram[offset] & 1;
-		r = ((state->paletteram[offset] & 2)>>0) | i;
-		g = ((state->paletteram[offset] & 4)>>1) | i;
-		b = ((state->paletteram[offset] & 8)>>2) | i;
+		i = state->m_paletteram[offset] & 1;
+		r = ((state->m_paletteram[offset] & 2)>>0) | i;
+		g = ((state->m_paletteram[offset] & 4)>>1) | i;
+		b = ((state->m_paletteram[offset] & 8)>>2) | i;
 
 		palette_set_color_rgb(space->machine(), offset, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
@@ -155,9 +155,9 @@ static WRITE16_HANDLER( act_pal_w )
 
 static ADDRESS_MAP_START(act_f1_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE_MEMBER(act_state,scrollram)
-	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE_MEMBER(act_state,paletteram)
-	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE_MEMBER(act_state,vram)
+	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE_MEMBER(act_state,m_scrollram)
+	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE_MEMBER(act_state,m_paletteram)
+	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE_MEMBER(act_state,m_vram)
 	AM_RANGE(0xf0000,0xf7fff) AM_RAM
 	AM_RANGE(0xf8000,0xfffff) AM_ROM
 ADDRESS_MAP_END

@@ -154,21 +154,21 @@ typedef struct
 /* Mouse/Joystick */
 typedef struct
 {
-	UINT8   mouse_px;
-	UINT8   mouse_py;
+	UINT8   m_mouse_px;
+	UINT8   m_mouse_py;
 
-	UINT8   mouse_x;
-	UINT8   mouse_y;
-	UINT8   mouse_pc;
-	UINT8   mouse_pcx;
-	UINT8   mouse_pcy;
+	UINT8   m_mouse_x;
+	UINT8   m_mouse_y;
+	UINT8   m_mouse_pc;
+	UINT8   m_mouse_pcx;
+	UINT8   m_mouse_pcy;
 
-	UINT8   intstate_x;
-	UINT8   intstate_y;
+	UINT8   m_intstate_x;
+	UINT8   m_intstate_y;
 
-	UINT8   reg0a4;
+	UINT8   m_reg0a4;
 
-	emu_timer   *mouse_timer;
+	emu_timer   *m_mouse_timer;
 } _mouse_joy_state;
 
 
@@ -178,24 +178,24 @@ public:
 	rmnimbus_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 debug_machine;
-	i186_state i186;
-	keyboard_t keyboard;
-	nimbus_drives_t nimbus_drives;
-	ipc_interface_t ipc_interface;
-	UINT8 mcu_reg080;
-	UINT8 iou_reg092;
-	UINT8 last_playmode;
-	_mouse_joy_state nimbus_mouse;
-	UINT8 ay8910_a;
-	UINT16 IOPorts[num_ioports];
-	UINT8 sio_int_state;
-	UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
-	UINT16 vidregs[NO_VIDREGS];
-	UINT8 bpp;
-	UINT16 pixel_mask;
-	UINT8 hs_count;
-	UINT32 debug_video;
+	UINT32 m_debug_machine;
+	i186_state m_i186;
+	keyboard_t m_keyboard;
+	nimbus_drives_t m_nimbus_drives;
+	ipc_interface_t m_ipc_interface;
+	UINT8 m_mcu_reg080;
+	UINT8 m_iou_reg092;
+	UINT8 m_last_playmode;
+	_mouse_joy_state m_nimbus_mouse;
+	UINT8 m_ay8910_a;
+	UINT16 m_IOPorts[num_ioports];
+	UINT8 m_sio_int_state;
+	UINT8 m_video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
+	UINT16 m_vidregs[NO_VIDREGS];
+	UINT8 m_bpp;
+	UINT16 m_pixel_mask;
+	UINT8 m_hs_count;
+	UINT32 m_debug_video;
 };
 
 
@@ -318,11 +318,11 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
 #define FDC_DRQ_MASK    0x80
 #define FDC_DRIVE_MASK  (FDC_DRIVE0_MASK | FDC_DRIVE1_MASK | FDC_DRIVE2_MASK | FDC_DRIVE3_MASK)
 
-#define FDC_SIDE()          ((state->nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
-#define FDC_MOTOR()         ((state->nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
-#define FDC_DRIVE()         (scsibus_driveno(state->nimbus_drives.reg400 & FDC_DRIVE_MASK))
-#define HDC_DRQ_ENABLED()   ((state->nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
-#define FDC_DRQ_ENABLED(state)   ((state->nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
+#define FDC_SIDE()          ((state->m_nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
+#define FDC_MOTOR()         ((state->m_nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
+#define FDC_DRIVE()         (scsibus_driveno(state->m_nimbus_drives.reg400 & FDC_DRIVE_MASK))
+#define HDC_DRQ_ENABLED()   ((state->m_nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
+#define FDC_DRQ_ENABLED(state)   ((state->m_nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
 
 /* Masks for port 0x410 read*/
 
@@ -346,7 +346,7 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
 #define HDC_RESET_MASK  0x01
 #define HDC_SEL_MASK    0x02
 #define HDC_IRQ_MASK    0x04
-#define HDC_IRQ_ENABLED(state)   ((state->nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
+#define HDC_IRQ_ENABLED(state)   ((state->m_nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
 
 
 #define SCSI_ID_NONE    0x80
@@ -416,7 +416,7 @@ enum
 READ8_HANDLER( nimbus_mouse_js_r );
 WRITE8_HANDLER( nimbus_mouse_js_w );
 
-#define MOUSE_INT_ENABLED(state)     (((state)->iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
+#define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
 /* Paralell / User port BBC compatible ! */
 

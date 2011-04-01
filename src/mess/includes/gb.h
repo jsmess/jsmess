@@ -111,71 +111,71 @@ public:
 	gb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 sgb_pal_data[4096];
-	UINT8 sgb_pal_map[20][18];
-	UINT16 sgb_pal[128];
-	UINT8 *sgb_tile_data;
-	UINT8 sgb_tile_map[2048];
-	UINT8 sgb_window_mask;
-	UINT8 sgb_hack;
+	UINT16 m_sgb_pal_data[4096];
+	UINT8 m_sgb_pal_map[20][18];
+	UINT16 m_sgb_pal[128];
+	UINT8 *m_sgb_tile_data;
+	UINT8 m_sgb_tile_map[2048];
+	UINT8 m_sgb_window_mask;
+	UINT8 m_sgb_hack;
 	//gb_state driver_data;
-	UINT8		gb_io[0x10];
+	UINT8		m_gb_io[0x10];
 
 	/* Timer related */
-	UINT16		divcount;
-	UINT8		shift;
-	UINT16		shift_cycles;
-	UINT8		triggering_irq;
-	UINT8		reloading;
+	UINT16		m_divcount;
+	UINT8		m_shift;
+	UINT16		m_shift_cycles;
+	UINT8		m_triggering_irq;
+	UINT8		m_reloading;
 
 	/* Serial I/O related */
-	UINT32		SIOCount;				/* Serial I/O counter */
-	emu_timer	*gb_serial_timer;
+	UINT32		m_SIOCount;				/* Serial I/O counter */
+	emu_timer	*m_gb_serial_timer;
 
 	/* SGB variables */
-	UINT8		sgb_atf_data[4050];		/* (SGB) Attributes files */
-	INT8 sgb_packets;
-	UINT8 sgb_bitcount;
-	UINT8 sgb_bytecount;
-	UINT8 sgb_start;
-	UINT8 sgb_rest;
-	UINT8 sgb_controller_no;
-	UINT8 sgb_controller_mode;
-	UINT8 sgb_data[112];
-	UINT32 sgb_atf;
+	UINT8		m_sgb_atf_data[4050];		/* (SGB) Attributes files */
+	INT8 m_sgb_packets;
+	UINT8 m_sgb_bitcount;
+	UINT8 m_sgb_bytecount;
+	UINT8 m_sgb_start;
+	UINT8 m_sgb_rest;
+	UINT8 m_sgb_controller_no;
+	UINT8 m_sgb_controller_mode;
+	UINT8 m_sgb_data[112];
+	UINT32 m_sgb_atf;
 
 	/* Cartridge/mapper */
-	UINT16		MBCType;				/* MBC type: 0 for none */
-	UINT8		CartType;				/* Cartridge type (battery, ram, rtc, etc) */
-	UINT8		*ROMMap[MAX_ROMBANK];	/* Addresses of ROM banks */
-	UINT16		ROMBank;				/* Index of ROM bank currently used at 4000-7fff */
-	UINT16		ROMBank00;				/* Index of ROM bank currently used at 0000-3fff */
-	UINT8		ROMMask;				/* Mask for the ROM bank number */
-	UINT16		ROMBanks;				/* Total number of ROM banks */
-	UINT8		*RAMMap[MAX_RAMBANK];	/* Addresses of RAM banks */
-	UINT8		RAMBank;				/* Number of RAM bank currently used */
-	UINT8		RAMMask;				/* Mask for the RAM bank number */
-	UINT8		RAMBanks;				/* Total number of RAM banks */
-	UINT8		MBC1Mode;				/* MBC1 ROM/RAM mode */
-	UINT8		*MBC3RTCData;			/* MBC3 RTC data */
-	UINT8		MBC3RTCMap[5];			/* MBC3 RTC banks */
-	UINT8		MBC3RTCBank;			/* MBC3 RTC bank */
-	UINT8		*GBC_RAMMap[8];			/* (CGB) Addresses of internal RAM banks */
-	UINT8		GBC_RAMBank;			/* (CGB) Current CGB RAM bank */
-	UINT8		gbTama5Memory[32];
-	UINT8		gbTama5Byte;
-	UINT8		gbTama5Address;
-	UINT8		gbLastTama5Command;
-	UINT8		*gb_cart;
-	UINT8		*gb_cart_ram;
-	UINT8		*gb_dummy_rom_bank;
-	UINT8		*gb_dummy_ram_bank;
+	UINT16		m_MBCType;				/* MBC type: 0 for none */
+	UINT8		m_CartType;				/* Cartridge type (battery, ram, rtc, etc) */
+	UINT8		*m_ROMMap[MAX_ROMBANK];	/* Addresses of ROM banks */
+	UINT16		m_ROMBank;				/* Index of ROM bank currently used at 4000-7fff */
+	UINT16		m_ROMBank00;				/* Index of ROM bank currently used at 0000-3fff */
+	UINT8		m_ROMMask;				/* Mask for the ROM bank number */
+	UINT16		m_ROMBanks;				/* Total number of ROM banks */
+	UINT8		*m_RAMMap[MAX_RAMBANK];	/* Addresses of RAM banks */
+	UINT8		m_RAMBank;				/* Number of RAM bank currently used */
+	UINT8		m_RAMMask;				/* Mask for the RAM bank number */
+	UINT8		m_RAMBanks;				/* Total number of RAM banks */
+	UINT8		m_MBC1Mode;				/* MBC1 ROM/RAM mode */
+	UINT8		*m_MBC3RTCData;			/* MBC3 RTC data */
+	UINT8		m_MBC3RTCMap[5];			/* MBC3 RTC banks */
+	UINT8		m_MBC3RTCBank;			/* MBC3 RTC bank */
+	UINT8		*m_GBC_RAMMap[8];			/* (CGB) Addresses of internal RAM banks */
+	UINT8		m_GBC_RAMBank;			/* (CGB) Current CGB RAM bank */
+	UINT8		m_gbTama5Memory[32];
+	UINT8		m_gbTama5Byte;
+	UINT8		m_gbTama5Address;
+	UINT8		m_gbLastTama5Command;
+	UINT8		*m_gb_cart;
+	UINT8		*m_gb_cart_ram;
+	UINT8		*m_gb_dummy_rom_bank;
+	UINT8		*m_gb_dummy_ram_bank;
 
-	UINT8 mmm01_bank_offset;
-	UINT8 mmm01_reg1;
-	UINT8 mmm01_bank;
-	UINT8 mmm01_bank_mask;
-	gb_lcd_t lcd;
+	UINT8 m_mmm01_bank_offset;
+	UINT8 m_mmm01_reg1;
+	UINT8 m_mmm01_bank;
+	UINT8 m_mmm01_bank_mask;
+	gb_lcd_t m_lcd;
 	void (*update_scanline)( running_machine &machine );
 };
 

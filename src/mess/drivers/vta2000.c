@@ -19,8 +19,8 @@ public:
 	vta2000_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	const UINT8 *FNT;
-	const UINT8 *videoram;
+	const UINT8 *m_FNT;
+	const UINT8 *m_videoram;
 };
 
 static ADDRESS_MAP_START(vta2000_mem, AS_PROGRAM, 8)
@@ -45,8 +45,8 @@ static MACHINE_RESET(vta2000)
 static VIDEO_START( vta2000 )
 {
 	vta2000_state *state = machine.driver_data<vta2000_state>();
-	state->FNT = machine.region("chargen")->base();
-	state->videoram = machine.region("maincpu")->base()+0x80a0;
+	state->m_FNT = machine.region("chargen")->base();
+	state->m_videoram = machine.region("maincpu")->base()+0x80a0;
 }
 
 static SCREEN_UPDATE( vta2000 )
@@ -74,13 +74,13 @@ Here we just show the first 80x25, with no scrolling. */
 			xx = ma << 1;
 			for (x = ma; x < ma + 80; x++)
 			{
-				chr = state->videoram[xx++];
-				attr = state->videoram[xx++];
+				chr = state->m_videoram[xx++];
+				attr = state->m_videoram[xx++];
 
 				if ((chr & 0x60)==0x60)
 					chr+=256;
 
-				gfx = state->FNT[(chr<<4) | ra ];
+				gfx = state->m_FNT[(chr<<4) | ra ];
 
 				/* Display a scanline of a character */
 				*p++ = ( gfx & 0x80 ) ? 1 : 0;

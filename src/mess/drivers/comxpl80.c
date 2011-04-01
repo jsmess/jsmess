@@ -8,16 +8,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* printer state */
-	UINT8 centronics_data;	/* centronics data */
+	UINT8 m_centronics_data;	/* centronics data */
 
 	/* PL-80 plotter state */
-	UINT16 font_addr;		/* font ROM pack address latch */
-	UINT8 x_motor_phase;	/* X motor phase */
-	UINT8 y_motor_phase;	/* Y motor phase */
-	UINT8 z_motor_phase;	/* Z motor phase */
-	UINT8 plotter_data;		/* plotter data bus */
-	int plotter_ack;		/* plotter acknowledge */
-	int plotter_online;		/* online LED */
+	UINT16 m_font_addr;		/* font ROM pack address latch */
+	UINT8 m_x_motor_phase;	/* X motor phase */
+	UINT8 m_y_motor_phase;	/* Y motor phase */
+	UINT8 m_z_motor_phase;	/* Z motor phase */
+	UINT8 m_plotter_data;		/* plotter data bus */
+	int m_plotter_ack;		/* plotter acknowledge */
+	int m_plotter_online;		/* online LED */
 };
 
 /* Read/Write Handlers */
@@ -41,10 +41,10 @@ static WRITE8_HANDLER( pl80_port_a_w )
 
 	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
-	state->y_motor_phase = data & 0x0f;
-	state->font_addr = (BIT(data, 4) << 12) | (state->font_addr & 0xfff);
+	state->m_y_motor_phase = data & 0x0f;
+	state->m_font_addr = (BIT(data, 4) << 12) | (state->m_font_addr & 0xfff);
 
-	state->plotter_data = 0xff;
+	state->m_plotter_data = 0xff;
 
 	if (BIT(data, 5))
 	{
@@ -55,19 +55,19 @@ static WRITE8_HANDLER( pl80_port_a_w )
 		// read data from font ROM
 		int font_rom = (input_port_read(space->machine(), "FONT") & 0x03) * 0x2000;
 
-		state->plotter_data = space->machine().region("gfx2")->base()[font_rom | state->font_addr];
+		state->m_plotter_data = space->machine().region("gfx2")->base()[font_rom | state->m_font_addr];
 	}
 
 	if (!BIT(data, 6))
 	{
 		// read data from Centronics bus
-		state->plotter_data = state->centronics_data;
+		state->m_plotter_data = state->m_centronics_data;
 	}
 
 	if (BIT(data, 7))
 	{
 		// read switches
-		state->plotter_data = input_port_read(space->machine(), "SW");
+		state->m_plotter_data = input_port_read(space->machine(), "SW");
 	}
 }
 
@@ -90,9 +90,9 @@ static WRITE8_HANDLER( pl80_port_b_w )
 
 	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
-	state->z_motor_phase = data & 0x0f;
+	state->m_z_motor_phase = data & 0x0f;
 
-	state->font_addr = (state->font_addr & 0x10ff) | (data << 4);
+	state->m_font_addr = (state->m_font_addr & 0x10ff) | (data << 4);
 }
 
 static WRITE8_HANDLER( pl80_port_c_w )
@@ -114,12 +114,12 @@ static WRITE8_HANDLER( pl80_port_c_w )
 
 	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
-	state->font_addr = (state->font_addr & 0x1f00) | data;
+	state->m_font_addr = (state->m_font_addr & 0x1f00) | data;
 
-	state->x_motor_phase = data & 0x0f;
+	state->m_x_motor_phase = data & 0x0f;
 
-	state->plotter_ack = BIT(data, 4);
-	state->plotter_online = BIT(data, 5);
+	state->m_plotter_ack = BIT(data, 4);
+	state->m_plotter_online = BIT(data, 5);
 }
 
 static READ8_HANDLER( pl80_port_d_r )
@@ -141,7 +141,7 @@ static READ8_HANDLER( pl80_port_d_r )
 
 	comxpl80_state *state = space->machine().driver_data<comxpl80_state>();
 
-	return state->plotter_data;
+	return state->m_plotter_data;
 }
 
 /* Memory Maps */

@@ -110,7 +110,7 @@ SCREEN_UPDATE( mc8020 )
 		xpos = 0;
 		for(x = 0; x < 32; x++ )
 		{
-			UINT8 code = state->mc8020_video_ram[addr + x] & 0x3f;
+			UINT8 code = state->m_mc8020_video_ram[addr + x] & 0x3f;
 			for(j = 0; j < 8; j++ )
 			{
 			  for(b = 0; b < 6; b++ )
@@ -132,7 +132,7 @@ SCREEN_UPDATE( mc8020 )
 VIDEO_START( mc8030 )
 {
 	mc80_state *state = machine.driver_data<mc80_state>();
-	state->mc8030_video_mem = auto_alloc_array_clear(machine, UINT8, 16*1024);
+	state->m_mc8030_video_mem = auto_alloc_array_clear(machine, UINT8, 16*1024);
 }
 
 SCREEN_UPDATE( mc8030 )
@@ -147,7 +147,7 @@ SCREEN_UPDATE( mc8030 )
 		int horpos = 0;
 		for (x = 0; x < 64; x++)
 		{
-			code = state->mc8030_video_mem[addr++];
+			code = state->m_mc8030_video_mem[addr++];
 			for (b = 0; b < 8; b++)
 			{
 				*BITMAP_ADDR16(bitmap, 255-y, horpos++) =  (code >> b) & 0x01;

@@ -19,8 +19,8 @@ public:
 	fk1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 video_rol;
-	UINT8 int_vector;
+	UINT8 m_video_rol;
+	UINT8 m_int_vector;
 };
 
 
@@ -166,7 +166,7 @@ static WRITE8_DEVICE_HANDLER (fk1_ppi_3_b_w )
 {
 	fk1_state *state = device->machine().driver_data<fk1_state>();
 
-	state->video_rol = data;
+	state->m_video_rol = data;
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_c_w )
 {
@@ -182,7 +182,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_3_b_r )
 {
 	fk1_state *state = device->machine().driver_data<fk1_state>();
 
-	return state->video_rol;
+	return state->m_video_rol;
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_3_c_r )
 {
@@ -345,7 +345,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
 	if (input_port_read(timer.machine(), "LINE0")) {
-		state->int_vector = 6;
+		state->m_int_vector = 6;
 		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 	}
 }
@@ -365,15 +365,15 @@ static IRQ_CALLBACK (fk1_irq_callback)
 {
 	fk1_state *state = device->machine().driver_data<fk1_state>();
 
-	logerror("IRQ %02x\n", state->int_vector*2);
-	return state->int_vector * 2;
+	logerror("IRQ %02x\n", state->m_int_vector*2);
+	return state->m_int_vector * 2;
 }
 
 static TIMER_DEVICE_CALLBACK( vsync_callback )
 {
 	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
-	state->int_vector = 3;
+	state->m_int_vector = 3;
 	cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 }
 
@@ -407,7 +407,7 @@ static SCREEN_UPDATE( fk1 )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = ram[x * 0x100 + ((y + state->video_rol) & 0xff) + 0x10000];
+			code = ram[x * 0x100 + ((y + state->m_video_rol) & 0xff) + 0x10000];
 			for (b = 0; b < 8; b++)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;

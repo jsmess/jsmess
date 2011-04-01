@@ -21,17 +21,17 @@ public:
 	pk8020_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 color;
-	UINT8 video_page;
-	UINT8 wide;
-	UINT8 font;
-	UINT8 attr;
-	UINT8 text_attr;
-	UINT8 takt;
-	UINT8 video_page_access;
-	UINT8 portc_data;
-	UINT8 sound_gate;
-	UINT8 sound_level;
+	UINT8 m_color;
+	UINT8 m_video_page;
+	UINT8 m_wide;
+	UINT8 m_font;
+	UINT8 m_attr;
+	UINT8 m_text_attr;
+	UINT8 m_takt;
+	UINT8 m_video_page_access;
+	UINT8 m_portc_data;
+	UINT8 m_sound_gate;
+	UINT8 m_sound_level;
 };
 
 

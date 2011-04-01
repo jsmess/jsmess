@@ -29,14 +29,14 @@ static READ8_DEVICE_HANDLER (ut88_8255_portb_r )
 {
 	ut88_state *state = device->machine().driver_data<ut88_state>();
 	UINT8 key = 0xff;
-	if ((state->keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"LINE0"); }
-	if ((state->keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"LINE1"); }
-	if ((state->keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"LINE2"); }
-	if ((state->keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"LINE3"); }
-	if ((state->keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"LINE4"); }
-	if ((state->keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"LINE5"); }
-	if ((state->keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"LINE6"); }
-	if ((state->keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"LINE7"); }
+	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"LINE0"); }
+	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"LINE1"); }
+	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"LINE2"); }
+	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"LINE3"); }
+	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"LINE4"); }
+	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"LINE5"); }
+	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"LINE6"); }
+	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"LINE7"); }
 	return key;
 }
 
@@ -48,7 +48,7 @@ static READ8_DEVICE_HANDLER (ut88_8255_portc_r )
 static WRITE8_DEVICE_HANDLER (ut88_8255_porta_w )
 {
 	ut88_state *state = device->machine().driver_data<ut88_state>();
-	state->keyboard_mask = data ^ 0xff;
+	state->m_keyboard_mask = data ^ 0xff;
 }
 
 I8255A_INTERFACE( ut88_ppi8255_interface )
@@ -71,7 +71,7 @@ MACHINE_RESET( ut88 )
 	ut88_state *state = machine.driver_data<ut88_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(ut88_reset));
 	memory_set_bank(machine, "bank1", 1);
-	state->keyboard_mask = 0;
+	state->m_keyboard_mask = 0;
 }
 
 
@@ -128,14 +128,14 @@ WRITE8_HANDLER( ut88mini_write_led )
 {
 	ut88_state *state = space->machine().driver_data<ut88_state>();
 		switch(offset) {
-			case 0  : state->lcd_digit[4] = (data >> 4) & 0x0f;
-								state->lcd_digit[5] = data & 0x0f;
+			case 0  : state->m_lcd_digit[4] = (data >> 4) & 0x0f;
+								state->m_lcd_digit[5] = data & 0x0f;
 								break;
-			case 1  : state->lcd_digit[2] = (data >> 4) & 0x0f;
-								state->lcd_digit[3] = data & 0x0f;
+			case 1  : state->m_lcd_digit[2] = (data >> 4) & 0x0f;
+								state->m_lcd_digit[3] = data & 0x0f;
 								break;
-			case 2  : state->lcd_digit[0] = (data >> 4) & 0x0f;
-								state->lcd_digit[1] = data & 0x0f;
+			case 2  : state->m_lcd_digit[0] = (data >> 4) & 0x0f;
+								state->m_lcd_digit[1] = data & 0x0f;
 								break;
 		}
 }
@@ -153,7 +153,7 @@ static TIMER_CALLBACK( update_display )
 	ut88_state *state = machine.driver_data<ut88_state>();
 	int i;
 	for (i=0;i<6;i++) {
-		output_set_digit_value(i, hex_to_7seg[state->lcd_digit[i]]);
+		output_set_digit_value(i, hex_to_7seg[state->m_lcd_digit[i]]);
 	}
 }
 
@@ -170,7 +170,7 @@ MACHINE_START( ut88mini )
 MACHINE_RESET( ut88mini )
 {
 	ut88_state *state = machine.driver_data<ut88_state>();
-	state->lcd_digit[0] = state->lcd_digit[1] = state->lcd_digit[2] = 0;
-	state->lcd_digit[3] = state->lcd_digit[4] = state->lcd_digit[5] = 0;
+	state->m_lcd_digit[0] = state->m_lcd_digit[1] = state->m_lcd_digit[2] = 0;
+	state->m_lcd_digit[3] = state->m_lcd_digit[4] = state->m_lcd_digit[5] = 0;
 }
 

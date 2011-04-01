@@ -11,12 +11,12 @@
 static void draw_mode0_scanline(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
 
-	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->BG0CNT, state->BG0HOFS, state->BG0VOFS);
-	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->BG1CNT, state->BG1HOFS, state->BG1VOFS);
-	draw_bg_scanline(state, line2, y, DISPCNT_BG2_EN, state->BG2CNT, state->BG2HOFS, state->BG2VOFS);
-	draw_bg_scanline(state, line3, y, DISPCNT_BG3_EN, state->BG3CNT, state->BG3HOFS, state->BG3VOFS);
+	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
+	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
+	draw_bg_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2HOFS, state->m_BG2VOFS);
+	draw_bg_scanline(state, line3, y, DISPCNT_BG3_EN, state->m_BG3CNT, state->m_BG3HOFS, state->m_BG3VOFS);
 	draw_gba_oam(state, machine, lineOBJ, y);
 
 	for(x = 0; x < 240; x++)
@@ -83,24 +83,24 @@ static void draw_mode0_scanline(running_machine &machine, gba_state *state, int 
 				top2 = 0x08;
 			}
 
-			if(top2 & (state->BLDCNT >> BLDCNT_TP2_SHIFT))
+			if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
-				color = alpha_blend_pixel(color, back, coeff[state->BLDALPHA & 0x1f], coeff[(state->BLDALPHA >> 8) & 0x1f]);
+				color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
 			}
 			else
 			{
-				switch(state->BLDCNT & BLDCNT_SFX)
+				switch(state->m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -114,13 +114,13 @@ static void draw_mode0_scanline(running_machine &machine, gba_state *state, int 
 static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->gba_pram)[0] | 0x30000000;
-	int effect = state->BLDCNT & BLDCNT_SFX;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	int effect = state->m_BLDCNT & BLDCNT_SFX;
 
-	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->BG0CNT, state->BG0HOFS, state->BG0VOFS);
-	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->BG1CNT, state->BG1HOFS, state->BG1VOFS);
-	draw_bg_scanline(state, line2, y, DISPCNT_BG2_EN, state->BG2CNT, state->BG2HOFS, state->BG2VOFS);
-	draw_bg_scanline(state, line3, y, DISPCNT_BG3_EN, state->BG3CNT, state->BG3HOFS, state->BG3VOFS);
+	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
+	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
+	draw_bg_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2HOFS, state->m_BG2VOFS);
+	draw_bg_scanline(state, line3, y, DISPCNT_BG3_EN, state->m_BG3CNT, state->m_BG3HOFS, state->m_BG3VOFS);
 	draw_gba_oam(state, machine, lineOBJ, y);
 
 	for(x = 0; x < 240; x++)
@@ -165,7 +165,7 @@ static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *st
 				case BLDCNT_SFX_NONE:
 					break;
 				case BLDCNT_SFX_ALPHA:
-					if(state->BLDCNT & top)
+					if(state->m_BLDCNT & top)
 					{
 						UINT32 back = backdrop;
 						UINT8 top2 = 0x20;
@@ -215,22 +215,22 @@ static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *st
 							}
 						}
 
-						if(top2 & (state->BLDCNT >> BLDCNT_TP2_SHIFT))
+						if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
 						{
-							color = alpha_blend_pixel(color, back, coeff[state->BLDALPHA & 0x1f], coeff[(state->BLDALPHA >> 8) & 0x1f]);
+							color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
 						}
 					}
 					break;
 				case BLDCNT_SFX_LIGHTEN:
-					if(top & state->BLDCNT)
+					if(top & state->m_BLDCNT)
 					{
-						color = increase_brightness(color, coeff[state->BLDY & 0x1f]);
+						color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
 					}
 					break;
 				case BLDCNT_SFX_DARKEN:
-					if(top & state->BLDCNT)
+					if(top & state->m_BLDCNT)
 					{
-						color = decrease_brightness(color, coeff[state->BLDY & 0x1f]);
+						color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
 					}
 					break;
 			}
@@ -264,24 +264,24 @@ static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *st
 				top2 = 0x08;
 			}
 
-			if(top2 & (state->BLDCNT >> BLDCNT_TP2_SHIFT))
+			if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
-				color = alpha_blend_pixel(color, back, coeff[state->BLDALPHA & 0x1f], coeff[(state->BLDALPHA >> 8) & 0x1f]);
+				color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
 			}
 			else
 			{
-				switch(state->BLDCNT & BLDCNT_SFX)
+				switch(state->m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -294,17 +294,17 @@ static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *st
 static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
-	UINT8 inWin0Mask = state->WININ & 0x00ff;
-	UINT8 inWin1Mask = state->WININ >> 8;
-	UINT8 outMask = state->WINOUT & 0x00ff;
+	UINT8 inWin0Mask = state->m_WININ & 0x00ff;
+	UINT8 inWin1Mask = state->m_WININ >> 8;
+	UINT8 outMask = state->m_WINOUT & 0x00ff;
 
-	if(state->DISPCNT & DISPCNT_WIN0_EN)
+	if(state->m_DISPCNT & DISPCNT_WIN0_EN)
 	{
-		UINT8 v0 = state->WIN0V >> 8;
-		UINT8 v1 = state->WIN0V & 0x00ff;
+		UINT8 v0 = state->m_WIN0V >> 8;
+		UINT8 v1 = state->m_WIN0V & 0x00ff;
 		inWindow0 = ((v0 == v1) && (v0 >= 0xe8)) ? 1 : 0;
 		if(v1 >= v0)
 		{
@@ -316,10 +316,10 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 		}
 	}
 
-	if(state->DISPCNT & DISPCNT_WIN1_EN)
+	if(state->m_DISPCNT & DISPCNT_WIN1_EN)
 	{
-		UINT8 v0 = state->WIN1V >> 8;
-		UINT8 v1 = state->WIN1V & 0x00ff;
+		UINT8 v0 = state->m_WIN1V >> 8;
+		UINT8 v1 = state->m_WIN1V & 0x00ff;
 		inWindow1 = ((v0 == v1) && (v0 >= 0xe8)) ? 1 : 0;
 		if(v1 >= v0)
 		{
@@ -331,10 +331,10 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 		}
 	}
 
-	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->BG0CNT, state->BG0HOFS, state->BG0VOFS);
-	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->BG1CNT, state->BG1HOFS, state->BG1VOFS);
-	draw_bg_scanline(state, line2, y, DISPCNT_BG2_EN, state->BG2CNT, state->BG2HOFS, state->BG2VOFS);
-	draw_bg_scanline(state, line3, y, DISPCNT_BG3_EN, state->BG3CNT, state->BG3HOFS, state->BG3VOFS);
+	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
+	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
+	draw_bg_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2HOFS, state->m_BG2VOFS);
+	draw_bg_scanline(state, line3, y, DISPCNT_BG3_EN, state->m_BG3CNT, state->m_BG3HOFS, state->m_BG3VOFS);
 	draw_gba_oam(state, machine, lineOBJ, y);
 	draw_gba_oam_window(state, machine, lineOBJWin, y);
 
@@ -346,7 +346,7 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 
 		if((lineOBJWin[x] & 0x80000000) == 0)
 		{
-			mask = state->WINOUT >> 8;
+			mask = state->m_WINOUT >> 8;
 		}
 
 		if(inWindow1)
@@ -399,13 +399,13 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 		{
 			if((color & 0x00010000) == 0)
 			{
-				switch(state->BLDCNT & BLDCNT_SFX)
+				switch(state->m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_NONE:
 						break;
 					case BLDCNT_SFX_ALPHA:
 					{
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
 							UINT32 back = backdrop;
 							UINT8 top2 = 0x20;
@@ -454,23 +454,23 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 								}
 							}
 
-							if(top2 & (state->BLDCNT >> BLDCNT_TP2_SHIFT))
+							if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
 							{
-								color = alpha_blend_pixel(color, back, coeff[state->BLDALPHA & 0x1f], coeff[(state->BLDALPHA >> 8) & 0x1f]);
+								color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
 							}
 						}
 						break;
 					}
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -504,24 +504,24 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 					top2 = 0x08;
 				}
 
-				if(top2 & (state->BLDCNT >> BLDCNT_TP2_SHIFT))
+				if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
 				{
-					color = alpha_blend_pixel(color, back, coeff[state->BLDALPHA & 0x1f], coeff[(state->BLDALPHA >> 8) & 0x1f]);
+					color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
 				}
 				else
 				{
-					switch(state->BLDCNT & BLDCNT_SFX)
+					switch(state->m_BLDCNT & BLDCNT_SFX)
 					{
 						case BLDCNT_SFX_LIGHTEN:
-							if(top & state->BLDCNT)
+							if(top & state->m_BLDCNT)
 							{
-								color = increase_brightness(color, coeff[state->BLDY & 0x1f]);
+								color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
 							}
 							break;
 						case BLDCNT_SFX_DARKEN:
-							if(top & state->BLDCNT)
+							if(top & state->m_BLDCNT)
 							{
-								color = decrease_brightness(color, coeff[state->BLDY & 0x1f]);
+								color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
 							}
 							break;
 					}
@@ -557,24 +557,24 @@ static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, 
 				top2 = 0x08;
 			}
 
-			if(top2 & (state->BLDCNT >> BLDCNT_TP2_SHIFT))
+			if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
-				color = alpha_blend_pixel(color, back, coeff[state->BLDALPHA & 0x1f], coeff[(state->BLDALPHA >> 8) & 0x1f]);
+				color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
 			}
 			else
 			{
-				switch(state->BLDCNT & BLDCNT_SFX)
+				switch(state->m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->BLDCNT)
+						if(top & state->m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
 						}
 						break;
 				}

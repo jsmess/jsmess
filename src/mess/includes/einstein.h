@@ -19,23 +19,23 @@ public:
 	einstein_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *color_screen;
-	device_t *ctc;
+	device_t *m_color_screen;
+	device_t *m_ctc;
 
-	int rom_enabled;
-	int interrupt;
-	int interrupt_mask;
-	int ctc_trigger;
+	int m_rom_enabled;
+	int m_interrupt;
+	int m_interrupt_mask;
+	int m_ctc_trigger;
 
 	/* keyboard */
-	UINT8 keyboard_line;
-	UINT8 keyboard_data;
+	UINT8 m_keyboard_line;
+	UINT8 m_keyboard_data;
 
 	/* 80 column device */
-	device_t *mc6845;
-	screen_device *crtc_screen;
-	UINT8 *crtc_ram;
-	UINT8	de;
+	device_t *m_mc6845;
+	screen_device *m_crtc_screen;
+	UINT8 *m_crtc_ram;
+	UINT8	m_de;
 };
 
 /***************************************************************************

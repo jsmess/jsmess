@@ -69,16 +69,16 @@ public:
 	mbc55x_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t	*maincpu;
-	device_t	*pic8259;
-	device_t	*pit8253;
+	device_t	*m_maincpu;
+	device_t	*m_pic8259;
+	device_t	*m_pit8253;
 
-	UINT32		debug_machine;
-	UINT32		debug_video;
-	UINT8		video_mem[VIDEO_MEM_SIZE];
-	UINT8		vram_page;
+	UINT32		m_debug_machine;
+	UINT32		m_debug_video;
+	UINT8		m_video_mem[VIDEO_MEM_SIZE];
+	UINT8		m_vram_page;
 
-	keyboard_t	keyboard;
+	keyboard_t	m_keyboard;
 };
 
 /* IO chips */

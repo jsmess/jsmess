@@ -35,20 +35,20 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( phunsy_kbd_put );
-	UINT8		*videoram;
-	UINT8		*FNT;
-	UINT8		data_out;
-	UINT8		keyboard_input;
-	UINT8		q_bank;
-	UINT8		u_bank;
-	UINT8		ram_1800[0x800];
+	UINT8		*m_videoram;
+	UINT8		*m_FNT;
+	UINT8		m_data_out;
+	UINT8		m_keyboard_input;
+	UINT8		m_q_bank;
+	UINT8		m_u_bank;
+	UINT8		m_ram_1800[0x800];
 };
 
 
 WRITE8_MEMBER( phunsy_state::phunsy_1800_w )
 {
-	if ( u_bank == 0 )
-		ram_1800[offset] = data;
+	if ( m_u_bank == 0 )
+		m_ram_1800[offset] = data;
 }
 
 
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE( videoram ) // Video RAM
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE( m_videoram ) // Video RAM
 	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1")	// Banked RAM/ROM
 	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
@@ -67,24 +67,24 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 	if (LOG)
 		logerror("%s: phunsy_ctrl_w %02x\n", m_machine.describe_context(), data);
 
-	u_bank = data >> 4;
-	q_bank = data & 0x0F;
+	m_u_bank = data >> 4;
+	m_q_bank = data & 0x0F;
 
-	switch( u_bank )
+	switch( m_u_bank )
 	{
 	case 0x00:	/* RAM */
-		memory_set_bankptr( m_machine, "bank1", ram_1800 );
+		memory_set_bankptr( m_machine, "bank1", m_ram_1800 );
 		break;
 	case 0x01:	/* MDCR program */
 	case 0x02:	/* Disassembler */
 	case 0x03:	/* Label handler */
-		memory_set_bankptr( m_machine, "bank1", m_machine.region("maincpu")->base() + ( 0x800 * u_bank ) );
+		memory_set_bankptr( m_machine, "bank1", m_machine.region("maincpu")->base() + ( 0x800 * m_u_bank ) );
 		break;
 	default:	/* Not used */
 		break;
 	}
 
-	memory_set_bankptr( m_machine, "bank2", m_machine.region("ram_4000")->base() + 0x4000 * q_bank );
+	memory_set_bankptr( m_machine, "bank2", m_machine.region("ram_4000")->base() + 0x4000 * m_q_bank );
 }
 
 
@@ -93,14 +93,14 @@ WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 	if (LOG)
 		logerror("%s: phunsy_data_w %02x\n", m_machine.describe_context(), data);
 
-	data_out = data;
+	m_data_out = data;
 
 	/* b0 - TTY out */
 	/* b1 - select MDCR / keyboard */
 	/* b2 - Clear keyboard strobe signal */
 	if ( data & 0x04 )
 	{
-		keyboard_input |= 0x80;
+		m_keyboard_input |= 0x80;
 	}
 
 	/* b3 - speaker output (manual says it is bit 1)*/
@@ -120,7 +120,7 @@ READ8_MEMBER( phunsy_state::phunsy_data_r )
 	if (LOG)
 		logerror("%s: phunsy_data_r\n", m_machine.describe_context());
 
-	if ( data_out & 0x02 )
+	if ( m_data_out & 0x02 )
 	{
 		/* MDCR selected */
 		/* b0 - TTY input */
@@ -138,7 +138,7 @@ READ8_MEMBER( phunsy_state::phunsy_data_r )
 		/* Keyboard selected */
 		/* b0-b6 - ASCII code from keyboard */
 		/* b7    - strobe signal */
-		data = keyboard_input;
+		data = m_keyboard_input;
 	}
 
 	return data;
@@ -166,7 +166,7 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( phunsy_state::phunsy_kbd_put )
 {
-	keyboard_input = data;
+	m_keyboard_input = data;
 }
 
 
@@ -185,12 +185,12 @@ static MACHINE_RESET(phunsy)
 {
 	phunsy_state *state = machine.driver_data<phunsy_state>();
 
-	memory_set_bankptr( machine, "bank1", state->ram_1800 );
+	memory_set_bankptr( machine, "bank1", state->m_ram_1800 );
 	memory_set_bankptr( machine, "bank2", machine.region("ram_4000")->base() );
 
-	state->u_bank = 0;
-	state->q_bank = 0;
-	state->keyboard_input = 0xFF;
+	state->m_u_bank = 0;
+	state->m_q_bank = 0;
+	state->m_keyboard_input = 0xFF;
 }
 
 
@@ -208,7 +208,7 @@ static PALETTE_INIT( phunsy )
 static VIDEO_START( phunsy )
 {
 	phunsy_state *state = machine.driver_data<phunsy_state>();
-	state->FNT = machine.region( "chargen" )->base();
+	state->m_FNT = machine.region( "chargen" )->base();
 }
 
 
@@ -226,7 +226,7 @@ static SCREEN_UPDATE( phunsy )
 
 			for (x = ma; x < ma+64; x++)
 			{
-				chr = state->videoram[x];
+				chr = state->m_videoram[x];
 
 				if (BIT(chr, 7))
 				{
@@ -241,7 +241,7 @@ static SCREEN_UPDATE( phunsy )
 				else
 				{
 					/* ASCII mode */
-					gfx = state->FNT[(chr<<3) | ra];
+					gfx = state->m_FNT[(chr<<3) | ra];
 					col = 7;
 				}
 

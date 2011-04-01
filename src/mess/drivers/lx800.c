@@ -23,7 +23,7 @@ public:
 	lx800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *speaker;
+	device_t *m_speaker;
 };
 
 
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( lx800_portc_w )
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
 	output_set_value("online_led", !BIT(data, 2));
-	beep_set_state(lx800->speaker, !BIT(data, 7));
+	beep_set_state(lx800->m_speaker, !BIT(data, 7));
 }
 
 
@@ -127,10 +127,10 @@ static MACHINE_START( lx800 )
 {
 	lx800_state *lx800 = machine.driver_data<lx800_state>();
 
-	lx800->speaker = machine.device("beep");
+	lx800->m_speaker = machine.device("beep");
 
-	beep_set_state(lx800->speaker, 0);
-	beep_set_frequency(lx800->speaker, 4000); /* ? */
+	beep_set_state(lx800->m_speaker, 0);
+	beep_set_frequency(lx800->m_speaker, 4000); /* ? */
 }
 
 

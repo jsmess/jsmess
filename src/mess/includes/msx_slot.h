@@ -113,13 +113,13 @@ enum msx_mem_type {
 };
 
 typedef struct {
-	int type;
-	int start_page;
-	int bank_mask;
-	int banks[4];
-	int size;
-	UINT8 *mem;
-	const char *sramfile;
+	int m_type;
+	int m_start_page;
+	int m_bank_mask;
+	int m_banks[4];
+	int m_size;
+	UINT8 *m_mem;
+	const char *m_sramfile;
 	union {
 		struct {
 			UINT8 *mem;
@@ -142,7 +142,7 @@ typedef struct {
 			int banks_saved[4];
 			int mode;
 		} sccp;
-	} cart;
+	} m_cart;
 } slot_state;
 
 typedef struct {

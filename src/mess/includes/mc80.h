@@ -17,8 +17,8 @@ public:
 	mc80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* mc8020_video_ram;
-	UINT8 *mc8030_video_mem;
+	UINT8* m_mc8020_video_ram;
+	UINT8 *m_mc8030_video_mem;
 };
 
 

@@ -38,7 +38,7 @@ PALETTE_INIT( channelf )
 VIDEO_START( channelf )
 {
 	channelf_state *state = machine.driver_data<channelf_state>();
-	state->videoram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_videoram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
 static int recalc_palette_offset(int reg1, int reg2)
@@ -52,7 +52,7 @@ static int recalc_palette_offset(int reg1, int reg2)
 SCREEN_UPDATE( channelf )
 {
 	channelf_state *state = screen->machine().driver_data<channelf_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int x,y,offset, palette_offset;
 	int color;
 	UINT16 pen;

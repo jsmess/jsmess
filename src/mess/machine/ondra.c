@@ -41,7 +41,7 @@ static void ondra_update_banks(running_machine &machine)
 {
 	ondra_state *state = machine.driver_data<ondra_state>();
 	UINT8 *mem = machine.region("maincpu")->base();
-	if (state->bank1_status==0) {
+	if (state->m_bank1_status==0) {
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	} else {
@@ -49,7 +49,7 @@ static void ondra_update_banks(running_machine &machine)
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x0000);
 	}
 	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000);
-	if (state->bank2_status==0) {
+	if (state->m_bank2_status==0) {
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xe000, 0xffff, "bank3");
 		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0xe000);
 	} else {
@@ -61,9 +61,9 @@ static void ondra_update_banks(running_machine &machine)
 WRITE8_HANDLER( ondra_port_03_w )
 {
 	ondra_state *state = space->machine().driver_data<ondra_state>();
-	state->video_enable = data & 1;
-	state->bank1_status = (data >> 1) & 1;
-	state->bank2_status = (data >> 2) & 1;
+	state->m_video_enable = data & 1;
+	state->m_bank1_status = (data >> 1) & 1;
+	state->m_bank2_status = (data >> 2) & 1;
 	ondra_update_banks(space->machine());
 	cassette_output(cassette_device_image(space->machine()), ((data >> 3) & 1) ? -1.0 : +1.0);
 }
@@ -87,8 +87,8 @@ static TIMER_CALLBACK(nmi_check_callback)
 MACHINE_RESET( ondra )
 {
 	ondra_state *state = machine.driver_data<ondra_state>();
-	state->bank1_status = 0;
-	state->bank2_status = 0;
+	state->m_bank1_status = 0;
+	state->m_bank2_status = 0;
 	ondra_update_banks(machine);
 }
 

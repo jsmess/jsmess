@@ -15,7 +15,7 @@ public:
 	mk2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 led[5];
+	UINT8 m_led[5];
 };
 
 
@@ -93,13 +93,13 @@ static TIMER_DEVICE_CALLBACK( update_leds )
 	int i;
 
 	for (i=0; i<4; i++)
-	output_set_digit_value(i, state->led[i]);
-	output_set_led_value(0, state->led[4]&8?1:0);
-	output_set_led_value(1, state->led[4]&0x20?1:0);
-	output_set_led_value(2, state->led[4]&0x10?1:0);
-	output_set_led_value(3, state->led[4]&0x10?0:1);
+	output_set_digit_value(i, state->m_led[i]);
+	output_set_led_value(0, state->m_led[4]&8?1:0);
+	output_set_led_value(1, state->m_led[4]&0x20?1:0);
+	output_set_led_value(2, state->m_led[4]&0x10?1:0);
+	output_set_led_value(3, state->m_led[4]&0x10?0:1);
 
-	state->led[0]= state->led[1]= state->led[2]= state->led[3]= state->led[4]= 0;
+	state->m_led[0]= state->m_led[1]= state->m_led[2]= state->m_led[3]= state->m_led[4]= 0;
 }
 
 static MACHINE_START( mk2 )
@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER( mk2_write_a )
 
 	switch(temp&0x3) {
 	case 0: case 1: case 2: case 3:
-		state->led[temp&3]|=data;
+		state->m_led[temp&3]|=data;
 	}
 }
 
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( mk2_write_b )
 
 	if ((data&0x06)==0x06)
 		dac_data_w(dac_device,data&1?80:0);
-	state->led[4]|=data;
+	state->m_led[4]|=data;
 
 	cputag_set_input_line( device->machine(), "maincpu", M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }

@@ -30,27 +30,27 @@ public:
 	supercon_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	emu_timer* timer_update_irq;
-	emu_timer* timer_mouse_click;
-	int emu_started;
-	int moving_piece;
-	UINT8 data_1E00;
-	UINT8 data_1F00;
-	UINT8 LED_18;
-	UINT8 LED_AH;
-	UINT8 LED_ST;
-	UINT8 *last_LED;
-	UINT8 last_LED_value;
-	int led_update;
-	int remove_led_flag;
-	int selecting;
-	int save_key_data;
-	attotime wait_time; 
-	int *current_field;
-	int confirm_board_click;
+	UINT8 *m_ram;
+	emu_timer* m_timer_update_irq;
+	emu_timer* m_timer_mouse_click;
+	int m_emu_started;
+	int m_moving_piece;
+	UINT8 m_data_1E00;
+	UINT8 m_data_1F00;
+	UINT8 m_LED_18;
+	UINT8 m_LED_AH;
+	UINT8 m_LED_ST;
+	UINT8 *m_last_LED;
+	UINT8 m_last_LED_value;
+	int m_led_update;
+	int m_remove_led_flag;
+	int m_selecting;
+	int m_save_key_data;
+	attotime m_wait_time; 
+	int *m_current_field;
+	int m_confirm_board_click;
 	int m_board[64];
-	int save_board[64];
+	int m_save_board[64];
 };
 
 
@@ -168,17 +168,17 @@ static void update_leds( supercon_state *state )
 
 	for (i = 0; i < 8; i++)
 	{
-		if (BIT(state->LED_18, i))
+		if (BIT(state->m_LED_18, i))
 			output_set_led_value(i + 1, 1);
 		else
 			output_set_led_value(i + 1, 0);
 
-		if (BIT(state->LED_AH, i))
+		if (BIT(state->m_LED_AH, i))
 			output_set_led_value(i + 9, 1);
 		else
 			output_set_led_value(i + 9, 0);
 
-		if (BIT(state->LED_ST, i))
+		if (BIT(state->m_LED_ST, i))
 			output_set_led_value(i + 17, 1);
 		else
 			output_set_led_value(i + 17, 0);
@@ -197,8 +197,8 @@ static void mouse_update(running_machine &machine)
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
-		state->moving_piece=border_pieces[i];
-		output_set_value("MOVING",state->moving_piece);
+		state->m_moving_piece=border_pieces[i];
+		output_set_value("MOVING",state->m_moving_piece);
 		return;
 	}
 
@@ -207,8 +207,8 @@ static void mouse_update(running_machine &machine)
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
-		state->moving_piece=border_pieces[6+i];
-		output_set_value("MOVING",state->moving_piece);
+		state->m_moving_piece=border_pieces[6+i];
+		output_set_value("MOVING",state->m_moving_piece);
 		return;
 	}
 
@@ -216,10 +216,10 @@ static void mouse_update(running_machine &machine)
 	port_input=input_port_read(machine, "B_CLR");
 	if (port_input)
 	{
-		if (state->moving_piece)
+		if (state->m_moving_piece)
 		{
-			state->moving_piece=0;
-			output_set_value("MOVING",state->moving_piece);
+			state->m_moving_piece=0;
+			output_set_value("MOVING",state->m_moving_piece);
 			return;
 		}
 	}
@@ -230,14 +230,14 @@ static void mouse_update(running_machine &machine)
 static DRIVER_INIT(supercon)
 {
 	supercon_state *state = machine.driver_data<supercon_state>();
-	state->LED_18=0;
-	state->LED_AH=0;
-	state->LED_ST=0;
+	state->m_LED_18=0;
+	state->m_LED_AH=0;
+	state->m_LED_ST=0;
 
-	state->wait_time =  attotime::from_hz(4);
-	state->save_key_data = 0xff;
+	state->m_wait_time =  attotime::from_hz(4);
+	state->m_save_key_data = 0xff;
 
-	state->moving_piece=0;
+	state->m_moving_piece=0;
 }
 
 /* Read 1C000 */
@@ -271,49 +271,49 @@ static READ8_HANDLER( supercon_port3_r )
 
 /* remove last bit (only if it was not already set) */
 
-	if ( state->data_1F00 & LED_LINE_AH )
+	if ( state->m_data_1F00 & LED_LINE_AH )
 	{
-		if (state->last_LED_value != state->LED_AH)
-			state->LED_AH=state->LED_AH & ~state->data_1E00;
+		if (state->m_last_LED_value != state->m_LED_AH)
+			state->m_LED_AH=state->m_LED_AH & ~state->m_data_1E00;
 	}
-	else if ( state->data_1F00 & LED_LINE_ST)
+	else if ( state->m_data_1F00 & LED_LINE_ST)
 	{
-		if (state->last_LED_value != state->LED_ST)
-			state->LED_ST=state->LED_ST & ~state->data_1E00;
+		if (state->m_last_LED_value != state->m_LED_ST)
+			state->m_LED_ST=state->m_LED_ST & ~state->m_data_1E00;
 	}
-	else if ( state->data_1F00 & LED_LINE_18 )
+	else if ( state->m_data_1F00 & LED_LINE_18 )
 	{
-		if (state->last_LED_value != state->LED_18)
-			state->LED_18=state->LED_18 & ~state->data_1E00;
+		if (state->m_last_LED_value != state->m_LED_18)
+			state->m_LED_18=state->m_LED_18 & ~state->m_data_1E00;
 	}
 
 
-	LOG(("LED_18 from %02x \n",state->LED_18));
-	LOG(("LED_AH from %02x \n",state->LED_AH));
-	LOG(("LED_ST from %02x \n",state->LED_ST));
+	LOG(("LED_18 from %02x \n",state->m_LED_18));
+	LOG(("LED_AH from %02x \n",state->m_LED_AH));
+	LOG(("LED_ST from %02x \n",state->m_LED_ST));
 
-	if (state->led_update)			/*No LED Update if Port 1C00,1D00 was read */
+	if (state->m_led_update)			/*No LED Update if Port 1C00,1D00 was read */
 		update_leds(state);
 
-	state->remove_led_flag=TRUE;
-	state->led_update=TRUE;
+	state->m_remove_led_flag=TRUE;
+	state->m_led_update=TRUE;
 
-	state->LED_18=0;
-	state->LED_AH=0;
-	state->LED_ST=0;
+	state->m_LED_18=0;
+	state->m_LED_AH=0;
+	state->m_LED_ST=0;
 
 
 /* Start */
 
-	if (!state->emu_started)
+	if (!state->m_emu_started)
 		return 0xbf;
 	else
-		state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(598) );  //HACK adjust timer after start ???
+		state->m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(598) );  //HACK adjust timer after start ???
 
 
 /* Buttons */
 
-	i=get_first_bit(state->data_1E00);
+	i=get_first_bit(state->m_data_1E00);
 	if (i==NOT_VALID)
 		return 0xff;
 
@@ -330,7 +330,7 @@ static READ8_HANDLER( supercon_port3_r )
 			set_board(state);
 			set_pieces(state);
 
-			state->emu_started=FALSE;
+			state->m_emu_started=FALSE;
 		}
 
 /* Button: Clear Board -> remove all pieces */
@@ -361,18 +361,18 @@ static READ8_HANDLER( supercon_port4_r )
 
 /* Board buttons */
 
-	i_18=get_first_bit(state->data_1E00);
+	i_18=get_first_bit(state->m_data_1E00);
 	if (i_18==NOT_VALID)
 		return 0xff;
 
 /* if a button was pressed wait til timer -timer_mouse_click- is fired */
 
-	if (state->selecting)
-		return state->save_key_data;
+	if (state->m_selecting)
+		return state->m_save_key_data;
 	else
 	{
 		set_pieces(state);
-		output_set_value("MOVING",state->moving_piece);
+		output_set_value("MOVING",state->m_moving_piece);
 	}
 
 	key_data=input_port_read(space->machine(), board_lines[i_18]);
@@ -391,22 +391,22 @@ static READ8_HANDLER( supercon_port4_r )
 			i_AH=7-get_first_cleared_bit(key_data);
 			LOG(("Press -> AH: %d 18: %d Piece: %d\n",i_AH,i_18,state->m_board[i_18*8 + i_AH]););
 
-			state->current_field=&state->m_board[i_18*8 + i_AH];
+			state->m_current_field=&state->m_board[i_18*8 + i_AH];
 
-			if (state->moving_piece)
+			if (state->m_moving_piece)
 			{
-				*state->current_field = state->moving_piece;
-				state->moving_piece = EM;
+				*state->m_current_field = state->m_moving_piece;
+				state->m_moving_piece = EM;
 			}
 			else
 			{
-				state->moving_piece = *state->current_field;
-				*state->current_field = EM;
+				state->m_moving_piece = *state->m_current_field;
+				*state->m_current_field = EM;
 			}
-			state->selecting=TRUE;				/* Flag is removed in timer -timer_mouse_click- */
-			state->save_key_data=key_data;		/* return same key_data til flag selecting is removed */
+			state->m_selecting=TRUE;				/* Flag is removed in timer -timer_mouse_click- */
+			state->m_save_key_data=key_data;		/* return same key_data til flag selecting is removed */
 
-			state->timer_mouse_click->adjust(state->wait_time, 0);
+			state->m_timer_mouse_click->adjust(state->m_wait_time, 0);
 
 			return key_data;
 		}
@@ -421,7 +421,7 @@ static WRITE8_HANDLER( supercon_port1_w )
 {
 	supercon_state *state = space->machine().driver_data<supercon_state>();
 	LOG(("Write from %04x data: %02x\n",0x1C00,data));
-	state->led_update=FALSE;
+	state->m_led_update=FALSE;
 }
 
 /* Write Port $1D00 */
@@ -431,7 +431,7 @@ static WRITE8_HANDLER( supercon_port2_w )
 	supercon_state *state = space->machine().driver_data<supercon_state>();
 
 	LOG(("Write from %04x data: %02x\n",0x1D00,data));
-	state->led_update=FALSE;
+	state->m_led_update=FALSE;
 }
 
 /* Write Port $1E00 */
@@ -445,33 +445,33 @@ static WRITE8_HANDLER( supercon_port3_w )
 
 	if (data)
 	{
-		state->data_1E00=data;
+		state->m_data_1E00=data;
 
 /* Set bits for LED's */
 
-		if ( state->data_1F00)
+		if ( state->m_data_1F00)
 		{
 
-			if (state->data_1F00 & LED_LINE_AH )
+			if (state->m_data_1F00 & LED_LINE_AH )
 			{
-				state->last_LED = &state->LED_AH;				/* save last value */
-				state->last_LED_value = *state->last_LED;
+				state->m_last_LED = &state->m_LED_AH;				/* save last value */
+				state->m_last_LED_value = *state->m_last_LED;
 
-				state->LED_AH=state->LED_AH | state->data_1E00;
+				state->m_LED_AH=state->m_LED_AH | state->m_data_1E00;
 			}
-			else if (state->data_1F00 & LED_LINE_ST )
+			else if (state->m_data_1F00 & LED_LINE_ST )
 			{
-				state->last_LED = &state->LED_ST;
-				state->last_LED_value = *state->last_LED;
+				state->m_last_LED = &state->m_LED_ST;
+				state->m_last_LED_value = *state->m_last_LED;
 
-				state->LED_ST=state->LED_ST | state->data_1E00;
+				state->m_LED_ST=state->m_LED_ST | state->m_data_1E00;
 			}
-			else if (state->data_1F00 &  LED_LINE_18)
+			else if (state->m_data_1F00 &  LED_LINE_18)
 			{
-				state->last_LED = &state->LED_18;
-				state->last_LED_value = *state->last_LED;
+				state->m_last_LED = &state->m_LED_18;
+				state->m_last_LED_value = *state->m_last_LED;
 
-				state->LED_18=state->LED_18 | state->data_1E00;
+				state->m_LED_18=state->m_LED_18 | state->m_data_1E00;
 			}
 		}
 
@@ -490,14 +490,14 @@ static WRITE8_HANDLER( supercon_port4_w )
 		LOG(("Write from %04x data: %02x\n",0x1F00,data));
 
 	if (data)
-		state->data_1F00=data;
+		state->m_data_1F00=data;
 
 /* Bit 7 is set -> Buzzer on */
 
-	if ( state->data_1F00 & 0x80 )
+	if ( state->m_data_1F00 & 0x80 )
 	{
 		beep_set_state(speaker,1);
-		state->emu_started=TRUE;
+		state->m_emu_started=TRUE;
 	}
 	else
 		beep_set_state(speaker,0);
@@ -509,9 +509,9 @@ static TIMER_CALLBACK( mouse_click )
 	supercon_state *state = machine.driver_data<supercon_state>();
 
 	if (input_port_read_safe(machine, "BUTTON_L",0) )				/* wait for mouse release */
-		state->timer_mouse_click->adjust(state->wait_time, 0);
+		state->m_timer_mouse_click->adjust(state->m_wait_time, 0);
 	else
-		state->selecting=FALSE;
+		state->m_selecting=FALSE;
 }
 
 static TIMER_DEVICE_CALLBACK( update_artwork )
@@ -532,7 +532,7 @@ static STATE_PRESAVE( m_board_presave )
     supercon_state *state = machine.driver_data<supercon_state>();
     int i;
     for (i=0;i<64;i++)
-        state->save_board[i]=state->m_board[i];
+        state->m_save_board[i]=state->m_board[i];
 }
 
 static STATE_POSTLOAD( m_board_postload )
@@ -540,7 +540,7 @@ static STATE_POSTLOAD( m_board_postload )
     supercon_state *state = machine.driver_data<supercon_state>();
     int i;
     for (i=0;i<64;i++)
-        state->m_board[i]=state->save_board[i];
+        state->m_board[i]=state->m_save_board[i];
 
     set_pieces(state);
 }
@@ -549,13 +549,13 @@ static MACHINE_START( supercon )
 {
 	supercon_state *state = machine.driver_data<supercon_state>();
 
-	state->timer_update_irq = machine.scheduler().timer_alloc(FUNC(update_irq));
-	state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
+	state->m_timer_update_irq = machine.scheduler().timer_alloc(FUNC(update_irq));
+	state->m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
 
-	state->timer_mouse_click =  machine.scheduler().timer_alloc(FUNC(mouse_click),NULL);
+	state->m_timer_mouse_click =  machine.scheduler().timer_alloc(FUNC(mouse_click),NULL);
 
 
-    state->save_item(NAME(state->save_board));
+    state->save_item(NAME(state->m_save_board));
     machine.state().register_postload(m_board_postload,NULL);
     machine.state().register_presave(m_board_presave,NULL);
 
@@ -568,13 +568,13 @@ static MACHINE_RESET( supercon )
 	set_pieces(state);
 	set_boarder_pieces();
 
-	state->emu_started=FALSE;
+	state->m_emu_started=FALSE;
 }
 
 /* Address maps */
 
 static ADDRESS_MAP_START(supercon_mem, AS_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(supercon_state, ram )
+	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(supercon_state, m_ram )
 	AM_RANGE( 0x2000, 0x7fff) AM_ROM
     AM_RANGE( 0x8000, 0xffff) AM_ROM
 

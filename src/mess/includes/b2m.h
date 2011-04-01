@@ -19,25 +19,25 @@ public:
 	b2m_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 b2m_8255_porta;
-	UINT8 b2m_video_scroll;
-	UINT8 b2m_8255_portc;
+	UINT8 m_b2m_8255_porta;
+	UINT8 m_b2m_video_scroll;
+	UINT8 m_b2m_8255_portc;
 
-	UINT8 b2m_video_page;
-	UINT8 b2m_drive;
-	UINT8 b2m_side;
+	UINT8 m_b2m_video_page;
+	UINT8 m_b2m_drive;
+	UINT8 m_b2m_side;
 
-	UINT8 b2m_romdisk_lsb;
-	UINT8 b2m_romdisk_msb;
+	UINT8 m_b2m_romdisk_lsb;
+	UINT8 m_b2m_romdisk_msb;
 
-	UINT8 b2m_color[4];
-	UINT8 b2m_localmachine;
-	UINT8 vblank_state;
+	UINT8 m_b2m_color[4];
+	UINT8 m_b2m_localmachine;
+	UINT8 m_vblank_state;
 
 	/* devices */
-	device_t *fdc;
-	device_t *pic;
-	device_t *speaker;
+	device_t *m_fdc;
+	device_t *m_pic;
+	device_t *m_speaker;
 };
 
 /*----------- defined in machine/b2m.c -----------*/

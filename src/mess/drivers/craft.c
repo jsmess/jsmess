@@ -47,29 +47,29 @@ public:
 	craft_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config)
 	{
-    	timer0_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer0_tick));
-		timer0_increment = 1;
+    	m_timer0_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer0_tick));
+		m_timer0_increment = 1;
 
-    	timer1_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer1_tick));
-		timer1_increment = 1;
+    	m_timer1_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer1_tick));
+		m_timer1_increment = 1;
 
-    	timer2_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer2_tick));
-		timer2_increment = 1;
+    	m_timer2_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer2_tick));
+		m_timer2_increment = 1;
 	}
 
-	UINT8 regs[0x100];
+	UINT8 m_regs[0x100];
 
-	emu_timer* timer0_timer;
-	UINT8 timer0_top;
-	INT32 timer0_increment;
+	emu_timer* m_timer0_timer;
+	UINT8 m_timer0_top;
+	INT32 m_timer0_increment;
 
-	emu_timer* timer1_timer;
-	UINT16 timer1_top;
-	INT32 timer1_increment;
+	emu_timer* m_timer1_timer;
+	UINT16 m_timer1_top;
+	INT32 m_timer1_increment;
 
-	emu_timer* timer2_timer;
-	UINT8 timer2_top;
-	INT32 timer2_increment;
+	emu_timer* m_timer2_timer;
+	UINT8 m_timer2_top;
+	INT32 m_timer2_increment;
 };
 
 enum
@@ -93,7 +93,7 @@ static TIMER_CALLBACK( avr8_timer1_tick )
 
     craft_state *state = machine.driver_data<craft_state>();
     UINT16 count = AVR8_TCNT1;
-    count += state->timer1_increment;
+    count += state->m_timer1_increment;
 
     for(INT32 reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
     {
@@ -201,7 +201,7 @@ static READ8_HANDLER( avr8_read )
 
 	if(offset <= Avr8::REGIDX_R31)
 	{
-		return state->regs[offset];
+		return state->m_regs[offset];
 	}
 
     switch( offset )
@@ -209,7 +209,7 @@ static READ8_HANDLER( avr8_read )
 		case Avr8::REGIDX_SPL:
 		case Avr8::REGIDX_SPH:
 		case Avr8::REGIDX_SREG:
-			return state->regs[offset];
+			return state->m_regs[offset];
 
         default:
             verboselog(space->machine(), 0, "AVR8: Unrecognized register read: %02x\n", offset );
@@ -466,41 +466,41 @@ static void avr8_update_timer1_waveform_gen_mode(running_machine &machine)
 {
 	// TODO
     craft_state *state = machine.driver_data<craft_state>();
-	state->timer1_top = 0;
+	state->m_timer1_top = 0;
 	verboselog(machine, 0, "avr8_update_timer1_waveform_gen_mode: TODO; WGM1 is %d\n", AVR8_WGM1 );
 	switch(AVR8_WGM1)
 	{
 		case Avr8::WGM1_NORMAL:
-			state->timer1_top = 0xffff;
+			state->m_timer1_top = 0xffff;
 			break;
 
 		case Avr8::WGM1_PWM_8_PC:
 		case Avr8::WGM1_FAST_PWM_8:
-			state->timer1_top = 0x00ff;
+			state->m_timer1_top = 0x00ff;
 			break;
 
 		case Avr8::WGM1_PWM_9_PC:
 		case Avr8::WGM1_FAST_PWM_9:
-			state->timer1_top = 0x01ff;
+			state->m_timer1_top = 0x01ff;
 			break;
 
 		case Avr8::WGM1_PWM_10_PC:
 		case Avr8::WGM1_FAST_PWM_10:
-			state->timer1_top = 0x03ff;
+			state->m_timer1_top = 0x03ff;
 			break;
 
 		case Avr8::WGM1_PWM_PFC_ICR:
 		case Avr8::WGM1_PWM_PC_ICR:
 		case Avr8::WGM1_CTC_ICR:
 		case Avr8::WGM1_FAST_PWM_ICR:
-			state->timer1_top = AVR8_ICR1;
+			state->m_timer1_top = AVR8_ICR1;
 			break;
 
 		case Avr8::WGM1_PWM_PFC_OCR:
 		case Avr8::WGM1_PWM_PC_OCR:
 		case Avr8::WGM1_CTC_OCR:
 		case Avr8::WGM1_FAST_PWM_OCR:
-			state->timer1_top = AVR8_OCR1A;
+			state->m_timer1_top = AVR8_OCR1A;
 			break;
 
 		default:
@@ -541,7 +541,7 @@ static TIMER_CALLBACK( avr8_timer2_tick )
 
     craft_state *state = machine.driver_data<craft_state>();
     UINT16 count = AVR8_TCNT2;
-    count += state->timer1_increment;
+    count += state->m_timer1_increment;
     for(INT32 reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
     {
         UINT8 mode = (reg == AVR8_REG_A) ? AVR8_TCCR2A_COM2A : AVR8_TCCR2A_COM2B;
@@ -669,7 +669,7 @@ static void avr8_update_timer1_clock_source(running_machine &machine)
 			verboselog(machine, 0, "avr8_update_timer1_clock_source: T1 Trigger mode not implemented yet\n");
 			break;
 	}
-	state->timer1_timer->adjust(period, 0, period);
+	state->m_timer1_timer->adjust(period, 0, period);
 }
 
 static void avr8_changed_tccr1b(running_machine &machine, UINT8 data)
@@ -707,19 +707,19 @@ static void avr8_changed_tccr1b(running_machine &machine, UINT8 data)
 static void avr8_update_timer2_waveform_gen_mode(running_machine &machine)
 {
     craft_state *state = machine.driver_data<craft_state>();
-    state->timer2_top = 0;
+    state->m_timer2_top = 0;
 	switch(AVR8_WGM2)
 	{
 		case Avr8::WGM2_NORMAL:
 		case Avr8::WGM2_PWM_PC:
 		case Avr8::WGM2_FAST_PWM:
-			state->timer2_top = 0x00ff;
+			state->m_timer2_top = 0x00ff;
 			break;
 
 		case Avr8::WGM2_CTC_CMP:
 		case Avr8::WGM2_PWM_PC_CMP:
 		case Avr8::WGM2_FAST_PWM_CMP:
-			state->timer2_top = AVR8_OCR2A;
+			state->m_timer2_top = AVR8_OCR2A;
 			break;
 
 		default:
@@ -774,7 +774,7 @@ static void avr8_update_timer2_clock_source(running_machine &machine)
 			period = attotime::from_hz(MASTER_CLOCK/1024);
 			break;
 	}
-	state->timer2_timer->adjust(period, 0, period);
+	state->m_timer2_timer->adjust(period, 0, period);
 }
 
 static void avr8_timer2_force_output_compare(running_machine &machine, int reg)
@@ -832,7 +832,7 @@ static WRITE8_HANDLER( avr8_write )
 
 	if(offset <= Avr8::REGIDX_R31)
 	{
-		state->regs[offset] = data;
+		state->m_regs[offset] = data;
 		return;
 	}
 
@@ -886,7 +886,7 @@ static WRITE8_HANDLER( avr8_write )
 		case Avr8::REGIDX_SPL:
 		case Avr8::REGIDX_SPH:
 		case Avr8::REGIDX_SREG:
-			state->regs[offset] = data;
+			state->m_regs[offset] = data;
 			break;
 
 		case Avr8::REGIDX_SPSR:

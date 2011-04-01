@@ -14,12 +14,12 @@ public:
 	p2000t_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 port_101f;
-	UINT8 port_202f;
-	UINT8 port_303f;
-	UINT8 port_707f;
-	INT8 frame_count;
+	UINT8 *m_videoram;
+	UINT8 m_port_101f;
+	UINT8 m_port_202f;
+	UINT8 m_port_303f;
+	UINT8 m_port_707f;
+	INT8 m_frame_count;
 };
 
 

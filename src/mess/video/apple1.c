@@ -75,13 +75,13 @@ static TILE_GET_INFO(terminal_gettileinfo)
 	apple1_state *state = machine.driver_data<apple1_state>();
 	int ch, gfxfont, code, color;
 
-	ch = state->current_terminal->mem[tile_index];
-	code = ch & ((1 << state->current_terminal->char_bits) - 1);
-	color = ch >> state->current_terminal->char_bits;
-	gfxfont = state->current_terminal->gfx;
+	ch = state->m_current_terminal->mem[tile_index];
+	code = ch & ((1 << state->m_current_terminal->char_bits) - 1);
+	color = ch >> state->m_current_terminal->char_bits;
+	gfxfont = state->m_current_terminal->gfx;
 
-	if ((tile_index == state->current_terminal->cur_offset) && !state->current_terminal->cur_hidden && state->current_terminal->getcursorcode)
-		code = state->current_terminal->getcursorcode(code);
+	if ((tile_index == state->m_current_terminal->cur_offset) && !state->m_current_terminal->cur_hidden && state->m_current_terminal->getcursorcode)
+		code = state->m_current_terminal->getcursorcode(code);
 
 	SET_TILE_INFO(
 		gfxfont,	/* gfx */
@@ -93,9 +93,9 @@ static TILE_GET_INFO(terminal_gettileinfo)
 static void terminal_draw(running_machine &machine, bitmap_t *dest, const rectangle *cliprect, terminal_t *terminal)
 {
 	apple1_state *state = machine.driver_data<apple1_state>();
-	state->current_terminal = terminal;
+	state->m_current_terminal = terminal;
 	tilemap_draw(dest, cliprect, terminal->tm, 0, 0);
-	state->current_terminal = NULL;
+	state->m_current_terminal = NULL;
 }
 
 static void verify_coords(terminal_t *terminal, int x, int y)
@@ -231,8 +231,8 @@ static int apple1_getcursorcode(int original_code)
 VIDEO_START( apple1 )
 {
 	apple1_state *state = machine.driver_data<apple1_state>();
-	state->blink_on = 1;		/* cursor is visible initially */
-	state->terminal = terminal_create(
+	state->m_blink_on = 1;		/* cursor is visible initially */
+	state->m_terminal = terminal_create(
 		machine,
 		0,			/* graphics font 0 (the only one we have) */
 		32,			/* Blank character is symbol 32 in the ROM */
@@ -240,7 +240,7 @@ VIDEO_START( apple1 )
 		apple1_getcursorcode,
 		40, 24);	/* 40 columns, 24 rows */
 
-	terminal_setcursor(state->terminal, 0, 0);
+	terminal_setcursor(state->m_terminal, 0, 0);
 }
 
 /* This function handles all writes to the video display. */
@@ -252,13 +252,13 @@ void apple1_vh_dsp_w (running_machine &machine, int data)
 
 	/* While CLEAR SCREEN is being held down, the hardware is forced
        to clear the video memory, so video writes have no effect. */
-	if (state->vh_clrscrn_pressed)
+	if (state->m_vh_clrscrn_pressed)
 		return;
 
 	/* The video display port only accepts the 7 lowest bits of the char. */
 	data &= 0x7f;
 
-	terminal_getcursor(state->terminal, &cursor_x, &cursor_y);
+	terminal_getcursor(state->m_terminal, &cursor_x, &cursor_y);
 
 	if (data == '\r') {
 		/* Carriage-return moves the cursor to the start of the next
@@ -283,7 +283,7 @@ void apple1_vh_dsp_w (running_machine &machine, int data)
 
 		int romindx = (data & 0x1f) | (((data ^ 0x40) & 0x40) >> 1);
 
-		terminal_putchar(state->terminal, cursor_x, cursor_y, romindx);
+		terminal_putchar(state->m_terminal, cursor_x, cursor_y, romindx);
 		if (cursor_x < 39)
 		{
 			cursor_x++;
@@ -300,16 +300,16 @@ void apple1_vh_dsp_w (running_machine &machine, int data)
 	{
 		for (y = 1; y < 24; y++)
 			for (x = 0; x < 40; x++)
-				terminal_putchar(state->terminal, x, y-1,
-								 terminal_getchar(state->terminal, x, y));
+				terminal_putchar(state->m_terminal, x, y-1,
+								 terminal_getchar(state->m_terminal, x, y));
 
 		for (x = 0; x < 40; x++)
-			terminal_putblank(state->terminal, x, 23);
+			terminal_putblank(state->m_terminal, x, 23);
 
 		cursor_y--;
 	}
 
-	terminal_setcursor(state->terminal, cursor_x, cursor_y);
+	terminal_setcursor(state->m_terminal, cursor_x, cursor_y);
 }
 
 /* This function handles clearing the video display on cold-boot or in
@@ -317,8 +317,8 @@ void apple1_vh_dsp_w (running_machine &machine, int data)
 void apple1_vh_dsp_clr (running_machine &machine)
 {
 	apple1_state *state = machine.driver_data<apple1_state>();
-	terminal_setcursor(state->terminal, 0, 0);
-	terminal_clear(state->terminal);
+	terminal_setcursor(state->m_terminal, 0, 0);
+	terminal_clear(state->m_terminal);
 }
 
 /* Calculate how long it will take for the display to assert the RDA
@@ -341,7 +341,7 @@ attotime apple1_vh_dsp_time_to_ready (running_machine &machine)
        the cursor's character line, when the beam reaches the cursor's
        horizontal position. */
 
-	terminal_getcursor(state->terminal, &cursor_x, &cursor_y);
+	terminal_getcursor(state->m_terminal, &cursor_x, &cursor_y);
 	cursor_scanline = cursor_y * apple1_charlayout.height;
 
 	/* Each scanline is composed of 455 pixel times.  The first 175 of
@@ -383,12 +383,12 @@ static void apple1_vh_cursor_blink (running_machine &machine)
 	else
 		new_blink_on = 0;
 
-	if (new_blink_on != state->blink_on) {		/* have we changed state? */
+	if (new_blink_on != state->m_blink_on) {		/* have we changed state? */
 		if (new_blink_on)
-			terminal_showcursor(state->terminal);
+			terminal_showcursor(state->m_terminal);
 		else
-			terminal_hidecursor(state->terminal);
-		state->blink_on = new_blink_on;
+			terminal_hidecursor(state->m_terminal);
+		state->m_blink_on = new_blink_on;
 	}
 }
 
@@ -396,6 +396,6 @@ SCREEN_UPDATE( apple1 )
 {
 	apple1_state *state = screen->machine().driver_data<apple1_state>();
 	apple1_vh_cursor_blink(screen->machine());
-	terminal_draw(screen->machine(), bitmap, NULL, state->terminal);
+	terminal_draw(screen->machine(), bitmap, NULL, state->m_terminal);
 	return 0;
 }

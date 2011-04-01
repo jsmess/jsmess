@@ -14,30 +14,30 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      mem10000;
-	UINT8 *      mem14000;
-	UINT8 *      mem18000;
-	UINT8 *      mem1c000;
-	UINT8 *      mem20000;
-	UINT8 *      mem24000;
-	UINT8 *      mem28000;
-	UINT8 *      mem2c000;
+	UINT8 *      m_mem10000;
+	UINT8 *      m_mem14000;
+	UINT8 *      m_mem18000;
+	UINT8 *      m_mem1c000;
+	UINT8 *      m_mem20000;
+	UINT8 *      m_mem24000;
+	UINT8 *      m_mem28000;
+	UINT8 *      m_mem2c000;
 
 	/* misc */
-	UINT8        keyline[10];
-	UINT8        port6529;
-	int          lowrom, highrom;
-	int          old_level;
+	UINT8        m_keyline[10];
+	UINT8        m_port6529;
+	int          m_lowrom, m_highrom;
+	int          m_old_level;
 
-	int          sidcard, pal;
+	int          m_sidcard, m_pal;
 
 	/* devices */
-	legacy_cpu_device *maincpu;
-	device_t *ted7360;
-	device_t *serbus;
-	device_t *cassette;
-	device_t *messram;
-	device_t *sid;
+	legacy_cpu_device *m_maincpu;
+	device_t *m_ted7360;
+	device_t *m_serbus;
+	device_t *m_cassette;
+	device_t *m_messram;
+	device_t *m_sid;
 };
 
 

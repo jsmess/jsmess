@@ -40,15 +40,15 @@ public:
 	bml3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 cursor_addr;
-	UINT16 cursor_raster;
-	UINT8 attr_latch;
-	UINT8 io_latch;
-	UINT8 hres_reg;
-	UINT8 vres_reg;
-	UINT8 keyb_press;
-	UINT8 keyb_press_flag;
-	int addr_latch;
+	UINT16 m_cursor_addr;
+	UINT16 m_cursor_raster;
+	UINT8 m_attr_latch;
+	UINT8 m_io_latch;
+	UINT8 m_hres_reg;
+	UINT8 m_vres_reg;
+	UINT8 m_keyb_press;
+	UINT8 m_keyb_press_flag;
+	int m_addr_latch;
 };
 
 
@@ -68,10 +68,10 @@ static SCREEN_UPDATE( bml3 )
 
 	count = 0x0000;
 
-	width = (state->hres_reg & 0x80) ? 80 : 40;
-	height = (state->vres_reg & 0x08) ? 1 : 0;
+	width = (state->m_hres_reg & 0x80) ? 80 : 40;
+	height = (state->m_vres_reg & 0x08) ? 1 : 0;
 
-//  popmessage("%02x %02x",state->hres_reg,state->vres_reg);
+//  popmessage("%02x %02x",state->m_hres_reg,state->m_vres_reg);
 
 	for(y=0;y<25;y++)
 	{
@@ -103,12 +103,12 @@ static SCREEN_UPDATE( bml3 )
 				}
 			}
 
-			if(state->cursor_addr-0x400 == count)
+			if(state->m_cursor_addr-0x400 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->cursor_raster & 0x60)
+				switch(state->m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -118,7 +118,7 @@ static SCREEN_UPDATE( bml3 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
@@ -146,17 +146,17 @@ static WRITE8_HANDLER( bml3_6845_w )
 	bml3_state *state = space->machine().driver_data<bml3_state>();
 	if(offset == 0)
 	{
-		state->addr_latch = data;
+		state->m_addr_latch = data;
 		mc6845_address_w(space->machine().device("crtc"), 0,data);
 	}
 	else
 	{
-		if(state->addr_latch == 0x0a)
-			state->cursor_raster = data;
-		if(state->addr_latch == 0x0e)
-			state->cursor_addr = ((data<<8) & 0x3f00) | (state->cursor_addr & 0xff);
-		else if(state->addr_latch == 0x0f)
-			state->cursor_addr = (state->cursor_addr & 0x3f00) | (data & 0xff);
+		if(state->m_addr_latch == 0x0a)
+			state->m_cursor_raster = data;
+		if(state->m_addr_latch == 0x0e)
+			state->m_cursor_addr = ((data<<8) & 0x3f00) | (state->m_cursor_addr & 0xff);
+		else if(state->m_addr_latch == 0x0f)
+			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
 
 		mc6845_register_w(space->machine().device("crtc"), 0,data);
 	}
@@ -165,11 +165,11 @@ static WRITE8_HANDLER( bml3_6845_w )
 static READ8_HANDLER( bml3_keyboard_r )
 {
 	bml3_state *state = space->machine().driver_data<bml3_state>();
-	if(state->keyb_press_flag)
+	if(state->m_keyb_press_flag)
 	{
 		int res;
-		res = state->keyb_press;
-		state->keyb_press = state->keyb_press_flag = 0;
+		res = state->m_keyb_press;
+		state->m_keyb_press = state->m_keyb_press_flag = 0;
 		return res | 0x80;
 	}
 
@@ -182,7 +182,7 @@ static READ8_HANDLER( bml3_io_r )
 	bml3_state *state = space->machine().driver_data<bml3_state>();
 	UINT8 *rom = space->machine().region("maincpu")->base();
 
-	if(offset == 0x19) return state->io_latch;
+	if(offset == 0x19) return state->m_io_latch;
 	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
 //  if(offset == 0xc5 || offset == 0xca) return space->machine().rand(); //tape related
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
@@ -194,7 +194,7 @@ static READ8_HANDLER( bml3_io_r )
 //  if(offset == 0x44) return 0 ? 0xff : 0x00;
 //  if(offset == 0x46) return 0 ? 0xff : 0x00;
 
-	if(offset == 0xd8) return state->attr_latch;
+	if(offset == 0xd8) return state->m_attr_latch;
 	if(offset == 0xe0) return bml3_keyboard_r(space,0);
 
 //  if(offset == 0xcb)
@@ -237,9 +237,9 @@ static WRITE8_HANDLER( bml3_hres_reg_w )
     --x- ---- used in some modes, unknown purpose (also wants $ffc4 to be 0xff), color / monochrome switch?
     */
 
-	state->hres_reg = data;
+	state->m_hres_reg = data;
 
-	m6845_change_clock(space->machine(),(state->hres_reg & 0x80) | (state->vres_reg & 0x08));
+	m6845_change_clock(space->machine(),(state->m_hres_reg & 0x80) | (state->m_vres_reg & 0x08));
 }
 
 static WRITE8_HANDLER( bml3_vres_reg_w )
@@ -248,21 +248,21 @@ static WRITE8_HANDLER( bml3_vres_reg_w )
 	/*
     ---- x--- char height
     */
-	state->vres_reg = data;
+	state->m_vres_reg = data;
 
-	m6845_change_clock(space->machine(),(state->hres_reg & 0x80) | (state->vres_reg & 0x08));
+	m6845_change_clock(space->machine(),(state->m_hres_reg & 0x80) | (state->m_vres_reg & 0x08));
 }
 
 static WRITE8_HANDLER( bml3_io_w )
 {
 	bml3_state *state = space->machine().driver_data<bml3_state>();
-	if(offset == 0x19)							{ state->io_latch = data; } //???
+	if(offset == 0x19)							{ state->m_io_latch = data; } //???
 //  else if(offset == 0xc4)                     { /* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else if(offset == 0xc6 || offset == 0xc7)	{ bml3_6845_w(space,offset-0xc6,data); }
 	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
 	else if(offset == 0xd3)						{ beep_set_state(space->machine().device("beeper"),!(data & 0x80)); }
 	else if(offset == 0xd6)						{ bml3_vres_reg_w(space,0,data); }
-	else if(offset == 0xd8)						{ state->attr_latch = data; }
+	else if(offset == 0xd8)						{ state->m_attr_latch = data; }
 	else
 	{
 		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(&space->device()));
@@ -275,7 +275,7 @@ static READ8_HANDLER( bml3_vram_r )
 	UINT8 *vram = space->machine().region("vram")->base();
 
 	/* TODO: this presumably also triggers an attr latch read, unsure yet */
-	state->attr_latch = vram[offset+0x4000];
+	state->m_attr_latch = vram[offset+0x4000];
 
 	return vram[offset];
 }
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( bml3_vram_w )
 	UINT8 *vram = space->machine().region("vram")->base();
 
 	vram[offset] = data;
-	vram[offset+0x4000] = state->attr_latch;
+	vram[offset+0x4000] = state->m_attr_latch;
 }
 
 static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8)
@@ -423,8 +423,8 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
 			{
 				{
-					state->keyb_press = scancode;
-					state->keyb_press_flag = 1;
+					state->m_keyb_press = scancode;
+					state->m_keyb_press_flag = 1;
 					cputag_set_input_line(timer.machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 					return;
 				}

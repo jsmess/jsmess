@@ -28,8 +28,8 @@ public:
 	rt1715_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int led1_val;
-	int led2_val;
+	int m_led1_val;
+	int m_led2_val;
 };
 
 
@@ -51,8 +51,8 @@ static WRITE8_HANDLER( rt1715_floppy_enable )
 static READ8_HANDLER( k7658_led1_r )
 {
 	rt1715_state *state = space->machine().driver_data<rt1715_state>();
-	state->led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", space->machine().describe_context(), state->led1_val);
+	state->m_led1_val ^= 1;
+	logerror("%s: k7658_led1_r %02x\n", space->machine().describe_context(), state->m_led1_val);
 	return 0xff;
 }
 
@@ -60,8 +60,8 @@ static READ8_HANDLER( k7658_led1_r )
 static READ8_HANDLER( k7658_led2_r )
 {
 	rt1715_state *state = space->machine().driver_data<rt1715_state>();
-	state->led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", space->machine().describe_context(), state->led2_val);
+	state->m_led2_val ^= 1;
+	logerror("%s: k7658_led2_r %02x\n", space->machine().describe_context(), state->m_led2_val);
 	return 0xff;
 }
 

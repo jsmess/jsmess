@@ -84,79 +84,79 @@ class towns_state : public driver_device
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	UINT8 ftimer;
-	UINT16 freerun_timer;
-	emu_timer* towns_freerun_counter;
-	UINT8 nmi_mask;
-	UINT8 compat_mode;
-	UINT8 towns_system_port;
-	UINT32 towns_ankcg_enable;
-	UINT32 towns_mainmem_enable;
-	UINT32 towns_ram_enable;
-	UINT32* towns_vram;
-	UINT8* towns_gfxvram;
-	UINT8* towns_txtvram;
-	int towns_selected_drive;
-	UINT8 towns_fdc_irq6mask;
-	UINT8* towns_serial_rom;
-	int towns_srom_position;
-	UINT8 towns_srom_clk;
-	UINT8 towns_srom_reset;
-	UINT8 towns_rtc_select;
-	UINT8 towns_rtc_data;
-	UINT8 towns_rtc_reg[16];
-	emu_timer* towns_rtc_timer;
-	UINT8 towns_timer_mask;
-	UINT16 towns_machine_id;  // default is 0x0101
-	UINT8 towns_kb_status;
-	UINT8 towns_kb_irq1_enable;
-	UINT8 towns_kb_output;  // key output
-	UINT8 towns_kb_extend;  // extended key output
-	emu_timer* towns_kb_timer;
-	emu_timer* towns_mouse_timer;
-	UINT8 towns_fm_irq_flag;
-	UINT8 towns_pcm_irq_flag;
-	UINT8 towns_pcm_channel_flag;
-	UINT8 towns_pcm_channel_mask;
-	UINT8 towns_pad_mask;
-	UINT8 towns_mouse_output;
-	UINT8 towns_mouse_x;
-	UINT8 towns_mouse_y;
-	UINT8 towns_volume[8];  // volume ports
-	UINT8 towns_volume_select;
-	UINT8 towns_scsi_control;
-	UINT8 towns_scsi_status;
-	UINT8 towns_spkrdata;
-	UINT8 towns_speaker_input;
+	UINT8 m_ftimer;
+	UINT16 m_freerun_timer;
+	emu_timer* m_towns_freerun_counter;
+	UINT8 m_nmi_mask;
+	UINT8 m_compat_mode;
+	UINT8 m_towns_system_port;
+	UINT32 m_towns_ankcg_enable;
+	UINT32 m_towns_mainmem_enable;
+	UINT32 m_towns_ram_enable;
+	UINT32* m_towns_vram;
+	UINT8* m_towns_gfxvram;
+	UINT8* m_towns_txtvram;
+	int m_towns_selected_drive;
+	UINT8 m_towns_fdc_irq6mask;
+	UINT8* m_towns_serial_rom;
+	int m_towns_srom_position;
+	UINT8 m_towns_srom_clk;
+	UINT8 m_towns_srom_reset;
+	UINT8 m_towns_rtc_select;
+	UINT8 m_towns_rtc_data;
+	UINT8 m_towns_rtc_reg[16];
+	emu_timer* m_towns_rtc_timer;
+	UINT8 m_towns_timer_mask;
+	UINT16 m_towns_machine_id;  // default is 0x0101
+	UINT8 m_towns_kb_status;
+	UINT8 m_towns_kb_irq1_enable;
+	UINT8 m_towns_kb_output;  // key output
+	UINT8 m_towns_kb_extend;  // extended key output
+	emu_timer* m_towns_kb_timer;
+	emu_timer* m_towns_mouse_timer;
+	UINT8 m_towns_fm_irq_flag;
+	UINT8 m_towns_pcm_irq_flag;
+	UINT8 m_towns_pcm_channel_flag;
+	UINT8 m_towns_pcm_channel_mask;
+	UINT8 m_towns_pad_mask;
+	UINT8 m_towns_mouse_output;
+	UINT8 m_towns_mouse_x;
+	UINT8 m_towns_mouse_y;
+	UINT8 m_towns_volume[8];  // volume ports
+	UINT8 m_towns_volume_select;
+	UINT8 m_towns_scsi_control;
+	UINT8 m_towns_scsi_status;
+	UINT8 m_towns_spkrdata;
+	UINT8 m_towns_speaker_input;
 
-	emu_timer* towns_wait_timer;
-	struct towns_cdrom_controller towns_cd;
-	struct towns_video_controller video;
+	emu_timer* m_towns_wait_timer;
+	struct towns_cdrom_controller m_towns_cd;
+	struct towns_video_controller m_video;
 	required_shared_ptr<UINT8>	m_nvram;
 
 	/* devices */
-	device_t* maincpu;
-	device_t* dma_1;
-	device_t* dma_2;
-	device_t* fdc;
-	device_t* pic_master;
-	device_t* pic_slave;
-	device_t* pit;
-	device_t* messram;
-	device_t* cdrom;
-	device_t* cdda;
-	device_t* speaker;
-	class fmscsi_device* scsi;
-	device_t* hd0;
-	device_t* hd1;
-	device_t* hd2;
-	device_t* hd3;
-	device_t* hd4;
-	device_t* ram;
-	UINT32 kb_prev[4];
-	UINT8 prev_pad_mask;
-	UINT8 prev_x;
-	UINT8 prev_y;
+	device_t* m_maincpu;
+	device_t* m_dma_1;
+	device_t* m_dma_2;
+	device_t* m_fdc;
+	device_t* m_pic_master;
+	device_t* m_pic_slave;
+	device_t* m_pit;
+	device_t* m_messram;
+	device_t* m_cdrom;
+	device_t* m_cdda;
+	device_t* m_speaker;
+	class fmscsi_device* m_scsi;
+	device_t* m_hd0;
+	device_t* m_hd1;
+	device_t* m_hd2;
+	device_t* m_hd3;
+	device_t* m_hd4;
+	device_t* m_ram;
+	UINT32 m_kb_prev[4];
+	UINT8 m_prev_pad_mask;
+	UINT8 m_prev_x;
+	UINT8 m_prev_y;
 };
 
 void towns_update_video_banks(address_space*);

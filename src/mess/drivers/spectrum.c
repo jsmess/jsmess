@@ -298,7 +298,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	device_t *speaker = space->machine().device("speaker");
 	unsigned char Changed;
 
-	Changed = state->port_fe_data^data;
+	Changed = state->m_port_fe_data^data;
 
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
@@ -319,7 +319,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 		cassette_output(space->machine().device("cassette"), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
-	state->port_fe_data = data;
+	state->m_port_fe_data = data;
 }
 
 DIRECT_UPDATE_HANDLER(spectrum_direct)
@@ -428,14 +428,14 @@ static READ8_HANDLER ( spectrum_port_ula_r )
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 	int vpos = space->machine().primary_screen->vpos();
 
-	return vpos<193 ? state->video_ram[(vpos&0xf8)<<2]:0xff;
+	return vpos<193 ? state->m_video_ram[(vpos&0xf8)<<2]:0xff;
 }
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(spectrum_state,video_ram)
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(spectrum_state,m_video_ram)
 //  AM_RANGE(0x5b00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -640,8 +640,8 @@ MACHINE_RESET( spectrum )
 
 	space->set_direct_update_handler(direct_update_delegate_create_static(spectrum_direct, machine));
 
-	state->port_7ffd_data = -1;
-	state->port_1ffd_data = -1;
+	state->m_port_7ffd_data = -1;
+	state->m_port_1ffd_data = -1;
 }
 
 /* F4 Character Displayer */

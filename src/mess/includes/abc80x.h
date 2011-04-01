@@ -116,7 +116,7 @@ public:
 	UINT8 *m_char_ram;				// character RAM
 	UINT8 *m_video_ram;				// HR video RAM
 	const UINT8 *m_char_rom;		// character generator ROM
-	const UINT8 *fgctl_prom;		// foreground control PROM
+	const UINT8 *m_fgctl_prom;		// foreground control PROM
 	UINT8 m_hrs;					// HR picture start scanline
 	UINT8 m_fgctl;					// HR foreground control
 
@@ -173,11 +173,11 @@ public:
 	abc802_state(running_machine &machine, const driver_device_config_base &config)
 		: abc800_state(machine, config),
 		  m_crtc(*this, MC6845_TAG),
-		  abc77(*this, ABC77_TAG)
+		  m_abc77(*this, ABC77_TAG)
 	{ }
 
 	required_device<device_t> m_crtc;
-	optional_device<device_t> abc77;
+	optional_device<device_t> m_abc77;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -216,12 +216,12 @@ public:
 		: abc800_state(machine, config),
 		  m_crtc(*this, MC6845_TAG),
 		  m_rtc(*this, E0516_TAG),
-		  abc77(*this, ABC77_TAG)
+		  m_abc77(*this, ABC77_TAG)
 	{ }
 
 	required_device<device_t> m_crtc;
 	required_device<e0516_device> m_rtc;
-	optional_device<device_t> abc77;
+	optional_device<device_t> m_abc77;
 
 	virtual void machine_start();
 	virtual void machine_reset();

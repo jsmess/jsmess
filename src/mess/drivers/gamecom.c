@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK("bank2")                                       /* External ROM/Flash. Controlled by MMU2 */
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                       /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                       /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE_MEMBER(gamecom_state, vram)			/* VRAM */
+	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE_MEMBER(gamecom_state, m_vram)			/* VRAM */
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("nvram")                  /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 

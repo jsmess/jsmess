@@ -19,31 +19,31 @@ public:
 		: driver_device(machine, config) { }
 
 	/* GAH40M state */
-	UINT16 icr;				/* input capture register */
-	UINT16 frc;				/* free running counter */
-	UINT8 ier;				/* interrupt acknowledge register */
-	UINT8 isr;				/* interrupt status register */
-	UINT8 sio;				/* serial I/O register */
-	int bank0;				/* */
+	UINT16 m_icr;				/* input capture register */
+	UINT16 m_frc;				/* free running counter */
+	UINT8 m_ier;				/* interrupt acknowledge register */
+	UINT8 m_isr;				/* interrupt status register */
+	UINT8 m_sio;				/* serial I/O register */
+	int m_bank0;				/* */
 
 	/* GAH40S state */
-	UINT16 cnt;				/* microcassette tape counter */
-	int swpr;				/* P-ROM power switch */
-	UINT16 pra;				/* P-ROM address */
-	UINT8 prd;				/* P-ROM data */
+	UINT16 m_cnt;				/* microcassette tape counter */
+	int m_swpr;				/* P-ROM power switch */
+	UINT16 m_pra;				/* P-ROM address */
+	UINT8 m_prd;				/* P-ROM data */
 
 	/* memory state */
-	int bk2;				/* */
+	int m_bk2;				/* */
 
 	/* keyboard state */
-	int ksc;				/* keyboard scan column */
+	int m_ksc;				/* keyboard scan column */
 
 	/* video state */
-	UINT8 *video_ram;		/* LCD video RAM */
+	UINT8 *m_video_ram;		/* LCD video RAM */
 
 	/* devices */
-	device_t *sed1320;
-	device_t *cassette;
+	device_t *m_sed1320;
+	device_t *m_cassette;
 };
 
 #endif

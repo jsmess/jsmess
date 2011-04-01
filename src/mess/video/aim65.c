@@ -39,41 +39,41 @@
 
 static void aim65_printer_inc(aim65_state *state)
 {
-	if (state->printer_dir)
+	if (state->m_printer_dir)
 	{
-		if (state->printer_x > 0) {
-			state->printer_x--;
+		if (state->m_printer_x > 0) {
+			state->m_printer_x--;
 		}
 		else {
-			state->printer_dir = 0;
-			state->printer_x++;
-			state->printer_y++;
+			state->m_printer_dir = 0;
+			state->m_printer_x++;
+			state->m_printer_y++;
 		}
 	}
 	else
 	{
-		if (state->printer_x < 9) {
-			state->printer_x++;
+		if (state->m_printer_x < 9) {
+			state->m_printer_x++;
 		}
 		else {
-			state->printer_dir = 1;
-			state->printer_x--;
-			state->printer_y++;
+			state->m_printer_dir = 1;
+			state->m_printer_x--;
+			state->m_printer_y++;
 		}
 	}
 
-	if (state->printer_y > 500) state->printer_y = 0;
+	if (state->m_printer_y > 500) state->m_printer_y = 0;
 
-	state->flag_a=0;
-	state->flag_b=0;
+	state->m_flag_a=0;
+	state->m_flag_b=0;
 }
 
 static void aim65_printer_cr(aim65_state *state)
 {
-	state->printer_x=0;
-	state->printer_y++;
-	if (state->printer_y > 500) state->printer_y = 0;
-	state->flag_a=state->flag_b=0;
+	state->m_printer_x=0;
+	state->m_printer_y++;
+	if (state->m_printer_y > 500) state->m_printer_y = 0;
+	state->m_flag_a=state->m_flag_b=0;
 }
 
 static TIMER_CALLBACK(aim65_printer_timer)
@@ -81,9 +81,9 @@ static TIMER_CALLBACK(aim65_printer_timer)
 	aim65_state *state = machine.driver_data<aim65_state>();
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
 
-	via_0->write_cb1(state->printer_level);
-	via_0->write_cb1(!state->printer_level);
-	state->printer_level = !state->printer_level;
+	via_0->write_cb1(state->m_printer_level);
+	via_0->write_cb1(!state->m_printer_level);
+	state->m_printer_level = !state->m_printer_level;
 	aim65_printer_inc(state);
 }
 
@@ -95,12 +95,12 @@ WRITE8_DEVICE_HANDLER( aim65_printer_on )
 	if (!data)
 	{
 		aim65_printer_cr(state);
-		state->print_timer->adjust(attotime::zero, 0, attotime::from_usec(10));
+		state->m_print_timer->adjust(attotime::zero, 0, attotime::from_usec(10));
 		via_0->write_cb1(0);
-		state->printer_level = 1;
+		state->m_printer_level = 1;
 	}
 	else
-		state->print_timer->reset();
+		state->m_print_timer->reset();
 }
 
 
@@ -108,9 +108,9 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
 {
 #if 0
 	aim65_state *state = device->machine().driver_data<aim65_state>();
-	if (state->flag_a == 0) {
-		printerRAM[(state->printer_y * 20) + state->printer_x] |= data;
-		state->flag_a = 1;
+	if (state->m_flag_a == 0) {
+		printerRAM[(state->m_printer_y * 20) + state->m_printer_x] |= data;
+		state->m_flag_a = 1;
 	}
 #endif
 }
@@ -121,9 +121,9 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 	aim65_state *state = device->machine().driver_data<aim65_state>();
 	data &= 0x03;
 
-	if (state->flag_b == 0) {
-		printerRAM[(state->printer_y * 20) + state->printer_x ] |= (data << 8);
-		state->flag_b = 1;
+	if (state->m_flag_b == 0) {
+		printerRAM[(state->m_printer_y * 20) + state->m_printer_x ] |= (data << 8);
+		state->m_flag_b = 1;
 	}
 #endif
 }
@@ -131,20 +131,20 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 VIDEO_START( aim65 )
 {
 	aim65_state *state = machine.driver_data<aim65_state>();
-	state->print_timer = machine.scheduler().timer_alloc(FUNC(aim65_printer_timer));
+	state->m_print_timer = machine.scheduler().timer_alloc(FUNC(aim65_printer_timer));
 
 #if 0
 	videoram_size = 600 * 10 * 2;
 	printerRAM = auto_alloc_array(machine, UINT16, videoram_size / 2);
 	memset(printerRAM, 0, videoram_size);
-	state->printer_x = 0;
-	state->printer_y = 0;
-	state->printer_dir = 0;
-	state->flag_a=0;
-	state->flag_b=0;
+	state->m_printer_x = 0;
+	state->m_printer_y = 0;
+	state->m_printer_dir = 0;
+	state->m_flag_a=0;
+	state->m_flag_b=0;
 
 
-	state->printer_level = 0;
+	state->m_printer_level = 0;
 
 	VIDEO_START_CALL(generic);
 #endif

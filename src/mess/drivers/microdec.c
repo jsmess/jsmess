@@ -19,7 +19,7 @@ public:
 	microdec_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 received_char;
+	UINT8 m_received_char;
 };
 
 
@@ -33,15 +33,15 @@ static WRITE8_HANDLER(microdec_terminal_w)
 static READ8_HANDLER(microdec_terminal_status_r)
 {
 	microdec_state *state = space->machine().driver_data<microdec_state>();
-	if (state->received_char!=0) return 3; // char received
+	if (state->m_received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
 static READ8_HANDLER(microdec_terminal_r)
 {
 	microdec_state *state = space->machine().driver_data<microdec_state>();
-	UINT8 retVal = state->received_char;
-	state->received_char = 0;
+	UINT8 retVal = state->m_received_char;
+	state->m_received_char = 0;
 	return retVal;
 }
 
@@ -68,13 +68,13 @@ INPUT_PORTS_END
 static MACHINE_RESET(microdec)
 {
 	microdec_state *state = machine.driver_data<microdec_state>();
-	state->received_char = 0;
+	state->m_received_char = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( microdec_kbd_put )
 {
 	microdec_state *state = device->machine().driver_data<microdec_state>();
-	state->received_char = data;
+	state->m_received_char = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( microdec_terminal_intf )

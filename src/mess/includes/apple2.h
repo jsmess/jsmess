@@ -108,37 +108,37 @@ public:
 	apple2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 flags;
-	INT32 a2_cnxx_slot;
-	UINT32 a2_mask;
-	UINT32 a2_set;
-	int a2_speaker_state;
-	double joystick_x1_time;
-	double joystick_y1_time;
-	double joystick_x2_time;
-	double joystick_y2_time;
-	apple2_memmap_config mem_config;
-	apple2_meminfo *current_meminfo;
-	int fdc_diskreg;
-	unsigned int *ay3600_keys;
-	UINT8 keycode;
-	UINT8 keycode_unmodified;
-	UINT8 keywaiting;
-	UINT8 keystilldown;
-	UINT8 keymodreg;
-	int reset_flag;
-	int last_key;
-	int last_key_unmodified;
-	unsigned int time_until_repeat;
-	const UINT8 *a2_videoram;
-	UINT32 a2_videomask;
-	UINT32 old_a2;
-	int fgcolor;
-	int bgcolor;
-	int flash;
-	int alt_charset_value;
-	UINT16 *hires_artifact_map;
-	UINT16 *dhires_artifact_map;
+	UINT32 m_flags;
+	INT32 m_a2_cnxx_slot;
+	UINT32 m_a2_mask;
+	UINT32 m_a2_set;
+	int m_a2_speaker_state;
+	double m_joystick_x1_time;
+	double m_joystick_y1_time;
+	double m_joystick_x2_time;
+	double m_joystick_y2_time;
+	apple2_memmap_config m_mem_config;
+	apple2_meminfo *m_current_meminfo;
+	int m_fdc_diskreg;
+	unsigned int *m_ay3600_keys;
+	UINT8 m_keycode;
+	UINT8 m_keycode_unmodified;
+	UINT8 m_keywaiting;
+	UINT8 m_keystilldown;
+	UINT8 m_keymodreg;
+	int m_reset_flag;
+	int m_last_key;
+	int m_last_key_unmodified;
+	unsigned int m_time_until_repeat;
+	const UINT8 *m_a2_videoram;
+	UINT32 m_a2_videomask;
+	UINT32 m_old_a2;
+	int m_fgcolor;
+	int m_bgcolor;
+	int m_flash;
+	int m_alt_charset_value;
+	UINT16 *m_hires_artifact_map;
+	UINT16 *m_dhires_artifact_map;
 };
 
 

@@ -60,15 +60,15 @@ public:
 		: driver_device(machine, config) { }
 
 
-	struct _vg230_t vg230;
-	struct _ems_t ems;
+	struct _vg230_t m_vg230;
+	struct _ems_t m_ems;
 };
 
 
 static TIMER_DEVICE_CALLBACK( vg230_timer )
 {
 	pasogo_state *state = timer.machine().driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->vg230;
+	vg230_t *vg230 = &state->m_vg230;
 
 	vg230->rtc.seconds+=1;
 	if (vg230->rtc.seconds>=60)
@@ -99,7 +99,7 @@ static TIMER_DEVICE_CALLBACK( vg230_timer )
 static void vg230_reset(running_machine &machine)
 {
 	pasogo_state *state = machine.driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->vg230;
+	vg230_t *vg230 = &state->m_vg230;
 	system_time systime;
 
 	memset(vg230, 0, sizeof(*vg230));
@@ -123,7 +123,7 @@ static void vg230_init(running_machine &machine)
 static READ8_HANDLER( vg230_io_r )
 {
 	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->vg230;
+	vg230_t *vg230 = &state->m_vg230;
 	int log=TRUE;
 	UINT8 data=0;
 
@@ -188,7 +188,7 @@ static READ8_HANDLER( vg230_io_r )
 static WRITE8_HANDLER( vg230_io_w )
 {
 	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->vg230;
+	vg230_t *vg230 = &state->m_vg230;
 	int log=TRUE;
 
 	if (offset&1)
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( vg230_io_w )
 static READ8_HANDLER( ems_r )
 {
 	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	ems_t *ems = &state->ems;
+	ems_t *ems = &state->m_ems;
 	UINT8 data=0;
 
 	switch (offset)
@@ -247,7 +247,7 @@ static READ8_HANDLER( ems_r )
 static WRITE8_HANDLER( ems_w )
 {
 	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	ems_t *ems = &state->ems;
+	ems_t *ems = &state->m_ems;
 	char bank[10];
 
 	switch (offset)
@@ -550,7 +550,7 @@ static DRIVER_INIT( pasogo )
 {
 	pasogo_state *state = machine.driver_data<pasogo_state>();
 	vg230_init(machine);
-	memset(&state->ems, 0, sizeof(state->ems));
+	memset(&state->m_ems, 0, sizeof(state->m_ems));
 	memory_set_bankptr( machine, "bank27", machine.region("user1")->base() + 0x00000 );
 	memory_set_bankptr( machine, "bank28", machine.region("maincpu")->base() + 0xb8000/*?*/ );
 }

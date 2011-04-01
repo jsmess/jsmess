@@ -19,26 +19,26 @@ public:
 	k8915_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *charrom;
-	UINT8 framecnt;
-	UINT8 term_data;
-	UINT8 k8915_53;
+	UINT8 *m_videoram;
+	UINT8 *m_charrom;
+	UINT8 m_framecnt;
+	UINT8 m_term_data;
+	UINT8 m_k8915_53;
 };
 
 static READ8_HANDLER( k8915_52_r )
 {
 // get data from ascii keyboard
 	k8915_state *state = space->machine().driver_data<k8915_state>();
-	state->k8915_53 = 0;
-	return state->term_data;
+	state->m_k8915_53 = 0;
+	return state->m_term_data;
 }
 
 static READ8_HANDLER( k8915_53_r )
 {
 // keyboard status
 	k8915_state *state = space->machine().driver_data<k8915_state>();
-	return state->k8915_53;
+	return state->m_k8915_53;
 }
 
 static WRITE8_HANDLER( k8915_a8_w )
@@ -53,7 +53,7 @@ static WRITE8_HANDLER( k8915_a8_w )
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(k8915_state, videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(k8915_state, m_videoram)
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -82,7 +82,7 @@ static DRIVER_INIT(k8915)
 static VIDEO_START( k8915 )
 {
 	k8915_state *state = machine.driver_data<k8915_state>();
-	state->charrom = machine.region("chargen")->base();
+	state->m_charrom = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( k8915 )
@@ -91,7 +91,7 @@ static SCREEN_UPDATE( k8915 )
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
-	state->framecnt++;
+	state->m_framecnt++;
 
 	for (y = 0; y < 25; y++)
 	{
@@ -105,15 +105,15 @@ static SCREEN_UPDATE( k8915 )
 
 				if (ra < 9)
 				{
-					chr = state->videoram[x];
+					chr = state->m_videoram[x];
 
 					/* Take care of flashing characters */
-					if ((chr & 0x80) && (state->framecnt & 0x08))
+					if ((chr & 0x80) && (state->m_framecnt & 0x08))
 						chr = 0x20;
 
 					chr &= 0x7f;
 
-					gfx = state->charrom[(chr<<4) | ra ];
+					gfx = state->m_charrom[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */
@@ -141,8 +141,8 @@ PALETTE_INIT( k8915 )
 static WRITE8_DEVICE_HANDLER( k8915_kbd_put )
 {
 	k8915_state *state = device->machine().driver_data<k8915_state>();
-	state->term_data = data;
-	state->k8915_53 = 1;
+	state->m_term_data = data;
+	state->m_k8915_53 = 1;
 }
 
 static GENERIC_TERMINAL_INTERFACE( k8915_terminal_intf )

@@ -21,8 +21,8 @@
 static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
-    AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_BASE_MEMBER(mikro80_state, cursor_ram)// Video RAM
-    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE_MEMBER(mikro80_state, video_ram) // Video RAM
+    AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_BASE_MEMBER(mikro80_state, m_cursor_ram)// Video RAM
+    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE_MEMBER(mikro80_state, m_video_ram) // Video RAM
     AM_RANGE( 0xd000, 0xf7ff ) AM_RAM  // RAM
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END

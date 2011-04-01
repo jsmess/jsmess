@@ -32,7 +32,7 @@ WRITE8_HANDLER( osborne1_0000_w )
 {
 	osborne1_state *state = space->machine().driver_data<osborne1_state>();
 	/* Check whether regular RAM is enabled */
-	if ( ! state->bank2_enabled || ( state->in_irq_handler && state->bankswitch == RAMMODE ) )
+	if ( ! state->m_bank2_enabled || ( state->m_in_irq_handler && state->m_bankswitch == RAMMODE ) )
 	{
 		ram_get_ptr(space->machine().device(RAM_TAG))[ offset ] = data;
 	}
@@ -43,7 +43,7 @@ WRITE8_HANDLER( osborne1_1000_w )
 {
 	osborne1_state *state = space->machine().driver_data<osborne1_state>();
 	/* Check whether regular RAM is enabled */
-	if ( ! state->bank2_enabled || ( state->in_irq_handler && state->bankswitch == RAMMODE ) )
+	if ( ! state->m_bank2_enabled || ( state->m_in_irq_handler && state->m_bankswitch == RAMMODE ) )
 	{
 		ram_get_ptr(space->machine().device(RAM_TAG))[ 0x1000 + offset ] = data;
 	}
@@ -59,7 +59,7 @@ READ8_HANDLER( osborne1_2000_r )
 	device_t *pia_1 = space->machine().device("pia_1" );
 
 	/* Check whether regular RAM is enabled */
-	if ( ! state->bank2_enabled )
+	if ( ! state->m_bank2_enabled )
 	{
 		data = ram_get_ptr(space->machine().device(RAM_TAG))[ 0x2000 + offset ];
 	}
@@ -110,13 +110,13 @@ WRITE8_HANDLER( osborne1_2000_w )
 	device_t *pia_1 = space->machine().device("pia_1" );
 
 	/* Check whether regular RAM is enabled */
-	if ( ! state->bank2_enabled )
+	if ( ! state->m_bank2_enabled )
 	{
 		ram_get_ptr(space->machine().device(RAM_TAG))[ 0x2000 + offset ] = data;
 	}
 	else
 	{
-		if ( state->in_irq_handler && state->bankswitch == RAMMODE )
+		if ( state->m_in_irq_handler && state->m_bankswitch == RAMMODE )
 		{
 			ram_get_ptr(space->machine().device(RAM_TAG))[ 0x2000 + offset ] = data;
 		}
@@ -143,7 +143,7 @@ WRITE8_HANDLER( osborne1_3000_w )
 {
 	osborne1_state *state = space->machine().driver_data<osborne1_state>();
 	/* Check whether regular RAM is enabled */
-	if ( ! state->bank2_enabled || ( state->in_irq_handler && state->bankswitch == RAMMODE ) )
+	if ( ! state->m_bank2_enabled || ( state->m_in_irq_handler && state->m_bankswitch == RAMMODE ) )
 	{
 		ram_get_ptr(space->machine().device(RAM_TAG))[ 0x3000 + offset ] = data;
 	}
@@ -154,11 +154,11 @@ WRITE8_HANDLER( osborne1_videoram_w )
 {
 	osborne1_state *state = space->machine().driver_data<osborne1_state>();
 	/* Check whether the video attribute section is enabled */
-	if ( state->bank3_enabled )
+	if ( state->m_bank3_enabled )
 	{
 		data |= 0x7F;
 	}
-	state->bank4_ptr[offset] = data;
+	state->m_bank4_ptr[offset] = data;
 }
 
 
@@ -168,27 +168,27 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	switch( offset )
 	{
 	case 0x00:
-		state->bank2_enabled = 1;
-		state->bank3_enabled = 0;
+		state->m_bank2_enabled = 1;
+		state->m_bank3_enabled = 0;
 		break;
 	case 0x01:
-		state->bank2_enabled = 0;
-		state->bank3_enabled = 0;
+		state->m_bank2_enabled = 0;
+		state->m_bank3_enabled = 0;
 		break;
 	case 0x02:
-		state->bank2_enabled = 1;
-		state->bank3_enabled = 1;
+		state->m_bank2_enabled = 1;
+		state->m_bank3_enabled = 1;
 		break;
 	case 0x03:
-		state->bank2_enabled = 1;
-		state->bank3_enabled = 0;
+		state->m_bank2_enabled = 1;
+		state->m_bank3_enabled = 0;
 		break;
 	}
-	if ( state->bank2_enabled )
+	if ( state->m_bank2_enabled )
 	{
 		memory_set_bankptr(space->machine(),"bank1", space->machine().region("maincpu")->base() );
-		memory_set_bankptr(space->machine(),"bank2", state->empty_4K );
-		memory_set_bankptr(space->machine(),"bank3", state->empty_4K );
+		memory_set_bankptr(space->machine(),"bank2", state->m_empty_4K );
+		memory_set_bankptr(space->machine(),"bank3", state->m_empty_4K );
 	}
 	else
 	{
@@ -196,10 +196,10 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 		memory_set_bankptr(space->machine(),"bank2", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x1000 );
 		memory_set_bankptr(space->machine(),"bank3", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x3000 );
 	}
-	state->bank4_ptr = ram_get_ptr(space->machine().device(RAM_TAG)) + ( ( state->bank3_enabled ) ? 0x10000 : 0xF000 );
-	memory_set_bankptr(space->machine(),"bank4", state->bank4_ptr );
-	state->bankswitch = offset;
-	state->in_irq_handler = 0;
+	state->m_bank4_ptr = ram_get_ptr(space->machine().device(RAM_TAG)) + ( ( state->m_bank3_enabled ) ? 0x10000 : 0xF000 );
+	memory_set_bankptr(space->machine(),"bank4", state->m_bank4_ptr );
+	state->m_bankswitch = offset;
+	state->m_in_irq_handler = 0;
 }
 
 
@@ -208,7 +208,7 @@ DIRECT_UPDATE_HANDLER( osborne1_opbase )
 	osborne1_state *state = machine->driver_data<osborne1_state>();
 	if ( ( address & 0xF000 ) == 0x2000 )
 	{
-		if ( ! state->bank2_enabled )
+		if ( ! state->m_bank2_enabled )
 		{
 			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
 			return ~0;
@@ -221,9 +221,9 @@ DIRECT_UPDATE_HANDLER( osborne1_opbase )
 static void osborne1_update_irq_state(running_machine &machine)
 {
 	osborne1_state *state = machine.driver_data<osborne1_state>();
-	//logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", state->pia_0_irq_state ? "SET" : "CLEARED", state->pia_1_irq_state ? "SET" : "CLEARED" );
+	//logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", state->m_pia_0_irq_state ? "SET" : "CLEARED", state->m_pia_1_irq_state ? "SET" : "CLEARED" );
 
-	if ( state->pia_1_irq_state )
+	if ( state->m_pia_1_irq_state )
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE );
 	}
@@ -237,7 +237,7 @@ static void osborne1_update_irq_state(running_machine &machine)
 static WRITE_LINE_DEVICE_HANDLER( ieee_pia_irq_a_func )
 {
 	osborne1_state *drvstate = device->machine().driver_data<osborne1_state>();
-	drvstate->pia_0_irq_state = state;
+	drvstate->m_pia_0_irq_state = state;
 	osborne1_update_irq_state(device->machine());
 }
 
@@ -269,7 +269,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 	osborne1_state *state = device->machine().driver_data<osborne1_state>();
 	device_t *fdc = device->machine().device("mb8877");
 
-	state->new_start_x = data >> 1;
+	state->m_new_start_x = data >> 1;
 	wd17xx_dden_w(fdc, BIT(data, 0));
 
 	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "FM" : "MFM" );
@@ -281,8 +281,8 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_b_w )
 	osborne1_state *state = device->machine().driver_data<osborne1_state>();
 	device_t *fdc = device->machine().device("mb8877");
 
-	state->new_start_y = data & 0x1F;
-	state->beep = ( data & 0x20 ) ? 1 : 0;
+	state->m_new_start_y = data & 0x1F;
+	state->m_beep = ( data & 0x20 ) ? 1 : 0;
 	if ( data & 0x40 )
 	{
 		wd17xx_set_drive( fdc, 0 );
@@ -298,7 +298,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_b_w )
 static WRITE_LINE_DEVICE_HANDLER( video_pia_irq_a_func )
 {
 	osborne1_state *drvstate = device->machine().driver_data<osborne1_state>();
-	drvstate->pia_1_irq_state = state;
+	drvstate->m_pia_1_irq_state = state;
 	osborne1_update_irq_state(device->machine());
 }
 
@@ -345,8 +345,8 @@ static TIMER_CALLBACK(osborne1_video_callback)
 	if ( y == 0 )
 	{
 		/* Clear CA1 on video PIA */
-		state->start_y = ( state->new_start_y - 1 ) & 0x1F;
-		state->charline = 0;
+		state->m_start_y = ( state->m_new_start_y - 1 ) & 0x1F;
+		state->m_charline = 0;
 		pia6821_ca1_w( pia_1, 0 );
 	}
 	if ( y == 240 )
@@ -357,7 +357,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 	if ( y < 240 )
 	{
 		/* Draw a line of the display */
-		UINT16 address = state->start_y * 128 + state->new_start_x + 11;
+		UINT16 address = state->m_start_y * 128 + state->m_new_start_x + 11;
 		UINT16 *p = BITMAP_ADDR16( machine.generic.tmpbitmap, y, 0 );
 		int x;
 
@@ -366,10 +366,10 @@ static TIMER_CALLBACK(osborne1_video_callback)
 			UINT8	character = ram_get_ptr(machine.device(RAM_TAG))[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
 			UINT8	cursor = character & 0x80;
 			UINT8	dim = ram_get_ptr(machine.device(RAM_TAG))[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
-			UINT8	bits = state->charrom[ state->charline * 128 + ( character & 0x7F ) ];
+			UINT8	bits = state->m_charrom[ state->m_charline * 128 + ( character & 0x7F ) ];
 			int		bit;
 
-			if ( cursor && state->charline == 9 )
+			if ( cursor && state->m_charline == 9 )
 			{
 				bits = 0xFF;
 			}
@@ -380,24 +380,24 @@ static TIMER_CALLBACK(osborne1_video_callback)
 			}
 		}
 
-		state->charline += 1;
-		if ( state->charline == 10 )
+		state->m_charline += 1;
+		if ( state->m_charline == 10 )
 		{
-			state->start_y += 1;
-			state->charline = 0;
+			state->m_start_y += 1;
+			state->m_charline = 0;
 		}
 	}
 
 	if ( ( y % 10 ) == 2 || ( y % 10 ) == 6 )
 	{
-		beep_set_state( speaker, state->beep );
+		beep_set_state( speaker, state->m_beep );
 	}
 	else
 	{
 		beep_set_state( speaker, 0 );
 	}
 
-	state->video_timer->adjust(machine.primary_screen->time_until_pos(y + 1, 0 ));
+	state->m_video_timer->adjust(machine.primary_screen->time_until_pos(y + 1, 0 ));
 }
 
 static TIMER_CALLBACK( setup_osborne1 )
@@ -443,13 +443,13 @@ MACHINE_RESET( osborne1 )
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
 
-	state->pia_0_irq_state = FALSE;
-	state->pia_1_irq_state = FALSE;
+	state->m_pia_0_irq_state = FALSE;
+	state->m_pia_1_irq_state = FALSE;
 
-	state->pia_1_irq_state = 0;
-	state->in_irq_handler = 0;
+	state->m_pia_1_irq_state = 0;
+	state->m_in_irq_handler = 0;
 
-	state->charrom = machine.region( "gfx1" )->base();
+	state->m_charrom = machine.region( "gfx1" )->base();
 
 	memset( ram_get_ptr(machine.device(RAM_TAG)) + 0x10000, 0xFF, 0x1000 );
 
@@ -466,13 +466,13 @@ DRIVER_INIT( osborne1 )
 {
 	osborne1_state *state = machine.driver_data<osborne1_state>();
 
-	state->empty_4K = auto_alloc_array(machine, UINT8, 0x1000 );
-	memset( state->empty_4K, 0xFF, 0x1000 );
+	state->m_empty_4K = auto_alloc_array(machine, UINT8, 0x1000 );
+	memset( state->m_empty_4K, 0xFF, 0x1000 );
 
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
-	state->video_timer = machine.scheduler().timer_alloc(FUNC(osborne1_video_callback));
-	state->video_timer->adjust(machine.primary_screen->time_until_pos(1, 0 ));
+	state->m_video_timer = machine.scheduler().timer_alloc(FUNC(osborne1_video_callback));
+	state->m_video_timer->adjust(machine.primary_screen->time_until_pos(1, 0 ));
 
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_osborne1));
 }
@@ -552,7 +552,7 @@ void osborne1_daisy_device::device_start()
 int osborne1_daisy_device::z80daisy_irq_state()
 {
 	osborne1_state *state = m_machine.driver_data<osborne1_state>();
-	return ( state->pia_1_irq_state ? Z80_DAISY_INT : 0 );
+	return ( state->m_pia_1_irq_state ? Z80_DAISY_INT : 0 );
 }
 
 
@@ -565,12 +565,12 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 {
 	osborne1_state *state = m_machine.driver_data<osborne1_state>();
 	/* Enable ROM and I/O when IRQ is acknowledged */
-	UINT8 old_bankswitch = state->bankswitch;
+	UINT8 old_bankswitch = state->m_bankswitch;
 	address_space* space = device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	osborne1_bankswitch_w( space, 0, 0 );
-	state->bankswitch = old_bankswitch;
-	state->in_irq_handler = 1;
+	state->m_bankswitch = old_bankswitch;
+	state->m_in_irq_handler = 1;
 	return 0xF8;
 }
 

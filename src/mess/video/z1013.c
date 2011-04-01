@@ -26,7 +26,7 @@ SCREEN_UPDATE( z1013 )
 	{
 		for(x = 0; x < 32; x++ )
 		{
-			code = state->video_ram[x + y*32];
+			code = state->m_video_ram[x + y*32];
 			for (i = 0; i < 8; i++)
 			{
 				line = gfx[code*8 + i];

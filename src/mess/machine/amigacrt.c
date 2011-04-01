@@ -124,7 +124,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		}
 	}
 
-	(*state->chip_ram_w)(state,  offset * 2, data );
+	(*state->m_chip_ram_w)(state,  offset * 2, data );
 }
 
 static void amiga_ar1_check_overlay( running_machine &machine )
@@ -228,7 +228,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 
 		if ( offset == 0x03 ) /* disable cart oberlay on chip mem */
 		{
-			UINT32 mirror_mask = state->chip_ram_size;
+			UINT32 mirror_mask = state->m_chip_ram_size;
 
 			memory_set_bank(space->machine(), "bank1", 0);
 
@@ -238,7 +238,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, state->chip_ram_size - 1, 0, mirror_mask, "bank1");
+			space->install_write_bank(0x000000, state->m_chip_ram_size - 1, 0, mirror_mask, "bank1");
 		}
 	}
 
@@ -254,7 +254,7 @@ static WRITE16_HANDLER( amiga_ar23_chipmem_w )
 			amiga_ar23_freeze(space->machine());
 	}
 
-	(*state->chip_ram_w)(state,  offset * 2, data );
+	(*state->m_chip_ram_w)(state,  offset * 2, data );
 }
 
 static void amiga_ar23_freeze( running_machine &machine )
@@ -280,7 +280,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 		memory_set_bank(machine, "bank1", 2);
 
 		/* writes go to chipram */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->chip_ram_size - 1, FUNC(amiga_ar23_chipmem_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->m_chip_ram_size - 1, FUNC(amiga_ar23_chipmem_w));
 
 		/* trigger NMI irq */
 		cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
@@ -383,7 +383,7 @@ static void amiga_ar23_init( running_machine &machine, int ar3 )
 	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
 	memory_set_bankptr(machine, "bank3", ar_ram);
 
-	memory_configure_bank(machine, "bank1", 0, 2, state->chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, state->m_chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 2, machine.region("user1")->base(), 0);
 	memory_configure_bank(machine, "bank1", 2, 2, machine.region("user2")->base(), 0);
 

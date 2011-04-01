@@ -88,37 +88,37 @@ public:
 	gp32_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *s3c240x_ram;
-	UINT8 *eeprom_data;
-	UINT32 s3c240x_lcd_regs[0x400/4];
-	emu_timer *s3c240x_lcd_timer;
-	s3c240x_lcd_t s3c240x_lcd;
-	UINT32 s3c240x_lcd_palette[0x400/4];
-	UINT32 s3c240x_clkpow_regs[0x18/4];
-	UINT32 s3c240x_irq_regs[0x18/4];
-	emu_timer *s3c240x_pwm_timer[5];
-	UINT32 s3c240x_pwm_regs[0x44/4];
-	emu_timer *s3c240x_dma_timer[4];
-	UINT32 s3c240x_dma_regs[0x7c/4];
-	smc_t smc;
-	i2s_t i2s;
-	UINT32 s3c240x_gpio[0x60/4];
-	UINT32 s3c240x_memcon_regs[0x34/4];
-	UINT32 s3c240x_usb_host_regs[0x5C/4];
-	UINT32 s3c240x_uart_0_regs[0x2C/4];
-	UINT32 s3c240x_uart_1_regs[0x2C/4];
-	UINT32 s3c240x_usb_device_regs[0xBC/4];
-	UINT32 s3c240x_watchdog_regs[0x0C/4];
-	s3c240x_iic_t s3c240x_iic;
-	emu_timer *s3c240x_iic_timer;
-	UINT32 s3c240x_iic_regs[0x10/4];
-	s3c240x_iis_t s3c240x_iis;
-	emu_timer *s3c240x_iis_timer;
-	UINT32 s3c240x_iis_regs[0x14/4];
-	UINT32 s3c240x_rtc_regs[0x4C/4];
-	UINT32 s3c240x_adc_regs[0x08/4];
-	UINT32 s3c240x_spi_regs[0x18/4];
-	UINT32 s3c240x_mmc_regs[0x40/4];
+	UINT32 *m_s3c240x_ram;
+	UINT8 *m_eeprom_data;
+	UINT32 m_s3c240x_lcd_regs[0x400/4];
+	emu_timer *m_s3c240x_lcd_timer;
+	s3c240x_lcd_t m_s3c240x_lcd;
+	UINT32 m_s3c240x_lcd_palette[0x400/4];
+	UINT32 m_s3c240x_clkpow_regs[0x18/4];
+	UINT32 m_s3c240x_irq_regs[0x18/4];
+	emu_timer *m_s3c240x_pwm_timer[5];
+	UINT32 m_s3c240x_pwm_regs[0x44/4];
+	emu_timer *m_s3c240x_dma_timer[4];
+	UINT32 m_s3c240x_dma_regs[0x7c/4];
+	smc_t m_smc;
+	i2s_t m_i2s;
+	UINT32 m_s3c240x_gpio[0x60/4];
+	UINT32 m_s3c240x_memcon_regs[0x34/4];
+	UINT32 m_s3c240x_usb_host_regs[0x5C/4];
+	UINT32 m_s3c240x_uart_0_regs[0x2C/4];
+	UINT32 m_s3c240x_uart_1_regs[0x2C/4];
+	UINT32 m_s3c240x_usb_device_regs[0xBC/4];
+	UINT32 m_s3c240x_watchdog_regs[0x0C/4];
+	s3c240x_iic_t m_s3c240x_iic;
+	emu_timer *m_s3c240x_iic_timer;
+	UINT32 m_s3c240x_iic_regs[0x10/4];
+	s3c240x_iis_t m_s3c240x_iis;
+	emu_timer *m_s3c240x_iis_timer;
+	UINT32 m_s3c240x_iis_regs[0x14/4];
+	UINT32 m_s3c240x_rtc_regs[0x4C/4];
+	UINT32 m_s3c240x_adc_regs[0x08/4];
+	UINT32 m_s3c240x_spi_regs[0x18/4];
+	UINT32 m_s3c240x_mmc_regs[0x40/4];
 };
 
 

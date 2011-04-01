@@ -65,7 +65,7 @@ WRITE8_HANDLER ( bbc_memorya1_w )
 	space->machine().region("maincpu")->base()[offset]=data;
 
 	// this array is set so that the video emulator know which addresses to redraw
-	state->vidmem[offset]=1;
+	state->m_vidmem[offset]=1;
 }
 
 /*************************
@@ -77,14 +77,14 @@ Model B memory handling functions
 WRITE8_HANDLER ( bbc_page_selectb_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	state->rombank=data&0x0f;
-	if (state->rombank!=1)
+	state->m_rombank=data&0x0f;
+	if (state->m_rombank!=1)
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + (state->rombank << 14));
+		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + (state->m_rombank << 14));
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user2")->base() + ((state->DFSType) << 14));
+		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user2")->base() + ((state->m_DFSType) << 14));
 	}
 }
 
@@ -92,16 +92,16 @@ WRITE8_HANDLER ( bbc_page_selectb_w )
 WRITE8_HANDLER ( bbc_memoryb3_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->RAMSize)
+	if (state->m_RAMSize)
 	{
 		space->machine().region("maincpu")->base()[offset + 0x4000] = data;
 		// this array is set so that the video emulator know which addresses to redraw
-		state->vidmem[offset + 0x4000] = 1;
+		state->m_vidmem[offset + 0x4000] = 1;
 	}
 	else
 	{
 		space->machine().region("maincpu")->base()[offset] = data;
-		state->vidmem[offset] = 1;
+		state->m_vidmem[offset] = 1;
 	}
 
 }
@@ -119,17 +119,17 @@ static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1}
 WRITE8_HANDLER ( bbc_memoryb4_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->rombank == 1)
+	if (state->m_rombank == 1)
 	{
 		// special DFS case for Acorn DFS E00 Hack that can write to the DFS RAM Bank;
-		if (state->DFSType == 3) space->machine().region("user2")->base()[((state->DFSType) << 14) + offset] = data;
+		if (state->m_DFSType == 3) space->machine().region("user2")->base()[((state->m_DFSType) << 14) + offset] = data;
 	} else
 	{
-		switch (state->SWRAMtype)
+		switch (state->m_SWRAMtype)
 		{
-			case 1:	if (bbc_SWRAMtype1[state->userport]) space->machine().region("user1")->base()[(state->userport << 14) + offset] = data;
-			case 2:	if (bbc_SWRAMtype2[state->rombank])  space->machine().region("user1")->base()[(state->rombank << 14) + offset] = data;
-			case 3:	if (bbc_SWRAMtype3[state->rombank])  space->machine().region("user1")->base()[(state->rombank << 14) + offset] = data;
+			case 1:	if (bbc_SWRAMtype1[state->m_userport]) space->machine().region("user1")->base()[(state->m_userport << 14) + offset] = data;
+			case 2:	if (bbc_SWRAMtype2[state->m_rombank])  space->machine().region("user1")->base()[(state->m_rombank << 14) + offset] = data;
+			case 3:	if (bbc_SWRAMtype3[state->m_rombank])  space->machine().region("user1")->base()[(state->m_rombank << 14) + offset] = data;
 		}
 	}
 }
@@ -150,7 +150,7 @@ static int vdudriverset(running_machine &machine)
 	bbc_state *state = machine.driver_data<bbc_state>();
 	int PC;
 	PC = cpu_get_pc(machine.device("maincpu")); // this needs to be set to the 6502 program counter
-	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((state->pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
+	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((state->m_pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
 }
 
 
@@ -161,10 +161,10 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	if ((offset&0x04)==0)
 	{
-		state->pagedRAM = (data >> 7) & 0x01;
-		state->rombank =  data & 0x0f;
+		state->m_pagedRAM = (data >> 7) & 0x01;
+		state->m_rombank =  data & 0x0f;
 
-		if (state->pagedRAM)
+		if (state->m_pagedRAM)
 		{
 			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
 			memory_set_bankptr(space->machine(), "bank4", space->machine().region("maincpu")->base() + 0x8000);
@@ -172,17 +172,17 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 		else
 		{
 			/* if paged rom then set the rom to be read from 8000 to afff */
-			memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + (state->rombank << 14));
+			memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + (state->m_rombank << 14));
 		};
 
 		/* set the rom to be read from b000 to bfff */
-		memory_set_bank(space->machine(), "bank6", state->rombank);
+		memory_set_bank(space->machine(), "bank6", state->m_rombank);
 	}
 	else
 	{
 		//the video display should now use this flag to display the shadow ram memory
-		state->vdusel=(data>>7)&0x01;
-		bbcbp_setvideoshadow(space->machine(), state->vdusel);
+		state->m_vdusel=(data>>7)&0x01;
+		bbcbp_setvideoshadow(space->machine(), state->m_vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
 		memory_set_bankptr(space->machine(), "bank2", space->machine().region("maincpu")->base()+0x3000);
 	}
@@ -199,7 +199,7 @@ WRITE8_HANDLER ( bbc_memorybp1_w )
 	space->machine().region("maincpu")->base()[offset]=data;
 
 	// this array is set so that the video emulator know which addresses to redraw
-	state->vidmem[offset]=1;
+	state->m_vidmem[offset]=1;
 }
 
 
@@ -220,7 +220,7 @@ DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
 	UINT8 *ram = machine->region("maincpu")->base();
-	if (state->vdusel == 0)
+	if (state->m_vdusel == 0)
 	{
 		// not in shadow ram mode so just read normal ram
 		memory_set_bankptr(*machine, "bank2", ram + 0x3000);
@@ -246,11 +246,11 @@ WRITE8_HANDLER ( bbc_memorybp2_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	UINT8 *ram = space->machine().region("maincpu")->base();
-	if (state->vdusel==0)
+	if (state->m_vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
 		ram[offset + 0x3000] = data;
-		state->vidmem[offset + 0x3000] = 1;
+		state->m_vidmem[offset + 0x3000] = 1;
 	}
 	else
 	{
@@ -258,13 +258,13 @@ WRITE8_HANDLER ( bbc_memorybp2_w )
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset + 0xb000] = data;
-			state->vidmem[offset + 0xb000] = 1;
+			state->m_vidmem[offset + 0xb000] = 1;
 		}
 		else
 		{
 			// else write to normal ram
 			ram[offset + 0x3000] = data;
-			state->vidmem[offset + 0x3000] = 1;
+			state->m_vidmem[offset + 0x3000] = 1;
 		}
 	}
 }
@@ -275,7 +275,7 @@ otherwise this area contains ROM so no write is required */
 WRITE8_HANDLER ( bbc_memorybp4_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->pagedRAM)
+	if (state->m_pagedRAM)
 	{
 		space->machine().region("maincpu")->base()[offset+0x8000]=data;
 	}
@@ -296,15 +296,15 @@ static const unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,
 WRITE8_HANDLER ( bbc_memorybp4_128_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->pagedRAM)
+	if (state->m_pagedRAM)
 	{
 		space->machine().region("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
-		if (bbc_b_plus_sideways_ram_banks[state->rombank])
+		if (bbc_b_plus_sideways_ram_banks[state->m_rombank])
 		{
-			space->machine().region("user1")->base()[offset+(state->rombank<<14)]=data;
+			space->machine().region("user1")->base()[offset+(state->m_rombank<<14)]=data;
 		}
 	}
 }
@@ -312,9 +312,9 @@ WRITE8_HANDLER ( bbc_memorybp4_128_w )
 WRITE8_HANDLER ( bbc_memorybp6_128_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (bbc_b_plus_sideways_ram_banks[state->rombank])
+	if (bbc_b_plus_sideways_ram_banks[state->m_rombank])
 	{
-		space->machine().region("user1")->base()[offset+(state->rombank<<14)+0x3000]=data;
+		space->machine().region("user1")->base()[offset+(state->m_rombank<<14)+0x3000]=data;
 	}
 }
 
@@ -377,34 +377,34 @@ READ8_HANDLER ( bbcm_ACCCON_read )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	logerror("ACCCON read %d\n",offset);
-	return state->ACCCON;
+	return state->m_ACCCON;
 }
 
 WRITE8_HANDLER ( bbcm_ACCCON_write )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	int tempIRR;
-	state->ACCCON=data;
+	state->m_ACCCON=data;
 
 	logerror("ACCCON write  %d %d \n",offset,data);
 
-	tempIRR=state->ACCCON_IRR;
-	state->ACCCON_IRR=(data>>7)&1;
+	tempIRR=state->m_ACCCON_IRR;
+	state->m_ACCCON_IRR=(data>>7)&1;
 
-	state->ACCCON_TST=(data>>6)&1;
-	state->ACCCON_IFJ=(data>>5)&1;
-	state->ACCCON_ITU=(data>>4)&1;
-	state->ACCCON_Y  =(data>>3)&1;
-	state->ACCCON_X  =(data>>2)&1;
-	state->ACCCON_E  =(data>>1)&1;
-	state->ACCCON_D  =(data>>0)&1;
+	state->m_ACCCON_TST=(data>>6)&1;
+	state->m_ACCCON_IFJ=(data>>5)&1;
+	state->m_ACCCON_ITU=(data>>4)&1;
+	state->m_ACCCON_Y  =(data>>3)&1;
+	state->m_ACCCON_X  =(data>>2)&1;
+	state->m_ACCCON_E  =(data>>1)&1;
+	state->m_ACCCON_D  =(data>>0)&1;
 
-	if (tempIRR!=state->ACCCON_IRR)
+	if (tempIRR!=state->m_ACCCON_IRR)
 	{
-		cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, state->ACCCON_IRR);
+		cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, state->m_ACCCON_IRR);
 	}
 
-	if (state->ACCCON_Y)
+	if (state->m_ACCCON_Y)
 	{
 		memory_set_bankptr(space->machine(), "bank7", space->machine().region("maincpu")->base() + 0x9000);
 	}
@@ -413,10 +413,10 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 		memory_set_bankptr(space->machine(), "bank7", space->machine().region("user1")->base() + 0x40000);
 	}
 
-	bbcbp_setvideoshadow(space->machine(), state->ACCCON_D);
+	bbcbp_setvideoshadow(space->machine(), state->m_ACCCON_D);
 
 
-	if (state->ACCCON_X)
+	if (state->m_ACCCON_X)
 	{
 		memory_set_bankptr(space->machine(), "bank2", space->machine().region( "maincpu" )->base() + 0xb000 );
 	}
@@ -428,7 +428,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
 	/* if 0 the I/O is paged for both reads and writes */
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
-	if (state->ACCCON_TST)
+	if (state->m_ACCCON_TST)
 	{
 		memory_set_bankptr(space->machine(), "bank8", space->machine().region("user1")->base()+0x43c00);
 		space->install_read_bank(0xFC00,0xFEFF,"bank8");
@@ -452,18 +452,18 @@ static int bbcm_vdudriverset(running_machine &machine)
 static WRITE8_HANDLER ( page_selectbm_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	state->pagedRAM = (data & 0x80) >> 7;
-	state->rombank = data & 0x0f;
+	state->m_pagedRAM = (data & 0x80) >> 7;
+	state->m_rombank = data & 0x0f;
 
-	if (state->pagedRAM)
+	if (state->m_pagedRAM)
 	{
 		memory_set_bankptr(space->machine(), "bank4", space->machine().region("maincpu")->base() + 0x8000);
-		memory_set_bank(space->machine(), "bank5", state->rombank);
+		memory_set_bank(space->machine(), "bank5", state->m_rombank);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + ((state->rombank) << 14));
-		memory_set_bank(space->machine(), "bank5", state->rombank);
+		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + ((state->m_rombank) << 14));
+		memory_set_bank(space->machine(), "bank5", state->m_rombank);
 	}
 }
 
@@ -473,20 +473,20 @@ WRITE8_HANDLER ( bbc_memorybm1_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset] = data;
-	state->vidmem[offset] = 1;
+	state->m_vidmem[offset] = 1;
 }
 
 
 DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
-	if (state->ACCCON_X)
+	if (state->m_ACCCON_X)
 	{
 		memory_set_bankptr( *machine, "bank2", machine->region( "maincpu" )->base() + 0xb000 );
 	}
 	else
 	{
-		if (state->ACCCON_E && bbcm_vdudriverset(*machine))
+		if (state->m_ACCCON_E && bbcm_vdudriverset(*machine))
 		{
 			memory_set_bankptr( *machine, "bank2", machine->region( "maincpu" )->base() + 0xb000 );
 		}
@@ -505,22 +505,22 @@ WRITE8_HANDLER ( bbc_memorybm2_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	UINT8 *ram = space->machine().region("maincpu")->base();
-	if (state->ACCCON_X)
+	if (state->m_ACCCON_X)
 	{
 		ram[offset + 0xb000] = data;
-		state->vidmem[offset + 0xb000] = 1;
+		state->m_vidmem[offset + 0xb000] = 1;
 	}
 	else
 	{
-		if (state->ACCCON_E && bbcm_vdudriverset(space->machine()))
+		if (state->m_ACCCON_E && bbcm_vdudriverset(space->machine()))
 		{
 			ram[offset + 0xb000] = data;
-			state->vidmem[offset + 0xb000] = 1;
+			state->m_vidmem[offset + 0xb000] = 1;
 		}
 		else
 		{
 			ram[offset + 0x3000] = data;
-			state->vidmem[offset + 0x3000] = 1;
+			state->m_vidmem[offset + 0x3000] = 1;
 		}
 	}
 }
@@ -534,15 +534,15 @@ static const unsigned short bbc_master_sideways_ram_banks[16]=
 WRITE8_HANDLER ( bbc_memorybm4_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->pagedRAM)
+	if (state->m_pagedRAM)
 	{
 		space->machine().region("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
-		if (bbc_master_sideways_ram_banks[state->rombank])
+		if (bbc_master_sideways_ram_banks[state->m_rombank])
 		{
-			space->machine().region("user1")->base()[offset+(state->rombank<<14)]=data;
+			space->machine().region("user1")->base()[offset+(state->m_rombank<<14)]=data;
 		}
 	}
 }
@@ -551,9 +551,9 @@ WRITE8_HANDLER ( bbc_memorybm4_w )
 WRITE8_HANDLER ( bbc_memorybm5_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (bbc_master_sideways_ram_banks[state->rombank])
+	if (bbc_master_sideways_ram_banks[state->m_rombank])
 	{
-		space->machine().region("user1")->base()[offset+(state->rombank<<14)+0x1000]=data;
+		space->machine().region("user1")->base()[offset+(state->m_rombank<<14)+0x1000]=data;
 	}
 }
 
@@ -561,7 +561,7 @@ WRITE8_HANDLER ( bbc_memorybm5_w )
 WRITE8_HANDLER ( bbc_memorybm7_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->ACCCON_Y)
+	if (state->m_ACCCON_Y)
 	{
 		space->machine().region("maincpu")->base()[offset+0x9000]=data;
 	}
@@ -597,7 +597,7 @@ READ8_HANDLER ( bbcm_r )
 long myo;
 
 	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
-//  if ( state->ACCCON_TST )
+//  if ( state->m_ACCCON_TST )
 //  {
 //      return space->machine().region("user1")->base()[offset+0x43c00];
 //  };
@@ -809,18 +809,18 @@ INTERRUPT_GEN( bbcb_keyscan )
 	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
 
 	/* only do auto scan if keyboard is not enabled */
-	if (state->b3_keyboard == 1)
+	if (state->m_b3_keyboard == 1)
 	{
 		/* KBD IC1 4 bit addressable counter */
 		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
-		state->column = (state->column + 1) % 16;
-		if (state->column < 10)
+		state->m_column = (state->m_column + 1) % 16;
+		if (state->m_column < 10)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-                 being pressed on the selected state->column */
-			if ((input_port_read(device->machine(), colnames[state->column]) | 0x01) != 0xff)
+                 being pressed on the selected state->m_column */
+			if ((input_port_read(device->machine(), colnames[state->m_column]) | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -848,20 +848,20 @@ INTERRUPT_GEN( bbcm_keyscan )
 	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
 
 	/* only do auto scan if keyboard is not enabled */
-	if (state->b3_keyboard == 1)
+	if (state->m_b3_keyboard == 1)
 	{
 		/* KBD IC1 4 bit addressable counter */
 		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
-		state->column = (state->column + 1) % 16;
+		state->m_column = (state->m_column + 1) % 16;
 
 		/* this IF should be removed as soon as the dip switches (keyboard keys) are set for the master */
-		if (state->column < 10)
+		if (state->m_column < 10)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-                 being pressed on the selected state->column */
-			if ((input_port_read(device->machine(), colnames[state->column]) | 0x01) != 0xff)
+                 being pressed on the selected state->m_column */
+			if ((input_port_read(device->machine(), colnames[state->m_column]) | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -892,14 +892,14 @@ static int bbc_keyboard(address_space *space, int data)
 	};
 	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 
-	state->column = data & 0x0f;
+	state->m_column = data & 0x0f;
 	row = (data>>4) & 0x07;
 
 	bit = 0;
 
-	if (state->column < 10)
+	if (state->m_column < 10)
 	{
-		res = input_port_read(space->machine(), colnames[state->column]);
+		res = input_port_read(space->machine(), colnames[state->m_column]);
 	}
 	else
 	{
@@ -927,14 +927,14 @@ static int bbc_keyboard(address_space *space, int data)
 
 static void bbcb_IC32_initialise(bbc_state *state)
 {
-	state->b0_sound=0x01;				// Sound is negative edge trigered
-	state->b1_speech_read=0x01;		// ????
-	state->b2_speech_write=0x01;		// ????
-	state->b3_keyboard=0x01;			// Keyboard is negative edge trigered
-	state->b4_video0=0x01;
-	state->b5_video1=0x01;
-	state->b6_caps_lock_led=0x01;
-	state->b7_shift_lock_led=0x01;
+	state->m_b0_sound=0x01;				// Sound is negative edge trigered
+	state->m_b1_speech_read=0x01;		// ????
+	state->m_b2_speech_write=0x01;		// ????
+	state->m_b3_keyboard=0x01;			// Keyboard is negative edge trigered
+	state->m_b4_video0=0x01;
+	state->m_b5_video1=0x01;
+	state->m_b6_caps_lock_led=0x01;
+	state->m_b7_shift_lock_led=0x01;
 
 }
 
@@ -943,32 +943,32 @@ static void bbcb_IC32_initialise(bbc_state *state)
 static void MC146818_set(address_space *space)
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",state->MC146818_WR,state->MC146818_DS,state->MC146818_AS,state->MC146818_CE);
+	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",state->m_MC146818_WR,state->m_MC146818_DS,state->m_MC146818_AS,state->m_MC146818_CE);
 	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
-	if (state->MC146818_CE)
+	if (state->m_MC146818_CE)
 	{
 		// if data select is set then access the data in the 146818
-		if (state->MC146818_DS)
+		if (state->m_MC146818_DS)
 		{
-			if (state->MC146818_WR)
+			if (state->m_MC146818_WR)
 			{
-				state->via_system_porta=rtc->read(*space, 1);
-				//logerror("read 146818 data %d \n",state->via_system_porta);
+				state->m_via_system_porta=rtc->read(*space, 1);
+				//logerror("read 146818 data %d \n",state->m_via_system_porta);
 			}
 			else
 			{
-				rtc->write(*space, 1, state->via_system_porta);
-				//logerror("write 146818 data %d \n",state->via_system_porta);
+				rtc->write(*space, 1, state->m_via_system_porta);
+				//logerror("write 146818 data %d \n",state->m_via_system_porta);
 			}
 		}
 
 		// if address select is set then set the address in the 146818
-		if (state->MC146818_AS)
+		if (state->m_MC146818_AS)
 		{
-			rtc->write(*space, 0, state->via_system_porta);
-			//logerror("write 146818 address %d \n",state->via_system_porta);
+			rtc->write(*space, 0, state->m_via_system_porta);
+			//logerror("write 146818 address %d \n",state->m_via_system_porta);
 		}
 	}
 }
@@ -980,18 +980,18 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	//logerror("SYSTEM write porta %d\n",data);
 
-	state->via_system_porta = data;
-	if (state->b0_sound == 0)
+	state->m_via_system_porta = data;
+	if (state->m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		sn76496_w(device->machine().device("sn76489"), 0,state->via_system_porta);
+		sn76496_w(device->machine().device("sn76489"), 0,state->m_via_system_porta);
 	}
-	if (state->b3_keyboard == 0)
+	if (state->m_b3_keyboard == 0)
 	{
 		//logerror("Doing an unsafe write to the keyboard %d \n",data);
-		state->via_system_porta = bbc_keyboard(space, state->via_system_porta);
+		state->m_via_system_porta = bbc_keyboard(space, state->m_via_system_porta);
 	}
-	if (state->Master) MC146818_set(space);
+	if (state->m_Master) MC146818_set(space);
 }
 
 
@@ -1011,80 +1011,80 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		switch (bit)
 		{
 		case 0:
-			if (state->b0_sound == 0)
+			if (state->m_b0_sound == 0)
 			{
-				state->b0_sound = 1;
+				state->m_b0_sound = 1;
 			}
 			break;
 		case 1:
-			if (state->Master)
+			if (state->m_Master)
 			{
-				if (state->MC146818_WR == 0)
+				if (state->m_MC146818_WR == 0)
 				{
 					/* BBC MASTER has NV RAM Here */
-					state->MC146818_WR = 1;
+					state->m_MC146818_WR = 1;
 					MC146818_set(space);
 				}
 			}
 			else
 			{
-				if (state->b1_speech_read == 0)
+				if (state->m_b1_speech_read == 0)
 				{
 					/* VSP TMS 5220 */
-					state->b1_speech_read = 1;
+					state->m_b1_speech_read = 1;
 				}
 			}
 			break;
 		case 2:
-			if (state->Master)
+			if (state->m_Master)
 			{
-				if (state->MC146818_DS == 0)
+				if (state->m_MC146818_DS == 0)
 				{
 					/* BBC MASTER has NV RAM Here */
-					state->MC146818_DS = 1;
+					state->m_MC146818_DS = 1;
 					MC146818_set(space);
 				}
 			}
 			else
 			{
-				if (state->b2_speech_write == 0)
+				if (state->m_b2_speech_write == 0)
 				{
 					/* VSP TMS 5220 */
-					state->b2_speech_write = 1;
+					state->m_b2_speech_write = 1;
 				}
 			}
 			break;
 		case 3:
-			if (state->b3_keyboard == 0)
+			if (state->m_b3_keyboard == 0)
 			{
-				state->b3_keyboard = 1;
+				state->m_b3_keyboard = 1;
 			}
 			break;
 		case 4:
-			if (state->b4_video0 == 0)
+			if (state->m_b4_video0 == 0)
 			{
-				state->b4_video0 = 1;
-				bbc_setscreenstart(device->machine(), state->b4_video0, state->b5_video1);
+				state->m_b4_video0 = 1;
+				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 5:
-			if (state->b5_video1 == 0)
+			if (state->m_b5_video1 == 0)
 			{
-				state->b5_video1 = 1;
-				bbc_setscreenstart(device->machine(), state->b4_video0, state->b5_video1);
+				state->m_b5_video1 = 1;
+				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 6:
-			if (state->b6_caps_lock_led == 0)
+			if (state->m_b6_caps_lock_led == 0)
 			{
-				state->b6_caps_lock_led = 1;
+				state->m_b6_caps_lock_led = 1;
 				/* call caps lock led update */
 			}
 			break;
 		case 7:
-			if (state->b7_shift_lock_led == 0)
+			if (state->m_b7_shift_lock_led == 0)
 			{
-				state->b7_shift_lock_led = 1;
+				state->m_b7_shift_lock_led = 1;
 				/* call shift lock led update */
 			}
 			break;
@@ -1095,83 +1095,83 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		switch (bit)
 		{
 		case 0:
-			if (state->b0_sound == 1)
+			if (state->m_b0_sound == 1)
 			{
-				state->b0_sound = 0;
-				sn76496_w(space->machine().device("sn76489"), 0, state->via_system_porta);
+				state->m_b0_sound = 0;
+				sn76496_w(space->machine().device("sn76489"), 0, state->m_via_system_porta);
 			}
 			break;
 		case 1:
-			if (state->Master)
+			if (state->m_Master)
 			{
-				if (state->MC146818_WR == 1)
+				if (state->m_MC146818_WR == 1)
 				{
 					/* BBC MASTER has NV RAM Here */
-					state->MC146818_WR = 0;
+					state->m_MC146818_WR = 0;
 					MC146818_set(space);
 				}
 			}
 			else
 			{
-				if (state->b1_speech_read == 1)
+				if (state->m_b1_speech_read == 1)
 				{
 					/* VSP TMS 5220 */
-					state->b1_speech_read = 0;
+					state->m_b1_speech_read = 0;
 				}
 			}
 			break;
 		case 2:
-			if (state->Master)
+			if (state->m_Master)
 			{
-				if (state->MC146818_DS == 1)
+				if (state->m_MC146818_DS == 1)
 				{
 					/* BBC MASTER has NV RAM Here */
-					state->MC146818_DS = 0;
+					state->m_MC146818_DS = 0;
 					MC146818_set(space);
 				}
 			}
 			else
 			{
-				if (state->b2_speech_write == 1)
+				if (state->m_b2_speech_write == 1)
 				{
 					/* VSP TMS 5220 */
-					state->b2_speech_write = 0;
+					state->m_b2_speech_write = 0;
 				}
 			}
 			break;
 		case 3:
-			if (state->b3_keyboard == 1)
+			if (state->m_b3_keyboard == 1)
 			{
-				state->b3_keyboard = 0;
+				state->m_b3_keyboard = 0;
 				/* *** call keyboard enabled *** */
-				state->via_system_porta=bbc_keyboard(space, state->via_system_porta);
+				state->m_via_system_porta=bbc_keyboard(space, state->m_via_system_porta);
 			}
 			break;
 		case 4:
-			if (state->b4_video0 == 1)
+			if (state->m_b4_video0 == 1)
 			{
-				state->b4_video0 = 0;
-				bbc_setscreenstart(device->machine(), state->b4_video0, state->b5_video1);
+				state->m_b4_video0 = 0;
+				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 5:
-			if (state->b5_video1 == 1)
+			if (state->m_b5_video1 == 1)
 			{
-				state->b5_video1 = 0;
-				bbc_setscreenstart(device->machine(), state->b4_video0, state->b5_video1);
+				state->m_b5_video1 = 0;
+				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 6:
-			if (state->b6_caps_lock_led == 1)
+			if (state->m_b6_caps_lock_led == 1)
 			{
-				state->b6_caps_lock_led = 0;
+				state->m_b6_caps_lock_led = 0;
 				/* call caps lock led update */
 			}
 			break;
 		case 7:
-			if (state->b7_shift_lock_led == 1)
+			if (state->m_b7_shift_lock_led == 1)
 			{
-				state->b7_shift_lock_led = 0;
+				state->m_b7_shift_lock_led = 0;
 				/* call shift lock led update */
 			}
 			break;
@@ -1180,19 +1180,19 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 
 
 
-	if (state->Master)
+	if (state->m_Master)
 	{
 		//set the Address Select
-		if (state->MC146818_AS != ((data>>7)&1))
+		if (state->m_MC146818_AS != ((data>>7)&1))
 		{
-			state->MC146818_AS=(data>>7)&1;
+			state->m_MC146818_AS=(data>>7)&1;
 			MC146818_set(space);
 		}
 
 		//if CE changes
-		if (state->MC146818_CE != ((data>>6)&1))
+		if (state->m_MC146818_CE != ((data>>6)&1))
 		{
-			state->MC146818_CE=(data>>6)&1;
+			state->m_MC146818_CE=(data>>6)&1;
 			MC146818_set(space);
 		}
 	}
@@ -1202,8 +1202,8 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_porta )
 {
 	bbc_state *state = device->machine().driver_data<bbc_state>();
-	//logerror("SYSTEM read porta %d\n",state->via_system_porta);
-	return state->via_system_porta;
+	//logerror("SYSTEM read porta %d\n",state->m_via_system_porta);
+	return state->m_via_system_porta;
 }
 
 // D4 of portb is joystick fire button 1
@@ -1300,7 +1300,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_user_read_portb )
 static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_portb )
 {
 	bbc_state *state = device->machine().driver_data<bbc_state>();
-	state->userport = data;
+	state->m_userport = data;
 }
 
 const via6522_interface bbcb_user_via =
@@ -1367,12 +1367,12 @@ const uPD7002_interface bbc_uPD7002 =
 static void MC6850_Receive_Clock(running_machine &machine, int new_clock)
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	if (!state->mc6850_clock && new_clock)
+	if (!state->m_mc6850_clock && new_clock)
 	{
 		device_t *acia = machine.device("acia6850");
 		acia6850_tx_clock_in(acia);
 	}
-	state->mc6850_clock = new_clock;
+	state->m_mc6850_clock = new_clock;
 }
 
 static TIMER_CALLBACK(bbc_tape_timer_cb)
@@ -1383,55 +1383,55 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 	dev_val=cassette_input(machine.device("cassette"));
 
 	// look for rising edges on the cassette wave
-	if (((dev_val>=0.0) && (state->last_dev_val<0.0)) || ((dev_val<0.0) && (state->last_dev_val>=0.0)))
+	if (((dev_val>=0.0) && (state->m_last_dev_val<0.0)) || ((dev_val<0.0) && (state->m_last_dev_val>=0.0)))
 	{
-		if (state->wav_len>(9*3))
+		if (state->m_wav_len>(9*3))
 		{
 			//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
-			logerror ("Cassette length %d\n",state->wav_len);
-			state->len0=0;
-			state->len1=0;
-			state->len2=0;
-			state->len3=0;
-			state->wav_len=0;
+			logerror ("Cassette length %d\n",state->m_wav_len);
+			state->m_len0=0;
+			state->m_len1=0;
+			state->m_len2=0;
+			state->m_len3=0;
+			state->m_wav_len=0;
 
 		}
 
-		state->len3=state->len2;
-		state->len2=state->len1;
-		state->len1=state->len0;
-		state->len0=state->wav_len;
+		state->m_len3=state->m_len2;
+		state->m_len2=state->m_len1;
+		state->m_len1=state->m_len0;
+		state->m_len0=state->m_wav_len;
 
-		state->wav_len=0;
-		logerror ("cassette  %d  %d  %d  %d\n",state->len3,state->len2,state->len1,state->len0);
+		state->m_wav_len=0;
+		logerror ("cassette  %d  %d  %d  %d\n",state->m_len3,state->m_len2,state->m_len1,state->m_len0);
 
-		if ((state->len0+state->len1)>=(18+18-5))
+		if ((state->m_len0+state->m_len1)>=(18+18-5))
 		{
 			/* Clock a 0 onto the serial line */
 			logerror("Serial value 0\n");
 			MC6850_Receive_Clock(machine, 0);
-			state->len0=0;
-			state->len1=0;
-			state->len2=0;
-			state->len3=0;
+			state->m_len0=0;
+			state->m_len1=0;
+			state->m_len2=0;
+			state->m_len3=0;
 		}
 
-		if (((state->len0+state->len1+state->len2+state->len3)<=41) && (state->len3!=0))
+		if (((state->m_len0+state->m_len1+state->m_len2+state->m_len3)<=41) && (state->m_len3!=0))
 		{
 			/* Clock a 1 onto the serial line */
 			logerror("Serial value 1\n");
 			MC6850_Receive_Clock(machine, 1);
-			state->len0=0;
-			state->len1=0;
-			state->len2=0;
-			state->len3=0;
+			state->m_len0=0;
+			state->m_len1=0;
+			state->m_len2=0;
+			state->m_len3=0;
 		}
 
 
 	}
 
-	state->wav_len++;
-	state->last_dev_val=dev_val;
+	state->m_wav_len++;
+	state->m_last_dev_val=dev_val;
 
 }
 
@@ -1441,17 +1441,17 @@ static void BBC_Cassette_motor(running_machine &machine, unsigned char status)
 	if (status)
 	{
 		cassette_change_state(machine.device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		state->tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
+		state->m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
 		cassette_change_state(machine.device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		state->tape_timer->reset();
-		state->len0 = 0;
-		state->len1 = 0;
-		state->len2 = 0;
-		state->len3 = 0;
-		state->wav_len = 0;
+		state->m_tape_timer->reset();
+		state->m_len0 = 0;
+		state->m_len1 = 0;
+		state->m_len2 = 0;
+		state->m_len3 = 0;
+		state->m_wav_len = 0;
 	}
 }
 
@@ -1476,7 +1476,7 @@ static void	bbc_i8271_interrupt(device_t *device, int state)
     is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=drvstate->previous_i8271_int_state)
+	if (state!=drvstate->m_previous_i8271_int_state)
 	{
 		if (state)
 		{
@@ -1486,7 +1486,7 @@ static void	bbc_i8271_interrupt(device_t *device, int state)
 		}
 	}
 
-	drvstate->previous_i8271_int_state = state;
+	drvstate->m_previous_i8271_int_state = state;
 }
 
 
@@ -1598,7 +1598,7 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 	int bbc_state;
 
 	/* if drq or irq is set, and interrupt is enabled */
-	if ((drvstate->wd177x_irq_state || drvstate->wd177x_drq_state) && (drvstate->_1770_IntEnabled))
+	if ((drvstate->m_wd177x_irq_state || drvstate->m_wd177x_drq_state) && (drvstate->m_1770_IntEnabled))
 	{
 		/* int trigger */
 		bbc_state = 1;
@@ -1611,7 +1611,7 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
     Here we are checking this transition before triggering the nmi */
-	if (bbc_state!=drvstate->previous_wd177x_int_state)
+	if (bbc_state!=drvstate->m_previous_wd177x_int_state)
 	{
 		if (bbc_state)
 		{
@@ -1621,20 +1621,20 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 		}
 	}
 
-	drvstate->previous_wd177x_int_state = bbc_state;
+	drvstate->m_previous_wd177x_int_state = bbc_state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( bbc_wd177x_intrq_w )
 {
 	bbc_state *drvstate = device->machine().driver_data<bbc_state>();
-	drvstate->wd177x_irq_state = state;
+	drvstate->m_wd177x_irq_state = state;
 	bbc_update_fdq_int(device->machine(), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( bbc_wd177x_drq_w )
 {
 	bbc_state *drvstate = device->machine().driver_data<bbc_state>();
-	drvstate->wd177x_drq_state = state;
+	drvstate->m_wd177x_drq_state = state;
 	bbc_update_fdq_int(device->machine(), state);
 }
 
@@ -1650,7 +1650,7 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	device_t *fdc = space->machine().device("wd177x");
-	state->drive_control = data;
+	state->m_drive_control = data;
 
 	/* set drive */
 	if ((data>>0) & 0x01) wd17xx_set_drive(fdc,0);
@@ -1662,7 +1662,7 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 	/* set density */
 	wd17xx_dden_w(fdc, BIT(data, 3));
 
-	state->_1770_IntEnabled=(((data>>4) & 0x01)==0);
+	state->m_1770_IntEnabled=(((data>>4) & 0x01)==0);
 
 }
 
@@ -1761,7 +1761,7 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	device_t *fdc = space->machine().device("wd177x");
-	state->drive_control = data;
+	state->m_drive_control = data;
 
 	/* set drive */
 	if ((data>>1) & 0x01) wd17xx_set_drive(fdc,0);
@@ -1773,7 +1773,7 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 	/* set density */
 	wd17xx_dden_w(fdc, BIT(data, 5));
 
-	state->_1770_IntEnabled=(data>>4) & 0x01;
+	state->m_1770_IntEnabled=(data>>4) & 0x01;
 
 }
 
@@ -1783,7 +1783,7 @@ READ8_HANDLER( bbc_opus_read )
 	device_t *fdc = space->machine().device("wd177x");
 	logerror("wd177x read: $%02X\n", offset);
 
-	if (state->DFSType==6)
+	if (state->m_DFSType==6)
 	{
 		if (offset<0x100)
 		{
@@ -1802,7 +1802,7 @@ READ8_HANDLER( bbc_opus_read )
 		}
 		else
 		{
-			return space->machine().region("disks")->base()[offset + (state->opusbank << 8)];
+			return space->machine().region("disks")->base()[offset + (state->m_opusbank << 8)];
 		}
 	}
 	return 0xff;
@@ -1814,7 +1814,7 @@ WRITE8_HANDLER (bbc_opus_write)
 	device_t *fdc = space->machine().device("wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 
-	if (state->DFSType==6)
+	if (state->m_DFSType==6)
 	{
 		if (offset<0x100)
 		{
@@ -1836,16 +1836,16 @@ WRITE8_HANDLER (bbc_opus_write)
 					bbc_opus_status_w(space, 0,data);
 					break;
 				case 0xfe:
-					state->opusbank=(state->opusbank & 0xff) | (data<<8);
+					state->m_opusbank=(state->m_opusbank & 0xff) | (data<<8);
 					break;
 				case 0xff:
-					state->opusbank=(state->opusbank & 0xff00) | data;
+					state->m_opusbank=(state->m_opusbank & 0xff00) | data;
 					break;
 			}
 		}
 		else
 		{
-			space->machine().region("disks")->base()[offset + (state->opusbank << 8)] = data;
+			space->machine().region("disks")->base()[offset + (state->m_opusbank << 8)] = data;
 		}
 	}
 }
@@ -1908,14 +1908,14 @@ WRITE8_HANDLER ( bbcm_wd1770_write )
 READ8_HANDLER ( bbcm_wd1770l_read )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	return state->drive_control;
+	return state->m_drive_control;
 }
 
 WRITE8_HANDLER ( bbcm_wd1770l_write )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	device_t *fdc = space->machine().device("wd177x");
-	state->drive_control = data;
+	state->m_drive_control = data;
 
 	/* set drive */
 	if ((data>>0) & 0x01) wd17xx_set_drive(fdc,0);
@@ -1927,8 +1927,8 @@ WRITE8_HANDLER ( bbcm_wd1770l_write )
 	/* set density */
 	wd17xx_dden_w(fdc, BIT(data, 5));
 
-//  state->_1770_IntEnabled=(((data>>4) & 0x01)==0);
-	state->_1770_IntEnabled=1;
+//  state->m_1770_IntEnabled=(((data>>4) & 0x01)==0);
+	state->m_1770_IntEnabled=1;
 
 }
 
@@ -1940,7 +1940,7 @@ DFS Hardware mapping for different Disc Controller types
 READ8_HANDLER( bbc_disc_r )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	switch (state->DFSType){
+	switch (state->m_DFSType){
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
 		return bbc_i8271_read(space, offset);
@@ -1964,7 +1964,7 @@ READ8_HANDLER( bbc_disc_r )
 WRITE8_HANDLER ( bbc_disc_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
-	switch (state->DFSType){
+	switch (state->m_DFSType){
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
 		bbc_i8271_write(space, offset,data);
@@ -2054,14 +2054,14 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 DRIVER_INIT( bbc )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	state->Master=0;
-	state->tape_timer = machine.scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
+	state->m_Master=0;
+	state->m_tape_timer = machine.scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
 DRIVER_INIT( bbcm )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	state->Master=1;
-	state->tape_timer = machine.scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
+	state->m_Master=1;
+	state->m_tape_timer = machine.scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
 
 MACHINE_START( bbca )
@@ -2072,7 +2072,7 @@ MACHINE_RESET( bbca )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
 	UINT8 *ram = machine.region("maincpu")->base();
-	state->RAMSize = 1;
+	state->m_RAMSize = 1;
 	memory_set_bankptr(machine, "bank1",ram);
 	memory_set_bankptr(machine, "bank3",ram);
 
@@ -2085,20 +2085,20 @@ MACHINE_RESET( bbca )
 MACHINE_START( bbcb )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	state->mc6850_clock = 0;
+	state->m_mc6850_clock = 0;
 	//removed from here because MACHINE_START can no longer read DIP swiches.
 	//put in MACHINE_RESET instead.
-	//state->DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
-	//state->SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
-	//state->RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
+	//state->m_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
+	//state->m_SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
+	//state->m_RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
 
 	/*set up the required disc controller*/
-	//switch (state->DFSType) {
+	//switch (state->m_DFSType) {
 	//case 0:   case 1: case 2: case 3:
-		state->previous_i8271_int_state=0;
+		state->m_previous_i8271_int_state=0;
 	//  break;
 	//case 4: case 5: case 6:
-		state->previous_wd177x_int_state=1;
+		state->m_previous_wd177x_int_state=1;
 	//  break;
 	//}
 }
@@ -2107,12 +2107,12 @@ MACHINE_RESET( bbcb )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
 	UINT8 *ram = machine.region("maincpu")->base();
-	state->DFSType=    (input_port_read(machine, "BBCCONFIG") >> 0) & 0x07;
-	state->SWRAMtype = (input_port_read(machine, "BBCCONFIG") >> 3) & 0x03;
-	state->RAMSize=    (input_port_read(machine, "BBCCONFIG") >> 5) & 0x01;
+	state->m_DFSType=    (input_port_read(machine, "BBCCONFIG") >> 0) & 0x07;
+	state->m_SWRAMtype = (input_port_read(machine, "BBCCONFIG") >> 3) & 0x03;
+	state->m_RAMSize=    (input_port_read(machine, "BBCCONFIG") >> 5) & 0x01;
 
 	memory_set_bankptr(machine, "bank1",ram);
-	if (state->RAMSize)
+	if (state->m_RAMSize)
 	{
 		/* 32K Model B */
 		memory_set_bankptr(machine, "bank3", ram + 0x4000);
@@ -2131,9 +2131,9 @@ MACHINE_RESET( bbcb )
 	bbcb_IC32_initialise(state);
 
 
-	state->opusbank = 0;
+	state->m_opusbank = 0;
 	/*set up the required disc controller*/
-	//switch (state->DFSType) {
+	//switch (state->m_DFSType) {
 	//case 0:   case 1: case 2: case 3:
 	//  break;
 	//case 4: case 5: case 6:
@@ -2145,7 +2145,7 @@ MACHINE_RESET( bbcb )
 MACHINE_START( bbcbp )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	state->mc6850_clock = 0;
+	state->m_mc6850_clock = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcbp_direct_handler, machine));
 
@@ -2165,7 +2165,7 @@ MACHINE_RESET( bbcbp )
 	bbcb_IC32_initialise(state);
 
 
-	state->previous_wd177x_int_state=1;
+	state->m_previous_wd177x_int_state=1;
 }
 
 
@@ -2173,7 +2173,7 @@ MACHINE_RESET( bbcbp )
 MACHINE_START( bbcm )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	state->mc6850_clock = 0;
+	state->m_mc6850_clock = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcm_direct_handler, machine));
 
@@ -2197,5 +2197,5 @@ MACHINE_RESET( bbcm )
 	bbcb_IC32_initialise(state);
 
 
-	state->previous_wd177x_int_state=1;
+	state->m_previous_wd177x_int_state=1;
 }

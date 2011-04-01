@@ -68,37 +68,37 @@ public:
 	spectrum_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int port_fe_data;
-	int port_7ffd_data;
-	int port_1ffd_data;	/* scorpion and plus3 */
-	int port_ff_data; /* Display enhancement control */
-	int port_f4_data; /* Horizontal Select Register */
+	int m_port_fe_data;
+	int m_port_7ffd_data;
+	int m_port_1ffd_data;	/* scorpion and plus3 */
+	int m_port_ff_data; /* Display enhancement control */
+	int m_port_f4_data; /* Horizontal Select Register */
 
-	int floppy;
+	int m_floppy;
 
 	/* video support */
-	int frame_invert_count;
-	int frame_number;    /* Used for handling FLASH 1 */
-	int flash_invert;
-	UINT8 retrace_cycles;
-	UINT8 *video_ram;
-	UINT8 *screen_location;
+	int m_frame_invert_count;
+	int m_frame_number;    /* Used for handling FLASH 1 */
+	int m_flash_invert;
+	UINT8 m_retrace_cycles;
+	UINT8 *m_video_ram;
+	UINT8 *m_screen_location;
 
-	int ROMSelection;
+	int m_ROMSelection;
 
 	/* Last border colour output in the previous frame */
-	int CurrBorderColor;
-	int LastDisplayedBorderColor; /* Negative value indicates redraw */
+	int m_CurrBorderColor;
+	int m_LastDisplayedBorderColor; /* Negative value indicates redraw */
 
-	EVENT_LIST_ITEM *pCurrentItem;
-	int NumEvents;
-	int TotalEvents;
-	char *pEventListBuffer;
-	int LastFrameStartTime;
-	int CyclesPerFrame;
+	EVENT_LIST_ITEM *m_pCurrentItem;
+	int m_NumEvents;
+	int m_TotalEvents;
+	char *m_pEventListBuffer;
+	int m_LastFrameStartTime;
+	int m_CyclesPerFrame;
 
-	UINT8 *ram_0000;
-	UINT8 ram_disabled_by_beta;
+	UINT8 *m_ram_0000;
+	UINT8 m_ram_disabled_by_beta;
 };
 
 

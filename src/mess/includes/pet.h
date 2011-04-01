@@ -25,23 +25,23 @@ public:
 	pet_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int pet_basic1; /* basic version 1 for quickloader */
-	int superpet;
-	int cbm8096;
+	int m_pet_basic1; /* basic version 1 for quickloader */
+	int m_superpet;
+	int m_cbm8096;
 
-	int pia0_irq;
-	int pia1_irq;
-	int via_irq;
-	UINT8 *videoram;
-	int font;
-	UINT8 *memory;
-	UINT8 *supermemory;
-	UINT8 *pet80_bank1_base;
-	int keyline_select;
-	emu_timer *datasette1_timer;
-	emu_timer *datasette2_timer;
-	spet_t spet;
-	int pia_level;
+	int m_pia0_irq;
+	int m_pia1_irq;
+	int m_via_irq;
+	UINT8 *m_videoram;
+	int m_font;
+	UINT8 *m_memory;
+	UINT8 *m_supermemory;
+	UINT8 *m_pet80_bank1_base;
+	int m_keyline_select;
+	emu_timer *m_datasette1_timer;
+	emu_timer *m_datasette2_timer;
+	spet_t m_spet;
+	int m_pia_level;
 };
 
 /*----------- defined in video/pet.c -----------*/

@@ -257,44 +257,44 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 
-	UINT8 portb_tmp;
-	int dma_channel;
-	UINT8 dma_offset[2][4];
-	UINT8 at_pages[0x10];
+	UINT8 m_portb_tmp;
+	int m_dma_channel;
+	UINT8 m_dma_offset[2][4];
+	UINT8 m_at_pages[0x10];
 
-	UINT8 vrtc_irq_mask;
-	UINT8 video_ff[8];
-	UINT8 video_reg[6];
-	UINT8 pal_clut[4];
+	UINT8 m_vrtc_irq_mask;
+	UINT8 m_video_ff[8];
+	UINT8 m_video_reg[6];
+	UINT8 m_pal_clut[4];
 
-	UINT8 *tvram;
+	UINT8 *m_tvram;
 
-	UINT16 font_addr;
-	UINT8 font_line;
-	UINT16 font_lr;
+	UINT16 m_font_addr;
+	UINT8 m_font_line;
+	UINT16 m_font_lr;
 
-	UINT8 keyb_press;
+	UINT8 m_keyb_press;
 
-	UINT8 fdc_2dd_ctrl;
-	UINT8 nmi_ff;
+	UINT8 m_fdc_2dd_ctrl;
+	UINT8 m_nmi_ff;
 
-	UINT8 vram_bank;
-	UINT8 vram_disp;
+	UINT8 m_vram_bank;
+	UINT8 m_vram_disp;
 
 	/* PC9801RS specific */
-	UINT8 gate_a20; //A20 line
-	UINT8 por; 		//Power-On Reset
-	UINT8 rom_bank;
-	UINT8 fdc_ctrl;
-	UINT32 ram_size;
-	UINT8 ex_video_ff[4];
+	UINT8 m_gate_a20; //A20 line
+	UINT8 m_por; 		//Power-On Reset
+	UINT8 m_rom_bank;
+	UINT8 m_fdc_ctrl;
+	UINT32 m_ram_size;
+	UINT8 m_ex_video_ff[4];
 	struct {
 		UINT8 pal_entry;
 		UINT8 r[16],g[16],b[16];
-	}analog16;
+	}m_analog16;
 
 	/* PC9821 specific */
-	UINT8 analog256,analog256e;
+	UINT8 m_analog256,m_analog256e;
 };
 
 
@@ -309,7 +309,7 @@ void pc9801_state::video_start()
 {
 	//pc9801_state *state = machine.driver_data<pc9801_state>();
 
-	tvram = auto_alloc_array(m_machine, UINT8, 0x4000);
+	m_tvram = auto_alloc_array(m_machine, UINT8, 0x4000);
 
 	// find memory regions
 	m_char_rom = m_machine.region("chargen")->base();
@@ -336,19 +336,19 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	UINT8 pen;
 	UINT8 interlace_on;
 
-	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
+	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	interlace_on = state->video_reg[2] == 0x10;
+	interlace_on = state->m_video_reg[2] == 0x10;
 
 	for(xi=0;xi<8;xi++)
 	{
 		res_x = x + xi;
 		res_y = y;
 
-		pen = ((vram[address + (0x08000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
-		pen|= ((vram[address + (0x10000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
-		pen|= ((vram[address + (0x18000) + (state->vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
+		pen = ((vram[address + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
+		pen|= ((vram[address + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
+		pen|= ((vram[address + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
 
 		if(interlace_on)
 		{
@@ -369,10 +369,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int x;
 	UINT8 char_size,interlace_on;
 
-	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
+	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	interlace_on = state->video_reg[2] == 0x10; /* TODO: correct? */
+	interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
 	char_size = (interlace_on) ? 16 : 8;
 
 	for(x=0;x<pitch;x++)
@@ -382,7 +382,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		UINT8 tile,attr,pen;
 		UINT32 tile_addr;
 
-		tile_addr = addr+(x*(state->video_ff[WIDTH40_REG]+1));
+		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 
 		tile = vram[(tile_addr*2) & 0x1fff] & 0x00ff; //TODO: kanji
 		attr = (vram[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
@@ -400,7 +400,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			{
 				int res_x,res_y;
 
-				res_x = (x*8+xi) * (state->video_ff[WIDTH40_REG]+1);
+				res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
 				res_y = y*lr+yi;
 
 				if(res_x > 640 || res_y > char_size*25) //TODO
@@ -423,7 +423,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(pen)
 					*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
 
-				if(state->video_ff[WIDTH40_REG])
+				if(state->m_video_ff[WIDTH40_REG])
 				{
 					if(res_x+1 > 640 || res_y > char_size*25) //TODO
 						continue;
@@ -559,7 +559,7 @@ static WRITE8_HANDLER( pc9801_20_w )
 	else // odd
 	{
 		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
-		state->dma_offset[0][((offset >> 1)+1) & 3] = data & 0x0f;
+		state->m_dma_offset[0][((offset >> 1)+1) & 3] = data & 0x0f;
 	}
 }
 
@@ -614,7 +614,7 @@ static READ8_HANDLER( pc9801_40_r )
 			{
 				UINT8 res;
 
-				res = state->keyb_press;
+				res = state->m_keyb_press;
 
 				return res;
 			}
@@ -669,7 +669,7 @@ static WRITE8_HANDLER( pc9801_50_w )
 		if(offset & 4)
 			printf("Write to undefined port [%02x] %02x\n",offset+0x50,data);
 		else
-			state->nmi_ff = (offset & 2) >> 1;
+			state->m_nmi_ff = (offset & 2) >> 1;
 
 	}
 	else // odd
@@ -709,7 +709,7 @@ static WRITE8_HANDLER( pc9801_vrtc_mask_w )
 
 	if((offset & 1) == 0)
 	{
-		state->vrtc_irq_mask = 1;
+		state->m_vrtc_irq_mask = 1;
 	}
 	else // odd
 	{
@@ -723,7 +723,7 @@ static WRITE8_HANDLER( pc9801_video_ff_w )
 
 	if((offset & 1) == 0)
 	{
-		state->video_ff[(data & 0x0e) >> 1] = data & 1;
+		state->m_video_ff[(data & 0x0e) >> 1] = data & 1;
 
 		if(0)
 		{
@@ -774,7 +774,7 @@ static WRITE8_HANDLER( pc9801_70_w )
 	if((offset & 1) == 0)
 	{
 		printf("Write to display register [%02x] %02x\n",offset+0x70,data);
-		state->video_reg[offset >> 1] = data;
+		state->m_video_reg[offset >> 1] = data;
 	}
 	else // odd
 	{
@@ -824,14 +824,14 @@ static READ8_HANDLER( pc9801_a0_r )
 				return upd7220_r(space->machine().device("upd7220_btm"),(offset & 2) >> 1);
 			/* bitmap palette clut read */
 			case 0x04:
-				return state->vram_disp & 1;
+				return state->m_vram_disp & 1;
 			case 0x06:
-				return state->vram_bank & 1;
+				return state->m_vram_bank & 1;
 			case 0x08:
 			case 0x0a:
 			case 0x0c:
 			case 0x0e:
-				return state->pal_clut[(offset & 0x6) >> 1];
+				return state->m_pal_clut[(offset & 0x6) >> 1];
 		}
 
 		return 0xff; //code unreachable
@@ -844,7 +844,7 @@ static READ8_HANDLER( pc9801_a0_r )
 			{
 				UINT8 *pcg = space->machine().region("pcg")->base();
 
-				return pcg[((state->font_addr & 0x7f7f) << 4) | state->font_lr | (state->font_line & 0x0f)];
+				return pcg[((state->m_font_addr & 0x7f7f) << 4) | state->m_font_lr | (state->m_font_line & 0x0f)];
 			}
 		}
 
@@ -865,9 +865,9 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			case 0x02:
 				upd7220_w(space->machine().device("upd7220_btm"),(offset & 2) >> 1,data);
 				return;
-			case 0x04: state->vram_disp = data & 1; return;
+			case 0x04: state->m_vram_disp = data & 1; return;
 			case 0x06:
-				state->vram_bank = data & 1;
+				state->m_vram_bank = data & 1;
 				upd7220_bank_w(space->machine().device("upd7220_btm"),0,(data & 1) << 2); //TODO: check me
 				return;
 			/* bitmap palette clut write */
@@ -878,7 +878,7 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			{
 				UINT8 pal_entry;
 
-				state->pal_clut[(offset & 0x6) >> 1] = data;
+				state->m_pal_clut[(offset & 0x6) >> 1] = data;
 
 				/* can't be more twisted I presume ... :-/ */
 				pal_entry = (((offset & 4) >> 1) | ((offset & 2) << 1)) >> 1;
@@ -898,20 +898,20 @@ static WRITE8_HANDLER( pc9801_a0_w )
 		switch((offset & 0xe) + 1)
 		{
 			case 0x01:
-				state->font_addr = (data << 8) | (state->font_addr & 0xff);
+				state->m_font_addr = (data << 8) | (state->m_font_addr & 0xff);
 				return;
 			case 0x03:
-				state->font_addr = (data & 0xff) | (state->font_addr & 0xff00);
+				state->m_font_addr = (data & 0xff) | (state->m_font_addr & 0xff00);
 				return;
 			case 0x05:
-				state->font_line = data & 0x1f;
-				state->font_lr = data & 0x20 ? 0x000 : 0x800;
+				state->m_font_line = data & 0x1f;
+				state->m_font_lr = data & 0x20 ? 0x000 : 0x800;
 				return;
 			case 0x09: //cg window font write
 			{
 				UINT8 *pcg = space->machine().region("pcg")->base();
 
-				pcg[((state->font_addr & 0x7f7f) << 4) | state->font_lr | state->font_line] = data;
+				pcg[((state->m_font_addr & 0x7f7f) << 4) | state->m_font_lr | state->m_font_line] = data;
 				return;
 			}
 		}
@@ -952,12 +952,12 @@ static WRITE8_HANDLER( pc9801_fdc_2dd_w )
 			case 2: upd765_data_w(space->machine().device("upd765_2dd"),0,data); return;
 			case 4:
 				printf("%02x ctrl\n",data);
-				if(((state->fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
+				if(((state->m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
 					upd765_reset_w(space->machine().device("upd765_2dd"),1);
-				if((state->fdc_2dd_ctrl & 0x80) && (!(data & 0x80)))
+				if((state->m_fdc_2dd_ctrl & 0x80) && (!(data & 0x80)))
 					upd765_reset_w(space->machine().device("upd765_2dd"),0);
 
-				state->fdc_2dd_ctrl = data;
+				state->m_fdc_2dd_ctrl = data;
 				//floppy_mon_w(floppy_get_device(space->machine(), 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
 				//floppy_mon_w(floppy_get_device(space->machine(), 1), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
 				//floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), (data & 8), 0);
@@ -982,7 +982,7 @@ static READ8_HANDLER( pc9801_tvram_r )
 		return 0xff;
 
 	//res = upd7220_vram_r(space->machine().device("upd7220_chr"),offset);
-	res = state->tvram[offset];
+	res = state->m_tvram[offset];
 
 	return res;
 }
@@ -991,8 +991,8 @@ static WRITE8_HANDLER( pc9801_tvram_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	if(offset < (0x3fe2) || state->video_ff[MEMSW_REG])
-		state->tvram[offset] = data;
+	if(offset < (0x3fe2) || state->m_video_ff[MEMSW_REG])
+		state->m_tvram[offset] = data;
 
 	upd7220_vram_w(space->machine().device("upd7220_chr"),offset,data); //TODO: check me
 }
@@ -1001,14 +1001,14 @@ static READ8_HANDLER( pc9801_gvram_r )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	return upd7220_vram_r(space->machine().device("upd7220_btm"),offset+0x8000+state->vram_bank*0x20000);
+	return upd7220_vram_r(space->machine().device("upd7220_btm"),offset+0x8000+state->m_vram_bank*0x20000);
 }
 
 static WRITE8_HANDLER( pc9801_gvram_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	upd7220_vram_w(space->machine().device("upd7220_btm"),offset+0x8000+state->vram_bank*0x20000, data);
+	upd7220_vram_w(space->machine().device("upd7220_btm"),offset+0x8000+state->m_vram_bank*0x20000, data);
 }
 
 static READ8_HANDLER( pc9801_opn_r )
@@ -1101,7 +1101,7 @@ static READ8_HANDLER( pc9801rs_ipl_r )
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 	UINT8 *ROM = space->machine().region("ipl")->base();
 
-	return ROM[(offset & 0x1ffff)+(state->rom_bank*0x20000)];
+	return ROM[(offset & 0x1ffff)+(state->m_rom_bank*0x20000)];
 }
 
 static READ8_HANDLER( pc9801rs_knjram_r )
@@ -1130,7 +1130,7 @@ static WRITE8_HANDLER( pc9801rs_bank_w )
 		{
 			if((data & 0xed) == 0x00)
 			{
-				state->rom_bank = (data & 2) >> 1;
+				state->m_rom_bank = (data & 2) >> 1;
 				return;
 			}
 		}
@@ -1140,7 +1140,7 @@ static WRITE8_HANDLER( pc9801rs_bank_w )
 	if(offset == 3)
 	{
 		if((data & 0xf0) == 0x20)
-			state->vram_bank = (data & 2) >> 1;
+			state->m_vram_bank = (data & 2) >> 1;
 		else
 			printf("Unknown EMS RAM setting %02x\n",data);
 	}
@@ -1151,9 +1151,9 @@ static READ8_HANDLER( pc9801rs_f0_r )
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
 	if(offset == 0x02)
-		return (state->gate_a20 ^ 1) | 0x2e;
+		return (state->m_gate_a20 ^ 1) | 0x2e;
 	else if(offset == 0x06)
-		return (state->gate_a20 ^ 1) | 0x5e;
+		return (state->m_gate_a20 ^ 1) | 0x5e;
 
 	return 0x00;
 }
@@ -1164,19 +1164,19 @@ static WRITE8_HANDLER( pc9801rs_f0_w )
 
 	if(offset == 0x00)
 	{
-		state->por = 0x00;
+		state->m_por = 0x00;
 		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	if(offset == 0x02)
-		state->gate_a20 = 1;
+		state->m_gate_a20 = 1;
 
 	if(offset == 0x06)
 	{
 		if(data == 0x02)
-			state->gate_a20 = 1;
+			state->m_gate_a20 = 1;
 		else if(data == 0x03)
-			state->gate_a20 = 0;
+			state->m_gate_a20 = 0;
 	}
 }
 
@@ -1185,7 +1185,7 @@ static READ8_HANDLER( pc9801rs_30_r )
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
 	if(offset == 5)
-		return (pc9801_30_r(space,offset) & ~0xa0) | state->por; //ppi bug?
+		return (pc9801_30_r(space,offset) & ~0xa0) | state->m_por; //ppi bug?
 
 	return pc9801_30_r(space,offset);
 }
@@ -1195,7 +1195,7 @@ static READ8_HANDLER( pc9801rs_memory_r )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	if(state->gate_a20 == 0)
+	if(state->m_gate_a20 == 0)
 		offset &= 0xfffff;
 
 	if	   (offset >= 0x00000000 && offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
@@ -1203,7 +1203,7 @@ static READ8_HANDLER( pc9801rs_memory_r )
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
-	else if(offset >= 0x00100000 && offset <= 0x00100000+state->ram_size-1) { return pc9801rs_ex_wram_r(space,offset-0x00100000); }
+	else if(offset >= 0x00100000 && offset <= 0x00100000+state->m_ram_size-1) { return pc9801rs_ex_wram_r(space,offset-0x00100000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
 	//printf("%08x\n",offset);
@@ -1215,14 +1215,14 @@ static WRITE8_HANDLER( pc9801rs_memory_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	if(state->gate_a20 == 0)
+	if(state->m_gate_a20 == 0)
 		offset &= 0xfffff;
 
 	if	   (offset >= 0x00000000 && offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
-	else if(offset >= 0x00100000 && offset <= 0x00100000+state->ram_size-1) { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
+	else if(offset >= 0x00100000 && offset <= 0x00100000+state->m_ram_size-1) { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	//else
 	//	printf("%08x %08x\n",offset,data);
 
@@ -1232,7 +1232,7 @@ static READ8_HANDLER( pc9810rs_fdc_ctrl_r )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	return (state->fdc_ctrl & 3) | 8;
+	return (state->m_fdc_ctrl & 3) | 8;
 }
 
 static WRITE8_HANDLER( pc9810rs_fdc_ctrl_w )
@@ -1244,7 +1244,7 @@ static WRITE8_HANDLER( pc9810rs_fdc_ctrl_w )
 	*/
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	state->fdc_ctrl = data;
+	state->m_fdc_ctrl = data;
 	if(data & 0xfc)
 		printf("FDC ctrl called with %02x\n",data);
 }
@@ -1284,7 +1284,7 @@ static READ8_HANDLER( pc9801rs_2dd_r )
 {
 //	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-//	if(state->fdc_ctrl & 1)
+//	if(state->m_fdc_ctrl & 1)
 //		return 0xff;
 
 	if((offset & 1) == 0)
@@ -1306,7 +1306,7 @@ static WRITE8_HANDLER( pc9801rs_2dd_w )
 {
 //	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-//	if(state->fdc_ctrl & 1)
+//	if(state->m_fdc_ctrl & 1)
 //		return;
 
 	if((offset & 1) == 0)
@@ -1329,7 +1329,7 @@ static WRITE8_HANDLER( pc9801rs_video_ff_w )
 	{
 		if((data & 0xf8) == 0)
 		{
-			state->ex_video_ff[(data & 0x6) >> 1] = data & 1;
+			state->m_ex_video_ff[(data & 0x6) >> 1] = data & 1;
 
 			if(1)
 			{
@@ -1356,20 +1356,20 @@ static WRITE8_HANDLER( pc9801rs_a0_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	if((offset & 1) == 0 && offset & 8 && state->ex_video_ff[ANALOG_16])
+	if((offset & 1) == 0 && offset & 8 && state->m_ex_video_ff[ANALOG_16])
 	{
 		switch(offset)
 		{
-			case 0x08: state->analog16.pal_entry = data & 0xf; break;
-			case 0x0a: state->analog16.g[state->analog16.pal_entry] = data & 0xf; break;
-			case 0x0c: state->analog16.r[state->analog16.pal_entry] = data & 0xf; break;
-			case 0x0e: state->analog16.b[state->analog16.pal_entry] = data & 0xf; break;
+			case 0x08: state->m_analog16.pal_entry = data & 0xf; break;
+			case 0x0a: state->m_analog16.g[state->m_analog16.pal_entry] = data & 0xf; break;
+			case 0x0c: state->m_analog16.r[state->m_analog16.pal_entry] = data & 0xf; break;
+			case 0x0e: state->m_analog16.b[state->m_analog16.pal_entry] = data & 0xf; break;
 		}
 
-		palette_set_color_rgb(space->machine(), (state->analog16.pal_entry)+0x10,
-											  pal4bit(state->analog16.r[state->analog16.pal_entry]),
-											  pal4bit(state->analog16.g[state->analog16.pal_entry]),
-											  pal4bit(state->analog16.b[state->analog16.pal_entry]));
+		palette_set_color_rgb(space->machine(), (state->m_analog16.pal_entry)+0x10,
+											  pal4bit(state->m_analog16.r[state->m_analog16.pal_entry]),
+											  pal4bit(state->m_analog16.g[state->m_analog16.pal_entry]),
+											  pal4bit(state->m_analog16.b[state->m_analog16.pal_entry]));
 		return;
 	}
 
@@ -1412,8 +1412,8 @@ static WRITE8_HANDLER( pc9821_video_ff_w )
 	{
 		switch(data & 0xf8)	// pc-9821 specific extended registers
 		{
-			case 0x20: state->analog256 = data & 1; return;
-			case 0x68: state->analog256e = data & 1; return;
+			case 0x20: state->m_analog256 = data & 1; return;
+			case 0x68: state->m_analog256e = data & 1; return;
 		} // intentional fall-through
 	}
 
@@ -1426,21 +1426,21 @@ static READ8_HANDLER( pc9821_a0_r )
 
 	if((offset & 1) == 0 && offset & 8)
 	{
-		if(state->analog256)
+		if(state->m_analog256)
 		{
 			printf("256 color mode [%02x] R\n",offset);
 			return 0;
 		}
-		else if(state->ex_video_ff[ANALOG_16]) //16 color mode, readback possible there
+		else if(state->m_ex_video_ff[ANALOG_16]) //16 color mode, readback possible there
 		{
 			UINT8 res = 0;
 
 			switch(offset)
 			{
-				case 0x08: res = state->analog16.pal_entry & 0xf; break;
-				case 0x0a: res = state->analog16.g[state->analog16.pal_entry] & 0xf; break;
-				case 0x0c: res = state->analog16.r[state->analog16.pal_entry] & 0xf; break;
-				case 0x0e: res = state->analog16.b[state->analog16.pal_entry] & 0xf; break;
+				case 0x08: res = state->m_analog16.pal_entry & 0xf; break;
+				case 0x0a: res = state->m_analog16.g[state->m_analog16.pal_entry] & 0xf; break;
+				case 0x0c: res = state->m_analog16.r[state->m_analog16.pal_entry] & 0xf; break;
+				case 0x0e: res = state->m_analog16.b[state->m_analog16.pal_entry] & 0xf; break;
 			}
 
 			return res;
@@ -1454,7 +1454,7 @@ static WRITE8_HANDLER( pc9821_a0_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	if((offset & 1) == 0 && offset & 8 && state->analog256)
+	if((offset & 1) == 0 && offset & 8 && state->m_analog256)
 	{
 		printf("256 color mode [%02x] %02x W\n",offset,data);
 		return;
@@ -1547,12 +1547,12 @@ static INPUT_CHANGED( key_stroke )
 
 	if(newval && !oldval)
 	{
-		state->keyb_press = (UINT8)(FPTR)(param) & 0x7f;
+		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
 		pic8259_ir1_w(field->port->machine().device("pic8259_master"), 1);
 	}
 
 	if(oldval && !newval)
-		state->keyb_press = 0;
+		state->m_keyb_press = 0;
 }
 
 /* for key modifiers */
@@ -1562,11 +1562,11 @@ static INPUT_CHANGED( shift_stroke )
 
 	if((newval && !oldval) || (oldval && !newval))
 	{
-		state->keyb_press = (UINT8)(FPTR)(param) & 0x7f;
+		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
 		pic8259_ir1_w(field->port->machine().device("pic8259_master"), 1);
 	}
 	else
-		state->keyb_press = 0;
+		state->m_keyb_press = 0;
 }
 
 static READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
@@ -1966,7 +1966,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 static READ8_HANDLER( pc_dma_read_byte )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
-	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space->read_byte(page_offset + offset);
@@ -1976,7 +1976,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
-	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
 		& 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
@@ -1985,7 +1985,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 static void set_dma_channel(device_t *device, int channel, int state)
 {
 	pc9801_state *drvstate = device->machine().driver_data<pc9801_state>();
-	if (!state) drvstate->dma_channel = channel;
+	if (!state) drvstate->m_dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { /*printf("%02x 0\n",state);*/ set_dma_channel(device, 0, state); }
@@ -2093,7 +2093,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_irq )
 
 	printf("IRQ %d\n",state);
 
-	if(drvstate->fdc_2dd_ctrl & 8)
+	if(drvstate->m_fdc_2dd_ctrl & 8)
 	{
 		pic8259_ir2_w(device->machine().device("pic8259_slave"), state);
 	}
@@ -2119,7 +2119,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc9801rs_fdc_irq )
 
 	/* 0xffaf8 */
 
-	if(drvstate->fdc_ctrl & 1)
+	if(drvstate->m_fdc_ctrl & 1)
 		pic8259_ir3_w(device->machine().device("pic8259_slave"), state);
 	else
 		pic8259_ir2_w(device->machine().device("pic8259_slave"), state);
@@ -2204,13 +2204,13 @@ static MACHINE_RESET(pc9801)
 		};
 
 		for(i=0;i<0x10;i++)
-			state->tvram[(0x3fe0)+i*2] = default_memsw_data[i];
+			state->m_tvram[(0x3fe0)+i*2] = default_memsw_data[i];
 	}
 
 	beep_set_frequency(machine.device("beeper"),2400);
 	beep_set_state(machine.device("beeper"),0);
 
-	state->nmi_ff = 0;
+	state->m_nmi_ff = 0;
 }
 
 static MACHINE_RESET(pc9801f)
@@ -2241,12 +2241,12 @@ static MACHINE_RESET(pc9801rs)
 	pc9801_state *state = machine.driver_data<pc9801_state>();
 	MACHINE_RESET_CALL(pc9801);
 
-	state->gate_a20 = 0;
-	state->por = 0xa0;
-	state->rom_bank = 0;
-	state->fdc_ctrl = 3;
+	state->m_gate_a20 = 0;
+	state->m_por = 0xa0;
+	state->m_rom_bank = 0;
+	state->m_fdc_ctrl = 3;
 
-	state->ram_size = ram_get_size(machine.device(RAM_TAG)) - 0xa0000;
+	state->m_ram_size = ram_get_size(machine.device(RAM_TAG)) - 0xa0000;
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)
@@ -2266,10 +2266,10 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 	}
 	#endif
 
-	if(state->vrtc_irq_mask)
+	if(state->m_vrtc_irq_mask)
 	{
 		pic8259_ir2_w(device->machine().device("pic8259_master"), 1);
-		state->vrtc_irq_mask = 0; // TODO: this irq auto-masks?
+		state->m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
 }
 

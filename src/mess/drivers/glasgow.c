@@ -60,10 +60,10 @@ public:
 	glasgow_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 lcd_shift_counter;
-	UINT8 led7;
-	UINT8 irq_flag;
-	UINT16 beeper;
+	UINT8 m_lcd_shift_counter;
+	UINT8 m_led7;
+	UINT8 m_irq_flag;
+	UINT16 m_beeper;
 };
 
 
@@ -73,11 +73,11 @@ static WRITE16_HANDLER( glasgow_lcd_w )
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 	UINT8 lcd_data = data >> 8;
 
-	if (state->led7 == 0)
-		output_set_digit_value(state->lcd_shift_counter, lcd_data);
+	if (state->m_led7 == 0)
+		output_set_digit_value(state->m_lcd_shift_counter, lcd_data);
 
-	state->lcd_shift_counter--;
-	state->lcd_shift_counter &= 3;
+	state->m_lcd_shift_counter--;
+	state->m_lcd_shift_counter &= 3;
 }
 
 static WRITE16_HANDLER( glasgow_lcd_flag_w )
@@ -89,10 +89,10 @@ static WRITE16_HANDLER( glasgow_lcd_flag_w )
 	beep_set_state(speaker, (lcd_flag & 0x100) ? 1 : 0);
 
 	if (lcd_flag)
-		state->led7 = 255;
+		state->m_led7 = 255;
 	else
 	{
-		state->led7 = 0;
+		state->m_led7 = 0;
 		mboard_key_selector = 1;
 	}
 }
@@ -123,9 +123,9 @@ static WRITE16_HANDLER( write_lcd )
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(state->lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
-	state->lcd_shift_counter--;
-	state->lcd_shift_counter &= 3;
+	output_set_digit_value(state->m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	state->m_lcd_shift_counter--;
+	state->m_lcd_shift_counter &= 3;
 	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
 }
 
@@ -138,17 +138,17 @@ static WRITE16_HANDLER( write_lcd_flag )
 	//beep_set_state(0, (data >> 8) & 1 ? 1 : 0);
 	if ((data >> 8) == 0) {
 		mboard_key_selector = 1;
-		state->led7 = 0;
+		state->m_led7 = 0;
 	} else {
-		state->led7 = 0xff;
+		state->m_led7 = 0xff;
 	}
 
 //  The key function in the rom expects after writing to
 //  the  a value from the second key row;
 //	if (lcd_flag != 0)
-//		state->led7 = 255;
+//		state->m_led7 = 255;
 //	else
-//		state->led7 = 0;
+//		state->m_led7 = 0;
 //
 	logerror("LCD Flag 16 = %x \n", data);
 }
@@ -160,8 +160,8 @@ static WRITE16_HANDLER( write_irq_flag )
 
 	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
-	state->irq_flag = 1;
-	state->beeper = data;
+	state->m_irq_flag = 1;
+	state->m_beeper = data;
 }
 
 static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
@@ -198,9 +198,9 @@ static WRITE32_HANDLER( write_lcd32 )
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(state->lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
-	state->lcd_shift_counter--;
-	state->lcd_shift_counter &= 3;
+	output_set_digit_value(state->m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	state->m_lcd_shift_counter--;
+	state->m_lcd_shift_counter &= 3;
 	//logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);
 }
 
@@ -213,18 +213,18 @@ static WRITE32_HANDLER( write_lcd_flag32 )
 
 	if ((data >> 24) == 0) {
 		mboard_key_selector = 1;
-		state->led7 = 0;
+		state->m_led7 = 0;
 	} else {
-		state->led7 = 0xff;
+		state->m_led7 = 0xff;
 	}
 
 	//logerror("LCD Flag 32 = %x \n", data >> 24);
 	//beep_set_state(0, (data >> 24) & 1 ? 1 : 0);
 
 //	if (lcd_flag != 0)
-//		state->led7 = 255;
+//		state->m_led7 = 255;
 //	else
-//		state->led7 = 0;
+//		state->m_led7 = 0;
 }
 
 static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
@@ -256,8 +256,8 @@ static WRITE32_HANDLER ( write_beeper32 )
 	device_t *speaker = space->machine().device("beep");
 	beep_set_state(speaker, data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
-	state->irq_flag = 1;
-	state->beeper = data;
+	state->m_irq_flag = 1;
+	state->m_beeper = data;
 }
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
@@ -276,8 +276,8 @@ static MACHINE_START( glasgow )
 	device_t *speaker = machine.device("beep");
 
 	mboard_key_selector = 0;
-	state->irq_flag = 0;
-	state->lcd_shift_counter = 3;
+	state->m_irq_flag = 0;
+	state->m_lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -289,7 +289,7 @@ static MACHINE_START( dallas32 )
 	glasgow_state *state = machine.driver_data<glasgow_state>();
 	device_t *speaker = machine.device("beep");
 
-	state->lcd_shift_counter = 3;
+	state->m_lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -299,7 +299,7 @@ static MACHINE_START( dallas32 )
 static MACHINE_RESET( glasgow )
 {
 	glasgow_state *state = machine.driver_data<glasgow_state>();
-	state->lcd_shift_counter = 3;
+	state->m_lcd_shift_counter = 3;
 
 	mboard_set_border_pieces();
 	mboard_set_board();

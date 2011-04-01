@@ -26,23 +26,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* eprom state */
-	int eprom;
+	int m_eprom;
 
 	/* video state */
-	UINT8 *video_ram;
+	UINT8 *m_video_ram;
 
 	/* keyboard state */
-	int keylatch;
+	int m_keylatch;
 
 	/* cassette state */
-	int hz2400;
-	int pc0;
-	int pc1;
+	int m_hz2400;
+	int m_pc0;
+	int m_pc1;
 
 	/* devices */
-	device_t *mc6847;
-	device_t *cassette;
-	int previous_i8271_int_state;
+	device_t *m_mc6847;
+	device_t *m_cassette;
+	int m_previous_i8271_int_state;
 };
 
 #endif

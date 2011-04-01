@@ -84,7 +84,7 @@ give the leftmost column of the rectangle, the next four give the next column, a
 #define DEBUG_LINES		1
 #define DEBUG_VSYNC		2
 
-#define DEBUG_SET(flags)    ((mstate->debug_video & (flags))==(flags))
+#define DEBUG_SET(flags)    ((mstate->m_debug_video & (flags))==(flags))
 
 static void video_debug(running_machine &machine, int ref, int params, const char *param[]);
 static MC6845_UPDATE_ROW( vid_update_row );
@@ -110,12 +110,12 @@ static void video_debug(running_machine &machine, int ref, int params, const cha
 	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
     if(params>0)
     {
-        sscanf(param[0],"%d",&mstate->debug_video);
+        sscanf(param[0],"%d",&mstate->m_debug_video);
     }
     else
     {
         debug_console_printf(machine,"Error usage : mbc55x_vid_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",mstate->debug_video);
+        debug_console_printf(machine,"Current debuglevel=%02X\n",mstate->m_debug_video);
     }
 }
 
@@ -124,8 +124,8 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	mbc55x_state *mstate = device->machine().driver_data<mbc55x_state>();
 
 	UINT8	*ram	= &ram_get_ptr(device->machine().device(RAM_TAG))[0];
-	UINT8	*red	= &mstate->video_mem[RED_PLANE_OFFSET];
-	UINT8	*blue	= &mstate->video_mem[BLUE_PLANE_OFFSET];
+	UINT8	*red	= &mstate->m_video_mem[RED_PLANE_OFFSET];
+	UINT8	*blue	= &mstate->m_video_mem[BLUE_PLANE_OFFSET];
 	UINT8	*green;
 	int		offset;
 	UINT8	rpx,gpx,bpx;
@@ -137,7 +137,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	UINT8	shifts;
 	UINT8	colour;
 
-	switch(mstate->vram_page)
+	switch(mstate->m_vram_page)
 	{
 		case 4	: green=&ram[0x08000]; break;
 		case 5	: green=&ram[0x1C000]; break;
@@ -221,7 +221,7 @@ WRITE8_HANDLER( mbc55x_video_io_w )
 VIDEO_START( mbc55x )
 {
 	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
-    mstate->debug_video=0;
+    mstate->m_debug_video=0;
 
     logerror("VIDEO_START\n");
 
@@ -235,7 +235,7 @@ VIDEO_RESET( mbc55x )
 {
 	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
     // When we reset clear the video registers and video memory.
-    memset(&mstate->video_mem,0,sizeof(mstate->video_mem));
+    memset(&mstate->m_video_mem,0,sizeof(mstate->m_video_mem));
 
     logerror("Video reset\n");
 }

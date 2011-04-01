@@ -19,15 +19,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* keyboard state */
-	UINT8 keylatch;
+	UINT8 m_keylatch;
 
 	/* joystick state */
-	UINT8 joylatch;
+	UINT8 m_joylatch;
 
 	/* devices */
-	device_t *psg;
-	device_t *cassette;
-	device_t *centronics;
+	device_t *m_psg;
+	device_t *m_cassette;
+	device_t *m_centronics;
 };
 
 #endif

@@ -54,11 +54,11 @@ void apple3_write_charmem(running_machine &machine)
 		{
 			addr = 0x7f & space->read_byte(screen_hole_map[i] + 0x400 + j + 0);
 			val = space->read_byte(screen_hole_map[i] + j + 0);
-			state->char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x3ff] = val;
+			state->m_char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x3ff] = val;
 
 			addr = 0x7f & space->read_byte(screen_hole_map[i] + 0x400 + j + 4);
 			val = space->read_byte(screen_hole_map[i] + j + 4);
-			state->char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x3ff] = val;
+			state->m_char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x3ff] = val;
 		}
 	}
 }
@@ -71,16 +71,16 @@ VIDEO_START( apple3 )
 	int i, j;
 	UINT32 v;
 
-	state->char_mem = auto_alloc_array(machine, UINT8, 0x800);
-	memset(state->char_mem, 0, 0x800);
+	state->m_char_mem = auto_alloc_array(machine, UINT8, 0x800);
+	memset(state->m_char_mem, 0, 0x800);
 
-	state->hgr_map = auto_alloc_array(machine, UINT32, 192);
+	state->m_hgr_map = auto_alloc_array(machine, UINT32, 192);
 	for (i = 0; i < 24; i++)
 	{
 		v = text_map[i] - 0x0400;
 		for (j = 0; j < 8; j++)
 		{
-			state->hgr_map[(i * 8) + j] = 0x2000 + v + (j * 0x400);
+			state->m_hgr_map[(i * 8) + j] = 0x2000 + v + (j * 0x400);
 		}
 	}
 }
@@ -103,13 +103,13 @@ static void apple3_video_text40(running_machine &machine,bitmap_t *bitmap)
 	{
 		for (x = 0; x < 40; x++)
 		{
-			offset = ram_size - 0x8000 + text_map[y] + x + (state->flags & VAR_VM2 ? 0x0400 : 0x0000);
+			offset = ram_size - 0x8000 + text_map[y] + x + (state->m_flags & VAR_VM2 ? 0x0400 : 0x0000);
 			ch = ram[offset];
 
-			if (state->flags & VAR_VM0)
+			if (state->m_flags & VAR_VM0)
 			{
 				/* color text */
-				offset = ram_size - 0x8000 + text_map[y] + x + (state->flags & VAR_VM2 ? 0x0000 : 0x0400);
+				offset = ram_size - 0x8000 + text_map[y] + x + (state->m_flags & VAR_VM2 ? 0x0000 : 0x0400);
 				bg = (ram[offset] >> 0) & 0x0F;
 				fg = (ram[offset] >> 4) & 0x0F;
 			}
@@ -128,7 +128,7 @@ static void apple3_video_text40(running_machine &machine,bitmap_t *bitmap)
 				bg = temp;
 			}
 
-			char_data = &state->char_mem[(ch & 0x7F) * 8];
+			char_data = &state->m_char_mem[(ch & 0x7F) * 8];
 
 			for (row = 0; row < 8; row++)
 			{
@@ -165,7 +165,7 @@ static void apple3_video_text80(running_machine &machine,bitmap_t *bitmap)
 
 			/* first character */
 			ch = ram[offset + 0x0000];
-			char_data = &state->char_mem[(ch & 0x7F) * 8];
+			char_data = &state->m_char_mem[(ch & 0x7F) * 8];
 			fg = (ch & 0x80) ? GREEN : BLACK;
 			bg = (ch & 0x80) ? BLACK : GREEN;
 
@@ -180,7 +180,7 @@ static void apple3_video_text80(running_machine &machine,bitmap_t *bitmap)
 
 			/* second character */
 			ch = ram[offset + 0x0400];
-			char_data = &state->char_mem[(ch & 0x7F) * 8];
+			char_data = &state->m_char_mem[(ch & 0x7F) * 8];
 			fg = (ch & 0x80) ? GREEN : BLACK;
 			bg = (ch & 0x80) ? BLACK : GREEN;
 
@@ -210,10 +210,10 @@ static void apple3_video_graphics_hgr(running_machine &machine,bitmap_t *bitmap)
 
 	for (y = 0; y < 192; y++)
 	{
-		if (state->flags & VAR_VM2)
-			pix_info = &ram[state->hgr_map[y]];
+		if (state->m_flags & VAR_VM2)
+			pix_info = &ram[state->m_hgr_map[y]];
 		else
-			pix_info = &ram[state->hgr_map[y] - 0x2000];
+			pix_info = &ram[state->m_hgr_map[y] - 0x2000];
 		ptr = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (i = 0; i < 40; i++)
@@ -256,15 +256,15 @@ static void apple3_video_graphics_chgr(running_machine &machine,bitmap_t *bitmap
 
 	for (y = 0; y < 192; y++)
 	{
-		if (state->flags & VAR_VM2)
+		if (state->m_flags & VAR_VM2)
 		{
-			pix_info = &ram[state->hgr_map[y]];
-			col_info = &ram[state->hgr_map[y] - 0x2000];
+			pix_info = &ram[state->m_hgr_map[y]];
+			col_info = &ram[state->m_hgr_map[y] - 0x2000];
 		}
 		else
 		{
-			pix_info = &ram[state->hgr_map[y] - 0x2000];
-			col_info = &ram[state->hgr_map[y]];
+			pix_info = &ram[state->m_hgr_map[y] - 0x2000];
+			col_info = &ram[state->m_hgr_map[y]];
 		}
 		ptr = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -302,15 +302,15 @@ static void apple3_video_graphics_shgr(running_machine &machine,bitmap_t *bitmap
 
 	for (y = 0; y < 192; y++)
 	{
-		if (state->flags & VAR_VM2)
+		if (state->m_flags & VAR_VM2)
 		{
-			pix_info1 = &ram[state->hgr_map[y]];
-			pix_info2 = &ram[state->hgr_map[y] + 0x2000];
+			pix_info1 = &ram[state->m_hgr_map[y]];
+			pix_info2 = &ram[state->m_hgr_map[y] + 0x2000];
 		}
 		else
 		{
-			pix_info1 = &ram[state->hgr_map[y] - 0x2000];
-			pix_info2 = &ram[state->hgr_map[y]];
+			pix_info1 = &ram[state->m_hgr_map[y] - 0x2000];
+			pix_info2 = &ram[state->m_hgr_map[y]];
 		}
 		ptr = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -345,10 +345,10 @@ static void apple3_video_graphics_chires(running_machine &machine,bitmap_t *bitm
 		pen = BITMAP_ADDR16(bitmap, y, 0);
 		for (i = 0; i < 20; i++)
 		{
-			pix.b.l  = ram[state->hgr_map[y] - 0x2000 + (i * 2) + (state->flags & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h  = ram[state->hgr_map[y] - 0x0000 + (i * 2) + (state->flags & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h2 = ram[state->hgr_map[y] - 0x2000 + (i * 2) + (state->flags & VAR_VM2 ? 1 : 0) + 1];
-			pix.b.h3 = ram[state->hgr_map[y] - 0x0000 + (i * 2) + (state->flags & VAR_VM2 ? 1 : 0) + 1];
+			pix.b.l  = ram[state->m_hgr_map[y] - 0x2000 + (i * 2) + (state->m_flags & VAR_VM2 ? 1 : 0) + 0];
+			pix.b.h  = ram[state->m_hgr_map[y] - 0x0000 + (i * 2) + (state->m_flags & VAR_VM2 ? 1 : 0) + 0];
+			pix.b.h2 = ram[state->m_hgr_map[y] - 0x2000 + (i * 2) + (state->m_flags & VAR_VM2 ? 1 : 0) + 1];
+			pix.b.h3 = ram[state->m_hgr_map[y] - 0x0000 + (i * 2) + (state->m_flags & VAR_VM2 ? 1 : 0) + 1];
 
 			pen[ 0] = pen[ 1] = pen[ 2] = pen[ 3] = ((pix.d >>  0) & 0x0F);
 			pen[ 4] = pen[ 5] = pen[ 6] = pen[ 7] = ((pix.d >>  4) & 0x07) | ((pix.d >>  1) & 0x08);
@@ -367,7 +367,7 @@ static void apple3_video_graphics_chires(running_machine &machine,bitmap_t *bitm
 SCREEN_UPDATE( apple3 )
 {
 	apple3_state *state = screen->machine().driver_data<apple3_state>();
-	switch(state->flags & (VAR_VM3|VAR_VM1|VAR_VM0))
+	switch(state->m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:
 		case VAR_VM0:

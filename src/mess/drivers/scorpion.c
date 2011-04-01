@@ -188,27 +188,27 @@ static void scorpion_update_memory(running_machine &machine)
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
 
-	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, "bank4", messram + (((state->port_7ffd_data & 0x07) | ((state->port_1ffd_data & 0x10)>>1)) * 0x4000));
+	memory_set_bankptr(machine, "bank4", messram + (((state->m_port_7ffd_data & 0x07) | ((state->m_port_1ffd_data & 0x10)>>1)) * 0x4000));
 
-	if ((state->port_1ffd_data & 0x01)==0x01)
+	if ((state->m_port_1ffd_data & 0x01)==0x01)
 	{
-		state->ram_0000 = messram+(8<<14);
+		state->m_ram_0000 = messram+(8<<14);
 		memory_set_bankptr(machine, "bank1", messram+(8<<14));
 		logerror("RAM\n");
 	}
 	else
 	{
-		if ((state->port_1ffd_data & 0x02)==0x02)
+		if ((state->m_port_1ffd_data & 0x02)==0x02)
 		{
-			state->ROMSelection = 2;
+			state->m_ROMSelection = 2;
 		}
 		else
 		{
-			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 	}
 
 
@@ -218,13 +218,13 @@ static WRITE8_HANDLER( scorpion_0000_w )
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
-	if ( ! state->ram_0000 )
+	if ( ! state->m_ram_0000 )
 		return;
 
-	if ((state->port_1ffd_data & 0x01)==0x01)
+	if ((state->m_port_1ffd_data & 0x01)==0x01)
 	{
-		if ( ! state->ram_disabled_by_beta )
-			state->ram_0000[offset] = data;
+		if ( ! state->m_ram_disabled_by_beta )
+			state->m_ram_0000[offset] = data;
 	}
 }
 
@@ -236,27 +236,27 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->ram_disabled_by_beta = 0;
+	state->m_ram_disabled_by_beta = 0;
 	if (betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
-			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			state->ram_disabled_by_beta = 1;
-			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+			state->m_ram_disabled_by_beta = 1;
+			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 		}
 	}
-	else if (((pc & 0xff00) == 0x3d00) && (state->ROMSelection==1))
+	else if (((pc & 0xff00) == 0x3d00) && (state->m_ROMSelection==1))
 	{
-		state->ROMSelection = 3;
+		state->m_ROMSelection = 3;
 		betadisk_enable(beta);
 	}
 	if((address>=0x0000) && (address<=0x3fff))
 	{
-		state->ram_disabled_by_beta = 1;
-		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, space->machine().region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
-		memory_set_bankptr(*machine, "bank1", space->machine().region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+		state->m_ram_disabled_by_beta = 1;
+		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, space->machine().region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+		memory_set_bankptr(*machine, "bank1", space->machine().region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 		return ~0;
 	}
 	return address;
@@ -268,7 +268,7 @@ static TIMER_DEVICE_CALLBACK(nmi_check_callback)
 
 	if ((input_port_read(timer.machine(), "NMI") & 1)==1)
 	{
-		state->port_1ffd_data |= 0x02;
+		state->m_port_1ffd_data |= 0x02;
 		scorpion_update_memory(timer.machine());
 		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -279,11 +279,11 @@ static WRITE8_HANDLER(scorpion_port_7ffd_w)
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	/* disable paging */
-	if (state->port_7ffd_data & 0x20)
+	if (state->m_port_7ffd_data & 0x20)
 		return;
 
 	/* store new state */
-	state->port_7ffd_data = data;
+	state->m_port_7ffd_data = data;
 
 	/* update memory */
 	scorpion_update_memory(space->machine());
@@ -294,9 +294,9 @@ static WRITE8_HANDLER(scorpion_port_1ffd_w)
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
 
 	/* if paging not disabled */
-	if ((state->port_7ffd_data & 0x20)==0)
+	if ((state->m_port_7ffd_data & 0x20)==0)
 	{
-		state->port_1ffd_data = data;
+		state->m_port_1ffd_data = data;
 		scorpion_update_memory(space->machine());
 	}
 }
@@ -323,7 +323,7 @@ static MACHINE_RESET( scorpion )
 	device_t *beta = machine.device(BETA_DISK_TAG);
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->ram_0000 = NULL;
+	state->m_ram_0000 = NULL;
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
 	space->install_legacy_write_handler(0x0000, 0x3fff, FUNC(scorpion_0000_w));
 
@@ -339,8 +339,8 @@ static MACHINE_RESET( scorpion )
 	/* Bank 2 is always in 0x8000 - 0xbfff */
 	memory_set_bankptr(machine, "bank3", messram + (2<<14));
 
-	state->port_7ffd_data = 0;
-	state->port_1ffd_data = 0;
+	state->m_port_7ffd_data = 0;
+	state->m_port_1ffd_data = 0;
 	scorpion_update_memory(machine);
 }
 static MACHINE_START( scorpion )

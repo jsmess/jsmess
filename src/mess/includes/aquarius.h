@@ -13,10 +13,10 @@ public:
 	aquarius_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 scrambler;
-	UINT8 *colorram;
-	tilemap_t *tilemap;
+	UINT8 *m_videoram;
+	UINT8 m_scrambler;
+	UINT8 *m_colorram;
+	tilemap_t *m_tilemap;
 };
 
 

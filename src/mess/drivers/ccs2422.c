@@ -17,23 +17,23 @@ public:
 	ccs2422_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ccs_ram;
-	UINT8 term_data;
+	UINT8 *m_ccs_ram;
+	UINT8 m_term_data;
 };
 
 
 static READ8_HANDLER( ccs2422_10_r )
 {
 	ccs2422_state *state = space->machine().driver_data<ccs2422_state>();
-	UINT8 ret = state->term_data;
-	state->term_data = 0;
+	UINT8 ret = state->m_term_data;
+	state->m_term_data = 0;
 	return ret;
 }
 
 static READ8_HANDLER( ccs2422_11_r )
 {
 	ccs2422_state *state = space->machine().driver_data<ccs2422_state>();
-	return 4 | ((state->term_data) ? 1 : 0);
+	return 4 | ((state->m_term_data) ? 1 : 0);
 }
 
 static WRITE8_HANDLER(ccs2422_10_w)
@@ -44,7 +44,7 @@ static WRITE8_HANDLER(ccs2422_10_w)
 
 static ADDRESS_MAP_START(ccs2422_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(ccs2422_state, ccs_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(ccs2422_state, m_ccs_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ccs2422_io , AS_IO, 8)
@@ -63,7 +63,7 @@ static MACHINE_RESET(ccs2422)
 {
 	ccs2422_state *state = machine.driver_data<ccs2422_state>();
 	UINT8* user1 = machine.region("user1")->base();
-	memcpy((UINT8*)state->ccs_ram,user1,0x0800);
+	memcpy((UINT8*)state->m_ccs_ram,user1,0x0800);
 
 	// this should be rom/ram banking
 }
@@ -71,7 +71,7 @@ static MACHINE_RESET(ccs2422)
 static WRITE8_DEVICE_HANDLER( ccs2422_kbd_put )
 {
 	ccs2422_state *state = device->machine().driver_data<ccs2422_state>();
-	state->term_data = data;
+	state->m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )

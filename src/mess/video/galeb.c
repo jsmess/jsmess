@@ -36,7 +36,7 @@ SCREEN_UPDATE( galeb )
 	{
 		for(x = 0; x < 48; x++ )
 		{
-			int code = state->video_ram[15 + x + y*64];
+			int code = state->m_video_ram[15 + x + y*64];
 			drawgfx_opaque(bitmap, NULL, screen->machine().gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}

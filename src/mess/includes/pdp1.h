@@ -234,27 +234,27 @@ public:
 	pdp1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	pdp1_reset_param_t reset_param;
-	int io_status;
-	tape_reader_t tape_reader;
-	tape_puncher_t tape_puncher;
-	typewriter_t typewriter;
-	emu_timer *dpy_timer;
-	lightpen_t lightpen;
-	parallel_drum_t parallel_drum;
-	int old_typewriter_keys[4];
-	int old_lightpen;
-	int old_control_keys;
-	int old_tw_keys;
-	int old_ta_keys;
-	int typewriter_color;
-	bitmap_t *panel_bitmap;
-	bitmap_t *typewriter_bitmap;
-	lightpen_t lightpen_state;
-	lightpen_t previous_lightpen_state;
-	int pos;
-	int case_shift;
-	device_t *crt;
+	pdp1_reset_param_t m_reset_param;
+	int m_io_status;
+	tape_reader_t m_tape_reader;
+	tape_puncher_t m_tape_puncher;
+	typewriter_t m_typewriter;
+	emu_timer *m_dpy_timer;
+	lightpen_t m_lightpen;
+	parallel_drum_t m_parallel_drum;
+	int m_old_typewriter_keys[4];
+	int m_old_lightpen;
+	int m_old_control_keys;
+	int m_old_tw_keys;
+	int m_old_ta_keys;
+	int m_typewriter_color;
+	bitmap_t *m_panel_bitmap;
+	bitmap_t *m_typewriter_bitmap;
+	lightpen_t m_lightpen_state;
+	lightpen_t m_previous_lightpen_state;
+	int m_pos;
+	int m_case_shift;
+	device_t *m_crt;
 };
 
 

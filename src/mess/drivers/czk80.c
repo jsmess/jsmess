@@ -24,8 +24,8 @@ public:
 	czk80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 term_data;
+	UINT8 *m_ram;
+	UINT8 m_term_data;
 };
 
 
@@ -39,8 +39,8 @@ static WRITE8_HANDLER( czk80_80_w )
 static READ8_HANDLER( czk80_80_r )
 {
 	czk80_state *state = space->machine().driver_data<czk80_state>();
-	UINT8 ret = state->term_data;
-	state->term_data = 0;
+	UINT8 ret = state->m_term_data;
+	state->m_term_data = 0;
 	return ret;
 }
 
@@ -52,12 +52,12 @@ static READ8_HANDLER( czk80_c0_r )
 static READ8_HANDLER( czk80_81_r )
 {
 	czk80_state *state = space->machine().driver_data<czk80_state>();
-	return 1 | ((state->term_data) ? 2 : 0);
+	return 1 | ((state->m_term_data) ? 2 : 0);
 }
 
 static ADDRESS_MAP_START(czk80_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(czk80_state, ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(czk80_state, m_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( czk80_io, AS_IO, 8 )
@@ -76,15 +76,15 @@ static MACHINE_RESET(czk80)
 	czk80_state *state = machine.driver_data<czk80_state>();
 	UINT8* bios = machine.region("maincpu")->base() + 0xe000;
 
-	memcpy(state->ram,bios, 0x2000);
-	memcpy(state->ram+0xe000,bios, 0x2000);
+	memcpy(state->m_ram,bios, 0x2000);
+	memcpy(state->m_ram+0xe000,bios, 0x2000);
 }
 
 
 static WRITE8_DEVICE_HANDLER( czk80_kbd_put )
 {
 	czk80_state *state = device->machine().driver_data<czk80_state>();
-	state->term_data = data;
+	state->m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( czk80_terminal_intf )

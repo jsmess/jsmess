@@ -16,33 +16,33 @@ public:
 	vtech2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int laser_latch;
-	char laser_frame_message[64+1];
-	int laser_frame_time;
-	UINT8 *mem;
-	int laser_bank_mask;
-	int laser_bank[4];
-	int laser_video_bank;
-	UINT8 laser_track_x2[2];
-	UINT8 laser_fdc_status;
-	UINT8 laser_fdc_data[TRKSIZE_FM];
-	int laser_data;
-	int laser_fdc_edge;
-	int laser_fdc_bits;
-	int laser_drive;
-	int laser_fdc_start;
-	int laser_fdc_write;
-	int laser_fdc_offs;
-	int laser_fdc_latch;
-	int level_old;
-	int cassette_bit;
-	int row_a;
-	int row_b;
-	int row_c;
-	int row_d;
-	int laser_bg_mode;
-	int laser_two_color;
+	UINT8 *m_videoram;
+	int m_laser_latch;
+	char m_laser_frame_message[64+1];
+	int m_laser_frame_time;
+	UINT8 *m_mem;
+	int m_laser_bank_mask;
+	int m_laser_bank[4];
+	int m_laser_video_bank;
+	UINT8 m_laser_track_x2[2];
+	UINT8 m_laser_fdc_status;
+	UINT8 m_laser_fdc_data[TRKSIZE_FM];
+	int m_laser_data;
+	int m_laser_fdc_edge;
+	int m_laser_fdc_bits;
+	int m_laser_drive;
+	int m_laser_fdc_start;
+	int m_laser_fdc_write;
+	int m_laser_fdc_offs;
+	int m_laser_fdc_latch;
+	int m_level_old;
+	int m_cassette_bit;
+	int m_row_a;
+	int m_row_b;
+	int m_row_c;
+	int m_row_d;
+	int m_laser_bg_mode;
+	int m_laser_two_color;
 };
 
 

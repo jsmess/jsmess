@@ -15,14 +15,14 @@
 VIDEO_START( p2000m )
 {
 	p2000t_state *state = machine.driver_data<p2000t_state>();
-	state->frame_count = 0;
+	state->m_frame_count = 0;
 }
 
 
 SCREEN_UPDATE( p2000m )
 {
 	p2000t_state *state = screen->machine().driver_data<p2000t_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int offs, sx, sy, code, loop;
 
 	for (offs = 0; offs < 80 * 24; offs++)
@@ -30,7 +30,7 @@ SCREEN_UPDATE( p2000m )
 		sy = (offs / 80) * 20;
 		sx = (offs % 80) * 12;
 
-		if ((state->frame_count > 25) && (videoram[offs + 2048] & 0x40))
+		if ((state->m_frame_count > 25) && (videoram[offs + 2048] & 0x40))
 			code = 32;
 		else
 		{

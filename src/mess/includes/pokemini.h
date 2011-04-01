@@ -43,10 +43,10 @@ public:
 	pokemini_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 pm_reg[0x100];
-	PRC prc;
-	TIMERS timers;
+	UINT8 *m_ram;
+	UINT8 m_pm_reg[0x100];
+	PRC m_prc;
+	TIMERS m_timers;
 };
 
 

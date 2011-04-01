@@ -67,13 +67,13 @@ enum {
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
-#define JOYPAD		state->gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
-#define SIODATA		state->gb_io[0x01]	/* Serial IO data buffer                       */
-#define SIOCONT		state->gb_io[0x02]	/* Serial IO control register                  */
-#define DIVREG		state->gb_io[0x04]	/* Divider register (???)                      */
-#define TIMECNT		state->gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
-#define TIMEMOD		state->gb_io[0x06]	/* New value of TimeCount after it overflows   */
-#define TIMEFRQ		state->gb_io[0x07]	/* Timer frequency and start/stop switch       */
+#define JOYPAD		state->m_gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
+#define SIODATA		state->m_gb_io[0x01]	/* Serial IO data buffer                       */
+#define SIOCONT		state->m_gb_io[0x02]	/* Serial IO control register                  */
+#define DIVREG		state->m_gb_io[0x04]	/* Divider register (???)                      */
+#define TIMECNT		state->m_gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
+#define TIMEMOD		state->m_gb_io[0x06]	/* New value of TimeCount after it overflows   */
+#define TIMEFRQ		state->m_gb_io[0x07]	/* Timer frequency and start/stop switch       */
 
 
 
@@ -154,27 +154,27 @@ static void gb_init(running_machine &machine)
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Initialize the memory banks */
-	state->MBC1Mode = 0;
-	state->MBC3RTCBank = 0;
-	state->ROMBank = state->ROMBank00 + 1;
-	state->RAMBank = 0;
+	state->m_MBC1Mode = 0;
+	state->m_MBC3RTCBank = 0;
+	state->m_ROMBank = state->m_ROMBank00 + 1;
+	state->m_RAMBank = 0;
 
-	if (state->gb_cart)
+	if (state->m_gb_cart)
 	{
-		if ( state->MBCType != MBC_MEGADUCK )
+		if ( state->m_MBCType != MBC_MEGADUCK )
 		{
-			gb_rom16_4000( machine, state->ROMMap[state->ROMBank] );
-			memory_set_bankptr (machine, "bank2", state->RAMMap[state->RAMBank] ? state->RAMMap[state->RAMBank] : state->gb_dummy_ram_bank);
+			gb_rom16_4000( machine, state->m_ROMMap[state->m_ROMBank] );
+			memory_set_bankptr (machine, "bank2", state->m_RAMMap[state->m_RAMBank] ? state->m_RAMMap[state->m_RAMBank] : state->m_gb_dummy_ram_bank);
 		}
 		else
 		{
-			memory_set_bankptr( machine, "bank1", state->ROMMap[state->ROMBank] );
-			memory_set_bankptr( machine, "bank10", state->ROMMap[0] );
+			memory_set_bankptr( machine, "bank1", state->m_ROMMap[state->m_ROMBank] );
+			memory_set_bankptr( machine, "bank10", state->m_ROMMap[0] );
 		}
 	}
 
 	/* Set handlers based on the Memory Bank Controller in the cart */
-	switch( state->MBCType )
+	switch( state->m_MBCType )
 	{
 		case MBC_NONE:
 			break;
@@ -237,9 +237,9 @@ static void gb_init(running_machine &machine)
 
 	gb_sound_w(space->machine().device("custom"), 0x16, 0x00 );       /* Initialize sound hardware */
 
-	state->divcount = 0;
-	state->triggering_irq = 0;
-	state->gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
+	state->m_divcount = 0;
+	state->m_triggering_irq = 0;
+	state->m_gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
 }
 
 MACHINE_START( gb )
@@ -248,8 +248,8 @@ MACHINE_START( gb )
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->gb_serial_timer->enable( 0 );
+	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
 }
@@ -260,8 +260,8 @@ MACHINE_START( gbc )
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->gb_serial_timer->enable( 0 );
+	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gbc_video );
 }
@@ -273,12 +273,12 @@ MACHINE_RESET( gb )
 
 	gb_video_reset( machine, GB_VIDEO_DMG );
 
-	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] );
+	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] );
 
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
 
-	state->divcount = 0x0004;
+	state->m_divcount = 0x0004;
 }
 
 
@@ -286,14 +286,14 @@ MACHINE_START( sgb )
 {
 	gb_state *state = machine.driver_data<gb_state>();
 
-	state->sgb_packets = -1;
-	state->sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
+	state->m_sgb_packets = -1;
+	state->m_sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->gb_serial_timer->enable( 0 );
+	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
 }
@@ -307,30 +307,30 @@ MACHINE_RESET( sgb )
 
 	gb_init_regs(machine);
 
-	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
+	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
 
-	memset( state->sgb_tile_data, 0, 0x2000 );
+	memset( state->m_sgb_tile_data, 0, 0x2000 );
 
-	state->sgb_window_mask = 0;
-	memset( state->sgb_pal_map, 0, sizeof(state->sgb_pal_map) );
-	memset( state->sgb_atf_data, 0, sizeof(state->sgb_atf_data) );
+	state->m_sgb_window_mask = 0;
+	memset( state->m_sgb_pal_map, 0, sizeof(state->m_sgb_pal_map) );
+	memset( state->m_sgb_atf_data, 0, sizeof(state->m_sgb_atf_data) );
 
 	/* HACKS for Donkey Kong Land 2 + 3.
        For some reason that I haven't figured out, they store the tile
        data differently.  Hacks will go once I figure it out */
-	state->sgb_hack = 0;
+	state->m_sgb_hack = 0;
 
-	if (state->gb_cart)	// make sure cart is in
+	if (state->m_gb_cart)	// make sure cart is in
 	{
-		if( strncmp( (const char*)(state->gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
-			strncmp( (const char*)(state->gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
-				state->sgb_hack = 1;
+		if( strncmp( (const char*)(state->m_gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
+			strncmp( (const char*)(state->m_gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
+				state->m_sgb_hack = 1;
 	}
 
-	state->divcount = 0x0004;
+	state->m_divcount = 0x0004;
 }
 
 MACHINE_RESET( gbpocket )
@@ -348,9 +348,9 @@ MACHINE_RESET( gbpocket )
 	gb_sound_w(machine.device("custom"), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
-	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
+	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
 
-	state->divcount = 0xABC8;
+	state->m_divcount = 0xABC8;
 }
 
 MACHINE_RESET( gbc )
@@ -364,7 +364,7 @@ MACHINE_RESET( gbc )
 
 	gb_init_regs(machine);
 
-	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
+	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
@@ -373,8 +373,8 @@ MACHINE_RESET( gbc )
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		state->GBC_RAMMap[ii] = ram_get_ptr(machine.device(RAM_TAG)) + CGB_START_RAM_BANKS + ii * 0x1000;
-		memset (state->GBC_RAMMap[ii], 0, 0x1000);
+		state->m_GBC_RAMMap[ii] = ram_get_ptr(machine.device(RAM_TAG)) + CGB_START_RAM_BANKS + ii * 0x1000;
+		memset (state->m_GBC_RAMMap[ii], 0, 0x1000);
 	}
 }
 
@@ -382,21 +382,21 @@ static void gb_machine_stop(running_machine &machine)
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	/* Don't save if there was no battery */
-	if(!(state->CartType & BATTERY) || !state->RAMBanks)
+	if(!(state->m_CartType & BATTERY) || !state->m_RAMBanks)
 		return;
 
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
        built in macros is because they force the filename to be the name of
        the machine.  We need to have a separate name for each game. */
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
-	image->battery_save(state->gb_cart_ram, state->RAMBanks * 0x2000);
+	image->battery_save(state->m_gb_cart_ram, state->m_RAMBanks * 0x2000);
 }
 
 static void gb_set_mbc1_banks( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	gb_rom16_4000( machine, state->ROMMap[ state->ROMBank ] );
-	memory_set_bankptr( machine, "bank2", state->RAMMap[ state->MBC1Mode ? ( state->ROMBank >> 5 ) : 0 ] );
+	gb_rom16_4000( machine, state->m_ROMMap[ state->m_ROMBank ] );
+	memory_set_bankptr( machine, "bank2", state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
@@ -407,7 +407,7 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
 	if( data == 0 )
 		data = 1;
 
-	state->ROMBank = ( state->ROMBank & 0x01E0 ) | data;
+	state->m_ROMBank = ( state->m_ROMBank & 0x01E0 ) | data;
 	/* Switch banks */
 	gb_set_mbc1_banks(space->machine());
 }
@@ -422,9 +422,9 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
 
 	/* The least significant bit of the upper address byte must be 1 */
 	if( offset & 0x0100 )
-		state->ROMBank = ( state->ROMBank & 0x100 ) | data;
+		state->m_ROMBank = ( state->m_ROMBank & 0x100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
+	gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
@@ -436,9 +436,9 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
 	if( data == 0 )
 		data = 1;
 
-	state->ROMBank = ( state->ROMBank & 0x0100 ) | data;
+	state->m_ROMBank = ( state->m_ROMBank & 0x0100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
+	gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
@@ -451,14 +451,14 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	if( offset & 0x1000 )
 	{
-		state->ROMBank = (state->ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
+		state->m_ROMBank = (state->m_ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
 	}
 	else
 	{
-		state->ROMBank = (state->ROMBank & 0x100 ) | data;
+		state->m_ROMBank = (state->m_ROMBank & 0x100 ) | data;
 	}
 	/* Switch banks */
-	gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
+	gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc6 )
@@ -474,12 +474,12 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 )
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_4000( space->machine(), state->ROMMap[state->ROMBank>>1] + ( ( state->ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_4000( space->machine(), state->m_ROMMap[state->m_ROMBank>>1] + ( ( state->m_ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
 	{
-		state->ROMBank = data;
+		state->m_ROMBank = data;
 	}
 }
 
@@ -491,12 +491,12 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 )
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_6000( space->machine(), state->ROMMap[state->ROMBank00>>1] + ( ( state->ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_6000( space->machine(), state->m_ROMMap[state->m_ROMBank00>>1] + ( ( state->m_ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
 	{
-		state->ROMBank00 = data;
+		state->m_ROMBank00 = data;
 	}
 }
 
@@ -507,8 +507,8 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc7 )
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 )
 	{
-		state->ROMBank = data;
-		gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
+		state->m_ROMBank = data;
+		gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
 	}
 }
 
@@ -535,10 +535,10 @@ static WRITE8_HANDLER( gb_rom_bank_select_wisdom )
 	gb_state *state = space->machine().driver_data<gb_state>();
 	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( &space->device() ), offset );
 	/* The address determines the bank to select */
-	state->ROMBank = ( offset << 1 ) & 0x1FF;
-	memory_set_bankptr( space->machine(), "bank5", state->ROMMap[ state->ROMBank ] );
-	memory_set_bankptr( space->machine(), "bank10", state->ROMMap[ state->ROMBank ] + 0x0100 );
-	gb_rom16_4000( space->machine(), state->ROMMap[ state->ROMBank + 1 ] );
+	state->m_ROMBank = ( offset << 1 ) & 0x1FF;
+	memory_set_bankptr( space->machine(), "bank5", state->m_ROMMap[ state->m_ROMBank ] );
+	memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[ state->m_ROMBank ] + 0x0100 );
+	gb_rom16_4000( space->machine(), state->m_ROMMap[ state->m_ROMBank + 1 ] );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
@@ -547,7 +547,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
 	data &= 0x3; /* Only uses the lower 2 bits */
 
 	/* Select the upper bits of the ROMMask */
-	state->ROMBank = ( state->ROMBank & 0x1F ) | ( data << 5 );
+	state->m_ROMBank = ( state->m_ROMBank & 0x1F ) | ( data << 5 );
 
 	/* Switch banks */
 	gb_set_mbc1_banks(space->machine());
@@ -559,22 +559,22 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	if( data & 0x8 )
 	{	/* RTC banks */
-		if ( state->CartType & TIMER )
+		if ( state->m_CartType & TIMER )
 		{
-			state->MBC3RTCBank = data & 0x07;
+			state->m_MBC3RTCBank = data & 0x07;
 			if ( data < 5 )
 			{
-				memset( state->MBC3RTCData, state->MBC3RTCMap[state->MBC3RTCBank], 0x2000 );
-				memory_set_bankptr( space->machine(), "bank2", state->MBC3RTCData );
+				memset( state->m_MBC3RTCData, state->m_MBC3RTCMap[state->m_MBC3RTCBank], 0x2000 );
+				memory_set_bankptr( space->machine(), "bank2", state->m_MBC3RTCData );
 			}
 		}
 	}
 	else
 	{	/* RAM banks */
-		state->RAMBank = data & 0x3;
-		state->MBC3RTCBank = 0xFF;
+		state->m_RAMBank = data & 0x3;
+		state->m_MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		memory_set_bankptr( space->machine(), "bank2", state->RAMMap[state->RAMBank] );
+		memory_set_bankptr( space->machine(), "bank2", state->m_RAMMap[state->m_RAMBank] );
 	}
 }
 
@@ -583,13 +583,13 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 	gb_state *state = space->machine().driver_data<gb_state>();
 	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
 	data &= 0x0F;
-	if( state->CartType & RUMBLE )
+	if( state->m_CartType & RUMBLE )
 	{
 		data &= 0x7;
 	}
-	state->RAMBank = data;
+	state->m_RAMBank = data;
 	/* Switch banks */
-	memory_set_bankptr (space->machine(), "bank2", state->RAMMap[state->RAMBank] );
+	memory_set_bankptr (space->machine(), "bank2", state->m_RAMMap[state->m_RAMBank] );
 }
 
 WRITE8_HANDLER ( gb_ram_enable )
@@ -602,7 +602,7 @@ WRITE8_HANDLER ( gb_ram_enable )
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1 )
 {
 	gb_state *state = space->machine().driver_data<gb_state>();
-	state->MBC1Mode = data & 0x1;
+	state->m_MBC1Mode = data & 0x1;
 	gb_set_mbc1_banks(space->machine());
 }
 
@@ -610,14 +610,14 @@ static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 {
 	gb_state *state = space->machine().driver_data<gb_state>();
         logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
-	if( state->CartType & TIMER )
+	if( state->m_CartType & TIMER )
 	{
 		/* FIXME: RTC Latch goes here */
-		state->MBC3RTCMap[0] = 50;    /* Seconds */
-		state->MBC3RTCMap[1] = 40;    /* Minutes */
-		state->MBC3RTCMap[2] = 15;    /* Hours */
-		state->MBC3RTCMap[3] = 25;    /* Day counter lowest 8 bits */
-		state->MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occured (bit7) */
+		state->m_MBC3RTCMap[0] = 50;    /* Seconds */
+		state->m_MBC3RTCMap[1] = 40;    /* Minutes */
+		state->m_MBC3RTCMap[2] = 15;    /* Hours */
+		state->m_MBC3RTCMap[3] = 25;    /* Day counter lowest 8 bits */
+		state->m_MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occured (bit7) */
 	}
 }
 
@@ -628,43 +628,43 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 	switch( offset & 0x0001 )
 	{
 	case 0x0000:    /* Write to data register */
-		switch( state->gbLastTama5Command )
+		switch( state->m_gbLastTama5Command )
 		{
 		case 0x00:      /* Bits 0-3 for rom bank selection */
-			state->ROMBank = ( state->ROMBank & 0xF0 ) | ( data & 0x0F );
-			gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
+			state->m_ROMBank = ( state->m_ROMBank & 0xF0 ) | ( data & 0x0F );
+			gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
 			break;
 		case 0x01:      /* Bit 4(-7?) for rom bank selection */
-			state->ROMBank = ( state->ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			gb_rom16_4000( space->machine(), state->ROMMap[state->ROMBank] );
+			state->m_ROMBank = ( state->m_ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
+			gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
 			break;
 		case 0x04:      /* Data to write lo */
-			state->gbTama5Byte = ( state->gbTama5Byte & 0xF0 ) | ( data & 0x0F );
+			state->m_gbTama5Byte = ( state->m_gbTama5Byte & 0xF0 ) | ( data & 0x0F );
 			break;
 		case 0x05:      /* Data to write hi */
-			state->gbTama5Byte = ( state->gbTama5Byte & 0x0F ) | ( ( data & 0x0F ) << 4 );
+			state->m_gbTama5Byte = ( state->m_gbTama5Byte & 0x0F ) | ( ( data & 0x0F ) << 4 );
 			break;
 		case 0x06:      /* Address selection hi */
-			state->gbTama5Address = ( state->gbTama5Address & 0x0F ) | ( ( data & 0x0F ) << 4 );
+			state->m_gbTama5Address = ( state->m_gbTama5Address & 0x0F ) | ( ( data & 0x0F ) << 4 );
 			break;
 		case 0x07:      /* Address selection lo */
 				/* This address always seems to written last, so we'll just
                    execute the command here */
-			state->gbTama5Address = ( state->gbTama5Address & 0xF0 ) | ( data & 0x0F );
-			switch ( state->gbTama5Address & 0xE0 )
+			state->m_gbTama5Address = ( state->m_gbTama5Address & 0xF0 ) | ( data & 0x0F );
+			switch ( state->m_gbTama5Address & 0xE0 )
 			{
 			case 0x00:      /* Write memory */
-				logerror( "Write tama5 memory 0x%02X <- 0x%02X\n", state->gbTama5Address & 0x1F, state->gbTama5Byte );
-				state->gbTama5Memory[ state->gbTama5Address & 0x1F ] = state->gbTama5Byte;
+				logerror( "Write tama5 memory 0x%02X <- 0x%02X\n", state->m_gbTama5Address & 0x1F, state->m_gbTama5Byte );
+				state->m_gbTama5Memory[ state->m_gbTama5Address & 0x1F ] = state->m_gbTama5Byte;
 				break;
 			case 0x20:      /* Read memory */
-				logerror( "Read tama5 memory 0x%02X\n", state->gbTama5Address & 0x1F );
-				state->gbTama5Byte = state->gbTama5Memory[ state->gbTama5Address & 0x1F ];
+				logerror( "Read tama5 memory 0x%02X\n", state->m_gbTama5Address & 0x1F );
+				state->m_gbTama5Byte = state->m_gbTama5Memory[ state->m_gbTama5Address & 0x1F ];
 				break;
 			case 0x40:      /* Unknown, some kind of read */
-				if ( ( state->gbTama5Address & 0x1F ) == 0x12 )
+				if ( ( state->m_gbTama5Address & 0x1F ) == 0x12 )
 				{
-					state->gbTama5Byte = 0xFF;
+					state->m_gbTama5Byte = 0xFF;
 				}
 			case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
 			default:
@@ -685,20 +685,20 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 		case 0x07:      /* Address register lo */
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
-			state->MBC3RTCData[0] = 0x01;
-			memory_set_bankptr( space->machine(), "bank2", state->MBC3RTCData );
+			state->m_MBC3RTCData[0] = 0x01;
+			memory_set_bankptr( space->machine(), "bank2", state->m_MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
-			state->MBC3RTCData[0] = state->gbTama5Byte & 0x0F;
+			state->m_MBC3RTCData[0] = state->m_gbTama5Byte & 0x0F;
 			break;
 		case 0x0D:      /* Data read register hi */
-			state->MBC3RTCData[0] = ( state->gbTama5Byte & 0xF0 ) >> 4;
+			state->m_MBC3RTCData[0] = ( state->m_gbTama5Byte & 0xF0 ) >> 4;
 			break;
 		default:
 			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", cpu_get_pc( &space->device() ), data );
 			break;
 		}
-		state->gbLastTama5Command = data;
+		state->m_gbLastTama5Command = data;
 		break;
 	}
 }
@@ -712,10 +712,10 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w )
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x000 );
 	if ( data & 0x40 )
 	{
-		state->mmm01_bank_offset = state->mmm01_reg1;
-		memory_set_bankptr( space->machine(), "bank5", state->ROMMap[ state->mmm01_bank_offset ] );
-		memory_set_bankptr( space->machine(), "bank10", state->ROMMap[ state->mmm01_bank_offset ] + 0x0100 );
-		gb_rom16_4000( space->machine(), state->ROMMap[ state->mmm01_bank_offset + state->mmm01_bank ] );
+		state->m_mmm01_bank_offset = state->m_mmm01_reg1;
+		memory_set_bankptr( space->machine(), "bank5", state->m_ROMMap[ state->m_mmm01_bank_offset ] );
+		memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[ state->m_mmm01_bank_offset ] + 0x0100 );
+		gb_rom16_4000( space->machine(), state->m_ROMMap[ state->m_mmm01_bank_offset + state->m_mmm01_bank ] );
 	}
 }
 
@@ -724,13 +724,13 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w )
 	gb_state *state = space->machine().driver_data<gb_state>();
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x2000 );
 
-	state->mmm01_reg1 = data & state->ROMMask;
-	state->mmm01_bank = state->mmm01_reg1 & state->mmm01_bank_mask;
-	if ( state->mmm01_bank == 0 )
+	state->m_mmm01_reg1 = data & state->m_ROMMask;
+	state->m_mmm01_bank = state->m_mmm01_reg1 & state->m_mmm01_bank_mask;
+	if ( state->m_mmm01_bank == 0 )
 	{
-		state->mmm01_bank = 1;
+		state->m_mmm01_bank = 1;
 	}
-	gb_rom16_4000( space->machine(), state->ROMMap[ state->mmm01_bank_offset + state->mmm01_bank ] );
+	gb_rom16_4000( space->machine(), state->m_ROMMap[ state->m_mmm01_bank_offset + state->m_mmm01_bank ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w )
@@ -746,9 +746,9 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
 	/* Momotarou Collection 2 writes 01 and 21 here */
 	switch( data )
 	{
-	case 0x30:	state->mmm01_bank_mask = 0x07;	break;
-	case 0x38:	state->mmm01_bank_mask = 0x03;	break;
-	default:	state->mmm01_bank_mask = 0xFF; break;
+	case 0x30:	state->m_mmm01_bank_mask = 0x07;	break;
+	case 0x38:	state->m_mmm01_bank_mask = 0x03;	break;
+	default:	state->m_mmm01_bank_mask = 0xFF; break;
 	}
 }
 
@@ -757,12 +757,12 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
 static void gb_set_mbc1_kor_banks( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	if ( state->ROMBank & 0x30 )
+	if ( state->m_ROMBank & 0x30 )
 	{
-		gb_rom16_0000( machine, state->ROMMap[ state->ROMBank & 0x30 ] );
+		gb_rom16_0000( machine, state->m_ROMMap[ state->m_ROMBank & 0x30 ] );
 	}
-	gb_rom16_4000( machine, state->ROMMap[ state->ROMBank ] );
-	memory_set_bankptr( machine, "bank2", state->RAMMap[ state->MBC1Mode ? ( state->ROMBank >> 5 ) : 0 ] );
+	gb_rom16_4000( machine, state->m_ROMMap[ state->m_ROMBank ] );
+	memory_set_bankptr( machine, "bank2", state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
@@ -773,7 +773,7 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
 	if( data == 0 )
 		data = 1;
 
-	state->ROMBank = ( state->ROMBank & 0x01F0 ) | data;
+	state->m_ROMBank = ( state->m_ROMBank & 0x01F0 ) | data;
 	/* Switch banks */
 	gb_set_mbc1_kor_banks(space->machine());
 }
@@ -784,7 +784,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
 	data &= 0x3; /* Only uses the lower 2 bits */
 
 	/* Select the upper bits of the ROMMask */
-	state->ROMBank = ( state->ROMBank & 0x0F ) | ( data << 4 );
+	state->m_ROMBank = ( state->m_ROMBank & 0x0F ) | ( data << 4 );
 
 	/* Switch banks */
 	gb_set_mbc1_kor_banks(space->machine());
@@ -793,7 +793,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor )
 {
 	gb_state *state = space->machine().driver_data<gb_state>();
-	state->MBC1Mode = data & 0x1;
+	state->m_MBC1Mode = data & 0x1;
 	gb_set_mbc1_kor_banks(space->machine());
 }
 
@@ -819,32 +819,32 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x00:
 		case 0x01:
 		case 0x80:				/* enabled & external clock */
-			state->SIOCount = 0;
+			state->m_SIOCount = 0;
 			break;
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
-			state->SIOCount = 8;
-			state->gb_serial_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
-			state->gb_serial_timer->enable( 1 );
+			state->m_SIOCount = 8;
+			state->m_gb_serial_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
+			state->m_gb_serial_timer->enable( 1 );
 			break;
 		}
 		break;
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
-		if ( state->divcount >= 16 )
+		if ( state->m_divcount >= 16 )
 			gb_timer_increment(space->machine());
-		state->divcount = 0;
+		state->m_divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( state->reloading && ( state->divcount & ( state->shift_cycles - 1 ) ) == 4 )
+		if ( state->m_reloading && ( state->m_divcount & ( state->m_shift_cycles - 1 ) ) == 4 )
 		{
 			data = TIMECNT;
 		}
 		break;
 	case 0x06:						/* TMA - Timer module */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( state->reloading && ( state->divcount & ( state->shift_cycles - 1 ) ) == 4 )
+		if ( state->m_reloading && ( state->m_divcount & ( state->m_shift_cycles - 1 ) ) == 4 )
 		{
 			TIMECNT = data;
 		}
@@ -855,13 +855,13 @@ WRITE8_HANDLER ( gb_io_w )
 		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) )
 		{
 			/* Check if TIMECNT should be incremented */
-			if ( ( state->divcount & ( state->shift_cycles - 1 ) ) >= ( state->shift_cycles >> 1 ) )
+			if ( ( state->m_divcount & ( state->m_shift_cycles - 1 ) ) >= ( state->m_shift_cycles >> 1 ) )
 			{
 				gb_timer_increment(space->machine());
 			}
 		}
-		state->shift = timer_shifts[data & 0x03];
-		state->shift_cycles = 1 << state->shift;
+		state->m_shift = timer_shifts[data & 0x03];
+		state->m_shift_cycles = 1 << state->m_shift;
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
@@ -869,7 +869,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	}
 
-	state->gb_io[offset] = data;
+	state->m_gb_io[offset] = data;
 }
 
 WRITE8_HANDLER ( gb_io2_w )
@@ -878,7 +878,7 @@ WRITE8_HANDLER ( gb_io2_w )
 	if ( offset == 0x10 )
 	{
 		/* disable BIOS ROM */
-		gb_rom16_0000( space->machine(), state->ROMMap[state->ROMBank00] );
+		gb_rom16_0000( space->machine(), state->m_ROMMap[state->m_ROMBank00] );
 	}
 	else
 	{
@@ -921,7 +921,7 @@ static const char *const sgbcmds[26] =
 WRITE8_HANDLER ( sgb_io_w )
 {
 	gb_state *state = space->machine().driver_data<gb_state>();
-	UINT8 *sgb_data = state->sgb_data;
+	UINT8 *sgb_data = state->m_sgb_data;
 
 	switch( offset )
 	{
@@ -929,41 +929,41 @@ WRITE8_HANDLER ( sgb_io_w )
 			switch (data & 0x30)
 			{
 			case 0x00:				   /* start condition */
-				if (state->sgb_start)
+				if (state->m_sgb_start)
 					logerror("SGB: Start condition before end of transfer ??\n");
-				state->sgb_bitcount = 0;
-				state->sgb_start = 1;
-				state->sgb_rest = 0;
+				state->m_sgb_bitcount = 0;
+				state->m_sgb_start = 1;
+				state->m_sgb_rest = 0;
 				JOYPAD = 0x0F & ((input_port_read(space->machine(), "INPUTS") >> 4) | input_port_read(space->machine(), "INPUTS") | 0xF0);
 				break;
 			case 0x10:				   /* data true */
-				if (state->sgb_rest)
+				if (state->m_sgb_rest)
 				{
 					/* We should test for this case , but the code below won't
                        work with the current setup */
 #if 0
-					if (state->sgb_bytecount == 16)
+					if (state->m_sgb_bytecount == 16)
 					{
 						logerror("SGB: end of block is not zero!");
-						state->sgb_start = 0;
+						state->m_sgb_start = 0;
 					}
 #endif
-					sgb_data[state->sgb_bytecount] >>= 1;
-					sgb_data[state->sgb_bytecount] |= 0x80;
-					state->sgb_bitcount++;
-					if (state->sgb_bitcount == 8)
+					sgb_data[state->m_sgb_bytecount] >>= 1;
+					sgb_data[state->m_sgb_bytecount] |= 0x80;
+					state->m_sgb_bitcount++;
+					if (state->m_sgb_bitcount == 8)
 					{
-						state->sgb_bitcount = 0;
-						state->sgb_bytecount++;
+						state->m_sgb_bitcount = 0;
+						state->m_sgb_bytecount++;
 					}
-					state->sgb_rest = 0;
+					state->m_sgb_rest = 0;
 				}
 				JOYPAD = 0x1F & ((input_port_read(space->machine(), "INPUTS") >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
-				if (state->sgb_rest)
+				if (state->m_sgb_rest)
 				{
-					if( state->sgb_bytecount == 16 && state->sgb_packets == -1 )
+					if( state->m_sgb_bytecount == 16 && state->m_sgb_packets == -1 )
 					{
 #ifdef MAME_DEBUG
 						logerror("SGB: %s (%02X) pkts: %d data: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
@@ -972,52 +972,52 @@ WRITE8_HANDLER ( sgb_io_w )
 								sgb_data[8], sgb_data[9], sgb_data[10], sgb_data[11],
 								sgb_data[12], sgb_data[13], sgb_data[14], sgb_data[15]);
 #endif
-						state->sgb_packets = sgb_data[0] & 0x07;
-						state->sgb_start = 0;
+						state->m_sgb_packets = sgb_data[0] & 0x07;
+						state->m_sgb_start = 0;
 					}
-					if (state->sgb_bytecount == (state->sgb_packets << 4) )
+					if (state->m_sgb_bytecount == (state->m_sgb_packets << 4) )
 					{
 						switch( sgb_data[0] >> 3 )
 						{
 							case 0x00:	/* PAL01 */
-								state->sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								state->m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								state->m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								state->m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								state->m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								state->m_sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								state->m_sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x01:	/* PAL23 */
-								state->sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->sgb_pal[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								state->m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								state->m_sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								state->m_sgb_pal[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								state->m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								state->m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								state->m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x02:	/* PAL03 */
-								state->sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								state->m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								state->m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								state->m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								state->m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								state->m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								state->m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x03:	/* PAL12 */
-								state->sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->sgb_pal[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->sgb_pal[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								state->m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								state->m_sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								state->m_sgb_pal[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								state->m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								state->m_sgb_pal[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								state->m_sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								state->m_sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x04:	/* ATTR_BLK */
 								{
@@ -1031,7 +1031,7 @@ WRITE8_HANDLER ( sgb_io_w )
 											{
 												for( J = sgb_data[o + 5]; J <= sgb_data[o + 7]; J++ )
 												{
-													state->sgb_pal_map[I][J] = sgb_data[o + 3] & 0x3;
+													state->m_sgb_pal_map[I][J] = sgb_data[o + 3] & 0x3;
 												}
 											}
 										}
@@ -1049,14 +1049,14 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											for( J = 0; J < 20; J++ )
 											{
-												state->sgb_pal_map[J][sgb_data[K + 1] & 0x1f] = (sgb_data[K + 1] & 0x60) >> 5;
+												state->m_sgb_pal_map[J][sgb_data[K + 1] & 0x1f] = (sgb_data[K + 1] & 0x60) >> 5;
 											}
 										}
 										else
 										{
 											for( J = 0; J < 18; J++ )
 											{
-												state->sgb_pal_map[sgb_data[K + 1] & 0x1f][J] = (sgb_data[K + 1] & 0x60) >> 5;
+												state->m_sgb_pal_map[sgb_data[K + 1] & 0x1f][J] = (sgb_data[K + 1] & 0x60) >> 5;
 											}
 										}
 									}
@@ -1071,18 +1071,18 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											for( J = 0; J < 20; J++ )
 											{
-												state->sgb_pal_map[J][I] = (sgb_data[1] & 0xC) >> 2;
+												state->m_sgb_pal_map[J][I] = (sgb_data[1] & 0xC) >> 2;
 											}
 										}
 										for( J = 0; J < 20; J++ )
 										{
-											state->sgb_pal_map[J][sgb_data[2]] = (sgb_data[1] & 0x30) >> 4;
+											state->m_sgb_pal_map[J][sgb_data[2]] = (sgb_data[1] & 0x30) >> 4;
 										}
 										for( I = sgb_data[2] + 1; I < 18; I++ )
 										{
 											for( J = 0; J < 20; J++ )
 											{
-												state->sgb_pal_map[J][I] = sgb_data[1] & 0x3;
+												state->m_sgb_pal_map[J][I] = sgb_data[1] & 0x3;
 											}
 										}
 									}
@@ -1092,18 +1092,18 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											for( J = 0; J < 18; J++ )
 											{
-												state->sgb_pal_map[I][J] = (sgb_data[1] & 0xC) >> 2;
+												state->m_sgb_pal_map[I][J] = (sgb_data[1] & 0xC) >> 2;
 											}
 										}
 										for( J = 0; J < 18; J++ )
 										{
-											state->sgb_pal_map[sgb_data[2]][J] = (sgb_data[1] & 0x30) >> 4;
+											state->m_sgb_pal_map[sgb_data[2]][J] = (sgb_data[1] & 0x30) >> 4;
 										}
 										for( I = sgb_data[2] + 1; I < 20; I++ )
 										{
 											for( J = 0; J < 18; J++ )
 											{
-												state->sgb_pal_map[I][J] = sgb_data[1] & 0x3;
+												state->m_sgb_pal_map[I][J] = sgb_data[1] & 0x3;
 											}
 										}
 									}
@@ -1124,7 +1124,7 @@ WRITE8_HANDLER ( sgb_io_w )
 									{
 										for( I = 6; I < sets; I++ )
 										{
-											state->sgb_pal_map[x][y++] = (sgb_data[I] & 0xC0) >> 6;
+											state->m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC0) >> 6;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1133,7 +1133,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													x = 0;
 											}
 
-											state->sgb_pal_map[x][y++] = (sgb_data[I] & 0x30) >> 4;
+											state->m_sgb_pal_map[x][y++] = (sgb_data[I] & 0x30) >> 4;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1142,7 +1142,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													x = 0;
 											}
 
-											state->sgb_pal_map[x][y++] = (sgb_data[I] & 0xC) >> 2;
+											state->m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC) >> 2;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1151,7 +1151,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													x = 0;
 											}
 
-											state->sgb_pal_map[x][y++] = sgb_data[I] & 0x3;
+											state->m_sgb_pal_map[x][y++] = sgb_data[I] & 0x3;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1165,7 +1165,7 @@ WRITE8_HANDLER ( sgb_io_w )
 									{
 										for( I = 6; I < sets; I++ )
 										{
-											state->sgb_pal_map[x++][y] = (sgb_data[I] & 0xC0) >> 6;
+											state->m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC0) >> 6;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1174,7 +1174,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													y = 0;
 											}
 
-											state->sgb_pal_map[x++][y] = (sgb_data[I] & 0x30) >> 4;
+											state->m_sgb_pal_map[x++][y] = (sgb_data[I] & 0x30) >> 4;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1183,7 +1183,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													y = 0;
 											}
 
-											state->sgb_pal_map[x++][y] = (sgb_data[I] & 0xC) >> 2;
+											state->m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC) >> 2;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1192,7 +1192,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													y = 0;
 											}
 
-											state->sgb_pal_map[x++][y] = sgb_data[I] & 0x3;
+											state->m_sgb_pal_map[x++][y] = sgb_data[I] & 0x3;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1219,42 +1219,42 @@ WRITE8_HANDLER ( sgb_io_w )
 
 									/* Palette 0 */
 									index_ = (UINT16)(sgb_data[1] | (sgb_data[2] << 8)) * 4;
-									state->sgb_pal[0] = state->sgb_pal_data[index_];
-									state->sgb_pal[1] = state->sgb_pal_data[index_ + 1];
-									state->sgb_pal[2] = state->sgb_pal_data[index_ + 2];
-									state->sgb_pal[3] = state->sgb_pal_data[index_ + 3];
+									state->m_sgb_pal[0] = state->m_sgb_pal_data[index_];
+									state->m_sgb_pal[1] = state->m_sgb_pal_data[index_ + 1];
+									state->m_sgb_pal[2] = state->m_sgb_pal_data[index_ + 2];
+									state->m_sgb_pal[3] = state->m_sgb_pal_data[index_ + 3];
 									/* Palette 1 */
 									index_ = (UINT16)(sgb_data[3] | (sgb_data[4] << 8)) * 4;
-									state->sgb_pal[4] = state->sgb_pal_data[index_];
-									state->sgb_pal[5] = state->sgb_pal_data[index_ + 1];
-									state->sgb_pal[6] = state->sgb_pal_data[index_ + 2];
-									state->sgb_pal[7] = state->sgb_pal_data[index_ + 3];
+									state->m_sgb_pal[4] = state->m_sgb_pal_data[index_];
+									state->m_sgb_pal[5] = state->m_sgb_pal_data[index_ + 1];
+									state->m_sgb_pal[6] = state->m_sgb_pal_data[index_ + 2];
+									state->m_sgb_pal[7] = state->m_sgb_pal_data[index_ + 3];
 									/* Palette 2 */
 									index_ = (UINT16)(sgb_data[5] | (sgb_data[6] << 8)) * 4;
-									state->sgb_pal[8] = state->sgb_pal_data[index_];
-									state->sgb_pal[9] = state->sgb_pal_data[index_ + 1];
-									state->sgb_pal[10] = state->sgb_pal_data[index_ + 2];
-									state->sgb_pal[11] = state->sgb_pal_data[index_ + 3];
+									state->m_sgb_pal[8] = state->m_sgb_pal_data[index_];
+									state->m_sgb_pal[9] = state->m_sgb_pal_data[index_ + 1];
+									state->m_sgb_pal[10] = state->m_sgb_pal_data[index_ + 2];
+									state->m_sgb_pal[11] = state->m_sgb_pal_data[index_ + 3];
 									/* Palette 3 */
 									index_ = (UINT16)(sgb_data[7] | (sgb_data[8] << 8)) * 4;
-									state->sgb_pal[12] = state->sgb_pal_data[index_];
-									state->sgb_pal[13] = state->sgb_pal_data[index_ + 1];
-									state->sgb_pal[14] = state->sgb_pal_data[index_ + 2];
-									state->sgb_pal[15] = state->sgb_pal_data[index_ + 3];
+									state->m_sgb_pal[12] = state->m_sgb_pal_data[index_];
+									state->m_sgb_pal[13] = state->m_sgb_pal_data[index_ + 1];
+									state->m_sgb_pal[14] = state->m_sgb_pal_data[index_ + 2];
+									state->m_sgb_pal[15] = state->m_sgb_pal_data[index_ + 3];
 									/* Attribute File */
 									if( sgb_data[9] & 0x40 )
-										state->sgb_window_mask = 0;
-									state->sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
+										state->m_sgb_window_mask = 0;
+									state->m_sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
 									if( sgb_data[9] & 0x80 )
 									{
 										for( J = 0; J < 18; J++ )
 										{
 											for( I = 0; I < 5; I++ )
 											{
-												state->sgb_pal_map[I * 4][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC0) >> 6;
-												state->sgb_pal_map[(I * 4) + 1][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x30) >> 4;
-												state->sgb_pal_map[(I * 4) + 2][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC) >> 2;
-												state->sgb_pal_map[(I * 4) + 3][J] = state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x3;
+												state->m_sgb_pal_map[I * 4][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC0) >> 6;
+												state->m_sgb_pal_map[(I * 4) + 1][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x30) >> 4;
+												state->m_sgb_pal_map[(I * 4) + 2][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC) >> 2;
+												state->m_sgb_pal_map[(I * 4) + 3][J] = state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x3;
 											}
 										}
 									}
@@ -1268,7 +1268,7 @@ WRITE8_HANDLER ( sgb_io_w )
 									for( I = 0; I < 2048; I++ )
 									{
 										col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
-										state->sgb_pal_data[I] = col;
+										state->m_sgb_pal_data[I] = col;
 									}
 								}
 								break;
@@ -1289,46 +1289,46 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x11:	/* MLT_REQ - Multi controller request */
 								if (sgb_data[1] == 0x00)
-									state->sgb_controller_mode = 0;
+									state->m_sgb_controller_mode = 0;
 								else if (sgb_data[1] == 0x01)
-									state->sgb_controller_mode = 2;
+									state->m_sgb_controller_mode = 2;
 								break;
 							case 0x12:	/* JUMP */
 								/* Not Implemented */
 								break;
 							case 0x13:	/* CHR_TRN */
 								if( sgb_data[1] & 0x1 )
-									memcpy( state->sgb_tile_data + 4096, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
+									memcpy( state->m_sgb_tile_data + 4096, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
 								else
-									memcpy( state->sgb_tile_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
+									memcpy( state->m_sgb_tile_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
 								break;
 							case 0x14:	/* PCT_TRN */
 								{
 									int I;
 									UINT16 col;
 									UINT8 *gb_vram = gb_get_vram_ptr(space->machine());
-									if( state->sgb_hack )
+									if( state->m_sgb_hack )
 									{
-										memcpy( state->sgb_tile_map, gb_vram + 0x1000, 2048 );
+										memcpy( state->m_sgb_tile_map, gb_vram + 0x1000, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
 											col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
-											state->sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
+											state->m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 									else /* Do things normally */
 									{
-										memcpy( state->sgb_tile_map, gb_vram + 0x0800, 2048 );
+										memcpy( state->m_sgb_tile_map, gb_vram + 0x0800, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
 											col = ( gb_vram[ 0x1000 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x1000 + (I*2) ];
-											state->sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
+											state->m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 								}
 								break;
 							case 0x15:	/* ATTR_TRN */
-								memcpy( state->sgb_atf_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4050 );
+								memcpy( state->m_sgb_atf_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4050 );
 								break;
 							case 0x16:	/* ATTR_SET */
 								{
@@ -1336,22 +1336,22 @@ WRITE8_HANDLER ( sgb_io_w )
 
 									/* Attribute File */
 									if( sgb_data[1] & 0x40 )
-										state->sgb_window_mask = 0;
-									state->sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
+										state->m_sgb_window_mask = 0;
+									state->m_sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
 									for( J = 0; J < 18; J++ )
 									{
 										for( I = 0; I < 5; I++ )
 										{
-											state->sgb_pal_map[I * 4][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC0) >> 6;
-											state->sgb_pal_map[(I * 4) + 1][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x30) >> 4;
-											state->sgb_pal_map[(I * 4) + 2][J] = (state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0xC) >> 2;
-											state->sgb_pal_map[(I * 4) + 3][J] = state->sgb_atf_data[(J * 5) + state->sgb_atf + I] & 0x3;
+											state->m_sgb_pal_map[I * 4][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC0) >> 6;
+											state->m_sgb_pal_map[(I * 4) + 1][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x30) >> 4;
+											state->m_sgb_pal_map[(I * 4) + 2][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC) >> 2;
+											state->m_sgb_pal_map[(I * 4) + 3][J] = state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x3;
 										}
 									}
 								}
 								break;
 							case 0x17:	/* MASK_EN */
-								state->sgb_window_mask = sgb_data[1];
+								state->m_sgb_window_mask = sgb_data[1];
 								break;
 							case 0x18:	/* OBJ_TRN */
 								/* Not Implemnted */
@@ -1369,33 +1369,33 @@ WRITE8_HANDLER ( sgb_io_w )
 								logerror( "SGB: Unknown Command 0x%02x!\n", sgb_data[0] >> 3 );
 						}
 
-						state->sgb_start = 0;
-						state->sgb_bytecount = 0;
-						state->sgb_packets = -1;
+						state->m_sgb_start = 0;
+						state->m_sgb_bytecount = 0;
+						state->m_sgb_packets = -1;
 					}
-					if( state->sgb_start )
+					if( state->m_sgb_start )
 					{
-						sgb_data[state->sgb_bytecount] >>= 1;
-						state->sgb_bitcount++;
-						if (state->sgb_bitcount == 8)
+						sgb_data[state->m_sgb_bytecount] >>= 1;
+						state->m_sgb_bitcount++;
+						if (state->m_sgb_bitcount == 8)
 						{
-							state->sgb_bitcount = 0;
-							state->sgb_bytecount++;
+							state->m_sgb_bitcount = 0;
+							state->m_sgb_bytecount++;
 						}
 					}
-					state->sgb_rest = 0;
+					state->m_sgb_rest = 0;
 				}
 				JOYPAD = 0x2F & (input_port_read(space->machine(), "INPUTS") | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
-				if (state->sgb_start)
-					state->sgb_rest = 1;
-				if (state->sgb_controller_mode)
+				if (state->m_sgb_start)
+					state->m_sgb_rest = 1;
+				if (state->m_sgb_controller_mode)
 				{
-					state->sgb_controller_no++;
-					if (state->sgb_controller_no == state->sgb_controller_mode)
-						state->sgb_controller_no = 0;
-					JOYPAD = 0x3F - state->sgb_controller_no;
+					state->m_sgb_controller_no++;
+					if (state->m_sgb_controller_no == state->m_sgb_controller_mode)
+						state->m_sgb_controller_no = 0;
+					JOYPAD = 0x3F - state->m_sgb_controller_no;
 				}
 				else
 					JOYPAD = 0x3F;
@@ -1412,7 +1412,7 @@ WRITE8_HANDLER ( sgb_io_w )
 			return;
 	}
 
-	state->gb_io[offset] = data;
+	state->m_gb_io[offset] = data;
 }
 
 /* Interrupt Enable register */
@@ -1433,7 +1433,7 @@ READ8_HANDLER ( gb_io_r )
 	switch(offset)
 	{
 		case 0x04:
-			return ( state->divcount >> 8 ) & 0xFF;
+			return ( state->m_divcount >> 8 ) & 0xFF;
 		case 0x00:
 		case 0x01:
 		case 0x02:
@@ -1441,7 +1441,7 @@ READ8_HANDLER ( gb_io_r )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			return state->gb_io[offset];
+			return state->m_gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
 			return 0xE0 | cpu_get_reg( space->machine().device("maincpu"), LR35902_IF );
@@ -1456,27 +1456,27 @@ DEVICE_START(gb_cart)
 	gb_state *state = device->machine().driver_data<gb_state>();
 	int I;
 
-	state->gb_dummy_rom_bank = auto_alloc_array(device->machine(), UINT8, 0x4000);
-	memset(state->gb_dummy_rom_bank, 0xff, 0x4000);
+	state->m_gb_dummy_rom_bank = auto_alloc_array(device->machine(), UINT8, 0x4000);
+	memset(state->m_gb_dummy_rom_bank, 0xff, 0x4000);
 
-	state->gb_dummy_ram_bank = auto_alloc_array(device->machine(), UINT8, 0x2000);
-	memset(state->gb_dummy_ram_bank, 0xff, 0x2000 );
+	state->m_gb_dummy_ram_bank = auto_alloc_array(device->machine(), UINT8, 0x2000);
+	memset(state->m_gb_dummy_ram_bank, 0xff, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++)
 	{
-		state->ROMMap[I] = state->gb_dummy_rom_bank;
+		state->m_ROMMap[I] = state->m_gb_dummy_rom_bank;
 	}
 	for(I = 0; I < MAX_RAMBANK; I++)
 	{
-		state->RAMMap[I] = state->gb_dummy_ram_bank;
+		state->m_RAMMap[I] = state->m_gb_dummy_ram_bank;
 	}
-	state->ROMBank00 = 0;
-	state->ROMBanks = 0;
-	state->RAMBanks = 0;
-	state->MBCType = MBC_NONE;
-	state->CartType = 0;
-	state->ROMMask = 0;
-	state->RAMMask = 0;
+	state->m_ROMBank00 = 0;
+	state->m_ROMBanks = 0;
+	state->m_RAMBanks = 0;
+	state->m_MBCType = MBC_NONE;
+	state->m_CartType = 0;
+	state->m_ROMMask = 0;
+	state->m_RAMMask = 0;
 }
 
 DEVICE_IMAGE_LOAD(gb_cart)
@@ -1635,7 +1635,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Claim memory */
-	state->gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
+	state->m_gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
 
 	if (image.software_entry() == NULL)
 	{
@@ -1643,17 +1643,17 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		image.fseek(load_start, SEEK_SET);
 
 		/* Read cartridge */
-		if (image.fread( state->gb_cart, filesize) != filesize)
+		if (image.fread( state->m_gb_cart, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
-		memcpy(state->gb_cart, image.get_software_region("rom") + load_start, filesize);
+		memcpy(state->m_gb_cart, image.get_software_region("rom") + load_start, filesize);
 
-	gb_header = state->gb_cart;
-	state->ROMBank00 = 0;
+	gb_header = state->m_gb_cart;
+	state->m_ROMBank00 = 0;
 
 	/* Check for presence of MMM01 mapper */
 	if (filesize >= 0x8000)
@@ -1664,7 +1664,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 			0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E
 		};
 		int	bytes_matched = 0;
-		gb_header = state->gb_cart + filesize - 0x8000;
+		gb_header = state->m_gb_cart + filesize - 0x8000;
 		for (I = 0; I < 0x18; I++)
 		{
 			if (gb_header[0x0104 + I] == nintendo_logo[I])
@@ -1675,50 +1675,50 @@ DEVICE_IMAGE_LOAD(gb_cart)
 
 		if (bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D)
 		{
-			state->ROMBank00 = (filesize / 0x4000) - 2;
-			state->mmm01_bank_offset = state->ROMBank00;
+			state->m_ROMBank00 = (filesize / 0x4000) - 2;
+			state->m_mmm01_bank_offset = state->m_ROMBank00;
 		}
 		else
 		{
-			gb_header = state->gb_cart;
+			gb_header = state->m_gb_cart;
 		}
 	}
 
 	/* Fill in our cart details */
 	switch(gb_header[0x0147])
 	{
-	case 0x00:	state->MBCType = MBC_NONE;	state->CartType = 0;				break;
-	case 0x01:	state->MBCType = MBC_MBC1;	state->CartType = 0;				break;
-	case 0x02:	state->MBCType = MBC_MBC1;	state->CartType = CART_RAM;				break;
-	case 0x03:	state->MBCType = MBC_MBC1;	state->CartType = CART_RAM | BATTERY;		break;
-	case 0x05:	state->MBCType = MBC_MBC2;	state->CartType = 0;				break;
-	case 0x06:	state->MBCType = MBC_MBC2;	state->CartType = BATTERY;			break;
-	case 0x08:	state->MBCType = MBC_NONE;	state->CartType = CART_RAM;				break;
-	case 0x09:	state->MBCType = MBC_NONE;	state->CartType = CART_RAM | BATTERY;		break;
-	case 0x0B:	state->MBCType = MBC_MMM01;	state->CartType = 0;				break;
-	case 0x0C:	state->MBCType = MBC_MMM01;	state->CartType = CART_RAM;				break;
-	case 0x0D:	state->MBCType = MBC_MMM01;	state->CartType = CART_RAM | BATTERY;		break;
-	case 0x0F:	state->MBCType = MBC_MBC3;	state->CartType = TIMER | BATTERY;		break;
-	case 0x10:	state->MBCType = MBC_MBC3;	state->CartType = TIMER | CART_RAM | BATTERY;	break;
-	case 0x11:	state->MBCType = MBC_MBC3;	state->CartType = 0;				break;
-	case 0x12:	state->MBCType = MBC_MBC3;	state->CartType = CART_RAM;				break;
-	case 0x13:	state->MBCType = MBC_MBC3;	state->CartType = CART_RAM | BATTERY;		break;
-	case 0x15:	state->MBCType = MBC_MBC4;	state->CartType = 0;				break;
-	case 0x16:	state->MBCType = MBC_MBC4;	state->CartType = CART_RAM;				break;
-	case 0x17:	state->MBCType = MBC_MBC4;	state->CartType = CART_RAM | BATTERY;		break;
-	case 0x19:	state->MBCType = MBC_MBC5;	state->CartType = 0;				break;
-	case 0x1A:	state->MBCType = MBC_MBC5;	state->CartType = CART_RAM;				break;
-	case 0x1B:	state->MBCType = MBC_MBC5;	state->CartType = CART_RAM | BATTERY;		break;
-	case 0x1C:	state->MBCType = MBC_MBC5;	state->CartType = RUMBLE;			break;
-	case 0x1D:	state->MBCType = MBC_MBC5;	state->CartType = RUMBLE | SRAM;		break;
-	case 0x1E:	state->MBCType = MBC_MBC5;	state->CartType = RUMBLE | SRAM | BATTERY;	break;
-	case 0x20:	state->MBCType = MBC_MBC6;	state->CartType = SRAM; break;
-	case 0x22:	state->MBCType = MBC_MBC7;	state->CartType = SRAM | BATTERY;		break;
-	case 0xBE:	state->MBCType = MBC_NONE;	state->CartType = 0;				break;	/* used in Flash2Advance GB Bridge boot program */
-	case 0xFD:	state->MBCType = MBC_TAMA5;	state->CartType = 0 /*RTC | BATTERY?*/;	break;
-	case 0xFE:	state->MBCType = MBC_HUC3;	state->CartType = 0;				break;
-	case 0xFF:	state->MBCType = MBC_HUC1;	state->CartType = 0;				break;
-	default:	state->MBCType = MBC_UNKNOWN;	state->CartType = UNKNOWN;			break;
+	case 0x00:	state->m_MBCType = MBC_NONE;	state->m_CartType = 0;				break;
+	case 0x01:	state->m_MBCType = MBC_MBC1;	state->m_CartType = 0;				break;
+	case 0x02:	state->m_MBCType = MBC_MBC1;	state->m_CartType = CART_RAM;				break;
+	case 0x03:	state->m_MBCType = MBC_MBC1;	state->m_CartType = CART_RAM | BATTERY;		break;
+	case 0x05:	state->m_MBCType = MBC_MBC2;	state->m_CartType = 0;				break;
+	case 0x06:	state->m_MBCType = MBC_MBC2;	state->m_CartType = BATTERY;			break;
+	case 0x08:	state->m_MBCType = MBC_NONE;	state->m_CartType = CART_RAM;				break;
+	case 0x09:	state->m_MBCType = MBC_NONE;	state->m_CartType = CART_RAM | BATTERY;		break;
+	case 0x0B:	state->m_MBCType = MBC_MMM01;	state->m_CartType = 0;				break;
+	case 0x0C:	state->m_MBCType = MBC_MMM01;	state->m_CartType = CART_RAM;				break;
+	case 0x0D:	state->m_MBCType = MBC_MMM01;	state->m_CartType = CART_RAM | BATTERY;		break;
+	case 0x0F:	state->m_MBCType = MBC_MBC3;	state->m_CartType = TIMER | BATTERY;		break;
+	case 0x10:	state->m_MBCType = MBC_MBC3;	state->m_CartType = TIMER | CART_RAM | BATTERY;	break;
+	case 0x11:	state->m_MBCType = MBC_MBC3;	state->m_CartType = 0;				break;
+	case 0x12:	state->m_MBCType = MBC_MBC3;	state->m_CartType = CART_RAM;				break;
+	case 0x13:	state->m_MBCType = MBC_MBC3;	state->m_CartType = CART_RAM | BATTERY;		break;
+	case 0x15:	state->m_MBCType = MBC_MBC4;	state->m_CartType = 0;				break;
+	case 0x16:	state->m_MBCType = MBC_MBC4;	state->m_CartType = CART_RAM;				break;
+	case 0x17:	state->m_MBCType = MBC_MBC4;	state->m_CartType = CART_RAM | BATTERY;		break;
+	case 0x19:	state->m_MBCType = MBC_MBC5;	state->m_CartType = 0;				break;
+	case 0x1A:	state->m_MBCType = MBC_MBC5;	state->m_CartType = CART_RAM;				break;
+	case 0x1B:	state->m_MBCType = MBC_MBC5;	state->m_CartType = CART_RAM | BATTERY;		break;
+	case 0x1C:	state->m_MBCType = MBC_MBC5;	state->m_CartType = RUMBLE;			break;
+	case 0x1D:	state->m_MBCType = MBC_MBC5;	state->m_CartType = RUMBLE | SRAM;		break;
+	case 0x1E:	state->m_MBCType = MBC_MBC5;	state->m_CartType = RUMBLE | SRAM | BATTERY;	break;
+	case 0x20:	state->m_MBCType = MBC_MBC6;	state->m_CartType = SRAM; break;
+	case 0x22:	state->m_MBCType = MBC_MBC7;	state->m_CartType = SRAM | BATTERY;		break;
+	case 0xBE:	state->m_MBCType = MBC_NONE;	state->m_CartType = 0;				break;	/* used in Flash2Advance GB Bridge boot program */
+	case 0xFD:	state->m_MBCType = MBC_TAMA5;	state->m_CartType = 0 /*RTC | BATTERY?*/;	break;
+	case 0xFE:	state->m_MBCType = MBC_HUC3;	state->m_CartType = 0;				break;
+	case 0xFF:	state->m_MBCType = MBC_HUC1;	state->m_CartType = 0;				break;
+	default:	state->m_MBCType = MBC_UNKNOWN;	state->m_CartType = UNKNOWN;			break;
 	}
 
 	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
@@ -1731,43 +1731,43 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		}
 		if (count == 0)
 		{
-			state->MBCType = MBC_WISDOM;
+			state->m_MBCType = MBC_WISDOM;
 		}
 	}
 
 	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
-	if (state->MBCType == MBC_MBC1)
+	if (state->m_MBCType == MBC_MBC1)
 	{
 		if (gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B)
 		{
-			state->MBCType = MBC_MBC1_KOR;
+			state->m_MBCType = MBC_MBC1_KOR;
 		}
 	}
-	if (state->MBCType == MBC_UNKNOWN)
+	if (state->m_MBCType == MBC_UNKNOWN)
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type");
 		return IMAGE_INIT_FAIL;
 	}
-	if (state->MBCType == MBC_MMM01)
+	if (state->m_MBCType == MBC_MMM01)
 	{
 //      image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet");
 //      return IMAGE_INIT_FAIL;
 	}
-	if (state->MBCType == MBC_MBC4)
+	if (state->m_MBCType == MBC_MBC4)
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet");
 		return IMAGE_INIT_FAIL;
 	}
 	/* MBC7 support is still work-in-progress, so only enable it for debug builds */
 #ifndef MAME_DEBUG
-	if (state->MBCType == MBC_MBC7)
+	if (state->m_MBCType == MBC_MBC7)
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet");
 		return IMAGE_INIT_FAIL;
 	}
 #endif
 
-	state->ROMBanks = filesize / 0x4000;
+	state->m_ROMBanks = filesize / 0x4000;
 	switch (gb_header[0x0148])
 	{
 	case 0x52:
@@ -1788,19 +1788,19 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		reported_rom_banks = 256;
 		break;
 	}
-	if (state->ROMBanks != reported_rom_banks && state->MBCType != MBC_WISDOM)
+	if (state->m_ROMBanks != reported_rom_banks && state->m_MBCType != MBC_WISDOM)
 	{
 		logerror("Warning loading cartridge: Filesize and reported ROM banks don't match.\n");
 	}
 
-	state->RAMBanks = rambanks[gb_header[0x0149] & 7];
+	state->m_RAMBanks = rambanks[gb_header[0x0149] & 7];
 
 	/* Calculate and check checksum */
 	Checksum = ((UINT16) gb_header[0x014E] << 8) + gb_header[0x014F];
 	Checksum += gb_header[0x014E] + gb_header[0x014F];
 	for (I = 0; I < filesize; I++)
 	{
-		Checksum -= state->gb_cart[I];
+		Checksum -= state->m_gb_cart[I];
 	}
 	if (Checksum & 0xFFFF)
 	{
@@ -1808,9 +1808,9 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Initialize ROMMap pointers */
-	for (I = 0; I < state->ROMBanks; I++)
+	for (I = 0; I < state->m_ROMBanks; I++)
 	{
-		state->ROMMap[I] = state->gb_cart + (I * 0x4000);
+		state->m_ROMMap[I] = state->m_gb_cart + (I * 0x4000);
 	}
 
 	/*
@@ -1820,20 +1820,20 @@ DEVICE_IMAGE_LOAD(gb_cart)
       80 (1010000)  1001111 (79)
       96 (1100000)  1011111 (95)
     */
-	state->ROMMask = I - 1;
-	if ((state->ROMBanks & state->ROMMask) != 0)
+	state->m_ROMMask = I - 1;
+	if ((state->m_ROMBanks & state->m_ROMMask) != 0)
 	{
-		for( ; I & state->ROMBanks; I++)
+		for( ; I & state->m_ROMBanks; I++)
 		{
-			state->ROMMap[I] = state->ROMMap[I & state->ROMMask];
+			state->m_ROMMap[I] = state->m_ROMMap[I & state->m_ROMMask];
 		}
-		state->ROMMask = I - 1;
+		state->m_ROMMask = I - 1;
 	}
 
 	/* Fill out the remaining rom bank pointers, if any. */
 	for ( ; I < MAX_ROMBANK; I++)
 	{
-		state->ROMMap[I] = state->ROMMap[I & state->ROMMask];
+		state->m_ROMMap[I] = state->m_ROMMap[I & state->m_ROMMask];
 	}
 
 	/* Log cart information */
@@ -1850,8 +1850,8 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		logerror("\tType:             %s [0x%2X]\n", CartTypes[gb_header[0x0147]], gb_header[0x0147] );
 		logerror("\tGame Boy:         %s\n", (gb_header[0x0143] == 0xc0) ? "No" : "Yes" );
 		logerror("\tSuper GB:         %s [0x%2X]\n", (gb_header[0x0146] == 0x03) ? "Yes" : "No", gb_header[0x0146] );
-		logerror("\tColor GB:         %s [0x%2X]\n", (gb_header[0x0143] == 0x80 || gb_header[0x0143] == 0xc0) ? "Yes" : "No", state->gb_cart[0x0143] );
-		logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", state->ROMBanks, gb_header[0x0148]);
+		logerror("\tColor GB:         %s [0x%2X]\n", (gb_header[0x0143] == 0x80 || gb_header[0x0143] == 0xc0) ? "Yes" : "No", state->m_gb_cart[0x0143] );
+		logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", state->m_ROMBanks, gb_header[0x0148]);
 		logerror("\tRAM Size:         %d kB [0x%2X]\n", ramsize[ gb_header[0x0149] & 0x07 ], gb_header[0x0149]);
 		logerror("\tLicense code:     0x%2X%2X\n", gb_header[0x0145], gb_header[0x0144] );
 		J = ((UINT16) gb_header[0x014B] << 8) + gb_header[0x014A];
@@ -1868,53 +1868,53 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* MBC2 has 512 * 4bits (8kb) internal RAM */
-	if(state->MBCType == MBC_MBC2)
-		state->RAMBanks = 1;
+	if(state->m_MBCType == MBC_MBC2)
+		state->m_RAMBanks = 1;
 	/* MBC7 has 512 bytes(?) of internal RAM */
-	if (state->MBCType == MBC_MBC7)
+	if (state->m_MBCType == MBC_MBC7)
 	{
-		state->RAMBanks = 1;
+		state->m_RAMBanks = 1;
 	}
 
-	if (state->RAMBanks && state->MBCType)
+	if (state->m_RAMBanks && state->m_MBCType)
 	{
 		/* Claim memory */
-		state->gb_cart_ram = auto_alloc_array(image.device().machine(), UINT8, state->RAMBanks * 0x2000);
-		memset(state->gb_cart_ram, 0xFF, state->RAMBank * 0x2000);
+		state->m_gb_cart_ram = auto_alloc_array(image.device().machine(), UINT8, state->m_RAMBanks * 0x2000);
+		memset(state->m_gb_cart_ram, 0xFF, state->m_RAMBank * 0x2000);
 
-		for (I = 0; I < state->RAMBanks; I++)
+		for (I = 0; I < state->m_RAMBanks; I++)
 		{
-			state->RAMMap[I] = state->gb_cart_ram + (I * 0x2000);
+			state->m_RAMMap[I] = state->m_gb_cart_ram + (I * 0x2000);
 		}
 
 		/* Set up rest of the (mirrored) RAM pages */
-		state->RAMMask = I - 1;
+		state->m_RAMMask = I - 1;
 		for ( ; I < MAX_RAMBANK; I++)
 		{
-			state->RAMMap[I] = state->RAMMap[I & state->RAMMask];
+			state->m_RAMMap[I] = state->m_RAMMap[I & state->m_RAMMask];
 		}
 	}
 	else
 	{
-		state->RAMMask = 0;
+		state->m_RAMMask = 0;
 	}
 
 	/* If there's an RTC claim memory to store the RTC contents */
-	if (state->CartType & TIMER)
+	if (state->m_CartType & TIMER)
 	{
-		state->MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
+		state->m_MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
 	}
 
-	if (state->MBCType == MBC_TAMA5)
+	if (state->m_MBCType == MBC_TAMA5)
 	{
-		state->MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
-		memset(state->gbTama5Memory, 0xff, sizeof(state->gbTama5Memory));
+		state->m_MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
+		memset(state->m_gbTama5Memory, 0xff, sizeof(state->m_gbTama5Memory));
 	}
 
 	/* Load the saved RAM if this cart has a battery */
-	if (state->CartType & BATTERY && state->RAMBanks)
+	if (state->m_CartType & BATTERY && state->m_RAMBanks)
 	{
-		image.battery_load(state->gb_cart_ram, state->RAMBanks * 0x2000, 0x00);
+		image.battery_load(state->m_gb_cart_ram, state->m_RAMBanks * 0x2000, 0x00);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -1930,12 +1930,12 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	/* Shift in a received bit */
 	SIODATA = (SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */
-	state->SIOCount--;
+	state->m_SIOCount--;
 	/* If all bits done, stop timer and trigger interrupt */
-	if ( ! state->SIOCount )
+	if ( ! state->m_SIOCount )
 	{
 		SIOCONT &= 0x7F;
-		state->gb_serial_timer->enable( 0 );
+		state->m_gb_serial_timer->enable( 0 );
 		cputag_set_input_line(machine, "maincpu", SIO_INT, ASSERT_LINE);
 	}
 }
@@ -1943,15 +1943,15 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 INLINE void gb_timer_check_irq( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	state->reloading = 0;
-	if ( state->triggering_irq )
+	state->m_reloading = 0;
+	if ( state->m_triggering_irq )
 	{
-		state->triggering_irq = 0;
+		state->m_triggering_irq = 0;
 		if ( TIMECNT == 0 )
 		{
 			TIMECNT = TIMEMOD;
 			cputag_set_input_line(machine, "maincpu", TIM_INT, ASSERT_LINE );
-			state->reloading = 1;
+			state->m_reloading = 1;
 		}
 	}
 }
@@ -1964,23 +1964,23 @@ static void gb_timer_increment( running_machine &machine )
 	TIMECNT += 1;
 	if ( TIMECNT == 0 )
 	{
-		state->triggering_irq = 1;
+		state->m_triggering_irq = 1;
 	}
 }
 
 void gb_timer_callback(device_t *device, int cycles)
 {
 	gb_state *state = device->machine().driver_data<gb_state>();
-	UINT16 old_gb_divcount = state->divcount;
-	state->divcount += cycles;
+	UINT16 old_gb_divcount = state->m_divcount;
+	state->m_divcount += cycles;
 
 	gb_timer_check_irq(device->machine());
 
 	if ( TIMEFRQ & 0x04 )
 	{
-		UINT16 old_count = old_gb_divcount >> state->shift;
-		UINT16 new_count = state->divcount >> state->shift;
-		if ( cycles > state->shift_cycles )
+		UINT16 old_count = old_gb_divcount >> state->m_shift;
+		UINT16 new_count = state->m_divcount >> state->m_shift;
+		if ( cycles > state->m_shift_cycles )
 		{
 			gb_timer_increment(device->machine());
 			old_count++;
@@ -1989,7 +1989,7 @@ void gb_timer_callback(device_t *device, int cycles)
 		{
 			gb_timer_increment(device->machine());
 		}
-		if ( new_count << state->shift < state->divcount )
+		if ( new_count << state->m_shift < state->m_divcount )
 		{
 			gb_timer_check_irq(device->machine());
 		}
@@ -2005,15 +2005,15 @@ WRITE8_HANDLER ( gbc_io2_w )
 			cpu_set_reg( space->machine().device("maincpu"), LR35902_SPEED, data );
 			return;
 		case 0x10:	/* BFF - Bios disable */
-			gb_rom16_0000( space->machine(), state->ROMMap[state->ROMBank00] );
+			gb_rom16_0000( space->machine(), state->m_ROMMap[state->m_ROMBank00] );
 			return;
 		case 0x16:	/* RP - Infrared port */
 			break;
 		case 0x30:	/* SVBK - RAM bank select */
-			state->GBC_RAMBank = data & 0x7;
-			if ( ! state->GBC_RAMBank )
-				state->GBC_RAMBank = 1;
-			memory_set_bankptr (space->machine(), "bank3", state->GBC_RAMMap[state->GBC_RAMBank]);
+			state->m_GBC_RAMBank = data & 0x7;
+			if ( ! state->m_GBC_RAMBank )
+				state->m_GBC_RAMBank = 1;
+			memory_set_bankptr (space->machine(), "bank3", state->m_GBC_RAMMap[state->m_GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2031,7 +2031,7 @@ READ8_HANDLER( gbc_io2_r )
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */
-		return state->GBC_RAMBank;
+		return state->m_GBC_RAMBank;
 	default:
 		break;
 	}
@@ -2048,8 +2048,8 @@ MACHINE_START( megaduck )
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	state->gb_serial_timer->enable( 0 );
+	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	state->m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
 }
@@ -2171,25 +2171,25 @@ READ8_HANDLER( megaduck_sound_r2 )
 WRITE8_HANDLER( megaduck_rom_bank_select_type1 )
 {
 	gb_state *state = space->machine().driver_data<gb_state>();
-	if( state->ROMMask )
+	if( state->m_ROMMask )
 	{
-		state->ROMBank = data & state->ROMMask;
+		state->m_ROMBank = data & state->m_ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr (space->machine(), "bank1", state->ROMMap[state->ROMBank]);
+		memory_set_bankptr (space->machine(), "bank1", state->m_ROMMap[state->m_ROMBank]);
 	}
 }
 
 WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
 {
 	gb_state *state = space->machine().driver_data<gb_state>();
-	if( state->ROMMask )
+	if( state->m_ROMMask )
 	{
-		state->ROMBank = (data << 1) & state->ROMMask;
+		state->m_ROMBank = (data << 1) & state->m_ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr( space->machine(), "bank10", state->ROMMap[state->ROMBank]);
-		memory_set_bankptr( space->machine(), "bank1", state->ROMMap[state->ROMBank + 1]);
+		memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[state->m_ROMBank]);
+		memory_set_bankptr( space->machine(), "bank1", state->m_ROMMap[state->m_ROMBank + 1]);
 	}
 }
 
@@ -2200,9 +2200,9 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	UINT32 filesize;
 
 	for (I = 0; I < MAX_ROMBANK; I++)
-		state->ROMMap[I] = NULL;
+		state->m_ROMMap[I] = NULL;
 	for (I = 0; I < MAX_RAMBANK; I++)
-		state->RAMMap[I] = NULL;
+		state->m_RAMMap[I] = NULL;
 
 	if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -2215,15 +2215,15 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->ROMBanks = filesize / 0x4000;
+	state->m_ROMBanks = filesize / 0x4000;
 
 	/* Claim memory */
-	state->gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
+	state->m_gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
 
 	/* Read cartridge */
 	if (image.software_entry() == NULL)
 	{
-		if (image.fread( state->gb_cart, filesize) != filesize)
+		if (image.fread( state->m_gb_cart, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -2231,30 +2231,30 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	}
 	else
 	{
-		memcpy(state->gb_cart, image.get_software_region("rom"), filesize);
+		memcpy(state->m_gb_cart, image.get_software_region("rom"), filesize);
 	}
 
 	/* Log cart information */
 	{
 		logerror("Cart Information\n");
-		logerror("\tRom Banks:        %d\n", state->ROMBanks);
+		logerror("\tRom Banks:        %d\n", state->m_ROMBanks);
 	}
 
-	for (I = 0; I < state->ROMBanks; I++)
+	for (I = 0; I < state->m_ROMBanks; I++)
 	{
-		state->ROMMap[I] = state->gb_cart + (I * 0x4000);
+		state->m_ROMMap[I] = state->m_gb_cart + (I * 0x4000);
 	}
 
 	/* Build rom bank Mask */
-	if (state->ROMBanks < 3)
-		state->ROMMask = 0;
+	if (state->m_ROMBanks < 3)
+		state->m_ROMMask = 0;
 	else
 	{
-		for (I = 1; I < state->ROMBanks; I <<= 1) ;
-			state->ROMMask = I - 1;
+		for (I = 1; I < state->m_ROMBanks; I <<= 1) ;
+			state->m_ROMMask = I - 1;
 	}
 
-	state->MBCType = MBC_MEGADUCK;
+	state->m_MBCType = MBC_MEGADUCK;
 
 	return IMAGE_INIT_PASS;
 }

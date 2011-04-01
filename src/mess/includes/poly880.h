@@ -46,9 +46,6 @@ public:
 	/* display state */
 	UINT8 m_digit;
 	UINT8 m_segment;
-
-	/* devices */
-	device_t *cassette;
 };
 
 #endif

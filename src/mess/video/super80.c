@@ -110,7 +110,7 @@ SCREEN_UPDATE( super80 )
 					chr = RAM[ma | x] & 0x3f;
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				gfx = state->m_FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character (8 pixels) */
 				for (i = 0; i < 8; i++)
@@ -146,7 +146,7 @@ SCREEN_UPDATE( super80d )
 					chr = RAM[ma | x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->FNT[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+				gfx = state->m_FNT[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
 				for (i = 0; i < 8; i++)
@@ -182,7 +182,7 @@ SCREEN_UPDATE( super80e )
 					chr = RAM[ma | x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				gfx = state->m_FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character (8 pixels) */
 				for (i = 0; i < 8; i++)
@@ -238,9 +238,9 @@ SCREEN_UPDATE( super80m )
 
 				/* get pattern of pixels for that character scanline */
 				if (cgen)
-					gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+					gfx = state->m_FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 				else
-					gfx = state->FNT[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+					gfx = state->m_FNT[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
 				for (i = 0; i < 8; i++)
@@ -256,7 +256,7 @@ VIDEO_START( super80 )
 {
 	super80_state *state = machine.driver_data<super80_state>();
 	state->m_vidpg = 0xfe00;
-	state->FNT = machine.region("gfx1")->base();
+	state->m_FNT = machine.region("gfx1")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
@@ -326,11 +326,11 @@ void super80_state::mc6845_cursor_configure()
         2 = full cursor
         3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(m_mc6845_cursor); i++) m_mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
-	r9  = mc6845_reg[9];					// number of scan lines - 1
-	r10 = mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
-	r11 = mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
+	r9  = m_mc6845_reg[9];					// number of scan lines - 1
+	r10 = m_mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
+	r11 = m_mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
 	if (r10 < r11) curs_type=1;				// start less than end, show start to end
@@ -343,11 +343,11 @@ void super80_state::mc6845_cursor_configure()
 	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(mc6845_cursor);i++) mc6845_cursor[i]=0xff; // turn on full cursor
+	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(m_mc6845_cursor);i++) m_mc6845_cursor[i]=0xff; // turn on full cursor
 
-	if (curs_type == 1) for (i = r10;i < r11;i++) mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
+	if (curs_type == 1) for (i = r10;i < r11;i++) m_mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
 
-	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
+	if (curs_type == 3) for (i = r11; i < r10;i++) m_mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
 VIDEO_START( super80v )
@@ -362,8 +362,8 @@ SCREEN_UPDATE( super80v )
 {
 	super80_state *state = screen->machine().driver_data<super80_state>();
 	state->m_framecnt++;
-	state->m_speed = state->mc6845_reg[10]&0x20, state->m_flash = state->mc6845_reg[10]&0x40; // cursor modes
-	state->m_cursor = (state->mc6845_reg[14]<<8) | state->mc6845_reg[15]; // get cursor position
+	state->m_speed = state->m_mc6845_reg[10]&0x20, state->m_flash = state->m_mc6845_reg[10]&0x40; // cursor modes
+	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15]; // get cursor position
 	state->m_s_options=input_port_read(screen->machine(), "CONFIG");
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 	mc6845_update(state->m_6845, bitmap, cliprect);
@@ -407,7 +407,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||
 			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&
 			(mem == state->m_cursor))
-				inv ^= state->mc6845_cursor[ra];
+				inv ^= state->m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_pcgram[(chr<<4) | ra] ^ inv;
@@ -423,13 +423,13 @@ MC6845_UPDATE_ROW( super80v_update_row )
 WRITE8_MEMBER( super80_state::super80v_10_w )
 {
 	data &= 0x1f;
-	mc6845_ind = data;
+	m_mc6845_ind = data;
 	mc6845_address_w( m_6845, 0, data );
 }
 
 WRITE8_MEMBER( super80_state::super80v_11_w )
 {
-	mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
+	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];	/* save data in register */
 	mc6845_register_w( m_6845, 0, data );
-	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 }

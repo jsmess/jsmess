@@ -16,14 +16,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* display state */
-	UINT8 data;
+	UINT8 m_data;
 
 	/* devices */
-	device_t *cdp1861;
-	device_t *mm74c923;
-	device_t *dm9368_l;
-	device_t *dm9368_h;
-	device_t *cassette;
+	device_t *m_cdp1861;
+	device_t *m_mm74c923;
+	device_t *m_dm9368_l;
+	device_t *m_dm9368_h;
+	device_t *m_cassette;
 };
 
 #endif

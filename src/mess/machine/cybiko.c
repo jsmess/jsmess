@@ -71,7 +71,7 @@ MACHINE_STOP( cybikov1 );
 MACHINE_STOP( cybikov2 );
 MACHINE_STOP( cybikoxt );
 
-// state->rs232
+// state->m_rs232
 static void cybiko_rs232_init(running_machine &machine);
 static void cybiko_rs232_exit(void);
 static void cybiko_rs232_reset(void);
@@ -331,7 +331,7 @@ static void cybiko_rs232_init(running_machine &machine)
 {
 	cybiko_state *state = machine.driver_data<cybiko_state>();
 	_logerror( 0, ("cybiko_rs232_init\n"));
-	memset( &state->rs232, 0, sizeof( state->rs232));
+	memset( &state->m_rs232, 0, sizeof( state->m_rs232));
 //  machine.scheduler().timer_pulse(TIME_IN_HZ( 10), FUNC(rs232_timer_callback));
 }
 
@@ -356,40 +356,40 @@ static void cybiko_rs232_pin_sck(cybiko_state *state, int data)
 {
 	_logerror( 3, ("cybiko_rs232_pin_sck (%d)\n", data));
 	// clock high-to-low
-	if ((state->rs232.pin.sck == 1) && (data == 0))
+	if ((state->m_rs232.pin.sck == 1) && (data == 0))
 	{
 		// transmit
-		if (state->rs232.pin.txd) state->rs232.tx_byte = state->rs232.tx_byte | (1 << state->rs232.tx_bits);
-		state->rs232.tx_bits++;
-		if (state->rs232.tx_bits == 8)
+		if (state->m_rs232.pin.txd) state->m_rs232.tx_byte = state->m_rs232.tx_byte | (1 << state->m_rs232.tx_bits);
+		state->m_rs232.tx_bits++;
+		if (state->m_rs232.tx_bits == 8)
 		{
-			state->rs232.tx_bits = 0;
-			cybiko_rs232_write_byte( state->rs232.tx_byte);
-			state->rs232.tx_byte = 0;
+			state->m_rs232.tx_bits = 0;
+			cybiko_rs232_write_byte( state->m_rs232.tx_byte);
+			state->m_rs232.tx_byte = 0;
 		}
 		// receive
-		state->rs232.pin.rxd = (state->rs232.rx_byte >> state->rs232.rx_bits) & 1;
-		state->rs232.rx_bits++;
-		if (state->rs232.rx_bits == 8)
+		state->m_rs232.pin.rxd = (state->m_rs232.rx_byte >> state->m_rs232.rx_bits) & 1;
+		state->m_rs232.rx_bits++;
+		if (state->m_rs232.rx_bits == 8)
 		{
-			state->rs232.rx_bits = 0;
-			state->rs232.rx_byte = 0;
+			state->m_rs232.rx_bits = 0;
+			state->m_rs232.rx_byte = 0;
 		}
 	}
 	// save sck
-	state->rs232.pin.sck = data;
+	state->m_rs232.pin.sck = data;
 }
 
 static void cybiko_rs232_pin_txd(cybiko_state *state, int data)
 {
 	_logerror( 3, ("cybiko_rs232_pin_txd (%d)\n", data));
-	state->rs232.pin.txd = data;
+	state->m_rs232.pin.txd = data;
 }
 
 static int cybiko_rs232_pin_rxd(cybiko_state *state)
 {
 	_logerror( 3, ("cybiko_rs232_pin_rxd\n"));
-	return state->rs232.pin.rxd;
+	return state->m_rs232.pin.rxd;
 }
 
 static int cybiko_rs232_rx_queue( void)
@@ -470,7 +470,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		}
 		break;
 
-		// state->rs232
+		// state->m_rs232
 		case H8S_IO_PORT5 : if (cybiko_rs232_pin_rxd(state)) data = data | H8S_P5_RXD2; break;
 		// real-time clock
 		case H8S_IO_PORTF :
@@ -510,7 +510,7 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 			at45dbxx_pin_sck( device, (data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
-		// state->rs232
+		// state->m_rs232
 		case H8S_IO_P5DR :
 		{
 			cybiko_rs232_pin_txd(state, (data & H8S_P5_TXD2) ? 1 : 0);
@@ -542,7 +542,7 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
 	switch (offset)
 	{
-		// state->rs232
+		// state->m_rs232
 		case H8S_IO_PORT3 : if (cybiko_rs232_pin_rxd(state)) data = data | H8S_P3_RXD1; break;
 		// default
 		default : data = cybiko_io_reg_r(space, offset);
@@ -568,7 +568,7 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 	_logerror( 2, ("cybikoxt_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
-		// state->rs232
+		// state->m_rs232
 		case H8S_IO_P3DR :
 		{
 			cybiko_rs232_pin_txd(state, (data & H8S_P3_TXD1) ? 1 : 0);

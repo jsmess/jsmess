@@ -20,8 +20,8 @@ public:
 	selz80_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 digit;
-	UINT8 segment;
+	UINT8 m_digit;
+	UINT8 m_segment;
 };
 
 
@@ -41,16 +41,16 @@ static WRITE8_HANDLER( selz80_01_w )
 	selz80_state *state = space->machine().driver_data<selz80_state>();
 	if ((data & 0xc0)==0x80)
 	{
-		state->digit = data & 7;
-		output_set_digit_value(state->digit, state->segment);
+		state->m_digit = data & 7;
+		output_set_digit_value(state->m_digit, state->m_segment);
 	}
 }
 
 static WRITE8_HANDLER( selz80_00_w )
 {
 	selz80_state *state = space->machine().driver_data<selz80_state>();
-	state->segment = BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4);
-	output_set_digit_value(state->digit, state->segment);
+	state->m_segment = BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4);
+	output_set_digit_value(state->m_digit, state->m_segment);
 }
 
 static ADDRESS_MAP_START(selz80_mem, AS_PROGRAM, 8)

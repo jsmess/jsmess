@@ -137,7 +137,7 @@ public:
 	UINT8 m_sol20_fa;
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
-	const UINT8 *FNT;
+	const UINT8 *m_FNT;
 	const UINT8 *m_videoram;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
@@ -557,7 +557,7 @@ static DRIVER_INIT( sol20 )
 static VIDEO_START( sol20 )
 {
 	sol20_state *state = machine.driver_data<sol20_state>();
-	state->FNT = machine.region("chargen")->base();
+	state->m_FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( sol20 )
@@ -606,12 +606,12 @@ static SCREEN_UPDATE( sol20 )
 					if (ra < 4)
 						gfx = inv;
 					else
-						gfx = state->FNT[which | (chr<<4) | (ra-4) ] ^ inv;
+						gfx = state->m_FNT[which | (chr<<4) | (ra-4) ] ^ inv;
 				}
 				else
 				{
 					if (ra < 10)
-						gfx = state->FNT[which | (chr<<4) | (ra-1) ] ^ inv;
+						gfx = state->m_FNT[which | (chr<<4) | (ra-1) ] ^ inv;
 					else
 						gfx = inv;
 				}

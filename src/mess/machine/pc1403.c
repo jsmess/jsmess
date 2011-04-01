@@ -20,7 +20,7 @@
 WRITE8_HANDLER(pc1403_asic_write)
 {
 	pc1403_state *state = space->machine().driver_data<pc1403_state>();
-    state->asic[offset>>9]=data;
+    state->m_asic[offset>>9]=data;
     switch( (offset>>9) ){
     case 0/*0x3800*/:
 	// output
@@ -40,7 +40,7 @@ WRITE8_HANDLER(pc1403_asic_write)
 READ8_HANDLER(pc1403_asic_read)
 {
 	pc1403_state *state = space->machine().driver_data<pc1403_state>();
-    UINT8 data=state->asic[offset>>9];
+    UINT8 data=state->m_asic[offset>>9];
     switch( (offset>>9) ){
     case 0: case 1: case 2:
 	logerror ("asic read %.4x %.2x\n",offset, data);
@@ -52,60 +52,60 @@ READ8_HANDLER(pc1403_asic_read)
 void pc1403_outa(device_t *device, int data)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
-    state->outa=data;
+    state->m_outa=data;
 }
 
 int pc1403_ina(device_t *device)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
-    UINT8 data=state->outa;
+    UINT8 data=state->m_outa;
 
-    if (state->asic[3] & 0x01)
+    if (state->m_asic[3] & 0x01)
 		data |= input_port_read(device->machine(), "KEY0");
 
-    if (state->asic[3] & 0x02)
+    if (state->m_asic[3] & 0x02)
 		data |= input_port_read(device->machine(), "KEY1");
 
-    if (state->asic[3] & 0x04)
+    if (state->m_asic[3] & 0x04)
 		data |= input_port_read(device->machine(), "KEY2");
 
-    if (state->asic[3] & 0x08)
+    if (state->m_asic[3] & 0x08)
 		data |= input_port_read(device->machine(), "KEY3");
 
-    if (state->asic[3] & 0x10)
+    if (state->m_asic[3] & 0x10)
 		data |= input_port_read(device->machine(), "KEY4");
 
-    if (state->asic[3] & 0x20)
+    if (state->m_asic[3] & 0x20)
 		data |= input_port_read(device->machine(), "KEY5");
 
-    if (state->asic[3] & 0x40)
+    if (state->m_asic[3] & 0x40)
 		data |= input_port_read(device->machine(), "KEY6");
 
-    if (state->outa & 0x01)
+    if (state->m_outa & 0x01)
 	{
 		data |= input_port_read(device->machine(), "KEY7");
 
 		/* At Power Up we fake a 'C-CE' pressure */
-		if (state->power)
+		if (state->m_power)
 			data |= 0x02;
 	}
 
-    if (state->outa & 0x02)
+    if (state->m_outa & 0x02)
 		data |= input_port_read(device->machine(), "KEY8");
 
-    if (state->outa & 0x04)
+    if (state->m_outa & 0x04)
 		data |= input_port_read(device->machine(), "KEY9");
 
-    if (state->outa & 0x08)
+    if (state->m_outa & 0x08)
 		data |= input_port_read(device->machine(), "KEY10");
 
-    if (state->outa & 0x10)
+    if (state->m_outa & 0x10)
 		data |= input_port_read(device->machine(), "KEY11");
 
-    if (state->outa & 0x20)
+    if (state->m_outa & 0x20)
 		data |= input_port_read(device->machine(), "KEY12");
 
-    if (state->outa & 0x40)
+    if (state->m_outa & 0x40)
 		data |= input_port_read(device->machine(), "KEY13");
 
     return data;
@@ -115,7 +115,7 @@ int pc1403_ina(device_t *device)
 int pc1403_inb(void)
 {
 	pc1403_state *state = machine.driver_data<pc140_state>();
-	int data = state->outb;
+	int data = state->m_outb;
 
 	if (input_port_read(machine, "KEY13"))
 		data |= 1;
@@ -127,7 +127,7 @@ int pc1403_inb(void)
 void pc1403_outc(device_t *device, int data)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
-    state->portc = data;
+    state->m_portc = data;
 //    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), cpu_get_pc(device->machine().device("maincpu")), data);
 }
 
@@ -169,7 +169,7 @@ NVRAM_HANDLER( pc1403 )
 static TIMER_CALLBACK(pc1403_power_up)
 {
 	pc1403_state *state = machine.driver_data<pc1403_state>();
-	state->power=0;
+	state->m_power=0;
 }
 
 DRIVER_INIT( pc1403 )
@@ -180,7 +180,7 @@ DRIVER_INIT( pc1403 )
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	state->power = 1;
+	state->m_power = 1;
 	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1403_power_up));
 
 	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());

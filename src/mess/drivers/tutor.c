@@ -174,11 +174,11 @@ public:
 	tutor_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	char cartridge_enable;
-	char tape_interrupt_enable;
-	emu_timer *tape_interrupt_timer;
-	UINT8 printer_data;
-	char printer_strobe;
+	char m_cartridge_enable;
+	char m_tape_interrupt_enable;
+	emu_timer *m_tape_interrupt_timer;
+	UINT8 m_printer_data;
+	char m_printer_strobe;
 };
 
 
@@ -200,7 +200,7 @@ enum
 static DRIVER_INIT(tutor)
 {
 	tutor_state *state = machine.driver_data<tutor_state>();
-	state->tape_interrupt_timer = machine.scheduler().timer_alloc(FUNC(tape_interrupt_handler));
+	state->m_tape_interrupt_timer = machine.scheduler().timer_alloc(FUNC(tape_interrupt_handler));
 
 	memory_configure_bank(machine, "bank1", 0, 1, machine.region("maincpu")->base() + basic_base, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine.region("maincpu")->base() + cartridge_base, 0);
@@ -231,12 +231,12 @@ static MACHINE_START(tutor)
 static MACHINE_RESET(tutor)
 {
 	tutor_state *state = machine.driver_data<tutor_state>();
-	state->cartridge_enable = 0;
+	state->m_cartridge_enable = 0;
 
-	state->tape_interrupt_enable = 0;
+	state->m_tape_interrupt_enable = 0;
 
-	state->printer_data = 0;
-	state->printer_strobe = 0;
+	state->m_printer_data = 0;
+	state->m_printer_strobe = 0;
 }
 
 static INTERRUPT_GEN( tutor_vblank_interrupt )
@@ -347,13 +347,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
-		state->cartridge_enable = 0;
+		state->m_cartridge_enable = 0;
 		memory_set_bank(space->machine(), "bank1", 0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
-		state->cartridge_enable = 1;
+		state->m_cartridge_enable = 1;
 		memory_set_bank(space->machine(), "bank1", 1);
 		break;
 
@@ -386,7 +386,7 @@ static WRITE8_HANDLER(tutor_mapper_w)
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//tutor_state *state = machine.driver_data<tutor_state>();
-	//assert(state->tape_interrupt_enable);
+	//assert(state->m_tape_interrupt_enable);
 	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(machine.device("cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -416,14 +416,14 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		case 1:
 			/* interrupt control??? */
 			//logerror("ignoring write of %d to cassette port 1\n", data);
-			if (state->tape_interrupt_enable != ! data)
+			if (state->m_tape_interrupt_enable != ! data)
 			{
-				state->tape_interrupt_enable = ! data;
-				if (state->tape_interrupt_enable)
-					state->tape_interrupt_timer->adjust(/*attotime::from_hz(44100)*/attotime::zero, 0, attotime::from_hz(44100));
+				state->m_tape_interrupt_enable = ! data;
+				if (state->m_tape_interrupt_enable)
+					state->m_tape_interrupt_timer->adjust(/*attotime::from_hz(44100)*/attotime::zero, 0, attotime::from_hz(44100));
 				else
 				{
-					state->tape_interrupt_timer->adjust(attotime::never);
+					state->m_tape_interrupt_timer->adjust(attotime::never);
 					cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 				}
 			}

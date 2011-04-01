@@ -169,10 +169,10 @@ static attotime prescale(int val)
 static void mfp_init(running_machine &machine)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->mfp.tadr = state->mfp.tbdr = state->mfp.tcdr = state->mfp.tddr = 0xff;
+	state->m_mfp.tadr = state->m_mfp.tbdr = state->m_mfp.tcdr = state->m_mfp.tddr = 0xff;
 
-	state->mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
-	state->mfp.current_irq = -1;  // No current interrupt
+	state->m_mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
+	state->m_mfp.current_irq = -1;  // No current interrupt
 
 #if 0
     mfp_timer[0] = machine.scheduler().timer_alloc(FUNC(mfp_timer_a_callback));
@@ -190,43 +190,43 @@ TIMER_CALLBACK(mfp_update_irq)
 	x68k_state *state = machine.driver_data<x68k_state>();
     int x;
 
-    if((state->ioc.irqstatus & 0xc0) != 0)
+    if((state->m_ioc.irqstatus & 0xc0) != 0)
         return;
 
     // check for pending IRQs, in priority order
-    if(state->mfp.ipra != 0)
+    if(state->m_mfp.ipra != 0)
     {
         for(x=7;x>=0;x--)
         {
-            if((state->mfp.ipra & (1 << x)) && (state->mfp.imra & (1 << x)))
+            if((state->m_mfp.ipra & (1 << x)) && (state->m_mfp.imra & (1 << x)))
             {
-                state->current_irq_line = state->mfp.irqline;
-                state->mfp.current_irq = x + 8;
+                state->m_current_irq_line = state->m_mfp.irqline;
+                state->m_mfp.current_irq = x + 8;
                 // assert IRQ line
-//              if(state->mfp.iera & (1 << x))
+//              if(state->m_mfp.iera & (1 << x))
                 {
-                    state->current_vector[6] = (state->mfp.vr & 0xf0) | (x+8);
-                    cputag_set_input_line_and_vector(machine, "maincpu",state->mfp.irqline,ASSERT_LINE,(state->mfp.vr & 0xf0) | (x + 8));
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(state->mfp.vr & 0xf0) | (x+8),state->mfp.irqline);
+                    state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | (x+8);
+                    cputag_set_input_line_and_vector(machine, "maincpu",state->m_mfp.irqline,ASSERT_LINE,(state->m_mfp.vr & 0xf0) | (x + 8));
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(state->m_mfp.vr & 0xf0) | (x+8),state->m_mfp.irqline);
                     return;  // one at a time only
                 }
             }
         }
     }
-    if(state->mfp.iprb != 0)
+    if(state->m_mfp.iprb != 0)
     {
         for(x=7;x>=0;x--)
         {
-            if((state->mfp.iprb & (1 << x)) && (state->mfp.imrb & (1 << x)))
+            if((state->m_mfp.iprb & (1 << x)) && (state->m_mfp.imrb & (1 << x)))
             {
-                state->current_irq_line = state->mfp.irqline;
-                state->mfp.current_irq = x;
+                state->m_current_irq_line = state->m_mfp.irqline;
+                state->m_mfp.current_irq = x;
                 // assert IRQ line
-//              if(state->mfp.ierb & (1 << x))
+//              if(state->m_mfp.ierb & (1 << x))
                 {
-                    state->current_vector[6] = (state->mfp.vr & 0xf0) | x;
-                    cputag_set_input_line_and_vector(machine, "maincpu",state->mfp.irqline,ASSERT_LINE,(state->mfp.vr & 0xf0) | x);
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(state->mfp.vr & 0xf0) | x,state->mfp.irqline);
+                    state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | x;
+                    cputag_set_input_line_and_vector(machine, "maincpu",state->m_mfp.irqline,ASSERT_LINE,(state->m_mfp.vr & 0xf0) | x);
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(state->m_mfp.vr & 0xf0) | x,state->m_mfp.irqline);
                     return;  // one at a time only
                 }
             }
@@ -240,20 +240,20 @@ void mfp_trigger_irq(running_machine &machine, int irq)
     // check if interrupt is enabled
     if(irq > 7)
     {
-        if(!(state->mfp.iera & (1 << (irq-8))))
+        if(!(state->m_mfp.iera & (1 << (irq-8))))
             return;  // not enabled, no action taken
     }
     else
     {
-        if(!(state->mfp.ierb & (1 << irq)))
+        if(!(state->m_mfp.ierb & (1 << irq)))
             return;  // not enabled, no action taken
     }
 
     // set requested IRQ as pending
     if(irq > 7)
-        state->mfp.ipra |= (1 << (irq-8));
+        state->m_mfp.ipra |= (1 << (irq-8));
     else
-        state->mfp.iprb |= (1 << irq);
+        state->m_mfp.iprb |= (1 << irq);
 
     // check for IRQs to be called
 //  mfp_update_irq(0);
@@ -263,10 +263,10 @@ void mfp_trigger_irq(running_machine &machine, int irq)
 TIMER_CALLBACK(mfp_timer_a_callback)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-    state->mfp.timer[0].counter--;
-    if(state->mfp.timer[0].counter == 0)
+    state->m_mfp.timer[0].counter--;
+    if(state->m_mfp.timer[0].counter == 0)
     {
-        state->mfp.timer[0].counter = state->mfp.tadr;
+        state->m_mfp.timer[0].counter = state->m_mfp.tadr;
         mfp_trigger_irq(MFP_IRQ_TIMERA);
     }
 }
@@ -274,10 +274,10 @@ TIMER_CALLBACK(mfp_timer_a_callback)
 TIMER_CALLBACK(mfp_timer_b_callback)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-    state->mfp.timer[1].counter--;
-    if(state->mfp.timer[1].counter == 0)
+    state->m_mfp.timer[1].counter--;
+    if(state->m_mfp.timer[1].counter == 0)
     {
-        state->mfp.timer[1].counter = state->mfp.tbdr;
+        state->m_mfp.timer[1].counter = state->m_mfp.tbdr;
             mfp_trigger_irq(MFP_IRQ_TIMERB);
     }
 }
@@ -285,10 +285,10 @@ TIMER_CALLBACK(mfp_timer_b_callback)
 TIMER_CALLBACK(mfp_timer_c_callback)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-    state->mfp.timer[2].counter--;
-    if(state->mfp.timer[2].counter == 0)
+    state->m_mfp.timer[2].counter--;
+    if(state->m_mfp.timer[2].counter == 0)
     {
-        state->mfp.timer[2].counter = state->mfp.tcdr;
+        state->m_mfp.timer[2].counter = state->m_mfp.tcdr;
             mfp_trigger_irq(MFP_IRQ_TIMERC);
     }
 }
@@ -296,10 +296,10 @@ TIMER_CALLBACK(mfp_timer_c_callback)
 TIMER_CALLBACK(mfp_timer_d_callback)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-    state->mfp.timer[3].counter--;
-    if(state->mfp.timer[3].counter == 0)
+    state->m_mfp.timer[3].counter--;
+    if(state->m_mfp.timer[3].counter == 0)
     {
-        state->mfp.timer[3].counter = state->mfp.tddr;
+        state->m_mfp.timer[3].counter = state->m_mfp.tddr;
             mfp_trigger_irq(MFP_IRQ_TIMERD);
     }
 }
@@ -324,14 +324,14 @@ static TIMER_CALLBACK( x68k_led_callback )
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	int drive;
-	if(state->led_state == 0)
-		state->led_state = 1;
+	if(state->m_led_state == 0)
+		state->m_led_state = 1;
 	else
-		state->led_state = 0;
-	if(state->led_state == 1)
+		state->m_led_state = 0;
+	if(state->m_led_state == 1)
 	{
 		for(drive=0;drive<4;drive++)
-			output_set_indexed_value("ctrl_drv",drive,state->fdc.led_ctrl[drive] ? 0 : 1);
+			output_set_indexed_value("ctrl_drv",drive,state->m_fdc.led_ctrl[drive] ? 0 : 1);
 	}
 	else
 	{
@@ -407,19 +407,19 @@ static void x68k_keyboard_ctrl_w(x68k_state *state, int data)
 
 	if((data & 0xf8) == 0x48)  // Keyboard enable
 	{
-		state->keyboard.enabled = data & 0x01;
-		logerror("KB: Keyboard enable bit = %i\n",state->keyboard.enabled);
+		state->m_keyboard.enabled = data & 0x01;
+		logerror("KB: Keyboard enable bit = %i\n",state->m_keyboard.enabled);
 	}
 
 	if((data & 0xf0) == 0x60)  // Key delay time
 	{
-		state->keyboard.delay = data & 0x0f;
+		state->m_keyboard.delay = data & 0x0f;
 		logerror("KB: Keypress delay time is now %ims\n",(data & 0x0f)*100+200);
 	}
 
 	if((data & 0xf0) == 0x70)  // Key repeat rate
 	{
-		state->keyboard.repeat = data & 0x0f;
+		state->m_keyboard.repeat = data & 0x0f;
 		logerror("KB: Keypress repeat rate is now %ims\n",((data & 0x0f)^2)*5+30);
 	}
 
@@ -428,13 +428,13 @@ static void x68k_keyboard_ctrl_w(x68k_state *state, int data)
 static int x68k_keyboard_pop_scancode(x68k_state *state)
 {
 	int ret;
-	if(state->keyboard.keynum == 0)  // no scancodes in USART buffer
+	if(state->m_keyboard.keynum == 0)  // no scancodes in USART buffer
 		return 0x00;
 
-	state->keyboard.keynum--;
-	ret = state->keyboard.buffer[state->keyboard.tailpos++];
-	if(state->keyboard.tailpos > 15)
-		state->keyboard.tailpos = 0;
+	state->m_keyboard.keynum--;
+	ret = state->m_keyboard.buffer[state->m_keyboard.tailpos++];
+	if(state->m_keyboard.tailpos > 15)
+		state->m_keyboard.tailpos = 0;
 
 	logerror("MFP: Keyboard buffer pop 0x%02x\n",ret);
 	return ret;
@@ -443,27 +443,27 @@ static int x68k_keyboard_pop_scancode(x68k_state *state)
 static void x68k_keyboard_push_scancode(running_machine &machine,unsigned char code)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->keyboard.keynum++;
-	if(state->keyboard.keynum >= 1)
+	state->m_keyboard.keynum++;
+	if(state->m_keyboard.keynum >= 1)
 	{ // keyboard buffer full
-		if(state->keyboard.enabled != 0)
+		if(state->m_keyboard.enabled != 0)
 		{
-			state->mfp.rsr |= 0x80;  // Buffer full
+			state->m_mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
 			if(input_port_read(machine,"options") & 0x01)
 			{
-				state->current_vector[6] = 0x4c;
+				state->m_current_vector[6] = 0x4c;
 				cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4c);
 				logerror("MFP: Receive buffer full IRQ sent\n");
 			}
 		}
 	}
-	state->keyboard.buffer[state->keyboard.headpos++] = code;
-	if(state->keyboard.headpos > 15)
+	state->m_keyboard.buffer[state->m_keyboard.headpos++] = code;
+	if(state->m_keyboard.headpos > 15)
 	{
-		state->keyboard.headpos = 0;
+		state->m_keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
-		state->current_vector[6] = 0x4b;
+		state->m_current_vector[6] = 0x4b;
 //      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4b);
 	}
 }
@@ -477,39 +477,39 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 	for(x=0;x<0x80;x++)
 	{
 		// adjust delay/repeat timers
-		if(state->keyboard.keytime[x] > 0)
+		if(state->m_keyboard.keytime[x] > 0)
 		{
-			state->keyboard.keytime[x] -= 5;
+			state->m_keyboard.keytime[x] -= 5;
 		}
 		if(!(input_port_read(machine, keynames[x / 32]) & (1 << (x % 32))))
 		{
-			if(state->keyboard.keyon[x] != 0)
+			if(state->m_keyboard.keyon[x] != 0)
 			{
 				x68k_keyboard_push_scancode(machine,0x80 + x);
-				state->keyboard.keytime[x] = 0;
-				state->keyboard.keyon[x] = 0;
-				state->keyboard.last_pressed = 0;
+				state->m_keyboard.keytime[x] = 0;
+				state->m_keyboard.keyon[x] = 0;
+				state->m_keyboard.last_pressed = 0;
 				logerror("KB: Released key 0x%02x\n",x);
 			}
 		}
 		// check to see if a key is being held
-		if(state->keyboard.keyon[x] != 0 && state->keyboard.keytime[x] == 0 && state->keyboard.last_pressed == x)
+		if(state->m_keyboard.keyon[x] != 0 && state->m_keyboard.keytime[x] == 0 && state->m_keyboard.last_pressed == x)
 		{
-			if(input_port_read(machine, keynames[state->keyboard.last_pressed / 32]) & (1 << (state->keyboard.last_pressed % 32)))
+			if(input_port_read(machine, keynames[state->m_keyboard.last_pressed / 32]) & (1 << (state->m_keyboard.last_pressed % 32)))
 			{
-				x68k_keyboard_push_scancode(machine,state->keyboard.last_pressed);
-				state->keyboard.keytime[state->keyboard.last_pressed] = (state->keyboard.repeat^2)*5+30;
-				logerror("KB: Holding key 0x%02x\n",state->keyboard.last_pressed);
+				x68k_keyboard_push_scancode(machine,state->m_keyboard.last_pressed);
+				state->m_keyboard.keytime[state->m_keyboard.last_pressed] = (state->m_keyboard.repeat^2)*5+30;
+				logerror("KB: Holding key 0x%02x\n",state->m_keyboard.last_pressed);
 			}
 		}
 		if((input_port_read(machine,  keynames[x / 32]) & (1 << (x % 32))))
 		{
-			if(state->keyboard.keyon[x] == 0)
+			if(state->m_keyboard.keyon[x] == 0)
 			{
 				x68k_keyboard_push_scancode(machine,x);
-				state->keyboard.keytime[x] = state->keyboard.delay * 100 + 200;
-				state->keyboard.keyon[x] = 1;
-				state->keyboard.last_pressed = x;
+				state->m_keyboard.keytime[x] = state->m_keyboard.delay * 100 + 200;
+				state->m_keyboard.keyon[x] = 1;
+				state->m_keyboard.last_pressed = x;
 				logerror("KB: Pushed key 0x%02x\n",x);
 			}
 		}
@@ -521,10 +521,10 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 void mfp_recv_data(int data)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->mfp.rsr |= 0x80;  // Buffer full
-	state->mfp.tsr |= 0x80;
-	state->mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
-	state->mfp.vector = state->current_vector[6] = (state->mfp.vr & 0xf0) | 0x0c;
+	state->m_mfp.rsr |= 0x80;  // Buffer full
+	state->m_mfp.tsr |= 0x80;
+	state->m_mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
+	state->m_mfp.vector = state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | 0x0c;
 //  mfp_trigger_irq(MFP_IRQ_RX_FULL);
 //  logerror("MFP: Receive buffer full IRQ sent\n");
 }
@@ -543,28 +543,28 @@ static int x68k_read_mouse(running_machine &machine)
 	if(!(scc8530_get_reg_b(scc,5) & 0x02))
 		return 0xff;
 
-	switch(state->mouse.inputtype)
+	switch(state->m_mouse.inputtype)
 	{
 	case 0:
 		ipt = input_port_read(machine, "mouse1");
 		break;
 	case 1:
 		val = input_port_read(machine, "mouse2");
-		ipt = val - state->mouse.last_mouse_x;
-		state->mouse.last_mouse_x = val;
+		ipt = val - state->m_mouse.last_mouse_x;
+		state->m_mouse.last_mouse_x = val;
 		break;
 	case 2:
 		val = input_port_read(machine, "mouse3");
-		ipt = val - state->mouse.last_mouse_y;
-		state->mouse.last_mouse_y = val;
+		ipt = val - state->m_mouse.last_mouse_y;
+		state->m_mouse.last_mouse_y = val;
 		break;
 	}
-	state->mouse.inputtype++;
-	if(state->mouse.inputtype > 2)
+	state->m_mouse.inputtype++;
+	if(state->m_mouse.inputtype > 2)
 	{
 		int i_val = scc8530_get_reg_b(scc, 0);
-		state->mouse.inputtype = 0;
-		state->mouse.bufferempty = 1;
+		state->m_mouse.inputtype = 0;
+		state->m_mouse.bufferempty = 1;
 		i_val &= ~0x01;
 		scc8530_set_reg_b(scc, 0, i_val);
 		logerror("SCC: mouse buffer empty\n");
@@ -608,12 +608,12 @@ static WRITE16_HANDLER( x68k_scc_w )
 	{
 	case 0:
 		scc8530_w(scc, 0,(UINT8)data);
-		if((scc8530_get_reg_b(scc, 5) & 0x02) != state->scc_prev)
+		if((scc8530_get_reg_b(scc, 5) & 0x02) != state->m_scc_prev)
 		{
 			if(scc8530_get_reg_b(scc, 5) & 0x02)  // Request to Send
 			{
 				int val = scc8530_get_reg_b(scc, 0);
-				state->mouse.bufferempty = 0;
+				state->m_mouse.bufferempty = 0;
 				val |= 0x01;
 				scc8530_set_reg_b(scc, 0,val);
 			}
@@ -629,17 +629,17 @@ static WRITE16_HANDLER( x68k_scc_w )
 		scc8530_w(scc, 3,(UINT8)data);
 		break;
 	}
-	state->scc_prev = scc8530_get_reg_b(scc, 5) & 0x02;
+	state->m_scc_prev = scc8530_get_reg_b(scc, 5) & 0x02;
 }
 
 static TIMER_CALLBACK(x68k_scc_ack)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	device_t *scc = machine.device("scc");
-	if(state->mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
+	if(state->m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
-//  if((state->ioc.irqstatus & 0xc0) != 0)
+//  if((state->m_ioc.irqstatus & 0xc0) != 0)
 //      return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
@@ -649,9 +649,9 @@ static TIMER_CALLBACK(x68k_scc_ack)
 		{
 			if(scc8530_get_reg_b(scc, 5) & 0x02)  // RTS signal
 			{
-				state->mouse.irqactive = 1;
-				state->current_vector[5] = 0x54;
-				state->current_irq_line = 5;
+				state->m_mouse.irqactive = 1;
+				state->m_current_vector[5] = 0x54;
+				state->m_current_irq_line = 5;
 				cputag_set_input_line_and_vector(machine, "maincpu",5,ASSERT_LINE,0x54);
 			}
 		}
@@ -664,7 +664,7 @@ static void x68k_set_adpcm(running_machine &machine)
 	device_t *dev = machine.device("hd63450");
 	UINT32 rate = 0;
 
-	switch(state->adpcm.rate & 0x0c)
+	switch(state->m_adpcm.rate & 0x0c)
 	{
 		case 0x00:
 			rate = 7812/2;
@@ -679,7 +679,7 @@ static void x68k_set_adpcm(running_machine &machine)
 			logerror("PPI: Invalid ADPCM sample rate set.\n");
 			rate = 15625/2;
 	}
-	if(state->adpcm.clock != 0)
+	if(state->m_adpcm.clock != 0)
 		rate = rate/2;
 	hd63450_set_timer(dev,3,attotime::from_hz(rate));
 }
@@ -697,7 +697,7 @@ static UINT8 md_3button_r(device_t* device, int port)
 	{
 		UINT8 porta = input_port_read(device->machine(),"md3b") & 0xff;
 		UINT8 portb = (input_port_read(device->machine(),"md3b") >> 8) & 0xff;
-		if(state->mdctrl.mux1 & 0x10)
+		if(state->m_mdctrl.mux1 & 0x10)
 		{
 			return porta | 0x90;
 		}
@@ -710,7 +710,7 @@ static UINT8 md_3button_r(device_t* device, int port)
 	{
 		UINT8 porta = (input_port_read(device->machine(),"md3b") >> 16) & 0xff;
 		UINT8 portb = (input_port_read(device->machine(),"md3b") >> 24) & 0xff;
-		if(state->mdctrl.mux2 & 0x20)
+		if(state->m_mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
 		}
@@ -726,20 +726,20 @@ static UINT8 md_3button_r(device_t* device, int port)
 static TIMER_CALLBACK(md_6button_port1_timeout)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->mdctrl.seq1 = 0;
+	state->m_mdctrl.seq1 = 0;
 }
 
 static TIMER_CALLBACK(md_6button_port2_timeout)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->mdctrl.seq2 = 0;
+	state->m_mdctrl.seq2 = 0;
 }
 
 static void md_6button_init(running_machine &machine)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->mdctrl.io_timeout1 = machine.scheduler().timer_alloc(FUNC(md_6button_port1_timeout));
-	state->mdctrl.io_timeout2 = machine.scheduler().timer_alloc(FUNC(md_6button_port2_timeout));
+	state->m_mdctrl.io_timeout1 = machine.scheduler().timer_alloc(FUNC(md_6button_port1_timeout));
+	state->m_mdctrl.io_timeout2 = machine.scheduler().timer_alloc(FUNC(md_6button_port2_timeout));
 }
 
 static UINT8 md_6button_r(device_t* device, int port)
@@ -751,11 +751,11 @@ static UINT8 md_6button_r(device_t* device, int port)
 		UINT8 portb = (input_port_read(device->machine(),"md6b") >> 8) & 0xff;
 		UINT8 extra = input_port_read(device->machine(),"md6b_extra") & 0x0f;
 
-		switch(state->mdctrl.seq1)
+		switch(state->m_mdctrl.seq1)
 		{
 			case 1:
 			default:
-				if(state->mdctrl.mux1 & 0x10)
+				if(state->m_mdctrl.mux1 & 0x10)
 				{
 					return porta | 0x90;
 				}
@@ -764,7 +764,7 @@ static UINT8 md_6button_r(device_t* device, int port)
 					return (portb & 0x60) | (porta & 0x03) | 0x90;
 				}
 			case 2:
-				if(state->mdctrl.mux1 & 0x10)
+				if(state->m_mdctrl.mux1 & 0x10)
 				{
 					return porta | 0x90;
 				}
@@ -773,7 +773,7 @@ static UINT8 md_6button_r(device_t* device, int port)
 					return (portb & 0x60) | 0x90;
 				}
 			case 3:
-				if(state->mdctrl.mux1 & 0x10)
+				if(state->m_mdctrl.mux1 & 0x10)
 				{
 					return (porta & 0x60) | (extra & 0x0f) | 0x90;
 				}
@@ -789,11 +789,11 @@ static UINT8 md_6button_r(device_t* device, int port)
 		UINT8 portb = (input_port_read(device->machine(),"md6b") >> 24) & 0xff;
 		UINT8 extra = (input_port_read(device->machine(),"md6b_extra") >> 4) & 0x0f;
 
-		switch(state->mdctrl.seq2)
+		switch(state->m_mdctrl.seq2)
 		{
 			case 1:
 			default:
-				if(state->mdctrl.mux2 & 0x20)
+				if(state->m_mdctrl.mux2 & 0x20)
 				{
 					return porta | 0x90;
 				}
@@ -802,7 +802,7 @@ static UINT8 md_6button_r(device_t* device, int port)
 					return (portb & 0x60) | (porta & 0x03) | 0x90;
 				}
 			case 2:
-				if(state->mdctrl.mux2 & 0x20)
+				if(state->m_mdctrl.mux2 & 0x20)
 				{
 					return porta | 0x90;
 				}
@@ -811,7 +811,7 @@ static UINT8 md_6button_r(device_t* device, int port)
 					return (portb & 0x60) | 0x90;
 				}
 			case 3:
-				if(state->mdctrl.mux2 & 0x20)
+				if(state->m_mdctrl.mux2 & 0x20)
 				{
 					return (porta & 0x60) | (extra & 0x0f) | 0x90;
 				}
@@ -838,7 +838,7 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 	{
 		UINT8 porta = input_port_read(device->machine(),"xpd1lr") & 0xff;
 		UINT8 portb = (input_port_read(device->machine(),"xpd1lr") >> 8) & 0xff;
-		if(state->mdctrl.mux1 & 0x10)
+		if(state->m_mdctrl.mux1 & 0x10)
 		{
 			return porta;
 		}
@@ -851,7 +851,7 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 	{
 		UINT8 porta = (input_port_read(device->machine(),"xpd1lr") >> 16) & 0xff;
 		UINT8 portb = (input_port_read(device->machine(),"xpd1lr") >> 24) & 0xff;
-		if(state->mdctrl.mux2 & 0x20)
+		if(state->m_mdctrl.mux2 & 0x20)
 		{
 			return porta;
 		}
@@ -872,7 +872,7 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
-			if(state->joy.joy1_enable == 0)
+			if(state->m_joy.joy1_enable == 0)
 				return input_port_read(device->machine(), "joy1");
 			else
 				return 0xff;
@@ -895,7 +895,7 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
-			if(state->joy.joy2_enable == 0)
+			if(state->m_joy.joy2_enable == 0)
 				return input_port_read(device->machine(), "joy2");
 			else
 				return 0xff;
@@ -913,7 +913,7 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 static READ8_DEVICE_HANDLER( ppi_port_c_r )
 {
 	x68k_state *state = device->machine().driver_data<x68k_state>();
-	return state->ppi_port[2];
+	return state->m_ppi_port[2];
 }
 
 /* PPI port C (Joystick control, R/W)
@@ -930,35 +930,35 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	// ADPCM / Joystick control
 	device_t *oki = device->machine().device("okim6258");
 
-	state->ppi_port[2] = data;
-	if((data & 0x0f) != (state->ppi_prev & 0x0f))
+	state->m_ppi_port[2] = data;
+	if((data & 0x0f) != (state->m_ppi_prev & 0x0f))
 	{
-		state->adpcm.pan = data & 0x03;
-		state->adpcm.rate = data & 0x0c;
+		state->m_adpcm.pan = data & 0x03;
+		state->m_adpcm.rate = data & 0x0c;
 		x68k_set_adpcm(device->machine());
 		okim6258_set_divider(oki, (data >> 2) & 3);
 	}
 
 	// The joystick enable bits also handle the multiplexer for various controllers
-	state->joy.joy1_enable = data & 0x10;
-	state->mdctrl.mux1 = data & 0x10;
-	if((state->ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
+	state->m_joy.joy1_enable = data & 0x10;
+	state->m_mdctrl.mux1 = data & 0x10;
+	if((state->m_ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
-		state->mdctrl.seq1++;
-		state->mdctrl.io_timeout1->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		state->m_mdctrl.seq1++;
+		state->m_mdctrl.io_timeout1->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 
-	state->joy.joy2_enable = data & 0x20;
-	state->mdctrl.mux2 = data & 0x20;
-	if((state->ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
+	state->m_joy.joy2_enable = data & 0x20;
+	state->m_mdctrl.mux2 = data & 0x20;
+	if((state->m_ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
-		state->mdctrl.seq2++;
-		state->mdctrl.io_timeout2->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		state->m_mdctrl.seq2++;
+		state->m_mdctrl.io_timeout2->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
-	state->ppi_prev = data;
+	state->m_ppi_prev = data;
 
-	state->joy.ioc6 = data & 0x40;
-	state->joy.ioc7 = data & 0x80;
+	state->m_joy.ioc6 = data & 0x40;
+	state->m_joy.ioc7 = data & 0x80;
 }
 
 
@@ -978,12 +978,12 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		x = data & 0x0f;
 		for(drive=0;drive<4;drive++)
 		{
-			if(state->fdc.selected_drive & (1 << drive))
+			if(state->m_fdc.selected_drive & (1 << drive))
 			{
 				if(!(x & (1 << drive)))  // functions take place on 1->0 transitions of drive bits only
 				{
-					state->fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
-					state->fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
+					state->m_fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
+					state->m_fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
@@ -993,12 +993,12 @@ static WRITE16_HANDLER( x68k_fdc_w )
 				}
 			}
 		}
-		state->fdc.selected_drive = data & 0x0f;
+		state->m_fdc.selected_drive = data & 0x0f;
 		logerror("FDC: signal control set to %02x\n",data);
 		break;
 	case 0x03:
-		state->fdc.media_density[data & 0x03] = data & 0x10;
-		state->fdc.motor[data & 0x03] = data & 0x80;
+		state->m_fdc.media_density[data & 0x03] = data & 0x10;
+		state->m_fdc.motor[data & 0x03] = data & 0x80;
 		floppy_mon_w(floppy_get_device(space->machine(), data & 0x03), !BIT(data, 7));
 		if(data & 0x80)
 		{
@@ -1059,10 +1059,10 @@ static READ16_HANDLER( x68k_fdc_r )
 		ret = 0x00;
 		for(x=0;x<4;x++)
 		{
-			if(state->fdc.selected_drive & (1 << x))
+			if(state->m_fdc.selected_drive & (1 << x))
 			{
 				ret = 0x00;
-				if(state->fdc.disk_inserted[x] != 0)
+				if(state->m_fdc.disk_inserted[x] != 0)
 				{
 					ret |= 0x80;
 				}
@@ -1084,13 +1084,13 @@ static READ16_HANDLER( x68k_fdc_r )
 static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
 {
 	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-	if((drvstate->ioc.irqstatus & 0x04) && state == ASSERT_LINE)
+	if((drvstate->m_ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
-		drvstate->current_vector[1] = drvstate->ioc.fdcvector;
-		drvstate->ioc.irqstatus |= 0x80;
-		drvstate->current_irq_line = 1;
+		drvstate->m_current_vector[1] = drvstate->m_ioc.fdcvector;
+		drvstate->m_ioc.irqstatus |= 0x80;
+		drvstate->m_current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cputag_set_input_line_and_vector(device->machine(), "maincpu", 1, ASSERT_LINE, drvstate->current_vector[1]);
+		cputag_set_input_line_and_vector(device->machine(), "maincpu", 1, ASSERT_LINE, drvstate->m_current_vector[1]);
 	}
 }
 
@@ -1100,7 +1100,7 @@ static int x68k_fdc_read_byte(running_machine &machine,int addr)
 	int data = -1;
 	device_t *fdc = machine.device("upd72065");
 
-	if(state->fdc.drq_state != 0)
+	if(state->m_fdc.drq_state != 0)
 		data = upd765_dack_r(fdc, 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
@@ -1115,7 +1115,7 @@ static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 static WRITE_LINE_DEVICE_HANDLER ( fdc_drq )
 {
 	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-	drvstate->fdc.drq_state = state;
+	drvstate->m_fdc.drq_state = state;
 }
 
 static WRITE16_HANDLER( x68k_fm_w )
@@ -1147,7 +1147,7 @@ static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	upd765_ready_w(fdc,data & 0x01);
-	state->adpcm.clock = data & 0x02;
+	state->m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm(device->machine());
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
 }
@@ -1174,26 +1174,26 @@ static WRITE16_HANDLER( x68k_ioc_w )
 	switch(offset)
 	{
 	case 0x00:
-		state->ioc.irqstatus = data & 0x0f;
+		state->m_ioc.irqstatus = data & 0x0f;
 		logerror("I/O: Status register write %02x\n",data);
 		break;
 	case 0x01:
 		switch(data & 0x03)
 		{
 		case 0x00:
-			state->ioc.fdcvector = data & 0xfc;
+			state->m_ioc.fdcvector = data & 0xfc;
 			logerror("IOC: FDC IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x01:
-			state->ioc.fddvector = data & 0xfc;
+			state->m_ioc.fddvector = data & 0xfc;
 			logerror("IOC: FDD IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x02:
-			state->ioc.hdcvector = data & 0xfc;
+			state->m_ioc.hdcvector = data & 0xfc;
 			logerror("IOC: HDD IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x03:
-			state->ioc.prnvector = data & 0xfc;
+			state->m_ioc.prnvector = data & 0xfc;
 			logerror("IOC: Printer IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		}
@@ -1208,7 +1208,7 @@ static READ16_HANDLER( x68k_ioc_r )
 	{
 	case 0x00:
 		logerror("I/O: Status register read\n");
-		return (state->ioc.irqstatus & 0xdf) | 0x20;
+		return (state->m_ioc.irqstatus & 0xdf) | 0x20;
 	default:
 		return 0x00;
 	}
@@ -1240,17 +1240,17 @@ static WRITE16_HANDLER( x68k_sysport_w )
 	switch(offset)
 	{
 	case 0x00:
-		state->sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
+		state->m_sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
 		// TODO: implement a decent, not slow, brightness control
 		break;
 	case 0x01:
-		state->sysport.monitor = data & 0x08;
+		state->m_sysport.monitor = data & 0x08;
 		break;
 	case 0x03:
-		state->sysport.keyctrl = data & 0x08;  // bit 3 = enable keyboard data transmission
+		state->m_sysport.keyctrl = data & 0x08;  // bit 3 = enable keyboard data transmission
 		break;
 	case 0x06:
-		state->sysport.sram_writeprotect = data;
+		state->m_sysport.sram_writeprotect = data;
 		break;
 	default:
 //      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",cpu_get_pc(&space->device()),data,offset);
@@ -1265,14 +1265,14 @@ static READ16_HANDLER( x68k_sysport_r )
 	switch(offset)
 	{
 	case 0x00:  // monitor contrast setting (bits3-0)
-		return state->sysport.contrast;
+		return state->m_sysport.contrast;
 	case 0x01:  // monitor control (bit3) / 3D Scope (bits1,0)
-		ret |= state->sysport.monitor;
+		ret |= state->m_sysport.monitor;
 		return ret;
 	case 0x03:  // bit 3 = key control (is 1 if keyboard is connected)
 		return 0x08;
 	case 0x05:  // CPU type and speed
-		return state->sysport.cputype;
+		return state->m_sysport.cputype;
 	default:
 		logerror("Read from invalid or unimplemented system port %04x\n",offset);
 		return 0xff;
@@ -1300,55 +1300,55 @@ static READ16_HANDLER( x68k_mfp_r )
 #if 0
     case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
-        if(machine.primary_screen->vpos() == state->crtc.reg[9])
+        if(machine.primary_screen->vpos() == state->m_crtc.reg[9])
             ret |= 0x40;
-        if(state->crtc.vblank == 0)
+        if(state->m_crtc.vblank == 0)
             ret |= 0x10;  // Vsync signal (low if in vertical retrace)
-//      if(state->mfp.isrb & 0x08)
+//      if(state->m_mfp.isrb & 0x08)
 //          ret |= 0x08;  // FM IRQ signal
-        if(machine.primary_screen->hpos() > state->crtc.width - 32)
+        if(machine.primary_screen->hpos() > state->m_crtc.width - 32)
             ret |= 0x80;  // Hsync signal
 //      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(&space->device()),offset,ret);
         return ret;  // bit 5 is always 1
     case 3:
-        return state->mfp.iera;
+        return state->m_mfp.iera;
     case 4:
-        return state->mfp.ierb;
+        return state->m_mfp.ierb;
     case 5:
-        return state->mfp.ipra;
+        return state->m_mfp.ipra;
     case 6:
-        return state->mfp.iprb;
+        return state->m_mfp.iprb;
     case 7:
-        if(state->mfp.eoi_mode == 0)  // forced low in auto EOI mode
+        if(state->m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
             return 0;
         else
-            return state->mfp.isra;
+            return state->m_mfp.isra;
     case 8:
-        if(state->mfp.eoi_mode == 0)  // forced low in auto EOI mode
+        if(state->m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
             return 0;
         else
-            return state->mfp.isrb;
+            return state->m_mfp.isrb;
     case 9:
-        return state->mfp.imra;
+        return state->m_mfp.imra;
     case 10:
-        return state->mfp.imrb;
+        return state->m_mfp.imrb;
     case 15:  // TADR
-        return state->mfp.timer[0].counter;  // Timer data registers return their main counter values
+        return state->m_mfp.timer[0].counter;  // Timer data registers return their main counter values
     case 16:  // TBDR
-        return state->mfp.timer[1].counter;
+        return state->m_mfp.timer[1].counter;
     case 17:  // TCDR
-        return state->mfp.timer[2].counter;
+        return state->m_mfp.timer[2].counter;
     case 18:  // TDDR
-        return state->mfp.timer[3].counter;
+        return state->m_mfp.timer[3].counter;
 #endif
     case 21:  // RSR
-        return state->mfp.rsr;
+        return state->m_mfp.rsr;
     case 22:  // TSR
-        return state->mfp.tsr | 0x80;  // buffer is typically empty?
+        return state->m_mfp.tsr | 0x80;  // buffer is typically empty?
     case 23:
         return x68k_keyboard_pop_scancode(state);
     default:
-		if (ACCESSING_BITS_0_7) return state->m_mfp->read(*space, offset);
+		if (ACCESSING_BITS_0_7) return state->m_mfpdev->read(*space, offset);
     }
     return 0xffff;
 }
@@ -1382,104 +1382,104 @@ static WRITE16_HANDLER( x68k_mfp_w )
         // All bits are inputs generally, so no action taken.
         break;
     case 1:  // AER
-        state->mfp.aer = data;
+        state->m_mfp.aer = data;
         break;
     case 2:  // DDR
-        state->mfp.ddr = data;  // usually all bits are 0 (input)
+        state->m_mfp.ddr = data;  // usually all bits are 0 (input)
         break;
     case 3:  // IERA
-        state->mfp.iera = data;
+        state->m_mfp.iera = data;
         break;
     case 4:  // IERB
-        state->mfp.ierb = data;
+        state->m_mfp.ierb = data;
         break;
     case 5:  // IPRA
-        state->mfp.ipra = data;
+        state->m_mfp.ipra = data;
         break;
     case 6:  // IPRB
-        state->mfp.iprb = data;
+        state->m_mfp.iprb = data;
         break;
     case 7:
-        state->mfp.isra = data;
+        state->m_mfp.isra = data;
         break;
     case 8:
-        state->mfp.isrb = data;
+        state->m_mfp.isrb = data;
         break;
     case 9:
-        state->mfp.imra = data;
+        state->m_mfp.imra = data;
 //      mfp_update_irq(0);
 //      logerror("MFP: IRQ Mask A write: %02x\n",data);
         break;
     case 10:
-        state->mfp.imrb = data;
+        state->m_mfp.imrb = data;
 //      mfp_update_irq(0);
 //      logerror("MFP: IRQ Mask B write: %02x\n",data);
         break;
     case 11:  // VR
-        state->mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
-        state->mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
-        if(state->mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
+        state->m_mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
+        state->m_mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
+        if(state->m_mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
         {
-            state->mfp.isra = 0;
-            state->mfp.isrb = 0;
+            state->m_mfp.isra = 0;
+            state->m_mfp.isrb = 0;
         }
         break;
     case 12:  // TACR
-        state->mfp.tacr = data;
+        state->m_mfp.tacr = data;
         mfp_set_timer(0,data & 0x0f);
         break;
     case 13:  // TBCR
-        state->mfp.tbcr = data;
+        state->m_mfp.tbcr = data;
         mfp_set_timer(1,data & 0x0f);
         break;
     case 14:  // TCDCR
-        state->mfp.tcdcr = data;
+        state->m_mfp.tcdcr = data;
         mfp_set_timer(2,(data & 0x70)>>4);
         mfp_set_timer(3,data & 0x07);
         break;
     case 15:  // TADR
-        state->mfp.tadr = data;
-        state->mfp.timer[0].counter = data;
+        state->m_mfp.tadr = data;
+        state->m_mfp.timer[0].counter = data;
         break;
     case 16:  // TBDR
-        state->mfp.tbdr = data;
-        state->mfp.timer[1].counter = data;
+        state->m_mfp.tbdr = data;
+        state->m_mfp.timer[1].counter = data;
         break;
     case 17:  // TCDR
-        state->mfp.tcdr = data;
-        state->mfp.timer[2].counter = data;
+        state->m_mfp.tcdr = data;
+        state->m_mfp.timer[2].counter = data;
         break;
     case 18:  // TDDR
-        state->mfp.tddr = data;
-        state->mfp.timer[3].counter = data;
+        state->m_mfp.tddr = data;
+        state->m_mfp.timer[3].counter = data;
         break;
     case 20:
-        state->mfp.ucr = data;
+        state->m_mfp.ucr = data;
         break;
 #endif
 	case 21:
 		if(data & 0x01)
-			state->mfp.usart.recv_enable = 1;
+			state->m_mfp.usart.recv_enable = 1;
 		else
-			state->mfp.usart.recv_enable = 0;
+			state->m_mfp.usart.recv_enable = 0;
 		break;
 	case 22:
 		if(data & 0x01)
-			state->mfp.usart.send_enable = 1;
+			state->m_mfp.usart.send_enable = 1;
 		else
-			state->mfp.usart.send_enable = 0;
+			state->m_mfp.usart.send_enable = 0;
 		break;
 	case 23:
-		if(state->mfp.usart.send_enable != 0)
+		if(state->m_mfp.usart.send_enable != 0)
 		{
 			// Keyboard control command.
-			state->mfp.usart.send_buffer = data;
+			state->m_mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(state, data);
 //          logerror("MFP: [%08x] USART Sent data %04x\n",cpu_get_pc(&space->device()),data);
 		}
 		break;
 	default:
-		if (ACCESSING_BITS_0_7) state->m_mfp->write(*space, offset, data & 0xff);
+		if (ACCESSING_BITS_0_7) state->m_mfpdev->write(*space, offset, data & 0xff);
 		return;
 	}
 }
@@ -1508,12 +1508,12 @@ static WRITE16_DEVICE_HANDLER( x68k_rtc_w )
 static void x68k_rtc_alarm_irq(running_machine &machine, int state)
 {
 	x68k_state *drvstate = machine.driver_data<x68k_state>();
-	if(drvstate->mfp.aer & 0x01)
+	if(drvstate->m_mfp.aer & 0x01)
 	{
 		if(state == 1)
 		{
-			drvstate->mfp.gpio |= 0x01;
-			drvstate->m_mfp->i0_w(1);
+			drvstate->m_mfp.gpio |= 0x01;
+			drvstate->m_mfpdev->i0_w(1);
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 		}
 	}
@@ -1521,8 +1521,8 @@ static void x68k_rtc_alarm_irq(running_machine &machine, int state)
 	{
 		if(state == 0)
 		{
-			drvstate->mfp.gpio &= ~0x01;
-			drvstate->m_mfp->i0_w(0);
+			drvstate->m_mfp.gpio &= ~0x01;
+			drvstate->m_mfpdev->i0_w(0);
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 		}
 	}
@@ -1533,7 +1533,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 
-	if(state->sysport.sram_writeprotect == 0x31)
+	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(state->m_nvram + offset);
 	}
@@ -1577,7 +1577,7 @@ static READ32_HANDLER( x68k_sram32_r )
 static WRITE32_HANDLER( x68k_sram32_w )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
-	if(state->sysport.sram_writeprotect == 0x31)
+	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(state->m_nvram + offset);
 	}
@@ -1589,16 +1589,16 @@ static WRITE16_HANDLER( x68k_vid_w )
 	int val;
 	if(offset < 0x100)  // Graphic layer palette
 	{
-		COMBINE_DATA(state->video.gfx_pal+offset);
-		val = state->video.gfx_pal[offset];
+		COMBINE_DATA(state->m_video.gfx_pal+offset);
+		val = state->m_video.gfx_pal[offset];
 		palette_set_color_rgb(space->machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
 	if(offset >= 0x100 && offset < 0x200)  // Text / Sprites / Tilemap palette
 	{
-		COMBINE_DATA(state->video.text_pal+(offset-0x100));
-		val = state->video.text_pal[offset-0x100];
+		COMBINE_DATA(state->m_video.text_pal+(offset-0x100));
+		val = state->m_video.text_pal[offset-0x100];
 		palette_set_color_rgb(space->machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
@@ -1606,32 +1606,32 @@ static WRITE16_HANDLER( x68k_vid_w )
 	switch(offset)
 	{
 	case 0x200:
-		COMBINE_DATA(state->video.reg);
+		COMBINE_DATA(state->m_video.reg);
 		break;
 	case 0x280:  // priority levels
-		COMBINE_DATA(state->video.reg+1);
+		COMBINE_DATA(state->m_video.reg+1);
 		if(ACCESSING_BITS_0_7)
 		{
-			state->video.gfxlayer_pri[0] = data & 0x0003;
-			state->video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
-			state->video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
-			state->video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
+			state->m_video.gfxlayer_pri[0] = data & 0x0003;
+			state->m_video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
+			state->m_video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
+			state->m_video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
 		}
 		if(ACCESSING_BITS_8_15)
 		{
-			state->video.gfx_pri = (data & 0x0300) >> 8;
-			state->video.text_pri = (data & 0x0c00) >> 10;
-			state->video.sprite_pri = (data & 0x3000) >> 12;
-			if(state->video.gfx_pri == 3)
-				state->video.gfx_pri--;
-			if(state->video.text_pri == 3)
-				state->video.text_pri--;
-			if(state->video.sprite_pri == 3)
-				state->video.sprite_pri--;
+			state->m_video.gfx_pri = (data & 0x0300) >> 8;
+			state->m_video.text_pri = (data & 0x0c00) >> 10;
+			state->m_video.sprite_pri = (data & 0x3000) >> 12;
+			if(state->m_video.gfx_pri == 3)
+				state->m_video.gfx_pri--;
+			if(state->m_video.text_pri == 3)
+				state->m_video.text_pri--;
+			if(state->m_video.sprite_pri == 3)
+				state->m_video.sprite_pri--;
 		}
 		break;
 	case 0x300:
-		COMBINE_DATA(state->video.reg+2);
+		COMBINE_DATA(state->m_video.reg+2);
 		break;
 	default:
 		logerror("VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);
@@ -1642,19 +1642,19 @@ static READ16_HANDLER( x68k_vid_r )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(offset < 0x100)
-		return state->video.gfx_pal[offset];
+		return state->m_video.gfx_pal[offset];
 
 	if(offset >= 0x100 && offset < 0x200)
-		return state->video.text_pal[offset-0x100];
+		return state->m_video.text_pal[offset-0x100];
 
 	switch(offset)
 	{
 	case 0x200:
-		return state->video.reg[0];
+		return state->m_video.reg[0];
 	case 0x280:
-		return state->video.reg[1];
+		return state->m_video.reg[1];
 	case 0x300:
-		return state->video.reg[2];
+		return state->m_video.reg[2];
 	default:
 		logerror("VC: Invalid video controller read (offset = 0x%04x)\n",offset);
 	}
@@ -1724,9 +1724,9 @@ static READ16_HANDLER( x68k_rom0_r )
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
        then access causes a bus error */
-	state->current_vector[2] = 0x02;  // bus error
-	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	state->m_current_vector[2] = 0x02;  // bus error
+	state->m_current_irq_line = 2;
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
@@ -1742,9 +1742,9 @@ static WRITE16_HANDLER( x68k_rom0_w )
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
        then access causes a bus error */
-	state->current_vector[2] = 0x02;  // bus error
-	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	state->m_current_vector[2] = 0x02;  // bus error
+	state->m_current_irq_line = 2;
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
@@ -1759,9 +1759,9 @@ static READ16_HANDLER( x68k_emptyram_r )
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location is unused RAM, access here causes a bus error
        Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	state->current_vector[2] = 0x02;  // bus error
-	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	state->m_current_vector[2] = 0x02;  // bus error
+	state->m_current_irq_line = 2;
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
@@ -1777,9 +1777,9 @@ static WRITE16_HANDLER( x68k_emptyram_w )
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* this location is unused RAM, access here causes a bus error
        Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	state->current_vector[2] = 0x02;  // bus error
-	state->current_irq_line = 2;
-//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+	state->m_current_vector[2] = 0x02;  // bus error
+	state->m_current_irq_line = 2;
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	if(input_port_read(space->machine(), "options") & 0x02)
 	{
 		offset *= 2;
@@ -1795,13 +1795,13 @@ static READ16_HANDLER( x68k_exp_r )
 	/* These are expansion devices, if not present, they cause a bus error */
 	if(input_port_read(space->machine(), "options") & 0x02)
 	{
-		state->current_vector[2] = 0x02;  // bus error
-		state->current_irq_line = 2;
+		state->m_current_vector[2] = 0x02;  // bus error
+		state->m_current_irq_line = 2;
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
 		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
-//      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+//      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1812,13 +1812,13 @@ static WRITE16_HANDLER( x68k_exp_w )
 	/* These are expansion devices, if not present, they cause a bus error */
 	if(input_port_read(space->machine(), "options") & 0x02)
 	{
-		state->current_vector[2] = 0x02;  // bus error
-		state->current_irq_line = 2;
+		state->m_current_vector[2] = 0x02;  // bus error
+		state->m_current_irq_line = 2;
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
 		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
-//      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
+//      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }
 
@@ -1826,10 +1826,10 @@ static void x68k_dma_irq(running_machine &machine, int channel)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	device_t *device = machine.device("hd63450");
-	state->current_vector[3] = hd63450_get_vector(device, channel);
-	state->current_irq_line = 3;
-	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->current_vector[3]);
-	cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,state->current_vector[3]);
+	state->m_current_vector[3] = hd63450_get_vector(device, channel);
+	state->m_current_irq_line = 3;
+	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->m_current_vector[3]);
+	cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,state->m_current_vector[3]);
 }
 
 static void x68k_dma_end(running_machine &machine, int channel,int irq)
@@ -1846,9 +1846,9 @@ static void x68k_dma_error(running_machine &machine, int channel, int irq)
 	device_t *device = machine.device("hd63450");
 	if(irq != 0)
 	{
-		state->current_vector[3] = hd63450_get_error_vector(device,channel);
-		state->current_irq_line = 3;
-		cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,state->current_vector[3]);
+		state->m_current_vector[3] = hd63450_get_error_vector(device,channel);
+		state->m_current_irq_line = 3;
+		cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,state->m_current_vector[3]);
 	}
 }
 
@@ -1857,25 +1857,25 @@ static void x68k_fm_irq(device_t *device, int irq)
 	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(irq == CLEAR_LINE)
 	{
-		state->mfp.gpio |= 0x08;
-		state->m_mfp->i3_w(1);
+		state->m_mfp.gpio |= 0x08;
+		state->m_mfpdev->i3_w(1);
 	}
 	else
 	{
-		state->mfp.gpio &= ~0x08;
-		state->m_mfp->i3_w(0);
+		state->m_mfp.gpio &= ~0x08;
+		state->m_mfpdev->i3_w(0);
 	}
 }
 
 READ8_MEMBER( x68k_state::mfp_gpio_r )
 {
-	UINT8 data = mfp.gpio;
+	UINT8 data = m_mfp.gpio;
 
-	data &= ~(crtc.hblank << 7);
-	data &= ~(crtc.vblank << 4);
+	data &= ~(m_crtc.hblank << 7);
+	data &= ~(m_crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
 
-//  m_mfp->tai_w(state->crtc.vblank);
+//  m_mfpdev->tai_w(state->m_crtc.vblank);
 
 	return data;
 }
@@ -1896,33 +1896,33 @@ static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
 static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 {
 	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-	if(drvstate->mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
+	if(drvstate->m_mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
 	if(state != CLEAR_LINE)
 		state = HOLD_LINE;  // to get around erroneous spurious interrupt
-//  if((state->ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+//  if((state->m_ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //      return;
 	cputag_set_input_line(device->machine(), "maincpu", 6, state);
-	drvstate->current_vector[6] = 0;
-	drvstate->mfp_prev = state;
+	drvstate->m_current_vector[6] = 0;
+	drvstate->m_mfp_prev = state;
 }
 
 static INTERRUPT_GEN( x68k_vsync_irq )
 {
 #if 0
 	x68k_state *state = machine.driver_data<x68k_state>();
-	if(state->mfp.ierb & 0x40)
+	if(state->m_mfp.ierb & 0x40)
 	{
-		state->mfp.isrb |= 0x40;
-		state->current_vector[6] = (state->mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
-		state->current_irq_line = 6;
+		state->m_mfp.isrb |= 0x40;
+		state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
+		state->m_current_irq_line = 6;
 		mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
 		mfp_trigger_irq(MFP_IRQ_GPIP4);
 	}
-	if(state->crtc.height == 256)
-		machine.primary_screen->update_partial(256);//state->crtc.reg[4]/2);
+	if(state->m_crtc.height == 256)
+		machine.primary_screen->update_partial(256);//state->m_crtc.reg[4]/2);
 	else
-		machine.primary_screen->update_partial(512);//state->crtc.reg[4]);
+		machine.primary_screen->update_partial(512);//state->m_crtc.reg[4]);
 #endif
 }
 
@@ -1932,27 +1932,27 @@ static IRQ_CALLBACK(x68k_int_ack)
 
 	if(irqline == 6)  // MFP
 	{
-		state->mfp.current_irq = -1;
-		if(state->current_vector[6] != 0x4b && state->current_vector[6] != 0x4c)
-			state->current_vector[6] = state->m_mfp->get_vector();
+		state->m_mfp.current_irq = -1;
+		if(state->m_current_vector[6] != 0x4b && state->m_current_vector[6] != 0x4c)
+			state->m_current_vector[6] = state->m_mfpdev->get_vector();
 		else
-			cputag_set_input_line_and_vector(device->machine(), "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
-		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->current_vector[6],irqline);
-		return state->current_vector[6];
+			cputag_set_input_line_and_vector(device->machine(), "maincpu",irqline,CLEAR_LINE,state->m_current_vector[irqline]);
+		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->m_current_vector[6],irqline);
+		return state->m_current_vector[6];
 	}
 
-	cputag_set_input_line_and_vector(device->machine(), "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu",irqline,CLEAR_LINE,state->m_current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
-		state->ioc.irqstatus &= ~0xf0;
+		state->m_ioc.irqstatus &= ~0xf0;
 	}
 	if(irqline == 5)  // SCC
 	{
-		state->mouse.irqactive = 0;
+		state->m_mouse.irqactive = 0;
 	}
 
-	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->current_vector[irqline],irqline);
-	return state->current_vector[irqline];
+	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->m_current_vector[irqline],irqline);
+	return state->m_current_vector[irqline];
 }
 
 static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_irq )
@@ -1968,8 +1968,8 @@ static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
 static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, tvram)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, m_tvram)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
@@ -2005,8 +2005,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, tvram)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, m_tvram)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
@@ -2043,8 +2043,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, tvram)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, m_tvram)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
@@ -2079,8 +2079,8 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER( x68k_state::mfp_tdo_w )
 {
-	m_mfp->tc_w(state);
-	m_mfp->rc_w(state);
+	m_mfpdev->tc_w(state);
+	m_mfpdev->rc_w(state);
 }
 
 static MC68901_INTERFACE( mfp_interface )
@@ -2461,28 +2461,28 @@ INPUT_PORTS_END
 static void x68k_load_proc(device_image_interface &image)
 {
 	x68k_state *state = image.device().machine().driver_data<x68k_state>();
-	if(state->ioc.irqstatus & 0x02)
+	if(state->m_ioc.irqstatus & 0x02)
 	{
-		state->current_vector[1] = 0x61;
-		state->ioc.irqstatus |= 0x40;
-		state->current_irq_line = 1;
-		cputag_set_input_line_and_vector(image.device().machine(), "maincpu",1,ASSERT_LINE,state->current_vector[1]);  // Disk insert/eject interrupt
+		state->m_current_vector[1] = 0x61;
+		state->m_ioc.irqstatus |= 0x40;
+		state->m_current_irq_line = 1;
+		cputag_set_input_line_and_vector(image.device().machine(), "maincpu",1,ASSERT_LINE,state->m_current_vector[1]);  // Disk insert/eject interrupt
 		logerror("IOC: Disk image inserted\n");
 	}
-	state->fdc.disk_inserted[floppy_get_drive(&image.device())] = 1;
+	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 1;
 }
 
 static void x68k_unload_proc(device_image_interface &image)
 {
 	x68k_state *state = image.device().machine().driver_data<x68k_state>();
-	if(state->ioc.irqstatus & 0x02)
+	if(state->m_ioc.irqstatus & 0x02)
 	{
-		state->current_vector[1] = 0x61;
-		state->ioc.irqstatus |= 0x40;
-		state->current_irq_line = 1;
-		cputag_set_input_line_and_vector(image.device().machine(), "maincpu",1,ASSERT_LINE,state->current_vector[1]);  // Disk insert/eject interrupt
+		state->m_current_vector[1] = 0x61;
+		state->m_ioc.irqstatus |= 0x40;
+		state->m_current_irq_line = 1;
+		cputag_set_input_line_and_vector(image.device().machine(), "maincpu",1,ASSERT_LINE,state->m_current_vector[1]);  // Disk insert/eject interrupt
 	}
-	state->fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
+	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
 
 static FLOPPY_OPTIONS_START( x68k )
@@ -2544,43 +2544,43 @@ static MACHINE_RESET( x68000 )
 	memcpy(ram_get_ptr(machine.device(RAM_TAG)),romdata,8);
 
 	// init keyboard
-	state->keyboard.delay = 500;  // 3*100+200
-	state->keyboard.repeat = 110;  // 4^2*5+30
+	state->m_keyboard.delay = 500;  // 3*100+200
+	state->m_keyboard.repeat = 110;  // 4^2*5+30
 
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
 		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine, drive));
 		if(image->exists())
-			state->fdc.disk_inserted[drive] = 1;
+			state->m_fdc.disk_inserted[drive] = 1;
 		else
-			state->fdc.disk_inserted[drive] = 0;
+			state->m_fdc.disk_inserted[drive] = 0;
 	}
 
 	// initialise CRTC, set registers to defaults for the standard text mode (768x512)
-	state->crtc.reg[0] = 137;  // Horizontal total  (in characters)
-	state->crtc.reg[1] = 14;   // Horizontal sync end
-	state->crtc.reg[2] = 28;   // Horizontal start
-	state->crtc.reg[3] = 124;  // Horizontal end
-	state->crtc.reg[4] = 567;  // Vertical total
-	state->crtc.reg[5] = 5;    // Vertical sync end
-	state->crtc.reg[6] = 40;   // Vertical start
-	state->crtc.reg[7] = 552;  // Vertical end
-	state->crtc.reg[8] = 27;   // Horizontal adjust
+	state->m_crtc.reg[0] = 137;  // Horizontal total  (in characters)
+	state->m_crtc.reg[1] = 14;   // Horizontal sync end
+	state->m_crtc.reg[2] = 28;   // Horizontal start
+	state->m_crtc.reg[3] = 124;  // Horizontal end
+	state->m_crtc.reg[4] = 567;  // Vertical total
+	state->m_crtc.reg[5] = 5;    // Vertical sync end
+	state->m_crtc.reg[6] = 40;   // Vertical start
+	state->m_crtc.reg[7] = 552;  // Vertical end
+	state->m_crtc.reg[8] = 27;   // Horizontal adjust
 
 	mfp_init(machine);
 
-	state->scanline = machine.primary_screen->vpos();// = state->crtc.reg[6];  // Vertical start
+	state->m_scanline = machine.primary_screen->vpos();// = state->m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
-	state->crtc.vblank = 1;
-	irq_time = machine.primary_screen->time_until_pos(state->crtc.reg[6],2);
-	state->vblank_irq->adjust(irq_time);
+	state->m_crtc.vblank = 1;
+	irq_time = machine.primary_screen->time_until_pos(state->m_crtc.reg[6],2);
+	state->m_vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
-	state->scanline_timer->adjust(machine.primary_screen->scan_period(), 1);
+	state->m_scanline_timer->adjust(machine.primary_screen->scan_period(), 1);
 
-	state->mfp.gpio = 0xfb;
+	state->m_mfp.gpio = 0xfb;
 
 	// reset output values
 	output_set_value("key_led_kana",1);
@@ -2608,30 +2608,30 @@ static MACHINE_START( x68000 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->spriteram = (UINT16*)machine.region("user1")->base();
+	state->m_spriteram = (UINT16*)machine.region("user1")->base();
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read16_space_func)x68k_emptyram_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write16_space_func)x68k_emptyram_w));
 	space->install_readwrite_bank(0x000000,ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine.device(RAM_TAG)));
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
-	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
-	memory_set_bankptr(machine, "bank3",state->tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_set_bankptr(machine, "bank3",state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	state->kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
+	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	state->mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
-	state->mouse.inputtype = 0;
+	state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
+	state->m_mouse.inputtype = 0;
 
 	// start LED timer
-	state->led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
+	state->m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
 static MACHINE_START( x68030 )
@@ -2639,7 +2639,7 @@ static MACHINE_START( x68030 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->spriteram = (UINT16*)machine.region("user1")->base();
+	state->m_spriteram = (UINT16*)machine.region("user1")->base();
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read32_space_func)x68k_rom0_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write32_space_func)x68k_rom0_w));
 	space->install_readwrite_bank(0x000000,ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank1");
@@ -2649,23 +2649,23 @@ static MACHINE_START( x68030 )
 	memory_set_bankptr(machine, "bank5",ram_get_ptr(machine.device(RAM_TAG)));
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
-	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
-	memory_set_bankptr(machine, "bank3",state->tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_set_bankptr(machine, "bank3",state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	state->kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
+	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	state->mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
-	state->mouse.inputtype = 0;
+	state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
+	state->m_mouse.inputtype = 0;
 
 	// start LED timer
-	state->led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
+	state->m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
 static DRIVER_INIT( x68000 )
@@ -2673,16 +2673,16 @@ static DRIVER_INIT( x68000 )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	unsigned char* rom = machine.region("maincpu")->base();
 	unsigned char* user2 = machine.region("user2")->base();
-	state->gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-	state->tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-	state->sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
+	state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+	state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+	state->m_sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
 
-	state->spritereg = auto_alloc_array_clear(machine, UINT16, 0x8000/sizeof(UINT16));
+	state->m_spritereg = auto_alloc_array_clear(machine, UINT16, 0x8000/sizeof(UINT16));
 
 #ifdef USE_PREDEFINED_SRAM
 	{
 		unsigned char* ramptr = machine.region("user3")->base();
-		memcpy(state->sram,ramptr,0x4000);
+		memcpy(state->m_sram,ramptr,0x4000);
 	}
 #endif
 
@@ -2694,33 +2694,33 @@ static DRIVER_INIT( x68000 )
 	device_set_irq_callback(machine.device("maincpu"), x68k_int_ack);
 
 	// init keyboard
-	state->keyboard.delay = 500;  // 3*100+200
-	state->keyboard.repeat = 110;  // 4^2*5+30
-	state->kb_timer = machine.scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
-	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(x68k_hsync));
-	state->raster_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
-	state->vblank_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
-	state->mouse_timer = machine.scheduler().timer_alloc(FUNC(x68k_scc_ack));
-	state->led_timer = machine.scheduler().timer_alloc(FUNC(x68k_led_callback));
+	state->m_keyboard.delay = 500;  // 3*100+200
+	state->m_keyboard.repeat = 110;  // 4^2*5+30
+	state->m_kb_timer = machine.scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
+	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(x68k_hsync));
+	state->m_raster_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
+	state->m_vblank_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
+	state->m_mouse_timer = machine.scheduler().timer_alloc(FUNC(x68k_scc_ack));
+	state->m_led_timer = machine.scheduler().timer_alloc(FUNC(x68k_led_callback));
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);
 
-	state->sysport.cputype = 0xff;  // 68000, 10MHz
+	state->m_sysport.cputype = 0xff;  // 68000, 10MHz
 }
 
 static DRIVER_INIT( x68kxvi )
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
-	state->sysport.cputype = 0xfe; // 68000, 16MHz
+	state->m_sysport.cputype = 0xfe; // 68000, 16MHz
 }
 
 static DRIVER_INIT( x68030 )
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
-	state->sysport.cputype = 0xdc; // 68030, 25MHz
+	state->m_sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
 static MACHINE_CONFIG_START( x68000_base, x68k_state )

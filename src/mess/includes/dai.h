@@ -19,13 +19,13 @@ public:
 	dai_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 paddle_select;
-	UINT8 paddle_enable;
-	UINT8 cassette_motor[2];
-	device_t *sound;
-	device_t *tms5501;
-	UINT8 keyboard_scan_mask;
-	unsigned short _4_colours_palette[4];
+	UINT8 m_paddle_select;
+	UINT8 m_paddle_enable;
+	UINT8 m_cassette_motor[2];
+	device_t *m_sound;
+	device_t *m_tms5501;
+	UINT8 m_keyboard_scan_mask;
+	unsigned short m_4_colours_palette[4];
 };
 
 

@@ -16,18 +16,18 @@ public:
 	special_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *specimx_colorram;
-	UINT8 erik_color_1;
-	UINT8 erik_color_2;
-	UINT8 erik_background;
-	UINT8 *specialist_video_ram;
-	UINT8 specimx_color;
-	device_t *specimx_audio;
-	int specialist_8255_porta;
-	int specialist_8255_portb;
-	int specialist_8255_portc;
-	UINT8 RR_register;
-	UINT8 RC_register;
+	UINT8 *m_specimx_colorram;
+	UINT8 m_erik_color_1;
+	UINT8 m_erik_color_2;
+	UINT8 m_erik_background;
+	UINT8 *m_specialist_video_ram;
+	UINT8 m_specimx_color;
+	device_t *m_specimx_audio;
+	int m_specialist_8255_porta;
+	int m_specialist_8255_portb;
+	int m_specialist_8255_portc;
+	UINT8 m_RR_register;
+	UINT8 m_RC_register;
 };
 
 

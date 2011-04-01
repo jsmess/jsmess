@@ -25,22 +25,22 @@ public:
 	microtan_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 chunky_graphics;
-	UINT8 *chunky_buffer;
-	UINT8 keypad_column;
-	UINT8 keyboard_ascii;
-	emu_timer *timer;
-	int via_0_irq_line;
-	int via_1_irq_line;
-	int kbd_irq_line;
-	UINT8 keyrows[10];
-	int lastrow;
-	int mask;
-	int key;
-	int repeat;
-	int repeater;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	UINT8 m_chunky_graphics;
+	UINT8 *m_chunky_buffer;
+	UINT8 m_keypad_column;
+	UINT8 m_keyboard_ascii;
+	emu_timer *m_timer;
+	int m_via_0_irq_line;
+	int m_via_1_irq_line;
+	int m_kbd_irq_line;
+	UINT8 m_keyrows[10];
+	int m_lastrow;
+	int m_mask;
+	int m_key;
+	int m_repeat;
+	int m_repeater;
+	tilemap_t *m_bg_tilemap;
 };
 
 

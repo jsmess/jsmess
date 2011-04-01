@@ -162,7 +162,7 @@ There don't seem to be any JV1 boot disks for Model III/4.
 static ADDRESS_MAP_START( trs80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_MEMBER(trs80_state, videoram)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_MEMBER(trs80_state, m_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_MEMBER(trs80_state, videoram)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_MEMBER(trs80_state, m_videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -825,40 +825,40 @@ ROM_END
 static DRIVER_INIT( trs80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->mode = 0;
-	state->model4 = 0;
+	state->m_mode = 0;
+	state->m_model4 = 0;
 }
 
 static DRIVER_INIT( trs80l2 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->mode = 2;
-	state->model4 = 0;
+	state->m_mode = 2;
+	state->m_model4 = 0;
 }
 
 static DRIVER_INIT( trs80m4 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->mode = 0;
-	state->model4 = 2;
-	state->videoram = machine.region("maincpu")->base()+0x4000;
+	state->m_mode = 0;
+	state->m_model4 = 2;
+	state->m_videoram = machine.region("maincpu")->base()+0x4000;
 }
 
 static DRIVER_INIT( trs80m4p )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->mode = 0;
-	state->model4 = 4;
-	state->videoram = machine.region("maincpu")->base()+0x4000;
+	state->m_mode = 0;
+	state->m_model4 = 4;
+	state->m_videoram = machine.region("maincpu")->base()+0x4000;
 }
 
 static DRIVER_INIT( lnw80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->mode = 0;
-	state->model4 = 0;
-	state->gfxram = machine.region("gfx2")->base();
-	state->videoram = machine.region("gfx2")->base()+0x4000;
+	state->m_mode = 0;
+	state->m_model4 = 0;
+	state->m_gfxram = machine.region("gfx2")->base();
+	state->m_videoram = machine.region("gfx2")->base()+0x4000;
 }
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT  COMPANY  FULLNAME */

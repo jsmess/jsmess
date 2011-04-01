@@ -27,28 +27,28 @@ public:
 	pasopia_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 vram_sel;
-	UINT8 mio_sel;
-	UINT8 *p7_pal;
-	UINT8 bank_reg;
-	UINT16 cursor_addr;
-	UINT8 cursor_blink;
-	UINT8 cursor_raster;
-	UINT8 plane_reg;
-	UINT8 attr_data;
-	UINT8 attr_wrap;
-	UINT8 attr_latch;
-	UINT8 pal_sel;
-	UINT8 x_width;
-	UINT8 gfx_mode;
-	UINT8 nmi_mask;
-	UINT8 nmi_enable_reg;
-	UINT8 nmi_trap;
-	UINT8 nmi_reset;
-	UINT16 pac2_index[2];
-	UINT32 kanji_index;
-	UINT8 pac2_bank_select;
-	int addr_latch;
+	UINT8 m_vram_sel;
+	UINT8 m_mio_sel;
+	UINT8 *m_p7_pal;
+	UINT8 m_bank_reg;
+	UINT16 m_cursor_addr;
+	UINT8 m_cursor_blink;
+	UINT8 m_cursor_raster;
+	UINT8 m_plane_reg;
+	UINT8 m_attr_data;
+	UINT8 m_attr_wrap;
+	UINT8 m_attr_latch;
+	UINT8 m_pal_sel;
+	UINT8 m_x_width;
+	UINT8 m_gfx_mode;
+	UINT8 m_nmi_mask;
+	UINT8 m_nmi_enable_reg;
+	UINT8 m_nmi_trap;
+	UINT8 m_nmi_reset;
+	UINT16 m_pac2_index[2];
+	UINT32 m_kanji_index;
+	UINT8 m_pac2_bank_select;
+	int m_addr_latch;
 };
 
 
@@ -59,7 +59,7 @@ public:
 static VIDEO_START( paso7 )
 {
 	pasopia_state *state = machine.driver_data<pasopia_state>();
-	state->p7_pal = auto_alloc_array(machine, UINT8, 0x10);
+	state->m_p7_pal = auto_alloc_array(machine, UINT8, 0x10);
 }
 
 #define keyb_press(_val_,_charset_) \
@@ -198,12 +198,12 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],tile,color & 7,0,0,x*8,y*8,0);
 
 			// draw cursor
-			if(state->cursor_addr*8 == count)
+			if(state->m_cursor_addr*8 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->cursor_raster & 0x60)
+				switch(state->m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -213,7 +213,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
@@ -278,12 +278,12 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 			}
 
 			// draw cursor
-			if(state->cursor_addr*8 == count)
+			if(state->m_cursor_addr*8 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->cursor_raster & 0x60)
+				switch(state->m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -293,7 +293,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
@@ -317,9 +317,9 @@ static SCREEN_UPDATE( paso7 )
 
 	fake_keyboard_data(screen->machine());
 
-	width = state->x_width ? 80 : 40;
+	width = state->m_x_width ? 80 : 40;
 
-	if(state->gfx_mode)
+	if(state->m_gfx_mode)
 		draw_mixed_screen(screen->machine(),bitmap,cliprect,width);
 	else
 	{
@@ -336,26 +336,26 @@ static READ8_HANDLER( vram_r )
 	UINT8 *vram = space->machine().region("vram")->base();
 	UINT8 res;
 
-	if(state->vram_sel == 0)
+	if(state->m_vram_sel == 0)
 	{
 		UINT8 *work_ram = space->machine().region("maincpu")->base();
 
 		return work_ram[offset+0x8000];
 	}
 
-	if(state->pal_sel && (state->plane_reg & 0x70) == 0x00)
-		return state->p7_pal[offset & 0xf];
+	if(state->m_pal_sel && (state->m_plane_reg & 0x70) == 0x00)
+		return state->m_p7_pal[offset & 0xf];
 
 	res = 0xff;
 
-	if((state->plane_reg & 0x11) == 0x11)
+	if((state->m_plane_reg & 0x11) == 0x11)
 		res &= vram[offset | 0x0000];
-	if((state->plane_reg & 0x22) == 0x22)
+	if((state->m_plane_reg & 0x22) == 0x22)
 		res &= vram[offset | 0x4000];
-	if((state->plane_reg & 0x44) == 0x44)
+	if((state->m_plane_reg & 0x44) == 0x44)
 	{
 		res &= vram[offset | 0x8000];
-		state->attr_latch = vram[offset | 0xc000] & 0x87;
+		state->m_attr_latch = vram[offset | 0xc000] & 0x87;
 	}
 
 	return res;
@@ -366,23 +366,23 @@ static WRITE8_HANDLER( vram_w )
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
 	UINT8 *vram = space->machine().region("vram")->base();
 
-	if(state->vram_sel)
+	if(state->m_vram_sel)
 	{
-		if(state->pal_sel && (state->plane_reg & 0x70) == 0x00)
+		if(state->m_pal_sel && (state->m_plane_reg & 0x70) == 0x00)
 		{
-			state->p7_pal[offset & 0xf] = data & 0xf;
+			state->m_p7_pal[offset & 0xf] = data & 0xf;
 			return;
 		}
 
-		if(state->plane_reg & 0x10)
-			vram[(offset & 0x3fff) | 0x0000] = (state->plane_reg & 1) ? data : 0xff;
-		if(state->plane_reg & 0x20)
-			vram[(offset & 0x3fff) | 0x4000] = (state->plane_reg & 2) ? data : 0xff;
-		if(state->plane_reg & 0x40)
+		if(state->m_plane_reg & 0x10)
+			vram[(offset & 0x3fff) | 0x0000] = (state->m_plane_reg & 1) ? data : 0xff;
+		if(state->m_plane_reg & 0x20)
+			vram[(offset & 0x3fff) | 0x4000] = (state->m_plane_reg & 2) ? data : 0xff;
+		if(state->m_plane_reg & 0x40)
 		{
-			vram[(offset & 0x3fff) | 0x8000] = (state->plane_reg & 4) ? data : 0xff;
-			state->attr_latch = state->attr_wrap ? state->attr_latch : state->attr_data;
-			vram[(offset & 0x3fff) | 0xc000] = state->attr_latch;
+			vram[(offset & 0x3fff) | 0x8000] = (state->m_plane_reg & 4) ? data : 0xff;
+			state->m_attr_latch = state->m_attr_wrap ? state->m_attr_latch : state->m_attr_data;
+			vram[(offset & 0x3fff) | 0xc000] = state->m_attr_latch;
 		}
 	}
 	else
@@ -416,13 +416,13 @@ static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 			break;
 	}
 
-	state->bank_reg = data & 3;
-	state->vram_sel = data & 4;
-	state->mio_sel = data & 8;
+	state->m_bank_reg = data & 3;
+	state->m_vram_sel = data & 4;
+	state->m_mio_sel = data & 8;
 
 	// bank4 is always RAM
 
-//  printf("%02x\n",state->vram_sel);
+//  printf("%02x\n",state->m_vram_sel);
 }
 
 #if 0
@@ -445,29 +445,29 @@ static WRITE8_HANDLER( pac2_w )
     anything else is nop
     */
 
-	if(state->pac2_bank_select == 3 || state->pac2_bank_select == 4)
+	if(state->m_pac2_bank_select == 3 || state->m_pac2_bank_select == 4)
 	{
 		switch(offset)
 		{
-			case 0:	state->pac2_index[(state->pac2_bank_select-3) & 1] = (state->pac2_index[(state->pac2_bank_select-3) & 1] & 0x7f00) | (data & 0xff); break;
-			case 1: state->pac2_index[(state->pac2_bank_select-3) & 1] = (state->pac2_index[(state->pac2_bank_select-3) & 1] & 0xff) | ((data & 0x7f) << 8); break;
+			case 0:	state->m_pac2_index[(state->m_pac2_bank_select-3) & 1] = (state->m_pac2_index[(state->m_pac2_bank_select-3) & 1] & 0x7f00) | (data & 0xff); break;
+			case 1: state->m_pac2_index[(state->m_pac2_bank_select-3) & 1] = (state->m_pac2_index[(state->m_pac2_bank_select-3) & 1] & 0xff) | ((data & 0x7f) << 8); break;
 			case 2: // PAC2 RAM write
 			{
 				UINT8 *pac2_ram;
 
-				pac2_ram = space->machine().region(((state->pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
+				pac2_ram = space->machine().region(((state->m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
-				pac2_ram[state->pac2_index[(state->pac2_bank_select-3) & 1]] = data;
+				pac2_ram[state->m_pac2_index[(state->m_pac2_bank_select-3) & 1]] = data;
 			}
 		}
 	}
-	else if(state->pac2_bank_select == 2) // kanji ROM
+	else if(state->m_pac2_bank_select == 2) // kanji ROM
 	{
 		switch(offset)
 		{
-			case 0: state->kanji_index = (state->kanji_index & 0x1ff00) | ((data & 0xff) << 0); break;
-			case 1: state->kanji_index = (state->kanji_index & 0x100ff) | ((data & 0xff) << 8); break;
-			case 2: state->kanji_index = (state->kanji_index & 0x0ffff) | ((data & 0x01) << 16); break;
+			case 0: state->m_kanji_index = (state->m_kanji_index & 0x1ff00) | ((data & 0xff) << 0); break;
+			case 1: state->m_kanji_index = (state->m_kanji_index & 0x100ff) | ((data & 0xff) << 8); break;
+			case 2: state->m_kanji_index = (state->m_kanji_index & 0x0ffff) | ((data & 0x01) << 16); break;
 		}
 	}
 
@@ -478,7 +478,7 @@ static WRITE8_HANDLER( pac2_w )
 			// ...
 		}
 		else
-			state->pac2_bank_select = data & 7;
+			state->m_pac2_bank_select = data & 7;
 	}
 }
 
@@ -487,23 +487,23 @@ static READ8_HANDLER( pac2_r )
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
 	if(offset == 2)
 	{
-		if(state->pac2_bank_select == 3 || state->pac2_bank_select == 4)
+		if(state->m_pac2_bank_select == 3 || state->m_pac2_bank_select == 4)
 		{
 			UINT8 *pac2_ram;
 
-			pac2_ram = space->machine().region(((state->pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
+			pac2_ram = space->machine().region(((state->m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
-			return pac2_ram[state->pac2_index[(state->pac2_bank_select-3) & 1]];
+			return pac2_ram[state->m_pac2_index[(state->m_pac2_bank_select-3) & 1]];
 		}
-		else if(state->pac2_bank_select == 2)
+		else if(state->m_pac2_bank_select == 2)
 		{
 			UINT8 *kanji_rom = space->machine().region("kanji")->base();
 
-			return kanji_rom[state->kanji_index];
+			return kanji_rom[state->m_kanji_index];
 		}
 		else
 		{
-			printf("%02x\n",state->pac2_bank_select);
+			printf("%02x\n",state->m_pac2_bank_select);
 		}
 	}
 
@@ -523,34 +523,34 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
 	if(offset == 0)
 	{
-		state->addr_latch = data;
+		state->m_addr_latch = data;
 		mc6845_address_w(space->machine().device("crtc"), 0,data);
 	}
 	else
 	{
 		/* FIXME: this should be inside the MC6845 core! */
-		if(state->addr_latch == 0x0a)
-			state->cursor_raster = data;
-		if(state->addr_latch == 0x0e)
-			state->cursor_addr = ((data<<8) & 0x3f00) | (state->cursor_addr & 0xff);
-		else if(state->addr_latch == 0x0f)
-			state->cursor_addr = (state->cursor_addr & 0x3f00) | (data & 0xff);
+		if(state->m_addr_latch == 0x0a)
+			state->m_cursor_raster = data;
+		if(state->m_addr_latch == 0x0e)
+			state->m_cursor_addr = ((data<<8) & 0x3f00) | (state->m_cursor_addr & 0xff);
+		else if(state->m_addr_latch == 0x0f)
+			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
 
 		mc6845_register_w(space->machine().device("crtc"), 0,data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
-		mc6845_set_clock(space->machine().device("crtc"), (state->x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
+		mc6845_set_clock(space->machine().device("crtc"), (state->m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
 	}
 }
 
 static void pasopia_nmi_trap(running_machine &machine)
 {
 	pasopia_state *state = machine.driver_data<pasopia_state>();
-	if(state->nmi_enable_reg)
+	if(state->m_nmi_enable_reg)
 	{
-		state->nmi_trap |= 2;
+		state->m_nmi_trap |= 2;
 
-		if(state->nmi_mask == 0)
+		if(state->m_nmi_mask == 0)
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
@@ -589,11 +589,11 @@ static READ8_HANDLER( pasopia7_io_r )
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
 	UINT16 io_port;
 
-	if(state->mio_sel)
+	if(state->m_mio_sel)
 	{
 		address_space *ram_space = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		state->mio_sel = 0;
+		state->m_mio_sel = 0;
 		//printf("%08x\n",offset);
 		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
 		return ram_space->read_byte(offset);
@@ -633,10 +633,10 @@ static WRITE8_HANDLER( pasopia7_io_w )
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
 	UINT16 io_port;
 
-	if(state->mio_sel)
+	if(state->m_mio_sel)
 	{
 		address_space *ram_space = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-		state->mio_sel = 0;
+		state->m_mio_sel = 0;
 		ram_space->write_byte(offset, data);
 		return;
 	}
@@ -784,7 +784,7 @@ static READ8_DEVICE_HANDLER( crtc_portb_r )
 	UINT8 vdisp = (device->machine().primary_screen->vpos() < (lcd_bit ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
 	UINT8 vsync = vdisp ? 0x00 : 0x20;
 
-	return 0x40 | (state->attr_latch & 0x87) | vsync | vdisp | (lcd_bit << 4);
+	return 0x40 | (state->m_attr_latch & 0x87) | vsync | vdisp | (lcd_bit << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( screen_mode_w )
@@ -793,10 +793,10 @@ static WRITE8_DEVICE_HANDLER( screen_mode_w )
 	if(data & 0x5f)
 		printf("GFX MODE %02x\n",data);
 
-	state->x_width = data & 0x20;
-	state->gfx_mode = data & 0x80;
+	state->m_x_width = data & 0x20;
+	state->m_gfx_mode = data & 0x80;
 
-//  printf("%02x\n",state->gfx_mode);
+//  printf("%02x\n",state->m_gfx_mode);
 }
 
 static WRITE8_DEVICE_HANDLER( plane_reg_w )
@@ -804,14 +804,14 @@ static WRITE8_DEVICE_HANDLER( plane_reg_w )
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	//if(data & 0x11)
 	//printf("PLANE %02x\n",data);
-	state->plane_reg = data;
+	state->m_plane_reg = data;
 }
 
 static WRITE8_DEVICE_HANDLER( video_attr_w )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	//printf("VIDEO ATTR %02x | TEXT_PAGE %02x\n",data & 0xf,data & 0x70);
-	state->attr_data = (data & 0x7) | ((data & 0x8)<<4);
+	state->m_attr_data = (data & 0x7) | ((data & 0x8)<<4);
 }
 
 //#include "debugger.h"
@@ -830,9 +830,9 @@ static WRITE8_DEVICE_HANDLER( video_misc_w )
 //      printf("VIDEO MISC %02x\n",data);
 //      debugger_break(device->machine());
 //  }
-	state->cursor_blink = data & 0x20;
-	state->attr_wrap = data & 0x10;
-//  state->pal_sel = data & 0x02;
+	state->m_cursor_blink = data & 0x20;
+	state->m_attr_wrap = data & 0x10;
+//  state->m_pal_sel = data & 0x02;
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_mask_w )
@@ -848,8 +848,8 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 
 	if(data & 1)
 	{
-		state->nmi_reset &= ~4;
-		state->nmi_trap &= ~2;
+		state->m_nmi_reset &= ~4;
+		state->m_nmi_trap &= ~2;
 		//cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE); //guess
 	}
 
@@ -865,7 +865,7 @@ static READ8_DEVICE_HANDLER( nmi_reg_r )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	//printf("C\n");
-	return 0xfc | state->bank_reg;//device->machine().rand();
+	return 0xfc | state->m_bank_reg;//device->machine().rand();
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_reg_w )
@@ -875,8 +875,8 @@ static WRITE8_DEVICE_HANDLER( nmi_reg_w )
         x--- ---- NMI mask
         -x-- ---- NMI enable trap on PPI8255 2 r/w
     */
-	state->nmi_mask = data & 0x80;
-	state->nmi_enable_reg = data & 0x40;
+	state->m_nmi_mask = data & 0x80;
+	state->m_nmi_enable_reg = data & 0x40;
 }
 
 static READ8_DEVICE_HANDLER( nmi_porta_r )
@@ -887,7 +887,7 @@ static READ8_DEVICE_HANDLER( nmi_porta_r )
 static READ8_DEVICE_HANDLER( nmi_portb_r )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
-	return 0xf9 | state->nmi_trap | state->nmi_reset;
+	return 0xf9 | state->m_nmi_trap | state->m_nmi_reset;
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -930,7 +930,7 @@ static MACHINE_RESET( paso7 )
 //  memory_set_bankptr(machine, "bank3", bios + 0x10000);
 //  memory_set_bankptr(machine, "bank4", bios + 0x10000);
 
-	state->nmi_reset |= 4;
+	state->m_nmi_reset |= 4;
 }
 
 static PALETTE_INIT( pasopia7 )

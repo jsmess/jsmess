@@ -138,7 +138,7 @@ public:
 	ex800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int irq_state;
+	int m_irq_state;
 };
 
 
@@ -182,8 +182,8 @@ static INPUT_CHANGED( online_switch )
 	ex800_state *state = field->port->machine().driver_data<ex800_state>();
 	if (newval)
 	{
-		cputag_set_input_line(field->port->machine(), "maincpu", UPD7810_INTF1, state->irq_state);
-		state->irq_state = (state->irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
+		cputag_set_input_line(field->port->machine(), "maincpu", UPD7810_INTF1, state->m_irq_state);
+		state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }
 
@@ -191,7 +191,7 @@ static INPUT_CHANGED( online_switch )
 static MACHINE_START(ex800)
 {
 	ex800_state *state = machine.driver_data<ex800_state>();
-	state->irq_state = ASSERT_LINE;
+	state->m_irq_state = ASSERT_LINE;
 	device_t *speaker = machine.device("beep");
 	/* Setup beep */
 	beep_set_state(speaker, 0);

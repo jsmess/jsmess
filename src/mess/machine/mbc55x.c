@@ -28,7 +28,7 @@
 
 /* Debugging */
 
-#define DEBUG_SET(flags)    ((state->debug_machine & (flags))==(flags))
+#define DEBUG_SET(flags)    ((state->m_debug_machine & (flags))==(flags))
 
 #define DEBUG_NONE			0x0000000
 #define DMA_BREAK           0x0000001
@@ -250,7 +250,7 @@ READ8_HANDLER(vram_page_r)
 {
 	mbc55x_state *state	= space->machine().driver_data<mbc55x_state>();
 
-	return state->vram_page;
+	return state->m_vram_page;
 }
 
 WRITE8_HANDLER(vram_page_w)
@@ -259,7 +259,7 @@ WRITE8_HANDLER(vram_page_w)
 
 	logerror("%s : set vram page to %02X\n",space->machine().describe_context(),data);
 
-	state->vram_page=data;
+	state->m_vram_page=data;
 }
 
 READ8_HANDLER(mbc55x_disk_r)
@@ -307,11 +307,11 @@ static void keyboard_reset(running_machine &machine)
 	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	logerror("keyboard_reset()\n");
 
-    memset(state->keyboard.keyrows,0xFF,MBC55X_KEYROWS);
-	state->keyboard.key_special=0;
+    memset(state->m_keyboard.keyrows,0xFF,MBC55X_KEYROWS);
+	state->m_keyboard.key_special=0;
 
-    // Setup timer to scan state->keyboard.
-    state->keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
+    // Setup timer to scan state->m_keyboard.
+    state->m_keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 }
 
 static void scan_keyboard(running_machine &machine)
@@ -356,7 +356,7 @@ static void scan_keyboard(running_machine &machine)
 
 	// First read shift, control and graph
 
-	state->keyboard.key_special=input_port_read(machine,KEY_SPECIAL_TAG);
+	state->m_keyboard.key_special=input_port_read(machine,KEY_SPECIAL_TAG);
 
     for(row=0;row<MBC55X_KEYROWS;row++)
     {
@@ -364,9 +364,9 @@ static void scan_keyboard(running_machine &machine)
 
         for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
         {
-            if(!(keyrow & mask) && (state->keyboard.keyrows[row] & mask))
+            if(!(keyrow & mask) && (state->m_keyboard.keyrows[row] & mask))
             {
-                if(state->keyboard.key_special & (KEY_BIT_LSHIFT | KEY_BIT_RSHIFT))
+                if(state->m_keyboard.key_special & (KEY_BIT_LSHIFT | KEY_BIT_RSHIFT))
 					key=keyvalues_shift[row][bitno];
 				else
 					key=keyvalues_normal[row][bitno];
@@ -376,7 +376,7 @@ static void scan_keyboard(running_machine &machine)
             }
         }
 
-        state->keyboard.keyrows[row]=keyrow;
+        state->m_keyboard.keyrows[row]=keyrow;
     }
 }
 
@@ -413,7 +413,7 @@ READ8_HANDLER(mbc55x_kb_usart_r)
 
 		case 2	: result=msm8251_status_r(msm8251,0);
 
-				  if (state->keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
+				  if (state->m_keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
 					result |= MSM8251_STATUS_PARITY_ERROR;
 				  break;
 	}
@@ -470,9 +470,9 @@ static void set_ram_size(running_machine &machine)
 	}
 
 	// Graphics red and blue plane memory mapping, green is in main memory
-	memory_set_bankptr(machine, RED_PLANE_TAG, &state->video_mem[RED_PLANE_OFFSET]);
+	memory_set_bankptr(machine, RED_PLANE_TAG, &state->m_video_mem[RED_PLANE_OFFSET]);
 	space->install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
-	memory_set_bankptr(machine, BLUE_PLANE_TAG, &state->video_mem[BLUE_PLANE_OFFSET]);
+	memory_set_bankptr(machine, BLUE_PLANE_TAG, &state->m_video_mem[BLUE_PLANE_OFFSET]);
 	space->install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 
@@ -503,10 +503,10 @@ MACHINE_START( mbc55x )
 		machine.device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
 
-	state->debug_machine=DEBUG_NONE;
+	state->m_debug_machine=DEBUG_NONE;
 
 	// Allocate keyscan timer
-	state->keyboard.keyscan_timer=machine.scheduler().timer_alloc(FUNC(keyscan_callback));
+	state->m_keyboard.keyscan_timer=machine.scheduler().timer_alloc(FUNC(keyscan_callback));
 }
 
 
@@ -515,12 +515,12 @@ static void mbc55x_debug(running_machine &machine, int ref, int params, const ch
 	mbc55x_state *state = machine.driver_data<mbc55x_state>();
     if(params>0)
     {
-        sscanf(param[0],"%d",&state->debug_machine);
+        sscanf(param[0],"%d",&state->m_debug_machine);
     }
     else
     {
         debug_console_printf(machine,"Error usage : mbc55x_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",state->debug_machine);
+        debug_console_printf(machine,"Current debuglevel=%02X\n",state->m_debug_machine);
     }
 }
 

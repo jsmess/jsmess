@@ -63,8 +63,8 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-	UINT8 *videoram;
-	UINT8 *hector_videoram;
+	UINT8 *m_videoram;
+	UINT8 *m_hector_videoram;
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/

@@ -139,77 +139,77 @@ public:
 	gba_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 DISPSTAT;
-	UINT32 BG2X, BG2Y, BG3X, BG3Y;
-	UINT16 DISPCNT,	GRNSWAP;
-	UINT16 BG0CNT, BG1CNT, BG2CNT, BG3CNT;
-	UINT16 BG0HOFS, BG0VOFS, BG1HOFS, BG1VOFS, BG2HOFS, BG2VOFS, BG3HOFS, BG3VOFS;
-	UINT16 BG2PA, BG2PB, BG2PC, BG2PD, BG3PA, BG3PB, BG3PC, BG3PD;
-	UINT16 WIN0H, WIN1H, WIN0V, WIN1V, WININ, WINOUT;
-	UINT16 MOSAIC;
-	UINT16 BLDCNT;
-	UINT16 BLDALPHA;
-	UINT16 BLDY;
-	UINT8  SOUNDCNT_X;
-	UINT16 SOUNDCNT_H;
-	UINT16 SOUNDBIAS;
-	UINT16 SIOMULTI0, SIOMULTI1, SIOMULTI2, SIOMULTI3;
-	UINT16 SIOCNT, SIODATA8;
-	UINT16 KEYCNT;
-	UINT16 RCNT;
-	UINT16 JOYCNT;
-	UINT32 JOY_RECV, JOY_TRANS;
-	UINT16 JOYSTAT;
-	UINT16 IR, IE, IF, IME;
-	UINT16 WAITCNT;
-	UINT8  POSTFLG;
-	UINT8  HALTCNT;
+	UINT32 m_DISPSTAT;
+	UINT32 m_BG2X, m_BG2Y, m_BG3X, m_BG3Y;
+	UINT16 m_DISPCNT,	m_GRNSWAP;
+	UINT16 m_BG0CNT, m_BG1CNT, m_BG2CNT, m_BG3CNT;
+	UINT16 m_BG0HOFS, m_BG0VOFS, m_BG1HOFS, m_BG1VOFS, m_BG2HOFS, m_BG2VOFS, m_BG3HOFS, m_BG3VOFS;
+	UINT16 m_BG2PA, m_BG2PB, m_BG2PC, m_BG2PD, m_BG3PA, m_BG3PB, m_BG3PC, m_BG3PD;
+	UINT16 m_WIN0H, m_WIN1H, m_WIN0V, m_WIN1V, m_WININ, m_WINOUT;
+	UINT16 m_MOSAIC;
+	UINT16 m_BLDCNT;
+	UINT16 m_BLDALPHA;
+	UINT16 m_BLDY;
+	UINT8  m_SOUNDCNT_X;
+	UINT16 m_SOUNDCNT_H;
+	UINT16 m_SOUNDBIAS;
+	UINT16 m_SIOMULTI0, m_SIOMULTI1, m_SIOMULTI2, m_SIOMULTI3;
+	UINT16 m_SIOCNT, m_SIODATA8;
+	UINT16 m_KEYCNT;
+	UINT16 m_RCNT;
+	UINT16 m_JOYCNT;
+	UINT32 m_JOY_RECV, m_JOY_TRANS;
+	UINT16 m_JOYSTAT;
+	UINT16 m_IR, m_IE, m_IF, m_IME;
+	UINT16 m_WAITCNT;
+	UINT8  m_POSTFLG;
+	UINT8  m_HALTCNT;
 
-	UINT8  windowOn;
-	UINT8  fxOn;
-	UINT8  gfxBG2Changed;
-	UINT8  gfxBG3Changed;
-	INT32  gfxBG2X;
-	INT32  gfxBG2Y;
-	INT32  gfxBG3X;
-	INT32  gfxBG3Y;
+	UINT8  m_windowOn;
+	UINT8  m_fxOn;
+	UINT8  m_gfxBG2Changed;
+	UINT8  m_gfxBG3Changed;
+	INT32  m_gfxBG2X;
+	INT32  m_gfxBG2Y;
+	INT32  m_gfxBG3X;
+	INT32  m_gfxBG3Y;
 
-	UINT32 *gba_pram;
-	UINT32 *gba_vram;
-	UINT32 *gba_oam;
+	UINT32 *m_gba_pram;
+	UINT32 *m_gba_vram;
+	UINT32 *m_gba_oam;
 
-	UINT32 dma_regs[16];
-	UINT32 dma_src[4], dma_dst[4], dma_cnt[4], dma_srcadd[4], dma_dstadd[4];
-	UINT32 timer_regs[4];
-	UINT16 timer_reload[4];
-	int timer_recalc[4];
+	UINT32 m_dma_regs[16];
+	UINT32 m_dma_src[4], m_dma_dst[4], m_dma_cnt[4], m_dma_srcadd[4], m_dma_dstadd[4];
+	UINT32 m_timer_regs[4];
+	UINT16 m_timer_reload[4];
+	int m_timer_recalc[4];
 
-	UINT32 gba_sram[0x10000/4];
-	UINT8 gba_eeprom[0x2000];
-	UINT32 flash_size;
-	UINT32 flash_mask;
-	intelfsh8_device *mFlashDev;
-	int eeprom_state, eeprom_command, eeprom_count, eeprom_addr, eeprom_bits, eeprom_addr_bits;
-	UINT8 eep_data;
+	UINT32 m_gba_sram[0x10000/4];
+	UINT8 m_gba_eeprom[0x2000];
+	UINT32 m_flash_size;
+	UINT32 m_flash_mask;
+	intelfsh8_device *m_mFlashDev;
+	int m_eeprom_state, m_eeprom_command, m_eeprom_count, m_eeprom_addr, m_eeprom_bits, m_eeprom_addr_bits;
+	UINT8 m_eep_data;
 
 	/* nvram-specific for MESS */
-	UINT8 *nvptr;
-	UINT32 nvsize;
-	device_t *nvimage;
+	UINT8 *m_nvptr;
+	UINT32 m_nvsize;
+	device_t *m_nvimage;
 
-	emu_timer *dma_timer[4], *tmr_timer[4], *irq_timer;
-	emu_timer *scan_timer, *hbl_timer;
+	emu_timer *m_dma_timer[4], *m_tmr_timer[4], *m_irq_timer;
+	emu_timer *m_scan_timer, *m_hbl_timer;
 
-	double timer_hz[4];
+	double m_timer_hz[4];
 
-	int fifo_a_ptr, fifo_b_ptr, fifo_a_in, fifo_b_in;
-	UINT8 fifo_a[20], fifo_b[20];
-	UINT32 xferscan[7][240+2048];
+	int m_fifo_a_ptr, m_fifo_b_ptr, m_fifo_a_in, m_fifo_b_in;
+	UINT8 m_fifo_a[20], m_fifo_b[20];
+	UINT32 m_xferscan[7][240+2048];
 
-	UINT32 bios_last_address;
-	int bios_protected;
+	UINT32 m_bios_last_address;
+	int m_bios_protected;
 
-	int flash_battery_load;
+	int m_flash_battery_load;
 };
 
 /*----------- defined in video/gba.c -----------*/

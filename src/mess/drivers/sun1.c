@@ -22,7 +22,7 @@ public:
 	sun1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16* ram;
+	UINT16* m_ram;
 };
 
 
@@ -42,7 +42,7 @@ static WRITE16_HANDLER(sun1_upd7201_w)
 
 static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(sun1_state, ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(sun1_state, m_ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
 ADDRESS_MAP_END
@@ -57,7 +57,7 @@ static MACHINE_RESET(sun1)
 	sun1_state *state = machine.driver_data<sun1_state>();
 	UINT8* user1 = machine.region("user1")->base();
 
-	memcpy((UINT8*)state->ram,user1,0x4000);
+	memcpy((UINT8*)state->m_ram,user1,0x4000);
 
 	machine.device("maincpu")->reset();
 }

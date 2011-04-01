@@ -183,16 +183,16 @@ enum
 
 } // namespace AVR8
 
-#define AVR8_OCR1BH				(state->regs[Avr8::REGIDX_OCR1BH])
-#define AVR8_OCR1BL				(state->regs[Avr8::REGIDX_OCR1BL])
-#define AVR8_OCR1AH				(state->regs[Avr8::REGIDX_OCR1AH])
-#define AVR8_OCR1AL				(state->regs[Avr8::REGIDX_OCR1AL])
-#define AVR8_ICR1H				(state->regs[Avr8::REGIDX_ICR1H])
-#define AVR8_ICR1L				(state->regs[Avr8::REGIDX_ICR1L])
-#define AVR8_TCNT1H				(state->regs[Avr8::REGIDX_TCNT1H])
-#define AVR8_TCNT1L				(state->regs[Avr8::REGIDX_TCNT1L])
+#define AVR8_OCR1BH				(state->m_regs[Avr8::REGIDX_OCR1BH])
+#define AVR8_OCR1BL				(state->m_regs[Avr8::REGIDX_OCR1BL])
+#define AVR8_OCR1AH				(state->m_regs[Avr8::REGIDX_OCR1AH])
+#define AVR8_OCR1AL				(state->m_regs[Avr8::REGIDX_OCR1AL])
+#define AVR8_ICR1H				(state->m_regs[Avr8::REGIDX_ICR1H])
+#define AVR8_ICR1L				(state->m_regs[Avr8::REGIDX_ICR1L])
+#define AVR8_TCNT1H				(state->m_regs[Avr8::REGIDX_TCNT1H])
+#define AVR8_TCNT1L				(state->m_regs[Avr8::REGIDX_TCNT1L])
 
-#define AVR8_TCCR1B					(state->regs[Avr8::REGIDX_TCCR1B])
+#define AVR8_TCCR1B					(state->m_regs[Avr8::REGIDX_TCCR1B])
 #define AVR8_TCCR1B_ICNC1_MASK		0x80
 #define AVR8_TCCR1B_ICNC1_SHIFT		7
 #define AVR8_TCCR1B_ICES1_MASK		0x40
@@ -202,7 +202,7 @@ enum
 #define AVR8_TCCR1B_CS_MASK			0x03
 #define AVR8_TCCR1B_CS_SHIFT		0
 
-#define AVR8_TCCR1A					(state->regs[Avr8::REGIDX_TCCR1A])
+#define AVR8_TCCR1A					(state->m_regs[Avr8::REGIDX_TCCR1A])
 #define AVR8_TCCR1A_COM1A_MASK		0xc0
 #define AVR8_TCCR1A_COM1A_SHIFT		6
 #define AVR8_TCCR1A_COM1B_MASK		0x30
@@ -213,7 +213,7 @@ enum
 #define AVR8_TCCR1A_COM1B			((AVR8_TCCR1A & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT)
 #define AVR8_TCCR1A_WGM1_10			(AVR8_TCCR1A & AVR8_TCCR1A_WGM1_10_MASK)
 
-#define AVR8_TIMSK1				(state->regs[Avr8::REGIDX_TIMSK1])
+#define AVR8_TIMSK1				(state->m_regs[Avr8::REGIDX_TIMSK1])
 #define AVR8_TIMSK1_ICIE1_MASK	0x20
 #define AVR8_TIMSK1_OCIE1B_MASK	0x04
 #define AVR8_TIMSK1_OCIE1A_MASK	0x02
@@ -223,7 +223,7 @@ enum
 #define AVR8_TIMSK1_OCIE1A		((AVR8_TIMSK1 & AVR8_TIMSK1_OCIE1A_MASK) >> 1)
 #define AVR8_TIMSK1_TOIE1		(AVR8_TIMSK1 & AVR8_TIMSK1_TOIE1_MASK)
 
-#define AVR8_TCCR2B					(state->regs[Avr8::REGIDX_TCCR1B])
+#define AVR8_TCCR2B					(state->m_regs[Avr8::REGIDX_TCCR1B])
 #define AVR8_TCCR2B_FOC2A_MASK		0x80
 #define AVR8_TCCR2B_FOC2A_SHIFT		7
 #define AVR8_TCCR2B_FOC2B_MASK		0x40
@@ -234,7 +234,7 @@ enum
 #define AVR8_TCCR2B_CS_SHIFT		0
 #define AVR8_TIMER2_CLOCK_SELECT	((AVR8_TCCR2B & AVR8_TCCR2B_CS_MASK) >> AVR8_TCCR2B_CS_SHIFT)
 
-#define AVR8_TCCR2A					(state->regs[Avr8::REGIDX_TCCR1A])
+#define AVR8_TCCR2A					(state->m_regs[Avr8::REGIDX_TCCR1A])
 #define AVR8_TCCR2A_COM2A_MASK		0xc0
 #define AVR8_TCCR2A_COM2A_SHIFT		6
 #define AVR8_TCCR2A_COM2B_MASK		0x30
@@ -245,13 +245,13 @@ enum
 #define AVR8_TCCR2A_COM2B			((AVR8_TCCR2A & AVR8_TCCR2A_COM2A_MASK) >> AVR8_TCCR2A_COM2A_SHIFT)
 #define AVR8_TCCR2A_WGM2_10			(AVR8_TCCR2A & AVR8_TCCR1A_WGM2_10_MASK)
 
-#define AVR8_SPSR				(state->regs[Avr8::REGIDX_SPSR])
+#define AVR8_SPSR				(state->m_regs[Avr8::REGIDX_SPSR])
 #define AVR8_SPSR_SPIF_MASK		0x80
 #define AVR8_SPSR_SPIF_SHIFT	7
 #define AVR8_SPSR_SPR2X_MASK	0x01
 #define AVR8_SPSR_SPR2X			(AVR8_SPSR & AVR8_SPSR_SPR2X_MASK)
 
-#define AVR8_SPCR				(state->regs[Avr8::REGIDX_SPCR])
+#define AVR8_SPCR				(state->m_regs[Avr8::REGIDX_SPCR])
 #define AVR8_SPCR_SPIE_MASK		0x80
 #define AVR8_SPCR_SPE_MASK		0x40
 #define AVR8_SPCR_DORD_MASK		0x20
@@ -267,7 +267,7 @@ enum
 #define AVR8_SPCR_CPHA			((AVR8_SPCR & AVR8_SPCR_CPHA_MASK) >> 2)
 #define AVR8_SPCR_SPR			(AVR8_SPCR & AVR8_SPCR_SPR_MASK)
 
-#define AVR8_TIFR1				(state->regs[Avr8::REGIDX_TIFR1])
+#define AVR8_TIFR1				(state->m_regs[Avr8::REGIDX_TIFR1])
 #define AVR8_TIFR1_ICF1_MASK	0x20
 #define AVR8_TIFR1_ICF1_SHIFT	5
 #define AVR8_TIFR1_OCF1B_MASK	0x04
@@ -277,21 +277,21 @@ enum
 #define AVR8_TIFR1_TOV1_MASK	0x01
 #define AVR8_TIFR1_TOV1_SHIFT	0
 
-#define AVR8_DDRD				(state->regs[Avr8::REGIDX_DDRD])
-#define AVR8_DDRC				(state->regs[Avr8::REGIDX_DDRC])
-#define AVR8_PORTB				(state->regs[Avr8::REGIDX_PORTB])
-#define AVR8_DDRB				(state->regs[Avr8::REGIDX_DDRB])
+#define AVR8_DDRD				(state->m_regs[Avr8::REGIDX_DDRD])
+#define AVR8_DDRC				(state->m_regs[Avr8::REGIDX_DDRC])
+#define AVR8_PORTB				(state->m_regs[Avr8::REGIDX_PORTB])
+#define AVR8_DDRB				(state->m_regs[Avr8::REGIDX_DDRB])
 
 #define AVR8_OCR1A				((AVR8_OCR1AH << 8) | AVR8_OCR1AL)
 #define AVR8_OCR1B				((AVR8_OCR1BH << 8) | AVR8_OCR1BL)
 #define AVR8_ICR1				((AVR8_ICR1H  << 8) | AVR8_ICR1L)
 #define AVR8_TCNT1				((AVR8_TCNT1H << 8) | AVR8_TCNT1L)
 #define AVR8_WGM1				(((AVR8_TCCR1B & 0x18) >> 1) | (AVR8_TCCR1A & 0x03))
-#define AVR8_TCNT1_DIR			(state->tcnt1_direction)
+#define AVR8_TCNT1_DIR			(state->m_tcnt1_direction)
 
-#define AVR8_OCR2B				state->regs[Avr8::REGIDX_OCR2B]
-#define AVR8_OCR2A				state->regs[Avr8::REGIDX_OCR2A]
-#define AVR8_TCNT2				state->regs[Avr8::REGIDX_TCNT2]
+#define AVR8_OCR2B				state->m_regs[Avr8::REGIDX_OCR2B]
+#define AVR8_OCR2A				state->m_regs[Avr8::REGIDX_OCR2A]
+#define AVR8_TCNT2				state->m_regs[Avr8::REGIDX_TCNT2]
 #define AVR8_WGM2				(((AVR8_TCCR2B & 0x08) >> 1) | (AVR8_TCCR2A & 0x03))
 
 #endif // __EMU_MACHINE_AVR8_H__

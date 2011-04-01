@@ -87,7 +87,7 @@ public:
 	camplynx_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *mc6845;
+	device_t *m_mc6845;
 };
 
 /* These bankswitch handlers are very incomplete, just enough to get the
@@ -411,14 +411,14 @@ static VIDEO_START( lynx48k )
 {
 	camplynx_state *state = machine.driver_data<camplynx_state>();
 
-	state->mc6845 = machine.device("crtc");
+	state->m_mc6845 = machine.device("crtc");
 }
 
 static SCREEN_UPDATE( lynx48k )
 {
 	camplynx_state *state = screen->machine().driver_data<camplynx_state>();
 
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	mc6845_update(state->m_mc6845, bitmap, cliprect);
 	return 0;
 }
 

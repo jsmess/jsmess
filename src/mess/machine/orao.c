@@ -17,13 +17,13 @@
 DRIVER_INIT(orao)
 {
 	orao_state *state = machine.driver_data<orao_state>();
-	memset(state->memory,0xff,0x6000);
+	memset(state->m_memory,0xff,0x6000);
 }
 
 DRIVER_INIT(orao103)
 {
 	orao_state *state = machine.driver_data<orao_state>();
-	memset(state->memory,0xff,0x6000);
+	memset(state->m_memory,0xff,0x6000);
 }
 
 MACHINE_RESET( orao )

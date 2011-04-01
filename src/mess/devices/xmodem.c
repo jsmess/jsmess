@@ -61,18 +61,18 @@
 
 typedef struct {
 
-	UINT8   block[132];          /* 3-byte header + 128-byte block + checksum */
-	UINT32  id;                  /* block id, starting at 1 */
-	UINT16  pos;                 /* position in block, including header */
-	UINT8   state;               /* one of XMODEM_ */
+	UINT8   m_block[132];          /* 3-byte header + 128-byte block + checksum */
+	UINT32  m_id;                  /* block id, starting at 1 */
+	UINT16  m_pos;                 /* position in block, including header */
+	UINT8   m_state;               /* one of XMODEM_ */
 
-	device_image_interface* image;  /* underlying image */
+	device_image_interface* m_image;  /* underlying image */
 
-	emu_timer* timer;            /* used to send periodic NAKs */
+	emu_timer* m_timer;            /* used to send periodic NAKs */
 
-	running_machine *machine;
+	running_machine *m_machine;
 
-	xmodem_config* conf;
+	xmodem_config* m_conf;
 
 } xmodem;
 
@@ -89,64 +89,64 @@ static UINT8 xmodem_chksum( xmodem* state )
 {
 	UINT8 sum = 0;
 	int i;
-	for ( i = 0; i < 128; i++ ) sum += state->block[ i + 3 ];
+	for ( i = 0; i < 128; i++ ) sum += state->m_block[ i + 3 ];
 	return sum;
 }
 
-/* fills state->block with the data for packet number state->id
+/* fills state->m_block with the data for packet number state->m_id
    returns != 0 if fail or end of file
 */
 static int xmodem_make_send_block( xmodem* state )
 {
-	if ( ! state->image ) return -1;
-	memset( state->block + 3, 0, 128 );
-	if ( state->image->fseek( (state->id - 1) * 128, SEEK_SET ) ) return -1;
-	if ( state->image->fread( state->block + 3, 128 ) <= 0 ) return -1;
-	state->block[0] = XMODEM_SOH;
-	state->block[1] = state->id & 0xff;
-	state->block[2] = 0xff - state->block[1];
-	state->block[131] = xmodem_chksum( state );
+	if ( ! state->m_image ) return -1;
+	memset( state->m_block + 3, 0, 128 );
+	if ( state->m_image->fseek( (state->m_id - 1) * 128, SEEK_SET ) ) return -1;
+	if ( state->m_image->fread( state->m_block + 3, 128 ) <= 0 ) return -1;
+	state->m_block[0] = XMODEM_SOH;
+	state->m_block[1] = state->m_id & 0xff;
+	state->m_block[2] = 0xff - state->m_block[1];
+	state->m_block[131] = xmodem_chksum( state );
 	return 0;
 }
 
-/* checks the received state->block packet and stores the data in the image
+/* checks the received state->m_block packet and stores the data in the image
    returns != 0 if fail (bad packet or bad image)
  */
 static int xmodem_get_receive_block( xmodem* state )
 {
-	int next_id = state->id + 1;
-	if ( ! state->image ) return -1;
-	if ( ! state->image->is_writable() ) return -1;
-	if ( state->block[0] != XMODEM_SOH ) return -1;
-	if ( state->block[1] != 0xff - state->block[2] ) return -1;
-	if ( state->block[131] != xmodem_chksum( state ) ) return -1;
-	if ( state->block[1] != (next_id & 0xff) ) return -1;
-	if ( state->image->fseek( (next_id - 1) * 128, SEEK_SET ) ) return -1;
-	if ( state->image->fwrite( state->block + 3, 128 ) != 128 ) return -1;
+	int next_id = state->m_id + 1;
+	if ( ! state->m_image ) return -1;
+	if ( ! state->m_image->is_writable() ) return -1;
+	if ( state->m_block[0] != XMODEM_SOH ) return -1;
+	if ( state->m_block[1] != 0xff - state->m_block[2] ) return -1;
+	if ( state->m_block[131] != xmodem_chksum( state ) ) return -1;
+	if ( state->m_block[1] != (next_id & 0xff) ) return -1;
+	if ( state->m_image->fseek( (next_id - 1) * 128, SEEK_SET ) ) return -1;
+	if ( state->m_image->fwrite( state->m_block + 3, 128 ) != 128 ) return -1;
 	return 0;
 }
 
 /* the outside (us) sends a byte to the emulated machine */
 static void xmodem_send_byte( xmodem* state, UINT8 data )
 {
-	if ( state->conf && state->conf->send )
+	if ( state->m_conf && state->m_conf->send )
 	{
-		state->conf->send(*state->machine, data );
+		state->m_conf->send(*state->m_machine, data );
 	}
 }
 
 static void xmodem_send_packet_byte( xmodem* state )
 {
-	assert( state->pos < 132 );
-	xmodem_send_byte( state, state->block[ state->pos ] );
-	state->pos++;
+	assert( state->m_pos < 132 );
+	xmodem_send_byte( state, state->m_block[ state->m_pos ] );
+	state->m_pos++;
 }
 
 
 static TIMER_CALLBACK( xmodem_nak_cb )
 {
 	xmodem* state = (xmodem*) ptr;
-	if ( state->state != XMODEM_IDLE ) return;
+	if ( state->m_state != XMODEM_IDLE ) return;
 	LOG(( "xmodem: sending NAK keep-alive\n" ));
 	xmodem_send_byte( state, XMODEM_NAK );
 }
@@ -154,22 +154,22 @@ static TIMER_CALLBACK( xmodem_nak_cb )
 static void xmodem_make_idle( xmodem* state )
 {
 	LOG(( "xmodem: entering idle state\n" ));
-	state->state = XMODEM_IDLE;
-	state->id = 0;
-	state->pos = 0;
+	state->m_state = XMODEM_IDLE;
+	state->m_id = 0;
+	state->m_pos = 0;
         /* When idle, we send NAK periodically to tell the emulated machine that we are
        always ready to receive.
        The 2 sec start time is here so that the machine does not get NAK instead of
        ACK or EOT as the last byte of a transfer.
      */
-	state->timer->adjust( attotime::from_seconds( 2 ), 0, attotime::from_seconds( 2 ) );
+	state->m_timer->adjust( attotime::from_seconds( 2 ), 0, attotime::from_seconds( 2 ) );
 }
 
 /* emulated machine has read the last byte we sent */
 void xmodem_byte_transmitted( device_t *device )
 {
 	xmodem* state = get_safe_token(device);
-	if ( (state->state == XMODEM_SENDING) && (state->pos < 132) )
+	if ( (state->m_state == XMODEM_SENDING) && (state->m_pos < 132) )
 	{
 		/* send next byte */
 		xmodem_send_packet_byte( state );
@@ -180,7 +180,7 @@ void xmodem_byte_transmitted( device_t *device )
 void xmodem_receive_byte( device_t *device, UINT8 data )
 {
 	xmodem* state = get_safe_token(device);
-	switch ( state->state )
+	switch ( state->m_state )
 	{
 
 	case XMODEM_NOIMAGE:
@@ -191,7 +191,7 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 		{
 			/* start sending */
 			LOG(( "xmodem: got NAK, start sending\n" ));
-			state->id = 1;
+			state->m_id = 1;
 			if ( xmodem_make_send_block( state ) )
 			{
 				/* error */
@@ -202,8 +202,8 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 			else
 			{
 				/* send first packet */
-				state->state = XMODEM_SENDING;
-				state->pos = 0;
+				state->m_state = XMODEM_SENDING;
+				state->m_pos = 0;
 				xmodem_send_packet_byte( state );
 			}
 			break;
@@ -212,10 +212,10 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 		{
 			/* start receiving */
 			LOG(( "xmodem: got SOH, start receiving\n" ));
-			state->state = XMODEM_RECEIVING;
-			state->block[ 0 ] = data;
-			state->pos = 1;
-			state->id = 0;
+			state->m_state = XMODEM_RECEIVING;
+			state->m_block[ 0 ] = data;
+			state->m_pos = 1;
+			state->m_id = 0;
 		}
 		else
 		{
@@ -235,8 +235,8 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 		if ( data == XMODEM_ACK )
 		{
 			/* send next packet */
-			state->id++;
-			LOG(( "xmodem: got ACK, sending next packet (%i)\n", state->id ));
+			state->m_id++;
+			LOG(( "xmodem: got ACK, sending next packet (%i)\n", state->m_id ));
 			if ( xmodem_make_send_block( state ) )
 			{
 				/* end of file */
@@ -250,18 +250,18 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 		else
 		{
 			/* empty - resend last packet */
-			LOG(( "xmodem: got NAK, resending packet %i\n", state->id ));
+			LOG(( "xmodem: got NAK, resending packet %i\n", state->m_id ));
 		}
-		state->pos = 0;
+		state->m_pos = 0;
 		xmodem_send_packet_byte( state );
 		break;
 
 
 	case XMODEM_RECEIVING:
-		assert( state->pos < 132 );
-		state->block[ state->pos ] = data;
-		state->pos++;
-		if ( state->pos == 1 )
+		assert( state->m_pos < 132 );
+		state->m_block[ state->m_pos ] = data;
+		state->m_pos++;
+		if ( state->m_pos == 1 )
 		{
 			/* header byte */
 			if ( data == XMODEM_EOT )
@@ -273,9 +273,9 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 				break;
 			}
 		}
-		else if ( state->pos == 132 )
+		else if ( state->m_pos == 132 )
 		{
-			LOG(( "xmodem: received packet %i\n", state->id ));
+			LOG(( "xmodem: received packet %i\n", state->m_id ));
 			/* end of block */
 			if ( xmodem_get_receive_block( state ) )
 			{
@@ -288,9 +288,9 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 				/* ok */
 				LOG(( "xmodem: packet is valid, sending ACK\n" ));
 				xmodem_send_byte( state, XMODEM_ACK );
-				state->id++;
+				state->m_id++;
 			}
-			state->pos = 0;
+			state->m_pos = 0;
 		}
 		break;
 
@@ -301,25 +301,25 @@ static DEVICE_START( xmodem )
 {
 	xmodem* state = get_safe_token(device);
 	LOG(( "xmodem: start\n" ));
-	state->state = XMODEM_NOIMAGE;
-	state->image = NULL;
-	state->conf = (xmodem_config*) device->baseconfig().static_config();
-	state->machine = &device->machine();
-	state->timer = device->machine().scheduler().timer_alloc(FUNC(xmodem_nak_cb), state );
+	state->m_state = XMODEM_NOIMAGE;
+	state->m_image = NULL;
+	state->m_conf = (xmodem_config*) device->baseconfig().static_config();
+	state->m_machine = &device->machine();
+	state->m_timer = device->machine().scheduler().timer_alloc(FUNC(xmodem_nak_cb), state );
 }
 
 static DEVICE_RESET( xmodem )
 {
 	xmodem* state = get_safe_token(device);
 	LOG(( "xmodem: reset\n" ));
-	if ( state->state != XMODEM_NOIMAGE ) xmodem_make_idle( state );
+	if ( state->m_state != XMODEM_NOIMAGE ) xmodem_make_idle( state );
 }
 
 static DEVICE_IMAGE_LOAD( xmodem )
 {
 	xmodem* state = get_safe_token(&image.device());
 	LOG(( "xmodem: image load\n" ));
-	state->image = &image;
+	state->m_image = &image;
 	xmodem_make_idle( state );
 	return IMAGE_INIT_PASS;
 }
@@ -328,7 +328,7 @@ static DEVICE_IMAGE_CREATE( xmodem )
 {
 	xmodem* state = get_safe_token(&image.device());
 	LOG(( "xmodem: image create\n" ));
-	state->image = &image;
+	state->m_image = &image;
 	xmodem_make_idle( state );
 	return IMAGE_INIT_PASS;
 }
@@ -337,8 +337,8 @@ static DEVICE_IMAGE_UNLOAD( xmodem )
 {
 	xmodem* state = get_safe_token(&image.device());
 	LOG(( "xmodem: image unload\n" ));
-	state->state = XMODEM_NOIMAGE;
-	state->image = NULL;
+	state->m_state = XMODEM_NOIMAGE;
+	state->m_image = NULL;
 }
 
 DEVICE_GET_INFO( xmodem )

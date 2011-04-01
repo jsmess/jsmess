@@ -26,14 +26,14 @@ public:
 	sym1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram_1k;
-	UINT8 *ram_2k;
-	UINT8 *ram_3k;
-	UINT8 *riot_ram;
-	UINT8 *monitor;
-	UINT8 riot_port_a;
-	UINT8 riot_port_b;
-	emu_timer *led_update;
+	UINT8 *m_ram_1k;
+	UINT8 *m_ram_2k;
+	UINT8 *m_ram_3k;
+	UINT8 *m_riot_ram;
+	UINT8 *m_monitor;
+	UINT8 m_riot_port_a;
+	UINT8 m_riot_port_b;
+	emu_timer *m_led_update;
 };
 
 

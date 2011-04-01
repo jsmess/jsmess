@@ -33,7 +33,7 @@ static ATTR_CONST UINT8 coco_get_attributes_2(running_machine &machine, UINT8 c,
 {
 	coco_state *state = machine.driver_data<coco_state>();
 	UINT8 result = 0x00;
-	UINT8 pia1_pb = pia6821_get_output_b(state->pia_1);
+	UINT8 pia1_pb = pia6821_get_output_b(state->m_pia_1);
 
 	if (c & 0x40)		result |= M6847_INV;
 	if (c & 0x80)		result |= M6847_AS;
@@ -49,7 +49,7 @@ ATTR_CONST UINT8 coco_get_attributes(running_machine &machine, UINT8 c, int scan
 {
 	coco_state *state = machine.driver_data<coco_state>();
 	UINT8 result = 0x00;
-	UINT8 pia1_pb = pia6821_get_output_b(state->pia_1);
+	UINT8 pia1_pb = pia6821_get_output_b(state->m_pia_1);
 
 	if (c & 0x40)		result |= M6847_INV;
 	if (c & 0x80)		result |= M6847_AS;
@@ -65,7 +65,7 @@ ATTR_CONST UINT8 coco_get_attributes(running_machine &machine, UINT8 c, int scan
 static void coco_horizontal_sync_callback(running_machine &machine, int data)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	pia6821_ca1_w(state->pia_0, data);
+	pia6821_ca1_w(state->m_pia_0, data);
 }
 
 
@@ -73,13 +73,13 @@ static void coco_horizontal_sync_callback(running_machine &machine, int data)
 static void coco_field_sync_callback(running_machine &machine, int data)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	pia6821_cb1_w(state->pia_0, data);
+	pia6821_cb1_w(state->m_pia_0, data);
 }
 
 static const UINT8 *get_video_ram_coco(running_machine &machine,int scanline)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	return sam6883_videoram(state->sam, scanline);
+	return sam6883_videoram(state->m_sam, scanline);
 }
 
 static void internal_video_start_coco(running_machine &machine, m6847_type type)

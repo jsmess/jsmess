@@ -27,8 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
 	DECLARE_WRITE8_MEMBER( relays_w );
-	UINT16 nixie[16];
-	UINT8 timer;
+	UINT16 m_nixie[16];
+	UINT8 m_timer;
 };
 
 READ8_MEMBER(nixieclock_state::data_r)
@@ -63,13 +63,13 @@ INLINE void output_set_neon_value(int index, int value)
 
 WRITE8_MEMBER(nixieclock_state::nixie_w)
 {
-	nixie[offset] = data;
-	output_set_nixie_value(5,nixie_to_num(((nixie[2] & 3)<<8) | (nixie[1] << 4) | nixie[0]));
-	output_set_nixie_value(4,nixie_to_num((nixie[4] << 6) | (nixie[3] << 2) | (nixie[2] >>2)));
-	output_set_nixie_value(3,nixie_to_num(((nixie[7] & 3)<<8) | (nixie[6] << 4) | nixie[5]));
-	output_set_nixie_value(2,nixie_to_num((nixie[9] << 6) | (nixie[8] << 2) | (nixie[7] >>2)));
-	output_set_nixie_value(1,nixie_to_num(((nixie[12] & 3)<<8) | (nixie[11] << 4) | nixie[10]));
-	output_set_nixie_value(0,nixie_to_num((nixie[14] << 6) | (nixie[13] << 2) | (nixie[12] >>2)));
+	m_nixie[offset] = data;
+	output_set_nixie_value(5,nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]));
+	output_set_nixie_value(4,nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >>2)));
+	output_set_nixie_value(3,nixie_to_num(((m_nixie[7] & 3)<<8) | (m_nixie[6] << 4) | m_nixie[5]));
+	output_set_nixie_value(2,nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >>2)));
+	output_set_nixie_value(1,nixie_to_num(((m_nixie[12] & 3)<<8) | (m_nixie[11] << 4) | m_nixie[10]));
+	output_set_nixie_value(0,nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2)));
 }
 
 WRITE8_MEMBER(nixieclock_state::neon_w)
@@ -127,18 +127,18 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK(timer_callback)
 {
 	nixieclock_state *state = timer.machine().driver_data<nixieclock_state>();
-	i4004_set_test(timer.machine().device("maincpu"),state->timer);
-	state->timer^=1;
+	i4004_set_test(timer.machine().device("maincpu"),state->m_timer);
+	state->m_timer^=1;
 }
 
 static MACHINE_START(4004clk)
 {
 	nixieclock_state *state = machine.driver_data<nixieclock_state>();
-	state->timer = 0;
+	state->m_timer = 0;
 
 	/* register for state saving */
-	state->save_item(NAME(state->timer));
-	state->save_pointer(NAME(state->nixie), 6);
+	state->save_item(NAME(state->m_timer));
+	state->save_pointer(NAME(state->m_nixie), 6);
 }
 
 static MACHINE_CONFIG_START( 4004clk, nixieclock_state )

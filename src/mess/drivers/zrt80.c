@@ -44,14 +44,14 @@ public:
 	DECLARE_WRITE8_MEMBER( zrt80_30_w );
 	DECLARE_WRITE8_MEMBER( zrt80_38_w );
 	DECLARE_WRITE8_MEMBER( zrt80_kbd_put );
-	UINT8 term_data;
-	UINT8 *videoram;
-	UINT8 *FNT;
+	UINT8 m_term_data;
+	UINT8 *m_videoram;
+	UINT8 *m_FNT;
 };
 
 READ8_MEMBER( zrt80_state::zrt80_10_r )
 {
-	UINT8 ret = term_data;
+	UINT8 ret = m_term_data;
 	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return ret;
 }
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
 	AM_RANGE(0x4000, 0x43ff) AM_RAM	// Board RAM
 	// Normally video RAM is 0x800 but could be expanded up to 8K
-	AM_RANGE(0xc000, 0xdfff) AM_RAM	AM_BASE(videoram) // Video RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM	AM_BASE(m_videoram) // Video RAM
 
 ADDRESS_MAP_END
 
@@ -189,7 +189,7 @@ static MACHINE_RESET(zrt80)
 static VIDEO_START( zrt80 )
 {
 	zrt80_state *state = machine.driver_data<zrt80_state>();
-	state->FNT = machine.region("chargen")->base();
+	state->m_FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( zrt80 )
@@ -212,7 +212,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 		inv = polarity;
 		if (x == cursor_x) inv ^= 0xff;
 		mem = (ma + x) & 0x1fff;
-		chr = state->videoram[mem];
+		chr = state->m_videoram[mem];
 
 		if BIT(chr, 7)
 		{
@@ -220,7 +220,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 			chr &= 0x7f;
 		}
 
-		gfx = state->FNT[(chr<<4) | ra] ^ inv;
+		gfx = state->m_FNT[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */
 		for (i = 0; i < 8; i++)
@@ -259,7 +259,7 @@ static const ins8250_interface zrt80_com_interface =
 
 WRITE8_MEMBER( zrt80_state::zrt80_kbd_put )
 {
-	term_data = data;
+	m_term_data = data;
 	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 

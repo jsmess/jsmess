@@ -18,9 +18,9 @@ public:
 	junior_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 port_a;
-	UINT8 port_b;
-	UINT8 led_time[6];
+	UINT8 m_port_a;
+	UINT8 m_port_b;
+	UINT8 m_led_time[6];
 };
 
 
@@ -95,7 +95,7 @@ static READ8_DEVICE_HANDLER(junior_riot_a_r)
 	junior_state *state = device->machine().driver_data<junior_state>();
 	UINT8	data = 0xff;
 
-	switch( ( state->port_b >> 1 ) & 0x0f )
+	switch( ( state->m_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
 		data = input_port_read(device->machine(), "LINE0");
@@ -125,14 +125,14 @@ static READ8_DEVICE_HANDLER(junior_riot_b_r)
 static WRITE8_DEVICE_HANDLER(junior_riot_a_w)
 {
 	junior_state *state = device->machine().driver_data<junior_state>();
-	UINT8 idx = ( state->port_b >> 1 ) & 0x0f;
+	UINT8 idx = ( state->m_port_b >> 1 ) & 0x0f;
 
-	state->port_a = data;
+	state->m_port_a = data;
 
-	if ((idx >= 4 && idx < 10) & ( state->port_a != 0xff ))
+	if ((idx >= 4 && idx < 10) & ( state->m_port_a != 0xff ))
 	{
-		output_set_digit_value( idx-4, state->port_a ^ 0x7f );
-		state->led_time[idx - 4] = 10;
+		output_set_digit_value( idx-4, state->m_port_a ^ 0x7f );
+		state->m_led_time[idx - 4] = 10;
 	}
 }
 
@@ -143,12 +143,12 @@ static WRITE8_DEVICE_HANDLER(junior_riot_b_w)
 	UINT8 newdata = data;
 	UINT8 idx = ( newdata >> 1 ) & 0x0f;
 
-	state->port_b = newdata;
+	state->m_port_b = newdata;
 
-	if ((idx >= 4 && idx < 10) & ( state->port_a != 0xff ))
+	if ((idx >= 4 && idx < 10) & ( state->m_port_a != 0xff ))
 	{
-		output_set_digit_value( idx-4, state->port_a ^ 0x7f );
-		state->led_time[idx - 4] = 10;
+		output_set_digit_value( idx-4, state->m_port_a ^ 0x7f );
+		state->m_led_time[idx - 4] = 10;
 	}
 }
 
@@ -176,8 +176,8 @@ static TIMER_DEVICE_CALLBACK( junior_update_leds )
 
 	for ( i = 0; i < 6; i++ )
 	{
-		if ( state->led_time[i] )
-			state->led_time[i]--;
+		if ( state->m_led_time[i] )
+			state->m_led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}
@@ -187,8 +187,8 @@ static TIMER_DEVICE_CALLBACK( junior_update_leds )
 static MACHINE_START( junior )
 {
 	junior_state *state = machine.driver_data<junior_state>();
-	state_save_register_item(machine, "junior", NULL, 0, state->port_a );
-	state_save_register_item(machine, "junior", NULL, 0, state->port_b );
+	state_save_register_item(machine, "junior", NULL, 0, state->m_port_a );
+	state_save_register_item(machine, "junior", NULL, 0, state->m_port_b );
 }
 
 
@@ -199,7 +199,7 @@ static MACHINE_RESET(junior)
 
 	for ( i = 0; i < 6; i++ )
 	{
-		state->led_time[i] = 0;
+		state->m_led_time[i] = 0;
 	}
 }
 

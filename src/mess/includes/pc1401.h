@@ -18,11 +18,11 @@ public:
 	pc1401_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 portc;
-	UINT8 outa;
-	UINT8 outb;
-	int power;
-	UINT8 reg[0x100];
+	UINT8 m_portc;
+	UINT8 m_outa;
+	UINT8 m_outb;
+	int m_power;
+	UINT8 m_reg[0x100];
 };
 
 

@@ -52,12 +52,12 @@ public:
 	apf_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	unsigned char keyboard_data;
-	unsigned char pad_data;
-	UINT8 mc6847_css;
-	UINT8 *videoram;
+	unsigned char m_keyboard_data;
+	unsigned char m_pad_data;
+	UINT8 m_mc6847_css;
+	UINT8 *m_videoram;
 
-	unsigned char apf_ints;
+	unsigned char m_apf_ints;
 
 };
 
@@ -67,11 +67,11 @@ static void apf_update_ints(running_machine &machine);
 static READ8_DEVICE_HANDLER( apf_mc6847_videoram_r )
 {
 	apf_state *state = device->machine().driver_data<apf_state>();
-	mc6847_css_w(device, state->mc6847_css && BIT(state->videoram[offset + 0x200], 6));
-	mc6847_inv_w(device, BIT(state->videoram[offset + 0x200], 6));
-	mc6847_as_w(device, BIT(state->videoram[offset + 0x200], 7));
+	mc6847_css_w(device, state->m_mc6847_css && BIT(state->m_videoram[offset + 0x200], 6));
+	mc6847_inv_w(device, BIT(state->m_videoram[offset + 0x200], 6));
+	mc6847_as_w(device, BIT(state->m_videoram[offset + 0x200], 7));
 
-	return state->videoram[offset + 0x200];
+	return state->m_videoram[offset + 0x200];
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
@@ -79,9 +79,9 @@ static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
 	apf_state *state_ = device->machine().driver_data<apf_state>();
 
 	if (state)
-		state_->apf_ints |= 0x10;
+		state_->m_apf_ints |= 0x10;
 	else
-		state_->apf_ints &= ~0x10;
+		state_->m_apf_ints &= ~0x10;
 
 	apf_update_ints(device->machine());
 }
@@ -97,13 +97,13 @@ static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_a_func)
 	apf_state *state = device->machine().driver_data<apf_state>();
 	UINT8 data=~0;
 
-	if (!(state->pad_data & 0x08))
+	if (!(state->m_pad_data & 0x08))
 		data &= input_port_read(device->machine(), "joy3");
-	if (!(state->pad_data & 0x04))
+	if (!(state->m_pad_data & 0x04))
 		data &= input_port_read(device->machine(), "joy2");
-	if (!(state->pad_data & 0x02))
+	if (!(state->m_pad_data & 0x02))
 		data &= input_port_read(device->machine(), "joy1");
-	if (!(state->pad_data & 0x01))
+	if (!(state->m_pad_data & 0x01))
 		data &= input_port_read(device->machine(), "joy0");
 
 	return data;
@@ -151,14 +151,14 @@ static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
 	mc6847_gm0_w(mc6847, BIT(data, 6));
 
 	/* bit 3..0 keypad line select */
-	state->pad_data = data;
+	state->m_pad_data = data;
 }
 
 static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 {
 	apf_state *state_ = device->machine().driver_data<apf_state>();
 
-	state_->mc6847_css = state;
+	state_->m_mc6847_css = state;
 }
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
@@ -177,7 +177,7 @@ static void apf_update_ints(running_machine &machine)
 {
 	apf_state *state = machine.driver_data<apf_state>();
 
-	cputag_set_input_line(machine, "maincpu", 0, state->apf_ints ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, state->m_apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
@@ -186,11 +186,11 @@ static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
 
 	if (state)
 	{
-		state_->apf_ints |= 1;
+		state_->m_apf_ints |= 1;
 	}
 	else
 	{
-		state_->apf_ints &= ~1;
+		state_->m_apf_ints &= ~1;
 	}
 
 	apf_update_ints(device->machine());
@@ -205,11 +205,11 @@ static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_b_func )
 
 	if (state)
 	{
-		state_->apf_ints |= 2;
+		state_->m_apf_ints |= 2;
 	}
 	else
 	{
-		state_->apf_ints &= ~2;
+		state_->m_apf_ints &= ~2;
 	}
 
 	apf_update_ints(device->machine());
@@ -237,7 +237,7 @@ static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_a_func)
 {
 	apf_state *state = device->machine().driver_data<apf_state>();
 
-	return state->keyboard_data;
+	return state->m_keyboard_data;
 }
 
 static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
@@ -292,7 +292,7 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	state->keyboard_data = input_port_read(device->machine(), keynames[keyboard_line]);
+	state->m_keyboard_data = input_port_read(device->machine(), keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
 	cassette_change_state(device->machine().device("cassette"),
@@ -318,11 +318,11 @@ static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_a_func )
 
 	if (state)
 	{
-		state_->apf_ints |= 4;
+		state_->m_apf_ints |= 4;
 	}
 	else
 	{
-		state_->apf_ints &= ~4;
+		state_->m_apf_ints &= ~4;
 	}
 
 	apf_update_ints(device->machine());
@@ -334,11 +334,11 @@ static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_b_func )
 
 	if (state)
 	{
-		state_->apf_ints |= 8;
+		state_->m_apf_ints |= 8;
 	}
 	else
 	{
-		state_->apf_ints &= ~8;
+		state_->m_apf_ints &= ~8;
 	}
 
 	apf_update_ints(device->machine());
@@ -366,7 +366,7 @@ static MACHINE_START( apf_imagination )
 {
 	apf_state *state = machine.driver_data<apf_state>();
 
-	state->apf_ints = 0;
+	state->m_apf_ints = 0;
 }
 
 static WRITE8_HANDLER(apf_dischw_w)
@@ -434,7 +434,7 @@ static READ8_HANDLER(apf_wd179x_data_r)
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, AS_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,videoram) AM_MIRROR(0x1c00)
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,m_videoram) AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START(apf_imagination_map, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apf_m1000_map, AS_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,videoram)  AM_MIRROR(0x1c00)
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,m_videoram)  AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM

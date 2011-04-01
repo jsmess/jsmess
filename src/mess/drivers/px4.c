@@ -55,13 +55,13 @@ static const int receive_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 3072,
     MACROS
 ***************************************************************************/
 
-#define ART_TX_ENABLED	(BIT(px4->artcr, 0))
-#define ART_RX_ENABLED	(BIT(px4->artcr, 2))
+#define ART_TX_ENABLED	(BIT(px4->m_artcr, 0))
+#define ART_RX_ENABLED	(BIT(px4->m_artcr, 2))
 
-#define ART_DATA		(BIT(px4->artmr, 2))	/* number of data bits, 7 or 8 */
-#define ART_PEN			(BIT(px4->artmr, 4))	/* parity enabled */
-#define ART_EVEN		(BIT(px4->artmr, 5))	/* even or odd parity */
-#define ART_STOP		(BIT(px4->artmr, 7))	/* number of stop bits, 1 or 2 */
+#define ART_DATA		(BIT(px4->m_artmr, 2))	/* number of data bits, 7 or 8 */
+#define ART_PEN			(BIT(px4->m_artmr, 4))	/* parity enabled */
+#define ART_EVEN		(BIT(px4->m_artmr, 5))	/* even or odd parity */
+#define ART_STOP		(BIT(px4->m_artmr, 7))	/* number of stop bits, 1 or 2 */
 
 
 /***************************************************************************
@@ -75,58 +75,58 @@ public:
 		: driver_device(machine, config) { }
 
 	/* internal ram */
-	device_t *ram;
+	device_t *m_ram;
 
 	/* gapnit register */
-	UINT8 ctrl1;
-	UINT16 icrb;
-	UINT8 bankr;
-	UINT8 isr;
-	UINT8 ier;
-	UINT8 str;
-	UINT8 sior;
+	UINT8 m_ctrl1;
+	UINT16 m_icrb;
+	UINT8 m_bankr;
+	UINT8 m_isr;
+	UINT8 m_ier;
+	UINT8 m_str;
+	UINT8 m_sior;
 
 	/* gapnit internal */
-	UINT16 frc_value;
-	UINT16 frc_latch;
+	UINT16 m_frc_value;
+	UINT16 m_frc_latch;
 
 	/* gapndi register */
-	UINT8 vadr;
-	UINT8 yoff;
+	UINT8 m_vadr;
+	UINT8 m_yoff;
 
 	/* gapnio */
-	emu_timer *receive_timer;
-	emu_timer *transmit_timer;
-	UINT8 artdir;
-	UINT8 artdor;
-	UINT8 artsr;
-	UINT8 artmr;
-	UINT8 artcr;
-	UINT8 swr;
+	emu_timer *m_receive_timer;
+	emu_timer *m_transmit_timer;
+	UINT8 m_artdir;
+	UINT8 m_artdor;
+	UINT8 m_artsr;
+	UINT8 m_artmr;
+	UINT8 m_artcr;
+	UINT8 m_swr;
 
 	/* 7508 internal */
-	int one_sec_int_enabled;
-	int alarm_int_enabled;
-	int key_int_enabled;
+	int m_one_sec_int_enabled;
+	int m_alarm_int_enabled;
+	int m_key_int_enabled;
 
-	UINT8 key_status;
-	UINT8 interrupt_status;
+	UINT8 m_key_status;
+	UINT8 m_interrupt_status;
 
 	/* centronics printer */
-	device_t *printer;
+	device_t *m_printer;
 
 	/* external ramdisk */
-	offs_t ramdisk_address;
-	UINT8 *ramdisk;
+	offs_t m_ramdisk_address;
+	UINT8 *m_ramdisk;
 
 	/* external cassette/barcode reader */
-	device_t *ext_cas;
-	emu_timer *ext_cas_timer;
-	int ear_last_state;
+	device_t *m_ext_cas;
+	emu_timer *m_ext_cas_timer;
+	int m_ear_last_state;
 
 	/* external devices */
-	device_t *sio_device;
-	device_t *rs232c_device;
+	device_t *m_sio_device;
+	device_t *m_rs232c_device;
 };
 
 
@@ -245,18 +245,18 @@ static void gapnit_interrupt(running_machine &machine)
 	px4_state *px4 = machine.driver_data<px4_state>();
 
 	/* any interrupts enabled and pending? */
-	if (px4->ier & px4->isr & INT0_7508)
+	if (px4->m_ier & px4->m_isr & INT0_7508)
 	{
-		px4->isr &= ~INT0_7508;
+		px4->m_isr &= ~INT0_7508;
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf0);
 	}
-	else if (px4->ier & px4->isr & INT1_ART)
+	else if (px4->m_ier & px4->m_isr & INT1_ART)
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf2);
-	else if (px4->ier & px4->isr & INT2_ICF)
+	else if (px4->m_ier & px4->m_isr & INT2_ICF)
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf4);
-	else if (px4->ier & px4->isr & INT3_OVF)
+	else if (px4->m_ier & px4->m_isr & INT3_OVF)
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf6);
-	else if (px4->ier & px4->isr & INT4_EXT)
+	else if (px4->m_ier & px4->m_isr & INT4_EXT)
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf8);
 	else
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -270,35 +270,35 @@ static TIMER_CALLBACK( ext_cassette_read )
 	int trigger = 0;
 
 	/* sample input state */
-	result = cassette_input(px4->ext_cas) > 0 ? 1 : 0;
+	result = cassette_input(px4->m_ext_cas) > 0 ? 1 : 0;
 
 	/* detect transition */
-	switch ((px4->ctrl1 >> 1) & 0x03)
+	switch ((px4->m_ctrl1 >> 1) & 0x03)
 	{
 	case 0: /* trigger inhibit */
 		trigger = 0;
 		break;
 	case 1: /* falling edge trigger */
-		trigger = px4->ear_last_state == 1 && result == 0;
+		trigger = px4->m_ear_last_state == 1 && result == 0;
 		break;
 	case 2: /* rising edge trigger */
-		trigger = px4->ear_last_state == 0 && result == 1;
+		trigger = px4->m_ear_last_state == 0 && result == 1;
 		break;
 	case 3: /* rising/falling edge trigger */
-		trigger = px4->ear_last_state != result;
+		trigger = px4->m_ear_last_state != result;
 		break;
 	}
 
 	/* generate an interrupt if we need to trigger */
 	if (trigger)
 	{
-		px4->icrb = px4->frc_value;
-		px4->isr |= INT2_ICF;
+		px4->m_icrb = px4->m_frc_value;
+		px4->m_isr |= INT2_ICF;
 		gapnit_interrupt(machine);
 	}
 
 	/* save last state */
-	px4->ear_last_state = result;
+	px4->m_ear_last_state = result;
 }
 
 /* free running counter */
@@ -306,11 +306,11 @@ static TIMER_DEVICE_CALLBACK( frc_tick )
 {
 	px4_state *px4 = timer.machine().driver_data<px4_state>();
 
-	px4->frc_value++;
+	px4->m_frc_value++;
 
-	if (px4->frc_value == 0)
+	if (px4->m_frc_value == 0)
 	{
-		px4->isr |= INT3_OVF;
+		px4->m_isr |= INT3_OVF;
 		gapnit_interrupt(timer.machine());
 	}
 }
@@ -324,9 +324,9 @@ static READ8_HANDLER( px4_icrlc_r )
 		logerror("%s: px4_icrlc_r\n", space->machine().describe_context());
 
 	/* latch value */
-	px4->frc_latch = px4->frc_value;
+	px4->m_frc_latch = px4->m_frc_value;
 
-	return px4->frc_latch & 0xff;
+	return px4->m_frc_latch & 0xff;
 }
 
 /* control register 1 */
@@ -343,11 +343,11 @@ static WRITE8_HANDLER( px4_ctrl1_w )
 
 	if (baud <= 12)
 	{
-		px4->transmit_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/transmit_rate[baud]));
-		px4->receive_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/receive_rate[baud]));
+		px4->m_transmit_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/transmit_rate[baud]));
+		px4->m_receive_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/receive_rate[baud]));
 	}
 
-	px4->ctrl1 = data;
+	px4->m_ctrl1 = data;
 }
 
 /* input capture register high command trigger */
@@ -358,7 +358,7 @@ static READ8_HANDLER( px4_icrhc_r )
 	if (VERBOSE)
 		logerror("%s: px4_icrhc_r\n", space->machine().describe_context());
 
-	return (px4->frc_latch >> 8) & 0xff;
+	return (px4->m_frc_latch >> 8) & 0xff;
 }
 
 /* command register */
@@ -372,7 +372,7 @@ static WRITE8_HANDLER( px4_cmdr_w )
 	/* clear overflow interrupt? */
 	if (BIT(data, 2))
 	{
-		px4->isr &= ~INT3_OVF;
+		px4->m_isr &= ~INT3_OVF;
 		gapnit_interrupt(space->machine());
 	}
 }
@@ -385,7 +385,7 @@ static READ8_HANDLER( px4_icrlb_r )
 	if (VERBOSE)
 		logerror("%s: px4_icrlb_r\n", space->machine().describe_context());
 
-	return px4->icrb & 0xff;
+	return px4->m_icrb & 0xff;
 }
 
 /* control register 2 */
@@ -397,18 +397,18 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 		logerror("%s: px4_ctrl2_w (0x%02x)\n", space->machine().describe_context(), data);
 
 	/* bit 0, MIC, cassette output */
-	cassette_output(px4->ext_cas, BIT(data, 0) ? -1.0 : +1.0);
+	cassette_output(px4->m_ext_cas, BIT(data, 0) ? -1.0 : +1.0);
 
 	/* bit 1, RMT, cassette motor */
 	if (BIT(data, 1))
 	{
-		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		px4->ext_cas_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
+		cassette_change_state(px4->m_ext_cas, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		px4->m_ext_cas_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
-		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		px4->ext_cas_timer->adjust(attotime::zero);
+		cassette_change_state(px4->m_ext_cas, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		px4->m_ext_cas_timer->adjust(attotime::zero);
 	}
 }
 
@@ -421,10 +421,10 @@ static READ8_HANDLER( px4_icrhb_r )
 		logerror("%s: px4_icrhb_r\n", space->machine().describe_context());
 
 	/* clear icf interrupt */
-	px4->isr &= ~INT2_ICF;
+	px4->m_isr &= ~INT2_ICF;
 	gapnit_interrupt(space->machine());
 
-	return (px4->icrb >> 8) & 0xff;
+	return (px4->m_icrb >> 8) & 0xff;
 }
 
 /* interrupt status register */
@@ -435,7 +435,7 @@ static READ8_HANDLER( px4_isr_r )
 	if (VERBOSE)
 		logerror("%s: px4_isr_r\n", space->machine().describe_context());
 
-	return px4->isr;
+	return px4->m_isr;
 }
 
 /* interrupt enable register */
@@ -446,7 +446,7 @@ static WRITE8_HANDLER( px4_ier_w )
 	if (VERBOSE)
 		logerror("%s: px4_ier_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->ier = data;
+	px4->m_ier = data;
 	gapnit_interrupt(space->machine());
 }
 
@@ -459,11 +459,11 @@ static READ8_HANDLER( px4_str_r )
 	if (VERBOSE)
 		logerror("%s: px4_str_r\n", space->machine().describe_context());
 
-	result |= cassette_input(px4->ext_cas) > 0 ? 1 : 0;
+	result |= cassette_input(px4->m_ext_cas) > 0 ? 1 : 0;
 	result |= 1 << 1;	/* BCRD, barcode reader input */
 	result |= 1 << 2;	/* RDY signal from 7805 */
 	result |= 1 << 3;	/* RDYSIO, enable access to the 7805 */
-	result |= px4->bankr & 0xf0;	/* bit 4-7, BANK - memory bank */
+	result |= px4->m_bankr & 0xf0;	/* bit 4-7, BANK - memory bank */
 
 	return result;
 }
@@ -475,7 +475,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 
 	/* ram, part 1 */
 	space->install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(px4->ram));
+	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(px4->m_ram));
 
 	/* actual rom data, part 1 */
 	space->install_read_bank(0xe000 - size, 0xffff - size, "bank2");
@@ -492,7 +492,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 
 	/* ram, continued */
 	space->install_readwrite_bank(0xe000, 0xffff, "bank4");
-	memory_set_bankptr(space->machine(), "bank4", ram_get_ptr(px4->ram) + 0xe000);
+	memory_set_bankptr(space->machine(), "bank4", ram_get_ptr(px4->m_ram) + 0xe000);
 }
 
 /* bank register */
@@ -504,7 +504,7 @@ static WRITE8_HANDLER( px4_bankr_w )
 	if (VERBOSE)
 		logerror("%s: px4_bankr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->bankr = data;
+	px4->m_bankr = data;
 
 	/* bank switch */
 	switch (data >> 4)
@@ -515,13 +515,13 @@ static WRITE8_HANDLER( px4_bankr_w )
 		space_program->nop_write(0x0000, 0x7fff);
 		memory_set_bankptr(space->machine(), "bank1", space->machine().region("os")->base());
 		space_program->install_readwrite_bank(0x8000, 0xffff, "bank2");
-		memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(px4->ram) + 0x8000);
+		memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(px4->m_ram) + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
 		space_program->install_readwrite_bank(0x0000, 0xffff, "bank1");
-		memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(px4->ram));
+		memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(px4->m_ram));
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -544,9 +544,9 @@ static READ8_HANDLER( px4_sior_r )
 	px4_state *px4 = space->machine().driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_sior_r 0x%02x\n", space->machine().describe_context(), px4->sior);
+		logerror("%s: px4_sior_r 0x%02x\n", space->machine().describe_context(), px4->m_sior);
 
-	return px4->sior;
+	return px4->m_sior;
 }
 
 /* serial io register */
@@ -557,7 +557,7 @@ static WRITE8_HANDLER( px4_sior_w )
 	if (VERBOSE)
 		logerror("%s: px4_sior_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->sior = data;
+	px4->m_sior = data;
 
 	switch (data)
 	{
@@ -573,24 +573,24 @@ static WRITE8_HANDLER( px4_sior_w )
 		if (VERBOSE)
 			logerror("7508 cmd: Read Status\n");
 
-		if (px4->interrupt_status != 0)
+		if (px4->m_interrupt_status != 0)
 		{
 			if (VERBOSE)
-				logerror("> 7508 has interrupts pending: 0x%02x\n", px4->interrupt_status);
+				logerror("> 7508 has interrupts pending: 0x%02x\n", px4->m_interrupt_status);
 
 			/* signal the interrupt(s) */
-			px4->sior = 0xc1 | px4->interrupt_status;
-			px4->interrupt_status = 0x00;
+			px4->m_sior = 0xc1 | px4->m_interrupt_status;
+			px4->m_interrupt_status = 0x00;
 		}
-		else if (px4->key_status != 0xff)
+		else if (px4->m_key_status != 0xff)
 		{
-			px4->sior = px4->key_status;
-			px4->key_status = 0xff;
+			px4->m_sior = px4->m_key_status;
+			px4->m_key_status = 0xff;
 		}
 		else
 		{
 			/* nothing happenend */
-			px4->sior = 0xbf;
+			px4->m_sior = 0xbf;
 		}
 
 		break;
@@ -608,7 +608,7 @@ static WRITE8_HANDLER( px4_sior_w )
 		if (VERBOSE)
 			logerror("7508 cmd: KB Interrupt OFF\n");
 
-		px4->key_int_enabled = FALSE;
+		px4->m_key_int_enabled = FALSE;
 		break;
 
 	case 0x16:
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( px4_sior_w )
 		if (VERBOSE)
 			logerror("7508 cmd: KB Interrupt ON\n");
 
-		px4->key_int_enabled = TRUE;
+		px4->m_key_int_enabled = TRUE;
 		break;
 
 	case 0x07: if (VERBOSE) logerror("7508 cmd: Clock Read\n"); break;
@@ -628,7 +628,7 @@ static WRITE8_HANDLER( px4_sior_w )
 			logerror("7508 cmd: Power Switch Read\n");
 
 		/* indicate that the power switch is in the "ON" position */
-		px4->sior = 0x01;
+		px4->m_sior = 0x01;
 		break;
 
 	case 0x09: if (VERBOSE) logerror("7508 cmd: Alarm Read\n"); break;
@@ -640,7 +640,7 @@ static WRITE8_HANDLER( px4_sior_w )
 
 		if (VERBOSE)
 			logerror("7508 cmd: DIP Switch Read\n");
-		px4->sior = input_port_read(space->machine(), "dips");
+		px4->m_sior = input_port_read(space->machine(), "dips");
 		break;
 
 	case 0x0b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
@@ -653,7 +653,7 @@ static WRITE8_HANDLER( px4_sior_w )
 		if (VERBOSE)
 			logerror("7508 cmd: 1 sec. Interrupt OFF\n");
 
-		px4->one_sec_int_enabled = FALSE;
+		px4->m_one_sec_int_enabled = FALSE;
 		break;
 
 	case 0x1d:
@@ -661,7 +661,7 @@ static WRITE8_HANDLER( px4_sior_w )
 		if (VERBOSE)
 			logerror("7508 cmd: 1 sec. Interrupt ON\n");
 
-		px4->one_sec_int_enabled = TRUE;
+		px4->m_one_sec_int_enabled = TRUE;
 		break;
 
 	case 0x0e:
@@ -669,7 +669,7 @@ static WRITE8_HANDLER( px4_sior_w )
 		if (VERBOSE)
 			logerror("7508 cmd: KB Clear\n");
 
-		px4->sior = 0xbf;
+		px4->m_sior = 0xbf;
 		break;
 
 	case 0x0f: if (VERBOSE) logerror("7508 cmd: System Reset\n"); break;
@@ -689,7 +689,7 @@ static WRITE8_HANDLER( px4_vadr_w )
 	if (VERBOSE)
 		logerror("%s: px4_vadr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->vadr = data;
+	px4->m_vadr = data;
 }
 
 /* y offset register */
@@ -700,7 +700,7 @@ static WRITE8_HANDLER( px4_yoff_w )
 	if (VERBOSE)
 		logerror("%s: px4_yoff_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->yoff = data;
+	px4->m_yoff = data;
 }
 
 /* frame register */
@@ -766,7 +766,7 @@ static READ8_HANDLER( px4_artdir_r )
 	if (VERBOSE)
 		logerror("%s: px4_artdir_r\n", space->machine().describe_context());
 
-	return px4->artdir;
+	return px4->m_artdir;
 }
 
 /* art data output register */
@@ -778,9 +778,9 @@ static WRITE8_HANDLER( px4_artdor_w )
 		logerror("%s: px4_artdor_w (0x%02x)\n", space->machine().describe_context(), data);
 
 	/* clear ready */
-	px4->artsr &= ~ART_TXRDY;
+	px4->m_artsr &= ~ART_TXRDY;
 
-	px4->artdor = data;
+	px4->m_artdor = data;
 }
 
 /* art status register */
@@ -792,9 +792,9 @@ static READ8_HANDLER( px4_artsr_r )
 	if (VERBOSE)
 		logerror("%s: px4_artsr_r\n", space->machine().describe_context());
 
-	result |= px4_rs232c_dsr(px4->rs232c_device) << 7;
+	result |= px4_rs232c_dsr(px4->m_rs232c_device) << 7;
 
-	return result | px4->artsr;
+	return result | px4->m_artsr;
 }
 
 /* art mode register */
@@ -805,7 +805,7 @@ static WRITE8_HANDLER( px4_artmr_w )
 	if (VERBOSE)
 		logerror("%s: px4_artmr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->artmr = data;
+	px4->m_artmr = data;
 }
 
 /* io status register */
@@ -817,12 +817,12 @@ static READ8_HANDLER( px4_iostr_r )
 	if (VERBOSE)
 		logerror("%s: px4_iostr_r\n", space->machine().describe_context());
 
-	result |= centronics_busy_r(px4->printer) << 0;
-	result |= !centronics_pe_r(px4->printer) << 1;
-	result |= px4_sio_pin(px4->sio_device) << 2;
-	result |= px4_sio_rxd(px4->sio_device) << 3;
-	result |= px4_rs232c_dcd(px4->rs232c_device) << 4;
-	result |= px4_rs232c_cts(px4->rs232c_device) << 5;
+	result |= centronics_busy_r(px4->m_printer) << 0;
+	result |= !centronics_pe_r(px4->m_printer) << 1;
+	result |= px4_sio_pin(px4->m_sio_device) << 2;
+	result |= px4_sio_rxd(px4->m_sio_device) << 3;
+	result |= px4_rs232c_dcd(px4->m_rs232c_device) << 4;
+	result |= px4_rs232c_cts(px4->m_rs232c_device) << 5;
 	result |= 1 << 6;	/* bit 6, csel, cartridge option select signal, set to 'other mode' */
 	result |= 0 << 7;	/* bit 7, caud - audio input from cartridge */
 
@@ -837,30 +837,30 @@ static WRITE8_HANDLER( px4_artcr_w )
 	if (VERBOSE)
 		logerror("%s: px4_artcr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->artcr = data;
+	px4->m_artcr = data;
 
 	/* bit 0, txe - transmit enable */
 	if (!ART_TX_ENABLED)
 	{
 		/* force high when disabled */
-		px4_sio_txd(px4->sio_device, ASSERT_LINE);
-		px4_rs232c_txd(px4->rs232c_device, ASSERT_LINE);
+		px4_sio_txd(px4->m_sio_device, ASSERT_LINE);
+		px4_rs232c_txd(px4->m_rs232c_device, ASSERT_LINE);
 	}
 
 	/* bit 3, sbrk - break output */
 	if (ART_TX_ENABLED && BIT(data, 3))
 	{
 		/* force low when enabled and transmit enabled */
-		px4_sio_txd(px4->sio_device, CLEAR_LINE);
-		px4_rs232c_txd(px4->rs232c_device, CLEAR_LINE);
+		px4_sio_txd(px4->m_sio_device, CLEAR_LINE);
+		px4_rs232c_txd(px4->m_rs232c_device, CLEAR_LINE);
 	}
 
 	/* error reset */
 	if (BIT(data, 4))
-		px4->artsr &= ~(ART_PE | ART_OE | ART_FE);
+		px4->m_artsr &= ~(ART_PE | ART_OE | ART_FE);
 
-	px4_rs232c_dtr(px4->rs232c_device, BIT(data, 1));
-	px4_rs232c_rts(px4->rs232c_device, BIT(data, 5));
+	px4_rs232c_dtr(px4->m_rs232c_device, BIT(data, 1));
+	px4_rs232c_rts(px4->m_rs232c_device, BIT(data, 5));
 }
 
 /* switch register */
@@ -871,7 +871,7 @@ static WRITE8_HANDLER( px4_swr_w )
 	if (VERBOSE)
 		logerror("%s: px4_swr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	px4->swr = data;
+	px4->m_swr = data;
 }
 
 /* io control register */
@@ -882,10 +882,10 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 	if (VERBOSE)
 		logerror("%s: px4_ioctlr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	centronics_strobe_w(px4->printer, !BIT(data, 0));
-	centronics_prime_w(px4->printer, BIT(data, 1));
+	centronics_strobe_w(px4->m_printer, !BIT(data, 0));
+	centronics_prime_w(px4->m_printer, BIT(data, 1));
 
-	px4_sio_pout(px4->sio_device, BIT(data, 2));
+	px4_sio_pout(px4->m_sio_device, BIT(data, 2));
 
 	/* bit 3, cartridge reset */
 
@@ -906,12 +906,12 @@ static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 	px4_state *px4 = timer.machine().driver_data<px4_state>();
 
 	/* adjust interrupt status */
-	px4->interrupt_status |= UPD7508_INT_ONE_SECOND;
+	px4->m_interrupt_status |= UPD7508_INT_ONE_SECOND;
 
 	/* are interrupts enabled? */
-	if (px4->one_sec_int_enabled)
+	if (px4->m_one_sec_int_enabled)
 	{
-		px4->isr |= INT0_7508;
+		px4->m_isr |= INT0_7508;
 		gapnit_interrupt(timer.machine());
 	}
 }
@@ -943,14 +943,14 @@ static INPUT_CHANGED( key_callback )
 
 	if (down || (scancode & 0xa0) == 0xa0)
 	{
-		px4->key_status = scancode;
+		px4->m_key_status = scancode;
 
-		if (px4->key_int_enabled)
+		if (px4->m_key_int_enabled)
 		{
 			if (VERBOSE)
 				logerror("upd7508: key interrupt\n");
 
-			px4->isr |= INT0_7508;
+			px4->m_isr |= INT0_7508;
 			gapnit_interrupt(field->port->machine());
 		}
 	}
@@ -967,9 +967,9 @@ static WRITE8_HANDLER( px4_ramdisk_address_w )
 
 	switch (offset)
 	{
-	case 0x00: px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | data; break;
-	case 0x01: px4->ramdisk_address = (px4->ramdisk_address & 0xff00ff) | (data << 8); break;
-	case 0x02: px4->ramdisk_address = (px4->ramdisk_address & 0x00ffff) | ((data & 0x07) << 16); break;
+	case 0x00: px4->m_ramdisk_address = (px4->m_ramdisk_address & 0xffff00) | data; break;
+	case 0x01: px4->m_ramdisk_address = (px4->m_ramdisk_address & 0xff00ff) | (data << 8); break;
+	case 0x02: px4->m_ramdisk_address = (px4->m_ramdisk_address & 0x00ffff) | ((data & 0x07) << 16); break;
 	}
 }
 
@@ -978,18 +978,18 @@ static READ8_HANDLER( px4_ramdisk_data_r )
 	px4_state *px4 = space->machine().driver_data<px4_state>();
 	UINT8 ret = 0xff;
 
-	if (px4->ramdisk_address < 0x20000)
+	if (px4->m_ramdisk_address < 0x20000)
 	{
 		/* read from ram */
-		ret = px4->ramdisk[px4->ramdisk_address];
+		ret = px4->m_ramdisk[px4->m_ramdisk_address];
 	}
-	else if (px4->ramdisk_address < 0x40000)
+	else if (px4->m_ramdisk_address < 0x40000)
 	{
 		/* read from rom */
-		ret = space->machine().region("ramdisk")->base()[px4->ramdisk_address];
+		ret = space->machine().region("ramdisk")->base()[px4->m_ramdisk_address];
 	}
 
-	px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | ((px4->ramdisk_address & 0xff) + 1);
+	px4->m_ramdisk_address = (px4->m_ramdisk_address & 0xffff00) | ((px4->m_ramdisk_address & 0xff) + 1);
 
 	return ret;
 }
@@ -998,10 +998,10 @@ static WRITE8_HANDLER( px4_ramdisk_data_w )
 {
 	px4_state *px4 = space->machine().driver_data<px4_state>();
 
-	if (px4->ramdisk_address < 0x20000)
-		px4->ramdisk[px4->ramdisk_address] = data;
+	if (px4->m_ramdisk_address < 0x20000)
+		px4->m_ramdisk[px4->m_ramdisk_address] = data;
 
-	px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | ((px4->ramdisk_address & 0xff) + 1);
+	px4->m_ramdisk_address = (px4->m_ramdisk_address & 0xffff00) | ((px4->m_ramdisk_address & 0xff) + 1);
 }
 
 static READ8_HANDLER( px4_ramdisk_control_r )
@@ -1015,10 +1015,10 @@ static NVRAM_HANDLER( px4_ramdisk )
 	px4_state *px4 = machine.driver_data<px4_state>();
 
 	if (read_or_write)
-		file->write(px4->ramdisk, 0x20000);
+		file->write(px4->m_ramdisk, 0x20000);
 	else
 		if (file)
-			file->read(px4->ramdisk, 0x20000);
+			file->read(px4->m_ramdisk, 0x20000);
 }
 
 
@@ -1031,17 +1031,17 @@ static SCREEN_UPDATE( px4 )
 	px4_state *px4 = screen->machine().driver_data<px4_state>();
 
 	/* display enabled? */
-	if (BIT(px4->yoff, 7))
+	if (BIT(px4->m_yoff, 7))
 	{
 		int y, x;
 
 		/* get vram start address */
-		UINT8 *vram = &ram_get_ptr(px4->ram)[(px4->vadr & 0xf8) << 8];
+		UINT8 *vram = &ram_get_ptr(px4->m_ram)[(px4->m_vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
 			/* adjust against y-offset */
-			UINT8 row = (y - (px4->yoff & 0x3f)) & 0x3f;
+			UINT8 row = (y - (px4->m_yoff & 0x3f)) & 0x3f;
 
 			for (x = 0; x < 240/8; x++)
 			{
@@ -1080,32 +1080,32 @@ static DRIVER_INIT( px4 )
 	px4_state *px4 = machine.driver_data<px4_state>();
 
 	/* find devices */
-	px4->ram = machine.device(RAM_TAG);
+	px4->m_ram = machine.device(RAM_TAG);
 
 	/* init 7508 */
-	px4->one_sec_int_enabled = TRUE;
-	px4->key_int_enabled = TRUE;
-	px4->alarm_int_enabled = TRUE;
+	px4->m_one_sec_int_enabled = TRUE;
+	px4->m_key_int_enabled = TRUE;
+	px4->m_alarm_int_enabled = TRUE;
 
 	/* art */
-	px4->receive_timer = machine.scheduler().timer_alloc(FUNC(receive_data));
-	px4->transmit_timer = machine.scheduler().timer_alloc(FUNC(transmit_data));
+	px4->m_receive_timer = machine.scheduler().timer_alloc(FUNC(receive_data));
+	px4->m_transmit_timer = machine.scheduler().timer_alloc(FUNC(transmit_data));
 
 	/* printer */
-	px4->printer = machine.device("centronics");
+	px4->m_printer = machine.device("centronics");
 
 	/* external cassette or barcode reader */
-	px4->ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
-	px4->ext_cas = machine.device("extcas");
-	px4->ear_last_state = 0;
+	px4->m_ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
+	px4->m_ext_cas = machine.device("extcas");
+	px4->m_ear_last_state = 0;
 
 	/* external devices */
-	px4->sio_device = machine.device("floppy");
-	px4->rs232c_device = NULL;
+	px4->m_sio_device = machine.device("floppy");
+	px4->m_rs232c_device = NULL;
 
 	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, "bank1", machine.region("os")->base());
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(px4->ram) + 0x8000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(px4->m_ram) + 0x8000);
 }
 
 static DRIVER_INIT( px4p )
@@ -1115,14 +1115,14 @@ static DRIVER_INIT( px4p )
 	DRIVER_INIT_CALL(px4);
 
 	/* reserve memory for external ram-disk */
-	px4->ramdisk = auto_alloc_array(machine, UINT8, 0x20000);
+	px4->m_ramdisk = auto_alloc_array(machine, UINT8, 0x20000);
 }
 
 static MACHINE_RESET( px4 )
 {
 	px4_state *px4 = machine.driver_data<px4_state>();
 
-	px4->artsr = ART_TXRDY | ART_TXEMPTY;
+	px4->m_artsr = ART_TXRDY | ART_TXEMPTY;
 }
 
 

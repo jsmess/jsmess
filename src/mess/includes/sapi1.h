@@ -13,10 +13,10 @@ public:
 	sapi1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* sapi_video_ram;
-	UINT8 keyboard_mask;
-	UINT8 refresh_counter;
-	UINT8 zps3_25;
+	UINT8* m_sapi_video_ram;
+	UINT8 m_keyboard_mask;
+	UINT8 m_refresh_counter;
+	UINT8 m_zps3_25;
 };
 
 

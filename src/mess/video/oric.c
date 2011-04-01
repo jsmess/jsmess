@@ -22,11 +22,11 @@ static TIMER_CALLBACK(oric_vh_timer_callback)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	/* update flash count */
-	state->vh_state.flash_count++;
-	if (state->vh_state.flash_count == 16)
+	state->m_vh_state.flash_count++;
+	if (state->m_vh_state.flash_count == 16)
 	{
-		state->vh_state.flash_count = 0;
-		state->vh_state.flash_state ^=(1<<3);
+		state->m_vh_state.flash_count = 0;
+		state->m_vh_state.flash_state ^=(1<<3);
 		oric_vh_update_flash(state);
 	}
 }
@@ -35,8 +35,8 @@ VIDEO_START( oric )
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	/* initialise flash timer */
-	state->vh_state.flash_count = 0;
-	state->vh_state.flash_state = 0;
+	state->m_vh_state.flash_count = 0;
+	state->m_vh_state.flash_state = 0;
 	machine.scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
 	/* mode */
 	oric_vh_update_attribute(machine,(1<<3)|(1<<4));
@@ -46,25 +46,25 @@ VIDEO_START( oric )
 static void oric_vh_update_flash(oric_state *state)
 {
 	/* flash active? */
-	if (state->vh_state.text_attributes & (1<<2))
+	if (state->m_vh_state.text_attributes & (1<<2))
 	{
 		/* yes */
 
 		/* show or hide text? */
-		if (state->vh_state.flash_state)
+		if (state->m_vh_state.flash_state)
 		{
 			/* hide */
 			/* set foreground and background to be the same */
-			state->vh_state.active_foreground_colour = state->vh_state.background_colour;
-			state->vh_state.active_background_colour = state->vh_state.background_colour;
+			state->m_vh_state.active_foreground_colour = state->m_vh_state.background_colour;
+			state->m_vh_state.active_background_colour = state->m_vh_state.background_colour;
 			return;
 		}
 	}
 
 
 	/* show */
-	state->vh_state.active_foreground_colour = state->vh_state.foreground_colour;
-	state->vh_state.active_background_colour = state->vh_state.background_colour;
+	state->m_vh_state.active_foreground_colour = state->m_vh_state.foreground_colour;
+	state->m_vh_state.active_background_colour = state->m_vh_state.background_colour;
 }
 
 /* the alternate charset follows from the standard charset.
@@ -74,15 +74,15 @@ The start address for the standard charset is dependant on the video mode */
 static void oric_refresh_charset(oric_state *state)
 {
 	/* alternate char set? */
-	if ((state->vh_state.text_attributes & (1<<0))==0)
+	if ((state->m_vh_state.text_attributes & (1<<0))==0)
 	{
 		/* no */
-		state->vh_state.char_data = state->vh_state.char_base;
+		state->m_vh_state.char_data = state->m_vh_state.char_base;
 	}
 	else
 	{
 		/* yes */
-		state->vh_state.char_data = state->vh_state.char_base + (128*8);
+		state->m_vh_state.char_data = state->m_vh_state.char_base + (128*8);
 	}
 }
 
@@ -99,14 +99,14 @@ static void oric_vh_update_attribute(running_machine &machine,int c)
 		case 0:
 		{
 			/* set foreground colour */
-			state->vh_state.foreground_colour = attribute & 0x07;
+			state->m_vh_state.foreground_colour = attribute & 0x07;
 			oric_vh_update_flash(state);
 		}
 		break;
 
 		case 1:
 		{
-			state->vh_state.text_attributes = attribute & 0x07;
+			state->m_vh_state.text_attributes = attribute & 0x07;
 
 			oric_refresh_charset(state);
 
@@ -118,7 +118,7 @@ static void oric_vh_update_attribute(running_machine &machine,int c)
 		case 2:
 		{
 			/* set background colour */
-			state->vh_state.background_colour = attribute & 0x07;
+			state->m_vh_state.background_colour = attribute & 0x07;
 			oric_vh_update_flash(state);
 		}
 		break;
@@ -126,20 +126,20 @@ static void oric_vh_update_attribute(running_machine &machine,int c)
 		case 3:
 		{
 			/* set video mode */
-			state->vh_state.mode = attribute & 0x07;
+			state->m_vh_state.mode = attribute & 0x07;
 
 			/* a different charset base is used depending on the video mode */
 			/* hires takes all the data from 0x0a000 through to about 0x0bf68,
             so the charset is moved to 0x09800 */
 			/* text mode starts at 0x0bb80 and so the charset is in a different location */
-			if (state->vh_state.mode & (1<<2))
+			if (state->m_vh_state.mode & (1<<2))
 			{
 				/* set screen memory base and standard charset location for this mode */
-				state->vh_state.read_addr = 0x0a000;
-				if (state->ram)
-					state->vh_state.char_base = state->ram + (unsigned long)0x09800;
+				state->m_vh_state.read_addr = 0x0a000;
+				if (state->m_ram)
+					state->m_vh_state.char_base = state->m_ram + (unsigned long)0x09800;
 				else
-					state->vh_state.char_base = (unsigned char *)space->get_read_ptr(0x09800);
+					state->m_vh_state.char_base = (unsigned char *)space->get_read_ptr(0x09800);
 
 				/* changing the mode also changes the position of the standard charset
                 and alternative charset */
@@ -148,11 +148,11 @@ static void oric_vh_update_attribute(running_machine &machine,int c)
 			else
 			{
 				/* set screen memory base and standard charset location for this mode */
-				state->vh_state.read_addr = 0x0bb80;
-				if (state->ram)
-					state->vh_state.char_base = state->ram + (unsigned long)0x0b400;
+				state->m_vh_state.read_addr = 0x0bb80;
+				if (state->m_ram)
+					state->m_vh_state.char_base = state->m_ram + (unsigned long)0x0b400;
 				else
-					state->vh_state.char_base = (unsigned char *)space->get_read_ptr(0x0b400);
+					state->m_vh_state.char_base = (unsigned char *)space->get_read_ptr(0x0b400);
 
 				/* changing the mode also changes the position of the standard charset
                 and alternative charset */
@@ -213,13 +213,13 @@ SCREEN_UPDATE( oric )
 	unsigned long read_addr_base;
 	int hires_active;
 
-	RAM = state->ram;
+	RAM = state->m_ram;
 
 	/* set initial base */
-	read_addr_base = state->vh_state.read_addr;
+	read_addr_base = state->m_vh_state.read_addr;
 
 	/* is hires active? */
-	if (state->vh_state.mode & (1<<2))
+	if (state->m_vh_state.mode & (1<<2))
 	{
 		hires_active = 1;
 	}
@@ -279,12 +279,12 @@ SCREEN_UPDATE( oric )
 				oric_vh_update_attribute(screen->machine(), c);
 
 				/* display background colour when attribute has been found */
-				oric_vh_render_6pixels(bitmap, x, y, state->vh_state.active_foreground_colour, state->vh_state.active_background_colour, 0, (c & 0x080));
+				oric_vh_render_6pixels(bitmap, x, y, state->m_vh_state.active_foreground_colour, state->m_vh_state.active_background_colour, 0, (c & 0x080));
 
 				if (y < 200)
 				{
 					/* is hires active? */
-					if (state->vh_state.mode & (1 << 2))
+					if (state->m_vh_state.mode & (1 << 2))
 					{
 						hires_active = 1;
 					}
@@ -293,7 +293,7 @@ SCREEN_UPDATE( oric )
 						hires_active = 0;
 					}
 
-					read_addr_base = state->vh_state.read_addr;
+					read_addr_base = state->m_vh_state.read_addr;
 				}
 			}
 			else
@@ -303,7 +303,7 @@ SCREEN_UPDATE( oric )
 				{
 					int pixel_data = c & 0x03f;
 					/* plot hires pixels */
-					oric_vh_render_6pixels(bitmap,x,y,state->vh_state.active_foreground_colour, state->vh_state.active_background_colour, pixel_data,(c & 0x080));
+					oric_vh_render_6pixels(bitmap,x,y,state->m_vh_state.active_foreground_colour, state->m_vh_state.active_background_colour, pixel_data,(c & 0x080));
 				}
 				else
 				{
@@ -316,7 +316,7 @@ SCREEN_UPDATE( oric )
 					ch_line = y & 7;
 
 					/* is double height set? */
-					if (state->vh_state.text_attributes & (1<<1))
+					if (state->m_vh_state.text_attributes & (1<<1))
 					{
 						/* if char line is even, top half of character is displayed,
                         if char line is odd, bottom half of character is displayed */
@@ -327,12 +327,12 @@ SCREEN_UPDATE( oric )
 					}
 
 					/* fetch pixel data for this char line */
-					char_data = state->vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
+					char_data = state->m_vh_state.char_data[(char_index<<3) | ch_line] & 0x03f;
 
 					/* draw! */
 					oric_vh_render_6pixels(bitmap,x,y,
-						state->vh_state.active_foreground_colour,
-						state->vh_state.active_background_colour, char_data, (c & 0x080));
+						state->m_vh_state.active_foreground_colour,
+						state->m_vh_state.active_background_colour, char_data, (c & 0x080));
 				}
 
 			}

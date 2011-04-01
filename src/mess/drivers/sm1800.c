@@ -25,7 +25,7 @@ public:
 	sm1800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 irq_state;
+	UINT8 m_irq_state;
 };
 
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8)
@@ -70,8 +70,8 @@ static SCREEN_UPDATE( sm1800 )
 static INTERRUPT_GEN( sm1800_vblank_interrupt )
 {
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	cputag_set_input_line(device->machine(), "maincpu", 0, state->irq_state ?  HOLD_LINE : CLEAR_LINE);
-	state->irq_state ^= 1;
+	cputag_set_input_line(device->machine(), "maincpu", 0, state->m_irq_state ?  HOLD_LINE : CLEAR_LINE);
+	state->m_irq_state ^= 1;
 }
 
 static I8275_DISPLAY_PIXELS(sm1800_display_pixels)

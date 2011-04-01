@@ -440,14 +440,14 @@ static void install_protection(device_image_interface& image)
 	if(strcmp(crypt_feature,"kof99_crypt") == 0)
 	{
 		kof99_decrypt_68k(image.device().machine());
-		state->fixed_layer_bank_type = 1;
+		state->m_fixed_layer_bank_type = 1;
 		kof99_neogeo_gfx_decrypt(image.device().machine(), 0x00);
 		kof99_install_protection(image.device().machine());
 		logerror("Decrypted KOF99 code and graphics.\n");
 	}
 	if(strcmp(crypt_feature,"mslug3_crypt") == 0)
 	{
-		state->fixed_layer_bank_type = 1;
+		state->m_fixed_layer_bank_type = 1;
 		kof99_neogeo_gfx_decrypt(image.device().machine(), 0xad);
 		logerror("Decrypted Metal Slug 3 graphics\n");
 	}
@@ -455,7 +455,7 @@ static void install_protection(device_image_interface& image)
 	{
 		matrim_decrypt_68k(image.device().machine());
 		neo_pcm2_swap(image.device().machine(), 1);
-		state->fixed_layer_bank_type = 2;
+		state->m_fixed_layer_bank_type = 2;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x6a);
 		logerror("Decrypted Matrimelee code, sound and graphics\n");
@@ -464,7 +464,7 @@ static void install_protection(device_image_interface& image)
 	{
 		svc_px_decrypt(image.device().machine());
 		neo_pcm2_swap(image.device().machine(), 3);
-		state->fixed_layer_bank_type = 2;
+		state->m_fixed_layer_bank_type = 2;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x57);
 		install_pvc_protection(image.device().machine());
@@ -474,7 +474,7 @@ static void install_protection(device_image_interface& image)
 	{
 		samsho5_decrypt_68k(image.device().machine());
 		neo_pcm2_swap(image.device().machine(), 4);
-		state->fixed_layer_bank_type = 1;
+		state->m_fixed_layer_bank_type = 1;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x0f);
 		logerror("Decrypted Samurai Shodown V code, sound and graphics.\n");
@@ -482,7 +482,7 @@ static void install_protection(device_image_interface& image)
 	if(strcmp(crypt_feature,"kof2000_crypt") == 0)
 	{
 		kof2000_decrypt_68k(image.device().machine());
-		state->fixed_layer_bank_type = 2;
+		state->m_fixed_layer_bank_type = 2;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x00);
 		kof2000_install_protection(image.device().machine());
@@ -490,7 +490,7 @@ static void install_protection(device_image_interface& image)
 	}
 	if(strcmp(crypt_feature,"kof2001_crypt") == 0)
 	{
-		state->fixed_layer_bank_type = 1;
+		state->m_fixed_layer_bank_type = 1;
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x1e);
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		logerror("Decrypted KOF2001 code and graphics.\n");
@@ -505,7 +505,7 @@ static void install_protection(device_image_interface& image)
 	}
 	if(strcmp(crypt_feature,"mslug4_crypt") == 0)
 	{
-		state->fixed_layer_bank_type = 1; /* USA violent content screen is wrong -- not a bug, confirmed on real hardware! */
+		state->m_fixed_layer_bank_type = 1; /* USA violent content screen is wrong -- not a bug, confirmed on real hardware! */
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x31);
 		neo_pcm2_snk_1999(image.device().machine(), 8);
@@ -515,7 +515,7 @@ static void install_protection(device_image_interface& image)
 	{
 		mslug5_decrypt_68k(image.device().machine());
 		neo_pcm2_swap(image.device().machine(), 2);
-		state->fixed_layer_bank_type = 1;
+		state->m_fixed_layer_bank_type = 1;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x19);
 		install_pvc_protection(image.device().machine());
@@ -525,7 +525,7 @@ static void install_protection(device_image_interface& image)
 	{
 		kof2003h_decrypt_68k(image.device().machine());
 		neo_pcm2_swap(image.device().machine(), 5);
-		state->fixed_layer_bank_type = 2;
+		state->m_fixed_layer_bank_type = 2;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x9d);
 		install_pvc_protection(image.device().machine());
@@ -535,7 +535,7 @@ static void install_protection(device_image_interface& image)
 	{
 		samsh5sp_decrypt_68k(image.device().machine());
 		neo_pcm2_swap(image.device().machine(), 6);
-		state->fixed_layer_bank_type = 1;
+		state->m_fixed_layer_bank_type = 1;
 		neogeo_cmc50_m1_decrypt(image.device().machine());
 		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x0d);
 	}

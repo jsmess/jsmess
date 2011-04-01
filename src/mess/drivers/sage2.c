@@ -22,14 +22,14 @@ public:
 	sage2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16* ram;
+	UINT16* m_ram;
 };
 
 
 
 static ADDRESS_MAP_START(sage2_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(sage2_state, ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(sage2_state, m_ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00fe0000, 0x00feffff) AM_ROM AM_REGION("user1",0)
 //  AM_RANGE(0x00ffc070, 0x00ffc071 ) AM_DEVREADWRITE8("uart", msm8251_data_r,msm8251_data_w, 0xffff)
 //  AM_RANGE(0x00ffc072, 0x00ffc073 ) AM_DEVREADWRITE8("uart", msm8251_status_r,msm8251_control_w, 0xffff)
@@ -45,7 +45,7 @@ static MACHINE_RESET(sage2)
 	sage2_state *state = machine.driver_data<sage2_state>();
 	UINT8* user1 = machine.region("user1")->base();
 
-	memcpy((UINT8*)state->ram,user1,0x2000);
+	memcpy((UINT8*)state->m_ram,user1,0x2000);
 
 	machine.device("maincpu")->reset();
 }

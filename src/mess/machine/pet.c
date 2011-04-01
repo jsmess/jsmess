@@ -67,7 +67,7 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 	UINT8 data = 0;
 
 	/* key */
-	data |= state->keyline_select;
+	data |= state->m_keyline_select;
 
 	/* #1 cassette switch */
 	data |= ((cassette_get_state(device->machine().device("cassette1")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
@@ -103,7 +103,7 @@ static WRITE8_DEVICE_HANDLER( pia0_pa_w )
     */
 
 	/* key */
-	state->keyline_select = data & 0x0f;
+	state->m_keyline_select = data & 0x0f;
 }
 
 /* Keyboard reading/handling for regular keyboard */
@@ -131,11 +131,11 @@ static READ8_DEVICE_HANDLER( kin_r )
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
 	};
 
-	if (state->keyline_select < 10)
+	if (state->m_keyline_select < 10)
 	{
-		data = input_port_read(device->machine(), keynames[state->keyline_select]);
+		data = input_port_read(device->machine(), keynames[state->m_keyline_select]);
 		/* Check for left-shift lock */
-		if ((state->keyline_select == 8) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
+		if ((state->m_keyline_select == 8) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
 			data &= 0xfe;
 	}
 	return data;
@@ -151,20 +151,20 @@ static READ8_DEVICE_HANDLER( petb_kin_r )
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
 	};
 
-	if (state->keyline_select < 10)
+	if (state->m_keyline_select < 10)
 	{
-		data = input_port_read(device->machine(), keynames[state->keyline_select]);
+		data = input_port_read(device->machine(), keynames[state->m_keyline_select]);
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
-		if (state->superpet)
+		if (state->m_superpet)
 		{
-			if ((state->keyline_select == 6) && !(input_port_read(device->machine(), "SPECIAL") & 0x80))
+			if ((state->m_keyline_select == 6) && !(input_port_read(device->machine(), "SPECIAL") & 0x80))
 				data &= 0xfe;
 		}
 		else
 		{
-			if ((state->keyline_select == 6) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
+			if ((state->m_keyline_select == 6) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
 				data &= 0xfe;
 		}
 	}
@@ -190,12 +190,12 @@ static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 	if (!data)
 	{
 		cassette_change_state(device->machine().device("cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		state->datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		state->m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
 		cassette_change_state(device->machine().device("cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-		state->datasette1_timer->reset();
+		state->m_datasette1_timer->reset();
 	}
 }
 
@@ -203,8 +203,8 @@ static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
 {
 	pet_state *driver_state = device->machine().driver_data<pet_state>();
 
-	driver_state->pia0_irq = state;
-	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+	driver_state->m_pia0_irq = state;
+	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
 	device_set_input_line(device->machine().firstcpu, INPUT_LINE_IRQ0, level);
 }
@@ -290,8 +290,8 @@ static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
 {
 	pet_state *driver_state = device->machine().driver_data<pet_state>();
 
-	driver_state->pia1_irq = state;
-	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+	driver_state->m_pia1_irq = state;
+	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
 	device_set_input_line(device->machine().firstcpu, INPUT_LINE_IRQ0, level);
 }
@@ -403,12 +403,12 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	if (BIT(data, 4))
 	{
 		cassette_change_state(device->machine().device("cassette2"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		state->datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		state->m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
 		cassette_change_state(device->machine().device("cassette2"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		state->datasette2_timer->reset();
+		state->m_datasette2_timer->reset();
 	}
 }
 
@@ -416,16 +416,16 @@ static WRITE_LINE_DEVICE_HANDLER( gb_w )
 {
 	pet_state *drvstate = device->machine().driver_data<pet_state>();
 	DBG_LOG(device->machine(), 1, "address line", ("%d\n", state));
-	if (state) drvstate->font |= 1;
-	else drvstate->font &= ~1;
+	if (state) drvstate->m_font |= 1;
+	else drvstate->m_font &= ~1;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 {
 	pet_state *driver_state = device->machine().driver_data<pet_state>();
 
-	driver_state->via_irq = state;
-	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+	driver_state->m_via_irq = state;
+	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
 	device_set_input_line(device->machine().firstcpu, INPUT_LINE_IRQ0, level);
 }
@@ -488,7 +488,7 @@ static READ8_HANDLER( cbm8096_io_r )
 static WRITE8_HANDLER( pet80_bank1_w )
 {
 	pet_state *state = space->machine().driver_data<pet_state>();
-	state->pet80_bank1_base[offset] = data;
+	state->m_pet80_bank1_base[offset] = data;
 }
 
 /*
@@ -534,8 +534,8 @@ WRITE8_HANDLER( cbm8096_w )
 
 		if (data & 0x20)
 		{
-			state->pet80_bank1_base = state->memory + 0x8000;
-			memory_set_bankptr(space->machine(), "bank1", state->pet80_bank1_base);
+			state->m_pet80_bank1_base = state->m_memory + 0x8000;
+			memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base);
 			space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 		}
 		else
@@ -560,71 +560,71 @@ WRITE8_HANDLER( cbm8096_w )
 		{
 			if (!(data & 0x20))
 			{
-				state->pet80_bank1_base = state->memory + 0x14000;
-				memory_set_bankptr(space->machine(), "bank1", state->pet80_bank1_base);
+				state->m_pet80_bank1_base = state->m_memory + 0x14000;
+				memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base);
 			}
-			memory_set_bankptr(space->machine(), "bank2", state->memory + 0x15000);
-			memory_set_bankptr(space->machine(), "bank3", state->memory + 0x16000);
-			memory_set_bankptr(space->machine(), "bank4", state->memory + 0x17000);
+			memory_set_bankptr(space->machine(), "bank2", state->m_memory + 0x15000);
+			memory_set_bankptr(space->machine(), "bank3", state->m_memory + 0x16000);
+			memory_set_bankptr(space->machine(), "bank4", state->m_memory + 0x17000);
 		}
 		else
 		{
 			if (!(data & 0x20))
 			{
-				state->pet80_bank1_base = state->memory + 0x10000;
-				memory_set_bankptr(space->machine(), "bank1", state->pet80_bank1_base);
+				state->m_pet80_bank1_base = state->m_memory + 0x10000;
+				memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base);
 			}
-			memory_set_bankptr(space->machine(), "bank2", state->memory + 0x11000);
-			memory_set_bankptr(space->machine(), "bank3", state->memory + 0x12000);
-			memory_set_bankptr(space->machine(), "bank4", state->memory + 0x13000);
+			memory_set_bankptr(space->machine(), "bank2", state->m_memory + 0x11000);
+			memory_set_bankptr(space->machine(), "bank3", state->m_memory + 0x12000);
+			memory_set_bankptr(space->machine(), "bank4", state->m_memory + 0x13000);
 		}
 
 		if (data & 8)
 		{
 			if (!(data & 0x40))
 			{
-				memory_set_bankptr(space->machine(), "bank7", state->memory + 0x1e800);
+				memory_set_bankptr(space->machine(), "bank7", state->m_memory + 0x1e800);
 			}
-			memory_set_bankptr(space->machine(), "bank6", state->memory + 0x1c000);
-			memory_set_bankptr(space->machine(), "bank8", state->memory + 0x1f000);
-			memory_set_bankptr(space->machine(), "bank9", state->memory + 0x1fff1);
+			memory_set_bankptr(space->machine(), "bank6", state->m_memory + 0x1c000);
+			memory_set_bankptr(space->machine(), "bank8", state->m_memory + 0x1f000);
+			memory_set_bankptr(space->machine(), "bank9", state->m_memory + 0x1fff1);
 		}
 		else
 		{
 			if (!(data & 0x40))
 			{
-				memory_set_bankptr(space->machine(), "bank7", state->memory+ 0x1a800);
+				memory_set_bankptr(space->machine(), "bank7", state->m_memory+ 0x1a800);
 			}
-			memory_set_bankptr(space->machine(), "bank6", state->memory + 0x18000);
-			memory_set_bankptr(space->machine(), "bank8", state->memory + 0x1b000);
-			memory_set_bankptr(space->machine(), "bank9", state->memory + 0x1bff1);
+			memory_set_bankptr(space->machine(), "bank6", state->m_memory + 0x18000);
+			memory_set_bankptr(space->machine(), "bank8", state->m_memory + 0x1b000);
+			memory_set_bankptr(space->machine(), "bank9", state->m_memory + 0x1bff1);
 		}
 	}
 	else
 	{
-		state->pet80_bank1_base = state->memory + 0x8000;
-		memory_set_bankptr(space->machine(), "bank1", state->pet80_bank1_base );
+		state->m_pet80_bank1_base = state->m_memory + 0x8000;
+		memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base );
 		space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 
-		memory_set_bankptr(space->machine(), "bank2", state->memory + 0x9000);
+		memory_set_bankptr(space->machine(), "bank2", state->m_memory + 0x9000);
 		space->unmap_write(0x9000, 0x9fff);
 
-		memory_set_bankptr(space->machine(), "bank3", state->memory + 0xa000);
+		memory_set_bankptr(space->machine(), "bank3", state->m_memory + 0xa000);
 		space->unmap_write(0xa000, 0xafff);
 
-		memory_set_bankptr(space->machine(), "bank4", state->memory + 0xb000);
+		memory_set_bankptr(space->machine(), "bank4", state->m_memory + 0xb000);
 		space->unmap_write(0xb000, 0xbfff);
 
-		memory_set_bankptr(space->machine(), "bank6", state->memory + 0xc000);
+		memory_set_bankptr(space->machine(), "bank6", state->m_memory + 0xc000);
 		space->unmap_write(0xc000, 0xe7ff);
 
 		space->install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
 		space->install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
 
-		memory_set_bankptr(space->machine(), "bank8", state->memory + 0xf000);
+		memory_set_bankptr(space->machine(), "bank8", state->m_memory + 0xf000);
 		space->unmap_write(0xf000, 0xffef);
 
-		memory_set_bankptr(space->machine(), "bank9", state->memory + 0xfff1);
+		memory_set_bankptr(space->machine(), "bank9", state->m_memory + 0xfff1);
 		space->unmap_write(0xfff1, 0xffff);
 	}
 }
@@ -650,15 +650,15 @@ WRITE8_HANDLER( superpet_w )
 
 		case 4:
 		case 5:
-			state->spet.bank = data & 0xf;
-			memory_configure_bank(space->machine(), "bank1", 0, 16, state->supermemory, 0x1000);
-			memory_set_bank(space->machine(), "bank1", state->spet.bank);
+			state->m_spet.bank = data & 0xf;
+			memory_configure_bank(space->machine(), "bank1", 0, 16, state->m_supermemory, 0x1000);
+			memory_set_bank(space->machine(), "bank1", state->m_spet.bank);
 			/* 7 low writeprotects systemlatch */
 			break;
 
 		case 6:
 		case 7:
-			state->spet.rom = data & 1;
+			state->m_spet.rom = data & 1;
 			break;
 	}
 }
@@ -668,8 +668,8 @@ static TIMER_CALLBACK( pet_interrupt )
 	pet_state *state = machine.driver_data<pet_state>();
 	device_t *pia_0 = machine.device("pia_0");
 
-	pia6821_cb1_w(pia_0, state->pia_level);
-	state->pia_level = !state->pia_level;
+	pia6821_cb1_w(pia_0, state->m_pia_level);
+	state->m_pia_level = !state->m_pia_level;
 }
 
 
@@ -695,14 +695,14 @@ static void pet_common_driver_init( running_machine &machine )
 	int i;
 	pet_state *state = machine.driver_data<pet_state>();
 
-	state->font = 0;
+	state->m_font = 0;
 
-	state->pet_basic1 = 0;
-	state->superpet = 0;
-	state->cbm8096 = 0;
+	state->m_pet_basic1 = 0;
+	state->m_superpet = 0;
+	state->m_cbm8096 = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, ram_get_size(machine.device(RAM_TAG)) - 1, "bank10");
-	memory_set_bankptr(machine, "bank10", state->memory);
+	memory_set_bankptr(machine, "bank10", state->m_memory);
 
 	if (ram_get_size(machine.device(RAM_TAG)) < 0x8000)
 	{
@@ -712,31 +712,31 @@ static void pet_common_driver_init( running_machine &machine )
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
 	for (i = 0; i < ram_get_size(machine.device(RAM_TAG)); i += 0x40)
 	{
-		memset (state->memory + i, i & 0x40 ? 0 : 0xff, 0x40);
+		memset (state->m_memory + i, i & 0x40 ? 0 : 0xff, 0x40);
 	}
 
 	/* pet clock */
 	machine.scheduler().timer_pulse(attotime::from_msec(10), FUNC(pet_interrupt));
 
 	/* datasette */
-	state->datasette1_timer = machine.scheduler().timer_alloc(FUNC(pet_tape1_timer));
-	state->datasette2_timer = machine.scheduler().timer_alloc(FUNC(pet_tape2_timer));
+	state->m_datasette1_timer = machine.scheduler().timer_alloc(FUNC(pet_tape1_timer));
+	state->m_datasette2_timer = machine.scheduler().timer_alloc(FUNC(pet_tape2_timer));
 }
 
 
 DRIVER_INIT( pet2001 )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->memory = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_memory = ram_get_ptr(machine.device(RAM_TAG));
 	pet_common_driver_init(machine);
-	state->pet_basic1 = 1;
+	state->m_pet_basic1 = 1;
 	pet_vh_init(machine);
 }
 
 DRIVER_INIT( pet )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->memory = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_memory = ram_get_ptr(machine.device(RAM_TAG));
 	pet_common_driver_init(machine);
 	pet_vh_init(machine);
 }
@@ -744,11 +744,11 @@ DRIVER_INIT( pet )
 DRIVER_INIT( pet80 )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->memory = machine.region("maincpu")->base();
+	state->m_memory = machine.region("maincpu")->base();
 
 	pet_common_driver_init(machine);
-	state->cbm8096 = 1;
-	state->videoram = &state->memory[0x8000];
+	state->m_cbm8096 = 1;
+	state->m_videoram = &state->m_memory[0x8000];
 	pet80_vh_init(machine);
 
 }
@@ -756,13 +756,13 @@ DRIVER_INIT( pet80 )
 DRIVER_INIT( superpet )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->memory = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_memory = ram_get_ptr(machine.device(RAM_TAG));
 	pet_common_driver_init(machine);
-	state->superpet = 1;
+	state->m_superpet = 1;
 
-	state->supermemory = auto_alloc_array(machine, UINT8, 0x10000);
+	state->m_supermemory = auto_alloc_array(machine, UINT8, 0x10000);
 
-	memory_configure_bank(machine, "bank1", 0, 16, state->supermemory, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 16, state->m_supermemory, 0x1000);
 	memory_set_bank(machine, "bank1", 0);
 
 	superpet_vh_init(machine);
@@ -774,24 +774,24 @@ MACHINE_RESET( pet )
 	device_t *ieeebus = machine.device("ieee_bus");
 	device_t *scapegoat = machine.device("pia_0");
 
-	if (state->superpet)
+	if (state->m_superpet)
 	{
-		state->spet.rom = 0;
+		state->m_spet.rom = 0;
 		if (input_port_read(machine, "CFG") & 0x04)
 		{
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
-			state->font = 2;
+			state->m_font = 2;
 		}
 		else
 		{
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
-			state->font = 0;
+			state->m_font = 0;
 		}
 	}
 
-	if (state->cbm8096)
+	if (state->m_cbm8096)
 	{
 		if (input_port_read(machine, "CFG") & 0x08)
 		{
@@ -817,19 +817,19 @@ MACHINE_RESET( pet )
 INTERRUPT_GEN( pet_frame_interrupt )
 {
 	pet_state *state = device->machine().driver_data<pet_state>();
-	if (state->superpet)
+	if (state->m_superpet)
 	{
 		if (input_port_read(device->machine(), "CFG") & 0x04)
 		{
 			device_set_input_line(device, INPUT_LINE_HALT, 1);
 			device_set_input_line(device, INPUT_LINE_HALT, 0);
-			state->font |= 2;
+			state->m_font |= 2;
 		}
 		else
 		{
 			device_set_input_line(device, INPUT_LINE_HALT, 0);
 			device_set_input_line(device, INPUT_LINE_HALT, 1);
-			state->font &= ~2;
+			state->m_font &= ~2;
 		}
 	}
 
@@ -860,7 +860,7 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 
 	logerror("Loading cart %s at %.4x size:%.4x\n", image.filename(), address, size);
 
-	image.fread(state->memory + address, size);
+	image.fread(state->m_memory + address, size);
 
 	return IMAGE_INIT_PASS;
 }

@@ -50,10 +50,10 @@ public:
 	polgar_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 led_status;
-	UINT8 lcd_char;
-	UINT8 led7;
-	UINT8 latch_data;
+	UINT8 m_led_status;
+	UINT8 m_lcd_char;
+	UINT8 m_led7;
+	UINT8 m_latch_data;
 };
 
 static const int value[4] = {0x80,0x81,0x00,0x01};
@@ -111,9 +111,9 @@ static WRITE8_HANDLER ( write_io )
 
 	if (BIT(data,1)) {
 		if (BIT(data,0)) {
-			hd44780->data_write(*space, 128, state->lcd_char);
+			hd44780->data_write(*space, 128, state->m_lcd_char);
 		} else {
-			hd44780->control_write(*space, 128, state->lcd_char);
+			hd44780->control_write(*space, 128, state->m_lcd_char);
 		}
 	}
 
@@ -122,18 +122,18 @@ static WRITE8_HANDLER ( write_io )
 	if (BIT(data,7) && BIT(data, 4))
 	{
 		for (i=0;i<8;i++)
-		output_set_led_value(i,!BIT(state->latch_data,i));
+		output_set_led_value(i,!BIT(state->m_latch_data,i));
 	}
 	else if (BIT(data,6) && BIT(data,5))
 	{
 		for (i=0;i<8;i++)
-		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
+		output_set_led_value(10+i,!BIT(state->m_latch_data,7-i));
 	}
 	else if (!data && (!strcmp(space->machine().system().name,"milano")))
 		for (i=0;i<8;i++)
 		{
-			output_set_led_value(i,!BIT(state->latch_data,i));
-			output_set_led_value(10+i,!BIT(state->latch_data,7-i));
+			output_set_led_value(i,!BIT(state->m_latch_data,i));
+			output_set_led_value(10+i,!BIT(state->m_latch_data,7-i));
 		}
 		
 
@@ -146,7 +146,7 @@ static WRITE8_HANDLER ( write_lcd )
 {
 	polgar_state *state = space->machine().driver_data<polgar_state>();
 
-	state->lcd_char=data;
+	state->m_lcd_char=data;
 
 	//logerror("LCD Data = %d [%c]\n",data,(data&0xff));
 
@@ -169,9 +169,9 @@ static WRITE8_HANDLER ( write_led )
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
-	if (data==0)state->led_status &= 255-(1<<offset) ; else state->led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
-	if (offset==7) state->led7=data& 0x80 ? 0x00 :0xff;
+	if (data==0)state->m_led_status &= 255-(1<<offset) ; else state->m_led_status|=1<<offset;
+	if (offset<6)output_set_led_value(LED_offset+offset, state->m_led_status&1<<offset?1:0);
+	if (offset==7) state->m_led7=data& 0x80 ? 0x00 :0xff;
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
@@ -184,9 +184,9 @@ static WRITE8_HANDLER ( write_led )
 		output_set_led_value(LED_offset+offset,1);
 	else
 		output_set_led_value(LED_offset+offset,0);
-	if (data==0)state->led_status &= 255-(1<<offset) ; else state->led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
-	if (offset==7) state->led7=data& 0x80 ? 0x00 :0xff;
+	if (data==0)state->m_led_status &= 255-(1<<offset) ; else state->m_led_status|=1<<offset;
+	if (offset<6)output_set_led_value(LED_offset+offset, state->m_led_status&1<<offset?1:0);
+	if (offset==7) state->m_led7=data& 0x80 ? 0x00 :0xff;
 
 
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
@@ -197,7 +197,7 @@ static WRITE8_HANDLER ( milano_write_board )
 {
 	polgar_state *state = space->machine().driver_data<polgar_state>();
 
-	state->latch_data=data;
+	state->m_latch_data=data;
 }
 
 static READ8_HANDLER(milano_read_board)
@@ -210,9 +210,9 @@ static READ8_HANDLER(milano_read_board)
 	UINT8 data=0x00;
 	UINT8 tmp=0xff;
 
-	if (state->latch_data)
+	if (state->m_latch_data)
 	{
-		line=get_first_cleared_bit(state->latch_data);
+		line=get_first_cleared_bit(state->m_latch_data);
 		tmp=input_port_read(space->machine(),  board_lines[line]);
 		
 		if (tmp != 0xff)
@@ -236,14 +236,14 @@ static READ8_HANDLER(read_keys)
 
 	data = 0xff;
 #if 0
-	if (((state->led_status & 0x80) == 0x00))
+	if (((state->m_led_status & 0x80) == 0x00))
 		data=input_port_read(space->machine(), keynames[0][offset]);
 	else
 		data=input_port_read(space->machine(), keynames[1][offset]);
 #endif
 	data=input_port_read(space->machine(), keynames[0][offset]);
 
-	// logerror("Keyboard Port = %s Data = %d\n  ", ((state->led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
+	// logerror("Keyboard Port = %s Data = %d\n  ", ((state->m_led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
 
@@ -436,8 +436,8 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 	// running_device *speaker = timer.machine().device("beep");
 	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
-	// dac_data_w(0,state->led_status&64?128:0);
-	// beep_set_state(speaker,state->led_status&64?1:0);
+	// dac_data_w(0,state->m_led_status&64?128:0);
+	// beep_set_state(speaker,state->m_led_status&64?1:0);
 }
 
 static MACHINE_START( polgar )
@@ -522,7 +522,7 @@ ROM_END
 static DRIVER_INIT( polgar )
 {
 	polgar_state *state = machine.driver_data<polgar_state>();
-	state->led_status=0;
+	state->m_led_status=0;
 }
 
 /***************************************************************************

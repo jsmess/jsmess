@@ -26,7 +26,7 @@ SCREEN_UPDATE( llc1 )
 	{
 		for (y = 0; y < 16; y++)
 		{
-			code = state->video_ram[x + y*64];
+			code = state->m_video_ram[x + y*64];
 			inv = code & 0x80; // highest bit is invert flag
 			code &= 0x7f;
 			for (b = 0; b < 8; b++)
@@ -58,7 +58,7 @@ SCREEN_UPDATE( llc2 )
 	{
 		for (y = 0; y < 32; y++)
 		{
-			code = state->video_ram[x + y*64];
+			code = state->m_video_ram[x + y*64];
 			for (b = 0; b < 8; b++)
 			{
 				disp = gfx[code * 8 + b];

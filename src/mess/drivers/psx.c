@@ -40,18 +40,18 @@ public:
 	psx1_state(running_machine &machine, const driver_device_config_base &config)
 		: psx_state(machine, config) { }
 
-	UINT8 *exe_buffer;
-	int exe_size;
+	UINT8 *m_exe_buffer;
+	int m_exe_size;
 	pad_t m_pad[ 2 ];
-	int cd_param_p;
-	int cd_result_p;
-	int cd_result_c;
-	int cd_result_ready;
-	int cd_reset;
-	UINT8 cd_stat;
-	UINT8 cd_io_status;
-	UINT8 cd_param[8];
-	UINT8 cd_result[8];
+	int m_cd_param_p;
+	int m_cd_result_p;
+	int m_cd_result_c;
+	int m_cd_result_ready;
+	int m_cd_reset;
+	UINT8 m_cd_stat;
+	UINT8 m_cd_io_status;
+	UINT8 m_cd_param[8];
+	UINT8 m_cd_result[8];
 };
 
 
@@ -147,8 +147,8 @@ static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 		logerror( "psx_exe_load: sp    %08x\n", psxexe_header->s_addr );
 		logerror( "psx_exe_load: len   %08x\n", psxexe_header->s_size );
 
-		p_ram = (UINT8 *)state->p_n_psxram;
-		n_ram = state->n_psxramsize;
+		p_ram = (UINT8 *)state->m_p_n_psxram;
+		n_ram = state->m_n_psxramsize;
 
 		p_psxexe = p_n_file + sizeof( struct PSXEXE_HEADER );
 
@@ -251,8 +251,8 @@ static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
 						( (int)p_n_file[ n_offset + 6 ] << 16 ) |
 						( (int)p_n_file[ n_offset + 7 ] << 24 );
 
-					UINT8 *p_ram = (UINT8 *)state->p_n_psxram;
-					UINT32 n_ram = state->n_psxramsize;
+					UINT8 *p_ram = (UINT8 *)state->m_p_n_psxram;
+					UINT32 n_ram = state->m_n_psxramsize;
 
 					n_offset += 8;
 
@@ -431,9 +431,9 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 		machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
 
-		if( load_psxexe( cpu, state->exe_buffer, state->exe_size ) ||
-			load_cpe( cpu, state->exe_buffer, state->exe_size ) ||
-			load_psf( cpu, state->exe_buffer, state->exe_size ) )
+		if( load_psxexe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
+			load_cpe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
+			load_psf( cpu, state->m_exe_buffer, state->m_exe_size ) )
 		{
 /*          DEBUGGER_BREAK; */
 
@@ -444,8 +444,8 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 			logerror( "psx_exe_load: invalid exe\n" );
 		}
 
-		state->exe_size = 0;
-		free( state->exe_buffer );
+		state->m_exe_size = 0;
+		free( state->m_exe_buffer );
 	}
 	return address;
 }
@@ -455,19 +455,19 @@ static QUICKLOAD_LOAD( psx_exe_load )
 	psx1_state *state = image.device().machine().driver_data<psx1_state>();
 	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
-	state->exe_size = 0;
-	state->exe_buffer = (UINT8*)malloc( quickload_size );
-	if( state->exe_buffer == NULL )
+	state->m_exe_size = 0;
+	state->m_exe_buffer = (UINT8*)malloc( quickload_size );
+	if( state->m_exe_buffer == NULL )
 	{
 		logerror( "psx_exe_load: out of memory\n" );
 		return IMAGE_INIT_FAIL;
 	}
-	if( image.fread( state->exe_buffer, quickload_size ) != quickload_size )
+	if( image.fread( state->m_exe_buffer, quickload_size ) != quickload_size )
 	{
-		free( state->exe_buffer );
+		free( state->m_exe_buffer );
 		return IMAGE_INIT_FAIL;
 	}
-	state->exe_size = quickload_size;
+	state->m_exe_size = quickload_size;
 	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, image.device().machine()));
 
 	return IMAGE_INIT_PASS;

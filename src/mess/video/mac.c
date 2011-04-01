@@ -41,9 +41,9 @@ SCREEN_UPDATE( mac )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *mac = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen->machine().driver_data<mac_state>();
 
-	video_base = ram_get_size(screen->machine().device(RAM_TAG)) - (mac->screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_base = ram_get_size(screen->machine().device(RAM_TAG)) - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
 	video_ram = (const UINT16 *) (ram_get_ptr(screen->machine().device(RAM_TAG)) + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
@@ -69,10 +69,10 @@ SCREEN_UPDATE( macse30 )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *mac = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen->machine().driver_data<mac_state>();
 
-	video_base = mac->screen_buffer ? 0x8000 : 0;
-	video_ram = (const UINT16 *) &mac->m_se30_vram[video_base/4];
+	video_base = state->m_screen_buffer ? 0x8000 : 0;
+	video_ram = (const UINT16 *) &state->m_se30_vram[video_base/4];
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{

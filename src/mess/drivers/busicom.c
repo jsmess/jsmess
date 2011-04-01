@@ -23,14 +23,14 @@ static READ8_HANDLER(keyboard_r)
 {
 	busicom_state *state = space->machine().driver_data<busicom_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
-	return input_port_read(space->machine(),keynames[get_bit_selected(state->keyboard_shifter & 0x3ff,10)]);
+	return input_port_read(space->machine(),keynames[get_bit_selected(state->m_keyboard_shifter & 0x3ff,10)]);
 }
 
 static READ8_HANDLER(printer_r)
 {
 	busicom_state *state = space->machine().driver_data<busicom_state>();
 	UINT8 retVal = 0;
-	if (state->drum_index==0) retVal |= 1;
+	if (state->m_drum_index==0) retVal |= 1;
 	retVal |= input_port_read(space->machine(),"PAPERADV") & 1 ? 8 : 0;
 	return retVal;
 }
@@ -40,12 +40,12 @@ static WRITE8_HANDLER(shifter_w)
 {
 	busicom_state *state = space->machine().driver_data<busicom_state>();
 	if (BIT(data,0)) {
-		state->keyboard_shifter <<= 1;
-		state->keyboard_shifter |= BIT(data,1);
+		state->m_keyboard_shifter <<= 1;
+		state->m_keyboard_shifter |= BIT(data,1);
 	}
 	if (BIT(data,2)) {
-		state->printer_shifter <<= 1;
-		state->printer_shifter |= BIT(data,1);
+		state->m_printer_shifter <<= 1;
+		state->m_printer_shifter |= BIT(data,1);
 	}
 }
 
@@ -54,35 +54,35 @@ static WRITE8_HANDLER(printer_w)
 	busicom_state *state = space->machine().driver_data<busicom_state>();
 	int i,j;
 	if (BIT(data,0)) {
-		logerror("color : %02x %02x %d\n",BIT(data,0),data,state->drum_index);
-		state->printer_line_color[10] = 1;
+		logerror("color : %02x %02x %d\n",BIT(data,0),data,state->m_drum_index);
+		state->m_printer_line_color[10] = 1;
 
 	}
 	if (BIT(data,1)) {
 		for(i=3;i<18;i++) {
-			if(BIT(state->printer_shifter,i)) {
-				state->printer_line[10][i-3] = state->drum_index + 1;
+			if(BIT(state->m_printer_shifter,i)) {
+				state->m_printer_line[10][i-3] = state->m_drum_index + 1;
 			}
 		}
-		if(BIT(state->printer_shifter,0)) {
-			state->printer_line[10][15] = state->drum_index + 13 + 1;
+		if(BIT(state->m_printer_shifter,0)) {
+			state->m_printer_line[10][15] = state->m_drum_index + 13 + 1;
 		}
-		if(BIT(state->printer_shifter,1)) {
-			state->printer_line[10][16] = state->drum_index + 26 + 1;
+		if(BIT(state->m_printer_shifter,1)) {
+			state->m_printer_line[10][16] = state->m_drum_index + 26 + 1;
 		}
 	}
 	if (BIT(data,3)) {
 
 		for(j=0;j<10;j++) {
 			for(i=0;i<17;i++) {
-				state->printer_line[j][i] = state->printer_line[j+1][i];
-				state->printer_line_color[j] = state->printer_line_color[j+1];
+				state->m_printer_line[j][i] = state->m_printer_line[j+1][i];
+				state->m_printer_line_color[j] = state->m_printer_line_color[j+1];
 			}
 		}
 		for(i=0;i<17;i++) {
-			state->printer_line[10][i] = 0;
+			state->m_printer_line[10][i] = 0;
 		}
-		state->printer_line_color[10] = 0;
+		state->m_printer_line_color[10] = 0;
 
 	}
 }
@@ -185,10 +185,10 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK(timer_callback)
 {
 	busicom_state *state = timer.machine().driver_data<busicom_state>();
-	state->timer ^=1;
-	if (state->timer==1) state->drum_index++;
-	if (state->drum_index==13) state->drum_index=0;
-	i4004_set_test(timer.machine().device("maincpu"),state->timer);
+	state->m_timer ^=1;
+	if (state->m_timer==1) state->m_drum_index++;
+	if (state->m_drum_index==13) state->m_drum_index=0;
+	i4004_set_test(timer.machine().device("maincpu"),state->m_timer);
 
 }
 
@@ -200,14 +200,14 @@ static MACHINE_RESET(busicom)
 {
 	busicom_state *state = machine.driver_data<busicom_state>();
 	int i,j;
-	state->drum_index =0;
-	state->keyboard_shifter = 0;
-	state->printer_shifter = 0;
+	state->m_drum_index =0;
+	state->m_keyboard_shifter = 0;
+	state->m_printer_shifter = 0;
 
 	for(i=0;i<17;i++) {
 		for(j=0;j<11;j++) {
-			state->printer_line[j][i] = 0;
-			state->printer_line_color[j] = 0;
+			state->m_printer_line[j][i] = 0;
+			state->m_printer_line_color[j] = 0;
 		}
 	}
 

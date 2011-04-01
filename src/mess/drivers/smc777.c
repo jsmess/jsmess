@@ -34,24 +34,24 @@ public:
 	smc777_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 cursor_addr;
-	UINT16 cursor_raster;
-	UINT8 keyb_press;
-	UINT8 keyb_press_flag;
-	UINT8 shift_press_flag;
-	UINT8 backdrop_pen;
-	UINT8 display_reg;
-	int addr_latch;
-	UINT8 fdc_irq_flag;
-	UINT8 fdc_drq_flag;
-	UINT8 system_data;
-	struct { UINT8 r,g,b; } pal;
-	UINT8 raminh,raminh_pending_change; //bankswitch
-	UINT8 raminh_prefetch;
-	UINT8 irq_mask;
-	UINT8 keyb_direct;
-	UINT8 pal_mode;
-	UINT8 keyb_cmd;
+	UINT16 m_cursor_addr;
+	UINT16 m_cursor_raster;
+	UINT8 m_keyb_press;
+	UINT8 m_keyb_press_flag;
+	UINT8 m_shift_press_flag;
+	UINT8 m_backdrop_pen;
+	UINT8 m_display_reg;
+	int m_addr_latch;
+	UINT8 m_fdc_irq_flag;
+	UINT8 m_fdc_drq_flag;
+	UINT8 m_system_data;
+	struct { UINT8 r,g,b; } m_pal;
+	UINT8 m_raminh,m_raminh_pending_change; //bankswitch
+	UINT8 m_raminh_prefetch;
+	UINT8 m_irq_mask;
+	UINT8 m_keyb_direct;
+	UINT8 m_pal_mode;
+	UINT8 m_keyb_cmd;
 };
 
 
@@ -73,9 +73,9 @@ static SCREEN_UPDATE( smc777 )
 	UINT8 *gram = screen->machine().region("fbuf")->base();
 	int x_width;
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[state->backdrop_pen]);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[state->m_backdrop_pen]);
 
-	x_width = (state->display_reg & 0x80) ? 2 : 4;
+	x_width = (state->m_display_reg & 0x80) ? 2 : 4;
 
 	count = 0x0000;
 
@@ -119,7 +119,7 @@ static SCREEN_UPDATE( smc777 )
 
 	count = 0x0000;
 
-	x_width = (state->display_reg & 0x80) ? 40 : 80;
+	x_width = (state->m_display_reg & 0x80) ? 40 : 80;
 
 	for(y=0;y<25;y++)
 	{
@@ -157,7 +157,7 @@ static SCREEN_UPDATE( smc777 )
 					UINT8 *gfx_data = screen->machine().region("pcg")->base();
 					int pen;
 
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->pal_mode) : bk_pen;
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->m_pal_mode) : bk_pen;
 
 					if(pen != -1)
 						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen->machine().pens[pen];
@@ -165,12 +165,12 @@ static SCREEN_UPDATE( smc777 )
 			}
 
 			// draw cursor
-			if(state->cursor_addr == count)
+			if(state->m_cursor_addr == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->cursor_raster & 0x60)
+				switch(state->m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -180,7 +180,7 @@ static SCREEN_UPDATE( smc777 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
@@ -190,7 +190,7 @@ static SCREEN_UPDATE( smc777 )
 				}
 			}
 
-			(state->display_reg & 0x80) ? count+=2 : count++;
+			(state->m_display_reg & 0x80) ? count+=2 : count++;
 		}
 	}
 
@@ -202,17 +202,17 @@ static WRITE8_HANDLER( smc777_6845_w )
 	smc777_state *state = space->machine().driver_data<smc777_state>();
 	if(offset == 0)
 	{
-		state->addr_latch = data;
+		state->m_addr_latch = data;
 		//mc6845_address_w(space->machine().device("crtc"), 0,data);
 	}
 	else
 	{
-		if(state->addr_latch == 0x0a)
-			state->cursor_raster = data;
-		else if(state->addr_latch == 0x0e)
-			state->cursor_addr = ((data<<8) & 0x3f00) | (state->cursor_addr & 0xff);
-		else if(state->addr_latch == 0x0f)
-			state->cursor_addr = (state->cursor_addr & 0x3f00) | (data & 0xff);
+		if(state->m_addr_latch == 0x0a)
+			state->m_cursor_raster = data;
+		else if(state->m_addr_latch == 0x0e)
+			state->m_cursor_addr = ((data<<8) & 0x3f00) | (state->m_cursor_addr & 0xff);
+		else if(state->m_addr_latch == 0x0f)
+			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
 
 		//mc6845_register_w(space->machine().device("crtc"), 0,data);
 	}
@@ -342,9 +342,9 @@ static READ8_HANDLER( smc777_fdc1_r )
 		case 0x03:
 			return wd17xx_data_r(dev,offset);
 		case 0x04: //irq / drq status
-			//popmessage("%02x %02x\n",state->fdc_irq_flag,state->fdc_drq_flag);
+			//popmessage("%02x %02x\n",state->m_fdc_irq_flag,state->m_fdc_drq_flag);
 
-			return (state->fdc_irq_flag ? 0x80 : 0x00) | (state->fdc_drq_flag ? 0x00 : 0x40);
+			return (state->m_fdc_irq_flag ? 0x80 : 0x00) | (state->m_fdc_drq_flag ? 0x00 : 0x40);
 	}
 
 	return 0x00;
@@ -383,13 +383,13 @@ static WRITE8_HANDLER( smc777_fdc1_w )
 static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_intrq_w )
 {
 	smc777_state *drvstate = device->machine().driver_data<smc777_state>();
-	drvstate->fdc_irq_flag = state;
+	drvstate->m_fdc_irq_flag = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
 {
 	smc777_state *drvstate = device->machine().driver_data<smc777_state>();
-	drvstate->fdc_drq_flag = state;
+	drvstate->m_fdc_drq_flag = state;
 }
 
 static READ8_HANDLER( key_r )
@@ -401,20 +401,20 @@ static READ8_HANDLER( key_r )
 	---- ---x handshake bit?
 	*/
 
-	switch(state->keyb_cmd)
+	switch(state->m_keyb_cmd)
 	{
 		case 0x00: //poll keyboard input
 		{
 			if(offset == 0)
-				state->keyb_press_flag = 0;
+				state->m_keyb_press_flag = 0;
 
-			return (offset == 0) ? state->keyb_press : ((state->shift_press_flag << 6) | (state->keyb_press_flag << 2) | (state->keyb_press_flag));
+			return (offset == 0) ? state->m_keyb_press : ((state->m_shift_press_flag << 6) | (state->m_keyb_press_flag << 2) | (state->m_keyb_press_flag));
 		}
 		break;
 		default:
 		{
 			//if(offset == 1)
-			//	printf("Unknown keyboard command %02x read-back\n",state->keyb_cmd);
+			//	printf("Unknown keyboard command %02x read-back\n",state->m_keyb_cmd);
 
 			return (offset == 0) ? 0x00 : (space->machine().rand() & 0x5);
 		}
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( key_w )
 	smc777_state *state = space->machine().driver_data<smc777_state>();
 
 	if(offset == 1) //keyboard command
-		state->keyb_cmd = data;
+		state->m_keyb_cmd = data;
 	else
 	{
 		// keyboard command param
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( border_col_w )
 	if(data & 0xf0)
 		printf("Special border color enabled %02x\n",data);
 
-	state->backdrop_pen = data & 0xf;
+	state->m_backdrop_pen = data & 0xf;
 }
 
 
@@ -450,15 +450,15 @@ static READ8_HANDLER( system_input_r )
 {
 	smc777_state *state = space->machine().driver_data<smc777_state>();
 
-	printf("System FF R %02x\n",state->system_data & 0x0f);
+	printf("System FF R %02x\n",state->m_system_data & 0x0f);
 
-	switch(state->system_data & 0x0f)
+	switch(state->m_system_data & 0x0f)
 	{
 		case 0x00:
-			return ((state->raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this for correct colors
+			return ((state->m_raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this for correct colors
 	}
 
-	return state->system_data;
+	return state->m_system_data;
 }
 
 
@@ -471,12 +471,12 @@ static WRITE8_HANDLER( system_output_w )
     ---x 1001 beep
     all the rest is unknown at current time
     */
-	state->system_data = data;
-	switch(state->system_data & 0x0f)
+	state->m_system_data = data;
+	switch(state->m_system_data & 0x0f)
 	{
 		case 0x00:
-			state->raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			state->raminh_prefetch = (UINT8)(cpu_get_reg(&space->device(), Z80_R)) & 0x7f;
+			state->m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
+			state->m_raminh_prefetch = (UINT8)(cpu_get_reg(&space->device(), Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
 		case 0x05: beep_set_state(space->machine().device("beeper"),data & 0x10); break;
@@ -498,7 +498,7 @@ static WRITE8_HANDLER( smc777_color_mode_w )
 
 	switch(data & 0x0f)
 	{
-		case 0x06: state->pal_mode = (data & 0x10) ^ 0x10; break;
+		case 0x06: state->m_pal_mode = (data & 0x10) ^ 0x10; break;
 		default: printf("Color FF %02x\n",data); break;
 	}
 }
@@ -514,9 +514,9 @@ static WRITE8_HANDLER( smc777_ramdac_w )
 
 	switch((offset & 0x3000) >> 12)
 	{
-		case 0: state->pal.r = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->pal.r), pal4bit(state->pal.g), pal4bit(state->pal.b)); break;
-		case 1: state->pal.g = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->pal.r), pal4bit(state->pal.g), pal4bit(state->pal.b)); break;
-		case 2: state->pal.b = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->pal.r), pal4bit(state->pal.g), pal4bit(state->pal.b)); break;
+		case 0: state->m_pal.r = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->m_pal.r), pal4bit(state->m_pal.g), pal4bit(state->m_pal.b)); break;
+		case 1: state->m_pal.g = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->m_pal.r), pal4bit(state->m_pal.g), pal4bit(state->m_pal.b)); break;
+		case 2: state->m_pal.b = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->m_pal.r), pal4bit(state->m_pal.g), pal4bit(state->m_pal.b)); break;
 		case 3: printf("RAMdac used with gradient index = 3! pal_index = %02x data = %02x\n",pal_index,data); break;
 	}
 }
@@ -524,7 +524,7 @@ static WRITE8_HANDLER( smc777_ramdac_w )
 static READ8_HANDLER( display_reg_r )
 {
 	smc777_state *state = space->machine().driver_data<smc777_state>();
-	return state->display_reg;
+	return state->m_display_reg;
 }
 
 /* x */
@@ -537,7 +537,7 @@ static WRITE8_HANDLER( display_reg_w )
     */
 
 	{
-		if((state->display_reg & 0x80) != (data & 0x80))
+		if((state->m_display_reg & 0x80) != (data & 0x80))
 		{
 			rectangle visarea = space->machine().primary_screen->visible_area();
 			int x_width;
@@ -552,7 +552,7 @@ static WRITE8_HANDLER( display_reg_w )
 		}
 	}
 
-	state->display_reg = data;
+	state->m_display_reg = data;
 }
 
 static READ8_HANDLER( smc777_mem_r )
@@ -562,18 +562,18 @@ static READ8_HANDLER( smc777_mem_r )
 	UINT8 *bios = space->machine().region("bios")->base();
 	UINT8 z80_r;
 
-	if(state->raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
+	if(state->m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
 	{
 		z80_r = (UINT8)cpu_get_reg(&space->device(), Z80_R);
 
-		if(z80_r == ((state->raminh_prefetch+2) & 0x7f))
+		if(z80_r == ((state->m_raminh_prefetch+2) & 0x7f))
 		{
-			state->raminh = state->raminh_pending_change;
-			state->raminh_prefetch = 0xff;
+			state->m_raminh = state->m_raminh_pending_change;
+			state->m_raminh_prefetch = 0xff;
 		}
 	}
 
-	if(state->raminh == 1 && ((offset & 0xc000) == 0))
+	if(state->m_raminh == 1 && ((offset & 0xc000) == 0))
 		return bios[offset];
 
 	return wram[offset];
@@ -591,7 +591,7 @@ static READ8_HANDLER( smc777_irq_mask_r )
 {
 	smc777_state *state = space->machine().driver_data<smc777_state>();
 
-	return state->irq_mask;
+	return state->m_irq_mask;
 }
 
 static WRITE8_HANDLER( smc777_irq_mask_w )
@@ -601,7 +601,7 @@ static WRITE8_HANDLER( smc777_irq_mask_w )
 	if(data & 0xfe)
 		printf("Irq mask = %02x\n",data & 0xfe);
 
-	state->irq_mask = data & 1;
+	state->m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START(smc777_mem, AS_PROGRAM, 8)
@@ -928,10 +928,10 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 		{
 			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
 			{
-				state->keyb_press = smc777_keytable[shift_mod & 1][scancode];
-				if(kana_mod) { state->keyb_press|=0x80; }
-				state->keyb_press_flag = 1;
-				state->shift_press_flag = shift_mod & 1;
+				state->m_keyb_press = smc777_keytable[shift_mod & 1][scancode];
+				if(kana_mod) { state->m_keyb_press|=0x80; }
+				state->m_keyb_press_flag = 1;
+				state->m_shift_press_flag = shift_mod & 1;
 				return;
 			}
 			scancode++;
@@ -952,9 +952,9 @@ static MACHINE_RESET(smc777)
 {
 	smc777_state *state = machine.driver_data<smc777_state>();
 
-	state->raminh = 1;
-	state->raminh_pending_change = 1;
-	state->raminh_prefetch = 0xff;
+	state->m_raminh = 1;
+	state->m_raminh_pending_change = 1;
+	state->m_raminh_prefetch = 0xff;
 }
 
 static const gfx_layout smc777_charlayout =
@@ -1035,7 +1035,7 @@ static INTERRUPT_GEN( smc777_vblank_irq )
 {
 	smc777_state *state = device->machine().driver_data<smc777_state>();
 
-	if(state->irq_mask)
+	if(state->m_irq_mask)
 		device_set_input_line(device,0,HOLD_LINE);
 }
 

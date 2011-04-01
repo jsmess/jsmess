@@ -31,19 +31,19 @@ static READ8_DEVICE_HANDLER (orion_romdisk_porta_r )
 {
 	orion_state *state = device->machine().driver_data<orion_state>();
 	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x10000;
-	return romdisk[state->romdisk_msb*256+state->romdisk_lsb];
+	return romdisk[state->m_romdisk_msb*256+state->m_romdisk_lsb];
 }
 
 static WRITE8_DEVICE_HANDLER (orion_romdisk_portb_w )
 {
 	orion_state *state = device->machine().driver_data<orion_state>();
-	state->romdisk_lsb = data;
+	state->m_romdisk_lsb = data;
 }
 
 static WRITE8_DEVICE_HANDLER (orion_romdisk_portc_w )
 {
 	orion_state *state = device->machine().driver_data<orion_state>();
-	state->romdisk_msb = data;
+	state->m_romdisk_msb = data;
 }
 
 I8255A_INTERFACE( orion128_ppi8255_interface_1)
@@ -60,7 +60,7 @@ I8255A_INTERFACE( orion128_ppi8255_interface_1)
 MACHINE_START( orion128 )
 {
 	orion_state *state = machine.driver_data<orion_state>();
-	state->video_mode_mask = 7;
+	state->m_video_mode_mask = 7;
 }
 
 READ8_HANDLER ( orion128_system_r )
@@ -97,81 +97,81 @@ static void orion_set_video_mode(running_machine &machine, int width)
 WRITE8_HANDLER ( orion128_video_mode_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	if ((data & 0x80)!=(state->orion128_video_mode & 0x80))
+	if ((data & 0x80)!=(state->m_orion128_video_mode & 0x80))
 	{
 		if ((data & 0x80)==0x80)
 		{
-			if (state->video_mode_mask == 31)
+			if (state->m_video_mode_mask == 31)
 			{
-				state->orion128_video_width = SCREEN_WIDTH_512;
+				state->m_orion128_video_width = SCREEN_WIDTH_512;
 				orion_set_video_mode(space->machine(),512);
 			}
 			else
 			{
-				state->orion128_video_width = SCREEN_WIDTH_480;
+				state->m_orion128_video_width = SCREEN_WIDTH_480;
 				orion_set_video_mode(space->machine(),480);
 			}
 		}
 		else
 		{
-			state->orion128_video_width = SCREEN_WIDTH_384;
+			state->m_orion128_video_width = SCREEN_WIDTH_384;
 			orion_set_video_mode(space->machine(),384);
 		}
 	}
 
-	state->orion128_video_mode = data;
+	state->m_orion128_video_mode = data;
 }
 
 WRITE8_HANDLER ( orion128_video_page_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	if (state->orion128_video_page != data)
+	if (state->m_orion128_video_page != data)
 	{
-		if ((data & 0x80)!=(state->orion128_video_page & 0x80))
+		if ((data & 0x80)!=(state->m_orion128_video_page & 0x80))
 		{
 			if ((data & 0x80)==0x80)
 			{
-				if (state->video_mode_mask == 31)
+				if (state->m_video_mode_mask == 31)
 				{
-					state->orion128_video_width = SCREEN_WIDTH_512;
+					state->m_orion128_video_width = SCREEN_WIDTH_512;
 					orion_set_video_mode(space->machine(),512);
 				}
 				else
 				{
-					state->orion128_video_width = SCREEN_WIDTH_480;
+					state->m_orion128_video_width = SCREEN_WIDTH_480;
 					orion_set_video_mode(space->machine(),480);
 				}
 			}
 			else
 			{
-				state->orion128_video_width = SCREEN_WIDTH_384;
+				state->m_orion128_video_width = SCREEN_WIDTH_384;
 				orion_set_video_mode(space->machine(),384);
 			}
 		}
 	}
-	state->orion128_video_page = data;
+	state->m_orion128_video_page = data;
 }
 
 
 WRITE8_HANDLER ( orion128_memory_page_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	if (data!=state->orion128_memory_page )
+	if (data!=state->m_orion128_memory_page )
 	{
 		memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)) + (data & 3) * 0x10000);
-		state->orion128_memory_page = (data & 3);
+		state->m_orion128_memory_page = (data & 3);
 	}
 }
 
 MACHINE_RESET ( orion128 )
 {
 	orion_state *state = machine.driver_data<orion_state>();
-	state->orion128_video_page = 0;
-	state->orion128_video_mode = 0;
-	state->orion128_memory_page = -1;
+	state->m_orion128_video_page = 0;
+	state->m_orion128_video_mode = 0;
+	state->m_orion128_memory_page = -1;
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0xf800);
 	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000);
-	state->orion128_video_width = SCREEN_WIDTH_384;
+	state->m_orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 	radio86_init_keyboard(machine);
 }
@@ -249,22 +249,22 @@ static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 MACHINE_START( orionz80 )
 {
 	orion_state *state = machine.driver_data<orion_state>();
-	state->video_mode_mask = 7;
+	state->m_video_mode_mask = 7;
 }
 
 WRITE8_HANDLER ( orionz80_sound_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
 	device_t *speaker = space->machine().device("speaker");
-	if (state->speaker == 0)
+	if (state->m_speaker == 0)
 	{
-		state->speaker = data;
+		state->m_speaker = data;
 	}
 	else
 	{
-		state->speaker = 0 ;
+		state->m_speaker = 0 ;
 	}
-	speaker_level_w(speaker,state->speaker);
+	speaker_level_w(speaker,state->m_speaker);
 
 }
 
@@ -282,22 +282,22 @@ static void orionz80_switch_bank(running_machine &machine)
 	UINT8 segment_select;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	bank_select = (state->orionz80_dispatcher & 0x0c) >> 2;
-	segment_select = state->orionz80_dispatcher & 0x03;
+	bank_select = (state->m_orionz80_dispatcher & 0x0c) >> 2;
+	segment_select = state->m_orionz80_dispatcher & 0x03;
 
 	space->install_write_bank(0x0000, 0x3fff, "bank1");
-	if ((state->orionz80_dispatcher & 0x80)==0)
+	if ((state->m_orionz80_dispatcher & 0x80)==0)
 	{ // dispatcher on
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000 * bank_select + segment_select * 0x4000 );
 	}
 	else
 	{ // dispatcher off
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000 * state->orionz80_memory_page);
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000 * state->m_orionz80_memory_page);
 	}
 
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000 + 0x10000 * state->orionz80_memory_page);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000 + 0x10000 * state->m_orionz80_memory_page);
 
-	if ((state->orionz80_dispatcher & 0x20) == 0)
+	if ((state->m_orionz80_dispatcher & 0x20) == 0)
 	{
 		space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
 		space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
@@ -320,23 +320,23 @@ static void orionz80_switch_bank(running_machine &machine)
 	else
 	{
 		/* if it is full memory access */
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000 + 0x10000 * state->orionz80_memory_page);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine.device(RAM_TAG)) + 0xf400 + 0x10000 * state->orionz80_memory_page);
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine.device(RAM_TAG)) + 0xf800 + 0x10000 * state->orionz80_memory_page);
+		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000 + 0x10000 * state->m_orionz80_memory_page);
+		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine.device(RAM_TAG)) + 0xf400 + 0x10000 * state->m_orionz80_memory_page);
+		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine.device(RAM_TAG)) + 0xf800 + 0x10000 * state->m_orionz80_memory_page);
 	}
 }
 
 WRITE8_HANDLER ( orionz80_memory_page_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	state->orionz80_memory_page = data & 7;
+	state->m_orionz80_memory_page = data & 7;
 	orionz80_switch_bank(space->machine());
 }
 
 WRITE8_HANDLER ( orionz80_dispatcher_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	state->orionz80_dispatcher = data;
+	state->m_orionz80_dispatcher = data;
 	orionz80_switch_bank(space->machine());
 }
 
@@ -370,12 +370,12 @@ MACHINE_RESET ( orionz80 )
 	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() + 0xf800);
 
 
-	state->orion128_video_page = 0;
-	state->orion128_video_mode = 0;
-	state->orionz80_memory_page = 0;
-	state->orionz80_dispatcher = 0;
-	state->speaker = 0;
-	state->orion128_video_width = SCREEN_WIDTH_384;
+	state->m_orion128_video_page = 0;
+	state->m_orion128_video_mode = 0;
+	state->m_orionz80_memory_page = 0;
+	state->m_orionz80_dispatcher = 0;
+	state->m_speaker = 0;
+	state->m_orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 	radio86_init_keyboard(machine);
 }
@@ -383,7 +383,7 @@ MACHINE_RESET ( orionz80 )
 INTERRUPT_GEN( orionz80_interrupt )
 {
 	orion_state *state = device->machine().driver_data<orion_state>();
-	if ((state->orionz80_dispatcher & 0x40)==0x40)
+	if ((state->m_orionz80_dispatcher & 0x40)==0x40)
 	{
 		device_set_input_line(device, 0, HOLD_LINE);
 	}
@@ -429,13 +429,13 @@ static void orionpro_bank_switch(running_machine &machine)
 {
 	orion_state *state = machine.driver_data<orion_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	int page = state->orionpro_page & 7; // we have only 8 pages
-	int is128 = (state->orionpro_dispatcher & 0x80) ? 1 : 0;
+	int page = state->m_orionpro_page & 7; // we have only 8 pages
+	int is128 = (state->m_orionpro_dispatcher & 0x80) ? 1 : 0;
 	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
 
 	if (is128==1)
 	{
-		page = state->orionpro_128_page & 7;
+		page = state->m_orionpro_128_page & 7;
 	}
 	space->install_write_bank(0x0000, 0x1fff, "bank1");
 	space->install_write_bank(0x2000, 0x3fff, "bank2");
@@ -447,43 +447,43 @@ static void orionpro_bank_switch(running_machine &machine)
 	space->install_write_bank(0xf800, 0xffff, "bank8");
 
 
-	if ((state->orionpro_dispatcher & 0x01)==0x00)
+	if ((state->m_orionpro_dispatcher & 0x01)==0x00)
 	{	// RAM0 segment disabled
 		memory_set_bankptr(machine, "bank1", ram + 0x10000 * page);
 		memory_set_bankptr(machine, "bank2", ram + 0x10000 * page + 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", ram + (state->orionpro_ram0_segment & 31) * 0x4000);
-		memory_set_bankptr(machine, "bank2", ram + (state->orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
+		memory_set_bankptr(machine, "bank1", ram + (state->m_orionpro_ram0_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank2", ram + (state->m_orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
 	}
-	if ((state->orionpro_dispatcher & 0x10)==0x10)
+	if ((state->m_orionpro_dispatcher & 0x10)==0x10)
 	{	// ROM1 enabled
 		space->unmap_write(0x0000, 0x1fff);
 		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x20000);
 	}
-	if ((state->orionpro_dispatcher & 0x08)==0x08)
+	if ((state->m_orionpro_dispatcher & 0x08)==0x08)
 	{	// ROM2 enabled
 		space->unmap_write(0x2000, 0x3fff);
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x22000 + (state->orionpro_rom2_segment & 7) * 0x2000);
+		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x22000 + (state->m_orionpro_rom2_segment & 7) * 0x2000);
 	}
 
-	if ((state->orionpro_dispatcher & 0x02)==0x00)
+	if ((state->m_orionpro_dispatcher & 0x02)==0x00)
 	{	// RAM1 segment disabled
 		memory_set_bankptr(machine, "bank3", ram + 0x10000 * page + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", ram + (state->orionpro_ram1_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank3", ram + (state->m_orionpro_ram1_segment & 31) * 0x4000);
 	}
 
-	if ((state->orionpro_dispatcher & 0x04)==0x00)
+	if ((state->m_orionpro_dispatcher & 0x04)==0x00)
 	{	// RAM2 segment disabled
 		memory_set_bankptr(machine, "bank4", ram + 0x10000 * page + 0x8000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank4", ram + (state->orionpro_ram2_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank4", ram + (state->m_orionpro_ram2_segment & 31) * 0x4000);
 	}
 
 	memory_set_bankptr(machine, "bank5", ram + 0x10000 * page + 0xc000);
@@ -512,7 +512,7 @@ static void orionpro_bank_switch(running_machine &machine)
 	}
 	else
 	{
-		if ((state->orionpro_dispatcher & 0x40)==0x40)
+		if ((state->m_orionpro_dispatcher & 0x40)==0x40)
 		{	// FIX F000 enabled
 			memory_set_bankptr(machine, "bank6", ram + 0x10000 * 0 + 0xf000);
 			memory_set_bankptr(machine, "bank7", ram + 0x10000 * 0 + 0xf400);
@@ -530,7 +530,7 @@ static void orionpro_bank_switch(running_machine &machine)
 static WRITE8_HANDLER ( orionpro_memory_page_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	state->orionpro_128_page = data;
+	state->m_orionpro_128_page = data;
 	orionpro_bank_switch(space->machine());
 }
 
@@ -539,25 +539,25 @@ MACHINE_RESET ( orionpro )
 	orion_state *state = machine.driver_data<orion_state>();
 	radio86_init_keyboard(machine);
 
-	state->orion128_video_page = 0;
-	state->orion128_video_mode = 0;
-	state->orionpro_ram0_segment = 0;
-	state->orionpro_ram1_segment = 0;
-	state->orionpro_ram2_segment = 0;
+	state->m_orion128_video_page = 0;
+	state->m_orion128_video_mode = 0;
+	state->m_orionpro_ram0_segment = 0;
+	state->m_orionpro_ram1_segment = 0;
+	state->m_orionpro_ram2_segment = 0;
 
-	state->orionpro_page = 0;
-	state->orionpro_128_page = 0;
-	state->orionpro_rom2_segment = 0;
+	state->m_orionpro_page = 0;
+	state->m_orionpro_128_page = 0;
+	state->m_orionpro_rom2_segment = 0;
 
-	state->orionpro_dispatcher = 0x50;
+	state->m_orionpro_dispatcher = 0x50;
 	orionpro_bank_switch(machine);
 
-	state->speaker = 0;
-	state->orion128_video_width = SCREEN_WIDTH_384;
+	state->m_speaker = 0;
+	state->m_orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 
-	state->video_mode_mask = 31;
-	state->orionpro_pseudo_color = 0;
+	state->m_video_mode_mask = 31;
+	state->m_orionpro_pseudo_color = 0;
 }
 
 READ8_HANDLER ( orionpro_io_r )
@@ -568,12 +568,12 @@ READ8_HANDLER ( orionpro_io_r )
 	switch (offset & 0xff)
 	{
 		case 0x00 : return 0x56;
-		case 0x04 : return state->orionpro_ram0_segment;
-		case 0x05 : return state->orionpro_ram1_segment;
-		case 0x06 : return state->orionpro_ram2_segment;
-		case 0x08 : return state->orionpro_page;
-		case 0x09 : return state->orionpro_rom2_segment;
-		case 0x0a : return state->orionpro_dispatcher;
+		case 0x04 : return state->m_orionpro_ram0_segment;
+		case 0x05 : return state->m_orionpro_ram1_segment;
+		case 0x06 : return state->m_orionpro_ram2_segment;
+		case 0x08 : return state->m_orionpro_page;
+		case 0x09 : return state->m_orionpro_rom2_segment;
+		case 0x0a : return state->m_orionpro_dispatcher;
 		case 0x10 : return wd17xx_status_r(fdc,0);
 		case 0x11 : return wd17xx_track_r(fdc,0);
 		case 0x12 : return wd17xx_sector_r(fdc,0);
@@ -602,12 +602,12 @@ WRITE8_HANDLER ( orionpro_io_w )
 
 	switch (offset & 0xff)
 	{
-		case 0x04 : state->orionpro_ram0_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x05 : state->orionpro_ram1_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x06 : state->orionpro_ram2_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x08 : state->orionpro_page = data;		  orionpro_bank_switch(space->machine()); break;
-		case 0x09 : state->orionpro_rom2_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x0a : state->orionpro_dispatcher = data;   orionpro_bank_switch(space->machine()); break;
+		case 0x04 : state->m_orionpro_ram0_segment = data; orionpro_bank_switch(space->machine()); break;
+		case 0x05 : state->m_orionpro_ram1_segment = data; orionpro_bank_switch(space->machine()); break;
+		case 0x06 : state->m_orionpro_ram2_segment = data; orionpro_bank_switch(space->machine()); break;
+		case 0x08 : state->m_orionpro_page = data;		  orionpro_bank_switch(space->machine()); break;
+		case 0x09 : state->m_orionpro_rom2_segment = data; orionpro_bank_switch(space->machine()); break;
+		case 0x0a : state->m_orionpro_dispatcher = data;   orionpro_bank_switch(space->machine()); break;
 		case 0x10 : wd17xx_command_w(fdc,0,data); break;
 		case 0x11 : wd17xx_track_w(fdc,0,data);break;
 		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
@@ -623,9 +623,9 @@ WRITE8_HANDLER ( orionpro_io_w )
 		case 0x2a : orion128_romdisk_w(space,2,data); break;
 		case 0x2b : orion128_romdisk_w(space,3,data); break;
 		case 0xf8 : orion128_video_mode_w(space,0,data);break;
-		case 0xf9 : state->orionpro_128_page = data;	  orionpro_bank_switch(space->machine()); break;
+		case 0xf9 : state->m_orionpro_128_page = data;	  orionpro_bank_switch(space->machine()); break;
 		case 0xfa : orion128_video_page_w(space,0,data);break;
-		case 0xfc : state->orionpro_pseudo_color = data;break;
+		case 0xfc : state->m_orionpro_pseudo_color = data;break;
 		case 0xfe : orionz80_sound_fe_w(space,0,data);break;
 		case 0xff : orionz80_sound_w(space,0,data);break;
 	}

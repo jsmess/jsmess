@@ -21,13 +21,13 @@ public:
 	pyl601_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 rom_page;
-	UINT32 vdisk_addr;
-	UINT8 key_code;
-	UINT8 keyboard_clk;
-	UINT8 video_mode;
-	UINT8 tick50_mark;
-	UINT8 floppy_ctrl;
+	UINT8 m_rom_page;
+	UINT32 m_vdisk_addr;
+	UINT8 m_key_code;
+	UINT8 m_keyboard_clk;
+	UINT8 m_video_mode;
+	UINT8 m_tick50_mark;
+	UINT8 m_floppy_ctrl;
 };
 
 
@@ -35,13 +35,13 @@ public:
 static READ8_HANDLER (rom_page_r)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->rom_page;
+	return state->m_rom_page;
 }
 
 static WRITE8_HANDLER (rom_page_w)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->rom_page =data;
+	state->m_rom_page =data;
 	if (data & 8)
 	{
 		int chip = (data >> 4) % 5;
@@ -58,35 +58,35 @@ static WRITE8_HANDLER (rom_page_w)
 static WRITE8_HANDLER (vdisk_page_w)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->vdisk_addr = (state->vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
+	state->m_vdisk_addr = (state->m_vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
 }
 
 static WRITE8_HANDLER (vdisk_h_w)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->vdisk_addr = (state->vdisk_addr & 0xf00ff) | (data<<8);
+	state->m_vdisk_addr = (state->m_vdisk_addr & 0xf00ff) | (data<<8);
 }
 
 static WRITE8_HANDLER (vdisk_l_w)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->vdisk_addr = (state->vdisk_addr & 0xfff00) | data;
+	state->m_vdisk_addr = (state->m_vdisk_addr & 0xfff00) | data;
 }
 
 static WRITE8_HANDLER (vdisk_data_w)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	ram_get_ptr(space->machine().device(RAM_TAG))[0x10000 + (state->vdisk_addr & 0x7ffff)] = data;
-	state->vdisk_addr++;
-	state->vdisk_addr&=0x7ffff;
+	ram_get_ptr(space->machine().device(RAM_TAG))[0x10000 + (state->m_vdisk_addr & 0x7ffff)] = data;
+	state->m_vdisk_addr++;
+	state->m_vdisk_addr&=0x7ffff;
 }
 
 static READ8_HANDLER (vdisk_data_r)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	UINT8 retVal = ram_get_ptr(space->machine().device(RAM_TAG))[0x10000 + (state->vdisk_addr & 0x7ffff)];
-	state->vdisk_addr++;
-	state->vdisk_addr &= 0x7ffff;
+	UINT8 retVal = ram_get_ptr(space->machine().device(RAM_TAG))[0x10000 + (state->m_vdisk_addr & 0x7ffff)];
+	state->m_vdisk_addr++;
+	state->m_vdisk_addr &= 0x7ffff;
 	return retVal;
 }
 
@@ -106,7 +106,7 @@ static UINT8 selectedline(UINT16 data)
 static READ8_HANDLER ( keyboard_r )
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->key_code;
+	return state->m_key_code;
 }
 
 static READ8_HANDLER ( keycheck_r )
@@ -131,10 +131,10 @@ static READ8_HANDLER ( keycheck_r )
 		addr |=  ((row2 == 0x00) ? 1 : 0) << 9;
 		addr |=  ((row1 == 0x00) ? 1 : 0) << 10;
 
-		state->key_code = keyboard[addr];
-		state->keyboard_clk = ~state->keyboard_clk;
+		state->m_key_code = keyboard[addr];
+		state->m_keyboard_clk = ~state->m_keyboard_clk;
 
-		if (state->keyboard_clk)
+		if (state->m_keyboard_clk)
 			retVal |= 0x80;
 	}
 	return retVal;
@@ -144,19 +144,19 @@ static READ8_HANDLER ( keycheck_r )
 static WRITE8_HANDLER (video_mode_w)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->video_mode = data;
+	state->m_video_mode = data;
 }
 static READ8_HANDLER (video_mode_r)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->video_mode;
+	return state->m_video_mode;
 }
 
 static READ8_HANDLER (timer_r)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	UINT8 retVal= state->tick50_mark | 0x37;
-	state->tick50_mark = 0;
+	UINT8 retVal= state->m_tick50_mark | 0x37;
+	state->m_tick50_mark = 0;
 	return retVal;
 }
 
@@ -196,12 +196,12 @@ static WRITE8_HANDLER( floppy_w )
 
 	upd765_tc_w(floppy, BIT(data,1));
 
-	state->floppy_ctrl = data;
+	state->m_floppy_ctrl = data;
 }
 static READ8_HANDLER (floppy_r)
 {
 	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->floppy_ctrl;
+	return state->m_floppy_ctrl;
 }
 
 static const struct upd765_interface pyldin_upd765_interface =
@@ -344,7 +344,7 @@ static MACHINE_RESET(pyl601)
 {
 	pyl601_state *state = machine.driver_data<pyl601_state>();
 	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
-	state->key_code = 0xff;
+	state->m_key_code = 0xff;
 	memory_set_bankptr(machine, "bank1", ram + 0x0000);
 	memory_set_bankptr(machine, "bank2", ram + 0xc000);
 	memory_set_bankptr(machine, "bank3", ram + 0xe000);
@@ -373,7 +373,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 
 	int column, bit, i;
 	UINT8 data;
-	if (BIT(state->video_mode, 5) == 0)
+	if (BIT(state->m_video_mode, 5) == 0)
 	{
 		for (column = 0; column < x_count; column++)
 		{
@@ -419,7 +419,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 
 	int column, bit, i;
 	UINT8 data;
-	if (BIT(state->video_mode, 5) == 0)
+	if (BIT(state->m_video_mode, 5) == 0)
 	{
 		for (column = 0; column < x_count; column++)
 		{
@@ -492,7 +492,7 @@ static DRIVER_INIT(pyl601)
 static INTERRUPT_GEN( pyl601_interrupt )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
-	state->tick50_mark = 0x80;
+	state->m_tick50_mark = 0x80;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 

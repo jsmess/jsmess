@@ -58,46 +58,46 @@ public:
 	required_device<device_t> m_fdc;
 
 	/* memory state */
-	UINT8 mmu[16];			/* MMU block register */
-	int init;				/* MMU enable */
+	UINT8 m_mmu[16];			/* MMU block register */
+	int m_init;				/* MMU enable */
 
 	/* RTC state */
-	int c0;
-	int c1;
-	int c2;
+	int m_c0;
+	int m_c1;
+	int m_c2;
 
 	/* floppy state */
-	int	fdc_index;			/* floppy index hole sensor */
-	int motor;				/* floppy motor */
+	int	m_fdc_index;			/* floppy index hole sensor */
+	int m_motor;				/* floppy motor */
 
 	/* GRIP state */
-	UINT8 gripd;			/* GRIP data */
-	UINT8 gripc;			/* GRIP status */
+	UINT8 m_gripd;			/* GRIP data */
+	UINT8 m_gripc;			/* GRIP status */
 
 	/* timers */
-	emu_timer	*floppy_motor_off_timer;
+	emu_timer	*m_floppy_motor_off_timer;
 
 /* ------------------------------------------------------------------------ */
 
 	/* sound state */
-	int vol0;
-	int vol1;
+	int m_vol0;
+	int m_vol1;
 
 	/* keyboard state */
-	UINT8 keydata;			/* keyboard data */
-	int kbf;				/* keyboard buffer full */
+	UINT8 m_keydata;			/* keyboard data */
+	int m_kbf;				/* keyboard buffer full */
 
 	/* video state */
-	UINT8 *video_ram;		/* video RAM */
-	int lps;				/* light pen sense */
-	int page;				/* video page */
-	int flash;				/* flash */
+	UINT8 *m_video_ram;		/* video RAM */
+	int m_lps;				/* light pen sense */
+	int m_page;				/* video page */
+	int m_flash;				/* flash */
 
 	/* devices */
-	device_t *mc6845;
-	device_t *ppi8255;
-	device_t *z80sti;
-	device_t *centronics;
+	device_t *m_mc6845;
+	device_t *m_ppi8255;
+	device_t *m_z80sti;
+	device_t *m_centronics;
 };
 
 #endif

@@ -24,30 +24,30 @@ public:
 	pcw16_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	unsigned long interrupt_counter;
-	int banks[4];
-	int _4_bit_port;
-	int fdc_int_code;
-	int system_status;
-	char *mem_ptr[4];
-	unsigned char keyboard_data_shift;
-	int keyboard_parity_table[256];
-	int keyboard_bits;
-	int keyboard_bits_output;
-	int keyboard_state;
-	int keyboard_previous_state;
-	unsigned char rtc_seconds;
-	unsigned char rtc_minutes;
-	unsigned char rtc_hours;
-	unsigned char rtc_days_max;
-	unsigned char rtc_days;
-	unsigned char rtc_months;
-	unsigned char rtc_years;
-	unsigned char rtc_control;
-	unsigned char rtc_256ths_seconds;
-	int previous_fdc_int_state;
-	int colour_palette[16];
-	int video_control;
+	unsigned long m_interrupt_counter;
+	int m_banks[4];
+	int m_4_bit_port;
+	int m_fdc_int_code;
+	int m_system_status;
+	char *m_mem_ptr[4];
+	unsigned char m_keyboard_data_shift;
+	int m_keyboard_parity_table[256];
+	int m_keyboard_bits;
+	int m_keyboard_bits_output;
+	int m_keyboard_state;
+	int m_keyboard_previous_state;
+	unsigned char m_rtc_seconds;
+	unsigned char m_rtc_minutes;
+	unsigned char m_rtc_hours;
+	unsigned char m_rtc_days_max;
+	unsigned char m_rtc_days;
+	unsigned char m_rtc_months;
+	unsigned char m_rtc_years;
+	unsigned char m_rtc_control;
+	unsigned char m_rtc_256ths_seconds;
+	int m_previous_fdc_int_state;
+	int m_colour_palette[16];
+	int m_video_control;
 };
 
 

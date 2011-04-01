@@ -16,7 +16,7 @@
 VIDEO_START( ondra )
 {
 	ondra_state *state = machine.driver_data<ondra_state>();
-	state->video_enable = 0;
+	state->m_video_enable = 0;
 }
 
 SCREEN_UPDATE( ondra )
@@ -26,7 +26,7 @@ SCREEN_UPDATE( ondra )
 	int y, x, b;
 	int Vaddr = 0x2800;
 
-	if (state->video_enable==1) {
+	if (state->m_video_enable==1) {
 		for (x = 0; x < 40; x++)
 		{
 			for (y = 127; y >=0; y--)

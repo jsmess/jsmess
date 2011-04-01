@@ -34,35 +34,35 @@ VIDEO_START(vc4000)
 
 	for (i=0;i<0x20; i++)
 	{
-		state->sprite_collision[i]=0;
-		if ((i&3)==3) state->sprite_collision[i]|=0x20;
-		if ((i&5)==5) state->sprite_collision[i]|=0x10;
-		if ((i&9)==9) state->sprite_collision[i]|=8;
-		if ((i&6)==6) state->sprite_collision[i]|=4;
-		if ((i&0xa)==0xa) state->sprite_collision[i]|=2;
-		if ((i&0xc)==0xc) state->sprite_collision[i]|=1;
-		state->background_collision[i]=0;
-		if ((i&0x11)==0x11) state->background_collision[i]|=0x80;
-		if ((i&0x12)==0x12) state->background_collision[i]|=0x40;
-		if ((i&0x14)==0x14) state->background_collision[i]|=0x20;
-		if ((i&0x18)==0x18) state->background_collision[i]|=0x10;
+		state->m_sprite_collision[i]=0;
+		if ((i&3)==3) state->m_sprite_collision[i]|=0x20;
+		if ((i&5)==5) state->m_sprite_collision[i]|=0x10;
+		if ((i&9)==9) state->m_sprite_collision[i]|=8;
+		if ((i&6)==6) state->m_sprite_collision[i]|=4;
+		if ((i&0xa)==0xa) state->m_sprite_collision[i]|=2;
+		if ((i&0xc)==0xc) state->m_sprite_collision[i]|=1;
+		state->m_background_collision[i]=0;
+		if ((i&0x11)==0x11) state->m_background_collision[i]|=0x80;
+		if ((i&0x12)==0x12) state->m_background_collision[i]|=0x40;
+		if ((i&0x14)==0x14) state->m_background_collision[i]|=0x20;
+		if ((i&0x18)==0x18) state->m_background_collision[i]|=0x10;
 	}
 
-	state->joy1_x = STICKCENTRE;
-	state->joy1_y = STICKCENTRE;
-	state->joy2_x = STICKCENTRE;
-	state->joy2_y = STICKCENTRE;
+	state->m_joy1_x = STICKCENTRE;
+	state->m_joy1_y = STICKCENTRE;
+	state->m_joy2_x = STICKCENTRE;
+	state->m_joy2_y = STICKCENTRE;
 
-	memset(&state->video, 0, sizeof(state->video));
+	memset(&state->m_video, 0, sizeof(state->m_video));
 	for (i=0; i<3; i++)
 	{
-		state->video.sprites[i].data = &state->video.reg.d.sprites[i];
-		state->video.sprites[i].mask = 1 << i;
+		state->m_video.sprites[i].data = &state->m_video.reg.d.sprites[i];
+		state->m_video.sprites[i].mask = 1 << i;
 	}
-	state->video.sprites[3].data = &state->video.reg.d.sprite4;
-	state->video.sprites[3].mask = 1 << 3;
+	state->m_video.sprites[3].data = &state->m_video.reg.d.sprite4;
+	state->m_video.sprites[3].mask = 1 << 3;
 
-	state->video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 INLINE UINT8 vc4000_joystick_return_to_centre(UINT8 joy)
@@ -88,35 +88,35 @@ READ8_HANDLER(vc4000_video_r)
 	switch (offset) {
 
 	case 0xca:		// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
-		data |= state->video.background_collision;
-		state->video.background_collision=0;
-		if (state->video.sprites[3].finished)
+		data |= state->m_video.background_collision;
+		state->m_video.background_collision=0;
+		if (state->m_video.sprites[3].finished)
 		{
 			data |= 1;
-			state->video.sprites[3].finished = FALSE;
+			state->m_video.sprites[3].finished = FALSE;
 		}
 
-		if (state->video.sprites[2].finished)
+		if (state->m_video.sprites[2].finished)
 		{
 			data |= 2;
-			state->video.sprites[2].finished = FALSE;
+			state->m_video.sprites[2].finished = FALSE;
 		}
-		if (state->video.sprites[1].finished)
+		if (state->m_video.sprites[1].finished)
 		{
 			data |= 4;
-			state->video.sprites[1].finished = FALSE;
+			state->m_video.sprites[1].finished = FALSE;
 		}
-		if (state->video.sprites[0].finished)
+		if (state->m_video.sprites[0].finished)
 		{
 			data |= 8;
-			state->video.sprites[0].finished = FALSE;
+			state->m_video.sprites[0].finished = FALSE;
 		}
 		break;
 
 	case 0xcb:		//    VRST-Flag (bit 6) and intersprite collision (bit5-0)
-		data = state->video.sprite_collision | (state->video.reg.d.sprite_collision & 0xc0);
-		state->video.sprite_collision = 0;
-		state->video.reg.d.sprite_collision &= 0xbf;
+		data = state->m_video.sprite_collision | (state->m_video.reg.d.sprite_collision & 0xc0);
+		state->m_video.sprite_collision = 0;
+		state->m_video.reg.d.sprite_collision &= 0xbf;
 		break;
 
 #ifndef ANALOG_HACK
@@ -139,17 +139,17 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x01:
-					state->joy1_x-=5;
-					if (state->joy1_x < STICKLOW) state->joy1_x=STICKLOW;
+					state->m_joy1_x-=5;
+					if (state->m_joy1_x < STICKLOW) state->m_joy1_x=STICKLOW;
 					break;
 				case 0x02:
-					state->joy1_x+=5;
-					if (state->joy1_x > STICKHIGH) state->joy1_x=STICKHIGH;
+					state->m_joy1_x+=5;
+					if (state->m_joy1_x > STICKHIGH) state->m_joy1_x=STICKHIGH;
 					break;
 				case 0x00:
-					state->joy1_x = vc4000_joystick_return_to_centre(state->joy1_x);
+					state->m_joy1_x = vc4000_joystick_return_to_centre(state->m_joy1_x);
 				}
-				data=state->joy1_x;
+				data=state->m_joy1_x;
 			}
 			else
 			{
@@ -157,17 +157,17 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x08:
-					state->joy1_y-=5;
-					if (state->joy1_y < STICKLOW) state->joy1_y=STICKLOW;
+					state->m_joy1_y-=5;
+					if (state->m_joy1_y < STICKLOW) state->m_joy1_y=STICKLOW;
 					break;
 				case 0x04:
-					state->joy1_y+=5;
-					if (state->joy1_y > STICKHIGH) state->joy1_y=STICKHIGH;
+					state->m_joy1_y+=5;
+					if (state->m_joy1_y > STICKHIGH) state->m_joy1_y=STICKHIGH;
 					break;
 		//      case 0x00:
-		//          state->joy1_y = vc4000_joystick_return_to_centre(state->joy1_y);
+		//          state->m_joy1_y = vc4000_joystick_return_to_centre(state->m_joy1_y);
 				}
-				data=state->joy1_y;
+				data=state->m_joy1_y;
 			}
 		}
 		else
@@ -178,15 +178,15 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x01:
-					state->joy1_x=STICKLOW;
+					state->m_joy1_x=STICKLOW;
 					break;
 				case 0x02:
-					state->joy1_x=STICKHIGH;
+					state->m_joy1_x=STICKHIGH;
 					break;
 				default:			/* autocentre */
-					state->joy1_x=STICKCENTRE;
+					state->m_joy1_x=STICKCENTRE;
 				}
-				data=state->joy1_x;
+				data=state->m_joy1_x;
 			}
 			else
 			{
@@ -194,15 +194,15 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x08:
-					state->joy1_y=STICKLOW;
+					state->m_joy1_y=STICKLOW;
 					break;
 				case 0x04:
-					state->joy1_y=STICKHIGH;
+					state->m_joy1_y=STICKHIGH;
 					break;
 				default:
-					state->joy1_y=STICKCENTRE;
+					state->m_joy1_y=STICKCENTRE;
 				}
-				data=state->joy1_y;
+				data=state->m_joy1_y;
 			}
 		}
 		break;
@@ -216,17 +216,17 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x10:
-					state->joy2_x-=5;
-					if (state->joy2_x < STICKLOW) state->joy2_x=STICKLOW;
+					state->m_joy2_x-=5;
+					if (state->m_joy2_x < STICKLOW) state->m_joy2_x=STICKLOW;
 					break;
 				case 0x20:
-					state->joy2_x+=5;
-					if (state->joy2_x > STICKHIGH) state->joy2_x=STICKHIGH;
+					state->m_joy2_x+=5;
+					if (state->m_joy2_x > STICKHIGH) state->m_joy2_x=STICKHIGH;
 				case 0x00:
-					state->joy2_x = vc4000_joystick_return_to_centre(state->joy2_x);
+					state->m_joy2_x = vc4000_joystick_return_to_centre(state->m_joy2_x);
 					break;
 				}
-				data=state->joy2_x;
+				data=state->m_joy2_x;
 			}
 			else
 			{
@@ -234,17 +234,17 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x80:
-					state->joy2_y-=5;
-					if (state->joy2_y < STICKLOW) state->joy2_y=STICKLOW;
+					state->m_joy2_y-=5;
+					if (state->m_joy2_y < STICKLOW) state->m_joy2_y=STICKLOW;
 					break;
 				case 0x40:
-					state->joy2_y+=5;
-					if (state->joy2_y > STICKHIGH) state->joy2_y=STICKHIGH;
+					state->m_joy2_y+=5;
+					if (state->m_joy2_y > STICKHIGH) state->m_joy2_y=STICKHIGH;
 					break;
 			//  case 0x00:
-			//      state->joy2_y = vc4000_joystick_return_to_centre(state->joy2_y);
+			//      state->m_joy2_y = vc4000_joystick_return_to_centre(state->m_joy2_y);
 				}
-				data=state->joy2_y;
+				data=state->m_joy2_y;
 			}
 		}
 		else
@@ -255,15 +255,15 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x10:
-					state->joy2_x=STICKLOW;
+					state->m_joy2_x=STICKLOW;
 					break;
 				case 0x20:
-					state->joy2_x=STICKHIGH;
+					state->m_joy2_x=STICKHIGH;
 					break;
 				default:			/* autocentre */
-					state->joy2_x=STICKCENTRE;
+					state->m_joy2_x=STICKCENTRE;
 				}
-				data=state->joy2_x;
+				data=state->m_joy2_x;
 			}
 			else
 			{
@@ -271,22 +271,22 @@ READ8_HANDLER(vc4000_video_r)
 				switch (data)
 				{
 				case 0x80:
-					state->joy2_y=STICKLOW;
+					state->m_joy2_y=STICKLOW;
 					break;
 				case 0x40:
-					state->joy2_y=STICKHIGH;
+					state->m_joy2_y=STICKHIGH;
 					break;
 				default:
-					state->joy2_y=STICKCENTRE;
+					state->m_joy2_y=STICKCENTRE;
 				}
-				data=state->joy2_y;
+				data=state->m_joy2_y;
 			}
 		}
 		break;
 #endif
 
 	default:
-		data = state->video.reg.data[offset];
+		data = state->m_video.reg.data[offset];
 		break;
 	}
 	return data;
@@ -295,61 +295,61 @@ READ8_HANDLER(vc4000_video_r)
 WRITE8_HANDLER(vc4000_video_w)
 {
 	vc4000_state *state = space->machine().driver_data<vc4000_state>();
-//  state->video.reg.data[offset]=data;
+//  state->m_video.reg.data[offset]=data;
 	if (offset > 0xcf) offset &= 0xcf;	// c0-cf is mirrored at d0-df, e0-ef, f0-ff
 
 	switch (offset) {
 
 	case 0xc0:						// Sprite size
-		state->video.sprites[0].size=1<<(data&3);
-		state->video.sprites[1].size=1<<((data>>2)&3);
-		state->video.sprites[2].size=1<<((data>>4)&3);
-		state->video.sprites[3].size=1<<((data>>6)&3);
+		state->m_video.sprites[0].size=1<<(data&3);
+		state->m_video.sprites[1].size=1<<((data>>2)&3);
+		state->m_video.sprites[2].size=1<<((data>>4)&3);
+		state->m_video.sprites[3].size=1<<((data>>6)&3);
 		break;
 
 	case 0xc1:						// Sprite 1+2 color
-		state->video.sprites[0].scolor=((~data>>3)&7);
-		state->video.sprites[1].scolor=(~data&7);
+		state->m_video.sprites[0].scolor=((~data>>3)&7);
+		state->m_video.sprites[1].scolor=(~data&7);
 		break;
 
 	case 0xc2:						// Sprite 2+3 color
-		state->video.sprites[2].scolor=((~data>>3)&7);
-		state->video.sprites[3].scolor=(~data&7);
+		state->m_video.sprites[2].scolor=((~data>>3)&7);
+		state->m_video.sprites[3].scolor=(~data&7);
 		break;
 
 	case 0xc3:						// Score control
-		state->video.reg.d.score_control = data;
+		state->m_video.reg.d.score_control = data;
 		break;
 
 	case 0xc6:						// Background color
-		state->video.reg.d.background = data;
+		state->m_video.reg.d.background = data;
 		break;
 
 	case 0xc7:						// Soundregister
-		state->video.reg.data[offset] = data;
+		state->m_video.reg.data[offset] = data;
 		vc4000_soundport_w(space->machine().device("custom"), 0, data);
 		break;
 
 	case 0xc8:						// Digits 1 and 2
-		state->video.reg.d.bcd[0] = data;
+		state->m_video.reg.d.bcd[0] = data;
 		break;
 
 	case 0xc9:						// Digits 3 and 4
-		state->video.reg.d.bcd[1] = data;
+		state->m_video.reg.d.bcd[1] = data;
 		break;
 
 	case 0xca:			// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
-		state->video.reg.data[offset]=data;
-		state->video.background_collision=data;
+		state->m_video.reg.data[offset]=data;
+		state->m_video.background_collision=data;
 		break;
 
 	case 0xcb:					// VRST-Flag (bit 6) and intersprite collision (bit5-0)
-		state->video.reg.data[offset]=data;
-		state->video.sprite_collision=data;
+		state->m_video.reg.data[offset]=data;
+		state->m_video.sprite_collision=data;
 		break;
 
 	default:
-		state->video.reg.data[offset]=data;
+		state->m_video.reg.data[offset]=data;
     }
 }
 
@@ -357,7 +357,7 @@ WRITE8_HANDLER(vc4000_video_w)
 READ8_HANDLER(vc4000_vsync_r)
 {
 	vc4000_state *state = space->machine().driver_data<vc4000_state>();
-	return state->video.line >= VC4000_END_LINE ? 0x80 : 0;
+	return state->m_video.line >= VC4000_END_LINE ? 0x80 : 0;
 }
 
 static const char led[20][12+1] =
@@ -396,7 +396,7 @@ static void vc4000_draw_digit(vc4000_state *state, bitmap_t *bitmap, int x, int 
 	for (j=0; j<sizeof(led[0]); j++)
 	{
 		if (digit_to_segment[d]&(1<<(led[i][j]-'a')) )
-			*BITMAP_ADDR16(bitmap, y+i, x+j) = ((state->video.reg.d.background>>4)&7)^7;
+			*BITMAP_ADDR16(bitmap, y+i, x+j) = ((state->m_video.reg.d.background>>4)&7)^7;
 	}
 }
 
@@ -418,7 +418,7 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 {
 	int i,j,m;
 
-	if (state->video.line==0)
+	if (state->m_video.line==0)
 	{
 		This->y=This->data->y1;
 		This->state=0;
@@ -428,12 +428,12 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 
 	This->finished_now=FALSE;
 
-	if (state->video.line>VC4000_END_LINE) return;
+	if (state->m_video.line>VC4000_END_LINE) return;
 
 	switch (This->state)
 	{
 	case 0:
-		if (state->video.line != This->y + 2) break;
+		if (state->m_video.line != This->y + 2) break;
 		This->state++;
 
 	case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:case 9:case 10:
@@ -446,8 +446,8 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 			{
 				for (i=0; i<This->size; i++)
 				{
-					state->objects[This->data->x1 + i + j*This->size] |= This->scolor;
-					state->objects[This->data->x1 + i + j*This->size] &= 7;
+					state->m_objects[This->data->x1 + i + j*This->size] |= This->scolor;
+					state->m_objects[This->data->x1 + i + j*This->size] &= 7;
 				}
 			}
 		}
@@ -498,8 +498,8 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 			{
 				for (i=0; i<This->size; i++)
 				{
-					state->objects[This->data->x2 + i + j*This->size] |= This->scolor;
-					state->objects[This->data->x2 + i + j*This->size] &= 7;
+					state->m_objects[This->data->x2 + i + j*This->size] |= This->scolor;
+					state->m_objects[This->data->x2 + i + j*This->size] &= 7;
 				}
 			}
 		}
@@ -521,20 +521,20 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 	screen_device *screen = machine.first_screen();
 	int width = screen->width();
 	int height = screen->height();
-	int i, j, m, x, line=state->video.line-20;
+	int i, j, m, x, line=state->m_video.line-20;
 	int w, k;
 
-	if (state->video.line>=height) return;
+	if (state->m_video.line>=height) return;
 
-	plot_box(state->video.bitmap, 0, state->video.line, width, 1, (state->video.reg.d.background)&7);
+	plot_box(state->m_video.bitmap, 0, state->m_video.line, width, 1, (state->m_video.reg.d.background)&7);
 
 	if (line<0 || line>=200) return;
-	if (~state->video.reg.d.background & 8) return;
+	if (~state->m_video.reg.d.background & 8) return;
 
 	i=(line/20)*2;
 	if (line%20>=2) i++;
 
-	k=state->video.reg.d.grid_control[i>>2];
+	k=state->m_video.reg.d.grid_control[i>>2];
 	switch (k>>6) {
 		default:
 		case 0:case 2: w=1;break;
@@ -562,11 +562,11 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 	}
 	for (x=30, j=0, m=0x80; j<16; j++, x+=8, m>>=1)
 	{
-		if (state->video.reg.d.grid[i][j>>3]&m)
+		if (state->m_video.reg.d.grid[i][j>>3]&m)
 		{
 			int l;
 			for (l=0; l<w; l++) collision[x+l]|=0x10;
-			plot_box(state->video.bitmap, x, state->video.line, w, 1, (state->video.reg.d.background>>4)&7);
+			plot_box(state->m_video.bitmap, x, state->m_video.line, w, 1, (state->m_video.reg.d.background>>4)&7);
 		}
 		if (j==7) m=0x100;
 	}
@@ -580,74 +580,74 @@ INTERRUPT_GEN( vc4000_video_line )
 	const rectangle &visarea = device->machine().primary_screen->visible_area();
 	assert(ARRAY_LENGTH(collision) >= device->machine().primary_screen->width());
 
-	state->video.line++;
-	if (state->irq_pause) state->irq_pause++;
-	if (state->video.line>311) state->video.line=0;
+	state->m_video.line++;
+	if (state->m_irq_pause) state->m_irq_pause++;
+	if (state->m_video.line>311) state->m_video.line=0;
 
-	if (state->video.line==0)
+	if (state->m_video.line==0)
 	{
-		state->video.background_collision=0;
-		state->video.sprite_collision=0;
-		state->video.reg.d.sprite_collision=0;
+		state->m_video.background_collision=0;
+		state->m_video.sprite_collision=0;
+		state->m_video.reg.d.sprite_collision=0;
 //      logerror("begin of frame\n");
 	}
 
-	if (state->irq_pause>10)
+	if (state->m_irq_pause>10)
 	{
 		cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
-		state->irq_pause = 0;
+		state->m_irq_pause = 0;
 	}
 
-	if (state->video.line <= VC4000_END_LINE)
+	if (state->m_video.line <= VC4000_END_LINE)
 	{
 		vc4000_draw_grid(device->machine(), collision);
 
 		/* init object colours */
-		for (i=visarea.min_x; i<visarea.max_x; i++) state->objects[i]=8;
+		for (i=visarea.min_x; i<visarea.max_x; i++) state->m_objects[i]=8;
 
 		/* calculate object colours and OR overlapping object colours */
-		vc4000_sprite_update(state, state->video.bitmap, collision, &state->video.sprites[0]);
-		vc4000_sprite_update(state, state->video.bitmap, collision, &state->video.sprites[1]);
-		vc4000_sprite_update(state, state->video.bitmap, collision, &state->video.sprites[2]);
-		vc4000_sprite_update(state, state->video.bitmap, collision, &state->video.sprites[3]);
+		vc4000_sprite_update(state, state->m_video.bitmap, collision, &state->m_video.sprites[0]);
+		vc4000_sprite_update(state, state->m_video.bitmap, collision, &state->m_video.sprites[1]);
+		vc4000_sprite_update(state, state->m_video.bitmap, collision, &state->m_video.sprites[2]);
+		vc4000_sprite_update(state, state->m_video.bitmap, collision, &state->m_video.sprites[3]);
 
 		for (i=visarea.min_x; i<visarea.max_x; i++)
 		{
-			state->video.sprite_collision|=state->sprite_collision[collision[i]];
-			state->video.background_collision|=state->background_collision[collision[i]];
+			state->m_video.sprite_collision|=state->m_sprite_collision[collision[i]];
+			state->m_video.background_collision|=state->m_background_collision[collision[i]];
 			/* display final object colours */
-			if (state->objects[i] < 8)
-					*BITMAP_ADDR16(state->video.bitmap, state->video.line, i) = state->objects[i];
+			if (state->m_objects[i] < 8)
+					*BITMAP_ADDR16(state->m_video.bitmap, state->m_video.line, i) = state->m_objects[i];
 		}
 
-		y = state->video.reg.d.score_control&1?200:20;
+		y = state->m_video.reg.d.score_control&1?200:20;
 
-		if ((state->video.line>=y)&&(state->video.line<y+20))
+		if ((state->m_video.line>=y)&&(state->m_video.line<y+20))
 		{
 			x = 60;
-			vc4000_draw_digit(state, state->video.bitmap, x, y, state->video.reg.d.bcd[0]>>4, state->video.line-y);
-			vc4000_draw_digit(state, state->video.bitmap, x+16, y, state->video.reg.d.bcd[0]&0xf, state->video.line-y);
-			if (state->video.reg.d.score_control&2)	x -= 16;
-			vc4000_draw_digit(state, state->video.bitmap, x+48, y, state->video.reg.d.bcd[1]>>4, state->video.line-y);
-			vc4000_draw_digit(state, state->video.bitmap, x+64, y, state->video.reg.d.bcd[1]&0xf, state->video.line-y);
+			vc4000_draw_digit(state, state->m_video.bitmap, x, y, state->m_video.reg.d.bcd[0]>>4, state->m_video.line-y);
+			vc4000_draw_digit(state, state->m_video.bitmap, x+16, y, state->m_video.reg.d.bcd[0]&0xf, state->m_video.line-y);
+			if (state->m_video.reg.d.score_control&2)	x -= 16;
+			vc4000_draw_digit(state, state->m_video.bitmap, x+48, y, state->m_video.reg.d.bcd[1]>>4, state->m_video.line-y);
+			vc4000_draw_digit(state, state->m_video.bitmap, x+64, y, state->m_video.reg.d.bcd[1]&0xf, state->m_video.line-y);
 		}
 	}
-	if (state->video.line==VC4000_END_LINE) state->video.reg.d.sprite_collision |=0x40;
+	if (state->m_video.line==VC4000_END_LINE) state->m_video.reg.d.sprite_collision |=0x40;
 
-	if (((state->video.line == VC4000_END_LINE) |
-		(state->video.sprites[3].finished_now) |
-		(state->video.sprites[2].finished_now) |
-		(state->video.sprites[1].finished_now) |
-		(state->video.sprites[0].finished_now)) && (!state->irq_pause))
+	if (((state->m_video.line == VC4000_END_LINE) |
+		(state->m_video.sprites[3].finished_now) |
+		(state->m_video.sprites[2].finished_now) |
+		(state->m_video.sprites[1].finished_now) |
+		(state->m_video.sprites[0].finished_now)) && (!state->m_irq_pause))
 		{
 			cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, ASSERT_LINE, 3);
-			state->irq_pause=1;
+			state->m_irq_pause=1;
 		}
 }
 
 SCREEN_UPDATE( vc4000 )
 {
 	vc4000_state *state = screen->machine().driver_data<vc4000_state>();
-	copybitmap(bitmap, state->video.bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_video.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

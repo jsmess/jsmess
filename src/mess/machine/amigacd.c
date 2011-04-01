@@ -104,7 +104,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 		dat16 <<= 8;
 		dat16 |= dat8;
 
-		(*state->chip_ram_w)(state, dmac_data.acr, dat16);
+		(*state->m_chip_ram_w)(state, dmac_data.acr, dat16);
 
 		dmac_data.acr += 2;
 		dmac_data.wtc--;

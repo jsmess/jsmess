@@ -30,13 +30,13 @@ public:
 	nascom1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	device_t *hd6402;
-	int tape_size;
-	UINT8 *tape_image;
-	int tape_index;
-	nascom1_portstat_t portstat;
-	nascom2_fdc_t nascom2_fdc;
+	UINT8 *m_videoram;
+	device_t *m_hd6402;
+	int m_tape_size;
+	UINT8 *m_tape_image;
+	int m_tape_index;
+	nascom1_portstat_t m_portstat;
+	nascom2_fdc_t m_nascom2_fdc;
 };
 
 

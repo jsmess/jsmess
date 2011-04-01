@@ -14,19 +14,19 @@ class pecom_state : public driver_device
 public:
 	pecom_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  cdp1802(*this, CDP1802_TAG),
-		  cdp1869(*this, CDP1869_TAG)
+		  m_cdp1802(*this, CDP1802_TAG),
+		  m_cdp1869(*this, CDP1869_TAG)
 	{ }
 
-	required_device<cosmac_device> cdp1802;
-	required_device<cdp1869_device> cdp1869;
+	required_device<cosmac_device> m_cdp1802;
+	required_device<cdp1869_device> m_cdp1869;
 
-	UINT8 *charram;			/* character generator ROM */
-	int reset;				/* CPU mode */
-	int dma;				/* memory refresh DMA */
+	UINT8 *m_charram;			/* character generator ROM */
+	int m_reset;				/* CPU mode */
+	int m_dma;				/* memory refresh DMA */
 
 	/* timers */
-	emu_timer *reset_timer;	/* power on reset timer */
+	emu_timer *m_reset_timer;	/* power on reset timer */
 
 };
 

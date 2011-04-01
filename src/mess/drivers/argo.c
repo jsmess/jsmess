@@ -23,8 +23,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	UINT8* m_videoram;
-	const UINT8 *FNT;
-	UINT8 framecnt;
+	const UINT8 *m_FNT;
+	UINT8 m_framecnt;
 };
 
 
@@ -67,7 +67,7 @@ DRIVER_INIT( argo )
 static VIDEO_START( argo )
 {
 	argo_state *state = machine.driver_data<argo_state>();
-	state->FNT = machine.region("chargen")->base();
+	state->m_FNT = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( argo )
@@ -76,7 +76,7 @@ static SCREEN_UPDATE( argo )
 	UINT8 y,ra,chr,gfx,i;
 	UINT16 sy=0,ma=0,x;
 
-	state->framecnt++;
+	state->m_framecnt++;
 
 	for (y = 0; y < 5; y++)
 	{
@@ -93,12 +93,12 @@ static SCREEN_UPDATE( argo )
 					chr = state->m_videoram[x];
 
 					/* Take care of flashing characters */
-					if ((chr & 0x80) && (state->framecnt & 0x08))
+					if ((chr & 0x80) && (state->m_framecnt & 0x08))
 						chr = 0x20;
 
 					chr &= 0x7f;
 
-					gfx = state->FNT[(chr<<4) | ra ];
+					gfx = state->m_FNT[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */

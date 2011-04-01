@@ -207,19 +207,19 @@ public:
 	gamecom_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram;
-	UINT8 *cartridge1;
-	UINT8 *cartridge2;
-	UINT8 *cartridge;
-	emu_timer *clock_timer;
-	GAMECOM_DMA dma;
-	GAMECOM_TIMER timer[2];
-	gamecom_sound_t sound;
-	UINT32 stylus_x;
-	UINT32 stylus_y;
-	int scanline;
-	unsigned int base_address;
-	emu_timer *scanline_timer;
+	UINT8 *m_vram;
+	UINT8 *m_cartridge1;
+	UINT8 *m_cartridge2;
+	UINT8 *m_cartridge;
+	emu_timer *m_clock_timer;
+	GAMECOM_DMA m_dma;
+	GAMECOM_TIMER m_timer[2];
+	gamecom_sound_t m_sound;
+	UINT32 m_stylus_x;
+	UINT32 m_stylus_y;
+	int m_scanline;
+	unsigned int m_base_address;
+	emu_timer *m_scanline_timer;
 };
 
 

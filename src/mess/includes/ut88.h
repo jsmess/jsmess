@@ -15,9 +15,9 @@ public:
 	ut88_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video_ram;
-	int keyboard_mask;
-	int lcd_digit[6];
+	UINT8 *m_video_ram;
+	int m_keyboard_mask;
+	int m_lcd_digit[6];
 };
 
 

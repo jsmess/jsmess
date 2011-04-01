@@ -54,26 +54,26 @@ public:
 	tm990189_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int load_state;
-	int ic_state;
-	int digitsel;
-	int segment;
-	emu_timer *displayena_timer;
-	UINT8 segment_state[10];
-	UINT8 old_segment_state[10];
-	UINT8 LED_state;
-	emu_timer *joy1x_timer;
-	emu_timer *joy1y_timer;
-	emu_timer *joy2x_timer;
-	emu_timer *joy2y_timer;
-	int LED_display_window_left;
-	int LED_display_window_top;
-	int LED_display_window_width;
-	int LED_display_window_height;
-	device_image_interface *rs232_fp;
-	UINT8 rs232_rts;
-	emu_timer *rs232_input_timer;
-	UINT8 bogus_read_save;
+	int m_load_state;
+	int m_ic_state;
+	int m_digitsel;
+	int m_segment;
+	emu_timer *m_displayena_timer;
+	UINT8 m_segment_state[10];
+	UINT8 m_old_segment_state[10];
+	UINT8 m_LED_state;
+	emu_timer *m_joy1x_timer;
+	emu_timer *m_joy1y_timer;
+	emu_timer *m_joy2x_timer;
+	emu_timer *m_joy2y_timer;
+	int m_LED_display_window_left;
+	int m_LED_display_window_top;
+	int m_LED_display_window_width;
+	int m_LED_display_window_height;
+	device_image_interface *m_rs232_fp;
+	UINT8 m_rs232_rts;
+	emu_timer *m_rs232_input_timer;
+	UINT8 m_bogus_read_save;
 };
 
 
@@ -105,7 +105,7 @@ static MACHINE_RESET( tm990_189 )
 static MACHINE_START( tm990_189 )
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
-	state->displayena_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC(NULL));
 }
 static const TMS9928a_interface tms9918_interface =
 {
@@ -120,12 +120,12 @@ static MACHINE_START( tm990_189_v )
 	tm990189_state *state = machine.driver_data<tm990189_state>();
 	TMS9928A_configure(&tms9918_interface);
 
-	state->displayena_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC(NULL));
 
-	state->joy1x_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->joy1y_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->joy2x_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->joy2y_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_joy1x_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_joy1y_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_joy2x_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_joy2y_timer = machine.scheduler().timer_alloc(FUNC(NULL));
 }
 
 static MACHINE_RESET( tm990_189_v )
@@ -158,12 +158,12 @@ static SCREEN_EOF( tm990_189 )
 	int i;
 
 	for (i=0; i<10; i++)
-		state->segment_state[i] = 0;
+		state->m_segment_state[i] = 0;
 }
 
 INLINE void draw_digit(tm990189_state *state)
 {
-	state->segment_state[state->digitsel] |= ~state->segment;
+	state->m_segment_state[state->m_digitsel] |= ~state->m_segment;
 }
 
 static void update_common(running_machine &machine, bitmap_t *bitmap,
@@ -189,30 +189,30 @@ static void update_common(running_machine &machine, bitmap_t *bitmap,
 
 	for (i=0; i<10; i++)
 	{
-		state->old_segment_state[i] |= state->segment_state[i];
+		state->m_old_segment_state[i] |= state->m_segment_state[i];
 
 		for (j=0; j<8; j++)
 			plot_box(bitmap, display_x + i*16 + bounds[j].x, display_y + bounds[j].y,
 						bounds[j].w, bounds[j].h,
-						(state->old_segment_state[i] & (1 << j)) ? fore_color : back_color);
+						(state->m_old_segment_state[i] & (1 << j)) ? fore_color : back_color);
 
-		state->old_segment_state[i] = state->segment_state[i];
+		state->m_old_segment_state[i] = state->m_segment_state[i];
 	}
 
 	for (i=0; i<4; i++)
 	{
 		plot_box(bitmap, LED14_x + 48+4 - i*16, LED14_y + 4, 8, 8,
-					(state->LED_state & (1 << i)) ? fore_color : back_color);
+					(state->m_LED_state & (1 << i)) ? fore_color : back_color);
 	}
 
 	plot_box(bitmap, LED7_x+4, LED7_y+4, 8, 8,
-				(state->LED_state & 0x10) ? fore_color : back_color);
+				(state->m_LED_state & 0x10) ? fore_color : back_color);
 
 	plot_box(bitmap, LED56_x+16+4, LED56_y+4, 8, 8,
-				(state->LED_state & 0x20) ? fore_color : back_color);
+				(state->m_LED_state & 0x20) ? fore_color : back_color);
 
 	plot_box(bitmap, LED56_x+4, LED56_y+4, 8, 8,
-				(state->LED_state & 0x40) ? fore_color : back_color);
+				(state->m_LED_state & 0x40) ? fore_color : back_color);
 }
 
 static SCREEN_UPDATE( tm990_189 )
@@ -229,10 +229,10 @@ static VIDEO_START( tm990_189_v )
 
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when
      * multimonitor support is added?*/
-	state->LED_display_window_left = visarea.min_x;
-	state->LED_display_window_top = visarea.max_y - 32;
-	state->LED_display_window_width = visarea.max_x - visarea.min_x;
-	state->LED_display_window_height = 32;
+	state->m_LED_display_window_left = visarea.min_x;
+	state->m_LED_display_window_top = visarea.max_y - 32;
+	state->m_LED_display_window_width = visarea.max_x - visarea.min_x;
+	state->m_LED_display_window_height = 32;
 }
 
 static SCREEN_UPDATE( tm990_189_v )
@@ -240,12 +240,12 @@ static SCREEN_UPDATE( tm990_189_v )
 	tm990189_state *state = screen->machine().driver_data<tm990189_state>();
 	SCREEN_UPDATE_CALL(tms9928a);
 
-	plot_box(bitmap, state->LED_display_window_left, state->LED_display_window_top, state->LED_display_window_width, state->LED_display_window_height, screen->machine().pens[1]);
+	plot_box(bitmap, state->m_LED_display_window_left, state->m_LED_display_window_top, state->m_LED_display_window_width, state->m_LED_display_window_height, screen->machine().pens[1]);
 	update_common(screen->machine(), bitmap,
-					state->LED_display_window_left, state->LED_display_window_top,
-					state->LED_display_window_left, state->LED_display_window_top+16,
-					state->LED_display_window_left+80, state->LED_display_window_top+16,
-					state->LED_display_window_left+128, state->LED_display_window_top+16,
+					state->m_LED_display_window_left, state->m_LED_display_window_top,
+					state->m_LED_display_window_left, state->m_LED_display_window_top+16,
+					state->m_LED_display_window_left+80, state->m_LED_display_window_top+16,
+					state->m_LED_display_window_left+128, state->m_LED_display_window_top+16,
 					6, 1);
 	return 0;
 }
@@ -257,10 +257,10 @@ static SCREEN_UPDATE( tm990_189_v )
 static void field_interrupts(running_machine &machine)
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
-	if (state->load_state)
+	if (state->m_load_state)
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 2);
 	else
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, state->ic_state);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, state->m_ic_state);
 }
 
 /*
@@ -270,14 +270,14 @@ static void field_interrupts(running_machine &machine)
 static TIMER_CALLBACK(clear_load)
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
-	state->load_state = FALSE;
+	state->m_load_state = FALSE;
 	field_interrupts(machine);
 }
 
 static void hold_load(running_machine &machine)
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
-	state->load_state = TRUE;
+	state->m_load_state = TRUE;
 	field_interrupts(machine);
 	machine.scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
 }
@@ -289,9 +289,9 @@ static void hold_load(running_machine &machine)
 static TMS9901_INT_CALLBACK ( usr9901_interrupt_callback )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	state->ic_state = ic & 7;
+	state->m_ic_state = ic & 7;
 
-	if (!state->load_state)
+	if (!state->m_load_state)
 		field_interrupts(device->machine());
 }
 
@@ -299,9 +299,9 @@ static WRITE8_DEVICE_HANDLER( usr9901_led_w )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
 	if (data)
-		state->LED_state |= (1 << offset);
+		state->m_LED_state |= (1 << offset);
 	else
-		state->LED_state &= ~(1 << offset);
+		state->m_LED_state &= ~(1 << offset);
 }
 
 static TMS9901_INT_CALLBACK( sys9901_interrupt_callback )
@@ -318,8 +318,8 @@ static READ8_DEVICE_HANDLER( sys9901_r0 )
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
 	/* keyboard read */
-	if (state->digitsel < 9)
-		reply |= input_port_read(device->machine(), keynames[state->digitsel]) << 1;
+	if (state->m_digitsel < 9)
+		reply |= input_port_read(device->machine(), keynames[state->m_digitsel]) << 1;
 
 	/* tape input */
 	if (cassette_input(device->machine().device("cassette")) > 0.0)
@@ -332,20 +332,20 @@ static WRITE8_DEVICE_HANDLER( sys9901_digitsel_w )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
 	if (data)
-		state->digitsel |= 1 << offset;
+		state->m_digitsel |= 1 << offset;
 	else
-		state->digitsel &= ~ (1 << offset);
+		state->m_digitsel &= ~ (1 << offset);
 }
 
 static WRITE8_DEVICE_HANDLER( sys9901_segment_w )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
 	if (data)
-		state->segment |= 1 << (offset-4);
+		state->m_segment |= 1 << (offset-4);
 	else
 	{
-		state->segment &= ~ (1 << (offset-4));
-		if ((state->displayena_timer->remaining() > attotime::zero)  && (state->digitsel < 10))
+		state->m_segment &= ~ (1 << (offset-4));
+		if ((state->m_displayena_timer->remaining() > attotime::zero)  && (state->m_digitsel < 10))
 			draw_digit(state);
 	}
 }
@@ -353,9 +353,9 @@ static WRITE8_DEVICE_HANDLER( sys9901_segment_w )
 static WRITE8_DEVICE_HANDLER( sys9901_dsplytrgr_w )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	if ((!data) && (state->digitsel < 10))
+	if ((!data) && (state->m_digitsel < 10))
 	{
-		state->displayena_timer->reset(displayena_duration);
+		state->m_displayena_timer->reset(displayena_duration);
 		draw_digit(state);
 	}
 }
@@ -364,9 +364,9 @@ static WRITE8_DEVICE_HANDLER( sys9901_shiftlight_w )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
 	if (data)
-		state->LED_state |= 0x10;
+		state->m_LED_state |= 0x10;
 	else
-		state->LED_state &= ~0x10;
+		state->m_LED_state &= ~0x10;
 }
 
 static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
@@ -389,7 +389,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 	//tm990189_state *state = machine.driver_data<tm990189_state>();
 	UINT8 buf;
 	device_image_interface *image = (device_image_interface *)(ptr);
-	if (/*state->rs232_rts &&*/ /*(mame_ftell(state->rs232_fp) < mame_fsize(state->rs232_fp))*/1)
+	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
 		if (image->fread(&buf, 1) == 1)
 			tms9902_push_data(machine.device("tms9902"), buf);
@@ -403,8 +403,8 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 {
 	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine().device("tms9902"), 1);
-	state->rs232_input_timer = image.device().machine().scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
-	state->rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
+	state->m_rs232_input_timer = image.device().machine().scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
+	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
 
 	return IMAGE_INIT_PASS;
 }
@@ -417,7 +417,7 @@ static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine().device("tms9902"), 0);
 
-	state->rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
+	state->m_rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
 }
 
 DEVICE_GET_INFO( tm990_189_rs232 )
@@ -445,7 +445,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 static TMS9902_RST_CALLBACK( rts_callback )
 {
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	state->rs232_rts = RTS;
+	state->m_rs232_rts = RTS;
 	tms9902_set_cts(device, RTS);
 }
 
@@ -454,8 +454,8 @@ static TMS9902_XMIT_CALLBACK( xmit_callback )
 	tm990189_state *state = device->machine().driver_data<tm990189_state>();
 	UINT8 buf = data;
 
-	if (state->rs232_fp)
-		state->rs232_fp->fwrite(&buf, 1);
+	if (state->m_rs232_fp)
+		state->m_rs232_fp->fwrite(&buf, 1);
 }
 
 /*
@@ -479,7 +479,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 		break;
 
 	case 5: /* CKON: set DECKCONTROL */
-		state->LED_state |= 0x20;
+		state->m_LED_state |= 0x20;
 		{
 			device_t *img = space->machine().device("cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
@@ -487,7 +487,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 		break;
 
 	case 6: /* CKOF: clear DECKCONTROL */
-		state->LED_state &= ~0x20;
+		state->m_LED_state &= ~0x20;
 		{
 			device_t *img = space->machine().device("cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -504,9 +504,9 @@ static void idle_callback(device_t *device, int state)
 {
 	tm990189_state *drvstate = device->machine().driver_data<tm990189_state>();
 	if (state)
-		drvstate->LED_state |= 0x40;
+		drvstate->m_LED_state |= 0x40;
 	else
-		drvstate->LED_state &= ~0x40;
+		drvstate->m_LED_state &= ~0x40;
 }
 
 /*
@@ -538,9 +538,9 @@ static  READ8_HANDLER(video_vdp_r)
 		reply = TMS9928A_vram_r(space, 0);
 
 	if (!(offset & 1))
-		state->bogus_read_save = reply;
+		state->m_bogus_read_save = reply;
 	else
-		reply = state->bogus_read_save;
+		reply = state->m_bogus_read_save;
 
 	return reply;
 }
@@ -562,16 +562,16 @@ static READ8_HANDLER(video_joy_r)
 	int reply = input_port_read(space->machine(), "BUTTONS");
 
 
-	if (state->joy1x_timer->remaining() < attotime::zero)
+	if (state->m_joy1x_timer->remaining() < attotime::zero)
 		reply |= 0x01;
 
-	if (state->joy1y_timer->remaining() < attotime::zero)
+	if (state->m_joy1y_timer->remaining() < attotime::zero)
 		reply |= 0x02;
 
-	if (state->joy2x_timer->remaining() < attotime::zero)
+	if (state->m_joy2x_timer->remaining() < attotime::zero)
 		reply |= 0x08;
 
-	if (state->joy2y_timer->remaining() < attotime::zero)
+	if (state->m_joy2y_timer->remaining() < attotime::zero)
 		reply |= 0x10;
 
 	return reply;
@@ -580,10 +580,10 @@ static READ8_HANDLER(video_joy_r)
 static WRITE8_HANDLER(video_joy_w)
 {
 	tm990189_state *state = space->machine().driver_data<tm990189_state>();
-	state->joy1x_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY1_X")*28+28));
-	state->joy1y_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY1_Y")*28+28));
-	state->joy2x_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY2_X")*28+28));
-	state->joy2y_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY2_Y")*28+28));
+	state->m_joy1x_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY1_X")*28+28));
+	state->m_joy1y_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY1_Y")*28+28));
+	state->m_joy2x_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY2_X")*28+28));
+	state->m_joy2y_timer->reset(attotime::from_usec(input_port_read(space->machine(), "JOY2_Y")*28+28));
 }
 
 /* user tms9901 setup */

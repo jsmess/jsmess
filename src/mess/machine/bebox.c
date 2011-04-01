@@ -143,34 +143,34 @@ static void bebox_mbreg32_w(UINT32 *target, UINT64 data, UINT64 mem_mask)
 READ64_HANDLER( bebox_cpu0_imask_r )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	return ((UINT64) state->cpu_imask[0]) << 32;
+	return ((UINT64) state->m_cpu_imask[0]) << 32;
 }
 
 READ64_HANDLER( bebox_cpu1_imask_r )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	return ((UINT64) state->cpu_imask[1]) << 32;
+	return ((UINT64) state->m_cpu_imask[1]) << 32;
 }
 
 READ64_HANDLER( bebox_interrupt_sources_r )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	return ((UINT64) state->interrupts) << 32;
+	return ((UINT64) state->m_interrupts) << 32;
 }
 
 WRITE64_HANDLER( bebox_cpu0_imask_w )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	UINT32 old_imask = state->cpu_imask[0];
+	UINT32 old_imask = state->m_cpu_imask[0];
 
-	bebox_mbreg32_w(&state->cpu_imask[0], data, mem_mask);
+	bebox_mbreg32_w(&state->m_cpu_imask[0], data, mem_mask);
 
-	if (old_imask != state->cpu_imask[0])
+	if (old_imask != state->m_cpu_imask[0])
 	{
 		if (LOG_CPUIMASK)
 		{
 			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
-				(unsigned) cpu_get_pc( &space->device()), state->cpu_imask[0]);
+				(unsigned) cpu_get_pc( &space->device()), state->m_cpu_imask[0]);
 		}
 		bebox_update_interrupts(space->machine());
 	}
@@ -179,16 +179,16 @@ WRITE64_HANDLER( bebox_cpu0_imask_w )
 WRITE64_HANDLER( bebox_cpu1_imask_w )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	UINT32 old_imask = state->cpu_imask[1];
+	UINT32 old_imask = state->m_cpu_imask[1];
 
-	bebox_mbreg32_w(&state->cpu_imask[1], data, mem_mask);
+	bebox_mbreg32_w(&state->m_cpu_imask[1], data, mem_mask);
 
-	if (old_imask != state->cpu_imask[1])
+	if (old_imask != state->m_cpu_imask[1])
 	{
 		if (LOG_CPUIMASK)
 		{
 			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
-				(unsigned) cpu_get_pc( &space->device() ), state->cpu_imask[1]);
+				(unsigned) cpu_get_pc( &space->device() ), state->m_cpu_imask[1]);
 		}
 		bebox_update_interrupts(space->machine());
 	}
@@ -198,7 +198,7 @@ READ64_HANDLER( bebox_crossproc_interrupts_r )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
 	UINT32 result;
-	result = state->crossproc_interrupts;
+	result = state->m_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
 	if (space != space->machine().device("ppc1")->memory().space(AS_PROGRAM))
@@ -226,16 +226,16 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 		{ 0x04000000, 1, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ }
 	};
 	int i, line;
-	UINT32 old_crossproc_interrupts = state->crossproc_interrupts;
+	UINT32 old_crossproc_interrupts = state->m_crossproc_interrupts;
 	static const char *const cputags[] = { "ppc1", "ppc2" };
 
-	bebox_mbreg32_w(&state->crossproc_interrupts, data, mem_mask);
+	bebox_mbreg32_w(&state->m_crossproc_interrupts, data, mem_mask);
 
 	for (i = 0; i < ARRAY_LENGTH(crossproc_map); i++)
 	{
-		if ((old_crossproc_interrupts ^ state->crossproc_interrupts) & crossproc_map[i].mask)
+		if ((old_crossproc_interrupts ^ state->m_crossproc_interrupts) & crossproc_map[i].mask)
 		{
-			if (state->crossproc_interrupts & crossproc_map[i].mask)
+			if (state->m_crossproc_interrupts & crossproc_map[i].mask)
 				line = crossproc_map[i].active_high ? ASSERT_LINE : CLEAR_LINE;
 			else
 				line = crossproc_map[i].active_high ? CLEAR_LINE : ASSERT_LINE;
@@ -274,12 +274,12 @@ static void bebox_update_interrupts(running_machine &machine)
 
 	for (cpunum = 0; cpunum < 2; cpunum++)
 	{
-		interrupt = state->interrupts & state->cpu_imask[cpunum];
+		interrupt = state->m_interrupts & state->m_cpu_imask[cpunum];
 
 		if (LOG_INTERRUPTS)
 		{
 			logerror("\tbebox_update_interrupts(): CPU #%d [%08X|%08X] IRQ %s\n", cpunum,
-				state->interrupts, state->cpu_imask[cpunum], interrupt ? "on" : "off");
+				state->m_interrupts, state->m_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
 		cputag_set_input_line(machine, cputags[cpunum], INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
@@ -339,14 +339,14 @@ static void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_b
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
 
-	old_interrupts = state->interrupts;
+	old_interrupts = state->m_interrupts;
 	if (val)
-		state->interrupts |= 1 << interrupt_bit;
+		state->m_interrupts |= 1 << interrupt_bit;
 	else
-		state->interrupts &= ~(1 << interrupt_bit);
+		state->m_interrupts &= ~(1 << interrupt_bit);
 
 	/* if interrupt values have changed, update the lines */
-	if (state->interrupts != old_interrupts)
+	if (state->m_interrupts != old_interrupts)
 		bebox_update_interrupts(machine);
 }
 
@@ -418,8 +418,8 @@ static void bebox_fdc_interrupt(running_machine &machine, int state)
 {
 	bebox_state *drvstate = machine.driver_data<bebox_state>();
 	bebox_set_irq_bit(machine, 13, state);
-	if ( drvstate->devices.pic8259_master ) {
-		pic8259_ir6_w(drvstate->devices.pic8259_master, state);
+	if ( drvstate->m_devices.pic8259_master ) {
+		pic8259_ir6_w(drvstate->m_devices.pic8259_master, state);
 	}
 }
 
@@ -427,8 +427,8 @@ static void bebox_fdc_interrupt(running_machine &machine, int state)
 static void bebox_fdc_dma_drq(running_machine &machine, int state)
 {
 	bebox_state *drvstate = machine.driver_data<bebox_state>();
-	if ( drvstate->devices.dma8237_1 ) {
-		i8237_dreq2_w(drvstate->devices.dma8237_1, state);
+	if ( drvstate->m_devices.dma8237_1 ) {
+		i8237_dreq2_w(drvstate->m_devices.dma8237_1, state);
 	}
 }
 
@@ -465,9 +465,9 @@ READ64_HANDLER( bebox_interrupt_ack_r )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
 	int result;
-	result = pic8259_acknowledge( state->devices.pic8259_master );
+	result = pic8259_acknowledge( state->m_devices.pic8259_master );
 	if (result == 2)
-		result = pic8259_acknowledge( state->devices.pic8259_slave );
+		result = pic8259_acknowledge( state->m_devices.pic8259_slave );
 	bebox_set_irq_bit(space->machine(), 5, 0);	/* HACK */
 	return ((UINT64) result) << 56;
 }
@@ -487,8 +487,8 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_master_set_int_line )
 static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_slave_set_int_line )
 {
 	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
-	if (drvstate->devices.pic8259_master)
-		pic8259_ir2_w(drvstate->devices.pic8259_master, state);
+	if (drvstate->m_devices.pic8259_master)
+		pic8259_ir2_w(drvstate->m_devices.pic8259_master, state);
 }
 
 const struct pic8259_interface bebox_pic8259_master_config =
@@ -555,8 +555,8 @@ void bebox_ide_interrupt(device_t *device, int state)
 {
 	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
 	bebox_set_irq_bit(device->machine(), 7, state);
-	if ( drvstate->devices.pic8259_master ) {
-		pic8259_ir6_w(drvstate->devices.pic8259_master, state);
+	if ( drvstate->m_devices.pic8259_master ) {
+		pic8259_ir6_w(drvstate->m_devices.pic8259_master, state);
 	}
 }
 
@@ -592,21 +592,21 @@ static WRITE64_HANDLER( bebox_video_w )
 static READ8_HANDLER(at_page8_r)
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	UINT8 data = state->at_pages[offset % 0x10];
+	UINT8 data = state->m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 		case 1:
-			data = state->dma_offset[(offset / 8) & 1][2];
+			data = state->m_dma_offset[(offset / 8) & 1][2];
 			break;
 		case 2:
-			data = state->dma_offset[(offset / 8) & 1][3];
+			data = state->m_dma_offset[(offset / 8) & 1][3];
 			break;
 		case 3:
-			data = state->dma_offset[(offset / 8) & 1][1];
+			data = state->m_dma_offset[(offset / 8) & 1][1];
 			break;
 		case 7:
-			data = state->dma_offset[(offset / 8) & 1][0];
+			data = state->m_dma_offset[(offset / 8) & 1][0];
 			break;
 	}
 	return data;
@@ -616,25 +616,25 @@ static READ8_HANDLER(at_page8_r)
 static WRITE8_HANDLER(at_page8_w)
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	state->at_pages[offset % 0x10] = data;
+	state->m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 		case 1:
-			state->dma_offset[(offset / 8) & 1][2] &= 0xFF00;
-			state->dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 0;
+			state->m_dma_offset[(offset / 8) & 1][2] &= 0xFF00;
+			state->m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 0;
 			break;
 		case 2:
-			state->dma_offset[(offset / 8) & 1][3] &= 0xFF00;
-			state->dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 0;
+			state->m_dma_offset[(offset / 8) & 1][3] &= 0xFF00;
+			state->m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 0;
 			break;
 		case 3:
-			state->dma_offset[(offset / 8) & 1][1] &= 0xFF00;
-			state->dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 0;
+			state->m_dma_offset[(offset / 8) & 1][1] &= 0xFF00;
+			state->m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 0;
 			break;
 		case 7:
-			state->dma_offset[(offset / 8) & 1][0] &= 0xFF00;
-			state->dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 0;
+			state->m_dma_offset[(offset / 8) & 1][0] &= 0xFF00;
+			state->m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 0;
 			break;
 	}
 }
@@ -658,20 +658,20 @@ static WRITE8_HANDLER(at_hipage8_w)
 	switch(offset % 8)
 	{
 		case 1:
-			state->dma_offset[(offset / 8) & 1][2] &= 0x00FF;
-			state->dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 8;
+			state->m_dma_offset[(offset / 8) & 1][2] &= 0x00FF;
+			state->m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 8;
 			break;
 		case 2:
-			state->dma_offset[(offset / 8) & 1][3] &= 0x00FF;
-			state->dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 8;
+			state->m_dma_offset[(offset / 8) & 1][3] &= 0x00FF;
+			state->m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 8;
 			break;
 		case 3:
-			state->dma_offset[(offset / 8) & 1][1] &= 0x00FF;
-			state->dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 8;
+			state->m_dma_offset[(offset / 8) & 1][1] &= 0x00FF;
+			state->m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 8;
 			break;
 		case 7:
-			state->dma_offset[(offset / 8) & 1][0] &= 0x00FF;
-			state->dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 8;
+			state->m_dma_offset[(offset / 8) & 1][0] &= 0x00FF;
+			state->m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 8;
 			break;
 	}
 }
@@ -701,7 +701,7 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_dma_hrq_changed )
 static READ8_HANDLER( bebox_dma_read_byte )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	return space->read_byte(page_offset + offset);
 }
@@ -710,7 +710,7 @@ static READ8_HANDLER( bebox_dma_read_byte )
 static WRITE8_HANDLER( bebox_dma_write_byte )
 {
 	bebox_state *state = space->machine().driver_data<bebox_state>();
-	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	space->write_byte(page_offset + offset, data);
 }
@@ -733,7 +733,7 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_dma8237_out_eop ) {
 static void set_dma_channel(device_t *device, int channel, int state)
 {
 	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
-	if (!state) drvstate->dma_channel = channel;
+	if (!state) drvstate->m_dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
@@ -775,8 +775,8 @@ I8237_INTERFACE( bebox_dma8237_2_config )
 static WRITE_LINE_DEVICE_HANDLER( bebox_timer0_w )
 {
 	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
-	if (drvstate->devices.pic8259_master)
-		pic8259_ir0_w(drvstate->devices.pic8259_master, state);
+	if (drvstate->m_devices.pic8259_master)
+		pic8259_ir0_w(drvstate->m_devices.pic8259_master, state);
 }
 
 
@@ -846,8 +846,8 @@ static void bebox_keyboard_interrupt(running_machine &machine,int state)
 {
 	bebox_state *drvstate = machine.driver_data<bebox_state>();
 	bebox_set_irq_bit(machine, 16, state);
-	if ( drvstate->devices.pic8259_master ) {
-		pic8259_ir1_w(drvstate->devices.pic8259_master, state);
+	if ( drvstate->m_devices.pic8259_master ) {
+		pic8259_ir1_w(drvstate->m_devices.pic8259_master, state);
 	}
 }
 
@@ -976,7 +976,7 @@ UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, 
 				break;
 
 			default:
-				result = state->scsi53c810_data[offset / 4];
+				result = state->m_scsi53c810_data[offset / 4];
 				break;
 		}
 	}
@@ -991,7 +991,7 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 
 	if (function == 0)
 	{
-		state->scsi53c810_data[offset / 4] = data;
+		state->m_scsi53c810_data[offset / 4] = data;
 
 		switch(offset)
 		{
@@ -1008,11 +1008,11 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 				if (data & 0x02)
 				{
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
-					if (state->scsi53c810_data[5] != 0xFFFFFFF0)
+					if (state->m_scsi53c810_data[5] != 0xFFFFFFF0)
 					{
 						address_space *space = device->machine().device("ppc1")->memory().space(AS_PROGRAM);
 
-						addr = (state->scsi53c810_data[5] | 0xC0000000) & ~0xFF;
+						addr = (state->m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						space->install_legacy_read_handler(addr, addr + 0xFF, FUNC(scsi53c810_r));
 						space->install_legacy_write_handler(addr, addr + 0xFF, FUNC(scsi53c810_w));
 					}
@@ -1043,10 +1043,10 @@ static const struct LSI53C810interface scsi53c810_intf =
 
 static TIMER_CALLBACK( bebox_get_devices ) {
 	bebox_state *state = machine.driver_data<bebox_state>();
-	state->devices.pic8259_master = machine.device("pic8259_master");
-	state->devices.pic8259_slave = machine.device("pic8259_slave");
-	state->devices.dma8237_1 = machine.device("dma8237_1");
-	state->devices.dma8237_2 = machine.device("dma8237_2");
+	state->m_devices.pic8259_master = machine.device("pic8259_master");
+	state->m_devices.pic8259_slave = machine.device("pic8259_slave");
+	state->m_devices.dma8237_1 = machine.device("dma8237_1");
+	state->m_devices.dma8237_2 = machine.device("dma8237_2");
 }
 
 
@@ -1059,10 +1059,10 @@ static TIMER_CALLBACK( bebox_get_devices ) {
 MACHINE_RESET( bebox )
 {
 	bebox_state *state = machine.driver_data<bebox_state>();
-	state->devices.pic8259_master = NULL;
-	state->devices.pic8259_slave = NULL;
-	state->devices.dma8237_1 = NULL;
-	state->devices.dma8237_2 = NULL;
+	state->m_devices.pic8259_master = NULL;
+	state->m_devices.pic8259_slave = NULL;
+	state->m_devices.dma8237_1 = NULL;
+	state->m_devices.dma8237_2 = NULL;
 
 	machine.scheduler().timer_set(attotime::zero, FUNC(bebox_get_devices));
 

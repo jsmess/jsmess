@@ -83,7 +83,7 @@ public:
 	ti990_10_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *terminal;
+	device_t *m_terminal;
 };
 
 
@@ -104,7 +104,7 @@ static MACHINE_RESET( ti990_10 )
 static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
 	ti990_10_state *state = device->machine().driver_data<ti990_10_state>();
-	vdt911_keyboard(state->terminal);
+	vdt911_keyboard(state->m_terminal);
 
 	ti990_line_interrupt(device->machine());
 }
@@ -147,13 +147,13 @@ static const vdt911_init_params_t vdt911_intf =
 static VIDEO_START( ti990_10 )
 {
 	ti990_10_state *state = machine.driver_data<ti990_10_state>();
-	state->terminal = machine.device("vdt911");
+	state->m_terminal = machine.device("vdt911");
 }
 
 static SCREEN_UPDATE( ti990_10 )
 {
 	ti990_10_state *state = screen->machine().driver_data<ti990_10_state>();
-	vdt911_refresh(state->terminal, bitmap, 0, 0);
+	vdt911_refresh(state->m_terminal, bitmap, 0, 0);
 	return 0;
 }
 

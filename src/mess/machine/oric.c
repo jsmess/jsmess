@@ -64,19 +64,19 @@ static void oric_refresh_ints(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	/* telestrat has floppy hardware built-in! */
-	if (state->is_telestrat==0)
+	if (state->m_is_telestrat==0)
 	{
 		/* oric 1 or oric atmos */
 
 		/* if floppy disc hardware is disabled, do not allow interrupts from it */
 		if ((input_port_read(machine, "FLOPPY") & 0x07) == ORIC_FLOPPY_INTERFACE_NONE)
 		{
-			state->irqs &=~(1<<1);
+			state->m_irqs &=~(1<<1);
 		}
 	}
 
 	/* any irq set? */
-	if ((state->irqs & 0x0f)!=0)
+	if ((state->m_irqs & 0x0f)!=0)
 	{
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
@@ -111,13 +111,13 @@ static void oric_keyboard_sense_refresh(running_machine &machine)
 	int input_port_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
-	input_port_data = input_port_read(machine, keynames[state->keyboard_line]);
+	input_port_data = input_port_read(machine, keynames[state->m_keyboard_line]);
 
 	/* go through all bits in line */
 	for (i=0; i<8; i++)
 	{
 		/* sense this bit? */
-		if (((~state->keyboard_mask) & (1<<i)) != 0)
+		if (((~state->m_keyboard_mask) & (1<<i)) != 0)
 		{
 			/* is key pressed? */
 			if (input_port_data & (1<<i))
@@ -129,12 +129,12 @@ static void oric_keyboard_sense_refresh(running_machine &machine)
 	}
 
 	/* clear sense result */
-	state->key_sense_bit = 0;
+	state->m_key_sense_bit = 0;
 	/* any keys pressed on this line? */
 	if (key_bit!=0)
 	{
 		/* set sense result */
-		state->key_sense_bit = (1<<3);
+		state->m_key_sense_bit = (1<<3);
 	}
 }
 
@@ -143,7 +143,7 @@ static void oric_keyboard_sense_refresh(running_machine &machine)
 WRITE8_HANDLER (oric_psg_porta_write)
 {
 	oric_state *state = space->machine().driver_data<oric_state>();
-	state->keyboard_mask = data;
+	state->m_keyboard_mask = data;
 }
 
 
@@ -160,10 +160,10 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 	/*logerror("port a read\r\n"); */
 
 	/* access psg? */
-	if (state->psg_control!=0)
+	if (state->m_psg_control!=0)
 	{
 		/* if psg is in read register state return reg data */
-		if (state->psg_control==0x01)
+		if (state->m_psg_control==0x01)
 		{
 			return ay8910_r(space->machine().device("ay8912"), 0);
 		}
@@ -173,7 +173,7 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 	}
 
 	/* correct?? */
-	return state->via_port_a_data;
+	return state->m_via_port_a_data;
 }
 
 static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
@@ -183,8 +183,8 @@ static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
 
 	oric_keyboard_sense_refresh(device->machine());
 
-	data = state->key_sense_bit;
-	data |= state->keyboard_line & 0x07;
+	data = state->m_key_sense_bit;
+	data |= state->m_keyboard_line & 0x07;
 
 	return data;
 }
@@ -194,9 +194,9 @@ static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
 static void oric_psg_connection_refresh(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	if (state->psg_control!=0)
+	if (state->m_psg_control!=0)
 	{
-		switch (state->psg_control)
+		switch (state->m_psg_control)
 		{
 			/* PSG inactive */
 			case 0:
@@ -204,21 +204,21 @@ static void oric_psg_connection_refresh(running_machine &machine)
 			/* read register data */
 			case 1:
 			{
-				//state->via_port_a_data = ay8910_read_port_0_r(space, 0);
+				//state->m_via_port_a_data = ay8910_read_port_0_r(space, 0);
 			}
 			break;
 			/* write register data */
 			case 2:
 			{
 				device_t *ay8912 = machine.device("ay8912");
-				ay8910_data_w(ay8912, 0, state->via_port_a_data);
+				ay8910_data_w(ay8912, 0, state->m_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
 				device_t *ay8912 = machine.device("ay8912");
-				ay8910_address_w(ay8912, 0, state->via_port_a_data);
+				ay8910_address_w(ay8912, 0, state->m_via_port_a_data);
 			}
 			break;
 
@@ -233,12 +233,12 @@ static void oric_psg_connection_refresh(running_machine &machine)
 static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	state->via_port_a_data = data;
+	state->m_via_port_a_data = data;
 
 	oric_psg_connection_refresh(device->machine());
 
 
-	if (state->psg_control==0)
+	if (state->m_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
 		device_t *printer = device->machine().device("centronics");
@@ -308,11 +308,11 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	device_t *printer = device->machine().device("centronics");
 
 	/* KEYBOARD */
-	state->keyboard_line = data & 0x07;
+	state->m_keyboard_line = data & 0x07;
 
 	/* CASSETTE */
 	/* cassette motor control */
-	if ((state->previous_portb_data^data) & (1<<6))
+	if ((state->m_previous_portb_data^data) & (1<<6))
 	{
 		if (data & (1<<6))
 		{
@@ -332,30 +332,30 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	centronics_strobe_w(printer, BIT(data, 4));
 
 	oric_psg_connection_refresh(device->machine());
-	state->previous_portb_data = data;
+	state->m_previous_portb_data = data;
 }
 
 
 static READ8_DEVICE_HANDLER ( oric_via_in_ca2_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	return state->psg_control & 1;
+	return state->m_psg_control & 1;
 }
 
 static READ8_DEVICE_HANDLER ( oric_via_in_cb2_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	return (state->psg_control>>1) & 1;
+	return (state->m_psg_control>>1) & 1;
 }
 
 static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	state->psg_control &=~1;
+	state->m_psg_control &=~1;
 
 	if (data)
 	{
-		state->psg_control |=1;
+		state->m_psg_control |=1;
 	}
 
 	oric_psg_connection_refresh(device->machine());
@@ -364,11 +364,11 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	state->psg_control &=~2;
+	state->m_psg_control &=~2;
 
 	if (data)
 	{
-		state->psg_control |=2;
+		state->m_psg_control |=2;
 	}
 
 	oric_psg_connection_refresh(device->machine());
@@ -378,7 +378,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 static void oric_via_irq_func(device_t *device, int state)
 {
 	oric_state *drvstate = device->machine().driver_data<oric_state>();
-	drvstate->irqs &= ~(1<<0);
+	drvstate->m_irqs &= ~(1<<0);
 
 	if (state)
 	{
@@ -387,7 +387,7 @@ static void oric_via_irq_func(device_t *device, int state)
 			//logerror("oric via1 interrupt\r\n");
 		}
 
-		drvstate->irqs |=(1<<0);
+		drvstate->m_irqs |=(1<<0);
 	}
 
 	oric_refresh_ints(device->machine());
@@ -470,7 +470,7 @@ static void oric_install_apple2_interface(running_machine &machine)
 	device_t *fdc = machine.device("fdc");
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	if (state->is_telestrat)
+	if (state->m_is_telestrat)
 		return;
 
 	space->install_legacy_read_handler(0x0300, 0x030f, FUNC(oric_IO_r));
@@ -489,7 +489,7 @@ static void oric_enable_memory(running_machine &machine, int low, int high, int 
 	int i;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	if (state->is_telestrat)
+	if (state->m_is_telestrat)
 		return;
 	for (i = low; i <= high; i++)
 	{
@@ -547,7 +547,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 {
 	oric_state *state = space->machine().driver_data<oric_state>();
 	/* data is ignored, address is used to decode operation */
-	if (state->is_telestrat)
+	if (state->m_is_telestrat)
 		return;
 
 /*  logerror("apple 2 interface v2 rom page: %01x\n",(offset & 0x02)>>1); */
@@ -569,21 +569,21 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 		memory_set_bankptr(space->machine(), "bank1", rom_ptr);
 		memory_set_bankptr(space->machine(), "bank2", rom_ptr+0x02000);
 		memory_set_bankptr(space->machine(), "bank3", rom_ptr+0x03800);
-		memory_set_bankptr(space->machine(), "bank5", state->ram_0x0c000);
-		memory_set_bankptr(space->machine(), "bank6", state->ram_0x0c000+0x02000);
-		memory_set_bankptr(space->machine(), "bank7", state->ram_0x0c000+0x03800);
+		memory_set_bankptr(space->machine(), "bank5", state->m_ram_0x0c000);
+		memory_set_bankptr(space->machine(), "bank6", state->m_ram_0x0c000+0x02000);
+		memory_set_bankptr(space->machine(), "bank7", state->m_ram_0x0c000+0x03800);
 	}
 	else
 	{
 		/*logerror("apple 2 interface v2: ram enabled\n"); */
 
 		/* enable ram */
-		memory_set_bankptr(space->machine(), "bank1", state->ram_0x0c000);
-		memory_set_bankptr(space->machine(), "bank2", state->ram_0x0c000+0x02000);
-		memory_set_bankptr(space->machine(), "bank3", state->ram_0x0c000+0x03800);
-		memory_set_bankptr(space->machine(), "bank5", state->ram_0x0c000);
-		memory_set_bankptr(space->machine(), "bank6", state->ram_0x0c000+0x02000);
-		memory_set_bankptr(space->machine(), "bank7", state->ram_0x0c000+0x03800);
+		memory_set_bankptr(space->machine(), "bank1", state->m_ram_0x0c000);
+		memory_set_bankptr(space->machine(), "bank2", state->m_ram_0x0c000+0x02000);
+		memory_set_bankptr(space->machine(), "bank3", state->m_ram_0x0c000+0x03800);
+		memory_set_bankptr(space->machine(), "bank5", state->m_ram_0x0c000);
+		memory_set_bankptr(space->machine(), "bank6", state->m_ram_0x0c000+0x02000);
+		memory_set_bankptr(space->machine(), "bank7", state->m_ram_0x0c000+0x03800);
 	}
 }
 
@@ -622,19 +622,19 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
     2. If os is enabled, and overlay ram is enabled, all 16k can be accessed.
     3. if os is disabled, and overlay ram is enabled, jasmin rom takes priority.
     */
-	if (state->is_telestrat)
+	if (state->m_is_telestrat)
 		return;
 
 	/* the ram is disabled in the jasmin rom which indicates that jasmin takes
     priority over the ram */
 
 	/* basic rom disabled? */
-	if ((state->port_3fb_w & 0x01)==0)
+	if ((state->m_port_3fb_w & 0x01)==0)
 	{
 		/* no, it is enabled! */
 
 		/* overlay ram enabled? */
-		if ((state->port_3fa_w & 0x01)==0)
+		if ((state->m_port_3fa_w & 0x01)==0)
 		{
 			unsigned char *rom_ptr;
 
@@ -654,19 +654,19 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 
 			oric_enable_memory(machine, 1, 3, TRUE, TRUE);
 
-			memory_set_bankptr(machine, "bank1", state->ram_0x0c000);
-			memory_set_bankptr(machine, "bank2", state->ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank3", state->ram_0x0c000+0x03800);
-			memory_set_bankptr(machine, "bank5", state->ram_0x0c000);
-			memory_set_bankptr(machine, "bank6", state->ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank7", state->ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, "bank1", state->m_ram_0x0c000);
+			memory_set_bankptr(machine, "bank2", state->m_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, "bank3", state->m_ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, "bank5", state->m_ram_0x0c000);
+			memory_set_bankptr(machine, "bank6", state->m_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, "bank7", state->m_ram_0x0c000+0x03800);
 		}
 	}
 	else
 	{
 		/* yes, basic rom is disabled */
 
-		if ((state->port_3fa_w & 0x01)==0)
+		if ((state->m_port_3fa_w & 0x01)==0)
 		{
 			/* overlay ram disabled */
 
@@ -678,10 +678,10 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 			/*logerror("&c000-&f8ff is ram!\n"); */
 			oric_enable_memory(machine, 1, 2, TRUE, TRUE);
 
-			memory_set_bankptr(machine, "bank1", state->ram_0x0c000);
-			memory_set_bankptr(machine, "bank2", state->ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank5", state->ram_0x0c000);
-			memory_set_bankptr(machine, "bank6", state->ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, "bank1", state->m_ram_0x0c000);
+			memory_set_bankptr(machine, "bank2", state->m_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, "bank5", state->m_ram_0x0c000);
+			memory_set_bankptr(machine, "bank6", state->m_ram_0x0c000+0x02000);
 		}
 
 		{
@@ -703,9 +703,9 @@ static WRITE_LINE_DEVICE_HANDLER( oric_jasmin_wd179x_drq_w )
 {
 	oric_state *drvstate = device->machine().driver_data<oric_state>();
 	if (state)
-		drvstate->irqs |= (1<<1);
+		drvstate->m_irqs |= (1<<1);
 	else
-		drvstate->irqs &=~(1<<1);
+		drvstate->m_irqs &=~(1<<1);
 
 	oric_refresh_ints(device->machine());
 }
@@ -771,12 +771,12 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			break;
 		case 0x0a:
 			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(space->machine().device("maincpu")));
-			state->port_3fa_w = data;
+			state->m_port_3fa_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine());
 			break;
 		case 0x0b:
 			//logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(space->machine().device("maincpu")));
-			state->port_3fb_w = data;
+			state->m_port_3fb_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine());
 			break;
 		/* bit 0,1 of addr is the drive */
@@ -799,7 +799,7 @@ static void oric_install_jasmin_interface(running_machine &machine)
 	oric_state *state = machine.driver_data<oric_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* romdis */
-	state->port_3fb_w = 1;
+	state->m_port_3fb_w = 1;
 	oric_jasmin_set_mem_0x0c000(machine);
 
 	space->install_legacy_read_handler(0x0300, 0x03ef, FUNC(oric_IO_r));
@@ -825,13 +825,13 @@ static void oric_install_jasmin_interface(running_machine &machine)
 static void oric_microdisc_refresh_wd179x_ints(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	state->irqs &=~(1<<1);
+	state->m_irqs &=~(1<<1);
 
-	if ((state->wd179x_int_state) && (state->port_314_w & (1<<0)))
+	if ((state->m_wd179x_int_state) && (state->m_port_314_w & (1<<0)))
 	{
 		/*logerror("oric microdisc interrupt\n"); */
 
-		state->irqs |=(1<<1);
+		state->m_irqs |=(1<<1);
 	}
 
 	oric_refresh_ints(machine);
@@ -840,12 +840,12 @@ static void oric_microdisc_refresh_wd179x_ints(running_machine &machine)
 static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_intrq_w )
 {
 	oric_state *drvstate = device->machine().driver_data<oric_state>();
-	drvstate->wd179x_int_state = state;
+	drvstate->m_wd179x_int_state = state;
 
 	if (state)
-		drvstate->port_314_r &= ~(1<<7);
+		drvstate->m_port_314_r &= ~(1<<7);
 	else
-		drvstate->port_314_r |=(1<<7);
+		drvstate->m_port_314_r |=(1<<7);
 
 	oric_microdisc_refresh_wd179x_ints(device->machine());
 }
@@ -854,27 +854,27 @@ static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_drq_w )
 {
 	oric_state *drvstate = device->machine().driver_data<oric_state>();
 	if (state)
-		drvstate->port_318_r &=~(1<<7);
+		drvstate->m_port_318_r &=~(1<<7);
 	else
-		drvstate->port_318_r |= (1<<7);
+		drvstate->m_port_318_r |= (1<<7);
 }
 
 static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	if (state->is_telestrat)
+	if (state->m_is_telestrat)
 		return;
 
 	/* for 0x0c000-0x0dfff: */
 	/* if os disabled, ram takes priority */
 	/* /ROMDIS */
-	if ((state->port_314_w & (1<<1))==0)
+	if ((state->m_port_314_w & (1<<1))==0)
 	{
 		/*logerror("&c000-&dfff is ram\n"); */
 		/* rom disabled enable ram */
 		oric_enable_memory(machine, 1, 1, TRUE, TRUE);
-		memory_set_bankptr(machine, "bank1", state->ram_0x0c000);
-		memory_set_bankptr(machine, "bank5", state->ram_0x0c000);
+		memory_set_bankptr(machine, "bank1", state->m_ram_0x0c000);
+		memory_set_bankptr(machine, "bank5", state->m_ram_0x0c000);
 	}
 	else
 	{
@@ -889,7 +889,7 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 
 	/* for 0x0e000-0x0ffff */
 	/* if not disabled, os takes priority */
-	if ((state->port_314_w & (1<<1))!=0)
+	if ((state->m_port_314_w & (1<<1))!=0)
 	{
 		unsigned char *rom_ptr;
 		/*logerror("&e000-&ffff is os rom\n"); */
@@ -905,7 +905,7 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 	else
 	{
 		/* if eprom is enabled, it takes priority over ram */
-		if ((state->port_314_w & (1<<7))==0)
+		if ((state->m_port_314_w & (1<<7))==0)
 		{
 			unsigned char *rom_ptr;
 			/*logerror("&e000-&ffff is disk rom\n"); */
@@ -920,10 +920,10 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 			/*logerror("&e000-&ffff is ram\n"); */
 			/* rom disabled enable ram */
 			oric_enable_memory(machine, 2, 3, TRUE, TRUE);
-			memory_set_bankptr(machine, "bank2", state->ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank3", state->ram_0x0c000+0x03800);
-			memory_set_bankptr(machine, "bank6", state->ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank7", state->ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, "bank2", state->m_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, "bank3", state->m_ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, "bank6", state->m_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, "bank7", state->m_ram_0x0c000+0x03800);
 		}
 	}
 }
@@ -952,11 +952,11 @@ READ8_HANDLER (oric_microdisc_r)
 			data = wd17xx_data_r(fdc, 0);
 			break;
 		case 0x04:
-			data = state->port_314_r | 0x07f;
+			data = state->m_port_314_r | 0x07f;
 /*          logerror("port_314_r: %02x\n",data); */
 			break;
 		case 0x08:
-			data = state->port_318_r | 0x07f;
+			data = state->m_port_318_r | 0x07f;
 /*          logerror("port_318_r: %02x\n",data); */
 			break;
 
@@ -993,7 +993,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 			break;
 		case 0x04:
 		{
-			state->port_314_w = data;
+			state->m_port_314_w = data;
 
 			//logerror("port_314_w: %02x\n",data);
 
@@ -1034,7 +1034,7 @@ static void oric_install_microdisc_interface(running_machine &machine)
 
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
-	state->port_314_w = 0x0ff^((1<<7) | (1<<1));
+	state->m_port_314_w = 0x0ff^((1<<7) | (1<<1));
 
 	oric_microdisc_set_mem_0x0c000(machine);
 }
@@ -1078,8 +1078,8 @@ static void oric_common_init_machine(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	/* clear all irqs */
-	state->irqs = 0;
-	state->ram_0x0c000 = NULL;
+	state->m_irqs = 0;
+	state->m_ram_0x0c000 = NULL;
 
 	machine.scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
 }
@@ -1089,9 +1089,9 @@ MACHINE_START( oric )
 	oric_state *state = machine.driver_data<oric_state>();
 	oric_common_init_machine(machine);
 
-	state->is_telestrat = 0;
+	state->m_is_telestrat = 0;
 
-	state->ram_0x0c000 = auto_alloc_array(machine, char, 16384);
+	state->m_ram_0x0c000 = auto_alloc_array(machine, char, 16384);
 }
 
 
@@ -1100,7 +1100,7 @@ MACHINE_RESET( oric )
 	oric_state *state = machine.driver_data<oric_state>();
 	int disc_interface_id = input_port_read(machine, "FLOPPY") & 0x07;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	if (state->is_telestrat)
+	if (state->m_is_telestrat)
 		return;
 
 	switch (disc_interface_id)
@@ -1293,7 +1293,7 @@ static void telestrat_refresh_mem(running_machine &machine)
 	oric_state *state = machine.driver_data<oric_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	telestrat_mem_block *mem_block = &state->telestrat_blocks[state->telestrat_bank_selection];
+	telestrat_mem_block *mem_block = &state->m_telestrat_blocks[state->m_telestrat_bank_selection];
 
 	switch (mem_block->MemType)
 	{
@@ -1326,8 +1326,8 @@ static void telestrat_refresh_mem(running_machine &machine)
 static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	//logerror("via 2 - port a %02x\n",state->telestrat_via2_port_a_data);
-	return state->telestrat_via2_port_a_data;
+	//logerror("via 2 - port a %02x\n",state->m_telestrat_via2_port_a_data);
+	return state->m_telestrat_via2_port_a_data;
 }
 
 
@@ -1336,11 +1336,11 @@ static WRITE8_DEVICE_HANDLER(telestrat_via2_out_a_func)
 	oric_state *state = device->machine().driver_data<oric_state>();
 	//logerror("via 2 - port a w: %02x\n",data);
 
-	state->telestrat_via2_port_a_data = data;
+	state->m_telestrat_via2_port_a_data = data;
 
-	if (((data^state->telestrat_bank_selection) & 0x07)!=0)
+	if (((data^state->m_telestrat_bank_selection) & 0x07)!=0)
 	{
-		state->telestrat_bank_selection = data & 0x07;
+		state->m_telestrat_bank_selection = data & 0x07;
 
 		telestrat_refresh_mem(device->machine());
 	}
@@ -1352,18 +1352,18 @@ static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 	unsigned char data = 0x01f;
 
 	/* left joystick selected? */
-	if (state->telestrat_via2_port_b_data & (1<<6))
+	if (state->m_telestrat_via2_port_b_data & (1<<6))
 	{
 		data &= input_port_read(device->machine(), "JOY0");
 	}
 
 	/* right joystick selected? */
-	if (state->telestrat_via2_port_b_data & (1<<7))
+	if (state->m_telestrat_via2_port_b_data & (1<<7))
 	{
 		data &= input_port_read(device->machine(), "JOY1");
 	}
 
-	data |= state->telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));
+	data |= state->m_telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));
 
 	return data;
 }
@@ -1371,20 +1371,20 @@ static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	state->telestrat_via2_port_b_data = data;
+	state->m_telestrat_via2_port_b_data = data;
 }
 
 
 static void telestrat_via2_irq_func(device_t *device, int state)
 {
 	oric_state *drvstate = device->machine().driver_data<oric_state>();
-	drvstate->irqs &=~(1<<2);
+	drvstate->m_irqs &=~(1<<2);
 
 	if (state)
 	{
 		//logerror("telestrat via2 interrupt\n");
 
-		drvstate->irqs |=(1<<2);
+		drvstate->m_irqs |=(1<<2);
 	}
 
 	oric_refresh_ints(device->machine());
@@ -1412,11 +1412,11 @@ const via6522_interface telestrat_via2_interface=
 static void telestrat_acia_callback(running_machine &machine, int irq_state)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	state->irqs&=~(1<<3);
+	state->m_irqs&=~(1<<3);
 
 	if (irq_state)
 	{
-		state->irqs |= (1<<3);
+		state->m_irqs |= (1<<3);
 	}
 
 	oric_refresh_ints(machine);
@@ -1430,40 +1430,40 @@ MACHINE_START( telestrat )
 
 	oric_common_init_machine(machine);
 
-	state->is_telestrat = 1;
+	state->m_is_telestrat = 1;
 
 	/* initialise overlay ram */
-	state->telestrat_blocks[0].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->telestrat_blocks[0].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[0].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	state->m_telestrat_blocks[0].ptr = auto_alloc_array(machine, UINT8, 16384);
 
-	state->telestrat_blocks[1].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->telestrat_blocks[1].ptr = auto_alloc_array(machine, UINT8, 16384);
-	state->telestrat_blocks[2].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->telestrat_blocks[2].ptr = auto_alloc_array(machine, UINT8, 16384);
-
-	/* initialise default cartridge */
-	state->telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[3].ptr = mem+0x010000;
-
-	state->telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->telestrat_blocks[4].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[1].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	state->m_telestrat_blocks[1].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[2].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	state->m_telestrat_blocks[2].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
-	state->telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[5].ptr = mem+0x014000;
+	state->m_telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	state->m_telestrat_blocks[3].ptr = mem+0x010000;
+
+	state->m_telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
+	state->m_telestrat_blocks[4].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
-	state->telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[6].ptr = mem+0x018000;
+	state->m_telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	state->m_telestrat_blocks[5].ptr = mem+0x014000;
 
 	/* initialise default cartridge */
-	state->telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[7].ptr = mem+0x01c000;
+	state->m_telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	state->m_telestrat_blocks[6].ptr = mem+0x018000;
 
-	state->telestrat_bank_selection = 7;
+	/* initialise default cartridge */
+	state->m_telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
+	state->m_telestrat_blocks[7].ptr = mem+0x01c000;
+
+	state->m_telestrat_bank_selection = 7;
 	telestrat_refresh_mem(machine);
 
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
-	state->port_314_w = 0x0ff^((1<<7) | (1<<1));
+	state->m_port_314_w = 0x0ff^((1<<7) | (1<<1));
 }

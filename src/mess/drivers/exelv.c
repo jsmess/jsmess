@@ -66,18 +66,18 @@ public:
 		: driver_device(machine, config) { }
 
 	/* tms7020 i/o ports */
-	UINT8	tms7020_porta;
-	UINT8	tms7020_portb;
+	UINT8	m_tms7020_porta;
+	UINT8	m_tms7020_portb;
 
 	/* tms7041 i/o ports */
-	UINT8	tms7041_porta;
-	UINT8	tms7041_portb;
-	UINT8	tms7041_portc;
-	UINT8	tms7041_portd;
+	UINT8	m_tms7041_porta;
+	UINT8	m_tms7041_portb;
+	UINT8	m_tms7041_portc;
+	UINT8	m_tms7041_portd;
 
 	/* mailbox data */
-	UINT8	wx318;	/* data of 74ls374 labeled wx318 */
-	UINT8	wx319;	/* data of 74sl374 labeled wx319 */
+	UINT8	m_wx318;	/* data of 74ls374 labeled wx318 */
+	UINT8	m_wx319;	/* data of 74sl374 labeled wx319 */
 };
 
 
@@ -194,7 +194,7 @@ static DEVICE_IMAGE_UNLOAD( exelv_cart )
 static READ8_HANDLER(mailbox_wx319_r)
 {
 	exelv_state *state = space->machine().driver_data<exelv_state>();
-	return state->wx319;
+	return state->m_wx319;
 }
 
 
@@ -203,7 +203,7 @@ static WRITE8_HANDLER(mailbox_wx318_w)
 	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("wx318 write 0x%02x\n", data);
 
-	state->wx318 = data;
+	state->m_wx318 = data;
 }
 
 
@@ -223,7 +223,7 @@ static READ8_HANDLER(tms7020_porta_r)
 	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7020_porta_r\n");
 
-	return ( state->tms7041_portb & 0x80 ) ? 0x01 : 0x00;
+	return ( state->m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
 }
 
 
@@ -232,7 +232,7 @@ static WRITE8_HANDLER(tms7020_porta_w)
 	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7020_porta_w: data = 0x%02x\n", data);
 
-	state->tms7020_porta = data;
+	state->m_tms7020_porta = data;
 }
 
 
@@ -260,7 +260,7 @@ static WRITE8_HANDLER(tms7020_portb_w)
 	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7020_portb_w: data = 0x%02x\n", data);
 
-	state->tms7020_portb = data;
+	state->m_tms7020_portb = data;
 }
 
 
@@ -283,9 +283,9 @@ static READ8_HANDLER(tms7041_porta_r)
 
 	logerror("tms7041_porta_r\n");
 
-	data |= ( state->tms7020_portb & 0x01 ) ? 0x04 : 0x00;
+	data |= ( state->m_tms7020_portb & 0x01 ) ? 0x04 : 0x00;
 	data |= tms5220_intq_r( tms5220c ) ? 0x08 : 0x00;
-	data |= ( state->tms7020_portb & 0x02 ) ? 0x10 : 0x00;
+	data |= ( state->m_tms7020_portb & 0x02 ) ? 0x10 : 0x00;
 	data |= tms5220_readyq_r( tms5220c ) ? 0x80 : 0x00;
 
 	return data;
@@ -297,7 +297,7 @@ static WRITE8_HANDLER(tms7041_porta_w)
 	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7041_porta_w: data = 0x%02x\n", data);
 
-	state->tms7041_porta = data;
+	state->m_tms7041_porta = data;
 }
 
 
@@ -335,13 +335,13 @@ static WRITE8_HANDLER(tms7041_portb_w)
 	cputag_set_input_line(space->machine(), "maincpu", TMS7000_IRQ1_LINE, ( data & 0x04 ) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
-	if ( ! ( state->tms7041_portb & 0x40 ) && ( data & 0x40 ) )
+	if ( ! ( state->m_tms7041_portb & 0x40 ) && ( data & 0x40 ) )
 	{
-		logerror("wx319 write 0x%02x\n", state->tms7041_portc);
-		state->wx319 = state->tms7041_portc;
+		logerror("wx319 write 0x%02x\n", state->m_tms7041_portc);
+		state->m_wx319 = state->m_tms7041_portc;
 	}
 
-	state->tms7041_portb = data;
+	state->m_tms7041_portb = data;
 }
 
 
@@ -356,9 +356,9 @@ static READ8_HANDLER(tms7041_portc_r)
 	logerror("tms7041_portc_r\n");
 
 	/* Check if wx318 output is enabled */
-	if ( ! ( state->tms7041_portb & 0x20 ) )
+	if ( ! ( state->m_tms7041_portb & 0x20 ) )
 	{
-		data = state->wx318;
+		data = state->m_wx318;
 	}
 
 	return data;
@@ -370,7 +370,7 @@ static WRITE8_HANDLER(tms7041_portc_w)
 	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7041_portc_w: data = 0x%02x\n", data);
 
-	state->tms7041_portc = data;
+	state->m_tms7041_portc = data;
 }
 
 
@@ -404,7 +404,7 @@ static WRITE8_HANDLER(tms7041_portd_w)
 
 	tms5220_data_w( tms5220c, 0, BITSWAP8(data,0,1,2,3,4,5,6,7) );
 
-	state->tms7041_portd = data;
+	state->m_tms7041_portd = data;
 }
 
 /*

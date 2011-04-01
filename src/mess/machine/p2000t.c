@@ -50,7 +50,7 @@ READ8_HANDLER (	p2000t_port_000f_r )
 		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
 	};
 
-	if (state->port_101f & P2000M_101F_KEYINT)
+	if (state->m_port_101f & P2000M_101F_KEYINT)
 	{
 		return (input_port_read(space->machine(), "KEY0") & input_port_read(space->machine(), "KEY1") &
 		input_port_read(space->machine(), "KEY2") & input_port_read(space->machine(), "KEY3") &
@@ -99,7 +99,7 @@ READ8_HANDLER (	p2000t_port_202f_r )
 WRITE8_HANDLER ( p2000t_port_101f_w )
 {
 	p2000t_state *state = space->machine().driver_data<p2000t_state>();
-	state->port_101f = data;
+	state->m_port_101f = data;
 }
 
 /*
@@ -117,7 +117,7 @@ WRITE8_HANDLER ( p2000t_port_101f_w )
 WRITE8_HANDLER ( p2000t_port_303f_w )
 {
 	p2000t_state *state = space->machine().driver_data<p2000t_state>();
-	state->port_303f = data;
+	state->m_port_303f = data;
 }
 
 /*
@@ -157,7 +157,7 @@ WRITE8_HANDLER ( p2000t_port_505f_w )
 WRITE8_HANDLER ( p2000t_port_707f_w )
 {
 	p2000t_state *state = space->machine().driver_data<p2000t_state>();
-	state->port_707f = data;
+	state->m_port_707f = data;
 }
 
 WRITE8_HANDLER ( p2000t_port_888b_w ) {}

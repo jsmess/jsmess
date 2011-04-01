@@ -162,10 +162,10 @@ typedef enum {
 #define GCtrlFS		0x20	/* labeled F/S, not yet sure of function Fast or Slow scan ? */
 #define GCtrlAddrLines	0xC0	/* Top two address lines for text mode */
 
-#define IsTextMode	(state->GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
-#define IsGfx16 	((~state->GCtrl & GCtrlChrGfx) && (~state->GCtrl & GCtrlControl)) ? 1 : 0	// is this 320x256x16bpp mode
-#define IsGfx2		((state->GCtrl & GCtrlHiLo) && (~state->GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode
-#define SWChar		(state->GCtrl & GCtrlSWChar)>>1					// Swchar bit
+#define IsTextMode	(state->m_GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
+#define IsGfx16 	((~state->m_GCtrl & GCtrlChrGfx) && (~state->m_GCtrl & GCtrlControl)) ? 1 : 0	// is this 320x256x16bpp mode
+#define IsGfx2		((state->m_GCtrl & GCtrlHiLo) && (~state->m_GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode
+#define SWChar		(state->m_GCtrl & GCtrlSWChar)>>1					// Swchar bit
 
 //static int beta_state;
 
@@ -187,8 +187,8 @@ typedef enum {
 void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->GCtrl=data;
-	if (state->LogRegWrites)
+	state->m_GCtrl=data;
+	if (state->m_LogRegWrites)
 		debug_console_printf(machine, "I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
 				     data,
 				     data & GCtrlAddrLines,
@@ -205,7 +205,7 @@ void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 static void beta_Set_RA(running_machine &machine, int offset, int data)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->beta_6845_RA=data;
+	state->m_beta_6845_RA=data;
 }
 
 // called when the 6845 changes the HSync
@@ -214,26 +214,26 @@ static void beta_Set_HSync(running_machine &machine, int offset, int data)
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int Dots;	/* Pixels per 16 bits */
 
-	state->beta_HSync=data;
+	state->m_beta_HSync=data;
 
 	if(IsGfx16)
 		Dots=2;
 	else
 		Dots=8;
 
-	if(!state->beta_HSync)
+	if(!state->m_beta_HSync)
 	{
 		int HT=m6845_get_register(H_TOTAL);			    // Get H total
 		int HS=m6845_get_register(H_SYNC_POS);		    // Get Hsync pos
 		int HW=m6845_get_register(H_SYNC_WIDTH)&0xF;	// Hsync width (in chars)
 
-		state->beta_scr_y++;
-//      state->beta_scr_x=0-(((HT-HS)-HW)*8);  // Number of dots after HS to wait before start of next line
-		state->beta_scr_x=0-((HT-(HS+HW))*Dots);
+		state->m_beta_scr_y++;
+//      state->m_beta_scr_x=0-(((HT-HS)-HW)*8);  // Number of dots after HS to wait before start of next line
+		state->m_beta_scr_x=0-((HT-(HS+HW))*Dots);
 
 //debug_console_printf(machine, "HT=%d, HS=%d, HW=%d, (HS+HW)=%d, HT-(HS+HW)=%d\n",HT,HS,HW,(HS+HW),(HT-(HS+HW)));
 //debug_console_printf(machine, "Scanline=%d, row=%d\n",m6845_get_scanline_counter(),m6845_get_row_counter());
-		state->HSyncMin=state->beta_scr_x;
+		state->m_HSyncMin=state->m_beta_scr_x;
 	}
 }
 
@@ -241,28 +241,28 @@ static void beta_Set_HSync(running_machine &machine, int offset, int data)
 static void beta_Set_VSync(running_machine &machine, int offset, int data)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->beta_VSync=data;
-	if (!state->beta_VSync)
+	state->m_beta_VSync=data;
+	if (!state->m_beta_VSync)
 	{
-		state->beta_scr_y = -20;
-		state->FlashCount++;
-		if(state->FlashCount==10)
+		state->m_beta_scr_y = -20;
+		state->m_FlashCount++;
+		if(state->m_FlashCount==10)
 		{
-			state->FlashCount=0;			// Reset counter
-			state->FlashBit=(!state->FlashBit) & 0x01;	// Invert flash bit.
+			state->m_FlashCount=0;			// Reset counter
+			state->m_FlashBit=(!state->m_FlashBit) & 0x01;	// Invert flash bit.
 		}
 
-		if (state->DrawInterlace==INTERLACE_AT_VS)
+		if (state->m_DrawInterlace==INTERLACE_AT_VS)
 		{
-			state->DrawInterlace=INTERLACE_ON;
-			state->Field=0;
+			state->m_DrawInterlace=INTERLACE_ON;
+			state->m_Field=0;
 		}
-		else if (state->DrawInterlace==INTERLACE_ON)
+		else if (state->m_DrawInterlace==INTERLACE_ON)
 		{
-			state->Field=(state->Field+1) & 0x01;	/* Invert field */
-//          debug_console_printf(machine, "Invert field=%d\n",state->Field);
+			state->m_Field=(state->m_Field+1) & 0x01;	/* Invert field */
+//          debug_console_printf(machine, "Invert field=%d\n",state->m_Field);
 		}
-		state->VSyncMin=state->beta_scr_y;
+		state->m_VSyncMin=state->m_beta_scr_y;
 	}
 
 	dgn_beta_frame_interrupt(machine, data);
@@ -271,31 +271,31 @@ static void beta_Set_VSync(running_machine &machine, int offset, int data)
 static void beta_Set_DE(running_machine &machine, int offset, int data)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->beta_DE = data;
+	state->m_beta_DE = data;
 
-	if(state->beta_DE)
-		state->DEPos=state->beta_scr_x;
+	if(state->m_beta_DE)
+		state->m_DEPos=state->m_beta_scr_x;
 }
 
 /* Video init */
 void dgnbeta_init_video(running_machine &machine)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
 	m6845_set_personality(M6845_PERSONALITY_HD6845S);
 
-	state->GCtrl=0;
+	state->m_GCtrl=0;
 
 	videoram=ram_get_ptr(machine.device(RAM_TAG));
 
-	state->ClkMax=65000;
-	state->FlashCount=0;
-	state->FlashBit=0;
-	state->DoubleHL=1;			/* Default to normal height */
-	state->s_DoubleY=1;
-	state->DrawInterlace=INTERLACE_OFF;	/* No interlace by default */
+	state->m_ClkMax=65000;
+	state->m_FlashCount=0;
+	state->m_FlashBit=0;
+	state->m_DoubleHL=1;			/* Default to normal height */
+	state->m_s_DoubleY=1;
+	state->m_DrawInterlace=INTERLACE_OFF;	/* No interlace by default */
 
 	/* setup debug commands */
 	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
@@ -307,19 +307,19 @@ void dgnbeta_init_video(running_machine &machine)
 		debug_console_register_command(machine, "beta_vid_limits", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid_limits);
 		debug_console_register_command(machine, "beta_vid_clkmax", CMDFLAG_NONE, 0, 0, 1, execute_beta_vid_clkmax);
 	}
-	state->LogRegWrites=0;
-	state->BoxColour=1;
-	state->BoxMinX		= 100;
-	state->BoxMinY		= 100;
-	state->BoxMaxX		= 500;
-	state->BoxMaxY		= 500;
+	state->m_LogRegWrites=0;
+	state->m_BoxColour=1;
+	state->m_BoxMinX		= 100;
+	state->m_BoxMinY		= 100;
+	state->m_BoxMaxX		= 500;
+	state->m_BoxMaxY		= 500;
 
-	state->MinAddr	    = 0xFFFF;
-	state->MaxAddr	    = 0x0000;
-	state->MinX	        = 0xFFFF;
-	state->MaxX	        = 0x0000;
-	state->MinY	        = 0xFFFF;
-	state->MaxY	        = 0x0000;
+	state->m_MinAddr	    = 0xFFFF;
+	state->m_MaxAddr	    = 0x0000;
+	state->m_MinX	        = 0xFFFF;
+	state->m_MaxX	        = 0x0000;
+	state->m_MinY	        = 0xFFFF;
+	state->m_MaxY	        = 0x0000;
 }
 
 void dgnbeta_video_reset(running_machine &machine)
@@ -337,7 +337,7 @@ static void plot_text_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int 
 {
 	int PlotX;
 	int PlotY;
-	int Double = (~state->GCtrl & GCtrlHiLo);
+	int Double = (~state->m_GCtrl & GCtrlHiLo);
 
 	/* We do this so that we can plot 40 column characters twice as wide */
 	if(Double)
@@ -377,7 +377,7 @@ static void plot_text_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int 
 static void beta_plot_char_line(running_machine &machine, int x,int y, bitmap_t *bitmap)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
 	unsigned char *data = machine.region("gfx1")->base();		// ptr to char rom
 	int Dot;
@@ -393,14 +393,14 @@ static void beta_plot_char_line(running_machine &machine, int x,int y, bitmap_t 
 	int FlashChar;							// Flashing char
 	int ULActive;							// Underline active
 
-	state->bit=bitmap;
+	state->m_bit=bitmap;
 
-	if (state->beta_DE)
+	if (state->m_beta_DE)
 	{
 		/* The beta text RAM contains alternate character and attribute bytes */
 		/* Top two address lines from PIA, IC28 PB6,7 */
 		crtcAddr=m6845_memory_address_r(0)-1;
-		Offset=(crtcAddr | ((state->GCtrl & GCtrlAddrLines)<<8))*2;
+		Offset=(crtcAddr | ((state->m_GCtrl & GCtrlAddrLines)<<8))*2;
 		if (Offset<0)
 			Offset=0;
 
@@ -414,15 +414,15 @@ static void beta_plot_char_line(running_machine &machine, int x,int y, bitmap_t 
 		FlashChar=(videoram[Offset+1] & 0x80) >> 7;
 
 		// underline is active for character set 0, on character row 9
-		ULActive=(UnderLine && (state->beta_6845_RA==9) && ~SWChar);
+		ULActive=(UnderLine && (state->m_beta_6845_RA==9) && ~SWChar);
 
 		/* If Character set one, and undeline set, latch double height */
-		state->s_DoubleY=(UnderLine & SWChar & state->DoubleHL) |
-		        (SWChar & ~state->s_DoubleY & state->DoubleHL) |
-			(SWChar & ~state->s_DoubleY & (state->beta_6845_RA==9));
+		state->m_s_DoubleY=(UnderLine & SWChar & state->m_DoubleHL) |
+		        (SWChar & ~state->m_s_DoubleY & state->m_DoubleHL) |
+			(SWChar & ~state->m_s_DoubleY & (state->m_beta_6845_RA==9));
 
 		/* Invert forground and background if flashing char and flash acive */
-		Invert=(FlashChar & state->FlashBit);
+		Invert=(FlashChar & state->m_FlashBit);
 
 		/* Underline inverts flash */
 		if (ULActive)
@@ -445,7 +445,7 @@ static void beta_plot_char_line(running_machine &machine, int x,int y, bitmap_t 
 		}
 
 		/* The beta Character ROM has characters of 8x10, each aligned to a 16 byte boundry */
-		data_byte = data[(char_code*16) + state->beta_6845_RA];
+		data_byte = data[(char_code*16) + state->m_beta_6845_RA];
 
 		for (Dot=0; Dot<8; Dot++)
 		{
@@ -474,7 +474,7 @@ static void beta_plot_char_line(running_machine &machine, int x,int y, bitmap_t 
 /* May merge at some point in the future, if they turn out to be sufficiently similar ! */
 static void plot_gfx_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int y, int Dot, int Colour)
 {
-	int	DoubleX		= (~state->GCtrl & GCtrlHiLo) ? 1 : 0;
+	int	DoubleX		= (~state->m_GCtrl & GCtrlHiLo) ? 1 : 0;
 	int	DoubleY		= (~m6845_get_register(INTERLACE) & 0x03) ? 1 : 0;
 	int	PlotX;
 	int	PlotY;
@@ -489,11 +489,11 @@ static void plot_gfx_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int y
 	else
 		PlotY=y;
 
-	if(state->DrawInterlace==INTERLACE_ON)
+	if(state->m_DrawInterlace==INTERLACE_ON)
 	{
-		PlotY=(y*2);//+state->Field;
+		PlotY=(y*2);//+state->m_Field;
 		DoubleY=0;
-//      debug_console_printf(machine, "Field=%d\n",state->Field);
+//      debug_console_printf(machine, "Field=%d\n",state->m_Field);
 	}
 
 	/* Error check, make sure we're drawing on the actual bitmap ! */
@@ -526,7 +526,7 @@ static void plot_gfx_pixel(dgn_beta_state *state, bitmap_t *bitmap, int x, int y
 static void beta_plot_gfx_line(running_machine &machine,int x,int y, bitmap_t *bitmap)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int crtcAddr;
 	int Addr;
 	int Red;
@@ -548,22 +548,22 @@ static void beta_plot_gfx_line(running_machine &machine,int x,int y, bitmap_t *b
 	else
 		Dots=8;
 
-	if (state->beta_DE)
+	if (state->m_beta_DE)
 	{
 		/* Calculate address of graphics pixels */
 		crtcAddr=(m6845_memory_address_r(0) & 0x1FFF);
-		Addr=((crtcAddr<<3) | (state->beta_6845_RA & 0x07))*2;
+		Addr=((crtcAddr<<3) | (state->m_beta_6845_RA & 0x07))*2;
 
-		if(Addr<state->MinAddr)
-			state->MinAddr=Addr;
+		if(Addr<state->m_MinAddr)
+			state->m_MinAddr=Addr;
 
-		if(Addr>state->MaxAddr)
-			state->MaxAddr=Addr;
+		if(Addr>state->m_MaxAddr)
+			state->m_MaxAddr=Addr;
 
-		if(x>state->MaxX) state->MaxX=x;
-		if(x<state->MinX) state->MinX=x;
-		if(y>state->MaxY) state->MaxY=y;
-		if(y<state->MinY) state->MinY=y;
+		if(x>state->m_MaxX) state->m_MaxX=x;
+		if(x<state->m_MinX) state->m_MinX=x;
+		if(y>state->m_MaxY) state->m_MaxY=y;
+		if(y<state->m_MinY) state->m_MinY=y;
 
 		Lo	= videoram[Addr];
 		Hi	= videoram[Addr+1];
@@ -595,10 +595,10 @@ static void beta_plot_gfx_line(running_machine &machine,int x,int y, bitmap_t *b
 		{
 			for (Dot=0;Dot<Dots;Dot=Dot+1)
 			{
-				Colour=state->ColourRAM[((Word&0x8000)>>15)];
+				Colour=state->m_ColourRAM[((Word&0x8000)>>15)];
 				plot_gfx_pixel(state,bitmap,x,y,Dot,Colour);
 
-//              Colour=state->ColourRAM[((Word&0x0080)>>7)];
+//              Colour=state->m_ColourRAM[((Word&0x0080)>>7)];
 //              plot_gfx_pixel(state,bitmap,x,y,Dot+1,Colour);
 
 				Hi=Word&0x8000;
@@ -609,7 +609,7 @@ static void beta_plot_gfx_line(running_machine &machine,int x,int y, bitmap_t *b
 		{
 			for (Dot=0;Dot<Dots;Dot++)
 			{
-				Colour=state->ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
+				Colour=state->m_ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
 				plot_gfx_pixel(state,bitmap,x,y,Dot,Colour);
 
 				Hi=Word&0x8000;
@@ -633,12 +633,12 @@ SCREEN_UPDATE( dgnbeta )
 	dgn_beta_state *state = screen->machine().driver_data<dgn_beta_state>();
 	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
 
-	state->bit=bitmap;
+	state->m_bit=bitmap;
 
 	c=0;
 
 	// loop until the end of the Vertical Sync pulse
-	while((state->beta_VSync)&&(c<state->ClkMax))
+	while((state->m_beta_VSync)&&(c<state->m_ClkMax))
 	{
 		// Clock the 6845
 		m6845_clock(screen->machine());
@@ -647,34 +647,34 @@ SCREEN_UPDATE( dgnbeta )
 
 	// loop until the Vertical Sync pulse goes high
 	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
-	while((!state->beta_VSync)&&(c<state->ClkMax))
+	while((!state->m_beta_VSync)&&(c<state->m_ClkMax))
 	{
-		while ((state->beta_HSync)&&(c<state->ClkMax))
+		while ((state->m_beta_HSync)&&(c<state->m_ClkMax))
 		{
 			m6845_clock(screen->machine());
 			c++;
 		}
 
-		while ((!state->beta_HSync)&&(c<state->ClkMax))
+		while ((!state->m_beta_HSync)&&(c<state->m_ClkMax))
 		{
 			// check that we are on the emulated screen area.
-			if ((state->beta_scr_x>=0) && (state->beta_scr_x<699) && (state->beta_scr_y>=0) && (state->beta_scr_y<549))
+			if ((state->m_beta_scr_x>=0) && (state->m_beta_scr_x<699) && (state->m_beta_scr_y>=0) && (state->m_beta_scr_y<549))
 			{
 				if(IsTextMode)
-					beta_plot_char_line(screen->machine(), state->beta_scr_x, state->beta_scr_y, bitmap);
+					beta_plot_char_line(screen->machine(), state->m_beta_scr_x, state->m_beta_scr_y, bitmap);
 				else
-					beta_plot_gfx_line(screen->machine(), state->beta_scr_x, state->beta_scr_y, bitmap);
+					beta_plot_gfx_line(screen->machine(), state->m_beta_scr_x, state->m_beta_scr_y, bitmap);
 			}
 
 			/* In direct drive mode we have 4bpp, so 4 pixels per word, so increment x by 4 */
 			/* In lookup mode we have 2bpp, so 8 pixels per word, so increment by 8 */
 			/* In text mode characters are 8 pixels wide, so increment by 8 */
 			if (IsGfx16)
-				state->beta_scr_x+=4;
+				state->m_beta_scr_x+=4;
 			else if (IsGfx2)
-				state->beta_scr_x+=16;
+				state->m_beta_scr_x+=16;
 			else
-				state->beta_scr_x+=8;
+				state->m_beta_scr_x+=8;
 
 			// Clock the 6845
 			m6845_clock(screen->machine());
@@ -697,17 +697,17 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 	{
 		m6845_register_w(offset,data);
 
-		if(state->VidAddr==INTERLACE)
+		if(state->m_VidAddr==INTERLACE)
 		{
-			state->DrawInterlace=(data & 0x03) ? INTERLACE_AT_VS : INTERLACE_OFF;
+			state->m_DrawInterlace=(data & 0x03) ? INTERLACE_AT_VS : INTERLACE_OFF;
 		}
 	}
 	else
 	{
 		m6845_address_w(offset,data);
-		state->VidAddr=data;				        /* Record reg being written to */
+		state->m_VidAddr=data;				        /* Record reg being written to */
 	}
-	if (state->LogRegWrites)
+	if (state->m_LogRegWrites)
 		RegLog(space->machine(), offset,data);
 }
 
@@ -715,7 +715,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 WRITE8_HANDLER(dgnbeta_colour_ram_w)
 {
 	dgn_beta_state *state = space->machine().driver_data<dgn_beta_state>();
-	state->ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
+	state->m_ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
 }
 
 /*************************************
@@ -727,9 +727,9 @@ WRITE8_HANDLER(dgnbeta_colour_ram_w)
 static void execute_beta_vid_log(running_machine &machine, int ref, int params, const char *param[])
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->LogRegWrites=!state->LogRegWrites;
+	state->m_LogRegWrites=!state->m_LogRegWrites;
 
-	debug_console_printf(machine, "6845 register write info set : %d\n",state->LogRegWrites);
+	debug_console_printf(machine, "6845 register write info set : %d\n",state->m_LogRegWrites);
 }
 
 
@@ -738,7 +738,7 @@ static void RegLog(running_machine &machine, int offset, int data)
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	char	RegName[16];
 
-	switch (state->VidAddr)
+	switch (state->m_VidAddr)
 	{
 		case H_TOTAL		: sprintf(RegName,"H Total      "); break;
 		case H_DISPLAYED	: sprintf(RegName,"H Displayed  "); break;
@@ -759,7 +759,7 @@ static void RegLog(running_machine &machine, int offset, int data)
 	}
 
 	if(offset&0x1)
-		debug_console_printf(machine, "6845 write Reg %s Addr=%3d Data=%3d ($%02X) \n",RegName,state->VidAddr,data,data);
+		debug_console_printf(machine, "6845 write Reg %s Addr=%3d Data=%3d ($%02X) \n",RegName,state->m_VidAddr,data,data);
 }
 
 static void execute_beta_vid_fill(running_machine &machine, int ref, int params, const char *param[])
@@ -769,9 +769,9 @@ static void execute_beta_vid_fill(running_machine &machine, int ref, int params,
 
 	for(x=1;x<899;x++)
 	{
-		plot_box(state->bit, x, 1, 1, 698, x & 0x07);
+		plot_box(state->m_bit, x, 1, 1, 698, x & 0x07);
 	}
-	state->NoScreen=1;
+	state->m_NoScreen=1;
 }
 
 static void execute_beta_vid_box(running_machine &machine, int ref, int params, const char *param[])
@@ -779,22 +779,22 @@ static void execute_beta_vid_box(running_machine &machine, int ref, int params, 
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int	x,y;
 
-	if(params>0)	sscanf(param[0],"%d",&state->BoxMinX);
-	if(params>1)	sscanf(param[1],"%d",&state->BoxMinY);
-	if(params>2)	sscanf(param[2],"%d",&state->BoxMaxX);
-	if(params>3)	sscanf(param[3],"%d",&state->BoxMaxY);
-	if(params>4)	sscanf(param[4],"%d",&state->BoxColour);
+	if(params>0)	sscanf(param[0],"%d",&state->m_BoxMinX);
+	if(params>1)	sscanf(param[1],"%d",&state->m_BoxMinY);
+	if(params>2)	sscanf(param[2],"%d",&state->m_BoxMaxX);
+	if(params>3)	sscanf(param[3],"%d",&state->m_BoxMaxY);
+	if(params>4)	sscanf(param[4],"%d",&state->m_BoxColour);
 
-	for(x=state->BoxMinX;x<state->BoxMaxX;x++)
+	for(x=state->m_BoxMinX;x<state->m_BoxMaxX;x++)
 	{
-		*BITMAP_ADDR16(state->bit, state->BoxMinY, x) = state->BoxColour;
-		*BITMAP_ADDR16(state->bit, state->BoxMaxY, x) = state->BoxColour;
+		*BITMAP_ADDR16(state->m_bit, state->m_BoxMinY, x) = state->m_BoxColour;
+		*BITMAP_ADDR16(state->m_bit, state->m_BoxMaxY, x) = state->m_BoxColour;
 	}
 
-	for(y=state->BoxMinY;y<state->BoxMaxY;y++)
+	for(y=state->m_BoxMinY;y<state->m_BoxMaxY;y++)
 	{
-		*BITMAP_ADDR16(state->bit, y, state->BoxMinX) = state->BoxColour;
-		*BITMAP_ADDR16(state->bit, y, state->BoxMaxX) = state->BoxColour;
+		*BITMAP_ADDR16(state->m_bit, y, state->m_BoxMinX) = state->m_BoxColour;
+		*BITMAP_ADDR16(state->m_bit, y, state->m_BoxMaxX) = state->m_BoxColour;
 	}
 	debug_console_printf(machine, "ScreenBox()\n");
 }
@@ -803,18 +803,18 @@ static void execute_beta_vid_box(running_machine &machine, int ref, int params, 
 static void execute_beta_vid(running_machine &machine, int ref, int params, const char *param[])
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->NoScreen=!state->NoScreen;
+	state->m_NoScreen=!state->m_NoScreen;
 }
 
 static void execute_beta_vid_limits(running_machine &machine, int ref, int params, const char *param[])
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	debug_console_printf(machine, "Min X     =$%4X, Max X     =$%4X\n",state->MinX,state->MaxX);
-	debug_console_printf(machine, "Min Y     =$%4X, Max Y     =$%4X\n",state->MinY,state->MaxY);
-	debug_console_printf(machine, "MinVidAddr=$%5X, MaxVidAddr=$%5X\n",state->MinAddr,state->MaxAddr);
-	debug_console_printf(machine, "HsyncMin  =%d, VSyncMin=%d\n",state->HSyncMin, state->VSyncMin);
-	debug_console_printf(machine, "Interlace =%d\n",state->DrawInterlace);
-	debug_console_printf(machine, "DEPos=%d\n",state->DEPos);
+	debug_console_printf(machine, "Min X     =$%4X, Max X     =$%4X\n",state->m_MinX,state->m_MaxX);
+	debug_console_printf(machine, "Min Y     =$%4X, Max Y     =$%4X\n",state->m_MinY,state->m_MaxY);
+	debug_console_printf(machine, "MinVidAddr=$%5X, MaxVidAddr=$%5X\n",state->m_MinAddr,state->m_MaxAddr);
+	debug_console_printf(machine, "HsyncMin  =%d, VSyncMin=%d\n",state->m_HSyncMin, state->m_VSyncMin);
+	debug_console_printf(machine, "Interlace =%d\n",state->m_DrawInterlace);
+	debug_console_printf(machine, "DEPos=%d\n",state->m_DEPos);
 	if (IsGfx16)
 		debug_console_printf(machine, "Gfx16\n");
 	else if (IsGfx2)
@@ -826,5 +826,5 @@ static void execute_beta_vid_limits(running_machine &machine, int ref, int param
 static void execute_beta_vid_clkmax(running_machine &machine, int ref, int params, const char *param[])
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	if(params>0)	sscanf(param[0],"%d",&state->ClkMax);
+	if(params>0)	sscanf(param[0],"%d",&state->m_ClkMax);
 }

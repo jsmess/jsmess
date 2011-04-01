@@ -17,28 +17,28 @@ public:
 	pc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *maincpu;
-	device_t *pic8259;
-	device_t *dma8237;
-	device_t *pit8253;
+	device_t *m_maincpu;
+	device_t *m_pic8259;
+	device_t *m_dma8237;
+	device_t *m_pit8253;
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
-	UINT8	u73_q2;
-	UINT8	out1;
-	int dma_channel;
-	UINT8 dma_offset[2][4];
-	UINT8 pc_spkrdata;
-	UINT8 pc_input;
+	UINT8	m_u73_q2;
+	UINT8	m_out1;
+	int m_dma_channel;
+	UINT8 m_dma_offset[2][4];
+	UINT8 m_pc_spkrdata;
+	UINT8 m_pc_input;
 
-	int						ppi_portc_switch_high;
-	int						ppi_speaker;
-	int						ppi_keyboard_clear;
-	UINT8					ppi_keyb_clock;
-	UINT8					ppi_portb;
-	UINT8					ppi_clock_signal;
-	UINT8					ppi_data_signal;
-	UINT8					ppi_shift_register;
-	UINT8					ppi_shift_enable;
+	int						m_ppi_portc_switch_high;
+	int						m_ppi_speaker;
+	int						m_ppi_keyboard_clear;
+	UINT8					m_ppi_keyb_clock;
+	UINT8					m_ppi_portb;
+	UINT8					m_ppi_clock_signal;
+	UINT8					m_ppi_data_signal;
+	UINT8					m_ppi_shift_register;
+	UINT8					m_ppi_shift_enable;
 };
 
 /*----------- defined in machine/pc.c -----------*/

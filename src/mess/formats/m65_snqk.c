@@ -242,7 +242,7 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
         /* 64 bytes of chunky graphics info */
         for (i = 0; i < 32*16; i++)
         {
-            state->chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
+            state->m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
         }
         base += 64;
         microtan_set_cpu_regs(machine, snapshot_buff, base);
@@ -293,7 +293,7 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
         }
 
         microtan_sound_w(space, 0, snapshot_buff[base++]);
-        state->chunky_graphics = snapshot_buff[base++];
+        state->m_chunky_graphics = snapshot_buff[base++];
 
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
@@ -311,7 +311,7 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
 
         for (i = 0; i < 32*16; i++)
         {
-            state->chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
+            state->m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
         }
         base += 64;
 
