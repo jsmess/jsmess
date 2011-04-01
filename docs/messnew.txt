@@ -162,6 +162,8 @@ Source Changes:
 - [WD17XX] Added device types WD1795, WD1797, WD2795, and fixed 
    wd17xx_has_side_select(). [Curt Coder]
 
+- [WD17XX] Set complete command delay to 16/32 usec based on DDEN. [Curt Coder]
+
 
 
 0.141
