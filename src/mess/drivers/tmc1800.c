@@ -111,42 +111,21 @@ Notes:
 
 */
 
-#include "emu.h"
 #include "includes/tmc1800.h"
-#include "cpu/cosmac/cosmac.h"
-#include "video/cdp1861.h"
-#include "sound/cdp1864.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "machine/rescap.h"
-#include "sound/beep.h"
-#include "machine/ram.h"
-
-#define TMC2000_BANK_RAM		0
-#define TMC2000_BANK_ROM		1
-#define TMC2000_BANK_MONITOR	0
-#define TMC2000_BANK_COLORRAM	1
-#define TMC2000_COLORRAM_SIZE	0x200
-
-#define OSCNANO_BANK_RAM		0
-#define OSCNANO_BANK_ROM		1
-
-static QUICKLOAD_LOAD( tmc1800 );
-
-static MACHINE_RESET( tmc1800 );
-static MACHINE_RESET( tmc2000 );
-static MACHINE_RESET( nano );
 
 /* Read/Write Handlers */
 
-static WRITE8_HANDLER( tmc1800_keylatch_w )
+WRITE8_MEMBER( tmc1800_state::keylatch_w )
 {
-	tmc1800_state *state = space->machine().driver_data<tmc1800_state>();
-
-	state->keylatch = data;
+	m_keylatch = data;
 }
 
-static WRITE8_HANDLER( tmc2000_keylatch_w )
+WRITE8_MEMBER( osc1000b_state::keylatch_w )
+{
+	m_keylatch = data;
+}
+
+WRITE8_MEMBER( tmc2000_state::keylatch_w )
 {
 	/*
 
@@ -163,12 +142,10 @@ static WRITE8_HANDLER( tmc2000_keylatch_w )
 
     */
 
-	tmc2000_state *state = space->machine().driver_data<tmc2000_state>();
-
-	state->keylatch = data & 0x3f;
+	m_keylatch = data & 0x3f;
 }
 
-static WRITE8_HANDLER( nano_keylatch_w )
+WRITE8_MEMBER( nano_state::keylatch_w )
 {
 	/*
 
@@ -185,134 +162,137 @@ static WRITE8_HANDLER( nano_keylatch_w )
 
     */
 
-	nano_state *state = space->machine().driver_data<nano_state>();
-
-	state->keylatch = data & 0x0f;
+	m_keylatch = data & 0x0f;
 }
 
-static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
+void tmc2000_state::bankswitch()
 {
-	int bank = data & 0x01;
-
-	/* enable RAM */
-
-	memory_set_bank(device->machine(), "bank1", TMC2000_BANK_RAM);
-
-	switch (ram_get_size(device->machine().device(RAM_TAG)))
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *rom = m_machine.region(CDP1802_TAG)->base();
+	
+	if (m_roc)
 	{
-	case 4 * 1024:
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x0fff, 0, 0x7000, "bank1");
-		break;
+		// monitor ROM
+		program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
+	}
+	else
+	{
+		// RAM
+		switch (ram_get_size(m_ram))
+		{
+		case 4 * 1024:
+			program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
+			break;
 
-	case 16 * 1024:
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
-		break;
+		case 16 * 1024:
+			program->install_ram(0x0000, 0x3fff, 0, 0x4000, ram);
+			break;
 
-	case 32 * 1024:
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x7fff, "bank1");
-		break;
+		case 32 * 1024:
+			program->install_ram(0x0000, 0x7fff, ram);
+			break;
+		}
 	}
 
-	/* enable monitor or color RAM */
-
-	memory_set_bank(device->machine(), "bank2", bank);
-
-	switch (bank)
+	if (m_rac)
 	{
-	case TMC2000_BANK_MONITOR:
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x81ff, 0, 0x7e00, "bank2");
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0x81ff, 0, 0x7e00 );
-		break;
-
-	case TMC2000_BANK_COLORRAM: // write-only
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x8000, 0x81ff, 0, 0x7e00, "bank2");
-		device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_read(0x8000, 0x81ff, 0, 0x7e00);
-		break;
+		// color RAM
+		program->install_ram(0x8000, 0x81ff, 0, 0x7e00, m_colorram);
+		program->unmap_read(0x8000, 0x81ff, 0, 0x7e00);
 	}
-
-	/* write to CDP1864 tone latch */
-
-	cdp1864_tone_latch_w(device, 0, data);
+	else
+	{
+		// monitor ROM
+		program->install_rom(0x8000, 0x81ff, 0, 0x7e00, rom);
+	}
 }
 
-static WRITE8_DEVICE_HANDLER( nano_bankswitch_w )
+WRITE8_MEMBER( tmc2000_state::bankswitch_w )
+{
+	m_roc = 0;
+	m_rac = BIT(data, 0);
+	bankswitch();
+
+	cdp1864_tone_latch_w(m_cti, 0, data);
+}
+
+WRITE8_MEMBER( nano_state::bankswitch_w )
 {
 	/* enable RAM */
-
-	memory_set_bank(device->machine(), "bank1", OSCNANO_BANK_RAM);
-
-	device->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x0fff, 0, 0x7000, "bank1");
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(m_ram);
+	program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
-
-	cdp1864_tone_latch_w(device, 0, data);
+	cdp1864_tone_latch_w(m_cti, 0, data);
 }
 
-static READ8_DEVICE_HANDLER( tmc1800_cdp1861_dispon_r )
+READ8_MEMBER( tmc1800_state::dispon_r )
 {
-	cdp1861_dispon_w(device, 1);
-	cdp1861_dispon_w(device, 0);
+	cdp1861_dispon_w(m_vdc, 1);
+	cdp1861_dispon_w(m_vdc, 0);
 
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( tmc1800_cdp1861_dispoff_w )
+WRITE8_MEMBER( tmc1800_state::dispoff_w )
 {
-	cdp1861_dispoff_w(device, 1);
-	cdp1861_dispoff_w(device, 0);
+	cdp1861_dispoff_w(m_vdc, 1);
+	cdp1861_dispoff_w(m_vdc, 0);
 }
 
 /* Memory Maps */
 
 // Telmac 1800
 
-static ADDRESS_MAP_START( tmc1800_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x8000, 0x81ff) AM_ROM
+static ADDRESS_MAP_START( tmc1800_map, AS_PROGRAM, 8, tmc1800_state )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x7800) AM_RAM
+	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc1800_io_map, AS_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, tmc1800_cdp1861_dispon_r, tmc1800_cdp1861_dispoff_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
+static ADDRESS_MAP_START( tmc1800_io_map, AS_IO, 8, tmc1800_state )
+	AM_RANGE(0x01, 0x01) AM_READWRITE(dispon_r, dispoff_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 // OSCOM 1000B
 
-static ADDRESS_MAP_START( osc1000b_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x8000, 0x81ff) AM_ROM
+static ADDRESS_MAP_START( osc1000b_map, AS_PROGRAM, 8, osc1000b_state )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x7800) AM_RAM
+	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( osc1000b_io_map, AS_IO, 8 )
-	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
+static ADDRESS_MAP_START( osc1000b_io_map, AS_IO, 8, osc1000b_state )
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 // Telmac 2000
 
-static ADDRESS_MAP_START( tmc2000_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmc2000_map, AS_PROGRAM, 8, tmc2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
+	AM_RANGE(0x0000, 0x7fff) // RAM / monitor ROM
+	AM_RANGE(0x8000, 0xffff) // color RAM / monitor ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc2000_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tmc2000_io_map, AS_IO, 8, tmc2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tmc2000_keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, tmc2000_bankswitch_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CDP1864_TAG, cdp1864_dispoff_r) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 // OSCOM Nano
 
-static ADDRESS_MAP_START( nano_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0x83ff) AM_ROM
+static ADDRESS_MAP_START( nano_map, AS_PROGRAM, 8, nano_state )
+	AM_RANGE(0x0000, 0x7fff) // RAM / monitor ROM
+	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nano_io_map, AS_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(nano_keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, nano_bankswitch_w)
+static ADDRESS_MAP_START( nano_io_map, AS_IO, 8, nano_state )
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CDP1864_TAG, cdp1864_dispoff_r) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -342,9 +322,41 @@ static INPUT_PORTS_START( tmc1800 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tmc2000 )
-	PORT_INCLUDE(tmc1800)
+static INPUT_CHANGED( tmc2000_run_pressed )
+{
+	running_machine &machine = field->port->machine();
+	tmc2000_state *state = machine.driver_data<tmc2000_state>();
 
+	if (oldval && !newval)
+	{
+		state->machine_reset();
+	}
+}
+
+static INPUT_PORTS_START( tmc2000 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START("RUN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED(tmc2000_run_pressed, 0)
+	
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
@@ -408,10 +420,12 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( run_pressed )
 {
+	running_machine &machine = field->port->machine();
+	nano_state *state = machine.driver_data<nano_state>();
+
 	if (oldval && !newval)
 	{
-		running_machine &machine = field->port->machine();
-		MACHINE_RESET_CALL(nano);
+		state->machine_reset();
 	}
 }
 
@@ -422,15 +436,15 @@ static INPUT_CHANGED( monitor_pressed )
 
 	if (oldval && !newval)
 	{
-		MACHINE_RESET_CALL(nano);
+		state->machine_reset();
 
-		cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, CLEAR_LINE);
+		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, CLEAR_LINE);
 	}
 	else if (!oldval && newval)
 	{
 		// TODO: what are the correct values?
 		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-		state->ef4_timer->adjust(attotime::from_msec(t));
+		state->m_ef4_timer->adjust(attotime::from_msec(t));
 	}
 }
 
@@ -466,42 +480,38 @@ INPUT_PORTS_END
 
 // Telmac 1800
 
-static READ_LINE_DEVICE_HANDLER( clear_r )
+READ_LINE_MEMBER( tmc1800_state::clear_r )
 {
-	return BIT(input_port_read(device->machine(), "RUN"), 0);
+	return BIT(input_port_read(m_machine, "RUN"), 0);
 }
 
-static READ_LINE_DEVICE_HANDLER( ef2_r )
+READ_LINE_MEMBER( tmc1800_state::ef2_r )
 {
-	return cassette_input(device) < 0;
+	return cassette_input(m_cassette) < 0;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef3_r )
+READ_LINE_MEMBER( tmc1800_state::ef3_r )
 {
-	tmc1800_state *state = device->machine().driver_data<tmc1800_state>();
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(device->machine(), keynames[state->keylatch / 8]);
+	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
 
-	return BIT(data, state->keylatch % 8);
+	return BIT(data, m_keylatch % 8);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( tmc1800_q_w )
+WRITE_LINE_MEMBER( tmc1800_state::q_w )
 {
-	tmc1800_state *driver_state = device->machine().driver_data<tmc1800_state>();
-
-	/* tape output */
-	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
+	cassette_output(m_cassette, state ? 1.0 : -1.0);
 }
 
 static COSMAC_INTERFACE( tmc1800_config )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
-	DEVCB_LINE(ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, ef3_r),
 	DEVCB_NULL,
-	DEVCB_LINE(tmc1800_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, q_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w),
 	NULL,
@@ -509,15 +519,40 @@ static COSMAC_INTERFACE( tmc1800_config )
 	DEVCB_NULL
 };
 
+// Oscom 1000B
+
+READ_LINE_MEMBER( osc1000b_state::clear_r )
+{
+	return BIT(input_port_read(m_machine, "RUN"), 0);
+}
+
+READ_LINE_MEMBER( osc1000b_state::ef2_r )
+{
+	return cassette_input(m_cassette) < 0;
+}
+
+READ_LINE_MEMBER( osc1000b_state::ef3_r )
+{
+	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+
+	return BIT(data, m_keylatch % 8);
+}
+
+WRITE_LINE_MEMBER( osc1000b_state::q_w )
+{
+	cassette_output(m_cassette, state ? 1.0 : -1.0);
+}
+
 static COSMAC_INTERFACE( osc1000b_config )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
-	DEVCB_LINE(ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, ef3_r),
 	DEVCB_NULL,
-	DEVCB_LINE(tmc1800_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, q_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL,
@@ -527,41 +562,55 @@ static COSMAC_INTERFACE( osc1000b_config )
 
 // Telmac 2000
 
-static WRITE_LINE_DEVICE_HANDLER( tmc2000_q_w )
+READ_LINE_MEMBER( tmc2000_state::clear_r )
 {
-	tmc2000_state *driver_state = device->machine().driver_data<tmc2000_state>();
-
-	/* CDP1864 audio output enable */
-	cdp1864_aoe_w(driver_state->cdp1864, state);
-
-	/* set Q led status */
-	set_led_status(device->machine(), 1, state);
-
-	/* tape output */
-	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
+	return BIT(input_port_read(m_machine, "RUN"), 0);
 }
 
-static WRITE8_DEVICE_HANDLER( tmc2000_dma_w )
+READ_LINE_MEMBER( tmc2000_state::ef2_r )
 {
-	tmc2000_state *state = device->machine().driver_data<tmc2000_state>();
+	return cassette_input(m_cassette) < 0;
+}
 
-	state->color = ~(state->colorram[offset & 0x1ff]) & 0x07;
+READ_LINE_MEMBER( tmc2000_state::ef3_r )
+{
+	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
 
-	cdp1864_con_w(state->cdp1864, 0); // HACK
-	cdp1864_dma_w(state->cdp1864, offset, data);
+	return BIT(data, m_keylatch % 8);
+}
+
+WRITE_LINE_MEMBER( tmc2000_state::q_w )
+{
+	/* CDP1864 audio output enable */
+	cdp1864_aoe_w(m_cti, state);
+
+	/* set Q led status */
+	set_led_status(m_machine, 1, state);
+
+	/* tape output */
+	cassette_output(m_cassette, state ? 1.0 : -1.0);
+}
+
+WRITE8_MEMBER( tmc2000_state::dma_w )
+{
+	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
+
+	cdp1864_con_w(m_cti, 0); // HACK
+	cdp1864_dma_w(m_cti, offset, data);
 }
 
 static COSMAC_INTERFACE( tmc2000_config )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
-	DEVCB_LINE(ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, ef3_r),
 	DEVCB_NULL,
-	DEVCB_LINE(tmc2000_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tmc2000_dma_w),
+	DEVCB_DRIVER_MEMBER(tmc2000_state, dma_w),
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -574,51 +623,48 @@ static TIMER_CALLBACK( nano_ef4_tick )
 	cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
 }
 
-static READ_LINE_DEVICE_HANDLER( nano_clear_r )
+READ_LINE_MEMBER( nano_state::clear_r )
 {
-	int run = BIT(input_port_read(device->machine(), "RUN"), 0);
-	int monitor = BIT(input_port_read(device->machine(), "MONITOR"), 0);
+	int run = BIT(input_port_read(m_machine, "RUN"), 0);
+	int monitor = BIT(input_port_read(m_machine, "MONITOR"), 0);
 
 	return run & monitor;
 }
 
-static READ_LINE_DEVICE_HANDLER( nano_ef2_r )
+READ_LINE_MEMBER( nano_state::ef2_r )
 {
-	return cassette_input(device) < 0;
+	return cassette_input(m_cassette) < 0;
 }
 
-static READ_LINE_DEVICE_HANDLER( nano_ef3_r )
+READ_LINE_MEMBER( nano_state::ef3_r )
 {
-	nano_state *state = device->machine().driver_data<nano_state>();
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(device->machine(), keynames[state->keylatch / 8]);
+	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
 
-	return BIT(data, state->keylatch % 8);
+	return BIT(data, m_keylatch % 8);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nano_q_w )
+WRITE_LINE_MEMBER( nano_state::q_w )
 {
-	nano_state *driver_state = device->machine().driver_data<nano_state>();
-
 	/* CDP1864 audio output enable */
-	cdp1864_aoe_w(driver_state->cdp1864, state);
+	cdp1864_aoe_w(m_cti, state);
 
 	/* set Q led status */
-	set_led_status(device->machine(), 1, state);
+	set_led_status(m_machine, 1, state);
 
 	/* tape output */
-	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
+	cassette_output(m_cassette, state ? 1.0 : -1.0);
 }
 
 static COSMAC_INTERFACE( nano_config )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(nano_clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(nano_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, nano_ef2_r),
-	DEVCB_LINE(nano_ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(nano_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(nano_state, ef3_r),
 	DEVCB_NULL,
-	DEVCB_LINE(nano_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(nano_state, q_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER(CDP1864_TAG, cdp1864_dma_w),
 	NULL,
@@ -630,126 +676,85 @@ static COSMAC_INTERFACE( nano_config )
 
 // Telmac 1800
 
-static MACHINE_START( tmc1800 )
+void tmc1800_state::machine_start()
 {
-	tmc1800_state *state = machine.driver_data<tmc1800_state>();
-
-	/* find devices */
-	state->cdp1861 = machine.device(CDP1861_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
-
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
+	save_item(NAME(m_keylatch));
 }
 
-static MACHINE_RESET( tmc1800 )
+void tmc1800_state::machine_reset()
 {
-	tmc1800_state *state = machine.driver_data<tmc1800_state>();
-
 	/* reset CDP1861 */
-	state->cdp1861->reset();
+	m_vdc->reset();
 }
 
 // OSCOM 1000B
 
-static MACHINE_START( osc1000b )
+void osc1000b_state::machine_start()
 {
-	osc1000b_state *state = machine.driver_data<osc1000b_state>();
-
-	/* find devices */
-	state->cassette = machine.device(CASSETTE_TAG);
-
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
+	save_item(NAME(m_keylatch));
 }
 
-static MACHINE_RESET( osc1000b )
+void osc1000b_state::machine_reset()
 {
 }
 
 // Telmac 2000
 
-static MACHINE_START( tmc2000 )
+void tmc2000_state::machine_start()
 {
-	tmc2000_state *state = machine.driver_data<tmc2000_state>();
-
 	UINT16 addr;
 
-	/* RAM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region(CDP1802_TAG)->base(), 0x8000);
+	m_colorram = auto_alloc_array(m_machine, UINT8, TMC2000_COLORRAM_SIZE);
 
-	/* ROM/colorram banking */
-	state->colorram = auto_alloc_array(machine, UINT8, TMC2000_COLORRAM_SIZE);
-
-	memory_configure_bank(machine, "bank2", TMC2000_BANK_MONITOR, 1, machine.region(CDP1802_TAG)->base() + 0x8000, 0);
-	memory_configure_bank(machine, "bank2", TMC2000_BANK_COLORRAM, 1, state->colorram, 0);
-
-	/* randomize color RAM contents */
+	// randomize color RAM contents
 	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
-		state->colorram[addr] = machine.rand() & 0xff;
+		m_colorram[addr] = m_machine.rand() & 0xff;
 	}
 
-	/* find devices */
-	state->cdp1864 = machine.device(CDP1864_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
-
-	/* register for state saving */
-	state->save_pointer(NAME(state->colorram), TMC2000_COLORRAM_SIZE);
-	state->save_item(NAME(state->keylatch));
+	// state saving
+	save_pointer(NAME(m_colorram), TMC2000_COLORRAM_SIZE);
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_rac));
+	save_item(NAME(m_roc));
 }
 
-static MACHINE_RESET( tmc2000 )
+void tmc2000_state::machine_reset()
 {
-	tmc2000_state *state = machine.driver_data<tmc2000_state>();
+	// reset CDP1864
+	m_cti->reset();
 
-	/* reset CDP1864 */
-	state->cdp1864->reset();
-
-	/* enable monitor mirror at 0x0000 */
-	memory_set_bank(machine, "bank1", TMC2000_BANK_ROM);
-	machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x01ff, 0, 0x7e00, "bank1");
-	machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x01ff, 0, 0x7e00);
-
-	/* enable monitor */
-	memory_set_bank(machine, "bank2", TMC2000_BANK_MONITOR);
-	machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x8000, 0x81ff, 0, 0x7e00, "bank2");
-	machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0x81ff, 0, 0x7e00);
+	// banking
+	m_roc = 1;
+	m_rac = 0;
+	bankswitch();
 }
 
 // OSCOM Nano
 
-static MACHINE_START( nano )
+void nano_state::machine_start()
 {
-	nano_state *state = machine.driver_data<nano_state>();
-
-	/* RAM/ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region(CDP1802_TAG)->base(), 0x8000);
-
 	/* allocate monitor timer */
-	state->ef4_timer = machine.scheduler().timer_alloc(FUNC(nano_ef4_tick));
-
-	/* find devices */
-	state->cdp1864 = machine.device(CDP1864_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
+	m_ef4_timer = m_machine.scheduler().timer_alloc(FUNC(nano_ef4_tick));
 
 	/* register for state saving */
-	state->save_item(NAME(state->keylatch));
+	save_item(NAME(m_keylatch));
 }
 
-static MACHINE_RESET( nano )
+void nano_state::machine_reset()
 {
-	nano_state *state = machine.driver_data<nano_state>();
-
 	/* assert EF4 */
-	cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
 
 	/* reset CDP1864 */
-	state->cdp1864->reset();
+	m_cti->reset();
 
 	/* enable ROM */
-	memory_set_bank(machine, "bank1", OSCNANO_BANK_ROM);
-	machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x01ff, 0, 0x7e00, "bank1");
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	UINT8 *rom = m_machine.region(CDP1802_TAG)->base();
+	program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }
 
 /* Machine Drivers */
@@ -762,6 +767,20 @@ static const cassette_config tmc1800_cassette_config =
 	NULL
 };
 
+static QUICKLOAD_LOAD( tmc1800 )
+{
+	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
+	int size = image.length();
+
+	if (size > ram_get_size(image.device().machine().device(RAM_TAG)))
+	{
+		return IMAGE_INIT_FAIL;
+	}
+
+	image.fread( ptr, size);
+
+	return IMAGE_INIT_PASS;
+}
 
 static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	// basic system hardware
@@ -769,9 +788,6 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
 	MCFG_CPU_IO_MAP(tmc1800_io_map)
 	MCFG_CPU_CONFIG(tmc1800_config)
-
-	MCFG_MACHINE_START(tmc1800)
-	MCFG_MACHINE_RESET(tmc1800)
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(tmc1800_video)
@@ -799,9 +815,6 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_CPU_IO_MAP(osc1000b_io_map)
 	MCFG_CPU_CONFIG(osc1000b_config)
 
-	MCFG_MACHINE_START(osc1000b)
-	MCFG_MACHINE_RESET(osc1000b)
-
 	// video hardware
 	MCFG_FRAGMENT_ADD(osc1000b_video)
 
@@ -815,7 +828,7 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
@@ -828,9 +841,6 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_CPU_IO_MAP(tmc2000_io_map)
 	MCFG_CPU_CONFIG(tmc2000_config)
 
-	MCFG_MACHINE_START(tmc2000)
-	MCFG_MACHINE_RESET(tmc2000)
-
 	// video hardware
 	MCFG_FRAGMENT_ADD(tmc2000_video)
 
@@ -838,7 +848,7 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
@@ -851,9 +861,6 @@ static MACHINE_CONFIG_START( nano, nano_state )
 	MCFG_CPU_IO_MAP(nano_io_map)
 	MCFG_CPU_CONFIG(nano_config)
 
-	MCFG_MACHINE_START(nano)
-	MCFG_MACHINE_RESET(nano)
-
 	// video hardware
 	MCFG_FRAGMENT_ADD(nano_video)
 
@@ -861,7 +868,7 @@ static MACHINE_CONFIG_START( nano, nano_state )
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
@@ -869,50 +876,33 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( tmc1800 )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
+	ROM_REGION( 0x200, CDP1802_TAG, 0 )
+	ROM_LOAD( "mmi6341-1.ic2", 0x000, 0x200, NO_DUMP ) // equivalent to 82S141
 ROM_END
 
 ROM_START( osc1000b )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
+	ROM_REGION( 0x200, CDP1802_TAG, 0 )
+	ROM_LOAD( "mmi6341-1.ic2", 0x000, 0x0200, NO_DUMP ) // equivalent to 82S141
 
 	ROM_REGION( 0x400, "gfx1", 0 )
-	ROM_LOAD( "mmi6349.5d",	0x0000, 0x0200, NO_DUMP ) // equivalent to 82S147
-	ROM_LOAD( "mmi6349.5c",	0x0200, 0x0200, NO_DUMP ) // equivalent to 82S147
+	ROM_LOAD( "mmi6349.5d",	0x000, 0x200, NO_DUMP ) // equivalent to 82S147
+	ROM_LOAD( "mmi6349.5c",	0x200, 0x200, NO_DUMP ) // equivalent to 82S147
 ROM_END
 
 ROM_START( tmc2000 )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x800, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "prom200", "PROM N:o 200" )
-	ROMX_LOAD( "200.m5",    0x8000, 0x0200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
+	ROMX_LOAD( "200.m5",    0x000, 0x200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
 	ROM_SYSTEM_BIOS( 1, "prom202", "PROM N:o 202" )
-	ROMX_LOAD( "202.m5",    0x8000, 0x0200, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "202.m5",    0x000, 0x200, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tool2000", "TOOL-2000" )
-	ROMX_LOAD( "tool2000",	0x8000, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "tool2000",	0x000, 0x800, NO_DUMP, ROM_BIOS(3) )
 ROM_END
 
 ROM_START( nano )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "mmi6349.ic", 0x8000, 0x0200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
+	ROM_REGION( 0x200, CDP1802_TAG, 0 )
+	ROM_LOAD( "mmi6349.ic", 0x000, 0x200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
 ROM_END
-
-/* System Configuration */
-
-static QUICKLOAD_LOAD( tmc1800 )
-{
-	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
-	int size = image.length();
-
-	if (size > ram_get_size(image.device().machine().device(RAM_TAG)))
-	{
-		return IMAGE_INIT_FAIL;
-	}
-
-	image.fread( ptr, size);
-
-	return IMAGE_INIT_PASS;
-}
 
 /* Driver Initialization */
 
@@ -934,4 +924,4 @@ static DRIVER_INIT( tmc1800 )
 COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,	"Telercas Oy",	"Telmac 1800",  GAME_NOT_WORKING )
 COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
 COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, nano,		tmc2000,0,		nano,		nano,	0,			"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+COMP( 1980, nano,		tmc2000,0,		nano,		nano,		0,			"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
