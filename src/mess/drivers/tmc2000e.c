@@ -29,73 +29,62 @@
 
 */
 
-#include "emu.h"
 #include "includes/tmc2000e.h"
-#include "cpu/cosmac/cosmac.h"
-#include "imagedev/printer.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "imagedev/cassette.h"
-#include "sound/cdp1864.h"
-#include "machine/rescap.h"
-#include "machine/ram.h"
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( vismac_r )
+READ8_MEMBER( tmc2000e_state::vismac_r )
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( vismac_w )
+WRITE8_MEMBER( tmc2000e_state::vismac_w )
 {
 }
 
-static READ8_HANDLER( floppy_r )
+READ8_MEMBER( tmc2000e_state::floppy_r )
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( floppy_w )
+WRITE8_MEMBER( tmc2000e_state::floppy_w )
 {
 }
 
-static READ8_HANDLER( ascii_keyboard_r )
+READ8_MEMBER( tmc2000e_state::ascii_keyboard_r )
 {
 	return 0;
 }
 
-static READ8_HANDLER( io_r )
+READ8_MEMBER( tmc2000e_state::io_r )
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( io_w )
+WRITE8_MEMBER( tmc2000e_state::io_w )
 {
 }
 
-static WRITE8_HANDLER( io_select_w )
+WRITE8_MEMBER( tmc2000e_state::io_select_w )
 {
 }
 
-static WRITE8_HANDLER( keyboard_latch_w )
+WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
 {
-	tmc2000e_state *state = space->machine().driver_data<tmc2000e_state>();
-
-	state->keylatch = data;
+	m_keylatch = data;
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tmc2000e_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmc2000e_map, AS_PROGRAM, 8, tmc2000e_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_BASE_MEMBER(tmc2000e_state, colorram)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_BASE(m_colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc2000e_io_map, AS_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1864_TAG, cdp1864_tone_latch_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(CDP1864_TAG, cdp1864_step_bgcolor_w)
+static ADDRESS_MAP_START( tmc2000e_io_map, AS_IO, 8, tmc2000e_state )
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY(CDP1864_TAG, cdp1864_tone_latch_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY(CDP1864_TAG, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
@@ -126,25 +115,19 @@ INPUT_PORTS_END
 
 /* Video */
 
-static READ_LINE_DEVICE_HANDLER( rdata_r )
+READ_LINE_MEMBER( tmc2000e_state::rdata_r )
 {
-	tmc2000e_state *state = device->machine().driver_data<tmc2000e_state>();
-
-	return BIT(state->color, 2);
+	return BIT(m_color, 2);
 }
 
-static READ_LINE_DEVICE_HANDLER( bdata_r )
+READ_LINE_MEMBER( tmc2000e_state::bdata_r )
 {
-	tmc2000e_state *state = device->machine().driver_data<tmc2000e_state>();
-
-	return BIT(state->color, 1);
+	return BIT(m_color, 1);
 }
 
-static READ_LINE_DEVICE_HANDLER( gdata_r )
+READ_LINE_MEMBER( tmc2000e_state::gdata_r )
 {
-	tmc2000e_state *state = device->machine().driver_data<tmc2000e_state>();
-
-	return BIT(state->color, 0);
+	return BIT(m_color, 0);
 }
 
 static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
@@ -152,9 +135,9 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
-	DEVCB_LINE(rdata_r),
-	DEVCB_LINE(bdata_r),
-	DEVCB_LINE(gdata_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, rdata_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, bdata_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, gdata_r),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
@@ -164,76 +147,69 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	RES_K(4.7)	// unverified
 };
 
-static SCREEN_UPDATE( tmc2000e )
+bool tmc2000e_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	tmc2000e_state *state = screen->machine().driver_data<tmc2000e_state>();
-
-	cdp1864_update(state->cdp1864, bitmap, cliprect);
+	cdp1864_update(m_cti, &bitmap, &cliprect);
 
 	return 0;
 }
 
 /* CDP1802 Interface */
 
-static READ_LINE_DEVICE_HANDLER( clear_r )
+READ_LINE_MEMBER( tmc2000e_state::clear_r )
 {
-	return BIT(input_port_read(device->machine(), "RUN"), 0);
+	return BIT(input_port_read(m_machine, "RUN"), 0);
 }
 
-static READ_LINE_DEVICE_HANDLER( ef2_r )
+READ_LINE_MEMBER( tmc2000e_state::ef2_r )
 {
-	return cassette_input(device) < 0;
+	return cassette_input(m_cassette) < 0;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef3_r )
+READ_LINE_MEMBER( tmc2000e_state::ef3_r )
 {
-	tmc2000e_state *state = device->machine().driver_data<tmc2000e_state>();
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(device->machine(), keynames[state->keylatch / 8]);
+	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
 
-	return BIT(data, state->keylatch % 8);
+	return BIT(data, m_keylatch % 8);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( tmc2000e_q_w )
+WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 {
-	tmc2000e_state *driver_state = device->machine().driver_data<tmc2000e_state>();
-
 	// turn CDP1864 sound generator on/off
 
-	cdp1864_aoe_w(driver_state->cdp1864, state);
+	cdp1864_aoe_w(m_cti, state);
 
 	// set Q led status
 
-	set_led_status(device->machine(), 1, state);
+	set_led_status(m_machine, 1, state);
 
 	// tape out
 
-	cassette_output(driver_state->cassette, state ? -1.0 : +1.0);
+	cassette_output(m_cassette, state ? -1.0 : +1.0);
 
 	// floppy control (FDC-6)
 }
 
-static WRITE8_DEVICE_HANDLER( tmc2000e_dma_w )
+WRITE8_MEMBER( tmc2000e_state::dma_w )
 {
-	tmc2000e_state *state = device->machine().driver_data<tmc2000e_state>();
+	m_color = (m_colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
 
-	state->color = (state->colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
-
-	cdp1864_con_w(state->cdp1864, 0); // HACK
-	cdp1864_dma_w(state->cdp1864, offset, data);
+	cdp1864_con_w(m_cti, 0); // HACK
+	cdp1864_dma_w(m_cti, offset, data);
 }
 
 static COSMAC_INTERFACE( tmc2000e_config )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
-	DEVCB_LINE(ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, ef3_r),
 	DEVCB_NULL,
-	DEVCB_LINE(tmc2000e_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tmc2000e_dma_w),
+	DEVCB_DRIVER_MEMBER(tmc2000e_state, dma_w),
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -241,28 +217,20 @@ static COSMAC_INTERFACE( tmc2000e_config )
 
 /* Machine Initialization */
 
-static MACHINE_START( tmc2000e )
+void tmc2000e_state::machine_start()
 {
-	tmc2000e_state *state = machine.driver_data<tmc2000e_state>();
-
 	/* allocate color RAM */
-	state->colorram = auto_alloc_array(machine, UINT8, TMC2000E_COLORRAM_SIZE);
-
-	/* find devices */
-	state->cdp1864 = machine.device(CDP1864_TAG);
-	state->cassette = machine.device(CASSETTE_TAG);
+	m_colorram = auto_alloc_array(m_machine, UINT8, TMC2000E_COLORRAM_SIZE);
 
 	/* register for state saving */
-	state->save_pointer(NAME(state->colorram), TMC2000E_COLORRAM_SIZE);
-	state->save_item(NAME(state->cdp1864_efx));
-	state->save_item(NAME(state->keylatch));
+	save_pointer(NAME(m_colorram), TMC2000E_COLORRAM_SIZE);
+	save_item(NAME(m_cdp1864_efx));
+	save_item(NAME(m_keylatch));
 }
 
-static MACHINE_RESET( tmc2000e )
+void tmc2000e_state::machine_reset()
 {
-	tmc2000e_state *state = machine.driver_data<tmc2000e_state>();
-
-	state->cdp1864->reset();
+	m_cti->reset();
 
 	// reset program counter to 0xc000
 }
@@ -296,12 +264,8 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	MCFG_CPU_IO_MAP(tmc2000e_io_map)
 	MCFG_CPU_CONFIG(tmc2000e_config)
 
-	MCFG_MACHINE_START(tmc2000e)
-	MCFG_MACHINE_RESET(tmc2000e)
-
 	// video hardware
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
-	MCFG_SCREEN_UPDATE(tmc2000e)
 
 	MCFG_PALETTE_LENGTH(8)
 
