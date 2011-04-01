@@ -54,6 +54,9 @@
  * 0x0404   : Disable VRAM, CMOS, memory-mapped I/O (everything in low memory except the BIOS)
  * 0x0440-5f: Video / CRTC
  * 0x0480 RW: bit 1 = disable BIOS ROM
+ * 0x048a RW: JEIDA v3/v4(?) IC Memory card status
+ * 0x0490 RW: JEIDA v4 IC Memory card page select
+ * 0x0491 RW: JEIDA v4 IC Memory card
  * 0x04c0-cf: CD-ROM controller
  * 0x04d5   : Sound mute
  * 0x04d8   : YM3438 control port A / status
@@ -1248,7 +1251,7 @@ static TIMER_CALLBACK( towns_cd_status_ready )
 	state->m_towns_cd.status |= 0x02;  // status read request
 	state->m_towns_cd.status |= 0x01;  // ready
 	state->m_towns_cd.cmd_status_ptr = 0;
-	towns_cdrom_set_irq((running_machine&)ptr,TOWNS_CD_IRQ_MPU,1);
+	towns_cdrom_set_irq((running_machine&)machine,TOWNS_CD_IRQ_MPU,1);
 }
 
 static void towns_cd_set_status(running_machine &machine, UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
@@ -1983,7 +1986,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 
 	if(tstate->m_towns_timer_mask & 0x02)
 	{
-	//  pic8259_ir0_w(dev, state);
+		//pic8259_ir0_w(dev, state);
 	}
 }
 
@@ -2009,6 +2012,8 @@ static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32)
 //  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
   AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
+  // 0xc0000000 - 0xc0ffffff  // IC Memory Card (static, first 16MB only)
+  // 0xc1000000 - 0xc1ffffff  // IC Memory Card (banked, can show any of 4 banks), JEIDA v4 only (UX and later)
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
@@ -2037,7 +2042,7 @@ static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 32)
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
+  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card (is this usable on the Marty?)
   AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
@@ -2063,7 +2068,7 @@ static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 32)
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
+  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card
   AM_RANGE(0x00e00000, 0x00e7ffff) AM_ROM AM_REGION("user",0x000000)  // OS
   AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
