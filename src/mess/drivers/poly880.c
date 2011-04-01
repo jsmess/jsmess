@@ -8,14 +8,7 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "includes/poly880.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "imagedev/cassette.h"
-#include "machine/z80pio.h"
-#include "machine/z80ctc.h"
-#include "machine/ram.h"
 #include "poly880.lh"
 
 /*
@@ -32,28 +25,26 @@
 
 /* Read/Write Handlers */
 
-static void update_display(poly880_state *state)
+void poly880_state::update_display()
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (BIT(state->digit, i)) output_set_digit_value(7 - i, state->segment);
+		if (BIT(m_digit, i)) output_set_digit_value(7 - i, m_segment);
 	}
 }
 
-static WRITE8_HANDLER( cldig_w )
+WRITE8_MEMBER( poly880_state::cldig_w )
 {
-	poly880_state *state = space->machine().driver_data<poly880_state>();
+	m_digit = data;
 
-	state->digit = data;
-
-	update_display(state);
+	update_display();
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( poly880_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( poly880_mem, AS_PROGRAM, 8, poly880_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_ROM
@@ -62,11 +53,11 @@ static ADDRESS_MAP_START( poly880_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly880_io, AS_IO, 8)
+static ADDRESS_MAP_START( poly880_io, AS_IO, 8, poly880_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xaf)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(cldig_w)
 ADDRESS_MAP_END
 
@@ -122,32 +113,27 @@ INPUT_PORTS_END
 
 /* Z80-CTC Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
+WRITE_LINE_MEMBER( poly880_state::ctc_z0_w )
 {
 	// SEND
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
+WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
 {
-}
-
-static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
-{
-	z80ctc_trg3_w(device, state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_z1_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)    /* ZC/TO2 callback */
+	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z0_w),	/* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z1_w),	/* ZC/TO1 callback */
+	DEVCB_LINE(z80ctc_trg3_w)    /* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */
 
-static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
+WRITE8_MEMBER( poly880_state::pio1_pa_w )
 {
 	/*
 
@@ -164,14 +150,12 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	poly880_state *state = device->machine().driver_data<poly880_state>();
+	m_segment = BITSWAP8(data, 3, 4, 6, 0, 1, 2, 7, 5);
 
-	state->segment = BITSWAP8(data, 3, 4, 6, 0, 1, 2, 7, 5);
-
-	update_display(state);
+	update_display();
 }
 
-static READ8_DEVICE_HANDLER( pio1_port_b_r )
+READ8_MEMBER( poly880_state::pio1_pb_r )
 {
 	/*
 
@@ -188,25 +172,23 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 
     */
 
-	poly880_state *state = device->machine().driver_data<poly880_state>();
-
-	UINT8 data = 0xf0 | ((cassette_input(state->cassette) < +0.0) << 1);
+	UINT8 data = 0xf0 | ((cassette_input(m_cassette) < +0.0) << 1);
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (BIT(state->digit, i))
+		if (BIT(m_digit, i))
 		{
-			if (!BIT(input_port_read(device->machine(), "KI1"), i)) data &= ~0x10;
-			if (!BIT(input_port_read(device->machine(), "KI2"), i)) data &= ~0x20;
-			if (!BIT(input_port_read(device->machine(), "KI3"), i)) data &= ~0x80;
+			if (!BIT(input_port_read(m_machine, "KI1"), i)) data &= ~0x10;
+			if (!BIT(input_port_read(m_machine, "KI2"), i)) data &= ~0x20;
+			if (!BIT(input_port_read(m_machine, "KI3"), i)) data &= ~0x80;
 		}
 	}
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
+WRITE8_MEMBER( poly880_state::pio1_pb_w )
 {
 	/*
 
@@ -223,20 +205,18 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	poly880_state *state = device->machine().driver_data<poly880_state>();
-
 	/* tape output */
-	cassette_output(state->cassette, BIT(data, 2) ? +1.0 : -1.0);
+	cassette_output(m_cassette, BIT(data, 2) ? +1.0 : -1.0);
 }
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_HANDLER(pio1_port_a_w),	/* port A write callback */
+	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pa_w),	/* port A write callback */
 	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_HANDLER(pio1_port_b_r),	/* port B read callback */
-	DEVCB_HANDLER(pio1_port_b_w),	/* port B write callback */
+	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pb_r),	/* port B read callback */
+	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pb_w),	/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
@@ -263,16 +243,11 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 /* Machine Initialization */
 
-static MACHINE_START( poly880 )
+void poly880_state::machine_start()
 {
-	poly880_state *state = machine.driver_data<poly880_state>();
-
-	/* find devices */
-	state->cassette = machine.device(CASSETTE_TAG);
-
 	/* register for state saving */
-	state->save_item(NAME(state->digit));
-	state->save_item(NAME(state->segment));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_segment));
 }
 
 /* Machine Driver */
@@ -286,13 +261,10 @@ static const cassette_config poly880_cassette_config =
 };
 
 static MACHINE_CONFIG_START( poly880, poly880_state )
-
 	/* basic machine hardware */
     MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
     MCFG_CPU_PROGRAM_MAP(poly880_mem)
     MCFG_CPU_IO_MAP(poly880_io)
-
-    MCFG_MACHINE_START(poly880)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_poly880 )
