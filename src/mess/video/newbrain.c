@@ -1,37 +1,31 @@
-#include "emu.h"
 #include "includes/newbrain.h"
+#include "newbrain.lh"
 
-static VIDEO_START( newbrain )
+void newbrain_state::video_start()
 {
-	newbrain_state *state = machine.driver_data<newbrain_state>();
-
 	/* find memory regions */
-
-	state->char_rom = machine.region("chargen")->base();
+	m_char_rom = m_machine.region("chargen")->base();
 
 	/* register for state saving */
-
-	state->save_item(NAME(state->tvcnsl));
-	state->save_item(NAME(state->tvctl));
-	state->save_item(NAME(state->tvram));
-	state->save_item(NAME(state->segment_data));
+	save_item(NAME(m_tvcnsl));
+	save_item(NAME(m_tvctl));
+	save_item(NAME(m_tvram));
+	save_item(NAME(m_segment_data));
 }
 
-static void newbrain_update(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+void newbrain_state::screen_update(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	newbrain_state *state = machine.driver_data<newbrain_state>();
-
-	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	int y, sx;
-	int columns = (state->tvctl & NEWBRAIN_VIDEO_80L) ? 80 : 40;
-	int excess = (state->tvctl & NEWBRAIN_VIDEO_32_40) ? 24 : 4;
-	int ucr = (state->tvctl & NEWBRAIN_VIDEO_UCR) ? 1 : 0;
-	int fs = (state->tvctl & NEWBRAIN_VIDEO_FS) ? 1 : 0;
-	int rv = (state->tvctl & NEWBRAIN_VIDEO_RV) ? 1 : 0;
+	int columns = (m_tvctl & NEWBRAIN_VIDEO_80L) ? 80 : 40;
+	int excess = (m_tvctl & NEWBRAIN_VIDEO_32_40) ? 24 : 4;
+	int ucr = (m_tvctl & NEWBRAIN_VIDEO_UCR) ? 1 : 0;
+	int fs = (m_tvctl & NEWBRAIN_VIDEO_FS) ? 1 : 0;
+	int rv = (m_tvctl & NEWBRAIN_VIDEO_RV) ? 1 : 0;
 	int gr = 0;
 
-	UINT16 videoram_addr = state->tvram;
+	UINT16 videoram_addr = m_tvram;
 	UINT8 rc = 0;
 
 	for (y = 0; y < 250; y++)
@@ -54,7 +48,7 @@ static void newbrain_update(running_machine &machine, bitmap_t *bitmap, const re
 			{
 				/* render character rom data */
 				UINT16 charrom_addr = (rc << 8) | ((BIT(videoram_data, 7) & fs) << 7) | (videoram_data & 0x7f);
-				charrom_data = state->char_rom[charrom_addr & 0xfff];
+				charrom_data = m_char_rom[charrom_addr & 0xfff];
 
 				if ((videoram_data & 0x80) && !fs)
 				{
@@ -107,17 +101,15 @@ static void newbrain_update(running_machine &machine, bitmap_t *bitmap, const re
 	}
 }
 
-static SCREEN_UPDATE( newbrain )
+bool newbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	newbrain_state *state = screen->machine().driver_data<newbrain_state>();
-
-	if (state->enrg1 & NEWBRAIN_ENRG1_TVP)
+	if (m_enrg1 & NEWBRAIN_ENRG1_TVP)
 	{
-		newbrain_update(screen->machine(), bitmap, cliprect);
+		screen_update(&bitmap, &cliprect);
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
 	}
 
 	return 0;
@@ -126,16 +118,15 @@ static SCREEN_UPDATE( newbrain )
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( newbrain_video )
+	MCFG_DEFAULT_LAYOUT(layout_newbrain)
+
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_SCREEN_UPDATE(newbrain)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(newbrain)
 MACHINE_CONFIG_END

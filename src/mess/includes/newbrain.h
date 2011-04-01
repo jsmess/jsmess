@@ -1,5 +1,24 @@
+#pragma once
+
 #ifndef __NEWBRAIN__
 #define __NEWBRAIN__
+
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "cpu/cop400/cop400.h"
+#include "machine/upd765.h"
+#include "machine/6850acia.h"
+#include "machine/adc080x.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+#include "imagedev/cassette.h"
+#include "machine/rescap.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"409"
@@ -42,73 +61,164 @@ class newbrain_state : public driver_device
 {
 public:
 	newbrain_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_copcpu(*this, COP420_TAG),
+		  m_cassette1(*this, CASSETTE1_TAG),
+		  m_cassette2(*this, CASSETTE2_TAG)
+	{ }
 
-	/* processor state */
-	int pwrup;				/* power up */
-	int userint;			/* user interrupt */
-	int userint0;			/* parallel port interrupt */
-	int clkint;				/* clock interrupt */
-	int aciaint;			/* ACIA interrupt */
-	int copint;				/* COP interrupt */
-	int anint;				/* A/DC interrupt */
-	int bee;				/* identity */
-	UINT8 enrg1;			/* enable register 1 */
-	UINT8 enrg2;			/* enable register 2 */
-	int acia_rxd;			/* ACIA receive */
-	int acia_txd;			/* ACIA transmit */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_copcpu;
+	required_device<device_t> m_cassette1;
+	required_device<device_t> m_cassette2;
 
-	/* COP420 state */
-	UINT8 cop_bus;			/* data bus */
-	int cop_so;				/* serial out */
-	int cop_tdo;			/* tape data output */
-	int cop_tdi;			/* tape data input */
-	int cop_rd;				/* memory read */
-	int cop_wr;				/* memory write */
-	int cop_access;			/* COP access */
+	virtual void machine_start();
+	virtual void machine_reset();
 
-	/* keyboard state */
-	int keylatch;			/* keyboard row */
-	int keydata;			/* keyboard column */
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	DECLARE_WRITE8_MEMBER( enrg1_w );
+	DECLARE_WRITE8_MEMBER( a_enrg1_w );
+	DECLARE_READ8_MEMBER( ust_r );
+	DECLARE_READ8_MEMBER( a_ust_r );
+	DECLARE_READ8_MEMBER( user_r );
+	DECLARE_WRITE8_MEMBER( user_w );
+	DECLARE_READ8_MEMBER( clclk_r );
+	DECLARE_WRITE8_MEMBER( clclk_w );
+	DECLARE_READ8_MEMBER( clusr_r );
+	DECLARE_WRITE8_MEMBER( clusr_w );
+	DECLARE_READ8_MEMBER( cop_l_r );
+	DECLARE_WRITE8_MEMBER( cop_l_w );
+	DECLARE_WRITE8_MEMBER( cop_g_w );
+	DECLARE_READ8_MEMBER( cop_g_r );
+	DECLARE_WRITE8_MEMBER( cop_d_w );
+	DECLARE_READ8_MEMBER( cop_in_r );
+	DECLARE_WRITE8_MEMBER( cop_sk_w );
+	DECLARE_READ8_MEMBER( cop_si_r );
+	DECLARE_WRITE8_MEMBER( cop_so_w );
+	DECLARE_READ8_MEMBER( tvl_r );
+	DECLARE_WRITE8_MEMBER( tvl_w );
+	DECLARE_WRITE8_MEMBER( tvctl_w );
+	DECLARE_READ8_MEMBER( cop_r );
+	DECLARE_WRITE8_MEMBER( cop_w );
+		
+	void check_interrupt();
+	void bankswitch();
+	void tvram_w(UINT8 data, int a6);
+	inline int get_reset_t();
+	inline int get_pwrup_t();
+	void screen_update(bitmap_t *bitmap, const rectangle *cliprect);
+	
+	// processor state
+	int m_pwrup;			// power up
+	int m_userint;			// user interrupt
+	int m_userint0;			// parallel port interrupt
+	int m_clkint;			// clock interrupt
+	int m_aciaint;			// ACIA interrupt
+	int m_copint;			// COP interrupt
+	int m_anint;			// A/DC interrupt
+	int m_bee;				// identity
+	UINT8 m_enrg1;			// enable register 1
+	UINT8 m_enrg2;			// enable register 2
+	int m_acia_rxd;			// ACIA receive
+	int m_acia_txd;			// ACIA transmit
 
-	/* paging state */
-	int paging;				/* paging enabled */
-	int mpm;				/* multi paging mode ? */
-	int a16;				/* address line 16 */
-	UINT8 pr[16];			/* expansion interface paging register */
-	UINT8 *eim_ram;			/* expansion interface RAM */
+	// COP420 state
+	UINT8 m_cop_bus;		// data bus
+	int m_cop_so;			// serial out
+	int m_cop_tdo;			// tape data output
+	int m_cop_tdi;			// tape data input
+	int m_cop_rd;			// memory read
+	int m_cop_wr;			// memory write
+	int m_cop_access;		// COP access
 
-	/* floppy state */
-	int fdc_int;			/* interrupt */
-	int fdc_att;			/* attention */
+	// keyboard state
+	int m_keylatch;			// keyboard row
+	int m_keydata;			// keyboard column
 
-	/* video state */
-	int segment_data[16];	/* VF segment data */
-	int tvcnsl;				/* TV console required */
-	int tvctl;				/* TV control register */
-	UINT16 tvram;			/* TV start address */
-	UINT8 *char_rom;		/* character ROM */
+	// video state
+	int m_segment_data[16];	// VF segment data
+	int m_tvcnsl;			// TV console required
+	int m_tvctl;			// TV control register
+	UINT16 m_tvram;			// TV start address
+	UINT8 *m_char_rom;		// character ROM
 
-	/* user bus state */
-	UINT8 user;
+	// user bus state
+	UINT8 m_user;
 
-	/* timers */
-	emu_timer *reset_timer;	/* power on reset timer */
-	emu_timer *pwrup_timer;	/* power up timer */
+	// timers
+	emu_timer *m_reset_timer;	// power on reset timer
+	emu_timer *m_pwrup_timer;	// power up timer
 
-	/* devices */
-	device_t *mc6850;
-	device_t *z80ctc;
-	device_t *upd765;
-	device_t *cassette1;
-	device_t *cassette2;
-	UINT8 copdata;
-	int copstate;
-	int copbytes;
-	int copregint;
+	// devices
+	UINT8 m_copdata;
+	int m_copstate;
+	int m_copbytes;
+	int m_copregint;
 };
 
-/* ---------- defined in video/newbrain.c ---------- */
+class newbrain_eim_state : public newbrain_state
+{
+public:
+	newbrain_eim_state(running_machine &machine, const driver_device_config_base &config)
+		: newbrain_state(machine, config),
+		  m_fdccpu(*this, FDC_Z80_TAG),
+		  m_ctc(*this, Z80CTC_TAG),
+		  m_acia(*this, MC6850_TAG),
+		  m_fdc(*this, UPD765_TAG),
+		  m_floppy(*this, FLOPPY_0)
+	{ }
+
+	required_device<cpu_device> m_fdccpu;
+	required_device<device_t> m_ctc;
+	required_device<device_t> m_acia;
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_floppy;
+
+	virtual void machine_start();
+
+	DECLARE_WRITE8_MEMBER( fdc_auxiliary_w );
+	DECLARE_READ8_MEMBER( fdc_control_r );
+	DECLARE_READ8_MEMBER( ust2_r );
+	DECLARE_WRITE8_MEMBER( enrg2_w );
+	DECLARE_WRITE8_MEMBER( pr_w );
+	DECLARE_READ8_MEMBER( user_r );
+	DECLARE_WRITE8_MEMBER( user_w );
+	DECLARE_READ8_MEMBER( anout_r );
+	DECLARE_WRITE8_MEMBER( anout_w );
+	DECLARE_READ8_MEMBER( anin_r );
+	DECLARE_WRITE8_MEMBER( anio_w );
+	DECLARE_READ8_MEMBER( st0_r );
+	DECLARE_READ8_MEMBER( st1_r );
+	DECLARE_READ8_MEMBER( st2_r );
+	DECLARE_READ8_MEMBER( usbs_r );
+	DECLARE_WRITE8_MEMBER( usbs_w );
+	DECLARE_WRITE8_MEMBER( paging_w );
+	DECLARE_READ_LINE_MEMBER( acia_rx );
+	DECLARE_WRITE_LINE_MEMBER( acia_tx );
+	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+		
+	void bankswitch();
+
+	// paging state
+	int m_paging;			// paging enabled
+	int m_mpm;				// multi paging mode ?
+	int m_a16;				// address line 16
+	UINT8 m_pr[16];			// expansion interface paging register
+	UINT8 *m_eim_ram;		// expansion interface RAM
+
+	// floppy state
+	int m_fdc_int;			// interrupt
+	int m_fdc_att;			// attention
+};
+
+// ---------- defined in video/newbrain.c ----------
 
 MACHINE_CONFIG_EXTERN( newbrain_video );
 

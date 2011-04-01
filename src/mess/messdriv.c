@@ -1523,9 +1523,9 @@ const game_driver * const drivers[] =
 
 	/* Grundy Business Systems Ltd */
 	DRIVER( newbrain )
-	DRIVER( newbraie )
-	DRIVER( newbraia )
-	DRIVER( newbraim )
+	DRIVER( newbraineim )
+	DRIVER( newbraina )
+	DRIVER( newbrainmd )
 
 	/* Nokia Data */
 	DRIVER( mm1m6 )
