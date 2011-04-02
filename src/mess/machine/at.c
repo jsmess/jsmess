@@ -570,9 +570,9 @@ MACHINE_RESET( at )
 {
 	at_state *st = machine.driver_data<at_state>();
 	st->m_maincpu = machine.device("maincpu");
-	st->m_pic8259_master = machine.device("m_pic8259_master");
-	st->m_pic8259_slave = machine.device("m_pic8259_slave");
-	st->m_dma8237_1 = machine.device("m_dma8237_1");
+	st->m_pic8259_master = machine.device("pic8259_master");
+	st->m_pic8259_slave = machine.device("pic8259_slave");
+	st->m_dma8237_1 = machine.device("dma8237_1");
 	st->m_dma8237_2 = machine.device("dma8237_2");
 	st->m_pit8254 = machine.device("pit8254");
 	pc_mouse_set_serial_port( machine.device("ns16450_0") );
