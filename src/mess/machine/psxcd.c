@@ -212,7 +212,7 @@ void psxcd_device::device_reset()
 		{
 //			printf("psxcd: found disc!\n");
 			driver = open_mess_drv();
-			driver->set_machine(&m_machine);
+			driver->set_machine(m_machine);
 			driver->set_cdrom_file(m_cd);
 		}
 		else

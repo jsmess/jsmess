@@ -60,7 +60,7 @@ public:
 	cdrom_driver();
 	virtual ~cdrom_driver();
 
-	void set_machine(const running_machine *machine);
+	void set_machine(const running_machine &machine);
 	void set_cdrom_file(cdrom_file *cdfile) { m_cd = cdfile; }
 
 	virtual bool is_usable(char *error_msg=NULL, const int msglen=0) const=0;

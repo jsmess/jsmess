@@ -25,6 +25,7 @@ cdrom_driver::cdrom_driver()
 	native_sector_size = raw_sector_size;
 	last_pf_status = NULL;
 	m_cd = NULL;
+	m_machine = NULL;
 
 //	printf("cdrom_driver base class init, pf_buffer size is %d\n", num_pf_sectors*num_pf_buffers*raw_sector_size);
 
@@ -284,7 +285,7 @@ bool cdrom_driver::read_sector(const unsigned int sec, unsigned char *buf, const
 	}
 }
 
-void cdrom_driver::set_machine(const running_machine *machine)
+void cdrom_driver::set_machine(const running_machine &machine)
 {
 	m_machine = (running_machine *)&machine;
 
