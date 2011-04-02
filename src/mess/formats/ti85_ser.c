@@ -30,6 +30,15 @@ enum
 	TI85_SEND_SCREEN_REQUEST
 };
 
+//supported image formats
+enum
+{
+	TI_FILE_UNK,
+	TI_FILE_V1,	//used for TI-85 and TI-86 image
+	TI_FILE_V2,	//used for TI-82, TI-83 and TI-73 image
+	TI_FILE_V3	//used for TI-83+ and TI-84+ image
+};
+
 #define TI85_HEADER_SIZE		0x37
 
 #define TI85_SEND_VARIABLES		1
@@ -41,19 +50,25 @@ enum
 #define TI85_PC_OK_PACKET_SIZE	4
 #define TI85_PC_END_PACKET_SIZE	4
 
-static const UINT8 ti85_pc_ok_packet[] = {0x05, 0x56, 0x00, 0x00};
-static const UINT8 ti82_pc_ok_packet[] = {0x02, 0x56, 0x00, 0x00};
-static const UINT8 ti86_pc_ok_packet[] = {0x06, 0x56, 0x00, 0x00};
-static const UINT8 ti85_pc_continue_packet[] = {0x05, 0x09, 0x00, 0x00};
-static const UINT8 ti82_pc_continue_packet[] = {0x02, 0x09, 0x00, 0x00};
-static const UINT8 ti86_pc_continue_packet[] = {0x06, 0x09, 0x00, 0x00};
-static const UINT8 ti85_pc_screen_request_packet[] = {0x05, 0x6d, 0x00, 0x00};
-static const UINT8 ti85_pc_end_packet[] = {0x05, 0x92, 0x00, 0x00};
-static const UINT8 ti82_pc_end_packet[] = {0x02, 0x92, 0x00, 0x00};
-static const UINT8 ti86_pc_end_packet[] = {0x06, 0x92, 0x00, 0x00};
+//known tranfer ID
+#define TI_TRANFER_ID_TI73		0x07
+#define TI_TRANFER_ID_TI82		0x02
+#define TI_TRANFER_ID_TI83		0x03
+#define TI_TRANFER_ID_TI83P		0x23
+#define TI_TRANFER_ID_TI85		0x05
+#define TI_TRANFER_ID_TI86		0x06
 
+//packet type
+#define	TI_OK_PACKET				0x56
+#define	TI_CONTINUE_PACKET			0x09
+#define	TI_SCREEN_REQUEST_PACKET	0x6d
+#define	TI_END_PACKET				0x92
+
+static const UINT8 ti73_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x37, 0x33, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
 static const UINT8 ti85_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x35, 0x2a, 0x2a, 0x1a, 0x0c, 0x00};
 static const UINT8 ti82_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x32, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
+static const UINT8 ti83_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x33, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
+static const UINT8 ti83p_file_signature[]= {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x33, 0x46, 0x2a, 0x1a, 0x0a, 0x00};
 static const UINT8 ti86_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x36, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
 
 typedef struct {
@@ -87,6 +102,9 @@ typedef struct
 {
 	UINT8	status;
 	int		transfer_type;
+	UINT8	image_type;
+	UINT8	send_id;			/* ID used for PC to TI transfer */
+	UINT8	receive_id;			/* ID used for TI to PC transfer */
 	UINT8	red_out;			/* signal line from machine */
 	UINT8	white_out;			/* signal line from machine */
 	UINT8	red_in;				/* signal line to machine */
@@ -116,7 +134,11 @@ typedef struct
 INLINE ti85serial_state *get_token(device_t *device)
 {
 	assert(device != NULL);
-	assert((device->type() == TI82SERIAL) || (device->type() == TI85SERIAL) || (device->type() == TI86SERIAL));
+	assert((device->type() == TI82SERIAL) ||
+		   (device->type() == TI73SERIAL) ||
+		   (device->type() == TI83PSERIAL) ||
+		   (device->type() == TI85SERIAL) ||
+		   (device->type() == TI86SERIAL));
 	return (ti85serial_state *) downcast<legacy_device_base *>(device)->token();
 }
 
@@ -210,6 +232,7 @@ static void ti85_backup_read (const UINT8 * ti85_data, unsigned int ti85_data_si
 
 static void ti85_variables_read (device_t *device, const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
 {
+	ti85serial_state *ti85serial = get_token( device );
 	unsigned int pos, i=0;
 
 	pos = TI85_HEADER_SIZE;
@@ -218,7 +241,7 @@ static void ti85_variables_read (device_t *device, const UINT8 * ti85_data, unsi
 		ti85_entries[i].head_size = ti85_data[pos+0x00] + ti85_data[pos+0x01]*256;
 		ti85_entries[i].data_size = ti85_data[pos+0x02] + ti85_data[pos+0x03]*256;
 		ti85_entries[i].type = ti85_data[pos+0x04];
-		ti85_entries[i].name_size = (device->type() == TI82SERIAL) ? 8 : ti85_data[pos+0x05];
+		ti85_entries[i].name_size = (ti85serial->image_type != TI_FILE_V1) ? 8 : ti85_data[pos+0x05];
 		ti85_entries[i].offset = pos;
 		pos += ti85_entries[i].head_size+ti85_entries[i].data_size+4;
 		i++;
@@ -302,6 +325,19 @@ static void ti85_convert_data_to_stream (const UINT8* file_data, unsigned int si
 }
 
 
+static void ti85_append_head_to_stream (UINT8 transfer_id, UINT8 tranfer_type, UINT8* serial_data)
+{
+	UINT8 tmp_data[4];
+
+	tmp_data[0] = transfer_id;
+	tmp_data[1] = tranfer_type;
+	tmp_data[2] = 0;
+	tmp_data[3] = 0;
+
+	ti85_convert_data_to_stream(tmp_data, sizeof(tmp_data), serial_data);
+}
+
+
 static void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, UINT8* data)
 {
 	UINT32 i;
@@ -330,15 +366,57 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 	UINT8* temp_data_to_convert = NULL;
 	UINT16 checksum;
 
+	//verify that the provided file is compatible with the model
+	if (device->type() == TI73SERIAL)
+		if (strncmp((char *) file_data, (char *) ti73_file_signature, 11))
+			return 0;
 	if (device->type() == TI85SERIAL)
 		if (strncmp((char *) file_data, (char *) ti85_file_signature, 11))
 			return 0;
 	if (device->type() == TI82SERIAL)
 		if (strncmp((char *) file_data, (char *) ti82_file_signature, 11))
 			return 0;
-	if (device->type() == TI86SERIAL)
-		if (strncmp((char *) file_data, (char *) ti86_file_signature, 11))
+	if (device->type() == TI83PSERIAL)	//TI-83+ is compatible with TI-83 and TI-82 file
+		if (strncmp((char *) file_data, (char *) ti83p_file_signature, 10) && strncmp((char *) file_data, (char *) ti83_file_signature, 11)
+			&& strncmp((char *) file_data, (char *) ti82_file_signature, 11))
 			return 0;
+	if (device->type() == TI86SERIAL)	//TI-86 is compatible with TI-85 file
+		if (strncmp((char *) file_data, (char *) ti86_file_signature, 11) && strncmp((char *) file_data, (char *) ti85_file_signature, 11))
+			return 0;
+
+	//identify the image
+	if (!strncmp((char *) file_data, (char *) ti73_file_signature, 11))
+	{
+		ti85serial->send_id = TI_TRANFER_ID_TI73;
+		ti85serial->image_type = TI_FILE_V2;
+	}
+	else if (!strncmp((char *) file_data, (char *) ti85_file_signature, 11))
+	{
+		ti85serial->send_id = TI_TRANFER_ID_TI85;
+		ti85serial->image_type = TI_FILE_V1;
+	}
+	else if (!strncmp((char *) file_data, (char *) ti82_file_signature, 11))
+	{
+		ti85serial->send_id = TI_TRANFER_ID_TI82;
+		ti85serial->image_type = TI_FILE_V2;
+	}
+	else if (!strncmp((char *) file_data, (char *) ti83_file_signature, 11))
+	{
+		ti85serial->send_id = TI_TRANFER_ID_TI83;
+		ti85serial->image_type = TI_FILE_V2;
+	}
+	else if (!strncmp((char *) file_data, (char *) ti83p_file_signature, 11))
+	{
+		ti85serial->send_id = TI_TRANFER_ID_TI83P;
+		ti85serial->image_type = TI_FILE_V3;
+	}
+	else if (!strncmp((char *) file_data, (char *) ti86_file_signature, 11))
+	{
+		ti85serial->send_id = TI_TRANFER_ID_TI86;
+		ti85serial->image_type = TI_FILE_V1;
+	}
+
+	logerror("Image ID: 0x%02x, version: 0x%02x\n", ti85serial->send_id, ti85serial->image_type);
 
 	/*Serial stream preparing*/
 	serial_data->end = NULL;
@@ -393,7 +471,7 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 					return 0;
 				}
 				serial_data->variables[i].header_size = 0x0f*8;
-				temp_data_to_convert[0] = 0x05;	//PC sends
+				temp_data_to_convert[0] = ti85serial->send_id;	//PC sends
 				temp_data_to_convert[1] = 0x06;	//header
 				memcpy(	temp_data_to_convert+0x02, file_data+0x37, 0x0b);
 				checksum = ti85_calculate_checksum(temp_data_to_convert+4, 0x09);
@@ -424,14 +502,11 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 				return 0;
 			}
 
-			if (device->type() == TI85SERIAL || device->type() == TI86SERIAL)
+			if (ti85serial->image_type == TI_FILE_V1)
 			{
 				serial_data->variables[i].header_size = (10+ti85_entries[i].name_size)*8;
 
-				if (device->type() == TI85SERIAL)
-					temp_data_to_convert[0] = 0x05;	//PC to TI-85
-				if (device->type() == TI86SERIAL)
-					temp_data_to_convert[0] = 0x06;	//PC to TI-86
+				temp_data_to_convert[0] = ti85serial->send_id;
 				temp_data_to_convert[1] = 0x06;	//header
 				temp_data_to_convert[2] = (4+ti85_entries[i].name_size)&0x00ff;
 				temp_data_to_convert[3] = ((4+ti85_entries[i].name_size)&0xff00)>>8;
@@ -446,11 +521,11 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 				ti85_convert_data_to_stream(temp_data_to_convert, 10+ti85_entries[i].name_size, serial_data->variables[i].header);
 			}
 
-			if (device->type() == TI82SERIAL)
+			if (ti85serial->image_type == TI_FILE_V2 || ti85serial->image_type == TI_FILE_V3)
 			{
 				serial_data->variables[i].header_size = (9+ti85_entries[i].name_size)*8;
 
-				temp_data_to_convert[0] = 0x02;	//PC to TI-82
+				temp_data_to_convert[0] = ti85serial->send_id;
 				temp_data_to_convert[1] = 0x06;	//header
 				temp_data_to_convert[2] = (3+ti85_entries[i].name_size)&0x00ff;
 				temp_data_to_convert[3] = ((3+ti85_entries[i].name_size)&0xff00)>>8;
@@ -474,12 +549,7 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 			free (ti85_entries);
 			return 0;
 		}
-		if (device->type() == TI85SERIAL)
-			ti85_convert_data_to_stream(ti85_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
-		if (device->type() == TI82SERIAL)
-			ti85_convert_data_to_stream(ti82_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
-		if (device->type() == TI86SERIAL)
-			ti85_convert_data_to_stream(ti86_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
+		ti85_append_head_to_stream(ti85serial->send_id, TI_OK_PACKET, serial_data->variables[i].ok);
 		serial_data->variables[i].ok_size = TI85_PC_OK_PACKET_SIZE*8;
 
 		/*Data packet*/
@@ -498,17 +568,17 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 		}
 		serial_data->variables[i].data_size = (6+ti85_entries[i].data_size)*8;
 
-		if (device->type() == TI85SERIAL)
-			temp_data_to_convert[0] = 0x05;	//PC to TI-85
-		if (device->type() == TI82SERIAL)
-			temp_data_to_convert[0] = 0x02;	//PC to TI-82
-		if (device->type() == TI86SERIAL)
-			temp_data_to_convert[0] = 0x06;	//PC to TI-86
+		temp_data_to_convert[0] = ti85serial->send_id;
 		temp_data_to_convert[1] = 0x15;	//data
 		temp_data_to_convert[2] = (ti85_entries[i].data_size)&0x00ff;
 		temp_data_to_convert[3] = ((ti85_entries[i].data_size)&0xff00)>>8;
 
-		UINT8 name_start = (device->type() == TI82SERIAL) ? 5 : 6;
+		UINT8 name_start = (ti85serial->image_type != TI_FILE_V1) ? 5 : 6;
+
+		//TI-83+ files have two additional byte used for the file's version and flag
+		if (ti85serial->image_type == TI_FILE_V3)
+			name_start += 2;
+
 		if (file_data[0x3b]==backup_id)
 			memcpy(temp_data_to_convert+4, file_data+ti85_entries[i].offset, ti85_entries[i].data_size);
 		else
@@ -529,12 +599,7 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 		free (ti85_entries);
 		return 0;
 	}
-	if (device->type() == TI85SERIAL)
-		ti85_convert_data_to_stream(ti85_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
-	if (device->type() == TI82SERIAL)
-		ti85_convert_data_to_stream(ti82_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
-	if (device->type() == TI86SERIAL)
-		ti85_convert_data_to_stream(ti86_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
+	ti85_append_head_to_stream(ti85serial->send_id, TI_END_PACKET, serial_data->end);
 	serial_data->end_size = TI85_PC_END_PACKET_SIZE*8;
 
 	free (ti85_entries);
@@ -798,8 +863,8 @@ static void ti85_receive_variables (device_t *device)
 					ti85serial->status = TI85_SEND_STOP;
 					return;
 				}
-				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85serial->receive_buffer);
-				ti85_convert_data_to_stream (ti85_pc_continue_packet, 4, ti85serial->receive_buffer+4*8);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_OK_PACKET, ti85serial->receive_buffer);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_CONTINUE_PACKET,  ti85serial->receive_buffer+4*8);
 				ti85serial->status = TI85_SEND_OK_1;
 			}
 			break;
@@ -849,7 +914,7 @@ static void ti85_receive_variables (device_t *device)
 					ti85serial->status = TI85_SEND_STOP;
 					return;
 				}
-				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85serial->receive_buffer);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_OK_PACKET, ti85serial->receive_buffer);
 				ti85serial->status = TI85_SEND_OK_2;
 			}
 			break;
@@ -917,7 +982,7 @@ static void ti85_receive_variables (device_t *device)
 						ti85serial->status = TI85_SEND_STOP;
 						return;
 					}
-					ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85serial->receive_buffer);
+					ti85_append_head_to_stream(ti85serial->receive_id, TI_OK_PACKET, ti85serial->receive_buffer);
 					ti85serial->status = TI85_SEND_OK_3;
 				}
 			}
@@ -983,8 +1048,8 @@ static void ti85_receive_backup (device_t *device)
 					ti85serial->status = TI85_SEND_STOP;
 					return;
 				}
-				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85serial->receive_buffer);
-				ti85_convert_data_to_stream (ti85_pc_continue_packet, 4, ti85serial->receive_buffer+4*8);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_OK_PACKET, ti85serial->receive_buffer);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_CONTINUE_PACKET, ti85serial->receive_buffer+4*8);
 				ti85serial->status = TI85_SEND_OK_1;
 			}
 			break;
@@ -1045,7 +1110,7 @@ static void ti85_receive_backup (device_t *device)
 					ti85serial->status = TI85_SEND_STOP;
 					return;
 				}
-				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85serial->receive_buffer);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_OK_PACKET, ti85serial->receive_buffer);
 				ti85serial->status = TI85_SEND_OK_2;
 			}
 			break;
@@ -1103,7 +1168,7 @@ static void ti85_receive_screen (device_t *device)
 				ti85serial->status = TI85_SEND_STOP;
 				return;
 			}
-			ti85_convert_data_to_stream (ti85_pc_screen_request_packet, 4, ti85serial->receive_buffer);
+			ti85_append_head_to_stream(ti85serial->receive_id, TI_SCREEN_REQUEST_PACKET, ti85serial->receive_buffer);
 			ti85serial->status = TI85_SEND_SCREEN_REQUEST;
 			break;
 		case TI85_SEND_SCREEN_REQUEST:
@@ -1178,7 +1243,7 @@ static void ti85_receive_screen (device_t *device)
 					ti85serial->status = TI85_SEND_STOP;
 					return;
 				}
-				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85serial->receive_buffer);
+				ti85_append_head_to_stream(ti85serial->receive_id, TI_OK_PACKET, ti85serial->receive_buffer);
 				ti85serial->status = TI85_SEND_OK;
 			}
 			break;
@@ -1333,6 +1398,20 @@ static DEVICE_RESET( ti85serial )
 	ti85serial->backup_file_data = NULL;
 	ti85serial->backup_variable_number = 0;
 	ti85serial->status = TI85_SEND_STOP;
+
+	//initialize the receive_id used for TI to PC transfer
+	if (device->type() == TI73SERIAL)
+		ti85serial->receive_id = TI_TRANFER_ID_TI73;
+	else if (device->type() == TI85SERIAL)
+		ti85serial->receive_id = TI_TRANFER_ID_TI85;
+	else if (device->type() == TI82SERIAL)
+		ti85serial->receive_id = TI_TRANFER_ID_TI82;
+	else if (device->type() == TI83PSERIAL)
+		ti85serial->receive_id = TI_TRANFER_ID_TI83P;
+	else if (device->type() == TI86SERIAL)
+		ti85serial->receive_id = TI_TRANFER_ID_TI86;
+
+	ti85serial->send_id = ti85serial->receive_id;
 }
 
 
@@ -1401,6 +1480,15 @@ DEVICE_GET_INFO( ti85serial )
 	}
 }
 
+DEVICE_GET_INFO( ti73serial )
+{
+	switch ( state )
+	{
+	case DEVINFO_STR_NAME:							strcpy(info->s, "TI73 Serial");													break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "73p,73s,73i,73n,73c,73l,73k,73m,73v,73d,73e,73r,73g");			break;
+	default:										DEVICE_GET_INFO_CALL( ti85serial );
+	}
+}
 
 DEVICE_GET_INFO( ti82serial )
 {
@@ -1413,16 +1501,31 @@ DEVICE_GET_INFO( ti82serial )
 }
 
 
+DEVICE_GET_INFO( ti83pserial )
+{
+	switch ( state )
+	{
+	case DEVINFO_STR_NAME:							strcpy(info->s, "TI83 Plus Serial");												break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "82p,82s,82i,82n,82c,82l,82k,82m,82v,82d,82e,82r,82g,"	//for TI-82 compatibility
+																	"83p,83s,83i,83n,83c,83l,83k,83m,83v,83d,83e,83r,83g,"	//for TI-83 compatibility
+																	"8xc,8xd,8xg,8xi,8xl,8xm,8xn,8xp,8xs,8xt,8xv,8xw,8xy,8xz");	break;
+	default:										DEVICE_GET_INFO_CALL( ti85serial );
+	}
+}
+
 DEVICE_GET_INFO( ti86serial )
 {
 	switch ( state )
 	{
 	case DEVINFO_STR_NAME:							strcpy(info->s, "TI86 Serial");													break;
-	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g");			break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "85p,85s,85i,85n,85c,85l,85k,85m,85v,85d,85e,85r,85g,85b" //for TI-85 compatibility
+																	"86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g");			break;
 	default:										DEVICE_GET_INFO_CALL( ti85serial );
 	}
 }
 
 DEFINE_LEGACY_IMAGE_DEVICE(TI85SERIAL, ti85serial);
+DEFINE_LEGACY_IMAGE_DEVICE(TI73SERIAL, ti73serial);
 DEFINE_LEGACY_IMAGE_DEVICE(TI82SERIAL, ti82serial);
+DEFINE_LEGACY_IMAGE_DEVICE(TI83PSERIAL, ti83pserial);
 DEFINE_LEGACY_IMAGE_DEVICE(TI86SERIAL, ti86serial);

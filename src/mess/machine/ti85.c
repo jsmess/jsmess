@@ -28,18 +28,6 @@ enum
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 static TIMER_CALLBACK(ti85_timer_callback)
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
@@ -566,9 +554,30 @@ READ8_HANDLER ( ti83_port_0000_r )
 	return data;
 }
 
+READ8_HANDLER ( ti73_port_0000_r )
+{
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *ti85serial = space->machine().device("ti73serial");;
+
+	ti85_update_serial(ti85serial);
+	return (state->m_white_out<<3)
+		| (state->m_red_out<<2)
+		| ((ti85serial_white_in(ti85serial,0)&(1-state->m_white_out))<<1)
+		| (ti85serial_red_in(ti85serial,0)&(1-state->m_red_out))
+		| state->m_PCR;
+}
+
 READ8_HANDLER ( ti83p_port_0000_r )
 {
-	return 0xff; // TODO
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *ti85serial = space->machine().device("ti83pserial");;
+
+	ti85_update_serial(ti85serial);
+	return (state->m_white_out<<3)
+		| (state->m_red_out<<2)
+		| ((ti85serial_white_in(ti85serial,0)&(1-state->m_white_out))<<1)
+		| (ti85serial_red_in(ti85serial,0)&(1-state->m_red_out))
+		| state->m_PCR;
 }
 
  READ8_HANDLER ( ti83p_port_0002_r )
@@ -757,9 +766,34 @@ WRITE8_HANDLER ( ti83_port_0003_w )
 		state->m_LCD_status = data&0x08;
 }
 
+WRITE8_HANDLER ( ti73_port_0000_w )
+{
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *speaker = space->machine().device("speaker");
+	device_t *ti85serial = space->machine().device("ti73serial");
+
+	speaker_level_w(speaker,( (data>>0)|(data>>1) )&0x01 );
+	state->m_red_out=(data>>0)&0x01;
+	state->m_white_out=(data>>1)&0x01;
+	ti85serial_red_out( ti85serial, 0, state->m_red_out );
+	ti85serial_white_out( ti85serial, 0, state->m_white_out );
+	ti85_update_serial(ti85serial);
+	state->m_PCR = data&0xf0;
+}
+
 WRITE8_HANDLER ( ti83p_port_0000_w )
 {
-	//TODO
+	ti85_state *state = space->machine().driver_data<ti85_state>();
+	device_t *speaker = space->machine().device("speaker");
+	device_t *ti85serial = space->machine().device("ti83pserial");
+
+	speaker_level_w(speaker,( (data>>0)|(data>>1) )&0x01 );
+	state->m_red_out=(data>>0)&0x01;
+	state->m_white_out=(data>>1)&0x01;
+	ti85serial_red_out( ti85serial, 0, state->m_red_out );
+	ti85serial_white_out( ti85serial, 0, state->m_white_out );
+	ti85_update_serial(ti85serial);
+	state->m_PCR = data&0xf0;
 }
 
 WRITE8_HANDLER ( ti83p_port_0002_w )
