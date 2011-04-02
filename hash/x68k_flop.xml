@@ -69,11 +69,11 @@
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="disk 2.xdf" size="1261568" crc="db53229c" sha1="2de753f6f579af6a6954d0df0c29694cdcff9992" offset="0" />
+				<rom name="disk 2.xdf" size="1261568" crc="db53229c" sha1="d0a891ca849190bed68351b26a9c71e627182d35" offset="0" />
 			</dataarea>
 			<!-- 
 			<dataarea name="flop" size="1261824">
-				<rom name="disk 2.dim" size="1261824" crc="b0c5da9b" sha1="d0a891ca849190bed68351b26a9c71e627182d35" offset="0" />
+				<rom name="disk 2.dim" size="1261824" crc="b0c5da9b" sha1="5660ee1bf2ecda733e08e666fd2bf1f0c7b8ff9a" offset="0" />
 			</dataarea>
 			-->
 		</part>
@@ -204,7 +204,7 @@
 		</part>
 	</software>
 
-	<software name="pipedrm" supported="no">
+	<software name="pipedrm">
 		<description>Pipe Dream</description>
 		<year>1989</year>
 		<publisher>BPS-Lucas Arts</publisher>
