@@ -50,6 +50,10 @@ enum
 #define TI85_PC_OK_PACKET_SIZE	4
 #define TI85_PC_END_PACKET_SIZE	4
 
+#define TI82_BACKUP_ID		0x0f	//used by the TI-82
+#define TI85_BACKUP_ID		0x1d	//used by the TI-85 and TI-86
+#define TI83_BACKUP_ID		0x13	//used by the TI-73, TI-83 and TI-83+
+
 //known tranfer ID
 #define TI_TRANFER_ID_TI73		0x07
 #define TI_TRANFER_ID_TI82		0x02
@@ -359,7 +363,7 @@ static int ti85_convert_file_data_to_serial_stream (device_t *device, const UINT
 	ti85serial_state *ti85serial = get_token( device );
 	UINT16 i;
 	UINT16 number_of_entries;
-	UINT8 backup_id = (device->type() == TI85SERIAL || device->type() == TI86SERIAL) ? 0x1d : 0x13;
+	UINT8 backup_id = (ti85serial->image_type == TI_FILE_V1) ? TI85_BACKUP_ID : ((device->type() == TI82SERIAL) ? TI82_BACKUP_ID : TI83_BACKUP_ID);
 
 	ti85_entry* ti85_entries = NULL;
 
