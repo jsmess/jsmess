@@ -69,7 +69,6 @@ $8000-$FFF ROM
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-// #include "sound/dac.h"
 #include "sound/beep.h"
 //#include "mephisto.lh"
 
@@ -90,15 +89,14 @@ public:
 };
 
 
-
 static WRITE8_HANDLER ( write_lcd )
 {
 	mephisto_state *state = space->machine().driver_data<mephisto_state>();
-	if (state->m_led7==0)output_set_digit_value(state->m_lcd_shift_counter,data);	// 0x109 MM IV // 0x040 MM V
+	if (state->m_led7 == 0) output_set_digit_value(state->m_lcd_shift_counter,data);	// 0x109 MM IV // 0x040 MM V
 
 	//output_set_digit_value(state->m_lcd_shift_counter,data ^ state->m_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
 	state->m_lcd_shift_counter--;
-	state->m_lcd_shift_counter&=3;
+	state->m_lcd_shift_counter &= 3;
 }
 
 static WRITE8_HANDLER ( mephisto_NMI )
@@ -362,7 +360,7 @@ static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 static MACHINE_START( mephisto )
 {
 	mephisto_state *state = machine.driver_data<mephisto_state>();
-	state->m_lcd_shift_counter=3;
+	state->m_lcd_shift_counter = 3;
 	state->m_allowNMI = 1;
 	mboard_savestate_register(machine);
 }
@@ -370,7 +368,7 @@ static MACHINE_START( mephisto )
 static MACHINE_START( mm2 )
 {
 	mephisto_state *state = machine.driver_data<mephisto_state>();
-	state->m_lcd_shift_counter=3;
+	state->m_lcd_shift_counter = 3;
 	state->m_led7=0xff;
 
 	mboard_savestate_register(machine);
@@ -412,9 +410,6 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	MCFG_MACHINE_START( mephisto )
 	MCFG_MACHINE_RESET( mephisto )
 
-	/* video hardware */
-//  MCFG_DEFAULT_LAYOUT(layout_mephisto)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
@@ -428,7 +423,6 @@ static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
-	//beep_set_frequency(0, 4000);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mm2, mephisto )
@@ -475,7 +469,7 @@ ROM_END
 
 ROM_START(mm5tk)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
+	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, BAD_DUMP CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
 	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(0))
@@ -512,12 +506,12 @@ static DRIVER_INIT( mephisto )
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
 
+CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer Turbo Kit + HG440",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer Turbo Kit + HG550",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1990, mm50,       mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schach Computer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer Turbo Kit + HG550",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 
-// second design sold (same computer/program?)
+
