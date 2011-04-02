@@ -108,6 +108,8 @@ System Driver Changes:
 - [PSX] Added CD-ROM support.  Some commercial games work well.  Some don't.
         [pSXAuthor, R. Belmont]
 
+- [PSX] Added memory card support, not working yet. [pSXAuthor, R. Belmont]
+
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
 
 - [QL]  Added support for Miracle Systems Trump Card disk and memory

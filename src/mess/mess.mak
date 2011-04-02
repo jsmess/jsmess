@@ -478,6 +478,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/psx.o		\
 	$(MESS_MACHINE)/psxcd.o		\
 	$(MESS_MACHINE)/psxcddrv.o	\
+	$(MESS_MACHINE)/psxcard.o  	\
 	$(MAME_VIDEO)/psx.o			\
 	$(MAME_DRIVERS)/cdi.o		\
 	$(MAME_MACHINE)/cdi070.o	\

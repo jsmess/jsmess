@@ -3,12 +3,7 @@
   Sony Playstaion
   ===============
   Preliminary driver by smf
-
-  todo:
-    add memcard support
-    tidy up cd controller
-    work out why bios scph1000 doesn't get past the first screen
-    add cd image support
+  Additional development by pSXAuthor and R. Belmont
 
 ***************************************************************************/
 
@@ -21,11 +16,12 @@
 #include "debugger.h"
 #include "zlib.h"
 #include "machine/psxcd.h"
+#include "machine/psxcard.h"
 
 typedef struct
 {
-	int n_shiftin;
-	int n_shiftout;
+	UINT8 n_shiftin;
+	UINT8 n_shiftout;
 	int n_bits;
 	int n_state;
 	int n_byte;
@@ -480,6 +476,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 #define PAD_STATE_ACTIVE ( 2 )
 #define PAD_STATE_READ ( 3 )
 #define PAD_STATE_UNLISTEN ( 4 )
+#define PAD_STATE_MEMCARD ( 5 )
 
 #define PAD_TYPE_STANDARD ( 4 )
 #define PAD_BYTES_STANDARD ( 2 )
@@ -517,6 +514,16 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 	int b_ack;
 	int b_ready;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	psxcard_device *psxcard = NULL;
+
+	if (n_port == 0)
+	{
+		psxcard = machine.device<psxcard_device>("card1");
+	}
+	else
+	{
+		psxcard = machine.device<psxcard_device>("card2");
+	}
 
 	b_sel = ( n_data & PSX_SIO_OUT_DTR ) / PSX_SIO_OUT_DTR;
 	b_clock = ( n_data & PSX_SIO_OUT_CLOCK ) / PSX_SIO_OUT_CLOCK;
@@ -534,6 +541,7 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 	case PAD_STATE_LISTEN:
 	case PAD_STATE_ACTIVE:
 	case PAD_STATE_READ:
+	case PAD_STATE_MEMCARD:
 		if( pad->b_lastclock && !b_clock )
 		{
 			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( pad->n_shiftout & 1 ) * PSX_SIO_IN_DATA );
@@ -575,9 +583,28 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 				pad->n_shiftout = ( PAD_TYPE_STANDARD << 4 ) | ( PAD_BYTES_STANDARD >> 1 );
 				b_ack = 1;
 			}
+			else if( psxcard->transfer(pad->n_shiftin, &pad->n_shiftout) )
+			{
+				pad->n_state = PAD_STATE_MEMCARD;
+				b_ack = 1;
+			}
 			else
 			{
 				pad->n_state = PAD_STATE_UNLISTEN;
+			}
+		}
+		break;
+	case PAD_STATE_MEMCARD:
+		if( b_ready )
+		{
+			if( psxcard->transfer(pad->n_shiftin, &pad->n_shiftout) )
+			{
+				b_ack = 1;
+			}
+			else
+			{
+				b_ack = 0;
+				pad->n_state = PAD_STATE_IDLE;
 			}
 		}
 		break;
@@ -593,7 +620,6 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 			}
 			else
 			{
-				logerror( "unknown pad command %02x\n", pad->n_shiftin );
 				pad->n_state = PAD_STATE_UNLISTEN;
 			}
 		}
@@ -622,18 +648,11 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 	}
 }
 
-static void psx_mcd( int n_port, int n_data )
-{
-	/* todo */
-}
-
 static void psx_sio0( running_machine &machine, int n_data )
 {
 	/* todo: raise data & ack when nothing is driving it low */
 	psx_pad( machine, 0, n_data );
-	psx_mcd( 0, n_data );
 	psx_pad( machine, 1, n_data ^ PSX_SIO_OUT_DTR );
-	psx_mcd( 1, n_data ^ PSX_SIO_OUT_DTR );
 }
 
 /* ----------------------------------------------------------------------- */
@@ -792,6 +811,8 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSXCARD_ADD("card1")
+	MCFG_PSXCARD_ADD("card2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( psxpal, psx1_state )
@@ -827,6 +848,8 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSXCARD_ADD("card1")
+	MCFG_PSXCARD_ADD("card2")
 MACHINE_CONFIG_END
 
 ROM_START( psj )
