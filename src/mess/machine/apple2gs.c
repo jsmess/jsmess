@@ -1698,8 +1698,10 @@ static void apple2gs_setup_memory(running_machine &machine)
 	state_save_register_item_pointer(machine, "APPLE2GS_SLOWMEM", NULL, 0, state->m_slowmem, 128*1024);
 
 	/* install expanded memory */
-	space->install_readwrite_bank(0x010000, ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
-	memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
+	if (ram_get_size(machine.device(RAM_TAG))> 0x010000) {
+		space->install_readwrite_bank(0x010000, ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
+		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
+	}
 
 	/* install hi memory */
 	space->install_read_bank(0xe00000, 0xe1ffff, "bank2");
