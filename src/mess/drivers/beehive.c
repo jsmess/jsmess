@@ -10,30 +10,41 @@
     for the moment.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class beehive_state : public driver_device
 {
 public:
 	beehive_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu")
+	{ }
 
-	const UINT8 *m_FNT;
-	const UINT8 *m_videoram;
+	required_device<cpu_device> m_maincpu;
+	const UINT8 *m_p_chargen;
+	const UINT8 *m_p_videoram;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
 
-static ADDRESS_MAP_START(beehive_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(beehive_mem, AS_PROGRAM, 8, beehive_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x17ff ) AM_ROM
 	AM_RANGE( 0x1800, 0xffff ) AM_RAM AM_REGION("maincpu", 0x1800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( beehive_io, AS_IO, 8)
+static ADDRESS_MAP_START( beehive_io, AS_IO, 8, beehive_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -42,22 +53,20 @@ static INPUT_PORTS_START( beehive )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(beehive)
+MACHINE_RESET_MEMBER(beehive_state)
 {
 }
 
-static VIDEO_START( beehive )
+VIDEO_START_MEMBER( beehive_state )
 {
-	beehive_state *state = machine.driver_data<beehive_state>();
-	state->m_FNT = machine.region("chargen")->base();
-	state->m_videoram = machine.region("maincpu")->base()+0x81fa;
+	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_videoram = m_machine.region("maincpu")->base()+0x81fa;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
-static SCREEN_UPDATE( beehive )
+SCREEN_UPDATE_MEMBER( beehive_state )
 {
-	beehive_state *state = screen->machine().driver_data<beehive_state>();
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x,xx;
@@ -68,7 +77,7 @@ static SCREEN_UPDATE( beehive )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
 			xx = ma;
 			for (x = ma; x < ma + 80; x++)
@@ -76,7 +85,7 @@ static SCREEN_UPDATE( beehive )
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = state->m_videoram[xx++];
+					chr = m_p_videoram[xx++];
 
 				//  /* Take care of flashing characters */
 				//  if ((chr < 0x80) && (framecnt & 0x08))
@@ -86,17 +95,17 @@ static SCREEN_UPDATE( beehive )
 						x--;
 					else
 					{
-						gfx = state->m_FNT[(chr<<4) | ra ];
+						gfx = m_p_chargen[(chr<<4) | ra ];
 
 						/* Display a scanline of a character */
-						*p++ = ( gfx & 0x80 ) ? 1 : 0;
-						*p++ = ( gfx & 0x40 ) ? 1 : 0;
-						*p++ = ( gfx & 0x20 ) ? 1 : 0;
-						*p++ = ( gfx & 0x10 ) ? 1 : 0;
-						*p++ = ( gfx & 0x08 ) ? 1 : 0;
-						*p++ = ( gfx & 0x04 ) ? 1 : 0;
-						*p++ = ( gfx & 0x02 ) ? 1 : 0;
-						*p++ = ( gfx & 0x01 ) ? 1 : 0;
+						*p++ = BIT(gfx, 7);
+						*p++ = BIT(gfx, 6);
+						*p++ = BIT(gfx, 5);
+						*p++ = BIT(gfx, 4);
+						*p++ = BIT(gfx, 3);
+						*p++ = BIT(gfx, 2);
+						*p++ = BIT(gfx, 1);
+						*p++ = BIT(gfx, 0);
 					}
 				}
 			}
@@ -112,8 +121,6 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
     MCFG_CPU_PROGRAM_MAP(beehive_mem)
     MCFG_CPU_IO_MAP(beehive_io)
 
-    MCFG_MACHINE_RESET(beehive)
-
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -121,12 +128,8 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 250)
     MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-    MCFG_SCREEN_UPDATE(beehive)
-
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(beehive)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -144,5 +147,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, beehive,  0,       0,	beehive,	beehive,	 0,  "BeeHive",   "DM3270",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, beehive,  0,       0,	beehive,	beehive,	 0,  "BeeHive",   "DM3270", GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -43,6 +43,11 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define MACHINE_START_MEMBER(name) void name::machine_start()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+
 class pegasus_state : public driver_device
 {
 public:
@@ -69,11 +74,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pegasus_cassette_w );
 	DECLARE_WRITE_LINE_MEMBER( pegasus_firq_clr );
 	UINT8 m_kbd_row;
-	UINT8 m_kbd_irq;
-	UINT8 *m_pcgram;
-	UINT8 *m_videoram;
-	UINT8 *m_FNT;
+	bool m_kbd_irq;
+	UINT8 *m_p_pcgram;
+	const UINT8 *m_p_videoram;
+	const UINT8 *m_p_chargen;
 	UINT8 m_control_bits;
+	virtual void machine_reset();
+	virtual void machine_start();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
@@ -133,16 +142,16 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
 
 READ8_MEMBER( pegasus_state::pegasus_pcg_r )
 {
-	UINT8 code = m_videoram[offset] & 0x7f;
-	return m_pcgram[(code << 4) | (~m_kbd_row & 15)];
+	UINT8 code = m_p_videoram[offset] & 0x7f;
+	return m_p_pcgram[(code << 4) | (~m_kbd_row & 15)];
 }
 
 WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 {
-//  if (state->m_control_bits & 2)
+//  if (m_control_bits & 2)
 	{
-		UINT8 code = m_videoram[offset] & 0x7f;
-		m_pcgram[(code << 4) | (~m_kbd_row & 15)] = data;
+		UINT8 code = m_p_videoram[offset] & 0x7f;
+		m_p_pcgram[(code << 4) | (~m_kbd_row & 15)] = data;
 	}
 }
 
@@ -158,7 +167,7 @@ static ADDRESS_MAP_START(pegasus_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
@@ -171,7 +180,7 @@ static ADDRESS_MAP_START(pegasusm_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
@@ -306,10 +315,9 @@ static const cassette_config pegasus_cassette_config =
 };
 
 
-static VIDEO_START( pegasus )
+VIDEO_START_MEMBER( pegasus_state )
 {
-	pegasus_state *state = machine.driver_data<pegasus_state>();
-	state->m_FNT = machine.region("chargen")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
 static const UINT8 mcm6571a_shift[] =
@@ -325,24 +333,23 @@ static const UINT8 mcm6571a_shift[] =
 };
 
 
-static SCREEN_UPDATE( pegasus )
+SCREEN_UPDATE_MEMBER( pegasus_state )
 {
-	pegasus_state *state = screen->machine().driver_data<pegasus_state>();
 	UINT8 y,ra,chr,gfx,inv;
 	UINT16 sy=0,ma=0,x;
-	UINT8 pcg_mode = state->m_control_bits & 2;
+	UINT8 pcg_mode = m_control_bits & 2;
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(ra = 0; ra < 16; ra++ )
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
 			for(x = ma; x < ma + 32; x++ )
 			{
 				inv = 0xff;
 				gfx = 0;
-				chr = state->m_videoram[x];
+				chr = m_p_videoram[x];
 
 				if (BIT(chr, 7))
 				{
@@ -352,7 +359,7 @@ static SCREEN_UPDATE( pegasus )
 
 				if (pcg_mode)
 				{
-					gfx = state->m_pcgram[(chr << 4) | ra] ^ inv;
+					gfx = m_p_pcgram[(chr << 4) | ra] ^ inv;
 				}
 				else
 				if (mcm6571a_shift[chr])
@@ -360,25 +367,25 @@ static SCREEN_UPDATE( pegasus )
 					if (ra < 3)
 						gfx = inv;
 					else
-						gfx = state->m_FNT[(chr<<4) | (ra-3) ] ^ inv;
+						gfx = m_p_chargen[(chr<<4) | (ra-3) ] ^ inv;
 				}
 				else
 				{
 					if (ra < 10)
-						gfx = state->m_FNT[(chr<<4) | ra ] ^ inv;
+						gfx = m_p_chargen[(chr<<4) | ra ] ^ inv;
 					else
 						gfx = inv;
 				}
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7) ? 1 : 0;
-				*p++ = BIT(gfx, 6) ? 1 : 0;
-				*p++ = BIT(gfx, 5) ? 1 : 0;
-				*p++ = BIT(gfx, 4) ? 1 : 0;
-				*p++ = BIT(gfx, 3) ? 1 : 0;
-				*p++ = BIT(gfx, 2) ? 1 : 0;
-				*p++ = BIT(gfx, 1) ? 1 : 0;
-				*p++ = BIT(gfx, 0) ? 1 : 0;
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=32;
@@ -467,18 +474,16 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_START( pegasus )
+MACHINE_START_MEMBER( pegasus_state )
 {
-	pegasus_state *state = machine.driver_data<pegasus_state>();
-	state->m_pcgram = machine.region("pcg")->base();
+	m_p_pcgram = m_machine.region("pcg")->base();
 }
 
-static MACHINE_RESET( pegasus )
+MACHINE_RESET_MEMBER( pegasus_state )
 {
-	pegasus_state *state = machine.driver_data<pegasus_state>();
-	state->m_kbd_row = 0;
-	state->m_kbd_irq = 1;
-	state->m_control_bits = 0;
+	m_kbd_row = 0;
+	m_kbd_irq = 1;
+	m_control_bits = 0;
 }
 
 static DRIVER_INIT( pegasus )
@@ -492,8 +497,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MCFG_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, attotime::from_hz(400))	// controls accuracy of the clock (ctrl-P)
-	MCFG_MACHINE_START(pegasus)
-	MCFG_MACHINE_RESET(pegasus)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -501,12 +505,9 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
-	MCFG_SCREEN_UPDATE(pegasus)
-	
 	MCFG_GFXDECODE(pegasus)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_START(pegasus)
 	
 	/* devices */
 	MCFG_PIA6821_ADD( "pia_s", pegasus_pia_s_intf )

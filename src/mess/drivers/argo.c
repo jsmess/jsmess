@@ -12,6 +12,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class argo_state : public driver_device
 {
@@ -22,9 +25,12 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	UINT8* m_videoram;
-	const UINT8 *m_FNT;
+	const UINT8 *m_p_videoram;
+	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -32,7 +38,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -52,10 +58,10 @@ static TIMER_CALLBACK( argo_boot )
 	memory_set_bank(machine, "boot", 0);
 }
 
-static MACHINE_RESET(argo)
+MACHINE_RESET_MEMBER(argo_state)
 {
-	memory_set_bank(machine, "boot", 1);
-	machine.scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
+	memory_set_bank(m_machine, "boot", 1);
+	m_machine.scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
 }
 
 DRIVER_INIT( argo )
@@ -64,25 +70,23 @@ DRIVER_INIT( argo )
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
 }
 
-static VIDEO_START( argo )
+VIDEO_START_MEMBER( argo_state )
 {
-	argo_state *state = machine.driver_data<argo_state>();
-	state->m_FNT = machine.region("chargen")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( argo )
+SCREEN_UPDATE_MEMBER( argo_state )
 {
-	argo_state *state = screen->machine().driver_data<argo_state>();
-	UINT8 y,ra,chr,gfx,i;
+	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
-	state->m_framecnt++;
+	m_framecnt++;
 
 	for (y = 0; y < 5; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
 			for (x = ma; x < ma + 16; x++)
 			{
@@ -90,20 +94,26 @@ static SCREEN_UPDATE( argo )
 
 				if (ra < 9)
 				{
-					chr = state->m_videoram[x];
+					chr = m_p_videoram[x];
 
 					/* Take care of flashing characters */
-					if ((chr & 0x80) && (state->m_framecnt & 0x08))
+					if ((chr & 0x80) && (m_framecnt & 0x08))
 						chr = 0x20;
 
 					chr &= 0x7f;
 
-					gfx = state->m_FNT[(chr<<4) | ra ];
+					gfx = m_p_chargen[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i);
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=16;
@@ -117,8 +127,6 @@ static MACHINE_CONFIG_START( argo, argo_state )
 	MCFG_CPU_PROGRAM_MAP(argo_mem)
 	MCFG_CPU_IO_MAP(argo_io)
 
-	MCFG_MACHINE_RESET(argo)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -126,12 +134,8 @@ static MACHINE_CONFIG_START( argo, argo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128, 50)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 50-1)
-	MCFG_SCREEN_UPDATE(argo)
-
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(argo)
 MACHINE_CONFIG_END
 
 /* ROM definition */

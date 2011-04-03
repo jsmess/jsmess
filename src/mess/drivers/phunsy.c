@@ -12,6 +12,9 @@
 #include "machine/terminal.h"
 #include "sound/speaker.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 #define LOG	1
 
@@ -35,13 +38,16 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( phunsy_kbd_put );
-	UINT8		*m_videoram;
-	UINT8		*m_FNT;
+	const UINT8	*m_p_videoram;
+	const UINT8	*m_p_chargen;
 	UINT8		m_data_out;
 	UINT8		m_keyboard_input;
 	UINT8		m_q_bank;
 	UINT8		m_u_bank;
 	UINT8		m_ram_1800[0x800];
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -56,7 +62,7 @@ static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE( m_videoram ) // Video RAM
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE( m_p_videoram ) // Video RAM
 	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1")	// Banked RAM/ROM
 	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
@@ -176,21 +182,14 @@ static GENERIC_TERMINAL_INTERFACE( phunsy_terminal_intf )
 };
 
 
-static DRIVER_INIT( phunsy )
+MACHINE_RESET_MEMBER(phunsy_state)
 {
-}
+	memory_set_bankptr( m_machine, "bank1", m_ram_1800 );
+	memory_set_bankptr( m_machine, "bank2", m_machine.region("ram_4000")->base() );
 
-
-static MACHINE_RESET(phunsy)
-{
-	phunsy_state *state = machine.driver_data<phunsy_state>();
-
-	memory_set_bankptr( machine, "bank1", state->m_ram_1800 );
-	memory_set_bankptr( machine, "bank2", machine.region("ram_4000")->base() );
-
-	state->m_u_bank = 0;
-	state->m_q_bank = 0;
-	state->m_keyboard_input = 0xFF;
+	m_u_bank = 0;
+	m_q_bank = 0;
+	m_keyboard_input = 0xFF;
 }
 
 
@@ -205,16 +204,14 @@ static PALETTE_INIT( phunsy )
 }
 
 
-static VIDEO_START( phunsy )
+VIDEO_START_MEMBER( phunsy_state )
 {
-	phunsy_state *state = machine.driver_data<phunsy_state>();
-	state->m_FNT = machine.region( "chargen" )->base();
+	m_p_chargen = m_machine.region( "chargen" )->base();
 }
 
 
-static SCREEN_UPDATE( phunsy )
+SCREEN_UPDATE_MEMBER( phunsy_state )
 {
-	phunsy_state *state = screen->machine().driver_data<phunsy_state>();
 	UINT8 y,ra,chr,gfx,col;
 	UINT16 sy=0,ma=0,x;
 
@@ -222,11 +219,11 @@ static SCREEN_UPDATE( phunsy )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
 			for (x = ma; x < ma+64; x++)
 			{
-				chr = state->m_videoram[x];
+				chr = m_p_videoram[x];
 
 				if (BIT(chr, 7))
 				{
@@ -241,17 +238,17 @@ static SCREEN_UPDATE( phunsy )
 				else
 				{
 					/* ASCII mode */
-					gfx = state->m_FNT[(chr<<3) | ra];
+					gfx = m_p_chargen[(chr<<3) | ra];
 					col = 7;
 				}
 
 				/* Display a scanline of a character (6 pixels) */
-				*p++ = ( gfx & 0x20 ) ? col : 0;
-				*p++ = ( gfx & 0x10 ) ? col : 0;
-				*p++ = ( gfx & 0x08 ) ? col : 0;
-				*p++ = ( gfx & 0x04 ) ? col : 0;
-				*p++ = ( gfx & 0x02 ) ? col : 0;
-				*p++ = ( gfx & 0x01 ) ? col : 0;
+				*p++ = BIT( gfx, 5 ) ? col : 0;
+				*p++ = BIT( gfx, 4 ) ? col : 0;
+				*p++ = BIT( gfx, 3 ) ? col : 0;
+				*p++ = BIT( gfx, 2 ) ? col : 0;
+				*p++ = BIT( gfx, 1 ) ? col : 0;
+				*p++ = BIT( gfx, 0 ) ? col : 0;
 			}
 		}
 		ma+=64;
@@ -284,8 +281,6 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
 	MCFG_CPU_IO_MAP(phunsy_io)
 
-	MCFG_MACHINE_RESET(phunsy)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* Display (page 12 of pdf)
@@ -299,9 +294,6 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_GFXDECODE(phunsy)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(phunsy)
-	MCFG_SCREEN_UPDATE(phunsy)
-
-	MCFG_VIDEO_START(phunsy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -310,6 +302,7 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
+	/* Devices */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,phunsy_terminal_intf)
 MACHINE_CONFIG_END
 
@@ -335,5 +328,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, phunsy,  0,       0,	phunsy, 	phunsy, 	 phunsy, "J.F.P. Philipse",   "PHUNSY", GAME_NOT_WORKING )
+COMP( 1980, phunsy,  0,       0,     phunsy,    phunsy,   0, "J.F.P. Philipse",   "PHUNSY", GAME_NOT_WORKING )
 

@@ -89,6 +89,11 @@
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define MACHINE_START_MEMBER(name) void name::machine_start()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+
 typedef struct {
 	struct {
 		int length;		/* time cassette level is at input.level */
@@ -137,11 +142,15 @@ public:
 	UINT8 m_sol20_fa;
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
-	const UINT8 *m_FNT;
-	const UINT8 *m_videoram;
+	const UINT8 *m_p_chargen;
+	const UINT8 *m_p_videoram;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
+	virtual void machine_reset();
+	virtual void machine_start();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -361,7 +370,7 @@ static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0X0800, 0Xbfff) AM_RAM	// optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0Xc800, 0Xcbff) AM_RAM	// system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_BASE(m_videoram)
+	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_BASE(m_p_videoram)
 	AM_RANGE(0Xd000, 0Xffff) AM_RAM	// optional s100 ram
 ADDRESS_MAP_END
 
@@ -489,42 +498,40 @@ static TIMER_CALLBACK( sol20_boot )
 	memory_set_bank(machine, "boot", 0);
 }
 
-static MACHINE_START( sol20 )
+MACHINE_START_MEMBER( sol20_state )
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
-	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(sol20_cassette_tc));
+	m_cassette_timer = m_machine.scheduler().timer_alloc(FUNC(sol20_cassette_tc));
 }
 
-static MACHINE_RESET( sol20 )
+MACHINE_RESET_MEMBER( sol20_state )
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
 	UINT8 data = 0, s_count = 0;
 	int s_clock;
 	const UINT16 s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
-	state->m_sol20_fe=0;
-	state->m_sol20_fa=1;
+	m_sol20_fe=0;
+	m_sol20_fa=1;
 
 	// set hard-wired uart pins
-	ay31015_set_input_pin( state->m_uart, AY31015_CS, 0 );
-	ay31015_set_input_pin( state->m_uart, AY31015_NB1, 1);
-	ay31015_set_input_pin( state->m_uart, AY31015_NB2, 1);
-	ay31015_set_input_pin( state->m_uart, AY31015_TSB, 1);
-	ay31015_set_input_pin( state->m_uart, AY31015_EPS, 1);
-	ay31015_set_input_pin( state->m_uart, AY31015_NP,  1);
-	ay31015_set_input_pin( state->m_uart, AY31015_CS, 1 );
+	ay31015_set_input_pin( m_uart, AY31015_CS, 0 );
+	ay31015_set_input_pin( m_uart, AY31015_NB1, 1);
+	ay31015_set_input_pin( m_uart, AY31015_NB2, 1);
+	ay31015_set_input_pin( m_uart, AY31015_TSB, 1);
+	ay31015_set_input_pin( m_uart, AY31015_EPS, 1);
+	ay31015_set_input_pin( m_uart, AY31015_NP,  1);
+	ay31015_set_input_pin( m_uart, AY31015_CS, 1 );
 
 	// set switched uart pins
-	data = input_port_read(machine, "S4");
-	ay31015_set_input_pin( state->m_uart_s, AY31015_CS, 0 );
-	ay31015_set_input_pin( state->m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
-	ay31015_set_input_pin( state->m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
-	ay31015_set_input_pin( state->m_uart_s, AY31015_TSB, BIT(data, 3) ? 1 : 0);
-	ay31015_set_input_pin( state->m_uart_s, AY31015_EPS, BIT(data, 0) ? 1 : 0);
-	ay31015_set_input_pin( state->m_uart_s, AY31015_NP, BIT(data, 4) ? 1 : 0);
-	ay31015_set_input_pin( state->m_uart_s, AY31015_CS, 1 );
+	data = input_port_read(m_machine, "S4");
+	ay31015_set_input_pin( m_uart_s, AY31015_CS, 0 );
+	ay31015_set_input_pin( m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
+	ay31015_set_input_pin( m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
+	ay31015_set_input_pin( m_uart_s, AY31015_TSB, BIT(data, 3) ? 1 : 0);
+	ay31015_set_input_pin( m_uart_s, AY31015_EPS, BIT(data, 0) ? 1 : 0);
+	ay31015_set_input_pin( m_uart_s, AY31015_NP, BIT(data, 4) ? 1 : 0);
+	ay31015_set_input_pin( m_uart_s, AY31015_CS, 1 );
 
 	// set rs232 baud rate
-	data = input_port_read(machine, "S3");
+	data = input_port_read(m_machine, "S3");
 
 	if (data > 1)
 		do
@@ -534,18 +541,18 @@ static MACHINE_RESET( sol20 )
 		}
 		while (!(data & 1) && (s_count < 7)); // find which switch is used
 
-	if ((s_count == 7) && (input_port_read(machine, "CONFIG")&1)) // if highest, look at jumper
+	if ((s_count == 7) && (input_port_read(m_machine, "CONFIG")&1)) // if highest, look at jumper
 		s_clock = 9600 << 4;
 	else
 		s_clock = s_bauds[s_count] << 4;
 
 	// these lines could be commented out for now if you want better performance
-	ay31015_set_receiver_clock( state->m_uart_s, s_clock);
-	ay31015_set_transmitter_clock( state->m_uart_s, s_clock);
+	ay31015_set_receiver_clock( m_uart_s, s_clock);
+	ay31015_set_transmitter_clock( m_uart_s, s_clock);
 
 	// boot-bank
-	memory_set_bank(machine, "boot", 1);
-	machine.scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
+	memory_set_bank(m_machine, "boot", 1);
+	m_machine.scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
 static DRIVER_INIT( sol20 )
@@ -554,43 +561,41 @@ static DRIVER_INIT( sol20 )
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
 }
 
-static VIDEO_START( sol20 )
+VIDEO_START_MEMBER( sol20_state )
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
-	state->m_FNT = machine.region("chargen")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( sol20 )
+SCREEN_UPDATE_MEMBER( sol20_state )
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT8 s1 = input_port_read(screen->machine(), "S1");
-	UINT16 which = (input_port_read(screen->machine(), "CONFIG") & 2) << 10;
-	sol20_state *state = screen->machine().driver_data<sol20_state>();
+	UINT8 s1 = input_port_read(machine(), "S1");
+	UINT16 which = (input_port_read(machine(), "CONFIG") & 2) << 10;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;
 
 	UINT8 cursor_inv = FALSE;
-	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (state->m_framecnt & 0x08)))
+	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (m_framecnt & 0x08)))
 		cursor_inv = TRUE;
 
-	state->m_framecnt++;
+	m_framecnt++;
 
-	ma = state->m_sol20_fe << 6; // scroll register
+	ma = m_sol20_fe << 6; // scroll register
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 13; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
 			for (x = ma; x < ma + 64; x++)
 			{
 				inv = polarity;
-				chr = state->m_videoram[x & 0x3ff];
+				chr = m_p_videoram[x & 0x3ff];
 
 				// cursor
 				if (BIT(chr, 7) && cursor_inv)
@@ -606,25 +611,25 @@ static SCREEN_UPDATE( sol20 )
 					if (ra < 4)
 						gfx = inv;
 					else
-						gfx = state->m_FNT[which | (chr<<4) | (ra-4) ] ^ inv;
+						gfx = m_p_chargen[which | (chr<<4) | (ra-4) ] ^ inv;
 				}
 				else
 				{
 					if (ra < 10)
-						gfx = state->m_FNT[which | (chr<<4) | (ra-1) ] ^ inv;
+						gfx = m_p_chargen[which | (chr<<4) | (ra-1) ] ^ inv;
 					else
 						gfx = inv;
 				}
 
 				/* Display a scanline of a character */
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 				*p++ = (inv) ? 1 : 0;
 			}
 		}
@@ -668,9 +673,6 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_CPU_PROGRAM_MAP(sol20_mem)
 	MCFG_CPU_IO_MAP(sol20_io)
 
-	MCFG_MACHINE_START(sol20)
-	MCFG_MACHINE_RESET(sol20)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -678,13 +680,9 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(576, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
-	MCFG_SCREEN_UPDATE(sol20)
-
 	MCFG_GFXDECODE(sol20)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(sol20)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

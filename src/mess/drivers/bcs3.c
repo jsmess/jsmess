@@ -12,99 +12,95 @@
     Note: The $ key makes a square symbol.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class bcs3_state : public driver_device
 {
 public:
 	bcs3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu")
+	{ }
 
-	const UINT8 *m_fnt;
-	UINT8 *m_videoram;
+	required_device<cpu_device> m_maincpu;
+	const UINT8 *m_p_chargen;
+	const UINT8 *m_p_videoram;
+	DECLARE_READ8_MEMBER(bcs3_keyboard_r);
+	virtual void machine_reset();
+	virtual void video_start();
 };
 
-static READ8_HANDLER( bcs3_videoram_r )
-{
-	bcs3_state *state = space->machine().driver_data<bcs3_state>();
-
-	return state->m_videoram[offset];
-}
-
-static WRITE8_HANDLER( bcs3_videoram_w )
-{
-	bcs3_state *state = space->machine().driver_data<bcs3_state>();
-
-	state->m_videoram[offset] = data;
-}
-
-static READ8_HANDLER( bcs3_keyboard_r )
+READ8_MEMBER( bcs3_state::bcs3_keyboard_r )
 {
 	UINT8 data = 0;
 
 	if (~offset & 0x01)
-		data |= input_port_read(space->machine(), "LINE0");
+		data |= input_port_read(machine(), "LINE0");
 	if (~offset & 0x02)
-		data |= input_port_read(space->machine(), "LINE1");
+		data |= input_port_read(machine(), "LINE1");
 	if (~offset & 0x04)
-		data |= input_port_read(space->machine(), "LINE2");
+		data |= input_port_read(machine(), "LINE2");
 	if (~offset & 0x08)
-		data |= input_port_read(space->machine(), "LINE3");
+		data |= input_port_read(machine(), "LINE3");
 	if (~offset & 0x10)
-		data |= input_port_read(space->machine(), "LINE4");
+		data |= input_port_read(machine(), "LINE4");
 	if (~offset & 0x20)
-		data |= input_port_read(space->machine(), "LINE5");
+		data |= input_port_read(machine(), "LINE5");
 	if (~offset & 0x40)
-		data |= input_port_read(space->machine(), "LINE6");
+		data |= input_port_read(machine(), "LINE6");
 	if (~offset & 0x80)
-		data |= input_port_read(space->machine(), "LINE7");
+		data |= input_port_read(machine(), "LINE7");
 	if (~offset & 0x100)
-		data |= input_port_read(space->machine(), "LINE8");
+		data |= input_port_read(machine(), "LINE8");
 
 	return data;
 }
 
-static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8, bcs3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c50, 0x3d9f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
+	AM_RANGE( 0x3c50, 0x3d9f ) AM_RAM AM_BASE(m_p_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5a7f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
+	AM_RANGE( 0x3c00, 0x5a7f ) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bcs3b_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bcs3b_mem, AS_PROGRAM, 8, bcs3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x657f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
+	AM_RANGE( 0x3c00, 0x657f ) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bcs3c_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bcs3c_mem, AS_PROGRAM, 8, bcs3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5ab3 ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,m_videoram)
+	AM_RANGE( 0x3c00, 0x5ab3 ) AM_RAM AM_BASE(m_p_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bcs3_io, AS_IO, 8)
+static ADDRESS_MAP_START( bcs3_io, AS_IO, 8, bcs3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE( 0xf8, 0xfb ) AM_DEVREADWRITE(Z80CTC,"z80ctc",z80ctc_r,z80ctc_w)
@@ -214,15 +210,13 @@ static INPUT_PORTS_START( bcs3 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(bcs3)
+MACHINE_RESET_MEMBER(bcs3_state)
 {
 }
 
-static VIDEO_START( bcs3 )
+VIDEO_START_MEMBER( bcs3_state )
 {
-	bcs3_state *state = machine.driver_data<bcs3_state>();
-
-	state->m_fnt = machine.region("gfx1")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( bcs3 )
@@ -235,30 +229,30 @@ static SCREEN_UPDATE( bcs3 )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 28; x++)
 			{
 				if (ra < 8)
 				{
-					chr = state->m_videoram[x] & 0x7f;
+					chr = state->m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_fnt[(chr<<3) | rat ];
+					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
-					gfx = 0;
+					gfx = 0xff;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 0 : 1;
-				*p++ = ( gfx & 0x40 ) ? 0 : 1;
-				*p++ = ( gfx & 0x20 ) ? 0 : 1;
-				*p++ = ( gfx & 0x10 ) ? 0 : 1;
-				*p++ = ( gfx & 0x08 ) ? 0 : 1;
-				*p++ = ( gfx & 0x04 ) ? 0 : 1;
-				*p++ = ( gfx & 0x02 ) ? 0 : 1;
-				*p++ = ( gfx & 0x01 ) ? 0 : 1;
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=28;
@@ -273,7 +267,7 @@ static SCREEN_UPDATE( bcs3a )
 	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (state->m_videoram[0x7a] | (state->m_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->m_p_videoram[0x7a] | (state->m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 128;
 
@@ -281,30 +275,30 @@ static SCREEN_UPDATE( bcs3a )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 29; x++)
 			{
 				if (ra < 8)
 				{
-					chr = state->m_videoram[x] & 0x7f;
+					chr = state->m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_fnt[(chr<<3) | rat ];
+					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
-					gfx = 0;
+					gfx = 0xff;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 0 : 1;
-				*p++ = ( gfx & 0x40 ) ? 0 : 1;
-				*p++ = ( gfx & 0x20 ) ? 0 : 1;
-				*p++ = ( gfx & 0x10 ) ? 0 : 1;
-				*p++ = ( gfx & 0x08 ) ? 0 : 1;
-				*p++ = ( gfx & 0x04 ) ? 0 : 1;
-				*p++ = ( gfx & 0x02 ) ? 0 : 1;
-				*p++ = ( gfx & 0x01 ) ? 0 : 1;
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=30;
@@ -317,7 +311,7 @@ static SCREEN_UPDATE( bcs3b )
 	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (state->m_videoram[0x7a] | (state->m_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->m_p_videoram[0x7a] | (state->m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 41;
 	if (rat > 23) ma = (rat-23) * 41 + 128;
 
@@ -325,30 +319,30 @@ static SCREEN_UPDATE( bcs3b )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 40; x++)
 			{
 				if (ra < 8)
 				{
-					chr = state->m_videoram[x] & 0x7f;
+					chr = state->m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_fnt[(chr<<3) | rat ];
+					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
-					gfx = 0;
+					gfx = 0xff;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 0 : 1;
-				*p++ = ( gfx & 0x40 ) ? 0 : 1;
-				*p++ = ( gfx & 0x20 ) ? 0 : 1;
-				*p++ = ( gfx & 0x10 ) ? 0 : 1;
-				*p++ = ( gfx & 0x08 ) ? 0 : 1;
-				*p++ = ( gfx & 0x04 ) ? 0 : 1;
-				*p++ = ( gfx & 0x02 ) ? 0 : 1;
-				*p++ = ( gfx & 0x01 ) ? 0 : 1;
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=41;
@@ -361,7 +355,7 @@ static SCREEN_UPDATE( bcs3c )
 	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
-	UINT16 cursor = (state->m_videoram[0x08] | (state->m_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->m_p_videoram[0x08] | (state->m_p_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 0xb4;
 
@@ -369,30 +363,30 @@ static SCREEN_UPDATE( bcs3c )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 29; x++)
 			{
 				if (ra < 8)
 				{
-					chr = state->m_videoram[x] & 0x7f;
+					chr = state->m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = state->m_fnt[(chr<<3) | rat ];
+					gfx = state->m_p_chargen[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
-					gfx = 0;
+					gfx = 0xff;
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 0 : 1;
-				*p++ = ( gfx & 0x40 ) ? 0 : 1;
-				*p++ = ( gfx & 0x20 ) ? 0 : 1;
-				*p++ = ( gfx & 0x10 ) ? 0 : 1;
-				*p++ = ( gfx & 0x08 ) ? 0 : 1;
-				*p++ = ( gfx & 0x04 ) ? 0 : 1;
-				*p++ = ( gfx & 0x02 ) ? 0 : 1;
-				*p++ = ( gfx & 0x01 ) ? 0 : 1;
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=30;
@@ -415,7 +409,7 @@ static const gfx_layout bcs3_charlayout =
 };
 
 static GFXDECODE_START( bcs3 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, bcs3_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, bcs3_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -426,8 +420,6 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_CPU_PROGRAM_MAP(bcs3_mem)
 	MCFG_CPU_IO_MAP(bcs3_io)
 
-	MCFG_MACHINE_RESET(bcs3)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -436,12 +428,9 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_SCREEN_SIZE(28*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE(bcs3)
-
 	MCFG_GFXDECODE(bcs3)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(bcs3)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bcs3a, bcs3 )
@@ -482,7 +471,7 @@ ROM_START( bcs3 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "se24.bin", 0x0000, 0x0800, CRC(268de5ee) SHA1(78784945956c1b0282a4e82ad55e7c3a77389e50))
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "se24font.bin", 0x0000, 0x0400, CRC(eaed9d84) SHA1(7023a6187cd6bd0c6489d76ff662453f14e5b636))
 ROM_END
 
@@ -491,7 +480,7 @@ ROM_START( bcs3a )
 	ROM_LOAD( "se31_29.bin", 0x0000, 0x1000, CRC(e9b55544) SHA1(82bae68c4bcaecf66632f5b43913b50a1acba316))
 	ROM_LOAD( "se31mceditor.bin", 0xf000, 0x0400, CRC(8eac92ec) SHA1(8950a3ef05d02abf34269bfce002c46d273ce113))
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "se31font.bin", 0x0000, 0x0400, CRC(a20c93c9) SHA1(b2be1c0d98b7ac05713349b099b392975968be1d))
 ROM_END
 
@@ -500,7 +489,7 @@ ROM_START( bcs3b )
 	ROM_LOAD( "se31_40.bin", 0x0000, 0x1000, CRC(4e993152) SHA1(6bb01ff5779627fa2eb2df432fffcfccc1e33231))
 	ROM_LOAD( "se31mceditor.bin", 0xf000, 0x0400, CRC(8eac92ec) SHA1(8950a3ef05d02abf34269bfce002c46d273ce113))
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "se31font.bin", 0x0000, 0x0400, CRC(a20c93c9) SHA1(b2be1c0d98b7ac05713349b099b392975968be1d))
 ROM_END
 
@@ -508,7 +497,7 @@ ROM_START( bcs3c )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sp33_29.bin", 0x0000, 0x1000, CRC(1c851eb2) SHA1(4f8bb5274ea1861a35a840e8f3482bdc693047c4))
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "sp33font.bin", 0x0000, 0x0400, CRC(b27f1c07) SHA1(61c80c585f198370ba5e856839c12b15acdc58ee))
 ROM_END
 

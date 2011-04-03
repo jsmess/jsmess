@@ -37,6 +37,10 @@
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+
 class dim68k_state : public driver_device
 {
 public:
@@ -64,9 +68,12 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
 	UINT16* m_ram;
-	UINT8 *m_FNT;
-	UINT8 m_speaker_bit;
+	const UINT8 *m_p_chargen;
+	bool m_speaker_bit;
 	UINT8 m_video_control;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 READ16_MEMBER( dim68k_state::dim68k_duart_r )
@@ -195,26 +202,23 @@ static INPUT_PORTS_START( dim68k )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dim68k)
+MACHINE_RESET_MEMBER(dim68k_state)
 {
-	dim68k_state *state = machine.driver_data<dim68k_state>();
-	UINT8* ROM = machine.region("bootrom")->base();
+	UINT8* ROM = m_machine.region("bootrom")->base();
 
-	memcpy((UINT8*)state->m_ram, ROM, 0x2000);
+	memcpy((UINT8*)m_ram, ROM, 0x2000);
 
-	machine.device("maincpu")->reset();
+	m_machine.device("maincpu")->reset();
 }
 
-static VIDEO_START( dim68k )
+VIDEO_START_MEMBER( dim68k_state )
 {
-	dim68k_state *state = machine.driver_data<dim68k_state>();
-	state->m_FNT = machine.region("chargen")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( dim68k )
+SCREEN_UPDATE_MEMBER( dim68k_state )
 {
-	dim68k_state *state = screen->machine().driver_data<dim68k_state>();
-	mc6845_update(state->m_crtc, bitmap, cliprect);
+	mc6845_update(m_crtc, &bitmap, &cliprect);
 	return 0;
 }
 
@@ -243,30 +247,30 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 		xx++;
 
 		chr = chr16>>8;
-		gfx = state->m_FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = ( gfx & 0x80 ) ? 1 : 0;
-		*p++ = ( gfx & 0x40 ) ? 1 : 0;
-		*p++ = ( gfx & 0x20 ) ? 1 : 0;
-		*p++ = ( gfx & 0x10 ) ? 1 : 0;
-		*p++ = ( gfx & 0x08 ) ? 1 : 0;
-		*p++ = ( gfx & 0x04 ) ? 1 : 0;
-		*p++ = ( gfx & 0x02 ) ? 1 : 0;
-		if (dot8) *p++ = ( gfx & 0x01 ) ? 1 : 0;
+		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+		*p++ = BIT(gfx, 7);
+		*p++ = BIT(gfx, 6);
+		*p++ = BIT(gfx, 5);
+		*p++ = BIT(gfx, 4);
+		*p++ = BIT(gfx, 3);
+		*p++ = BIT(gfx, 2);
+		*p++ = BIT(gfx, 1);
+		if (dot8) *p++ = BIT(gfx, 1);
 
 		inv = 0;
 		if (xx == cursor_x) inv=0xff;
 		xx++;
 
 		chr = chr16;
-		gfx = state->m_FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = ( gfx & 0x80 ) ? 1 : 0;
-		*p++ = ( gfx & 0x40 ) ? 1 : 0;
-		*p++ = ( gfx & 0x20 ) ? 1 : 0;
-		*p++ = ( gfx & 0x10 ) ? 1 : 0;
-		*p++ = ( gfx & 0x08 ) ? 1 : 0;
-		*p++ = ( gfx & 0x04 ) ? 1 : 0;
-		*p++ = ( gfx & 0x02 ) ? 1 : 0;
-		if (dot8) *p++ = ( gfx & 0x01 ) ? 1 : 0;
+		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+		*p++ = BIT(gfx, 7);
+		*p++ = BIT(gfx, 6);
+		*p++ = BIT(gfx, 5);
+		*p++ = BIT(gfx, 4);
+		*p++ = BIT(gfx, 3);
+		*p++ = BIT(gfx, 2);
+		*p++ = BIT(gfx, 1);
+		if (dot8) *p++ = BIT(gfx, 1);
 	}
 }
 
@@ -306,8 +310,6 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
 
-	MCFG_MACHINE_RESET(dim68k)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -315,19 +317,17 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
-	MCFG_SCREEN_UPDATE(dim68k)
-
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(dim68k)
-
-	MCFG_VIDEO_START(dim68k)
-	MCFG_MC6845_ADD("crtc", MC6845, 1790000, dim68k_crtc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", MC6845, 1790000, dim68k_crtc)
 MACHINE_CONFIG_END
 
 /*
