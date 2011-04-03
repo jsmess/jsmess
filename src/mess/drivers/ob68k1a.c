@@ -379,4 +379,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, ob68k1a,  0,       0,	ob68k1a,	ob68k1a,	 0,  "Omnibyte",   "OB68K1A",		GAME_NO_SOUND_HW)
+COMP( 1982, ob68k1a,  0,       0,	ob68k1a,	ob68k1a,	 0,  "Omnibyte",   "OB68K1A",		GAME_NOT_WORKING| GAME_NO_SOUND_HW )
