@@ -1,4 +1,3 @@
-#include "emu.h"
 #include "includes/osi.h"
 
 /* Palette Initialization */
@@ -22,36 +21,33 @@ static PALETTE_INIT( osi630 )
 
 /* Video Start */
 
-static VIDEO_START( osi600 )
+void sb2m600_state::video_start()
 {
-	osi_state *state = machine.driver_data<osi_state>();
 	UINT16 addr;
 
 	/* randomize video memory contents */
 	for (addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
 	{
-		state->m_video_ram[addr] = machine.rand() & 0xff;
+		m_video_ram[addr] = m_machine.rand() & 0xff;
 	}
 
 	/* randomize color memory contents */
-	if (state->m_color_ram)
+	if (m_color_ram)
 	{
 		for (addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 		{
-			state->m_color_ram[addr] = machine.rand() & 0x0f;
+			m_color_ram[addr] = m_machine.rand() & 0x0f;
 		}
 	}
 }
 
 /* Video Update */
 
-static SCREEN_UPDATE( osi600 )
+bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	osi_state *state = screen->machine().driver_data<osi_state>();
-
 	int y, bit, sx;
 
-	if (state->m_32)
+	if (m_32)
 	{
 		for (y = 0; y < 256; y++)
 		{
@@ -61,21 +57,21 @@ static SCREEN_UPDATE( osi600 )
 
 			for (sx = 0; sx < 64; sx++)
 			{
-				UINT8 videoram_data = state->m_video_ram[videoram_addr];
+				UINT8 videoram_data = m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = m_machine.region("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
 					int color = BIT(charrom_data, 7);
 
-					if (state->m_coloren)
+					if (m_coloren)
 					{
-						UINT8 colorram_data = state->m_color_ram[videoram_addr];
+						UINT8 colorram_data = m_color_ram[videoram_addr];
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
-					*BITMAP_ADDR16(bitmap, y, x++) = color;
+					*BITMAP_ADDR16(&bitmap, y, x++) = color;
 
 					charrom_data <<= 1;
 				}
@@ -94,22 +90,22 @@ static SCREEN_UPDATE( osi600 )
 
 			for (sx = 0; sx < 32; sx++)
 			{
-				UINT8 videoram_data = state->m_video_ram[videoram_addr];
+				UINT8 videoram_data = m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = m_machine.region("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
 					int color = BIT(charrom_data, 7);
 
-					if (state->m_coloren)
+					if (m_coloren)
 					{
-						UINT8 colorram_data = state->m_color_ram[videoram_addr];
+						UINT8 colorram_data = m_color_ram[videoram_addr];
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
-					*BITMAP_ADDR16(bitmap, y, x++) = color;
-					*BITMAP_ADDR16(bitmap, y, x++) = color;
+					*BITMAP_ADDR16(&bitmap, y, x++) = color;
+					*BITMAP_ADDR16(&bitmap, y, x++) = color;
 
 					charrom_data <<= 1;
 				}
@@ -122,10 +118,8 @@ static SCREEN_UPDATE( osi600 )
 	return 0;
 }
 
-static SCREEN_UPDATE( uk101 )
+bool uk101_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	osi_state *state = screen->machine().driver_data<osi_state>();
-
 	int y, bit, sx;
 
 	for (y = 0; y < 256; y++)
@@ -136,13 +130,13 @@ static SCREEN_UPDATE( uk101 )
 
 		for (sx = 0; sx < 64; sx++)
 		{
-			UINT8 videoram_data = state->m_video_ram[videoram_addr++];
+			UINT8 videoram_data = m_video_ram[videoram_addr++];
 			UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-			UINT8 charrom_data = screen->machine().region("chargen")->base()[charrom_addr];
+			UINT8 charrom_data = m_machine.region("chargen")->base()[charrom_addr];
 
 			for (bit = 0; bit < 8; bit++)
 			{
-				*BITMAP_ADDR16(bitmap, y, x) = BIT(charrom_data, 7);
+				*BITMAP_ADDR16(&bitmap, y, x) = BIT(charrom_data, 7);
 				x++;
 				charrom_data <<= 1;
 			}
@@ -160,12 +154,9 @@ MACHINE_CONFIG_FRAGMENT( osi600_video )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE(osi600)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(osi600)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( uk101_video )
@@ -174,12 +165,9 @@ MACHINE_CONFIG_FRAGMENT( uk101_video )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
-	MCFG_SCREEN_UPDATE(uk101)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(osi600)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( osi630_video )
@@ -188,10 +176,7 @@ MACHINE_CONFIG_FRAGMENT( osi630_video )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
-	MCFG_SCREEN_UPDATE(osi600)
 
 	MCFG_PALETTE_LENGTH(8+2)
 	MCFG_PALETTE_INIT(osi630)
-
-	MCFG_VIDEO_START(osi600)
 MACHINE_CONFIG_END
