@@ -1716,7 +1716,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 		space->install_readwrite_bank(0x010000, ramsize - 1, "bank1");
 		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
 
-		space->install_legacy_read_handler( ramsize, 0x7fffff, FUNC(apple2gs_bank_echo_r));
+		space->install_legacy_read_handler( ramsize, 0xdfffff, FUNC(apple2gs_bank_echo_r));
 		state->m_echo_bank = (ramsize >> 16);
 	}
 	else
@@ -1727,7 +1727,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 		space->install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
 		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
 
-		space->install_legacy_read_handler( ramsize + 0x10000, 0x7fffff, FUNC(apple2gs_bank_echo_r));
+		space->install_legacy_read_handler( ramsize + 0x10000, 0xdfffff, FUNC(apple2gs_bank_echo_r));
 		state->m_echo_bank = (ramsize+0x10000) >> 16;
 	}
 
