@@ -28,8 +28,9 @@
 		- specific x1turboz features?
 
     per-game/program specific TODO:
-    - Dragon Buster: it crashed to me once with a obj flag hang;
+	- CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
 	- Chack'n Pop: game is too fast, presumably missing wait states;
+    - Dragon Buster: it crashed to me once with a obj flag hang;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
 	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
  	- Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
@@ -41,7 +42,6 @@
 	- Shilver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
 	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
 	- Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
-    - Take the A-Train: returns to basic prompt if you try to start a play, missing disk perhaps?
 	- Trivia-Q: dunno what to do on the selection screen, missing inputs?
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
@@ -206,6 +206,7 @@
 ************************************************************************************************/
 
 #include "emu.h"
+#include "includes/x1.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -225,7 +226,6 @@
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
 #include "imagedev/cartslot.h"
-#include "includes/x1.h"
 
 #define MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz
@@ -246,12 +246,12 @@
 
 static VIDEO_START( x1 )
 {
-	x1_state *state = machine.driver_data<x1_state>();
-	state->m_avram = auto_alloc_array(machine, UINT8, 0x800);
-	state->m_tvram = auto_alloc_array(machine, UINT8, 0x800);
-	state->m_kvram = auto_alloc_array(machine, UINT8, 0x800);
-	state->m_gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
-	state->m_pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
+//	x1_state *state = machine.driver_data<x1_state>();
+//	state->m_avram = auto_alloc_array(machine, UINT8, 0x800);
+//	state->m_tvram = auto_alloc_array(machine, UINT8, 0x800);
+//	state->m_kvram = auto_alloc_array(machine, UINT8, 0x800);
+//	state->m_gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
+//	state->m_pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
 }
 
 static void x1_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
@@ -1756,7 +1756,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset == 0x0803)						{ printf("Color image board 2 read\n"); return 0xff; } // *
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board read %04x\n",offset); return 0xff; } // *
 	else if(offset == 0x0b00)						{ return x1turbo_bank_r(space,0); }
-	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C read %04x\n",offset); return 0xff; } // *
+	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C read %04x\n",offset); return 0; } // *
 	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ return x1_emm_r(space,offset & 0xff); } // *
 	else if(offset == 0x0e03)                   	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0e80 && offset <= 0x0e81)	{ return x1_kanji_r(space, offset-0xe80); }
@@ -1901,10 +1901,9 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	state->m_vsync = (device->machine().primary_screen->vpos() < vsync_line) ? 0x00 : 0x04;
 
 //	popmessage("%d",vsync_line);
+//	popmessage("%d",vblank_line);
 
 	res = state->m_ram_bank | state->m_sub_obf | state->m_vsync | state->m_vdisp;
-
-	//popmessage("%d",vblank_line);
 
 	if(cassette_input(device->machine().device("cass")) > 0.03)
 		res |= 0x02;
@@ -2728,7 +2727,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d) )
 
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2758,7 +2757,7 @@ ROM_START( x1twin )
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a) )
 
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2792,7 +2791,7 @@ ROM_START( x1turbo )
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
 
-	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
@@ -2828,7 +2827,7 @@ ROM_START( x1turbo40 )
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.bin", 0x0000, 0x8000, CRC(112f80a2) SHA1(646cc3fb5d2d24ff4caa5167b0892a4196e9f843) )
 
-	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )

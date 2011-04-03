@@ -80,17 +80,16 @@ public:
 	x1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *m_tvram;
-	UINT8 *m_avram;
-	UINT8 *m_kvram;
+	UINT8 m_tvram[0x800];
+	UINT8 m_avram[0x800];
+	UINT8 m_kvram[0x800];
 	UINT8 m_hres_320;
 	UINT8 m_io_switch;
 	UINT8 m_io_sys;
 	UINT8 m_vsync;
 	UINT8 m_vdisp;
 	UINT8 m_io_bank_mode;
-	UINT8 *m_gfx_bitmap_ram;
-	UINT16 m_pcg_index[3];
+	UINT8 m_gfx_bitmap_ram[0xc000*2];
 	UINT8 m_pcg_reset;
 	UINT8 m_sub_obf;
 	UINT8 m_ctc_irq_flag;
@@ -110,7 +109,6 @@ public:
 	UINT8 m_rom_index[3];
 	UINT32 m_kanji_offset;
 	UINT8 m_bios_offset;
-	UINT8 m_pcg_index_r[3];
 	UINT8 m_x_b;
 	UINT8 m_x_g;
 	UINT8 m_x_r;
@@ -126,7 +124,7 @@ public:
 	UINT8 m_key_irq_flag;
 	UINT8 m_key_irq_vector;
 	UINT32 m_emm_addr;
-	UINT8 *m_pal_4096;
+	UINT8 m_pal_4096[0x1000*3];
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 m_is_turbo;
 	UINT8 m_ex_bank;
