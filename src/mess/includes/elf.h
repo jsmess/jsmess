@@ -1,5 +1,19 @@
+#pragma once
+
 #ifndef __INCLUDES_ELF__
 #define __INCLUDES_ELF__
+
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/mm74c922.h"
+#include "video/cdp1861.h"
+#include "video/dm9368.h"
+#include "machine/rescap.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"a6"
@@ -13,17 +27,41 @@ class elf2_state : public driver_device
 {
 public:
 	elf2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, CDP1802_TAG),
+		  m_cti(*this, CDP1861_TAG),
+		  m_kb(*this, MM74C923_TAG),
+		  m_led_l(*this, DM9368_L_TAG),
+		  m_led_h(*this, DM9368_H_TAG),
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_ram(*this, RAM_TAG)
+	{ }
 
-	/* display state */
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_cti;
+	required_device<device_t> m_kb;
+	required_device<device_t> m_led_l;
+	required_device<device_t> m_led_h;
+	required_device<device_t> m_cassette;
+	required_device<device_t> m_ram;
+
+	virtual void machine_start();
+
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER( dispon_r );
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_WRITE8_MEMBER( memory_w );
+	DECLARE_READ_LINE_MEMBER( wait_r );
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_READ8_MEMBER( dma_r );
+	DECLARE_WRITE_LINE_MEMBER( da_w );
+
+	// display state
 	UINT8 m_data;
-
-	/* devices */
-	device_t *m_cdp1861;
-	device_t *m_mm74c923;
-	device_t *m_dm9368_l;
-	device_t *m_dm9368_h;
-	device_t *m_cassette;
 };
 
 #endif
