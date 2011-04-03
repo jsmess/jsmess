@@ -140,7 +140,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.141u2.  This incorporates all features of the
+- The core is based on MAME 0.142.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Added support for a new template to -snapname to use software names for 
