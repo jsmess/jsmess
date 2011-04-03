@@ -10,24 +10,7 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
 #include "includes/comx35.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "imagedev/flopdrv.h"
-#include "formats/comx35_dsk.h"
-#include "formats/comx35_comx.h"
-#include "imagedev/cassette.h"
-#include "imagedev/printer.h"
-#include "imagedev/snapquik.h"
-#include "machine/cdp1871.h"
-#include "machine/comxpl80.h"
-#include "machine/wd17xx.h"
-#include "machine/ram.h"
-#include "video/mc6845.h"
 
 /* Memory Maps */
 
@@ -201,34 +184,28 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static READ_LINE_DEVICE_HANDLER( clear_r )
+READ_LINE_MEMBER( comx35_state::clear_r )
 {
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
-	return state->m_reset;
+	return m_reset;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef2_r )
+READ_LINE_MEMBER( comx35_state::ef2_r )
 {
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
-	if (state->m_iden)
+	if (m_iden)
 	{
 		// interrupts disabled: PAL/NTSC
-		return state->m_vis->pal_ntsc_r();
+		return m_vis->pal_ntsc_r();
 	}
 	else
 	{
 		// interrupts enabled: keyboard repeat
-		return state->m_kbe->rpt_r();
+		return m_kbe->rpt_r();
 	}
 }
 
-static READ_LINE_DEVICE_HANDLER( ef4_r )
+READ_LINE_MEMBER( comx35_state::ef4_r )
 {
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
-	return (cassette_input(device) < 0) | state->m_cdp1802_ef4;
+	return (cassette_input(m_cassette) < 0) | m_cdp1802_ef4;
 }
 
 static COSMAC_SC_WRITE( comx35_sc_w )
@@ -270,31 +247,29 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( comx35_q_w )
+WRITE_LINE_MEMBER( comx35_state::q_w )
 {
-	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
+	m_cdp1802_q = state;
 
-	driver_state->m_cdp1802_q = state;
-
-	if (driver_state->m_iden && state)
+	if (m_iden && state)
 	{
 		// enable interrupts
-		driver_state->m_iden = 0;
+		m_iden = 0;
 	}
 
 	// cassette output
-	cassette_output(driver_state->m_cassette, state ? +1.0 : -1.0);
+	cassette_output(m_cassette, state ? +1.0 : -1.0);
 }
 
 static COSMAC_INTERFACE( cosmac_intf )
 {
 	DEVCB_LINE_VCC,								// wait
-	DEVCB_LINE(clear_r),						// clear
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, clear_r),// clear
 	DEVCB_NULL,									// EF1
-	DEVCB_LINE(ef2_r),							// EF2
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef2_r),	// EF2
 	DEVCB_NULL,									// EF3
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef4_r),		// EF4
-	DEVCB_LINE(comx35_q_w),						// Q
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_r),	// EF4
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, q_w),	// Q
 	DEVCB_NULL,									// DMA in
 	DEVCB_NULL,									// DMA out
 	comx35_sc_w,								// SC
@@ -304,14 +279,14 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 /* CDP1871 Interface */
 
-static READ_LINE_DEVICE_HANDLER( comx35_shift_r )
+READ_LINE_MEMBER( comx35_state::shift_r )
 {
-	return BIT(input_port_read(device->machine(), "MODIFIERS"), 0);
+	return BIT(input_port_read(m_machine, "MODIFIERS"), 0);
 }
 
-static READ_LINE_DEVICE_HANDLER( comx35_control_r )
+READ_LINE_MEMBER( comx35_state::control_r )
 {
-	return BIT(input_port_read(device->machine(), "MODIFIERS"), 1);
+	return BIT(input_port_read(m_machine, "MODIFIERS"), 1);
 }
 
 static CDP1871_INTERFACE( comx35_cdp1871_intf )
@@ -327,8 +302,8 @@ static CDP1871_INTERFACE( comx35_cdp1871_intf )
 	DEVCB_INPUT_PORT("D9"),
 	DEVCB_INPUT_PORT("D10"),
 	DEVCB_INPUT_PORT("D11"),
-	DEVCB_LINE(comx35_shift_r),
-	DEVCB_LINE(comx35_control_r),
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, shift_r),
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, control_r),
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3),
 	DEVCB_NULL // polled
@@ -445,11 +420,11 @@ ROM_START( comx35p )
 	ROM_LOAD( "f&m.eprom.board.1.1.bin",0x0000, 0x0800, CRC(a042a31a) SHA1(13831a1350aa62a87988bfcc99c4b7db8ef1cf62) )
 
 	ROM_REGION( 0x2000, "80column", 0 ) /* 80 Column Card */
-	ROM_LOAD( "p.cl1",					0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738) ) // V1.0
+	ROM_LOAD( "p 1.0.cl1",				0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738) ) // V1.0
 	ROM_LOAD( "p 1.1.cl1",				0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d) ) // V1.1
 
 	ROM_REGION( 0x800, "chargen", 0 ) /* 80 Column Card */
-	ROM_LOAD( "c.cl4",					0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26) ) // V1.0
+	ROM_LOAD( "c 1.0.cl4",				0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26) ) // V1.0
 	ROM_LOAD( "c 1.1.cl4",				0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a) ) // V1.1
 ROM_END
 

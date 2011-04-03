@@ -114,17 +114,7 @@ Notes:
 
 */
 
-#include "emu.h"
-#include "cpu/cosmac/cosmac.h"
-#include "machine/wd17xx.h"
-#include "imagedev/printer.h"
-#include "imagedev/snapquik.h"
-#include "sound/cdp1869.h"
-#include "video/mc6845.h"
 #include "includes/comx35.h"
-#include "machine/rescap.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
 
 enum
 {
@@ -137,7 +127,8 @@ enum
 UINT8 comx35_state::read_expansion()
 {
 	UINT8 result;
-	switch(m_machine.phase())
+	
+	switch (m_machine.phase())
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
@@ -148,6 +139,7 @@ UINT8 comx35_state::read_expansion()
 			result = 0x00;
 			break;
 	}
+
 	return result;
 }
 
@@ -169,25 +161,23 @@ bool comx35_state::is_dos_card_active()
 }
 
 /* Floppy Disc Controller */
-static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_intrq_w )
+
+WRITE_LINE_MEMBER( comx35_state::fdc_intrq_w )
 {
-	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
-	driver_state->m_fdc_irq = state;
+	m_fdc_irq = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_drq_w )
+WRITE_LINE_MEMBER( comx35_state::fdc_drq_w )
 {
-	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
-
-	if (driver_state->m_fdc_drq_enable)
-		driver_state->m_cdp1802_ef4 = state;
+	if (m_fdc_drq_enable)
+		m_cdp1802_ef4 = state;
 }
 
 const wd17xx_interface comx35_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(comx35_fdc_intrq_w),
-	DEVCB_LINE(comx35_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 

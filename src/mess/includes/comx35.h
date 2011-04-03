@@ -1,12 +1,26 @@
+#pragma once
+
 #ifndef __COMX35__
 #define __COMX35__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
-#include "machine/cdp1871.h"
+#include "sound/wave.h"
+#include "imagedev/flopdrv.h"
+#include "formats/comx35_dsk.h"
+#include "formats/comx35_comx.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
 #include "imagedev/snapquik.h"
+#include "machine/cdp1871.h"
+#include "machine/comxpl80.h"
 #include "machine/wd17xx.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
+#include "video/mc6845.h"
 
 #define SCREEN_TAG			"screen"
 #define MC6845_SCREEN_TAG	"screen80"
@@ -67,17 +81,19 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(cdp1869_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_READ8_MEMBER(io2_r);
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(comx35_q_w);
-	DECLARE_READ_LINE_MEMBER(comx35_shift_r);
-	DECLARE_READ_LINE_MEMBER(comx35_control_r);
+	DECLARE_WRITE8_MEMBER( cdp1869_w );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_READ8_MEMBER( io2_r );
+	DECLARE_WRITE8_MEMBER( bank_select_w );
+	DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef2_r );
+	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_READ_LINE_MEMBER( shift_r );
+	DECLARE_READ_LINE_MEMBER( control_r );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	UINT8 read_expansion();
 	bool is_expansion_box_installed();
