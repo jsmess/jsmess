@@ -15,17 +15,17 @@
 
 struct messdocs_state
 {
-	const char *dest_dir;
+	const char *m_dest_dir;
 
-	const char *title;
-	const char *default_topic;
+	const char *m_title;
+	const char *m_default_topic;
 
-	object_pool *pool;
-	XML_Parser parser;
-	int depth;
-	int error;
-	char *toc_dir;
-	FILE *chm_toc;
+	object_pool *m_pool;
+	XML_Parser m_parser;
+	int m_depth;
+	int m_error;
+	char *m_toc_dir;
+	FILE *m_chm_toc;
 };
 
 
@@ -639,7 +639,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	XML_Memory_Handling_Suite memcallbacks;
 
 	memset(&state, 0, sizeof(state));
-	state.pool = pool_alloc_lib(NULL);
+	state.m_pool = pool_alloc_lib(NULL);
 
 	/* open the DOC */
 	in = fopen(toc_filename, "r");
@@ -650,61 +650,61 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	}
 
 	/* figure out the TOC directory */
-	state.toc_dir = pool_strdup_lib(state.pool, toc_filename);
-	if (!state.toc_dir)
+	state.m_toc_dir = pool_strdup_lib(state.m_pool, toc_filename);
+	if (!state.m_toc_dir)
 		goto outofmemory;
-	for (i = strlen(state.toc_dir) - 1; (i > 0) && !osd_is_path_separator(state.toc_dir[i]); i--)
-		state.toc_dir[i] = '\0';
+	for (i = strlen(state.m_toc_dir) - 1; (i > 0) && !osd_is_path_separator(state.m_toc_dir[i]); i--)
+		state.m_toc_dir[i] = '\0';
 
 	/* clean the target directory */
 	rmdir_recursive(dest_dir);
 	osd_mkdir(dest_dir);
 
 	/* create the help contents file */
-	s = (char*)pool_malloc_lib(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
+	s = (char*)pool_malloc_lib(state.m_pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
 		goto outofmemory;
 	strcpy(s, dest_dir);
 	strcat(s, PATH_SEPARATOR);
 	strcat(s, help_contents_filename);
-	state.chm_toc = fopen(s, "w");
-	state.dest_dir = dest_dir;
-	if (!state.chm_toc)
+	state.m_chm_toc = fopen(s, "w");
+	state.m_dest_dir = dest_dir;
+	if (!state.m_chm_toc)
 	{
 		fprintf(stderr, "Cannot open file %s\n", s);
 		goto error;
 	}
 
-	fprintf(state.chm_toc, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\"\n");
-	fprintf(state.chm_toc, "<HTML>\n");
-	fprintf(state.chm_toc, "<HEAD>\n");
-	fprintf(state.chm_toc, "</HEAD>\n");
-	fprintf(state.chm_toc, "<BODY>\n");
-	fprintf(state.chm_toc, "<OBJECT type=\"text/site properties\">\n");
-	fprintf(state.chm_toc, "\t<param name=\"Window Styles\" value=\"0x800625\">\n");
-	fprintf(state.chm_toc, "\t<param name=\"ImageType\" value=\"Folder\">\n");
-	fprintf(state.chm_toc, "\t<param name=\"Font\" value=\"Arial,8,0\">\n");
-	fprintf(state.chm_toc, "</OBJECT>\n");
-	fprintf(state.chm_toc, "<UL>\n");
+	fprintf(state.m_chm_toc, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\"\n");
+	fprintf(state.m_chm_toc, "<HTML>\n");
+	fprintf(state.m_chm_toc, "<HEAD>\n");
+	fprintf(state.m_chm_toc, "</HEAD>\n");
+	fprintf(state.m_chm_toc, "<BODY>\n");
+	fprintf(state.m_chm_toc, "<OBJECT type=\"text/site properties\">\n");
+	fprintf(state.m_chm_toc, "\t<param name=\"Window Styles\" value=\"0x800625\">\n");
+	fprintf(state.m_chm_toc, "\t<param name=\"ImageType\" value=\"Folder\">\n");
+	fprintf(state.m_chm_toc, "\t<param name=\"Font\" value=\"Arial,8,0\">\n");
+	fprintf(state.m_chm_toc, "</OBJECT>\n");
+	fprintf(state.m_chm_toc, "<UL>\n");
 
 	/* create the XML parser */
 	memcallbacks.malloc_fcn = expat_malloc;
 	memcallbacks.realloc_fcn = expat_realloc;
 	memcallbacks.free_fcn = expat_free;
-	state.parser = XML_ParserCreate_MM(NULL, &memcallbacks, NULL);
-	if (!state.parser)
+	state.m_parser = XML_ParserCreate_MM(NULL, &memcallbacks, NULL);
+	if (!state.m_parser)
 		goto outofmemory;
 
-	XML_SetUserData(state.parser, &state);
-	XML_SetElementHandler(state.parser, start_handler, end_handler);
-	XML_SetCharacterDataHandler(state.parser, data_handler);
+	XML_SetUserData(state.m_parser, &state);
+	XML_SetElementHandler(state.m_parser, start_handler, end_handler);
+	XML_SetCharacterDataHandler(state.m_parser, data_handler);
 
 	do
 	{
 		len = (int) fread(buf, 1, sizeof(buf), in);
 		done = feof(in);
 
-		if (XML_Parse(state.parser, buf, len, done) == XML_STATUS_ERROR)
+		if (XML_Parse(state.m_parser, buf, len, done) == XML_STATUS_ERROR)
 		{
 			process_error(&state, NULL, NULL);
 			break;
@@ -712,12 +712,12 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	}
 	while(!done);
 
-	fprintf(state.chm_toc, "</UL>\n");
-	fprintf(state.chm_toc, "</BODY></HTML>");
-	fclose(state.chm_toc);
+	fprintf(state.m_chm_toc, "</UL>\n");
+	fprintf(state.m_chm_toc, "</BODY></HTML>");
+	fclose(state.m_chm_toc);
 
 	/* create the help project file */
-	s = (char*)pool_malloc_lib(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
+	s = (char*)pool_malloc_lib(state.m_pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
 		goto outofmemory;
 	strcpy(s, dest_dir);
@@ -733,22 +733,22 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	fprintf(chm_hhp, "[OPTIONS]\n");
 	fprintf(chm_hhp, "Compiled file=%s\n", help_filename);
 	fprintf(chm_hhp, "Contents file=%s\n", help_contents_filename);
-	fprintf(chm_hhp, "Default topic=%s\n", state.default_topic);
+	fprintf(chm_hhp, "Default topic=%s\n", state.m_default_topic);
 	fprintf(chm_hhp, "Language=0x409 English (United States)\n");
-	fprintf(chm_hhp, "Title=%s\n", state.title);
+	fprintf(chm_hhp, "Title=%s\n", state.m_title);
 	fprintf(chm_hhp, "\n");
 	fclose(chm_hhp);
 
 	/* finish up */
-	XML_ParserFree(state.parser);
+	XML_ParserFree(state.m_parser);
 	fclose(in);
-	pool_free_lib(state.pool);
-	return state.error ? -1 : 0;
+	pool_free_lib(state.m_pool);
+	return state.m_error ? -1 : 0;
 
 outofmemory:
 	fprintf(stderr, "Out of memory");
 error:
-	if (state.chm_toc) fclose(state.chm_toc);
+	if (state.m_chm_toc) fclose(state.m_chm_toc);
 	if (in)	fclose(in);
 	return -1;
 }
