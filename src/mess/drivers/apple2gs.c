@@ -300,12 +300,19 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	MCFG_RAM_DEFAULT_SIZE("2M")      // 1M on board + 1M in the expansion slot was common for ROM 03
+	MCFG_RAM_EXTRA_OPTIONS("1M,3M,4M,5M,6M,7M,8M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( apple2gsr1, apple2gs )
+	MCFG_MACHINE_START( apple2gsr1 )
 
+    MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("1280K")  // 256K on board + 1M in the expansion slot was common for ROM 01
+	MCFG_RAM_EXTRA_OPTIONS("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -386,5 +393,5 @@ static DRIVER_INIT(apple2gs)
 COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM03)", 0 )
 COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
 COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM03 late prototype?)", GAME_NOT_WORKING )
-COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM01)", 0 )
-COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM00)", 0 )
+COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM01)", 0 )
+COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM00)", 0 )

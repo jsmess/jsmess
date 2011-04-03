@@ -92,12 +92,15 @@ public:
 	int m_sndglu_addr;
 	int m_sndglu_dummy_read;
 	bitmap_t *m_legacy_gfx;
+    bool m_is_rom3;
+    UINT8 m_echo_bank;
 };
 
 
 /*----------- defined in machine/apple2gs.c -----------*/
 
 MACHINE_START( apple2gs );
+MACHINE_START( apple2gsr1 );
 MACHINE_RESET( apple2gs );
 
 NVRAM_HANDLER( apple2gs );

@@ -1685,6 +1685,14 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 	}
 }
 
+// Because the bank address multiplexes on the 65816 data bus, reading a memory area
+// which doesn't drive the bus results in reading back the bank number.
+static READ8_HANDLER(apple2gs_bank_echo_r)
+{
+	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
+
+	return state->m_echo_bank + (offset>>16);
+}
 
 static void apple2gs_setup_memory(running_machine &machine)
 {
@@ -1697,10 +1705,30 @@ static void apple2gs_setup_memory(running_machine &machine)
 	state->m_slowmem = auto_alloc_array_clear(machine, UINT8, 128*1024);
 	state_save_register_item_pointer(machine, "APPLE2GS_SLOWMEM", NULL, 0, state->m_slowmem, 128*1024);
 
-	/* install expanded memory */
-	if (ram_get_size(machine.device(RAM_TAG))> 0x010000) {
-		space->install_readwrite_bank(0x010000, ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
+	// install expanded memory
+	// fair warning: other code assumes banks 0 and 1 are the first 128k of the RAM device, so you must install bank 1 at 0x10000
+	// otherwise nothing works :)
+	if (state->m_is_rom3)
+	{
+		int ramsize = ram_get_size(machine.device(RAM_TAG));
+
+		// ROM 03 hardware: the quoted "1 MB" for a base machine doesn't include banks e0/e1, so map accordingly
+		space->install_readwrite_bank(0x010000, ramsize - 1, "bank1");
 		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
+
+		space->install_legacy_read_handler( ramsize, 0x7fffff, FUNC(apple2gs_bank_echo_r));
+		state->m_echo_bank = (ramsize >> 16);
+	}
+	else
+	{
+		int ramsize = ram_get_size(machine.device(RAM_TAG))-0x30000;
+
+		// ROM 00/01 hardware: the quoted "256K" for a base machine *does* include banks e0/e1.
+		space->install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
+		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
+
+		space->install_legacy_read_handler( ramsize + 0x10000, 0x7fffff, FUNC(apple2gs_bank_echo_r));
+		state->m_echo_bank = (ramsize+0x10000) >> 16;
 	}
 
 	/* install hi memory */
@@ -1761,7 +1789,7 @@ MACHINE_RESET( apple2gs )
     When F3 pressed, the video mode changes and the machine goes into Basic */
 }
 
-MACHINE_START( apple2gs )
+MACHINE_START( apple2gscommon )
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	apple2_init_common(machine);
@@ -1812,8 +1840,7 @@ MACHINE_START( apple2gs )
 	state->m_sndglu_addr = 0;
 	state->m_sndglu_dummy_read = 0;
 
-	/* init the various subsystems */
-	apple2gs_setup_memory(machine);
+	state->m_is_rom3 = true;
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
@@ -1873,4 +1900,19 @@ MACHINE_START( apple2gs )
 
 	// fire on scanline zero
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
+}
+
+MACHINE_START( apple2gs )
+{
+	MACHINE_START_NAME(apple2gscommon)(machine);
+	apple2gs_setup_memory(machine);
+}
+
+MACHINE_START( apple2gsr1 )
+{
+	MACHINE_START_NAME(apple2gscommon)(machine);
+
+	apple2gs_state *state = machine.driver_data<apple2gs_state>();
+	state->m_is_rom3 = false;
+	apple2gs_setup_memory(machine);
 }
