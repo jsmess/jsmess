@@ -171,7 +171,9 @@ void cs4031_device::device_start()
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);
 
 	// install extended memory
-	m_space->install_ram(0x100000, ram_size - 1, m_ram + 0x100000);
+	if (ram_size > 0x100000) {
+		m_space->install_ram(0x100000, ram_size - 1, m_ram + 0x100000);
+	}
 
 	// install bios rom at cpu inital pc
 	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
