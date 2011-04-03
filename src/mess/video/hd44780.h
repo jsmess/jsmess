@@ -102,7 +102,7 @@ private:
 	UINT8 m_cursor_on;		//cursor on/off
 	UINT8 m_blink_on;		//blink on/off
 	UINT8 m_shift_on;		//shift  on/off
-	INT8 disp_shift;		//display shift
+	INT8 m_disp_shift;		//display shift
 
 	INT8 m_direction;		//auto increment/decrement
 	UINT8 m_data_len;		//interface data length 4 or 8 bit

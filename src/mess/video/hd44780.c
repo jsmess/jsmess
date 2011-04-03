@@ -128,7 +128,7 @@ void hd44780_device::device_start()
 	save_item( NAME(m_data_len));
 	save_item( NAME(m_num_line));
 	save_item( NAME(m_char_size));
-	save_item( NAME(disp_shift));
+	save_item( NAME(m_disp_shift));
 	save_item( NAME(m_blink));
 	save_item( NAME(m_ddram));
 	save_item( NAME(m_cgram));
@@ -158,7 +158,7 @@ void hd44780_device::device_reset()
 	m_data_len = -1; // must not be 0 or 1 on intial start to pick up first 4/8 bit mode change
 	m_num_line = 0;
 	m_char_size = 0;
-	disp_shift = 0;
+	m_disp_shift = 0;
 	m_blink = 0;
 
 	set_busy_flag(1520);
@@ -213,7 +213,7 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 					char_pos = m_config.custom_layout[l*m_config.width + i];
 				else
 				{
-					char_pos += disp_shift;
+					char_pos += m_disp_shift;
 
 					while (char_pos < 0 || (char_pos - line_base) >= line_size)
 					{
@@ -296,7 +296,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		UINT8 direct = (BIT(data, 2)) ? +1 : -1;
 
 		if (BIT(data, 3))
-			disp_shift += direct;
+			m_disp_shift += direct;
 		else
 		{
 			m_ac += direct;
@@ -327,7 +327,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_cursor_pos = 0;
 		m_ac_mode = 0; // datasheet does not specifically say this but mephisto won't run without it
 		m_direction = 1;
-		disp_shift = 0;
+		m_disp_shift = 0;
 		set_busy_flag(1520);
 	}
 	else if (BIT(data, 0)) // clear display
@@ -336,7 +336,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_cursor_pos = 0;
 		m_ac_mode = 0;
 		m_direction = 1;
-		disp_shift = 0;
+		m_disp_shift = 0;
 		memset(m_ddram, 0x20, sizeof(m_ddram));
 		set_busy_flag(1520);
 	}
@@ -355,7 +355,7 @@ void hd44780_device::update_ac(void) // m_data_bus_flag was left as global so ol
 	{
 		m_cursor_pos = m_ac;
 		// display is shifted only after a write
-		if (m_shift_on && m_data_bus_flag == 1)	disp_shift += m_direction;
+		if (m_shift_on && m_data_bus_flag == 1)	m_disp_shift += m_direction;
 	}
 	m_data_bus_flag = 0;
 }

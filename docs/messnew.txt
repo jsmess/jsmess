@@ -11,6 +11,8 @@ New System Drivers Supported:
 - IBM PC 5155 [Lord Nightmare]
 - EA Car Computer (not working) [Robbbert]
 - 68k Single Board Computer [Robbbert]
+- PB-1000, PB2000c (not fully working) [Sandro Ronco]
+- DataSlim 2 (not working) [Sandro Ronco]
 
 
 
