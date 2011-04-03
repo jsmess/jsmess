@@ -17,9 +17,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-#define UTS20_MACHINE_RESET void univac_state::machine_reset()
-#define UTS20_VIDEO_START void univac_state::video_start()
-#define UTS20_SCREEN_UPDATE bool univac_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class univac_state : public driver_device
 {
@@ -33,8 +33,8 @@ public:
 	DECLARE_READ8_MEMBER( uts20_vram_r );
 	DECLARE_WRITE8_MEMBER( uts20_vram_w );
 	DECLARE_WRITE8_MEMBER( uts20_43_w );
-	const UINT8 *m_FNT;
-	UINT8 m_uts20_screen;
+	const UINT8 *m_p_chargen;
+	bool m_screen_num;
 	UINT8 m_framecnt;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -45,19 +45,19 @@ public:
 
 WRITE8_MEMBER( univac_state::uts20_43_w )
 {
-	m_uts20_screen = data & 1;
+	m_screen_num = data & 1;
 }
 
 READ8_MEMBER( univac_state::uts20_vram_r )
 {
 	UINT8 *RAM = machine().region("maincpu")->base();
-	return RAM[offset | ((m_uts20_screen) ? 0xe000 : 0xc000)];
+	return RAM[offset | ((m_screen_num) ? 0xe000 : 0xc000)];
 }
 
 WRITE8_MEMBER( univac_state::uts20_vram_w )
 {
 	UINT8 *RAM = machine().region("maincpu")->base();
-	RAM[offset | ((m_uts20_screen) ? 0xe000 : 0xc000)] = data;
+	RAM[offset | ((m_screen_num) ? 0xe000 : 0xc000)] = data;
 }
 
 
@@ -80,21 +80,21 @@ static INPUT_PORTS_START( uts20 )
 INPUT_PORTS_END
 
 
-UTS20_MACHINE_RESET
+MACHINE_RESET_MEMBER(univac_state)
 {
-	m_uts20_screen = 0;
+	m_screen_num = 0;
 }
 
-UTS20_VIDEO_START
+VIDEO_START_MEMBER(univac_state)
 {
-	m_FNT = m_machine.region("chargen")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
-UTS20_SCREEN_UPDATE
+SCREEN_UPDATE_MEMBER(univac_state)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = machine().region("maincpu")->base()+((m_uts20_screen) ? 0xe000 : 0xc000);
+	UINT8 *videoram = machine().region("maincpu")->base()+((m_screen_num) ? 0xe000 : 0xc000);
 
 	m_framecnt++;
 
@@ -118,7 +118,7 @@ UTS20_SCREEN_UPDATE
 
 					chr &= 0x7f;
 
-					gfx = m_FNT[(chr<<4) | ra ];
+					gfx = m_p_chargen[(chr<<4) | ra ];
 				}
 
 				/* Display a scanline of a character */
@@ -166,7 +166,7 @@ ROM_START( uts20 )
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf) )
 ROM_END
 
 /* Driver */
