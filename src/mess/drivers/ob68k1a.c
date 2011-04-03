@@ -265,9 +265,14 @@ static COM8116_INTERFACE( dbrg_intf )
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
+static WRITE8_DEVICE_HANDLER( dummy_w )
+{
+	// this is here only so that terminal.c will initialize the keyboard scan timer
+}
+
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_NULL
+	DEVCB_HANDLER(dummy_w)
 };
 
 
@@ -379,4 +384,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, ob68k1a,  0,       0,	ob68k1a,	ob68k1a,	 0,  "Omnibyte",   "OB68K1A",		GAME_NOT_WORKING| GAME_NO_SOUND_HW )
+COMP( 1982, ob68k1a,  0,       0,	ob68k1a,	ob68k1a,	 0,  "Omnibyte",   "OB68K1A",	GAME_NO_SOUND_HW )
