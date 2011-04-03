@@ -14,6 +14,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
@@ -25,15 +27,20 @@ class tek4107a_state : public driver_device
 public:
 	tek4107a_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
+
+	virtual void machine_start();
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tek4107a_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tek4107a_mem, AS_PROGRAM, 8, tek4107a_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tek4107a_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tek4107a_io, AS_IO, 8, tek4107a_state )
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -43,11 +50,11 @@ INPUT_PORTS_END
 
 /* Video */
 
-static VIDEO_START( tek4107a )
+void tek4107a_state::video_start()
 {
 }
 
-static SCREEN_UPDATE( tek4107a )
+bool tek4107a_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -69,11 +76,7 @@ GFXDECODE_END
 
 /* Machine Initialization */
 
-static MACHINE_START( tek4107a )
-{
-}
-
-static MACHINE_RESET( tek4107a )
+void tek4107a_state::machine_start()
 {
 }
 
@@ -85,9 +88,6 @@ static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
     MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
     MCFG_CPU_IO_MAP(tek4107a_io)
 
-    MCFG_MACHINE_START(tek4107a)
-    MCFG_MACHINE_RESET(tek4107a)
-
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -95,10 +95,8 @@ static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(tek4107a)
 
 	MCFG_PALETTE_LENGTH(64)
-	MCFG_VIDEO_START(tek4107a)
 	MCFG_GFXDECODE(tek4107a)
 MACHINE_CONFIG_END
 
