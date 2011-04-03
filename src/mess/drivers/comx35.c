@@ -24,6 +24,7 @@
 #include "imagedev/printer.h"
 #include "imagedev/snapquik.h"
 #include "machine/cdp1871.h"
+#include "machine/comxpl80.h"
 #include "machine/wd17xx.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
@@ -373,6 +374,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_PRINTER_ADD("printer")
 
 	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	MCFG_COMXPL80_ADD()
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -397,6 +399,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_PRINTER_ADD("printer")
 
 	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	MCFG_COMXPL80_ADD()
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
