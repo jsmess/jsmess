@@ -17,12 +17,14 @@
 *    8000-BFFF 6821
 *    C000-FFFF ROM (mirror)
 *
-*    The ROM was typed in from the dump in the magazine article, therefore
-*    it is marked as BAD_DUMP.
+*    The ROM was typed in twice from the dump in the magazine article, and the
+*    results compared. Only one byte was different, so I can be confident that
+*    it has been typed in properly.
 *
 *    ToDo:
 *    - Proper artwork
-*    - There are various problems probably due to typos when making the rom.
+*    - There are various problems, seems to be another victim of inadequate
+*      6821 emulation.
 *
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -33,6 +35,7 @@
 #include "eacc.lh"
 #include "machine/6821pia.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class eacc_state : public driver_device
 {
@@ -50,11 +53,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
 	DECLARE_READ8_MEMBER( eacc_keyboard_r );
 	DECLARE_WRITE_LINE_MEMBER( eacc_cb2_w );
-	DECLARE_WRITE8_MEMBER( eacc_multiplex_w );
+	DECLARE_WRITE8_MEMBER( eacc_digit_w );
 	DECLARE_WRITE8_MEMBER( eacc_segment_w );
-	UINT8 m_cb1;
-	UINT8 m_cb2;
-	UINT8 m_multiplex;
+	bool m_cb1;
+	bool m_cb2;
+	UINT8 m_digit;
 	UINT8 m_segment;
 	void eacc_display();
 	virtual void machine_reset();
@@ -106,7 +109,7 @@ static INPUT_PORTS_START(eacc)
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 INPUT_PORTS_END
 
-void eacc_state::machine_reset()
+MACHINE_RESET_MEMBER(eacc_state)
 {
 	m_cb2 = 0;
 }
@@ -120,6 +123,7 @@ static TIMER_DEVICE_CALLBACK( eacc_cb1 )
 static TIMER_DEVICE_CALLBACK( eacc_nmi )
 {
 	eacc_state *state = timer.machine().driver_data<eacc_state>();
+
 	if (state->m_cb2)
 		device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -146,15 +150,15 @@ WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
 
 READ8_MEMBER( eacc_state::eacc_keyboard_r )
 {
-	UINT8 data = m_multiplex;
+	UINT8 data = m_digit;
 
-	if (BIT(m_multiplex, 3))
+	if (BIT(m_digit, 3))
 		data |= input_port_read(m_machine, "X0");
-	if (BIT(m_multiplex, 4))
+	if (BIT(m_digit, 4))
 		data |= input_port_read(m_machine, "X1");
-	if (BIT(m_multiplex, 5))
+	if (BIT(m_digit, 5))
 		data |= input_port_read(m_machine, "X2");
-	if (BIT(m_multiplex, 6))
+	if (BIT(m_digit, 6))
 		data |= input_port_read(m_machine, "X3");
 
 	return data;
@@ -166,10 +170,10 @@ void eacc_state::eacc_display()
 	char lednum[6];
 
 	for (i = 3; i < 7; i++)
-		if (BIT(m_multiplex, i))
+		if (BIT(m_digit, i))
 			output_set_digit_value(i, m_segment);
 
-	if (BIT(m_multiplex, 7))
+	if (BIT(m_digit, 7))
 		for (i = 0; i < 8; i++)
 		{
 			sprintf(lednum,"led%d",i);
@@ -192,10 +196,10 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 	eacc_display();
 }
 
-WRITE8_MEMBER( eacc_state::eacc_multiplex_w )
+WRITE8_MEMBER( eacc_state::eacc_digit_w )
 {
 	device_set_input_line(m_machine.device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
-	m_multiplex = data & 0xf8;
+	m_digit = data & 0xf8;
 	eacc_display();
 }
 
@@ -208,7 +212,7 @@ static const pia6821_interface eacc_mc6821_intf =
 	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_fuel_sensor_r),	/* CA2 input - pulses as fuel consumed */
 	DEVCB_NULL,						/* CB2 input */
 	DEVCB_DRIVER_MEMBER(eacc_state, eacc_segment_w),	/* port A output */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_multiplex_w),	/* port B output */
+	DEVCB_DRIVER_MEMBER(eacc_state, eacc_digit_w),		/* port B output */
 	DEVCB_NULL,						/* CA2 output */
 	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb2_w),	/* CB2 output - high after boot complete */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA output */
