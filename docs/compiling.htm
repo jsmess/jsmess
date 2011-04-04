@@ -1,5 +1,19 @@
-<html><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><h1><a name="compiling_mess" id="compiling_mess">Compiling MESS</a></h1>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en"><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>compiling_mess</title>
+<meta name="generator" content="DokuWiki Darcs --">
+<meta name="robots" content="index,follow">
+<meta name="date" content="2011-02-19T23:41:04+0100">
+<meta name="keywords" content="compiling_mess">
+</head>
+<body>
+<div class="dokuwiki export">
+
+
+
+
+<h1><a name="compiling_mess" id="compiling_mess">Compiling MESS</a></h1>
 <div class="level1">
 
 <p>
@@ -113,13 +127,13 @@ You have now fully compiled <acronym title="Multi Emulator Super System">MESS</a
 </p>
 
 <p>
-To compile the <acronym title="Multi Emulator Super System">MESS</acronym> UI, add <code>MESSUI=1</code>:
+To compile the <acronym title="Multi Emulator Super System">MESS</acronym> with its Windows UI, add <code>OSD=winui</code>:
 </p>
-<pre class="code">D:\mess&gt;make TARGET=mess MESSUI=1</pre>
+<pre class="code">D:\mess&gt;make TARGET=mess OSD=winui</pre>
 <p>
-To compile the <acronym title="Multi Emulator Super System">MESS</acronym> tools (chdman, imgtool, etc.), add <code>tools</code>:
+To compile the <acronym title="Multi Emulator Super System">MESS</acronym> tools (chdman, imgtool, etc.), use make all:
 </p>
-<pre class="code">D:\mess&gt;make TARGET=mess tools</pre>
+<pre class="code">D:\mess&gt;make all</pre>
 <p>
 If you are building on a windows platform and you want to build the mess.chm help file (you will need to have installed the <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=00535334-c8a6-452f-9aa0-d597d16580cc&amp;displaylang=en" class="urlextern" title="http://www.microsoft.com/downloads/details.aspx?FamilyID=00535334-c8a6-452f-9aa0-d597d16580cc&amp;displaylang=en" rel="nofollow">HTML Help Workshop</a>), type:
 
@@ -130,7 +144,7 @@ To compile a symbols-enabled version for backtracing add <code>SYMBOLS=1</code>:
 </p>
 <pre class="code">D:\mess&gt;make TARGET=mess SYMBOLS=1</pre>
 </div>
-<!-- SECTION "Building MESS on Windows" [2105-3581] -->
+<!-- SECTION "Building MESS on Windows" [2105-3585] -->
 <h2><a name="building_mess_on_nix" id="building_mess_on_nix">Building MESS on *nix</a></h2>
 <div class="level2">
 
@@ -148,7 +162,7 @@ To compile the <acronym title="Multi Emulator Super System">MESS</acronym> tools
 </p>
 
 </div>
-<!-- SECTION "Building MESS on *nix" [3582-4069] -->
+<!-- SECTION "Building MESS on *nix" [3586-4073] -->
 <h2><a name="see_also" id="see_also">See also</a></h2>
 <div class="level2">
 <ul>
@@ -157,4 +171,7 @@ To compile the <acronym title="Multi Emulator Super System">MESS</acronym> tools
 </ul>
 
 </div>
-<!-- SECTION "See also" [4070-] --></body></html>
+<!-- SECTION "See also" [4074-] --></div>
+
+
+</body></html>
