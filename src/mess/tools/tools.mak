@@ -35,7 +35,8 @@ TOOLS += $(DAT2HTML)
 endif
 
 # include OS-specific MESS stuff
-ifeq ($(OSD),windows)
+# the following expression is true if OSD is windows or winui
+ifeq ($(OSD),$(filter $(OSD),windows winui))
 include $(MESSSRC)/tools/messdocs/messdocs.mak
 
 ifdef BUILD_WIMGTOOL
