@@ -33,9 +33,8 @@
 
 /* Fake Keyboard */
 
-static void pc8401a_keyboard_scan(running_machine &machine)
+void pc8401a_state::scan_keyboard()
 {
-	pc8401a_state *state = machine.driver_data<pc8401a_state>();
 	int row, strobe = 0;
 
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -43,28 +42,30 @@ static void pc8401a_keyboard_scan(running_machine &machine)
 	/* scan keyboard */
 	for (row = 0; row < 10; row++)
 	{
-		UINT8 data = input_port_read(machine, keynames[row]);
+		UINT8 data = input_port_read(m_machine, keynames[row]);
 
 		if (data != 0xff)
 		{
 			strobe = 1;
-			state->m_key_latch = data;
+			m_key_latch = data;
 		}
 	}
 
-	if (!state->m_key_strobe && strobe)
+	if (!m_key_strobe && strobe)
 	{
 		/* trigger interrupt */
-		state->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x28);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x28);
 		logerror("INTERRUPT\n");
 	}
 
-	if (strobe)	state->m_key_strobe = strobe;
+	if (strobe)	m_key_strobe = strobe;
 }
 
 static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 {
-	pc8401a_keyboard_scan(timer.machine());
+	pc8401a_state *state = timer.machine().driver_data<pc8401a_state>();
+	
+	state->scan_keyboard();
 }
 
 /* Read/Write Handlers */
@@ -362,8 +363,8 @@ static ADDRESS_MAP_START( pc8500_io, AS_IO, 8, pc8401a_state )
 	AM_RANGE(0x40, 0x40) AM_READWRITE(rtc_r, rtc_ctrl_w)
 //  AM_RANGE(0x41, 0x41)
 //  AM_RANGE(0x50, 0x51)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_LEGACY(SED1330_TAG, sed1330_status_r, sed1330_data_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY(SED1330_TAG, sed1330_data_r, sed1330_command_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SED1330_TAG, sed1330_device, status_r, data_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SED1330_TAG, sed1330_device, data_r, command_w)
 	AM_RANGE(0x70, 0x70) AM_READWRITE(port70_r, port70_w)
 	AM_RANGE(0x71, 0x71) AM_READWRITE(port71_r, port71_w)
 //  AM_RANGE(0x80, 0x80) modem status, set to 0xff to boot

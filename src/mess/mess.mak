@@ -570,7 +570,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/m6845.o		\
 	$(MESS_VIDEO)/m6847.o		\
 	$(MESS_VIDEO)/saa505x.o		\
-	$(MESS_VIDEO)/sed1330.o		\
 	$(MESS_VIDEO)/tms3556.o		\
 	$(MESS_VIDEO)/upd7220.o		\
 	$(MESS_MACHINE)/applefdc.o	\

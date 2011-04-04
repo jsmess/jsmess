@@ -27,10 +27,6 @@
 #define MSM8251_TAG		"msm8251"
 
 #define PC8401A_CRT_VIDEORAM_SIZE	0x2000
-#define PC8401A_LCD_VIDEORAM_SIZE	0x2000
-#define PC8401A_LCD_VIDEORAM_MASK	0x1fff
-#define PC8500_LCD_VIDEORAM_SIZE	0x4000
-#define PC8500_LCD_VIDEORAM_MASK	0x3fff
 
 class pc8401a_state : public driver_device
 {
@@ -47,7 +43,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
-	required_device<device_t> m_lcdc;
+	required_device<sed1330_device> m_lcdc;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_screen_lcd;
 	required_device<device_t> m_ram;
@@ -71,6 +67,7 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	
+	void scan_keyboard();
 	void bankswitch(UINT8 data);
 
 	// keyboard state
@@ -81,7 +78,6 @@ public:
 	UINT32 m_io_addr;			// I/O ROM address counter
 
 	// video state
-	UINT8 *m_video_ram;			// LCD video RAM
 	UINT8 *m_crt_ram;			// CRT video RAM
 
 	UINT8 m_key_latch;
@@ -96,9 +92,6 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-
-	DECLARE_READ8_MEMBER( vd_r );
-	DECLARE_WRITE8_MEMBER( vd_w );
 };
 
 // ---------- defined in video/pc8401a.c ----------
