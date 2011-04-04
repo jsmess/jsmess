@@ -116,7 +116,7 @@ static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 
 	case s_pgm_3:
 		/* programming cycle end */
-		memcpy(feeprom->memptr + (feeprom->programming_last_offset & ~0xff), feeprom->programming_buffer, SECTOR_SIZE);
+		memcpy(feeprom->memptr + 2 + (feeprom->programming_last_offset & ~0xff), feeprom->programming_buffer, SECTOR_SIZE);
 
 		if (feeprom->s_enabling_sdb)
 			feeprom->s_sdp = TRUE;
@@ -224,8 +224,7 @@ READ8_DEVICE_HANDLER( at29c040a_r )
 			reply |= 0x01;
 	}
 	else
-		reply = feeprom->memptr[offset];
-
+		reply = feeprom->memptr[offset+2];
 	return reply;
 }
 
@@ -304,7 +303,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 						logerror("If the boot block lockout feature has been enabled, the 6-byte software chip erase algorithm will not function.\n");
 					else
 					{
-						memset(feeprom->memptr, 0xff, 524288);
+						memset(feeprom->memptr+2, 0xff, 524288);
 						feeprom->s_dirty = TRUE;
 					}
 				}
@@ -423,8 +422,6 @@ static DEVICE_RESET( at29c040a )
 	feeprom->s_higher_bbl = (feeprom->memptr[1] >> 1) & 1;
 	feeprom->s_sdp = feeprom->memptr[1] & 1;
 	feeprom->s_dirty = FALSE;
-
-	feeprom->memptr += 2;
 }
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
