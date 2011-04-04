@@ -61,4 +61,4 @@ $(WIMGTOOLOBJ)/%.res: $(WIMGTOOLSRC)/%.rc | $(OSPREBUILD)
 
 $(WIMGTOOL): $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS_WIN) -mwindows $^ $(LIBS_WIN) -o $@
+	$(LD) $(LDFLAGS_WIN) -municode -mwindows $^ $(LIBS_WIN) -o $@
