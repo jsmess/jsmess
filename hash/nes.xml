@@ -34864,6 +34864,22 @@ If you can help us with any of these, please contact us (at the MESS boards) or 
 
 Also notice that VRAM, WRAM & mirror are probably incorrect for some of these sets, at the moment... -->
 
+	<software name="bioforce">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Bio Force Ape (Jpn, Prototype)</description>
+		<year>1991</year>
+		<publisher>Seta</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bio force ape (j)(prototype).prg" size="131072" crc="7a46c984" sha1="97418d2b6ef39efea9758d5b1a410536fefaf801" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bio force ape (j)(prototype).chr" size="131072" crc="bab49652" sha1="9b81991c0c16e6b122f55c9da0b9a1b090ba6afa" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="100mandk" cloneof="casinok">
 		<!-- Serial:  - Release Date: 1989-01-06 - Alternative Title:  -->
 		<description>100 Man Dollar Kid - Maboroshi no Teiou Hen (Jpn)</description>
