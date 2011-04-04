@@ -1,5 +1,19 @@
+#pragma once
+
 #ifndef __PX8__
 #define __PX8__
+
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "machine/ram.h"
+#include "machine/msm8251.h"
+#include "machine/pf10.h"
+#include "sound/wave.h"
 
 #define UPD70008_TAG	"4a"
 #define UPD7508_TAG		"2e"
@@ -16,8 +30,33 @@ class px8_state : public driver_device
 {
 public:
 	px8_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, UPD70008_TAG),
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_ram(*this, RAM_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_cassette;
+	required_device<device_t> m_ram;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	READ8_MEMBER( gah40m_r );
+	WRITE8_MEMBER( gah40m_w );
+	READ8_MEMBER( gah40s_r );
+	WRITE8_MEMBER( gah40s_w );
+	WRITE8_MEMBER( gah40s_ier_w );
+	READ8_MEMBER( krtn_0_3_r );
+	READ8_MEMBER( krtn_4_7_r );
+	WRITE8_MEMBER( ksc_w );
+	
+	void bankswitch();
+	UINT8 krtn_read();
+	
 	/* GAH40M state */
 	UINT16 m_icr;				/* input capture register */
 	UINT16 m_frc;				/* free running counter */
@@ -40,10 +79,6 @@ public:
 
 	/* video state */
 	UINT8 *m_video_ram;		/* LCD video RAM */
-
-	/* devices */
-	device_t *m_sed1320;
-	device_t *m_cassette;
 };
 
 #endif
