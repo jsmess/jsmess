@@ -8,41 +8,64 @@
 
         04/12/2009 Skeleton driver.
 
+        04/04/2011 Modernised, added terminal keyboard.
+
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/upd7201.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class sun1_state : public driver_device
 {
 public:
 	sun1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ16_MEMBER( sun1_upd7201_r );
+	DECLARE_WRITE16_MEMBER( sun1_upd7201_w );
+	DECLARE_WRITE8_MEMBER( sun1_kbd_put );
+	virtual void machine_reset();
 	UINT16* m_ram;
+	UINT8 m_term_data;
 };
 
 
 
 // Just hack to show output since upd7201 is not implemented yet
 
-static READ16_HANDLER(sun1_upd7201_r)
+READ16_MEMBER(sun1_state::sun1_upd7201_r)
 {
-	return 0xffff;
+	UINT16 ret;
+	if (offset == 0)
+	{
+		ret = m_term_data << 8;
+		m_term_data = 0;
+	}
+	else
+		ret = 0xfeff | (m_term_data ? 0x100 : 0);
+
+	return ret;
 }
 
-static WRITE16_HANDLER(sun1_upd7201_w)
+WRITE16_MEMBER(sun1_state::sun1_upd7201_w)
 {
-	device_t *devconf = space->machine().device(TERMINAL_TAG);
-	if (offset==0) terminal_write(devconf,0,data >> 8);
+	if (offset == 0)
+		terminal_write(m_terminal, 0, data >> 8);
 }
 
-static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(sun1_state, m_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
 ADDRESS_MAP_END
@@ -52,47 +75,48 @@ static INPUT_PORTS_START( sun1 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(sun1)
+MACHINE_RESET_MEMBER(sun1_state)
 {
-	sun1_state *state = machine.driver_data<sun1_state>();
-	UINT8* user1 = machine.region("user1")->base();
+	UINT8* user1 = m_machine.region("user1")->base();
 
-	memcpy((UINT8*)state->m_ram,user1,0x4000);
+	memcpy((UINT8*)m_ram,user1,0x4000);
 
-	machine.device("maincpu")->reset();
+	m_machine.device("maincpu")->reset();
+	m_term_data = 0;
 }
 
 
-static WRITE8_DEVICE_HANDLER( sun1_kbd_put )
+WRITE8_MEMBER( sun1_state::sun1_kbd_put )
 {
+	m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 {
-	DEVCB_HANDLER(sun1_kbd_put)
+	DEVCB_DRIVER_MEMBER(sun1_state, sun1_kbd_put)
 };
 
 
 static MACHINE_CONFIG_START( sun1, sun1_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
-    MCFG_CPU_PROGRAM_MAP(sun1_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-    MCFG_MACHINE_RESET(sun1)
-
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_terminal )
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sun1 )
-    ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "v10.8.bin", 0x0001, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0))
 	ROM_LOAD16_BYTE( "v10.0.bin", 0x0000, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d))
+
 	ROM_REGION( 0x4000, "diag", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "8mhzdiag.8.bin", 0x0001, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4))
 	ROM_LOAD16_BYTE( "8mhzdiag.0.bin", 0x0000, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb))
+
 	ROM_REGION( 0x10000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "gfxu605.g4.bin",  0x0000, 0x0200, CRC(274b7b3d) SHA1(40d8be2cfcbd03512a05925991bb5030d5d4b5e9))
 	ROM_LOAD( "gfxu308.g21.bin", 0x0200, 0x0200, CRC(35a6eed8) SHA1(25cb2dd8e5343cd7927c3045eb4cb96dc9935a37))
@@ -101,11 +125,11 @@ ROM_START( sun1 )
 	ROM_LOAD( "gfxu104.g1.bin",  0x0800, 0x0200, CRC(86f7a483) SHA1(8eb3778f5497741cd4345e81ff1a903c9a63c8bb))
 	ROM_LOAD( "gfxu307.g61.bin", 0x0a00, 0x0020, CRC(b190f25d) SHA1(80fbdc843f1eb68a2d3713499f04d99dab88ce83))
 	ROM_LOAD( "gfxu107.g60.bin", 0x0a20, 0x0020, CRC(425d3a98) SHA1(9ae4ce3761c2f995d00bed8d752c55224d274062))
+
 	ROM_REGION( 0x10000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "cpuu503.p2.bin", 0x0000, 0x0200, CRC(12d9a6be) SHA1(fca99f9c5afc630ac67cbd4e5ba4e5242b826848))
 	ROM_LOAD( "cpuu602.p1.bin", 0x0200, 0x0020, CRC(ee1e5a14) SHA1(0d3346cb3b647fa2475bd7b4fa36ea6ecfdaf805))
 	ROM_LOAD( "cpuu502.p0.bin", 0x0220, 0x0020, CRC(20eb1183) SHA1(9b268792b28d858d6b6a1b6c4148af88a8d6b735))
-
 ROM_END
 
 /* Driver */
