@@ -51,4 +51,4 @@ help: maketree $(MESSHELP)
 $(MESSHELP): $(OBJ)/build/$(MESSDOCS) sysinfo.dat
 	$(subst /,\,$(OBJ)/build/$(MESSDOCS)) docs/wintoc.xml $(HELPOBJ)
 	$(HHC) $(subst /,\\,$(HELPOBJ))\\mess.hhp
-	@cp $(HELPOBJ)/$(MESSHELP) $@
+	@copy $(subst /,\,$(HELPOBJ)/$(MESSHELP) $@)
