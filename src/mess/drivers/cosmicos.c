@@ -4,7 +4,7 @@
 
     http://retro.hansotten.nl/index.php?page=1802-cosmicos
 
-
+	
     HEX-monitor
 
     0 - start user program
@@ -504,7 +504,7 @@ void cosmicos_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize LED display */
-	dm9368_rbi_w(m_led, 1);
+	m_led->rbi_w(1);
 
 	/* setup memory banking */
 	switch (ram_get_size(m_ram))
@@ -566,6 +566,13 @@ static const cassette_config cosmicos_cassette_config =
 	NULL
 };
 
+static DM9368_INTERFACE( led_intf )
+{
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	/* basic machine hardware */
     MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
@@ -575,7 +582,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
-	MCFG_DM9368_ADD(DM9368_TAG, 0, NULL)
+	MCFG_DM9368_ADD(DM9368_TAG, led_intf)
 	MCFG_TIMER_ADD_PERIODIC("digit", digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, attotime::from_hz(1000))
 

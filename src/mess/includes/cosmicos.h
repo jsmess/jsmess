@@ -55,7 +55,7 @@ public:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<device_t> m_cti;
-	required_device<device_t> m_led;
+	required_device<dm9368_device> m_led;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_ram;

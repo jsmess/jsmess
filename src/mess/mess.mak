@@ -561,7 +561,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/cdp1862.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
-	$(MESS_VIDEO)/dm9368.o		\
 	$(MESS_VIDEO)/hd44102.o		\
 	$(MESS_VIDEO)/hd44780.o		\
 	$(MESS_VIDEO)/hd66421.o		\

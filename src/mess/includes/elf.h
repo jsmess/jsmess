@@ -40,8 +40,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_cti;
 	required_device<device_t> m_kb;
-	required_device<device_t> m_led_l;
-	required_device<device_t> m_led_h;
+	required_device<dm9368_device> m_led_l;
+	required_device<dm9368_device> m_led_h;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_ram;
 

@@ -44,8 +44,8 @@ READ8_MEMBER( elf2_state::data_r )
 
 WRITE8_MEMBER( elf2_state::data_w )
 {
-	dm9368_w(m_led_l, 0, data & 0x0f);
-	dm9368_w(m_led_h, 0, data >> 4);
+	m_led_l->a_w(data & 0x0f);
+	m_led_h->a_w(data >> 4);
 }
 
 WRITE8_MEMBER( elf2_state::memory_w )
@@ -64,8 +64,8 @@ WRITE8_MEMBER( elf2_state::memory_w )
 		}
 
 		/* write data to 7 segment displays */
-		dm9368_w(m_led_l, 0, data & 0x0f);
-		dm9368_w(m_led_h, 0, data >> 4);
+		m_led_l->a_w(data & 0x0f);
+		m_led_h->a_w(data >> 4);
 	}
 }
 
@@ -205,8 +205,8 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 		if (LOAD)
 		{
 			/* write data to 7 segment displays */
-			dm9368_w(m_led_l, 0, m_data & 0x0f);
-			dm9368_w(m_led_h, 0, m_data >> 4);
+			m_led_l->a_w(m_data & 0x0f);
+			m_led_h->a_w(m_data >> 4);
 		}
 	}
 }
@@ -248,8 +248,8 @@ void elf2_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize LED displays */
-	dm9368_rbi_w(m_led_l, 1);
-	dm9368_rbi_w(m_led_h, 1);
+	m_led_l->rbi_w(1);
+	m_led_h->rbi_w(1);
 
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
@@ -269,6 +269,20 @@ static const cassette_config elf_cassette_config =
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
 	NULL
+};
+
+static DM9368_INTERFACE( led_h_intf )
+{
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static DM9368_INTERFACE( led_l_intf )
+{
+	1,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static QUICKLOAD_LOAD( elf )
@@ -305,8 +319,8 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_MM74C923_ADD(MM74C923_TAG, keyboard_intf)
-	MCFG_DM9368_ADD(DM9368_H_TAG, 0, NULL)
-	MCFG_DM9368_ADD(DM9368_L_TAG, 1, NULL)
+	MCFG_DM9368_ADD(DM9368_H_TAG, led_h_intf)
+	MCFG_DM9368_ADD(DM9368_L_TAG, led_l_intf)
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2, elf2_cdp1861_intf)
 
 	/* devices */
