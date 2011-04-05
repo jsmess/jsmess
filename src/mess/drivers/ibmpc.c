@@ -76,8 +76,179 @@ Currently known: (probably exist for all the standard codepages)
 ???????: Greek (code page 737) NOT DUMPED!
 ???????: Estonian/Lithuanian/Latvian (code page 775) NOT DUMPED!
 ???????: Icelandic (code page 861, characters 0x8B-0x8D, 0x95, 0x97-0x98, 0x9B, 0x9D, 0xA4-0xA7 differ from cp437) NOT DUMPED!
-4733197: Danish/Norwegian (code page 865, characters 0x9B and 0x9D differ from cp437) NOT DUMPED!
+4733197: Danish/Norwegian (code page 865, characters 0x9B and 0x9D differ from cp437)
 ???????: Hebrew (code page 862) NOT DUMPED!
+
+=========================
+IBM Roms thanks to Frode
+=========================
+
+1504036.bin: IBM 4860 PC/jr BIOS. vissible in memory at F0000-F7FFF.
+1504037.bin: IBM 4860 PC/jr BIOS. vissible in memory at F8000-FFFFF.
+
+  ROM_LOAD( "1504036.bin", 0xf0000, 0x8000, CRC(de8fa668) SHA1(459341e033be1199c107e56d33680170e144b689))
+  ROM_LOAD( "1504037.bin", 0xf8000, 0x8000, CRC(04c05f17) SHA1(319423cb6bb02b399ecf6e0cb82015c16ada68f5))
+
+5601JDA.bin: IBM 5511 PC/JX BIOS. vissible in memory at F0000-FFFFF.
+  ROM_LOAD( "5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6))
+
+7396917.bin: IBM 5140 PC/Convertible BIOS. vissible in memory at F0000-F7FFF.
+7396918.bin: IBM 5140 PC/Convertible BIOS. vissible in memory at F8000-FFFFF.
+  ROM_LOAD( "7396917.bin", 0xf0000, 0x8000, CRC(95c35652) SHA1(2bdac30715dba114fbe0895b8b4723f8dc26a90d))
+  ROM_LOAD( "7396918.bin", 0xf8000, 0x8000, CRC(1b4202b0) SHA1(4797ff853ba1675860f293b6368832d05e2f3ea9))
+
+5700019.bin: IBM 5150 PC BASIC 1.0. vissible in memory at F6000-F7FFF.
+5700027.bin: IBM 5150 PC BASIC 1.0. vissible in memory at F8000-F9FFF.
+5700035.bin: IBM 5150 PC BASIC 1.0. vissible in memory at FA000-FBFFF.
+5700043.bin: IBM 5150 PC BASIC 1.0. vissible in memory at FC000-FDFFF.
+  ROM_LOAD( "5700019.bin", 0xf6000, 0x2000, CRC(b59e8f6c) SHA1(7a5db95370194c73b7921f2d69267268c69d2511))
+  ROM_LOAD( "5700027.bin", 0xf8000, 0x2000, CRC(bfff99b8) SHA1(ca2f126ba69c1613b7b5a4137d8d8cf1db36a8e6))
+  ROM_LOAD( "5700035.bin", 0xfa000, 0x2000, CRC(9fe4ec11) SHA1(89af8138185938c3da3386f97d3b0549a51de5ef))
+  ROM_LOAD( "5700043.bin", 0xfc000, 0x2000, CRC(ea2794e6) SHA1(22fe58bc853ffd393d5e2f98defda7456924b04f))
+
+
+5700051.bin: First early IBM 5150 PC BIOS. vissible in memory at FE000-FFFFF.
+  ROM_LOAD( "5700051.bin", 0xfe000, 0x2000, CRC(12d33fb8) SHA1(f046058faa016ad13aed5a082a45b21dea43d346))
+5700671.bin: Second early IBM 5150 PC BIOS. vissible in memory at FE000-FFFFF.
+  ROM_LOAD( "5700671.bin", 0xfe000, 0x2000, CRC(b7d4ec46) SHA1(bdb06f846c4768f39eeff7e16b6dbff8cd2117d2))
+
+5000019.bin: IBM 5150 PC BASIC 1.1. vissible in memory at F6000-F7FFF.
+5000021.bin: IBM 5150 PC BASIC 1.1. vissible in memory at F8000-F9FFF.
+5000022.bin: IBM 5150 PC BASIC 1.1. vissible in memory at FA000-FBFFF.
+5000023.bin: IBM 5150 PC BASIC 1.1. vissible in memory at FC000-FDFFF.
+  ROM_LOAD( "5000019.bin", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
+  ROM_LOAD( "5000021.bin", 0xf8000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
+  ROM_LOAD( "5000022.bin", 0xfa000, 0x2000, CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74))
+  ROM_LOAD( "5000023.bin", 0xfc000, 0x2000, CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7))
+
+
+5700476.0.bin: Late IBM 5150 PC BIOS. vissible in memory at FE000-FFFFF. (1981 copyright)
+  ROM_LOAD( "1501476.0.bin", 0xfe000, 0x2000, CRC(9b791d3e) SHA1(0c93f07e62cd27688f7f473e9787ef5308535fa0))
+5700476.1.bin: Late IBM 5150 PC BIOS. vissible in memory at FE000-FFFFF. (1982 copyright)
+  ROM_LOAD( "1501476.1.bin", 0xfe000, 0x2000, CRC(e88792b3) SHA1(40fce6a94dda4328a8b608c7ae2f39d1dc688af4))
+
+5000027.bin: Early IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F6000-F7FFF.
+5000026.bin: Prototype IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF.
+  ROM_LOAD( "5000027.bin", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
+  ROM_LOAD( "5000026.bin", 0xf8000, 0x8000, CRC(3c9b0ac3) SHA1(271c9f4cef5029a1560075550b67c3395db09fef))
+
+6359116.bin: Early IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F6000-F7FFF.
+  ROM_LOAD( "6359116.bin", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
+
+1501512.bin: Early IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF.
+  ROM_LOAD( "1501512.bin", 0xf8000, 0x8000, CRC(79522c3d) SHA1(6bac726d8d033491d52507278aa388ec04cf8b7e))
+
+62x0854.bin: First late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F0000-F7FFF. (PROM)
+62x0851.bin: First late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF. (PROM)
+  ROM_LOAD( "62x0854.bin", 0xf0000, 0x8000, CRC(b5fb0e83) SHA1(937b43759ffd472da4fb0fe775b3842f5fb4c3b3))
+  ROM_LOAD( "62x0851.bin", 0xf8000, 0x8000, CRC(1054f7bd) SHA1(e7d0155813e4c650085144327581f05486ed1484))
+
+62x0853.bin: First late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F0000-F7FFF. (EPROM)
+62x0852.bin: First late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF. (EPROM)
+  ROM_LOAD( "62x0853.bin", 0xf0000, 0x8000, CRC(b5fb0e83) SHA1(937b43759ffd472da4fb0fe775b3842f5fb4c3b3))
+  ROM_LOAD( "62x0852.bin", 0xf8000, 0x8000, CRC(1054f7bd) SHA1(e7d0155813e4c650085144327581f05486ed1484))
+
+68x4370.bin: Second late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F0000-F7FFF. (PROM)
+62x0890.bin: Second late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF. (PROM)
+  ROM_LOAD( "68x4370.bin", 0xf0000, 0x8000, CRC(758ff036) SHA1(045e27a70407d89b7956ecae4d275bd2f6b0f8e2))
+  ROM_LOAD( "62x0890.bin", 0xf8000, 0x8000, CRC(4f417635) SHA1(daa61762d3afdd7262e34edf1a3d2df9a05bcebb))
+
+62x0819.bin: Second late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F0000-F7FFF. (EPROM)
+59x7268.bin: Second late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF. (EPROM)
+  ROM_LOAD( "62x0819.bin", 0xf0000, 0x8000, CRC(758ff036) SHA1(045e27a70407d89b7956ecae4d275bd2f6b0f8e2))
+  ROM_LOAD( "59x7268.bin", 0xf8000, 0x8000, CRC(4f417635) SHA1(daa61762d3afdd7262e34edf1a3d2df9a05bcebb))
+  
+78x7460.bin: IBM 5162 PC/XT 286 BIOS. vissible in even memory at F0000-FFFFF (mirror at E0000-EFFFF).
+78x7461.bin: IBM 5162 PC/XT 286 BIOS. vissible in odd memory at F0000-FFFFF (mirror at E0000-EFFFF).
+  ROM_LOAD16_BYTE( "78x7460.bin", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31))
+  ROM_LOAD16_BYTE( "78x7461.bin", 0xf0001, 0x8000, CRC(be14b453) SHA1(ec7c10087dbd53f9c6d1174e8f14212e2aec1818))
+
+6181028.bin: First 6MHz IBM 5170 PC/AT BIOS. vissible in even memory at F0000-FFFFF.
+6181029.bin: First 6MHz IBM 5170 PC/AT BIOS. vissible in odd memory at F0000-FFFFF.
+  ROM_LOAD16_BYTE( "6181028.bin", 0xf0000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a))
+  ROM_LOAD16_BYTE( "6181029.bin", 0xf0001, 0x8000, CRC(7075fbb2) SHA1(a7b885cfd38710c9bc509da1e3ba9b543a2760be))
+
+6480090.bin: Second 6MHz IBM 5170 PC/AT BIOS. vissible in even memory at F0000-FFFFF.
+6480091.bin: Second 6MHz IBM 5170 PC/AT BIOS. vissible in odd memory at F0000-FFFFF.
+  ROM_LOAD16_BYTE( "6480090.bin", 0xf0000, 0x8000, CRC(99703aa9) SHA1(18022e93a0412c8477e58f8c61a87718a0b9ab0e))
+  ROM_LOAD16_BYTE( "6480091.bin", 0xf0001, 0x8000, CRC(013ef44b) SHA1(bfa15d2180a1902cb6d38c6eed3740f5617afd16))
+
+62x0820.bin: 8MHz IBM 5170 PC/AT BIOS. vissible in even memory at F0000-FFFFF. (PROM)
+62x0821.bin: 8MHz IBM 5170 PC/AT BIOS. vissible in odd memory at F0000-FFFFF. (PROM)
+  ROM_LOAD( "62x0820.bin", 0xf0000, 0x8000, CRC(e9cc3761) SHA1(ff9373c1a1f34a32fb6acdabc189c61b01acf9aa))
+  ROM_LOAD( "62x0821.bin", 0xf0001, 0x8000, CRC(b5978ccb) SHA1(2a1aeb9ae3cd7e60fc4c383ca026208b82156810))
+
+61x9266.bin: 8MHz IBM 5170 PC/AT BIOS. vissible in even memory at F0000-FFFFF. (EPROM)
+61x9265.bin: 8MHz IBM 5170 PC/AT BIOS. vissible in odd memory at F0000-FFFFF. (EPROM)
+  ROM_LOAD( "61x9265.bin", 0xf0001, 0x8000, CRC(c32713e4) SHA1(22ed4e2be9f948682891e2fd056a97dbea01203c))
+  ROM_LOAD( "61x9266.bin", 0xf0000, 0x8000, CRC(4995be7a) SHA1(8e8e5c863ae3b8c55fd394e345d8cca48b6e575c))
+
+
+5788005.bin: IBM MDA/CGA font. Not mapped in PC memory. (American manufacture, otherwise similar to the Europeian manufacture)
+  ROM_LOAD( "5788005.bin", 0x0000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+6359300.bin: IBM MDA/CGA font. Not mapped in PC memory. (Europeian manufacture, otherwise similar to the American manufacture)
+  ROM_LOAD( "6359300.bin", 0x0000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+4733197.bin: IBM MDA/CGA Alternative font. Not mapped in PC memory.
+  ROM_LOAD( "4733197.bin", 0x0000, 0x2000, CRC(650c0f85) SHA1(0c8ac77248a9856d065b1c64658e712ea55b7507))
+
+6277356.bin: IBM EGA ROM. Visible in memory at C3FFF-C0000.
+  ROM_LOAD( "6277356.bin", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
+
+8222554.bin: IBM VGA ROM. Visible in memory at C0000-C5FFF.
+  ROM_LOAD( "8222554.bin", 0x0000, 0x6000, CRC(6c12d745) SHA1(c0156607100e377c6c9563f23967409dab3ab92b))
+
+5000059.bin: First version Hard drive controller ROM. Visible in memory at C8000-C9FFF.
+  ROM_LOAD( "5000059.bin", 0xc8000, 0x2000, CRC(03e0ee9a) SHA1(6691be4f6a8d690c696ad8b259708d3e7e87ad89))
+
+6359121.bin: First version Hard drive controller ROM. Visible in memory at C8000-C9FFF.
+  ROM_LOAD( "6359121.bin", 0xc8000, 0x2000, CRC(03e0ee9a) SHA1(6691be4f6a8d690c696ad8b259708d3e7e87ad89))
+
+59x7291.bin: Second version Hard drive controller ROM. Visible in memory at C8000-C8FFF.
+  ROM_LOAD( "59x7291.bin", 0xc8000, 0x1000, CRC(25920437) SHA1(de970bcc5c6f1b588fbc4c76617165ce8eb2bf1d))
+  
+104839e.bin: Hard drive controller Z80 firmware ROM. Not mapped in PC memory. (Mapped in Z80 microcontroller memory at 0000-7FFF)
+  ROM_LOAD( "104839e.bin", 0x0000, 0x1000, CRC(3ad32fcc) SHA1(0127fa520aaee91285cb46a640ed835b4554e4b3))
+
+6323581.bin: 3270 Keyboard adapter ROM. The first 0x800 bytes vissible in memory at C0000-C07FF. The later 0x1800 bytes visible in memory at CA000-CB7FF.
+  ROM_LOAD( "6323581.bin", 0xc0000, 0x2000, CRC(cf323cbd) SHA1(93c1ef2ede02772a46dab075c32e179faa045f81))
+
+1504161.bin: 3270 Character ROM (pixels 0-7). Not mapped in PC memory.
+1504162.bin: 3270 Character ROM (pixel 8). Not mapped in PC memory.
+  ROM_LOAD( "1504161.bin", 0x0000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140))
+  ROM_LOAD( "1504162.bin", 0x2000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7))
+
+6137323.bin: Professional Graphics Controller, first half of x86 firmware. Not mapped in PC memory. (Mapped in 8088-2 microcontroller memory at 00000-07FFF)
+6137322.bin: Professional Graphics Controller, second half of x86 firmware. Not mapped in PC memory. (Mapped in 8088-2 microcontroller memory at 08000-0FFFF and any address within (8-F)(0-F)(3/7/B/F)00-(8-F)(0-F)(3/7/B/F)FF)
+___MISSING___ 6137560.bin: Professional Graphics Controller, CGA emulation font. Not mapped in PC memory.
+  ROM_LOAD( "6137322.bin", 0x8000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5))
+  ROM_LOAD( "6137323.bin", 0x0000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526))
+
+  
+XC215 C 0.bin: IBM Music feature card Z80 firmware ROM. Not mapped in PC memory. (Mapped in Z80 microcontroller memory at 0000-7FFF)
+  ROM_LOAD( "xc215 c 0.bin", 0x0000, 0x8000, CRC(28c58a4f) SHA1(e7edf28d20e6c146e3144526c89cd6beea64663b))
+
+XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapped in PC memory.
+  ROM_LOAD( "xt u44 ibm.bin",0x0000, 0x0080, CRC(60ebb6e5) SHA1(e96a83b2fd6a231235374272a99353ab362b8e37))
+
+1503033.bin: IBM 5170 PC/AT keyboard controller i8042 firmware. Not mapped in PC memory.
+  ROM_LOAD( "1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+
+1503099.bin: IBM AT 84-key Keyboard firmware. Not mapped in PC memory.
+  ROM_LOAD( "1503099.bin", 0x0000, 0x0400, CRC(1e921f37) SHA1(5f722bdb3b57f5a532c02a5c3f78f30d785796f2))
+
+1385001.bin: IBM Terminal 122-key Keyboard firmware. Not mapped in PC memory.
+  ROM_LOAD( "1385001.bin", 0x0000, 0x0400, CRC(c19767e9) SHA1(a3701e4617383a4de0fd5e2e86c4b74beaf94a7b))
+
+30F9580.bin: IBM PS/2 model 30 286 even.
+30F9579.bin: IBM PS/2 model 30 286 odd.
+  ROM_LOAD( "30f9579.bin", 0x0000, 0x10000, CRC(1448d3cb) SHA1(13fa26d895ce084278cd5ab1208fc16c80115ebe))
+  ROM_LOAD( "30f9580.bin", 0x0000, 0x10000, CRC(9965a634) SHA1(c237b1760f8a4561ec47dc70fe2e9df664e56596))
+
+90X7415.bin: IBM PS/2 model 25/30 external FDD support adapter. vissible in memory at C8000-C9FFF.
+  ROM_LOAD( "90x7415.bin", 0x0000, 0x2000, CRC(02d28556) SHA1(5543a8634f90a9141cf95f6a13c71be7778ee2a1))
+
 
 ***************************************************************************/
 

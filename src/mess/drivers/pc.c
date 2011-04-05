@@ -17,52 +17,6 @@ Driver file for IBM PC, IBM PC XT, and related machines.
     F0000-FDFFF   NOP       or ROM Basic + other Extensions
     FE000-FFFFF   ROM
 
-IBM PC 5150
-===========
-
-- Intel 8088 at 4.77 MHz derived from a 14.31818 MHz crystal
-- Onboard RAM: Revision A mainboard - min. 16KB, max. 64KB
-               Revision B mainboard - min. 64KB, max. 256KB
-- Total RAM (using 5161 expansion chassis or ISA memory board): 512KB (rev 1 or rev 2 bios) or 640KB (rev 3 bios)
-- Graphics: MDA, CGA, or MDA and CGA
-- Cassette port
-- Five ISA expansion slots (short type)
-- PC/XT keyboard 83-key 'IBM Model F' (some early 'IBM Model M' keyboards can produce scancodes compatible with this as well, but it was an undocumented feature unsupported by IBM)
-- Optional 8087 co-processor
-- Optional up to 4 (2 internal, 2 external) 160KB single-sided or 360KB double-sided 5 1/4" floppy drives
-- Optional 10MB hard disk (using 5161 expansion chassis)
-- Optional Game port joystick ISA card (two analog joysticks with 2 buttons each)
-- Optional Parallel port ISA card, Unidirectional (upgradable to bidirectional (as is on the ps/2) with some minor hacking; IBM had all the circuitry there but it wasn't hooked up properly)
-- Optional Serial port ISA card
-
-
-IBM PC-JR
-=========
-
-
-IBM PC-XT 5160
-==============
-
-- Intel 8088 at 4.77 MHz derived from a 14.31818 MHz crystal
-- Onboard RAM: Revision A mainboard (P/N 6181655) - min. 64KB, max. 256KB (4x 64KB banks of 9 IMS2600 64kx1 drams plus parity); could be upgraded to 640KB with a hack; may support the weird 256k stacked-chip dram the AT rev 1 uses)
-               Revision B mainboard - min. 256KB, max 640KB (2x 256KB, 2x 64KB banks)
-- Total RAM (using 5161 expansion chassis, ISA memory board, or rev B mainboard): 640KB
-- Graphics: MDA, CGA, MDA and CGA, EGA, EGA and MDA, or EGA and CGA
-- One internal 360KB double-sided 5 1/4" floppy drive
-- PC/XT keyboard 83-key 'IBM Model F' (BIOS revisions 1 and 2) (some early 'IBM Model M' keyboards can produce scancodes compatible with this as well, but it was an undocumented feature unsupported by IBM)
-- 84-key 'AT/Enhanced' keyboard or 101-key 'IBM Model M' (BIOS revisions 3 and 4)
-- Eight ISA expansion slots (short type)
-- Optional 8087 co-processor
-- Optional second internal 360KB double-sided 5 1/4" floppy drive, if no internal hard disk
-- Optional 'half height' 720KB double density 3 1/2" floppy drive
-- Optional 10MB hard disk via 5161 expansion chassis
-- Optional 10MB or 20MB Seagate ST-412 hard disk (in place of second floppy drive)
-- Optional up to 2 external 360KB double-sided 5 1/4" floppy drive
-- Optional Game port joystick ISA card (two analog joysticks with 2 buttons each)
-- Optional Parallel port ISA card, Unidirectional (upgradable to bidirectional (as is on the ps/2) with some minor hacking; IBM had all the circuitry there but it wasn't hooked up properly)
-- Optional Serial port ISA card
-
-
 Amstrad PC1640
 ==============
 
@@ -98,22 +52,6 @@ Tandy 1000 (80286) variations:
 
 Tandy 1000 (80386) variations:
 1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00
-
-IBM PC Jr:
-
-TODO: Which clock signals are available in a PC Jr?
-      - What clock is Y1? This eventually gets passed on to the CPU (ZM40?) and some other components by a 8284 (ZM8?).
-      - Is the clock attached to the Video Gate Array (ZM36?) exactly 14MHz?
-
-IBM CGA/MDA:
-Several different font roms were available, depending on what region the card was purchased in;
-Currently known: (probably exist for all the standard codepages)
-5788005: US (code page 437)
-???????: Greek (code page 737) NOT DUMPED!
-???????: Estonian/Lithuanian/Latvian (code page 775) NOT DUMPED!
-???????: Icelandic (code page 861, characters 0x8B-0x8D, 0x95, 0x97-0x98, 0x9B, 0x9D, 0xA4-0xA7 differ from cp437) NOT DUMPED!
-4733197: Danish/Norwegian (code page 865, characters 0x9B and 0x9D differ from cp437) NOT DUMPED!
-???????: Hebrew (code page 862) NOT DUMPED!
 
 ***************************************************************************/
 
