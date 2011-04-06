@@ -14,16 +14,16 @@ void ssystem3_lcd_reset(running_machine &machine)
 void ssystem3_lcd_write(running_machine &machine, int clock, int data)
 {
 	ssystem3_state *state = machine.driver_data<ssystem3_state>();
-  if (clock&&!state->m_lcd.clock) {
-    state->m_lcd.data[state->m_lcd.count/8]&=~(1<<(state->m_lcd.count&7));
-    if (data) state->m_lcd.data[state->m_lcd.count/8]|=1<<(state->m_lcd.count&7);
-    if (state->m_lcd.count+1==40) {
-      logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(machine.device("maincpu")),
-	       state->m_lcd.data[0], state->m_lcd.data[1], state->m_lcd.data[2], state->m_lcd.data[3], state->m_lcd.data[4]);
-    }
-    state->m_lcd.count=(state->m_lcd.count+1)%40;
-  }
-  state->m_lcd.clock=clock;
+	if (clock&&!state->m_lcd.clock) {
+		state->m_lcd.data[state->m_lcd.count/8]&=~(1<<(state->m_lcd.count&7));
+		if (data) state->m_lcd.data[state->m_lcd.count/8]|=1<<(state->m_lcd.count&7);
+		if (state->m_lcd.count+1==40) {
+			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(machine.device("maincpu")),
+				state->m_lcd.data[0], state->m_lcd.data[1], state->m_lcd.data[2], state->m_lcd.data[3], state->m_lcd.data[4]);
+		}
+		state->m_lcd.count=(state->m_lcd.count+1)%40;
+	}
+	state->m_lcd.clock=clock;
 }
 
 
@@ -207,32 +207,31 @@ SCREEN_UPDATE( ssystem3 )
 	ssystem3_draw_led(bitmap, state->m_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
 	if (input_port_read(screen->machine(), "Configuration")&1) { // playfield(optional device)
-	  static const int lcd_signs_on[]={
-	    0, // empty
-	    1, // bauer
-	    3, // springer
-	    0x11, // l??ufer
-	    7, // turm
-	    0x1f, // dame
-	    0x17, // k??nig
-	    0
-	  };
-	  int y, x;
-	  for (y=0; y<8; y++) {
-	    for (x=0; x<8; x++) {
-	      int figure, black;
-	      int xp=263+x*22;
-	      int yp=55+(y^7)*28;
-	      ssystem3_playfield_getfigure(screen->machine(), x, y, &figure, &black);
-	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
-	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
-	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');
-	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&8?1:0, xp, yp, 'b');
-	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&0x10?1:0, xp, yp, 'c');
-	      ssystem3_draw_led(bitmap, figure!=0 && black?1:0, xp, yp, '7');
-
-	    }
-	  }
+		static const int lcd_signs_on[]={
+			0, // empty
+			1, // bauer
+			3, // springer
+			0x11, // l??ufer
+			7, // turm
+			0x1f, // dame
+			0x17, // k??nig
+			0
+		};
+		int y, x;
+		for (y=0; y<8; y++) {
+			for (x=0; x<8; x++) {
+				int figure, black;
+				int xp=263+x*22;
+				int yp=55+(y^7)*28;
+				ssystem3_playfield_getfigure(screen->machine(), x, y, &figure, &black);
+				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
+				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
+				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');
+				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&8?1:0, xp, yp, 'b');
+				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&0x10?1:0, xp, yp, 'c');
+				ssystem3_draw_led(bitmap, figure!=0 && black?1:0, xp, yp, '7');
+			}
+		}
 	}
 
 	return 0;

@@ -34,19 +34,19 @@ struct _vt_video_t
 	screen_device *screen;	/* screen */
 	UINT8 *gfx;		/* content of char rom */
 
-    int lba7;
+	int lba7;
 
-    // dc012 attributes
-    UINT8 scroll_latch;
-    UINT8 blink_flip_flop;
-    UINT8 reverse_field;
-    UINT8 basic_attribute;
-    // dc011 attributes
-    UINT8 columns;
-    UINT8 height;
-    UINT8 skip_lines;
-    UINT8 frequency;
-    UINT8 interlaced;
+	// dc012 attributes
+	UINT8 scroll_latch;
+	UINT8 blink_flip_flop;
+	UINT8 reverse_field;
+	UINT8 basic_attribute;
+	// dc011 attributes
+	UINT8 columns;
+	UINT8 height;
+	UINT8 skip_lines;
+	UINT8 frequency;
+	UINT8 interlaced;
 };
 
 /***************************************************************************
@@ -102,7 +102,7 @@ WRITE8_DEVICE_HANDLER( vt_video_dc012_w )
 {
 	vt_video_t *vt = get_safe_token(device);
 
-    if ((data & 0x08)==0) {
+	if ((data & 0x08)==0) {
 		if ((data & 0x04)==0) {
 			// set lower part scroll
 			vt->scroll_latch = (vt->scroll_latch & 0x0c) | (data & 0x03);
@@ -238,42 +238,42 @@ void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *clipre
 	vt_video_t *vt = get_safe_token(device);
 
 	UINT16 addr = 0;
-    int line = 0;
-    int xpos = 0;
-    int ypos = 0;
-    UINT8 code;
-    int x = 0;
-    UINT8 scroll_region = 1; // binary 1
-    UINT8 display_type = 3;  // binary 11
-    UINT16 temp =0;
+	int line = 0;
+	int xpos = 0;
+	int ypos = 0;
+	UINT8 code;
+	int x = 0;
+	UINT8 scroll_region = 1; // binary 1
+	UINT8 display_type = 3;  // binary 11
+	UINT16 temp =0;
 
 	if (devcb_call_read8(&vt->in_ram_func, 0) !=0x7f) return;
 
-    while(line < (vt->height + vt->skip_lines)) {
-	    code =  devcb_call_read8(&vt->in_ram_func, addr + xpos);
-	    if (code == 0x7f) {
-	    	// end of line, fill empty till end of line
-	    	if (line >= vt->skip_lines) {
-	    		for(x = xpos; x < ((display_type==2) ? (vt->columns / 2) : vt->columns); x++ )
+	while(line < (vt->height + vt->skip_lines)) {
+		code =  devcb_call_read8(&vt->in_ram_func, addr + xpos);
+		if (code == 0x7f) {
+			// end of line, fill empty till end of line
+			if (line >= vt->skip_lines) {
+				for(x = xpos; x < ((display_type==2) ? (vt->columns / 2) : vt->columns); x++ )
 				{
 					vt_video_display_char(device,bitmap,code,x,ypos,scroll_region,display_type);
 				}
-	    	}
-	    	// move to new data
-	    	temp = devcb_call_read8(&vt->in_ram_func, addr+xpos+1)*256 + devcb_call_read8(&vt->in_ram_func, addr+xpos+2);
-	    	addr = (temp) & 0x1fff;
-	    	// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
-	    	if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
-	    	scroll_region = (temp >> 15) & 1;
-	    	display_type  = (temp >> 13) & 3;
-	    	if (line >= vt->skip_lines) {
-	    		ypos++;
-	    	}
-	    	xpos=0;
-	    	line++;
-	    } else {
-	    	// display regular char
-	    	if (line >= vt->skip_lines) {
+			}
+			// move to new data
+			temp = devcb_call_read8(&vt->in_ram_func, addr+xpos+1)*256 + devcb_call_read8(&vt->in_ram_func, addr+xpos+2);
+			addr = (temp) & 0x1fff;
+			// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
+			if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
+			scroll_region = (temp >> 15) & 1;
+			display_type  = (temp >> 13) & 3;
+			if (line >= vt->skip_lines) {
+				ypos++;
+			}
+			xpos=0;
+			line++;
+		} else {
+			// display regular char
+			if (line >= vt->skip_lines) {
 				vt_video_display_char(device,bitmap,code,xpos,ypos,scroll_region,display_type);
 			}
 			xpos++;
@@ -281,7 +281,7 @@ void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *clipre
 				line++;
 				xpos=0;
 			}
-	    }
+		}
 	}
 
 }
@@ -313,7 +313,7 @@ static DEVICE_START( vt_video )
 	vt->gfx = device->machine().region(intf->char_rom_region_tag)->base();
 	assert(vt->gfx != NULL);
 
-    // LBA7 is scan line frequency update
+	// LBA7 is scan line frequency update
 	device->machine().scheduler().timer_pulse(attotime::from_nsec(31778), FUNC(lba7_change), 0, (void *) device);
 }
 
@@ -332,13 +332,13 @@ static DEVICE_RESET( vt_video )
 	vt->lba7 = 0;
 
 	vt->scroll_latch = 0;
-    vt->blink_flip_flop = 0;
-    vt->reverse_field = 0;
-    vt->basic_attribute = 0;
+	vt->blink_flip_flop = 0;
+	vt->reverse_field = 0;
+	vt->basic_attribute = 0;
 
 	vt->columns = 80;
-    vt->frequency = 60;
-    vt->interlaced = 1;
+	vt->frequency = 60;
+	vt->interlaced = 1;
 	vt->skip_lines = 2; // for 60Hz
 }
 

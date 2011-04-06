@@ -617,7 +617,7 @@ static MACHINE_RESET( osbexec )
 
 static const z80_daisy_config osbexec_daisy_config[] =
 {
-    { "sio" },
+	{ "sio" },
 	{ NULL }
 };
 

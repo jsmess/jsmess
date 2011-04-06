@@ -44,7 +44,7 @@ static VIDEO_START( unior )
 
 static SCREEN_UPDATE( unior )
 {
-    return 0;
+	return 0;
 }
 
 /* F4 Character Displayer */
@@ -66,34 +66,33 @@ static GFXDECODE_START( unior )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( unior, unior_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8080, 2222222)
-    MCFG_CPU_PROGRAM_MAP(unior_mem)
-    MCFG_CPU_IO_MAP(unior_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8080, 2222222)
+	MCFG_CPU_PROGRAM_MAP(unior_mem)
+	MCFG_CPU_IO_MAP(unior_io)
 
-    MCFG_MACHINE_RESET(unior)
+	MCFG_MACHINE_RESET(unior)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(unior)
-
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(unior)
 	MCFG_GFXDECODE(unior)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(unior)
+	MCFG_VIDEO_START(unior)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( unior )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "unior.rom", 0xf800, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
-    ROM_REGION( 0x0840, "gfx1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0840, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "unior.fnt",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
 	ROM_LOAD( "palette.rom", 0x0800, 0x0040, CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
 ROM_END

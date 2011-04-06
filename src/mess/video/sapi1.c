@@ -95,8 +95,8 @@ SCREEN_UPDATE( sapi1 )
 {
 	sapi1_state *state = screen->machine().driver_data<sapi1_state>();
 	int x,y,j,b;
-  UINT16 addr;
-  int xpos;
+	UINT16 addr;
+	int xpos;
 
 	for(y = 0; y < 24; y++ )
 	{
@@ -110,27 +110,27 @@ SCREEN_UPDATE( sapi1 )
 			for(j = 0; j < 9; j++ )
 			{
 				for(b = 0; b < 6; b++ )
-			  {
-				UINT8 val;
-				if (j==8) {
-					if (attr==2) {
-						val = (state->m_refresh_counter & 0x20) ? 1 : 0;
+				{
+					UINT8 val;
+					if (j==8) {
+						if (attr==2) {
+							val = (state->m_refresh_counter & 0x20) ? 1 : 0;
+						} else {
+							val = 0;
+						}
 					} else {
-						val = 0;
+						val = (MHB2501[code*8 + j] >> (5-b)) & 1;
+						if (attr==1) {
+							val = (state->m_refresh_counter & 0x20) ? val : 0;
+						}
 					}
-				} else {
-					val = (MHB2501[code*8 + j] >> (5-b)) & 1;
-					if (attr==1) {
-						val = (state->m_refresh_counter & 0x20) ? val : 0;
+					if(attr==3) {
+						*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b   ) = val;
+						*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b+1 ) = val;
+					} else {
+						*BITMAP_ADDR16(bitmap, y*9+j, xpos+b ) = val;
 					}
 				}
-				if(attr==3) {
-					*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b   ) = val;
-					*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b+1 ) = val;
-				} else {
-					*BITMAP_ADDR16(bitmap, y*9+j, xpos+b ) = val;
-				}
-			  }
 			}
 			xpos+= (attr==3) ? 12 : 6;
 			if (xpos>=6*40) break;

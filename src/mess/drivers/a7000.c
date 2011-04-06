@@ -626,10 +626,10 @@ static void viddma_transfer_start(address_space *space)
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)
 	{
-		 vram[dst] = space->read_byte(src);
+		vram[dst] = space->read_byte(src);
 
-		 src++;
-		 dst++;
+		src++;
+		dst++;
 	}
 }
 
@@ -813,19 +813,18 @@ static MACHINE_CONFIG_START( a7000, a7000_state )
 	MCFG_MACHINE_START( a7000 )
 	MCFG_MACHINE_RESET( a7000 )
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-    MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-    MCFG_SCREEN_UPDATE(a7000)
-
-    MCFG_PALETTE_LENGTH(0x200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+	MCFG_SCREEN_UPDATE(a7000)
+	MCFG_PALETTE_LENGTH(0x200)
 //  MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(a7000)
+	MCFG_VIDEO_START(a7000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a7000p, a7000 )

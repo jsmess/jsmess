@@ -45,31 +45,31 @@ PALETTE_INIT( z88 )
 
 static void z88_vh_render_8x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
 {
-        int h,b;
+	int h,b;
 
-        for (h=0; h<8; h++)
-        {
-            UINT8 data;
+	for (h=0; h<8; h++)
+	{
+		UINT8 data;
 
-            data = pData[h];
-            for (b=0; b<8; b++)
-            {
-                int pen;
+		data = pData[h];
+		for (b=0; b<8; b++)
+		{
+			int pen;
 
-                if (data & 0x080)
-                {
-                  pen = pen1;
-                }
-                else
-                {
-                  pen = pen0;
-                }
+			if (data & 0x080)
+			{
+				pen = pen1;
+			}
+			else
+			{
+				pen = pen0;
+			}
 
-                z88_plot_pixel(bitmap, x+b, y+h, pen);
+			z88_plot_pixel(bitmap, x+b, y+h, pen);
 
-                data = data<<1;
-            }
-        }
+			data = data<<1;
+		}
+	}
 }
 
 static void z88_vh_render_6x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
@@ -88,11 +88,11 @@ static void z88_vh_render_6x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1
 			int pen;
 			if (data & 0x080)
 			{
-			  pen = pen1;
+				pen = pen1;
 			}
 			else
 			{
-			  pen = pen0;
+				pen = pen0;
 			}
 
 			z88_plot_pixel(bitmap, x+1+b, y+h, pen);

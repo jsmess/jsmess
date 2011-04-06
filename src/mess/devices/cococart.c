@@ -87,7 +87,7 @@ static DEVICE_START(coco_cartridge)
 	device_t *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
 	const cococart_config *config = (const cococart_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-   int i;
+	int i;
 
 	/* initialize */
 	memset(cococart, 0, sizeof(*cococart));
@@ -102,8 +102,8 @@ static DEVICE_START(coco_cartridge)
 			throw device_missing_dependencies();
 		}
 
-      cococart->pcb_r = (read8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&cococart->pcb->baseconfig())->get_config_fct(COCOCARTINFO_FCT_FF40_R);
-      cococart->pcb_w = (write8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&cococart->pcb->baseconfig())->get_config_fct(COCOCARTINFO_FCT_FF40_W);
+		cococart->pcb_r = (read8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&cococart->pcb->baseconfig())->get_config_fct(COCOCARTINFO_FCT_FF40_R);
+		cococart->pcb_w = (write8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&cococart->pcb->baseconfig())->get_config_fct(COCOCARTINFO_FCT_FF40_W);
 	}
 
 	/* finish setup */

@@ -73,7 +73,7 @@ struct hp48_port_config
 /* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
 
 static const char *const hp48_module_names[6] =
-  { "HDW (I/O)", "NCE2 (RAM)", "CE1", "CE2", "NCE3", "NCE1 (ROM)" };
+{ "HDW (I/O)", "NCE2 (RAM)", "CE1", "CE2", "NCE3", "NCE1 (ROM)" };
 
 /* values returned by C=ID */
 static const UINT8 hp48_module_mask_id[6] = { 0x00, 0x03, 0x05, 0x07, 0x01, 0x00 };
@@ -337,7 +337,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 		return;
 	}
 
-        /* regular keys */
+	/* regular keys */
 	hp48_update_kdn( machine );
 }
 
@@ -565,7 +565,7 @@ static READ8_HANDLER ( hp48_io_r )
 	/* serial */
 	case 0x15:
 	{
-                /* second nibble of received data */
+		/* second nibble of received data */
 
 		device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space->machine().device("rs232_x"));
 		device_image_interface *kermit = dynamic_cast<device_image_interface *>(space->machine().device("rs232_k"));
@@ -746,7 +746,7 @@ static void hp48_apply_modules( running_machine &machine, void* param )
 		if ( state->m_io[0x29] & 8 )
 		{
 			/* A19 */
-		        state->m_modules[5].off_mask = 0xfffff;
+			state->m_modules[5].off_mask = 0xfffff;
 			nce2_enable = 0;
 		}
 		else
@@ -1055,7 +1055,7 @@ static DEVICE_IMAGE_CREATE( hp48_port )
 	hp48_state *state = image.device().machine().driver_data<hp48_state>();
 	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
 	int size = conf->max_size;
-        /* XXX defaults to max_size; get user-specified size instead */
+	/* XXX defaults to max_size; get user-specified size instead */
 
 	/* check size */
 	/* size must be a power of 2 between 32K and max_size */
@@ -1194,7 +1194,7 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 
 	if ( HP48_G_SERIES )
 	{
-                /* bank switcher */
+		/* bank switcher */
 		state->m_modules[2].off_mask = 0x00fff;  /* 2 KB */
 		state->m_modules[2].read     = hp48_bank_r;
 		state->m_modules[2].write    = NULL;

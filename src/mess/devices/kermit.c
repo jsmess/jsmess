@@ -360,8 +360,8 @@ static void kermit_send_string_packet( kermit* state, UINT8 h, const char* data 
 		char c = data[i];
 		if ( kermit_is_char( c ) && ( c != '_' ) && ( c != ' ' ) )
 		{
-		  state->m_pout[ 4 + len ] = c;
-		  len++;
+			state->m_pout[ 4 + len ] = c;
+			len++;
 		}
 	}
 	state->m_pout[ 0 ] = KERMIT_SOH;

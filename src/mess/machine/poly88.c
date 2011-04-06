@@ -313,23 +313,23 @@ SNAPSHOT_LOAD( poly88 )
 					theend = 1;
 					break;
 			case 3 :
-    				/* 03 Auto Start @ Address */
-    				cpu_set_reg(image.device().machine().device("maincpu"), I8085_PC, address);
-    				theend = 1;
-    				break;
-    		case 4 :
-    				/* 04 Data ( used by Assembler ) */
-    				logerror("ASM load unsupported\n");
-    				theend = 1;
-    				break;
-    		case 5 :
-    				/* 05 BASIC program file */
-    				logerror("BASIC load unsupported\n");
-    				theend = 1;
-    				break;
-    		case 6 :
-    				/* 06 End ( used by Assembler? ) */
-    				theend = 1;
+					/* 03 Auto Start @ Address */
+					cpu_set_reg(image.device().machine().device("maincpu"), I8085_PC, address);
+					theend = 1;
+					break;
+			case 4 :
+					/* 04 Data ( used by Assembler ) */
+					logerror("ASM load unsupported\n");
+					theend = 1;
+					break;
+			case 5 :
+					/* 05 BASIC program file */
+					logerror("BASIC load unsupported\n");
+					theend = 1;
+					break;
+			case 6 :
+					/* 06 End ( used by Assembler? ) */
+					theend = 1;
 					break;
 			default: break;
 		}

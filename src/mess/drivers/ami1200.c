@@ -141,7 +141,7 @@ static void cd32_potgo_w(running_machine &machine, UINT16 data)
 	state->m_potgo_value = state->m_potgo_value & 0x5500;
 	state->m_potgo_value |= data & 0xaa00;
 
-    for (i = 0; i < 8; i += 2)
+	for (i = 0; i < 8; i += 2)
 	{
 		UINT16 dir = 0x0200 << i;
 		if (data & dir)
@@ -150,22 +150,21 @@ static void cd32_potgo_w(running_machine &machine, UINT16 data)
 			state->m_potgo_value &= ~d;
 			state->m_potgo_value |= data & d;
 		}
-    }
-    for (i = 0; i < 2; i++)
+	}
+	for (i = 0; i < 2; i++)
 	{
-	    UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-	    UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-	    if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
-		state->m_cd32_shifter[i] = 8;
-    }
-
+		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
+			state->m_cd32_shifter[i] = 8;
+	}
 }
 
 static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
 {
-    int i;
+	int i;
 
-    for (i = 0; i < 2; i++)
+	for (i = 0; i < 2; i++)
 	{
 		UINT8 but = 0x40 << i;
 		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
@@ -183,7 +182,7 @@ static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
 			}
 		}
 		state->m_oldstate[i] = pra & but;
-    }
+	}
 }
 
 
@@ -304,13 +303,13 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 	MCFG_VIDEO_START(amiga_aga)
 
 	/* sound hardware */
-    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-    MCFG_SOUND_ADD("amiga", AMIGA, XTAL_28_63636MHz/8)
-    MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-    MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-    MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-    MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
+	MCFG_SOUND_ADD("amiga", AMIGA, XTAL_28_63636MHz/8)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
 
 	/* cia */
 	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_0_intf)

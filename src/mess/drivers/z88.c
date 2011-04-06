@@ -324,55 +324,55 @@ ADDRESS_MAP_END
 static void blink_pb_w(running_machine &machine, int offset, int data, int reg_index)
 {
 	z88_state *state = machine.driver_data<z88_state>();
-    unsigned short addr_written = (offset & 0x0ff00) | (data & 0x0ff);
+	unsigned short addr_written = (offset & 0x0ff00) | (data & 0x0ff);
 
 	logerror("reg_index: %02x addr: %04x\n",reg_index,addr_written);
 
-    switch (reg_index)
+	switch (reg_index)
 	{
 
 		/* 1c000 */
 
-	case 0x00:
+		case 0x00:
 		{
-/**/            state->m_blink.pb[0] = addr_written;
-            state->m_blink.lores0 = ((addr_written & 0x01f)<<9) | ((addr_written & 0x01fe0)<<9);	// blink_pb_offset(-1, addr_written, 9);
-            logerror("lores0 %08x\n",state->m_blink.lores0);
+/**/			state->m_blink.pb[0] = addr_written;
+			state->m_blink.lores0 = ((addr_written & 0x01f)<<9) | ((addr_written & 0x01fe0)<<9);	// blink_pb_offset(-1, addr_written, 9);
+			logerror("lores0 %08x\n",state->m_blink.lores0);
 		}
 		break;
 
 		case 0x01:
 		{
-            state->m_blink.pb[1] = addr_written;
-            state->m_blink.lores1 = ((addr_written & 0x01f)<<12) | ((addr_written & 0x01fe0)<<12);	//blink_pb_offset(-1, addr_written, 12);
-            logerror("lores1 %08x\n",state->m_blink.lores1);
+			state->m_blink.pb[1] = addr_written;
+			state->m_blink.lores1 = ((addr_written & 0x01f)<<12) | ((addr_written & 0x01fe0)<<12);	//blink_pb_offset(-1, addr_written, 12);
+			logerror("lores1 %08x\n",state->m_blink.lores1);
 		}
 		break;
 
 		case 0x02:
 		{
-            state->m_blink.pb[2] = addr_written;
-/**/            state->m_blink.hires0 = ((addr_written & 0x01f)<<13) | ((addr_written & 0x01fe0)<<13);	//blink_pb_offset(-1, addr_written, 13);
-            logerror("hires0 %08x\n", state->m_blink.hires0);
+			state->m_blink.pb[2] = addr_written;
+/**/			state->m_blink.hires0 = ((addr_written & 0x01f)<<13) | ((addr_written & 0x01fe0)<<13);	//blink_pb_offset(-1, addr_written, 13);
+			logerror("hires0 %08x\n", state->m_blink.hires0);
 		}
 		break;
 
 
 		case 0x03:
 		{
-            state->m_blink.pb[3] = addr_written;
-            state->m_blink.hires1 = ((addr_written & 0x01f)<<11) | ((addr_written & 0x01fe0)<<11);	//blink_pb_offset(-1, addr_written, 11);
+			state->m_blink.pb[3] = addr_written;
+			state->m_blink.hires1 = ((addr_written & 0x01f)<<11) | ((addr_written & 0x01fe0)<<11);	//blink_pb_offset(-1, addr_written, 11);
 
-            logerror("hires1 %08x\n", state->m_blink.hires1);
+			logerror("hires1 %08x\n", state->m_blink.hires1);
 		}
 		break;
 
 		case 0x04:
 		{
-            state->m_blink.sbr = addr_written;
+			state->m_blink.sbr = addr_written;
 
 			state->m_blink.sbf = ((addr_written & 0x01f)<<11) | ((addr_written & 0x01fe0)<<11);
-            logerror("%08x\n", state->m_blink.sbf);
+			logerror("%08x\n", state->m_blink.sbf);
 
 		}
 		break;
@@ -425,7 +425,7 @@ static WRITE8_HANDLER(z88_port_w)
 		/* write rtc interrupt acknowledge */
 		case 0x0b4:
 		{
-		    logerror("tack w: %02x\n", data);
+			logerror("tack w: %02x\n", data);
 
 			/* set acknowledge */
 			state->m_blink.tack = data & 0x07;
@@ -441,7 +441,7 @@ static WRITE8_HANDLER(z88_port_w)
 		/* write rtc interrupt mask */
 		case 0x0b5:
 		{
-		    logerror("tmk w: %02x\n", data);
+			logerror("tmk w: %02x\n", data);
 
 			/* set new int mask */
 			state->m_blink.tmk = data & 0x07;
@@ -456,7 +456,7 @@ static WRITE8_HANDLER(z88_port_w)
 		{
 			UINT8 changed_bits;
 
-		    logerror("com w: %02x\n", data);
+			logerror("com w: %02x\n", data);
 
 			changed_bits = state->m_blink.com^data;
 			state->m_blink.com = data;
@@ -496,7 +496,7 @@ static WRITE8_HANDLER(z88_port_w)
 		case 0x0b1:
 		{
 			/* set int enables */
-		    logerror("int w: %02x\n", data);
+			logerror("int w: %02x\n", data);
 
 			state->m_blink.ints = data;
 			z88_update_rtc_interrupt(space->machine());
@@ -507,7 +507,7 @@ static WRITE8_HANDLER(z88_port_w)
 
 		case 0x0b6:
 		{
-		    logerror("ack w: %02x\n", data);
+			logerror("ack w: %02x\n", data);
 
 			/* acknowledge ints */
 			state->m_blink.ack = data & ((1<<6) | (1<<5) | (1<<3) | (1<<2));
@@ -529,7 +529,7 @@ static WRITE8_HANDLER(z88_port_w)
 	}
 
 
-    logerror("blink w: %04x %02x\n", offset, data);
+	logerror("blink w: %04x %02x\n", offset, data);
 
 }
 
@@ -604,7 +604,7 @@ static  READ8_HANDLER(z88_port_r)
 
 		/* read real time clock counters */
 		case 0x0d0:
-		    logerror("tim0 r: %02x\n", state->m_blink.tim[0]);
+			logerror("tim0 r: %02x\n", state->m_blink.tim[0]);
 			return state->m_blink.tim[0] & 0x0ff;
 		case 0x0d1:
 			logerror("tim1 r: %02x\n", state->m_blink.tim[1]);
@@ -786,12 +786,12 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START(z88)
-    ROM_REGION(((64*1024)+(128*1024)), "maincpu",0)
-    ROM_SYSTEM_BIOS( 0, "ver3", "Version 3.0 UK")
-    ROMX_LOAD("z88v300.rom" ,  0x010000, 0x020000, CRC(802cb9aa) SHA1(ceb688025b79454cf229cae4dbd0449df2747f79), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "ver4", "Version 4.0 UK")
-    ROMX_LOAD("z88v400.rom",   0x010000, 0x020000, CRC(1356d440) SHA1(23c63ceced72d0a9031cba08d2ebc72ca336921d), ROM_BIOS(2) )
-    ROM_SYSTEM_BIOS( 2, "ver41fi", "Version 4.1 Finnish")
+	ROM_REGION(((64*1024)+(128*1024)), "maincpu",0)
+	ROM_SYSTEM_BIOS( 0, "ver3", "Version 3.0 UK")
+	ROMX_LOAD("z88v300.rom" ,  0x010000, 0x020000, CRC(802cb9aa) SHA1(ceb688025b79454cf229cae4dbd0449df2747f79), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "ver4", "Version 4.0 UK")
+	ROMX_LOAD("z88v400.rom",   0x010000, 0x020000, CRC(1356d440) SHA1(23c63ceced72d0a9031cba08d2ebc72ca336921d), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "ver41fi", "Version 4.1 Finnish")
 	ROMX_LOAD("z88v401fi.rom", 0x010000, 0x020000, CRC(ecd7f3f6) SHA1(bf8d3e083f1959e5a0d7e9c8d2ad0c14abd46381), ROM_BIOS(3) )
 ROM_END
 

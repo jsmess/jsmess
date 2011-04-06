@@ -17,15 +17,15 @@ DECLARE_LEGACY_IMAGE_DEVICE(KERMIT, kermit);
 
 typedef struct {
 
-  /* called by Kermit when it wants to send a byte to the emulated machine */
-  void (*send)( running_machine &machine, UINT8 data );
+	/* called by Kermit when it wants to send a byte to the emulated machine */
+	void (*send)( running_machine &machine, UINT8 data );
 
 } kermit_config;
 
 
 #define MCFG_KERMIT_ADD(_tag, _intrf) \
-  MCFG_DEVICE_ADD(_tag, KERMIT, 0)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD(_tag, KERMIT, 0)	      \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /* call this when the emulated machine has read the last byte sent by

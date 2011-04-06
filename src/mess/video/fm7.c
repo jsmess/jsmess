@@ -1557,77 +1557,77 @@ VIDEO_START( fm7 )
 SCREEN_UPDATE( fm7 )
 {
 	fm7_state *state = screen->machine().driver_data<fm7_state>();
-    UINT8 code_r = 0,code_g = 0,code_b = 0;
+	UINT8 code_r = 0,code_g = 0,code_b = 0;
 	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
 	UINT8 code_r3 = 0,code_g3 = 0,code_b3 = 0;
 	UINT8 code_r4 = 0,code_g4 = 0,code_b4 = 0;
-    UINT16 col;
-    int y, x, b;
-    UINT16 page = 0x0000;
+	UINT16 col;
+	int y, x, b;
+	UINT16 page = 0x0000;
 
-    if(state->m_video.display_video_page != 0)
-    	page = 0xc000;
+	if(state->m_video.display_video_page != 0)
+		page = 0xc000;
 
 	if(state->m_video.crt_enable == 0)
 		return 0;
 
 	if(state->m_video.modestatus & 0x40)  // 320x200 mode
 	{
-	    for (y = 0; y < 200; y++)
-	    {
-		    for (x = 0; x < 40; x++)
-		    {
-		    	if(!(state->m_video.multi_page & 0x40))
-		    	{
-	            	code_r = state->m_video_ram[0x8000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
-	            	code_r2 = state->m_video_ram[0xa000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
-	            	code_r3 = state->m_video_ram[0x14000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
-	            	code_r4 = state->m_video_ram[0x16000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
-		    	}
-		    	if(!(state->m_video.multi_page & 0x20))
-		    	{
-	    	        code_g = state->m_video_ram[0x4000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
-	    	        code_g2 = state->m_video_ram[0x6000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
-	            	code_g3 = state->m_video_ram[0x10000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
-	            	code_g4 = state->m_video_ram[0x12000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
-		    	}
-		    	if(!(state->m_video.multi_page & 0x10))
-		    	{
-		            code_b = state->m_video_ram[0x0000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
-		            code_b2 = state->m_video_ram[0x2000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
-	            	code_b3 = state->m_video_ram[0xc000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
-	            	code_b4 = state->m_video_ram[0xe000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
-		    	}
-	            for (b = 0; b < 8; b++)
-	            {
-	            	col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0);
-	            	col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
-	            	col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
+		for (y = 0; y < 200; y++)
+		{
+			for (x = 0; x < 40; x++)
+			{
+				if(!(state->m_video.multi_page & 0x40))
+				{
+					code_r = state->m_video_ram[0x8000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
+					code_r2 = state->m_video_ram[0xa000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
+					code_r3 = state->m_video_ram[0x14000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
+					code_r4 = state->m_video_ram[0x16000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
+				}
+				if(!(state->m_video.multi_page & 0x20))
+				{
+					code_g = state->m_video_ram[0x4000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
+					code_g2 = state->m_video_ram[0x6000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
+					code_g3 = state->m_video_ram[0x10000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
+					code_g4 = state->m_video_ram[0x12000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
+				}
+				if(!(state->m_video.multi_page & 0x10))
+				{
+					code_b = state->m_video_ram[0x0000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
+					code_b2 = state->m_video_ram[0x2000 + ((y*40 + x + state->m_video.vram_offset) & 0x1fff)];
+					code_b3 = state->m_video_ram[0xc000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
+					code_b4 = state->m_video_ram[0xe000 + ((y*40 + x + state->m_video.vram_offset2) & 0x1fff)];
+				}
+				for (b = 0; b < 8; b++)
+				{
+					col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0);
+					col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
+					col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
 					col += 8;  // use analog palette
-	                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
-	            }
-	        }
-	    }
+					*BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
+				}
+			}
+		}
 	}
 	else
 	{
-	    for (y = 0; y < 200; y++)
-	    {
-		    for (x = 0; x < 80; x++)
-		    {
-		    	if(!(state->m_video.multi_page & 0x40))
-	            	code_r = state->m_video_ram[page + 0x8000 + ((y*80 + x + state->m_video.vram_offset) & 0x3fff)];
-		    	if(!(state->m_video.multi_page & 0x20))
-	    	        code_g = state->m_video_ram[page + 0x4000 + ((y*80 + x + state->m_video.vram_offset) & 0x3fff)];
-		    	if(!(state->m_video.multi_page & 0x10))
-		            code_b = state->m_video_ram[page + 0x0000 + ((y*80 + x + state->m_video.vram_offset) & 0x3fff)];
-	            for (b = 0; b < 8; b++)
-	            {
-	                col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-	                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
-	            }
-	        }
-	    }
+		for (y = 0; y < 200; y++)
+		{
+			for (x = 0; x < 80; x++)
+			{
+				if(!(state->m_video.multi_page & 0x40))
+					code_r = state->m_video_ram[page + 0x8000 + ((y*80 + x + state->m_video.vram_offset) & 0x3fff)];
+				if(!(state->m_video.multi_page & 0x20))
+					code_g = state->m_video_ram[page + 0x4000 + ((y*80 + x + state->m_video.vram_offset) & 0x3fff)];
+				if(!(state->m_video.multi_page & 0x10))
+					code_b = state->m_video_ram[page + 0x0000 + ((y*80 + x + state->m_video.vram_offset) & 0x3fff)];
+				for (b = 0; b < 8; b++)
+				{
+					col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
+					*BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
+				}
+			}
+		}
 	}
 	return 0;
 }

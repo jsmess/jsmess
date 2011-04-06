@@ -28,8 +28,8 @@ typedef enum
 {
 	VIC6567,	// VIC II NTSC
 	VIC6569,	// VIC II PAL
-      VIC8564,	// VIC IIe NTSC
-      VIC8566	// VIC IIe PAL
+	VIC8564,	// VIC IIe NTSC
+	VIC8566	// VIC IIe PAL
 } vic2_type;
 
 typedef struct _vic2_interface vic2_interface;

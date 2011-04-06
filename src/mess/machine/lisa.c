@@ -1799,19 +1799,19 @@ INLINE void cpu_board_control_access(running_machine &machine, offs_t offset)
 		state->m_seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-    	logerror("setup SET PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("setup SET PC=%x\n", cpu_get_pc(machine.device("maincpu")));
 		state->m_setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-    	logerror("setup UNSET PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("setup UNSET PC=%x\n", cpu_get_pc(machine.device("maincpu")));
 		state->m_setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-    	logerror("enable retrace PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("enable retrace PC=%x\n", cpu_get_pc(machine.device("maincpu")));
 		state->m_VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-    	logerror("disable retrace PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("disable retrace PC=%x\n", cpu_get_pc(machine.device("maincpu")));
 		state->m_VTMSK = 0;
 		set_VTIR(machine, 2);
 		break;
@@ -1933,7 +1933,7 @@ static READ16_HANDLER ( lisa_IO_r )
 				}
 				else
 				{
-    			 logerror("read status time=%x\n", time_in_frame);
+					logerror("read status time=%x\n", time_in_frame);
 					if ((time_in_frame >= 364) && (time_in_frame <= 383))	/* these values are approximative */
 					{	/* if VSyncing, read ROM 2nd half ? */
 					}
@@ -1948,7 +1948,7 @@ static READ16_HANDLER ( lisa_IO_r )
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			 logerror("read status PC=%x val=%x\n", cpu_get_pc(space->machine().device("maincpu")), answer);
+			logerror("read status PC=%x val=%x\n", cpu_get_pc(space->machine().device("maincpu")), answer);
 
 			break;
 		}

@@ -17,15 +17,15 @@ DECLARE_LEGACY_IMAGE_DEVICE(XMODEM, xmodem);
 
 typedef struct {
 
-  /* called by XMODEM when it wants to send a byte to the emulated machine */
-  void (*send)( running_machine &machine, UINT8 data );
+	/* called by XMODEM when it wants to send a byte to the emulated machine */
+	void (*send)( running_machine &machine, UINT8 data );
 
 } xmodem_config;
 
 
 #define MCFG_XMODEM_ADD(_tag, _intrf) \
-  MCFG_DEVICE_ADD(_tag, XMODEM, 0)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD(_tag, XMODEM, 0)	      \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 
