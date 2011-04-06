@@ -2676,13 +2676,18 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
 	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
 	MCFG_SOUND_WAVE_ADD("wave","cass")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
 	MCFG_CASSETTE_ADD("cass",x1_cassette_config)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
@@ -2712,7 +2717,8 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MCFG_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 //  MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
 MACHINE_CONFIG_END
 
 /*************************************
