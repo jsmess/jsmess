@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "includes/pc_ide.h"
-
+#include "imagedev/harddriv.h"
 
 typedef	struct {
 	int lba;				/* 0 CHS mode, 1 LBA mode */
@@ -278,4 +278,13 @@ WRITE8_HANDLER(at_mfm_0_w)
 	//logerror("ide read %.2x %.2x\n", offset, data);
 	return data;
 }
+
+MACHINE_CONFIG_FRAGMENT( pc_ide )
+	/* harddisk */
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
+MACHINE_CONFIG_END
+
 

@@ -26,7 +26,6 @@
 #include "video/pc_cga.h"
 #include "video/pc_ega.h"
 
-#include "machine/pc_hdc.h"
 #include "includes/pc_ide.h"
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"
@@ -187,8 +186,6 @@ static ADDRESS_MAP_START(at16_io, AS_IO, 16)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffff)
-    AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r, pc16le_HDC1_w)
-    AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r, pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0389) AM_DEVREADWRITE("ym3812", at16_388_r, at16_388_w )
@@ -210,11 +207,10 @@ static ADDRESS_MAP_START(at386_io, AS_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
@@ -265,11 +261,10 @@ static ADDRESS_MAP_START( ct486_io, AS_IO, 32 )
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
@@ -288,11 +283,10 @@ static ADDRESS_MAP_START(at586_io, AS_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP // used for timing?
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,				pc32le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,				pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
@@ -318,8 +312,6 @@ static ADDRESS_MAP_START(ps2m30286_io, AS_IO, 8)
 	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc_parallelport2_r,		pc_parallelport2_w)
 	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_3_r,				uart8250_3_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_1_r,				uart8250_1_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,		pc_parallelport1_w)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE("ym3812", ym3812_status_port_r,ym3812_control_port_w)
@@ -341,11 +333,10 @@ static ADDRESS_MAP_START(megapc_io, AS_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
@@ -615,7 +606,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
+	MCFG_FRAGMENT_ADD( pc_ide )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -690,7 +681,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
+	MCFG_FRAGMENT_ADD( pc_ide )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -756,7 +747,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
+	MCFG_FRAGMENT_ADD( pc_ide )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -824,7 +815,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
+	MCFG_FRAGMENT_ADD( pc_ide )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -894,7 +885,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
+	MCFG_FRAGMENT_ADD( pc_ide )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1049,7 +1040,6 @@ ROM_END
 
 ROM_START( ibm5170a )
 	ROM_REGION(0x100000,"maincpu", 0)
-//    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS( 0, "rev3", "IBM PC/AT 5170 11/15/85")
 	ROMX_LOAD("61x9266.u27", 0xf0000, 0x8000, CRC(4995be7a) SHA1(8e8e5c863ae3b8c55fd394e345d8cca48b6e575c), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("61x9265.u47", 0xf0001, 0x8000, CRC(c32713e4) SHA1(22ed4e2be9f948682891e2fd056a97dbea01203c), ROM_SKIP(1) | ROM_BIOS(1))
@@ -1083,7 +1073,6 @@ ROM_END
 
 ROM_START( ibm5162 ) //MB p/n 62x1168
 	ROM_REGION16_LE(0x1000000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_LOAD16_BYTE("78x7460.u34", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31)) /* 78X7460 U34 // (C) IBM CORP // 1981-1986 */
 	ROM_LOAD16_BYTE("78x7461.u35", 0xf0001, 0x8000, CRC(be14b453) SHA1(ec7c10087dbd53f9c6d1174e8f14212e2aec1818)) /* 78X7461 U35 // (C) IBM CORP // 1981-1986 */
@@ -1108,7 +1097,6 @@ ROM_END
 
 ROM_START( i8530286 )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// saved from running machine
     ROM_LOAD16_BYTE("ps2m30.0", 0xe0000, 0x10000, CRC(9965a634) SHA1(c237b1760f8a4561ec47dc70fe2e9df664e56596))
 	ROM_RELOAD(0xfe0000,0x10000)
@@ -1119,7 +1107,6 @@ ROM_END
 
 ROM_START( i8555081 )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// saved from running machine
     ROM_LOAD16_BYTE("33fb8145.zm40", 0xe0000, 0x10000, CRC(0895894c) SHA1(7cee77828867ad1bdbe0ac223bc25d23c65b28a0))
 	ROM_RELOAD(0xfe0000, 0x10000)
@@ -1130,7 +1117,6 @@ ROM_END
 
 ROM_START( at )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS(0, "at", "PC 286")
     ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
     ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
@@ -1175,7 +1161,6 @@ ROM_END
 
 ROM_START( cmdpc30 )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROMX_LOAD( "commodore pc 30 iii even.bin", 0xf8000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1))
 	ROMX_LOAD( "commodore pc 30 iii odd.bin",  0xf8001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1))
 	/* Character rom */
@@ -1188,7 +1173,6 @@ ROM_END
 ROM_START( atvga )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS(0, "at", "PC 286")
     ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
     ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
@@ -1225,7 +1209,6 @@ ROM_END
 
 ROM_START( neat )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	//ROM_SYSTEM_BIOS(0, "neat286", "NEAT 286")
 	ROM_LOAD16_BYTE("at030389.0", 0xf0000, 0x8000, CRC(4c36e61d) SHA1(094e8d5e6819889163cb22a2cf559186de782582))
 	//ROM_RELOAD(0xff0000,0x8000)
@@ -1243,7 +1226,6 @@ ROM_END
 ROM_START( at386 )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS(0, "at386", "unknown 386")	// This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
     ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(1))
 	//ROM_RELOAD(0xff0000,0x10000)
@@ -1258,7 +1240,6 @@ ROM_END
 ROM_START( at486 )
 	ROM_REGION(0x1000000, "maincpu", 0)
 	ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-	ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_SYSTEM_BIOS(0, "at486", "PC/AT 486")	\
 	ROMX_LOAD("at486.bin",   0x0f0000, 0x10000, CRC(31214616) SHA1(51b41fa44d92151025fc9ad06e518e906935e689), ROM_BIOS(1))
@@ -1329,7 +1310,6 @@ ROM_END
 ROM_START( ct486 )
 	ROM_REGION(0x100000, "isa", 0)
 	ROM_LOAD("et4000.bin",  0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
@@ -1341,7 +1321,6 @@ ROM_END
 ROM_START( ficpio2 )
 	ROM_REGION(0x1000000, "maincpu", 0)
 	ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-	ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_SYSTEM_BIOS(0, "ficpio2c7", "FIC 486-PIO-2 1.15C701") /* pnp, i/o core: NS 332 */
 	ROMX_LOAD("115c701.awd",  0x0e0000, 0x20000, CRC(b0dd7975) SHA1(bfde13b0fbd141bc945d37d92faca9f4f59b716d), ROM_BIOS(1))
@@ -1357,7 +1336,6 @@ ROM_END
 ROM_START( at586 )
 	ROM_REGION32_LE(0x40000, "user1", 0)
 	ROM_LOAD("et4000.bin",  0x00000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom",  0x08000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS(0, "sptx", "SP-586TX")
     ROMX_LOAD("sp586tx.bin",   0x20000, 0x20000, CRC(1003d72c) SHA1(ec9224ff9b0fdfd6e462cb7bbf419875414739d6), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "unisys", "Unisys 586") // probably bad dump due to need of hack in i82439tx to work
@@ -1376,7 +1354,6 @@ ROM_START( c386sx16 )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	/* actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php */
 	ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-	ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	/* Commodore 80386SX BIOS Rev. 1.03 */
 	/* Copyright (C) 1985-1990 Commodore Electronics Ltd. */
@@ -1389,7 +1366,6 @@ ROM_END
 ROM_START( ficvt503 )
 	ROM_REGION32_LE(0x40000, "user1", 0)
 	ROM_LOAD("et4000.bin",  0x00000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-	ROM_LOAD("wdbios.rom",  0x08000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_SYSTEM_BIOS(0, "109gi13", "1.09GI13") /* 1997-10-02 */
 	ROMX_LOAD("109gi13.bin", 0x20000, 0x20000, CRC(0c32af48) SHA1(2cce40a98598f1ed1f398975f7a90c8be4200667), ROM_BIOS(1))
@@ -1406,7 +1382,6 @@ ROM_END
 ROM_START( megapc )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_LOAD16_BYTE( "41651-bios lo.u18",  0xe0000, 0x10000, CRC(1e9bd3b7) SHA1(14fd39ec12df7fae99ccdb0484ee097d93bf8d95))
 	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0xe0001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
@@ -1415,7 +1390,6 @@ ROM_END
 ROM_START( megapcpl )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_LOAD16_BYTE( "41652.u18",  0xe0000, 0x10000, CRC(6f5b9a1c) SHA1(cae981a35a01234fcec99a96cb38075d7bf23474))
 	ROM_LOAD16_BYTE( "486slc.u19", 0xe0001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))

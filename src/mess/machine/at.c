@@ -24,7 +24,6 @@
 #include "machine/i82439tx.h"
 
 #include "machine/pc_fdc.h"
-#include "machine/pc_hdc.h"
 #include "includes/pc_mouse.h"
 
 #include "machine/ram.h"
@@ -128,25 +127,6 @@ const struct pit8253_config at_pit8254_config =
 };
 
 
-static void at_set_irq_line(running_machine &machine,int irq, int state)
-{
-	at_state *st = machine.driver_data<at_state>();
-
-	switch (irq)
-	{
-	case 0: pic8259_ir0_w(st->m_pic8259_master, state); break;
-	case 1: pic8259_ir1_w(st->m_pic8259_master, state); break;
-	case 2: pic8259_ir2_w(st->m_pic8259_master, state); break;
-	case 3: pic8259_ir3_w(st->m_pic8259_master, state); break;
-	case 4: pic8259_ir4_w(st->m_pic8259_master, state); break;
-	case 5: pic8259_ir5_w(st->m_pic8259_master, state); break;
-	case 6: pic8259_ir6_w(st->m_pic8259_master, state); break;
-	case 7: pic8259_ir7_w(st->m_pic8259_master, state); break;
-	}
-}
-
-
-
 /*************************************************************************
  *
  *      PC DMA stuff
@@ -241,18 +221,8 @@ static READ8_DEVICE_HANDLER( at_dma8237_fdc_dack_r ) {
 }
 
 
-static READ8_DEVICE_HANDLER( at_dma8237_hdc_dack_r ) {
-	return pc_hdc_dack_r(device->machine());
-}
-
-
 static WRITE8_DEVICE_HANDLER( at_dma8237_fdc_dack_w ) {
 	pc_fdc_dack_w( device->machine(), data );
-}
-
-
-static WRITE8_DEVICE_HANDLER( at_dma8237_hdc_dack_w ) {
-	pc_hdc_dack_w( device->machine(), data );
 }
 
 
@@ -276,8 +246,8 @@ I8237_INTERFACE( at_dma8237_1_config )
 	DEVCB_LINE(at_dma8237_out_eop),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(at_dma8237_fdc_dack_r), DEVCB_HANDLER(at_dma8237_hdc_dack_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(at_dma8237_fdc_dack_w), DEVCB_HANDLER(at_dma8237_hdc_dack_w) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(at_dma8237_fdc_dack_r), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(at_dma8237_fdc_dack_w), DEVCB_NULL },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
 };
 
@@ -464,9 +434,6 @@ static void init_at_common(running_machine &machine)
 		}
 	}
 
-	/* FDC/HDC hardware */
-	pc_hdc_setup(machine, at_set_irq_line);
-
 	/* serial mouse */
 	pc_mouse_initialise(machine);
 
@@ -539,29 +506,11 @@ static IRQ_CALLBACK(at_irq_callback)
 	return pic8259_acknowledge(st->m_pic8259_master);
 }
 
-static void pc_set_irq_line(running_machine &machine,int irq, int state)
-{
-	at_state *st = machine.driver_data<at_state>();;
-
-	switch (irq)
-	{
-	case 0: pic8259_ir0_w(st->m_pic8259_master, state); break;
-	case 1: pic8259_ir1_w(st->m_pic8259_master, state); break;
-	case 2: pic8259_ir2_w(st->m_pic8259_master, state); break;
-	case 3: pic8259_ir3_w(st->m_pic8259_master, state); break;
-	case 4: pic8259_ir4_w(st->m_pic8259_master, state); break;
-	case 5: pic8259_ir5_w(st->m_pic8259_master, state); break;
-	case 6: pic8259_ir6_w(st->m_pic8259_master, state); break;
-	case 7: pic8259_ir7_w(st->m_pic8259_master, state); break;
-	}
-}
-
 MACHINE_START( at )
 {
 	device_set_irq_callback(machine.device("maincpu"), at_irq_callback);
 	/* FDC/HDC hardware */
 	pc_fdc_init( machine, &fdc_interface );
-	pc_hdc_setup(machine, pc_set_irq_line);
 }
 
 
@@ -576,6 +525,5 @@ MACHINE_RESET( at )
 	st->m_dma8237_2 = machine.device("dma8237_2");
 	st->m_pit8254 = machine.device("pit8254");
 	pc_mouse_set_serial_port( machine.device("ns16450_0") );
-	pc_hdc_set_dma8237_device( st->m_dma8237_1 );
 	poll_delay = 4;
 }
