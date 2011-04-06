@@ -33,7 +33,7 @@ public:
 	required_device<device_t> m_terminal;
 	DECLARE_READ16_MEMBER( sun1_upd7201_r );
 	DECLARE_WRITE16_MEMBER( sun1_upd7201_w );
-	DECLARE_WRITE8_MEMBER( sun1_kbd_put );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	virtual void machine_reset();
 	UINT16* m_ram;
 	UINT8 m_term_data;
@@ -86,14 +86,14 @@ MACHINE_RESET_MEMBER(sun1_state)
 }
 
 
-WRITE8_MEMBER( sun1_state::sun1_kbd_put )
+WRITE8_MEMBER( sun1_state::kbd_put )
 {
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(sun1_state, sun1_kbd_put)
+	DEVCB_DRIVER_MEMBER(sun1_state, kbd_put)
 };
 
 
@@ -104,7 +104,7 @@ static MACHINE_CONFIG_START( sun1, sun1_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

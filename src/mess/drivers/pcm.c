@@ -64,6 +64,9 @@
 #include "sound/wave.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class pcm_state : public driver_device
 {
@@ -94,11 +97,15 @@ public:
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
-	DECLARE_WRITE8_MEMBER( pcm_kbd_put );
-	UINT8 *m_videoram;
+	DECLARE_WRITE8_MEMBER( kbd_put );
+	UINT8 *m_p_chargen;
+	UINT8 *m_p_videoram;
 	UINT8 m_term_data;
 	UINT8 m_step;
 	UINT8 m_85;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -165,10 +172,10 @@ static ADDRESS_MAP_START(pcm_mem, AS_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
 	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(m_videoram) // Video RAM
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(m_p_videoram) // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcm_io, AS_IO, 8, pcm_state)
+static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc_s", z80ctc_r, z80ctc_w) // system CTC
@@ -186,48 +193,54 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pcm )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( pcm_state::pcm_kbd_put )
+WRITE8_MEMBER( pcm_state::kbd_put )
 {
 	m_term_data = data;
 	m_step = 0;
 }
 
-static GENERIC_TERMINAL_INTERFACE( pcm_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(pcm_state, pcm_kbd_put)
+	DEVCB_DRIVER_MEMBER(pcm_state, kbd_put)
 };
 
-static MACHINE_RESET(pcm)
+MACHINE_RESET_MEMBER(pcm_state)
 {
 }
 
-static VIDEO_START( pcm )
+VIDEO_START_MEMBER( pcm_state )
 {
+	m_p_chargen = machine().region("chargen")->base();
 }
 
-static SCREEN_UPDATE( pcm )
+SCREEN_UPDATE_MEMBER( pcm_state )
 {
-	pcm_state *state = screen->machine().driver_data<pcm_state>();
-	UINT8 code;
-	UINT8 line;
-	int y, x, j, b;
-
-	UINT8 *gfx = screen->machine().region("chargen")->base();
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0x400,x;
 
 	for (y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 64; x++)
+		for (ra = 0; ra < 8; ra++)
 		{
-			code = state->m_videoram[(0x400 + y*64 + x) & 0x7ff];
-			for(j = 0; j < 8; j++ )
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 64; x++)
 			{
-				line = gfx[code*8 + j];
-				for (b = 0; b < 8; b++)
-				{
-					*BITMAP_ADDR16(bitmap, y*8+j, x * 8 + (7 - b)) =  ((line >> b) & 0x01);
-				}
+				chr = m_p_videoram[x & 0x7ff];
+
+				gfx = m_p_chargen[(chr<<3) | ra];
+
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
+		ma+=64;
 	}
 	return 0;
 }
@@ -321,8 +334,6 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_CPU_IO_MAP(pcm_io)
 	MCFG_CPU_CONFIG(pcm_daisy_chain)
 
-	MCFG_MACHINE_RESET(pcm)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -330,12 +341,9 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE(pcm)
 	MCFG_GFXDECODE(pcm)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(pcm)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -345,7 +353,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, pcm_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )

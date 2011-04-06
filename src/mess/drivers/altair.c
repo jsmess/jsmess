@@ -36,7 +36,7 @@ public:
 	DECLARE_READ8_MEMBER( sio_data_r );
 	DECLARE_READ8_MEMBER( sio_key_status_r );
 	DECLARE_WRITE8_MEMBER( sio_command_w );
-	DECLARE_WRITE8_MEMBER( altair_kbd_put );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
 	UINT8* m_ram;
 };
@@ -77,8 +77,7 @@ static ADDRESS_MAP_START(altair_io, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_READ(sio_key_status_r)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_READ(sio_data_r)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_READ(sio_data_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 	AM_RANGE( 0x10, 0x10 ) AM_READWRITE(sio_status_r,sio_command_w)
 ADDRESS_MAP_END
 
@@ -112,14 +111,14 @@ static MACHINE_RESET(altair)
 	state->m_term_data = 0;
 }
 
-WRITE8_MEMBER( altair_state::altair_kbd_put )
+WRITE8_MEMBER( altair_state::kbd_put )
 {
 	m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(altair_state, altair_kbd_put)
+	DEVCB_DRIVER_MEMBER(altair_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( altair, altair_state )

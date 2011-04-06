@@ -5,49 +5,58 @@
         11/12/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class ccs2422_state : public driver_device
 {
 public:
 	ccs2422_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( ccs2422_10_r );
+	DECLARE_READ8_MEMBER( ccs2422_11_r );
+	DECLARE_WRITE8_MEMBER( ccs2422_10_w );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_ccs_ram;
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 
-static READ8_HANDLER( ccs2422_10_r )
+READ8_MEMBER( ccs2422_state::ccs2422_10_r )
 {
-	ccs2422_state *state = space->machine().driver_data<ccs2422_state>();
-	UINT8 ret = state->m_term_data;
-	state->m_term_data = 0;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
 	return ret;
 }
 
-static READ8_HANDLER( ccs2422_11_r )
+READ8_MEMBER( ccs2422_state::ccs2422_11_r )
 {
-	ccs2422_state *state = space->machine().driver_data<ccs2422_state>();
-	return 4 | ((state->m_term_data) ? 1 : 0);
+	return 4 | (m_term_data ? 1 : 0);
 }
 
-static WRITE8_HANDLER(ccs2422_10_w)
+WRITE8_MEMBER( ccs2422_state::ccs2422_10_w )
 {
-	device_t *devconf = space->machine().device(TERMINAL_TAG);
-	terminal_write(devconf,0,data & 0x7f);
+	terminal_write(m_terminal, 0, data & 0x7f);
 }
 
-static ADDRESS_MAP_START(ccs2422_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(ccs2422_mem, AS_PROGRAM, 8, ccs2422_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(ccs2422_state, m_ccs_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(m_ccs_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ccs2422_io , AS_IO, 8)
+static ADDRESS_MAP_START( ccs2422_io, AS_IO, 8, ccs2422_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(ccs2422_10_r,ccs2422_10_w)
@@ -59,24 +68,22 @@ static INPUT_PORTS_START( ccs2422 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ccs2422)
+MACHINE_RESET_MEMBER(ccs2422_state)
 {
-	ccs2422_state *state = machine.driver_data<ccs2422_state>();
-	UINT8* user1 = machine.region("user1")->base();
-	memcpy((UINT8*)state->m_ccs_ram,user1,0x0800);
+	UINT8* user1 = m_machine.region("user1")->base();
+	memcpy((UINT8*)m_ccs_ram, user1, 0x0800);
 
 	// this should be rom/ram banking
 }
 
-static WRITE8_DEVICE_HANDLER( ccs2422_kbd_put )
+WRITE8_MEMBER( ccs2422_state::kbd_put )
 {
-	ccs2422_state *state = device->machine().driver_data<ccs2422_state>();
-	state->m_term_data = data;
+	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( ccs2422_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(ccs2422_kbd_put)
+	DEVCB_DRIVER_MEMBER(ccs2422_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( ccs2422, ccs2422_state )
@@ -85,11 +92,9 @@ static MACHINE_CONFIG_START( ccs2422, ccs2422_state )
 	MCFG_CPU_PROGRAM_MAP(ccs2422_mem)
 	MCFG_CPU_IO_MAP(ccs2422_io)
 
-	MCFG_MACHINE_RESET(ccs2422)
-
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ccs2422_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

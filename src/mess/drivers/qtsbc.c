@@ -7,53 +7,55 @@
     It expects a rom or similar at E377-up, so currently it crashes.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class qtsbc_state : public driver_device
 {
 public:
 	qtsbc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( qtsbc_06_r );
+	DECLARE_READ8_MEMBER( qtsbc_43_r );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_ram;
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 
-
-static WRITE8_HANDLER( qtsbc_06_w )
+READ8_MEMBER( qtsbc_state::qtsbc_06_r )
 {
-	device_t *terminal = space->machine().device(TERMINAL_TAG);
-
-	terminal_write(terminal, 0, data);
-}
-
-static READ8_HANDLER( qtsbc_06_r )
-{
-	qtsbc_state *state = space->machine().driver_data<qtsbc_state>();
-	UINT8 ret = state->m_term_data;
-	state->m_term_data = 0;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
 	return ret;
 }
 
-static READ8_HANDLER( qtsbc_43_r )
+READ8_MEMBER( qtsbc_state::qtsbc_43_r )
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START(qtsbc_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(qtsbc_mem, AS_PROGRAM, 8, qtsbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE_MEMBER(qtsbc_state, m_ram) AM_REGION("maincpu",0)
+	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE(m_ram) AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qtsbc_io , AS_IO, 8)
+static ADDRESS_MAP_START( qtsbc_io, AS_IO, 8, qtsbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(qtsbc_06_r,qtsbc_06_w)
+	AM_RANGE(0x06, 0x06) AM_READ(qtsbc_06_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 	AM_RANGE(0x43, 0x43) AM_READ(qtsbc_43_r)
 ADDRESS_MAP_END
 
@@ -62,22 +64,20 @@ static INPUT_PORTS_START( qtsbc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(qtsbc)
+MACHINE_RESET_MEMBER(qtsbc_state)
 {
-	qtsbc_state *state = machine.driver_data<qtsbc_state>();
-	UINT8* bios = machine.region("maincpu")->base()+0x10000;
-	memcpy(state->m_ram,bios, 0x800);
+	UINT8* bios = m_machine.region("maincpu")->base()+0x10000;
+	memcpy(m_ram, bios, 0x800);
 }
 
-static WRITE8_DEVICE_HANDLER( qtsbc_kbd_put )
+WRITE8_MEMBER( qtsbc_state::kbd_put )
 {
-	qtsbc_state *state = device->machine().driver_data<qtsbc_state>();
-	state->m_term_data = data;
+	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( qtsbc_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(qtsbc_kbd_put)
+	DEVCB_DRIVER_MEMBER(qtsbc_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( qtsbc, qtsbc_state )
@@ -86,12 +86,9 @@ static MACHINE_CONFIG_START( qtsbc, qtsbc_state )
 	MCFG_CPU_PROGRAM_MAP(qtsbc_mem)
 	MCFG_CPU_IO_MAP(qtsbc_io)
 
-	MCFG_MACHINE_RESET(qtsbc)
-
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, qtsbc_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

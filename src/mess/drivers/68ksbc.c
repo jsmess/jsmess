@@ -45,7 +45,7 @@ public:
 	DECLARE_READ16_MEMBER( c68ksbc_status_r );
 	DECLARE_READ16_MEMBER( c68ksbc_terminal_r );
 	DECLARE_WRITE16_MEMBER( c68ksbc_terminal_w );
-	DECLARE_WRITE8_MEMBER( c68ksbc_kbd_put );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
 };
 
@@ -89,14 +89,14 @@ static MACHINE_RESET(c68ksbc)
 {
 }
 
-WRITE8_MEMBER( c68ksbc_state::c68ksbc_kbd_put )
+WRITE8_MEMBER( c68ksbc_state::kbd_put )
 {
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( c68ksbc_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(c68ksbc_state, c68ksbc_kbd_put)
+	DEVCB_DRIVER_MEMBER(c68ksbc_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
@@ -105,7 +105,7 @@ static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
 	MCFG_MACHINE_RESET(c68ksbc)
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, c68ksbc_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

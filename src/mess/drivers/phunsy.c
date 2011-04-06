@@ -37,7 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_1800_w );
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
-	DECLARE_WRITE8_MEMBER( phunsy_kbd_put );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	const UINT8	*m_p_videoram;
 	const UINT8	*m_p_chargen;
 	UINT8		m_data_out;
@@ -170,15 +170,15 @@ static INPUT_PORTS_START( phunsy )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( phunsy_state::phunsy_kbd_put )
+WRITE8_MEMBER( phunsy_state::kbd_put )
 {
 	m_keyboard_input = data;
 }
 
 
-static GENERIC_TERMINAL_INTERFACE( phunsy_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(phunsy_state, phunsy_kbd_put)
+	DEVCB_DRIVER_MEMBER(phunsy_state, kbd_put)
 };
 
 
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,phunsy_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 

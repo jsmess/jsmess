@@ -5,6 +5,7 @@
         23/02/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
@@ -14,37 +15,44 @@ class pdp11_state : public driver_device
 {
 public:
 	pdp11_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-		
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ16_MEMBER( term_r );
+	DECLARE_READ16_MEMBER( term_tx_status_r );
+	DECLARE_READ16_MEMBER( term_rx_status_r );
+	DECLARE_WRITE16_MEMBER( term_w );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
 	UINT16 m_term_status;
 };
 
-static WRITE16_HANDLER(term_w)
+WRITE16_MEMBER(pdp11_state::term_w)
 {
-	device_t *devconf = space->machine().device("terminal");
-	terminal_write(devconf,0,data);
+	terminal_write(m_terminal, 0, data);
 }
 
-static READ16_HANDLER(term_r)
+READ16_MEMBER(pdp11_state::term_r)
 {
-	pdp11_state *state = space->machine().driver_data<pdp11_state>();
-	state->m_term_status = 0x0000;
-	return state->m_term_data;
+	m_term_status = 0x0000;
+	return m_term_data;
 }
 
-static READ16_HANDLER(term_tx_status_r)
+READ16_MEMBER(pdp11_state::term_tx_status_r)
 {   // always ready
 	return 0xffff;
 }
 
-static READ16_HANDLER(term_rx_status_r)
+READ16_MEMBER(pdp11_state::term_rx_status_r)
 { 	
-	pdp11_state *state = space->machine().driver_data<pdp11_state>();
-	return state->m_term_status;
+	return m_term_status;
 }
 
-static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
@@ -54,7 +62,7 @@ static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16)
 	AM_RANGE( 0xff76, 0xff77 ) AM_WRITE(term_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe9ff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xefff ) AM_ROM
@@ -62,8 +70,7 @@ static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pdp11 )
-	PORT_INCLUDE(generic_terminal)
+static INPUT_PORTS_START( pdp11 )
 INPUT_PORTS_END
 
 
@@ -133,37 +140,37 @@ static const struct t11_setup mxv11_data =
 {
 	0 << 13
 };
-static WRITE8_DEVICE_HANDLER( pdp_kbd_put )
+
+WRITE8_MEMBER( pdp11_state::kbd_put )
 {
-	pdp11_state *state = device->machine().driver_data<pdp11_state>();
-	state->m_term_data = data;
-	state->m_term_status = 0xffff;
+	m_term_data = data;
+	m_term_status = 0xffff;
 }
 
-static GENERIC_TERMINAL_INTERFACE( pdp_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(pdp_kbd_put)
+	DEVCB_DRIVER_MEMBER(pdp11_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( pdp11, pdp11_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
 	MCFG_CPU_CONFIG(pdp11_data)
-    MCFG_CPU_PROGRAM_MAP(pdp11_mem)
+	MCFG_CPU_PROGRAM_MAP(pdp11_mem)
 
-    MCFG_MACHINE_RESET(pdp11)
+	MCFG_MACHINE_RESET(pdp11)
 	
-    /* video hardware */
+	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,pdp_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pdp11ub2, pdp11 )
-    MCFG_MACHINE_RESET(pdp11ub2)
+	MCFG_MACHINE_RESET(pdp11ub2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pdp11qb, pdp11 )
-    MCFG_MACHINE_RESET(pdp11qb)
+	MCFG_MACHINE_RESET(pdp11qb)
 	
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(mxv11_data)
@@ -172,7 +179,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pdp11ub )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
 	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-034a9.bin", 0x0000, 0x0200, CRC(01c5d78d) SHA1(b447c67bfd5134c142240a919f23a949e1953fb2))
 	ROM_LOAD( "23-035a9.bin", 0x0200, 0x0200, CRC(c456df6c) SHA1(188c8ece6a2d67911016f55dd22b698a40aff515))
@@ -181,14 +188,14 @@ ROM_START( pdp11ub )
 ROM_END
 
 ROM_START( pdp11ub2 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
 	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-248f1.bin", 0x0000, 0x0400, CRC(ecda1a6d) SHA1(b2bf770dda349fdd469235871564280baf06301d))
 	//ROM_LOAD( "23-616f1-1666.bin", 0x0000, 0x0400, CRC(a3dfb5aa) SHA1(7f06c624ae3fbb49535258b8722b5a3c548da3ba))
 ROM_END
 
 ROM_START( pdp11qb )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
 	ROM_LOAD16_BYTE( "m7195fa.1", 0xc000, 0x2000, CRC(0fa58752) SHA1(4bcd006790a60f2998ee8377ac5e2c18ef330930))
 	ROM_LOAD16_BYTE( "m7195fa.2", 0xc001, 0x2000, CRC(15b6f60c) SHA1(80dd4f8ca3c27babb5e75111b04241596a07c53a))
 ROM_END
