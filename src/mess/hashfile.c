@@ -74,9 +74,9 @@ struct _hash_file
 
 enum hash_parse_position
 {
-	POS_ROOT,
-	POS_MAIN,
-	POS_HASH
+	HASH_POS_ROOT,
+	HASH_POS_MAIN,
+	HASH_POS_HASH
 };
 
 
@@ -194,7 +194,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 	switch(state->pos)
 	{
-		case POS_ROOT:
+		case HASH_POS_ROOT:
 			if (!strcmp(tagname, "hashfile"))
 			{
 			}
@@ -204,7 +204,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			}
 			break;
 
-		case POS_MAIN:
+		case HASH_POS_MAIN:
 			if (!strcmp(tagname, "hash"))
 			{
 				// we are now examining a hash tag
@@ -283,7 +283,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			}
 			break;
 
-		case POS_HASH:
+		case HASH_POS_HASH:
 			text_dest = NULL;
 
 			if (!strcmp(tagname, "year"))
@@ -321,11 +321,11 @@ static void end_handler(void *data, const char *name)
 	state->pos = (hash_parse_position) (state->pos - 1);
 	switch(state->pos)
 	{
-		case POS_ROOT:
-		case POS_HASH:
+		case HASH_POS_ROOT:
+		case HASH_POS_HASH:
 			break;
 
-		case POS_MAIN:
+		case HASH_POS_MAIN:
 			if (state->hi)
 			{
 				if (state->use_proc)
