@@ -25,6 +25,20 @@ static MACHINE_CONFIG_FRAGMENT( game_blaster_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gblaster:mono", 0.50)	
 MACHINE_CONFIG_END
 
+static READ8_DEVICE_HANDLER( saa1099_16_r )
+{
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( saa1099_16_w )
+{
+	switch(offset) 
+	{
+		case 0 : saa1099_control_w( device, offset, data ); break;
+		case 1 : saa1099_data_w( device, offset, data ); break;
+	}
+}
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -97,6 +111,8 @@ isa8_gblaster_device::isa8_gblaster_device(running_machine &_machine, const isa8
 void isa8_gblaster_device::device_start()
 {        
 	m_isa->add_isa_card(this, m_config.m_isa_num);	
+	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, saa1099_16_r, saa1099_16_w );
+	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, saa1099_16_r, saa1099_16_w );
 }
 
 //-------------------------------------------------
