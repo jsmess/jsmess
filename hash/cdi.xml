@@ -29,6 +29,7 @@
 	<description>The 7th Guest (Euro)[DVC][8110033V113 50404169 02]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
@@ -47,6 +48,7 @@
 	<description>The 7th Guest (Euro)[DVC][8111033V113 50404169 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
@@ -65,6 +67,7 @@
 	<description>The 7th Guest (Ger)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="Das Spiel" />
 		<diskarea name="cdrom">
@@ -83,6 +86,7 @@
 	<description>The 7th Guest (Fra)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="Le Jeu" />
 		<diskarea name="cdrom">
@@ -256,6 +260,7 @@
 	<description>Atlantis - The Last Resort v1.11 (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="atlantis - the last resort v1.11 (1996)(philips)(eu)[dvc]" sha1="efa8c1fa2ccff5bd7166fbc1ed464f974beac93d"/>
@@ -300,6 +305,7 @@
 	<description>Brain Dead 13 v1.07 (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="brain dead 13 v1.07 (1997)(philips)(eu)[dvc]" sha1="81781f6c70f7f4985642fd3b60567c4b07268d52"/>
@@ -366,6 +372,7 @@
 	<description>Caesars World of Boxing (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="caesars world of boxing (1993)(philips)(eu)[!][dvc]" sha1="dc7975a8e8c8230215e18e5444a030a9cce36bee"/>
@@ -432,6 +439,7 @@
 	<description>Centurion (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="centurion (1995)(philips)(nl)[dvc]" sha1="e37575220bf3d1fff5e16fe76765118e7af00bcf"/>
@@ -443,6 +451,7 @@
 	<description>Chaos Control v1.15 (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="chaos control v1.15 (1995)(philips)(eu)[!][dvc]" sha1="7edc539334eb37dfd82f2e3f540967f8be9a3354"/>
@@ -454,6 +463,7 @@
 	<description>Chaos Control v1.15 (Fra)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="chaos control v1.15 (1995)(philips)(fr)[dvc]" sha1="901447443d0ef41b847fd97ea55a14fb87532d08"/>
@@ -465,6 +475,7 @@
 	<description>Chaos Control v1.15 (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="chaos control v1.15 (1995)(philips)(de)[!][dvc]" sha1="a7d73fc368276e88efff52fbd4f2237b4fc92c00"/>
@@ -476,6 +487,7 @@
 	<description>Chaos Control v1.15 (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="chaos control v1.15 (1995)(philips)(us)[dvc]" sha1="f7c2baef338a8034e2d2a6d1e5a106e4da8b3483"/>
@@ -487,6 +499,7 @@
 	<description>Christmas Country (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Creative Media</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="christmas country (1996)(creative media)(eu)[dvc]" sha1="2101a562897b8374b8e3cf9b27c330fa39b3327e"/>
@@ -498,6 +511,7 @@
 	<description>Christmas Crisis (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>DIMA ~ Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="christmas crisis (1995)(dima - philips)(eu)[!][dvc]" sha1="abd547a3b4ff916e19de6338625db166602a7906"/>
@@ -509,6 +523,7 @@
 	<description>Cluedo (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cluedo (1994)(philips)(eu)[dvc]" sha1="1ae6ae15b53089f4fbff81d5b83150f12c826df9"/>
@@ -520,6 +535,7 @@
 	<description>Clue (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="clue (1994)(philips)(us)[dvc]" sha1="119a042e7dcd52e367fdc0ff6dec3952bfa6d61d"/>
@@ -531,6 +547,7 @@
 	<description>Cluedo - The Mysteries Continue (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cluedo - the mysteries continue (1995)(philips)(eu)[dvc]" sha1="41555ab802aa58777dd01bcff44c3c89357236d6"/>
@@ -553,6 +570,7 @@
 	<description>Creature Shock (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips ~ Virgin</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="creature shock (1996)(philips - virgin)(eu)(disc 1 of 2)[dvc]" sha1="d490b2771ad307ac7dc623e6e6f7a2cc008cc6ed"/>
@@ -613,6 +631,7 @@
 	<description>Dragon's Lair (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dragon's lair (1994)(philips)(eu)[!][dvc]" sha1="ae039a16098a58257fba0d0b3145fe4efabd017c"/>
@@ -624,6 +643,7 @@
 	<description>Dragon's Lair (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dragon's lair (1994)(philips)(us)[!][dvc]" sha1="d52877389d012f7f2b8ee8f1485717410103eef6"/>
@@ -646,6 +666,7 @@
 	<description>Dragon's Lair II - Time Warp (USA)[DVC][13920805 02]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dragon's lair ii - time warp (1994)(philips)(us)[!][dvc][13920805 02]" sha1="bb92a302ef1698825bf740e76ce71fae2da0b64d"/>
@@ -657,6 +678,7 @@
 	<description>Dragon's Lair II - Time Warp (USA)[DVC][13920805 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dragon's lair ii - time warp (1994)(philips)(us)[dvc][13920805 01]" sha1="a7ece8eb49cd2235fb7b1d1bacbfbad9912b6440"/>
@@ -668,6 +690,7 @@
 	<description>Drug Wars (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="drug wars (1996)(philips)(eu)[dvc]" sha1="e54420063121466529348630145dbb75f524a92b"/>
@@ -822,6 +845,7 @@
 	<description>Les Guignols de l'Info - Le Jeu! (Fra)[DVC]</description>
 	<year>1996</year>
 	<publisher>CANAL+ ~ Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="guignols de l'info, les - le jeu! (1996)(canal+ - philips)(fr)[dvc]" sha1="f85f3fa97e65664bacba69489ab5ecf539dc0e6b"/>
@@ -1108,6 +1132,7 @@
 	<description>Kingdom - Shadoan (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="kingdom - shadoan (1996)(philips)(eu)[!][dvc]" sha1="8da46f34c91ee11e7df9ec67eb64818ee74c01ec"/>
@@ -1119,6 +1144,7 @@
 	<description>Kingdom - The Far Reaches (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="kingdom - the far reaches (1995)(philips)(us)[!][dvc]" sha1="55077066216a3173694766749969d3f639e56f3c"/>
@@ -1141,6 +1167,7 @@
 	<description>Labyrinth of Crete (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="labyrinth of crete (1995)(philips)(eu)[dvc]" sha1="79f3f512452d6f00cdca07e5842ce532de101463"/>
@@ -1251,6 +1278,7 @@
 	<description>Litil Divil (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="litil divil (1994)(philips)(eu)[!][dvc]" sha1="1f342cbca16defa5aae923aaaf3b12b0f55ceca4"/>
@@ -1262,6 +1290,7 @@
 	<description>Litil Divil (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="litil divil (1994)(philips)(us)[!][dvc]" sha1="ec46239ffeb6158e6184c0a5010f821000f12b08"/>
@@ -1284,6 +1313,7 @@
 	<description>Lost Eden (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="lost eden (1995)(philips)(eu)[!][dvc]" sha1="9578b91f9e84f05b5d954033456b38187110238a"/>
@@ -1295,6 +1325,7 @@
 	<description>Lost Eden (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="lost eden (1995)(philips)(de)[!][dvc]" sha1="099652b449a96190dd54c5b990bc467c4dc8b73d"/>
@@ -1306,6 +1337,7 @@
 	<description>Lost Eden (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="lost eden (1995)(philips)(nl)(m4)[!][dvc]" sha1="82b9327e88b127be1304761a8e8b2461d4b7ec76"/>
@@ -1317,6 +1349,7 @@
 	<description>The Lost Ride (Euro)[DVC]</description>
 	<year>1998</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="lost ride, the (1998)(philips)(eu)[dvc]" sha1="8793e577a122f69f89ced13cda0c59a775361ea4"/>
@@ -1328,6 +1361,7 @@
 	<description>Mad Dog II - The Lost Gold (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mad dog ii - the lost gold (1995)(philips)(eu)[dvc]" sha1="f999b9890510aa5226bacfe443ae680014c56833"/>
@@ -1339,6 +1373,7 @@
 	<description>Mad Dog 2 - Le Tresor Perdu (Fra)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mad dog 2 - le tresor perdu (1996)(philips)(fr)[dvc]" sha1="1b5596d3da6da191614fafca36b4f9d7ce116904"/>
@@ -1350,6 +1385,7 @@
 	<description>Mad Dog McCree (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mad dog mccree (1994)(philips)(eu)[!][dvc]" sha1="7a2e986f5da5d522a73c0016e073299475ec69b5"/>
@@ -1361,6 +1397,7 @@
 	<description>Mad Dog McCree (USA)[DVC][05820818 N01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mad dog mccree (1994)(philips)(us)[dvc][05820818 n01]" sha1="6b1aba75c335d1886ad174eabf6449d39703464c"/>
@@ -1372,6 +1409,7 @@
 	<description>Mad Dog McCree (USA)[DVC][05820826 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mad dog mccree (1994)(philips)(us)[dvc][05820826 01]" sha1="9e4f2d303a9b21ada0c307d9005c9b3305d3258e"/>
@@ -1394,6 +1432,7 @@
 	<description>Making the Grade v0.90 (Euro, Pre-Release)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="making the grade v0.90 (1994)(philips)(eu)[pre-release][dvc]" sha1="7ca4555f802581304c591eb3dc98bb845a779748"/>
@@ -1441,6 +1480,7 @@
 	<description>Master Labyrinth v1.06 (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Pack-In Video</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="master labyrinth v1.06 (1995)(pack-in-video)(eu)[dvc]" sha1="8e9d3f6e9e9f62cd611ffcf0a3651dd485b1eb58"/>
@@ -1518,6 +1558,7 @@
 	<description>Mutant Rampage - Bodyslam (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mutant rampage - bodyslam (1994)(philips)(eu)[!][dvc]" sha1="a9bab3fff44c3979a368e986fdae2432de49a63c"/>
@@ -1529,6 +1570,7 @@
 	<description>Mutant Rampage - Bodyslam (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mutant rampage - bodyslam (1994)(philips)(us)[dvc]" sha1="b661c94d9bf667b317e879e519e796262824f315"/>
@@ -1606,6 +1648,7 @@
 	<description>NFL Hall of Fame Football (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="nfl hall of fame football (1994)(philips)(eu)[!][dvc]" sha1="ece5b8bc3a70d7fd93c53fcb74c1fdac723e7608"/>
@@ -1749,6 +1792,7 @@
 	<description>Rise of the Robots (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="rise of the robots (1995)(philips)(eu)[!][dvc]" sha1="73c7e39a0c6a83b772e417eb2f21ca8a68ea8d33"/>
@@ -1859,6 +1903,7 @@
 	<description>Space Ace (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="space ace (1994)(philips)(eu)[!][dvc]" sha1="8c74b9a3184c433137d1b072858117c03e38dfcd"/>
@@ -1870,6 +1915,7 @@
 	<description>Space Ace (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="space ace (1994)(philips)(us)[!][dvc]" sha1="382ef7f1d46bb050678615294f506f64c5b62b8a"/>
@@ -1958,6 +2004,7 @@
 	<description>Tetsuo Gaiden (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>New Frontier</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="tetsuo gaiden (1997)(new frontier)(eu)[dvc]" sha1="a0659d9165b09bcaad54273af4509e21222048a6"/>
@@ -1980,6 +2027,7 @@
 	<description>Thunder in Paradise (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
@@ -1998,6 +2046,7 @@
 	<description>Thunder in Paradise (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
@@ -2016,6 +2065,7 @@
 	<description>Thunder in Paradise (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="Das Spiel" />
 		<diskarea name="cdrom">
@@ -2057,6 +2107,7 @@
 	<description>Ultra CD-i Soccer (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="ultra cd-i soccer (1997)(philips)(eu)[dvc]" sha1="cb0aea09b6da6007bf2b2446892d8b00177d1daf"/>
@@ -2112,6 +2163,7 @@
 	<description>Voetbal v1.04 (Ned)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="voetbal v1.04 (1994)(philips)(nl)[dvc]" sha1="7a14a3770888a83757667d55fdc20acc4948659b"/>
@@ -2211,6 +2263,7 @@
 	<description>Who Shot Johnny Rock (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="who shot johnny rock (1995)(philips)(eu)[dvc]" sha1="4bf2fcf4231e958c3b7da366feff4aac1a0551ac"/>
@@ -2222,6 +2275,7 @@
 	<description>Who Shot Johnny Rock (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="who shot johnny rock (1995)(philips)(us)[dvc]" sha1="a62b04e1868ad4cfba6b9130d5e9100662b902ca"/>
@@ -2255,6 +2309,7 @@
 	<description>World Cup Golf (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world cup golf (1995)(philips)(eu)[!][dvc]" sha1="9debd983029ef28f576119425d456aa96bf9e5e0"/>
@@ -2266,6 +2321,7 @@
 	<description>De Zaak van Sam - Interactieve Detective (Ned)[DVC]</description>
 	<year>1997</year>
 	<publisher>NOB-Interactive</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="zaak van sam, de - interactieve detective (1997)(nob-interactive)(nl)[dvc]" sha1="ff2f912f1d6738c51d8d9fb125b41e373344d240"/>
@@ -2412,6 +2468,7 @@
 	<description>1995 - All the News and Views (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="1995 - all the news and views (1995)(philips)(eu)[!][dvc]" sha1="2e94dff65233e0a41135cffda383330d9e1e6717"/>
@@ -2456,6 +2513,7 @@
 	<description>A Night in Nylon City (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>ICDI ~ Sofidoc</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="a night in nylon city (1995)(icdi - sofidoc)(eu)[dvc]" sha1="0b88f90913c5e2879308b96dd4c9e0f6d692b9ac"/>
@@ -2511,6 +2569,7 @@
 	<description>Accent Health - Information for Healthy Living - January 2004 - General CDi 1-04 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="accent health - information for healthy living - january 2004 - general cdi 1-04 (2004)(cnn)(us)[dvc]" sha1="bb54f09df7ad7314709ca00f45e7999e3647542c"/>
@@ -2522,6 +2581,7 @@
 	<description>Accent Health - Information for Healthy Living - November 2004 - 50 + Silver CDi 1104 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="accent health - information for healthy living - november 2004 - 50 + silver cdi 1104 (2004)(cnn)(us)[dvc]" sha1="41e9c73f61a71906583d1d8712dd1eefed9564c8"/>
@@ -2533,6 +2593,7 @@
 	<description>Accent Health - Information for Healthy Living - November 2004 - General CDi 11-04 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="accent health - information for healthy living - november 2004 - general cdi 11-04 (2004)(cnn)(us)[dvc]" sha1="c6fef69eab76cff4a4374c68aef784a855369d4c"/>
@@ -2544,6 +2605,7 @@
 	<description>Accent Health - Information for Healthy Living - October 2004 - General CDi 10-04 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="accent health - information for healthy living - october 2004 - general cdi 10-04 (2004)(cnn)(us)[dvc]" sha1="7ec706927765a3ec59e4832ed9f62150273c491d"/>
@@ -2621,6 +2683,7 @@
 	<description>AIMS - A First Look at Birds [DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - a first look at birds (1995)(aims multimedia)(us)[dvc]" sha1="bc091226c561c3c183b0288f2f14c6b4290f59de"/>
@@ -2632,6 +2695,7 @@
 	<description>AIMS - A First Look at Mammals (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - a first look at mammals (1995)(aims multimedia)(us)[dvc]" sha1="69dfb67c2d763087f19a0fe7b9c821fc0da45ee7"/>
@@ -2643,6 +2707,7 @@
 	<description>AIMS - A First Look at Trees (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - a first look at trees (1995)(aims multimedia)(us)[dvc]" sha1="c734fdb0d4b0a6a82e02c1e73559c6c640097d2e"/>
@@ -2654,6 +2719,7 @@
 	<description>AIMS - Animal Communities (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - animal communities (1995)(aims multimedia)(us)[dvc]" sha1="644fa1f378bb3e08f830d8c1b42ca2c8e63fdaef"/>
@@ -2665,6 +2731,7 @@
 	<description>AIMS - Animal Life in a Tidepool (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - animal life in a tidepool (1995)(aims multimedia)(us)[dvc]" sha1="e722c6f14b67346952c3c523baafd40c4e53f319"/>
@@ -2676,6 +2743,7 @@
 	<description>AIMS - Beavers and How they Live (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - beavers and how they live (1995)(aims multimedia)(us)[dvc]" sha1="1855caf6b052d445b23442d96e10ad3724e92fce"/>
@@ -2687,6 +2755,7 @@
 	<description>AIMS - Bees and How they Live (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - bees and how they live (1995)(aims multimedia)(us)[dvc]" sha1="1a985abec574fbd1e32ed1400ab373a2c8a42d77"/>
@@ -2698,6 +2767,7 @@
 	<description>AIMS - Ecosystems - Nature in Balance (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - ecosystems - nature in balance (1995)(aims multimedia)(us)[dvc]" sha1="42dcbac3e13690f53ed81cffa3a7e9376958b2a6"/>
@@ -2709,6 +2779,7 @@
 	<description>AIMS - Evolution - Change Through Natural Selection (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - evolution - change through natural selection (1995)(aims multimedia)(us)[dvc]" sha1="bbad18ec016ff778e8f656267e1e8235a76b19fd"/>
@@ -2720,6 +2791,7 @@
 	<description>AIMS - Exploring our Solar System (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - exploring our solar system (1995)(aims multimedia)(us)[dvc]" sha1="eb228b87c5df9111cfb2add8204be5e4d5d45eb6"/>
@@ -2731,6 +2803,7 @@
 	<description>AIMS - Frogs and How they Live (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - frogs and how they live (1995)(aims multimedia)(us)[dvc]" sha1="47ced36b7b87ea92ffe876a3f67058e8fea312c2"/>
@@ -2742,6 +2815,7 @@
 	<description>AIMS - How Animals Survive (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - how animals survive (1995)(aims multimedia)(us)[dvc]" sha1="9149d9000acd44c1cb4249df358bf67759711ec5"/>
@@ -2753,6 +2827,7 @@
 	<description>AIMS - How we Classify Animals (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - how we classify animals (1995)(aims multimedia)(us)[dvc]" sha1="42c842bae74395a7b14c0af5378fa30a99322c4d"/>
@@ -2764,6 +2839,7 @@
 	<description>AIMS - Insects Reproduction and Metamorphosis (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - insects reproduction and metamorphosis (1995)(aims multimedia)(us)[dvc]" sha1="00c89dcd48e32ababc82410831237676f39bf627"/>
@@ -2775,6 +2851,7 @@
 	<description>AIMS - Learning About Ecology (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - learning about ecology (1995)(aims multimedia)(us)[dvc]" sha1="9e07b5480ea3a9bbdc22adcc552695320af8bdfe"/>
@@ -2786,6 +2863,7 @@
 	<description>AIMS - Temperature, Pressure and Humidity (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - temperature, pressure and humidity (1995)(aims multimedia)(us)[dvc]" sha1="c07a7efd813a1d8970a67df51454ed240b48a9ed"/>
@@ -2797,6 +2875,7 @@
 	<description>AIMS - The Civil War - Four Years of War and its Aftermath (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - the civil war - four years of war and it's aftermath (1995)(aims multimedia)(us)[dvc]" sha1="a4bf7a0140230aff75a5707207fd86451db6ade3"/>
@@ -2808,6 +2887,7 @@
 	<description>AIMS - The Civil War - The South Secedes and War Begins (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - the civil war - the south secedes and war begins (1995)(aims multimedia)(us)[dvc]" sha1="c4f5b34fac8f3e3d7af67a7771fd200fcaca1ff3"/>
@@ -2819,6 +2899,7 @@
 	<description>AIMS - Winds, Fronts and Storms (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="aims - winds, fronts and storms (1995)(aims multimedia)(us)[dvc]" sha1="2234658e209a5b61cf1c016a414dab34d485488a"/>
@@ -2874,6 +2955,7 @@
 	<description>Andrew Lloyd Webber - The Premiere Collection Encore (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips ~ PolyGram</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="andrew lloyd webber - the premiere collection encore (1993)(philips - polygram)(pal)(eu)[!][dvc]" sha1="f7976b9a92eaee3226874f2235484923b84961b0"/>
@@ -2885,6 +2967,7 @@
 	<description>Andrew Lloyd Webber - The Premiere Collection Encore (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips ~ PolyGram</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="andrew lloyd webber - the premiere collection encore (1993)(philips - polygram)(us)[dvc]" sha1="fc344555911556395f925f867945cb69345607f5"/>
@@ -2918,6 +3001,7 @@
 	<description>Around Atlanta - The Olympic City (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="around atlanta - the olympic city (1996)(philips)(eu)[dvc]" sha1="d5101cb9124ca2d3e0cc65d84cbbf414eba95516"/>
@@ -3072,6 +3156,7 @@
 	<description>Bertelsmann Universal Lexikon (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="bertelsmann universal lexikon (1995)(pathe - philips)(de)[!][dvc]" sha1="4ed55755bef1f1b0a79973ba3d7acbebc0155283"/>
@@ -3094,6 +3179,7 @@
 	<description>The Best of Baby Songs - Featuring the Songs of Hop Palmer (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="best of baby songs, the - featuring the songs of hop palmer (1993)(philips)(us)[dvc]" sha1="1a87c5696113c65a87736e63b345e6c0dea9ba19"/>
@@ -3116,6 +3202,7 @@
 	<description>The Best Of Manfred Deix Vol. 1 (Aut)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="best of manfred deix vol. 1, the (1994)(philips)(at)[dvc]" sha1="837196b670873ef5e4c49a6b831616c871eb9e6a"/>
@@ -3193,6 +3280,7 @@
 	<description>Cartoon Carnival (Euro, USA)[DVC enhanced]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cartoon carnival (1993)(philips)(eu-us)[!][dvc enhanced]" sha1="a6a6b29a56ed0e083a3c640c11554d5f3f3fd54f"/>
@@ -3237,6 +3325,7 @@
 	<description>CD-i Demonstratie Disc - Fall 1996 - Spring 1997 (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cd-i demonstratie disc - fall 1996 - spring 1997 (1996)(philips)(nl)[!][dvc]" sha1="bac7c5e6ee1aa67e357ef76c8bea33246b801d04"/>
@@ -3325,6 +3414,7 @@
 	<description>CD-Online - Issue 01 - Internet on TV (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>CD-Online</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cd-online - issue 01 - internet on tv (1995)(cd-online)(eu)[dvc]" sha1="a90af7cbcd8aa103cd3952b1df3b101a4882cbfc"/>
@@ -3336,6 +3426,7 @@
 	<description>CD-Online - Issue 02 - The Internet Game Issue (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>CD-Online</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cd-online - issue 02 - the internet game issue (1996)(cd-online)(eu)[dvc]" sha1="7bc02b2ad89018fe915419cc4cfda4864541fa9f"/>
@@ -3347,6 +3438,7 @@
 	<description>CD-Online Disc 97-10 (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>CD-Online</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cd-online disc 97-10 (1997)(cd-online)(eu)(m3)[dvc]" sha1="196dfd10af187f06a8f0c413707e40927b8e6416"/>
@@ -3446,6 +3538,7 @@
 	<description>Compton's Interactive Encyclopedia (Euro)[DVC enhanced]</description>
 	<year>1995</year>
 	<publisher>Compton's NewMedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="compton's interactive encyclopedia (1995)(compton's newmedia)(eu)[dvc enhanced]" sha1="87bb630e2460b4e6532305bb99728052173c733c"/>
@@ -3501,6 +3594,7 @@
 	<description>Cosmopolitan Interactive - Tonetics (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cosmopolitan interactive - tonetics (1995)(philips)(us)[dvc]" sha1="5668157f9b54788ec9ada74fc58f98f1f7cc5ae9"/>
@@ -3567,6 +3661,7 @@
 	<description>Dansen! (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dansen! (1996)(philips)(nl)[!][dvc]" sha1="19c3103c37e8d594791305d6c90d76953c86cf80"/>
@@ -3589,6 +3684,7 @@
 	<description>Destination Great Britain - Central and Northern England (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>World of Wonders</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="destination great britain - central and northern england (1994)(world of wonders)(us)[dvc]" sha1="7ebb035e7ebe6d2a2a980220197c0354350dfbdd"/>
@@ -3600,6 +3696,7 @@
 	<description>Destination Great Britain - England's West Country (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>World of Wonders</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="destination great britain - england's west country (1994)(world of wonders)(us)[dvc]" sha1="9b51de1883511a4c02c55cb4d197e8adf4444ae8"/>
@@ -3611,6 +3708,7 @@
 	<description>Destination Great Britain - London &amp; Southern England (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>World of Wonders</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="destination great britain - london &amp; southern england (1995)(world of wonders)(us)[dvc]" sha1="6e0799bec8f265ff1933c1a3dac157775636c9e6"/>
@@ -3622,6 +3720,7 @@
 	<description>Destination Great Britain - Wales (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>World of Wonders</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="destination great britain - wales (1994)(world of wonders)(us)[dvc]" sha1="cac883934d36bc57b177c0a21e9c2225e314a995"/>
@@ -3655,6 +3754,7 @@
 	<description>Dit Was 1994 - Wereldnieuws Overzicht (Ned)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dit was 1994 - wereldnieuws overzicht (1995)(philips)(nl)[!][dvc]" sha1="4944e60cab3d709d1847a8a8abb76fbe113c0ab1"/>
@@ -3666,6 +3766,7 @@
 	<description>Dit Was 1995 - Wereldnieuws Overzicht (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="dit was 1995 - wereldnieuws overzicht (1996)(philips)(nl)[dvc]" sha1="06e3447cf64f8cd6d192e50c1e29d33da399f506"/>
@@ -3788,6 +3889,7 @@
 	<description>Eric Clapton - The Cream Of Eric Clapton (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips ~ PolyGram</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="eric clapton - the cream of eric clapton (1994)(philips - polygram)(pal)(eu)(disc 1 of 2)[dvc]" sha1="849a5c73142e65afe573dcab9ae743de0404356e"/>
@@ -3870,6 +3972,7 @@
 	<description>De Filmmaand - Highlights-Previews-Filmclips (Ned, Alt)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="filmmaand, de - highlights-previews-filmclips (1995-05)(philips)(nl)[a][dvc]" sha1="0f369bc334affc81c0c147ef68640d132d649605"/>
@@ -3881,6 +3984,7 @@
 	<description>De Filmmaand - Highlights-Previews-Filmclips (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="filmmaand, de - highlights-previews-filmclips (1995-05)(philips)(nl)[dvc]" sha1="ca59611ec63e896687afda22d120f79fc4409bbb"/>
@@ -3936,6 +4040,7 @@
 	<description>Football - L'histoire, les regles, les vedettes, le jeu de penalties v1.04 (Fra)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(philips)(fr)[!][dvc]" sha1="ea48f982568a3971c21164e3669a90ac90b4672c"/>
@@ -4121,6 +4226,7 @@
 	<description>Great American Golf 2 (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Xdra</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="great american golf 2 (1994)(xdra)(eu)[dvc]" sha1="65d9503e563d6fdda870dfc729aeef51a15a213b"/>
@@ -4256,6 +4362,7 @@
 	<description>Henri Des - Les Betises (Fra)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="henri des - les betises (1993)(philips)(fr)[dvc]" sha1="ed2360164a223ff9d2dd16f39dc6e62e7d8cffcb"/>
@@ -4370,6 +4477,7 @@
 	<description>Hondenliefde (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>AVRO</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="hondenliefde (1995)(avro)(nl)[dvc]" sha1="930a630dda0f1fa7b74c62f8435717e1ef76fbb7"/>
@@ -4436,6 +4544,7 @@
 	<description>Ik, Mik, Letterland - een leesavontuur met maan roos vis (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="ik, mik, letterland - een leesavontuur met maan roos vis (1996)(philips)(nl)[!][dvc]" sha1="1a13af6aba462ad0a1a7454ea3298c610133609e"/>
@@ -4447,6 +4556,7 @@
 	<description>Imagination in Motion - A New Era in 3D Chill Out Video (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>AIMS Multimedia</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="imagination in motion - a new era in 3d chill out video (1996)(aims multimedia)(eu)[dvc]" sha1="74ac6ec58a73259ec6051480257f9430e9ba20b6"/>
@@ -4458,6 +4568,7 @@
 	<description>Interactive Math - Decimals v1.0 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Gulliver Ritchie Associates</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="interactive math - decimals v1.0 (1994)(gulliver ritchie associates)(us)[dvc]" sha1="7e7e37f1856909dd670dc9b78d3474e88cb641ce"/>
@@ -4480,6 +4591,7 @@
 	<description>Internetten op je TV! - Demo Disc (Ned)[DVC][8140154]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="internetten op je tv! - demo disc (1996)(philips)(nl)[!][dvc][8140154]" sha1="1620b35d3b7f36d5066734694d7baf948cd776a8"/>
@@ -4491,6 +4603,7 @@
 	<description>Internetten op je TV! - Demo Disc (Ned)[DVC][8100330]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="internetten op je tv! - demo disc (1996)(philips)(nl)[dvc][8100330]" sha1="908ea704879b1a50e8f5e9d5fb3cf6a72c5b84f4"/>
@@ -4535,6 +4648,7 @@
 	<description>Le Journal Interactif '94 et Le Jeu des Stars de l'info (Fra)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="Journal Interactif" />
 		<diskarea name="cdrom">
@@ -4553,6 +4667,7 @@
 	<description>Le Journal interactif 1995 et Le Jeu des Stars de l'info (Fra)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<feature name="part_id" value="Journal Interactif" />
 		<diskarea name="cdrom">
@@ -4571,6 +4686,7 @@
 	<description>The Joy of Sex v3.01 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="joy of sex, the v3.01 (1994)(philips)(us)[dvc]" sha1="cace9eea975ebfcdbde04425979ef4ae1e418598"/>
@@ -4582,6 +4698,7 @@
 	<description>The Joy of Sex v3.03 (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="joy of sex, the v3.03 (1993)(philips)(eu)[!][dvc]" sha1="1c172310e21fbf1e256c9b3e92187d3c5d1c3a4d"/>
@@ -4659,6 +4776,7 @@
 	<description>Kathy Smith - Personal Trainer (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="kathy smith - personal trainer (1995)(philips)(eu)[dvc]" sha1="0dd8458b59368281d3aadec2964791afd28b5f88"/>
@@ -4670,6 +4788,7 @@
 	<description>Kathy Smith - Personal Trainer (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="kathy smith - personal trainer (1995)(philips)(us)[dvc]" sha1="dc25c3d37c9611f875d28b5453b0c636b9fdffd3"/>
@@ -4681,6 +4800,7 @@
 	<description>Keep The Faith - An Evening with Bon Jovi (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips ~ PolyGram</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="keep the faith - an evening with bon jovi (1993)(philips - polygram)(pal)(eu)(disc 1 of 2)[!][dvc]" sha1="16dd9ae93d2d24456feda0a1419d56f60b0ac490"/>
@@ -4697,6 +4817,7 @@
 	<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="kinderdisc met het complete verhaal ijsbeer in de tropen, de (1995)(philips)(nl)[dvc]" sha1="7a2a31f547270710e01e3094d03625ba890c0172"/>
@@ -4708,6 +4829,7 @@
 	<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Ned, Alt)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="kinderdisc met het complete verhaal ijsbeer in de tropen, de (1995)(philips)(nl)[a][dvc]" sha1="9e4471ca4013e45f07bfe041427c4cb986d2edb5"/>
@@ -4972,6 +5094,7 @@
 	<description>Live Without Monty Python (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="live without monty python (1994)(philips)(eu)[dvc]" sha1="490f2ef4c855c52244ca1b7a73f6d109cc30a10a"/>
@@ -4983,6 +5106,7 @@
 	<description>Live Without Monty Python (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="live without monty python (1994)(philips)(us)[dvc]" sha1="886edbcd1aad683d75af581c90bb8256c248c5cf"/>
@@ -4994,6 +5118,7 @@
 	<description>Loving for a Lifetime (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Extraware ~ Interlance ~ Meteor Film</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="loving for a lifetime (1994)(extraware - interlance - meteor film)(eu)(disc 1 of 2)[dvc]" sha1="4da406ea80afa34deef0e1149733fb72458df96f"/>
@@ -5070,6 +5195,7 @@
 	<description>Mathtrak K1 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher> InterROM </publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mathtrak k1 (1994)(interrom)(us)[dvc]" sha1="9834e2391902a26b21cbad632f5cf152e654991a"/>
@@ -5081,6 +5207,7 @@
 	<description>Mathtrak K2 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher> InterROM </publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="mathtrak k2 (1994)(interrom)(us)[dvc]" sha1="d6ea2dbbb619ee611fa538be138d1951d018ae40"/>
@@ -5180,6 +5307,7 @@
 	<description>Monty Python's Invasion from the Planet Skyron (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="monty python's invasion from the planet skyron (1995)(philips)(eu)[dvc]" sha1="d0184e1aef31a45b79fe62215570aa475706d2a1"/>
@@ -5191,6 +5319,7 @@
 	<description>Monty Python's More Naughty Bits (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="monty python's more naughty bits (1994)(philips)(eu)(m4)[dvc]" sha1="2e0047ad3e2754167c4ce9058d6e936a821e1447"/>
@@ -5202,6 +5331,7 @@
 	<description>Monty Python's More Naughty Bits (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="monty python's more naughty bits (1995)(daedalus)(us)(m4)[!][dvc]" sha1="35cead179d6ba852f9f53d38db70af5614e27451"/>
@@ -5268,6 +5398,7 @@
 	<description>Muzzy - Learn French the Fun Way (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="muzzy - learn french the fun way (1994)(philips)(eu)[dvc]" sha1="c3df6f64357e8e4798c1813e579115532f4fa623"/>
@@ -5279,6 +5410,7 @@
 	<description>Muzzy - Learn French the Fun Way (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="muzzy - learn french the fun way (1994)(philips)(us)[dvc]" sha1="d71584ecf08f0b9cbcc3319f37d3a0c27e8684a4"/>
@@ -5301,6 +5433,7 @@
 	<description>Nederlands Elftal Compleet - Alles over de Europese Kampioenschappen (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="nederlands elftal compleet - alles over de europese kampioenschappen (1996)(philips)(nl)[!][dvc]" sha1="702934457d67cc356044e4aa835a77217eb82d14"/>
@@ -5312,6 +5445,7 @@
 	<description>Nederlands Film Festival '95 - 15 Jaar Gouden Kalf (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="nederlands film festival '95 - 15 jaar gouden kalf (1995)(philips)(nl)[!][dvc]" sha1="1bbf2dcf1dc7fd4399bddbc643aa535f55c15f59"/>
@@ -5389,6 +5523,7 @@
 	<description>Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="ontdek het onbekende nederland - nederland-waterland v1.0 (1995)(philips)(nl)[!][dvc]" sha1="7f1f443710b1cd57928ea42229578e284794355a"/>
@@ -5488,6 +5623,7 @@
 	<description>Philips Demo CD (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="philips demo cd (1995)(philips)(nl)[dvc]" sha1="59b7fe28e3ba0bbee2266a1088296310de54da26"/>
@@ -5511,6 +5647,7 @@
 	<description>Philips Media Interactieve Encyclopedie (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="philips media interactieve encyclopedie (1995)(philips)(nl)[!][aka standaard interactieve encyclopedie][dvc]" sha1="28bb605dc2ebfaacd978b3939b3dd02c00830f87"/>
@@ -5522,6 +5659,7 @@
 	<description>Philips Media Interactieve Encyclopedie - Demonstratie - Exemplaar (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="philips media interactieve encyclopedie - demonstratie - exemplaar (1995)(philips)(nl)[!][dvc]" sha1="ec911541e153d06f6f8b64b6c92cb3eed17e05d7"/>
@@ -5533,6 +5671,7 @@
 	<description>Philips Media Medische Encyclopedie (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="philips media medische encyclopedie (1996)(philips)(nl)[!][dvc]" sha1="015e23599f7c83dcec262d49f269cecca5657c17"/>
@@ -5566,6 +5705,7 @@
 	<description>Playboy - I Segreti Del Massaggio (Ita)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="playboy - i segreti del massaggio (1994)(philips)(it)[dvc]" sha1="afdf56042dac1a943c403902f7c4c0729da842b4"/>
@@ -5577,6 +5717,7 @@
 	<description>Playboy's Complete Massage (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="playboy's complete massage (1993)(philips)(us)[!][dvc]" sha1="e4b64d8aba8244e43664330ef00b711ada3a1c2f"/>
@@ -5665,6 +5806,7 @@
 	<description>Pyramid Adventures - Episode 1 - Treasures of the Lost Pyramid (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Compact Disc Incorporated</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="pyramid adventures - episode 1 - treasures of the lost pyramid (1995)(compact disc incorporated)(us)[!][dvc]" sha1="462c7461fe3366f97da87407d140d17107ab5f12"/>
@@ -5676,6 +5818,7 @@
 	<description>Queen - Greatest Flix I &amp; II (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Queen Films</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="queen - greatest flix i &amp; ii (1994)(queen films)(eu)(disc 1 of 2)[dvc]" sha1="9b6408fcbffcdc55b9bb3023f2b5f8b94703d769"/>
@@ -5978,6 +6121,7 @@
 	<description>Rio '88 - Tina Turner (Euro)[DVC]</description>
 	<year>19??</year>
 	<publisher>Philips ~ PolyGram</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="rio '88 - tina turner (1988)(philips - polygram)(pal)(eu)(disc 1 of 2)[!][dvc]" sha1="e054c54935db3c87213a47cae20ef123c1190334"/>
@@ -6127,6 +6271,7 @@
 	<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[DVC][8100236V103 50461390 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="sciamo con alberto tomba - let's go skiing with alberto tomba (1994)(philips)(eu)(en-it)[dvc][8100236v103 50461390 01]" sha1="118887eebba2ed2e14b910ae14e0403d86cdbe58"/>
@@ -6138,6 +6283,7 @@
 	<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[DVC][991953100049 1445-A]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="sciamo con alberto tomba - let's go skiing with alberto tomba (1994)(philips)(eu)(en-it)[dvc][991953100049 1445-a]" sha1="5c55eb5987e506dff0870364daa35cb37d4705ca"/>
@@ -6149,6 +6295,7 @@
 	<description>Shari Lewis - Lamb Chop's Play-Along! - Action Songs (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="shari lewis - lamb chop's play-along! - action songs (1993)(philips)(us)[dvc]" sha1="8c49529d1f41ced2ca444d198b5da02a268409a1"/>
@@ -6314,6 +6461,7 @@
 	<description>Sting - Ten Summoner's Tales (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="sting - ten summoner's tales (1994)(philips)(eu)[!][dvc]" sha1="d0efcc0dbb8524fdc77410ae7e1c56b0f29bb991"/>
@@ -6424,6 +6572,7 @@
 	<description>Tennis Our Way (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom1" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="tennis our way (1994)(philips)(us)(disc 1 of 3)[dvc]" sha1="3ba4904a1c2dc02032fd5aea2560b25c3f67e08c"/>
@@ -6445,6 +6594,7 @@
 	<description>Thumbelina (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="thumbelina (1995)(philips)(eu)[dvc]" sha1="f7781c83976fac5e736eaf455053d584293f228d"/>
@@ -6643,6 +6793,7 @@
 	<description>Titanic - An interactive exploration (USA)[DVC enhanced]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="titanic - an interactive exploration (1994)(philips)(us)[dvc enhanced]" sha1="fbc111866cc40cd465b7a42f958f5199302b324c"/>
@@ -6687,6 +6838,7 @@
 	<description>Total Euro 96 (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="total euro 96 (1996)(philips)(eu)[dvc]" sha1="69315a50c9e20c4898a29b26b18cadaacc02c98c"/>
@@ -6742,6 +6894,7 @@
 	<description>UEFA Champions League (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="uefa champions league (1995)(philips)(de)[season 1995-96][dvc]" sha1="fc44f5f660a5a18c4da0aaf068123a90aa0e1a38"/>
@@ -6753,6 +6906,7 @@
 	<description>UEFA Champions League (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="uefa champions league (1995)(philips)(nl)[season 1995-96][dvc]" sha1="715b50093d1530eed23cb50246fed6c3633ee80d"/>
@@ -6775,6 +6929,7 @@
 	<description>USA '94 - World Cup (Euro, German / French / Dutch)[DVC enhanced][8100101V104 50404061 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[!][de-fr-nl][dvc enhanced][8100101v104 50404061 01]" sha1="fc40fd4e77f88fc4297a08ca0f6decb567d50f7f"/>
@@ -6786,6 +6941,7 @@
 	<description>USA '94 - World Cup (Euro, English / Spanish / Italian, Alt)[DVC enhanced][8100103V105 50404055 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[a][en-es-it][dvc enhanced][8100103v105 50404055 01]" sha1="a18e2308a98049c50deeb05ba42550a08b85e6b2"/>
@@ -6797,6 +6953,7 @@
 	<description>USA '94 - World Cup (Euro, English / Spanish / Italian)[DVC enhanced][8100103V105 50404055 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[en-es-it][dvc enhanced][8100103v105 50404055 01]" sha1="ecf3c13399d8f5a9bb89094c48e8ce138841fbd7"/>
@@ -6841,6 +6998,7 @@
 	<description>Video CD - Music Sampler (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips ~ PolyGram</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="video cd - music sampler (1995)(philips - polygram)(eu)[dvc]" sha1="307eac171685ec019ea1ad802dee7c18b5f3f68a"/>
@@ -6973,6 +7131,7 @@
 	<description>World Tours - Egypt (USA)[DVC]</description>
 	<year>1996</year>
 	<publisher>Educational Management Group</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world tours - egypt (1996)(educational management group)(us)[dvc]" sha1="2c0e990971c45e8cf5a5a3eb50bb29a79bac7cae"/>
@@ -6984,6 +7143,7 @@
 	<description>World Tours - Hong Kong (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Educational Management Group</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world tours - hong kong (1995)(educational management group)(us)[dvc]" sha1="e03388b2a1d94dc7b56e604abcce71137b90b3f3"/>
@@ -6995,6 +7155,7 @@
 	<description>World Tours - New Zealand (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Educational Management Group</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world tours - new zealand (1995)(educational management group)(us)[dvc]" sha1="ea0365baa41910a95dfbd148c66b2ae2f6e2e6ac"/>
@@ -7006,6 +7167,7 @@
 	<description>World Tours - Pacific Islands (USA)[DVC]</description>
 	<year>1996</year>
 	<publisher>Educational Management Group</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world tours - pacific islands (1996)(educational management group)(us)[dvc]" sha1="4af1f529fc1b0d92f725be650e5738a096e94beb"/>
@@ -7017,6 +7179,7 @@
 	<description>World Tours - The Amazon Rainforest (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Educational Management Group</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world tours - the amazon rainforest (1995)(educational management group)(us)[dvc]" sha1="8af37b1fe4da730865954c320d35bc6fa4851a4c"/>
@@ -7028,6 +7191,7 @@
 	<description>World Tours - West Africa (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Educational Management Group</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="world tours - west africa (1994)(educational management group)(us)[dvc]" sha1="2f2bfcb1ca309bb7c65b33bf8787ea597b75f240"/>
@@ -7039,6 +7203,7 @@
 	<description>Xplora 1 - Peter Gabriel's Secret World (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
+	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="xplora 1 - peter gabriel's secret world (1995)(philips)(eu)[!][dvc]" sha1="794a42059b172f0cfff4c670568b061386d71897"/>
