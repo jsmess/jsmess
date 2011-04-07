@@ -21,9 +21,12 @@
 #include "machine/ram.h"
 #include "machine/isa.h"
 
+#include "machine/isa_adlib.h"
 #include "machine/isa_com.h"
 #include "machine/isa_fdc.h"
+#include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
+#include "machine/isa_sblaster.h"
 
 #include "machine/kb_keytro.h"
 
@@ -148,6 +151,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "adlib", ISA8_ADLIB)
 	
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -170,6 +174,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "adlib", ISA8_ADLIB)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH( 256 )
@@ -199,6 +204,7 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
     MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "gblaster", ISA8_GAME_BLASTER)
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -222,6 +228,7 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
+	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "sblaster", ISA8_SOUND_BLASTER_1_0)
 	
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
