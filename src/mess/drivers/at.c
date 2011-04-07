@@ -13,7 +13,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
-#include "sound/3812intf.h"
+
 #include "machine/i8255a.h"
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
@@ -47,35 +47,10 @@
 
 #include "sound/dac.h"
 #include "sound/speaker.h"
-#include "sound/saa1099.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "memconv.h"
 
-
-#define ym3812_StdClock 3579545
-
-/*
-  adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
-  soundblaster: YM3812 also accessible at 0x228/9 (address jumperable)
-  soundblaster pro version 1: 2 YM3812 chips
-   at 0x388 both accessed,
-   at 0x220/1 left?, 0x222/3 right? (jumperable)
-  soundblaster pro version 2: 1 OPL3 chip
-
-  pro audio spectrum +: 2 OPL2
-  pro audio spectrum 16: 1 OPL3
- */
-#define ADLIB	/* YM3812/OPL2 Chip */
-/*
-  creativ labs game blaster (CMS creativ music system)
-  2 x saa1099 chips
-  also on sound blaster 1.0
-  option on sound blaster 1.5
-
-  jumperable? normally 0x220
-*/
-#define GAMEBLASTER
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
@@ -125,31 +100,6 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 	i8237_w( device, offset / 2, data);
 }
 
-static READ16_DEVICE_HANDLER( at16_388_r )
-{
-	if ( ACCESSING_BITS_0_7 )
-	{
-		return 0xFF;
-	}
-	else
-	{
-		return ym3812_status_port_r( device, offset );
-	}
-}
-
-
-static WRITE16_DEVICE_HANDLER( at16_388_w )
-{
-	if ( ACCESSING_BITS_0_7 )
-	{
-		ym3812_write_port_w( device, offset, data );
-	}
-	else
-	{
-		ym3812_control_port_w( device, offset, data );
-	}
-}
-
 static READ8_HANDLER( at_keybc_r )
 {
 	switch (offset)
@@ -187,9 +137,6 @@ static ADDRESS_MAP_START(at16_io, AS_IO, 16)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
-#ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_DEVREADWRITE("ym3812", at16_388_r, at16_388_w )
-#endif
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ns16450_2", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                 pc_fdc_w, 0xffff)
@@ -313,10 +260,6 @@ static ADDRESS_MAP_START(ps2m30286_io, AS_IO, 8)
 	AM_RANGE(0x02e8, 0x02ef) AM_READWRITE(uart8250_3_r,				uart8250_3_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_READWRITE(uart8250_1_r,				uart8250_1_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,		pc_parallelport1_w)
-#ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE("ym3812", ym3812_status_port_r,ym3812_control_port_w)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE("ym3812", ym3812_write_port_w)
-#endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,				uart8250_2_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
@@ -509,14 +452,6 @@ INPUT_PORTS_END
 static const unsigned i286_address_mask = 0x00ffffff;
 
 
-#if defined(ADLIB)
-static const ym3812_interface at_ym3812_interface =
-{
-	/* irq line not connected to pc on adlib cards (and compatibles) */
-	NULL
-};
-#endif
-
 static const pc_lpt_interface at_lpt_config =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
@@ -583,17 +518,6 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(at_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
@@ -664,11 +588,6 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(at_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
@@ -724,17 +643,6 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(at_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
@@ -790,17 +698,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(at_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
+
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -859,17 +757,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#ifdef ADLIB
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(at_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-#endif
-#ifdef GAMEBLASTER
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 8000000)	/* running at 8 MHz ISA bus speed? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
+
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
