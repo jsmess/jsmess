@@ -1,9 +1,28 @@
 #ifndef FMTOWNS_H_
 #define FMTOWNS_H_
 
-#include "emu.h"
+#define ADDRESS_MAP_MODERN
 
-#define IRQ_LOG 0  // set to 1 to log IRQ line activity
+#include "emu.h"
+#include "cpu/i386/i386.h"
+#include "sound/2612intf.h"
+#include "sound/rf5c68.h"
+#include "sound/cdda.h"
+#include "sound/speaker.h"
+#include "imagedev/chd_cd.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "formats/basicdsk.h"
+#include "machine/wd17xx.h"
+#include "imagedev/flopdrv.h"
+#include "machine/upd71071.h"
+#include "machine/ram.h"
+#include "machine/nvram.h"
+#include "imagedev/harddriv.h"
+#include "machine/scsi.h"
+#include "machine/fm_scsi.h"
+
+#define IRQ_LOG 1  // set to 1 to log IRQ line activity
 
 READ8_HANDLER( towns_gfx_high_r );
 WRITE8_HANDLER( towns_gfx_high_w );
@@ -82,7 +101,28 @@ class towns_state : public driver_device
 	public:
 	towns_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram")
+	{ }
+
+	/* devices */
+	device_t* m_maincpu;
+	device_t* m_dma_1;
+	device_t* m_dma_2;
+	device_t* m_fdc;
+	device_t* m_pic_master;
+	device_t* m_pic_slave;
+	device_t* m_pit;
+	device_t* m_messram;
+	device_t* m_cdrom;
+	device_t* m_cdda;
+	device_t* m_speaker;
+	class fmscsi_device* m_scsi;
+	device_t* m_hd0;
+	device_t* m_hd1;
+	device_t* m_hd2;
+	device_t* m_hd3;
+	device_t* m_hd4;
+	device_t* m_ram;
 
 	UINT8 m_ftimer;
 	UINT16 m_freerun_timer;
@@ -132,37 +172,94 @@ class towns_state : public driver_device
 	emu_timer* m_towns_wait_timer;
 	struct towns_cdrom_controller m_towns_cd;
 	struct towns_video_controller m_video;
-	required_shared_ptr<UINT8>	m_nvram;
 
-	/* devices */
-	device_t* m_maincpu;
-	device_t* m_dma_1;
-	device_t* m_dma_2;
-	device_t* m_fdc;
-	device_t* m_pic_master;
-	device_t* m_pic_slave;
-	device_t* m_pit;
-	device_t* m_messram;
-	device_t* m_cdrom;
-	device_t* m_cdda;
-	device_t* m_speaker;
-	class fmscsi_device* m_scsi;
-	device_t* m_hd0;
-	device_t* m_hd1;
-	device_t* m_hd2;
-	device_t* m_hd3;
-	device_t* m_hd4;
-	device_t* m_ram;
 	UINT32 m_kb_prev[4];
 	UINT8 m_prev_pad_mask;
 	UINT8 m_prev_x;
 	UINT8 m_prev_y;
+
+	required_shared_ptr<UINT8> m_nvram;
+
+	virtual void driver_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(towns_system_r);
+	DECLARE_WRITE8_MEMBER(towns_system_w);
+	DECLARE_READ8_MEMBER(towns_sys6c_r);
+	DECLARE_WRITE8_MEMBER(towns_sys6c_w);
+	DECLARE_READ8_MEMBER(towns_dma1_r);
+	DECLARE_WRITE8_MEMBER(towns_dma1_w);
+	DECLARE_READ8_MEMBER(towns_dma2_r);
+	DECLARE_WRITE8_MEMBER(towns_dma2_w);
+	DECLARE_READ8_MEMBER(towns_floppy_r);
+	DECLARE_WRITE8_MEMBER(towns_floppy_w);
+	DECLARE_READ8_MEMBER(towns_keyboard_r);
+	DECLARE_WRITE8_MEMBER(towns_keyboard_w);
+	DECLARE_READ8_MEMBER(towns_port60_r);
+	DECLARE_WRITE8_MEMBER(towns_port60_w);
+	DECLARE_READ32_MEMBER(towns_sys5e8_r);
+	DECLARE_WRITE32_MEMBER(towns_sys5e8_w);
+	DECLARE_READ8_MEMBER(towns_sound_ctrl_r);
+	DECLARE_WRITE8_MEMBER(towns_sound_ctrl_w);
+	DECLARE_READ32_MEMBER(towns_padport_r);
+	DECLARE_WRITE32_MEMBER(towns_pad_mask_w);
+	DECLARE_READ8_MEMBER(towns_cmos8_r);
+	DECLARE_WRITE8_MEMBER(towns_cmos8_w);
+	DECLARE_READ8_MEMBER(towns_cmos_low_r);
+	DECLARE_WRITE8_MEMBER(towns_cmos_low_w);
+	DECLARE_READ8_MEMBER(towns_cmos_r);
+	DECLARE_WRITE8_MEMBER(towns_cmos_w);
+	DECLARE_READ8_MEMBER(towns_sys480_r);
+	DECLARE_WRITE8_MEMBER(towns_sys480_w);
+	DECLARE_READ32_MEMBER(towns_video_404_r);
+	DECLARE_WRITE32_MEMBER(towns_video_404_w);
+	DECLARE_READ8_MEMBER(towns_cdrom_r);
+	DECLARE_WRITE8_MEMBER(towns_cdrom_w);
+	DECLARE_READ32_MEMBER(towns_rtc_r);
+	DECLARE_WRITE32_MEMBER(towns_rtc_w);
+	DECLARE_WRITE32_MEMBER(towns_rtc_select_w);
+	DECLARE_READ8_MEMBER(towns_volume_r);
+	DECLARE_WRITE8_MEMBER(towns_volume_w);
+	DECLARE_READ8_MEMBER(towns_41ff_r);
+
+	DECLARE_READ8_MEMBER(towns_gfx_high_r);
+	DECLARE_WRITE8_MEMBER(towns_gfx_high_w);
+	DECLARE_READ8_MEMBER(towns_gfx_r);
+	DECLARE_WRITE8_MEMBER(towns_gfx_w);
+	DECLARE_READ8_MEMBER(towns_video_cff80_r);
+	DECLARE_WRITE8_MEMBER(towns_video_cff80_w);
+	DECLARE_READ8_MEMBER(towns_video_cff80_mem_r);
+	DECLARE_WRITE8_MEMBER(towns_video_cff80_mem_w);
+	DECLARE_READ8_MEMBER(towns_video_440_r);
+	DECLARE_WRITE8_MEMBER(towns_video_440_w);
+	DECLARE_READ8_MEMBER(towns_video_5c8_r);
+	DECLARE_WRITE8_MEMBER(towns_video_5c8_w);
+	DECLARE_READ8_MEMBER(towns_video_fd90_r);
+	DECLARE_WRITE8_MEMBER(towns_video_fd90_w);
+	DECLARE_READ8_MEMBER(towns_video_ff81_r);
+	DECLARE_WRITE8_MEMBER(towns_video_ff81_w);
+	DECLARE_READ8_MEMBER(towns_spriteram_low_r);
+	DECLARE_WRITE8_MEMBER(towns_spriteram_low_w);
+	DECLARE_READ8_MEMBER(towns_spriteram_r);
+	DECLARE_WRITE8_MEMBER(towns_spriteram_w);
+
+	void towns_update_video_banks(address_space&);
 };
 
-void towns_update_video_banks(address_space*);
+class marty_state : public towns_state
+{
+	public:
+	marty_state(running_machine &machine, const driver_device_config_base &config)
+		: towns_state(machine, config)
+	{ }
+
+	virtual void driver_start();
+};
 
 INTERRUPT_GEN( towns_vsync_irq );
-VIDEO_START( towns );
-SCREEN_UPDATE( towns );
+//VIDEO_START( towns );
+//SCREEN_UPDATE( towns );
 
 #endif /*FMTOWNS_H_*/
