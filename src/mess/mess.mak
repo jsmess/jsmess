@@ -1277,7 +1277,6 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_turbo.o	\
 	$(MESS_AUDIO)/sblaster.o	\
 	$(MESS_MACHINE)/pc_fdc.o	\
-	$(MESS_MACHINE)/pc_hdc.o	\
 	$(MESS_MACHINE)/pc_joy.o	\
 	$(MESS_MACHINE)/kb_keytro.o	\
 	$(MESS_MACHINE)/isa_com.o	\

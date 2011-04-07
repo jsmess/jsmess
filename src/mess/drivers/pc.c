@@ -91,7 +91,6 @@ Tandy 1000 (80386) variations:
 #include "machine/pcshare.h"
 #include "includes/pc.h"
 
-#include "machine/pc_hdc.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
 #include "imagedev/cassette.h"
@@ -192,8 +191,6 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_r, ins8250_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,			pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE("lpt_1", pc_lpt_r, pc_lpt_w)
 #ifdef ADLIB
@@ -251,8 +248,6 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
 	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 #ifdef ADLIB
@@ -289,8 +284,6 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ     (europc_jim2_r)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_r, ins8250_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,			pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_1", pc_lpt_r, pc_lpt_w)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE("ym3812", ym3812_status_port_r,ym3812_control_port_w)
@@ -326,8 +319,6 @@ static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", 	sn76496_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
@@ -358,8 +349,6 @@ static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",	sn76496_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,					pc_JOY_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,				pc_HDC1_w, 0xffff)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,				pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,			pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
@@ -391,8 +380,6 @@ static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",    sn76496_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                    pc_JOY_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,               pc_HDC1_w, 0xffff)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,               pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                    pc_fdc_w, 0xffff)
@@ -424,8 +411,6 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8)
 	AM_RANGE(0x00f0, 0x00f7) AM_READWRITE(pc_fdc_r,					pcjr_fdc_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
@@ -462,8 +447,6 @@ static ADDRESS_MAP_START(ppc512_io, AS_IO, 16)
 	AM_RANGE(0x0278, 0x027b) AM_READ(pc200_16le_port278_r) AM_DEVWRITE8("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,				pc16le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,				pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READ(pc200_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
@@ -492,8 +475,6 @@ static ADDRESS_MAP_START(pc200_io, AS_IO, 16)
 	AM_RANGE(0x0278, 0x027b) AM_READ(pc200_16le_port278_r) AM_DEVWRITE8("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,				pc16le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,				pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READ(pc200_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
@@ -526,8 +507,6 @@ static ADDRESS_MAP_START(pc1640_io, AS_IO, 16)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READ(pc1640_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
@@ -557,8 +536,6 @@ static ADDRESS_MAP_START(pc1512_io, AS_IO, 16)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
-	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READ(pc1640_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
@@ -1388,9 +1365,6 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -1449,9 +1423,6 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1534,9 +1505,6 @@ static MACHINE_CONFIG_START( europc, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -1597,9 +1565,6 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1668,9 +1633,6 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -1727,9 +1689,6 @@ static MACHINE_CONFIG_START( pc1512, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -1775,9 +1734,6 @@ static MACHINE_CONFIG_START( pc1640, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -1825,9 +1781,6 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -1874,9 +1827,6 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -1922,9 +1872,6 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -2059,9 +2006,6 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -2122,9 +2066,6 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -2184,9 +2125,6 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
-
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
@@ -2245,9 +2183,6 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_hdc )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 

@@ -30,7 +30,6 @@
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
 #include "machine/pc_fdc.h"
-#include "machine/pc_hdc.h"
 #include "machine/upd765.h"
 #include "includes/amstr_pc.h"
 #include "includes/europc.h"
@@ -131,7 +130,7 @@ static READ8_DEVICE_HANDLER( pc_dma8237_fdc_dack_r )
 
 static READ8_DEVICE_HANDLER( pc_dma8237_hdc_dack_r )
 {
-	return pc_hdc_dack_r(device->machine());
+	return 0xff;
 }
 
 
@@ -143,7 +142,6 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_fdc_dack_w )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_hdc_dack_w )
 {
-	pc_hdc_dack_w( device->machine(), data );
 }
 
 
@@ -972,9 +970,6 @@ void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb
 	if ( ram_get_ptr(machine.device(RAM_TAG)) )
 		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine.device(RAM_TAG)) );
 
-	/* FDC/HDC hardware */
-	pc_hdc_setup(machine, set_hdc_int_func);
-
 	/* serial mouse */
 	pc_mouse_initialise(machine);
 }
@@ -1153,7 +1148,6 @@ MACHINE_RESET( pc )
 	st->m_ppi_shift_enable = 0;
 
 	pc_mouse_set_serial_port( machine.device("ins8250_0") );
-	pc_hdc_set_dma8237_device( st->m_dma8237 );
 	speaker_level_w( speaker, 0 );
 }
 
@@ -1193,7 +1187,6 @@ MACHINE_RESET( pcjr )
 	st->m_ppi_shift_register = 0;
 	st->m_ppi_shift_enable = 0;
 	pc_mouse_set_serial_port( machine.device("ins8250_0") );
-	pc_hdc_set_dma8237_device( st->m_dma8237 );
 	speaker_level_w( speaker, 0 );
 
 	pcjr_keyb_init(machine);
