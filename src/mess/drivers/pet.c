@@ -389,6 +389,8 @@ normal keyboards?
 #include "video/mc6845.h"
 #include "machine/ram.h"
 #include "machine/c2040.h"
+#include "machine/c8280.h"
+#include "machine/c9060.h"
 
 /* devices config */
 #include "includes/cbm.h"

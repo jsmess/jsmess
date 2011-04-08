@@ -139,6 +139,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
+#include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
 #include "machine/ieee488.h"
