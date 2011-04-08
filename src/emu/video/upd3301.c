@@ -30,7 +30,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 #define COMMAND_MASK					0xe0
