@@ -9589,6 +9589,30 @@ There appear to exist some undumped N64 protos
 
 	<software name="turokg" cloneof="turok">
 		<!-- Serial:  - Release Date:  -->
+		<description>Turok - Dinosaur Hunter (Ger, Rev. B)</description>
+		<year>1997</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="turok - dinosaur hunter (germany) (rev b).bin" size="8388608" crc="01f632f6" sha1="90b11d34f7dd13aea195f98ecb40f869bcefbce4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokga" cloneof="turok">
+		<!-- Serial:  - Release Date:  -->
+		<description>Turok - Dinosaur Hunter (Ger, Rev. A)</description>
+		<year>1997</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="turok - dinosaur hunter (germany) (rev a).bin" size="8388608" crc="5a345522" sha1="e6418a4823751f78977dbc392f24f098b2e42c1a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokgb" cloneof="turok">
+		<!-- Serial:  - Release Date:  -->
 		<description>Turok - Dinosaur Hunter (Ger)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>

@@ -4,7 +4,6 @@
 <!-- 
 
   To investigate:
-  - Frogger by Majesco (not Hasbro): was it BW or Color?
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
 
   Undumped pirate carts:
@@ -4882,6 +4881,18 @@
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="frisky tom (japan).bin" size="131072" crc="0bef84a1" sha1="4162ca88c94c40e3fa6e09067b956cf4953ccf89" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<!-- Serial: DMG-AFGE-USA - Release Date:  - Notes: SGB enhanced -->
+		<description>Frogger (USA)</description>
+		<year>1998</year>
+		<publisher>Majesco</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="frogger (usa).bin" size="131072" crc="4d933c08" sha1="1dbb26dd94c9710b029f2f88473aed0267db491c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15704,6 +15715,18 @@
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super bombliss (japan).bin" size="131072" crc="b503ffad" sha1="8f44cd2d819a3cd0ab697e60939d5921e29609ac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbrkout">
+		<!-- Serial: DMG-ABOE-USA - Release Date:  - Notes: SGB enhanced -->
+		<description>Super Breakout (USA)</description>
+		<year>199?</year>
+		<publisher>Majesco</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super breakout (usa).bin" size="131072" crc="1dc0f813" sha1="f98ff68b3004212d09904c5db5ccfcf1d20405c3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
