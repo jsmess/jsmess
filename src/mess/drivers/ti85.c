@@ -225,8 +225,8 @@ static ADDRESS_MAP_START( ti82_io, AS_IO, 8)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
-	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, control_read, control_write)
+	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8)
@@ -235,8 +235,8 @@ static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
-	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, control_read, control_write)
+	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti83_io, AS_IO, 8)
@@ -246,8 +246,8 @@ static ADDRESS_MAP_START( ti83_io, AS_IO, 8)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti83_port_0002_r, ti83_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti83_port_0003_r, ti83_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
-	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, control_read, control_write)
+	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 	AM_RANGE(0x0014, 0x0014) AM_READ_PORT( "BATTERY" )
 ADDRESS_MAP_END
 
@@ -260,8 +260,8 @@ static ADDRESS_MAP_START( ti73_io, AS_IO, 8)
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti83_port_0003_r, ti83p_port_0004_w )
 	AM_RANGE(0x0006, 0x0006) AM_READWRITE( ti86_port_0005_r, ti83p_port_0006_w )
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE( ti86_port_0006_r, ti83p_port_0007_w )
-	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti83p_port_0010_w )
-	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, control_read, control_write)
+	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti83p_io, AS_IO, 8)
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( ti83p_io, AS_IO, 8)
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti83_port_0003_r, ti83p_port_0004_w )
 	AM_RANGE(0x0006, 0x0006) AM_READWRITE( ti86_port_0005_r, ti83p_port_0006_w )
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE( ti86_port_0006_r, ti83p_port_0007_w )
-	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti83p_port_0010_w )
-	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, control_read, control_write)
+	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti86_io, AS_IO, 8)
@@ -562,6 +562,12 @@ static MACHINE_CONFIG_DERIVED( ti85d, ti85 )
 MACHINE_CONFIG_END
 
 
+static const t6a04_interface ti82_display =
+{
+	64,					// number of lines
+	96,					// pixels for line
+};
+
 static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( 6000000)		/* 6 MHz */
@@ -572,6 +578,10 @@ static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE( ti82 )
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT( ti82 )
+
+	MCFG_T6A04_ADD("t6a04", ti82_display);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -595,6 +605,10 @@ static MACHINE_CONFIG_DERIVED( ti83, ti81 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE( ti82 )
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT( ti82 )
+
+	MCFG_T6A04_ADD("t6a04", ti82_display);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti86, ti85 )
@@ -622,6 +636,10 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE( ti82 )
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT( ti82 )
+
+	MCFG_T6A04_ADD("t6a04", ti82_display);
 
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(ti83p)

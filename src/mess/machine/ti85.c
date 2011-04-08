@@ -206,14 +206,6 @@ MACHINE_START( ti82 )
 	state->m_video_buffer_width = 0;
 	state->m_interrupt_speed = 0;
 	state->m_port4_bit0 = 0;
-	state->m_ti82_video_mode = 0;
-	state->m_ti82_video_x = 0;
-	state->m_ti82_video_y = 0;
-	state->m_ti82_video_dir = 0;
-	state->m_ti82_video_scroll = 0;
-	state->m_ti82_video_bit = 0;
-	state->m_ti82_video_col = 0;
-	memset(state->m_ti82_video_buffer, 0x00, 0x300);
 
 	if (state->m_ti_calculator_model == TI_82)
 		memset(mem+0x8000, 0, sizeof(unsigned char)*0x8000);
@@ -294,14 +286,6 @@ MACHINE_START( ti83p )
 	state->m_video_buffer_width = 0;
 	state->m_interrupt_speed = 0;
 	state->m_port4_bit0 = 0;
-	state->m_ti82_video_mode = 0;
-	state->m_ti82_video_x = 0;
-	state->m_ti82_video_y = 0;
-	state->m_ti82_video_dir = 0;
-	state->m_ti82_video_scroll = 0;
-	state->m_ti82_video_bit = 0;
-	state->m_ti82_video_col = 0;
-	memset(state->m_ti82_video_buffer, 0x00, 0x300);
 
 	state->m_ti8x_ram = auto_alloc_array(machine, UINT8, 32*1024);
 	{
@@ -469,51 +453,6 @@ READ8_HANDLER ( ti82_port_0000_r )
 	return state->m_ti8x_port2;
 }
 
- READ8_HANDLER ( ti82_port_0010_r )
-{
-	return 0x00;
-}
-
- READ8_HANDLER ( ti82_port_0011_r )
-{
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-    UINT8* ti82_video;
-	UINT8 ti82_port11;
-
-	if(state->m_ti82_video_dir == 4)
-		++state->m_ti82_video_y;
-	if(state->m_ti82_video_dir == 5)
-		--state->m_ti82_video_y;
-	if(state->m_ti82_video_dir == 6)
-		++state->m_ti82_video_x;
-	if(state->m_ti82_video_dir == 7)
-		--state->m_ti82_video_x;
-
-	if(state->m_ti82_video_mode)
-		ti82_port11 = state->m_ti82_video_buffer[(12*state->m_ti82_video_y)+state->m_ti82_video_x];
-	else
-	{
-		state->m_ti82_video_col = state->m_ti82_video_x * 6;
-		state->m_ti82_video_bit = state->m_ti82_video_col & 7;
-		ti82_video = &state->m_ti82_video_buffer[(state->m_ti82_video_y*12)+(state->m_ti82_video_col>>3)];
-		ti82_port11 = ((((*ti82_video)<<8)+ti82_video[1])>>(10-state->m_ti82_video_bit));
-	}
-
-	if(state->m_ti82_video_dir == 4)
-		state->m_ti82_video_y-=2;
-	if(state->m_ti82_video_dir == 5)
-		state->m_ti82_video_y+=2;
-	if(state->m_ti82_video_dir == 6)
-		state->m_ti82_video_x-=2;
-	if(state->m_ti82_video_dir == 7)
-		state->m_ti82_video_x+=2;
-
-	state->m_ti82_video_x &= 15;
-	state->m_ti82_video_y &= 63;
-
-	return ti82_port11;
-}
-
 READ8_HANDLER ( ti86_port_0005_r )
 {
 	ti85_state *state = space->machine().driver_data<ti85_state>();
@@ -543,8 +482,8 @@ READ8_HANDLER ( ti83_port_0000_r )
 	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0;
 
-	if (state->m_LCD_status)
-		data |= state->m_LCD_mask;
+	data |= state->m_LCD_mask;
+
 	if (state->m_ON_interrupt_status)
 		data |= 0x01;
 	if (!state->m_ON_pressed)
@@ -693,54 +632,6 @@ WRITE8_HANDLER ( ti82_port_0002_w )
 	state->m_ti8x_port2 = data;
 }
 
-WRITE8_HANDLER ( ti82_port_0010_w )
-{
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	if (data == 0x00 || data == 0x01)
-		state->m_ti82_video_mode = data;
-	if (data >= 0x04 && data <= 0x07)
-		state->m_ti82_video_dir = data;
-	if (data >= 0x20 && data <= 0x30)
-		state->m_ti82_video_x = data - 0x20;
-	if (data >= 0x40 && data <= 0x7F)
-		state->m_ti82_video_scroll = data - 0x40;
-	if (data >= 0x80 && data <= 0xBF)
-		state->m_ti82_video_y = data - 0x80;
-	if (data >= 0xD8)
-		state->m_LCD_contrast = data - 0xD8;
-}
-
-WRITE8_HANDLER ( ti82_port_0011_w )
-{
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	UINT8* ti82_video;
-
-	if(state->m_ti82_video_mode)
-		state->m_ti82_video_buffer[(12*state->m_ti82_video_y)+state->m_ti82_video_x] = data;
-	else
-	{
-		data = data<<0x02;
-		state->m_ti82_video_col = state->m_ti82_video_x * 6;
-		state->m_ti82_video_bit = state->m_ti82_video_col & 0x07;
-		ti82_video = &state->m_ti82_video_buffer[(state->m_ti82_video_y*12)+(state->m_ti82_video_col>>3)];
-		*ti82_video = (*ti82_video & ~(0xFC>>state->m_ti82_video_bit)) | (data>>state->m_ti82_video_bit);
-		if(state->m_ti82_video_bit>0x02)
-			ti82_video[1] = (ti82_video[1] & ~(0xFC<<(8-state->m_ti82_video_bit))) | (data<<(8-state->m_ti82_video_bit));
-	}
-
-	if(state->m_ti82_video_dir == 0x04)
-		--state->m_ti82_video_y;
-	if(state->m_ti82_video_dir == 0x05)
-		++state->m_ti82_video_y;
-	if(state->m_ti82_video_dir == 0x06)
-		--state->m_ti82_video_x;
-	if(state->m_ti82_video_dir == 0x07)
-		++state->m_ti82_video_x;
-
-	state->m_ti82_video_x &= 15;
-	state->m_ti82_video_y &= 63;
-}
-
 WRITE8_HANDLER ( ti83_port_0000_w )
 {
 	ti85_state *state = space->machine().driver_data<ti85_state>();
@@ -838,26 +729,6 @@ WRITE8_HANDLER ( ti83p_port_0007_w )
 	ti85_state *state = space->machine().driver_data<ti85_state>();
 	state->m_ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
 	update_ti83p_memory(space->machine());
-}
-
-WRITE8_HANDLER ( ti83p_port_0010_w )
-{
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	if (data == 0x00 || data == 0x01)
-		state->m_ti82_video_mode = data;
-	if (data == 0x02 || data == 0x03)
-		state->m_LCD_status = data - 0x02;
-	if (data >= 0x04 && data <= 0x07)
-		state->m_ti82_video_dir = data;
-	if (data >= 0x20 && data <= 0x30)
-		state->m_ti82_video_x = data - 0x20;
-	if (data >= 0x40 && data <= 0x7F)
-		state->m_ti82_video_scroll = data - 0x40;
-	if (data >= 0x80 && data <= 0xBF)
-		state->m_ti82_video_y = data - 0x80;
-	if (data >= 0xc8)
-		state->m_LCD_contrast = data - 0xc8;
-
 }
 
 /* NVRAM functions */
@@ -1073,5 +944,4 @@ SNAPSHOT_LOAD( ti8x )
 	free(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;
 }
-
 

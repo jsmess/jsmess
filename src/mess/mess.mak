@@ -1553,6 +1553,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_DRIVERS)/ti85.o		\
 	$(MESS_FORMATS)/ti85_ser.o	\
 	$(MESS_VIDEO)/ti85.o		\
+	$(MESS_VIDEO)/t6a04.o		\
 	$(MESS_MACHINE)/ti85.o		\
 	$(MESS_DRIVERS)/ti89.o		\
 	$(MESS_MACHINE)/tms9901.o	\

@@ -13,16 +13,6 @@
 #define TI81_SCREEN_Y_SIZE	  64
 #define TI81_NUMBER_OF_FRAMES	   6
 
-#define TI82_VIDEO_MEMORY_SIZE	 768
-#define TI82_SCREEN_X_SIZE	  12
-#define TI82_SCREEN_Y_SIZE	  64
-#define TI82_NUMBER_OF_FRAMES	   6
-
-#define TI83_VIDEO_MEMORY_SIZE	 768
-#define TI83_SCREEN_X_SIZE	  12
-#define TI83_SCREEN_Y_SIZE	  64
-#define TI83_NUMBER_OF_FRAMES	   6
-
 #define TI85_VIDEO_MEMORY_SIZE	1024
 #define TI85_SCREEN_X_SIZE	  16
 #define TI85_SCREEN_Y_SIZE	  64
@@ -32,11 +22,6 @@
 #define TI86_SCREEN_X_SIZE	  16
 #define TI86_SCREEN_Y_SIZE	  64
 #define TI86_NUMBER_OF_FRAMES	   6
-
-#define TI73_VIDEO_MEMORY_SIZE	768
-#define TI73_SCREEN_X_SIZE	  12
-#define TI73_SCREEN_Y_SIZE	  64
-#define TI73_NUMBER_OF_FRAMES	   6
 
 
 
@@ -143,40 +128,12 @@ PALETTE_INIT( ti85 )
 		state->m_ti_screen_y_size = TI85_SCREEN_Y_SIZE;
 		state->m_ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
-	else if (!strncmp(machine.system().name, "ti82", 4))
-	{
-		state->m_ti_video_memory_size = TI82_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI82_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI82_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
-	}
-	else if (!strncmp(machine.system().name, "ti83p", 5))
-	{
-		state->m_ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI83_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI83_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
-	}
-	else if (!strncmp(machine.system().name, "ti83", 4))
-	{
-		state->m_ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI83_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI83_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
-	}
 	else if (!strncmp(machine.system().name, "ti86", 4))
 	{
 		state->m_ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
 		state->m_ti_screen_x_size = TI86_SCREEN_X_SIZE;
 		state->m_ti_screen_y_size = TI86_SCREEN_Y_SIZE;
 		state->m_ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
-	}
-	else if (!strncmp(machine.system().name, "ti73", 4))
-	{
-		state->m_ti_video_memory_size = TI73_VIDEO_MEMORY_SIZE;
-		state->m_ti_screen_x_size = TI73_SCREEN_X_SIZE;
-		state->m_ti_screen_y_size = TI73_SCREEN_Y_SIZE;
-		state->m_ti_number_of_frames = TI73_NUMBER_OF_FRAMES;
 	}
 	else
 	{
@@ -232,44 +189,15 @@ SCREEN_UPDATE( ti85 )
 	return 0;
 }
 
-SCREEN_UPDATE( ti82 )
+PALETTE_INIT( ti82 )
 {
-	ti85_state *state = screen->machine().driver_data<ti85_state>();
-	//for now use the ti85_palette
-
-	int x,y,b;
-	int brightnes;
-
-	if (!state->m_LCD_status || !state->m_timer_interrupt_mask)
-	{
-		for (y=0; y<state->m_ti_screen_y_size; y++)
-			for (x=0; x<state->m_ti_screen_x_size; x++)
-				for (b=0; b<8; b++)
-					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[state->m_LCD_contrast&0x1f][6];
-		return 0;
-	}
-
-	memcpy (state->m_frames, state->m_frames+state->m_ti_video_memory_size, sizeof (UINT8) * (state->m_ti_number_of_frames-1) * state->m_ti_video_memory_size);
-
-        for (y=0; y<state->m_ti_screen_y_size; y++)
-		for (x=0; x<state->m_ti_screen_x_size; x++)
-			*(state->m_frames+(state->m_ti_number_of_frames-1)*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x) = state->m_ti82_video_buffer[ y*state->m_ti_screen_x_size+x];
-
-    	for (y=0; y<state->m_ti_screen_y_size; y++)
-		for (x=0; x<state->m_ti_screen_x_size; x++)
-			for (b=0; b<8; b++)
-			{
-				brightnes = ((*(state->m_frames+0*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(state->m_frames+1*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(state->m_frames+2*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(state->m_frames+3*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(state->m_frames+4*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-					  + ((*(state->m_frames+5*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01);
-
-				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[state->m_LCD_contrast&0x1f][brightnes];
-			}
-	return 0;
+	palette_set_color(machine, 0, MAKE_RGB(160, 190, 170));
+	palette_set_color(machine, 1, MAKE_RGB(83, 111, 138));
 }
 
+SCREEN_UPDATE( ti82 )
+{
+	t6a04_device* t6a04 = screen->machine().device<t6a04_device>("t6a04");
 
-
+	return t6a04->video_update(bitmap, cliprect);
+}

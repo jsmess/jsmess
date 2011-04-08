@@ -8,6 +8,7 @@
 #define TI85_H_
 
 #include "imagedev/snapquik.h"
+#include "video/t6a04.h"
 
 
 class ti85_state : public driver_device
@@ -22,7 +23,6 @@ public:
 	UINT8 m_LCD_contrast;
 	UINT8 m_LCD_status;
 	UINT8 m_timer_interrupt_mask;
-	UINT8 m_ti82_video_buffer[0x300];
 	UINT8 m_ti_calculator_model;
 	UINT8 m_timer_interrupt_status;
 	UINT8 m_ON_interrupt_mask;
@@ -41,13 +41,6 @@ public:
 	UINT8 m_PCR;
 	UINT8 m_red_out;
 	UINT8 m_white_out;
-	UINT8 m_ti82_video_mode;
-	UINT8 m_ti82_video_x;
-	UINT8 m_ti82_video_y;
-	UINT8 m_ti82_video_dir;
-	UINT8 m_ti82_video_scroll;
-	UINT8 m_ti82_video_bit;
-	UINT8 m_ti82_video_col;
 	UINT8 m_ti8x_port2;
 	UINT8 m_ti83p_port4;
 	int m_ti_video_memory_size;
@@ -85,8 +78,6 @@ WRITE8_HANDLER( ti81_port_0007_w );
  READ8_HANDLER( ti86_port_0006_r );
  READ8_HANDLER( ti82_port_0000_r );
  READ8_HANDLER( ti82_port_0002_r );
- READ8_HANDLER( ti82_port_0010_r );
- READ8_HANDLER( ti82_port_0011_r );
  READ8_HANDLER( ti83_port_0000_r );
  READ8_HANDLER( ti83_port_0002_r );
  READ8_HANDLER( ti83_port_0003_r );
@@ -105,8 +96,6 @@ WRITE8_HANDLER( ti86_port_0005_w );
 WRITE8_HANDLER( ti86_port_0006_w );
 WRITE8_HANDLER( ti82_port_0000_w );
 WRITE8_HANDLER( ti82_port_0002_w );
-WRITE8_HANDLER( ti82_port_0010_w );
-WRITE8_HANDLER( ti82_port_0011_w );
 WRITE8_HANDLER( ti83_port_0000_w );
 WRITE8_HANDLER( ti83_port_0002_w );
 WRITE8_HANDLER( ti83_port_0003_w );
@@ -117,7 +106,6 @@ WRITE8_HANDLER( ti83p_port_0003_w );
 WRITE8_HANDLER( ti83p_port_0004_w );
 WRITE8_HANDLER( ti83p_port_0006_w );
 WRITE8_HANDLER( ti83p_port_0007_w );
-WRITE8_HANDLER( ti83p_port_0010_w );
 
 /*----------- defined in video/ti85.c -----------*/
 
@@ -125,6 +113,7 @@ VIDEO_START( ti85 );
 SCREEN_UPDATE( ti85 );
 SCREEN_UPDATE( ti82 );
 PALETTE_INIT( ti85 );
+PALETTE_INIT( ti82 );
 
 
 #endif /* TI85_H_ */
