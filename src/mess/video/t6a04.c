@@ -267,11 +267,12 @@ WRITE8_MEMBER(t6a04_device::data_write)
 READ8_MEMBER(t6a04_device::data_read)
 {
 	UINT8 data = m_output_reg;
+	UINT8 output_reg;
 
 	if (m_word_len)
 	{
 		//8bit mode
-		m_output_reg = m_lcd_ram[m_xpos*15 + m_ypos];
+		output_reg = m_lcd_ram[m_xpos*15 + m_ypos];
 	}
 	else
 	{
@@ -280,13 +281,18 @@ READ8_MEMBER(t6a04_device::data_read)
 		UINT8 pos_bit = start_bit & 7;
 		UINT8 *ti82_video = &m_lcd_ram[(m_xpos*15)+(start_bit>>3)];
 
-		m_output_reg = ((((*ti82_video)<<8)+ti82_video[1])>>(10-pos_bit));
+		output_reg = ((((*ti82_video)<<8)+ti82_video[1])>>(10-pos_bit));
 	}
 
-	if (m_active_counter)
-		m_ypos = (m_ypos + m_direction) & 0x1f;
-	else
-		m_xpos = (m_xpos + m_direction) & 0x3f;
+	if (!space.debugger_access())
+	{
+		m_output_reg = output_reg;
+
+		if (m_active_counter)
+			m_ypos = (m_ypos + m_direction) & 0x1f;
+		else
+			m_xpos = (m_xpos + m_direction) & 0x3f;
+	}
 
 	return data;
 }
