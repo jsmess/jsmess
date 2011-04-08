@@ -26,7 +26,7 @@
 #include "video/pc_cga.h"
 #include "video/pc_ega.h"
 
-#include "includes/pc_ide.h"
+#include "machine/idectrl.h"
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"
 #include "machine/pc_lpt.h"
@@ -51,6 +51,25 @@
 #include "machine/nvram.h"
 #include "memconv.h"
 
+static READ16_DEVICE_HANDLER( ide16_r )
+{
+	return ide_controller16_r(device, 0x1f0/2 + offset, mem_mask);
+}
+
+static WRITE16_DEVICE_HANDLER( ide16_w )
+{
+	ide_controller16_w(device, 0x1f0/2 + offset, data, mem_mask);
+}
+
+static READ32_DEVICE_HANDLER( ide_r )
+{
+	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER( ide_w )
+{
+	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
+}
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
@@ -130,7 +149,7 @@ static ADDRESS_MAP_START(at16_io, AS_IO, 16)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,               at_page8_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide16_r, ide16_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                 pc_JOY_w, 0xffff)
 	AM_RANGE(0x0220, 0x022f) AM_READWRITE8(soundblaster_r,           soundblaster_w, 0xffff)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
@@ -154,7 +173,7 @@ static ADDRESS_MAP_START(at386_io, AS_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
@@ -208,7 +227,7 @@ static ADDRESS_MAP_START( ct486_io, AS_IO, 32 )
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
@@ -230,7 +249,7 @@ static ADDRESS_MAP_START(at586_io, AS_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP // used for timing?
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
@@ -276,7 +295,7 @@ static ADDRESS_MAP_START(megapc_io, AS_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
@@ -485,6 +504,12 @@ static const kb_keytronic_interface at_keytronic_intf =
 	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_data_w)
 };
 
+static void ide_interrupt(device_t *device, int state)
+{
+	//at_state *drvstate = device->machine().driver_data<at_state>();
+	//pic8259_ir6_w(drvstate->m_pic8259_slave, state);
+	pic8259_ir6_w(device->machine().device("pic8259_slave"),state);
+}
 
 static MACHINE_CONFIG_START( ibm5170, at_state )
 	/* basic machine hardware */
@@ -530,7 +555,8 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_ide )
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -600,7 +626,8 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_ide )
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -655,7 +682,8 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_ide )
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -713,7 +741,8 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_ide )
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
@@ -723,7 +752,6 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_START( at386, at_state )
     /* basic machine hardware */
@@ -772,8 +800,9 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_PC_LPT_ADD("lpt_1", at_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
-	/* harddisk */
-	MCFG_FRAGMENT_ADD( pc_ide )
+	/* harddisk */	
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
