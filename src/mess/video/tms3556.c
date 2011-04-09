@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "tms3556.h"
 
-static struct
+typedef struct
 {
 	/* registers */
 	UINT8 controlRegs[8];
@@ -27,13 +27,13 @@ static struct
 	/* memory */
 	UINT8 *vram;
 	int vram_size;
-    /* scanline counter */
+	/* scanline counter */
 	int scanline;
-    /* blinking */
-    int blink, blink_count;
-    /* background color for current line */
-    int bg_color;
-    /* current offset in name table */
+	/* blinking */
+	int blink, blink_count;
+	/* background color for current line */
+	int bg_color;
+	/* current offset in name table */
 	int name_offset;
 	/* c/g flag (mixed mode only) */
 	int cg_flag;
@@ -42,7 +42,8 @@ static struct
 	int char_line_counter;
 	/* double height phase flags (one per horizontal character position) */
 	int dbl_h_phase[40];
-} vdp;
+} vdp_t;
+static vdp_t vdp;
 
 #define TOP_BORDER 1
 #define BOTTOM_BORDER 1

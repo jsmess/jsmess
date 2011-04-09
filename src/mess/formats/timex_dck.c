@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  mess/machine/spectrum.c
+  mess/formats/timex_dsk.c
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -28,10 +28,7 @@
 #include "sound/ay8910.h"
 
 
-int timex_cart_type;
-UINT8 timex_cart_chunks;
-UINT8 *timex_cart_data;
-
+static timex_cart_t timex_cart;
 
 
 DEVICE_IMAGE_LOAD( timex_cart )
@@ -75,9 +72,9 @@ DEVICE_IMAGE_LOAD( timex_cart )
 	switch (file_data[0x00])
 	{
 		case 0x00:  logerror ("DOCK cart\n");
-				timex_cart_type = TIMEX_CART_DOCK;
-				timex_cart_data = (UINT8*) malloc (0x10000);
-				if (!timex_cart_data)
+				timex_cart.type = TIMEX_CART_DOCK;
+				timex_cart.data = (UINT8*) malloc (0x10000);
+				if (!timex_cart.data)
 				{
 					free (file_data);
 					logerror ("Memory allocate error\n");
@@ -86,18 +83,18 @@ DEVICE_IMAGE_LOAD( timex_cart )
 				chunks_in_file = 0;
 				for (i=0; i<8; i++)
 				{
-					timex_cart_chunks = timex_cart_chunks | ((file_data[i+1]&0x01)<<i);
+					timex_cart.chunks = timex_cart.chunks | ((file_data[i+1]&0x01)<<i);
 					if (file_data[i+1]&0x02)
 					{
-						memcpy (timex_cart_data+i*0x2000, file_data+0x09+chunks_in_file*0x2000, 0x2000);
+						memcpy (timex_cart.data+i*0x2000, file_data+0x09+chunks_in_file*0x2000, 0x2000);
 						chunks_in_file++;
 					}
 					else
 					{
 						if (file_data[i+1]&0x01)
-							memset (timex_cart_data+i*0x2000, 0x00, 0x2000);
+							memset (timex_cart.data+i*0x2000, 0x00, 0x2000);
 						else
-							memset (timex_cart_data+i*0x2000, 0xff, 0x2000);
+							memset (timex_cart.data+i*0x2000, 0xff, 0x2000);
 					}
 				}
 				free (file_data);
@@ -105,22 +102,27 @@ DEVICE_IMAGE_LOAD( timex_cart )
 
 		default:    logerror ("Cart type not supported\n");
 				free (file_data);
-				timex_cart_type = TIMEX_CART_NONE;
+				timex_cart.type = TIMEX_CART_NONE;
 				return IMAGE_INIT_FAIL;
 	}
 
 	logerror ("Cart loaded\n");
-	logerror ("Chunks %02x\n", timex_cart_chunks);
+	logerror ("Chunks %02x\n", timex_cart.chunks);
 	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( timex_cart )
 {
-  if (timex_cart_data)
-  {
-      free (timex_cart_data);
-      timex_cart_data = NULL;
-  }
-  timex_cart_type = TIMEX_CART_NONE;
-  timex_cart_chunks = 0x00;
+	if (timex_cart.data)
+  	{
+		free (timex_cart.data);
+		timex_cart.data = NULL;
+	}
+	timex_cart.type = TIMEX_CART_NONE;
+	timex_cart.chunks = 0x00;
+}
+
+const timex_cart_t *timex_cart_data(void)
+{
+	return &timex_cart;
 }

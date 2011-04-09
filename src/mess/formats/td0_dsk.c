@@ -17,6 +17,26 @@
 #include "imagedev/flopimg.h"
 #include "imagedev/flopdrv.h"
 
+#define BUFSZ           512     // new input buffer
+
+/* LZSS Parameters */
+
+#define N        4096    /* Size of string buffer */
+#define F        60    /* Size of look-ahead buffer */
+#define THRESHOLD    2
+#define NIL        N    /* End of tree's node  */
+
+
+/* Huffman coding parameters */
+
+#define N_CHAR      (256 - THRESHOLD + F)
+                /* character code (= 0..N_CHAR-1) */
+#define T         (N_CHAR * 2 - 1)    /* Size of table */
+#define R         (T - 1)            /* root position */
+#define MAX_FREQ    0x8000
+                    /* update when cumulative frequency */
+                    /* reaches to this value */
+
 struct td0dsk_tag
 {
 	int heads;
@@ -25,6 +45,51 @@ struct td0dsk_tag
 	UINT64 track_offsets[84*2]; /* offset within data for each track */
 	UINT8 *data;
 };
+
+struct tdlzhuf {
+	UINT16 r,
+				   bufcnt,bufndx,bufpos,  // string buffer
+			 // the following to allow block reads from input in next_word()
+				   ibufcnt,ibufndx; // input buffer counters
+	UINT8  inbuf[BUFSZ];    // input buffer
+};
+
+
+struct td0dsk_t
+{
+	floppy_image *floppy_file;
+	UINT64 floppy_file_offset;
+
+	struct tdlzhuf tdctl;
+	UINT8 text_buf[N + F - 1];
+	UINT16 freq[T + 1];    /* cumulative freq table */
+
+/*
+ * pointing parent nodes.
+ * area [T..(T + N_CHAR - 1)] are pointers for leaves
+ */
+	INT16 prnt[T + N_CHAR];
+
+	/* pointing children nodes (son[], son[] + 1)*/
+	INT16 son[T];
+
+	UINT16 getbuf;
+	UINT8 getlen;
+
+	int data_read(UINT8 *buf, UINT16 size);
+	int next_word();
+	int GetBit();
+	int GetByte();
+	void StartHuff();
+	void reconst();
+	void update(int c);
+	INT16 DecodeChar();
+	INT16 DecodePosition();
+	void init_Decode();
+	int Decode(UINT8 *buf, int len);
+};
+
+static td0dsk_t td0dsk;
 
 
 static struct td0dsk_tag *get_tag(floppy_image *floppy)
@@ -247,50 +312,16 @@ static floperr_t td0_get_indexed_sector_info(floppy_image *floppy, int head, int
 	return retVal;
 }
 
-static floppy_image *floppy_file;
-static UINT64 floppy_file_offset;
-
-static int data_read(UINT8 *buf,UINT16 size)
+int td0dsk_t::data_read(UINT8 *buf, UINT16 size)
 {
 	if (floppy_file_offset + size > floppy_image_size(floppy_file) ) {
-		size = floppy_image_size(floppy_file)- floppy_file_offset;
+		size = floppy_image_size(floppy_file) - floppy_file_offset;
 	}
 	floppy_image_read(floppy_file,buf,floppy_file_offset,size);
 	floppy_file_offset += size;
 	return size;
 }
 
-#define BUFSZ           512     // new input buffer
-
-static struct tdlzhuf {
-	UINT16 r,
-				   bufcnt,bufndx,bufpos,  // string buffer
-			 // the following to allow block reads from input in next_word()
-				   ibufcnt,ibufndx; // input buffer counters
-	UINT8  inbuf[BUFSZ];    // input buffer
-} tdctl;
-
-
-
-
-/* LZSS Parameters */
-
-#define N        4096    /* Size of string buffer */
-#define F        60    /* Size of look-ahead buffer */
-#define THRESHOLD    2
-#define NIL        N    /* End of tree's node  */
-
-static UINT8 text_buf[N + F - 1];
-
-/* Huffman coding parameters */
-
-#define N_CHAR      (256 - THRESHOLD + F)
-                /* character code (= 0..N_CHAR-1) */
-#define T         (N_CHAR * 2 - 1)    /* Size of table */
-#define R         (T - 1)            /* root position */
-#define MAX_FREQ    0x8000
-                    /* update when cumulative frequency */
-                    /* reaches to this value */
 
 /*
  * Tables for encoding/decoding upper 6 bits of
@@ -368,21 +399,7 @@ static const UINT8 d_len[256] = {
     0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08,
 };
 
-static UINT16 freq[T + 1];    /* cumulative freq table */
-
-/*
- * pointing parent nodes.
- * area [T..(T + N_CHAR - 1)] are pointers for leaves
- */
-static INT16 prnt[T + N_CHAR];
-
-/* pointing children nodes (son[], son[] + 1)*/
-static INT16 son[T];
-
-static UINT16 getbuf;
-static UINT8 getlen;
-
-static int next_word(void)
+int td0dsk_t::next_word()
 {
     if(tdctl.ibufndx >= tdctl.ibufcnt)
     {
@@ -399,7 +416,7 @@ static int next_word(void)
 }
 
 
-static int GetBit(void)    /* get one bit */
+int td0dsk_t::GetBit()    /* get one bit */
 {
     INT16 i;
     if(next_word() < 0)
@@ -413,15 +430,15 @@ static int GetBit(void)    /* get one bit */
         return(0);
 }
 
-static int GetByte(void)    /* get a byte */
+int td0dsk_t::GetByte()    /* get a byte */
 {
     UINT16 i;
-        if(next_word() != 0)
+    if(next_word() != 0)
         return(-1);
     i = getbuf;
     getbuf <<= 8;
     getlen -= 8;
-        i = i >> 8;
+    i = i >> 8;
     return((int) i);
 }
 
@@ -429,7 +446,7 @@ static int GetByte(void)    /* get a byte */
 
 /* initialize freq tree */
 
-static void StartHuff(void)
+void td0dsk_t::StartHuff()
 {
     int i, j;
 
@@ -452,7 +469,7 @@ static void StartHuff(void)
 
 /* reconstruct freq tree */
 
-static void reconst(void)
+void td0dsk_t::reconst()
 {
     INT16 i, j, k;
     UINT16 f, l;
@@ -497,7 +514,7 @@ static void reconst(void)
 
 /* update freq tree */
 
-static void update(int c)
+void td0dsk_t::update(int c)
 {
     int i, j, k, l;
 
@@ -532,7 +549,7 @@ static void update(int c)
 }
 
 
-static INT16 DecodeChar(void)
+INT16 td0dsk_t::DecodeChar()
 {
     int ret;
     UINT16 c;
@@ -545,7 +562,7 @@ static INT16 DecodeChar(void)
      * else choose #(son[]+1) (input bit == 1)
      */
     while (c < T) {
-                if((ret = GetBit()) < 0)
+        if((ret = GetBit()) < 0)
             return(-1);
         c += (unsigned) ret;
         c = son[c];
@@ -555,13 +572,13 @@ static INT16 DecodeChar(void)
     return c;
 }
 
-static INT16 DecodePosition(void)
+INT16 td0dsk_t::DecodePosition()
 {
     INT16 bit;
     UINT16 i, j, c;
 
     /* decode upper 6 bits from given table */
-        if((bit=GetByte()) < 0)
+    if((bit=GetByte()) < 0)
         return(-1);
     i = (UINT16) bit;
     c = (UINT16)d_code[i] << 6;
@@ -570,8 +587,8 @@ static INT16 DecodePosition(void)
     /* input lower 6 bits directly */
     j -= 2;
     while (j--) {
-                if((bit = GetBit()) < 0)
-                     return(-1);
+        if((bit = GetBit()) < 0)
+            return(-1);
         i = (i << 1) + bit;
     }
     return(c | (i & 0x3f));
@@ -583,11 +600,11 @@ split out initialization code to init_Decode()
 
 */
 
-static void init_Decode(void)
+void td0dsk_t::init_Decode()
 {
     int i;
-	getbuf = 0;
-	getlen = 0;
+    getbuf = 0;
+    getlen = 0;
     tdctl.ibufcnt= tdctl.ibufndx = 0; // input buffer is empty
     tdctl.bufcnt = 0;
     StartHuff();
@@ -597,7 +614,7 @@ static void init_Decode(void)
 }
 
 
-static int Decode(UINT8 *buf, int len)  /* Decoding/Uncompressing */
+int td0dsk_t::Decode(UINT8 *buf, int len)  /* Decoding/Uncompressing */
 {
     INT16 c,pos;
     int  count;  // was an unsigned long, seems unnecessary
@@ -639,6 +656,7 @@ static int Decode(UINT8 *buf, int len)  /* Decoding/Uncompressing */
 
 FLOPPY_CONSTRUCT( td0_dsk_construct )
 {
+	td0dsk_t *state = &td0dsk;
 	struct FloppyCallbacks *callbacks;
 	struct td0dsk_tag *tag;
 	UINT8 *header;
@@ -669,13 +687,13 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		int rd;
 		int off = 12;
 		int size = 0;
-		floppy_file	= floppy;
-		init_Decode();
-		floppy_file_offset =12;
-        do
-        {
-           if((rd = Decode(obuf,BUFSZ)) > 0) size += rd;
-        }  while(rd == BUFSZ);
+		state->floppy_file = floppy;
+		state->init_Decode();
+		state->floppy_file_offset = 12;
+		do
+		{
+			if((rd = state->Decode(obuf, BUFSZ)) > 0) size += rd;
+		} while(rd == BUFSZ);
 		memcpy(obuf,tag->data,12);
 		free(tag->data);
 		tag->data = (UINT8*)malloc(size+12);
@@ -683,15 +701,15 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 			return FLOPPY_ERROR_OUTOFMEMORY;
 		}
 		memcpy(tag->data,obuf,12);
-		floppy_file_offset =12;
-		init_Decode();
-        do
-        {
-           if((rd = Decode(obuf,BUFSZ)) > 0) {
+		state->floppy_file_offset = 12;
+		state->init_Decode();
+		do
+		{
+			if((rd = state->Decode(obuf, BUFSZ)) > 0) {
 				memcpy(tag->data+off,obuf,rd);
 				off += rd;
-		   }
-        }  while(rd == BUFSZ);
+			}
+		}  while(rd == BUFSZ);
 	}
 	header = tag->data;
 	tag->heads   = header[9];

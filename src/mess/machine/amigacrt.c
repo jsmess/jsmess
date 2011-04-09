@@ -24,7 +24,13 @@ enum
 	ACTION_REPLAY_MKIII
 };
 
-static int amiga_cart_type;
+typedef struct
+{
+	int cart_type;
+	int ar1_spurious;
+	UINT16 ar23_mode;
+} amigacrt_t;
+static amigacrt_t amigacrt;
 
 /***************************************************************************
 
@@ -68,11 +74,9 @@ static int check_kickstart_12_13( running_machine &machine, const char *cart_nam
 
 ***************************************************************************/
 
-static int amiga_ar1_spurious;
-
 static IRQ_CALLBACK(amiga_ar1_irqack)
 {
-	if ( irqline == 7 && amiga_ar1_spurious )
+	if ( irqline == 7 && amigacrt.ar1_spurious )
 	{
 		return M68K_INT_ACK_SPURIOUS;
 	}
@@ -101,7 +105,7 @@ static void amiga_ar1_nmi( running_machine &machine )
 			ar_ram[0x1800+i] = CUSTOM_REG(i);
 
 		/* trigger NMI irq */
-		amiga_ar1_spurious = 0;
+		amigacrt.ar1_spurious = 0;
 		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(28), FUNC(amiga_ar1_delayed_nmi));
 	}
 }
@@ -119,7 +123,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		if ( offset == (0x60/2) || offset == (0x7c/2) )
 		{
 			/* trigger an NMI or spurious irq */
-			amiga_ar1_spurious = (offset == 0x60/2) ? 0 : 1;
+			amigacrt.ar1_spurious = (offset == 0x60/2) ? 0 : 1;
 			space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(28), FUNC(amiga_ar1_delayed_nmi));
 		}
 	}
@@ -139,7 +143,7 @@ static void amiga_ar1_init( running_machine &machine )
 	/* check kickstart version */
 	if ( !check_kickstart_12_13( machine, "Amiga Action Replay" ) )
 	{
-		amiga_cart_type = -1;
+		amigacrt.cart_type = -1;
 		return;
 	}
 
@@ -158,7 +162,7 @@ static void amiga_ar1_init( running_machine &machine )
 	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
 	memory_set_bankptr(machine, "bank3", ar_ram);
 
-	amiga_ar1_spurious = 0;
+	amigacrt.ar1_spurious = 0;
 
 	/* Install IRQ ACK callback */
 	device_set_irq_callback(machine.device("maincpu"), amiga_ar1_irqack);
@@ -182,8 +186,6 @@ static void amiga_ar1_init( running_machine &machine )
   command requested the monitoring of the cia) then the cart is invoked.
 
 ***************************************************************************/
-
-static UINT16 amiga_ar23_mode;
 
 static void amiga_ar23_freeze( running_machine &machine );
 
@@ -210,9 +212,9 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 		space->install_legacy_read_handler(0xbfd000, 0xbfefff, FUNC(amiga_cia_r));
 	}
 
-	amiga_ar23_mode = (data&0x3);
-	if ( amiga_ar23_mode == 0 )
-		amiga_ar23_mode = 1;
+	amigacrt.ar23_mode = (data&0x3);
+	if ( amigacrt.ar23_mode == 0 )
+		amigacrt.ar23_mode = 1;
 
 }
 
@@ -224,7 +226,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 	if ( ACCESSING_BITS_0_7 )
 	{
 		if ( offset < 2 )
-			return (mem[offset] | (amiga_ar23_mode&3));
+			return (mem[offset] | (amigacrt.ar23_mode&3));
 
 		if ( offset == 0x03 ) /* disable cart oberlay on chip mem */
 		{
@@ -250,7 +252,7 @@ static WRITE16_HANDLER( amiga_ar23_chipmem_w )
 	amiga_state *state = space->machine().driver_data<amiga_state>();
 	if ( offset == (0x08/2) )
 	{
-		if ( amiga_ar23_mode & 1 )
+		if ( amigacrt.ar23_mode & 1 )
 			amiga_ar23_freeze(space->machine());
 	}
 
@@ -289,7 +291,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 
 static void amiga_ar23_nmi( running_machine &machine )
 {
-	amiga_ar23_mode = 0;
+	amigacrt.ar23_mode = 0;
 	amiga_ar23_freeze(machine);
 }
 
@@ -337,7 +339,7 @@ static READ16_HANDLER( amiga_ar23_custom_r )
 
 static void amiga_ar23_check_overlay( running_machine &machine )
 {
-	amiga_ar23_mode = 3;
+	amigacrt.ar23_mode = 3;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, 0x00000f, FUNC(amiga_ar23_chipmem_w));
 }
 
@@ -350,7 +352,7 @@ static void amiga_ar23_init( running_machine &machine, int ar3 )
 	/* check kickstart version */
 	if ( !check_kickstart_12_13( machine, "Action Replay MKII or MKIII" ) )
 	{
-		amiga_cart_type = -1;
+		amigacrt.cart_type = -1;
 		return;
 	}
 
@@ -387,7 +389,7 @@ static void amiga_ar23_init( running_machine &machine, int ar3 )
 	memory_configure_bank(machine, "bank1", 1, 2, machine.region("user1")->base(), 0);
 	memory_configure_bank(machine, "bank1", 2, 2, machine.region("user2")->base(), 0);
 
-	amiga_ar23_mode = 3;
+	amigacrt.ar23_mode = 3;
 }
 
 /***************************************************************************
@@ -401,23 +403,23 @@ void amiga_cart_init( running_machine &machine )
 	/* see what is there */
 	UINT16 *mem = (UINT16 *)machine.region( "user2" )->base();
 
-	amiga_cart_type = -1;
+	amigacrt.cart_type = -1;
 
 	if ( mem != NULL )
 	{
 		if ( mem[0x00] == 0x1111 )
 		{
-			amiga_cart_type = ACTION_REPLAY;
+			amigacrt.cart_type = ACTION_REPLAY;
 			amiga_ar1_init(machine);
 		}
 		else if ( mem[0x0C] == 0x4D6B )
 		{
-			amiga_cart_type = ACTION_REPLAY_MKII;
+			amigacrt.cart_type = ACTION_REPLAY_MKII;
 			amiga_ar23_init(machine, 0);
 		}
 		else if ( mem[0x0C] == 0x4D4B )
 		{
-			amiga_cart_type = ACTION_REPLAY_MKIII;
+			amigacrt.cart_type = ACTION_REPLAY_MKIII;
 			amiga_ar23_init(machine, 1);
 		}
 	}
@@ -425,10 +427,10 @@ void amiga_cart_init( running_machine &machine )
 
 void amiga_cart_check_overlay( running_machine &machine )
 {
-	if ( amiga_cart_type < 0 )
+	if ( amigacrt.cart_type < 0 )
 		return;
 
-	switch( amiga_cart_type )
+	switch( amigacrt.cart_type )
 	{
 		case ACTION_REPLAY:
 			amiga_ar1_check_overlay(machine);
@@ -443,10 +445,10 @@ void amiga_cart_check_overlay( running_machine &machine )
 
 void amiga_cart_nmi( running_machine &machine )
 {
-	if ( amiga_cart_type < 0 )
+	if ( amigacrt.cart_type < 0 )
 		return;
 
-	switch( amiga_cart_type )
+	switch( amigacrt.cart_type )
 	{
 		case ACTION_REPLAY:
 			amiga_ar1_nmi(machine);

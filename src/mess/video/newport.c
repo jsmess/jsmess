@@ -52,138 +52,162 @@ static WRITE32_HANDLER( newport_xmap1_w );
 static READ32_HANDLER( newport_vc2_r );
 static WRITE32_HANDLER( newport_vc2_w );
 
-static UINT16 nVC2_Register[0x21];
-static UINT16 nVC2_RAM[0x8000];
-static UINT8 nVC2_RegIdx;
-static UINT16 nVC2_RegData;
+typedef struct
+{
+	UINT16 nRegister[0x21];
+	UINT16 nRAM[0x8000];
+	UINT8 nRegIdx;
+	UINT16 nRegData;
+} VC2_t;
 
-#define VC2_VIDENTRY		nVC2_Register[0x00]
-#define VC2_CURENTRY		nVC2_Register[0x01]
-#define VC2_CURSORX			nVC2_Register[0x02]
-#define VC2_CURSORY			nVC2_Register[0x03]
-#define VC2_CURCURSORX		nVC2_Register[0x04]
-#define VC2_DIDENTRY		nVC2_Register[0x05]
-#define VC2_SCANLINELEN		nVC2_Register[0x06]
-#define VC2_RAMADDR			nVC2_Register[0x07]
-#define VC2_VTFRAMEPTR		nVC2_Register[0x08]
-#define VC2_VTLINEPTR		nVC2_Register[0x09]
-#define VC2_VTLINERUN		nVC2_Register[0x0a]
-#define VC2_VLINECNT		nVC2_Register[0x0b]
-#define VC2_CURTABLEPTR		nVC2_Register[0x0c]
-#define VC2_WORKCURSORY		nVC2_Register[0x0d]
-#define VC2_DIDFRAMEPTR		nVC2_Register[0x0e]
-#define VC2_DIDLINEPTR		nVC2_Register[0x0f]
-#define VC2_DISPLAYCTRL		nVC2_Register[0x10]
-#define VC2_CONFIG			nVC2_Register[0x1f]
+#define VC2_VIDENTRY		pNVID->VC2.nRegister[0x00]
+#define VC2_CURENTRY		pNVID->VC2.nRegister[0x01]
+#define VC2_CURSORX			pNVID->VC2.nRegister[0x02]
+#define VC2_CURSORY			pNVID->VC2.nRegister[0x03]
+#define VC2_CURCURSORX		pNVID->VC2.nRegister[0x04]
+#define VC2_DIDENTRY		pNVID->VC2.nRegister[0x05]
+#define VC2_SCANLINELEN		pNVID->VC2.nRegister[0x06]
+#define VC2_RAMADDR			pNVID->VC2.nRegister[0x07]
+#define VC2_VTFRAMEPTR		pNVID->VC2.nRegister[0x08]
+#define VC2_VTLINEPTR		pNVID->VC2.nRegister[0x09]
+#define VC2_VTLINERUN		pNVID->VC2.nRegister[0x0a]
+#define VC2_VLINECNT		pNVID->VC2.nRegister[0x0b]
+#define VC2_CURTABLEPTR		pNVID->VC2.nRegister[0x0c]
+#define VC2_WORKCURSORY		pNVID->VC2.nRegister[0x0d]
+#define VC2_DIDFRAMEPTR		pNVID->VC2.nRegister[0x0e]
+#define VC2_DIDLINEPTR		pNVID->VC2.nRegister[0x0f]
+#define VC2_DISPLAYCTRL		pNVID->VC2.nRegister[0x10]
+#define VC2_CONFIG			pNVID->VC2.nRegister[0x1f]
 
-static UINT32 nXMAP0_Register[0x08];
-static UINT32 nXMAP0_ModeTable[0x20];
+typedef struct
+{
+	UINT32 nRegister[0x08];
+	UINT32 nModeTable[0x20];
+} XMAP_t;
 
-#define XMAP0_CONFIG		nXMAP0_Register[0x00]
-#define XMAP0_REVISION		nXMAP0_Register[0x01]
-#define XMAP0_ENTRIES		nXMAP0_Register[0x02]
-#define XMAP0_CURCMAP		nXMAP0_Register[0x03]
-#define XMAP0_POPUPCMAP		nXMAP0_Register[0x04]
-#define XMAP0_MODETBLIDX	nXMAP0_Register[0x07]
+#define XMAP0_CONFIG		pNVID->XMAP0.nRegister[0x00]
+#define XMAP0_REVISION		pNVID->XMAP0.nRegister[0x01]
+#define XMAP0_ENTRIES		pNVID->XMAP0.nRegister[0x02]
+#define XMAP0_CURCMAP		pNVID->XMAP0.nRegister[0x03]
+#define XMAP0_POPUPCMAP		pNVID->XMAP0.nRegister[0x04]
+#define XMAP0_MODETBLIDX	pNVID->XMAP0.nRegister[0x07]
 
-static UINT32 nXMAP1_Register[0x08];
-static UINT32 nXMAP1_ModeTable[0x20];
+#define XMAP1_CONFIG		pNVID->XMAP1.nRegister[0x00]
+#define XMAP1_REVISION		pNVID->XMAP1.nRegister[0x01]
+#define XMAP1_ENTRIES		pNVID->XMAP1.nRegister[0x02]
+#define XMAP1_CURCMAP		pNVID->XMAP1.nRegister[0x03]
+#define XMAP1_POPUPCMAP		pNVID->XMAP1.nRegister[0x04]
+#define XMAP1_MODETBLIDX	pNVID->XMAP1.nRegister[0x07]
 
-#define XMAP1_CONFIG		nXMAP1_Register[0x00]
-#define XMAP1_REVISION		nXMAP1_Register[0x01]
-#define XMAP1_ENTRIES		nXMAP1_Register[0x02]
-#define XMAP1_CURCMAP		nXMAP1_Register[0x03]
-#define XMAP1_POPUPCMAP		nXMAP1_Register[0x04]
-#define XMAP1_MODETBLIDX	nXMAP1_Register[0x07]
 
-static UINT32 nREX3_DrawMode1;
-static UINT32 nREX3_DrawMode0;
-static UINT32 nREX3_LSMode;
-static UINT32 nREX3_LSPattern;
-static UINT32 nREX3_LSPatSave;
-static UINT32 nREX3_ZPattern;
-static UINT32 nREX3_ColorBack;
-static UINT32 nREX3_ColorVRAM;
-static UINT32 nREX3_AlphaRef;
-//static UINT32 nREX3_Stall0;
-static UINT32 nREX3_SMask0X;
-static UINT32 nREX3_SMask0Y;
-static UINT32 nREX3_Setup;
-static UINT32 nREX3_StepZ;
-static UINT32 nREX3_XStart;
-static UINT32 nREX3_YStart;
-static UINT32 nREX3_XEnd;
-static UINT32 nREX3_YEnd;
-static UINT32 nREX3_XSave;
-static UINT32 nREX3_XYMove;
-static UINT32 nREX3_BresD;
-static UINT32 nREX3_BresS1;
-static UINT32 nREX3_BresOctInc1;
-static UINT32 nREX3_BresRndInc2;
-static UINT32 nREX3_BresE1;
-static UINT32 nREX3_BresS2;
-static UINT32 nREX3_AWeight0;
-static UINT32 nREX3_AWeight1;
-static UINT32 nREX3_XStartF;
-static UINT32 nREX3_YStartF;
-static UINT32 nREX3_XEndF;
-static UINT32 nREX3_YEndF;
-static UINT32 nREX3_XStartI;
-//static UINT32 nREX3_YEndF1;
-static UINT32 nREX3_XYStartI;
-static UINT32 nREX3_XYEndI;
-static UINT32 nREX3_XStartEndI;
-static UINT32 nREX3_ColorRed;
-static UINT32 nREX3_ColorAlpha;
-static UINT32 nREX3_ColorGreen;
-static UINT32 nREX3_ColorBlue;
-static UINT32 nREX3_SlopeRed;
-static UINT32 nREX3_SlopeAlpha;
-static UINT32 nREX3_SlopeGreen;
-static UINT32 nREX3_SlopeBlue;
-static UINT32 nREX3_WriteMask;
-static UINT32 nREX3_ZeroFract;
-static UINT32 nREX3_ZeroOverflow;
-//static UINT32 nREX3_ColorIndex;
-static UINT32 nREX3_HostDataPortMSW;
-static UINT32 nREX3_HostDataPortLSW;
-static UINT32 nREX3_DCBMode;
-static UINT32 nREX3_DCBRegSelect;
-static UINT32 nREX3_DCBSlvSelect;
-static UINT32 nREX3_DCBDataMSW;
-static UINT32 nREX3_DCBDataLSW;
-static UINT32 nREX3_SMask1X;
-static UINT32 nREX3_SMask1Y;
-static UINT32 nREX3_SMask2X;
-static UINT32 nREX3_SMask2Y;
-static UINT32 nREX3_SMask3X;
-static UINT32 nREX3_SMask3Y;
-static UINT32 nREX3_SMask4X;
-static UINT32 nREX3_SMask4Y;
-static UINT32 nREX3_TopScanline;
-static UINT32 nREX3_XYWin;
-static UINT32 nREX3_ClipMode;
-static UINT32 nREX3_Config;
-static UINT32 nREX3_Status;
-static UINT8 nREX3_XFerWidth;
+typedef struct
+{
+	UINT32 nDrawMode1;
+	UINT32 nDrawMode0;
+	UINT32 nLSMode;
+	UINT32 nLSPattern;
+	UINT32 nLSPatSave;
+	UINT32 nZPattern;
+	UINT32 nColorBack;
+	UINT32 nColorVRAM;
+	UINT32 nAlphaRef;
+	//UINT32 nStall0;
+	UINT32 nSMask0X;
+	UINT32 nSMask0Y;
+	UINT32 nSetup;
+	UINT32 nStepZ;
+	UINT32 nXStart;
+	UINT32 nYStart;
+	UINT32 nXEnd;
+	UINT32 nYEnd;
+	UINT32 nXSave;
+	UINT32 nXYMove;
+	UINT32 nBresD;
+	UINT32 nBresS1;
+	UINT32 nBresOctInc1;
+	UINT32 nBresRndInc2;
+	UINT32 nBresE1;
+	UINT32 nBresS2;
+	UINT32 nAWeight0;
+	UINT32 nAWeight1;
+	UINT32 nXStartF;
+	UINT32 nYStartF;
+	UINT32 nXEndF;
+	UINT32 nYEndF;
+	UINT32 nXStartI;
+	//UINT32 nYEndF1;
+	UINT32 nXYStartI;
+	UINT32 nXYEndI;
+	UINT32 nXStartEndI;
+	UINT32 nColorRed;
+	UINT32 nColorAlpha;
+	UINT32 nColorGreen;
+	UINT32 nColorBlue;
+	UINT32 nSlopeRed;
+	UINT32 nSlopeAlpha;
+	UINT32 nSlopeGreen;
+	UINT32 nSlopeBlue;
+	UINT32 nWriteMask;
+	UINT32 nZeroFract;
+	UINT32 nZeroOverflow;
+	//UINT32 nColorIndex;
+	UINT32 nHostDataPortMSW;
+	UINT32 nHostDataPortLSW;
+	UINT32 nDCBMode;
+	UINT32 nDCBRegSelect;
+	UINT32 nDCBSlvSelect;
+	UINT32 nDCBDataMSW;
+	UINT32 nDCBDataLSW;
+	UINT32 nSMask1X;
+	UINT32 nSMask1Y;
+	UINT32 nSMask2X;
+	UINT32 nSMask2Y;
+	UINT32 nSMask3X;
+	UINT32 nSMask3Y;
+	UINT32 nSMask4X;
+	UINT32 nSMask4Y;
+	UINT32 nTopScanline;
+	UINT32 nXYWin;
+	UINT32 nClipMode;
+	UINT32 nConfig;
+	UINT32 nStatus;
+	UINT8 nXFerWidth;
 #if 0
-static UINT32 nREX3_CurrentX;
-static UINT32 nREX3_CurrentY;
+	UINT32 nCurrentX;
+	UINT32 nCurrentY;
 #endif
-static UINT32 nREX3_Kludge_SkipLine;
+	UINT32 nKludge_SkipLine;
+} REX3_t;
 
-static UINT32 *video_base;
 
-static UINT8 nDrawGreen;
+typedef struct
+{
+	UINT16 nPaletteIndex;
+	UINT32 nPalette[0x10000];
+} CMAP_t;
+
+typedef struct _newport_video_t newport_video_t;
+struct _newport_video_t
+{
+	VC2_t VC2;
+	XMAP_t XMAP0;
+	XMAP_t XMAP1;
+	REX3_t REX3;
+	UINT32 *base;
+	UINT8 nDrawGreen;
+	CMAP_t CMAP0;
+};
+static newport_video_t *pNVID;
 
 VIDEO_START( newport )
 {
-	nDrawGreen = 0;
-	nREX3_DrawMode0 = 0x00000000;
-	nREX3_DrawMode1 = 0x3002f001;
-	nREX3_DCBMode = 0x00000780;
-	nREX3_Kludge_SkipLine = 0;
-	video_base = auto_alloc_array_clear(machine, UINT32, (1280+64) * (1024+64));
+	pNVID = auto_alloc_clear(machine, newport_video_t);
+	pNVID->nDrawGreen = 0;
+	pNVID->REX3.nDrawMode0 = 0x00000000;
+	pNVID->REX3.nDrawMode1 = 0x3002f001;
+	pNVID->REX3.nDCBMode = 0x00000780;
+	pNVID->REX3.nKludge_SkipLine = 0;
+	pNVID->base = auto_alloc_array_clear(machine, UINT32, (1280+64) * (1024+64));
 }
 
 SCREEN_UPDATE( newport )
@@ -195,7 +219,7 @@ SCREEN_UPDATE( newport )
 	/* loop over rows and copy to the destination */
 	for( y = cliprect->min_y; y <= cliprect->max_y; y++ )
 	{
-		UINT32 *src = &video_base[1344 * y];
+		UINT32 *src = &pNVID->base[1344 * y];
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
 		int x;
 
@@ -209,25 +233,22 @@ SCREEN_UPDATE( newport )
 	return 0;
 }
 
-static UINT16 nCMAP0_PaletteIndex;
-static UINT32 nCMAP0_Palette[0x10000];
-
 static WRITE32_HANDLER( newport_cmap0_w )
 {
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0x00:
 		verboselog(machine, 2, "CMAP0 Palette Index Write: %04x\n", data & 0x0000ffff );
-		nCMAP0_PaletteIndex = data & 0x0000ffff;
+		pNVID->CMAP0.nPaletteIndex = data & 0x0000ffff;
 		break;
 	case 0x02:
-		verboselog(machine, 2, "CMAP0 Palette Entry %04x Write: %08x\n", nCMAP0_PaletteIndex, ( data >> 8 ) & 0x00ffffff );
-		nCMAP0_Palette[nCMAP0_PaletteIndex] = ( data >> 8 ) & 0x00ffffff;
+		verboselog(machine, 2, "CMAP0 Palette Entry %04x Write: %08x\n", pNVID->CMAP0.nPaletteIndex, ( data >> 8 ) & 0x00ffffff );
+		pNVID->CMAP0.nPalette[pNVID->CMAP0.nPaletteIndex] = ( data >> 8 ) & 0x00ffffff;
 		break;
 	default:
-		verboselog(machine, 2, "Unknown CMAP0 Register %d Write: %08x\n", nREX3_DCBRegSelect, data );
+		verboselog(machine, 2, "Unknown CMAP0 Register %d Write: %08x\n", pNVID->REX3.nDCBRegSelect, data );
 		break;
 	}
 }
@@ -236,7 +257,7 @@ static READ32_HANDLER( newport_cmap0_r )
 {
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0x04:
 		verboselog(machine, 2, "CMAP0 Status Read: %08x\n", 0x00000008 );
@@ -245,7 +266,7 @@ static READ32_HANDLER( newport_cmap0_r )
 		verboselog(machine, 2, "CMAP0 Revision Read: CMAP Rev 1, Board Rev 2, 8bpp\n" );
 		return 0x000000a1;
 	default:
-		verboselog(machine, 2, "Unknown CMAP0 Register %d Read\n", nREX3_DCBRegSelect );
+		verboselog(machine, 2, "Unknown CMAP0 Register %d Read\n", pNVID->REX3.nDCBRegSelect );
 		return 0x00000000;
 	}
 }
@@ -254,7 +275,7 @@ static READ32_HANDLER( newport_cmap1_r )
 {
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0x04:
 		verboselog(machine, 2, "CMAP1 Status Read: %08x\n", 0x00000008 );
@@ -263,7 +284,7 @@ static READ32_HANDLER( newport_cmap1_r )
 		verboselog(machine, 2, "CMAP1 Revision Read: CMAP Rev 1, Board Rev 2, 8bpp\n" );
 		return 0x000000a1;
 	default:
-		verboselog(machine, 2, "Unknown CMAP0 Register %d Read\n", nREX3_DCBRegSelect );
+		verboselog(machine, 2, "Unknown CMAP0 Register %d Read\n", pNVID->REX3.nDCBRegSelect );
 		return 0x00000000;
 	}
 }
@@ -273,7 +294,7 @@ static READ32_HANDLER( newport_xmap0_r )
 	UINT8 nModeIdx;
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0:
 		verboselog(machine, 2, "XMAP0 Config Read: %08x\n", XMAP0_CONFIG );
@@ -295,14 +316,14 @@ static READ32_HANDLER( newport_xmap0_r )
 		switch( XMAP0_MODETBLIDX & 0x00000003 )
 		{
 		case 0:
-			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 0): %08x\n", nModeIdx, ( nXMAP0_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16 );
-			return ( nXMAP0_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16;
+			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 0): %08x\n", nModeIdx, ( pNVID->XMAP0.nModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16 );
+			return ( pNVID->XMAP0.nModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16;
 		case 1:
-			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 1): %08x\n", nModeIdx, ( nXMAP0_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8 );
-			return ( nXMAP0_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8;
+			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 1): %08x\n", nModeIdx, ( pNVID->XMAP0.nModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8 );
+			return ( pNVID->XMAP0.nModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8;
 		case 2:
-			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 2): %08x\n", nModeIdx, ( nXMAP0_ModeTable[ nModeIdx ] & 0x000000ff ) );
-			return ( nXMAP0_ModeTable[ nModeIdx ] & 0x000000ff );
+			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 2): %08x\n", nModeIdx, ( pNVID->XMAP0.nModeTable[ nModeIdx ] & 0x000000ff ) );
+			return ( pNVID->XMAP0.nModeTable[ nModeIdx ] & 0x000000ff );
 		}
 		break;
 	case 6:
@@ -313,7 +334,7 @@ static READ32_HANDLER( newport_xmap0_r )
 		return XMAP0_MODETBLIDX;
 	}
 
-	verboselog(machine, 2, "XMAP0 Unknown nREX3_DCBRegSelect Value: %02x, returning 0\n", nREX3_DCBRegSelect );
+	verboselog(machine, 2, "XMAP0 Unknown pNVID->REX3.nDCBRegSelect Value: %02x, returning 0\n", pNVID->REX3.nDCBRegSelect );
 	return 0x00000000;
 }
 
@@ -322,7 +343,7 @@ static WRITE32_HANDLER( newport_xmap0_w )
 	UINT8 n8BitVal = data & 0x000000ff;
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0:
 		verboselog(machine, 2, "XMAP0 Config Write: %02x\n", n8BitVal );
@@ -344,7 +365,7 @@ static WRITE32_HANDLER( newport_xmap0_w )
 		break;
 	case 5:
 		verboselog(machine, 2, "XMAP0 Mode Register Write: %02x = %06x\n", ( data & 0xff000000 ) >> 24, data & 0x00ffffff );
-		nXMAP0_ModeTable[ ( data & 0xff000000 ) >> 24 ] = data & 0x00ffffff;
+		pNVID->XMAP0.nModeTable[ ( data & 0xff000000 ) >> 24 ] = data & 0x00ffffff;
 		break;
 	case 6:
 		verboselog(machine, 2, "XMAP0 Unused Write (Ignored): %08x\n", data );
@@ -361,7 +382,7 @@ static READ32_HANDLER( newport_xmap1_r )
 	UINT8 nModeIdx;
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0:
 		verboselog(machine, 2, "XMAP1 Config Read: %08x\n", XMAP1_CONFIG );
@@ -383,14 +404,14 @@ static READ32_HANDLER( newport_xmap1_r )
 		switch( XMAP1_MODETBLIDX & 0x00000003 )
 		{
 		case 0:
-			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 0): %08x\n", nModeIdx, ( nXMAP1_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16 );
-			return ( nXMAP1_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16;
+			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 0): %08x\n", nModeIdx, ( pNVID->XMAP1.nModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16 );
+			return ( pNVID->XMAP1.nModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16;
 		case 1:
-			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 1): %08x\n", nModeIdx, ( nXMAP1_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8 );
-			return ( nXMAP1_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8;
+			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 1): %08x\n", nModeIdx, ( pNVID->XMAP1.nModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8 );
+			return ( pNVID->XMAP1.nModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8;
 		case 2:
-			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 2): %08x\n", nModeIdx, ( nXMAP1_ModeTable[ nModeIdx ] & 0x000000ff ) );
-			return ( nXMAP1_ModeTable[ nModeIdx ] & 0x000000ff );
+			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 2): %08x\n", nModeIdx, ( pNVID->XMAP1.nModeTable[ nModeIdx ] & 0x000000ff ) );
+			return ( pNVID->XMAP1.nModeTable[ nModeIdx ] & 0x000000ff );
 		}
 		break;
 	case 6:
@@ -401,7 +422,7 @@ static READ32_HANDLER( newport_xmap1_r )
 		return XMAP1_MODETBLIDX;
 	}
 
-	verboselog(machine, 2, "XMAP1 Unknown nREX3_DCBRegSelect Value: %02x, returning 0\n", nREX3_DCBRegSelect );
+	verboselog(machine, 2, "XMAP1 Unknown pNVID->REX3.nDCBRegSelect Value: %02x, returning 0\n", pNVID->REX3.nDCBRegSelect );
 	return 0x00000000;
 }
 
@@ -410,7 +431,7 @@ static WRITE32_HANDLER( newport_xmap1_w )
 	UINT8 n8BitVal = data & 0x000000ff;
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0:
 		verboselog(machine, 2, "XMAP1 Config Write: %02x\n", n8BitVal );
@@ -432,7 +453,7 @@ static WRITE32_HANDLER( newport_xmap1_w )
 		break;
 	case 5:
 		verboselog(machine, 2, "XMAP1 Mode Register Write: %02x = %06x\n", ( data & 0xff000000 ) >> 24, data & 0x00ffffff );
-		nXMAP1_ModeTable[ ( data & 0xff000000 ) >> 24 ] = data & 0x00ffffff;
+		pNVID->XMAP1.nModeTable[ ( data & 0xff000000 ) >> 24 ] = data & 0x00ffffff;
 		break;
 	case 6:
 		verboselog(machine, 2, "XMAP1 Unused Write (Ignored): %08x\n", data );
@@ -449,14 +470,14 @@ static READ32_HANDLER( newport_vc2_r )
 	UINT16 ret16;
 	running_machine &machine = space->machine();
 
-	switch( nREX3_DCBRegSelect )
+	switch( pNVID->REX3.nDCBRegSelect )
 	{
 	case 0x01: /* Register Read */
-		verboselog(machine, 2, "VC2 Register Read: %02x, %08x\n", nVC2_RegIdx, nVC2_Register[nVC2_RegIdx] );
-		return nVC2_Register[nVC2_RegIdx];
+		verboselog(machine, 2, "VC2 Register Read: %02x, %08x\n", pNVID->VC2.nRegIdx, pNVID->VC2.nRegister[pNVID->VC2.nRegIdx] );
+		return pNVID->VC2.nRegister[pNVID->VC2.nRegIdx];
 	case 0x03: /* RAM Read */
-		verboselog(machine, 2, "VC2 RAM Read: %04x = %08x\n", VC2_RAMADDR, nVC2_RAM[VC2_RAMADDR] );
-		ret16 = nVC2_RAM[VC2_RAMADDR];
+		verboselog(machine, 2, "VC2 RAM Read: %04x = %08x\n", VC2_RAMADDR, pNVID->VC2.nRAM[VC2_RAMADDR] );
+		ret16 = pNVID->VC2.nRAM[VC2_RAMADDR];
 		VC2_RAMADDR++;
 		if( VC2_RAMADDR == 0x8000 )
 		{
@@ -464,7 +485,7 @@ static READ32_HANDLER( newport_vc2_r )
 		}
 		return ret16;
 	default:
-		verboselog(machine, 2, "Unknown VC2 Register Read: %02x\n", nREX3_DCBRegSelect );
+		verboselog(machine, 2, "Unknown VC2 Register Read: %02x\n", pNVID->REX3.nDCBRegSelect );
 		return 0;
 	}
 	return 0;
@@ -474,26 +495,26 @@ static WRITE32_HANDLER( newport_vc2_w )
 {
 	running_machine &machine = space->machine();
 
-	switch( nREX3_XFerWidth )
+	switch( pNVID->REX3.nXFerWidth )
 	{
 	case 0x01: /* Register Select */
-		switch( nREX3_DCBRegSelect )
+		switch( pNVID->REX3.nDCBRegSelect )
 		{
 		case 0x00:
-			nVC2_RegIdx = ( data & 0x000000ff ) >> 0;
-			verboselog(machine, 2, "VC2 Register Select: %02x\n", nVC2_RegIdx );
+			pNVID->VC2.nRegIdx = ( data & 0x000000ff ) >> 0;
+			verboselog(machine, 2, "VC2 Register Select: %02x\n", pNVID->VC2.nRegIdx );
 			break;
 		default:
-			verboselog(machine, 2, "Unknown VC2 Register Select: DCB Register %02x, data = 0x%08x\n", nREX3_DCBRegSelect, data );
+			verboselog(machine, 2, "Unknown VC2 Register Select: DCB Register %02x, data = 0x%08x\n", pNVID->REX3.nDCBRegSelect, data );
 			break;
 		}
 		break;
 	case 0x02: /* RAM Write */
-		switch( nREX3_DCBRegSelect )
+		switch( pNVID->REX3.nDCBRegSelect )
 		{
 		case 0x03:
 			verboselog(machine, 2, "VC2 RAM Write: %04x = %08x\n", VC2_RAMADDR, data & 0x0000ffff );
-			nVC2_RAM[VC2_RAMADDR] = data & 0x0000ffff;
+			pNVID->VC2.nRAM[VC2_RAMADDR] = data & 0x0000ffff;
 			VC2_RAMADDR++;
 			if( VC2_RAMADDR == 0x8000 )
 			{
@@ -501,87 +522,87 @@ static WRITE32_HANDLER( newport_vc2_w )
 			}
 			break;
 		default:
-			verboselog(machine, 2, "Unknown 2-byte Write: DCB Register %02x, data = 0x%08x\n", nREX3_DCBRegSelect, data );
+			verboselog(machine, 2, "Unknown 2-byte Write: DCB Register %02x, data = 0x%08x\n", pNVID->REX3.nDCBRegSelect, data );
 			break;
 		}
 		break;
 	case 0x03: /* Register Write */
-		switch( nREX3_DCBRegSelect )
+		switch( pNVID->REX3.nDCBRegSelect )
 		{
 		case 0x00:
 			verboselog(machine, 2, "VC2 Register Setup:\n" );
-			nVC2_RegIdx = ( data & 0xff000000 ) >> 24;
-			nVC2_RegData = ( data & 0x00ffff00 ) >> 8;
-		switch( nVC2_RegIdx )
+			pNVID->VC2.nRegIdx = ( data & 0xff000000 ) >> 24;
+			pNVID->VC2.nRegData = ( data & 0x00ffff00 ) >> 8;
+		switch( pNVID->VC2.nRegIdx )
 		{
 		case 0x00:
-			verboselog(machine, 2, "    Video Entry Pointer:  %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Video Entry Pointer:  %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x01:
-			verboselog(machine, 2, "    Cursor Entry Pointer: %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Cursor Entry Pointer: %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x02:
-			verboselog(machine, 2, "    Cursor X Location:    %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Cursor X Location:    %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x03:
-			verboselog(machine, 2, "    Cursor Y Location:    %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Cursor Y Location:    %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x04:
-			verboselog(machine, 2, "    Current Cursor X:     %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Current Cursor X:     %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x05:
-			verboselog(machine, 2, "    DID Entry Pointer:    %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    DID Entry Pointer:    %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x06:
-			verboselog(machine, 2, "    Scanline Length:      %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Scanline Length:      %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x07:
-			verboselog(machine, 2, "    RAM Address:          %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    RAM Address:          %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x08:
-			verboselog(machine, 2, "    VT Frame Table Ptr:   %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    VT Frame Table Ptr:   %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x09:
-			verboselog(machine, 2, "    VT Line Sequence Ptr: %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    VT Line Sequence Ptr: %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x0a:
-			verboselog(machine, 2, "    VT Lines in Run:      %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    VT Lines in Run:      %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x0b:
-			verboselog(machine, 2, "    Vertical Line Count:  %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Vertical Line Count:  %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x0c:
-			verboselog(machine, 2, "    Cursor Table Ptr:     %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Cursor Table Ptr:     %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x0d:
-			verboselog(machine, 2, "    Working Cursor Y:     %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Working Cursor Y:     %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x0e:
-			verboselog(machine, 2, "    DID Frame Table Ptr:  %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    DID Frame Table Ptr:  %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x0f:
-			verboselog(machine, 2, "    DID Line Table Ptr:   %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    DID Line Table Ptr:   %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x10:
-			verboselog(machine, 2, "    Display Control:      %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Display Control:      %04x\n", pNVID->VC2.nRegData );
 			break;
 		case 0x1f:
-			verboselog(machine, 2, "    Configuration:        %04x\n", nVC2_RegData );
-			nVC2_Register[0x20] = nVC2_RegData;
+			verboselog(machine, 2, "    Configuration:        %04x\n", pNVID->VC2.nRegData );
+			pNVID->VC2.nRegister[0x20] = pNVID->VC2.nRegData;
 			break;
 		default:
-			verboselog(machine, 2, "    Unknown VC2 Register: %04x\n", nVC2_RegData );
+			verboselog(machine, 2, "    Unknown VC2 Register: %04x\n", pNVID->VC2.nRegData );
 			break;
 		}
-			nVC2_Register[nVC2_RegIdx] = nVC2_RegData;
+			pNVID->VC2.nRegister[pNVID->VC2.nRegIdx] = pNVID->VC2.nRegData;
 			break;
 		default:
-			verboselog(machine, 2, "Unknown VC2 Register Write: %02x = %08x\n", nREX3_DCBRegSelect, data );
+			verboselog(machine, 2, "Unknown VC2 Register Write: %02x = %08x\n", pNVID->REX3.nDCBRegSelect, data );
 			break;
 		}
 		break;
 	default:
-		verboselog(machine, 2, "Unknown VC2 XFer Width: Width %02x, DCB Register %02x, Value 0x%08x\n", nREX3_XFerWidth, nREX3_DCBRegSelect, data );
+		verboselog(machine, 2, "Unknown VC2 XFer Width: Width %02x, DCB Register %02x, Value 0x%08x\n", pNVID->REX3.nXFerWidth, pNVID->REX3.nDCBRegSelect, data );
 		break;
 	}
 }
@@ -599,211 +620,211 @@ READ32_HANDLER( newport_rex3_r )
 	{
 	case 0x0000/4:
 	case 0x0800/4:
-		verboselog(machine, 2, "REX3 Draw Mode 1 Read: %08x\n", nREX3_DrawMode1 );
-		return nREX3_DrawMode1;
+		verboselog(machine, 2, "REX3 Draw Mode 1 Read: %08x\n", pNVID->REX3.nDrawMode1 );
+		return pNVID->REX3.nDrawMode1;
 	case 0x0004/4:
 	case 0x0804/4:
-		verboselog(machine, 2, "REX3 Draw Mode 0 Read: %08x\n", nREX3_DrawMode0 );
-		return nREX3_DrawMode0;
+		verboselog(machine, 2, "REX3 Draw Mode 0 Read: %08x\n", pNVID->REX3.nDrawMode0 );
+		return pNVID->REX3.nDrawMode0;
 	case 0x0008/4:
 	case 0x0808/4:
-		verboselog(machine, 2, "REX3 Line Stipple Mode Read: %08x\n", nREX3_LSMode );
-		return nREX3_LSMode;
+		verboselog(machine, 2, "REX3 Line Stipple Mode Read: %08x\n", pNVID->REX3.nLSMode );
+		return pNVID->REX3.nLSMode;
 	case 0x000c/4:
 	case 0x080c/4:
-		verboselog(machine, 2, "REX3 Line Stipple Pattern Read: %08x\n", nREX3_LSPattern );
-		return nREX3_LSPattern;
+		verboselog(machine, 2, "REX3 Line Stipple Pattern Read: %08x\n", pNVID->REX3.nLSPattern );
+		return pNVID->REX3.nLSPattern;
 	case 0x0010/4:
 	case 0x0810/4:
-		verboselog(machine, 2, "REX3 Line Stipple Pattern (Save) Read: %08x\n", nREX3_LSPatSave );
-		return nREX3_LSPatSave;
+		verboselog(machine, 2, "REX3 Line Stipple Pattern (Save) Read: %08x\n", pNVID->REX3.nLSPatSave );
+		return pNVID->REX3.nLSPatSave;
 	case 0x0014/4:
 	case 0x0814/4:
-		verboselog(machine, 2, "REX3 Pattern Register Read: %08x\n", nREX3_ZPattern );
-		return nREX3_ZPattern;
+		verboselog(machine, 2, "REX3 Pattern Register Read: %08x\n", pNVID->REX3.nZPattern );
+		return pNVID->REX3.nZPattern;
 	case 0x0018/4:
 	case 0x0818/4:
-		verboselog(machine, 2, "REX3 Opaque Pattern / Blendfunc Dest Color Read: %08x\n", nREX3_ColorBack );
-		return nREX3_ColorBack;
+		verboselog(machine, 2, "REX3 Opaque Pattern / Blendfunc Dest Color Read: %08x\n", pNVID->REX3.nColorBack );
+		return pNVID->REX3.nColorBack;
 	case 0x001c/4:
 	case 0x081c/4:
-		verboselog(machine, 2, "REX3 VRAM Fastclear Color Read: %08x\n", nREX3_ColorVRAM );
-		return nREX3_ColorVRAM;
+		verboselog(machine, 2, "REX3 VRAM Fastclear Color Read: %08x\n", pNVID->REX3.nColorVRAM );
+		return pNVID->REX3.nColorVRAM;
 	case 0x0020/4:
 	case 0x0820/4:
-		verboselog(machine, 2, "REX3 AFUNCTION Reference Alpha Read: %08x\n", nREX3_AlphaRef );
-		return nREX3_AlphaRef;
+		verboselog(machine, 2, "REX3 AFUNCTION Reference Alpha Read: %08x\n", pNVID->REX3.nAlphaRef );
+		return pNVID->REX3.nAlphaRef;
 	case 0x0028/4:
 	case 0x0828/4:
-		verboselog(machine, 2, "REX3 Screenmask 0 X Min/Max Read: %08x\n", nREX3_SMask0X );
-		return nREX3_SMask0X;
+		verboselog(machine, 2, "REX3 Screenmask 0 X Min/Max Read: %08x\n", pNVID->REX3.nSMask0X );
+		return pNVID->REX3.nSMask0X;
 	case 0x002c/4:
 	case 0x082c/4:
-		verboselog(machine, 2, "REX3 Screenmask 0 Y Min/Max Read: %08x\n", nREX3_SMask0Y );
-		return nREX3_SMask0Y;
+		verboselog(machine, 2, "REX3 Screenmask 0 Y Min/Max Read: %08x\n", pNVID->REX3.nSMask0Y );
+		return pNVID->REX3.nSMask0Y;
 	case 0x0030/4:
 	case 0x0830/4:
-		verboselog(machine, 2, "REX3 Line/Span Setup Read: %08x\n", nREX3_Setup );
-		return nREX3_Setup;
+		verboselog(machine, 2, "REX3 Line/Span Setup Read: %08x\n", pNVID->REX3.nSetup );
+		return pNVID->REX3.nSetup;
 	case 0x0034/4:
 	case 0x0834/4:
-		verboselog(machine, 2, "REX3 ZPattern Enable Read: %08x\n", nREX3_StepZ );
-		return nREX3_StepZ;
+		verboselog(machine, 2, "REX3 ZPattern Enable Read: %08x\n", pNVID->REX3.nStepZ );
+		return pNVID->REX3.nStepZ;
 	case 0x0100/4:
 	case 0x0900/4:
-		verboselog(machine, 2, "REX3 X Start Read: %08x\n", nREX3_XStart );
-		return nREX3_XStart;
+		verboselog(machine, 2, "REX3 X Start Read: %08x\n", pNVID->REX3.nXStart );
+		return pNVID->REX3.nXStart;
 	case 0x0104/4:
 	case 0x0904/4:
-		verboselog(machine, 2, "REX3 YStart Read: %08x\n", nREX3_YStart );
-		return nREX3_YStart;
+		verboselog(machine, 2, "REX3 YStart Read: %08x\n", pNVID->REX3.nYStart );
+		return pNVID->REX3.nYStart;
 	case 0x0108/4:
 	case 0x0908/4:
-		verboselog(machine, 2, "REX3 XEnd Read: %08x\n", nREX3_XEnd );
-		return nREX3_XEnd;
+		verboselog(machine, 2, "REX3 XEnd Read: %08x\n", pNVID->REX3.nXEnd );
+		return pNVID->REX3.nXEnd;
 	case 0x010c/4:
 	case 0x090c/4:
-		verboselog(machine, 2, "REX3 YEnd Read: %08x\n", nREX3_YEnd );
-		return nREX3_YEnd;
+		verboselog(machine, 2, "REX3 YEnd Read: %08x\n", pNVID->REX3.nYEnd );
+		return pNVID->REX3.nYEnd;
 	case 0x0110/4:
 	case 0x0910/4:
-		verboselog(machine, 2, "REX3 XSave Read: %08x\n", nREX3_XSave );
-		return nREX3_XSave;
+		verboselog(machine, 2, "REX3 XSave Read: %08x\n", pNVID->REX3.nXSave );
+		return pNVID->REX3.nXSave;
 	case 0x0114/4:
 	case 0x0914/4:
-		verboselog(machine, 2, "REX3 XYMove Read: %08x\n", nREX3_XYMove );
-		return nREX3_XYMove;
+		verboselog(machine, 2, "REX3 XYMove Read: %08x\n", pNVID->REX3.nXYMove );
+		return pNVID->REX3.nXYMove;
 	case 0x0118/4:
 	case 0x0918/4:
-		verboselog(machine, 2, "REX3 Bresenham D Read: %08x\n", nREX3_BresD );
-		return nREX3_BresD;
+		verboselog(machine, 2, "REX3 Bresenham D Read: %08x\n", pNVID->REX3.nBresD );
+		return pNVID->REX3.nBresD;
 	case 0x011c/4:
 	case 0x091c/4:
-		verboselog(machine, 2, "REX3 Bresenham S1 Read: %08x\n", nREX3_BresS1 );
-		return nREX3_BresS1;
+		verboselog(machine, 2, "REX3 Bresenham S1 Read: %08x\n", pNVID->REX3.nBresS1 );
+		return pNVID->REX3.nBresS1;
 	case 0x0120/4:
 	case 0x0920/4:
-		verboselog(machine, 2, "REX3 Bresenham Octant & Incr1 Read: %08x\n", nREX3_BresOctInc1 );
-		return nREX3_BresOctInc1;
+		verboselog(machine, 2, "REX3 Bresenham Octant & Incr1 Read: %08x\n", pNVID->REX3.nBresOctInc1 );
+		return pNVID->REX3.nBresOctInc1;
 	case 0x0124/4:
 	case 0x0924/4:
-		verboselog(machine, 2, "REX3 Bresenham Octant Rounding Mode & Incr2 Read: %08x\n", nREX3_BresRndInc2 );
-		return nREX3_BresRndInc2;
+		verboselog(machine, 2, "REX3 Bresenham Octant Rounding Mode & Incr2 Read: %08x\n", pNVID->REX3.nBresRndInc2 );
+		return pNVID->REX3.nBresRndInc2;
 	case 0x0128/4:
 	case 0x0928/4:
-		verboselog(machine, 2, "REX3 Bresenham E1 Read: %08x\n", nREX3_BresE1 );
-		return nREX3_BresE1;
+		verboselog(machine, 2, "REX3 Bresenham E1 Read: %08x\n", pNVID->REX3.nBresE1 );
+		return pNVID->REX3.nBresE1;
 	case 0x012c/4:
 	case 0x092c/4:
-		verboselog(machine, 2, "REX3 Bresenham S2 Read: %08x\n", nREX3_BresS2 );
-		return nREX3_BresS2;
+		verboselog(machine, 2, "REX3 Bresenham S2 Read: %08x\n", pNVID->REX3.nBresS2 );
+		return pNVID->REX3.nBresS2;
 	case 0x0130/4:
 	case 0x0930/4:
-		verboselog(machine, 2, "REX3 AA Line Weight Table 1/2 Read: %08x\n", nREX3_AWeight0 );
-		return nREX3_AWeight0;
+		verboselog(machine, 2, "REX3 AA Line Weight Table 1/2 Read: %08x\n", pNVID->REX3.nAWeight0 );
+		return pNVID->REX3.nAWeight0;
 	case 0x0134/4:
 	case 0x0934/4:
-		verboselog(machine, 2, "REX3 AA Line Weight Table 2/2 Read: %08x\n", nREX3_AWeight1 );
-		return nREX3_AWeight1;
+		verboselog(machine, 2, "REX3 AA Line Weight Table 2/2 Read: %08x\n", pNVID->REX3.nAWeight1 );
+		return pNVID->REX3.nAWeight1;
 	case 0x0138/4:
 	case 0x0938/4:
-		verboselog(machine, 2, "REX3 GL XStart Read: %08x\n", nREX3_XStartF );
-		return nREX3_XStartF;
+		verboselog(machine, 2, "REX3 GL XStart Read: %08x\n", pNVID->REX3.nXStartF );
+		return pNVID->REX3.nXStartF;
 	case 0x013c/4:
 	case 0x093c/4:
-		verboselog(machine, 2, "REX3 GL YStart Read: %08x\n", nREX3_YStartF );
-		return nREX3_YStartF;
+		verboselog(machine, 2, "REX3 GL YStart Read: %08x\n", pNVID->REX3.nYStartF );
+		return pNVID->REX3.nYStartF;
 	case 0x0140/4:
 	case 0x0940/4:
-		verboselog(machine, 2, "REX3 GL XEnd Read: %08x\n", nREX3_XEndF );
-		return nREX3_XEndF;
+		verboselog(machine, 2, "REX3 GL XEnd Read: %08x\n", pNVID->REX3.nXEndF );
+		return pNVID->REX3.nXEndF;
 	case 0x0144/4:
 	case 0x0944/4:
-		verboselog(machine, 2, "REX3 GL YEnd Read: %08x\n", nREX3_YEndF );
-		return nREX3_YEndF;
+		verboselog(machine, 2, "REX3 GL YEnd Read: %08x\n", pNVID->REX3.nYEndF );
+		return pNVID->REX3.nYEndF;
 	case 0x0148/4:
 	case 0x0948/4:
-		verboselog(machine, 2, "REX3 XStart (integer) Read: %08x\n", nREX3_XStartI );
-		return nREX3_XStartI;
+		verboselog(machine, 2, "REX3 XStart (integer) Read: %08x\n", pNVID->REX3.nXStartI );
+		return pNVID->REX3.nXStartI;
 	case 0x014c/4:
 	case 0x094c/4:
-		verboselog(machine, 2, "REX3 GL XEnd (copy) Read: %08x\n", nREX3_XEndF );
-		return nREX3_XEndF;
+		verboselog(machine, 2, "REX3 GL XEnd (copy) Read: %08x\n", pNVID->REX3.nXEndF );
+		return pNVID->REX3.nXEndF;
 	case 0x0150/4:
 	case 0x0950/4:
-		verboselog(machine, 2, "REX3 XYStart (integer) Read: %08x\n", nREX3_XYStartI );
-		return nREX3_XYStartI;
+		verboselog(machine, 2, "REX3 XYStart (integer) Read: %08x\n", pNVID->REX3.nXYStartI );
+		return pNVID->REX3.nXYStartI;
 	case 0x0154/4:
 	case 0x0954/4:
-		verboselog(machine, 2, "REX3 XYEnd (integer) Read: %08x\n", nREX3_XYEndI );
-		return nREX3_XYEndI;
+		verboselog(machine, 2, "REX3 XYEnd (integer) Read: %08x\n", pNVID->REX3.nXYEndI );
+		return pNVID->REX3.nXYEndI;
 	case 0x0158/4:
 	case 0x0958/4:
-		verboselog(machine, 2, "REX3 XStartEnd (integer) Read: %08x\n", nREX3_XStartEndI );
-		return nREX3_XStartEndI;
+		verboselog(machine, 2, "REX3 XStartEnd (integer) Read: %08x\n", pNVID->REX3.nXStartEndI );
+		return pNVID->REX3.nXStartEndI;
 	case 0x0200/4:
 	case 0x0a00/4:
-		verboselog(machine, 2, "REX3 Red/CI Full State Read: %08x\n", nREX3_ColorRed );
-		return nREX3_ColorRed;
+		verboselog(machine, 2, "REX3 Red/CI Full State Read: %08x\n", pNVID->REX3.nColorRed );
+		return pNVID->REX3.nColorRed;
 	case 0x0204/4:
 	case 0x0a04/4:
-		verboselog(machine, 2, "REX3 Alpha Full State Read: %08x\n", nREX3_ColorAlpha );
-		return nREX3_ColorAlpha;
+		verboselog(machine, 2, "REX3 Alpha Full State Read: %08x\n", pNVID->REX3.nColorAlpha );
+		return pNVID->REX3.nColorAlpha;
 	case 0x0208/4:
 	case 0x0a08/4:
-		verboselog(machine, 2, "REX3 Green Full State Read: %08x\n", nREX3_ColorGreen );
-		return nREX3_ColorGreen;
+		verboselog(machine, 2, "REX3 Green Full State Read: %08x\n", pNVID->REX3.nColorGreen );
+		return pNVID->REX3.nColorGreen;
 	case 0x020c/4:
 	case 0x0a0c/4:
-		verboselog(machine, 2, "REX3 Blue Full State Read: %08x\n", nREX3_ColorBlue );
-		return nREX3_ColorBlue;
+		verboselog(machine, 2, "REX3 Blue Full State Read: %08x\n", pNVID->REX3.nColorBlue );
+		return pNVID->REX3.nColorBlue;
 	case 0x0210/4:
 	case 0x0a10/4:
-		verboselog(machine, 2, "REX3 Red/CI Slope Read: %08x\n", nREX3_SlopeRed );
-		return nREX3_SlopeRed;
+		verboselog(machine, 2, "REX3 Red/CI Slope Read: %08x\n", pNVID->REX3.nSlopeRed );
+		return pNVID->REX3.nSlopeRed;
 	case 0x0214/4:
 	case 0x0a14/4:
-		verboselog(machine, 2, "REX3 Alpha Slope Read: %08x\n", nREX3_SlopeAlpha );
-		return nREX3_SlopeAlpha;
+		verboselog(machine, 2, "REX3 Alpha Slope Read: %08x\n", pNVID->REX3.nSlopeAlpha );
+		return pNVID->REX3.nSlopeAlpha;
 	case 0x0218/4:
 	case 0x0a18/4:
-		verboselog(machine, 2, "REX3 Green Slope Read: %08x\n", nREX3_SlopeGreen );
-		return nREX3_SlopeGreen;
+		verboselog(machine, 2, "REX3 Green Slope Read: %08x\n", pNVID->REX3.nSlopeGreen );
+		return pNVID->REX3.nSlopeGreen;
 	case 0x021c/4:
 	case 0x0a1c/4:
-		verboselog(machine, 2, "REX3 Blue Slope Read: %08x\n", nREX3_SlopeBlue );
-		return nREX3_SlopeBlue;
+		verboselog(machine, 2, "REX3 Blue Slope Read: %08x\n", pNVID->REX3.nSlopeBlue );
+		return pNVID->REX3.nSlopeBlue;
 	case 0x0220/4:
 	case 0x0a20/4:
-		verboselog(machine, 2, "REX3 Write Mask Read: %08x\n", nREX3_WriteMask );
-		return nREX3_WriteMask;
+		verboselog(machine, 2, "REX3 Write Mask Read: %08x\n", pNVID->REX3.nWriteMask );
+		return pNVID->REX3.nWriteMask;
 	case 0x0224/4:
 	case 0x0a24/4:
-		verboselog(machine, 2, "REX3 Packed Color Fractions Read: %08x\n", nREX3_ZeroFract );
-		return nREX3_ZeroFract;
+		verboselog(machine, 2, "REX3 Packed Color Fractions Read: %08x\n", pNVID->REX3.nZeroFract );
+		return pNVID->REX3.nZeroFract;
 	case 0x0228/4:
 	case 0x0a28/4:
-		verboselog(machine, 2, "REX3 Color Index Zeros Overflow Read: %08x\n", nREX3_ZeroOverflow );
-		return nREX3_ZeroOverflow;
+		verboselog(machine, 2, "REX3 Color Index Zeros Overflow Read: %08x\n", pNVID->REX3.nZeroOverflow );
+		return pNVID->REX3.nZeroOverflow;
 	case 0x022c/4:
 	case 0x0a2c/4:
-		verboselog(machine, 2, "REX3 Red/CI Slope (copy) Read: %08x\n", nREX3_SlopeRed );
-		return nREX3_SlopeRed;
+		verboselog(machine, 2, "REX3 Red/CI Slope (copy) Read: %08x\n", pNVID->REX3.nSlopeRed );
+		return pNVID->REX3.nSlopeRed;
 	case 0x0230/4:
 	case 0x0a30/4:
-		verboselog(machine, 2, "REX3 Host Data Port MSW Read: %08x\n", nREX3_HostDataPortMSW );
-		return nREX3_HostDataPortMSW;
+		verboselog(machine, 2, "REX3 Host Data Port MSW Read: %08x\n", pNVID->REX3.nHostDataPortMSW );
+		return pNVID->REX3.nHostDataPortMSW;
 	case 0x0234/4:
 	case 0x0a34/4:
-		verboselog(machine, 2, "REX3 Host Data Port LSW Read: %08x\n", nREX3_HostDataPortLSW );
-		return nREX3_HostDataPortLSW;
+		verboselog(machine, 2, "REX3 Host Data Port LSW Read: %08x\n", pNVID->REX3.nHostDataPortLSW );
+		return pNVID->REX3.nHostDataPortLSW;
 	case 0x0238/4:
 	case 0x0a38/4:
-		verboselog(machine, 2, "REX3 Display Control Bus Mode Read: %08x\n", nREX3_DCBMode );
-		return nREX3_DCBMode;
+		verboselog(machine, 2, "REX3 Display Control Bus Mode Read: %08x\n", pNVID->REX3.nDCBMode );
+		return pNVID->REX3.nDCBMode;
 	case 0x0240/4:
 	case 0x0a40/4:
-		switch( nREX3_DCBSlvSelect )
+		switch( pNVID->REX3.nDCBSlvSelect )
 		{
 		case 0x00:
 			return newport_vc2_r( space, 0, mem_mask );
@@ -816,54 +837,54 @@ READ32_HANDLER( newport_rex3_r )
 		case 0x06:
 			return newport_xmap1_r( space, 0, mem_mask );
 		default:
-			verboselog(machine, 2, "REX3 Display Control Bus Data MSW Read: %08x\n", nREX3_DCBDataMSW );
+			verboselog(machine, 2, "REX3 Display Control Bus Data MSW Read: %08x\n", pNVID->REX3.nDCBDataMSW );
 			break;
 		}
-		return nREX3_DCBDataMSW;
+		return pNVID->REX3.nDCBDataMSW;
 	case 0x0244/4:
 	case 0x0a44/4:
-		verboselog(machine, 2, "REX3 Display Control Bus Data LSW Read: %08x\n", nREX3_DCBDataLSW );
-		return nREX3_DCBDataLSW;
+		verboselog(machine, 2, "REX3 Display Control Bus Data LSW Read: %08x\n", pNVID->REX3.nDCBDataLSW );
+		return pNVID->REX3.nDCBDataLSW;
 	case 0x1300/4:
-		verboselog(machine, 2, "REX3 Screenmask 1 X Min/Max Read: %08x\n", nREX3_SMask1X );
-		return nREX3_SMask1X;
+		verboselog(machine, 2, "REX3 Screenmask 1 X Min/Max Read: %08x\n", pNVID->REX3.nSMask1X );
+		return pNVID->REX3.nSMask1X;
 	case 0x1304/4:
-		verboselog(machine, 2, "REX3 Screenmask 1 Y Min/Max Read: %08x\n", nREX3_SMask1Y );
-		return nREX3_SMask1Y;
+		verboselog(machine, 2, "REX3 Screenmask 1 Y Min/Max Read: %08x\n", pNVID->REX3.nSMask1Y );
+		return pNVID->REX3.nSMask1Y;
 	case 0x1308/4:
-		verboselog(machine, 2, "REX3 Screenmask 2 X Min/Max Read: %08x\n", nREX3_SMask2X );
-		return nREX3_SMask2X;
+		verboselog(machine, 2, "REX3 Screenmask 2 X Min/Max Read: %08x\n", pNVID->REX3.nSMask2X );
+		return pNVID->REX3.nSMask2X;
 	case 0x130c/4:
-		verboselog(machine, 2, "REX3 Screenmask 2 Y Min/Max Read: %08x\n", nREX3_SMask2Y );
-		return nREX3_SMask2Y;
+		verboselog(machine, 2, "REX3 Screenmask 2 Y Min/Max Read: %08x\n", pNVID->REX3.nSMask2Y );
+		return pNVID->REX3.nSMask2Y;
 	case 0x1310/4:
-		verboselog(machine, 2, "REX3 Screenmask 3 X Min/Max Read: %08x\n", nREX3_SMask3X );
-		return nREX3_SMask3X;
+		verboselog(machine, 2, "REX3 Screenmask 3 X Min/Max Read: %08x\n", pNVID->REX3.nSMask3X );
+		return pNVID->REX3.nSMask3X;
 	case 0x1314/4:
-		verboselog(machine, 2, "REX3 Screenmask 3 Y Min/Max Read: %08x\n", nREX3_SMask3Y );
-		return nREX3_SMask3Y;
+		verboselog(machine, 2, "REX3 Screenmask 3 Y Min/Max Read: %08x\n", pNVID->REX3.nSMask3Y );
+		return pNVID->REX3.nSMask3Y;
 	case 0x1318/4:
-		verboselog(machine, 2, "REX3 Screenmask 4 X Min/Max Read: %08x\n", nREX3_SMask4X );
-		return nREX3_SMask4X;
+		verboselog(machine, 2, "REX3 Screenmask 4 X Min/Max Read: %08x\n", pNVID->REX3.nSMask4X );
+		return pNVID->REX3.nSMask4X;
 	case 0x131c/4:
-		verboselog(machine, 2, "REX3 Screenmask 4 Y Min/Max Read: %08x\n", nREX3_SMask4Y );
-		return nREX3_SMask4Y;
+		verboselog(machine, 2, "REX3 Screenmask 4 Y Min/Max Read: %08x\n", pNVID->REX3.nSMask4Y );
+		return pNVID->REX3.nSMask4Y;
 	case 0x1320/4:
-		verboselog(machine, 2, "REX3 Top of Screen Scanline Read: %08x\n", nREX3_TopScanline );
-		return nREX3_TopScanline;
+		verboselog(machine, 2, "REX3 Top of Screen Scanline Read: %08x\n", pNVID->REX3.nTopScanline );
+		return pNVID->REX3.nTopScanline;
 	case 0x1324/4:
-		verboselog(machine, 2, "REX3 Clipping Mode Read: %08x\n", nREX3_XYWin );
-		return nREX3_XYWin;
+		verboselog(machine, 2, "REX3 Clipping Mode Read: %08x\n", pNVID->REX3.nXYWin );
+		return pNVID->REX3.nXYWin;
 	case 0x1328/4:
-		verboselog(machine, 2, "REX3 Clipping Mode Read: %08x\n", nREX3_ClipMode );
-		return nREX3_ClipMode;
+		verboselog(machine, 2, "REX3 Clipping Mode Read: %08x\n", pNVID->REX3.nClipMode );
+		return pNVID->REX3.nClipMode;
 	case 0x1330/4:
-		verboselog(machine, 2, "REX3 Config Read: %08x\n", nREX3_Config );
-		return nREX3_Config;
+		verboselog(machine, 2, "REX3 Config Read: %08x\n", pNVID->REX3.nConfig );
+		return pNVID->REX3.nConfig;
 	case 0x1338/4:
 		verboselog(machine, 2, "REX3 Status Read: %08x\n", 0x00000001 );
-		nTemp = nREX3_Status;
-		nREX3_Status = 0;
+		nTemp = pNVID->REX3.nStatus;
+		pNVID->REX3.nStatus = 0;
 		return 0x00000001;
 	case 0x133c/4:
 		verboselog(machine, 2, "REX3 User Status Read: %08x\n", 0x00000001 );
@@ -877,17 +898,17 @@ READ32_HANDLER( newport_rex3_r )
 
 static void DoREX3Command(running_machine &machine)
 {
-	UINT32 nCommand = ( ( nREX3_DrawMode0 & ( 1 << 15 ) ) >> 15 ) |
-						( ( nREX3_DrawMode0 & ( 1 <<  5 ) ) >>  4 ) |
-						( ( nREX3_DrawMode0 & ( 1 <<  9 ) ) >>  7 ) |
-						( ( nREX3_DrawMode0 & ( 1 <<  8 ) ) >>  5 ) |
-						( ( nREX3_DrawMode0 & 0x0000001c  ) <<  2 ) |
-						( ( nREX3_DrawMode0 & 0x00000003  ) <<  7 );
+	UINT32 nCommand = ( ( pNVID->REX3.nDrawMode0 & ( 1 << 15 ) ) >> 15 ) |
+						( ( pNVID->REX3.nDrawMode0 & ( 1 <<  5 ) ) >>  4 ) |
+						( ( pNVID->REX3.nDrawMode0 & ( 1 <<  9 ) ) >>  7 ) |
+						( ( pNVID->REX3.nDrawMode0 & ( 1 <<  8 ) ) >>  5 ) |
+						( ( pNVID->REX3.nDrawMode0 & 0x0000001c  ) <<  2 ) |
+						( ( pNVID->REX3.nDrawMode0 & 0x00000003  ) <<  7 );
 	UINT16 nX, nY;
-	UINT16 nStartX = ( nREX3_XYStartI >> 16 ) & 0x0000ffff;
-	UINT16 nStartY = ( nREX3_XYStartI >>  0 ) & 0x0000ffff;
-	UINT16 nEndX = ( nREX3_XYEndI >> 16 ) & 0x0000ffff;
-	UINT16 nEndY = ( nREX3_XYEndI >>  0 ) & 0x0000ffff;
+	UINT16 nStartX = ( pNVID->REX3.nXYStartI >> 16 ) & 0x0000ffff;
+	UINT16 nStartY = ( pNVID->REX3.nXYStartI >>  0 ) & 0x0000ffff;
+	UINT16 nEndX = ( pNVID->REX3.nXYEndI >> 16 ) & 0x0000ffff;
+	UINT16 nEndY = ( pNVID->REX3.nXYEndI >>  0 ) & 0x0000ffff;
 	INT16 nMoveX, nMoveY;
 
 	switch( nCommand )
@@ -895,64 +916,64 @@ static void DoREX3Command(running_machine &machine)
 	case 0x00000110:
 		nX = nStartX;
 		nY = nStartY;
-		verboselog(machine, 3, "Tux Logo Draw: %04x, %04x = %08x\n", nX, nY, nCMAP0_Palette[ ( nREX3_HostDataPortMSW & 0xff000000 ) >> 24 ] );
-//      nREX3_Kludge_SkipLine = 1;
-		nREX3_BresOctInc1 = 0;
-		video_base[ nY*(1280+64) + nX ] = nCMAP0_Palette[ ( nREX3_HostDataPortMSW & 0xff000000 ) >> 24 ];
+		verboselog(machine, 3, "Tux Logo Draw: %04x, %04x = %08x\n", nX, nY, pNVID->CMAP0.nPalette[ ( pNVID->REX3.nHostDataPortMSW & 0xff000000 ) >> 24 ] );
+//      pNVID->REX3.nKludge_SkipLine = 1;
+		pNVID->REX3.nBresOctInc1 = 0;
+		pNVID->base[ nY*(1280+64) + nX ] = pNVID->CMAP0.nPalette[ ( pNVID->REX3.nHostDataPortMSW & 0xff000000 ) >> 24 ];
 		nX++;
-		if( nX > ( ( nREX3_XYEndI & 0xffff0000 ) >> 16 ) )
+		if( nX > ( ( pNVID->REX3.nXYEndI & 0xffff0000 ) >> 16 ) )
 		{
 			nY++;
-			nX = nREX3_XSave;
+			nX = pNVID->REX3.nXSave;
 		}
-		nREX3_XYStartI = ( nX << 16 ) | nY;
-		nREX3_XStartI = nX;
-		nREX3_XStart = 0 | ( ( nREX3_XYStartI & 0xffff0000 ) >>  5 );
-		nREX3_YStart = 0 | ( ( nREX3_XYStartI & 0x0000ffff ) << 11 );
+		pNVID->REX3.nXYStartI = ( nX << 16 ) | nY;
+		pNVID->REX3.nXStartI = nX;
+		pNVID->REX3.nXStart = 0 | ( ( pNVID->REX3.nXYStartI & 0xffff0000 ) >>  5 );
+		pNVID->REX3.nYStart = 0 | ( ( pNVID->REX3.nXYStartI & 0x0000ffff ) << 11 );
 		break;
 	case 0x0000011e:
-		verboselog(machine, 3, "Block draw: %04x, %04x to %04x, %04x = %08x\n", nStartX, nStartY, nEndX, nEndY, nCMAP0_Palette[ nREX3_ZeroFract ] );
+		verboselog(machine, 3, "Block draw: %04x, %04x to %04x, %04x = %08x\n", nStartX, nStartY, nEndX, nEndY, pNVID->CMAP0.nPalette[ pNVID->REX3.nZeroFract ] );
 		for( nY = nStartY; nY <= nEndY; nY++ )
 		{
-			verboselog(machine, 3, "Pixel: %04x, %04x = %08x\n", nStartX, nY, nCMAP0_Palette[ nREX3_ZeroFract ] );
+			verboselog(machine, 3, "Pixel: %04x, %04x = %08x\n", nStartX, nY, pNVID->CMAP0.nPalette[ pNVID->REX3.nZeroFract ] );
 			for( nX = nStartX; nX <= nEndX; nX++ )
 			{
-				video_base[ nY*(1280+64) + nX ] = nCMAP0_Palette[ nREX3_ZeroFract ];
+				pNVID->base[ nY*(1280+64) + nX ] = pNVID->CMAP0.nPalette[ pNVID->REX3.nZeroFract ];
 			}
 		}
 		break;
 	case 0x00000119:
-		if( !nREX3_Kludge_SkipLine )
+		if( !pNVID->REX3.nKludge_SkipLine )
 		{
-			verboselog(machine, 3, "Pattern Line Draw: %08x at %04x, %04x color %08x\n", nREX3_ZPattern, nREX3_XYStartI >> 16, nREX3_XYStartI & 0x0000ffff, nCMAP0_Palette[ nREX3_ZeroFract ] );
-		for( nX = nStartX; nX <= nEndX && nX < ( nStartX + 32 ); nX++ )
-		{
-			if( nREX3_ZPattern & ( 1 << ( 31 - ( nX - nStartX ) ) ) )
+			verboselog(machine, 3, "Pattern Line Draw: %08x at %04x, %04x color %08x\n", pNVID->REX3.nZPattern, pNVID->REX3.nXYStartI >> 16, pNVID->REX3.nXYStartI & 0x0000ffff, pNVID->CMAP0.nPalette[ pNVID->REX3.nZeroFract ] );
+			for( nX = nStartX; nX <= nEndX && nX < ( nStartX + 32 ); nX++ )
 			{
-				video_base[ nStartY*(1280+64) + nX ] = nCMAP0_Palette[ nREX3_ZeroFract ];
+				if( pNVID->REX3.nZPattern & ( 1 << ( 31 - ( nX - nStartX ) ) ) )
+				{
+					pNVID->base[ nStartY*(1280+64) + nX ] = pNVID->CMAP0.nPalette[ pNVID->REX3.nZeroFract ];
+				}
 			}
-		}
-			if( nREX3_BresOctInc1 & 0x01000000 )
-		{
-			nStartY--;
-		}
+			if( pNVID->REX3.nBresOctInc1 & 0x01000000 )
+			{
+				nStartY--;
+			}
 			else
-		{
-			nStartY++;
-		}
-		nREX3_XYStartI = ( nStartX << 16 ) | nStartY;
-		nREX3_YStart = 0 | ( ( nREX3_XYStartI & 0x0000ffff ) << 11 );
+			{
+				nStartY++;
+			}
+			pNVID->REX3.nXYStartI = ( nStartX << 16 ) | nStartY;
+			pNVID->REX3.nYStart = 0 | ( ( pNVID->REX3.nXYStartI & 0x0000ffff ) << 11 );
 		}
 		break;
 	case 0x0000019e:
-		nMoveX = (INT16)( ( nREX3_XYMove >> 16 ) & 0x0000ffff );
-		nMoveY = (INT16)( nREX3_XYMove & 0x0000ffff );
+		nMoveX = (INT16)( ( pNVID->REX3.nXYMove >> 16 ) & 0x0000ffff );
+		nMoveY = (INT16)( pNVID->REX3.nXYMove & 0x0000ffff );
 		verboselog(machine, 1, "FB to FB Copy: %04x, %04x - %04x, %04x to %04x, %04x\n", nStartX, nStartY, nEndX, nEndY, nStartX + nMoveX, nStartY + nMoveY );
 		for( nY = nStartY; nY <= nEndY; nY++ )
 		{
 			for( nX = nStartX; nX <= nEndX; nX++ )
 			{
-				video_base[ (nY + nMoveY)*(1280+64) + (nX + nMoveX) ] = video_base[ nY*(1280+64) + nX ];
+				pNVID->base[ (nY + nMoveY)*(1280+64) + (nX + nMoveX) ] = pNVID->base[ nY*(1280+64) + nX ];
 			}
 		}
 		break;
@@ -1144,7 +1165,7 @@ WRITE32_HANDLER( newport_rex3_w )
 			verboselog(machine, 2, "    Logical Op. Type:   1\n" );
 			break;
 		}
-		nREX3_DrawMode1 = data;
+		pNVID->REX3.nDrawMode1 = data;
 //      if( offset >= ( 0x800 / 4 ) )
 //      {
 //          DoREX3Command();
@@ -1207,31 +1228,31 @@ WRITE32_HANDLER( newport_rex3_w )
 		verboselog(machine, 2, "    Enable CI Clamping: %d\n", ( data & 0x00200000 ) >> 21 );
 		verboselog(machine, 2, "    Enable End Filter:  %d\n", ( data & 0x00400000 ) >> 22 );
 		verboselog(machine, 2, "    Enable Y+2 Stride:  %d\n", ( data & 0x00800000 ) >> 23 );
-		nREX3_DrawMode0 = data;
+		pNVID->REX3.nDrawMode0 = data;
 		break;
 	case 0x0804/4:
 		verboselog(machine, 2, "REX3 Draw Mode 0 Write: %08x\n", data );
-		nREX3_DrawMode0 = data;
+		pNVID->REX3.nDrawMode0 = data;
 		break;
 	case 0x0008/4:
 	case 0x0808/4:
 		verboselog(machine, 2, "REX3 Line Stipple Mode Write: %08x\n", data );
-		nREX3_LSMode = data & 0x0fffffff;
+		pNVID->REX3.nLSMode = data & 0x0fffffff;
 		break;
 	case 0x000C/4:
 	case 0x080c/4:
 		verboselog(machine, 2, "REX3 Line Stipple Pattern Write: %08x\n", data );
-		nREX3_LSPattern = data;
+		pNVID->REX3.nLSPattern = data;
 		break;
 	case 0x0010/4:
 	case 0x0810/4:
 		verboselog(machine, 2, "REX3 Line Stipple Pattern (Save) Write: %08x\n", data );
-		nREX3_LSPatSave = data;
+		pNVID->REX3.nLSPatSave = data;
 		break;
 	case 0x0014/4:
 	case 0x0814/4:
 		verboselog(machine, 2, "REX3 Pattern Register Write: %08x\n", data );
-		nREX3_ZPattern = data;
+		pNVID->REX3.nZPattern = data;
 		if( offset & 0x00000200 )
 		{
 			DoREX3Command(machine);
@@ -1240,17 +1261,17 @@ WRITE32_HANDLER( newport_rex3_w )
 	case 0x0018/4:
 	case 0x0818/4:
 		verboselog(machine, 2, "REX3 Opaque Pattern / Blendfunc Dest Color Write: %08x\n", data );
-		nREX3_ColorBack = data;
+		pNVID->REX3.nColorBack = data;
 		break;
 	case 0x001c/4:
 	case 0x081c/4:
 		verboselog(machine, 2, "REX3 VRAM Fastclear Color Write: %08x\n", data );
-		nREX3_ColorVRAM = data;
+		pNVID->REX3.nColorVRAM = data;
 		break;
 	case 0x0020/4:
 	case 0x0820/4:
 		verboselog(machine, 2, "REX3 AFUNCTION Reference Alpha Write: %08x\n", data );
-		nREX3_AlphaRef = data & 0x000000ff;
+		pNVID->REX3.nAlphaRef = data & 0x000000ff;
 		break;
 	case 0x0024/4:
 	case 0x0824/4:
@@ -1259,63 +1280,63 @@ WRITE32_HANDLER( newport_rex3_w )
 	case 0x0028/4:
 	case 0x0828/4:
 		verboselog(machine, 2, "REX3 Screenmask 0 X Min/Max Write: %08x\n", data );
-		nREX3_SMask0X = data;
+		pNVID->REX3.nSMask0X = data;
 		break;
 	case 0x002c/4:
 	case 0x082c/4:
 		verboselog(machine, 2, "REX3 Screenmask 0 Y Min/Max Write: %08x\n", data );
-		nREX3_SMask0Y = data;
+		pNVID->REX3.nSMask0Y = data;
 		break;
 	case 0x0030/4:
 	case 0x0830/4:
 		verboselog(machine, 2, "REX3 Line/Span Setup Write: %08x\n", data );
-		nREX3_Setup = data;
+		pNVID->REX3.nSetup = data;
 		break;
 	case 0x0034/4:
 	case 0x0834/4:
 		verboselog(machine, 2, "REX3 ZPattern Enable Write: %08x\n", data );
-		nREX3_StepZ = data;
+		pNVID->REX3.nStepZ = data;
 		break;
 	case 0x0038/4:
 	case 0x0838/4:
 		verboselog(machine, 2, "REX3 Update LSPATTERN/LSRCOUNT\n" );
-		nREX3_LSPattern = nREX3_LSPatSave;
+		pNVID->REX3.nLSPattern = pNVID->REX3.nLSPatSave;
 		break;
 	case 0x003c/4:
 	case 0x083c/4:
 		verboselog(machine, 2, "REX3 Update LSPATSAVE/LSRCNTSAVE\n" );
-		nREX3_LSPatSave = nREX3_LSPattern;
+		pNVID->REX3.nLSPatSave = pNVID->REX3.nLSPattern;
 		break;
 	case 0x0100/4:
 	case 0x0900/4:
 		verboselog(machine, 2, "REX3 XStart Write: %08x\n", data );
-		nREX3_XStart = data & ( 0x0000fffff << 7 );
+		pNVID->REX3.nXStart = data & ( 0x0000fffff << 7 );
 		break;
 	case 0x0104/4:
 	case 0x0904/4:
 		verboselog(machine, 2, "REX3 YStart Write: %08x\n", data );
-		nREX3_YStart = data & ( 0x0000fffff << 7 );
+		pNVID->REX3.nYStart = data & ( 0x0000fffff << 7 );
 		break;
 	case 0x0108/4:
 	case 0x0908/4:
 		verboselog(machine, 2, "REX3 XEnd Write: %08x\n", data );
-		nREX3_XEnd = data & ( 0x0000fffff << 7 );
+		pNVID->REX3.nXEnd = data & ( 0x0000fffff << 7 );
 		break;
 	case 0x010c/4:
 	case 0x090c/4:
 		verboselog(machine, 2, "REX3 YEnd Write: %08x\n", data );
-		nREX3_YEnd = data & ( 0x0000fffff << 7 );
+		pNVID->REX3.nYEnd = data & ( 0x0000fffff << 7 );
 		break;
 	case 0x0110/4:
 	case 0x0910/4:
 		verboselog(machine, 2, "REX3 XSave Write: %08x\n", data );
-		nREX3_XSave = data & 0x0000ffff;
-		nREX3_XStartI = nREX3_XSave & 0x0000ffff;
+		pNVID->REX3.nXSave = data & 0x0000ffff;
+		pNVID->REX3.nXStartI = pNVID->REX3.nXSave & 0x0000ffff;
 		break;
 	case 0x0114/4:
 	case 0x0914/4:
 		verboselog(machine, 2, "REX3 XYMove Write: %08x\n", data );
-		nREX3_XYMove = data;
+		pNVID->REX3.nXYMove = data;
 		if( offset & 0x00000200 )
 		{
 			DoREX3Command(machine);
@@ -1324,90 +1345,90 @@ WRITE32_HANDLER( newport_rex3_w )
 	case 0x0118/4:
 	case 0x0918/4:
 		verboselog(machine, 2, "REX3 Bresenham D Write: %08x\n", data );
-		nREX3_BresD = data & 0x07ffffff;
+		pNVID->REX3.nBresD = data & 0x07ffffff;
 		break;
 	case 0x011c/4:
 	case 0x091c/4:
 		verboselog(machine, 2, "REX3 Bresenham S1 Write: %08x\n", data );
-		nREX3_BresS1 = data & 0x0001ffff;
+		pNVID->REX3.nBresS1 = data & 0x0001ffff;
 		break;
 	case 0x0120/4:
 	case 0x0920/4:
 		verboselog(machine, 2, "REX3 Bresenham Octant & Incr1 Write: %08x\n", data );
-		nREX3_BresOctInc1 = data & 0x070fffff;
+		pNVID->REX3.nBresOctInc1 = data & 0x070fffff;
 		break;
 	case 0x0124/4:
 	case 0x0924/4:
 		verboselog(machine, 2, "REX3 Bresenham Octant Rounding Mode & Incr2 Write: %08x\n", data );
-		nREX3_BresRndInc2 = data & 0xff1fffff;
+		pNVID->REX3.nBresRndInc2 = data & 0xff1fffff;
 		break;
 	case 0x0128/4:
 	case 0x0928/4:
 		verboselog(machine, 2, "REX3 Bresenham E1 Write: %08x\n", data );
-		nREX3_BresE1 = data & 0x0000ffff;
+		pNVID->REX3.nBresE1 = data & 0x0000ffff;
 		break;
 	case 0x012c/4:
 	case 0x092c/4:
 		verboselog(machine, 2, "REX3 Bresenham S2 Write: %08x\n", data );
-		nREX3_BresS2 = data & 0x03ffffff;
+		pNVID->REX3.nBresS2 = data & 0x03ffffff;
 		break;
 	case 0x0130/4:
 	case 0x0930/4:
 		verboselog(machine, 2, "REX3 AA Line Weight Table 1/2 Write: %08x\n", data );
-		nREX3_AWeight0 = data;
+		pNVID->REX3.nAWeight0 = data;
 		break;
 	case 0x0134/4:
 	case 0x0934/4:
 		verboselog(machine, 2, "REX3 AA Line Weight Table 2/2 Write: %08x\n", data );
-		nREX3_AWeight1 = data;
+		pNVID->REX3.nAWeight1 = data;
 		break;
 	case 0x0138/4:
 	case 0x0938/4:
 		verboselog(machine, 2, "REX3 GL XStart Write: %08x\n", data );
-		nREX3_XStartF = data & ( 0x0000ffff << 7 );
+		pNVID->REX3.nXStartF = data & ( 0x0000ffff << 7 );
 		break;
 	case 0x013c/4:
 	case 0x093c/4:
 		verboselog(machine, 2, "REX3 GL YStart Write: %08x\n", data );
-		nREX3_YStartF = data & ( 0x0000ffff << 7 );
+		pNVID->REX3.nYStartF = data & ( 0x0000ffff << 7 );
 		break;
 	case 0x0140/4:
 	case 0x0940/4:
 		verboselog(machine, 2, "REX3 GL XEnd Write: %08x\n", data );
-		nREX3_XEndF = data & ( 0x0000ffff << 7 );
+		pNVID->REX3.nXEndF = data & ( 0x0000ffff << 7 );
 		break;
 	case 0x0144/4:
 	case 0x0944/4:
 		verboselog(machine, 2, "REX3 GL YEnd Write: %08x\n", data );
-		nREX3_YEndF = data & ( 0x0000ffff << 7 );
+		pNVID->REX3.nYEndF = data & ( 0x0000ffff << 7 );
 		break;
 	case 0x0148/4:
 	case 0x0948/4:
 		verboselog(machine, 2, "REX3 XStart (integer) Write: %08x\n", data );
-		nREX3_XStartI = data & 0x0000ffff;
-		nREX3_XSave = nREX3_XStartI;
-		nREX3_XStart = 0 | ( ( nREX3_XStartI & 0x0000ffff ) << 11 );
+		pNVID->REX3.nXStartI = data & 0x0000ffff;
+		pNVID->REX3.nXSave = pNVID->REX3.nXStartI;
+		pNVID->REX3.nXStart = 0 | ( ( pNVID->REX3.nXStartI & 0x0000ffff ) << 11 );
 		break;
 	case 0x014c/4:
 	case 0x094c/4:
 		verboselog(machine, 2, "REX3 GL XEnd (copy) Write: %08x\n", data );
-		nREX3_XEndF = data & ( 0x0000ffff << 7 );
+		pNVID->REX3.nXEndF = data & ( 0x0000ffff << 7 );
 		break;
 	case 0x0150/4:
 	case 0x0950/4:
 		verboselog(machine, 2, "REX3 XYStart (integer) Write: %08x\n", data );
-		nREX3_XYStartI = data;
-		nREX3_XStartI = ( data & 0xffff0000 ) >> 16;
-		nREX3_XSave = nREX3_XStartI;
-		nREX3_XStart = 0 | ( ( nREX3_XYStartI & 0xffff0000 ) >>  5 );
-		nREX3_YStart = 0 | ( ( nREX3_XYStartI & 0x0000ffff ) << 11 );
+		pNVID->REX3.nXYStartI = data;
+		pNVID->REX3.nXStartI = ( data & 0xffff0000 ) >> 16;
+		pNVID->REX3.nXSave = pNVID->REX3.nXStartI;
+		pNVID->REX3.nXStart = 0 | ( ( pNVID->REX3.nXYStartI & 0xffff0000 ) >>  5 );
+		pNVID->REX3.nYStart = 0 | ( ( pNVID->REX3.nXYStartI & 0x0000ffff ) << 11 );
 		break;
 	case 0x0154/4:
 	case 0x0954/4:
 		verboselog(machine, 2, "REX3 XYEnd (integer) Write: %08x\n", data );
-		nREX3_XYEndI = data;
-		nREX3_XEnd = 0 | ( ( nREX3_XYEndI & 0xffff0000 ) >>  5 );
-		nREX3_YEnd = 0 | ( ( nREX3_XYEndI & 0x0000ffff ) << 11 );
+		pNVID->REX3.nXYEndI = data;
+		pNVID->REX3.nXEnd = 0 | ( ( pNVID->REX3.nXYEndI & 0xffff0000 ) >>  5 );
+		pNVID->REX3.nYEnd = 0 | ( ( pNVID->REX3.nXYEndI & 0x0000ffff ) << 11 );
 		if( offset & 0x00000200 )
 		{
 			DoREX3Command(machine);
@@ -1416,32 +1437,32 @@ WRITE32_HANDLER( newport_rex3_w )
 	case 0x0158/4:
 	case 0x0958/4:
 		verboselog(machine, 2, "REX3 XStartEnd (integer) Write: %08x\n", data );
-		nREX3_XStartEndI = data;
-		nREX3_XYEndI   = ( nREX3_XYEndI   & 0x0000ffff ) | ( ( nREX3_XStartEndI & 0x0000ffff ) << 16 );
-		nREX3_XYStartI = ( nREX3_XYStartI & 0x0000ffff ) | ( nREX3_XStartEndI & 0xffff0000 );
-		nREX3_XSave = nREX3_XStartI;
-		nREX3_XStart = 0 | ( ( nREX3_XStartEndI & 0xffff0000 ) >>  5 );
-		nREX3_XEnd   = 0 | ( ( nREX3_XStartEndI & 0x0000ffff ) << 11 );
+		pNVID->REX3.nXStartEndI = data;
+		pNVID->REX3.nXYEndI   = ( pNVID->REX3.nXYEndI   & 0x0000ffff ) | ( ( pNVID->REX3.nXStartEndI & 0x0000ffff ) << 16 );
+		pNVID->REX3.nXYStartI = ( pNVID->REX3.nXYStartI & 0x0000ffff ) | ( pNVID->REX3.nXStartEndI & 0xffff0000 );
+		pNVID->REX3.nXSave = pNVID->REX3.nXStartI;
+		pNVID->REX3.nXStart = 0 | ( ( pNVID->REX3.nXStartEndI & 0xffff0000 ) >>  5 );
+		pNVID->REX3.nXEnd   = 0 | ( ( pNVID->REX3.nXStartEndI & 0x0000ffff ) << 11 );
 		break;
 	case 0x0200/4:
 	case 0x0a00/4:
 		verboselog(machine, 2, "REX3 Red/CI Full State Write: %08x\n", data );
-		nREX3_ColorRed = data & 0x00ffffff;
+		pNVID->REX3.nColorRed = data & 0x00ffffff;
 		break;
 	case 0x0204/4:
 	case 0x0a04/4:
 		verboselog(machine, 2, "REX3 Alpha Full State Write: %08x\n", data );
-		nREX3_ColorAlpha = data & 0x000fffff;
+		pNVID->REX3.nColorAlpha = data & 0x000fffff;
 		break;
 	case 0x0208/4:
 	case 0x0a08/4:
 		verboselog(machine, 2, "REX3 Green Full State Write: %08x\n", data );
-		nREX3_ColorGreen = data & 0x000fffff;
+		pNVID->REX3.nColorGreen = data & 0x000fffff;
 		break;
 	case 0x020c/4:
 	case 0x0a0c/4:
 		verboselog(machine, 2, "REX3 Blue Full State Write: %08x\n", data );
-		nREX3_ColorBlue = data & 0x000fffff;
+		pNVID->REX3.nColorBlue = data & 0x000fffff;
 		break;
 	case 0x0210/4:
 	case 0x0a10/4:
@@ -1457,7 +1478,7 @@ WRITE32_HANDLER( newport_rex3_w )
 			nTemp |= 0x00800000;
 			break;
 		}
-		nREX3_SlopeRed = nTemp;
+		pNVID->REX3.nSlopeRed = nTemp;
 		break;
 	case 0x0214/4:
 	case 0x0a14/4:
@@ -1473,7 +1494,7 @@ WRITE32_HANDLER( newport_rex3_w )
 			nTemp |= 0x00080000;
 			break;
 		}
-		nREX3_SlopeAlpha = nTemp;
+		pNVID->REX3.nSlopeAlpha = nTemp;
 		break;
 	case 0x0218/4:
 	case 0x0a18/4:
@@ -1489,7 +1510,7 @@ WRITE32_HANDLER( newport_rex3_w )
 			nTemp |= 0x00080000;
 			break;
 		}
-		nREX3_SlopeGreen = nTemp;
+		pNVID->REX3.nSlopeGreen = nTemp;
 		break;
 	case 0x021c/4:
 	case 0x0a1c/4:
@@ -1505,32 +1526,32 @@ WRITE32_HANDLER( newport_rex3_w )
 			nTemp |= 0x00080000;
 			break;
 		}
-		nREX3_SlopeBlue = nTemp;
+		pNVID->REX3.nSlopeBlue = nTemp;
 		break;
 	case 0x0220/4:
 	case 0x0a20/4:
 		verboselog(machine, 2, "REX3 Write Mask Write: %08x\n", data );
-		nREX3_WriteMask = data & 0x00ffffff;
+		pNVID->REX3.nWriteMask = data & 0x00ffffff;
 		break;
 	case 0x0224/4:
 	case 0x0a24/4:
 		verboselog(machine, 2, "REX3 Packed Color Fractions Write: %08x\n", data );
-		nREX3_ZeroFract = data;
+		pNVID->REX3.nZeroFract = data;
 		break;
 	case 0x0228/4:
 	case 0x0a28/4:
 		verboselog(machine, 2, "REX3 Color Index Zeros Overflow Write: %08x\n", data );
-		nREX3_ZeroOverflow = data;
+		pNVID->REX3.nZeroOverflow = data;
 		break;
 	case 0x022c/4:
 	case 0x0a2c/4:
 		verboselog(machine, 2, "REX3 Red/CI Slope (copy) Write: %08x\n", data );
-		nREX3_SlopeRed = data;
+		pNVID->REX3.nSlopeRed = data;
 		break;
 	case 0x0230/4:
 	case 0x0a30/4:
 		verboselog(machine, 3, "REX3 Host Data Port MSW Write: %08x\n", data );
-		nREX3_HostDataPortMSW = data;
+		pNVID->REX3.nHostDataPortMSW = data;
 		if( offset & 0x00000200 )
 		{
 			DoREX3Command(machine);
@@ -1539,7 +1560,7 @@ WRITE32_HANDLER( newport_rex3_w )
 	case 0x0234/4:
 	case 0x0a34/4:
 		verboselog(machine, 2, "REX3 Host Data Port LSW Write: %08x\n", data );
-		nREX3_HostDataPortLSW = data;
+		pNVID->REX3.nHostDataPortLSW = data;
 		break;
 	case 0x0238/4:
 	case 0x0a38/4:
@@ -1548,19 +1569,19 @@ WRITE32_HANDLER( newport_rex3_w )
 		{
 		case 0x00:
 			verboselog(machine, 2, "    Transfer Width:     4 bytes\n" );
-			nREX3_XFerWidth = 4;
+			pNVID->REX3.nXFerWidth = 4;
 			break;
 		case 0x01:
 			verboselog(machine, 2, "    Transfer Width:     1 bytes\n" );
-			nREX3_XFerWidth = 1;
+			pNVID->REX3.nXFerWidth = 1;
 			break;
 		case 0x02:
 			verboselog(machine, 2, "    Transfer Width:     2 bytes\n" );
-			nREX3_XFerWidth = 2;
+			pNVID->REX3.nXFerWidth = 2;
 			break;
 		case 0x03:
 			verboselog(machine, 2, "    Transfer Width:     3 bytes\n" );
-			nREX3_XFerWidth = 3;
+			pNVID->REX3.nXFerWidth = 3;
 			break;
 		}
 		verboselog(machine, 2, "    DCB Reg Select Adr: %d\n", ( data & 0x00000070 ) >> 4 );
@@ -1571,14 +1592,14 @@ WRITE32_HANDLER( newport_rex3_w )
 //      verboselog(machine, 2, "    GIO CLK Cycle Hold: %d\n", ( data & 0x007c0000 ) >> 18 );
 //      verboselog(machine, 2, "   GIO CLK Cycle Setup: %d\n", ( data & 0x0f800000 ) >> 23 );
 //      verboselog(machine, 2, "    Swap Byte Ordering: %d\n", ( data & 0x10000000 ) >> 28 );
-		nREX3_DCBRegSelect = ( data & 0x00000070 ) >> 4;
-		nREX3_DCBSlvSelect = ( data & 0x00000780 ) >> 7;
-		nREX3_DCBMode = data & 0x1fffffff;
+		pNVID->REX3.nDCBRegSelect = ( data & 0x00000070 ) >> 4;
+		pNVID->REX3.nDCBSlvSelect = ( data & 0x00000780 ) >> 7;
+		pNVID->REX3.nDCBMode = data & 0x1fffffff;
 		break;
 	case 0x0240/4:
 	case 0x0a40/4:
-		nREX3_DCBDataMSW = data;
-		switch( nREX3_DCBSlvSelect )
+		pNVID->REX3.nDCBDataMSW = data;
+		switch( pNVID->REX3.nDCBSlvSelect )
 		{
 		case 0x00:
 			newport_vc2_w( space, 0, data, mem_mask );
@@ -1604,58 +1625,58 @@ WRITE32_HANDLER( newport_rex3_w )
 	case 0x0244/4:
 	case 0x0a44/4:
 		verboselog(machine, 2, "REX3 Display Control Bus Data LSW Write: %08x\n", data );
-		nREX3_DCBDataLSW = data;
+		pNVID->REX3.nDCBDataLSW = data;
 		break;
 	case 0x1300/4:
 		verboselog(machine, 2, "REX3 Screenmask 1 X Min/Max Write: %08x\n", data );
-		nREX3_SMask1X = data;
+		pNVID->REX3.nSMask1X = data;
 		break;
 	case 0x1304/4:
 		verboselog(machine, 2, "REX3 Screenmask 1 Y Min/Max Write: %08x\n", data );
-		nREX3_SMask1Y = data;
+		pNVID->REX3.nSMask1Y = data;
 		break;
 	case 0x1308/4:
 		verboselog(machine, 2, "REX3 Screenmask 2 X Min/Max Write: %08x\n", data );
-		nREX3_SMask2X = data;
+		pNVID->REX3.nSMask2X = data;
 		break;
 	case 0x130c/4:
 		verboselog(machine, 2, "REX3 Screenmask 2 Y Min/Max Write: %08x\n", data );
-		nREX3_SMask2Y = data;
+		pNVID->REX3.nSMask2Y = data;
 		break;
 	case 0x1310/4:
 		verboselog(machine, 2, "REX3 Screenmask 3 X Min/Max Write: %08x\n", data );
-		nREX3_SMask3X = data;
+		pNVID->REX3.nSMask3X = data;
 		break;
 	case 0x1314/4:
 		verboselog(machine, 2, "REX3 Screenmask 3 Y Min/Max Write: %08x\n", data );
-		nREX3_SMask3Y = data;
+		pNVID->REX3.nSMask3Y = data;
 		break;
 	case 0x1318/4:
 		verboselog(machine, 2, "REX3 Screenmask 4 X Min/Max Write: %08x\n", data );
-		nREX3_SMask4X = data;
+		pNVID->REX3.nSMask4X = data;
 		break;
 	case 0x131c/4:
 		verboselog(machine, 2, "REX3 Screenmask 4 Y Min/Max Write: %08x\n", data );
-		nREX3_SMask4Y = data;
+		pNVID->REX3.nSMask4Y = data;
 		break;
 	case 0x1320/4:
 		verboselog(machine, 2, "REX3 Top of Screen Scanline Write: %08x\n", data );
-		nREX3_TopScanline = data & 0x000003ff;
+		pNVID->REX3.nTopScanline = data & 0x000003ff;
 		break;
 	case 0x1324/4:
 		verboselog(machine, 2, "REX3 Clipping Mode Write: %08x\n", data );
-		nREX3_XYWin = data;
+		pNVID->REX3.nXYWin = data;
 		break;
 	case 0x1328/4:
 		verboselog(machine, 2, "REX3 Clipping Mode Write: %08x\n", data );
-		nREX3_ClipMode = data & 0x00001fff;
+		pNVID->REX3.nClipMode = data & 0x00001fff;
 		break;
 	case 0x132c/4:
 		verboselog(machine, 2, "Request GFIFO Stall\n" );
 		break;
 	case 0x1330/4:
 		verboselog(machine, 2, "REX3 Config Write: %08x\n", data );
-		nREX3_Config = data & 0x001fffff;
+		pNVID->REX3.nConfig = data & 0x001fffff;
 		break;
 	case 0x1340/4:
 		verboselog(machine, 2, "Reset DCB Bus and Flush BFIFO\n" );

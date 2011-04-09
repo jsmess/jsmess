@@ -31,16 +31,24 @@ enum
 #define WAVEENTRY_HIGH  32767
 #define WAVEENTRY_NULL  0
 
+#define ORIC_LEADER_LENGTH 512
+
+struct oric_t
+{
+	int cassette_state;
+	int data_count;
+	int data_length;
+	int tap_size;
+};
+static oric_t oric;
+
 /* to write a bit to the tape, the rom routines output either 4 periods at 1200 Hz for a 0 or 8 periods at 2400 Hz for a 1  */
 /* 4800 is twice 2400Hz */
 
 /* 8 periods at 2400Hz */
 /* hi,lo, hi,lo, hi,lo, hi,lo */
 
-static INT16 wave_state = WAVEENTRY_HIGH;
-static INT16 xor_wave_state = WAVEENTRY_HIGH^WAVEENTRY_LOW;
-
-static INT16 *oric_emit_level(INT16 *p, int count)
+static INT16 *oric_emit_level(INT16 *p, int count, INT16 wave_state)
 {
 	int i;
 
@@ -48,25 +56,16 @@ static INT16 *oric_emit_level(INT16 *p, int count)
 	{
 		*(p++) = wave_state;
 	}
-	wave_state = wave_state^xor_wave_state;
 	return p;
 }
 
 /* 4 periods at 1200Hz */
 static INT16* oric_output_bit(INT16 *p, UINT8 b)
 {
-	p = oric_emit_level(p,1);
+	p = oric_emit_level(p, 1, WAVEENTRY_HIGH);
+	p = oric_emit_level(p, b ? 1 : 2, WAVEENTRY_LOW);
 
-	if (b)
-	{
-		p = oric_emit_level(p,1);
-	}
-	else
-	{
-		p = oric_emit_level(p,2);
-	}
-
-    return p;
+	return p;
 }
 
 static int oric_get_bit_size_in_samples(UINT8 b)
@@ -215,13 +214,6 @@ static int oric_seconds_to_samples(float seconds)
 	return (int)((float)seconds*(float)ORIC_WAV_FREQUENCY);
 }
 
-#define ORIC_LEADER_LENGTH 512
-
-static int oric_cassette_state;
-static int oric_data_count;
-static int oric_data_length;
-static int oric_tap_size;
-
 /* length is length of .tap file! */
 static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
@@ -232,9 +224,9 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 	int i;
 	UINT8 data;
 
-	oric_tap_size = length;
+	oric.tap_size = length;
 
-	oric_cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
+	oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 	count = 0;
 	data_ptr = bytes;
 
@@ -243,7 +235,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 		data = data_ptr[0];
 		data_ptr++;
 
-		switch (oric_cassette_state)
+		switch (oric.cassette_state)
 		{
 			case ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE:
 			{
@@ -251,7 +243,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 				{
 					logerror("found sync byte!\n");
 					/* found first sync byte */
-					oric_cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
+					oric.cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
 				}
 			}
 			break;
@@ -277,9 +269,9 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 						//logerror("reading header!\n");
 						count+=oric_calculate_byte_size_in_samples(0x024);
 
-						oric_cassette_state = ORIC_CASSETTE_READ_HEADER;
-						oric_data_count = 0;
-						oric_data_length = 9;
+						oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
+						oric.data_count = 0;
+						oric.data_length = 9;
 					}
 				}
 			}
@@ -287,15 +279,15 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 			case ORIC_CASSETTE_READ_HEADER:
 			{
-				header[oric_data_count] = data;
+				header[oric.data_count] = data;
 				count+=oric_calculate_byte_size_in_samples(data);
 
-				oric_data_count++;
+				oric.data_count++;
 
-				if (oric_data_count==oric_data_length)
+				if (oric.data_count==oric.data_length)
 				{
 					//logerror("finished reading header!\n");
-					oric_cassette_state = ORIC_CASSETTE_READ_FILENAME;
+					oric.cassette_state = ORIC_CASSETTE_READ_FILENAME;
 				}
 			}
 			break;
@@ -316,14 +308,14 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
                                             count+=oric_get_bit_size_in_samples(1);
                                         }
 
-					oric_cassette_state = ORIC_CASSETTE_WRITE_DATA;
-					oric_data_count = 0;
+					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
+					oric.data_count = 0;
 
 					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
 					LOG(("start (from header): %02x\n",start));
 					LOG(("end (from header): %02x\n",end));
-                                        oric_data_length =end - start + 1;
+                                        oric.data_length = end - start + 1;
 				}
 			}
 			break;
@@ -331,12 +323,12 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 			case ORIC_CASSETTE_WRITE_DATA:
 			{
 				count+=oric_calculate_byte_size_in_samples(data);
-				oric_data_count++;
+				oric.data_count++;
 
-				if (oric_data_count==oric_data_length)
+				if (oric.data_count==oric.data_length)
 				{
 					logerror("finished writing data!\n");
-					oric_cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
+					oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 				}
 			}
 			break;
@@ -362,38 +354,36 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	/* header and trailer act as pauses */
 	/* the trailer is required so that the via sees the last bit of the last
         byte */
-    if (bytes == CODE_HEADER) {
-        for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
-            *(p++) = WAVEENTRY_NULL;
-    }
-    else if (bytes == CODE_TRAILER) {
-        for (i = 0; i < ORIC_WAVESAMPLES_TRAILER; i++)
-            *(p++) = WAVEENTRY_NULL;
-    }
+	if (bytes == CODE_HEADER) {
+		for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
+			*(p++) = WAVEENTRY_NULL;
+	}
+	else if (bytes == CODE_TRAILER) {
+		for (i = 0; i < ORIC_WAVESAMPLES_TRAILER; i++)
+			*(p++) = WAVEENTRY_NULL;
+	}
 	else
 {
 	/* the length is the number of samples left in the buffer and NOT the number of bytes for the input file */
 	length = length - ORIC_WAVESAMPLES_TRAILER;
 
-	oric_cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
+	oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 	data_ptr = bytes;
 
-	while ((data_ptr<(bytes+oric_tap_size)) && (p<(buffer+length)) )
+	while ((data_ptr<(bytes + oric.tap_size)) && (p < (buffer+length)) )
 	{
 		data = data_ptr[0];
 		data_ptr++;
 
-		switch (oric_cassette_state)
+		switch (oric.cassette_state)
 		{
 			case ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE:
 			{
-				wave_state = WAVEENTRY_HIGH;
-
 				if (data==ORIC_SYNC_BYTE)
 				{
 					logerror("found sync byte!\n");
 					/* found first sync byte */
-					oric_cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
+					oric.cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
 				}
 			}
 			break;
@@ -416,9 +406,9 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					{
 						//logerror("reading header!\n");
 						p = oric_output_byte(p,data);
-						oric_cassette_state = ORIC_CASSETTE_READ_HEADER;
-						oric_data_count = 0;
-						oric_data_length = 9;
+						oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
+						oric.data_count = 0;
+						oric.data_length = 9;
 					}
 				}
 			}
@@ -426,14 +416,14 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 			case ORIC_CASSETTE_READ_HEADER:
 			{
-				header[oric_data_count] = data;
+				header[oric.data_count] = data;
 				p = oric_output_byte(p, data);
-				oric_data_count++;
+				oric.data_count++;
 
-				if (oric_data_count==oric_data_length)
+				if (oric.data_count==oric.data_length)
 				{
 					//logerror("finished reading header!\n");
-					oric_cassette_state = ORIC_CASSETTE_READ_FILENAME;
+					oric.cassette_state = ORIC_CASSETTE_READ_FILENAME;
 				}
 			}
 			break;
@@ -455,14 +445,14 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
                                             p = oric_output_bit(p,1);
 					}
 
-					oric_cassette_state = ORIC_CASSETTE_WRITE_DATA;
-					oric_data_count = 0;
+					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
+					oric.data_count = 0;
 
 					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
 					LOG(("start (from header): %02x\n",start));
 					LOG(("end (from header): %02x\n",end));
-                                        oric_data_length = end - start + 1;
+                                        oric.data_length = end - start + 1;
 				}
 			}
 			break;
@@ -470,12 +460,12 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			case ORIC_CASSETTE_WRITE_DATA:
 			{
 				p = oric_output_byte(p, data);
-				oric_data_count++;
+				oric.data_count++;
 
-				if (oric_data_count==oric_data_length)
+				if (oric.data_count==oric.data_length)
 				{
 					logerror("finished writing data!\n");
-					oric_cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
+					oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 				}
 			}
 			break;

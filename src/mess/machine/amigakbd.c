@@ -13,10 +13,14 @@
 
 #define KEYBOARD_BUFFER_SIZE	256
 
-static UINT8 *key_buf = NULL;
-static int key_buf_pos = 0;
-static int key_cur_pos = 0;
-static emu_timer *kbd_timer;
+typedef struct
+{
+	UINT8 *buf;
+	int buf_pos;
+	int cur_pos;
+	emu_timer *timer;
+} amigakbd_t;
+static amigakbd_t kbd;
 
 static void kbd_sendscancode( running_machine &machine, UINT8 scancode )
 {
@@ -40,18 +44,18 @@ static TIMER_CALLBACK( kbd_update_callback )
 
 	/* if we don't have pending data, bail */
 
-	if ( key_buf_pos == key_cur_pos )
+	if ( kbd.buf_pos == kbd.cur_pos )
 		return;
 
 	/* fetch the next scan code and send it to the Amiga */
-	scancode = key_buf[key_cur_pos++];
-	key_cur_pos %= KEYBOARD_BUFFER_SIZE;
+	scancode = kbd.buf[kbd.cur_pos++];
+	kbd.cur_pos %= KEYBOARD_BUFFER_SIZE;
 	kbd_sendscancode( machine, scancode );
 
 	/* if we still have more data, schedule another update */
-	if ( key_buf_pos != key_cur_pos )
+	if ( kbd.buf_pos != kbd.cur_pos )
 	{
-		kbd_timer->adjust(machine.primary_screen->frame_period() / 4);
+		kbd.timer->adjust(machine.primary_screen->frame_period() / 4);
 	}
 }
 
@@ -73,7 +77,7 @@ static INPUT_CHANGED( kbd_update )
 	}
 	else
 	{
-		int key_buf_was_empty = ( key_buf_pos == key_cur_pos ) ? 1 : 0;
+		int key_buf_was_empty = ( kbd.buf_pos == kbd.cur_pos ) ? 1 : 0;
 
 		for( i = 0; i < 32; i++ )
 		{
@@ -84,15 +88,15 @@ static INPUT_CHANGED( kbd_update )
 				int amigacode = ~scancode;
 
 				/* add the keycode to the buffer */
-				key_buf[key_buf_pos++] = amigacode & 0xff;
-				key_buf_pos %= KEYBOARD_BUFFER_SIZE;
+				kbd.buf[kbd.buf_pos++] = amigacode & 0xff;
+				kbd.buf_pos %= KEYBOARD_BUFFER_SIZE;
 			}
 		}
 
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
-		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
+		if ( key_buf_was_empty && ( kbd.buf_pos != kbd.cur_pos ) )
 		{
-			kbd_timer->adjust(field->port->machine().primary_screen->frame_period() / 4);
+			kbd.timer->adjust(field->port->machine().primary_screen->frame_period() / 4);
 		}
 	}
 }
@@ -100,11 +104,11 @@ static INPUT_CHANGED( kbd_update )
 void amigakbd_init( running_machine &machine )
 {
 	/* allocate a keyboard buffer */
-	key_buf = auto_alloc_array(machine, UINT8, KEYBOARD_BUFFER_SIZE );
-	key_buf_pos = 0;
-	key_cur_pos = 0;
-	kbd_timer = machine.scheduler().timer_alloc(FUNC(kbd_update_callback));
-	kbd_timer->reset(  );
+	kbd.buf = auto_alloc_array(machine, UINT8, KEYBOARD_BUFFER_SIZE);
+	kbd.buf_pos = 0;
+	kbd.cur_pos = 0;
+	kbd.timer = machine.scheduler().timer_alloc(FUNC(kbd_update_callback));
+	kbd.timer->reset();
 }
 
 /*********************************************************************************************/

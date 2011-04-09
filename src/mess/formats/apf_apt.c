@@ -11,15 +11,19 @@
 /* frequency of wave */
 #define APF_WAV_FREQUENCY	11050
 
-static INT16 wave_state = WAVEENTRY_HIGH;
-static INT16 xor_wave_state = WAVEENTRY_HIGH^WAVEENTRY_LOW;
-
 #define APF_APT_BIT_0_LENGTH ((int)(APF_WAV_FREQUENCY*0.0005))
 #define APF_APT_BIT_1_LENGTH ((int)(APF_WAV_FREQUENCY*0.001))
 
+struct apf_t
+{
+	int cassette_length;
+};
+static apf_t apf;
+
+
 /* 500 microsecond of bit 0 and 1000 microsecond of bit 1 */
 
-static INT16 *apf_emit_level(INT16 *p, int count)
+static INT16 *apf_emit_level(INT16 *p, int count, INT16 wave_state)
 {
 	int i;
 
@@ -27,7 +31,6 @@ static INT16 *apf_emit_level(INT16 *p, int count)
 	{
 		*(p++) = wave_state;
 	}
-	wave_state = wave_state^xor_wave_state;
 	return p;
 }
 
@@ -36,16 +39,16 @@ static INT16* apf_output_bit(INT16 *p, UINT8 b)
 {
 	if (b)
 	{
-		p = apf_emit_level(p,(APF_APT_BIT_1_LENGTH>>1));
-		p = apf_emit_level(p,(APF_APT_BIT_1_LENGTH>>1));
+		p = apf_emit_level(p, (APF_APT_BIT_1_LENGTH>>1), WAVEENTRY_HIGH);
+		p = apf_emit_level(p, (APF_APT_BIT_1_LENGTH>>1), WAVEENTRY_LOW);
 	}
 	else
 	{
-		p = apf_emit_level(p,(APF_APT_BIT_0_LENGTH>>1));
-		p = apf_emit_level(p,(APF_APT_BIT_0_LENGTH>>1));
+		p = apf_emit_level(p, (APF_APT_BIT_0_LENGTH>>1), WAVEENTRY_HIGH);
+		p = apf_emit_level(p, (APF_APT_BIT_0_LENGTH>>1), WAVEENTRY_LOW);
 	}
 
-    return p;
+	return p;
 }
 
 static int apf_get_bit_size_in_samples(UINT8 b)
@@ -60,7 +63,6 @@ static int apf_get_bit_size_in_samples(UINT8 b)
 
 
 /*************************************************************************************/
-static int apf_cassette_length;
 
 /* each bit in the data represents a "1" or "0" waveform */
 static int apf_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
@@ -71,7 +73,7 @@ static int apf_cassette_calculate_size_in_samples(const UINT8 *bytes, int length
 	UINT8 data;
 
 	size = 0;
-	apf_cassette_length = length;
+	apf.cassette_length = length;
 
 
 	for (i=0; i<length; i++)
@@ -99,7 +101,7 @@ static int apf_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 	p = buffer;
 
-	for (i=0; i<apf_cassette_length; i++)
+	for (i=0; i<apf.cassette_length; i++)
 	{
 		data = bytes[i];
 		for (b=0; b<8; b++)
