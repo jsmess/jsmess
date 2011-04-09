@@ -3,6 +3,7 @@
 <!-- TODO: fix floppy image naming in these ... -->
 <softwarelist name="x68k_flop" description="Sharp X68k disk images">
 
+
 	<software name="177">
 		<description>177</description>
 		<year>1986</year>
@@ -10,6 +11,38 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk 0.xdf" size="1261568" crc="5e03679b" sha1="9680fbb8de2461f45f00b4df8bfc64de4bbcad10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="177d" cloneof="177">
+		<description>177 (DIM)</description>
+		<year>1986</year>
+		<publisher>Macadamia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="177 (1986)(macadamia).dim" size="1261824" crc="cdecc90f" sha1="364db17876a468f2da59362f7e2de198b2653f87" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2069ad">
+		<description>2069 AD</description>
+		<year>1991</year>
+		<publisher>Home Data</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="2096 ad (1991)(home data)(disk 1 of 3)(disk a).dim" size="1261824" crc="e0c69982" sha1="537ec5145b8d495ee36f6f3ee6d6580a378a1688" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="2096 ad (1991)(home data)(disk 2 of 3)(disk b).dim" size="1261824" crc="21ad51bf" sha1="283ec03d3ecd7b958bef649f949da35b14de94e5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="2096 ad (1991)(home data)(disk 3 of 3)(disk c).dim" size="1261824" crc="2fe6a747" sha1="d862f53b9c795e9d7e84f08b38b9167815f11d32" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37,6 +70,43 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="3 meekaa (1994)(youkan soft).dim" size="1261824" crc="308584C7" sha1="1E4C7D0BC6D1B34DC2D587FB7CAF1D9E110C0DB5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="37degree">
+		<description>37 Degress C Kai no Bouken</description>
+		<year>19??</year>
+		<publisher>68 Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="37 degrees c kai no bouken (19xx)(68 bank).dim" size="1261824" crc="c51be3fa" sha1="3f7138de6471323d2c2d41647b28eb38d1896543" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="38man">
+		<description>38 Man Kilo no Kokuu</description>
+		<year>1989</year>
+		<publisher>System Sacom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="38 man kilo no kokuu (1989)(system sacom)(disk 1 of 4).dim" size="1261824" crc="c9068e8f" sha1="925d90008660d8223e9bb4a8d17b25764da6ad9a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="38 man kilo no kokuu (1989)(system sacom)(disk 2 of 4).dim" size="1261824" crc="802ced15" sha1="8bd919eb2cfb941459fb12dcb4b0b46f58351a78" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="38 man kilo no kokuu (1989)(system sacom)(disk 3 of 4).dim" size="1261824" crc="0c460a22" sha1="45efe874c8ad6f6e439b329856b6b5eccfffc51d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="38 man kilo no kokuu (1989)(system sacom)(disk 4 of 4).dim" size="1261824" crc="7725ab4e" sha1="be80eaff4aac400556e0284dffdc4ec63b6d2548" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -391,6 +461,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="puyo puyo (1994) (compile-sps) [xdf].xdf" size="1261568" crc="bb1446c0" sha1="a2e5cd9c5d70d4672cecfb5a298f7a3384d10fb6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzle15">
+		<description>Puzzle 15</description>
+		<year>1991</year>
+		<publisher>Sygnas</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="15 puzzle (1991)(sygnas).dim" size="1261824" crc="70aebce0" sha1="9b09e432c31eac20a5aca640b99b0cc5c5cf9878" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
