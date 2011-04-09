@@ -3,7 +3,22 @@
 #ifndef __VICTOR9K__
 #define __VICTOR9K__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
+#include "machine/ctronics.h"
+#include "machine/6522via.h"
+#include "machine/ieee488.h"
+#include "machine/mc6852.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "machine/upd7201.h"
+#include "sound/hc55516.h"
+#include "video/mc6845.h"
 
 #define SCREEN_TAG		"screen"
 #define I8088_TAG		"8l"
@@ -47,7 +62,7 @@ public:
 	required_device<cpu_device> m_fdc_cpu;
 	required_device<device_t> m_ieee488;
 	required_device<device_t> m_pic;
-	required_device<device_t> m_ssda;
+	required_device<mc6852_device> m_ssda;
 	required_device<device_t> m_via1;
 	required_device<device_t> m_cvsd;
 	required_device<device_t> m_crtc;

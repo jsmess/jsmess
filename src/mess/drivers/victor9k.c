@@ -23,22 +23,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/i86/i86.h"
-#include "cpu/mcs48/mcs48.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/ctronics.h"
-#include "machine/6522via.h"
-#include "machine/ieee488.h"
-#include "machine/mc6852.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/upd7201.h"
-#include "sound/hc55516.h"
-#include "video/mc6845.h"
 #include "includes/victor9k.h"
 
 /* Memory Maps */
@@ -52,7 +36,7 @@ static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE_LEGACY(HD46505S_TAG, mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE_LEGACY(MC6852_TAG, mc6852_r, mc6852_w)
+	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
 	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
 	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(M6522_4_TAG, via6522_device, read, write)
 	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(M6522_6_TAG, via6522_device, read, write)
@@ -530,8 +514,8 @@ WRITE8_MEMBER( victor9k_state::via3_pb_w )
     */
 
 	/* codec clock output */
-	mc6852_rx_clk_w(m_ssda, BIT(data, 7));
-	mc6852_tx_clk_w(m_ssda, BIT(data, 7));
+	m_ssda->rx_clk_w(BIT(data, 7));
+	m_ssda->tx_clk_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
