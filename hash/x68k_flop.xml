@@ -14,6 +14,138 @@
 		</part>
 	</software>
 
+	<software name="3danhen">
+		<description>3 Danhenkei Meka Fuzzy</description>
+		<year>19??</year>
+		<publisher>Login Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="3 danhenkei meka fuzzy (19xx)(login)(disk 1 of 2).dim" size="1261824" crc="3A9C6B2F" sha1="049B23683829C8B4BA79C37760DF662717990CF6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="3 danhenkei meka fuzzy (19xx)(login)(disk 2 of 2).dim" size="1261824" crc="4355AF33" sha1="955439D09390111663F7D319701B11CCA769C889" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3meekaa">
+		<description>3 Meekaa</description>
+		<year>1994</year>
+		<publisher>Youkan Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="3 meekaa (1994)(youkan soft).dim" size="1261824" crc="308584C7" sha1="1E4C7D0BC6D1B34DC2D587FB7CAF1D9E110C0DB5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thunit">
+		<description>The 4th Unit</description>
+		<year>1988</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit, the (1988)(data west)(disk 1 of 2)(disk a).dim" size="1261824" crc="bc9e7e36" sha1="4384c33b372b2f3a0841c99802921dbc11011712" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit, the (1988)(data west)(disk 2 of 2)(disk b).dim" size="1261824" crc="1aa50b01" sha1="8b5398494bbeeb086d7c110f4a2c1e947130725e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thunit2">
+		<description>The 4th Unit Act 2</description>
+		<year>1988</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 2, the (1988)(data west)(disk 1 of 3)(disk a).dim" size="1261824" crc="7D87E7CB" sha1="D22630B366021A29701536D3B4915643974509D9" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 2, the (1988)(data west)(disk 2 of 3)(disk b).dim" size="1261824" crc="C5BCA37C" sha1="C5173146516B5B68CED787221109143FAB739C97" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 2, the (1988)(data west)(disk 3 of 3)(disk c).dim" size="1261824" crc="F9BB0C52" sha1="C00B01CF5AD781D672E83BCAAA20ECB1A93E9B09" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thunit3">
+		<description>The 4th Unit Act 3 - Dual Target</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 3 dual target, the (1989)(data west)(disk 1 of 3)(disk a).dim" size="1261824" crc="0b386cb7" sha1="451e452df828d68642f7c1380c70b7efb628952b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 3 dual target, the (1989)(data west)(disk 2 of 3)(disk b).dim" size="1261824" crc="9181ea26" sha1="f5cf01f8e2fb4f155e703ed6a7bafe4d71ba1b0e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 3 dual target, the (1989)(data west)(disk 3 of 3)(disk c).dim" size="1261824" crc="05a31767" sha1="22e5bbfd4de49edfc0d61c2ed22bf312e4d06a78" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thunit4">
+		<description>The 4th Unit Act 4 - Zero</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 4 zero, the (1990)(data west)(disk 1 of 3)(disk a).dim" size="1261824" crc="aab14627" sha1="0de904ea32eb3ef19ca97d8dcc1f2d8324c917f3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 4 zero, the (1990)(data west)(disk 2 of 3)(disk b).dim" size="1261824" crc="a92af994" sha1="6590f084a7c76dd20fca5a28f85b9c246a64bc08" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 4 zero, the (1990)(data west)(disk 3 of 3)(disk c).dim" size="1261824" crc="8dc3564e" sha1="048b7b119b51ee22b7f7e76c8a9f218282b3db9d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thunit5">
+		<description>The 4th Unit Act 5 - D-Again</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 5 d-again, the (1990)(data west)(disk 1 of 4)(disk a).dim" size="1261824" crc="e26e61b7" sha1="843521f23632f096882b6be9e86fad13525ba077" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 5 d-again, the (1990)(data west)(disk 2 of 4)(disk b).dim" size="1261824" crc="50f756e8" sha1="38770cbe22950e12ffd20ad8515bdfc7fdca5334" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 5 d-again, the (1990)(data west)(disk 3 of 4)(disk c).dim" size="1261824" crc="a1d6a498" sha1="35e34821e5db314318679cfdb22a4488e99be599" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="4th unit act 5 d-again, the (1990)(data west)(disk 4 of 4)(disk d).dim" size="1261824" crc="6f5e9baf" sha1="c417f029c53478920e4f7d6065222f536d36044a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akiko">
 		<description>Akiko</description>
 		<year>1993</year>
