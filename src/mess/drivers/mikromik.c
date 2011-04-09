@@ -1,33 +1,3 @@
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/8237dma.h"
-#include "machine/i8212.h"
-#include "machine/upd765.h"
-#include "machine/pit8253.h"
-#include "machine/upd7201.h"
-#include "video/i8275.h"
-#include "video/upd7220.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
-#include "includes/mikromik.h"
-
-/*
-
-    TODO:
-
-    - add HRTC/VRTC output to i8275
-    - NEC uPD7220 GDC
-    - accurate video timing
-    - floppy DRQ during RECALL = 0
-    - PCB layout
-    - NEC uPD7201 MPSC
-
-*/
-
 /*
 
     Nokia Elektroniikka pj
@@ -66,6 +36,21 @@
     RST7.5  DMA EOP
 
 */
+
+/*
+
+    TODO:
+
+    - add HRTC/VRTC output to i8275
+    - NEC uPD7220 GDC
+    - accurate video timing
+    - floppy DRQ during RECALL = 0
+    - PCB layout
+    - NEC uPD7201 MPSC
+
+*/
+
+#include "includes/mikromik.h"
 
 /* Read/Write Handlers */
 
@@ -136,7 +121,7 @@ static ADDRESS_MAP_START( mm1_map, AS_PROGRAM, 8, mm1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY(I8237_TAG, i8237_r, i8237_w)
-	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE_LEGACY(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
+	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
     AM_RANGE(0xff20, 0xff21) AM_MIRROR(0x8e) AM_DEVREADWRITE_LEGACY(I8275_TAG, i8275_r, i8275_w)
 	AM_RANGE(0xff30, 0xff33) AM_MIRROR(0x8c) AM_DEVREADWRITE_LEGACY(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE(I8212_TAG, i8212_device, data_r, data_w)
@@ -400,12 +385,12 @@ READ8_MEMBER( mm1_state::mpsc_dack_r )
 	/* clear data request */
 	i8237_dreq2_w(m_dmac, CLEAR_LINE);
 
-	return upd7201_dtra_r(m_mpsc);
+	return m_mpsc->dtra_r();
 }
 
 WRITE8_MEMBER( mm1_state::mpsc_dack_w )
 {
-	upd7201_hai_w(m_mpsc, data);
+	m_mpsc->hai_w(data);
 
 	/* clear data request */
 	i8237_dreq1_w(m_dmac, CLEAR_LINE);
@@ -421,7 +406,7 @@ WRITE_LINE_MEMBER( mm1_state::tc_w )
 
 	m_tc = !state;
 
-	device_set_input_line(m_maincpu, I8085_RST75_LINE, state);
+	m_maincpu->set_input_line(I8085_RST75_LINE, state);
 }
 
 WRITE_LINE_MEMBER( mm1_state::dack3_w )
@@ -466,7 +451,7 @@ WRITE_LINE_MEMBER( mm1_state::itxc_w )
 {
 	if (!m_intc)
 	{
-		upd7201_txca_w(m_mpsc, state);
+		m_mpsc->txca_w(state);
 	}
 }
 
@@ -474,14 +459,14 @@ WRITE_LINE_MEMBER( mm1_state::irxc_w )
 {
 	if (!m_intc)
 	{
-		upd7201_rxca_w(m_mpsc, state);
+		m_mpsc->rxca_w(state);
 	}
 }
 
 WRITE_LINE_MEMBER( mm1_state::auxc_w )
 {
-	upd7201_txcb_w(m_mpsc, state);
-	upd7201_rxcb_w(m_mpsc, state);
+	m_mpsc->txcb_w(state);
+	m_mpsc->rxcb_w(state);
 }
 
 static const struct pit8253_config mm1_pit8253_intf =

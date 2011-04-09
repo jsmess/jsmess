@@ -3,7 +3,7 @@
     Epson TF-20
 
     Dual floppy drive with HX-20 factory option
-
+	
 
     Status: Boots from system disk, missing ??PD7201 emulation
 
@@ -35,7 +35,7 @@ struct _tf20_state
 {
 	device_t *ram;
 	device_t *upd765a;
-	device_t *upd7201;
+	upd7201_device *upd7201;
 	device_t *floppy_0;
 	device_t *floppy_1;
 };
@@ -63,10 +63,10 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 {
 	tf20_state *tf20 = get_safe_token(timer.owner());
 
-	upd7201_rxca_w(tf20->upd7201, ASSERT_LINE);
-	upd7201_txca_w(tf20->upd7201, ASSERT_LINE);
-	upd7201_rxcb_w(tf20->upd7201, ASSERT_LINE);
-	upd7201_txcb_w(tf20->upd7201, ASSERT_LINE);
+	tf20->upd7201->rxca_w(ASSERT_LINE);
+	tf20->upd7201->txca_w(ASSERT_LINE);
+	tf20->upd7201->rxcb_w(ASSERT_LINE);
+	tf20->upd7201->txcb_w(ASSERT_LINE);
 }
 
 /* a read from this location disables the rom */
@@ -130,7 +130,7 @@ READ_LINE_DEVICE_HANDLER( tf20_rxs_r )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_rxs_r\n", device->machine().describe_context());
 
-	return upd7201_txda_r(tf20->upd7201);
+	return tf20->upd7201->txda_r();
 }
 
 READ_LINE_DEVICE_HANDLER( tf20_pins_r )
@@ -138,7 +138,7 @@ READ_LINE_DEVICE_HANDLER( tf20_pins_r )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_pins_r\n", device->machine().describe_context());
 
-	return upd7201_dtra_r(tf20->upd7201);
+	return tf20->upd7201->dtra_r();
 }
 
 /* serial input signal (from host computer) */
@@ -147,7 +147,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_txs_w )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_txs_w %u\n", device->machine().describe_context(), state);
 
-	upd7201_rxda_w(tf20->upd7201, state);
+	tf20->upd7201->rxda_w(state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w )
@@ -155,7 +155,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_pouts_w %u\n", device->machine().describe_context(), state);
 
-	upd7201_ctsa_w(tf20->upd7201, state);
+	tf20->upd7201->ctsa_w(state);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -165,7 +165,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_txc_w )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_txc_w %u\n", device->machine().describe_context(), state);
 
-	upd7201_rxda_w(tf20->upd7201, state);
+	tf20->upd7201->rxda_w(state);
 }
 
 /* serial input signal (from another terminal) */
@@ -174,7 +174,7 @@ READ_LINE_DEVICE_HANDLER( tf20_rxc_r )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_rxc_r\n", device->machine().describe_context());
 
-	return upd7201_txda_r(tf20->upd7201);
+	return tf20->upd7201->txda_r();
 }
 
 WRITE_LINE_DEVICE_HANDLER( tf20_poutc_w )
@@ -182,7 +182,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_poutc_w )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_poutc_w %u\n", device->machine().describe_context(), state);
 
-	upd7201_ctsa_w(tf20->upd7201, state);
+	tf20->upd7201->ctsa_w(state);
 }
 
 READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
@@ -190,7 +190,7 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
 	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_pinc_r\n", device->machine().describe_context());
 
-	return upd7201_dtra_r(tf20->upd7201);
+	return tf20->upd7201->dtra_r();
 }
 #endif
 
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tf20_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("3a", upd7201_ba_cd_r, upd7201_ba_cd_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_MODERN("3a", upd7201_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0xf6, 0xf6) AM_READ(tf20_rom_disable)
 	AM_RANGE(0xf7, 0xf7) AM_READ(tf20_dip_r)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREAD("5a", tf20_upd765_tc_r) AM_WRITE(tf20_fdc_control_w)
@@ -340,7 +340,7 @@ static DEVICE_START( tf20 )
 
 	/* locate child devices */
 	tf20->upd765a = device->subdevice("5a");
-	tf20->upd7201 = device->subdevice("3a");
+	tf20->upd7201 = device->subdevice<upd7201_device>("3a");
 	tf20->floppy_0 = device->subdevice(FLOPPY_0);
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 

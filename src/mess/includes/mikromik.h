@@ -1,5 +1,23 @@
+#pragma once
+
 #ifndef __MIKROMIKKO__
 #define __MIKROMIKKO__
+
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/i8085/i8085.h"
+#include "formats/basicdsk.h"
+#include "imagedev/flopdrv.h"
+#include "machine/8237dma.h"
+#include "machine/i8212.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/upd7201.h"
+#include "video/i8275.h"
+#include "video/upd7220.h"
+#include "sound/speaker.h"
 
 #define SCREEN_TAG		"screen"
 #define I8085A_TAG		"ic40"
@@ -34,7 +52,7 @@ public:
 	required_device<device_t> m_dmac;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_mpsc;
+	required_device<upd7201_device> m_mpsc;
 	required_device<device_t> m_hgdc;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_floppy0;
