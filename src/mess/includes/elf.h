@@ -29,7 +29,7 @@ public:
 	elf2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, CDP1802_TAG),
-		  m_cti(*this, CDP1861_TAG),
+		  m_vdc(*this, CDP1861_TAG),
 		  m_kb(*this, MM74C923_TAG),
 		  m_led_l(*this, DM9368_L_TAG),
 		  m_led_h(*this, DM9368_H_TAG),
@@ -38,7 +38,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cti;
+	required_device<cdp1861_device> m_vdc;
 	required_device<device_t> m_kb;
 	required_device<dm9368_device> m_led_l;
 	required_device<dm9368_device> m_led_h;

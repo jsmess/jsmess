@@ -31,8 +31,8 @@
 
 READ8_MEMBER( elf2_state::dispon_r )
 {
-	cdp1861_dispon_w(m_cti, 1);
-	cdp1861_dispon_w(m_cti, 0);
+	m_vdc->disp_on_w(1);
+	m_vdc->disp_on_w(0);
 
 	return 0xff;
 }
@@ -186,7 +186,7 @@ static COSMAC_INTERFACE( elf2_config )
 	DEVCB_DRIVER_LINE_MEMBER(elf2_state, ef4_r),
 	DEVCB_DRIVER_LINE_MEMBER(elf2_state, q_w),
 	DEVCB_DRIVER_MEMBER(elf2_state, dma_r),
-	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w),
+	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
 	elf2_sc_w,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -227,7 +227,7 @@ static MM74C922_INTERFACE( keyboard_intf )
 
 bool elf2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	cdp1861_update(m_cti, &bitmap, &cliprect);
+	m_vdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }

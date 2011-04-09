@@ -217,21 +217,7 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
 #include "includes/vip.h"
-#include "cpu/cosmac/cosmac.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "audio/vp550.h"
-#include "audio/vp595.h"
-#include "sound/cdp1863.h"
-#include "sound/discrete.h"
-#include "video/cdp1861.h"
-#include "video/cdp1862.h"
-#include "machine/rescap.h"
-#include "machine/ram.h"
 
 static QUICKLOAD_LOAD( vip );
 
@@ -285,16 +271,16 @@ WRITE8_MEMBER( vip_state::bankswitch_w )
 
 READ8_MEMBER( vip_state::dispon_r )
 {
-	cdp1861_dispon_w(m_vdc, 1);
-	cdp1861_dispon_w(m_vdc, 0);
+	m_vdc->disp_on_w(1);
+	m_vdc->disp_on_w(0);
 
 	return 0xff;
 }
 
 WRITE8_MEMBER( vip_state::dispoff_w )
 {
-	cdp1861_dispoff_w(m_vdc, 1);
-	cdp1861_dispoff_w(m_vdc, 0);
+	m_vdc->disp_on_w(1);
+	m_vdc->disp_on_w(0);
 }
 
 /* Memory Maps */
@@ -397,33 +383,27 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
-static READ_LINE_DEVICE_HANDLER( rd_r )
+READ_LINE_MEMBER( vip_state::rd_r )
 {
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	return BIT(state->m_color, 1);
+	return BIT(m_color, 1);
 }
 
-static READ_LINE_DEVICE_HANDLER( bd_r )
+READ_LINE_MEMBER( vip_state::bd_r )
 {
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	return BIT(state->m_color, 2);
+	return BIT(m_color, 2);
 }
 
-static READ_LINE_DEVICE_HANDLER( gd_r )
+READ_LINE_MEMBER( vip_state::gd_r )
 {
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	return BIT(state->m_color, 3);
+	return BIT(m_color, 3);
 }
 
 static CDP1862_INTERFACE( vip_cdp1862_intf )
 {
 	SCREEN_TAG,
-	DEVCB_LINE(rd_r),
-	DEVCB_LINE(bd_r),
-	DEVCB_LINE(gd_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, rd_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, bd_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, gd_r),
 	510,			/* R3 */
 	360,			/* R4 */
 	RES_K(1),		/* R5 */
@@ -434,7 +414,7 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 	RES_K(3.3)		/* R10 */
 };
 
-WRITE8_MEMBER( vip_state::vip_colorram_w )
+WRITE8_MEMBER( vip_state::colorram_w )
 {
 	UINT8 mask = 0xff;
 
@@ -457,7 +437,7 @@ bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 	switch (input_port_read(m_machine, "VIDEO"))
 	{
 	case VIDEO_CDP1861:
-		cdp1861_update(m_vdc, &bitmap, &cliprect);
+		m_vdc->update_screen(&bitmap, &cliprect);
 		break;
 
 	case VIDEO_CDP1862:
@@ -470,33 +450,29 @@ bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 
 /* CDP1802 Configuration */
 
-static READ_LINE_DEVICE_HANDLER( clear_r )
+READ_LINE_MEMBER( vip_state::clear_r )
 {
-	return BIT(input_port_read(device->machine(), "RUN"), 0);
+	return BIT(input_port_read(m_machine, "RUN"), 0);
 }
 
-static READ_LINE_DEVICE_HANDLER( ef2_r )
+READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	set_led_status(device->machine(), LED_TAPE, (cassette_input(device) > 0));
+	set_led_status(m_machine, LED_TAPE, (cassette_input(m_cassette) > 0));
 
-	return cassette_input(device) < 0;
+	return cassette_input(m_cassette) < 0;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef3_r )
+READ_LINE_MEMBER( vip_state::ef3_r )
 {
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	return BIT(input_port_read(device->machine(), "KEYPAD"), state->m_keylatch);
+	return BIT(input_port_read(m_machine, "KEYPAD"), m_keylatch);
 }
 
-static READ_LINE_DEVICE_HANDLER( ef4_r )
+READ_LINE_MEMBER( vip_state::ef4_r )
 {
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	switch (input_port_read(device->machine(), "KEYBOARD"))
+	switch (input_port_read(m_machine, "KEYBOARD"))
 	{
 	case KEYBOARD_VP580:
-		return BIT(input_port_read(device->machine(), "VP-580"), state->m_keylatch);
+		return BIT(input_port_read(m_machine, "VP-580"), m_keylatch);
 	}
 
 	return 0;
@@ -516,63 +492,59 @@ static COSMAC_SC_WRITE( vip_sc_w )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
+WRITE_LINE_MEMBER( vip_state::q_w )
 {
-	vip_state *driver_state = device->machine().driver_data<vip_state>();
-
 	// sound output
-	switch (input_port_read(device->machine(), "SOUND"))
+	switch (input_port_read(m_machine, "SOUND"))
 	{
 	case SOUND_SPEAKER:
-		discrete_sound_w(driver_state->m_beeper, NODE_01, state);
-		vp595_q_w(driver_state->m_vp595, 0);
-		vp550_q_w(driver_state->m_vp550, 0);
+		discrete_sound_w(m_beeper, NODE_01, state);
+		vp595_q_w(m_vp595, 0);
+		vp550_q_w(m_vp550, 0);
 		break;
 
 	case SOUND_VP595:
-		discrete_sound_w(driver_state->m_beeper, NODE_01, 0);
-		vp595_q_w(driver_state->m_vp595, state);
-		vp550_q_w(driver_state->m_vp550, 0);
+		discrete_sound_w(m_beeper, NODE_01, 0);
+		vp595_q_w(m_vp595, state);
+		vp550_q_w(m_vp550, 0);
 		break;
 
 	case SOUND_VP550:
 	case SOUND_VP551:
-		discrete_sound_w(driver_state->m_beeper, NODE_01, 0);
-		vp595_q_w(driver_state->m_vp595, 0);
-		vp550_q_w(driver_state->m_vp550, state);
+		discrete_sound_w(m_beeper, NODE_01, 0);
+		vp595_q_w(m_vp595, 0);
+		vp550_q_w(m_vp550, state);
 		break;
 	}
 
 	// Q led
-	set_led_status(device->machine(), LED_Q, state);
+	set_led_status(m_machine, LED_Q, state);
 
 	// tape output
-	cassette_output(driver_state->m_cassette, state ? 1.0 : -1.0);
+	cassette_output(m_cassette, state ? 1.0 : -1.0);
 }
 
-static WRITE8_DEVICE_HANDLER( vip_dma_w )
+WRITE8_MEMBER( vip_state::dma_w )
 {
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	switch (input_port_read(device->machine(), "VIDEO"))
+	switch (input_port_read(m_machine, "VIDEO"))
 	{
 	case VIDEO_CDP1861:
-		cdp1861_dma_w(state->m_vdc, offset, data);
+		m_vdc->dma_w(space, offset, data);
 		break;
 
 	case VIDEO_CDP1862:
 		{
 			UINT8 mask = 0xff;
 
-			if (!state->m_a12)
+			if (!m_a12)
 			{
 				// mask out A4 and A3
 				mask = 0xe7;
 			}
 
-			state->m_color = state->m_colorram[offset & mask];
+			m_color = m_colorram[offset & mask];
 
-			cdp1862_dma_w(state->m_cgc, offset, data);
+			cdp1862_dma_w(m_cgc, offset, data);
 		}
 		break;
 	}
@@ -581,14 +553,14 @@ static WRITE8_DEVICE_HANDLER( vip_dma_w )
 static COSMAC_INTERFACE( cosmac_intf )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
-	DEVCB_LINE(ef3_r),
-	DEVCB_LINE(ef4_r),
-	DEVCB_LINE(vip_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef4_r),
+	DEVCB_DRIVER_LINE_MEMBER(vip_state, q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(vip_dma_w),
+	DEVCB_DRIVER_MEMBER(vip_state, dma_w),
 	vip_sc_w,
 	DEVCB_NULL,
 	DEVCB_NULL

@@ -230,16 +230,16 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 
 READ8_MEMBER( tmc1800_state::dispon_r )
 {
-	cdp1861_dispon_w(m_vdc, 1);
-	cdp1861_dispon_w(m_vdc, 0);
+	m_vdc->disp_on_w(1);
+	m_vdc->disp_on_w(0);
 
 	return 0xff;
 }
 
 WRITE8_MEMBER( tmc1800_state::dispoff_w )
 {
-	cdp1861_dispoff_w(m_vdc, 1);
-	cdp1861_dispoff_w(m_vdc, 0);
+	m_vdc->disp_off_w(1);
+	m_vdc->disp_off_w(0);
 }
 
 /* Memory Maps */
@@ -513,7 +513,7 @@ static COSMAC_INTERFACE( tmc1800_config )
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, q_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w),
+	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

@@ -34,7 +34,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_vdc;
+	required_device<cdp1861_device> m_vdc;
 	required_device<device_t> m_cassette;
 	
 	virtual void machine_start();
