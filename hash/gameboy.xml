@@ -9973,6 +9973,20 @@
 	</software>
 
 	<software name="motoxman">
+		<!-- Serial: DMG-MX-NOE-1 - Release Date:  -->
+		<description>Motocross Maniacs (Euro, Re-release)</description>
+		<year>1991</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="u1" value="U1 PRG" />
+			<dataarea name="rom" size="32768">
+				<rom name="dmg-mxx-1.u1" size="32768" crc="f867ee3b" sha1="d21f2a4ddb69c408a370b6768f83914c11012c71" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motoxmana" cloneof="motoxman">
 		<!-- Serial: DMG-MX? - Release Date:  -->
 		<description>Motocross Maniacs (Euro)</description>
 		<year>1990</year>
