@@ -4,6 +4,9 @@
 
 	05/11/2009 Skeleton driver.
 
+	TODO:
+	- needs MCS1850 RTC device emulation to remove the ROM patch;
+
 	DASM notes:
 	- Jumping to 0x21ee means that the system POST failed
 	- 0x258c: ROM test (check with 0x1a)
@@ -89,6 +92,13 @@ static READ32_HANDLER( next_scr2_r )
 	next_state *state = space->machine().driver_data<next_state>();
 	if(!space->debugger_access())
 		printf("%08x\n",cpu_get_pc(&space->device()));
+	/*
+	x--- ---- ---- ---- MCS1850 RTCDOUT
+	-x-- ---- ---- ---- MCS1850 RTCDIN
+	--x- ---- ---- ---- MCS1850 RTCCLK
+	---x ---- ---- ---- MCS1850 RTCCE
+	*/
+
 	return state->m_scr2;
 }
 
@@ -146,14 +156,14 @@ static WRITE32_HANDLER( next_irq_mask_w )
 static ADDRESS_MAP_START(next_mem, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x02007000, 0x02007003) AM_READWRITE(next_irq_status_r,next_irq_status_w)
-	AM_RANGE(0x02007800, 0x02007803) AM_READWRITE(next_irq_mask_r,next_irq_mask_w)
+	AM_RANGE(0x02007000, 0x02007003) AM_MIRROR(0x100000) AM_READWRITE(next_irq_status_r,next_irq_status_w)
+	AM_RANGE(0x02007800, 0x02007803) AM_MIRROR(0x100000) AM_READWRITE(next_irq_mask_r,next_irq_mask_w)
 
-	AM_RANGE(0x0200c000, 0x0200c003) AM_READ(next_scr1_r)
-	AM_RANGE(0x0200c800, 0x0200c803) AM_READ(next_rom_map_r)
-	AM_RANGE(0x0200d000, 0x0200d003) AM_READWRITE(next_scr2_r,next_scr2_w)
+	AM_RANGE(0x0200c000, 0x0200c003) AM_MIRROR(0x100000) AM_READ(next_scr1_r)
+	AM_RANGE(0x0200c800, 0x0200c803) AM_MIRROR(0x100000) AM_READ(next_rom_map_r)
+	AM_RANGE(0x0200d000, 0x0200d003) AM_MIRROR(0x100000) AM_READWRITE(next_scr2_r,next_scr2_w)
 
-	AM_RANGE(0x02000000, 0x0201ffff) AM_READWRITE8(next_io_r,next_io_w,0xffffffff) //intentional fall-through
+	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x100000) AM_READWRITE8(next_io_r,next_io_w,0xffffffff) //intentional fall-through
 
 	AM_RANGE(0x04000000, 0x07ffffff) AM_RAM //work ram
 
