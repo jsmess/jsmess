@@ -13,7 +13,6 @@
 /*-------------------------------------------------------------------------*/
 
 #include "emu.h"
-#include "video/i82720.h"
 #include "machine/i8255a.h"
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
@@ -1374,19 +1373,10 @@ static IRQ_CALLBACK( compis_irq_callback )
 	return pic8259_acknowledge(state->m_devices.pic8259_master);
 }
 
-#if 0
-static const compis_gdc_interface i82720_interface =
-{
-	GDC_MODE_HRG,
-	0x8000
-};
-#endif
-
 
 DRIVER_INIT( compis )
 {
 	compis_state *state = machine.driver_data<compis_state>();
-//	compis_init( &i82720_interface );
 
 	device_set_irq_callback(machine.device("maincpu"), compis_irq_callback);
 	memset (&state->m_compis, 0, sizeof (state->m_compis) );

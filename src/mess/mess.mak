@@ -560,7 +560,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/hd44102.o		\
 	$(MESS_VIDEO)/hd44780.o		\
 	$(MESS_VIDEO)/hd66421.o		\
-	$(MESS_VIDEO)/i82720.o		\
 	$(MESS_VIDEO)/i8275.o		\
 	$(MESS_VIDEO)/m6845.o		\
 	$(MESS_VIDEO)/m6847.o		\
