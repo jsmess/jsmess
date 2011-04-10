@@ -160,16 +160,19 @@
 
 //#define USE_PROPER_I8214
 
-#define UPD1990A_TAG "upd1990a"
+#define I8214_TAG		"i8214"
+#define UPD1990A_TAG	"upd1990a"
 
 class pc8801_state : public driver_device
 {
 public:
 	pc8801_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
+		  m_pic(*this, I8214_TAG),
 		  m_rtc(*this, UPD1990A_TAG)
 	{ }
 
+	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 };
 
@@ -975,9 +978,9 @@ static WRITE8_HANDLER( pc8801_vram_select_w )
 static WRITE8_HANDLER( i8214_irq_level_w )
 {
 	if(data & 8)
-		i8214_b_w(space->machine().device("i8214"), 0, (7));
+		m_pic->b_w(7);
 	else
-		i8214_b_w(space->machine().device("i8214"), 0, (data & 0x07));
+		m_pic->b_w(data & 0x07);
 }
 
 static WRITE8_HANDLER( i8214_irq_mask_w )
@@ -1865,7 +1868,7 @@ void pc8801_raise_irq(running_machine &machine,UINT8 irq,UINT8 state)
 	{
 		m_int_state |= irq;
 
-		i8214_r_w(machine.device("i8214"), 0, ~irq);
+		m_pic->r_w(~irq);
 
 		cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 	}
@@ -1899,7 +1902,7 @@ static I8214_INTERFACE( pic_intf )
 
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
-	UINT8 vector = (7 - i8214_a_r(device->machine().device("i8214"), 0));
+	UINT8 vector = (7 - m_pic->a_r());
 
 	m_int_state &= ~(1<<vector);
 	cputag_set_input_line(device->machine(),"maincpu",0,CLEAR_LINE);
@@ -2025,8 +2028,8 @@ static MACHINE_RESET( pc8801 )
 	#ifdef USE_PROPER_I8214
 	{
 		/* initialize I8214 */
-		i8214_etlg_w(machine.device("i8214"), 1);
-		i8214_inte_w(machine.device("i8214"), 1);
+		m_pic->etlg_w(1);
+		m_pic->inte_w(1);
 	}
 	#else
 	{
@@ -2154,7 +2157,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_UPD765A_ADD("upd765", pc8801_upd765_interface)
 	#ifdef USE_PROPER_I8214
-	MCFG_I8214_ADD("i8214", MASTER_CLOCK, pic_intf)
+	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)

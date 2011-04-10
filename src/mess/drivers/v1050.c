@@ -102,24 +102,7 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
 #include "includes/v1050.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/mcs48/mcs48.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "formats/basicdsk.h"
-#include "machine/ctronics.h"
-#include "machine/i8214.h"
-#include "machine/i8255a.h"
-#include "machine/msm58321.h"
-#include "machine/msm8251.h"
-#include "machine/wd17xx.h"
-#include "video/mc6845.h"
-#include "sound/discrete.h"
 
 void v1050_state::set_interrupt(UINT8 mask, int state)
 {
@@ -132,7 +115,7 @@ void v1050_state::set_interrupt(UINT8 mask, int state)
 		m_int_state &= ~mask;
 	}
 
-	i8214_r_w(m_pic, 0, ~(m_int_state & m_int_mask));
+	m_pic->r_w(~(m_int_state & m_int_mask));
 }
 
 void v1050_state::bankswitch()
@@ -310,7 +293,8 @@ READ8_MEMBER( v1050_state::kb_status_r )
 
 WRITE8_MEMBER( v1050_state::v1050_i8214_w )
 {
-	i8214_b_w(m_pic, 0, (data >> 1) & 0x0f);
+	m_pic->b_w((data >> 1) & 0x07);
+	m_pic->sgs_w(BIT(data, 4));
 }
 
 READ8_MEMBER( v1050_state::vint_clr_r )
@@ -1100,7 +1084,7 @@ static IRQ_CALLBACK( v1050_int_ack )
 {
 	v1050_state *state = device->machine().driver_data<v1050_state>();
 
-	UINT8 vector = 0xf0 | (i8214_a_r(state->m_pic, 0) << 1);
+	UINT8 vector = 0xf0 | (state->m_pic->a_r() << 1);
 
 	//logerror("Interrupt Acknowledge Vector: %02x\n", vector);
 
@@ -1114,8 +1098,8 @@ void v1050_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* initialize I8214 */
-	i8214_etlg_w(m_pic, 1);
-	i8214_inte_w(m_pic, 1);
+	m_pic->etlg_w(1);
+	m_pic->inte_w(1);
 
 	/* initialize RTC */
 	msm58321_cs1_w(m_rtc, 1);

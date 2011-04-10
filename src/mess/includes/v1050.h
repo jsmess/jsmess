@@ -1,8 +1,25 @@
+#pragma once
+
 #ifndef __V1050__
 #define __V1050__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
+#include "formats/basicdsk.h"
+#include "machine/ctronics.h"
+#include "machine/i8214.h"
+#include "machine/i8255a.h"
+#include "machine/msm58321.h"
+#include "machine/msm8251.h"
+#include "machine/wd17xx.h"
+#include "video/mc6845.h"
+#include "sound/discrete.h"
 
 #define SCREEN_TAG				"screen"
 
@@ -60,7 +77,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<device_t> m_pic;
+	required_device<i8214_device> m_pic;
 	required_device<device_t> m_rtc;
 	required_device<device_t> m_uart_kb;
 	required_device<device_t> m_uart_sio;
