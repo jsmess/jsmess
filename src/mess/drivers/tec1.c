@@ -44,6 +44,10 @@ ToDo:
 - The 10ms debounce is not emulated.
 - Needs proper artwork.
 
+Note (2011-04-10)
+I've enabled the tec1b rom at the request of a user, but it doesn't seem
+to do anything useful. He will investigate..
+
 ***************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -204,12 +208,12 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 MACHINE_START_MEMBER( tec1_state )
 {
 	m_kbd_timer = m_machine.scheduler().timer_alloc(FUNC(tec1_kbd_callback));
+	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
 
 MACHINE_RESET_MEMBER( tec1_state )
 {
 	m_kbd = 0;
-	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
 
 
@@ -223,7 +227,8 @@ MACHINE_RESET_MEMBER( tec1_state )
 static ADDRESS_MAP_START( tec1_map, AS_PROGRAM, 8, tec1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x17ff) AM_RAM
+	AM_RANGE(0x0800, 0x0fff) AM_RAM // on main board
+	AM_RANGE(0x1000, 0x3fff) AM_RAM // expansion
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
@@ -300,12 +305,11 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START(tec1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("tec1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3) )
-//  ROM_SYSTEM_BIOS(0, "tec1", "TEC-1")
-//  ROMX_LOAD("tec1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
-//  ROM_SYSTEM_BIOS(1, "tec1a", "TEC-1A")
-//  ROMX_LOAD("tec1a.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_SYSTEM_BIOS(0, "tec1", "TEC-1")
+	ROMX_LOAD("tec1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "tec1b", "TEC-1B")
+	ROMX_LOAD("tec1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY  FULLNAME */
