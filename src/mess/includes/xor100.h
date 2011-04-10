@@ -22,6 +22,7 @@ public:
 	xor100_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, Z80_TAG),
+		  m_dbrg(*this, COM5016_TAG),
 		  m_uart_b(*this, I8251_B_TAG),
 		  m_fdc(*this, WD1795_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
@@ -32,6 +33,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<com8116_device> m_dbrg;
 	required_device<device_t> m_uart_b;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_ctc;
@@ -46,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
+	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_WRITE8_MEMBER( i8251_b_data_w );
 	DECLARE_READ8_MEMBER( fdc_wait_r );
 	DECLARE_WRITE8_MEMBER( fdc_dcont_w );

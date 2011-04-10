@@ -160,10 +160,10 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( baud_w )
+WRITE8_MEMBER( xor100_state::baud_w )
 {
-	com8116_str_w(device, 0, data & 0x0f);
-	com8116_stt_w(device, 0, data >> 4);
+	m_dbrg->str_w(space, 0, data & 0x0f);
+	m_dbrg->stt_w(space, 0, data >> 4);
 }
 
 WRITE8_MEMBER( xor100_state::i8251_b_data_w )
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(prom_toggle_w)
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_DEVWRITE_LEGACY(COM5016_TAG, baud_w)
+	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_WRITE(baud_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE_LEGACY(WD1795_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE(fdc_wait_r, fdc_dcont_w)

@@ -82,8 +82,8 @@ Notes:
 
 WRITE8_MEMBER( ob68k1a_state::com8116_w )
 {
-	com8116_stt_w(m_dbrg, 0, data & 0x0f);
-//  com8116_str_w(m_dbrg, 0, data >> 4); // HACK for terminal
+	m_dbrg->stt_w(space, 0, data & 0x0f);
+//  m_dbrg->str_w(space, 0, data >> 4); // HACK for terminal
 }
 
 
@@ -305,12 +305,14 @@ void ob68k1a_state::machine_start()
 
 void ob68k1a_state::machine_reset()
 {
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+
 	// initialize COM8116
-//  com8116_stt_w(m_dbrg, 0, 0x01);
-//  com8116_str_w(m_dbrg, 0, 0x01);
+//  m_dbrg->stt_w(program, 0, 0x01);
+//  m_dbrg->str_w(program, 0, 0x01);
 
 	// set reset vector
-	void *ram = m_maincpu->memory().space(AS_PROGRAM)->get_write_ptr(0);
+	void *ram = program->get_write_ptr(0);
 	UINT8 *rom = m_machine.region(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
