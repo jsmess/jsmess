@@ -162,6 +162,7 @@ const game_driver * const drivers[] =
 	DRIVER( d6800 )		/* Dream 6800 */
 
 	/* Ensoniq */
+    DRIVER( mirage ) /* 1985 Mirage Digital Multi-Sampler */
 	DRIVER( esq1 )	/* 1986 ESQ-1 Digital Wave Synthesizer */
 
 	/* Fairchild */

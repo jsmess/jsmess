@@ -52,6 +52,8 @@ TODO:
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
@@ -100,11 +102,11 @@ static MACHINE_RESET( esq1 )
 	memory_set_bankptr(machine, "osbank", machine.region("osrom")->base() );
 }
 
-static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM					// OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_r, es5503_w)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duart68681_r, duart68681_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("es5503", es5503_r, es5503_w)
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
 ADDRESS_MAP_END
@@ -196,4 +198,4 @@ ROM_START( esq1 )
         ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
 ROM_END
 
-CONS( 1987, esq1, 0, 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
+CONS( 1986, esq1, 0, 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )

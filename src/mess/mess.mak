@@ -936,6 +936,7 @@ $(MESSOBJ)/elektor.a:			\
 
 $(MESSOBJ)/ensoniq.a:			\
 	$(MESS_DRIVERS)/esq1.o		\
+    $(MESS_DRIVERS)/mirage.o    \
 
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
