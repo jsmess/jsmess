@@ -93,10 +93,10 @@ static READ32_HANDLER( next_scr2_r )
 	if(!space->debugger_access())
 		printf("%08x\n",cpu_get_pc(&space->device()));
 	/*
-	x--- ---- ---- ---- MCS1850 RTCDOUT
-	-x-- ---- ---- ---- MCS1850 RTCDIN
-	--x- ---- ---- ---- MCS1850 RTCCLK
-	---x ---- ---- ---- MCS1850 RTCCE
+	---- x--- ---- ---- MCS1850 RTCDOUT
+	---- -x-- ---- ---- MCS1850 RTCDIN
+	---- --x- ---- ---- MCS1850 RTCCLK
+	---- ---x ---- ---- MCS1850 RTCCE
 	*/
 
 	return state->m_scr2;
