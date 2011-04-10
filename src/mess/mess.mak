@@ -554,7 +554,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/teleprinter.o	\
 	$(MESS_MACHINE)/upd7002.o	\
 	$(MESS_MACHINE)/wd17xx.o	\
-	$(MESS_VIDEO)/cdp1862.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/hd44102.o		\

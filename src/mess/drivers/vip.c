@@ -404,8 +404,8 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 	DEVCB_DRIVER_LINE_MEMBER(vip_state, rd_r),
 	DEVCB_DRIVER_LINE_MEMBER(vip_state, bd_r),
 	DEVCB_DRIVER_LINE_MEMBER(vip_state, gd_r),
-	510,			/* R3 */
-	360,			/* R4 */
+	RES_R(510),		/* R3 */
+	RES_R(360),		/* R4 */
 	RES_K(1),		/* R5 */
 	RES_K(1.5),		/* R6 */
 	RES_K(3.9),		/* R7 */
@@ -413,6 +413,12 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 	RES_K(2),		/* R9 */
 	RES_K(3.3)		/* R10 */
 };
+
+WRITE8_MEMBER( vip_state::bkg_w )
+{
+	m_cgc->bkg_w(1);
+	m_cgc->bkg_w(0);
+}
 
 WRITE8_MEMBER( vip_state::colorram_w )
 {
@@ -429,7 +435,7 @@ WRITE8_MEMBER( vip_state::colorram_w )
 	// write to CDP1822
 	m_colorram[offset & mask] = data << 1;
 
-	cdp1862_con_w(m_cgc, 0);
+	m_cgc->con_w(0);
 }
 
 bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -441,7 +447,7 @@ bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 		break;
 
 	case VIDEO_CDP1862:
-		cdp1862_update(m_cgc, &bitmap, &cliprect);
+		m_cgc->update_screen(&bitmap, &cliprect);
 		break;
 	}
 
@@ -544,7 +550,7 @@ WRITE8_MEMBER( vip_state::dma_w )
 
 			m_color = m_colorram[offset & mask];
 
-			cdp1862_dma_w(m_cgc, offset, data);
+			m_cgc->dma_w(space, offset, data);
 		}
 		break;
 	}
@@ -619,8 +625,8 @@ void vip_state::machine_reset()
 		break;
 
 	case VIDEO_CDP1862:
-		io->install_legacy_write_handler(*m_cgc, 0x05, 0x05, FUNC(cdp1862_bkg_w));
-//      program->install_legacy_write_handler(0xc000, 0xdfff, FUNC(vip_colorram_w));
+		io->install_write_handler(0x05, 0x05, write8_delegate_create(vip_state, bkg_w, *this));
+		program->install_write_handler(0xc000, 0xdfff, write8_delegate_create(vip_state, colorram_w, *this));
 		break;
 	}
 

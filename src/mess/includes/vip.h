@@ -75,7 +75,7 @@ public:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
-	required_device<device_t> m_cgc;
+	required_device<cdp1862_device> m_cgc;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_beeper;
 	required_device<device_t> m_vp595;
@@ -92,6 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dispoff_w );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	DECLARE_WRITE8_MEMBER( bkg_w );
 	DECLARE_WRITE8_MEMBER( colorram_w );
 	DECLARE_READ_LINE_MEMBER( rd_r );
 	DECLARE_READ_LINE_MEMBER( bd_r );
