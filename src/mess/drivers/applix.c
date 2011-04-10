@@ -27,6 +27,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_crtc;
+	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(applix_index_w);
 	DECLARE_WRITE16_MEMBER(applix_register_w);
 	UINT8* m_base;
@@ -42,10 +43,27 @@ WRITE16_MEMBER( applix_state::applix_register_w )
 	mc6845_register_w( m_crtc, 0, data >> 8 );
 }
 
+READ16_MEMBER( applix_state::applix_inputs_r )
+{
+	return 0;
+}
+
 static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x47ffff) AM_RAM AM_BASE(m_base)
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(m_base)
+	AM_RANGE(0x080000, 0x47ffff) AM_NOP //AM_RAM // expansion
 	AM_RANGE(0x500000, 0x5fffff) AM_ROM
+	//AM_RANGE(0x600000, 0x600001) centronics latch (odd), video palette entry 0 (even)
+	//AM_RANGE(0x600020, 0x600021) video palette entry 1 (even)
+	//AM_RANGE(0x600040, 0x600041) video palette entry 2 (even)
+	//AM_RANGE(0x600060, 0x600061) video palette entry 3 (even)
+	//AM_RANGE(0x600080, 0x600081) dac latch (odd)
+	//AM_RANGE(0x600100, 0x600101) video latch (=border colour, nybble; video base, nybble) (odd)
+	//AM_RANGE(0x600180, 0x600181) analog multiplexer latch (odd)
+	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
+	AM_RANGE(0x700080, 0x700081) AM_READ(applix_inputs_r) //input port (odd)
+	//AM_RANGE(0x700100, 0x70011f) VIA base address (even)
 	AM_RANGE(0x700180, 0x700181) AM_WRITE(applix_index_w)
 	AM_RANGE(0x700182, 0x700183) AM_WRITE(applix_register_w)
 	//600000, 6FFFFF  io ports and latches
@@ -54,6 +72,10 @@ static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	//FFFFC0, FFFFFF  disk controller board
 ADDRESS_MAP_END
 
+// io priorities:
+// 4 cassette
+// 3 scc
+// 2 via
 
 /* Input ports */
 static INPUT_PORTS_START( applix )
@@ -67,6 +89,37 @@ static MACHINE_RESET(applix)
 	memcpy(state->m_base, RAM+0x500000, 16);
 	machine.device("maincpu")->reset();
 }
+
+
+static PALETTE_INIT( applix )
+{ // shades need to be verified - the names on the right are from the manual
+	const UINT8 colors[16*3] = {
+	0x00, 0x00, 0x00,	//  0 Black
+	0x40, 0x40, 0x40,	//  1 Dark Grey
+	0x00, 0x00, 0x80,	//  2 Dark Blue
+	0x00, 0x00, 0xff,	//  3 Mid Blue
+	0x00, 0x80, 0x00,	//  4 Dark Green
+	0x00, 0xff, 0x00,	//  5 Green
+	0x00, 0xff, 0xff,	//  6 Blue Grey
+	0x00, 0x7f, 0x7f,	//  7 Light Blue
+	0x7f, 0x00, 0x00,	//  8 Dark Red
+	0xff, 0x00, 0x00,	//  9 Red
+	0x7f, 0x00, 0x7f,	// 10 Dark Violet
+	0xff, 0x00, 0xff,	// 11 Violet
+	0x7f, 0x7f, 0x00,	// 12 Brown
+	0xff, 0xff, 0x00,	// 13 Yellow
+	0xbf, 0xbf, 0xbf,	// 14 Light Grey
+	0xff, 0xff, 0xff };	// 15 White
+
+	UINT8 r, b, g, i, color_count = 0;
+
+	for (i = 0; i < 48; color_count++)
+	{
+		r = colors[i++]; g = colors[i++]; b = colors[i++];
+		palette_set_color(machine, color_count, MAKE_RGB(r, g, b));
+	}
+}
+
 
 static VIDEO_START( applix )
 {
@@ -142,8 +195,8 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(applix)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(applix)
 
 	MCFG_VIDEO_START(applix)
 	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc)
