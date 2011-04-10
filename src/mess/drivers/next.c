@@ -1,8 +1,12 @@
 /***************************************************************************
 
-        NeXT
+	NeXT
 
-        05/11/2009 Skeleton driver.
+	05/11/2009 Skeleton driver.
+
+	DASM notes:
+	- Jumping to 0x21ee means that the system POST failed
+	- 0x258c: ROM test (check with 0x1a)
 
 ****************************************************************************/
 
@@ -16,14 +20,144 @@ public:
 	next_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	UINT32 m_scr2;
+	UINT32 m_irq_status;
+	UINT32 m_irq_mask;
+	UINT32 *m_vram;
 };
 
+static VIDEO_START( next )
+{
+}
+
+static SCREEN_UPDATE( next )
+{
+	next_state *state = screen->machine().driver_data<next_state>();
+	UINT32 count;
+	int x,y,xi;
+
+	count = 0;
+
+	for(y=0;y<832;y++)
+	{
+		for(x=0;x<1152;x+=16)
+		{
+			for(xi=0;xi<16;xi++)
+			{
+				UINT8 pen = (state->m_vram[count] >> (30-(xi*2))) & 0x3;
+
+				pen ^= 3;
+
+				if((x+xi)>screen->machine().primary_screen->visible_area().max_x || (y)>screen->machine().primary_screen->visible_area().max_y)
+					continue;
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine().pens[pen];
+			}
+
+			count++;
+		}
+	}
+
+    return 0;
+}
+
+/* Dummy catcher for any unknown r/w */
+static READ8_HANDLER( next_io_r )
+{
+	if(!space->debugger_access())
+		printf("Read I/O register %08x\n",offset+0x02000000);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( next_io_w )
+{
+	if(!space->debugger_access())
+		printf("Write I/O register %08x %02x\n",offset+0x02000000,data);
+}
+
+/* map ROM at 0x01000000-0x0101ffff? */
+static READ32_HANDLER( next_rom_map_r )
+{
+	if(!space->debugger_access())
+		printf("%08x ROM MAP?\n",cpu_get_pc(&space->device()));
+	return 0x01000000;
+}
+
+static READ32_HANDLER( next_scr2_r )
+{
+	next_state *state = space->machine().driver_data<next_state>();
+	if(!space->debugger_access())
+		printf("%08x\n",cpu_get_pc(&space->device()));
+	return state->m_scr2;
+}
+
+static WRITE32_HANDLER( next_scr2_w )
+{
+	next_state *state = space->machine().driver_data<next_state>();
+	if(!space->debugger_access())
+		printf("%08x %08x\n",cpu_get_pc(&space->device()),data);
+	COMBINE_DATA(&state->m_scr2);
+}
+
+static READ32_HANDLER( next_scr1_r )
+{
+	/*
+		xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
+		---- ---- xxxx xxxx ---- ---- ---- ---- DMA type
+		---- ---- ---- ---- xxxx ---- ---- ---- cpu type
+		---- ---- ---- ---- ---- xxxx ---- ---- board revision
+		---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
+		---- ---- ---- ---- ---- ---- ---x x--- mem speed
+		---- ---- ---- ---- ---- ---- ---- -xxx cpu speed
+	*/
+
+	return 0x00012002; // TODO
+}
+
+static READ32_HANDLER( next_irq_status_r )
+{
+	next_state *state = space->machine().driver_data<next_state>();
+
+	return state->m_irq_status;
+}
+
+static WRITE32_HANDLER( next_irq_status_w )
+{
+	next_state *state = space->machine().driver_data<next_state>();
+
+	COMBINE_DATA(&state->m_irq_status);
+}
+
+static READ32_HANDLER( next_irq_mask_r )
+{
+	next_state *state = space->machine().driver_data<next_state>();
+
+	return state->m_irq_mask;
+}
+
+static WRITE32_HANDLER( next_irq_mask_w )
+{
+	next_state *state = space->machine().driver_data<next_state>();
+
+	COMBINE_DATA(&state->m_irq_mask);
+}
 
 static ADDRESS_MAP_START(next_mem, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM
+	AM_RANGE(0x02007000, 0x02007003) AM_READWRITE(next_irq_status_r,next_irq_status_w)
+	AM_RANGE(0x02007800, 0x02007803) AM_READWRITE(next_irq_mask_r,next_irq_mask_w)
+
+	AM_RANGE(0x0200c000, 0x0200c003) AM_READ(next_scr1_r)
+	AM_RANGE(0x0200c800, 0x0200c803) AM_READ(next_rom_map_r)
+	AM_RANGE(0x0200d000, 0x0200d003) AM_READWRITE(next_scr2_r,next_scr2_w)
+
+	AM_RANGE(0x02000000, 0x0201ffff) AM_READWRITE8(next_io_r,next_io_w,0xffffffff) //intentional fall-through
+
+	AM_RANGE(0x04000000, 0x07ffffff) AM_RAM //work ram
+
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE_MEMBER(next_state, m_vram) //vram
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -35,13 +169,13 @@ static MACHINE_RESET(next)
 {
 }
 
-static VIDEO_START( next )
+static PALETTE_INIT(next)
 {
-}
-
-static SCREEN_UPDATE( next )
-{
-    return 0;
+	/* TODO: simplify this*/
+	palette_set_color(machine, 0,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine, 1,MAKE_RGB(0x55,0x55,0x55));
+	palette_set_color(machine, 2,MAKE_RGB(0xaa,0xaa,0xaa));
+	palette_set_color(machine, 3,MAKE_RGB(0xff,0xff,0xff));
 }
 
 static MACHINE_CONFIG_START( next, next_state )
@@ -53,15 +187,15 @@ static MACHINE_CONFIG_START( next, next_state )
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_SIZE(1120, 832)
+    MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
     MCFG_SCREEN_UPDATE(next)
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+    MCFG_PALETTE_LENGTH(4)
+    MCFG_PALETTE_INIT(next)
 
     MCFG_VIDEO_START(next)
 MACHINE_CONFIG_END
@@ -100,10 +234,19 @@ ROM_START( nexttrb )
 	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(3))
 ROM_END
 
+static DRIVER_INIT( next )
+{
+	UINT32 *ROM = (UINT32 *)machine.region("user1")->base();
+
+	ROM[0x61dc/4] = (0x6604 << 16) | (ROM[0x61dc/4] & 0xffff); //hack until I understand ...
+
+	ROM[0x00b8/4] = (ROM[0x00b8/4] << 16) | (0x67ff & 0xffff); //patch ROM checksum
+}
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                FLAGS */
-COMP( 1987, next,   0,          0,   next,      next,    0,      "Next Software Inc",   "NeXT",				GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, next,   0,          0,   next,      next,    next,   "Next Software Inc",   "NeXT",				GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1990, nextnt, next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Non Turbo)",	GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1992, nexttrb,next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
