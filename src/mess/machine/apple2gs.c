@@ -753,8 +753,8 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 	scanline = machine.primary_screen->vpos();
 	machine.primary_screen->update_partial(scanline);
 
-	/* scanline interrupt */
-	if ((state->m_newvideo & 0x80) && (state->m_vgcint & 0x02) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
+	if ((state->m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
 	{
 		UINT8 scb;
 
@@ -762,8 +762,15 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 		if (scb & 0x40)
 		{
-			state->m_vgcint |= 0xa0;
-			apple2gs_add_irq(machine, IRQ_VGC_SCANLINE);
+			// scanline int flag is set even when the actual interrupt is disabled 
+			state->m_vgcint |= 0x20;
+
+			// see if the interrupt is also enabled and trigger it if so
+			if (state->m_vgcint & 0x02)
+			{
+				state->m_vgcint |= 0x80;
+				apple2gs_add_irq(machine, IRQ_VGC_SCANLINE);
+			}
 		}
 	}
 
