@@ -136,6 +136,7 @@ const struct pit8253_config at_pit8254_config =
 static int dma_channel;
 static UINT8 dma_offset[2][4];
 static UINT8 at_pages[0x10];
+static UINT16 dma_high_byte;
 
 
 READ8_HANDLER(at_page8_r)
@@ -199,8 +200,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 static READ8_HANDLER( pc_dma_read_byte )
 {
 	UINT8 result;
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
-		& 0xFF0000;
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16) & 0xFF0000;
 
 	result = space->read_byte(page_offset + offset);
 	return result;
@@ -209,10 +209,29 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
-		& 0xFF0000;
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16) & 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
+}
+
+
+static READ8_HANDLER( pc_dma_read_word )
+{
+	UINT16 result;
+	offs_t page_offset = (((offs_t) dma_offset[1][dma_channel & 3]) << 16) & 0xFF0000;
+
+	result = space->read_word(page_offset + ( offset << 1 ) );
+	dma_high_byte = result & 0xFF00;
+
+	return result & 0xFF;
+}
+
+
+static WRITE8_HANDLER( pc_dma_write_word )
+{
+	offs_t page_offset = (((offs_t) dma_offset[1][dma_channel & 3]) << 16) & 0xFF0000;
+
+	space->write_word(page_offset + ( offset << 1 ), dma_high_byte | data);
 }
 
 
@@ -232,13 +251,23 @@ static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) {
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	if (!state) dma_channel = channel;
+	if (!state)
+		dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
 static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
 static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
 static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack4_w )
+{
+	at_state *st = device->machine().driver_data<at_state>();
+
+	i8237_hlda_w( st->m_dma8237_1, state ? 0 : 1); // it's inverted
+}
+static WRITE_LINE_DEVICE_HANDLER( pc_dack5_w ) { set_dma_channel(device, 5, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack6_w ) { set_dma_channel(device, 6, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack7_w ) { set_dma_channel(device, 7, state); }
 
 I8237_INTERFACE( at_dma8237_1_config )
 {
@@ -252,16 +281,15 @@ I8237_INTERFACE( at_dma8237_1_config )
 };
 
 
-/* TODO: How is this hooked up in the actual machine? */
 I8237_INTERFACE( at_dma8237_2_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_word),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_word),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+	{ DEVCB_LINE(pc_dack4_w), DEVCB_LINE(pc_dack5_w), DEVCB_LINE(pc_dack6_w), DEVCB_LINE(pc_dack7_w) }
 };
 
 
