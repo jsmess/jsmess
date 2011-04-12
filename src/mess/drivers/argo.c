@@ -26,19 +26,48 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
+	DECLARE_WRITE8_MEMBER(argo_io_w);
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
+	UINT8 m_cursor_pos[3];
+	UINT8 m_cur;
+	bool m_ram_ctrl;
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
+// write to videoram if following 'out b9,61' otherwise discard
 WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
-	UINT8 *RAM = machine().region("videoram")->base();
-	RAM[offset] = data;
+	if (m_ram_ctrl)
+	{
+		UINT8 *RAM = machine().region("videoram")->base();
+		RAM[offset] = data;
+	}
 }
+
+WRITE8_MEMBER(argo_state::argo_io_w)
+{
+	UINT8 low_io = offset;
+
+	switch (low_io)
+	{
+	case 0xC0: // store cursor position if it followed 'out c4,80'
+		if (m_cur > 0) m_cursor_pos[m_cur]=data;
+		if (m_cur < 2) m_cur++;
+		break;
+	case 0xC4:
+		if (data == 0x80) m_cur=1; else m_cur=0;
+		break;
+	case 0xB9:
+		m_ram_ctrl = (data == 0x61);
+		break;
+	}
+}
+
+
 
 static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -62,6 +91,7 @@ static ADDRESS_MAP_START(argo_io, AS_IO, 8, argo_state)
 	AM_RANGE(0x09A1, 0x09A1) AM_READ_PORT("X9")
 	AM_RANGE(0x0AA1, 0x0AA1) AM_READ_PORT("XA")
 	AM_RANGE(0x0BA1, 0x0BA1) AM_READ_PORT("XB")
+	AM_RANGE(0x0000, 0xFFFF) AM_WRITE(argo_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -108,7 +138,7 @@ SCREEN_UPDATE_MEMBER( argo_state )
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *vram = m_p_videoram;
+	UINT8 *p_vram = m_p_videoram;
 
 	m_framecnt++;
 
@@ -118,22 +148,26 @@ SCREEN_UPDATE_MEMBER( argo_state )
 		{
 			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
-			for (x = ma; x < ma + 80; x++)
+			for (x = 1; x < 81; x++) // align x to the cursor position numbers
 			{
 				gfx = 0;
 
 				if (ra < 9)
 				{
-					chr = vram[x];
+					chr = p_vram[x+ma-1];
 
 					/* Take care of flashing characters */
-					if ((chr & 0x80) && (m_framecnt & 0x08))
-						chr = 0x20;
+					//if ((chr & 0x80) && (m_framecnt & 0x08))
+					//	chr = 0x20;
 
 					chr &= 0x7f;
 
 					gfx = m_p_chargen[(chr<<4) | ra ];
 				}
+				else
+				// display cursor if at cursor position and flash on
+				if ((x==m_cursor_pos[1]) && (y==m_cursor_pos[2]) && (m_framecnt & 0x08))
+					gfx = 0xff;
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -152,7 +186,7 @@ SCREEN_UPDATE_MEMBER( argo_state )
 		else
 		{
 			ma=0;
-			vram = machine().region("videoram")->base();
+			p_vram = machine().region("videoram")->base();
 		}
 	}
 	return 0;
