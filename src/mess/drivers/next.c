@@ -231,31 +231,37 @@ static MACHINE_CONFIG_DERIVED( next040, next )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( next )
+ROM_START( next ) // 68030
     ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v12", "v1.2" )
-	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" )
-	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 0, "v12", "v1.2" ) // version? word at 0xC: 5AD0
+	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(1)) /* Label: "(C) 1990 NeXT, Inc. // All Rights Reserved. // Release 1.2 // 1142.02", underlabel exists but unknown */
+	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" ) // version? word at 0xC: 3090
+	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */
+	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 prototype?" ) // version? word at 0xC: 23D9
+	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(F44974F9) SHA1(09EAF9F5D47E379CFA0E4DC377758A97D2869DDC), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
 ROM_END
 
-ROM_START( nextnt )
+ROM_START( nextnt ) // 68040 non-turbo
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v25", "v2.5 v66" )
+	ROM_SYSTEM_BIOS( 0, "v25", "v2.5 v66" ) // version? word at 0xC: F302
 	ROMX_LOAD( "rev_2.5_v66.bin", 0x0000, 0x20000, CRC(f47e0bfe) SHA1(b3534796abae238a0111299fc406a9349f7fee24), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" )
+	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" ) // version? word at 0xC: A634
 	ROMX_LOAD( "rev_2.4_v65.bin", 0x0000, 0x20000, CRC(74e9e541) SHA1(67d195351288e90818336c3a84d55e6a070960d2), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "v21", "v2.1 v59" )
-	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 2, "v21a", "v2.1a? v60?" ) // version? word at 0xC: 894C; NOT SURE about correct rom major and v versions of this one!
+	ROMX_LOAD( "rev_2.1a_v60.bin", 0x0000, 0x20000, CRC(739D7C07) SHA1(48FFE54CF2038782A92A0850337C5C6213C98571), ROM_BIOS(3)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */
+	ROM_SYSTEM_BIOS( 3, "v21", "v2.1 v59" ) // version? word at 0xC: 72FE
+	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) // version? word at 0xC: 6372
+	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(B815B6A4) SHA1(97D8B09D03616E1487E69D26609487486DB28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
 ROM_END
 
-ROM_START( nexttrb )
+ROM_START( nexttrb ) // 68040 turbo
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v33", "v3.3 v74" )
+	ROM_SYSTEM_BIOS( 0, "v33", "v3.3 v74" ) // version? word at 0xC: (12)3456
 	ROMX_LOAD( "rev_3.3_v74.bin", 0x0000, 0x20000, CRC(fbc3a2cd) SHA1(a9bef655f26f97562de366e4a33bb462e764c929), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v32", "v3.2 v72" )
+	ROM_SYSTEM_BIOS( 1, "v32", "v3.2 v72" ) // version? word at 0xC: (01)2f31
 	ROMX_LOAD( "rev_3.2_v72.bin", 0x0000, 0x20000, CRC(e750184f) SHA1(ccebf03ed090a79c36f761265ead6cd66fb04329), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" )
+	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" ) // version? word at 0xC: (01)06e8
 	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(3))
 ROM_END
 
