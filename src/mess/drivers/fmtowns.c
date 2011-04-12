@@ -2299,7 +2299,8 @@ void towns_state::driver_start()
 void marty_state::driver_start()
 {
 	towns_state::driver_start();
-	m_towns_machine_id = 0x034a;
+	if(m_towns_machine_id == 0x0101) // default if no serial ROM present
+		m_towns_machine_id = 0x034a;
 }
 
 void towns_state::machine_reset()
@@ -2471,29 +2472,28 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( towns, towns_state )
-
+static MACHINE_CONFIG_FRAGMENT( towns_base )
 	/* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I386, 16000000)
-    MCFG_CPU_PROGRAM_MAP(towns_mem)
-    MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_ADD("maincpu",I386, 16000000)
+	MCFG_CPU_PROGRAM_MAP(towns_mem)
+	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
-
-//    MCFG_MACHINE_RESET(towns)
-
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MCFG_SCREEN_SIZE(768,512)
-    MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
-//	MCFG_SCREEN_UPDATE(towns)
 	
-    MCFG_GFXDECODE(towns)
+	//    MCFG_MACHINE_RESET(towns)
 
-    /* sound hardware */
-    MCFG_SPEAKER_STANDARD_MONO("mono")
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(768,512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
+	//	MCFG_SCREEN_UPDATE(towns)
+
+	MCFG_GFXDECODE(towns)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
 	MCFG_SOUND_CONFIG(ym3438_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2505,7 +2505,7 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MCFG_SOUND_ADD("speaker",SPEAKER_SOUND,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-    MCFG_PIT8253_ADD("pit",towns_pit8253_config)
+	MCFG_PIT8253_ADD("pit",towns_pit8253_config)
 
 	MCFG_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
 
@@ -2528,12 +2528,18 @@ static MACHINE_CONFIG_START( towns, towns_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-    //MCFG_VIDEO_START(towns)
+	//MCFG_VIDEO_START(towns)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( towns, towns_state )
+
+	MCFG_FRAGMENT_ADD(towns_base)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( townsux, towns )
@@ -2572,7 +2578,8 @@ static MACHINE_CONFIG_DERIVED( townshr, towns )
 	MCFG_RAM_EXTRA_OPTIONS("12M,20M,28M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( marty, towns )
+static MACHINE_CONFIG_START( marty, marty_state )
+	MCFG_FRAGMENT_ADD(towns_base)
 
 	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
 	MCFG_CPU_PROGRAM_MAP(marty_mem)
