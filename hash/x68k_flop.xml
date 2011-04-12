@@ -216,6 +216,200 @@
 		</part>
 	</software>
 
+	<software name="aakushu">
+		<description>Aakushu Youen no Jidai wo Koete</description>
+		<year>1990</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aakushu youen no jidai wo koete (1990)(wolf team).dim" size="1261824" crc="31461ace" sha1="c40ebdb1777b1a3e189c4957c0c373854375fc49" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- has minor priority issues -->
+	<software name="aburner2">
+		<description>Afterburner II</description>
+		<year>1989</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="afterburner ii (1989)(dempa)(disk 1 of 2).dim" size="1261824" crc="1cab6b09" sha1="d0c4fe36b09369d52a529836b57d789d6f1ff2bb" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="afterburner ii (1989)(dempa)(disk 2 of 2).dim" size="1261824" crc="6a8201c5" sha1="e6ebc0ef2c7dfd7d61c7c3484e3601d3780799bb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abuten">
+		<description>Abunai Tengoku Densetsu</description>
+		<year>1989</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="abunai tengoku densetsu (1989)(alice soft).dim" size="1261824" crc="b0411514" sha1="17d5b45271ed3af279a6fb783b070bf4d163fead" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- appears to be some garbage on the background, but otherwise playable -->
+	<software name="accheat">
+		<description>Access Heat</description>
+		<year>1995</year>
+		<publisher>Fox Factory</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="access heat (1995)(fox factory).dim" size="1261824" crc="ebc0760a" sha1="7ceb246172d5f1cbb22428c97427a700a34e5a6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acombat2">
+		<description>Air Combat - Yuugekiou II</description>
+		<year>1990</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="air combat ii yuugekiou ii (1990)(system soft)(disk 1 of 2)(system).dim" size="1261824" crc="15213e65" sha1="276e23c4ffabab992058732ed32af04c04a5f586" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="air combat ii yuugekiou ii (1990)(system soft)(disk 2 of 2)(user).dim" size="1261824" crc="d732ca53" sha1="eb8ea229e95568b993312b773cd46d31ca7f4c00" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Some projectiles don't seem to want to move...  -->
+	<software name="actshoot">
+		<description>Active Shoot</description>
+		<year>1999</year>
+		<publisher>Satou Kouji</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="active shoot (1999)(satou kouji).dim" size="1261824" crc="10430ea0" sha1="024282dcc8cfa7c065c6eb4d2a126e47c5126c12" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advland">
+		<description>Adventure Land</description>
+		<year>1993</year>
+		<publisher>Keima - JN1FEZ</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="adventure land (1993)(keima - jn1fez).dim" size="1261824" crc="78ecad47" sha1="6354caa1106d69955cb6e1634f44bd426c47de8a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advland2">
+		<description>Adventure Land 2 (v0.99)</description>
+		<year>1995</year>
+		<publisher>Keima - JN1FEZ</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="adventure land 2 v0.99 (1995)(keima - jn1fez).dim" size="1261824" crc="2f9ee408" sha1="f640afe7d64423ab3ec80db4ffc7b39a3e4bca97" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advland2a" cloneof="advland2">
+		<description>Adventure Land 2 (v0.50)</description>
+		<year>1994</year>
+		<publisher>Keima - JN1FEZ</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="adventure land 2 v0.50 (1994)(keima - jn1fez).dim" size="1261824" crc="e43ba804" sha1="451ad41537f1417c1fd19e2d4fcf38c3c37d1032" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aikoku">
+		<description>Aikoku Pro Uso-68K</description>
+		<year>1990</year>
+		<publisher>Hazama Kuroo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aikoku pro uso-68k (1990)(hazama kuroo).dim" size="1261824" crc="17329a1c" sha1="c3a746d1895f890a108e86644fbacb867b8ed2e0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airhork">
+		<description>Air Hork</description>
+		<year>1990</year>
+		<publisher>PCCM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="air hork (1990)(pccm).dim" size="1261824" crc="9cc984ed" sha1="e44f1ece31a9059a195b14533c3d1938aa16facc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- disk error loading title screen? -->
+	<software name="airmanag">
+		<description>Air Management</description>
+		<year>19??</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="air management (19xx)(koei)(disk 1 of 2)(disk a).dim" size="1261824" crc="1cca036c" sha1="fd33353545f68ec217b3f78f7ce61dd37646e81d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="air management (19xx)(koei)(disk 2 of 2)(disk b).dim" size="1261824" crc="f14ebf29" sha1="2be66110bb92141bbbc691e59b1bcd897174aff3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ajax">
+		<description>A-Jax</description>
+		<year>1989</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a-jax (1989)(konami)(disk 1 of 3)(program).dim" size="1261824" crc="13b336a5" sha1="86205f967d85ed65fb8157770bca1586539fa6f3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a-jax (1989)(konami)(disk 2 of 3)(disk 1).dim" size="1261824" crc="27b524e6" sha1="a5fa3e5027d1af87e8a2e992c4272ef15b6000f6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a-jax (1989)(konami)(disk 3 of 3)(disk 2).dim" size="1261824" crc="f63564b7" sha1="b55ff897d8c8caf59724d57bfb768140d3d3b296" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akazucha">
+		<description>Akazukin Cha Cha Cha (v1.04)</description>
+		<year>1995</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akazukin cha cha cha v1.04 (1995)(sprite).dim" size="1261824" crc="b8e73fd1" sha1="0061d897b105cc33a0818c5496722ddb5502106a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akazukin">
+		<description>Akazukin Monogatari</description>
+		<year>199?</year>
+		<publisher>Tera Tera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akazukin monogatari (199x)(tera tera soft).dim" size="1261824" crc="535d3b96" sha1="7c46e9721b33ad067e337ba8ab77c60f873c182a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akiko">
 		<description>Akiko</description>
 		<year>1993</year>
@@ -237,6 +431,27 @@
 		</part>
 	</software>
 
+	<software name="akikod" cloneof="akiko">
+		<description>Akiko (DIM)</description>
+		<year>1993</year>
+		<publisher>Ides</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akiko (1993)(ides)(disk 1 of 3).dim" size="1261824" crc="67be1ba8" sha1="0bdf01a320ad28f74e8984590f686070d8ed6bf7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akiko (1993)(ides)(disk 2 of 3).dim" size="1261824" crc="4fb9e5e1" sha1="72d7ebfcfc2b6b1d36c4ae7dafef87f5c087bd7e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akiko (1993)(ides)(disk 3 of 3).dim" size="1261824" crc="ef83ac05" sha1="baacc31764661b6226e97cdb0de7a48c2880ce97" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akumajou">
 		<description>Akumajou Dracula</description>
 		<year>1993</year>
@@ -249,6 +464,96 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk 2.xdf" size="1261568" crc="6831b09b" sha1="2de753f6f579af6a6954d0df0c29694cdcff9992" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akumajoud" cloneof="akumajou">
+		<description>Akumajou Dracula (DIM)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akumajou dracula (1993)(konami)(disk 1 of 2).dim" size="1261824" crc="12ed7cbc" sha1="93044170e3ed3e7b528cf0bf1e670792c9745e68" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="akumajou dracula (1993)(konami)(disk 2 of 2).dim" size="1261824" crc="78490385" sha1="d3aa885bc7cf9f8e4074f88955adb6a0264fc6f8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alfarne">
+		<description>Alfarne</description>
+		<year>1989</year>
+		<publisher>Shilpheed Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alfarne (1989)(shilpheed software).dim" size="1261824" crc="1d23a4e2" sha1="549413b899722e16f8e4bc41cec25da27486190b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algarna">
+		<description>Algarna</description>
+		<year>1991</year>
+		<publisher>MNM Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="algarna (1991)(mnm software)(disk 1 of 2)(system disk).dim" size="1261824" crc="821234b5" sha1="e45c1be6a320d8f622088659efaf9dc86859f594" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="algarna (1991)(mnm software)(disk 2 of 2)(data disk).dim" size="1261824" crc="027d5e3e" sha1="ba6e830a3ff5d11fe40feb5c021cad3b5ab04287" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alice">
+		<description>Alice no Yakata</description>
+		<year>19??</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata (19xx)(alice soft)(disk 1 of 3).dim" size="1261824" crc="2c913558" sha1="be7f5093ed37650b07c7d6047461978f34d52a98" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata (19xx)(alice soft)(disk 2 of 3).dim" size="1261824" crc="b9ae5f76" sha1="ae832a68f66fd2916b4409b5c6c5172ae3b35010" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata (19xx)(alice soft)(disk 3 of 3).dim" size="1261824" crc="3a2015ac" sha1="0dec9b00dbb3a03a556f021e8d39bab4bcab7b61" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alice2">
+		<description>Alice no Yakata II</description>
+		<year>1992</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata ii (1992)(alice soft)(disk 1 of 4)(disk a).dim" size="1261824" crc="f2e2018a" sha1="caec6eb510e9e08a503372c8fc0679f1990e1d45" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata ii (1992)(alice soft)(disk 2 of 4)(disk b).dim" size="1261824" crc="bdefa3e7" sha1="114738e380fcb9955688f547cb2120dacc7d9f19" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata ii (1992)(alice soft)(disk 3 of 4)(disk c).dim" size="1261824" crc="74f72d61" sha1="f26745f014837edd8dd59f7bd91b2445d453a97d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alice no yakata ii (1992)(alice soft)(disk 4 of 4)(disk d).dim" size="1261824" crc="35e5ca6d" sha1="d47e58a361a7ce504f0013cffc31f3dafb498de4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -271,6 +576,290 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk 1.xdf" size="1261568" crc="d93369da" sha1="83166698f3abbbd8141f2c2d9360fb67188c3720" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliensynd" cloneof="aliensyn">
+		<description>Alien Syndrome</description>
+		<year>1992</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alien syndrome (1992)(dempa).dim" size="1261824" crc="0f4f2f1d" sha1="27929f4f0e67b60431cdf84ffce01e2f727769ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atennis">
+		<description>Alien Tennis Chikyuu no Kiki</description>
+		<year>19??</year>
+		<publisher>Killer</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alien tennis chikyuu no kiki (19xx)(killer).dim" size="1261824" crc="fae4eb4a" sha1="cb3e498639801ad8344015d09566a9a6d56ba8ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alshark">
+		<description>Alshark</description>
+		<year>1991</year>
+		<publisher>Right Stuff</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alshark (1991)(right stuff)(disk 1 of 5)(system).dim" size="1261824" crc="e5daffe8" sha1="fa6c0a65e3e93b4fc2782a64ab972275be8065b0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alshark (1991)(right stuff)(disk 2 of 5)(data).dim" size="1261824" crc="1756809a" sha1="dc33f8a751a8b1b770ef04a64d100c15ce39b9f2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alshark (1991)(right stuff)(disk 3 of 5)(opening).dim" size="1261824" crc="2d47e7bb" sha1="6c5d8db3f2e0202ba7fad51de98d8b38a9a1ff76" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alshark (1991)(right stuff)(disk 4 of 5)(visual).dim" size="1261824" crc="4875eb6c" sha1="06a82a23ea1b4dcfc9ea735b0d872499e4fc9529" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alshark (1991)(right stuff)(disk 5 of 5)(ending).dim" size="1261824" crc="a66d09f0" sha1="1f7f698624cfcd9e7a5b3e72e753523f02ceacd1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amamori">
+		<description>Amamori Pro Uso-68K</description>
+		<year>1991</year>
+		<publisher>Hazama Kuroo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="amamori pro uso-68k (1991)(hazama kuroo).dim" size="1261824" crc="61849122" sha1="222ce95395ac9789ea3f7085f817cec51e4d746c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ambiv">
+		<description>Ambivalenz</description>
+		<year>1994</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 1 of 7).dim" size="1261824" crc="51fda322" sha1="b0b31ca8a97fb96d70f451dd5abe0e06f24d25ca" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 2 of 7).dim" size="1261824" crc="5752f764" sha1="ee8cb5f7633abb9436f97dcb5353eccacf019fb8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 3 of 7).dim" size="1261824" crc="8fa7b1b1" sha1="b271e962fd57c045361826ee5fb581a4d0b8bccb" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 4 of 7).dim" size="1261824" crc="d9a59272" sha1="0f5d2f5d79526d8a24867dbf142ebc5919f93ae2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 5 of 7).dim" size="1261824" crc="a8d62659" sha1="ff7fe470d4960adc96ac534e680a4b08ae1949e0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 6 of 7).dim" size="1261824" crc="2330e51f" sha1="a83357507a285ed9069215cab3c3deabb3f7fab1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ambivalenz (1994)(alice soft)(disk 7 of 7).dim" size="1261824" crc="2f2b791e" sha1="26da2c60bb6db5207b5f041f63b63b4f39d00393" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Text remains on screen during gameplay -->
+	<software name="amegame">
+		<description>Ame Game (v0.90)</description>
+		<year>19??</year>
+		<publisher>Shin - Kisshin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ame game 0.90 (19xx)(shin &amp; kisshin).dim" size="1261824" crc="7fb87de3" sha1="49ad7da072191a74053391fb658636ee91752a03" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amheroes">
+		<description>American Heroes BF 92 Extra Version</description>
+		<year>1992</year>
+		<publisher>LTT - Kuma</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="american heroes bf 92 extra version (1992)(ltt - kuma).dim" size="1261824" crc="3c062225" sha1="1466e2ea98e7e0fcaa7e153e6d835a536601ca61" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andromed">
+		<description>Andromeda Seiun</description>
+		<year>19??</year>
+		<publisher>Reki</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="andromeda seiun (19xx)(reki).dim" size="1261824" crc="eb1dd518" sha1="06c79309648200dc6777c17e76f1e22ea26ef1a3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angeldiv">
+		<description>Angel Dive</description>
+		<year>1996</year>
+		<publisher>Yamada Kikaku</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="angel dive (1996)(yamada kikaku).dim" size="1261824" crc="b30231ea" sha1="d5c9a3b75188096ca6bf5fa350c92043e8c5014d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animj">
+		<description>Ani Mahjongg (demo)</description>
+		<year>1993</year>
+		<publisher>Sogna</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ani mahjongg (demo) (1993)(sogna).dim" size="1261824" crc="8fbebb32" sha1="d8ddc2af843ad4ae2f549d755b18d6db1a5792ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animjtsu">
+		<description>Ani Mahjongg (demo) [tsuika file]</description>
+		<year>1993</year>
+		<publisher>Sogna</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ani mahjongg (demo) (1993)(sogna)[tsuika file].dim" size="1261824" crc="4f1c5325" sha1="c2dae7f38df64fa1d3a236e963f9110923619868" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anmira">
+		<description>Anmira Daihinmin</description>
+		<year>19??</year>
+		<publisher>Nippousha</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="anmira daihinmin (19xx)(nippousha).dim" size="1261824" crc="642ae80a" sha1="844114c3281d04c630f739e40ce88df9449a7eb7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anzufly">
+		<description>Anzu Fly!</description>
+		<year>1991</year>
+		<publisher>Pussy Cat</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="anzu fly! (1991)(pussy cat).dim" size="1261824" crc="1bea6961" sha1="3bef9fa8168ae3e5cb6acc9862c1cd8ab4707796" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aokigh">
+		<description>Aoki Ookami to Shiroki Meshika Genchou Hishi</description>
+		<year>1993</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aoki ookami to shiroki meshika genchou hishi (1993)(koei)(disk 1 of 3).dim" size="1261824" crc="79bd93c7" sha1="4177096639ddf153b502de379c57fc6746065d58" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aoki ookami to shiroki meshika genchou hishi (1993)(koei)(disk 2 of 3).dim" size="1261824" crc="9a56bdbf" sha1="55ebf48be301eaa809defbc974ec04b2a0097877" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aoki ookami to shiroki meshika genchou hishi (1993)(koei)(disk 3 of 3).dim" size="1261824" crc="b3609f96" sha1="713338f87af418aa2a40b92da8411826f78c4912" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aokigk">
+		<description>Aoki Ookami to Shiroki Meshika Genghis Khan</description>
+		<year>1989</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aoki ookami to shiroki meshika genghis khan (1989)(koei)(disk 1 of 3).dim" size="1261824" crc="35eb3417" sha1="8bddd1bce5ba761e4303171cadc592d5741a31aa" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aoki ookami to shiroki meshika genghis khan (1989)(koei)(disk 2 of 3).dim" size="1261824" crc="b660682c" sha1="b1723c4f337b5e32e92e188470515a4db8635caf" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aoki ookami to shiroki meshika genghis khan (1989)(koei)(disk 3 of 3).dim" size="1261824" crc="ce3c52c4" sha1="b7d40a61182e53cd78ae3ce5cd340fba3fc74bd9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- boot with disk 1 in drive 0 and disk 3 in drive 1 -->
+	<software name="aquales">
+		<description>Aquales</description>
+		<year>1991</year>
+		<publisher>Exact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aquales (1991)(exact)(disk 1 of 3).dim" size="1261824" crc="c03bb393" sha1="f752eb5b7c56f96a466c1f1da26682e2142c33a8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aquales (1991)(exact)(disk 2 of 3).dim" size="1261824" crc="d178d948" sha1="35fe019806f31906baade488f3c9714328f6d430" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="aquales (1991)(exact)(disk 3 of 3).dim" size="1261824" crc="5954a3e4" sha1="510755526ecce6589a60ace5f3fe0332d91723c0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcus2">
+		<description>Arcus II Silent Symphony</description>
+		<year>19??</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus ii silent symphany (19xx)(wolf team)(disk 1 of 4).dim" size="1261824" crc="025664eb" sha1="58f7261e7ff01b7a3125d0c352a70e825c0fa725" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus ii silent symphany (19xx)(wolf team)(disk 2 of 4).dim" size="1261824" crc="2fd63993" sha1="0e00fff09143ff8c21299eb13755c80109201c38" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus ii silent symphany (19xx)(wolf team)(disk 3 of 4).dim" size="1261824" crc="52c97fdf" sha1="fbc77929b2da5c845b729a09e692a4d6244400e5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus ii silent symphany (19xx)(wolf team)(disk 4 of 4).dim" size="1261824" crc="507dcc72" sha1="f4dd0c07c52d08662af378a18b3ff2ba291c6c68" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -299,6 +888,290 @@
 				<rom name="disk 2.dim" size="1261824" crc="b0c5da9b" sha1="5660ee1bf2ecda733e08e666fd2bf1f0c7b8ff9a" offset="0" />
 			</dataarea>
 			-->
+		</part>
+	</software>
+
+	<software name="arcusodd" cloneof="arcusod">
+		<description>Arcus Odyssey (DIM)</description>
+		<year>1991</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus odyssey (1991)(wolf team)(disk 1 of 2).dim" size="1261824" crc="5ca9c342" sha1="094e2295bf22fbc9a86c2bed91934165273c5cba" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus odyssey (1991)(wolf team)(disk 2 of 2).dim" size="1261824" crc="7e1cf6e4" sha1="a88175d39397bd42e980226a9752cd2d2c0b99e3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcuspro">
+		<description>Arcus Pro 68K</description>
+		<year>1989</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus pro 68k (1989)(wolf team)(disk 1 of 5).dim" size="1261824" crc="39987892" sha1="14a1c73ebdfd871ae8554cab4d25eb1e248a9533" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus pro 68k (1989)(wolf team)(disk 2 of 5).dim" size="1261824" crc="f0f95c0a" sha1="f688a3d644773d0d85e8d494a8432aba765b2d76" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus pro 68k (1989)(wolf team)(disk 3 of 5).dim" size="1261824" crc="cab003f8" sha1="c917299709efac3a6f3eef60cda0b096db90859e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus pro 68k (1989)(wolf team)(disk 4 of 5).dim" size="1261824" crc="402e3854" sha1="2ae35a3372ab278aa026cd4cd60682be86b389c4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arcus pro 68k (1989)(wolf team)(disk 5 of 5).dim" size="1261824" crc="3b7bade0" sha1="0a7ca8ff765e5bc3201c3fe70005066a2690859e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aressha2">
+		<description>A Ressha de Ikou II</description>
+		<year>1988</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a ressha de ikou ii (1988)(artdink)(disk 1 of 2).dim" size="1261824" crc="94d79855" sha1="639b6ca9ee1c67f4544d31d553edce727ad535f1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a ressha de ikou ii (1988)(artdink)(disk 2 of 2).dim" size="1261824" crc="3af4a19f" sha1="cb79ae398fe7f73f564de0b89f6ab45bbcaa0942" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="aressha3">
+		<description>A Ressha de Ikou III</description>
+		<year>1991</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a ressha de ikou iii (1991)(artdink)(disk 1 of 2).dim" size="1261824" crc="8ca768a3" sha1="66ad29d11c7b22e8714dd400809c342f9e8651bc" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="a ressha de ikou iii (1991)(artdink)(disk 2 of 2).dim" size="1261824" crc="848c9333" sha1="e2876a7d8405ac2f803fc2fca1a3663192a25109" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Video Game Anthology Vol. 9 -->
+	<software name="argos">
+		<description>Argos no Senshi</description>
+		<year>1994</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="argos no senshi (1994)(dempa).dim" size="1261824" crc="e03b61d0" sha1="bce9eef82dc46c7d8e1c44f4bf93b5844c3a64ce" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arianshu">
+		<description>Arianshuu</description>
+		<year>19??</year>
+		<publisher>Haiteidoradorazu</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arianshuu (19xx)(haiteidoradorazu).dim" size="1261824" crc="6132edf4" sha1="e2462e99a352968c4f8358ea3329ae388b7d986f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- appears to lock up on the controller select screen -->
+	<software name="arkanoi2">
+		<description>Arkanoid - Revenge of Doh</description>
+		<year>1987</year>
+		<publisher>Sharp - SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arkanoid revenge of doh (1987)(sharp - sps).dim" size="1261824" crc="a5d3e4b2" sha1="6d86cfadb6c39752e030c0fa4452d15627bf5c52" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armtroop">
+		<description>Armored Trooper Votoms Dead Ash</description>
+		<year>1991</year>
+		<publisher>Family Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="armored trooper votoms dead ash (1991)(family soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="542dc750" sha1="5a7a6064dedbbbd5d0a861bd58ad4b6a6afc03b2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="armored trooper votoms dead ash (1991)(family soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="c7d49a85" sha1="c3793345cc519991397dcf1d0cce7012a4ec1f20" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arobokid">
+		<description>Atomic Robo-Kid</description>
+		<year>1990</year>
+		<publisher>System Sacom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="atomic robo-kid (1990)(system sacom)(disk 1 of 2)(disk a).dim" size="1261824" crc="a5035dc1" sha1="85fcb804440e52dc33fafe1e9d5066190b0733e3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="atomic robo-kid (1990)(system sacom)(disk 2 of 2)(disk b).dim" size="1261824" crc="cc160201" sha1="d3d52fef051e3f039d30ed59fb92947f9e339d60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arquiz">
+		<description>Advanced Ruumik Quiz</description>
+		<year>1990</year>
+		<publisher>Master Piece</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="advanced ruumik quiz (1990)(master piece).dim" size="1261824" crc="6331f82b" sha1="067485cc392c883dc2a436f758cc680359d22cf4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arquiz2">
+		<description>Advanced Ruumik Quiz 2</description>
+		<year>199?</year>
+		<publisher>Master Piece</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="advanced ruumik quiz 2 (199x)(master piece).dim" size="1261824" crc="8ddf9d8a" sha1="e8d40b701691e1e6552082c3549f289b378715ed" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arsia">
+		<description>Arsia no Ki</description>
+		<year>1995</year>
+		<publisher>Moai</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arsia no ki (1995)(moai)(disk 1 of 2).dim" size="1261824" crc="93090373" sha1="f324a3193337533e911e2bf9b0a3347f4ec3fb42" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arsia no ki (1995)(moai)(disk 2 of 2).dim" size="1261824" crc="cd8234a0" sha1="e7b894eb6ead4425727c097fdfc2146b0c41198f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This one requires some installation, disk contains only a compressed LZH file -->
+	<software name="artemis">
+		<description>Artemis</description>
+		<year>1993</year>
+		<publisher>X-Works</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="artemis (1993)(x-works).dim" size="1261824" crc="472d557f" sha1="75b450647ebb842d2faab5f661ce1133871c9545" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arururu">
+		<description>Arururu</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="arururu (19xx)(-).dim" size="1261824" crc="6d36fa6d" sha1="e77a255cea3d01e7731cf89d46659e42e69a22ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astqueen">
+		<description>Asteroid Queen</description>
+		<year>19??</year>
+		<publisher>Kuwaki Ryuji</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="asteroid queen (19xx)(kuwaki ryuji).dim" size="1261824" crc="850eeae2" sha1="b80d08754929b72c7fbab678478bf798c2c0c53b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroid">
+		<description>Asteroids</description>
+		<year>19??</year>
+		<publisher>Yoz</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="asteroids (19xx)(yoz).dim" size="1261824" crc="bced96d1" sha1="4cccc899640e3d45575d876b4f37e6fe68ce0cbb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroi2">
+		<description>Asteroids (v2.0)</description>
+		<year>19??</year>
+		<publisher>Yoz</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="asteroids v2.0 (19xx)(yoz).dim" size="1261824" crc="4ee12702" sha1="a3e7cf0bff09d81996a42a8d7b0a0e3d307cf4ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asuka120">
+		<description>Asuka 120 Percent Burning Fest</description>
+		<year>1994</year>
+		<publisher>Family Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="asuka 120 percent burning fest (1994)(family soft)(disk 1 of 2).dim" size="1261824" crc="b02e3377" sha1="96c621c389abdf050a280ebf897d22c261da0efd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="asuka 120 percent burning fest (1994)(family soft)(disk 2 of 2).dim" size="1261824" crc="d8f02290" sha1="beaa016da100090f25916080ad10f57e102871ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ayachan">
+		<description>Ayachan Suupurekkusu II</description>
+		<year>19??</year>
+		<publisher>Kankyouken</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ayachan suupurekkusu ii (19xx)(kankyouken)(disk 1 of 2)(disk a).dim" size="1261824" crc="8fdfd77d" sha1="e0188914a173dadddead86ea2fd6362c34e961e2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ayachan suupurekkusu ii (19xx)(kankyouken)(disk 2 of 2)(disk b).dim" size="1261824" crc="0ad505c9" sha1="670c81863707d4749d3d38a8bf586cc45f592091" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Video Game Anthology Vol. 2 -->
+	<software name="chelnov">
+		<description>Atomic Runner Chelnov</description>
+		<year>1993</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="atomic runner chelnov (1993)(dempa).dim" size="1261824" crc="f5c32abb" sha1="d8846a0d831493f4d0a4962fe414221c7a166d9e" offset="000000" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -472,6 +1345,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="15 puzzle (1991)(sygnas).dim" size="1261824" crc="70aebce0" sha1="9b09e432c31eac20a5aca640b99b0cc5c5cf9878" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruhappy">
+		<description>Are You Happy Shiawase?</description>
+		<year>1995</year>
+		<publisher>68 Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="are you happy shiawase (1995)(68 bank).dim" size="1261824" crc="da878e96" sha1="7e5e94b3d92d635dc855afc6eba9d3cf68b1a10d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
