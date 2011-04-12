@@ -1845,17 +1845,7 @@ READ8_MEMBER(towns_state::towns_41ff_r)
 static IRQ_CALLBACK( towns_irq_callback )
 {
 	towns_state* state = device->machine().driver_data<towns_state>();
-	device_t* pic1 = state->m_pic_master;
-	device_t* pic2 = state->m_pic_slave;
-	int r;
-
-	r = pic8259_acknowledge(pic2);
-	if(r == 0)
-	{
-		r = pic8259_acknowledge(pic1);
-	}
-
-	return r;
+	return pic8259_acknowledge(state->m_pic_master);
 }
 
 // YM3438 interrupt (IRQ 13)
@@ -2368,15 +2358,27 @@ static const struct pit8253_config towns_pit8253_config =
 	}
 };
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	towns_state* state = device->machine().driver_data<towns_state>();
+	if (offset==7) { // IRQ = 7
+		return pic8259_acknowledge(state->m_pic_slave);
+	}
+	return 0x00;
+}
 static const struct pic8259_interface towns_pic8259_master_config =
 {
-	DEVCB_LINE(towns_pic_irq)
+	DEVCB_LINE(towns_pic_irq),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 
 static const struct pic8259_interface towns_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 static const wd17xx_interface towns_mb8877a_interface =

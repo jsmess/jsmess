@@ -775,7 +775,9 @@ static I8255A_INTERFACE( i8255_intf )
 
 static const struct pic8259_interface i8259_0_intf =
 {
-	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT0)
+	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT0),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 /*
@@ -793,7 +795,9 @@ static const struct pic8259_interface i8259_0_intf =
 
 static const struct pic8259_interface i8259_1_intf =
 {
-	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT1)
+	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT1),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 /* Floppy Configuration */

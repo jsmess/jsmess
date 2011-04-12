@@ -466,8 +466,6 @@ READ64_HANDLER( bebox_interrupt_ack_r )
 	bebox_state *state = space->machine().driver_data<bebox_state>();
 	int result;
 	result = pic8259_acknowledge( state->m_devices.pic8259_master );
-	if (result == 2)
-		result = pic8259_acknowledge( state->m_devices.pic8259_slave );
 	bebox_set_irq_bit(space->machine(), 5, 0);	/* HACK */
 	return ((UINT64) result) << 56;
 }
@@ -491,14 +489,27 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_slave_set_int_line )
 		pic8259_ir2_w(drvstate->m_devices.pic8259_master, state);
 }
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	bebox_state *state = device->machine().driver_data<bebox_state>();
+	if (offset==2) { // IRQ = 2
+		return pic8259_acknowledge(state->m_devices.pic8259_slave);
+	}
+	return 0x00;
+}
+
 const struct pic8259_interface bebox_pic8259_master_config =
 {
-	DEVCB_LINE(bebox_pic8259_master_set_int_line)
+	DEVCB_LINE(bebox_pic8259_master_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 const struct pic8259_interface bebox_pic8259_slave_config =
 {
-	DEVCB_LINE(bebox_pic8259_slave_set_int_line)
+	DEVCB_LINE(bebox_pic8259_slave_set_int_line),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 

@@ -496,9 +496,20 @@ static WRITE_LINE_DEVICE_HANDLER( qx10_pic8259_master_set_int_line )
 	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	qx10_state *state = device->machine().driver_data<qx10_state>();
+	if (offset==7) { // IRQ = 7
+		return pic8259_acknowledge(state->m_pic8259_slave);
+	}
+	return 0x00;
+}
+
 static const struct pic8259_interface qx10_pic8259_master_config =
 {
-	DEVCB_LINE(qx10_pic8259_master_set_int_line)
+	DEVCB_LINE(qx10_pic8259_master_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 /*
@@ -516,18 +527,14 @@ static const struct pic8259_interface qx10_pic8259_master_config =
 
 static const struct pic8259_interface qx10_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 static IRQ_CALLBACK( irq_callback )
 {
-	int r = 0;
-	r = pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic8259_slave );
-	if (r==0)
-	{
-		r = pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic8259_master );
-	}
-	return r;
+	return pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic8259_master );
 }
 
 static READ8_HANDLER( upd7201_r )

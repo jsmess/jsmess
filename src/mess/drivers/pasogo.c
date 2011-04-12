@@ -496,7 +496,9 @@ static WRITE_LINE_DEVICE_HANDLER( pasogo_pic8259_set_int_line )
 
 static const struct pic8259_interface pasogo_pic8259_config =
 {
-	DEVCB_LINE(pasogo_pic8259_set_int_line)
+	DEVCB_LINE(pasogo_pic8259_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 

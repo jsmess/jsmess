@@ -1480,14 +1480,8 @@ static I8255A_INTERFACE( r232c_ctrl_intf )
 };
 
 static IRQ_CALLBACK(pc88va_irq_callback)
-{
-	int r = 0;
-	r = pic8259_acknowledge( device->machine().device( "pic8259_slave" ));
-	if (r==0)
-	{
-		r = pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
-	}
-	return r;
+{	
+	return pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc88va_pic_irq )
@@ -1496,14 +1490,26 @@ static WRITE_LINE_DEVICE_HANDLER( pc88va_pic_irq )
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	if (offset==7) { // IRQ = 7
+		return pic8259_acknowledge(device->machine().device( "pic8259_slave"));
+	}
+	return 0x00;
+}
+
 static const struct pic8259_interface pc88va_pic8259_master_config =
 {
-	DEVCB_LINE(pc88va_pic_irq)
+	DEVCB_LINE(pc88va_pic_irq),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 static const struct pic8259_interface pc88va_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 static MACHINE_START( pc88va )

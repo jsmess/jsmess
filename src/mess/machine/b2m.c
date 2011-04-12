@@ -358,7 +358,9 @@ static IRQ_CALLBACK(b2m_irq_callback)
 
 const struct pic8259_interface b2m_pic8259_config =
 {
-	DEVCB_LINE(b2m_pic_set_int_line)
+	DEVCB_LINE(b2m_pic_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 INTERRUPT_GEN( b2m_vblank_interrupt )

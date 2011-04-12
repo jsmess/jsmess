@@ -987,7 +987,9 @@ static WRITE_LINE_DEVICE_HANDLER( pk8020_pic_set_int_line )
 
 const struct pic8259_interface pk8020_pic8259_config =
 {
-	DEVCB_LINE(pk8020_pic_set_int_line)
+	DEVCB_LINE(pk8020_pic_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 static IRQ_CALLBACK( pk8020_irq_callback )

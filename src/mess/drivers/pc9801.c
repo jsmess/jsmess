@@ -1894,14 +1894,26 @@ static WRITE_LINE_DEVICE_HANDLER( pc9801_master_set_int_line )
 	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	if (offset==7) { // IRQ = 7
+		return 	pic8259_acknowledge( device->machine().device( "pic8259_slave" ));
+	}
+	return 0x00;
+}
+
 static const struct pic8259_interface pic8259_master_config =
 {
-	DEVCB_LINE(pc9801_master_set_int_line)
+	DEVCB_LINE(pc9801_master_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 static const struct pic8259_interface pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w) //TODO: check me
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w), //TODO: check me
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 /****************************************
@@ -2170,14 +2182,7 @@ static PALETTE_INIT( pc9801 )
 
 static IRQ_CALLBACK(irq_callback)
 {
-	int r = 0;
-	r = pic8259_acknowledge( device->machine().device( "pic8259_slave" ));
-	if (r==0)
-	{
-		r = pic8259_acknowledge( device->machine().device( "pic8259_master" ));
-		//printf("%02x ACK\n",r);
-	}
-	return r;
+	return pic8259_acknowledge( device->machine().device( "pic8259_master" ));
 }
 
 static MACHINE_START(pc9801)

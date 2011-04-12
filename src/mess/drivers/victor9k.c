@@ -190,7 +190,9 @@ static const struct pit8253_config pit_intf =
 
 static const struct pic8259_interface pic_intf =
 {
-	DEVCB_CPU_INPUT_LINE(I8088_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(I8088_TAG, INPUT_LINE_IRQ0),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 /* NEC uPD7201 Interface */

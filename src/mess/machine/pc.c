@@ -190,7 +190,9 @@ I8237_INTERFACE( ibm5150_dma8237_config )
 
 const struct pic8259_interface ibm5150_pic8259_config =
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 
@@ -230,7 +232,9 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 
 const struct pic8259_interface pcjr_pic8259_config =
 {
-	DEVCB_LINE(pcjr_pic8259_set_int_line)
+	DEVCB_LINE(pcjr_pic8259_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 

@@ -506,8 +506,6 @@ static const kb_keytronic_interface at_keytronic_intf =
 
 static void ide_interrupt(device_t *device, int state)
 {
-	//at_state *drvstate = device->machine().driver_data<at_state>();
-	//pic8259_ir6_w(drvstate->m_pic8259_slave, state);
 	pic8259_ir6_w(device->machine().device("pic8259_slave"),state);
 }
 

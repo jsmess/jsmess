@@ -41,14 +41,27 @@ static int poll_delay;
  *
  *************************************************************/
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	at_state *st = device->machine().driver_data<at_state>();
+	if (offset==2) { // IRQ = 2
+		return pic8259_acknowledge(st->m_pic8259_slave);
+	}
+	return 0x00;
+}
+
 const struct pic8259_interface at_pic8259_master_config =
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 const struct pic8259_interface at_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w)
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 

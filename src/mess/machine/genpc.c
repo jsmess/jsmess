@@ -174,7 +174,9 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_cpu_line)
 
 const struct pic8259_interface pc_pic8259_config =
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_cpu_line)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_cpu_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 

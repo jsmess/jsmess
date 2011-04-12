@@ -111,7 +111,9 @@ static WRITE_LINE_DEVICE_HANDLER( irisha_pic_set_int_line )
 
 const struct pic8259_interface irisha_pic8259_config =
 {
-	DEVCB_LINE(irisha_pic_set_int_line)
+	DEVCB_LINE(irisha_pic_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 const struct pit8253_config irisha_pit8253_intf =

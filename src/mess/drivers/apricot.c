@@ -127,7 +127,9 @@ static IRQ_CALLBACK( apricot_irq_ack )
 
 static const struct pic8259_interface apricot_pic8259_intf =
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
 };
 
 
