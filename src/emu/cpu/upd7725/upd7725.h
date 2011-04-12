@@ -47,6 +47,9 @@ struct necdsp_interface
 	//devcb_write_line	m_out_drq_func;
 };
 
+#define NECDSP_INTERFACE(name) \
+	const necdsp_interface (name) =
+
 // ======================> necdsp_device_config
 
 class necdsp_device_config :	public cpu_device_config, public necdsp_interface
