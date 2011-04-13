@@ -4,15 +4,16 @@
 
     16/03/2011 Skeleton driver.
 
-    Used some info obtained from EMU-80.
+    Some info obtained from EMU-80.
+    There are no manuals, diagrams, or anything else available afaik.
+    The entire driver is guesswork.
 
-    Commands: C D E F H J K M (do not know what they do)
+    Commands: C D E F H J K L M (do not know what they do)
 
     ToDo:
     - Add devices
     - Add shift, backspace, ctrl keys (and probably others)
-    - When it should scroll, it freezes
-    - If you press L at the prompt (the first character in a line), it hangs
+    - There is no obvious evidence of sound, or of storage facilities
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -34,25 +35,49 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
+	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	UINT8 m_cursor_pos[3];
-	UINT8 m_cur;
+	UINT8 m_p_cursor_pos;
 	bool m_ram_ctrl;
+	UINT8 m_scroll_ctrl;
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-// write to videoram if following 'out b9,61' otherwise discard
+// write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
 WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
+	UINT8 *RAM;
 	if (m_ram_ctrl)
+		RAM = machine().region("videoram")->base();
+	else
+		RAM = machine().region("extraram")->base();
+
+	RAM[offset] = data;
+}
+
+READ8_MEMBER(argo_state::argo_io_r)
+{
+	UINT8 low_io = offset;
+
+	switch (low_io)
 	{
-		UINT8 *RAM = machine().region("videoram")->base();
-		RAM[offset] = data;
+	case 0xA1: // keyboard
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",offset>>8);
+		return input_port_read(machine(), kbdrow);
+
+	case 0xE8: // wants bit 4 low then high
+		return m_framecnt << 4;
+
+	default:
+		logerror("In %X\n",low_io);
+		return 0xff;
 	}
 }
 
@@ -62,16 +87,42 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 
 	switch (low_io)
 	{
+	case 0xA1: // prep scroll step 1
+		m_scroll_ctrl = (data == 0x61);
+		break;
+
+	case 0xA9: // prep scroll step 2
+		if ((m_scroll_ctrl == 1) && (data == 0x61))
+			m_scroll_ctrl++;
+		break;
+
+	case 0xE8: // hardware scroll - we should use ports E0,E1,E2,E3
+		if ((m_scroll_ctrl == 2) & (data == 0xe3))
+		{
+			UINT8 *RAM = machine().region("videoram")->base();
+			m_scroll_ctrl = 0;
+			memcpy(RAM, RAM+80, 24*80);
+		}
+		break;
+
+	case 0xC4: // prepare to receive cursor position
+		m_p_cursor_pos = (data == 0x80);
+		break;
+
 	case 0xC0: // store cursor position if it followed 'out c4,80'
-		if (m_cur > 0) m_cursor_pos[m_cur]=data;
-		if (m_cur < 2) m_cur++;
+		if (m_p_cursor_pos)
+		{
+			m_cursor_pos[m_p_cursor_pos]=data;
+			if (m_p_cursor_pos == 1) m_p_cursor_pos++;
+		}
 		break;
-	case 0xC4:
-		if (data == 0x80) m_cur=1; else m_cur=0;
-		break;
-	case 0xB9:
+
+	case 0xB9: // switch between videoram and extraram
 		m_ram_ctrl = (data == 0x61);
 		break;
+
+	default:
+		logerror("Out %X,%X\n",low_io,data);
 	}
 }
 
@@ -86,20 +137,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(argo_io, AS_IO, 8, argo_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00A1, 0x00A1) AM_READ_PORT("X0")
-	AM_RANGE(0x01A1, 0x01A1) AM_READ_PORT("X1")
-	AM_RANGE(0x02A1, 0x02A1) AM_READ_PORT("X2")
-	AM_RANGE(0x03A1, 0x03A1) AM_READ_PORT("X3")
-	AM_RANGE(0x04A1, 0x04A1) AM_READ_PORT("X4")
-	AM_RANGE(0x05A1, 0x05A1) AM_READ_PORT("X5")
-	AM_RANGE(0x06A1, 0x06A1) AM_READ_PORT("X6")
-	AM_RANGE(0x07A1, 0x07A1) AM_READ_PORT("X7")
-	AM_RANGE(0x08A1, 0x08A1) AM_READ_PORT("X8")
-	AM_RANGE(0x09A1, 0x09A1) AM_READ_PORT("X9")
-	AM_RANGE(0x0AA1, 0x0AA1) AM_READ_PORT("XA")
-	AM_RANGE(0x0BA1, 0x0BA1) AM_READ_PORT("XB")
-	AM_RANGE(0x0000, 0xFFFF) AM_WRITE(argo_io_w)
+	AM_RANGE(0x0000, 0xFFFF) AM_READWRITE(argo_io_r,argo_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -312,6 +350,7 @@ ROM_START( argo )
 	ROM_LOAD( "argo.rom", 0xf800, 0x0800, CRC(4c4c045b) SHA1(be2b97728cc190d4a8bd27262ba9423f252d31a3) )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "extraram", ROMREGION_ERASEFF ) // no idea what this is for
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
