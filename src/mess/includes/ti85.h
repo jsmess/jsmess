@@ -16,14 +16,21 @@ class ti85_state : public driver_device
 public:
 	ti85_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  m_nvram(*this, "nvram") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_speaker(*this, "speaker"),
+		  m_serial(*this, "tiserial"),
+		  m_nvram(*this, "nvram")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<device_t> m_speaker;
+	optional_device<device_t> m_serial;
 	optional_shared_ptr<UINT8>	m_nvram;
+
 	UINT8 m_LCD_memory_base;
 	UINT8 m_LCD_contrast;
 	UINT8 m_LCD_status;
 	UINT8 m_timer_interrupt_mask;
-	UINT8 m_ti_calculator_model;
 	UINT8 m_timer_interrupt_status;
 	UINT8 m_ON_interrupt_mask;
 	UINT8 m_ON_interrupt_status;
@@ -54,8 +61,6 @@ public:
 /*----------- defined in machine/ti85.c -----------*/
 
 MACHINE_START( ti81 );
-MACHINE_START( ti82 );
-MACHINE_START( ti85 );
 MACHINE_START( ti83p );
 MACHINE_START( ti86 );
 MACHINE_RESET( ti85 );
@@ -73,16 +78,14 @@ WRITE8_HANDLER( ti81_port_0007_w );
  READ8_HANDLER( ti85_port_0004_r );
  READ8_HANDLER( ti85_port_0005_r );
  READ8_HANDLER( ti85_port_0006_r );
- READ8_HANDLER( ti85_port_0007_r );
+ READ8_HANDLER( ti8x_serial_r );
  READ8_HANDLER( ti86_port_0005_r );
  READ8_HANDLER( ti86_port_0006_r );
- READ8_HANDLER( ti82_port_0000_r );
  READ8_HANDLER( ti82_port_0002_r );
  READ8_HANDLER( ti83_port_0000_r );
  READ8_HANDLER( ti83_port_0002_r );
  READ8_HANDLER( ti83_port_0003_r );
- READ8_HANDLER( ti73_port_0000_r );
- READ8_HANDLER( ti83p_port_0000_r );
+ READ8_HANDLER( ti8x_plus_serial_r );
  READ8_HANDLER( ti83p_port_0002_r );
 WRITE8_HANDLER( ti85_port_0000_w );
 WRITE8_HANDLER( ti8x_keypad_w );
@@ -91,16 +94,14 @@ WRITE8_HANDLER( ti85_port_0003_w );
 WRITE8_HANDLER( ti85_port_0004_w );
 WRITE8_HANDLER( ti85_port_0005_w );
 WRITE8_HANDLER( ti85_port_0006_w );
-WRITE8_HANDLER( ti85_port_0007_w );
+WRITE8_HANDLER( ti8x_serial_w );
 WRITE8_HANDLER( ti86_port_0005_w );
 WRITE8_HANDLER( ti86_port_0006_w );
-WRITE8_HANDLER( ti82_port_0000_w );
 WRITE8_HANDLER( ti82_port_0002_w );
 WRITE8_HANDLER( ti83_port_0000_w );
 WRITE8_HANDLER( ti83_port_0002_w );
 WRITE8_HANDLER( ti83_port_0003_w );
-WRITE8_HANDLER( ti73_port_0000_w );
-WRITE8_HANDLER( ti83p_port_0000_w );
+WRITE8_HANDLER( ti8x_plus_serial_w );
 WRITE8_HANDLER( ti83p_port_0002_w );
 WRITE8_HANDLER( ti83p_port_0003_w );
 WRITE8_HANDLER( ti83p_port_0004_w );
