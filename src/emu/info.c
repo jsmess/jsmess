@@ -198,6 +198,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	for (port = portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
+
 			if (nplayer < field->player + 1)
 				nplayer = field->player + 1;
 

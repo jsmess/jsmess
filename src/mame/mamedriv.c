@@ -1251,6 +1251,9 @@ const game_driver * const drivers[] =
 	DRIVER( supergm3 )  /* 1996 */
 	DRIVER( cham24 )	/* 2002 */
 
+        /* Famicom Box */
+	DRIVER( famibox )	/* 1986 */
+
 	/* Nintendo Super System Games */
 	DRIVER( nss )
 	DRIVER( nss_ssoc )	/* 1992 Human Inc. */
@@ -1272,8 +1275,6 @@ const game_driver * const drivers[] =
 	DRIVER( pss62 )		/* 199? T & E Soft / I'Max */
 	//pss63 - Super Donkey Kong / Super Tetris 2 + Bombliss
 	//pss64 - Super Donkey Kong / Super Bomberman 2
-
-
 
 	/* SNES-based hacks */
 	DRIVER( kinstb )	/* bootleg */
@@ -3154,6 +3155,7 @@ V-V                           TP-027
 	DRIVER( warzarda )	/* 23/10/1996 (c) 1996 (Japan) */
 	DRIVER( sfiii )	/* 04/02/1997 (c) 1997 (USA) */
 	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 (Japan) */
+	DRIVER( sfiiih )	/* 04/02/1997 (c) 1997 (Hispanic) */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 (USA) */
 	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 (Japan) */
 	DRIVER( jojo )	/* 08/01/1999 (c) 1998 (USA) */
@@ -3210,6 +3212,9 @@ V-V                           TP-027
 	DRIVER( strider2 )	/* Strider 2 (USA 991213) */
 	DRIVER( strider2a )	/* Strider 2 (ASIA 991213) */
 	DRIVER( shiryu2 )	/* Strider Hiryu 2 (JAPAN 991213) */
+
+	DRIVER( alien )		/* (c) 2005 */
+	/* Alien Danger */
 
 	/* Tecmo ZN1 */
 	DRIVER( tps )
@@ -5949,11 +5954,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sscope )	/* GX830 (c)1999 */
 	DRIVER( sscopea )	/* GX830 (c)1999 */
 	DRIVER( sscopeb )	/* GX830 (c)1999 */
+	DRIVER( sscopec )	/* GX830 (c)1999 */
 	DRIVER( sscope2 )	/* GX931 (c)2000 */
 	DRIVER( racingj )	/* GX676 (c)1998 */
-	DRIVER( racingj2 )	/* GX888 (c)1999 */
+	DRIVER( racingj2 )	/* GX888 (c)1999 (EAE) */
+	DRIVER( racingj2j )	/* GX888 (c)1999 (JAE) */
 	DRIVER( thrilld )	/* GX713 (c)1998 Japan JAE */
 	DRIVER( thrilldb )	/* GX713 (c)1998 Japan JAB */
+    DRIVER( thrilldae ) /* GX713 (c)1998 Europe EAA */
 	DRIVER( midnrun )	/* GX476 (c)1995 */
 	DRIVER( windheat )	/* GX677 (c)1996 */
 	DRIVER( windheatu )	/* GX677 (c)1996 */
@@ -7327,6 +7335,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tm8k902 )	/* (c) 2000 Midway Games */
 	DRIVER( galgbios )	/* (c) 1998 Creative Electronics & Software (CES) */
 	DRIVER( galgame2 )	/* (c) 1998 Creative Electronics & Software (CES) / Namco */
+
+	/* Creative Electronics & Software */
+	DRIVER( hrclass )
+	DRIVER( ccclass )
+	DRIVER( tsclass )
 
 	/* Cinematronics raster games */
 	DRIVER( embargo )
@@ -9369,6 +9382,7 @@ Other Sun games
 	DRIVER( othello )	/* (c) 1984 Success */
 	DRIVER( sothello )	/* (c) 1986 Success / Fujiwara */
 	DRIVER( quake )		/* (c) 19?? Lazer-Tron / iD Software  */
+	DRIVER( majorpkr )	/* (c) 1994 PAL System. */
 
 	/* Multi Amenity Cassette System */
 	DRIVER( macsbios )
@@ -9541,6 +9555,7 @@ Other Sun games
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( saloon )	/* 199? unknown */
 	DRIVER( funquiz )	/* (c) 198? Funworld */
+	DRIVER( witchryl )	/* (c) 199? Video Klein */
 	DRIVER( photoply )
 
 	/* Sandii' */
@@ -9625,13 +9640,14 @@ Other Sun games
 	DRIVER( victor6 )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( victor6a )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( victor6b )	/* (c) 1995 Subsino (Alpha license) */
+	DRIVER( mtrain )	/* (c) 1996 Subsino */
+	DRIVER( mtrainnv )	/* (c) 1996 Subsino */
 	DRIVER( sharkpy )	/* (c) 1996 Subsino */
 	DRIVER( sharkpya )	/* (c) 1996 Subsino */
 	DRIVER( sharkpye )	/* (c) 1996 Subsino (Alpha license) */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
-	DRIVER( mtrain )	/* (c) 1996 Subsino */
-	DRIVER( mtrainnv )	/* (c) 1996 Subsino */
+	DRIVER( wtrnymph )	/* (c) 1996 Subsino */
 	DRIVER( expcard )	/* (c) 1998 American Alpha */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
