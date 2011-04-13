@@ -14,7 +14,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 
-#include "video/pc_vga_mess.h"
+#include "video/ibm_vga.h"
 #include "video/pc_cga.h"
 #include "video/isa_mda.h"
 
@@ -76,45 +76,8 @@ static INPUT_PORTS_START( pccga )
 	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
-
-static INPUT_PORTS_START( xtvga )
-	PORT_START("IN0") /* IN0 */
-	PORT_DIPNAME( 0x08, 0x08, "VGA 1")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "VGA 2")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "VGA 3")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x00, "VGA 4")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) ) 
-
-	PORT_INCLUDE( kb_keytronic_pc )
-INPUT_PORTS_END
 	
 static const unsigned i86_address_mask = 0x000fffff;
-
-
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine(), "IN0"); } 
-
-static const struct pc_vga_interface vga_interface =
-{
-	NULL,
-	NULL,
-
-	input_port_0_r,
-
-	AS_IO,
-	0x0000
-};
-
-DRIVER_INIT( genpcvga )
-{
-	pc_vga_init(machine, &vga_interface, NULL);
-}
 
 static const kb_keytronic_interface pc_keytronic_intf =
 {
@@ -231,7 +194,7 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "sblaster", ISA8_SOUND_BLASTER_1_0)
 	
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_IBM_VGA_ADD( "vga" )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	/* keyboard */
@@ -267,7 +230,6 @@ ROM_END
 
 ROM_START( xtvga )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5)) // from unknown revision/model of Tseng ET4000 Video card
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 ROM_END
 
@@ -281,4 +243,4 @@ ROM_END
 COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,   		"<generic>",  "PC (CGA)" , GAME_NO_SOUND)
 COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,    		"<generic>",  "PC (MDA)" , GAME_NO_SOUND)
 COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,    		"<generic>",  "PC (Hercules)" , GAME_NO_SOUND)
-COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      xtvga,		genpcvga,	"<generic>",  "PC (VGA)" , GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      pcgen,		0,			"<generic>",  "PC (VGA)" , GAME_NOT_WORKING | GAME_NO_SOUND)
