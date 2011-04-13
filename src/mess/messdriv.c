@@ -110,6 +110,7 @@ const game_driver * const drivers[] =
 	DRIVER( picoj )	 /* 1993 Sega Pico (Japan)     */
 	DRIVER( segacd )	/* 1992 Sega Sega CD (USA)    */
 	DRIVER( megacd )	/* 1993 Sega Mega-CD (Europe)      */
+	DRIVER( megacda )	/* 1993 Sega Mega-CD (Asia)      */
 	DRIVER( megacdj )   /* 1991 Sega Mega-CD (Japan)    */
 	DRIVER( segacd2 )   /* 1993 Sega Sega CD 2 (USA)    */
 	DRIVER( megacd2 )   /* 1993 Sega Mega-CD 2 (Europe)  */
