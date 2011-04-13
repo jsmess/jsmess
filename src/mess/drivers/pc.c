@@ -75,7 +75,6 @@ Tandy 1000 (80386) variations:
 #include "video/pc_t1t.h"
 #include "video/pc_ega.h"
 
-#include "includes/pc_ide.h"
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
