@@ -1268,7 +1268,7 @@ void ti85_update_serial (device_t *device)
 
 	if (ti85serial->status == TI85_SEND_STOP)
 	{
-		if (input_port_read(device->machine(), "SERIAL") & 0x01)
+		if (input_port_read(device, "SERIAL") & 0x01)
 		{
 			if(!ti85_alloc_serial_data_memory(device, 15)) return;
 			if(!ti85_receive_serial (device, ti85serial->receive_buffer, 7*8))
@@ -1287,7 +1287,7 @@ void ti85_update_serial (device_t *device)
 		{
 			ti85_receive_serial(device, NULL, 0);
 			ti85_free_serial_data_memory(device);
-			if (input_port_read(device->machine(), "DUMP") & 0x01)
+			if (input_port_read(device, "DUMP") & 0x01)
 			{
 				ti85serial->status = TI85_PREPARE_SCREEN_REQUEST;
 				ti85serial->transfer_type = TI85_RECEIVE_SCREEN;
@@ -1460,6 +1460,14 @@ static DEVICE_IMAGE_UNLOAD( ti85serial )
 }
 
 
+static INPUT_PORTS_START ( ti85serial )
+	PORT_START("SERIAL")   /* receive data from calculator */
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Receive data") PORT_CODE(KEYCODE_R)
+	PORT_START("DUMP")   /* screen dump requesting */
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Screen dump request") PORT_CODE(KEYCODE_S)
+INPUT_PORTS_END
+
+
 DEVICE_GET_INFO( ti85serial )
 {
 	switch ( state )
@@ -1475,6 +1483,7 @@ DEVICE_GET_INFO( ti85serial )
 	case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( ti85serial );									break;
 	case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( ti85serial );						break;
 	case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( ti85serial );						break;
+	case DEVINFO_PTR_INPUT_PORTS:					info->ipt = INPUT_PORTS_NAME( ti85serial );										break;
 	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		strcpy(info->s, "ser");															break;
 	case DEVINFO_STR_IMAGE_INSTANCE_NAME:
 	case DEVINFO_STR_NAME:							strcpy(info->s, "TI85 Serial");													break;
