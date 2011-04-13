@@ -1856,6 +1856,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="linkwrld">
+		<description>Link World (Prototype?)</description>
+		<year>1987</year>
+		<publisher>Abstract Software</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="link world.bin" size="32768" crc="d5e919c1" sha1="c81c783fb806b3626ece75bf4456038a8a9e7075" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="homebas">
 		<description>Home BASIC (Jpn)</description>
 		<year>1985</year>
