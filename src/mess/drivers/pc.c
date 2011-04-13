@@ -2097,7 +2097,6 @@ MACHINE_CONFIG_END
 
 ROM_START( bw230 )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */ // taken from other machine
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
 
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
