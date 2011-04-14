@@ -44,6 +44,42 @@ Notes:
     CN3     - 2x10 PCB header, ST-506 drive 0 data
     CN4     - 2x10 PCB header, ST-506 drive 1 data
     CN5     - 2x25 PCB header, SASI host interface
+	
+	
+ASSY 104766 REV C02 SN 231985P
+
+|-------------------------------------------|
+|                                           |
+| CN1							SY2158      |
+|                               CN7     CN6 |
+|								ROM         |
+| CN2                                       |
+|			XEBEC1			Z80	            |
+|                                       CN5 |
+| CN3       XEBEC2   20MHz		XEBEC3      |
+|                                           |
+| CN4       XEBEC4				XEBEC5		|
+|                                           |
+|-------------------------------------------|
+
+Notes:
+    Relevant IC's shown.
+
+    Z80     - Zilog Z8400APS Z80A CPU
+    ROM     - 2732 pinout ROM "XEBEC 104521G 2155008 M460949"
+	SY2158	- Synertek SY2158A-3 1Kx8 RAM
+    XEBEC1  - Xebec 3198-0046N8445
+    XEBEC2  - Xebec 3198-0009
+    XEBEC3  - Xebec 3198-0057
+    XEBEC4  - Xebec 3198-0058
+    XEBEC5  - Xebec 3198-0056
+    CN1     - 4-pin Molex, drive power
+    CN2     - 34-pin PCB edge, ST-506 drive 0/1 control
+    CN3     - 2x10 PCB header, ST-506 drive 0 data
+    CN4     - 2x10 PCB header, ST-506 drive 1 data
+    CN5     - 2x25 PCB header, SASI host interface
+	CN6		- 2x8 PCB header
+	CN7		- 2x10 PCB header (test only)
 
 */
 
@@ -98,6 +134,7 @@ void s1410_device_config::device_config_complete()
 ROM_START( s1410 )
 	ROM_REGION( 0x1000, Z8400A_TAG, 0 )
 	ROM_LOAD( "104521g", 0x0000, 0x1000, CRC(24385115) SHA1(c389f6108cd5ed798a090acacce940ee43d77042) )
+	ROM_LOAD( "104788d", 0x0000, 0x1000, CRC(2e385e2d) SHA1(7e2c349b2b6e95f2134f82cffc38d86b8a68390d) )
 
 	ROM_REGION( 0x20, "103911", 0 )
 	ROM_LOAD( "103911", 0x00, 0x20, NO_DUMP ) // DM74S288N
