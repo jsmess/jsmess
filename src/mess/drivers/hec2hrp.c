@@ -297,13 +297,14 @@ static MACHINE_RESET(hec2hrp)
 static MACHINE_START( hec2hrx )
 /*****************************************************************************/
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
 	// Memory install for bank switching
 	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, state->m_hector_videoram_hrx, 0); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
 	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
@@ -322,8 +323,7 @@ static MACHINE_START( hec2hrx )
 /*************************************************SPECIFIQUE DISK II ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	state->m_hector_videoram  = hector_videoram;
+	state->m_hector_videoram  = state->m_hector_videoram_hrx;
 
 	hector_init(machine);
 	hector_disc2_init(machine); // Init of the Disc II !

@@ -9,6 +9,7 @@
 #ifndef PCE_H_
 #define PCE_H_
 
+#include "cdrom.h"
 #include "sound/msm5205.h"
 
 #define C6280_TAG			"c6280"
@@ -28,11 +29,99 @@
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
 #define PCE_ROM_MAXSIZE		0x280000
 
+typedef struct
+{
+	UINT8	regs[16];
+	UINT8	*bram;
+	UINT8	*adpcm_ram;
+	int		bram_locked;
+	int		adpcm_read_ptr;
+	UINT8	adpcm_read_buf;
+	int		adpcm_write_ptr;
+	UINT8	adpcm_write_buf;
+	int		adpcm_length;
+	int		adpcm_clock_divider;
+	UINT32  msm_start_addr;
+	UINT32	msm_end_addr;
+	UINT32	msm_half_addr;
+	UINT8	msm_nibble;
+	UINT8	msm_idle;
+
+	/* SCSI signals */
+	int		scsi_BSY;	/* Busy. Bus in use */
+	int		scsi_SEL;	/* Select. Initiator has won arbitration and has selected a target */
+	int		scsi_CD;	/* Control/Data. Target is sending control (data) information */
+	int		scsi_IO;	/* Input/Output. Target is sending (receiving) information */
+	int		scsi_MSG;	/* Message. Target is sending or receiving a message */
+	int		scsi_REQ;	/* Request. Target is requesting a data transfer */
+	int		scsi_ACK;	/* Acknowledge. Initiator acknowledges that it is ready for a data transfer */
+	int		scsi_ATN;	/* Attention. Initiator has a message ready for the target */
+	int		scsi_RST;	/* Reset. Initiator forces all targets and any other initiators to do a warm reset */
+	int		scsi_last_RST;	/* To catch setting of RST signal */
+	int		cd_motor_on;
+	int		selected;
+	UINT8	*command_buffer;
+	int		command_buffer_index;
+	int		status_sent;
+	int		message_after_status;
+	int		message_sent;
+	UINT8	*data_buffer;
+	int		data_buffer_size;
+	int		data_buffer_index;
+	int		data_transferred;
+
+	/* Arcade Card specific */
+	UINT8	*acard_ram;
+	UINT8	acard_latch;
+	UINT8	acard_ctrl[4];
+	UINT32	acard_base_addr[4];
+	UINT16	acard_addr_offset[4];
+	UINT16	acard_addr_inc[4];
+	UINT32	acard_shift;
+	UINT8	acard_shift_reg;
+
+	UINT32	current_frame;
+	UINT32	end_frame;
+	UINT32	last_frame;
+	UINT8	cdda_status;
+	UINT8	cdda_play_mode;
+	UINT8	*subcode_buffer;
+	UINT8	end_mark;
+	cdrom_file	*cd;
+	const cdrom_toc*	toc;
+	emu_timer	*data_timer;
+	emu_timer	*adpcm_dma_timer;
+
+	emu_timer	*cdda_fadeout_timer;
+	emu_timer	*cdda_fadein_timer;
+	double	cdda_volume;
+	emu_timer	*adpcm_fadeout_timer;
+	emu_timer	*adpcm_fadein_timer;
+	double	adpcm_volume;
+} pce_cd_t;
+
+
+class pce_state : public driver_device
+{
+public:
+	pce_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	unsigned char *m_user_ram;
+	UINT8 *m_cd_ram;
+	UINT8 m_io_port_options;
+	UINT8 m_sys3_card;
+	UINT8 m_acard;
+	pce_cd_t m_cd;
+	UINT8 *m_cartridge_ram;
+	int m_joystick_port_select;
+	int m_joystick_data_select;
+	UINT8 m_joy_6b_packet[5];
+};
+
 
 /*----------- defined in machine/pce.c -----------*/
 
-extern unsigned char *pce_user_ram; /* scratch RAM at F8 */
-extern UINT8 *pce_cd_ram;
 DEVICE_IMAGE_LOAD(pce_cart);
 NVRAM_HANDLER( pce );
 WRITE8_HANDLER ( pce_joystick_w );

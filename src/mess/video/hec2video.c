@@ -36,17 +36,11 @@
 
 #include "includes/hec2hrp.h"
 
-// Color status
-UINT8 hector_color[4];	// For current colors
-// Ram video BR :
-UINT8 hector_videoram[0x04000];
-// Status for screen definition
-UINT8 hector_flag_hr;
-UINT8 hector_flag_80c;
-
 
 static void Init_Hector_Palette( running_machine &machine)
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
+	UINT8 *hector_color = state->m_hector_color;
 	// basic colors !
 	hector_color[0] = 0;  // fond (noir)
 	hector_color[1] = 1;  // HECTOR HRX (rouge)
@@ -74,8 +68,10 @@ static void Init_Hector_Palette( running_machine &machine)
 	palette_set_color( machine,15,MAKE_RGB(128,128,128));//Blanc
 }
 
-void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
+void hector_hr(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
+	UINT8 *hector_color = state->m_hector_color;
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
 	for (y = 0; y <= ymax; y++) {  //224
@@ -92,7 +88,7 @@ void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 	}
 }
 
-void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
+void hector_80c(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 {
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
@@ -125,23 +121,23 @@ SCREEN_UPDATE( hec2hrp )
 	hec2hrp_state *state = screen->machine().driver_data<hec2hrp_state>();
 	UINT8 *videoram = state->m_videoram;
 	UINT8 *videoram_HR = state->m_hector_videoram;
-	if (hector_flag_hr==1)
+	if (state->m_hector_flag_hr==1)
 		{
-		if (hector_flag_80c==0)
+		if (state->m_hector_flag_80c==0)
 			{
 				screen->set_visible_area(0, 243, 0, 227);
-				hector_hr( bitmap , &videoram_HR[0], 227, 64);
+				hector_hr( screen->machine(), bitmap , &videoram_HR[0], 227, 64);
 			}
 		else
 			{
 				screen->set_visible_area(0, 243*2, 0, 227);
-				hector_80c( bitmap , &videoram_HR[0], 227, 64);
+				hector_80c( screen->machine(), bitmap , &videoram_HR[0], 227, 64);
 			}
 		}
 	else
 		{
 			screen->set_visible_area(0, 113, 0, 75);
-			hector_hr( bitmap, videoram,  77, 32);
+			hector_hr( screen->machine(), bitmap, videoram,  77, 32);
 		}
 	return 0;
 }

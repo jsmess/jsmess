@@ -62,11 +62,12 @@
 #include "includes/hec2hrp.h"
 
 
-class interact_state : public driver_device
+class interact_state : public hec2hrp_state
 {
 public:
 	interact_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: hec2hrp_state(machine, config) { }
+
 	UINT8 *m_videoram;
 };
 
@@ -129,7 +130,7 @@ static SCREEN_UPDATE( interact )
 	interact_state *state = screen->machine().driver_data<interact_state>();
 	UINT8 *videoram = state->m_videoram;
 	screen->set_visible_area(0, 113, 0, 75);
-	hector_hr( bitmap, videoram,  77, 32);
+	hector_hr( screen->machine(), bitmap, videoram,  77, 32);
 	return 0;
 }
 

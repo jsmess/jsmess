@@ -63,60 +63,83 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
+
 	UINT8 *m_videoram;
 	UINT8 *m_hector_videoram;
+	UINT8 m_hector_flag_hr;
+	UINT8 m_hector_flag_80c;
+	UINT8 m_hector_color[4];
+	UINT8 m_hector_disc2_data_r_ready;
+	UINT8 m_hector_disc2_data_w_ready;
+	UINT8 m_hector_disc2_data_read;
+	UINT8 m_hector_disc2_data_write;
+	UINT8 m_hector_disc2_RNMI;
+	UINT8 m_state3000;
+	UINT8 m_write_cassette;
+	emu_timer *m_Cassette_timer;
+	UINT8 m_CK_signal ;
+	UINT8 m_flag_clk;
+	double m_Pin_Value[29][2];
+	int m_AU[17];
+	int m_ValMixer;
+	int m_oldstate3000;
+	int m_oldstate1000;
+	UINT8 m_pot0;
+	UINT8 m_pot1;
+	UINT8 m_actions;
+	UINT8 m_hector_port_a;
+	UINT8 m_hector_port_b;
+	UINT8 m_hector_port_c_h;
+	UINT8 m_hector_port_c_l;
+	UINT8 m_hector_port_cmd;
+	UINT8 m_cassette_bit;
+	UINT8 m_cassette_bit_mem;
+	UINT8 m_Data_K7;
+	int m_counter_write;
+	emu_timer *m_DMA_timer;
+	emu_timer *m_INT_timer;
+	int m_NMI_current_state;
+	int m_hector_cmd[10];
+	int m_hector_nb_cde;
+	int m_hector_flag_result;
+	int m_print;
+	UINT8 m_hector_videoram_hrx[0x04000];
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/
 
 /* Protoype of memory Handler*/
-extern WRITE8_HANDLER( hector_switch_bank_w );
-extern READ8_HANDLER( hector_keyboard_r );
-extern WRITE8_HANDLER( hector_keyboard_w );
-extern WRITE8_HANDLER( hector_sn_2000_w );
-extern WRITE8_HANDLER( hector_sn_2800_w );
-extern WRITE8_HANDLER( hector_sn_3000_w );
-extern READ8_HANDLER( hector_cassette_r );
-extern WRITE8_HANDLER( hector_color_a_w );
-extern WRITE8_HANDLER( hector_color_b_w );
+WRITE8_HANDLER( hector_switch_bank_w );
+READ8_HANDLER( hector_keyboard_r );
+WRITE8_HANDLER( hector_keyboard_w );
+WRITE8_HANDLER( hector_sn_2000_w );
+WRITE8_HANDLER( hector_sn_2800_w );
+WRITE8_HANDLER( hector_sn_3000_w );
+READ8_HANDLER( hector_cassette_r );
+WRITE8_HANDLER( hector_color_a_w );
+WRITE8_HANDLER( hector_color_b_w );
 
-extern void hector_init( running_machine &machine);
-extern void hector_reset(running_machine &machine, int hr, int with_D2);
-extern void hector_disc2_reset( running_machine &machine);
+void hector_init( running_machine &machine);
+void hector_reset(running_machine &machine, int hr, int with_D2);
+void hector_disc2_reset( running_machine &machine);
 
-extern READ8_HANDLER( hector_mx_io_port_r );
-extern WRITE8_HANDLER( hector_mx80_io_port_w );
-extern WRITE8_HANDLER( hector_mx40_io_port_w );
-extern  READ8_HANDLER( hector_io_8255_r);
-extern WRITE8_HANDLER( hector_io_8255_w);
+READ8_HANDLER( hector_mx_io_port_r );
+WRITE8_HANDLER( hector_mx80_io_port_w );
+WRITE8_HANDLER( hector_mx40_io_port_w );
+ READ8_HANDLER( hector_io_8255_r);
+WRITE8_HANDLER( hector_io_8255_w);
 
 /*----------- defined in video/hec2video.c -----------*/
 
-extern void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
-extern void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
+void hector_80c(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
+void hector_hr(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
 VIDEO_START( hec2hrp );
 SCREEN_UPDATE( hec2hrp );
-
-/* Global variables used in extern modules*/
-
-/* Status for screen definition*/
-extern UINT8 hector_flag_hr;
-extern UINT8 hector_flag_80c;
-
-/* Ram video BR :*/
-extern UINT8 hector_videoram[0x04000];
-
-/* Color status*/
-extern UINT8 hector_color[4];
 
 /* Sound function*/
 extern const sn76477_interface hector_sn76477_interface;
 
-// state disc2 port
-extern UINT8 hector_disc2_data_r_ready; /* =ff when PC2 = true and data in read buffer (hector_disc2_data_read) */
-extern UINT8 hector_disc2_data_w_ready; /* =ff when Disc 2 Port 40 had send a data in write buffer (hector_disc2_data_write) */
-extern UINT8 hector_disc2_data_read;    /* Data send by Hector to Disc 2 when PC2=true */
-extern UINT8 hector_disc2_data_write;   /* Data send by Disc 2 to Hector when Write Port I/O 40 */
+/*----------- defined in machine/hecdisk2.c -----------*/
 
 // disc2 handling
 WRITE_LINE_DEVICE_HANDLER( hector_disk2_fdc_interrupt );
@@ -135,7 +158,7 @@ WRITE8_HANDLER( hector_disc2_io61_port_w);
 READ8_HANDLER(  hector_disc2_io70_port_r);
 WRITE8_HANDLER( hector_disc2_io70_port_w);
 
-extern void hector_disc2_init( running_machine &machine);
+void hector_disc2_init( running_machine &machine);
 
 extern const upd765_interface hector_disc2_upd765_interface;
 extern const floppy_config    hector_disc2_floppy_config;
