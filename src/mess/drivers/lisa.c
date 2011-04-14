@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_CPU_CONFIG(cop_intf)
 	MCFG_DEVICE_DISABLE()
 	
-	MCFG_CPU_ADD("fdccpu", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
