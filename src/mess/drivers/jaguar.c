@@ -109,7 +109,7 @@ extern UINT32 *jaguar_dsp_ram;
 extern UINT32 *jaguar_wave_rom;
 extern UINT8 cojag_is_r3000;
 #endif
-
+UINT32* high_rom_base;
 
 
 /*************************************
@@ -146,23 +146,10 @@ static MACHINE_RESET( jaguar )
 	protection_check = 0;
 
 	/* Set up pointers for Jaguar logo */
+
 	memcpy(jaguar_shared_ram, rom_base, 0x400);	// do not increase, or Doom breaks
-	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, rom_base[1]);
 
-#if 0
-	/* set up main CPU RAM/ROM banks */
-	memory_set_bankptr(machine, 3, jaguar_gpu_ram);
-
-	/* set up DSP RAM/ROM banks */
-	memory_set_bankptr(machine, 10, jaguar_shared_ram);
-	memory_set_bankptr(machine, 11, jaguar_gpu_clut);
-	memory_set_bankptr(machine, 12, jaguar_gpu_ram);
-	memory_set_bankptr(machine, 13, jaguar_dsp_ram);
-	memory_set_bankptr(machine, 14, jaguar_shared_ram);
-	memory_set_bankptr(machine, 15, cart_base);
-	memory_set_bankptr(machine, 16, rom_base);
-	memory_set_bankptr(machine, 17, jaguar_gpu_ram);
-#endif
+	device_set_input_line(machine.device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 
 	/* clear any spinuntil stuff */
 	jaguar_gpu_resume(machine);
@@ -303,6 +290,7 @@ static READ32_HANDLER( jaguar_eeprom_cs )
 static READ32_HANDLER( gpuctrl_r )
 {
 	UINT32 result = jaguargpu_ctrl_r(space->machine().device("gpu"), offset);
+
 	if (protection_check != 1) return result;
 
 	protection_check++;
@@ -446,25 +434,72 @@ static WRITE32_HANDLER( joystick_w )
  *
  *************************************/
 
+// surely these should be 16-bit natively if the standard Jaguar is driven by a plain 68k?
+// all these trampolines are not good for performance ;-)
 
-static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 32 )
+static READ16_HANDLER( gpuctrl_r16 )  { if (!(offset&1)) { return gpuctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( gpuctrl_w16 ) { if (!(offset&1)) { gpuctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_blitter_r16 )  { if (!(offset&1)) { return jaguar_blitter_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_blitter_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_blitter_w16 ) { if (!(offset&1)) { jaguar_blitter_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_blitter_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_serial_r16 )  { if (!(offset&1)) { return jaguar_serial_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_serial_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_serial_w16 ) { if (!(offset&1)) { jaguar_serial_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_serial_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( dspctrl_r16 )  { if (!(offset&1)) { return dspctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( dspctrl_w16 ) { if (!(offset&1)) { dspctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_eeprom_cs16 )  { if (!(offset&1)) { return jaguar_eeprom_cs(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_eeprom_cs(space, offset>>1, mem_mask); } }
+static READ16_HANDLER( jaguar_eeprom_clk16 )  { if (!(offset&1)) { return jaguar_eeprom_clk(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_eeprom_clk(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_eeprom_w16 ) { if (!(offset&1)) { jaguar_eeprom_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_eeprom_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( joystick_r16 )  { if (!(offset&1)) { return joystick_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return joystick_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( joystick_w16 ) { if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
+
+static READ32_HANDLER( jaguar_shared_ram_r ) { return jaguar_shared_ram[offset]; }
+static WRITE32_HANDLER( jaguar_shared_ram_w ) {	COMBINE_DATA(&jaguar_shared_ram[offset]); }
+static READ32_HANDLER( jaguar_rom_base_r ) { return rom_base[offset]; }
+static WRITE32_HANDLER( jaguar_rom_base_w ) { /*ROM!*/ }
+static READ32_HANDLER( jaguar_cart_base_r ) { return cart_base[offset]; }
+static WRITE32_HANDLER( jaguar_cart_base_w ) { /*ROM!*/ }
+static READ32_HANDLER( high_rom_base_r ) { return high_rom_base[offset]; }
+static WRITE32_HANDLER( high_rom_base_w ) { /*ROM!*/ }
+static READ32_HANDLER( jaguar_dsp_ram_r ) {	return jaguar_dsp_ram[offset]; }
+static WRITE32_HANDLER( jaguar_dsp_ram_w ) { COMBINE_DATA(&jaguar_dsp_ram[offset]); }
+static READ32_HANDLER( jaguar_gpu_clut_r ) { return jaguar_gpu_clut[offset]; }
+static WRITE32_HANDLER( jaguar_gpu_clut_w ) { COMBINE_DATA(&jaguar_gpu_clut[offset]); }
+static READ32_HANDLER( jaguar_gpu_ram_r ) { return jaguar_gpu_ram[offset]; }
+static WRITE32_HANDLER( jaguar_gpu_ram_w ) { COMBINE_DATA(&jaguar_gpu_ram[offset]); }
+
+static READ16_HANDLER( jaguar_shared_ram_r16 )  { if (!(offset&1)) { return jaguar_shared_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_shared_ram_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_shared_ram_w16 ) { if (!(offset&1)) { jaguar_shared_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_shared_ram_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_rom_base_r16 )  { if (!(offset&1)) { return jaguar_rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_rom_base_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_rom_base_w16 ) { if (!(offset&1)) { jaguar_rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_rom_base_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_cart_base_r16 )  { if (!(offset&1)) { return jaguar_cart_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_cart_base_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_cart_base_w16 ) { if (!(offset&1)) { jaguar_cart_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_cart_base_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( high_rom_base_r16 )  { if (!(offset&1)) { return high_rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return high_rom_base_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( high_rom_base_w16 ) { if (!(offset&1)) { high_rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { high_rom_base_w(space, offset>>1, data, mem_mask); } }
+
+static READ16_HANDLER( jaguar_dsp_ram_r16 )  { if (!(offset&1)) { return jaguar_dsp_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_dsp_ram_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_dsp_ram_w16 ) { if (!(offset&1)) { jaguar_dsp_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_dsp_ram_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_gpu_clut_r16 )  { if (!(offset&1)) { return jaguar_gpu_clut_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_clut_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_gpu_clut_w16 ) { if (!(offset&1)) { jaguar_gpu_clut_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_clut_w(space, offset>>1, data, mem_mask); } }
+static READ16_HANDLER( jaguar_gpu_ram_r16 )  { if (!(offset&1)) { return jaguar_gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_ram_r(space, offset>>1, mem_mask); } }
+static WRITE16_HANDLER( jaguar_gpu_ram_w16 ) { if (!(offset&1)) { jaguar_gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_ram_w(space, offset>>1, data, mem_mask); } }
+
+static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000) AM_SHARE("share1") AM_REGION("maincpu", 0)
-	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size) AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size) AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
-	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE("share3")
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(jaguar_eeprom_clk,jaguar_eeprom_w)	// GPI00
-	AM_RANGE(0xf15000, 0xf15003) AM_READ(jaguar_eeprom_cs)				// GPI01
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE("share4")
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE( jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
+	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE( jaguar_cart_base_r16, jaguar_cart_base_w16 )
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE( jaguar_rom_base_r16, jaguar_rom_base_w16 )
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs_r, jaguar_tom_regs_w) // might be reversed endian of the others..
+	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE(jaguar_gpu_clut_r16, jaguar_gpu_clut_w16 )
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r16, gpuctrl_w16)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r16, jaguar_blitter_w16)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE( jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs_r, jaguar_jerry_regs_w) // might be reversed endian of the others..
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r16, joystick_w16)
+	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(jaguar_eeprom_clk16,jaguar_eeprom_w16)	// GPI00
+	AM_RANGE(0xf15000, 0xf15003) AM_READ(jaguar_eeprom_cs16)				// GPI01
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r16, dspctrl_w16)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r16, jaguar_serial_w16)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE(jaguar_dsp_ram_r16, jaguar_dsp_ram_w16)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE( high_rom_base_r16, high_rom_base_w16 )
 ADDRESS_MAP_END
 
 /*************************************
@@ -474,6 +509,24 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32 )
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000)  AM_SHARE("share1") AM_REGION("maincpu", 0)
+	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size)  AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size)  AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
+	AM_RANGE(0xf00400, 0xf005ff) AM_BASE(&jaguar_gpu_clut) AM_MIRROR(0x000200) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf03000, 0xf03fff) AM_BASE(&jaguar_gpu_ram) AM_MIRROR(0x008000) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_BASE(&jaguar_dsp_ram) AM_RAM AM_SHARE("share4")
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_BASE(&high_rom_base) AM_REGION("maincpu", 0xf1d000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("share1") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
@@ -490,7 +543,6 @@ static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -621,7 +673,7 @@ static const jaguar_cpu_config dsp_config =
 static MACHINE_CONFIG_START( jaguar, driver_device )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, JAGUAR_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(jaguar_map)
 
 	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
@@ -630,7 +682,7 @@ static MACHINE_CONFIG_START( jaguar, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK)
 	MCFG_CPU_CONFIG(dsp_config)
-	MCFG_CPU_PROGRAM_MAP(gpu_map)
+	MCFG_CPU_PROGRAM_MAP(dsp_map)
 
 	MCFG_MACHINE_RESET(jaguar)
 //  MCFG_NVRAM_HANDLER(jaguar)
@@ -725,6 +777,16 @@ static DRIVER_INIT( jaguar )
 {
 	state_save_register_global(machine, joystick_data);
 	using_cart = 0;
+
+	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
+	{
+		rom_base[i] = ((rom_base[i] & 0xffff0000)>>16) | ((rom_base[i] & 0x0000ffff)<<16);
+	}
+	
+	for (int i=0;i<0x1000/4;i++)
+	{
+		high_rom_base[i] = ((high_rom_base[i] & 0xffff0000)>>16) | ((high_rom_base[i] & 0x0000ffff)<<16);
+	}
 }
 
 static QUICKLOAD_LOAD( jaguar )
@@ -827,7 +889,6 @@ static DEVICE_IMAGE_LOAD( jaguar )
 	}
 
 	memset(jaguar_shared_ram, 0, 0x200000);
-	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
 	jaguar_fix_endian(image.device().machine(), 0x800000+load_offset, size);
 
