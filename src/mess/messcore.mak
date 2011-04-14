@@ -78,7 +78,6 @@ OBJDIRS += $(MESS_MACHINE)/ti99 \
 LIBOCORE_NOMAIN = $(OBJ)/libocore_nomain.a
 
 EMUOBJS += \
-	$(MESSOBJ)/mess.o		\
 	$(MESSOBJ)/hashfile.o	\
 
 $(LIBEMU): $(EMUOBJS)
