@@ -82,9 +82,6 @@ The start address of a cart may be found at 800404. It is normally 802000.
 #include "machine/eeprom.h"
 #include "includes/jaguar.h"
 
-/* 26.6MHz for Tom and Jerry, and half that for the CPU */
-#define JAGUAR_CLOCK		26.6e6
-
 static QUICKLOAD_LOAD( jaguar );
 static DEVICE_START( jaguar_cart );
 static DEVICE_IMAGE_LOAD( jaguar );
@@ -694,11 +691,11 @@ static MACHINE_CONFIG_START( jaguar, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
+	MCFG_SCREEN_RAW_PARAMS(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_UPDATE(cojag)
 
-	MCFG_VIDEO_START(cojag)
+	MCFG_VIDEO_START(jaguar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -782,7 +779,7 @@ static DRIVER_INIT( jaguar )
 	{
 		rom_base[i] = ((rom_base[i] & 0xffff0000)>>16) | ((rom_base[i] & 0x0000ffff)<<16);
 	}
-	
+
 	for (int i=0;i<0x1000/4;i++)
 	{
 		high_rom_base[i] = ((high_rom_base[i] & 0xffff0000)>>16) | ((high_rom_base[i] & 0x0000ffff)<<16);
