@@ -7,6 +7,10 @@
     Then you will be granted permission to visit the repository.
  
 	TODO: everything!
+    - Required device Z8530 Z80SCC (not emulated, but it is just a dual-channel
+      serial controller, possibly just like the other ones)
+    - Keyboard is a standard pc keyboard
+    - Sound is stereo dac-sound, plus an analog output. Details unknown.
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -44,9 +48,19 @@ WRITE16_MEMBER( applix_state::applix_register_w )
 }
 
 READ16_MEMBER( applix_state::applix_inputs_r )
-{
+{// as far as i can tell:
+// bits 4,5,6,7 are SW0,1,2,3
+// bits 2,3 joystick in
+// bit 1 cassette in
+// bit 0 something to do with audio
 	return 0;
 }
+
+// dac-latch seems to be:
+// bit 7 cassette relay, low=on
+// bit 6,5,4 sound outputs
+// bit 3 cassette LED, low=on
+// bit 2,1,0 joystick
 
 static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -59,7 +73,7 @@ static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	//AM_RANGE(0x600040, 0x600041) video palette entry 2 (even)
 	//AM_RANGE(0x600060, 0x600061) video palette entry 3 (even)
 	//AM_RANGE(0x600080, 0x600081) dac latch (odd)
-	//AM_RANGE(0x600100, 0x600101) video latch (=border colour, nybble; video base, nybble) (odd)
+	//AM_RANGE(0x600100, 0x600101) video latch (=border colour, high nybble; video base, low nybble) (odd)
 	//AM_RANGE(0x600180, 0x600181) analog multiplexer latch (odd)
 	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
 	AM_RANGE(0x700080, 0x700081) AM_READ(applix_inputs_r) //input port (odd)
@@ -135,6 +149,13 @@ static SCREEN_UPDATE( applix )
 MC6845_UPDATE_ROW( applix_update_row )
 {
 #if 0
+// This needs complete rewriting
+// Need to display a border but the mame mc6845 code doesn't allow it.
+// 640x200, display 4 of 16 colours, each 2 bits points at a palette entry.
+// 320x200, display all 16 colours, each nybble has the colour code
+// There is a monochrome mode, but no info found as yet.
+// Display is bitmapped, no character generator.
+// The video page can be moved around to almost anywhere in memory.
 	applix_state *state = device->machine().driver_data<applix_state>();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
@@ -199,7 +220,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_PALETTE_INIT(applix)
 
 	MCFG_VIDEO_START(applix)
-	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
 MACHINE_CONFIG_END
 
 /* ROM definition */
