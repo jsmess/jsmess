@@ -11,6 +11,9 @@
 
 #include "machine/6522via.h"
 
+#define COP421_TAG		"u9f"
+#define KB_COP421_TAG	"kbcop"
+
 /* lisa MMU segment regs */
 typedef struct real_mmu_entry
 {

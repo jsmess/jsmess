@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/cop400/cop400.h"
 #include "includes/lisa.h"
 #include "devices/sonydriv.h"
 #include "machine/applefdc.h"
@@ -25,6 +26,26 @@
 
 static ADDRESS_MAP_START(lisa_map, AS_PROGRAM, 16)
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)			/* no fixed map, we use an MMU */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lisa_cop_io_map, AS_IO, 8 )
+	AM_RANGE(COP400_PORT_L, COP400_PORT_L)
+	AM_RANGE(COP400_PORT_G, COP400_PORT_G)
+	AM_RANGE(COP400_PORT_D, COP400_PORT_D)
+	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN)
+	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITENOP
+	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP
+	AM_RANGE(COP400_PORT_CKO, COP400_PORT_CKO) AM_READNOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kb_cop_io_map, AS_IO, 8 )
+	AM_RANGE(COP400_PORT_L, COP400_PORT_L)
+	AM_RANGE(COP400_PORT_G, COP400_PORT_G)
+	AM_RANGE(COP400_PORT_D, COP400_PORT_D)
+	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN)
+	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITENOP
+	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP
+	AM_RANGE(COP400_PORT_CKO, COP400_PORT_CKO) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8)
@@ -109,6 +130,13 @@ static const floppy_config lisa_floppy_config =
 	"floppy_5_25"
 };
 
+static COP400_INTERFACE( cop_intf )
+{
+	COP400_CKI_DIVISOR_16, // ???
+	COP400_CKO_OSCILLATOR_OUTPUT,
+	COP400_MICROBUS_ENABLED
+};
+
 /***************************************************************************
     MACHINE DRIVER
 ***************************************************************************/
@@ -120,6 +148,15 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_CPU_PROGRAM_MAP(lisa_map)
 	MCFG_CPU_VBLANK_INT("screen", lisa_interrupt)
 
+	MCFG_CPU_ADD(COP421_TAG, COP421, 3900000)
+	MCFG_CPU_IO_MAP(lisa_cop_io_map)
+	MCFG_CPU_CONFIG(cop_intf)
+
+	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
+	MCFG_CPU_IO_MAP(kb_cop_io_map)
+	MCFG_CPU_CONFIG(cop_intf)
+	MCFG_DEVICE_DISABLE()
+	
 	MCFG_CPU_ADD("fdccpu", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
 
@@ -361,6 +398,12 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROMX_LOAD( "341-0175-a", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8)) /* 341-0175-A LISA Bootrom Rev A (10/12/82?) (High) */
 	ROMX_LOAD( "341-0176-a", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8)) /* 341-0176-A LISA Bootrom Rev A (10/12/82?) (Low) */
 
+	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+
+	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	/* note: other ?prototype? revisions of this rom for the lisa probably exist as well */
 	ROM_LOAD( "341-0138-f", 0x1000, 0x1000, NO_DUMP) /* 341-0138-F LISA 1 'Twiggy' Disk I/O Rom (io40) */
@@ -398,6 +441,12 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROMX_LOAD( "341-0175-3b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0175-3b LISA Bootrom Rev 3B (9/8/83) (High) */
 	ROMX_LOAD( "341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low) */
 
+	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+
+	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port */
 
@@ -425,6 +474,12 @@ ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built
 	ROMX_LOAD( "341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0175-F LISA Bootrom Rev F (12/21/83) (High) */
 	ROMX_LOAD( "341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0176-F LISA Bootrom Rev F (12/21/83) (Low) */
 
+	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+
+	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) /* 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port */
@@ -446,6 +501,12 @@ ROM_START( macxl )
 	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) /* 341-0347-A Mac XL '3A' Bootrom Hi (boot3a.hi)*/
 	ROM_LOAD16_BYTE( "341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) /* 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)*/
+
+	ROM_REGION( 0x400, COP421_TAG, 0 )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+
+	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
+	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
 
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
