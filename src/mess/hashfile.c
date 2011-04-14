@@ -21,11 +21,6 @@ typedef struct _hash_info hash_info;
 struct _hash_info
 {
 	hash_collection *hashes;
-	const char *longname;
-	const char *manufacturer;
-	const char *year;
-	const char *playable;
-	const char *pcb;
 	const char *extrainfo;
 };
 
@@ -47,12 +42,6 @@ void hashfile_close(hash_file *hashfile);
 
 /* looks up information in a hash file */
 const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *hashes);
-
-/* performs a syntax check on a hash file */
-int hashfile_verify(const char *sysname, void (*error_proc)(const char *message));
-
-/* returns the functions used in this hash file */
-const char *hashfile_functions_used(hash_file *hashfile, iodevice_t devtype);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -258,10 +247,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					attributes += 2;
 				}
 
-				//for (i = 0; i < IO_COUNT; i++)
-					//if (i == device || device == IO_COUNT)
-						//state->hashfile->functions[i] = all_functions;
-
 				/* do we use this hash? */
 				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, &hashes))
 				{
@@ -270,9 +255,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						return;
 					memset(hi, 0, sizeof(*hi));
 
-					hi->longname = pool_strdup_lib(state->hashfile->pool, name);
-					if (!hi->longname)
-						return;
 					hi->hashes = &hashes;
 					state->hi = hi;
 				}
@@ -286,14 +268,14 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 		case HASH_POS_HASH:
 			text_dest = NULL;
 
-			if (!strcmp(tagname, "year"))
-				text_dest = (char **) &state->hi->year;
-			else if (!strcmp(tagname, "manufacturer"))
-				text_dest = (char **) &state->hi->manufacturer;
-			else if (!strcmp(tagname, "status"))
-				text_dest = (char **) &state->hi->playable;
-			else if (!strcmp(tagname, "pcb"))
-				text_dest = (char **) &state->hi->pcb;
+			if (!strcmp(tagname, "year")) {
+			}
+			else if (!strcmp(tagname, "manufacturer")){
+			}
+			else if (!strcmp(tagname, "status")){
+			}
+			else if (!strcmp(tagname, "pcb")){
+			}
 			else if (!strcmp(tagname, "extrainfo")) {
 				text_dest = (char **) &state->hi->extrainfo;		
 			}
@@ -554,38 +536,6 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
 	hashfile_parse(hashfile, singular_selector_proc, singular_use_proc,
 		hashfile->error_proc, (void *) &param);
 	return param.hi;
-}
-
-
-
-/*-------------------------------------------------
-    hashfile_functions_used
--------------------------------------------------*/
-
-const char *hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
-{
-	assert(devtype >= 0);
-	assert(devtype < IO_COUNT);
-	return hashfile->functions[devtype];
-}
-
-
-
-/*-------------------------------------------------
-    hashfile_verify
--------------------------------------------------*/
-
-int hashfile_verify(emu_options &options, const char *sysname, void (*my_error_proc)(const char *message))
-{
-	hash_file *hashfile;
-
-	hashfile = hashfile_open(options, sysname, FALSE, my_error_proc);
-	if (!hashfile)
-		return -1;
-
-	hashfile_parse(hashfile, NULL, NULL, my_error_proc, NULL);
-	hashfile_close(hashfile);
-	return 0;
 }
 
 const char *extra_info = NULL;
