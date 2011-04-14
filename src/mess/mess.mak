@@ -255,11 +255,6 @@ SOUNDS += TMS5200
 # the list of drivers
 #-------------------------------------------------
 
-ifeq ($(TARGET),mess)
-DRVLIBS += \
-	$(MESSOBJ)/messdriv.o
-endif
-
 DRVLIBS += \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \

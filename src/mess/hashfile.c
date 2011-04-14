@@ -624,19 +624,18 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 
 const char *hashfile_extrainfo(device_image_interface &image)
 {
-	const game_driver *drv;
 	const char *rc;	
 
 	/* now read the hash file */
 	image.crc();
 	extra_info = NULL;
-	drv = &image.device().machine().system();
+	int drv = driver_list::find(image.device().machine().system());
 	do
 	{
-		rc = read_hash_config(image, drv->name);
-		drv = driver_get_compatible(drv);
+		rc = read_hash_config(image,driver_list::driver(drv).name);
+		drv = driver_list::compatible_with(drv);
 	}
-	while(rc!=NULL && drv != NULL);
+	while(rc!=NULL && drv != -1);
 	return rc;
 }
 
