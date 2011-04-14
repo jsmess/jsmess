@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "imgtool.h"
-#include "mess.h"
 #include "main.h"
 #include "fileio.h"
 #include "modules.h"

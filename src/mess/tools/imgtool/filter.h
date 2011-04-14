@@ -13,7 +13,6 @@
 #include <stdio.h>
 
 #include "osdepend.h"
-#include "mess.h"
 #include "library.h"
 
 typedef struct _imgtool_filter imgtool_filter;

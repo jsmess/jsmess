@@ -16,7 +16,6 @@
 #include <assert.h>
 
 #include "emu.h"
-#include "mess.h"
 #include "fileio.h"
 
 #include "imagedev/cassette.h"
