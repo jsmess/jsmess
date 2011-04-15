@@ -66,7 +66,7 @@ Notes:
     Relevant IC's shown.
 
     Z80     - Zilog Z8400APS Z80A CPU
-    ROM     - 2732 pinout ROM "XEBEC 104521G 2155008 M460949"
+    ROM     - 2732 pinout ROM "104788D"
 	SY2158	- Synertek SY2158A-3 1Kx8 RAM
     XEBEC1  - Xebec 3198-0046N8445
     XEBEC2  - Xebec 3198-0009
