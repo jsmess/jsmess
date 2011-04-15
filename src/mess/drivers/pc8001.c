@@ -442,19 +442,37 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	i8257_hlda_w(m_dma, state);
 }
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+WRITE8_MEMBER( pc8001_state::dma_mem_w )
+{
+	//if (channel == 2)
+	{
+		m_crtc->dack_w(space, offset, data);
+	}
+}
 
-static I8257_INTERFACE( pc8001_8257_intf )
+READ8_MEMBER( pc8001_state::dma_io_r )
+{
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	
+	return program->read_byte(offset);
+}
+
+WRITE8_MEMBER( pc8001_state::dma_io_w )
+{
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	
+	program->write_byte(offset, data);
+}
+
+static I8257_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(pc8001_state, hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD3301_TAG, upd3301_device, dack_w), DEVCB_NULL },
-	I8257_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
-	I8257_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc8001_state, dma_mem_w),
+	{ DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_r), DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_r), DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_r), DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_r) },
+	{ DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_w), DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_w), DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_w), DEVCB_DRIVER_MEMBER(pc8001_state, dma_io_w) },
 };
 
 /* uPD1990A Interface */
@@ -556,7 +574,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	/* devices */
 	MCFG_MSM8251_ADD(I8251_TAG, uart_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_I8257_ADD(I8257_TAG, 4000000, pc8001_8257_intf)
+	MCFG_I8257_ADD(I8257_TAG, 4000000, dmac_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
@@ -593,7 +611,7 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	/* devices */
 	MCFG_MSM8251_ADD(I8251_TAG, uart_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_I8257_ADD(I8257_TAG, 4000000, pc8001_8257_intf)
+	MCFG_I8257_ADD(I8257_TAG, 4000000, dmac_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
