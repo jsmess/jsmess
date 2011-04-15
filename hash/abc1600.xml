@@ -84,17 +84,6 @@
 		</part>
 	</software>
 
-	<software name="u7">
-		<description>u7</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="577404">
-				<rom name="u7.td0" size="577404" crc="04e6b1f8" sha1="35f5beaf3d753abce79ce398d931bdfb37bec9df" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="uppg518">
 		<description>uppg518</description>
 		<year>19??</year>
@@ -140,6 +129,7 @@
 				<rom name="utv6_9.td0" size="594658" crc="c9a97dd0" sha1="d737c33e04bb74e8c79cab6c73c60b51c7a8e31b" offset="0" />
 			</dataarea>
 		</part>
+		<!-- also listed as 'u7' only -->
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="577404">
 				<rom name="utv7_9.td0" size="577404" crc="04e6b1f8" sha1="35f5beaf3d753abce79ce398d931bdfb37bec9df" offset="0" />

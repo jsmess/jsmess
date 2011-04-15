@@ -2621,27 +2621,6 @@
 		</part>
 	</software>
 
-	<software name="3gokushi">
-		<description>Sangokushi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="380864">
-				<rom name="sangokushi_a (turbo).d88" size="380864" crc="1aa46e57" sha1="1e2290a465aaa713b7d94e9e6ea51cfef033750f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="380848">
-				<rom name="sangokushi_b (turbo).d88" size="380848" crc="766ed5b9" sha1="02d95c7665bd5948976881be57c1c7e89394471e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="380848">
-				<rom name="sangokushi_c (turbo).d88" size="380848" crc="cbea36da" sha1="ad0f393cc7b7caa3ba1c7ba545ab1c59c83b2af4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scruiser">
 		<description>Star Cruiser</description>
 		<year>19??</year>
@@ -3238,17 +3217,6 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
                 <rom name="gyajiko2.d88" size="348848" crc="81a7c4eb" sha1="71c15c75f46810ac8159b4784a4500c54e85b198" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="unk_fl2">
-		<description>Unknown Game by Taito &amp; SPS</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-                <rom name="unk_disk2.d88" size="348848" crc="1b4fd2e1" sha1="ba078d57c1d544dedecd5ebe358d346015724ac0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
