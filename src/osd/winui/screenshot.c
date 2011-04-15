@@ -106,29 +106,29 @@ BOOL LoadScreenShot(int nGame, int nType)
 	if (lpSoftwareName)
 	{
 		int nParentIndex = -1;
-		loaded = LoadSoftwareScreenShot(drivers[nGame], lpSoftwareName, nType);
+		loaded = LoadSoftwareScreenShot(&driver_list::driver(nGame), lpSoftwareName, nType);
 		if (!loaded && DriverIsClone(nGame) == TRUE)
 		{
-			nParentIndex = GetParentIndex(drivers[nGame]);
-			loaded = LoadSoftwareScreenShot(drivers[nParentIndex], lpSoftwareName, nType);
+			nParentIndex = GetParentIndex(&driver_list::driver(nGame));
+			loaded = LoadSoftwareScreenShot(&driver_list::driver(nParentIndex), lpSoftwareName, nType);
 		}
 	}
 	if (!loaded)
 #endif /* MESS */
 	{
-		loaded = LoadDIB(drivers[nGame]->name, &m_hDIB, &m_hPal, nType);
+		loaded = LoadDIB(driver_list::driver(nGame).name, &m_hDIB, &m_hPal, nType);
 	}
 
 	/* If not loaded, see if there is a clone and try that */
 	if (!loaded)
 	{
-		int nParentIndex = GetParentIndex(drivers[nGame]);
+		int nParentIndex = GetParentIndex(&driver_list::driver(nGame));
 		if( nParentIndex >= 0)
 		{
-			loaded = LoadDIB(drivers[nParentIndex]->name, &m_hDIB, &m_hPal, nType);
-			nParentIndex = GetParentIndex(drivers[nParentIndex]);
+			loaded = LoadDIB(driver_list::driver(nParentIndex).name, &m_hDIB, &m_hPal, nType);
+			nParentIndex = GetParentIndex(&driver_list::driver(nParentIndex));
 			if (!loaded && nParentIndex >= 0)
-				loaded = LoadDIB(drivers[nParentIndex]->name, &m_hDIB, &m_hPal, nType);
+				loaded = LoadDIB(driver_list::driver(nParentIndex).name, &m_hDIB, &m_hPal, nType);
 		}
 	}
 

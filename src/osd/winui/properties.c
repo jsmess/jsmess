@@ -535,7 +535,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	// Create the propery sheets
 	if( OPTIONS_GAME == opt_type )
 	{
-		pspage = CreatePropSheetPages(hInst, FALSE, drivers[game_num], &pshead.nPages, TRUE);
+		pspage = CreatePropSheetPages(hInst, FALSE, &driver_list::driver(game_num), &pshead.nPages, TRUE);
 	}
 	else
 	{
@@ -549,7 +549,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	switch( opt_type )
 	{
 	case OPTIONS_GAME:
-		t_description = tstring_from_utf8(ModifyThe(drivers[g_nGame]->description));
+		t_description = tstring_from_utf8(ModifyThe(driver_list::driver(g_nGame).description));
 		break;
 	case OPTIONS_VECTOR:
 	case OPTIONS_VERTICAL:
@@ -599,7 +599,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 static char *GameInfoCPU(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config config(*drivers[nIndex],pCurrentOpts);
+	machine_config config(driver_list::driver(nIndex),pCurrentOpts);
 	const device_config_execute_interface *cpu;
 
 	ZeroMemory(buf, sizeof(buf));
@@ -637,7 +637,7 @@ static char *GameInfoSound(UINT nIndex)
 
 	buf[0] = 0;
 	
-	machine_config config(*drivers[nIndex],pCurrentOpts);
+	machine_config config(driver_list::driver(nIndex),pCurrentOpts);
 	
 	/* iterate over sound chips */
 	const device_config_sound_interface *sound = NULL;
@@ -696,7 +696,7 @@ static char *GameInfoSound(UINT nIndex)
 static char *GameInfoScreen(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config config(*drivers[nIndex],pCurrentOpts);
+	machine_config config(driver_list::driver(nIndex),pCurrentOpts);
 	memset(buf, '\0', 1024);
 
 	if (isDriverVector(&config))
@@ -714,7 +714,7 @@ static char *GameInfoScreen(UINT nIndex)
 				char tmpbuf[256];
 				const rectangle &visarea = screen->visible_area();
 
-				if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
+				if (driver_list::driver(nIndex).flags & ORIENTATION_SWAP_XY)
 				{
 					sprintf(tmpbuf,"%d x %d (V) %f Hz\n",
 							visarea.max_y - visarea.min_y + 1,
@@ -737,7 +737,7 @@ static char *GameInfoScreen(UINT nIndex)
 static char *GameInfoColors(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config config(*drivers[nIndex],pCurrentOpts);
+	machine_config config(driver_list::driver(nIndex),pCurrentOpts);
 
 	ZeroMemory(buf, sizeof(buf));
 	sprintf(buf, "%d colors ", config.m_total_colors);
@@ -763,49 +763,49 @@ const char *GameInfoStatus(int driver_index, BOOL bRomStatus)
  			{
 				strcpy(buffer, "Not working");
 				
-				if (drivers[driver_index]->flags & GAME_UNEMULATED_PROTECTION)
+				if (driver_list::driver(driver_index).flags & GAME_UNEMULATED_PROTECTION)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Game protection isn't fully emulated");
 				}
-				if (drivers[driver_index]->flags & GAME_WRONG_COLORS)
+				if (driver_list::driver(driver_index).flags & GAME_WRONG_COLORS)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Colors are completely wrong");
 				}
-				if (drivers[driver_index]->flags & GAME_IMPERFECT_COLORS)
+				if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_COLORS)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Colors aren't 100% accurate");
 				}
-				if (drivers[driver_index]->flags & GAME_IMPERFECT_GRAPHICS)
+				if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_GRAPHICS)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Video emulation isn't 100% accurate");
 				}
-				if (drivers[driver_index]->flags & GAME_NO_SOUND)
+				if (driver_list::driver(driver_index).flags & GAME_NO_SOUND)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Game lacks sound");
 				}
-				if (drivers[driver_index]->flags & GAME_IMPERFECT_SOUND)
+				if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_SOUND)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Sound emulation isn't 100% accurate");
 				}
-				if (drivers[driver_index]->flags & GAME_NO_COCKTAIL)
+				if (driver_list::driver(driver_index).flags & GAME_NO_COCKTAIL)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Screen flipping is not supported");
 				}
- 				if (drivers[driver_index]->flags & GAME_REQUIRES_ARTWORK)
+ 				if (driver_list::driver(driver_index).flags & GAME_REQUIRES_ARTWORK)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
@@ -816,49 +816,49 @@ const char *GameInfoStatus(int driver_index, BOOL bRomStatus)
 			{
 				strcpy(buffer, "Working");
 				
-				if (drivers[driver_index]->flags & GAME_UNEMULATED_PROTECTION)
+				if (driver_list::driver(driver_index).flags & GAME_UNEMULATED_PROTECTION)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Game protection isn't fully emulated");
 				}
-				if (drivers[driver_index]->flags & GAME_WRONG_COLORS)
+				if (driver_list::driver(driver_index).flags & GAME_WRONG_COLORS)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Colors are completely wrong");
 				}
-				if (drivers[driver_index]->flags & GAME_IMPERFECT_COLORS)
+				if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_COLORS)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Colors aren't 100% accurate");
 				}
-				if (drivers[driver_index]->flags & GAME_IMPERFECT_GRAPHICS)
+				if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_GRAPHICS)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Video emulation isn't 100% accurate");
 				}
-				if (drivers[driver_index]->flags & GAME_NO_SOUND)
+				if (driver_list::driver(driver_index).flags & GAME_NO_SOUND)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Game lacks sound");
 				}
-				if (drivers[driver_index]->flags & GAME_IMPERFECT_SOUND)
+				if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_SOUND)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Sound emulation isn't 100% accurate");
 				}
-				if (drivers[driver_index]->flags & GAME_NO_COCKTAIL)
+				if (driver_list::driver(driver_index).flags & GAME_NO_COCKTAIL)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Screen flipping is not supported");
 				}
-				if (drivers[driver_index]->flags & GAME_REQUIRES_ARTWORK)
+				if (driver_list::driver(driver_index).flags & GAME_REQUIRES_ARTWORK)
 				{
 					if (*buffer != '\0')
 						strcat(buffer, "\r\n");
@@ -887,49 +887,49 @@ const char *GameInfoStatus(int driver_index, BOOL bRomStatus)
 		{
 			strcpy(buffer, "Working");
 		}	
-		if (drivers[driver_index]->flags & GAME_UNEMULATED_PROTECTION)
+		if (driver_list::driver(driver_index).flags & GAME_UNEMULATED_PROTECTION)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Game protection isn't fully emulated");
 		}
-		if (drivers[driver_index]->flags & GAME_WRONG_COLORS)
+		if (driver_list::driver(driver_index).flags & GAME_WRONG_COLORS)
 		{
 		if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Colors are completely wrong");
 		}
-		if (drivers[driver_index]->flags & GAME_IMPERFECT_COLORS)
+		if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_COLORS)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Colors aren't 100% accurate");
 		}
-		if (drivers[driver_index]->flags & GAME_IMPERFECT_GRAPHICS)
+		if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_GRAPHICS)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Video emulation isn't 100% accurate");
 		}
-		if (drivers[driver_index]->flags & GAME_NO_SOUND)
+		if (driver_list::driver(driver_index).flags & GAME_NO_SOUND)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Game lacks sound");
 		}
-		if (drivers[driver_index]->flags & GAME_IMPERFECT_SOUND)
+		if (driver_list::driver(driver_index).flags & GAME_IMPERFECT_SOUND)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Sound emulation isn't 100% accurate");
 		}
-		if (drivers[driver_index]->flags & GAME_NO_COCKTAIL)
+		if (driver_list::driver(driver_index).flags & GAME_NO_COCKTAIL)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Screen flipping is not supported");
 		}
-		if (drivers[driver_index]->flags & GAME_REQUIRES_ARTWORK)
+		if (driver_list::driver(driver_index).flags & GAME_REQUIRES_ARTWORK)
 		{
 			if (*buffer != '\0')
 				strcat(buffer, "\r\n");
@@ -944,7 +944,7 @@ static char *GameInfoManufactured(UINT nIndex)
 {
 	static char buffer[1024];
 
-	snprintf(buffer,sizeof(buffer),"%s %s",drivers[nIndex]->year,drivers[nIndex]->manufacturer); 
+	snprintf(buffer,sizeof(buffer),"%s %s",driver_list::driver(nIndex).year,driver_list::driver(nIndex).manufacturer); 
 	return buffer;
 }
 
@@ -959,7 +959,7 @@ char *GameInfoTitle(OPTIONS_TYPE opt_type, UINT nIndex)
 		OPTIONS_VERTICAL == opt_type || OPTIONS_HORIZONTAL == opt_type)
 		strcpy(buf, "Global folder options\nDefault options used by all games in the folder");
 	else
-		sprintf(buf, "%s\n\"%s\"", ModifyThe(drivers[nIndex]->description), drivers[nIndex]->name); 
+		sprintf(buf, "%s\n\"%s\"", ModifyThe(driver_list::driver(nIndex).description), driver_list::driver(nIndex).name); 
 	return buf;
 }
 
@@ -973,10 +973,10 @@ static char *GameInfoCloneOf(UINT nIndex)
 
 	if (DriverIsClone(nIndex))
 	{
-		nParentIndex = GetParentIndex(drivers[nIndex]);
+		nParentIndex = GetParentIndex(&driver_list::driver(nIndex));
 		sprintf(buf, "%s - \"%s\"",
-			ConvertAmpersandString(ModifyThe(drivers[nParentIndex]->description)),
-			drivers[nParentIndex]->name); 
+			ConvertAmpersandString(ModifyThe(driver_list::driver(nParentIndex).description)),
+			driver_list::driver(nParentIndex).name); 
 	}
 
 	return buf;
@@ -2416,7 +2416,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	{		
 		const device_config_sound_interface *sound;
 		if ( nIndex > -1 ) {
-			machine_config config(*drivers[nIndex],pCurrentOpts);
+			machine_config config(driver_list::driver(nIndex),pCurrentOpts);
 		
 			for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 			{
@@ -2696,7 +2696,7 @@ static void InitializeBIOSUI(HWND hwnd)
 	TCHAR* t_s;
 	if (hCtrl)
 	{
-		const game_driver *gamedrv = drivers[g_nGame];
+		const game_driver *gamedrv = &driver_list::driver(g_nGame);
 		const rom_entry *rom;
 
 		if (g_nGame == GLOBAL_OPTIONS)
@@ -2707,7 +2707,7 @@ static void InitializeBIOSUI(HWND hwnd)
 		}
 		if (g_nGame == FOLDER_OPTIONS) //Folder Options
 		{
-			gamedrv = drivers[g_nFolderGame];
+			gamedrv = &driver_list::driver(g_nFolderGame);
 			if (DriverHasOptionalBIOS(g_nFolderGame) == FALSE)
 			{
 				(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));

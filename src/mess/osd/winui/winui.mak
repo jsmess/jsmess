@@ -9,7 +9,6 @@
 # build the executable names
 RCFLAGS += -DMESS
 
-EMULATOR = 
 EMU_EXE = $(PREFIX)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(EXE)
 BUILD += $(EMU_EXE)
 

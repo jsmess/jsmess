@@ -116,7 +116,7 @@ static int GetGameNameIndex(const char *name)
 		sorted_drivers = (driver_data_type *)malloc(sizeof(driver_data_type) * num_games);
 		for (i=0;i<num_games;i++)
 		{
-			sorted_drivers[i].name = drivers[i]->name;
+			sorted_drivers[i].name = driver_list::driver(i).name;
 			sorted_drivers[i].index = i;
 		}
 		qsort(sorted_drivers,num_games,sizeof(driver_data_type),DriverDataCompareFunc);
@@ -418,9 +418,7 @@ static int index_datafile (struct tDatafileIndex **_index)
         struct tDatafileIndex *idx;
         int count = 0;
         UINT32 token = TOKEN_SYMBOL;
-		num_games = 0;
-		while (drivers[num_games] != NULL)
-			num_games++;
+		num_games = driver_list::total();
         /* rewind file */
         if (ParseSeek (0L, SEEK_SET)) return 0;
 
@@ -456,7 +454,7 @@ static int index_datafile (struct tDatafileIndex **_index)
 									game_index = GetGameNameIndex((char *)s);
 									if (game_index >= 0)
 									{
-										idx->driver = drivers[game_index];
+										idx->driver = &driver_list::driver(game_index);
 										idx->offset = tell;
 										idx++;
 										count++;
@@ -630,7 +628,8 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
 					break;
                                 err = load_datafile_text (gdrv, buffer, bufsize,
                                                                                   hist_idx, DATAFILE_TAG_BIO);
-				gdrv = driver_get_clone(gdrv);
+						int g = driver_list::clone(*gdrv);
+						if (g!=-1) gdrv = &driver_list::driver(g); else gdrv = NULL;
                         } while (err && gdrv);
 
                         if (err) history = 0;
@@ -664,7 +663,8 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
 				err = load_datafile_text (gdrv, buffer+len, bufsize-len,
                                                                                   mame_idx, DATAFILE_TAG_MAME);
 				
-				gdrv = driver_get_clone(gdrv);
+					int g = driver_list::clone(*gdrv);
+					if (g!=-1) gdrv = &driver_list::driver(g); else gdrv = NULL;				
                         } while (err && gdrv);
 
                         if (err) mameinfo = 0;

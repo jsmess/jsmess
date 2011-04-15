@@ -522,12 +522,12 @@ BOOL OptionsInit()
 		while(perGameOptions[game_option_count].name)
 			game_option_count++;
 
-		for (i = 0; i < driver_list_get_count(drivers); i++)
+		for (i = 0; i < driver_list::total(); i++)
 		{
 			for (j = 0; j < game_option_count; j++)
 			{
 				options_entry entry[2] = { { 0 }, { 0 } };
-				snprintf(buffer, ARRAY_LENGTH(buffer), "%s%s", drivers[i]->name, perGameOptions[j].name);
+				snprintf(buffer, ARRAY_LENGTH(buffer), "%s%s", driver_list::driver(i).name, perGameOptions[j].name);
 				
 				entry[0].name = core_strdup(buffer);
 				entry[0].defvalue = perGameOptions[j].defvalue;
@@ -1627,7 +1627,7 @@ void SetSnapName(const char* pattern)
 
 void ResetGameOptions(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
+	assert(0 <= driver_index && driver_index < driver_list::total());
 
 	//save_options(OPTIONS_GAME, NULL, driver_index);
 }
@@ -1648,7 +1648,7 @@ void ResetAllGameOptions(void)
 {
 	int i;
 
-	for (i = 0; i < driver_list_get_count(drivers); i++)
+	for (i = 0; i < driver_list::total(); i++)
 	{
 		ResetGameOptions(i);
 	}
@@ -1666,8 +1666,8 @@ void ResetAllGameOptions(void)
 
 static void GetDriverOptionName(int driver_index, const char *option_name, char *buffer, size_t buffer_len)
 {
-	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
-	snprintf(buffer, buffer_len, "%s_%s", drivers[driver_index]->name, option_name);
+	assert(0 <= driver_index && driver_index < driver_list::total());
+	snprintf(buffer, buffer_len, "%s_%s", driver_list::driver(driver_index).name, option_name);
 }
 
 int GetRomAuditResults(int driver_index)
@@ -1732,7 +1732,7 @@ static void ResetPlayVariable(int driver_index, const char *play_variable)
 	if (driver_index < 0)
 	{
 		/* all games */
-		for (i = 0; i< driver_list_get_count(drivers); i++)
+		for (i = 0; i< driver_list::total(); i++)
 		{
 			/* 20070808 MSH - Was passing in driver_index instead of i. Doh! */
 			ResetPlayVariable(i, play_variable);
@@ -1775,7 +1775,7 @@ void GetTextPlayTime(int driver_index,char *buf)
 	int hour, minute, second;
 	int temp = GetPlayTime(driver_index);
 
-	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
+	assert(0 <= driver_index && driver_index < driver_list::total());
 
 	hour = temp / 3600;
 	temp = temp - 3600*hour;
@@ -2795,14 +2795,22 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 #endif
 	if (game_num >= 0)
 	{
-		driver = drivers[game_num];
+		driver = &driver_list::driver(game_num);
 	}
 
 	// if we have a valid game driver, parse game-specific INI files 
 	if (driver != NULL)
 	{
-		const game_driver *parent = driver_get_clone(driver);
-		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
+		const game_driver *parent = NULL;
+		int cl = driver_list::clone(*driver);
+		if (cl!=-1) parent = &driver_list::driver(cl);
+		int gp = -1;
+		if (parent!=NULL) gp = driver_list::clone(*parent);
+		const game_driver *gparent = NULL;
+		if (parent != NULL) {
+			if (gp!=-1) gparent= &driver_list::driver(gp);
+		}
+		
 
 		astring *basename;
 		astring *srcname;
@@ -2898,7 +2906,7 @@ void save_options(OPTIONS_TYPE opt_type, windows_options &opts, int game_num)
 
 	if (game_num >= 0)
 	{
-		driver = drivers[game_num];
+		driver = &driver_list::driver(game_num);
 	}
 
 	if (opt_type == OPTIONS_GLOBAL)

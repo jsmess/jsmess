@@ -396,7 +396,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, windows_
 
 	// identify the driver
 	driver_index = PropertiesCurrentGame(dialog);
-	gamedrv = drivers[driver_index];
+	gamedrv = &driver_list::driver(driver_index);
 
 	// clear out the combo box
 	(void)ComboBox_ResetContent(control);

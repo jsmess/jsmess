@@ -21,7 +21,6 @@
 
 software_config *software_config_alloc(int driver_index) //, hashfile_error_func error_proc)
 {
-	const game_driver *driver;
 	software_config *config;
 
 	// allocate the software_config
@@ -31,19 +30,11 @@ software_config *software_config_alloc(int driver_index) //, hashfile_error_func
 	// allocate the machine config
 	windows_options pCurrentOpts;
 	load_options(pCurrentOpts, OPTIONS_GLOBAL, driver_index); 
-	config->mconfig = global_alloc(machine_config(*drivers[driver_index],pCurrentOpts));
-
-	// allocate the hash file
-	driver = drivers[driver_index];
-	while (driver) //&& (!config->hashfile))
-	{
-		//config->hashfile = hashfile_open(*opts, driver->name, TRUE, error_proc);
-		driver = driver_get_compatible(driver);
-	}
+	config->mconfig = global_alloc(machine_config(driver_list::driver(driver_index),pCurrentOpts));
 
 	// other stuff
 	config->driver_index = driver_index;
-	config->gamedrv = drivers[driver_index];
+	config->gamedrv = &driver_list::driver(driver_index);
 
 	return config;
 }

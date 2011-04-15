@@ -40,7 +40,7 @@ char * GetGameHistory(int driver_index)
 	static char buffer[1024 * 1024];
 	buffer[0] = '\0';
 
-	if (load_driver_history(drivers[driver_index],buffer,sizeof(buffer)) != 0)
+	if (load_driver_history(&driver_list::driver(driver_index),buffer,sizeof(buffer)) != 0)
 		return buffer;
 
 	return ConvertToWindowsNewlines(buffer);

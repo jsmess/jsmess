@@ -47,7 +47,7 @@ void MessSetupGameOptions(windows_options &opts, int driver_index)
 {
 	if (driver_index >= 0)
 	{
-		opts.set_system_name(drivers[driver_index]->name);
+		opts.set_system_name(driver_list::driver(driver_index).name);
 	}
 }
 
@@ -155,7 +155,7 @@ void SetSelectedSoftware(int driver_index, const machine_config *config, const d
 	if (LOG_SOFTWARE)
 	{
 		dprintf("SetSelectedSoftware(): dev=%p (\'%s\') software='%s'\n",
-			dev, drivers[driver_index]->name, software);
+			dev, driver_list::driver(driver_index).name, software);
 	}
 
 	load_options(o,OPTIONS_GAME, driver_index);
@@ -180,9 +180,9 @@ void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
 {
 	char opt_name[32];
 
-	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
+	assert(0 <= driver_index && driver_index < driver_list::total());
 
-	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
+	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", driver_list::driver(driver_index).name);
 	astring error_string;
 	MameUISettings().set_value(opt_name, extra_paths, OPTION_PRIORITY_CMDLINE,error_string);
 	assert(!error_string);
@@ -193,9 +193,9 @@ const char *GetExtraSoftwarePaths(int driver_index)
 	char opt_name[32];
 	const char *paths;
 
-	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
+	assert(0 <= driver_index && driver_index < driver_list::total());
 
-	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
+	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", driver_list::driver(driver_index).name);
 	paths = MameUISettings().value(opt_name);
 	return paths ? paths : "";
 }

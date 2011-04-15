@@ -296,7 +296,7 @@ const char * GetDriverFilename(int nIndex)
 	static char tmp[40];
 	const char *ptmp;
 
-	const char *s = drivers[nIndex]->source_file;
+	const char *s = driver_list::driver(nIndex).source_file;
 
 	tmp[0] = '\0';
 
@@ -355,10 +355,10 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 	if (drivers_info == NULL)
 	{
 		int ndriver;
-		drivers_info = (DriversInfo*)malloc(sizeof(struct DriversInfo) * driver_list_get_count(drivers));
-		for (ndriver = 0; ndriver < driver_list_get_count(drivers); ndriver++)
+		drivers_info = (DriversInfo*)malloc(sizeof(struct DriversInfo) * driver_list::total());
+		for (ndriver = 0; ndriver < driver_list::total(); ndriver++)
 		{
-			const game_driver *gamedrv = drivers[ndriver];
+			const game_driver *gamedrv = &driver_list::driver(ndriver);
 			struct DriversInfo *gameinfo = &drivers_info[ndriver];
 			const rom_entry *region, *rom;
 			windows_options pCurrentOpts;
@@ -488,7 +488,7 @@ BOOL DriverIsHarddisk(int driver_index)
 BOOL DriverIsBios(int driver_index)
 {
 	BOOL bBios = FALSE;
-	if( !( (drivers[driver_index]->flags & GAME_IS_BIOS_ROOT ) == 0)   )
+	if( !( (driver_list::driver(driver_index).flags & GAME_IS_BIOS_ROOT ) == 0)   )
 		bBios = TRUE;
 	return bBios;
 }
@@ -496,7 +496,7 @@ BOOL DriverIsBios(int driver_index)
 BOOL DriverIsMechanical(int driver_index)
 {
 	BOOL bMechanical = FALSE;
-	if( !( (drivers[driver_index]->flags & GAME_MECHANICAL ) == 0)   )
+	if( !( (driver_list::driver(driver_index).flags & GAME_MECHANICAL ) == 0)   )
 		bMechanical = TRUE;
 	return bMechanical;
 }

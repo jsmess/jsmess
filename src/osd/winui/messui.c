@@ -289,10 +289,10 @@ BOOL CreateMessIcons(void)
 	// create the icon index, if we havn't already
     if (!mess_icon_index)
 	{
-		mess_icon_index = (int*)pool_malloc_lib(GetMameUIMemoryPool(), driver_list_get_count(drivers) * IO_COUNT * sizeof(*mess_icon_index));
+		mess_icon_index = (int*)pool_malloc_lib(GetMameUIMemoryPool(), driver_list::total() * IO_COUNT * sizeof(*mess_icon_index));
     }
 
-    for (i = 0; i < (driver_list_get_count(drivers) * IO_COUNT); i++)
+    for (i = 0; i < (driver_list::total() * IO_COUNT); i++)
         mess_icon_index[i] = 0;
 
 	// Associate the image lists with the list view control.
@@ -316,7 +316,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
 	const char *iconname;
 
 	assert(drvindex >= 0);
-	assert(drvindex < driver_list_get_count(drivers));
+	assert(drvindex < driver_list::total());
 
     if ((nSoftwareType >= 0) && (nSoftwareType < IO_COUNT))
 	{
@@ -326,12 +326,16 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
         nIconPos = mess_icon_index[the_index];
         if (nIconPos >= 0)
 		{
-			for (drv = drivers[drvindex]; drv; drv = driver_get_clone(drv))
+			drv = &driver_list::driver(drvindex);
+			while (drv)
 			{
 				_snprintf(buffer, ARRAY_LENGTH(buffer), "%s/%s", drv->name, iconname);
 				hIcon = LoadIconFromFile(buffer);
 				if (hIcon)
 					break;
+				
+				int cl = driver_list::clone(*drv);
+				if (cl!=-1) drv = &driver_list::driver(cl); else drv = NULL;
 			}
 
 			if (hIcon)
@@ -432,11 +436,16 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	SoftwarePicker_SetDriver(hwndSoftwarePicker, s_config);
 
 	// add the relevant paths
-	drv = drivers[drvindex];
+	drv = &driver_list::driver(drvindex);
 	while(drv != NULL)
 	{
 		AddSoftwarePickerDirs(hwndSoftwarePicker, GetSoftwareDirs(), drv->name);
-		drv = driver_get_compatible(drv);
+		int cl = driver_list::clone(*drv);
+		if (cl!=-1) {
+			drv = &driver_list::driver(cl);
+		} else {
+		    drv = NULL;
+		}
 	}
 	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(drvindex), NULL);
 
@@ -445,7 +454,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	SoftwareList_SetDriver(hwndSoftwareList, s_config);
 
 	/* allocate the machine config */
-	machine_config config(*drivers[drvindex],MameUIGlobal());
+	machine_config config(driver_list::driver(drvindex),MameUIGlobal());
 
 	windows_options options;
 	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
@@ -507,7 +516,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 		return TRUE;
 	}
 	// allocate the machine config
-	machine_config config(*drivers[drvindex],MameUIGlobal());
+	machine_config config(driver_list::driver(drvindex),MameUIGlobal());
 
 	for (bool gotone = config.m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
@@ -519,7 +528,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 			{
 				snprintf(szMessage, ARRAY_LENGTH(szMessage),
 					"System '%s' requires that device %s must have an image to load\n",
-					drivers[drvindex]->description,
+					driver_list::driver(drvindex).description,
 					dev->image_type_name());
 				goto done;
 			}
@@ -918,7 +927,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 	drvindex = Picker_GetSelectedItem(hwndList);
 
 	// allocate the machine config
-	machine_config config(*drivers[drvindex],MameUIGlobal());
+	machine_config config(driver_list::driver(drvindex),MameUIGlobal());
 
 	SetupImageTypes(&config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	cfd_res = CommonFileImageDialog(last_directory, cfd, filename, &config, imagetypes);
@@ -1651,7 +1660,7 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 
 	nNewGame = GetSelectedPick() + 1;
 
-	if (nNewGame >= driver_list_get_count(drivers))
+	if (nNewGame >= driver_list::total())
 	{
 		/* We are done */
 		Picker_SetSelectedPick(hwndList, s_nOriginalPick);

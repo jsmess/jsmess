@@ -288,49 +288,49 @@ endif
 
 
 # add UI objs
-#OSDOBJS += \
-#	$(WINOBJ)/winmainui.o \
-#	$(UIOBJ)/mui_util.o \
-#	$(UIOBJ)/directinput.o \
-#	$(UIOBJ)/dijoystick.o \
-#	$(UIOBJ)/directdraw.o \
-#	$(UIOBJ)/directories.o \
-#	$(UIOBJ)/mui_audit.o \
-#	$(UIOBJ)/columnedit.o \
-#	$(UIOBJ)/screenshot.o \
-#	$(UIOBJ)/treeview.o \
-#	$(UIOBJ)/splitters.o \
-#	$(UIOBJ)/bitmask.o \
-#	$(UIOBJ)/datamap.o \
-#	$(UIOBJ)/dxdecode.o \
-#	$(UIOBJ)/picker.o \
-#	$(UIOBJ)/properties.o \
-#	$(UIOBJ)/tabview.o \
-#	$(UIOBJ)/help.o \
-#	$(UIOBJ)/history.o \
-#	$(UIOBJ)/dialogs.o \
-#	$(UIOBJ)/mui_opts.o \
-#	$(UIOBJ)/datafile.o \
-#	$(UIOBJ)/dirwatch.o \
-#	$(UIOBJ)/winui.o \
-#	$(UIOBJ)/helpids.o \
-#	$(UIOBJ)/messui.o \
-#	$(UIOBJ)/optionsms.o \
-#	$(UIOBJ)/msuiutil.o \
-#	$(UIOBJ)/propertiesms.o \
-#	$(UIOBJ)/swconfig.o \
-#	$(UIOBJ)/softwarepicker.o \
-#	$(UIOBJ)/softwarelist.o \
-#	$(UIOBJ)/devview.o
-#
-#ifneq ($(TARGET),mess)
-#OSDOBJS += \
-#	$(UIOBJ)/layout.o
-#endif
-#ifeq ($(TARGET),mess)
-#OSDOBJS += \
-#	$(UIOBJ)/layoutms.o
-#endif
+OSDOBJS += \
+	$(WINOBJ)/winmainui.o \
+	$(UIOBJ)/mui_util.o \
+	$(UIOBJ)/directinput.o \
+	$(UIOBJ)/dijoystick.o \
+	$(UIOBJ)/directdraw.o \
+	$(UIOBJ)/directories.o \
+	$(UIOBJ)/mui_audit.o \
+	$(UIOBJ)/columnedit.o \
+	$(UIOBJ)/screenshot.o \
+	$(UIOBJ)/treeview.o \
+	$(UIOBJ)/splitters.o \
+	$(UIOBJ)/bitmask.o \
+	$(UIOBJ)/datamap.o \
+	$(UIOBJ)/dxdecode.o \
+	$(UIOBJ)/picker.o \
+	$(UIOBJ)/properties.o \
+	$(UIOBJ)/tabview.o \
+	$(UIOBJ)/help.o \
+	$(UIOBJ)/history.o \
+	$(UIOBJ)/dialogs.o \
+	$(UIOBJ)/mui_opts.o \
+	$(UIOBJ)/datafile.o \
+	$(UIOBJ)/dirwatch.o \
+	$(UIOBJ)/winui.o \
+	$(UIOBJ)/helpids.o \
+	$(UIOBJ)/messui.o \
+	$(UIOBJ)/optionsms.o \
+	$(UIOBJ)/msuiutil.o \
+	$(UIOBJ)/propertiesms.o \
+	$(UIOBJ)/swconfig.o \
+	$(UIOBJ)/softwarepicker.o \
+	$(UIOBJ)/softwarelist.o \
+	$(UIOBJ)/devview.o
+
+ifneq ($(TARGET),mess)
+OSDOBJS += \
+	$(UIOBJ)/layout.o
+endif
+ifeq ($(TARGET),mess)
+OSDOBJS += \
+	$(UIOBJ)/layoutms.o
+endif
 
 # extra dependencies
 $(WINOBJ)/drawdd.o : 	$(SRC)/emu/rendersw.c

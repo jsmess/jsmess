@@ -112,16 +112,16 @@ const char * GetAuditString(int audit_result)
 {
 	switch (audit_result)
 	{
-	case CORRECT :
-	case BEST_AVAILABLE :
+	case media_auditor::CORRECT :
+	case media_auditor::BEST_AVAILABLE :
 		return "Yes";
 
-	case NOTFOUND :
-	case INCORRECT :
+	case media_auditor::NOTFOUND :
+	case media_auditor::INCORRECT :
 		return "No";
 
-	case UNKNOWN :
-		return "?";
+	//case UNKNOWN :
+//		return "?";
 
 	default:
 		dprintf("unknown audit value %i\n",audit_result);
@@ -132,17 +132,17 @@ const char * GetAuditString(int audit_result)
 
 BOOL IsAuditResultKnown(int audit_result)
 {
-	return audit_result != UNKNOWN;
+	return TRUE;//audit_result != UNKNOWN;
 }
 
 BOOL IsAuditResultYes(int audit_result)
 {
-	return audit_result == CORRECT || audit_result == BEST_AVAILABLE;
+	return audit_result == media_auditor::CORRECT || audit_result == media_auditor::BEST_AVAILABLE;
 }
 
 BOOL IsAuditResultNo(int audit_result)
 {
-	return audit_result == NOTFOUND || audit_result == INCORRECT;
+	return audit_result == media_auditor::NOTFOUND || audit_result == media_auditor::INCORRECT;
 }
 
 
@@ -157,51 +157,54 @@ static void MameUIOutput(void *param, const char *format, va_list argptr)
 	DetailsPrintf("%s", buffer);
 }
 
-static int ProcessAuditResults(int game, audit_record *audit, int audit_records)
+/*static int ProcessAuditResults(int game, audit_record *audit, int audit_records)
 {
 	output_callback_func prevcb;
 	void *prevparam;
 	int res;
 
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, MameUIOutput, NULL, &prevcb, &prevparam);
-	res = audit_summary(drivers[game], audit_records, audit, TRUE);
+	res = TRUE;//audit_summary(&driver_list::driver(game), audit_records, audit, TRUE);
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, prevcb ? prevcb : mame_null_output_callback, prevparam, NULL, NULL);
 
 	return res;
-}
+}*/
 
 // Verifies the ROM set while calling SetRomAuditResults	
 int MameUIVerifyRomSet(int game)
 {
-	audit_record *audit;
-	int audit_records;
-	int res;
+
+	//audit_record *audit;
+	//int audit_records;
+	//int res;
 
 	// perform the audit
-	audit_records = audit_images(MameUIGlobal(), drivers[game], AUDIT_VALIDATE_FAST, &audit);
-	res = ProcessAuditResults(game, audit, audit_records);
-	if (audit_records > 0)
-		global_free(audit);
+	//audit_records = audit_images(MameUIGlobal(), &driver_list::driver(game), AUDIT_VALIDATE_FAST, &audit);
+	//res = ProcessAuditResults(game, audit, audit_records);
+	//if (audit_records > 0)
+//		global_free(audit);
 
-	SetRomAuditResults(game, res);
-	return res;
+//	SetRomAuditResults(game, res);
+//	return res;
+return TRUE;
 }
 
 // Verifies the Sample set while calling SetSampleAuditResults	
 int MameUIVerifySampleSet(int game)
 {
-	audit_record *audit;
-	int audit_records;
-	int res;
+//	audit_record *audit;
+//	int audit_records;
+//	int res;
 
 	// perform the audit
-	audit_records = audit_samples(MameUIGlobal(), drivers[game], &audit);
-	res = ProcessAuditResults(game, audit, audit_records);
-	if (audit_records > 0)
-		global_free(audit);
+	//audit_records = audit_samples(MameUIGlobal(), &driver_list::driver(game), &audit);
+//	res = ProcessAuditResults(game, audit, audit_records);
+//	if (audit_records > 0)
+//		global_free(audit);
 
-	SetSampleAuditResults(game, res);
-	return res;
+	//SetSampleAuditResults(game, res);
+	//return res;
+	return TRUE;
 }
 
 static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
@@ -215,7 +218,7 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 			if (rom_index != -1)
 			{
 				sprintf(buffer, "Checking Game %s - %s",
-					drivers[rom_index]->name, drivers[rom_index]->description);
+					driver_list::driver(rom_index).name, driver_list::driver(rom_index).description);
 				win_set_window_text_utf8((HWND)hDlg, buffer);
 				ProcessNextRom();
 			}
@@ -224,7 +227,7 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 				if (sample_index != -1)
 				{
 					sprintf(buffer, "Checking Game %s - %s",
-						drivers[sample_index]->name, drivers[sample_index]->description);
+						driver_list::driver(sample_index).name, driver_list::driver(sample_index).description);
 					win_set_window_text_utf8((HWND)hDlg, buffer);
 					ProcessNextSample();
 				}
@@ -260,8 +263,8 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 			SendMessage( hEdit, EM_SETLIMITTEXT, MAX_AUDITBOX_TEXT, 0 );
 
 		}
-		SendDlgItemMessage(hDlg, IDC_ROMS_PROGRESS,    PBM_SETRANGE, 0, MAKELPARAM(0, driver_list_get_count(drivers)));
-		SendDlgItemMessage(hDlg, IDC_SAMPLES_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, driver_list_get_count(drivers)));
+		SendDlgItemMessage(hDlg, IDC_ROMS_PROGRESS,    PBM_SETRANGE, 0, MAKELPARAM(0, driver_list::total()));
+		SendDlgItemMessage(hDlg, IDC_SAMPLES_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, driver_list::total()));
 		bPaused = FALSE;
 		bCancel = FALSE;
 		rom_index = 0;
@@ -343,8 +346,8 @@ static void ProcessNextRom()
 	retval = MameUIVerifyRomSet(rom_index);
 	switch (retval)
 	{
-	case BEST_AVAILABLE: /* correct, incorrect or separate count? */
-	case CORRECT:
+	case media_auditor::BEST_AVAILABLE: /* correct, incorrect or separate count? */
+	case media_auditor::CORRECT:
 		roms_correct++;
 		_stprintf(buffer, TEXT("%i"), roms_correct);
 		SendDlgItemMessage(hAudit, IDC_ROMS_CORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -352,10 +355,10 @@ static void ProcessNextRom()
 		SendDlgItemMessage(hAudit, IDC_ROMS_TOTAL, WM_SETTEXT, 0, (LPARAM)buffer);
 		break;
 
-	case NOTFOUND:
+	case media_auditor::NOTFOUND:
 		break;
 
-	case INCORRECT:
+	case media_auditor::INCORRECT:
 		roms_incorrect++;
 		_stprintf(buffer, TEXT("%i"), roms_incorrect);
 		SendDlgItemMessage(hAudit, IDC_ROMS_INCORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -367,7 +370,7 @@ static void ProcessNextRom()
 	rom_index++;
 	SendDlgItemMessage(hAudit, IDC_ROMS_PROGRESS, PBM_SETPOS, rom_index, 0);
 
-	if (rom_index == driver_list_get_count(drivers))
+	if (rom_index == driver_list::total())
 	{
 		sample_index = 0;
 		rom_index = -1;
@@ -383,7 +386,7 @@ static void ProcessNextSample()
 	
 	switch (retval)
 	{
-	case CORRECT:
+	case media_auditor::CORRECT:
 		if (DriverUsesSamples(sample_index))
 		{
 			samples_correct++;
@@ -394,10 +397,10 @@ static void ProcessNextSample()
 			break;
 		}
 
-	case NOTFOUND:
+	case media_auditor::NOTFOUND:
 		break;
 			
-	case INCORRECT:
+	case media_auditor::INCORRECT:
 		samples_incorrect++;
 		_stprintf(buffer, TEXT("%i"), samples_incorrect);
 		SendDlgItemMessage(hAudit, IDC_SAMPLES_INCORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
@@ -410,7 +413,7 @@ static void ProcessNextSample()
 	sample_index++;
 	SendDlgItemMessage(hAudit, IDC_SAMPLES_PROGRESS, PBM_SETPOS, sample_index, 0);
 	
-	if (sample_index == driver_list_get_count(drivers))
+	if (sample_index == driver_list::total())
 	{
 		DetailsPrintf("Audit complete.\n");
 		SendDlgItemMessage(hAudit, IDCANCEL, WM_SETTEXT, 0, (LPARAM)TEXT("Close"));
@@ -463,19 +466,19 @@ static const char * StatusString(int iStatus)
 
 	switch (iStatus)
 	{
-	case CORRECT:
+	case media_auditor::CORRECT:
 		ptr = "Passed";
 		break;
 		
-	case BEST_AVAILABLE:
+	case media_auditor::BEST_AVAILABLE:
 		ptr = "Best available";
 		break;
 		
-	case NOTFOUND:
+	case media_auditor::NOTFOUND:
 		ptr = "Not found";
 		break;
 		
-	case INCORRECT:
+	case media_auditor::INCORRECT:
 		ptr = "Failed";
 		break;
 	}

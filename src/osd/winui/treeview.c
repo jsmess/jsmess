@@ -292,7 +292,7 @@ void ResetWhichGamesInFolders(void)
 {
 	UINT	i, jj, k;
 	BOOL b;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 
 	for (i = 0; i < numFolders; i++)
 	{
@@ -336,7 +336,7 @@ BOOL GameFiltered(int nGame, DWORD dwMask)
 	//Filter out the Bioses on all Folders, except for the Bios Folder
 	if( lpFolder->m_nFolderId != FOLDER_BIOS )
 	{
-//		if( !( (drivers[nGame]->flags & GAME_IS_BIOS_ROOT ) == 0) )
+//		if( !( (driver_list::driver(nGame).flags & GAME_IS_BIOS_ROOT ) == 0) )
 //			return TRUE;
 	}
  	// Filter games--return TRUE if the game should be HIDDEN in this view
@@ -357,15 +357,15 @@ BOOL GameFiltered(int nGame, DWORD dwMask)
 
 	if (strlen(GetSearchText()) && _stricmp(GetSearchText(), SEARCH_PROMPT))
 	{
-		if (MyStrStrI(drivers[nGame]->description,GetSearchText()) == NULL &&
-			MyStrStrI(drivers[nGame]->name,GetSearchText()) == NULL) 
+		if (MyStrStrI(driver_list::driver(nGame).description,GetSearchText()) == NULL &&
+			MyStrStrI(driver_list::driver(nGame).name,GetSearchText()) == NULL) 
 			return TRUE;
 	}
 	/*Filter Text is already global*/
-	if (MyStrStrI(drivers[nGame]->description,GetFilterText()) == NULL &&
-		MyStrStrI(drivers[nGame]->name,GetFilterText()) == NULL && 
-		MyStrStrI(drivers[nGame]->source_file,GetFilterText()) == NULL && 
-		MyStrStrI(drivers[nGame]->manufacturer,GetFilterText()) == NULL)
+	if (MyStrStrI(driver_list::driver(nGame).description,GetFilterText()) == NULL &&
+		MyStrStrI(driver_list::driver(nGame).name,GetFilterText()) == NULL && 
+		MyStrStrI(driver_list::driver(nGame).source_file,GetFilterText()) == NULL && 
+		MyStrStrI(driver_list::driver(nGame).manufacturer,GetFilterText()) == NULL)
 	{
 		return TRUE;
 	}
@@ -396,7 +396,7 @@ BOOL GetParentFound(int nGame)
 
 	if( lpFolder )
 	{
-		nParentIndex = GetParentIndex(drivers[nGame]);
+		nParentIndex = GetParentIndex(&driver_list::driver(nGame));
 
 		/* return FALSE if no parent is there in this view */
 		if( nParentIndex == -1)
@@ -428,7 +428,7 @@ LPCFILTER_ITEM GetFilterList(void)
 void CreateSourceFolders(int parent_index)
 {
 	int i,jj, k=0;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
@@ -480,7 +480,7 @@ void CreateSourceFolders(int parent_index)
 void CreateScreenFolders(int parent_index)
 {
 	int i,jj, k=0;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
@@ -532,7 +532,7 @@ void CreateScreenFolders(int parent_index)
 void CreateManufacturerFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
  	LPTREEFOLDER lpTemp;
@@ -542,7 +542,7 @@ void CreateManufacturerFolders(int parent_index)
 
 	for (jj = 0; jj < nGames; jj++)
 	{
-		const char *manufacturer = drivers[jj]->manufacturer;
+		const char *manufacturer = driver_list::driver(jj).manufacturer;
 		int iChars = 0;
 		while( manufacturer != NULL && manufacturer[0] != '\0' )
 		{
@@ -916,9 +916,9 @@ void CreateCPUFolders(int parent_index)
 	const device_config_execute_interface *device = NULL;
 	int nFolder = numFolders;
 
-	for (i = 0; drivers[i] != NULL; i++)
+	for (i = 0; i < driver_list::total(); i++)
 	{
-		machine_config config(*drivers[i],MameUIGlobal());
+		machine_config config(driver_list::driver(i),MameUIGlobal());
 
 		// enumerate through all devices
 		for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
@@ -976,9 +976,9 @@ void CreateSoundFolders(int parent_index)
 	const device_config_sound_interface *device = NULL;
 	int nFolder = numFolders;
 
-	for (i = 0; drivers[i] != NULL; i++)
+	for (i = 0; i < driver_list::total(); i++)
 	{
-		machine_config config(*drivers[i],MameUIGlobal());
+		machine_config config(driver_list::driver(i),MameUIGlobal());
 
 		// enumerate through all devices
 		
@@ -1030,7 +1030,7 @@ void CreateSoundFolders(int parent_index)
 void CreateDeficiencyFolders(int parent_index)
 {
 	int jj;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
 	// create our subfolders
@@ -1142,35 +1142,35 @@ void CreateDeficiencyFolders(int parent_index)
 
 	for (jj = 0; jj < nGames; jj++)
 	{
-		if (drivers[jj]->flags & GAME_WRONG_COLORS)
+		if (driver_list::driver(jj).flags & GAME_WRONG_COLORS)
 		{
 			AddGame(lpWrongCol,jj);
 		}
-		if (drivers[jj]->flags & GAME_UNEMULATED_PROTECTION)
+		if (driver_list::driver(jj).flags & GAME_UNEMULATED_PROTECTION)
 		{
 			AddGame(lpProt,jj);
 		}
-		if (drivers[jj]->flags & GAME_IMPERFECT_COLORS)
+		if (driver_list::driver(jj).flags & GAME_IMPERFECT_COLORS)
 		{
 			AddGame(lpImpCol,jj);
 		}
-		if (drivers[jj]->flags & GAME_IMPERFECT_GRAPHICS)
+		if (driver_list::driver(jj).flags & GAME_IMPERFECT_GRAPHICS)
 		{
 			AddGame(lpImpGraph,jj);
 		}
-		if (drivers[jj]->flags & GAME_NO_SOUND)
+		if (driver_list::driver(jj).flags & GAME_NO_SOUND)
 		{
 			AddGame(lpMissSnd,jj);
 		}
-		if (drivers[jj]->flags & GAME_IMPERFECT_SOUND)
+		if (driver_list::driver(jj).flags & GAME_IMPERFECT_SOUND)
 		{
 			AddGame(lpImpSnd,jj);
 		}
-		if (drivers[jj]->flags & GAME_NO_COCKTAIL)
+		if (driver_list::driver(jj).flags & GAME_NO_COCKTAIL)
 		{
 			AddGame(lpFlip,jj);
 		}
-		if (drivers[jj]->flags & GAME_REQUIRES_ARTWORK)
+		if (driver_list::driver(jj).flags & GAME_REQUIRES_ARTWORK)
 		{
 			AddGame(lpArt,jj);
 		}		
@@ -1182,7 +1182,7 @@ void CreateDumpingFolders(int parent_index)
 	int jj;
 	BOOL bBadDump  = FALSE;
 	BOOL bNoDump = FALSE;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	const rom_entry *region, *rom;
 	//const char *name;
@@ -1221,7 +1221,7 @@ void CreateDumpingFolders(int parent_index)
 	for (jj = 0; jj < nGames; jj++)
 	{
 		const rom_source *source;
-		gamedrv = drivers[jj];
+		gamedrv = &driver_list::driver(jj);
 
 		if (!gamedrv->rom) 
 			continue;
@@ -1263,7 +1263,7 @@ void CreateDumpingFolders(int parent_index)
 void CreateYearFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = driver_list_get_count(drivers);
+	int nGames = driver_list::total();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
@@ -1273,7 +1273,7 @@ void CreateYearFolders(int parent_index)
 	for (jj = 0; jj < nGames; jj++)
 	{
 		char s[100];
-		strcpy(s,drivers[jj]->year);
+		strcpy(s,driver_list::driver(jj).year);
 
 		if (s[0] == '\0' || s[0] == '?')
 			continue;
@@ -1562,7 +1562,7 @@ static LPTREEFOLDER NewFolder(const char *lpTitle,
 	lpFolder->m_lpTitle = (LPSTR)malloc(strlen(lpTitle) + 1);
 	strcpy((char *)lpFolder->m_lpTitle,lpTitle);
 	lpFolder->m_lptTitle = tstring_from_utf8(lpFolder->m_lpTitle);
-	lpFolder->m_lpGameBits = NewBits(driver_list_get_count(drivers));
+	lpFolder->m_lpGameBits = NewBits(driver_list::total());
 	lpFolder->m_nFolderId = nFolderId;
 	lpFolder->m_nParent = nParent;
 	lpFolder->m_nIconId = nIconId;
@@ -2406,12 +2406,12 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 
 	   fprintf(fp,"\n[ROOT_FOLDER]\n");
 
-	   for (i=0;i<driver_list_get_count(drivers);i++)
+	   for (i=0;i<driver_list::total();i++)
 	   {
 		   int driver_index = GetIndexFromSortedIndex(i); 
 		   if (TestBit(folder_data->m_lpGameBits,driver_index))
 		   {
-			   fprintf(fp,"%s\n",drivers[driver_index]->name);
+			   fprintf(fp,"%s\n",driver_list::driver(driver_index).name);
 		   }
 	   }
 
@@ -2425,12 +2425,12 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 		   {
 			   fprintf(fp,"\n[%s]\n",folder_data->m_lpTitle);
 			   
-			   for (i=0;i<driver_list_get_count(drivers);i++)
+			   for (i=0;i<driver_list::total();i++)
 			   {
 				   int driver_index = GetIndexFromSortedIndex(i); 
 				   if (TestBit(folder_data->m_lpGameBits,driver_index))
 				   {
-					   fprintf(fp,"%s\n",drivers[driver_index]->name);
+					   fprintf(fp,"%s\n",driver_list::driver(driver_index).name);
 				   }
 			   }
 		   }
