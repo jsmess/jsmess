@@ -56,7 +56,7 @@ block of RAM instead of 8.
 
     TODO:
 
-    - C1540 is unreliable (VIA timing issues?)
+    - C1540 is not working currently
     - clean up inputs
     - clean up VIA interface
     - access violation in mos6560.c
@@ -67,7 +67,6 @@ block of RAM instead of 8.
     - restore key
     - light pen
     - VIC21 (built in 21K ram)
-    - new cart system (rpk)
 
 */
 
@@ -442,12 +441,19 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 
 /* IEEE-488 Bus */
 
+#ifdef INCLUDE_C2031
 static IEEE488_DAISY( ieee488_daisy )
 {
 	{ VIC1112_IEEE488 },
 	{ C2031_IEEE488(C2031_TAG) },
 	{ NULL}
 };
+
+static VIC1112_INTERFACE( vic1112_intf )
+{
+	IEEE488_TAG
+};
+#endif
 
 /* MOS6560 Interface */
 
@@ -692,11 +698,11 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
 	MCFG_CBM_IEC_ADD(IEC_TAG, cbm_iec_daisy)
 	MCFG_C1540_ADD(C1540_TAG, IEC_TAG, 8)
-/*
+#ifdef INCLUDE_C2031
     MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
-    MCFG_VIC1112_ADD(IEEE488_TAG)
+    MCFG_VIC1112_ADD(vic1112_intf)
     MCFG_C2031_ADD(C2031_TAG, IEEE488_TAG, 9)
-*/
+#endif
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")
 	MCFG_CARTSLOT_NOT_MANDATORY
