@@ -670,7 +670,7 @@ static CBM_IEC_DAISY( c128d81_iec_bus )
 {
 	{ "cia_0", DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("cia_0", c128_iec_data_w) },
 	{ "cia_1" },
-	{ C1581_IEC("c1563") },
+	{ C1581_IEC("c1581") },
 	{ NULL}
 };
 
@@ -812,7 +812,8 @@ static MACHINE_CONFIG_DERIVED( c128d81, c128 )
 	MCFG_DEVICE_REMOVE("c1571")
 
 	MCFG_CBM_IEC_ADD("iec", c128d81_iec_bus)
-	MCFG_C1563_ADD("c1563", "iec", 8)
+//	MCFG_C1563_ADD("c1563", "iec", 8)
+	MCFG_C1581_ADD("c1581", "iec", 8)
 MACHINE_CONFIG_END
 
 
