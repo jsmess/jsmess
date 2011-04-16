@@ -614,7 +614,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy200_io, AS_IO, 8, tandy200_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE_LEGACY(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
+	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01_device, read, write)
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
@@ -880,7 +880,7 @@ static UPD1990A_INTERFACE( kc85_upd1990a_intf )
 
 /* RP5C01A Interface */
 
-static RP5C01A_INTERFACE( tandy200_rp5c01a_intf )
+static RP5C01_INTERFACE( tandy200_rtc_intf )
 {
 	DEVCB_NULL								/* alarm */
 };
@@ -1095,7 +1095,7 @@ static I8155_INTERFACE( tandy200_8155_intf )
 
 /* MSM8251 Interface */
 
-static const msm8251_interface tandy200_msm8251_interface =
+static const msm8251_interface tandy200_uart_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1422,8 +1422,8 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
-	MCFG_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
-	MCFG_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_msm8251_interface)
+	MCFG_RP5C01_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rtc_intf)
+	MCFG_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_uart_intf)
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD("cassette", kc85_cassette_config)

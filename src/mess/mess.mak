@@ -530,7 +530,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/pc_mouse.o	\
 	$(MESS_MACHINE)/pcf8593.o	\
-	$(MESS_MACHINE)/rp5c01a.o	\
 	$(MESS_MACHINE)/rp5c15.o	\
 	$(MESS_MACHINE)/rs232.o		\
 	$(MESS_MACHINE)/scsibus.o	\
