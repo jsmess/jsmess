@@ -1012,6 +1012,41 @@ static const pia6821_interface xegs_pia_interface =
 	DEVCB_NULL		/* IRQB */
 };
 
+// FIXME: should there be anything connected where other system have the fdc?
+static const pokey_interface a5200_pokey_interface =
+{
+	{
+		DEVCB_INPUT_PORT("analog_0"),
+		DEVCB_INPUT_PORT("analog_1"),
+		DEVCB_INPUT_PORT("analog_2"),
+		DEVCB_INPUT_PORT("analog_3"),
+		DEVCB_INPUT_PORT("analog_4"),
+		DEVCB_INPUT_PORT("analog_5"),
+		DEVCB_INPUT_PORT("analog_6"),
+		DEVCB_INPUT_PORT("analog_7")
+	},
+	DEVCB_NULL,
+	DEVCB_NULL,	// FIXME: is there anything connected here?
+	DEVCB_NULL,	// FIXME: is there anything connected here?
+	atari_interrupt_cb,
+};
+
+static const pia6821_interface a5200_pia_interface =
+{
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */	// FIXME: is there anything connected here
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
 
 /**************************************************************
  *
@@ -1249,6 +1284,13 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
 	MCFG_CPU_VBLANK_INT_HACK(a5200_interrupt, TOTAL_LINES_60HZ)
+
+	MCFG_DEVICE_REMOVE("pokey")
+	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_CONFIG(a5200_pokey_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MCFG_PIA6821_MODIFY( "pia", a5200_pia_interface )
 
 	MCFG_MACHINE_START( a5200 )
 
