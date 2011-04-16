@@ -112,6 +112,12 @@ private:
 
 	UINT8 m_clock_signal;
 	UINT8 m_data_signal;
+	UINT8 m_my_clock_signal;
+	UINT8 m_my_data_signal;
+	UINT8 m_in_clock_signal;
+	UINT8 m_in_data_signal;
+
+	void update_signals();
 };
 
 
