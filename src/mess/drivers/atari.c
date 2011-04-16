@@ -1070,14 +1070,14 @@ static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("40K")
-
-	MCFG_ATARI_FDC_ADD("fdc")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_ATARI_FDC_ADD("fdc")
 MACHINE_CONFIG_END
 
 

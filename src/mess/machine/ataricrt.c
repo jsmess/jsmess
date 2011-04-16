@@ -605,32 +605,34 @@ MACHINE_START( a5200 )
 DEVICE_IMAGE_LOAD( a5200_cart )
 {
 	UINT8 *mem = image.device().machine().region("maincpu")->base();
-	int size;
+	UINT32 size;
+
 	if (image.software_entry() == NULL)
 	{
 		/* load an optional (dual) cartidge */
 		size = image.fread(&mem[0x4000], 0x8000);
-	} else {
+	} 
+	else
+	{
 		size = image.get_software_region_length("rom");
 		memcpy(mem + 0x4000, image.get_software_region("rom"), size);
 	}
+
 	if (size<0x8000) memmove(mem+0x4000+0x8000-size, mem+0x4000, size);
 	// mirroring of smaller cartridges
 	if (size <= 0x1000) memcpy(mem+0xa000, mem+0xb000, 0x1000);
 	if (size <= 0x2000) memcpy(mem+0x8000, mem+0xa000, 0x2000);
 	if (size <= 0x4000)
 	{
-		const char *info;
+		const char *info = hashfile_extrainfo(image);
 		memcpy(&mem[0x4000], &mem[0x8000], 0x4000);
-		info = hashfile_extrainfo(image);		
-		if (strcmp(info, "") && !strcmp(info, "A13MIRRORING"))
+		if (info && !strcmp(info, "A13MIRRORING"))
 		{
 			memcpy(&mem[0x8000], &mem[0xa000], 0x2000);
 			memcpy(&mem[0x6000], &mem[0x4000], 0x2000);
 		}
 	}
-	logerror("%s loaded cartridge '%s' size %dK\n",
-		image.device().machine().system().name, image.filename() , size/1024);
+	logerror("A5200 loaded cartridge '%s' size %dK\n", image.filename() , size/1024);
 	return IMAGE_INIT_PASS;
 }
 
