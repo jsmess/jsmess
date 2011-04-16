@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255a.h"
-#include "machine/i8257.h"
+#include "machine/8257dma.h"
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
@@ -377,11 +377,10 @@ I8257_INTERFACE( partner_dma )
 	DEVCB_LINE(hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
 	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL }
 };
 
 

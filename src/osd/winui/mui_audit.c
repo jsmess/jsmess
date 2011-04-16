@@ -149,14 +149,14 @@ BOOL IsAuditResultNo(int audit_result)
 /***************************************************************************
     Internal functions
  ***************************************************************************/
-
+/*
 static void MameUIOutput(void *param, const char *format, va_list argptr)
 {
 	char buffer[512];
 	vsnprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), format, argptr);
 	DetailsPrintf("%s", buffer);
 }
-
+*/
 /*static int ProcessAuditResults(int game, audit_record *audit, int audit_records)
 {
 	output_callback_func prevcb;

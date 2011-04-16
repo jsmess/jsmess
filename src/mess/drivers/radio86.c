@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 #include "machine/i8255a.h"
-#include "machine/i8257.h"
+#include "machine/8257dma.h"
 #include "video/i8275.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"

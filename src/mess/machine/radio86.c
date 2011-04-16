@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255a.h"
-#include "machine/i8257.h"
+#include "machine/8257dma.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
 
@@ -149,11 +149,10 @@ I8257_INTERFACE( radio86_dma )
 	DEVCB_LINE(hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL }
 };
 
 static TIMER_CALLBACK( radio86_reset )

@@ -8,7 +8,7 @@
 #define radio86_H_
 
 #include "machine/i8255a.h"
-#include "machine/i8257.h"
+#include "machine/8257dma.h"
 #include "video/i8275.h"
 
 class radio86_state : public driver_device

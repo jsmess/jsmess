@@ -8,7 +8,7 @@
 #define partner_H_
 
 #include "machine/i8255a.h"
-#include "machine/i8257.h"
+#include "machine/8257dma.h"
 #include "machine/wd17xx.h"
 
 class partner_state : public radio86_state
