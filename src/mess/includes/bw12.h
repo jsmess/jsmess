@@ -11,7 +11,7 @@
 #define PIT8253_TAG			"ic34"
 #define PIA6821_TAG			"ic16"
 #define MC1408_TAG			"ic4"
-#define AY3600_TAG			"ic74"
+#define AY3600PRO002_TAG	"ic74"
 #define CENTRONICS_TAG		"centronics"
 #define FLOPPY_TIMER_TAG	"motor_off"
 
@@ -26,7 +26,7 @@ public:
 		  m_maincpu(*this, Z80_TAG),
 		  m_pia(*this, PIA6821_TAG),
 		  m_fdc(*this, UPD765_TAG),
-		  m_kbc(*this, AY3600_TAG),
+		  m_kbc(*this, AY3600PRO002_TAG),
 		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ram(*this, RAM_TAG),
@@ -38,7 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pia;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_kbc;
+	required_device<ay3600_device> m_kbc;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_ram;
@@ -64,6 +64,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_out2_w );
+	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );
+	DECLARE_READ_LINE_MEMBER( ay3600_control_r );
 	DECLARE_WRITE_LINE_MEMBER( ay3600_data_ready_w );
 
 	/* memory state */

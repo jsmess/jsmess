@@ -585,34 +585,14 @@ static const struct pit8253_config pit_intf =
 
 /* AY-5-3600-PRO-002 Interface */
 
-static AY3600_Y_READ( bw2_ay3600_y_r )
+READ_LINE_MEMBER( bw12_state::ay3600_shift_r )
 {
-	UINT16 data = 0;
-
-	switch (x)
-	{
-	case 0: data = input_port_read(device->machine(), "X0"); break;
-	case 1: data = input_port_read(device->machine(), "X1"); break;
-	case 2: data = input_port_read(device->machine(), "X2"); break;
-	case 3: data = input_port_read(device->machine(), "X3"); break;
-	case 4: data = input_port_read(device->machine(), "X4"); break;
-	case 5: data = input_port_read(device->machine(), "X5"); break;
-	case 6: data = input_port_read(device->machine(), "X6"); break;
-	case 7: data = input_port_read(device->machine(), "X7"); break;
-	case 8: data = input_port_read(device->machine(), "X8"); break;
-	}
-
-	return data;
+	return BIT(input_port_read(m_machine, "MODIFIERS"), 0);
 }
 
-static READ_LINE_DEVICE_HANDLER( ay3600_shift_r )
+READ_LINE_MEMBER( bw12_state::ay3600_control_r )
 {
-	return BIT(input_port_read(device->machine(), "MODIFIERS"), 0);
-}
-
-static READ_LINE_DEVICE_HANDLER( ay3600_control_r )
-{
-	return BIT(input_port_read(device->machine(), "MODIFIERS"), 1);
+	return BIT(input_port_read(m_machine, "MODIFIERS"), 1);
 }
 
 WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
@@ -623,7 +603,7 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 	if (state)
 	{
-		UINT16 data = ay3600_b_r(m_kbc);
+		UINT16 data = m_kbc->b_r();
 
 		m_key_data[0] = BIT(data, 6);
 		m_key_data[1] = BIT(data, 3);
@@ -642,11 +622,19 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 static AY3600_INTERFACE( bw12_ay3600_intf )
 {
-	bw2_ay3600_y_r,							/* Y input */
-	DEVCB_LINE(ay3600_shift_r),			/* shift */
-	DEVCB_LINE(ay3600_control_r),		/* control */
-	DEVCB_DRIVER_LINE_MEMBER(bw12_state, ay3600_data_ready_w),	/* data ready */
-	DEVCB_NULL								/* any key down */
+	DEVCB_INPUT_PORT("X0"),
+	DEVCB_INPUT_PORT("X1"),
+	DEVCB_INPUT_PORT("X2"),
+	DEVCB_INPUT_PORT("X3"),
+	DEVCB_INPUT_PORT("X4"),
+	DEVCB_INPUT_PORT("X5"),
+	DEVCB_INPUT_PORT("X6"),
+	DEVCB_INPUT_PORT("X7"),
+	DEVCB_INPUT_PORT("X8"),
+	DEVCB_DRIVER_LINE_MEMBER(bw12_state, ay3600_shift_r),
+	DEVCB_DRIVER_LINE_MEMBER(bw12_state, ay3600_control_r),
+	DEVCB_DRIVER_LINE_MEMBER(bw12_state, ay3600_data_ready_w),
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
@@ -812,7 +800,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
 	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
-	MCFG_AY3600PRO002_ADD(AY3600_TAG, bw12_ay3600_intf)
+	MCFG_AY3600_ADD(AY3600PRO002_TAG, 0, bw12_ay3600_intf)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
