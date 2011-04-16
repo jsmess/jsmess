@@ -180,6 +180,8 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
@@ -220,7 +222,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, apple2_state )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
@@ -562,26 +564,6 @@ static const ay8910_interface apple2_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL
 };
-
-#ifdef UNUSED_FUNCTION
-static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-    switch(state)
-    {
-        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:  info->i = 15; break;
-        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:   info->i = 16; break;
-
-        case MESS_DEVINFO_STR_NAME+0:                       strcpy(info->s = device_temp_str(), "slot6disk1"); break;
-        case MESS_DEVINFO_STR_NAME+1:                       strcpy(info->s = device_temp_str(), "slot6disk2"); break;
-        case MESS_DEVINFO_STR_SHORT_NAME+0:                 strcpy(info->s = device_temp_str(), "s6d1"); break;
-        case MESS_DEVINFO_STR_SHORT_NAME+1:                 strcpy(info->s = device_temp_str(), "s6d2"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
-
-        default:                                        apple525_device_getinfo(devclass, state, info); break;
-    }
-}
-#endif
 
 static const floppy_config apple2_floppy_config =
 {
