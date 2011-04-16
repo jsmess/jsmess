@@ -83,23 +83,49 @@
 		</part>
 	</software>
 
+<!-- The following version consists of d88 disks which only differ in the header, but contains the exact same data
+	<rom name="crimsonp.d88" size="348848" crc="bb46dc55" sha1="1cfebfe7b80e4818ca815ee9aa9df337d6bb900b" offset="0" />
+	<rom name="crimsons.d88" size="348848" crc="d3cd8490" sha1="24054ba0c57b14cdaf1fa2fd4c5c8d1d874198d8" offset="0" />
+	<rom name="crimsonu.d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
+-->
 	<software name="crimson">
 		<description>Crimson</description>
 		<year>1988</year>
 		<publisher>Xtalsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="crimsin (1988)(xtalsoft)(jp)(disk 1 of 3).d88" size="348848" crc="050b0fe6" sha1="05eb7831b328890291e79e9325009ea0415fb31d" offset="0" />
+				<rom name="crimson (1988)(xtalsoft)(jp)(disk 1 of 3).d88" size="348848" crc="050b0fe6" sha1="05eb7831b328890291e79e9325009ea0415fb31d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="crimsin (1988)(xtalsoft)(jp)(disk 2 of 3).d88" size="348848" crc="e2674825" sha1="4972e93bfe3dbe4e1b2f358df22f41a54126b234" offset="0" />
+				<rom name="crimson (1988)(xtalsoft)(jp)(disk 2 of 3).d88" size="348848" crc="e2674825" sha1="4972e93bfe3dbe4e1b2f358df22f41a54126b234" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="crimsin (1988)(xtalsoft)(jp)(disk 3 of 3).d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
+				<rom name="crimson (1988)(xtalsoft)(jp)(disk 3 of 3).d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimsona" cloneof="crimson">
+		<description>Crimson (Alt Disk 1)</description>
+		<year>1988</year>
+		<publisher>Xtalsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="crimsonb (disk 1).d88"  size="348848" crc="26125d32" sha1="274dc32c55b678635a4b7cbabc334a6cd78dfe5c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="crimsonb (disk 2).d88" size="348848" crc="e2674825" sha1="4972e93bfe3dbe4e1b2f358df22f41a54126b234" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="crimsonb (disk 3).d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -320,7 +346,7 @@
 		</part>
 	</software>
 
-	<software name="maiduma">
+	<software name="maiduma" cloneof="maidum">
 		<description>Maidum (Alt)</description>
 		<year>19??</year>
 		<publisher>NCS</publisher>
@@ -584,10 +610,11 @@
 		</part>
 	</software>
 
+<!-- Start this on Turbo, with both disks mounted -->
 	<software name="ouji">
 		<description>Ouji Binbin Monogatari</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>East Cube</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="ouji_a.2d" size="327680" crc="5f17343b" sha1="8290d9fe662567170e4737692cd2efb3a78ea2ff" offset="0" />
@@ -602,8 +629,8 @@
 
 	<software name="oujia" cloneof="ouji">
 		<description>Ouji Binbin Monogatari (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>East Cube</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zzz-unk-ouji_a.2d" size="327680" crc="5f17343b" sha1="8290d9fe662567170e4737692cd2efb3a78ea2ff" offset="0" />
@@ -612,6 +639,22 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zzz-unk-ouji_b.2d" size="327680" crc="09859d99" sha1="5c809b4f926059e65755291328f089e2a89a2ecf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oujib" cloneof="ouji">
+		<description>Ouji Binbin Monogatari (Alt 2)</description>
+		<year>1987</year>
+		<publisher>East Cube</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+                <rom name="unk_disk1_a.d88" size="348848" crc="2aa58976" sha1="3640c60c8b54961de8ef20e6f2cb0c668c88bcd1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+                <rom name="unk_disk1_b.d88" size="348848" crc="8de42d9f" sha1="20bfecef331af8496dfea010a5c271ca6cb03b6d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1491,39 +1534,6 @@
 		</part>
 	</software>
 
-	<software name="crimsona" cloneof="crimson">
-		<description>Crimson (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="crimsonp.d88" size="348848" crc="bb46dc55" sha1="1cfebfe7b80e4818ca815ee9aa9df337d6bb900b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="crimsons.d88" size="348848" crc="d3cd8490" sha1="24054ba0c57b14cdaf1fa2fd4c5c8d1d874198d8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="crimsonu.d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- is this an alt disk1 ?? -->
-	<software name="crimsonb" cloneof="crimson">
-		<description>Crimson (Alt 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="crimsonb.d88"  size="348848" crc="26125d32" sha1="274dc32c55b678635a4b7cbabc334a6cd78dfe5c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blassty">
 		<description>Cruise Chaser Blassty</description>
 		<year>19??</year>
@@ -1698,6 +1708,11 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="game.d88" size="348848" crc="aba63500" sha1="7ec04863fb6b7659348e0f3bbeccfe2d35db169b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="user.d88" size="348848" crc="8349e963" sha1="77bef6b513f8f7109a35774bacd1365e194b112e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2283,6 +2298,9 @@
 		</part>
 	</software>
 
+<!-- There exists an alt checksum for the first disk (due to differences only in the d88 header, but exact same data)
+	<rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
+-->
 	<software name="wibarm">
 		<description>Wibarm</description>
 		<year>1986</year>
@@ -2299,6 +2317,10 @@
 		</part>
 	</software>
 
+<!-- The following version consists of d88 disks which only differ in the header, but contains the exact same data
+	<rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
+	<rom name="zzz-unk-wib_usr.d88" size="414992" crc="61bd9a53" sha1="a0e65a7fd206e71e3025dcb1bcd63947914f33f0" offset="0" />
+-->
 	<software name="wibarma" cloneof="wibarm">
 		<description>Wibarm (Alt)</description>
 		<year>1986</year>
@@ -2311,22 +2333,6 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
 				<rom name="wibarma_u.d88" size="414992" crc="8d154f9c" sha1="057980ddf6a0b86f3c344ec7aa0bf8b25dd31dd2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wibarmb" cloneof="wibarm">
-		<description>Wibarm (Alt 2)</description>
-		<year>1986</year>
-		<publisher>Arsys</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
-				<rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
-				<rom name="zzz-unk-wib_usr.d88" size="414992" crc="61bd9a53" sha1="a0e65a7fd206e71e3025dcb1bcd63947914f33f0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3183,22 +3189,6 @@
 		</part>
 	</software>
 
-	<software name="unk_fl1">
-		<description>Unknown Game by East Cube</description>
-		<year>1987</year>
-		<publisher>East Cube</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-                <rom name="unk_disk1_a.d88" size="348848" crc="2aa58976" sha1="3640c60c8b54961de8ef20e6f2cb0c668c88bcd1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-                <rom name="unk_disk1_b.d88" size="348848" crc="8de42d9f" sha1="20bfecef331af8496dfea010a5c271ca6cb03b6d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gyajiko">
 		<description>Gambler Jiko Chuushinha</description>
 		<year>198?</year>
@@ -3217,17 +3207,6 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
                 <rom name="gyajiko2.d88" size="348848" crc="81a7c4eb" sha1="71c15c75f46810ac8159b4784a4500c54e85b198" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="unk_fl3">
-		<description>Unknown Game</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-                <rom name="unk_disk3.d88" size="348848" crc="821d3e69" sha1="8de8f1855fa97a2381b9a3328c331c14d3d79300" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3266,9 +3245,9 @@
 
 
 	<software name="vip">
-		<description>VIP</description>
+		<description>V.I.P. - Visual Instrument Player</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Kamiya</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="vip_a.2d" size="327680" crc="3101d7c6" sha1="39fb6b8c32cd296562f7f3e354927dbd00be4d84" offset="0" />
@@ -3282,7 +3261,34 @@
 	</software>
 
 	<software name="vipa" cloneof="vip">
-		<description>VIP (Alt?)</description>
+		<description>V.I.P. - Visual Instrument Player (Alt)</description>
+		<year>19??</year>
+		<publisher>Kamiya</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="vip_sys.2d" size="327680" crc="f8708a8f" sha1="2a9f0afee23a11ad3f0354bb1eaa22ae25a47f92" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="vip_data.2d" size="327680" crc="6e5c4da5" sha1="c947190495ded49a9f279f7ead61b6bcec4c2e13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vipb" cloneof="vip">
+		<description>V.I.P. - Visual Instrument Player (Alt 2)</description>
+		<year>19??</year>
+		<publisher>Kamiya</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="zzz-unk-fmmusic.d88" size="348848" crc="41628a04" sha1="bade85f8ddc44822474b7bdfa1406dc9b59a7988" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vipc" cloneof="vip">
+		<description>V.I.P. - Visual Instrument Player (Alt 3?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3292,29 +3298,13 @@
 		</part>
 	</software>
 
-	<software name="vipb" cloneof="vip">
-		<description>VIP (Alt 2?)</description>
+	<software name="vipd" cloneof="vip">
+		<description>FM Ongen Music Tool V.I.P.</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="zzz-unk-fmmusic.d88" size="348848" crc="41628a04" sha1="bade85f8ddc44822474b7bdfa1406dc9b59a7988" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="viplay">
-		<description>Visual Instrument Player</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="vip_data.2d" size="327680" crc="6e5c4da5" sha1="c947190495ded49a9f279f7ead61b6bcec4c2e13" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="vip_sys.2d" size="327680" crc="f8708a8f" sha1="2a9f0afee23a11ad3f0354bb1eaa22ae25a47f92" offset="0" />
+			<dataarea name="flop" size="1089776">
+				<rom name="fm ongen.d88" size="1089776" crc="3676fbc2" sha1="483023bae28c20c9de8cdba005ceeebd063fa5ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3516,16 +3506,6 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="fmongen">
-		<description>FM Ongen Music Tool V.I.P.</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1089776">
-				<rom name="fm ongen.d88" size="1089776" crc="3676fbc2" sha1="483023bae28c20c9de8cdba005ceeebd063fa5ae" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 	<software name="graphtol">
 		<description>Graphic Tool</description>
 		<year>19??</year>
@@ -3619,13 +3599,14 @@
 	</software>
 
 <!-- is this part of a multi-disk game? -->
-	<software name="user">
-		<description>user</description>
+
+	<software name="unk_fl1">
+		<description>Unknown Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="user.d88" size="348848" crc="8349e963" sha1="77bef6b513f8f7109a35774bacd1365e194b112e" offset="0" />
+                <rom name="unk_disk.d88" size="348848" crc="821d3e69" sha1="8de8f1855fa97a2381b9a3328c331c14d3d79300" offset="0" />
 			</dataarea>
 		</part>
 	</software>
