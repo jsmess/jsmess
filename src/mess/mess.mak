@@ -504,7 +504,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/74145.o		\
 	$(MESS_MACHINE)/8530scc.o	\
-	$(MESS_MACHINE)/adc080x.o	\
 	$(MESS_MACHINE)/at45dbxx.o	\
 	$(MESS_MACHINE)/ay31015.o	\
 	$(MESS_MACHINE)/ctronics.o	\

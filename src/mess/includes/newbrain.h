@@ -11,7 +11,7 @@
 #include "cpu/cop400/cop400.h"
 #include "machine/upd765.h"
 #include "machine/6850acia.h"
-#include "machine/adc080x.h"
+#include "machine/adc0808.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "imagedev/flopdrv.h"
@@ -172,7 +172,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_fdccpu;
-	required_device<device_t> m_ctc;
+	required_device<z80ctc_device> m_ctc;
 	required_device<device_t> m_acia;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_floppy;
@@ -203,6 +203,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
 		
 	void bankswitch();
 

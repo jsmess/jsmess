@@ -953,34 +953,33 @@ WRITE8_MEMBER( newbrain_eim_state::paging_w )
 
 /* A/D Converter */
 
-static ADC080X_ON_EOC_CHANGED( newbrain_adc_on_eoc_changed )
+WRITE_LINE_MEMBER( newbrain_eim_state::adc_eoc_w )
 {
-	newbrain_state *state = device->machine().driver_data<newbrain_state>();
-
-	state->m_anint = level;
+	m_anint = state;
 }
 
-static ADC080X_VREF_POSITIVE_READ( newbrain_adc_vref_pos_r )
+static ADC0808_ANALOG_READ( newbrain_adc_vref_pos_r )
 {
 	return 5.0;
 }
 
-static ADC080X_VREF_NEGATIVE_READ( newbrain_adc_vref_neg_r )
+static ADC0808_ANALOG_READ( newbrain_adc_vref_neg_r )
 {
 	return 0.0;
 }
 
-static ADC080X_INPUT_READ( newbrain_adc_input_r )
+static ADC0808_ANALOG_READ( newbrain_adc_input_r )
 {
 	return 0.0;
 }
 
-static ADC080X_INTERFACE( newbrain_adc0809_intf )
+static ADC0808_INTERFACE( adc_intf )
 {
-	newbrain_adc_on_eoc_changed,
+	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, adc_eoc_w),
 	newbrain_adc_vref_pos_r,
 	newbrain_adc_vref_neg_r,
-	newbrain_adc_input_r
+	{ newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r,
+	  newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r }
 };
 
 /* Memory Maps */
@@ -1174,7 +1173,7 @@ WRITE_LINE_MEMBER( newbrain_eim_state::acia_interrupt )
 	m_aciaint = state;
 }
 
-static ACIA6850_INTERFACE( newbrain_acia_intf )
+static ACIA6850_INTERFACE( acia_intf )
 {
 	0,
 	0,
@@ -1191,7 +1190,7 @@ WRITE_LINE_MEMBER( newbrain_eim_state::fdc_interrupt )
 	m_fdc_int = state;
 }
 
-static const upd765_interface newbrain_upd765_interface =
+static const upd765_interface fdc_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, fdc_interrupt),
 	DEVCB_NULL,
@@ -1433,9 +1432,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
-	MCFG_ADC0809_ADD(ADC0809_TAG, 500000, newbrain_adc0809_intf)
-	MCFG_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, newbrain_upd765_interface)
+	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
+	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(newbrain_floppy_config)
 
 	// internal ram
