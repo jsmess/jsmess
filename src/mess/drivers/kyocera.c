@@ -529,32 +529,32 @@ READ8_MEMBER( kc85_state::lcd_r )
 {
 	UINT8 data = 0;
 
-	data |= hd44102_r(m_lcdc0, offset);
-	data |= hd44102_r(m_lcdc1, offset);
-	data |= hd44102_r(m_lcdc2, offset);
-	data |= hd44102_r(m_lcdc3, offset);
-	data |= hd44102_r(m_lcdc4, offset);
-	data |= hd44102_r(m_lcdc5, offset);
-	data |= hd44102_r(m_lcdc6, offset);
-	data |= hd44102_r(m_lcdc7, offset);
-	data |= hd44102_r(m_lcdc8, offset);
-	data |= hd44102_r(m_lcdc9, offset);
+	data |= m_lcdc0->read(space, offset);
+	data |= m_lcdc1->read(space, offset);
+	data |= m_lcdc2->read(space, offset);
+	data |= m_lcdc3->read(space, offset);
+	data |= m_lcdc4->read(space, offset);
+	data |= m_lcdc5->read(space, offset);
+	data |= m_lcdc6->read(space, offset);
+	data |= m_lcdc7->read(space, offset);
+	data |= m_lcdc8->read(space, offset);
+	data |= m_lcdc9->read(space, offset);
 
 	return data;
 }
 
 WRITE8_MEMBER( kc85_state::lcd_w )
 {
-	hd44102_w(m_lcdc0, offset, data);
-	hd44102_w(m_lcdc1, offset, data);
-	hd44102_w(m_lcdc2, offset, data);
-	hd44102_w(m_lcdc3, offset, data);
-	hd44102_w(m_lcdc4, offset, data);
-	hd44102_w(m_lcdc5, offset, data);
-	hd44102_w(m_lcdc6, offset, data);
-	hd44102_w(m_lcdc7, offset, data);
-	hd44102_w(m_lcdc8, offset, data);
-	hd44102_w(m_lcdc9, offset, data);
+	m_lcdc0->write(space, offset, data);
+	m_lcdc1->write(space, offset, data);
+	m_lcdc2->write(space, offset, data);
+	m_lcdc3->write(space, offset, data);
+	m_lcdc4->write(space, offset, data);
+	m_lcdc5->write(space, offset, data);
+	m_lcdc6->write(space, offset, data);
+	m_lcdc7->write(space, offset, data);
+	m_lcdc8->write(space, offset, data);
+	m_lcdc9->write(space, offset, data);
 }
 
 /* Memory Maps */
@@ -908,14 +908,14 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	m_keylatch = (m_keylatch & 0x100) | data;
 
 	/* LCD */
-	hd44102_cs2_w(m_lcdc0, BIT(data, 0));
-	hd44102_cs2_w(m_lcdc1, BIT(data, 1));
-	hd44102_cs2_w(m_lcdc2, BIT(data, 2));
-	hd44102_cs2_w(m_lcdc3, BIT(data, 3));
-	hd44102_cs2_w(m_lcdc4, BIT(data, 4));
-	hd44102_cs2_w(m_lcdc5, BIT(data, 5));
-	hd44102_cs2_w(m_lcdc6, BIT(data, 6));
-	hd44102_cs2_w(m_lcdc7, BIT(data, 7));
+	m_lcdc0->cs2_w(BIT(data, 0));
+	m_lcdc1->cs2_w(BIT(data, 1));
+	m_lcdc2->cs2_w(BIT(data, 2));
+	m_lcdc3->cs2_w(BIT(data, 3));
+	m_lcdc4->cs2_w(BIT(data, 4));
+	m_lcdc5->cs2_w(BIT(data, 5));
+	m_lcdc6->cs2_w(BIT(data, 6));
+	m_lcdc7->cs2_w(BIT(data, 7));
 
 	/* RTC */
 	m_rtc->c0_w(BIT(data, 0));
@@ -946,8 +946,8 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
 
 	/* LCD */
-	hd44102_cs2_w(m_lcdc8, BIT(data, 0));
-	hd44102_cs2_w(m_lcdc9, BIT(data, 1));
+	m_lcdc8->cs2_w(BIT(data, 0));
+	m_lcdc9->cs2_w(BIT(data, 1));
 
 	/* beeper */
 	m_buzzer = BIT(data, 2);

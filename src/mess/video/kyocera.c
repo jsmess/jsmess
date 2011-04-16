@@ -8,16 +8,16 @@ static PALETTE_INIT( kc85 )
 
 bool kc85_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	hd44102_update(m_lcdc0, &bitmap, &cliprect);
-	hd44102_update(m_lcdc1, &bitmap, &cliprect);
-	hd44102_update(m_lcdc2, &bitmap, &cliprect);
-	hd44102_update(m_lcdc3, &bitmap, &cliprect);
-	hd44102_update(m_lcdc4, &bitmap, &cliprect);
-	hd44102_update(m_lcdc5, &bitmap, &cliprect);
-	hd44102_update(m_lcdc6, &bitmap, &cliprect);
-	hd44102_update(m_lcdc7, &bitmap, &cliprect);
-	hd44102_update(m_lcdc8, &bitmap, &cliprect);
-	hd44102_update(m_lcdc9, &bitmap, &cliprect);
+	m_lcdc0->update_screen(&bitmap, &cliprect);
+	m_lcdc1->update_screen(&bitmap, &cliprect);
+	m_lcdc2->update_screen(&bitmap, &cliprect);
+	m_lcdc3->update_screen(&bitmap, &cliprect);
+	m_lcdc4->update_screen(&bitmap, &cliprect);
+	m_lcdc5->update_screen(&bitmap, &cliprect);
+	m_lcdc6->update_screen(&bitmap, &cliprect);
+	m_lcdc7->update_screen(&bitmap, &cliprect);
+	m_lcdc8->update_screen(&bitmap, &cliprect);
+	m_lcdc9->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
