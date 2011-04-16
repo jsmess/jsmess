@@ -15,7 +15,7 @@
 #include "machine/i8255a.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
-#include "machine/tc8521.h"
+#include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
@@ -672,27 +672,15 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
 	msx_state *state = space->machine().driver_data<msx_state>();
-	device_t *rtc = space->machine().device("rtc");
-	tc8521_w(rtc, state->m_rtc_latch, data);
+	rp5c01_device *rtc = space->machine().device<rp5c01_device>(TC8521_TAG);
+	rtc->write(*space, state->m_rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
 	msx_state *state = space->machine().driver_data<msx_state>();
-	device_t *rtc = space->machine().device("rtc");
-	return tc8521_r(rtc, state->m_rtc_latch);
-}
-
-NVRAM_HANDLER( msx2 )
-{
-	device_t *rtc = machine.device("rtc");
-	if (file)
-	{
-		if (read_or_write)
-			tc8521_save_stream (rtc, file);
-		else
-			tc8521_load_stream (rtc, file);
-	}
+	rp5c01_device *rtc = space->machine().device<rp5c01_device>(TC8521_TAG);
+	return rtc->read(*space, state->m_rtc_latch);
 }
 
 /*

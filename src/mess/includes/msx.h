@@ -12,6 +12,8 @@
 
 #define MSX_MAX_CARTS	(2)
 
+#define TC8521_TAG	"rtc"
+
 class msx_state : public driver_device
 {
 public:
@@ -62,7 +64,6 @@ extern MACHINE_RESET( msx );
 extern MACHINE_RESET( msx2 );
 extern INTERRUPT_GEN( msx_interrupt );
 extern INTERRUPT_GEN( msx2_interrupt );
-extern NVRAM_HANDLER( msx2 );
 
 DEVICE_IMAGE_LOAD( msx_cart );
 DEVICE_IMAGE_UNLOAD( msx_cart );

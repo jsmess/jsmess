@@ -26,7 +26,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/pc4.h"
-#include "machine/tc8521.h"
+#include "machine/rp5c01.h"
 #include "sound/beep.h"
 #include "rendlay.h"
 
@@ -62,7 +62,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc4_io, AS_IO, 8, pc4_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE_LEGACY("rtc", tc8521_r, tc8521_w)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(beep_w)
 	AM_RANGE(0x1fff, 0x1fff) AM_WRITE(bank_w)
 
@@ -203,9 +203,9 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-static const tc8521_interface pc4_tc8521_interface =
+static RP5C01_INTERFACE( rtc_intf )
 {
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( pc4, pc4_state )
@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MCFG_SOUND_ADD( "beep", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_TC8521_ADD("rtc", pc4_tc8521_interface)
+	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 MACHINE_CONFIG_END
 
 ROM_START( pc4 )

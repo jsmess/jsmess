@@ -101,7 +101,7 @@
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"	/* for NC100 uart */
 #include "machine/mc146818.h"	/* for NC200 real time clock */
-#include "machine/tc8521.h"	/* for NC100 real time clock */
+#include "machine/rp5c01.h"	/* for NC100 real time clock */
 #include "machine/upd765.h"		/* for NC200 disk drive interface */
 #include "imagedev/flopdrv.h"	/* for NC200 disk image */
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
@@ -466,7 +466,7 @@ static void nc_common_open_stream_for_reading(running_machine &machine)
 	nc_state *state = machine.driver_data<nc_state>();
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
-	sprintf(filename,"%s.nv", machine.system().name);
+	sprintf(filename,"%s.hack", machine.system().name);
 
 	state->m_file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->m_file->open(filename);
@@ -477,7 +477,7 @@ static void nc_common_open_stream_for_writing(running_machine &machine)
 	nc_state *state = machine.driver_data<nc_state>();
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
-	sprintf(filename,"%s.nv", machine.system().name);
+	sprintf(filename,"%s.hack", machine.system().name);
 	
 	state->m_file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->m_file->open(filename);
@@ -850,26 +850,9 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 }
 
 
-static void nc100_tc8521_alarm_callback(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER(nc100_tc8521_alarm_callback)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	/* I'm assuming that the nmi is edge triggered */
-	/* a interrupt from the fdc will cause a change in line state, and
-    the nmi will be triggered, but when the state changes because the int
-    is cleared this will not cause another nmi */
-	/* I'll emulate it like this to be sure */
-
-	if (state != drvstate->m_previous_alarm_state)
-	{
-		if (state)
-		{
-			/* I'll pulse it because if I used hold-line I'm not sure
-            it would clear - to be checked */
-			cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-		}
-	}
-
-	drvstate->m_previous_alarm_state = state;
+	// TODO
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nc100_txrdy_callback )
@@ -908,9 +891,9 @@ static WRITE_LINE_DEVICE_HANDLER( nc100_rxrdy_callback )
 }
 
 
-static const tc8521_interface nc100_tc8521_interface =
+static RP5C01_INTERFACE( rtc_intf )
 {
-	nc100_tc8521_alarm_callback,
+	DEVCB_LINE(nc100_tc8521_alarm_callback)
 };
 
 static const msm8251_interface nc100_uart_interface =
@@ -961,14 +944,7 @@ static MACHINE_RESET( nc100 )
 	nc_common_init_machine(machine);
 
 	nc_common_open_stream_for_reading(machine);
-
-	{
-		device_t *rtc = machine.device("rtc");
-		tc8521_load_stream(rtc, state->m_file);
-	}
-
 	nc_common_restore_memory_from_stream(machine);
-
 	nc_common_close_stream(machine);
 
 	/* serial */
@@ -977,12 +953,7 @@ static MACHINE_RESET( nc100 )
 
 static void nc100_machine_stop(running_machine &machine)
 {
-	nc_state *state = machine.driver_data<nc_state>();
 	nc_common_open_stream_for_writing(machine);
-	{
-		device_t *rtc = machine.device("rtc");
-		tc8521_save_stream(rtc, state->m_file);
-	}
 	nc_common_store_memory_to_stream(machine);
 	nc_common_close_stream(machine);
 }
@@ -1068,7 +1039,7 @@ static ADDRESS_MAP_START(nc100_io, AS_IO, 8)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("rtc", tc8521_r, tc8521_w)
+	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE_MODERN("rtc", rp5c01_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1641,51 +1612,6 @@ static INPUT_PORTS_START(nc200)
 	PORT_DIPSETTING(	0x02, DEF_STR( On) )
 INPUT_PORTS_END
 
-
-/* Serial */
-static DEVICE_IMAGE_LOAD( nc_serial )
-{
-	device_t *uart = image.device().machine().device("uart");
-
-	/* filename specified */
-	if (device_load_serial(image)==IMAGE_INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(&image.device(), 9600, 8, 1, SERIAL_PARITY_NONE);
-
-		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(uart, &image.device());
-
-		/* and start transmit */
-		serial_device_set_transmit_state(&image.device(),1);
-
-		return IMAGE_INIT_PASS;
-	}
-
-	return IMAGE_INIT_FAIL;
-
-}
-
-DEVICE_GET_INFO( nc_serial )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( nc_serial );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "NC serial port");	                    break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
-DEFINE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
-
-#define MCFG_NC_SERIAL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NC_SERIAL, 0)
-
 /**********************************************************************************************************/
 
 static MACHINE_CONFIG_START( nc100, nc_state )
@@ -1703,8 +1629,8 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640 /*NC_SCREEN_WIDTH*/, 480 /*NC_SCREEN_HEIGHT*/)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(480, 64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
 	MCFG_SCREEN_UPDATE( nc )
 
 	MCFG_PALETTE_LENGTH(NC_NUM_COLOURS)
@@ -1727,7 +1653,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_MSM8251_ADD("uart", nc100_uart_interface)
 
 	/* rtc */
-	MCFG_TC8521_ADD("rtc", nc100_tc8521_interface)
+	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1740,8 +1666,6 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-
-	MCFG_NC_SERIAL_ADD("serial")
 
 	/* dummy timer */
 	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))
@@ -1826,5 +1750,4 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
 COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      "Amstrad plc",  "NC100",    0 )
 COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      "Amstrad plc",  "NC200",    0 )
-
+COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      "Amstrad plc",  "NC200",    GAME_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit

@@ -20,7 +20,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/tc8521.h"
+#include "machine/rp5c01.h"
 #include "machine/ram.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
@@ -36,6 +36,8 @@
 #define	IRQ_FLAG_IRQ2		0x20
 #define	IRQ_FLAG_IRQ1		0x40
 #define	IRQ_FLAG_EVENT		0x80
+
+#define TC8521_TAG	"rtc"
 
 class rex6000_state : public driver_device
 {
@@ -322,7 +324,7 @@ static ADDRESS_MAP_START( rex6000_io, AS_IO, 8, rex6000_state)
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("INPUT")
 	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
 	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE_LEGACY("rtc", tc8521_r, tc8521_w)
+	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, rp5c01_device, read, write)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)	AM_NOP	//SIO
 	AM_RANGE( 0x50, 0x51 ) AM_READWRITE(lcd_io_r, lcd_io_w)
 	AM_RANGE( 0x60, 0x6f ) AM_READWRITE(touchscreen_r, touchscreen_w)
@@ -526,9 +528,9 @@ static GFXDECODE_START( rex6000 )
 GFXDECODE_END
 
 
-static const tc8521_interface rex6000_tc8521_interface =
+static RP5C01_INTERFACE( rtc_intf )
 {
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( rex6000, rex6000_state )
@@ -556,7 +558,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000, "rex,ds2", 0)
 
-	MCFG_TC8521_ADD("rtc", rex6000_tc8521_interface)
+	MCFG_RP5C01_ADD(TC8521_TAG, XTAL_32_768kHz, rtc_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

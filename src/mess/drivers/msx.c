@@ -279,7 +279,7 @@ PCB Layouts missing
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "machine/i8255a.h"
-#include "machine/tc8521.h"
+#include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
@@ -1102,6 +1102,11 @@ MACHINE_CONFIG_END
 #define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
+static RP5C01_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( msx2, msx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
@@ -1144,8 +1149,6 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_NVRAM_HANDLER( msx2 )
-
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
@@ -1153,7 +1156,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_CASSETTE_ADD( "cassette", msx_cassette_config )
 
 	/* real time clock */
-	MCFG_TC8521_ADD("rtc", default_tc8521_interface)
+	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
 	MCFG_WD179X_ADD("wd179x", msx_wd17xx_interface )
 
