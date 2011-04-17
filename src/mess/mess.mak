@@ -753,7 +753,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_AUDIO)/t6721.o		\
 	$(MESS_MACHINE)/c16.o		\
 	$(MESS_DRIVERS)/c16.o		\
-	$(MESS_MACHINE)/mos6529.o	\
 	$(MESS_DRIVERS)/cbmb.o		\
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\
