@@ -43,6 +43,7 @@
     - Keyboard autorepeat
 
 *******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -56,6 +57,10 @@
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define MACHINE_START_MEMBER(name) void name::machine_start()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 #define MSM5832RS_TAG "rtc"
 
 class mycom_state : public driver_device
@@ -63,40 +68,65 @@ class mycom_state : public driver_device
 public:
 	mycom_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  m_rtc(*this, MSM5832RS_TAG)
+	m_maincpu(*this, "maincpu"),
+	m_ppi0(*this, "ppi8255_0"),
+	m_ppi1(*this, "ppi8255_1"),
+	m_ppi2(*this, "ppi8255_2"),
+	m_cass(*this, "cassette"),
+	m_wave(*this, "wave"),
+	m_crtc(*this, "crtc"),
+	m_fdc(*this, "fdc"),
+	m_audio(*this, "sn1"),
+	m_rtc(*this, MSM5832RS_TAG)
 	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_ppi0;
+	required_device<device_t> m_ppi1;
+	required_device<device_t> m_ppi2;
+	required_device<device_t> m_cass;
+	required_device<device_t> m_wave;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_audio;
 	required_device<msm5832_device> m_rtc;
-
-	device_t *m_mc6845;
-	device_t *m_audio;
-	device_t *m_cassette;
-	device_t *m_fdc;
-	UINT8 *m_vram;
-	UINT8 *m_gfx_rom;
-	UINT16 m_vram_addr;
+	DECLARE_READ8_MEMBER( mycom_upper_r );
+	DECLARE_WRITE8_MEMBER( mycom_upper_w );
+	DECLARE_READ8_MEMBER( vram_data_r );
+	DECLARE_WRITE8_MEMBER( vram_data_w );
+	DECLARE_WRITE8_MEMBER( mycom_00_w );
+	DECLARE_WRITE8_MEMBER( mycom_04_w );
+	DECLARE_WRITE8_MEMBER( mycom_06_w );
+	DECLARE_WRITE8_MEMBER( mycom_0a_w );
+	DECLARE_READ8_MEMBER( mycom_05_r );
+	DECLARE_READ8_MEMBER( mycom_06_r );
+	DECLARE_READ8_MEMBER( mycom_08_r );
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_chargen;
+	UINT16 m_i_videoram;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_0a;
 	UINT8 m_sn_we;
 	UINT32 m_upper_sw;
-	UINT8 *m_RAM;
+	UINT8 *m_p_ram;
+	virtual void machine_reset();
+	virtual void machine_start();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
 
-static VIDEO_START( mycom )
+VIDEO_START_MEMBER( mycom_state )
 {
-	mycom_state *state = machine.driver_data<mycom_state>();
-	state->m_mc6845 = machine.device("crtc");
-	state->m_vram = machine.region("vram")->base();
-	state->m_gfx_rom = machine.region("gfx")->base();
+	m_p_videoram = m_machine.region("vram")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( mycom )
+SCREEN_UPDATE_MEMBER( mycom_state )
 {
-	mycom_state *state = screen->machine().driver_data<mycom_state>();
-	mc6845_update(state->m_mc6845, bitmap, cliprect);
+	mc6845_update(m_crtc, &bitmap, &cliprect);
 	return 0;
 }
 
@@ -114,7 +144,7 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 			UINT8 dbit=1;
 			if (x == cursor_x) dbit=0;
 			mem = (ma + x) & 0x7ff;
-			chr = state->m_vram[mem];
+			chr = state->m_p_videoram[mem];
 			z = ra / 3;
 			*p++ = BIT( chr, z ) ? dbit: dbit^1;
 			*p++ = BIT( chr, z ) ? dbit: dbit^1;
@@ -138,76 +168,71 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 				gfx = inv;	// some blank spacing lines
 			else
 			{
-				chr = state->m_vram[mem];
-				gfx = state->m_gfx_rom[(chr<<3) | ra] ^ inv;
+				chr = state->m_p_videoram[mem];
+				gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
 			}
 
 			/* Display a scanline of a character */
-			*p++ = ( gfx & 0x80 ) ? 1 : 0;
-			*p++ = ( gfx & 0x40 ) ? 1 : 0;
-			*p++ = ( gfx & 0x20 ) ? 1 : 0;
-			*p++ = ( gfx & 0x10 ) ? 1 : 0;
-			*p++ = ( gfx & 0x08 ) ? 1 : 0;
-			*p++ = ( gfx & 0x04 ) ? 1 : 0;
-			*p++ = ( gfx & 0x02 ) ? 1 : 0;
-			*p++ = ( gfx & 0x01 ) ? 1 : 0;
+			*p++ = BIT(gfx, 7);
+			*p++ = BIT(gfx, 6);
+			*p++ = BIT(gfx, 5);
+			*p++ = BIT(gfx, 4);
+			*p++ = BIT(gfx, 3);
+			*p++ = BIT(gfx, 2);
+			*p++ = BIT(gfx, 1);
+			*p++ = BIT(gfx, 0);
 		}
 	}
 }
 
-static WRITE8_HANDLER( mycom_00_w )
+WRITE8_MEMBER( mycom_state::mycom_00_w )
 {
-	mycom_state *state = space->machine().driver_data<mycom_state>();
 	switch(data)
 	{
-		case 0x00: memory_set_bank(space->machine(), "boot", 1); break;
-		case 0x01: memory_set_bank(space->machine(), "boot", 0); break;
-		case 0x02: state->m_upper_sw = 0x10000; break;
-		case 0x03: state->m_upper_sw = 0x0c000; break;
+		case 0x00: memory_set_bank(machine(), "boot", 1); break;
+		case 0x01: memory_set_bank(machine(), "boot", 0); break;
+		case 0x02: m_upper_sw = 0x10000; break;
+		case 0x03: m_upper_sw = 0x0c000; break;
 	}
 }
 
-static READ8_HANDLER( mycom_upper_r )
+READ8_MEMBER( mycom_state::mycom_upper_r )
 {
-	mycom_state *state = space->machine().driver_data<mycom_state>();
-	return state->m_RAM[offset | state->m_upper_sw];
+	return m_p_ram[offset | m_upper_sw];
 }
 
-static WRITE8_HANDLER( mycom_upper_w )
+WRITE8_MEMBER( mycom_state::mycom_upper_w )
 {
-	mycom_state *state = space->machine().driver_data<mycom_state>();
-	state->m_RAM[offset | 0xc000] = data;
+	m_p_ram[offset | 0xc000] = data;
 }
 
-static READ8_HANDLER( vram_data_r )
+READ8_MEMBER( mycom_state::vram_data_r )
 {
-	mycom_state *state = space->machine().driver_data<mycom_state>();
-	return state->m_vram[state->m_vram_addr];
+	return m_p_videoram[m_i_videoram];
 }
 
-static WRITE8_HANDLER( vram_data_w )
+WRITE8_MEMBER( mycom_state::vram_data_w )
 {
-	mycom_state *state = space->machine().driver_data<mycom_state>();
-	state->m_vram[state->m_vram_addr] = data;
+	m_p_videoram[m_i_videoram] = data;
 }
 
-static ADDRESS_MAP_START(mycom_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(mycom_map, AS_PROGRAM, 8, mycom_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(mycom_upper_r,mycom_upper_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mycom_io, AS_IO, 8)
+static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mycom_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("crtc", mc6845_status_r,mc6845_address_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_LEGACY("crtc", mc6845_status_r,mc6845_address_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r,mc6845_register_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", i8255a_r, i8255a_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", i8255a_r, i8255a_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -310,7 +335,7 @@ static const gfx_layout mycom_charlayout =
 };
 
 static GFXDECODE_START( mycom )
-	GFXDECODE_ENTRY( "gfx", 0x0000, mycom_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
 static const wd17xx_interface wd1771_intf =
@@ -335,27 +360,24 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static WRITE8_DEVICE_HANDLER( mycom_04_w )
+WRITE8_MEMBER( mycom_state::mycom_04_w )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
-	state->m_vram_addr = (state->m_vram_addr & 0x700) | data;
+	m_i_videoram = (m_i_videoram & 0x700) | data;
 
-	state->m_sn_we = data;
+	m_sn_we = data;
 	/* doesn't work? */
 	//printf(":%X ",data);
-	//if(state->m_sn_we)
-	  //sn76496_w(state->m_audio, 0, data);
+	//if(m_sn_we)
+	  //sn76496_w(m_audio, 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( mycom_06_w )
+WRITE8_MEMBER( mycom_state::mycom_06_w )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
-	state->m_vram_addr = (state->m_vram_addr & 0x0ff) | ((data & 0x007) << 8);
+	m_i_videoram = (m_i_videoram & 0x0ff) | ((data & 0x007) << 8);
 }
 
-static READ8_DEVICE_HANDLER( mycom_08_r )
+READ8_MEMBER( mycom_state::mycom_08_r )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
 	/*
     x--- ---- display flag
     ---- --x- keyboard shift
@@ -363,15 +385,15 @@ static READ8_DEVICE_HANDLER( mycom_08_r )
     */
 	UINT8 data = 0;
 
-	data = state->m_keyb_press_flag; //~state->m_keyb_press_flag & 1;
+	data = m_keyb_press_flag; //~m_keyb_press_flag & 1;
 
-	if (cassette_input(state->m_cassette) > 0.03) // not working
+	if (cassette_input(m_cass) > 0.03) // not working
 		data+=4;
 
 	return data;
 }
 
-static READ8_DEVICE_HANDLER( mycom_06_r )
+READ8_MEMBER( mycom_state::mycom_06_r )
 {
 	/*
     x--- ---- keyboard s5
@@ -382,15 +404,13 @@ static READ8_DEVICE_HANDLER( mycom_06_r )
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( mycom_05_r )
+READ8_MEMBER( mycom_state::mycom_05_r )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
-	return state->m_keyb_press;
+	return m_keyb_press;
 }
 
-static WRITE8_DEVICE_HANDLER( mycom_0a_w )
+WRITE8_MEMBER( mycom_state::mycom_0a_w )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
 	/*
     x--- ---- width 80/40 (0 = 80, 1 = 40)
     -x-- ---- video mode (0= tile, 1 = bitmap)
@@ -402,17 +422,17 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
     ---- ---x printer strobe
     */
 
-	if ((state->m_0a & 8) != (data & 8))
-		cassette_change_state(state->m_cassette,
-		(data & 8) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	if ( (BIT(m_0a, 3)) != (BIT(data, 3)) )
+		cassette_change_state(m_cass,
+		BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-	if (data & 8) // motor on
-		cassette_output(state->m_cassette, (data & 4) ? -1.0 : +1.0);
+	if BIT(data, 3) // motor on
+		cassette_output(m_cass, BIT(data, 2) ? -1.0 : +1.0);
 
-	if ((data & 0x80) != (state->m_0a & 0x80))
-		mc6845_set_clock(state->m_mc6845, (data & 0x80) ? 1008000 : 2016000);
+	if ( (BIT(data, 7)) != (BIT(m_0a, 7)) )
+		mc6845_set_clock(m_crtc, BIT(data, 7) ? 1008000 : 2016000);
 
-	state->m_0a = data;
+	m_0a = data;
 
 	/* Info about sound
     - uses a SN76489N chip at an unknown clock
@@ -424,7 +444,7 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
 
 	// no sound comes out
 	if ((data & 0x30)==0)
-		sn76496_w(state->m_audio, 0, state->m_sn_we);
+		sn76496_w(m_audio, 0, m_sn_we);
 }
 
 static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
@@ -442,21 +462,21 @@ static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_NULL,			/* Port A read */
-	DEVCB_HANDLER(mycom_05_r),	/* Port B read */
-	DEVCB_HANDLER(mycom_06_r),	/* Port C read */
-	DEVCB_HANDLER(mycom_04_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_05_r),	/* Port B read */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_r),	/* Port C read */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_04_w),	/* Port A write */
 	DEVCB_NULL,			/* Port B write */
-	DEVCB_HANDLER(mycom_06_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_w)	/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_HANDLER(mycom_08_r),	/* Port A read */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_08_r),	/* Port A read */
 	DEVCB_NULL,			/* Port B read */
 	DEVCB_NULL,			/* Port C read */
 	DEVCB_NULL,			/* Port A write */
 	DEVCB_NULL,			/* Port B write */
-	DEVCB_HANDLER(mycom_0a_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_0a_w)	/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
@@ -523,21 +543,16 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 	}
 }
 
-static MACHINE_START(mycom)
+MACHINE_START_MEMBER(mycom_state)
 {
-	mycom_state *state = machine.driver_data<mycom_state>();
-	state->m_audio = machine.device("sn1");
-	state->m_cassette = machine.device("cassette");
-	state->m_fdc = machine.device("fdc");
-	state->m_RAM = machine.region("maincpu")->base();
+	m_p_ram = m_machine.region("maincpu")->base();
 }
 
-static MACHINE_RESET(mycom)
+MACHINE_RESET_MEMBER(mycom_state)
 {
-	mycom_state *state = machine.driver_data<mycom_state>();
-	memory_set_bank(machine, "boot", 1);
-	state->m_upper_sw = 0x10000;
-	state->m_0a = 0;
+	memory_set_bank(m_machine, "boot", 1);
+	m_upper_sw = 0x10000;
+	m_0a = 0;
 }
 
 static DRIVER_INIT( mycom )
@@ -552,9 +567,6 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_CPU_PROGRAM_MAP(mycom_map)
 	MCFG_CPU_IO_MAP(mycom_io)
 
-	MCFG_MACHINE_START(mycom)
-	MCFG_MACHINE_RESET(mycom)
-
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
@@ -566,8 +578,6 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE(mycom)
-
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(mycom)
@@ -575,8 +585,6 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
     The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
 	MCFG_MC6845_ADD("crtc", MC6845, 1008000, mc6845_intf)
-
-	MCFG_VIDEO_START(mycom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")
@@ -608,7 +616,7 @@ ROM_START( mycom )
 
 	ROM_REGION( 0x0800, "vram", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0800, "gfx", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(4039bb6f) SHA1(086ad303bf4bcf983fd6472577acbf744875fea8) )
 ROM_END
 
