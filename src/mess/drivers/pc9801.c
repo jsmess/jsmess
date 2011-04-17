@@ -250,8 +250,8 @@ public:
 	{ }
 
 	required_device<upd1990a_device> m_rtc;
-	required_device<device_t> m_hgdc1;
-	required_device<device_t> m_hgdc2;
+	required_device<upd7220_device> m_hgdc1;
+	required_device<upd7220_device> m_hgdc2;
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -322,8 +322,8 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	bitmap_fill(&bitmap, &cliprect, 0);
 
 	/* graphics */
-	upd7220_update(m_hgdc2, &bitmap, &cliprect);
-	upd7220_update(m_hgdc1, &bitmap, &cliprect);
+	m_hgdc2->update_screen(&bitmap, &cliprect);
+	m_hgdc1->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -442,7 +442,7 @@ static UPD7220_INTERFACE( hgdc_1_intf )
 	NULL,
 	hgdc_draw_text,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("upd7220_btm", upd7220_ext_sync_w),
+	DEVCB_DEVICE_LINE_MEMBER("upd7220_btm", upd7220_device, ext_sync_w),
 	DEVCB_NULL
 };
 
@@ -680,9 +680,11 @@ static WRITE8_HANDLER( pc9801_50_w )
 
 static READ8_HANDLER( pc9801_60_r )
 {
+	pc9801_state *state = space->machine().driver_data<pc9801_state>();
+
 	if((offset & 1) == 0)
 	{
-		return upd7220_r(space->machine().device("upd7220_chr"),(offset & 2) >> 1); // upd7220 character port
+		return state->m_hgdc1->read(*space, (offset & 2) >> 1); // upd7220 character port
 	}
 	else // odd
 	{
@@ -693,9 +695,11 @@ static READ8_HANDLER( pc9801_60_r )
 
 static WRITE8_HANDLER( pc9801_60_w )
 {
+	pc9801_state *state = space->machine().driver_data<pc9801_state>();
+
 	if((offset & 1) == 0)
 	{
-		upd7220_w(space->machine().device("upd7220_chr"),(offset & 2) >> 1,data); // upd7220 character port
+		state->m_hgdc1->write(*space, (offset & 2) >> 1,data); // upd7220 character port
 	}
 	else // odd
 	{
@@ -821,7 +825,7 @@ static READ8_HANDLER( pc9801_a0_r )
 		{
 			case 0x00:
 			case 0x02:
-				return upd7220_r(space->machine().device("upd7220_btm"),(offset & 2) >> 1);
+				return state->m_hgdc2->read(*space, (offset & 2) >> 1);
 			/* bitmap palette clut read */
 			case 0x04:
 				return state->m_vram_disp & 1;
@@ -863,12 +867,12 @@ static WRITE8_HANDLER( pc9801_a0_w )
 		{
 			case 0x00:
 			case 0x02:
-				upd7220_w(space->machine().device("upd7220_btm"),(offset & 2) >> 1,data);
+				state->m_hgdc2->write(*space, (offset & 2) >> 1,data);
 				return;
 			case 0x04: state->m_vram_disp = data & 1; return;
 			case 0x06:
 				state->m_vram_bank = data & 1;
-				upd7220_bank_w(space->machine().device("upd7220_btm"),0,(data & 1) << 2); //TODO: check me
+				state->m_hgdc2->bank_w(*space, 0,(data & 1) << 2); //TODO: check me
 				return;
 			/* bitmap palette clut write */
 			case 0x08:
@@ -994,21 +998,21 @@ static WRITE8_HANDLER( pc9801_tvram_w )
 	if(offset < (0x3fe2) || state->m_video_ff[MEMSW_REG])
 		state->m_tvram[offset] = data;
 
-	upd7220_vram_w(space->machine().device("upd7220_chr"),offset,data); //TODO: check me
+	state->m_hgdc1->vram_w(*space, offset,data); //TODO: check me
 }
 
 static READ8_HANDLER( pc9801_gvram_r )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	return upd7220_vram_r(space->machine().device("upd7220_btm"),offset+0x8000+state->m_vram_bank*0x20000);
+	return state->m_hgdc2->vram_r(*space, offset+0x8000+state->m_vram_bank*0x20000);
 }
 
 static WRITE8_HANDLER( pc9801_gvram_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	upd7220_vram_w(space->machine().device("upd7220_btm"),offset+0x8000+state->m_vram_bank*0x20000, data);
+	state->m_hgdc2->vram_w(*space, offset+0x8000+state->m_vram_bank*0x20000, data);
 }
 
 static READ8_HANDLER( pc9801_opn_r )
@@ -1532,11 +1536,11 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_chr",upd7220_vram_r,upd7220_vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220_chr", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_btm",upd7220_vram_r,upd7220_vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220_btm", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 /* keyboard code */

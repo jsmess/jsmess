@@ -53,7 +53,7 @@ public:
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<upd7201_device> m_mpsc;
-	required_device<device_t> m_hgdc;
+	required_device<upd7220_device> m_hgdc;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;

@@ -55,7 +55,7 @@ public:
     	  m_hgdc(*this, "upd7220")
 		{ }
 
-	required_device<device_t> m_hgdc;
+	required_device<upd7220_device> m_hgdc;
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -624,9 +624,9 @@ static WRITE8_HANDLER( vram_bank_w )
 		if(data != 1 && data != 2 && data != 4)
 			printf("%02x\n",data);
 
-		if(data & 1) 	  { upd7220_bank_w(space->machine().device("upd7220"),0,0); } // B
-		else if(data & 2) { upd7220_bank_w(space->machine().device("upd7220"),0,2); } // G
-		else if(data & 4) { upd7220_bank_w(space->machine().device("upd7220"),0,4); } // R
+		if(data & 1) 	  { state->m_hgdc->bank_w(*space, 0, 0); } // B
+		else if(data & 2) { state->m_hgdc->bank_w(*space, 0, 2); } // G
+		else if(data & 4) { state->m_hgdc->bank_w(*space, 0, 4); } // R
 	}
 }
 
@@ -654,7 +654,7 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8)
 	AM_RANGE(0x30, 0x33) AM_READWRITE(qx10_30_r, fdd_motor_w)
 	AM_RANGE(0x34, 0x34) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
-	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE("upd7220", upd7220_r, upd7220_w)
+	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, read, write)
 //	AM_RANGE(0x3a, 0x3a) GDC zoom
 //	AM_RANGE(0x3b, 0x3b) GDC light pen req
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
@@ -957,7 +957,7 @@ bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 	bitmap_fill(&bitmap, &cliprect, 0);
 
 	/* graphics */
-	upd7220_update(m_hgdc, &bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -978,7 +978,7 @@ static PALETTE_INIT( gdc )
 }
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 

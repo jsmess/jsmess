@@ -86,7 +86,7 @@ void compis_state::video_start()
 bool compis_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* graphics */
-	upd7220_update(m_hgdc, &bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16 )
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
 //  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
-	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_r, upd7220_w,0x00ff)//AM_READWRITE( compis_gdc_16_r, compis_gdc_16_w )	/* GDC 82720 PCS6:6     */
+	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_READWRITE8( compis_fdc_r, compis_fdc_w, 0xffff )	/* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_READ(compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
@@ -352,7 +352,7 @@ static GFXDECODE_START( compis )
 GFXDECODE_END
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )

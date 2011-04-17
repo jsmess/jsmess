@@ -28,7 +28,7 @@ public:
   		m_beep(*this, "beep")
 		{ }
 
-	required_device<device_t> m_hgdc;
+	required_device<upd7220_device> m_hgdc;
 	required_device<device_t> m_cass;
 	required_device<device_t> m_beep;
 
@@ -75,7 +75,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		for( yi = 0; yi < lr; yi++)
 		{
-			tile_data = state->m_char_rom[tile*8+yi];
+			tile_data = state->m_char_rom[(tile*8+yi) & 0x7ff];
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( a5105_io , AS_IO, 8)
 //	AM_RANGE(0x40, 0x4b) fdc, upd765?
 //	AM_RANGE(0x80, 0x83) z80ctc
 //	AM_RANGE(0x90, 0x93) ppi8255?
-	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_r, upd7220_w)
+	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, read, write)
 
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)
 //	AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
@@ -410,7 +410,7 @@ void a5105_state::video_start()
 bool a5105_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* graphics */
-	upd7220_update(m_hgdc, &bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -426,7 +426,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 };
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( a5105, a5105_state )

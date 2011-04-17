@@ -30,17 +30,25 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __UPD7220__
 #define __UPD7220__
 
-#include "devcb.h"
+#include "emu.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
-//ADDRESS_MAP_EXTERN( upd7220_map,16 );
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MCFG_UPD7220_ADD(_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, UPD7220, _clock) \
@@ -50,9 +58,11 @@ DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
 #define UPD7220_INTERFACE(name) \
 	const upd7220_interface (name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT8 *vram);
 #define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT8 *vram)
@@ -60,51 +70,198 @@ typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, 
 typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_t *bitmap, UINT8 *vram, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
 #define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_t *bitmap, UINT8 *vram, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)
 
-typedef struct _upd7220_interface upd7220_interface;
-struct _upd7220_interface
+
+// ======================> upd7220_interface
+
+struct upd7220_interface
 {
-	const char *screen_tag;		/* screen we are acting on */
+	const char *m_screen_tag;
 
-	upd7220_display_pixels_func	display_func;
-	upd7220_draw_text_line draw_text_func;
+	upd7220_display_pixels_func	m_display_func;
+	upd7220_draw_text_line m_draw_text_func;
 
-	/* this gets called for every change of the DRQ pin (pin 7) */
-	devcb_write_line		out_drq_func;
-
-	/* this gets called for every change of the HSYNC pin (pin 3) */
-	devcb_write_line		out_hsync_func;
-
-	/* this gets called for every change of the VSYNC pin (pin 4) */
-	devcb_write_line		out_vsync_func;
-
-	/* this gets called for every change of the BLANK pin (pin 5) */
-	devcb_write_line		out_blank_func;
+	devcb_write_line		m_out_drq_func;
+	devcb_write_line		m_out_hsync_func;
+	devcb_write_line		m_out_vsync_func;
+	devcb_write_line		m_out_blank_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-/* register read */
-READ8_DEVICE_HANDLER( upd7220_r );
+// ======================> upd7220_device_config
 
-/* register write */
-WRITE8_DEVICE_HANDLER( upd7220_w );
-WRITE8_DEVICE_HANDLER( upd7220_bank_w );
-READ8_DEVICE_HANDLER( upd7220_vram_r );
-WRITE8_DEVICE_HANDLER( upd7220_vram_w );
+class upd7220_device_config :   public device_config,
+								public device_config_memory_interface,
+                                public upd7220_interface
+{
+    friend class upd7220_device;
 
-/* dma acknowledge */
-READ8_DEVICE_HANDLER( upd7220_dack_r );
-WRITE8_DEVICE_HANDLER( upd7220_dack_w );
+    // construction/destruction
+    upd7220_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
-/* external synchronization */
-WRITE_LINE_DEVICE_HANDLER( upd7220_ext_sync_w );
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
 
-/* light pen strobe */
-WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w );
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
 
-/* screen update */
-void upd7220_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
+};
+
+
+// ======================> upd7220_device
+
+class upd7220_device :	public device_t,
+						public device_memory_interface
+{
+    friend class upd7220_device_config;
+
+    // construction/destruction
+    upd7220_device(running_machine &_machine, const upd7220_device_config &_config);
+
+public:
+    DECLARE_READ8_MEMBER( read );
+    DECLARE_WRITE8_MEMBER( write );
+
+    DECLARE_READ8_MEMBER( dack_r );
+    DECLARE_WRITE8_MEMBER( dack_w );
+
+	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
+	DECLARE_WRITE_LINE_MEMBER( lpen_w );
+
+    DECLARE_WRITE8_MEMBER( bank_w );
+    DECLARE_READ8_MEMBER( vram_r );
+    DECLARE_WRITE8_MEMBER( vram_w );
+
+	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	inline UINT8 readbyte(offs_t address);
+	inline void writebyte(offs_t address, UINT8 data);
+
+private:
+	static const device_timer_id TIMER_VSYNC = 0;
+	static const device_timer_id TIMER_HSYNC = 1;
+	static const device_timer_id TIMER_BLANK = 2;
+
+	inline void fifo_clear();
+	inline int fifo_param_count();
+	inline void fifo_set_direction(int dir);
+	inline void queue(UINT8 data, int flag);
+	inline void dequeue(UINT8 *data, int *flag);
+	inline void update_vsync_timer(int state);
+	inline void update_hsync_timer(int state);
+	inline void update_blank_timer(int state);
+	inline void recompute_parameters();
+	inline void reset_figs_param();
+	inline void advance_ead();
+	inline void read_vram(UINT8 type, UINT8 mod);
+	inline void write_vram(UINT8 type, UINT8 mod);
+	inline UINT16 check_pattern(UINT16 pattern);
+	inline void get_text_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
+	inline void get_graphics_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
+
+	void draw_pixel(int x, int y, UINT16 tile_data);
+	void draw_line(int x, int y);
+	void draw_rectangle(int x, int y);
+	void draw_char(int x, int y);
+	int translate_command(UINT8 data);
+	void process_fifo();
+	void update_text(bitmap_t *bitmap, const rectangle *cliprect);
+	void draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, int wd);
+	void update_graphics(bitmap_t *bitmap, const rectangle *cliprect, int force_bitmap);
+
+	devcb_resolved_write_line	m_out_drq_func;
+	devcb_resolved_write_line	m_out_hsync_func;
+	devcb_resolved_write_line	m_out_vsync_func;
+	devcb_resolved_write_line	m_out_blank_func;
+
+	screen_device *m_screen;
+
+	UINT16 m_mask;					// mask register
+	UINT8 m_pitch;					// number of word addresses in display memory in the horizontal direction
+	UINT32 m_ead;					// execute word address
+	UINT16 m_dad;					// dot address within the word
+	UINT32 m_lad;					// light pen address
+
+	UINT8 m_ra[16];					// parameter RAM
+	int m_ra_addr;					// parameter RAM address
+
+	UINT8 m_sr;						// status register
+	UINT8 m_cr;						// command register
+	UINT8 m_pr[17];					// parameter byte register
+	int m_param_ptr;				// parameter pointer
+
+	UINT8 m_fifo[16];				// FIFO data queue
+	int m_fifo_flag[16];			// FIFO flag queue
+	int m_fifo_ptr;					// FIFO pointer
+	int m_fifo_dir;					// FIFO direction
+
+	UINT8 m_mode;					// mode of operation
+	UINT8 m_draw_mode;				// mode of drawing
+
+	int m_de;						// display enabled
+	int m_m;						// 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
+	int m_aw;						// active display words per line - 2 (must be even number with bit 0 = 0)
+	int m_al;						// active display lines per video field
+	int m_vs;						// vertical sync width - 1
+	int m_vfp;						// vertical front porch width - 1
+	int m_vbp;						// vertical back porch width - 1
+	int m_hs;						// horizontal sync width - 1
+	int m_hfp;						// horizontal front porch width - 1
+	int m_hbp;						// horizontal back porch width - 1
+
+	int m_dc;						// display cursor
+	int m_sc;						// 0 = blinking cursor / 1 = steady cursor
+	int m_br;						// blink rate
+	int m_ctop;						// cursor top line number in the row
+	int m_cbot;						// cursor bottom line number in the row (CBOT < LR)
+	int m_lr;						// lines per character row - 1
+
+	int m_disp;						// display zoom factor
+	int m_gchr;						// zoom factor for graphics character writing and area filling
+
+	struct {
+		UINT8 m_dir;				// figs param 0: drawing direction
+		UINT8 m_figure_type;		// figs param 1: figure type
+		UINT16 m_dc;				// figs param 2:
+		UINT16 m_d;					// figs param 3:
+		UINT16 m_d1;				// figs param 4:
+		UINT16 m_d2;				// figs param 5:
+		UINT16 m_dm;				// figs param 6:
+	} m_figs;
+
+	// timers
+	emu_timer *m_vsync_timer;		// vertical sync timer
+	emu_timer *m_hsync_timer;		// horizontal sync timer
+	emu_timer *m_blank_timer;		// CRT blanking timer
+
+	UINT8 m_vram[0x40000];
+	UINT32 m_vram_bank;
+
+	UINT8 m_bitmap_mod;
+
+	const upd7220_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type UPD7220;
+
+
 
 #endif

@@ -132,11 +132,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mm1m6_map, AS_PROGRAM, 8, mm1_state )
 	AM_IMPORT_FROM(mm1_map)
-	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE_LEGACY(UPD7220_TAG, upd7220_r, upd7220_w)
+	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD7220_TAG, upd7220_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 8, mm1_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_LEGACY(UPD7220_TAG,upd7220_vram_r,upd7220_vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE(UPD7220_TAG, upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -335,7 +335,7 @@ bool mm1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 	copybitmap(&bitmap, screen.machine().generic.tmpbitmap, 0, 0, 0, 0, &cliprect);
 
 	/* graphics */
-	upd7220_update(m_hgdc, &bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
