@@ -290,10 +290,22 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 					break;
 
 				case 80:
-					for (b = 0; b < 7; b++)
+					if (state->m_monochrome_dhr)
 					{
-						v = state->m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
-						*(p++) = v;
+						for (b = 0; b < 7; b++)
+						{
+							v = (w & 1);
+							w >>= 1;
+							*(p++) = v ? WHITE : BLACK;
+						}
+					}
+					else
+					{
+						for (b = 0; b < 7; b++)
+						{
+							v = state->m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+							*(p++) = v;
+						}
 					}
 					break;
 
@@ -414,6 +426,8 @@ VIDEO_START( apple2 )
 	/* hack to fix the colors on apple2/apple2p */
 	state->m_fgcolor = 0;
 	state->m_bgcolor = 15;
+
+	state->m_monochrome_dhr = false;
 }
 
 
@@ -425,6 +439,8 @@ VIDEO_START( apple2p )
 	/* hack to fix the colors on apple2/apple2p */
 	state->m_fgcolor = 0;
 	state->m_bgcolor = 15;
+
+	state->m_monochrome_dhr = false;
 }
 
 

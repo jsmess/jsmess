@@ -46,7 +46,17 @@
         bit 2 - key data interurpt enabled
         bit 1 - clear if horizontal mouse data, set if vertical
         bit 0 - command register full
-
+ 
+    C029 - NEWVIDEO
+    	bit 7 - 1 for Super Hi-Res mode, 0 for old Apple II video modes
+    	bit 6 - 1 to enable memory linearization (2000-9D00 in banks 01/E1), 0 for physical layout
+    	bit 5 - 1 to display double hi-res mode in monochrome, 0 for color
+    	bit 4 - ???
+    	bit 3 - ???
+    	bit 2 - ???
+    	bit 1 - ???
+    	bit 0 - ???
+ 
     C02D - SLTROMSEL
 
     C031 - DISKREG

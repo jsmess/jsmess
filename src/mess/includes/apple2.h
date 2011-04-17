@@ -139,6 +139,7 @@ public:
 	int m_alt_charset_value;
 	UINT16 *m_hires_artifact_map;
 	UINT16 *m_dhires_artifact_map;
+    bool m_monochrome_dhr;
 };
 
 

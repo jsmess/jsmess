@@ -117,6 +117,17 @@ SCREEN_UPDATE( apple2gs )
 		if (beamy == 0)
 		{
 			rectangle new_cliprect;
+			apple2_state *a2state = screen->machine().driver_data<apple2_state>();
+
+			// check if DHR should be monochrome 560x192
+			if (state->m_newvideo & 0x20)
+			{
+				a2state->m_monochrome_dhr = true;
+			}
+			else
+			{
+				a2state->m_monochrome_dhr = false;
+			}
 
 			new_cliprect.min_x = 0;
 			new_cliprect.min_y = 0;
