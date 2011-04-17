@@ -14,6 +14,101 @@
 
 -->
 <softwarelist name="32x" description="Sega 32X cartridges">
+
+<!-- Confirmed dump by ElBarto -->
+
+	<software name="doom" supported="no">
+		<description>Doom (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR=17351-F" />
+			<feature name="ic2" value="MPR=17352-F" />
+			<feature name="ic3" value="74HC139N" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-17351.ic1" size="2097152" crc="e0ef6ebc" sha1="30258efdcacb6c49873ef7de466c1b393e27b79d" offset="000000" />
+				<rom name="mpr-17352.ic1" size="1048576" crc="c7079709" sha1="0f22e68e3013fa7e4110cddbe989986d2639833b" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motox" supported="no">
+		<description>Motocross Championship (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="171-6884A" />
+			<feature name="ic1" value="MPR-17353-MX" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-17353.ic1" size="2097152" crc="ae3364e9" sha1="af0cb8626825e1b431eba07b8a9b571186745c16" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharrier" supported="no">
+		<description>Space Harrier (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="171-6884A" />
+			<feature name="ic1" value="MPR-17525-F" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-17525.ic1" size="2097152" crc="5cac3587" sha1="8b0495257fa5392ef9ddcc9c3ba1860ae58f4f3d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swa" supported="no">
+		<description>Star Wars Arcade (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR-17349 W79" />
+			<feature name="ic2" value="MPR-17350-S" />
+			<feature name="ic3" value="74HC139N" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-17349.ic1" size="2097152" crc="f1f7f657" sha1="5ab5bd1e9cd6d8d43e7cf78c3619b087c1d931c2" offset="000000" />
+				<rom name="mpr-17350.ic2" size="524288" crc="55931049" sha1="3edd15d2e53b1a126559414290b8da23a7cbed5d" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toughman" supported="no">
+		<description>Toughman Contest (Euro, USA)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR-17926-MX" />
+			<feature name="ic2" value="MPR-17927-MX" />
+			<feature name="ic3" value="74HC139N" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-17926.ic1" size="2097152" crc="543d310f" sha1="c8510d61dfca6bcf3949ad13cef33d92118688d9" offset="000000" />
+				<rom name="mpr-17927.ic2" size="2097152" crc="ecfef9e6" sha1="85a5859688742ab59ff16a8b67c872a2d2dbe076" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vrdx" supported="no">
+		<description>Virtua Racing Deluxe (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR-17347 W72" />
+			<feature name="ic2" value="MPR-17348 T34" />
+			<feature name="ic3" value="74HC139N" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-17347.ic1" size="2097152" crc="99e83be0" sha1="2b3e364494f6bdcae686e1535e51adee2aabca16" offset="000000" />
+				<rom name="mpr-17348.ic2" size="1048576" crc="aa2f8743" sha1="db85888bf3743195c0bf41e0b3d65486c328b197" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Old interleaved/unconfirmed dump -->
+
 	<software name="afterb" supported="no">
 		<description>After Burner Complete (Euro)</description>
 		<year>1994</year>
@@ -197,17 +292,6 @@
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="darxide (europe) (en,fr,de,es).bin" size="2097152" crc="22d7c906" sha1="108b4ffed8643abdefa921cfb58389b119b47f3d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doom" supported="no">
-		<description>Doom (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="doom (europe).bin" size="3145728" crc="53734e3a" sha1="4ec03c2114ebffbbcd16859583340d4ea4cd8dd5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1160,17 +1244,6 @@
 		</part>
 	</software>
 
-	<software name="motox" supported="no">
-		<description>Motocross Championship (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="motocross championship (europe).bin" size="2097152" crc="ae3364e9" sha1="af0cb8626825e1b431eba07b8a9b571186745c16" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="motoxu" cloneof="motox" supported="no">
 		<description>Motocross Championship (USA)</description>
 		<year>1994</year>
@@ -1524,17 +1597,6 @@
 		</part>
 	</software>
 
-	<software name="sharrier" supported="no">
-		<description>Space Harrier (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="space harrier (europe).bin" size="2097152" crc="5cac3587" sha1="8b0495257fa5392ef9ddcc9c3ba1860ae58f4f3d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sharrierju" cloneof="sharrier" supported="no">
 		<description>Space Harrier (Jpn, USA)</description>
 		<year>1994</year>
@@ -1564,17 +1626,6 @@
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="star trek starfleet academy - starship bridge simulator (usa).bin" size="2097152" crc="dd9708b9" sha1="e5248328b64a1ec4f1079c88ee53ef8d48e99e58" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swa" supported="no">
-		<description>Star Wars Arcade (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="star wars arcade (europe).bin" size="2621440" crc="82e82660" sha1="a877cbf704fe7480966fd88a3c39efb6a39392ac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1909,17 +1960,6 @@
 		</part>
 	</software>
 
-	<software name="toughman" supported="no">
-		<description>Toughman Contest (Euro, USA)</description>
-		<year>1995</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="toughman contest (usa, europe).bin" size="4194304" crc="14eac7a6" sha1="7588b0b8f4e93d5fdc920d3ab7e464154e423da9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vf" supported="no">
 		<description>Virtua Fighter (Euro)</description>
 		<year>1995</year>
@@ -2026,17 +2066,6 @@
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua hamster (usa) (proto).bin" size="2097152" crc="cd54ac37" sha1="c10f98d9db73ae90be5e5d556b663a5aff015cef" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vrdx" supported="no">
-		<description>Virtua Racing Deluxe (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="virtua racing deluxe (europe).bin" size="3145728" crc="27f14b5f" sha1="bb26ddde26cd07191d872e8a76a170ca3326f781" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
