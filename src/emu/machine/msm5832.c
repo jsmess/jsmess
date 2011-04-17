@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    OKI MSM58321RS Real Time Clock/Calendar emulation
+    OKI MSM5832 Real Time Clock/Calendar emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -14,13 +14,12 @@
 	- 12/24 hour
 	- AM/PM
 	- leap year
-    - stop
-    - reset
-    - reference registers
+	- test input
+	- reference signal output
 
 */
 
-#include "msm58321.h"
+#include "msm5832.h"
 #include "machine/devhelpr.h"
 
 
@@ -29,7 +28,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 // registers
@@ -48,9 +47,7 @@ enum
 	REGISTER_MO10,
 	REGISTER_Y1,
 	REGISTER_Y10,
-	REGISTER_RESET,
-	REGISTER_REF0,
-	REGISTER_REF1
+	REGISTER_REF = 15
 };
 
 
@@ -64,7 +61,7 @@ static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 
 //**************************************************************************
 
 // devices
-const device_type MSM58321 = msm58321_device_config::static_alloc_device_config;
+const device_type MSM5832 = msm5832_device_config::static_alloc_device_config;
 
 
 
@@ -72,28 +69,7 @@ const device_type MSM58321 = msm58321_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(msm58321, "MSM58321")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void msm58321_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const msm58321_interface *intf = reinterpret_cast<const msm58321_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<msm58321_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_busy_func, 0, sizeof(m_out_busy_func));
-	}
-}
+GENERIC_DEVICE_CONFIG_SETUP(msm5832, "MSM5832")
 
 
 
@@ -105,7 +81,7 @@ void msm58321_device_config::device_config_complete()
 //  read_counter -
 //-------------------------------------------------
 
-inline int msm58321_device::read_counter(int counter)
+inline int msm5832_device::read_counter(int counter)
 {
 	return (m_reg[counter + 1] * 10) + m_reg[counter];
 }
@@ -115,7 +91,7 @@ inline int msm58321_device::read_counter(int counter)
 //  write_counter -
 //-------------------------------------------------
 
-inline void msm58321_device::write_counter(int counter, int value)
+inline void msm5832_device::write_counter(int counter, int value)
 {
 	m_reg[counter] = value % 10;
 	m_reg[counter + 1] = value / 10;
@@ -126,7 +102,7 @@ inline void msm58321_device::write_counter(int counter, int value)
 //  advance_seconds - 
 //-------------------------------------------------
 
-inline void msm58321_device::advance_seconds()
+inline void msm5832_device::advance_seconds()
 {
 	int seconds = read_counter(REGISTER_S1);
 
@@ -147,7 +123,7 @@ inline void msm58321_device::advance_seconds()
 //  advance_minutes -
 //-------------------------------------------------
 
-inline void msm58321_device::advance_minutes()
+inline void msm5832_device::advance_minutes()
 {
 	int minutes = read_counter(REGISTER_MI1);
 	int hours = read_counter(REGISTER_H1);
@@ -208,11 +184,16 @@ inline void msm58321_device::advance_minutes()
 //**************************************************************************
 
 //-------------------------------------------------
-//  msm58321_device - constructor
+//  msm5832_device - constructor
 //-------------------------------------------------
 
-msm58321_device::msm58321_device(running_machine &_machine, const msm58321_device_config &config)
+msm5832_device::msm5832_device(running_machine &_machine, const msm5832_device_config &config)
     : device_t(_machine, config),
+	  m_hold(0),
+	  m_address(0),
+	  m_read(0),
+	  m_write(0),
+	  m_cs(0),
       m_config(config)
 {
 	for (int i = 0; i < 13; i++)
@@ -224,28 +205,19 @@ msm58321_device::msm58321_device(running_machine &_machine, const msm58321_devic
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void msm58321_device::device_start()
+void msm5832_device::device_start()
 {
-	// resolve callbacks
-	devcb_resolve_write_line(&m_out_busy_func, &m_config.m_out_busy_func, this);
-
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
-	m_busy_timer = timer_alloc(TIMER_BUSY);
-	m_busy_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
-
 	// state saving
-	save_item(NAME(m_cs1));
-	save_item(NAME(m_cs2));
-	save_item(NAME(m_busy));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_hold));
+	save_item(NAME(m_address));
 	save_item(NAME(m_read));
 	save_item(NAME(m_write));
-	save_item(NAME(m_address_write));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_latch));
-	save_item(NAME(m_address));
+	save_item(NAME(m_cs));
 }
 
 
@@ -253,126 +225,117 @@ void msm58321_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void msm5832_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
 	case TIMER_CLOCK:
-		advance_seconds();
-		break;
-
-	case TIMER_BUSY:
-		devcb_call_write_line(&m_out_busy_func, m_busy);
-		m_busy = !m_busy;
+		if (!m_hold)
+		{
+			advance_seconds();
+		}
 		break;
 	}
 }
 
 
 //-------------------------------------------------
-//  read -
+//  data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( msm58321_device::read )
+READ8_MEMBER( msm5832_device::data_r )
 {
 	UINT8 data = 0;
-
-	if (m_cs1 && m_cs2)
+	
+	if (m_cs && m_read)
 	{
-		if (m_read)
+		if (m_address == REGISTER_REF)
 		{
-			switch (m_address)
-			{
-			case REGISTER_RESET:
-				break;
-
-			case REGISTER_REF0:
-			case REGISTER_REF1:
-				break;
-
-			default:
-				data = m_reg[m_address];
-				break;
-			}
+			// TODO reference output
 		}
-
-		if (m_write)
+		else
 		{
-			if (m_address >= REGISTER_REF0)
-			{
-				// TODO: output reference values
-			}
+			data = m_reg[m_address];
 		}
 	}
 
-	if (LOG) logerror("MSM58321 '%s' Register Read %01x: %01x\n", tag(), m_address, data & 0x0f);
+	if (LOG) logerror("MSM5832 '%s' Register Read %01x: %01x\n", tag(), m_address, data & 0x0f);
 
-	return data;
+	return data & 0x0f;
 }
 
 
 //-------------------------------------------------
-//  write -
+//  data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( msm58321_device::write )
+WRITE8_MEMBER( msm5832_device::data_w )
 {
-	// latch data for future use
-	m_latch = data & 0x0f;
+	if (LOG) logerror("MSM5832 '%s' Register Write %01x: %01x\n", tag(), m_address, data & 0x0f);
 
-	if (!m_cs1 || !m_cs2) return;
-
-	if (m_address_write)
+	if (m_cs && m_write)
 	{
-		if (LOG) logerror("MSM58321 '%s' Latch Address %01x\n", tag(), m_latch);
-
-		// latch address
-		m_address = m_latch;
+		m_reg[m_address] = data & 0x0f;
 	}
+}
 
-	if (m_write)
+
+//-------------------------------------------------
+//  address_w -
+//-------------------------------------------------
+
+void msm5832_device::address_w(UINT8 data)
+{
+	if (LOG) logerror("MSM5832 '%s' Address: %01x\n", tag(), data & 0x0f);
+
+	m_address = data & 0x0f;
+}
+
+
+//-------------------------------------------------
+//  adj_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( msm5832_device::adj_w )
+{
+	if (LOG) logerror("MSM5832 '%s' 30 ADJ: %u\n", tag(), state);
+
+	if (state)
 	{
-		switch(m_address)
+		int seconds = read_counter(REGISTER_S1);
+
+		if (seconds < 30)
 		{
-		case REGISTER_RESET:
-			if (LOG) logerror("MSM58321 '%s' Reset\n", tag());
-			break;
-
-		case REGISTER_REF0:
-		case REGISTER_REF1:
-			if (LOG) logerror("MSM58321 '%s' Reference Signal\n", tag());
-			break;
-
-		default:
-			if (LOG) logerror("MSM58321 '%s' Register Write %01x: %01x\n", tag(), m_address, data & 0x0f);
-			m_reg[m_address] = m_latch & 0x0f;
-			break;
+			write_counter(REGISTER_S1, 0);
+		}
+		else
+		{
+			write_counter(REGISTER_S1, 0);
+			advance_minutes();
 		}
 	}
 }
 
 
 //-------------------------------------------------
-//  cs1_w -
+//  test_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::cs1_w )
+WRITE_LINE_MEMBER( msm5832_device::test_w )
 {
-	if (LOG) logerror("MSM58321 '%s' CS1: %u\n", tag(), state);
-
-	m_cs1 = state;
+	if (LOG) logerror("MSM5832 '%s' TEST: %u\n", tag(), state);
 }
 
 
 //-------------------------------------------------
-//  cs2_w -
+//  hold_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::cs2_w )
+WRITE_LINE_MEMBER( msm5832_device::hold_w )
 {
-	if (LOG) logerror("MSM58321 '%s' CS2: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 '%s' HOLD: %u\n", tag(), state);
 
-	m_cs2 = state;
+	m_hold = state;
 }
 
 
@@ -380,9 +343,9 @@ WRITE_LINE_MEMBER( msm58321_device::cs2_w )
 //  read_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::read_w )
+WRITE_LINE_MEMBER( msm5832_device::read_w )
 {
-	if (LOG) logerror("MSM58321 '%s' READ: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 '%s' READ: %u\n", tag(), state);
 
 	m_read = state;
 }
@@ -392,59 +355,21 @@ WRITE_LINE_MEMBER( msm58321_device::read_w )
 //  write_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::write_w )
+WRITE_LINE_MEMBER( msm5832_device::write_w )
 {
-	if (LOG) logerror("MSM58321 '%s' WRITE: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 '%s' WR: %u\n", tag(), state);
 
 	m_write = state;
 }
 
 
 //-------------------------------------------------
-//  address_write_w -
+//  cs_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::address_write_w )
+WRITE_LINE_MEMBER( msm5832_device::cs_w )
 {
-	if (LOG) logerror("MSM58321 '%s' ADDRESS WRITE: %u\n", tag(), state);
+	if (LOG) logerror("MSM5832 '%s' CS: %u\n", tag(), state);
 
-	m_address_write = state;
-
-	if (m_address_write)
-	{
-		if (LOG) logerror("MSM58321 '%s' Latch Address %01x\n", tag(), m_latch);
-
-		// latch address
-		m_address = m_latch;
-	}
-}
-
-
-//-------------------------------------------------
-//  stop_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( msm58321_device::stop_w )
-{
-	if (LOG) logerror("MSM58321 '%s' STOP: %u\n", tag(), state);
-}
-
-
-//-------------------------------------------------
-//  test_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( msm58321_device::test_w )
-{
-	if (LOG) logerror("MSM58321 '%s' TEST: %u\n", tag(), state);
-}
-
-
-//-------------------------------------------------
-//  busy_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( msm58321_device::busy_r )
-{
-	return m_busy;
+	m_cs = state;
 }

@@ -39,7 +39,6 @@
     - FDC, type 1771, single sided, capacity 143KBytes, not connected up
     - Cassette doesn't load
     - Printer
-    - RTC, type MSM5832RS, unemulated device
     - Keyboard lookup table for Kana and Shifted Kana
     - Keyboard autorepeat
 
@@ -53,15 +52,21 @@
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "machine/wd17xx.h"
+#include "machine/msm5832.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
+#define MSM5832RS_TAG "rtc"
 
 class mycom_state : public driver_device
 {
 public:
 	mycom_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_rtc(*this, MSM5832RS_TAG)
+	{ }
+
+	required_device<msm5832_device> m_rtc;
 
 	device_t *m_mc6845;
 	device_t *m_audio;
@@ -422,6 +427,18 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
 		sn76496_w(state->m_audio, 0, state->m_sn_we);
 }
 
+static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
+{
+	mycom_state *state = device->machine().driver_data<mycom_state>();
+
+	state->m_rtc->address_w(data & 0x0f);
+	
+	state->m_rtc->hold_w(BIT(data, 4));
+	state->m_rtc->read_w(BIT(data, 5));
+	state->m_rtc->write_w(BIT(data, 6));
+	state->m_rtc->cs_w(BIT(data, 7));
+}
+
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_NULL,			/* Port A read */
@@ -445,11 +462,11 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 static I8255A_INTERFACE( ppi8255_intf_2 )
 {
 	DEVCB_NULL,			/* Port A read */
-	DEVCB_NULL,			/* Port B read */
+	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),			/* Port B read */
 	DEVCB_NULL,			/* Port C read */
 	DEVCB_NULL,			/* Port A write */
-	DEVCB_NULL,			/* Port B write */
-	DEVCB_NULL			/* Port C write */
+	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_w),			/* Port B write */
+	DEVCB_HANDLER(mycom_rtc_w)			/* Port C write */
 };
 
 static const UINT8 mycom_keyval[] = { 0,
@@ -568,6 +585,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
+	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 	MCFG_WD179X_ADD("fdc", wd1771_intf) // WD1771
 
