@@ -15,47 +15,109 @@
 #include "machine/mc146818.h"
 #include "video/mc6845.h"
 #include "sound/speaker.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/mc146818.h"
+#include "sound/wave.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
 
 
 class mbee_state : public driver_device
 {
 public:
 	mbee_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_pio(*this, "z80pio"),
+	m_cass(*this, "cassette"),
+	m_wave(*this, "wave"),
+	m_speaker(*this, "speaker"),
+	m_printer(*this, "centronics"),
+	m_crtc(*this, "crtc"),
+	m_fdc(*this, "fdc"),
+	m_rtc(*this, "rtc")
+	{ }
 
-	UINT8 m_dummy;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pio;
+	required_device<device_t> m_cass;
+	required_device<device_t> m_wave;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_printer;
+	required_device<device_t> m_crtc;
+	optional_device<device_t> m_fdc;
+	optional_device<device_t> m_rtc;
+	DECLARE_WRITE8_MEMBER( mbee_04_w );
+	DECLARE_WRITE8_MEMBER( mbee_06_w );
+	DECLARE_READ8_MEMBER( mbee_07_r );
+	DECLARE_READ8_MEMBER( mbeeic_0a_r );
+	DECLARE_WRITE8_MEMBER( mbeeic_0a_w );
+	DECLARE_READ8_MEMBER( mbeepc_telcom_low_r );
+	DECLARE_READ8_MEMBER( mbeepc_telcom_high_r );
+	DECLARE_READ8_MEMBER( mbee256_speed_low_r );
+	DECLARE_READ8_MEMBER( mbee256_speed_high_r );
+	DECLARE_READ8_MEMBER( mbee256_18_r );
+	DECLARE_WRITE8_MEMBER( mbee64_50_w );
+	DECLARE_WRITE8_MEMBER( mbee128_50_w );
+	DECLARE_WRITE8_MEMBER( mbee256_50_w );
+	DECLARE_READ8_MEMBER( m6545_status_r );
+	DECLARE_WRITE8_MEMBER( m6545_index_w );
+	DECLARE_READ8_MEMBER( m6545_data_r );
+	DECLARE_WRITE8_MEMBER( m6545_data_w );
+	DECLARE_READ8_MEMBER( mbee_low_r );
+	DECLARE_READ8_MEMBER( mbee_high_r );
+	DECLARE_READ8_MEMBER( mbeeic_high_r );
+	DECLARE_WRITE8_MEMBER( mbeeic_high_w );
+	DECLARE_WRITE8_MEMBER( mbee_low_w );
+	DECLARE_WRITE8_MEMBER( mbee_high_w );
+	DECLARE_READ8_MEMBER( mbeeic_08_r );
+	DECLARE_WRITE8_MEMBER( mbeeic_08_w );
+	DECLARE_READ8_MEMBER( mbee_0b_r );
+	DECLARE_WRITE8_MEMBER( mbee_0b_w );
+	DECLARE_READ8_MEMBER( mbeeppc_1c_r );
+	DECLARE_WRITE8_MEMBER( mbeeppc_1c_w );
+	DECLARE_WRITE8_MEMBER( mbee256_1c_w );
+	DECLARE_READ8_MEMBER( mbeeppc_low_r );
+	DECLARE_READ8_MEMBER( mbeeppc_high_r );
+	DECLARE_WRITE8_MEMBER( mbeeppc_high_w );
+	DECLARE_WRITE8_MEMBER( mbeeppc_low_w );
+	DECLARE_WRITE8_MEMBER( pio_port_a_w );
+	DECLARE_WRITE8_MEMBER( pio_port_b_w );
+	DECLARE_READ8_MEMBER( pio_port_b_r );
+	DECLARE_WRITE_LINE_MEMBER( pio_ardy );
+	DECLARE_READ8_MEMBER(mbee_fdc_status_r);
+	DECLARE_WRITE8_MEMBER(mbee_fdc_motor_w);
+	DECLARE_WRITE_LINE_MEMBER(mbee_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(mbee_fdc_drq_w);
 	size_t m_size;
 	UINT8 m_clock_pulse;
 	UINT8 m_mbee256_key_available;
 	UINT8 m_fdc_intrq;
 	UINT8 m_fdc_drq;
-	UINT8 m_0a;
-	device_t *m_fdc;
-	mc146818_device *m_rtc;
-	device_t *m_z80pio;
-	device_t *m_speaker;
-	device_t *m_cassette;
-	device_t *m_printer;
 	UINT8 m_mbee256_was_pressed[15];
 	UINT8 m_mbee256_q[20];
 	UINT8 m_mbee256_q_pos;
 	UINT8 m_framecnt;
-	UINT8 *m_gfxram;
-	UINT8 *m_colorram;
-	UINT8 *m_videoram;
-	UINT8 *m_attribram;
+	UINT8 *m_p_gfxram;
+	UINT8 *m_p_colorram;
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_attribram;
 	UINT8 m_08;
+	UINT8 m_0a;
 	UINT8 m_0b;
 	UINT8 m_1c;
 	UINT8 m_is_premium;
 	UINT8 m_sy6545_cursor[16];
 	UINT8 m_sy6545_status;
-	device_t *m_mc6845;
 	UINT8 m_speed;
 	UINT8 m_flash;
 	UINT16 m_cursor;
 	UINT8 m_sy6545_reg[32];
 	UINT8 m_sy6545_ind;
+	void sy6545_cursor_configure();
+	void keyboard_matrix_r(int offs);
+	void mbee_video_kbd_scan(int param);
 };
 
 
@@ -80,22 +142,6 @@ MACHINE_RESET( mbee64 );
 MACHINE_RESET( mbee128 );
 MACHINE_RESET( mbee256 );
 MACHINE_RESET( mbeett );
-WRITE8_HANDLER( mbee_04_w );
-WRITE8_HANDLER( mbee_06_w );
-READ8_HANDLER( mbee_07_r );
-READ8_HANDLER( mbeeic_0a_r );
-WRITE8_HANDLER( mbeeic_0a_w );
-READ8_HANDLER( mbeepc_telcom_low_r );
-READ8_HANDLER( mbeepc_telcom_high_r );
-READ8_HANDLER( mbee256_speed_low_r );
-READ8_HANDLER( mbee256_speed_high_r );
-READ8_HANDLER( mbee256_18_r );
-WRITE8_HANDLER( mbee64_50_w );
-WRITE8_HANDLER( mbee128_50_w );
-WRITE8_HANDLER( mbee256_50_w );
-
-READ8_HANDLER ( mbee_fdc_status_r );
-WRITE8_HANDLER ( mbee_fdc_motor_w );
 INTERRUPT_GEN( mbee_interrupt );
 Z80BIN_EXECUTE( mbee );
 QUICKLOAD_LOAD( mbee );
@@ -103,27 +149,6 @@ QUICKLOAD_LOAD( mbee );
 
 /*----------- defined in video/mbee.c -----------*/
 
-READ8_HANDLER( m6545_status_r );
-WRITE8_HANDLER( m6545_index_w );
-READ8_HANDLER( m6545_data_r );
-WRITE8_HANDLER( m6545_data_w );
-READ8_HANDLER( mbee_low_r );
-READ8_HANDLER( mbee_high_r );
-READ8_HANDLER( mbeeic_high_r );
-WRITE8_HANDLER( mbeeic_high_w );
-WRITE8_HANDLER( mbee_low_w );
-WRITE8_HANDLER( mbee_high_w );
-READ8_HANDLER( mbeeic_08_r );
-WRITE8_HANDLER( mbeeic_08_w );
-READ8_HANDLER( mbee_0b_r );
-WRITE8_HANDLER( mbee_0b_w );
-READ8_HANDLER( mbeeppc_1c_r );
-WRITE8_HANDLER( mbeeppc_1c_w );
-WRITE8_HANDLER( mbee256_1c_w );
-READ8_HANDLER( mbeeppc_low_r );
-READ8_HANDLER( mbeeppc_high_r );
-WRITE8_HANDLER( mbeeppc_high_w );
-WRITE8_HANDLER( mbeeppc_low_w );
 MC6845_UPDATE_ROW( mbee_update_row );
 MC6845_UPDATE_ROW( mbeeic_update_row );
 MC6845_UPDATE_ROW( mbeeppc_update_row );
