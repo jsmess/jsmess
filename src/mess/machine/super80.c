@@ -15,13 +15,15 @@ WRITE8_MEMBER( super80_state::pio_port_a_w )
 static READ8_DEVICE_HANDLER( pio_port_b_r ) // cannot be modernised yet as super80 hangs at start
 {
 	super80_state *state = device->machine().driver_data<super80_state>();
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
-
-	int bit;
+	char kbdrow[6];
+	UINT8 i;
 	UINT8 data = 0xff;
 
-	for (bit = 0; bit < 8; bit++)
-		if (!BIT(state->m_keylatch, bit)) data &= input_port_read(device->machine(), keynames[bit]);
+	for (i = 0; i < 8; i++)
+	{
+		sprintf(kbdrow,"X%d",i);
+		if (!BIT(state->m_keylatch, i)) data &= input_port_read(device->machine(), kbdrow);
+	}
 
 	return data;
 };
@@ -49,7 +51,7 @@ static void super80_cassette_motor( running_machine &machine, UINT8 data )
 		cassette_change_state(state->m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
-	if (input_port_read(machine, "CONFIG") & 8)
+	if BIT(input_port_read(machine, "CONFIG"), 3)
 		cassette_change_state(state->m_cass, CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
 		cassette_change_state(state->m_cass, CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -105,7 +107,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 {
 	UINT8 go_fast = 0;
 	super80_state *state = machine.driver_data<super80_state>();
-	if (!(state->m_shared & 4) || (!(input_port_read(machine, "CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
+	if ( (!BIT(state->m_shared, 2)) | (!BIT(input_port_read(machine, "CONFIG"), 1)) )	/* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
@@ -176,9 +178,9 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data;
-	speaker_level_w(m_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 2) super80_cassette_motor(m_machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	cassette_output(m_cass, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	speaker_level_w(m_speaker, BIT(data, 3));				/* bit 3 - speaker */
+	if (BIT(bits, 1)) super80_cassette_motor(m_machine, BIT(data, 1));	/* bit 1 - cassette motor */
+	cassette_output(m_cass, BIT(data, 0) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	m_last_data = data;
 }
@@ -187,9 +189,9 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data | 0x14;
-	speaker_level_w(m_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 2) super80_cassette_motor(m_machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	cassette_output(m_cass, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	speaker_level_w(m_speaker, BIT(data, 3));				/* bit 3 - speaker */
+	if (BIT(bits, 1)) super80_cassette_motor(m_machine, BIT(data, 1));	/* bit 1 - cassette motor */
+	cassette_output(m_cass, BIT(data, 0) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	m_last_data = data;
 }
