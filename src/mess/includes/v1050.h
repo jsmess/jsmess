@@ -78,7 +78,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<i8214_device> m_pic;
-	required_device<device_t> m_rtc;
+	required_device<msm58321_device> m_rtc;
 	required_device<device_t> m_uart_kb;
 	required_device<device_t> m_uart_sio;
 	required_device<device_t> m_fdc;
@@ -112,6 +112,8 @@ public:
 	DECLARE_WRITE8_MEMBER( misc_ppi_pa_w );
 	DECLARE_WRITE8_MEMBER( misc_ppi_pc_w );
 	DECLARE_WRITE8_MEMBER( rtc_ppi_pb_w );
+	DECLARE_READ8_MEMBER( rtc_ppi_pc_r );
+	DECLARE_WRITE8_MEMBER( rtc_ppi_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_txrdy_w );

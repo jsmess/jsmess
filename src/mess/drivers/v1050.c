@@ -905,7 +905,7 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
 	m_int_mask = data;
 }
 
-static READ8_DEVICE_HANDLER( rtc_ppi_pc_r )
+READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
 {
 	/*
 
@@ -915,17 +915,17 @@ static READ8_DEVICE_HANDLER( rtc_ppi_pc_r )
         PC1
         PC2
         PC3                 clock busy
-        PC4                 clock address write
-        PC5                 clock data write
-        PC6                 clock data read
-        PC7                 clock device select
+        PC4                 
+        PC5                 
+        PC6                 
+        PC7                 
 
     */
 
-	return msm58321_busy_r(device) << 3;
+	return m_rtc->busy_r() << 3;
 }
 
-static WRITE8_DEVICE_HANDLER( rtc_ppi_pc_w )
+WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
 {
 	/*
 
@@ -934,7 +934,7 @@ static WRITE8_DEVICE_HANDLER( rtc_ppi_pc_w )
         PC0
         PC1
         PC2
-        PC3                 clock busy
+        PC3                 
         PC4                 clock address write
         PC5                 clock data write
         PC6                 clock data read
@@ -942,20 +942,20 @@ static WRITE8_DEVICE_HANDLER( rtc_ppi_pc_w )
 
     */
 
-	msm58321_address_write_w(device, BIT(data, 4));
-	msm58321_write_w(device, BIT(data, 5));
-	msm58321_read_w(device, BIT(data, 6));
-	msm58321_cs2_w(device, BIT(data, 7));
+	m_rtc->address_write_w(BIT(data, 4));
+	m_rtc->write_w(BIT(data, 5));
+	m_rtc->read_w(BIT(data, 6));
+	m_rtc->cs2_w(BIT(data, 7));
 }
 
 static I8255A_INTERFACE( rtc_ppi_intf )
 {
-	DEVCB_DEVICE_HANDLER(MSM58321RS_TAG, msm58321_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_DEVICE_HANDLER(MSM58321RS_TAG, rtc_ppi_pc_r),		// Port C read
-	DEVCB_DEVICE_HANDLER(MSM58321RS_TAG, msm58321_w),	// Port A write
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pb_w),		// Port B write
-	DEVCB_DEVICE_HANDLER(MSM58321RS_TAG, rtc_ppi_pc_w)			// Port C write
+	DEVCB_DEVICE_MEMBER(MSM58321RS_TAG, msm58321_device, read),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_r),
+	DEVCB_DEVICE_MEMBER(MSM58321RS_TAG, msm58321_device, write),
+	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pb_w),
+	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_w)
 };
 
 /* Keyboard 8251A Interface */
@@ -1102,7 +1102,7 @@ void v1050_state::machine_start()
 	m_pic->inte_w(1);
 
 	/* initialize RTC */
-	msm58321_cs1_w(m_rtc, 1);
+	m_rtc->cs1_w(1);
 
 	/* set CPU interrupt callback */
 	device_set_irq_callback(m_maincpu, v1050_int_ack);
@@ -1183,7 +1183,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 
 	/* devices */
 	MCFG_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, pic_intf)
-	MCFG_MSM58321RS_ADD(MSM58321RS_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_MSM58321_ADD(MSM58321RS_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_I8255A_ADD(I8255A_DISP_TAG, disp_ppi_intf)
 	MCFG_I8255A_ADD(I8255A_MISC_TAG, misc_ppi_intf)
 	MCFG_I8255A_ADD(I8255A_RTC_TAG, rtc_ppi_intf)
