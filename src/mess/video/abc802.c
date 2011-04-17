@@ -93,7 +93,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			address |= 0x800;
 		}
 
-		data = state->m_char_rom[(address + ra_latch) & 0x1fff];
+		data = state->m_char_rom[(address + ra_latch) & 0xfff];
 
 		if (data & ABC802_ATE)
 		{
