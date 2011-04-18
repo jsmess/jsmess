@@ -217,14 +217,14 @@ static int detect_modeDC(running_machine &machine)
 static int detect_modef6(running_machine &machine)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
-	int i,numfound = 0;
+	int i, numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
 	if (state->m_cart_size == 0x4000)
 	{
 		UINT8 *cart = CART;
 		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&cart[i], signature,sizeof signature))
+			if (!memcmp(&cart[i], signature, sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -559,14 +559,17 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 	running_machine &machine = image.device().machine();
 	UINT8 *cart = CART;
 
-	state->m_cart_size = image.length();
+	if (image.software_entry() == NULL)
+		state->m_cart_size = image.length();
+	else
+		state->m_cart_size = image.get_software_region_length("rom");
 
 	switch (state->m_cart_size)
 	{
 	case 0x00800:
 	case 0x01000:
 	case 0x02000:
-	case 0x028FF:
+	case 0x028ff:
 	case 0x02900:
 	case 0x03000:
 	case 0x04000:
@@ -582,7 +585,10 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 
 	state->m_current_bank = 0;
 
-	image.fread(cart, state->m_cart_size);
+	if (image.software_entry() == NULL)
+		image.fread(cart, state->m_cart_size);
+	else
+		memcpy(cart, image.get_software_region("rom"), state->m_cart_size);
 
 	if (!(state->m_cart_size == 0x4000 && detect_modef6(image.device().machine())))
 	{
@@ -2187,6 +2193,10 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_START(a2600_cart)
 	MCFG_CARTSLOT_LOAD(a2600_cart)
+	MCFG_CARTSLOT_INTERFACE("a2600_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a2600")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( a2600, a2600_state )
