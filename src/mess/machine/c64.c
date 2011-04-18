@@ -546,9 +546,11 @@ static void c64_bankswitch( running_machine &machine, int reset )
   p6,7 not available on M6510
  */
 
-void c64_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
+WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 {
 	c64_state *state = device->machine().driver_data<c64_state>();
+	
+	UINT8 direction = offset; // HACK ALERT!
 
 	/* if line is marked as input then keep current value */
 	data = (state->m_port_data & ~direction) | (data & direction);
@@ -595,7 +597,7 @@ void c64_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
 
 }
 
-UINT8 c64_m6510_port_read( device_t *device, UINT8 direction )
+READ8_DEVICE_HANDLER(c64_m6510_port_read)
 {
 	c64_state *state = device->machine().driver_data<c64_state>();
 	UINT8 data = state->m_port_data;

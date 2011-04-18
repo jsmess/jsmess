@@ -250,7 +250,7 @@ static void step_motor(c1551_t *c1551, int mtr, int stp)
     c1551_port_r - M6510T port read
 -------------------------------------------------*/
 
-static UINT8 c1551_port_r( device_t *device, UINT8 direction )
+static READ8_DEVICE_HANDLER( c1551_port_r )
 {
 	/*
 
@@ -283,7 +283,7 @@ static UINT8 c1551_port_r( device_t *device, UINT8 direction )
     c1551_port_w - M6510T port write
 -------------------------------------------------*/
 
-static void c1551_port_w( device_t *device, UINT8 direction, UINT8 data )
+static WRITE8_DEVICE_HANDLER( c1551_port_w )
 {
 	/*
 
@@ -326,8 +326,8 @@ static const m6502_interface m6510t_intf =
 {
 	NULL,			/* read_indexed_func */
 	NULL,			/* write_indexed_func */
-	c1551_port_r,	/* port_read_func */
-	c1551_port_w	/* port_write_func */
+	DEVCB_HANDLER(c1551_port_r),	/* port_read_func */
+	DEVCB_HANDLER(c1551_port_w)	/* port_write_func */
 };
 
 /*-------------------------------------------------

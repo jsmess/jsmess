@@ -68,7 +68,7 @@
   p7 serial data in, serial bus 5
 */
 
-void c16_m7501_port_write( device_t *device, UINT8 direction, UINT8 data )
+WRITE8_DEVICE_HANDLER(c16_m7501_port_write)
 {
 	c16_state *state = device->machine().driver_data<c16_state>();
 
@@ -82,7 +82,7 @@ void c16_m7501_port_write( device_t *device, UINT8 direction, UINT8 data )
 	cassette_change_state(state->m_cassette, BIT(data, 7) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-UINT8 c16_m7501_port_read( device_t *device, UINT8 direction )
+READ8_DEVICE_HANDLER(c16_m7501_port_read)
 {
 	c16_state *state = device->machine().driver_data<c16_state>();
 	UINT8 data = 0xff;

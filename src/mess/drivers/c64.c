@@ -548,8 +548,8 @@ static const m6502_interface c64_m6510_interface =
 {
 	NULL,
 	NULL,
-	c64_m6510_port_read,
-	c64_m6510_port_write
+	DEVCB_HANDLER(c64_m6510_port_read),
+	DEVCB_HANDLER(c64_m6510_port_write)
 };
 
 static CBM_IEC_DAISY( cbm_iec_daisy )

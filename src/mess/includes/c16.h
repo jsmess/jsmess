@@ -43,8 +43,8 @@ public:
 
 /*----------- defined in machine/c16.c -----------*/
 
-UINT8 c16_m7501_port_read(device_t *device, UINT8 direction);
-void c16_m7501_port_write(device_t *device, UINT8 direction, UINT8 data);
+extern READ8_DEVICE_HANDLER(c16_m7501_port_read);
+extern WRITE8_DEVICE_HANDLER(c16_m7501_port_write);
 
 extern WRITE8_HANDLER(c16_6551_port_w);
 extern READ8_HANDLER(c16_6551_port_r);

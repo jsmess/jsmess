@@ -58,8 +58,8 @@ static const m6502_interface sbc6510_m6510_interface =
 {
 	NULL,
 	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface sbc6510_ay_interface =

@@ -654,8 +654,8 @@ static const m6502_interface c128_m8502_interface =
 {
 	NULL,					/* read_indexed_func */
 	NULL,					/* write_indexed_func */
-	c128_m6510_port_read,	/* port_read_func */
-	c128_m6510_port_write,	/* port_write_func */
+	DEVCB_HANDLER(c128_m6510_port_read),	/* port_read_func */
+	DEVCB_HANDLER(c128_m6510_port_write)	/* port_write_func */
 };
 
 static CBM_IEC_DAISY( c128_iec_bus )

@@ -413,8 +413,8 @@ static const m6502_interface c16_m7501_interface =
 {
 	NULL,					/* read_indexed_func */
 	NULL,					/* write_indexed_func */
-	c16_m7501_port_read,	/* port_read_func */
-	c16_m7501_port_write	/* port_write_func */
+	DEVCB_HANDLER(c16_m7501_port_read),	/* port_read_func */
+	DEVCB_HANDLER(c16_m7501_port_write)	/* port_write_func */
 };
 
 static CBM_IEC_DAISY( c16_iec_no_drives )

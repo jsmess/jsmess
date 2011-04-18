@@ -37,8 +37,8 @@ static const m6502_interface apple3_m6502_interface =
 {
 	apple3_indexed_read,	/* read_indexed_func */
 	apple3_indexed_write,	/* write_indexed_func */
-	NULL,					/* port_read_func */
-	NULL,					/* port_write_func */
+	DEVCB_NULL,				/* port_read_func */
+	DEVCB_NULL				/* port_write_func */
 };
 
 #ifdef UNUSED_FUNCTION

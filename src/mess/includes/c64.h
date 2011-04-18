@@ -75,8 +75,8 @@ public:
 
 /* private area */
 
-UINT8 c64_m6510_port_read(device_t *device, UINT8 direction);
-void c64_m6510_port_write(device_t *device, UINT8 direction, UINT8 data);
+extern READ8_DEVICE_HANDLER(c64_m6510_port_read);
+extern WRITE8_DEVICE_HANDLER(c64_m6510_port_write);
 
 READ8_HANDLER ( c64_colorram_read );
 WRITE8_HANDLER ( c64_colorram_write );
