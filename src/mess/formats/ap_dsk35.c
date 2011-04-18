@@ -5,7 +5,7 @@
     Apple 3.5" disk images
 
     This code supports 3.5" 400k/800k disks used in early Macintoshes
-    and the Apple IIgs.
+    and the Apple IIgs, and 3.5" 1440k MFM disks used on most Macintoshes.
 
     These disks have the following properties:
 
@@ -18,10 +18,9 @@
         Tracks 48-63 have  9 sectors each
         Tracks 64-79 have  8 sectors each
 
-        1440k disks are the exception; they are simply 80 tracks, 2 heads and
-        18 sectors per track.
+        1440k disks are simply 80 tracks, 2 heads and 18 sectors per track.
 
-    Each sector has 524 bytes, 512 of which are really used by the Macintosh
+    Each sector on 400/800k disks has 524 bytes, 512 of which are really used by the Macintosh
 
     (80 tracks) * (avg of 10 sectors) * (512 bytes) * (2 sides) = 800 kB
 
@@ -54,6 +53,32 @@
         759     0xDE
         760     0xAA
         761     pad byte where head is turned off (0xFF here)
+
+    MFM Track layout for 1440K disks:
+    	Pos	
+	--------- track ID
+	0	0x4E (x80)
+	80	00 (x12)
+	92	C2 (x3) Mark byte
+	93	FC Index mark
+	94	4E (x50)
+	--------- sector ID
+	144	00 (x12)
+	156	A1 (x3) Mark byte
+	159	FE Address mark
+	160	xx Track number
+	161	xx Side number
+	162	xx Sector number
+	163	xx Sector length
+	164/165	xx CRC
+	166	4E (x22)
+	--------- sector data
+	188	00 (x12)
+	200	A1 (x3) Mark byte
+	203	FB Data address mark
+	204	xx (x256) data
+	460	4E (x54)
+	(repeat from sector ID to fill track; end of track is padded with 4E)
 
     Note : "Self synch refers to a technique whereby two zeroes are inserted
     between each synch byte written to the disk.", i.e. "0xFF, 0xFF, 0xFF,
@@ -451,6 +476,7 @@ static UINT32 apple35_get_offset(floppy_image *floppy, int head, int track, int 
 static floperr_t apple35_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	UINT32 data_offset;
+//	printf("Read sector: T %d S %d H %d\n", track, sector, head);
 	data_offset = apple35_get_offset(floppy, head, track, sector, NULL);
 	if (data_offset == ~0)
 		return FLOPPY_ERROR_SEEKERROR;
@@ -479,6 +505,8 @@ static floperr_t apple35_read_sector_td(floppy_image *floppy, int head, int trac
 	UINT32 tag_offset = 0;
 
 	assert(buflen == 524);
+
+//	printf("Read sector TD: T %d S %d H %d\n", track, sector, head);
 
 	/* first read the sector */
 	err = apple35_read_sector(floppy, head, track, sector, ((UINT8 *) buffer) + 12, 512);
@@ -798,7 +826,7 @@ static FLOPPY_IDENTIFY(apple35_raw_identify)
 {
 	UINT64 size;
 	size = floppy_image_size(floppy);
-	*vote = ((size == 80*1*10*512) || (size == 80*2*10*512)
+	*vote = ((size == 80*1*10*512) || (size == 80*2*10*512) || (size == (80*2*18*512)+84)
 		|| (size == 80*2*18*512)) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -828,10 +856,10 @@ static FLOPPY_CONSTRUCT(apple35_raw_construct)
 			sides = 1;
 			is_1440k = FALSE;
 		}
-		else if ((size == 80*2*10*512) || (size == 80*2*18*512))
+		else if ((size == 80*2*10*512) || (size == 80*2*18*512) || (size == (80*2*18*512)+84))
 		{
 			sides = 2;
-			is_1440k = (size == 80*2*18*512);
+			is_1440k = (size == 80*2*18*512) || (size == (80*2*18*512)+84);
 		}
 		else
 			return FLOPPY_ERROR_INVALIDIMAGE;
@@ -1019,12 +1047,16 @@ static floperr_t apple35_2img_decode(floppy_image *floppy, UINT32 *image_format,
 
 	size = floppy_image_size(floppy);
 	if (size < sizeof(header))
+	{
 		return FLOPPY_ERROR_INVALIDIMAGE;
+	}
 
 	floppy_image_read(floppy, &header, 0, sizeof(header));
 
 	if (memcmp(header.magic, "2IMG", 4))
+	{
 		return FLOPPY_ERROR_INVALIDIMAGE;
+	}
 
 	header.header_length	= LITTLE_ENDIANIZE_INT16(header.header_length);
 	header.version			= LITTLE_ENDIANIZE_INT16(header.version);
@@ -1037,6 +1069,14 @@ static floperr_t apple35_2img_decode(floppy_image *floppy, UINT32 *image_format,
 	header.comment_length	= LITTLE_ENDIANIZE_INT32(header.comment_length);
 	header.creator_offset	= LITTLE_ENDIANIZE_INT32(header.creator_offset);
 	header.creator_length	= LITTLE_ENDIANIZE_INT32(header.creator_length);
+
+	// at least some images "in the wild" (e.g. TOSEC Minor Set 1) have big-endian data sizes
+	// even though that's against the .2mg spec
+	if (header.data_length == 0x800c00)
+	{
+		logerror("ap_dsk35: corrected bad-endian data length\n");
+		header.data_length = 0x0c8000;
+	}
 
 	if ((((UINT64) header.data_offset) + header.data_length) > size)
 		return FLOPPY_ERROR_INVALIDIMAGE;
