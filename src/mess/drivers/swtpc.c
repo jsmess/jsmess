@@ -6,7 +6,23 @@
 
         http://www.swtpc.com/mholley/swtpc_6800.htm
 
+    bios 0 (SWTBUG) is made for a PIA (parallel) interface.
+    bios 1 (MIKBUG) is made for a ACIA (serial) interface at the same address.
+    MIKBUG will actually read the bits as they arrive and assemble a byte.
+
+    Since the interface is optional, it is not on the schematics, so I've
+    looked at the code and come up with something horrible that works.
+
+    Note: All commands must be in uppercase. See the SWTBUG manual.
+
+    ToDo:
+        - Add PIA and work out the best way to hook up the keyboard. As can be
+          seen from the code below, it might be tricky.
+
+        - Finish conversion to modern.
+
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -19,19 +35,52 @@ public:
 	swtpc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	DECLARE_READ8_MEMBER(swtpc_status_r);
+	DECLARE_READ8_MEMBER(swtpc_terminal_r);
+	DECLARE_READ8_MEMBER(swtpc_tricky_r);
+	DECLARE_WRITE8_MEMBER(swtpc_terminal_w);
+	DECLARE_WRITE8_MEMBER(swtpc_kbd_put);
+	UINT8 m_term_data;
 };
 
-
-static WRITE8_HANDLER(swtpc_terminal_w)
+// bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal
+READ8_MEMBER(swtpc_state::swtpc_status_r)
 {
-	device_t *devconf = space->machine().device(TERMINAL_TAG);
-	terminal_write(devconf,0,data);
+	if (m_term_data)
+		return 3;
+	else
+		return 0x82;
+}
+
+READ8_MEMBER(swtpc_state::swtpc_terminal_r)
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER(swtpc_state::swtpc_tricky_r)
+{
+	UINT8 ret = m_term_data;
+	return ret;
+}
+
+// SWTBUG sends lots of nulls for slow terminals
+WRITE8_MEMBER(swtpc_state::swtpc_terminal_w)
+{
+	if (data)
+	{
+		device_t *devconf = machine().device(TERMINAL_TAG);
+		terminal_write(devconf,0,data);
+	}
 }
 
 
-static ADDRESS_MAP_START(swtpc_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(swtpc_mem, AS_PROGRAM, 8, swtpc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x8005, 0x8005 ) AM_WRITE(swtpc_terminal_w)
+	AM_RANGE( 0x8004, 0x8004 ) AM_READ(swtpc_status_r)
+	AM_RANGE( 0x8005, 0x8005 ) AM_READWRITE(swtpc_terminal_r,swtpc_terminal_w)
+	AM_RANGE( 0x8007, 0x8007 ) AM_READ(swtpc_tricky_r)
 	AM_RANGE( 0xa000, 0xa07f ) AM_RAM
 	AM_RANGE( 0xe000, 0xe3ff ) AM_MIRROR(0x1c00) AM_ROM
 ADDRESS_MAP_END
@@ -45,30 +94,31 @@ static MACHINE_RESET(swtpc)
 {
 }
 
-static WRITE8_DEVICE_HANDLER( swtpc_kbd_put )
+WRITE8_MEMBER( swtpc_state::swtpc_kbd_put )
 {
+	m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( swtpc_terminal_intf )
 {
-	DEVCB_HANDLER(swtpc_kbd_put)
+	DEVCB_DRIVER_MEMBER(swtpc_state, swtpc_kbd_put)
 };
 
 static MACHINE_CONFIG_START( swtpc, swtpc_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz)
-    MCFG_CPU_PROGRAM_MAP(swtpc_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(swtpc_mem)
 
-    MCFG_MACHINE_RESET(swtpc)
+	MCFG_MACHINE_RESET(swtpc)
 
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_terminal )
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, swtpc_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( swtpc )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "swt", "SWTBUG" )
 	ROMX_LOAD( "swtbug.bin", 0xe000, 0x0400, CRC(f9130ef4) SHA1(089b2d2a56ce9526c3e78ce5d49ce368b9eabc0c), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "mik", "MIKBUG" )
