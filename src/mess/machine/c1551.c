@@ -29,9 +29,7 @@
 #define M6510T_TAG		"u2"
 #define M6523_0_TAG		"u3"
 #define M6523_1_TAG		"ci_u2"
-
-#define SYNC \
-	!(m_mode && ((m_data & G64_SYNC_MARK) == G64_SYNC_MARK))
+#define C64H156_TAG		"u6"
 
 enum
 {
@@ -112,13 +110,13 @@ READ8_MEMBER( c1551_device::port_r )
 
         bit     description
 
-        P0      STP0A
-        P1      STP0B
-        P2      MTR0
-        P3      ACT0
+        P0      
+        P1      
+        P2      
+        P3      
         P4      WPS
-        P5      DS0
-        P6      DS1
+        P5      
+        P6      
         P7      BYTE LTCHED
 
 	*/   
@@ -126,10 +124,10 @@ READ8_MEMBER( c1551_device::port_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= !floppy_wpt_r(m_image) << 4;
+	data |= (!floppy_wpt_r(m_image)) << 4;
 
 	// byte latched
-	data |= (m_soe & m_byte) << 7;
+	data |= m_ga->atn_r() << 7;
 
 	return data;
 }
@@ -145,32 +143,24 @@ WRITE8_MEMBER( c1551_device::port_w )
         P1      STP0B
         P2      MTR0
         P3      ACT0
-        P4      WPS
+        P4      
         P5      DS0
         P6      DS1
-        P7      BYTE LTCHED
+        P7      
 
 	*/
 
 	// spindle motor
-	int mtr = BIT(data, 2);
-	spindle_motor(mtr);
+	m_ga->mtr_w(BIT(data, 2));
 
 	// stepper motor
-	int stp = data & 0x03;
-	step_motor(mtr, stp);
+	m_ga->stp_w(data & 0x03);
 
 	// activity LED
-	output_set_led_value(LED_ACT, BIT(data, 6));
+	output_set_led_value(LED_ACT, BIT(data, 3));
 
 	// density select
-	int ds = (data >> 5) & 0x03;
-
-	if (m_ds != ds)
-	{
-		m_bit_timer->adjust(attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
-		m_ds = ds;
-	}
+	m_ga->ds_w((data >> 5) & 0x03);
 }
 
 
@@ -229,50 +219,6 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
 }
 
 
-READ8_MEMBER( c1551_device::yb_r )
-{
-	/*
-
-        bit     description
-
-        PB0     YB0
-        PB1     YB1
-        PB2     YB2
-        PB3     YB3
-        PB4     YB4
-        PB5     YB5
-        PB6     YB6
-        PB7     YB7
-
-	*/
-
-	m_byte = 0;
-
-	return m_yb;
-}
-
-
-WRITE8_MEMBER( c1551_device::yb_w )
-{
-	/*
-
-        bit     description
-
-        PB0     YB0
-        PB1     YB1
-        PB2     YB2
-        PB3     YB3
-        PB4     YB4
-        PB5     YB5
-        PB6     YB6
-        PB7     YB7
-
-	*/
-
-	m_yb = data;
-}
-
-
 READ8_MEMBER( c1551_device::tpi0_pc_r )
 {
 	/*
@@ -296,7 +242,7 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	data |= m_config.m_address << 5;
 
 	// SYNC detect line
-	data |= SYNC << 6;
+	data |= m_ga->sync_r() << 6;
 
 	// TCBM data valid
 	data |= m_dav << 7;
@@ -331,7 +277,7 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 	m_ack = BIT(data, 3);
 
 	// read/write mode
-	m_mode = BIT(data, 4);
+	m_ga->oe_w(BIT(data, 4));
 }
 
 
@@ -340,8 +286,8 @@ static const tpi6525_interface tpi0_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, yb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, yb_w),
+	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
+	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi0_pc_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi0_pc_w),
 	DEVCB_NULL,
@@ -386,7 +332,7 @@ READ8_MEMBER( c1551_device::tpi1_pc_r )
         PC3
         PC4
         PC5
-        PC6     TCBM DAV
+        PC6     
         PC7     TCBM ACK
 
 	*/
@@ -413,7 +359,7 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
         PC4
         PC5
         PC6     TCBM DAV
-        PC7     TCBM ACK
+        PC7     
 
 	*/
 
@@ -475,6 +421,18 @@ static const floppy_config c1551_floppy_config =
 
 
 //-------------------------------------------------
+//  C64H156_INTERFACE( ga_intf )
+//-------------------------------------------------
+
+static C64H156_INTERFACE( ga_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE_MEMBER(c64h156_device, atni_w)
+};
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1551 )
 //-------------------------------------------------
 
@@ -487,6 +445,7 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf)
 
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_config)
+	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 
 
@@ -503,146 +462,6 @@ machine_config_constructor c1551_device_config::device_mconfig_additions() const
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  read_current_track - 
-//-------------------------------------------------
-
-inline void c1551_device::read_current_track()
-{
-	m_track_len = G64_BUFFER_SIZE;
-	m_buffer_pos = 0;
-	m_bit_pos = 7;
-	m_bit_count = 0;
-
-	// read track data
-	floppy_drive_read_track_data_info_buffer(m_image, 0, m_track_buffer, &m_track_len);
-
-	// extract track length
-	m_track_len = floppy_drive_get_current_track_size(m_image, 0);
-}
-
-
-//-------------------------------------------------
-//  on_disk_change - 
-//-------------------------------------------------
-
-void c1551_device::on_disk_change(device_image_interface &image)
-{
-    c1551_device *c1551 = static_cast<c1551_device *>(image.device().owner());
-
-	c1551->read_current_track();
-}
-
-
-//-------------------------------------------------
-//  spindle_motor - 
-//-------------------------------------------------
-
-inline void c1551_device::spindle_motor(int mtr)
-{
-	if (m_mtr != mtr)
-	{
-		if (mtr)
-		{
-			// read track data
-			read_current_track();
-		}
-
-		floppy_mon_w(m_image, !mtr);
-		m_bit_timer->enable(mtr);
-
-		m_mtr = mtr;
-	}
-}
-
-
-//-------------------------------------------------
-//  step_motor - 
-//-------------------------------------------------
-
-inline void c1551_device::step_motor(int mtr, int stp)
-{
-	if (mtr && (m_stp != stp))
-	{
-		int tracks = 0;
-
-		switch (m_stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			// step read/write head
-			floppy_drive_seek(m_image, tracks);
-
-			// read new track data
-			read_current_track();
-		}
-
-		m_stp = stp;
-	}
-}
-
-
-//-------------------------------------------------
-//  receive_bit - 
-//-------------------------------------------------
-
-inline void c1551_device::receive_bit()
-{
-	int byte = 0;
-
-	// shift in data from the read head
-	m_data <<= 1;
-	m_data |= BIT(m_track_buffer[m_buffer_pos], m_bit_pos);
-	m_bit_pos--;
-	m_bit_count++;
-
-	if (m_bit_pos < 0)
-	{
-		m_bit_pos = 7;
-		m_buffer_pos++;
-
-		if (m_buffer_pos >= m_track_len)
-		{
-			// loop to the start of the track
-			m_buffer_pos = 0;
-		}
-	}
-
-	if (!SYNC)
-	{
-		// SYNC detected
-		m_bit_count = 0;
-	}
-
-	if (m_bit_count > 7)
-	{
-		// byte ready
-		m_bit_count = 0;
-		byte = 1;
-
-		m_yb = m_data & 0xff;
-
-		if (!m_yb)
-		{
-			// simulate weak bits with randomness
-			m_yb = m_machine.rand() & 0xff;
-		}
-
-		m_byte = byte;
-	}
-}
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -655,17 +474,12 @@ c1551_device::c1551_device(running_machine &_machine, const c1551_device_config 
 	  m_maincpu(*this, M6510T_TAG),
 	  m_tpi0(*this, M6523_0_TAG),
 	  m_tpi1(*this, M6523_1_TAG),
+	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
 	  m_tcbm_data(0),
 	  m_status(0),
 	  m_dav(0),
 	  m_ack(0),
-	  m_stp(0),
-	  m_mtr(0),
-	  m_ds(0),
-	  m_soe(0),
-	  m_byte(0),
-	  m_mode(0),
       m_config(_config)
 {
 }
@@ -677,13 +491,8 @@ c1551_device::c1551_device(running_machine &_machine, const c1551_device_config 
 
 void c1551_device::device_start()
 {
-	// install image callbacks
-	floppy_install_unload_proc(m_image, c1551_device::on_disk_change);
-	floppy_install_load_proc(m_image, c1551_device::on_disk_change);
-
-	// allocate data timer
-	m_bit_timer = timer_alloc(TIMER_BIT);
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	// allocate timers
+	m_irq_timer = timer_alloc();
 	m_irq_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 
 	// map TPI1 to host CPU memory space
@@ -692,23 +501,15 @@ void c1551_device::device_start()
 
 	program->install_legacy_readwrite_handler(*m_tpi1, start_address, start_address + 7, FUNC(tpi6525_r), FUNC(tpi6525_w));
 
+	// install image callbacks
+	floppy_install_unload_proc(m_image, c1551_device::on_disk_change);
+	floppy_install_load_proc(m_image, c1551_device::on_disk_change);
+
 	// register for state saving
 	save_item(NAME(m_tcbm_data));
 	save_item(NAME(m_status));
 	save_item(NAME(m_dav));
 	save_item(NAME(m_ack));
-	save_item(NAME(m_stp));
-	save_item(NAME(m_mtr));
-	save_item(NAME(m_track_len));
-	save_item(NAME(m_buffer_pos));
-	save_item(NAME(m_bit_pos));
-	save_item(NAME(m_bit_count));
-	save_item(NAME(m_data));
-	save_item(NAME(m_yb));
-	save_item(NAME(m_ds));
-	save_item(NAME(m_soe));
-	save_item(NAME(m_byte));
-	save_item(NAME(m_mode));
 }
 
 
@@ -718,7 +519,11 @@ void c1551_device::device_start()
 
 void c1551_device::device_reset()
 {
-	m_soe = 1;
+	// initialize gate array
+	m_ga->test_w(1);
+	m_ga->soe_w(1);
+	m_ga->accl_w(1);
+	m_ga->atna_w(1);
 }
 
 
@@ -728,15 +533,18 @@ void c1551_device::device_reset()
 
 void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (id)
-	{
-	case TIMER_BIT:
-		receive_bit();
-		break;
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+}
 
-	case TIMER_IRQ:
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-		break;
-	}
+
+//-------------------------------------------------
+//  on_disk_change - 
+//-------------------------------------------------
+
+void c1551_device::on_disk_change(device_image_interface &image)
+{
+    c1551_device *c1551 = static_cast<c1551_device *>(image.device().owner());
+
+	c1551->m_ga->on_disk_changed();
 }

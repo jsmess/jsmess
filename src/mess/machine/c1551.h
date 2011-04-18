@@ -19,6 +19,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
+#include "machine/64h156.h"
 #include "machine/6525tpi.h"
 
 
@@ -81,19 +82,19 @@ public:
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
-	READ8_MEMBER( port_r );
-	WRITE8_MEMBER( port_w );
-	READ8_MEMBER( tcbm_data_r );
-	WRITE8_MEMBER( tcbm_data_w );
-	READ8_MEMBER( yb_r );
-	WRITE8_MEMBER( yb_w );
-	READ8_MEMBER( tpi0_pc_r );
-	WRITE8_MEMBER( tpi0_pc_w );
-	READ8_MEMBER( tpi1_pa_r );
-	WRITE8_MEMBER( tpi1_pa_w );
-	READ8_MEMBER( tpi1_pb_r );
-	READ8_MEMBER( tpi1_pc_r );
-	WRITE8_MEMBER( tpi1_pc_w );
+	DECLARE_READ8_MEMBER( port_r );
+	DECLARE_WRITE8_MEMBER( port_w );
+	DECLARE_READ8_MEMBER( tcbm_data_r );
+	DECLARE_WRITE8_MEMBER( tcbm_data_w );
+	DECLARE_READ8_MEMBER( yb_r );
+	DECLARE_WRITE8_MEMBER( yb_w );
+	DECLARE_READ8_MEMBER( tpi0_pc_r );
+	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
+	DECLARE_READ8_MEMBER( tpi1_pa_r );
+	DECLARE_WRITE8_MEMBER( tpi1_pa_w );
+	DECLARE_READ8_MEMBER( tpi1_pb_r );
+	DECLARE_READ8_MEMBER( tpi1_pc_r );
+	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
 
 protected:
     // device-level overrides
@@ -101,18 +102,11 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	inline void read_current_track();
-	inline void spindle_motor(int mtr);
-	inline void step_motor(int mtr, int stp);
-	inline void receive_bit();
-
 private:
-	static const device_timer_id TIMER_BIT = 0;
-	static const device_timer_id TIMER_IRQ = 1;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_tpi0;
 	required_device<device_t> m_tpi1;
+	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
 
 	// TCBM bus
@@ -121,27 +115,7 @@ private:
 	int m_dav;								// data valid
 	int m_ack;								// acknowledge
 
-	// motors
-	int m_stp;								// stepper motor phase
-	int m_mtr;								// spindle motor on
-
-	// track
-	UINT8 m_track_buffer[G64_BUFFER_SIZE];	// track data buffer
-	int m_track_len;						// track length
-	int m_buffer_pos;						// current byte position within track buffer
-	int m_bit_pos;							// current bit position within track buffer byte
-	int m_bit_count;						// current data byte bit counter
-	UINT16 m_data;							// data shift register
-	UINT8 m_yb;								// GCR data byte
-
-	// signals
-	int m_ds;								// density select
-	int m_soe;								// s? output enable
-	int m_byte;								// byte ready
-	int m_mode;								// mode (0 = write, 1 = read)
-
 	// timers
-	emu_timer *m_bit_timer;
 	emu_timer *m_irq_timer;
 
     const c1551_device_config &m_config;
