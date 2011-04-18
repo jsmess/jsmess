@@ -7,30 +7,151 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __C1551__
 #define __C1551__
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
+#include "cpu/m6502/m6502.h"
+#include "imagedev/flopdrv.h"
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
+#include "machine/6525tpi.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(C1551, c1551);
 
-#define MCFG_C1551_ADD(_tag, _cpu_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C1551, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1551_config, cpu_tag, _cpu_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1551_config, address, _address)
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+#define MCFG_C1551_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1551, 0) \
+	c1551_device_config::static_set_config(device, _address);
 
-typedef struct _c1551_config c1551_config;
-struct _c1551_config
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> c1551_device_config
+
+class c1551_device_config :   public device_config
 {
-	const char *cpu_tag;		/* CPU to hook into */
-	int address;				/* bus address */
+    friend class c1551_device;
+
+    // construction/destruction
+    c1551_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+	// inline configuration helpers
+	static void static_set_config(device_config *device, int address);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+	
+private:
+	const char *m_cpu_tag;
+	int m_address;
 };
+
+
+// ======================> c1551_device
+
+class c1551_device :  public device_t
+{
+    friend class c1551_device_config;
+
+    // construction/destruction
+    c1551_device(running_machine &_machine, const c1551_device_config &_config);
+
+public:
+	// not really public
+	static void on_disk_change(device_image_interface &image);
+
+	READ8_MEMBER( port_r );
+	WRITE8_MEMBER( port_w );
+	READ8_MEMBER( tcbm_data_r );
+	WRITE8_MEMBER( tcbm_data_w );
+	READ8_MEMBER( yb_r );
+	WRITE8_MEMBER( yb_w );
+	READ8_MEMBER( tpi0_pc_r );
+	WRITE8_MEMBER( tpi0_pc_w );
+	READ8_MEMBER( tpi1_pa_r );
+	WRITE8_MEMBER( tpi1_pa_w );
+	READ8_MEMBER( tpi1_pb_r );
+	READ8_MEMBER( tpi1_pc_r );
+	WRITE8_MEMBER( tpi1_pc_w );
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	inline void read_current_track();
+	inline void spindle_motor(int mtr);
+	inline void step_motor(int mtr, int stp);
+	inline void receive_bit();
+
+private:
+	static const device_timer_id TIMER_BIT = 0;
+	static const device_timer_id TIMER_IRQ = 1;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_tpi0;
+	required_device<device_t> m_tpi1;
+	required_device<device_t> m_image;
+
+	// TCBM bus
+	UINT8 m_tcbm_data;						// data
+	int m_status;							// status
+	int m_dav;								// data valid
+	int m_ack;								// acknowledge
+
+	// motors
+	int m_stp;								// stepper motor phase
+	int m_mtr;								// spindle motor on
+
+	// track
+	UINT8 m_track_buffer[G64_BUFFER_SIZE];	// track data buffer
+	int m_track_len;						// track length
+	int m_buffer_pos;						// current byte position within track buffer
+	int m_bit_pos;							// current bit position within track buffer byte
+	int m_bit_count;						// current data byte bit counter
+	UINT16 m_data;							// data shift register
+	UINT8 m_yb;								// GCR data byte
+
+	// signals
+	int m_ds;								// density select
+	int m_soe;								// s? output enable
+	int m_byte;								// byte ready
+	int m_mode;								// mode (0 = write, 1 = read)
+
+	// timers
+	emu_timer *m_bit_timer;
+	emu_timer *m_irq_timer;
+
+    const c1551_device_config &m_config;
+};
+
+
+
+// device type definition
+extern const device_type C1551;
+
+
+
 #endif
