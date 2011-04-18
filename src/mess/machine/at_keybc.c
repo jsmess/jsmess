@@ -9,9 +9,6 @@
 #include "cpu/mcs48/mcs48.h"
 
 
-#define LOG		0
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -161,10 +158,6 @@ void at_keyboard_controller_device::device_start()
 	// register for save states
 	save_item(NAME(m_clock_signal));
 	save_item(NAME(m_data_signal));
-	save_item(NAME(m_my_clock_signal));
-	save_item(NAME(m_my_data_signal));
-	save_item(NAME(m_in_clock_signal));
-	save_item(NAME(m_in_data_signal));
 }
 
 /*-------------------------------------------------
@@ -229,21 +222,8 @@ WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
 	devcb_call_write_line(&m_input_buffer_full_func, BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 	devcb_call_write_line(&m_output_buffer_empty_func, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_my_clock_signal = !BIT(data, 6);
-	m_my_data_signal = BIT(data, 7);
-
-	update_signals();
-}
-
-
-void at_keyboard_controller_device::update_signals()
-{
-	m_clock_signal = m_my_clock_signal ? m_in_clock_signal : m_my_clock_signal;
-
-	m_data_signal = m_my_data_signal ? m_in_data_signal : m_my_data_signal;
-
-	if (LOG)
-		logerror("at_kbdc: signals: clock = %d, data = %d (myclock = %d, mydata = %d, inclock=%d, indata=%d)\n", m_clock_signal, m_data_signal, m_my_clock_signal, m_my_data_signal, m_in_clock_signal, m_in_data_signal);
+	m_clock_signal = !BIT(data, 6);
+	m_data_signal = BIT(data, 7);
 
 	devcb_call_write_line(&m_keyboard_data_func, m_data_signal);
 	devcb_call_write_line(&m_keyboard_clock_func, m_clock_signal);
@@ -276,12 +256,10 @@ WRITE8_MEMBER( at_keyboard_controller_device::command_w )
 
 WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_clock_w )
 {
-	m_in_clock_signal = state;
-	update_signals();
+	m_clock_signal = state;
 }
 
 WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_data_w )
 {
-	m_in_data_signal = state;
-	update_signals();
+	m_data_signal = state;
 }
