@@ -155,7 +155,6 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
 	MCFG_CPU_IO_MAP(kb_cop_io_map)
 	MCFG_CPU_CONFIG(cop_intf)
-	MCFG_DEVICE_DISABLE()
 	
 	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
@@ -399,10 +398,10 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROMX_LOAD( "341-0176-a", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8)) /* 341-0176-A LISA Bootrom Rev A (10/12/82?) (Low) */
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	/* note: other ?prototype? revisions of this rom for the lisa probably exist as well */
@@ -442,10 +441,10 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROMX_LOAD( "341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low) */
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port */
@@ -475,10 +474,10 @@ ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built
 	ROMX_LOAD( "341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(3)) /* 341-0176-F LISA Bootrom Rev F (12/21/83) (Low) */
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
@@ -503,10 +502,10 @@ ROM_START( macxl )
 	ROM_LOAD16_BYTE( "341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) /* 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)*/
 
 	ROM_REGION( 0x400, COP421_TAG, 0 )
-	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, BAD_DUMP CRC(213f75b3) SHA1(8ebefdb6c76cf8e177f13455a8ec66034d3413e3) ) // wrong bit order
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 	ROM_REGION( 0x400, KB_COP421_TAG, 0 )
-	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b) )
 
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
