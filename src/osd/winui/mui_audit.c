@@ -149,62 +149,38 @@ BOOL IsAuditResultNo(int audit_result)
 /***************************************************************************
     Internal functions
  ***************************************************************************/
-/*
-static void MameUIOutput(void *param, const char *format, va_list argptr)
-{
-	char buffer[512];
-	vsnprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), format, argptr);
-	DetailsPrintf("%s", buffer);
-}
-*/
-/*static int ProcessAuditResults(int game, audit_record *audit, int audit_records)
-{
-	output_callback_func prevcb;
-	void *prevparam;
-	int res;
-
-	mame_set_output_channel(OUTPUT_CHANNEL_INFO, MameUIOutput, NULL, &prevcb, &prevparam);
-	res = TRUE;//audit_summary(&driver_list::driver(game), audit_records, audit, TRUE);
-	mame_set_output_channel(OUTPUT_CHANNEL_INFO, prevcb ? prevcb : mame_null_output_callback, prevparam, NULL, NULL);
-
-	return res;
-}*/
-
 // Verifies the ROM set while calling SetRomAuditResults	
 int MameUIVerifyRomSet(int game)
 {
-
-	//audit_record *audit;
-	//int audit_records;
-	//int res;
-
-	// perform the audit
-	//audit_records = audit_images(MameUIGlobal(), &driver_list::driver(game), AUDIT_VALIDATE_FAST, &audit);
-	//res = ProcessAuditResults(game, audit, audit_records);
-	//if (audit_records > 0)
-//		global_free(audit);
-
-//	SetRomAuditResults(game, res);
-//	return res;
-return TRUE;
+	driver_enumerator enumerator(MameUIGlobal(), driver_list::driver(game));
+	enumerator.next();
+	media_auditor auditor(enumerator);
+	media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+	
+	// output the summary of the audit
+	astring summary_string;
+	auditor.summarize(&summary_string);
+	DetailsPrintf("%s", summary_string.cstr());	
+	
+	SetRomAuditResults(game, summary);
+	return summary;
 }
 
 // Verifies the Sample set while calling SetSampleAuditResults	
 int MameUIVerifySampleSet(int game)
 {
-//	audit_record *audit;
-//	int audit_records;
-//	int res;
-
-	// perform the audit
-	//audit_records = audit_samples(MameUIGlobal(), &driver_list::driver(game), &audit);
-//	res = ProcessAuditResults(game, audit, audit_records);
-//	if (audit_records > 0)
-//		global_free(audit);
-
-	//SetSampleAuditResults(game, res);
-	//return res;
-	return TRUE;
+	driver_enumerator enumerator(MameUIGlobal(), driver_list::driver(game));
+	enumerator.next();
+	media_auditor auditor(enumerator);
+	media_auditor::summary summary = auditor.audit_samples();
+	
+	// output the summary of the audit
+	astring summary_string;
+	auditor.summarize(&summary_string);
+	DetailsPrintf("%s", summary_string.cstr());	
+	
+	SetSampleAuditResults(game, summary);
+	return summary;
 }
 
 static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
