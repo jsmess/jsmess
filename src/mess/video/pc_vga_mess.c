@@ -536,8 +536,8 @@ static void vga_cpu_interface(running_machine &machine)
 {
 	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 	static int sequencer, gc;
-	read8_space_func read_handler;
-	write8_space_func write_handler;
+	read8_space_func read_handler; const char *read_handler_name;
+	write8_space_func write_handler; const char *write_handler_name;
 	read16_space_func read_handler16;
 	write16_space_func write_handler16;
 	read32_space_func read_handler32;
@@ -554,8 +554,8 @@ static void vga_cpu_interface(running_machine &machine)
 
 	if (vga.sequencer.data[4]&8)
 	{
-		read_handler = vga_vga_r;
-		write_handler = vga_vga_w;
+		read_handler = vga_vga_r; read_handler_name = "vga_vga_r";
+		write_handler = vga_vga_w; write_handler_name = "vga_vga_w";
 		read_handler16 = vga_vga16_r;
 		write_handler16 = vga_vga16_w;
 		read_handler32 = vga_vga32_r;
@@ -565,8 +565,8 @@ static void vga_cpu_interface(running_machine &machine)
 	}
 	else if (vga.sequencer.data[4] & 4)
 	{
-		read_handler = vga_ega_r;
-		write_handler = vga_ega_w;
+		read_handler = vga_ega_r; read_handler_name = "vga_ega_r";
+		write_handler = vga_ega_w; read_handler_name = "vga_ega_w";
 		read_handler16 = vga_ega16_r;
 		write_handler16 = vga_ega16_w;
 		read_handler32 = vga_ega32_r;
@@ -576,8 +576,8 @@ static void vga_cpu_interface(running_machine &machine)
 	}
 	else
 	{
-		read_handler = vga_text_r;
-		write_handler = vga_text_w;
+		read_handler = vga_text_r; read_handler_name = "vga_text_r";
+		write_handler = vga_text_w; read_handler_name = "vga_text_w";
 		read_handler16 = vga_text16_r;
 		write_handler16 = vga_text16_w;
 		read_handler32 = vga_text32_r;
@@ -596,18 +596,18 @@ static void vga_cpu_interface(running_machine &machine)
 			case 0x00:
 				if (vga.vga_intf.vga_memory_bank != NULL)
 				{
-					vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, write_handler);
+					vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, read_handler_name, write_handler, write_handler_name);
 					memory_set_bankptr(machine, vga.vga_intf.vga_memory_bank, vga.memory);
 				}
 				break;
 			case 0x04:
-				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xAFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xAFFFF, read_handler, read_handler_name, write_handler, write_handler_name);
 				break;
 			case 0x08:
-				vga.vga_intf.map_vga_memory(machine, 0xB0000, 0xB7FFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xB0000, 0xB7FFF, read_handler, read_handler_name, write_handler, write_handler_name);
 				break;
 			case 0x0C:
-				vga.vga_intf.map_vga_memory(machine, 0xB8000, 0xBFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xB8000, 0xBFFFF, read_handler, read_handler_name, write_handler, write_handler_name);
 				break;
 		}
 	}
@@ -620,12 +620,12 @@ static void vga_cpu_interface(running_machine &machine)
 				sel = vga.gc.data[6] & 0x0c;
 				if (sel)
 				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, FUNC(read_handler) ); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, FUNC(read_handler) ); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, FUNC(read_handler) ); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, FUNC(write_handler)); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, FUNC(write_handler)); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, FUNC(write_handler)); else space->nop_write(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler, read_handler_name ); else space->nop_read(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler, read_handler_name ); else space->nop_read(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler, read_handler_name ); else space->nop_read(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
 				}
 				else
 				{
@@ -639,12 +639,12 @@ static void vga_cpu_interface(running_machine &machine)
 				sel = vga.gc.data[6] & 0x0c;
 				if (sel)
 				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, FUNC(read_handler16) ); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, FUNC(read_handler16) ); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, FUNC(read_handler16) ); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, FUNC(write_handler16)); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, FUNC(write_handler16)); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, FUNC(write_handler16)); else space->nop_write(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler16, read_handler_name ); else space->nop_read(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler16, read_handler_name ); else space->nop_read(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler16, read_handler_name ); else space->nop_read(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler16, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler16, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler16, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
 				}
 				else
 				{
@@ -658,12 +658,12 @@ static void vga_cpu_interface(running_machine &machine)
 				sel = vga.gc.data[6] & 0x0c;
 				if (sel)
 				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, FUNC(read_handler32) ); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, FUNC(read_handler32) ); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, FUNC(read_handler32) ); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, FUNC(write_handler32)); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, FUNC(write_handler32)); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, FUNC(write_handler32)); else space->nop_write(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler32, read_handler_name ); else space->nop_read(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler32, read_handler_name ); else space->nop_read(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler32, read_handler_name ); else space->nop_read(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler32, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler32, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler32, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
 				}
 				else
 				{
@@ -677,12 +677,12 @@ static void vga_cpu_interface(running_machine &machine)
 				sel = vga.gc.data[6] & 0x0c;
 				if (sel)
 				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, FUNC(read_handler64) ); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, FUNC(read_handler64) ); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, FUNC(read_handler64) ); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, FUNC(write_handler64)); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, FUNC(write_handler64)); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, FUNC(write_handler64)); else space->nop_write(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler64, read_handler_name ); else space->nop_read(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler64, read_handler_name ); else space->nop_read(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler64, read_handler_name ); else space->nop_read(0xb8000, 0xbffff);
+					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler64, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
+					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler64, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
+					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler64, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
 				}
 				else
 				{

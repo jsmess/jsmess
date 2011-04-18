@@ -3157,7 +3157,7 @@ static STATE_POSTLOAD( mac_state_load )
 
 DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 {
-	mac_state *mac = machine->driver_data<mac_state>();
+	mac_state *mac = machine.driver_data<mac_state>();
 
 	if (mac->m_overlay != -1)
 	{
@@ -3224,7 +3224,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(overlay_opbaseoverride, machine));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
 	}
 
 	/* setup keyboard */

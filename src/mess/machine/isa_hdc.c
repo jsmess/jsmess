@@ -206,9 +206,9 @@ void isa8_hdc_device::device_start()
 {        	
 	m_isa->add_isa_card(this, m_config.m_isa_num);
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
-	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, pc_HDC_r, pc_HDC_w );	
+	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );	
 	buffer = auto_alloc_array(m_machine, UINT8, 17*4*512);
-	timer = m_machine.scheduler().timer_alloc(FUNC(&pc_hdc_command), this);
+	timer = m_machine.scheduler().timer_alloc(FUNC(pc_hdc_command), this);
 }
 
 //-------------------------------------------------

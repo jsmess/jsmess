@@ -125,7 +125,7 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
 void isa8_fdc_device::device_start()
 {        
 	m_isa->add_isa_card(this, m_config.m_isa_num);
-	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, pc_fdc_r, pc_fdc_w );	
+	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );	
 }
 
 //-------------------------------------------------

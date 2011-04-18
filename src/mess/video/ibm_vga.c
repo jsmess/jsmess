@@ -330,15 +330,15 @@ void ibm_vga_device::device_start()
 	switch(buswidth)
 	{
 		case 8:
-			spaceio->install_readwrite_handler(0x3b0, 0x3bf, read8_delegate_create(ibm_vga_device,vga_port_03b0_r, *this), write8_delegate_create(ibm_vga_device,vga_port_03b0_w, *this));
-			spaceio->install_readwrite_handler(0x3c0, 0x3cf, read8_delegate_create(ibm_vga_device,vga_port_03c0_r, *this), write8_delegate_create(ibm_vga_device,vga_port_03c0_w, *this));
-			spaceio->install_readwrite_handler(0x3d0, 0x3df, read8_delegate_create(ibm_vga_device,vga_port_03d0_r, *this), write8_delegate_create(ibm_vga_device,vga_port_03d0_w, *this));
+			spaceio->install_readwrite_handler(0x3b0, 0x3bf, read8_delegate(FUNC(ibm_vga_device::vga_port_03b0_r), this), write8_delegate(FUNC(ibm_vga_device::vga_port_03b0_w), this));
+			spaceio->install_readwrite_handler(0x3c0, 0x3cf, read8_delegate(FUNC(ibm_vga_device::vga_port_03c0_r), this), write8_delegate(FUNC(ibm_vga_device::vga_port_03c0_w), this));
+			spaceio->install_readwrite_handler(0x3d0, 0x3df, read8_delegate(FUNC(ibm_vga_device::vga_port_03d0_r), this), write8_delegate(FUNC(ibm_vga_device::vga_port_03d0_w), this));
 			break;
 
 		case 16:
-			spaceio->install_readwrite_handler(0x3b0, 0x3bf, read8_delegate_create(ibm_vga_device,vga_port_03b0_r, *this), write8_delegate_create(ibm_vga_device,vga_port_03b0_w, *this), 0xffff);
-			spaceio->install_readwrite_handler(0x3c0, 0x3cf, read8_delegate_create(ibm_vga_device,vga_port_03c0_r, *this), write8_delegate_create(ibm_vga_device,vga_port_03c0_w, *this), 0xffff);
-			spaceio->install_readwrite_handler(0x3d0, 0x3df, read8_delegate_create(ibm_vga_device,vga_port_03d0_r, *this), write8_delegate_create(ibm_vga_device,vga_port_03d0_w, *this), 0xffff);
+			spaceio->install_readwrite_handler(0x3b0, 0x3bf, read8_delegate(FUNC(ibm_vga_device::vga_port_03b0_r), this), write8_delegate(FUNC(ibm_vga_device::vga_port_03b0_w), this), 0xffff);
+			spaceio->install_readwrite_handler(0x3c0, 0x3cf, read8_delegate(FUNC(ibm_vga_device::vga_port_03c0_r), this), write8_delegate(FUNC(ibm_vga_device::vga_port_03c0_w), this), 0xffff);
+			spaceio->install_readwrite_handler(0x3d0, 0x3df, read8_delegate(FUNC(ibm_vga_device::vga_port_03d0_r), this), write8_delegate(FUNC(ibm_vga_device::vga_port_03d0_w), this), 0xffff);
 			break;
 
 		case 32:

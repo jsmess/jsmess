@@ -231,7 +231,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 
 //-------------------------------------------------
-//  listxml - output the XML data for one or more 
+//  listxml - output the XML data for one or more
 //  games
 //-------------------------------------------------
 
@@ -249,10 +249,10 @@ void cli_frontend::listxml(const char *gamename)
 
 
 //-------------------------------------------------
-//  listfull - output the name and description of 
+//  listfull - output the name and description of
 //  one or more games
 //-------------------------------------------------
-  
+
 void cli_frontend::listfull(const char *gamename)
 {
 	// determine which drivers to output; return an error if none found
@@ -271,7 +271,7 @@ void cli_frontend::listfull(const char *gamename)
 
 
 //-------------------------------------------------
-//  listsource - output the name and source 
+//  listsource - output the name and source
 //  filename of one or more games
 //-------------------------------------------------
 
@@ -290,7 +290,7 @@ void cli_frontend::listsource(const char *gamename)
 
 
 //-------------------------------------------------
-//  listclones - output the name and parent of all 
+//  listclones - output the name and parent of all
 //  clones matching the given pattern
 //-------------------------------------------------
 
@@ -299,7 +299,7 @@ void cli_frontend::listclones(const char *gamename)
 	// start with a filtered list of drivers
 	driver_enumerator drivlist(m_options, gamename);
 	int original_count = drivlist.count();
-	
+
 	// iterate through the remaining ones to see if their parent matches
 	while (drivlist.next_excluded())
 	{
@@ -309,7 +309,7 @@ void cli_frontend::listclones(const char *gamename)
 			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
 				drivlist.include();
 	}
-	
+
 	// return an error if none found
 	if (drivlist.count() == 0)
 	{
@@ -336,8 +336,8 @@ void cli_frontend::listclones(const char *gamename)
 
 
 //-------------------------------------------------
-//  listbrothers - for each matching game, output 
-//  the list of other games that share the same 
+//  listbrothers - for each matching game, output
+//  the list of other games that share the same
 //  source file
 //-------------------------------------------------
 
@@ -358,14 +358,14 @@ void cli_frontend::listbrothers(const char *gamename)
 		// if we are already marked in the final list, we don't need to do anything
 		if (drivlist.included(initial_drivlist.current()))
 			continue;
-		
+
 		// otherwise, walk excluded items in the final list and mark any that match
 		drivlist.reset();
 		while (drivlist.next_excluded())
 			if (strcmp(drivlist.driver().source_file, initial_drivlist.driver().source_file) == 0)
 				drivlist.include();
 	}
-	
+
 	// print the header
 	mame_printf_info("Source file:     Name:            Parent:\n");
 
@@ -381,7 +381,7 @@ void cli_frontend::listbrothers(const char *gamename)
 
 
 //-------------------------------------------------
-//  listcrc - output the CRC and name of all ROMs 
+//  listcrc - output the CRC and name of all ROMs
 //  referenced by the emulator
 //-------------------------------------------------
 
@@ -407,7 +407,7 @@ void cli_frontend::listcrc(const char *gamename)
 
 
 //-------------------------------------------------
-//  listroms - output the list of ROMs referenced 
+//  listroms - output the list of ROMs referenced
 //  by a given game or set of games
 //-------------------------------------------------
 
@@ -469,7 +469,7 @@ void cli_frontend::listroms(const char *gamename)
 
 
 //-------------------------------------------------
-//  listsamples - output the list of samples 
+//  listsamples - output the list of samples
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
@@ -491,7 +491,7 @@ void cli_frontend::listsamples(const char *gamename)
 				break;
 		if (devconfig == NULL)
 			continue;
-	
+
 		// print a header
 		if (!first)
 			mame_printf_info("\n");
@@ -514,7 +514,7 @@ void cli_frontend::listsamples(const char *gamename)
 
 
 //-------------------------------------------------
-//  listdevices - output the list of devices 
+//  listdevices - output the list of devices
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
@@ -575,7 +575,7 @@ void cli_frontend::listmedia(const char *gamename)
 	// iterate over drivers
 	while (drivlist.next())
 	{
-		// iterate 
+		// iterate
 		const device_config_image_interface *imagedev = NULL;
 		bool first = true;
 		for (bool gotone = drivlist.config().m_devicelist.first(imagedev); gotone; gotone = imagedev->next(imagedev))
@@ -596,12 +596,12 @@ void cli_frontend::listmedia(const char *gamename)
 				if (end == -1)
 					break;
 			}
-			
+
 			// end the line
 			printf("\n");
 			first = false;
 		}
-		
+
 		// if we didn't get any at all, just print a none line
 		if (first)
 			printf("%-13s(none)\n", drivlist.driver().name);
@@ -610,7 +610,7 @@ void cli_frontend::listmedia(const char *gamename)
 
 
 //-------------------------------------------------
-//  verifyroms - verify the ROM sets of one or 
+//  verifyroms - verify the ROM sets of one or
 //  more games
 //-------------------------------------------------
 
@@ -636,7 +636,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		astring summary_string;
 		auditor.summarize(&summary_string);
 		mame_printf_info("%s", summary_string.cstr());
-		
+
 		// if not found, count that and leave it at that
 		if (summary == media_auditor::NOTFOUND)
 			notfound++;
@@ -667,7 +667,7 @@ void cli_frontend::verifyroms(const char *gamename)
 					mame_printf_info("is best available\n");
 					correct++;
 					break;
-				
+
 				default:
 					break;
 			}
@@ -718,12 +718,12 @@ void cli_frontend::verifysamples(const char *gamename)
 	{
 		// audit the samples in this set
 		media_auditor::summary summary = auditor.audit_samples();
-		
+
 		// output the summary of the audit
 		astring summary_string;
 		auditor.summarize(&summary_string);
 		mame_printf_info("%s", summary_string.cstr());
-		
+
 		// if not found, print a message and set the flag
 		if (summary == media_auditor::NOTFOUND)
 		{
@@ -757,7 +757,7 @@ void cli_frontend::verifysamples(const char *gamename)
 					mame_printf_info("is best available\n");
 					correct++;
 					break;
-				
+
 				default:
 					break;
 			}
@@ -1073,7 +1073,7 @@ static void info_listsoftware(const char *gamename)
 
 
 //-------------------------------------------------
-//  romident - identify ROMs by looking for 
+//  romident - identify ROMs by looking for
 //  matches in our internal database
 //-------------------------------------------------
 
@@ -1084,7 +1084,6 @@ void cli_frontend::romident(const char *filename)
 	// identify the file, then output results
 	mame_printf_info("Identifying %s....\n", filename);
 	ident.identify(filename);
-	mame_printf_info("%s\n", ident.result());
 
 	// return the appropriate error code
 	if (ident.matches() == ident.total())
@@ -1175,7 +1174,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_VERIFYROMS,	&cli_frontend::verifyroms },
 		{ CLICOMMAND_VERIFYSAMPLES,	&cli_frontend::verifysamples },
 		{ CLICOMMAND_LISTMEDIA,		&cli_frontend::listmedia },
-//		{ CLICOMMAND_LISTSOFTWARE,	&cli_frontend::listsoftware },
+//      { CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
 		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident }
 	};
 
@@ -1202,7 +1201,7 @@ void cli_frontend::execute_commands(const char *exename)
 void cli_frontend::display_help()
 {
 	mame_printf_info(APPLONGNAME " v%s - " FULLLONGNAME "\n"
-		   COPYRIGHT_INFO "\n\n", build_version);		   
+		   COPYRIGHT_INFO "\n\n", build_version);
 	mame_printf_info("%s\n", DISCLAIMER);
 	mame_printf_info(USAGE "\n\n"
 		   "        " APPNAME " -showusage    for a brief list of options\n"
@@ -1258,7 +1257,7 @@ void media_identifier::identify(const char *filename)
 				astring curfile(filename, PATH_SEPARATOR, entry->name);
 				identify_file(curfile);
 			}
-		
+
 		// close the directory and be done
 		osd_closedir(directory);
 	}
@@ -1311,7 +1310,7 @@ void media_identifier::identify_file(const char *name)
 	{
 		// output the name
 		astring basename;
-		m_result.catprintf("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
+		mame_printf_info("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
 		m_total++;
 
 		// attempt to open as a CHD; fail if not
@@ -1319,7 +1318,7 @@ void media_identifier::identify_file(const char *name)
 		chd_error err = chd_open(name, CHD_OPEN_READ, NULL, &chd);
 		if (err != CHDERR_NONE)
 		{
-			m_result.catprintf("NOT A CHD\n");
+			mame_printf_info("NOT A CHD\n");
 			m_nonroms++;
 			return;
 		}
@@ -1331,10 +1330,10 @@ void media_identifier::identify_file(const char *name)
 		// error on writable CHDs
 		if (header.flags & CHDFLAGS_IS_WRITEABLE)
 		{
-			m_result.catprintf("is a writeable CHD\n");
+			mame_printf_info("is a writeable CHD\n");
 			return;
 		}
-		
+
 		// otherwise, get the hash collection for this CHD
 		static const UINT8 nullhash[20] = { 0 };
 		hash_collection hashes;
@@ -1347,11 +1346,11 @@ void media_identifier::identify_file(const char *name)
 		// determine whether this file exists
 		int found = find_by_hash(hashes, header.logicalbytes);
 		if (found == 0)
-			m_result.catprintf("NO MATCH\n");
+			mame_printf_info("NO MATCH\n");
 		else
 			m_matches++;
 	}
-	
+
 	// all other files have their hashes computed directly
 	else
 	{
@@ -1392,7 +1391,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 	// output the name
 	m_total++;
 	astring basename;
-	m_result.catprintf("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
+	mame_printf_info("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
 
 	// see if we can find a match in the ROMs
 	int found = find_by_hash(hashes, length);
@@ -1403,13 +1402,13 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 		// if not a power of 2, assume it is a non-ROM file
 		if ((length & (length - 1)) != 0)
 		{
-			m_result.catprintf("NOT A ROM\n");
+			mame_printf_info("NOT A ROM\n");
 			m_nonroms++;
 		}
 
 		// otherwise, it's just not a match
 		else
-			m_result.catprintf("NO MATCH\n");
+			mame_printf_info("NO MATCH\n");
 	}
 
 	// if we did find it, count it as a match
@@ -1484,6 +1483,6 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 				}
 		}
 	}
-	
+
 	return found;
 }

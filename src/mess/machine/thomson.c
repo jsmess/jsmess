@@ -3525,7 +3525,7 @@ static void to8_kbd_reset ( running_machine &machine )
 static void to8_kbd_init ( running_machine &machine )
 {
 	to8_kbd_timer = machine.scheduler().timer_alloc(FUNC(to8_kbd_timer_cb));
-	to8_kbd_signal = machine.scheduler().timer_alloc(FUNC(NULL));
+	to8_kbd_signal = machine.scheduler().timer_alloc(FUNC_NULL);
 	state_save_register_global( machine, to8_kbd_ack );
 	state_save_register_global( machine, to8_kbd_data );
 	state_save_register_global( machine, to8_kbd_step );

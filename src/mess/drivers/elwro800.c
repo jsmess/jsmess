@@ -56,7 +56,7 @@ public:
  *************************************/
 DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
-	elwro800_state *state = machine->driver_data<elwro800_state>();
+	elwro800_state *state = machine.driver_data<elwro800_state>();
 	if (state->m_ram_at_0000 && address == 0x66)
 	{
 		direct.explicit_configure(0x66, 0x66, 0, &state->m_df_on_databus);
@@ -521,7 +521,7 @@ static MACHINE_RESET(elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(elwro800_direct_handler, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_direct_handler), &machine));
 }
 
 static const cassette_config elwro800jr_cassette_config =

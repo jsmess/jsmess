@@ -241,7 +241,7 @@ ROM_END
 
 DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 {
-	vcs80_state *state = machine->driver_data<vcs80_state>();
+	vcs80_state *state = machine.driver_data<vcs80_state>();
 
 	/* _A0 is connected to PIO PB7 */
 	z80pio_pb_w(state->m_z80pio, 0, (!BIT(address, 0)) << 7);
@@ -251,8 +251,8 @@ DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 
 static DRIVER_INIT( vcs80 )
 {
-	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, machine));
-	machine.device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate_create_static(vcs80_direct_update_handler, machine));
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_direct_update_handler), &machine));
+	machine.device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_direct_update_handler), &machine));
 }
 
 /* System Drivers */

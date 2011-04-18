@@ -69,10 +69,26 @@ int driver_list::find(const char *name)
 	game_driver driver;
 	driver.name = name;
 	game_driver *driverptr = &driver;
-	
+
 	// binary search to find it
 	const game_driver **result = reinterpret_cast<const game_driver **>(bsearch(&driverptr, s_drivers_sorted, s_driver_count, sizeof(*s_drivers_sorted), driver_sort_callback));
 	return (result == NULL) ? -1 : result - s_drivers_sorted;
+}
+
+
+//-------------------------------------------------
+//  matches - true if we match, taking into
+//  account wildcards in the wildstring
+//-------------------------------------------------
+
+bool driver_list::matches(const char *wildstring, const char *string)
+{
+	// can only match internal drivers if the wildstring starts with an underscore
+	if (string[0] == '_' && (wildstring == NULL || wildstring[0] != '_'))
+		return false;
+
+	// match everything else normally
+	return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0);
 }
 
 
@@ -211,7 +227,7 @@ int driver_enumerator::filter(const char *filterstring)
 {
 	// reset the count
 	exclude_all();
-	
+
 	// match name against each driver in the list
 	for (int index = 0; index < s_driver_count; index++)
 		if (matches(filterstring, s_drivers_sorted[index]->name))
@@ -230,13 +246,26 @@ int driver_enumerator::filter(const game_driver &driver)
 {
 	// reset the count
 	exclude_all();
-	
+
 	// match name against each driver in the list
 	for (int index = 0; index < s_driver_count; index++)
 		if (s_drivers_sorted[index] == &driver)
 			include(index);
 
 	return m_filtered_count;
+}
+
+
+//-------------------------------------------------
+//  include_all - include all non-internal drivers
+//-------------------------------------------------
+
+void driver_enumerator::include_all()
+{
+	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count;
+	int empty = find("___empty");
+	assert(empty != -1);
+	m_included[empty] = 0;
 }
 
 
@@ -249,7 +278,7 @@ bool driver_enumerator::next()
 {
 	// always advance one
 	m_current++;
-	
+
 	// if we have a filter, scan forward to the next match
 	while (m_current < s_driver_count)
 	{
@@ -272,7 +301,7 @@ bool driver_enumerator::next_excluded()
 {
 	// always advance one
 	m_current++;
-	
+
 	// if we have a filter, scan forward to the next match
 	while (m_current < s_driver_count)
 	{

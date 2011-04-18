@@ -1127,10 +1127,10 @@ DIRECT_UPDATE_HANDLER( amstrad_default )
 /* used to setup computer if a snapshot was specified */
 DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 {
-	amstrad_state *state = machine->driver_data<amstrad_state>();
+	amstrad_state *state = machine.driver_data<amstrad_state>();
 		int pc;
 
-		pc = cpu_get_pc(machine->device("maincpu"));
+		pc = cpu_get_pc(machine.device("maincpu"));
 
 		/* there are two places where CALL &0065 can be found
         in the multiface rom. At this address there is a RET.
@@ -1159,7 +1159,7 @@ DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 		  state->m_multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
 
 		 /* clear op base override */
-		  machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(amstrad_default, *machine));
+		  machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(amstrad_default), &machine));
 		}
 
 		return pc;
@@ -1255,7 +1255,7 @@ static void multiface_stop(running_machine &machine)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(amstrad_multiface_directoverride, machine));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(amstrad_multiface_directoverride), &machine));
 	}
 
 }

@@ -210,30 +210,31 @@ const pia6821_interface dgnbeta_pia_intf[] =
 // Info for bank switcher
 struct bank_info_entry
 {
-	write8_space_func handler;	// Pointer to write handler
+	write8_space_func func;	// Pointer to write handler
+	const char *name;
 	offs_t start;		// Offset of start of block
 	offs_t end;		// offset of end of block
 };
 
 static const struct bank_info_entry bank_info[] =
 {
-	{ dgnbeta_ram_b0_w, 0x0000, 0x0fff },
-	{ dgnbeta_ram_b1_w, 0x1000, 0x1fff },
-	{ dgnbeta_ram_b2_w, 0x2000, 0x2fff },
-	{ dgnbeta_ram_b3_w, 0x3000, 0x3fff },
-	{ dgnbeta_ram_b4_w, 0x4000, 0x4fff },
-	{ dgnbeta_ram_b5_w, 0x5000, 0x5fff },
-	{ dgnbeta_ram_b6_w, 0x6000, 0x6fff },
-	{ dgnbeta_ram_b7_w, 0x7000, 0x7fff },
-	{ dgnbeta_ram_b8_w, 0x8000, 0x8fff },
-	{ dgnbeta_ram_b9_w, 0x9000, 0x9fff },
-	{ dgnbeta_ram_bA_w, 0xA000, 0xAfff },
-	{ dgnbeta_ram_bB_w, 0xB000, 0xBfff },
-	{ dgnbeta_ram_bC_w, 0xC000, 0xCfff },
-	{ dgnbeta_ram_bD_w, 0xD000, 0xDfff },
-	{ dgnbeta_ram_bE_w, 0xE000, 0xEfff },
-	{ dgnbeta_ram_bF_w, 0xF000, 0xFBff },
-	{ dgnbeta_ram_bG_w, 0xFF00, 0xFfff }
+	{ FUNC(dgnbeta_ram_b0_w), 0x0000, 0x0fff },
+	{ FUNC(dgnbeta_ram_b1_w), 0x1000, 0x1fff },
+	{ FUNC(dgnbeta_ram_b2_w), 0x2000, 0x2fff },
+	{ FUNC(dgnbeta_ram_b3_w), 0x3000, 0x3fff },
+	{ FUNC(dgnbeta_ram_b4_w), 0x4000, 0x4fff },
+	{ FUNC(dgnbeta_ram_b5_w), 0x5000, 0x5fff },
+	{ FUNC(dgnbeta_ram_b6_w), 0x6000, 0x6fff },
+	{ FUNC(dgnbeta_ram_b7_w), 0x7000, 0x7fff },
+	{ FUNC(dgnbeta_ram_b8_w), 0x8000, 0x8fff },
+	{ FUNC(dgnbeta_ram_b9_w), 0x9000, 0x9fff },
+	{ FUNC(dgnbeta_ram_bA_w), 0xA000, 0xAfff },
+	{ FUNC(dgnbeta_ram_bB_w), 0xB000, 0xBfff },
+	{ FUNC(dgnbeta_ram_bC_w), 0xC000, 0xCfff },
+	{ FUNC(dgnbeta_ram_bD_w), 0xD000, 0xDfff },
+	{ FUNC(dgnbeta_ram_bE_w), 0xE000, 0xEfff },
+	{ FUNC(dgnbeta_ram_bF_w), 0xF000, 0xFBff },
+	{ FUNC(dgnbeta_ram_bG_w), 0xFF00, 0xFfff }
 };
 
 #define is_last_page(page)  (((page==LastPage) || (page==LastPage+1)) ? 1 : 0)
@@ -260,7 +261,6 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 	address_space *space_1 = machine.device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int		            Page;
 	UINT8		        *readbank;
-	write8_space_func	writebank;
 	int		            bank_start;
 	int		            bank_end;
 	int		            MapPage;
@@ -296,9 +296,8 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 				readbank = &ram_get_ptr(machine.device(RAM_TAG))[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
-			writebank=bank_info[Page].handler;
-			space_0->install_legacy_write_handler(bank_start, bank_end,FUNC(writebank));
-			space_1->install_legacy_write_handler(bank_start, bank_end,FUNC(writebank));
+			space_0->install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
+			space_1->install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
 		}
 		else					// Block is rom, or undefined
 		{

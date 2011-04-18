@@ -184,7 +184,7 @@ cirrus_device::cirrus_device(running_machine &_machine, const cirrus_device_conf
 {
 }
 
-static void bebox_map_vga_memory(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
+static void bebox_map_vga_memory(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, const char *rh_name, write8_space_func wh, const char *wh_name )
 {
 	address_space *space = machine.device("ppc1")->memory().space(AS_PROGRAM);
 

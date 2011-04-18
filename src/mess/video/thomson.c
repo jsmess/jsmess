@@ -1153,7 +1153,7 @@ VIDEO_START ( thom )
 	state_save_register_global(machine,  thom_floppy_rcount );
 	output_set_value( "floppy", 0 );
 
-	thom_video_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	thom_video_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 
 	thom_scanline_timer = machine.scheduler().timer_alloc(FUNC(thom_scanline_start));
 

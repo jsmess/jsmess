@@ -121,7 +121,7 @@ protected:
 public:
 	// getters
 	static int total() { return s_driver_count; }
-	
+
 	// any item by index
 	static const game_driver &driver(int index) { assert(index >= 0 && index < s_driver_count); return *s_drivers_sorted[index]; }
 	static int clone(int index) { return find(driver(index).parent); }
@@ -138,7 +138,7 @@ public:
 	static int find(const game_driver &driver) { return find(driver.name); }
 
 	// static helpers
-	static bool matches(const char *wildstring, const char *string) { return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0); }
+	static bool matches(const char *wildstring, const char *string);
 
 protected:
 	// internal helpers
@@ -147,7 +147,7 @@ protected:
 
 	// internal state
 	static int							s_driver_count;
-	static const game_driver * const 	s_drivers_sorted[];
+	static const game_driver * const	s_drivers_sorted[];
 };
 
 
@@ -162,12 +162,12 @@ public:
 	driver_enumerator(emu_options &options, const char *filter);
 	driver_enumerator(emu_options &options, const game_driver &filter);
 	~driver_enumerator();
-	
+
 	// getters
 	int count() const { return m_filtered_count; }
 	int current() const { return m_current; }
 	emu_options &options() const { return m_options; }
-	
+
 	// current item
 	const game_driver &driver() const { return driver_list::driver(m_current); }
 	machine_config &config() const { return config(m_current); }
@@ -191,7 +191,7 @@ public:
 	// filtering/iterating
 	int filter(const char *string = NULL);
 	int filter(const game_driver &driver);
-	void include_all() { memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count; }
+	void include_all();
 	void exclude_all() { memset(m_included, 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }
 	void reset() { m_current = -1; }
 	bool next();

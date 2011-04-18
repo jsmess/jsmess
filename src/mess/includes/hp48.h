@@ -25,7 +25,9 @@ typedef struct
 	/* static part */
 	UINT32 off_mask;             /* offset bit-mask, indicates the real size */
 	read8_space_func read;
+	const char *read_name;
 	write8_space_func write;
+	const char *write_name;
 	void* data;                  /* non-NULL for banks */
 	int isnop;
 

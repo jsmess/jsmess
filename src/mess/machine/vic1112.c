@@ -312,8 +312,8 @@ void vic1112_device::device_start()
 	address_space *program = m_machine.firstcpu->memory().space(AS_PROGRAM);
 
 	// map VIAs to VIC-20 address space
-	program->install_readwrite_handler(0x9800, 0x980f, 0, 0, read8_delegate_create(via6522_device, read, *m_via0), write8_delegate_create(via6522_device, write, *m_via0));
-	program->install_readwrite_handler(0x9810, 0x981f, 0, 0, read8_delegate_create(via6522_device, read, *m_via1), write8_delegate_create(via6522_device, write, *m_via1));
+	program->install_readwrite_handler(0x9800, 0x980f, 0, 0, read8_delegate(FUNC(via6522_device::read), (via6522_device*)m_via0), write8_delegate(FUNC(via6522_device::write), (via6522_device*)m_via0));
+	program->install_readwrite_handler(0x9810, 0x981f, 0, 0, read8_delegate(FUNC(via6522_device::read), (via6522_device*)m_via1), write8_delegate(FUNC(via6522_device::write), (via6522_device*)m_via1));
 
 	// map ROM to VIC-20 address space
 	program->install_rom(0xb000, 0xb7ff, subregion(VIC1112_TAG)->base());

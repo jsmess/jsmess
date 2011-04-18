@@ -3224,7 +3224,7 @@ MACHINE_CONFIG_END
    and some games verify that as a protection check (notably Metroid Fusion) */
 DIRECT_UPDATE_HANDLER( gba_direct )
 {
-	gba_state *state = machine->driver_data<gba_state>();
+	gba_state *state = machine.driver_data<gba_state>();
 	if (address > 0x4000)
 	{
 		state->m_bios_protected = 1;
@@ -3239,7 +3239,7 @@ DIRECT_UPDATE_HANDLER( gba_direct )
 
 static DRIVER_INIT(gbadv)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(gba_direct, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(gba_direct), &machine));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */

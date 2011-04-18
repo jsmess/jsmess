@@ -153,7 +153,7 @@ WRITE8_DEVICE_HANDLER( ti998spch_w )
 			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
 			device_adjust_icount(device->machine().device("maincpu"),-cycles_to_ready);
-			device->machine().scheduler().timer_set(attotime::zero, FUNC(NULL));
+			device->machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
 		}
 		tms5220_data_w(spsys->vsp, offset, data);
 	}

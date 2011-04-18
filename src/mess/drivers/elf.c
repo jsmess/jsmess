@@ -253,7 +253,7 @@ void elf2_state::machine_start()
 
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
-	program->install_write_handler(0x0000, 0x00ff, write8_delegate_create(elf2_state, memory_w, *this));
+	program->install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
 	memory_configure_bank(m_machine, "bank1", 0, 1, ram_get_ptr(m_ram), 0);
 	memory_set_bank(m_machine, "bank1", 0);
 

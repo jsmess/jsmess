@@ -59,42 +59,42 @@ DRIVER_INIT ( zx )
 DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(*machine, address, "maincpu", 0);
+		zx_ula_r(machine, address, "maincpu", 0);
 	return address;
 }
 
 DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(*machine, address, "gfx1", 0);
+		zx_ula_r(machine, address, "gfx1", 0);
 	return address;
 }
 
 DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(*machine, address, "gfx1", 1);
+		zx_ula_r(machine, address, "gfx1", 1);
 	return address;
 }
 
 MACHINE_RESET ( zx80 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(zx_setdirect, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_setdirect), &machine));
 	state->m_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pow3000 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pow3000_setdirect, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pow3000_setdirect), &machine));
 	state->m_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pc8300 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pc8300_setdirect, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pc8300_setdirect), &machine));
 	state->m_tape_bit = 0x80;
 }
 

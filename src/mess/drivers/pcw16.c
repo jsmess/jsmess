@@ -250,20 +250,20 @@ static  READ8_HANDLER(pcw16_flash1_bank_handler3_r)
 	return pcw16_flash1_bank_handler_r(space->machine(),3, offset);
 }
 
-static const read8_space_func pcw16_flash0_bank_handlers_r[4] =
+static const struct { read8_space_func func; const char *name; } pcw16_flash0_bank_handlers_r[4] =
 {
-	pcw16_flash0_bank_handler0_r,
-	pcw16_flash0_bank_handler1_r,
-	pcw16_flash0_bank_handler2_r,
-	pcw16_flash0_bank_handler3_r,
+	{ FUNC(pcw16_flash0_bank_handler0_r) },
+	{ FUNC(pcw16_flash0_bank_handler1_r) },
+	{ FUNC(pcw16_flash0_bank_handler2_r) },
+	{ FUNC(pcw16_flash0_bank_handler3_r) }
 };
 
-static const read8_space_func pcw16_flash1_bank_handlers_r[4] =
+static const struct { read8_space_func func; const char *name; } pcw16_flash1_bank_handlers_r[4] =
 {
-	pcw16_flash1_bank_handler0_r,
-	pcw16_flash1_bank_handler1_r,
-	pcw16_flash1_bank_handler2_r,
-	pcw16_flash1_bank_handler3_r,
+	{ FUNC(pcw16_flash1_bank_handler0_r) },
+	{ FUNC(pcw16_flash1_bank_handler1_r) },
+	{ FUNC(pcw16_flash1_bank_handler2_r) },
+	{ FUNC(pcw16_flash1_bank_handler3_r) }
 };
 
 /* write flash0 */
@@ -333,20 +333,20 @@ static WRITE8_HANDLER(pcw16_flash1_bank_handler3_w)
 	pcw16_flash1_bank_handler_w(space->machine(),3, offset, data);
 }
 
-static const write8_space_func pcw16_flash0_bank_handlers_w[4] =
+static const struct { write8_space_func func; const char *name; } pcw16_flash0_bank_handlers_w[4] =
 {
-	pcw16_flash0_bank_handler0_w,
-	pcw16_flash0_bank_handler1_w,
-	pcw16_flash0_bank_handler2_w,
-	pcw16_flash0_bank_handler3_w,
+	{ FUNC(pcw16_flash0_bank_handler0_w) },
+	{ FUNC(pcw16_flash0_bank_handler1_w) },
+	{ FUNC(pcw16_flash0_bank_handler2_w) },
+	{ FUNC(pcw16_flash0_bank_handler3_w) }
 };
 
-static const write8_space_func pcw16_flash1_bank_handlers_w[4] =
+static const struct { write8_space_func func; const char *name; } pcw16_flash1_bank_handlers_w[4] =
 {
-	pcw16_flash1_bank_handler0_w,
-	pcw16_flash1_bank_handler1_w,
-	pcw16_flash1_bank_handler2_w,
-	pcw16_flash1_bank_handler3_w,
+	{ FUNC(pcw16_flash1_bank_handler0_w) },
+	{ FUNC(pcw16_flash1_bank_handler1_w) },
+	{ FUNC(pcw16_flash1_bank_handler2_w) },
+	{ FUNC(pcw16_flash1_bank_handler3_w) }
 };
 
 typedef enum
@@ -381,13 +381,13 @@ static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RA
 
 	case PCW16_MEM_FLASH_1:
 		/* sram */
-		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash0_bank_handlers_r[bank]));
-		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash0_bank_handlers_w[bank]));
+		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_r[bank].func, pcw16_flash0_bank_handlers_r[bank].name);
+		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_w[bank].func, pcw16_flash0_bank_handlers_w[bank].name);
 		break;
 
 	case PCW16_MEM_FLASH_2:
-		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash1_bank_handlers_r[bank]));
-		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, FUNC(pcw16_flash1_bank_handlers_w[bank]));
+		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash1_bank_handlers_r[bank].func, pcw16_flash1_bank_handlers_r[bank].name);
+		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash1_bank_handlers_w[bank].func, pcw16_flash1_bank_handlers_w[bank].name);
 		break;
 
 	case PCW16_MEM_NONE:

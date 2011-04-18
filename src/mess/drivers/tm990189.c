@@ -105,7 +105,7 @@ static MACHINE_RESET( tm990_189 )
 static MACHINE_START( tm990_189 )
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
-	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 }
 static const TMS9928a_interface tms9918_interface =
 {
@@ -120,12 +120,12 @@ static MACHINE_START( tm990_189_v )
 	tm990189_state *state = machine.driver_data<tm990189_state>();
 	TMS9928A_configure(&tms9918_interface);
 
-	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 
-	state->m_joy1x_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->m_joy1y_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->m_joy2x_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->m_joy2y_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_joy1x_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_joy1y_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_joy2x_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_joy2y_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 }
 
 static MACHINE_RESET( tm990_189_v )

@@ -446,11 +446,11 @@ static void apple3_update_memory(running_machine &machine)
 
 	/* reinstall VIA handlers */
 	{
-		device_t *via_0 = space->machine().device("via6522_0");
-		device_t *via_1 = space->machine().device("via6522_1");
+		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
+		via6522_device *via_1 = space->machine().device<via6522_device>("via6522_1");
 
-        space->install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
-		space->install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate_create(via6522_device, read, *via_1), write8_delegate_create(via6522_device, write, *via_1));
+		space->install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_0), write8_delegate(FUNC(via6522_device::write),via_0));
+		space->install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_1), write8_delegate(FUNC(via6522_device::write),via_1));
 	}
 }
 
@@ -659,7 +659,7 @@ DIRECT_UPDATE_HANDLER( apple3_opbase )
 
 	if ((address & 0xFF00) == 0x0000)
 	{
-		opptr = apple3_get_zpa_addr(*machine,address);
+		opptr = apple3_get_zpa_addr(machine,address);
 		direct.explicit_configure(address, address, ~0, opptr - address);
 		address = ~0;
 	}
@@ -735,5 +735,5 @@ DRIVER_INIT( apple3 )
 	state->m_via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(apple3_opbase, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(apple3_opbase), &machine));
 }

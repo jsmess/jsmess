@@ -283,16 +283,16 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 		case 0x00:
 			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
 			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate_create(mbee_state, mbeeppc_low_r, *this), write8_delegate_create(mbee_state, mbeeppc_low_w, *this));
-			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate_create(mbee_state, mbeeppc_high_r, *this), write8_delegate_create(mbee_state, mbeeppc_high_w, *this));
+			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
+			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
 			memory_set_bank(machine(), "bank8l", 0); // rom
 			memory_set_bank(machine(), "bank8h", 0); // rom
 			break;
 		case 0x04:
 			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
 			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate_create(mbee_state, mbeeppc_low_r, *this), write8_delegate_create(mbee_state, mbeeppc_low_w, *this));
-			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate_create(mbee_state, mbeeppc_high_r, *this), write8_delegate_create(mbee_state, mbeeppc_high_w, *this));
+			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
+			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
 			memory_set_bank(machine(), "bank8l", 1); // ram
 			memory_set_bank(machine(), "bank8h", 1); // ram
 			break;
@@ -320,8 +320,8 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 			break;
 		case 0x10:
 		case 0x14:
-			mem->install_readwrite_handler (0x8000, 0x87ff, read8_delegate_create(mbee_state, mbeeppc_low_r, *this), write8_delegate_create(mbee_state, mbeeppc_low_w, *this));
-			mem->install_readwrite_handler (0x8800, 0x8fff, read8_delegate_create(mbee_state, mbeeppc_high_r, *this), write8_delegate_create(mbee_state, mbeeppc_high_w, *this));
+			mem->install_readwrite_handler (0x8000, 0x87ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
+			mem->install_readwrite_handler (0x8800, 0x8fff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
 			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
 			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(machine(), "bankfl", 0); // ram
@@ -365,16 +365,16 @@ WRITE8_MEMBER( mbee_state::mbee128_50_w )
 		case 0x00:
 			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
 			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate_create(mbee_state, mbeeppc_low_r, *this), write8_delegate_create(mbee_state, mbeeppc_low_w, *this));
-			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate_create(mbee_state, mbeeppc_high_r, *this), write8_delegate_create(mbee_state, mbeeppc_high_w, *this));
+			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
+			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
 			memory_set_bank(machine(), "bank8l", 0); // rom
 			memory_set_bank(machine(), "bank8h", 0); // rom
 			break;
 		case 0x04:
 			mem->install_read_bank (0x8000, 0x87ff, "bank8l");
 			mem->install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate_create(mbee_state, mbeeppc_low_r, *this), write8_delegate_create(mbee_state, mbeeppc_low_w, *this));
-			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate_create(mbee_state, mbeeppc_high_r, *this), write8_delegate_create(mbee_state, mbeeppc_high_w, *this));
+			mem->install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
+			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
 			memory_set_bank(machine(), "bank8l", 1); // ram
 			memory_set_bank(machine(), "bank8h", 1); // ram
 			break;
@@ -402,8 +402,8 @@ WRITE8_MEMBER( mbee_state::mbee128_50_w )
 			break;
 		case 0x10:
 		case 0x14:
-			mem->install_readwrite_handler (0x8000, 0x87ff, read8_delegate_create(mbee_state, mbeeppc_low_r, *this), write8_delegate_create(mbee_state, mbeeppc_low_w, *this));
-			mem->install_readwrite_handler (0x8800, 0x8fff, read8_delegate_create(mbee_state, mbeeppc_high_r, *this), write8_delegate_create(mbee_state, mbeeppc_high_w, *this));
+			mem->install_readwrite_handler (0x8000, 0x87ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
+			mem->install_readwrite_handler (0x8800, 0x8fff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
 			mem->install_read_bank (0xf000, 0xf7ff, "bankfl");
 			mem->install_read_bank (0xf800, 0xffff, "bankfh");
 			memory_set_bank(machine(), "bankfl", 0); // ram

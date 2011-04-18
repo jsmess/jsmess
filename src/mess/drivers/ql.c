@@ -975,16 +975,16 @@ void ql_state::machine_reset()
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
 			program->install_rom(0x0c0000, 0x0c3fff, &m_machine.region(M68008_TAG)->base()[SANDY_ROM_BASE]);
-			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
-			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
+			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=SANDY_IO_BASE;
 			break;
 		case DISK_TYPE_TRUMP :
 			logerror("Configuring TrumpCard\n");
-			program->install_read_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate_create(ql_state, cart_rom_r, *this));
-			program->install_read_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate_create(ql_state, trump_card_rom_r, *this));
-			program->install_read_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
-			program->install_write_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			program->install_read_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::cart_rom_r), this));
+			program->install_read_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::trump_card_rom_r), this));
+			program->install_read_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
+			program->install_write_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=TRUMP_IO_BASE;
 			break;
 	}

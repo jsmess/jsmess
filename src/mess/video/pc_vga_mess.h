@@ -22,7 +22,7 @@ struct pc_vga_interface
 {
 	/* VGA memory mapper */
 	const char *vga_memory_bank;
-	void (*map_vga_memory)(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh);
+	void (*map_vga_memory)(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, const char *rh_name, write8_space_func wh, const char *wh_name);
 
 	/* VGA dipswitch (???) */
 	read8_space_func read_dipswitch;

@@ -625,8 +625,8 @@ void vip_state::machine_reset()
 		break;
 
 	case VIDEO_CDP1862:
-		io->install_write_handler(0x05, 0x05, write8_delegate_create(vip_state, bkg_w, *this));
-		program->install_write_handler(0xc000, 0xdfff, write8_delegate_create(vip_state, colorram_w, *this));
+		io->install_write_handler(0x05, 0x05, write8_delegate(FUNC(vip_state::bkg_w), this));
+		program->install_write_handler(0xc000, 0xdfff, write8_delegate(FUNC(vip_state::colorram_w), this));
 		break;
 	}
 

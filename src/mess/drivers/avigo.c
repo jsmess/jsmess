@@ -72,7 +72,7 @@
 /* bits 0-5 define bank index */
 /* bits 0-5 define bank index */
 
-static void avigo_setbank(running_machine &machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
+static void avigo_setbank(running_machine &machine, int bank, void *address, read8_space_func rh, char const *rh_name, write8_space_func wh, const char *wh_name)
 {
 	avigo_state *state = machine.driver_data<avigo_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -89,13 +89,13 @@ static void avigo_setbank(running_machine &machine, int bank, void *address, rea
 	}
 	if (rh)
 	{
-		space->install_legacy_read_handler((bank * 0x4000),(bank * 0x4000) + 0x3FFF, FUNC(rh));
+		space->install_legacy_read_handler((bank * 0x4000),(bank * 0x4000) + 0x3FFF, rh, rh_name);
 	} else {
 //      space->nop_read((bank * 0x4000),(bank * 0x4000) + 0x3FFF);
 	}
 	if (wh)
 	{
-		space->install_legacy_write_handler((bank * 0x4000),(bank * 0x4000) + 0x3FFF, FUNC(wh));
+		space->install_legacy_write_handler((bank * 0x4000),(bank * 0x4000) + 0x3FFF, wh, wh_name);
 	} else {
 //      space->nop_write((bank * 0x4000),(bank * 0x4000) + 0x3FFF);
 	}
@@ -310,14 +310,14 @@ static void avigo_refresh_memory(running_machine &machine)
 
 	addr = (unsigned char *)state->m_flashes[state->m_flash_at_0x4000]->space()->get_read_ptr(0);
 	addr = addr + (state->m_rom_bank_l<<14);
-	avigo_setbank(machine, 1, addr, avigo_flash_0x4000_read_handler, avigo_flash_0x4000_write_handler);
+	avigo_setbank(machine, 1, addr, FUNC(avigo_flash_0x4000_read_handler), FUNC(avigo_flash_0x4000_write_handler));
 
 	switch (state->m_ram_bank_h)
 	{
 		/* %101 */
 		/* screen */
 		case 0x06:
-			avigo_setbank(machine, 2, NULL, avigo_vid_memory_r, avigo_vid_memory_w);
+			avigo_setbank(machine, 2, NULL, FUNC(avigo_vid_memory_r), FUNC(avigo_vid_memory_w));
 			break;
 
 		/* %001 */
@@ -338,7 +338,7 @@ static void avigo_refresh_memory(running_machine &machine)
 
 			addr = (unsigned char *)state->m_flashes[state->m_flash_at_0x8000]->space()->get_read_ptr(0);
 			addr = addr + (state->m_ram_bank_l<<14);
-			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
+			avigo_setbank(machine, 2, addr, FUNC(avigo_flash_0x8000_read_handler), FUNC_NULL /* avigo_flash_0x8000_write_handler */);
 			break;
 
 		case 0x07:
@@ -346,7 +346,7 @@ static void avigo_refresh_memory(running_machine &machine)
 
 			addr = (unsigned char *)state->m_flashes[state->m_flash_at_0x8000]->space()->get_read_ptr(0);
 			addr = addr + (state->m_ram_bank_l<<14);
-			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
+			avigo_setbank(machine, 2, addr, FUNC(avigo_flash_0x8000_read_handler), FUNC_NULL /* avigo_flash_0x8000_write_handler */);
 			break;
 	}
 }
@@ -422,9 +422,9 @@ static MACHINE_RESET( avigo )
 	memset(ram_get_ptr(machine.device(RAM_TAG)), 0, 128*1024);
 
 	addr = (unsigned char *)state->m_flashes[0]->space()->get_read_ptr(0);
-	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
+	avigo_setbank(machine, 0, addr, FUNC(avigo_flash_0x0000_read_handler), FUNC(avigo_flash_0x0000_write_handler));
 
-	avigo_setbank(machine, 3, ram_get_ptr(machine.device(RAM_TAG)), NULL, NULL);
+	avigo_setbank(machine, 3, ram_get_ptr(machine.device(RAM_TAG)), FUNC_NULL, FUNC_NULL);
 
 	/* 0x08000 is specially banked! */
 	avigo_refresh_memory(machine);

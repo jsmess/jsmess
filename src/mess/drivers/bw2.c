@@ -657,7 +657,7 @@ void bw2_state::machine_reset()
 		memory_configure_bank(m_machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram, 0);
 		memory_configure_bank(m_machine, "bank1", BANK_RAM6, 1, m_work_ram + 0x18000, 0);
 
-		io->install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate_create(bw2_state, ramcard_bank_w, *this), 0);
+		io->install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate(FUNC(bw2_state::ramcard_bank_w), this), 0);
 	}
 	else
 	{

@@ -218,24 +218,24 @@ WRITE8_HANDLER ( bbc_memorybp1_w )
 
 DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 {
-	bbc_state *state = machine->driver_data<bbc_state>();
-	UINT8 *ram = machine->region("maincpu")->base();
+	bbc_state *state = machine.driver_data<bbc_state>();
+	UINT8 *ram = machine.region("maincpu")->base();
 	if (state->m_vdusel == 0)
 	{
 		// not in shadow ram mode so just read normal ram
-		memory_set_bankptr(*machine, "bank2", ram + 0x3000);
+		memory_set_bankptr(machine, "bank2", ram + 0x3000);
 	}
 	else
 	{
-		if (vdudriverset(*machine))
+		if (vdudriverset(machine))
 		{
 			// if VDUDriver set then read from shadow ram
-			memory_set_bankptr(*machine, "bank2", ram + 0xb000);
+			memory_set_bankptr(machine, "bank2", ram + 0xb000);
 		}
 		else
 		{
 			// else read from normal ram
-			memory_set_bankptr(*machine, "bank2", ram + 0x3000);
+			memory_set_bankptr(machine, "bank2", ram + 0x3000);
 		}
 	}
 	return address;
@@ -479,20 +479,20 @@ WRITE8_HANDLER ( bbc_memorybm1_w )
 
 DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 {
-	bbc_state *state = machine->driver_data<bbc_state>();
+	bbc_state *state = machine.driver_data<bbc_state>();
 	if (state->m_ACCCON_X)
 	{
-		memory_set_bankptr( *machine, "bank2", machine->region( "maincpu" )->base() + 0xb000 );
+		memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0xb000 );
 	}
 	else
 	{
-		if (state->m_ACCCON_E && bbcm_vdudriverset(*machine))
+		if (state->m_ACCCON_E && bbcm_vdudriverset(machine))
 		{
-			memory_set_bankptr( *machine, "bank2", machine->region( "maincpu" )->base() + 0xb000 );
+			memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0xb000 );
 		}
 		else
 		{
-			memory_set_bankptr( *machine, "bank2", machine->region( "maincpu" )->base() + 0x3000 );
+			memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0x3000 );
 		}
 	}
 
@@ -2147,7 +2147,7 @@ MACHINE_START( bbcbp )
 	bbc_state *state = machine.driver_data<bbc_state>();
 	state->m_mc6850_clock = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcbp_direct_handler, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbcbp_direct_handler), &machine));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
 	memory_configure_bank(machine, "bank6", 0, 16, machine.region("user1")->base() + 0x3000, 1<<14);
@@ -2175,7 +2175,7 @@ MACHINE_START( bbcm )
 	bbc_state *state = machine.driver_data<bbc_state>();
 	state->m_mc6850_clock = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcm_direct_handler, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbcm_direct_handler), &machine));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
 	memory_configure_bank(machine, "bank5", 0, 16, machine.region("user1")->base()+0x01000, 1<<14);

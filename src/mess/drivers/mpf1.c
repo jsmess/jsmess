@@ -463,7 +463,7 @@ ROM_END
 
 DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 {
-	mpf1_state *state = machine->driver_data<mpf1_state>();
+	mpf1_state *state = machine.driver_data<mpf1_state>();
 
 	if (!state->m_break)
 	{
@@ -482,7 +482,7 @@ static DRIVER_INIT( mpf1 )
 {
 	mpf1_state *state = machine.driver_data<mpf1_state>();
 
-	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mpf1_direct_update_handler, machine));
+	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mpf1_direct_update_handler), &machine));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)

@@ -511,13 +511,13 @@ ROM_END
 
 DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 {
-	mc1000_state *state = machine->driver_data<mc1000_state>();
+	mc1000_state *state = machine.driver_data<mc1000_state>();
 
 	if (state->m_rom0000)
 	{
 		if (address >= 0xc000)
 		{
-			memory_set_bank(*machine, "bank1", 0);
+			memory_set_bank(machine, "bank1", 0);
 			state->m_rom0000 = 0;
 		}
 	}
@@ -527,7 +527,7 @@ DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 
 static DRIVER_INIT( mc1000 )
 {
-	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(mc1000_direct_update_handler, machine));
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mc1000_direct_update_handler), &machine));
 }
 
 /* System Drivers */

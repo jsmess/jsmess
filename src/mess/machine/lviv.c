@@ -48,8 +48,8 @@ static TIMER_CALLBACK( lviv_reset )
 
 DIRECT_UPDATE_HANDLER(lviv_directoverride)
 {
-	if (input_port_read(*machine, "RESET") & 0x01)
-		machine->scheduler().timer_set(attotime::from_usec(10), FUNC(lviv_reset));
+	if (input_port_read(machine, "RESET") & 0x01)
+		machine.scheduler().timer_set(attotime::from_usec(10), FUNC(lviv_reset));
 	return address;
 }
 
@@ -238,7 +238,7 @@ MACHINE_RESET( lviv )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem;
 
-	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(lviv_directoverride), &machine));
 
 	state->m_video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
 

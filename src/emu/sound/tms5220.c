@@ -273,7 +273,7 @@ device), PES Speech adapter (serial port connection)
  * if VOICED_ZERO_HACK defined, acts as shown in patent, but the first and >=51 samples are 0x80 (-128)
  * if VOICED_PULSE_HACK defined, acts as a pulse waveform with a period of PWIDTH samples at PAMP, PWIDTH samples at ~PAMP, and the rest at 0
  * if VOICED_PULSE_MONOPOLAR_HACK defined, acts as a pulse waveform with a period of PWIDTH samples at PAMP, and the rest at 0
- * If you want this to sound like MGE, set VOICED_PULSE_MONOPOLAR_HACK to 1, PAMP to 0x3F and PWIDTH to 1
+ * If you want this to sound like MGE, set VOICED_PULSE_MONOPOLAR_HACK to 1, PAMP to 0x3F and PWIDTH to 2, and set the perfect interpolation hack below on as well.
  */
 #undef VOICED_INV_HACK
 #undef VOICED_ZERO_HACK
@@ -288,7 +288,6 @@ device), PES Speech adapter (serial port connection)
 #undef ALLOW_4_LSB
 
 /* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
-// TODO: as of around mame 0.141 this doesn't work right. please fix! - LN, to LN
 #undef PERFECT_INTERPOLATION_HACK
 
 
@@ -1001,9 +1000,12 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		{
 			if (tms->interp_period == 0) tms->inhibit = 0; // disable inhibit when reaching the last interp period
 #ifdef PERFECT_INTERPOLATION_HACK
-			int samples_per_frame = tms->subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
-			int current_sample = ((tms->PC*(3-tms->subc_reload))+((tms->subc_reload?38:25)*tms->interp_period));
+			int samples_per_frame = tms->subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
+			//int samples_per_frame = tms->subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
+			int current_sample = (tms->subcycle - tms->subc_reload)+(tms->PC*(3-tms->subc_reload))+((tms->subc_reload?25:38)*((tms->interp_period-1)&7));
+
 			zpar = OLD_FRAME_UNVOICED_FLAG;
+			//fprintf(stderr, "CS: %03d", current_sample);
 			// reset the current energy, pitch, etc to what it was at frame start
 			tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
 			tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
@@ -1011,11 +1013,21 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
 			for (i = 4; i < tms->coeff->num_k; i++)
 				tms->current_k[i] = (tms->coeff->ktable[i][tms->old_frame_k_idx[i]] * (1-zpar));
-			// now adjust each value to be exactly correct for each of the samples per frsme
-			tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*current_sample)/samples_per_frame;
-			tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*current_sample)/samples_per_frame;
-			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*current_sample)/samples_per_frame;
+			// now adjust each value to be exactly correct for each of the samples per frame
+			if (tms->interp_period != 0) // if we're still interpolating...
+			{
+				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*current_sample)/samples_per_frame;
+				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*current_sample)/samples_per_frame;
+				for (i = 0; i < tms->coeff->num_k; i++)
+					tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*current_sample)/samples_per_frame;
+			}
+			else // we're done, play this frame for 1/8 frame.
+			{
+				tms->current_energy = tms->target_energy;
+				tms->current_pitch = tms->target_pitch;
+				for (i = 0; i < tms->coeff->num_k; i++)
+					tms->current_k[i] = tms->target_k[i];
+			}
 #else
 			//Updates to parameters only happen on subcycle '2' (B cycle) of PCs.
 			if (tms->subcycle == 2)
@@ -1113,6 +1125,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 	}
 		this_sample = lattice_filter(tms); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
+		//fprintf(stderr,"C: %01d; ",tms->subcycle);
 		//fprintf(stderr,"IP: %01d; PC: %02d; X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->interp_period, tms->PC, tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ", tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		for (i=0; i<10; i++)

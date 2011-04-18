@@ -150,9 +150,9 @@ isa8_sblaster_device::isa8_sblaster_device(running_machine &_machine, const isa8
 void isa8_sblaster_device::device_start()
 {        
 	m_isa->add_isa_card(this, m_config.m_isa_num);
-	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, ym3812_16_r, ym3812_16_w );
-	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, saa1099_16_r, saa1099_16_w );
-	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, saa1099_16_r, saa1099_16_w );	
+	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
+	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );	
 }
 
 //-------------------------------------------------

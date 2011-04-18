@@ -21,9 +21,9 @@ public:
 
 DIRECT_UPDATE_HANDLER( atm_direct )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	device_t *beta = machine->device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	device_t *beta = machine.device(BETA_DISK_TAG);
+	UINT16 pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE);
 
 	if (beta->started() && betadisk_is_active(beta))
 	{
@@ -31,7 +31,7 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 		{
 			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 		}
 	}
 	else if (((pc & 0xff00) == 0x3d00) && (state->m_ROMSelection==1))
@@ -44,11 +44,11 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 	if((address>=0x0000) && (address<=0x3fff))
 	{
 		if (state->m_ROMSelection == 3) {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine->region("maincpu")->base() + 0x018000);
-			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x018000);
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x018000);
+			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x018000);
 		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine->region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
-			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 		}
 		return ~0;
 	}
@@ -119,7 +119,7 @@ static MACHINE_RESET( atm )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	space->set_direct_update_handler(direct_update_delegate_create_static(atm_direct, machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(atm_direct), &machine));
 
 	memset(messram,0,128*1024);
 

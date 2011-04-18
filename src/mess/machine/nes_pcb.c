@@ -11650,7 +11650,9 @@ typedef void (*nes_ppu_latch)(device_t *device, offs_t offset);
 struct nes_memory_accessor
 {
 	write8_space_func write;
+	const char		  *write_name;
 	read8_space_func  read;
+	const char		  *read_name;
 };
 
 typedef struct _nes_pcb_intf  nes_pcb_intf;
@@ -11666,13 +11668,13 @@ struct _nes_pcb_intf
 };
 
 #define NES_NOACCESS \
-{NULL, NULL}
+{FUNC_NULL, FUNC_NULL}
 
 #define NES_READONLY(a) \
-{NULL, a}
+{FUNC_NULL, FUNC(a)}
 
 #define NES_WRITEONLY(a) \
-{a, NULL}
+{FUNC(a), FUNC_NULL}
 
 static WRITE8_HANDLER( dummy_l_w )
 {
@@ -11733,7 +11735,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ STD_TXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txrom_w),               NULL, NULL, mmc3_irq },
 	{ STD_TVROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txrom_w),               NULL, NULL, mmc3_irq },
 	{ STD_TKROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_HKROM,            NES_NOACCESS, {hkrom_m_w, hkrom_m_r}, NES_WRITEONLY(hkrom_w),     NULL, NULL, mmc3_irq },
+	{ STD_HKROM,            NES_NOACCESS, {FUNC(hkrom_m_w), FUNC(hkrom_m_r)}, NES_WRITEONLY(hkrom_w),     NULL, NULL, mmc3_irq },
 	{ STD_TQROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tqrom_w),               NULL, NULL, mmc3_irq },
 	{ STD_TXSROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txsrom_w),              NULL, NULL, mmc3_irq },
 	{ STD_DXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(dxrom_w),               NULL, NULL, NULL },
@@ -11742,7 +11744,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ NAMCOT_3425,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(namcot3425_w),          NULL, NULL, NULL },
 	{ NAMCOT_3446,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(namcot3446_w),          NULL, NULL, NULL },
 	{ NAMCOT_3453,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(namcot3453_w),          NULL, NULL, NULL },
-	{ STD_EXROM,            {exrom_l_w, exrom_l_r}, NES_NOACCESS, NES_NOACCESS,               NULL, NULL, mmc5_irq },
+	{ STD_EXROM,            {FUNC(exrom_l_w), FUNC(exrom_l_r)}, NES_NOACCESS, NES_NOACCESS,               NULL, NULL, mmc5_irq },
 	{ NES_QJ,               NES_NOACCESS, NES_WRITEONLY(qj_m_w), NES_WRITEONLY(txrom_w),      NULL, NULL, mmc3_irq },
 	{ PAL_ZZ,               NES_NOACCESS, NES_WRITEONLY(zz_m_w), NES_WRITEONLY(txrom_w),      NULL, NULL, mmc3_irq },
 	{ UXROM_CC,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(uxrom_cc_w),            NULL, NULL, NULL },
@@ -11775,15 +11777,15 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc4_w),         NULL, NULL, konami_irq },
 	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc6_w),         NULL, NULL, konami_irq },
 	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc7_w),         NULL, NULL, konami_irq },
-	{ NAMCOT_163,           {namcot163_l_w, namcot163_l_r}, NES_NOACCESS, NES_WRITEONLY(namcot163_w), NULL, NULL, namcot_irq },
+	{ NAMCOT_163,           {FUNC(namcot163_l_w), FUNC(namcot163_l_r) }, NES_NOACCESS, NES_WRITEONLY(namcot163_w), NULL, NULL, namcot_irq },
 	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
 	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft2_w),            NULL, NULL, NULL },
 	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft3_w),            NULL, NULL, sunsoft3_irq },
 	{ TAITO_TC0190FMC,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tc0190fmc_w),           NULL, NULL, NULL },
 	{ TAITO_TC0190FMCP,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tc0190fmc_p16_w),       NULL, NULL, mmc3_irq },
-	{ TAITO_X1_005,         NES_NOACCESS, {x1005_m_w, x1005_m_r}, NES_NOACCESS,               NULL, NULL, NULL },
-	{ TAITO_X1_005_A,       NES_NOACCESS, {x1005a_m_w, x1005_m_r}, NES_NOACCESS,              NULL, NULL, NULL },
-	{ TAITO_X1_017,         NES_NOACCESS, {x1017_m_w, x1017_m_r}, NES_NOACCESS,               NULL, NULL, NULL },
+	{ TAITO_X1_005,         NES_NOACCESS, {FUNC(x1005_m_w), FUNC(x1005_m_r)}, NES_NOACCESS,               NULL, NULL, NULL },
+	{ TAITO_X1_005_A,       NES_NOACCESS, {FUNC(x1005a_m_w), FUNC(x1005_m_r)}, NES_NOACCESS,              NULL, NULL, NULL },
+	{ TAITO_X1_017,         NES_NOACCESS, {FUNC(x1017_m_w), FUNC(x1017_m_r)}, NES_NOACCESS,               NULL, NULL, NULL },
 	//
 	{ AGCI_50282,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(agci_50282_w),          NULL, NULL, NULL },
 	{ ACTENT_ACT52,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ae_act52_w),            NULL, NULL, NULL },
@@ -11797,24 +11799,24 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ CAMERICA_BF9097,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bf9093_w),              NULL, NULL, NULL },
 	{ CAMERICA_BF9096,      NES_NOACCESS, NES_WRITEONLY(bf9096_w), NES_WRITEONLY(bf9096_w),   NULL, NULL, NULL },
 	{ CAMERICA_GOLDENFIVE,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(golden5_w),             NULL, NULL, NULL },
-	{ CONY_BOARD,           {cony_l_w, cony_l_r}, NES_NOACCESS, NES_WRITEONLY(cony_w),        NULL, NULL, sunsoft3_irq },
+	{ CONY_BOARD,           {FUNC(cony_l_w), FUNC(cony_l_r)}, NES_NOACCESS, NES_WRITEONLY(cony_w),        NULL, NULL, sunsoft3_irq },
 	{ DREAMTECH_BOARD,      NES_WRITEONLY(dreamtech_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
 	{ FUTUREMEDIA_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(futuremedia_w),         NULL, NULL, futuremedia_irq },
-	{ FUKUTAKE_BOARD,       {fukutake_l_w, fukutake_l_r}, NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
-	{ GOUDER_37017,         {gouder_sf4_l_w, gouder_sf4_l_r}, NES_NOACCESS, NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
+	{ FUKUTAKE_BOARD,       {FUNC(fukutake_l_w), FUNC(fukutake_l_r)}, NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
+	{ GOUDER_37017,         {FUNC(gouder_sf4_l_w), FUNC(gouder_sf4_l_r)}, NES_NOACCESS, NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ HENGEDIANZI_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(henggedianzi_w),        NULL, NULL, NULL },
 	{ HENGEDIANZI_XJZB,     NES_WRITEONLY(heng_xjzb_l_w), NES_NOACCESS, NES_WRITEONLY(heng_xjzb_w), NULL, NULL, NULL },
 	{ HES6IN1_BOARD,        NES_WRITEONLY(hes6in1_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
 	{ HES_BOARD,            NES_WRITEONLY(hes_l_w), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
 	{ HOSENKAN_BOARD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(hosenkan_w),            NULL, NULL, mmc3_irq },
 	{ KAISER_KS7058,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ks7058_w),              NULL, NULL, NULL },
-	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, {ks7022_w, ks7022_r},                 NULL, NULL, NULL },
+	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, {FUNC(ks7022_w), FUNC(ks7022_r)},                 NULL, NULL, NULL },
 	{ KAISER_KS7032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ks7032_w),              NULL, NULL, ks7032_irq },
 	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ks202_w),               NULL, NULL, ks7032_irq },
 	{ KAISER_KS7017,		NES_WRITEONLY(ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
-	{ KAY_PANDAPRINCE,      {kay_pp_l_w, kay_pp_l_r}, NES_NOACCESS, NES_WRITEONLY(kay_pp_w),  NULL, NULL, mmc3_irq },
+	{ KAY_PANDAPRINCE,      {FUNC(kay_pp_l_w), FUNC(kay_pp_l_r)}, NES_NOACCESS, NES_WRITEONLY(kay_pp_w),  NULL, NULL, mmc3_irq },
 	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(kasing_m_w), NES_WRITEONLY(txrom_w),  NULL, NULL, mmc3_irq },
-	{ SACHEN_74LS374,       {sachen_74x374_l_w, sachen_74x374_l_r}, NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
+	{ SACHEN_74LS374,       {FUNC(sachen_74x374_l_w), FUNC(sachen_74x374_l_r)}, NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
 	{ SACHEN_74LS374_A,     NES_WRITEONLY(sachen_74x374a_l_w), NES_NOACCESS, NES_NOACCESS,    NULL, NULL, NULL },
 	{ SACHEN_8259A,         NES_WRITEONLY(s8259_l_w), NES_WRITEONLY(s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
 	{ SACHEN_8259B,         NES_WRITEONLY(s8259_l_w), NES_WRITEONLY(s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
@@ -11827,18 +11829,18 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ SACHEN_SA72008,       NES_WRITEONLY(sa72008_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
 	{ SACHEN_TCA01,         NES_READONLY(tca01_l_r), NES_NOACCESS, NES_NOACCESS,              NULL, NULL, NULL },
 	{ SACHEN_TCU01,         NES_WRITEONLY(tcu01_l_w), NES_WRITEONLY(tcu01_m_w), NES_WRITEONLY(tcu01_w), NULL, NULL, NULL },
-	{ SACHEN_TCU02,         {tcu02_l_w, tcu02_l_r}, NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
+	{ SACHEN_TCU02,         {FUNC(tcu02_l_w), FUNC(tcu02_l_r)}, NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
 	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(subor0_w),              NULL, NULL, NULL },
 	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(subor1_w),              NULL, NULL, NULL },
 	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(magics_md_w),           NULL, NULL, NULL },
-	{ NANJING_BOARD,        {nanjing_l_w, nanjing_l_r}, NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq },
+	{ NANJING_BOARD,        {FUNC(nanjing_l_w), FUNC(nanjing_l_r)}, NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq },
 	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nitra_w),               NULL, NULL, mmc3_irq },
 	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ntdec_asder_w),         NULL, NULL, NULL },
 	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(ntdec_fh_m_w), NES_NOACCESS,          NULL, NULL, NULL },
 	{ OPENCORP_DAOU306,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(daou306_w),             NULL, NULL, NULL },
 	{ RCM_GS2015,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(gs2015_w),              NULL, NULL, NULL },
 	{ RCM_TETRISFAMILY,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(rcm_tf_w),              NULL, NULL, NULL },
-	{ REXSOFT_DBZ5,         {rex_dbz_l_w, rex_dbz_l_r}, NES_READONLY(rex_dbz_l_r), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
+	{ REXSOFT_DBZ5,         {FUNC(rex_dbz_l_w), FUNC(rex_dbz_l_r)}, NES_READONLY(rex_dbz_l_r), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ REXSOFT_SL1632,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(rex_sl1632_w),          NULL, NULL, mmc3_irq },
 	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(rumblestation_m_w), NES_WRITEONLY(rumblestation_w),      NULL, NULL, NULL },
 	{ SOMERI_SL12,          NES_WRITEONLY(someri_l_w), NES_NOACCESS, NES_WRITEONLY(someri_w), NULL, NULL, mmc3_irq },
@@ -11847,9 +11849,9 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800008_w),       NULL, NULL, NULL },
 	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800032_w),       NULL, NULL, tengen_800032_irq },
 	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800037_w),       NULL, NULL, tengen_800032_irq },
-	{ TXC_22211A,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL },
-	{ TXC_22211B,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211b_w), NULL, NULL, NULL },
-	{ TXC_22211C,           {txc_22211_l_w, txc_22211c_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL },
+	{ TXC_22211A,           {FUNC(txc_22211_l_w), FUNC(txc_22211_l_r)}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL },
+	{ TXC_22211B,           {FUNC(txc_22211_l_w), FUNC(txc_22211_l_r)}, NES_NOACCESS, NES_WRITEONLY(txc_22211b_w), NULL, NULL, NULL },
+	{ TXC_22211C,           {FUNC(txc_22211_l_w), FUNC(txc_22211c_l_r)}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL },
 	{ TXC_TW,               NES_WRITEONLY(txc_tw_l_w), NES_WRITEONLY(txc_tw_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txc_strikewolf_w),      NULL, NULL, NULL },
 	{ TXC_MXMDHTWO,         NES_READONLY(txc_mxmdhtwo_l_r), NES_NOACCESS, NES_WRITEONLY(txc_mxmdhtwo_w), NULL, NULL, NULL },
@@ -11877,7 +11879,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_cc21_w),            NULL, NULL, NULL },
 	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_kof97_w),           NULL, NULL, mmc3_irq },
 	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_t230_w),            NULL, NULL, konami_irq },
-	{ UNL_KOF96,            {kof96_l_w, kof96_l_r}, NES_NOACCESS, NES_WRITEONLY(kof96_w),     NULL, NULL, mmc3_irq },
+	{ UNL_KOF96,            {FUNC(kof96_l_w), FUNC(kof96_l_r)}, NES_NOACCESS, NES_WRITEONLY(kof96_w),     NULL, NULL, mmc3_irq },
 	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(mk2_m_w), NES_NOACCESS,               NULL, NULL, mmc3_irq },
 	{ UNL_N625092,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(n625092_w),             NULL, NULL, NULL },
 	{ UNL_SC127,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sc127_w),               NULL, NULL, sc127_irq },
@@ -11886,10 +11888,10 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_XZY,              NES_WRITEONLY(unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
 	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_racmate_w),         NULL, NULL, NULL },
 	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sng32_w),               NULL, NULL, NULL },
-	{ UNL_603_5052,         {unl_6035052_extra_w, unl_6035052_extra_r}, {unl_6035052_extra_w, unl_6035052_extra_r}, NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
+	{ UNL_603_5052,         {FUNC(unl_6035052_extra_w), FUNC(unl_6035052_extra_r)}, {FUNC(unl_6035052_extra_w), FUNC(unl_6035052_extra_r)}, NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),               NULL, NULL, NULL },
 	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(shjy3_w),               NULL, NULL, shjy3_irq },
-	{ UNL_H2288,            {h2288_l_w, h2288_l_r}, NES_NOACCESS, NES_WRITEONLY(h2288_w),     NULL, NULL, mmc3_irq },
+	{ UNL_H2288,            {FUNC(h2288_l_w), FUNC(h2288_l_r)}, NES_NOACCESS, NES_WRITEONLY(h2288_w),     NULL, NULL, mmc3_irq },
 	//
 	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_mariobaby_w),       NULL, NULL, NULL },
 	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_dn_w),              NULL, NULL, btl_dn_irq },
@@ -11899,7 +11901,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BTL_SMB3,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_smb3_w),            NULL, NULL, btl_smb3_irq },
 	{ BTL_SUPERBROS11,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_smb11_w),           NULL, NULL, mmc3_irq },
 	{ BTL_TOBIDASE,         NES_WRITEONLY(btl_tobi_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
-	{ BTL_PIKACHUY2K,       NES_NOACCESS, {btl_pika_y2k_m_w, btl_pika_y2k_m_r}, NES_WRITEONLY(btl_pika_y2k_w),  NULL, NULL, mmc3_irq },
+	{ BTL_PIKACHUY2K,       NES_NOACCESS, {FUNC(btl_pika_y2k_m_w), FUNC(btl_pika_y2k_m_r)}, NES_WRITEONLY(btl_pika_y2k_w),  NULL, NULL, mmc3_irq },
 	{ WHIRLWIND_2706,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(whirl2706_w),           NULL, NULL, NULL },
 	//
 	{ BMC_190IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_190in1_w),          NULL, NULL, NULL },
@@ -11938,11 +11940,11 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(bmc_15in1_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(bmc_ball11_m_w), NES_WRITEONLY(bmc_ball11_w), NULL, NULL, NULL },
 	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(bmc_gc6in1_w), NULL, NULL, mmc3_irq },
-	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, {bmc_vt5201_w, bmc_vt5201_r},         NULL, NULL, NULL },
+	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, {FUNC(bmc_vt5201_w), FUNC(bmc_vt5201_r)},         NULL, NULL, NULL },
 	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_bs5_w),             NULL, NULL, NULL },
 	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_810544_w),          NULL, NULL, NULL },
 	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_ntd03_w),           NULL, NULL, NULL },
-	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {bmc_gb63_w, bmc_gb63_r},             NULL, NULL, NULL },
+	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {FUNC(bmc_gb63_w), FUNC(bmc_gb63_r)},             NULL, NULL, NULL },
 	{ BMC_FK23C,            NES_WRITEONLY(fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(fk23c_w),   NULL, NULL, mmc3_irq },
 	{ BMC_FK23CA,           NES_WRITEONLY(fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(fk23c_w),   NULL, NULL, mmc3_irq },
 	{ BMC_PJOY84,           NES_NOACCESS, NES_WRITEONLY(pjoy84_m_w), NES_WRITEONLY(txrom_w),  NULL, NULL, mmc3_irq },
@@ -11951,7 +11953,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(mapper8_w),             NULL, NULL, NULL },
 	{ FFE_MAPPER17,         NES_WRITEONLY(mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, ffe_irq },
 	// for debug and development
-	{ UNKNOWN_BOARD,        {dummy_l_w, dummy_l_r}, {dummy_m_w, dummy_m_r}, {dummy_w, dummy_r}, NULL, NULL, NULL },
+	{ UNKNOWN_BOARD,        {FUNC(dummy_l_w), FUNC(dummy_l_r)}, {FUNC(dummy_m_w), FUNC(dummy_m_r)}, {FUNC(dummy_w), FUNC(dummy_r)}, NULL, NULL, NULL },
 	//
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
@@ -11980,11 +11982,17 @@ void pcb_handlers_setup( running_machine &machine )
 	if (intf)
 	{
 		state->m_mmc_write_low = intf->mmc_l.write;
+		state->m_mmc_write_low_name = intf->mmc_l.write_name;
 		state->m_mmc_write_mid = intf->mmc_m.write;
+		state->m_mmc_write_mid_name = intf->mmc_m.write_name;
 		state->m_mmc_write = intf->mmc_h.write;
+		state->m_mmc_write_name = intf->mmc_h.write_name;
 		state->m_mmc_read_low = intf->mmc_l.read;
+		state->m_mmc_read_low_name = intf->mmc_l.read_name;
 		state->m_mmc_read_mid = intf->mmc_m.read;	// in progress
+		state->m_mmc_read_mid_name = intf->mmc_m.read_name;
 		state->m_mmc_read = intf->mmc_h.read;	// in progress
+		state->m_mmc_read_name = intf->mmc_h.read_name;
 		ppu2c0x_set_latch(ppu, intf->mmc_ppu_latch);
 	}
 	else

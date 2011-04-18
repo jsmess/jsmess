@@ -146,17 +146,17 @@ static void init_nes_core( running_machine &machine )
 
 	// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
 	if (state->m_mmc_write_mid)
-		space->install_legacy_write_handler(0x6000, 0x7fff, FUNC(state->m_mmc_write_mid));
+		space->install_legacy_write_handler(0x6000, 0x7fff, state->m_mmc_write_mid,state->m_mmc_write_mid_name);
 	if (state->m_mmc_write)
-		space->install_legacy_write_handler(0x8000, 0xffff, FUNC(state->m_mmc_write));
+		space->install_legacy_write_handler(0x8000, 0xffff, state->m_mmc_write, state->m_mmc_write_name);
 
 	// In fact, we also allow single pcbs to overwrite the bank read handlers defined above,
 	// because some pcbs (mainly pirate ones) require protection values to be read instead of
 	// the expected ROM banks: these handlers, though, must take care of the ROM access as well
 	if (state->m_mmc_read_mid)
-		space->install_legacy_read_handler(0x6000, 0x7fff, FUNC(state->m_mmc_read_mid));
+		space->install_legacy_read_handler(0x6000, 0x7fff, state->m_mmc_read_mid,state->m_mmc_read_mid_name);
 	if (state->m_mmc_read)
-		space->install_legacy_read_handler(0x8000, 0xffff, FUNC(state->m_mmc_read));
+		space->install_legacy_read_handler(0x8000, 0xffff, state->m_mmc_read,state->m_mmc_read_name);
 
 	// install additional handlers
 	if (state->m_pcb_id == BTL_SMB2B || state->m_mapper == 50)

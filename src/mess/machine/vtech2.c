@@ -46,21 +46,21 @@ static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space->machine(),2,offset);
 static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space->machine(),3,offset); }
 
 /* read banked memory (handle memory mapped i/o) */
-static const read8_space_func mra_bank_soft[4] =
+static const struct { read8_space_func func; const char *name; }  mra_bank_soft[4] =
 {
-    mra_bank1,  /* mapped in 0000-3fff */
-    mra_bank2,  /* mapped in 4000-7fff */
-    mra_bank3,  /* mapped in 8000-bfff */
-    mra_bank4   /* mapped in c000-ffff */
+    { FUNC(mra_bank1) },  /* mapped in 0000-3fff */
+    { FUNC(mra_bank2) },  /* mapped in 4000-7fff */
+    { FUNC(mra_bank3) },  /* mapped in 8000-bfff */
+    { FUNC(mra_bank4) }   /* mapped in c000-ffff */
 };
 
 /* write banked memory (handle memory mapped i/o and videoram) */
-static const write8_space_func mwa_bank_soft[4] =
+static const struct { write8_space_func func; const char *name; }  mwa_bank_soft[4] =
 {
-    mwa_bank1,  /* mapped in 0000-3fff */
-    mwa_bank2,  /* mapped in 4000-7fff */
-    mwa_bank3,  /* mapped in 8000-bfff */
-    mwa_bank4   /* mapped in c000-ffff */
+    { FUNC(mwa_bank1) },  /* mapped in 0000-3fff */
+    { FUNC(mwa_bank2) },  /* mapped in 4000-7fff */
+    { FUNC(mwa_bank3) },  /* mapped in 8000-bfff */
+    { FUNC(mwa_bank4) }   /* mapped in c000-ffff */
 };
 
 /* read banked memory (plain ROM/RAM) */
@@ -157,8 +157,8 @@ WRITE8_HANDLER( laser_bank_select_w )
         /* memory mapped I/O bank selected? */
 		if (data == 2)
 		{
-			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mra_bank_soft[offset]));
-			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, FUNC(mwa_bank_soft[offset]));
+			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset].func, mra_bank_soft[offset].name);
+			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_soft[offset].func, mwa_bank_soft[offset].name);
 		}
 		else
 		{

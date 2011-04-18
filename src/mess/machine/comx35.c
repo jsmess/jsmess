@@ -530,14 +530,14 @@ static TIMER_CALLBACK( reset_tick )
 
 DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 {
-	comx35_state *state = machine->driver_data<comx35_state>();
+	comx35_state *state = machine.driver_data<comx35_state>();
 
 	if (address >= 0x0dd0 && address <= 0x0ddf)
 	{
 		if (state->is_dos_card_active())
 		{
 			// read opcode from DOS ROM
-			direct.explicit_configure(0x0dd0, 0x0ddf, 0x000f, machine->region("fdc")->base());
+			direct.explicit_configure(0x0dd0, 0x0ddf, 0x000f, machine.region("fdc")->base());
 			return ~0;
 		}
 	}
@@ -557,7 +557,7 @@ void comx35_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* opbase handling for DOS Card */
-	program->set_direct_update_handler(direct_update_delegate_create_static(comx35_opbase_handler, m_machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(comx35_opbase_handler), &m_machine));
 
 	/* BASIC ROM banking */
 	program->install_read_bank(0x1000, 0x17ff, "bank2");

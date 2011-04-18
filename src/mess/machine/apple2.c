@@ -108,8 +108,8 @@ void apple2_update_memory(running_machine &machine)
 	char rbank[10], wbank[10];
 	int full_update = 0;
 	apple2_meminfo meminfo;
-	read8_space_func rh;
-	write8_space_func wh;
+	read8_space_func rh; const char *rh_name;
+	write8_space_func wh; const char *wh_name;
 	offs_t begin, end_r, end_w;
 	UINT8 *rbase, *wbase, *rom, *slot_ram;
 	UINT32 rom_length, slot_length, offset;
@@ -160,11 +160,13 @@ void apple2_update_memory(running_machine &machine)
 			{
 				/* handler */
 				rh = meminfo.read_handler;
+				rh_name = meminfo.read_handler_name;
 			}
 			else if (meminfo.read_mem == APPLE2_MEM_FLOATING)
 			{
 				/* floating RAM */
 				rh = read_floatingbus;
+				rh_name = "read_floatingbus";
 			}
 			else if ((meminfo.read_mem & 0xC0000000) == APPLE2_MEM_AUX)
 			{
@@ -179,10 +181,12 @@ void apple2_update_memory(running_machine &machine)
 				if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0)
 				{
 					rh = apple2_c1xx_r;
+					rh_name = "apple2_c1xx_r";
 				}
 				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300)
 				{	// slots 4-7
 					rh = apple2_c4xx_r;
+					rh_name = "apple2_c4xx_r";
 				}
 			}
 			else if ((meminfo.read_mem & 0xC0000000) == APPLE2_MEM_ROM)
@@ -204,7 +208,7 @@ void apple2_update_memory(running_machine &machine)
 			/* install the actual handlers */
 			if (begin <= end_r) {
 				if (rh) {
-					space->install_legacy_read_handler(begin, end_r, FUNC(rh));
+					space->install_legacy_read_handler(begin, end_r, rh, rh_name);
 				} else {
 					space->install_read_bank(begin, end_r, rbank);
 				}
@@ -247,6 +251,7 @@ void apple2_update_memory(running_machine &machine)
 			{
 				/* handler */
 				wh = meminfo.write_handler;
+				wh_name = meminfo.write_handler_name;
 			}
 			else if ((meminfo.write_mem & 0xC0000000) == APPLE2_MEM_AUX)
 			{
@@ -263,10 +268,12 @@ void apple2_update_memory(running_machine &machine)
 				if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0)
 				{
 					wh = apple2_c1xx_w;
+					wh_name = "apple2_c1xx_w";
 				}
 				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300)
 				{	// slots 4-7
 					wh = apple2_c4xx_w;
+					wh_name = "apple2_c4xx_w";
 				}
 			}
 			else if ((meminfo.write_mem & 0xC0000000) == APPLE2_MEM_ROM)
@@ -288,7 +295,7 @@ void apple2_update_memory(running_machine &machine)
 			/* install the actual handlers */
 			if (begin <= end_w) {
 				if (wh) {
-					space->install_legacy_write_handler(begin, end_w, FUNC(wh));
+					space->install_legacy_write_handler(begin, end_w, wh ,wh_name);
 				} else {
 					if (wh_nop) {
 						space->nop_write(begin, end_w);

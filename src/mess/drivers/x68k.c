@@ -2609,8 +2609,8 @@ static MACHINE_START( x68000 )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->m_spriteram = (UINT16*)machine.region("user1")->base();
-	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read16_space_func)x68k_emptyram_r));
-	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write16_space_func)x68k_emptyram_w));
+	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
+	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
 	space->install_readwrite_bank(0x000000,ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine.device(RAM_TAG)));
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
@@ -2640,8 +2640,8 @@ static MACHINE_START( x68030 )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->m_spriteram = (UINT16*)machine.region("user1")->base();
-	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((read32_space_func)x68k_rom0_r));
-	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC((write32_space_func)x68k_rom0_w));
+	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r));
+	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w));
 	space->install_readwrite_bank(0x000000,ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
 	space->install_readwrite_bank(0x3000000,0x3000000+ram_get_size(machine.device(RAM_TAG))-1,0xffffffff,0,"bank5");

@@ -1617,9 +1617,9 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if ((detect_tvdraw(state->m_cartridge[index].ROM)) && state->m_is_region_japan)
 	{
 		address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
-		program->install_legacy_write_handler(0x6000, 0x6000, FUNC(&sms_tvdraw_axis_w));
-		program->install_legacy_read_handler(0x8000, 0x8000, FUNC(&sms_tvdraw_status_r));
-		program->install_legacy_read_handler(0xa000, 0xa000, FUNC(&sms_tvdraw_data_r));
+		program->install_legacy_write_handler(0x6000, 0x6000, FUNC(sms_tvdraw_axis_w));
+		program->install_legacy_read_handler(0x8000, 0x8000, FUNC(sms_tvdraw_status_r));
+		program->install_legacy_read_handler(0xa000, 0xa000, FUNC(sms_tvdraw_data_r));
 		program->nop_write(0xa000, 0xa000);
 	}
 
@@ -1629,7 +1629,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		// and then the handlers should be installed here for all but the KOREAN_NOBANK carts
 		// However, to avoid memory map breakage, we currently go the other way around
 		address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
-		program->install_legacy_readwrite_handler(0xfffc, 0xffff, FUNC(&sms_kor_nobank_r), FUNC(&sms_kor_nobank_w));
+		program->install_legacy_readwrite_handler(0xfffc, 0xffff, FUNC(sms_kor_nobank_r), FUNC(sms_kor_nobank_w));
 	}
 
 	LOG(("Cart Features: %x\n", state->m_cartridge[index].features));

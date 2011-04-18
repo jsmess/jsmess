@@ -231,11 +231,10 @@ static WRITE8_HANDLER( scorpion_0000_w )
 
 DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
-	device_t *beta = machine->device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-
+	spectrum_state *state = machine.driver_data<spectrum_state>();
+	device_t *beta = machine.device(BETA_DISK_TAG);
+	UINT16 pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE);
+	
 	state->m_ram_disabled_by_beta = 0;
 	if (betadisk_is_active(beta))
 	{
@@ -244,7 +243,7 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
 			state->m_ram_disabled_by_beta = 1;
-			memory_set_bankptr(*machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 		}
 	}
 	else if (((pc & 0xff00) == 0x3d00) && (state->m_ROMSelection==1))
@@ -255,8 +254,8 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	if((address>=0x0000) && (address<=0x3fff))
 	{
 		state->m_ram_disabled_by_beta = 1;
-		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, space->machine().region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
-		memory_set_bankptr(*machine, "bank1", space->machine().region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 		return ~0;
 	}
 	return address;
@@ -329,7 +328,7 @@ static MACHINE_RESET( scorpion )
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
-	space->set_direct_update_handler(direct_update_delegate_create_static(scorpion_direct, machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(scorpion_direct), &machine));
 
 	memset(messram,0,256*1024);
 

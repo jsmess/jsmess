@@ -570,16 +570,16 @@ ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb
 {
 }
  
-void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, write8_device_func whandler)
+void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
 {	
 	int buswidth = m_machine.firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0);
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name, 0);
 			break;
 		case 16:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, FUNC(rhandler), FUNC(whandler),0xffff);
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -587,16 +587,16 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 	}
 }
 
-void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler)
+void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler, const char *whandler_name)
 {	
 	int buswidth = m_machine.firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0);
+			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, whandler, whandler_name,0);
 			break;
 		case 16:
-			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, FUNC(whandler),0xffff);
+			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, whandler, whandler_name, 0xffff);
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
@@ -638,12 +638,12 @@ void ibm5160_mb_device::device_start()
 	devcb_resolve_write_line(&m_kb_set_clock_signal_func, &m_config.m_kb_set_clock_signal_func, this);
 	devcb_resolve_write_line(&m_kb_set_data_signal_func,  &m_config.m_kb_set_data_signal_func,  this);
 
-	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, i8237_r, i8237_w );	
-	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, pic8259_r, pic8259_w );	
-	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, pit8253_r, pit8253_w );	
-	install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, i8255a_r, i8255a_w );	
-	install_device(this,    0x0080, 0x0087, 0, 0, pc_page_r, pc_page_w );	
-	install_device_write(this,    0x00a0, 0x00a1, 0, 0, nmi_enable_w);	
+	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, FUNC(i8237_r), FUNC(i8237_w) );	
+	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, FUNC(pic8259_r), FUNC(pic8259_w) );	
+	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, FUNC(pit8253_r), FUNC(pit8253_w) );	
+	install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, FUNC(i8255a_r), FUNC(i8255a_w) );	
+	install_device(this,    0x0080, 0x0087, 0, 0, FUNC(pc_page_r), FUNC(pc_page_w) );	
+	install_device_write(this,    0x00a0, 0x00a1, 0, 0, FUNC(nmi_enable_w));	
 	/* MESS managed RAM */
 	if ( ram_get_ptr(m_machine.device(RAM_TAG)) )
 		memory_set_bankptr( m_machine, "bank10", ram_get_ptr(m_machine.device(RAM_TAG)) );	

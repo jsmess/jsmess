@@ -420,12 +420,12 @@ DIRECT_UPDATE_HANDLER( psx_default )
 
 DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
-	psx1_state *state = machine->driver_data<psx1_state>();
+	psx1_state *state = machine.driver_data<psx1_state>();
 	if( address == 0x80030000 )
 	{
-		device_t *cpu = machine->device("maincpu");
+		device_t *cpu = machine.device("maincpu");
 
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(psx_default), &machine));
 
 		if( load_psxexe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
 			load_cpe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
@@ -464,7 +464,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	state->m_exe_size = quickload_size;
-	space->set_direct_update_handler(direct_update_delegate_create_static(psx_setopbase, image.device().machine()));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(psx_setopbase), &image.device().machine()));
 
 	return IMAGE_INIT_PASS;
 }

@@ -805,9 +805,9 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	default:
 		if (IS_CARTRIDGE_TV_DRAW(ptr))
 		{
-			program->install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate_create(sg1000_state, tvdraw_axis_w, *this), 0);
-			program->install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_status_r, *this), 0);
-			program->install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate_create(sg1000_state, tvdraw_data_r, *this), 0);
+			program->install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate(FUNC(sg1000_state::tvdraw_axis_w), this), 0);
+			program->install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_status_r), this), 0);
+			program->install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_data_r), this), 0);
 			program->nop_write(0xa000, 0xa000);
 		}
 		else if (IS_CARTRIDGE_THE_CASTLE(ptr))

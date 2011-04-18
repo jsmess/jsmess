@@ -871,8 +871,8 @@ static TIMER_CALLBACK( pmd_reset )
 
 DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 {
-	if (input_port_read(*machine, "RESET") & 0x01)
-		machine->scheduler().timer_set(attotime::from_usec(10), FUNC(pmd_reset));
+	if (input_port_read(machine, "RESET") & 0x01)
+		machine.scheduler().timer_set(attotime::from_usec(10), FUNC(pmd_reset));
 	return address;
 }
 
@@ -976,5 +976,5 @@ MACHINE_RESET( pmd85 )
 
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pmd85_opbaseoverride), &machine));
 }

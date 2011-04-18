@@ -414,7 +414,7 @@ void abc806_state::bankswitch()
 
 					program->install_read_bank(0x7000, 0x77ff, bank_name);
 					program->unmap_write(0x7000, 0x77ff);
-					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
+					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r),this), write8_delegate(FUNC(abc806_state::charram_w),this));
 					memory_set_bank(m_machine, bank_name, 0);
 					break;
 
@@ -449,7 +449,7 @@ void abc806_state::bankswitch()
 			if (start_addr == 0x7000)
 			{
 				program->install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate_create(abc806_state, charram_r, *this), write8_delegate_create(abc806_state, charram_w, *this));
+				program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
 			}
 			else
 			{
@@ -1786,11 +1786,11 @@ ROM_END
 
 DIRECT_UPDATE_HANDLER( abc800c_direct_update_handler )
 {
-	abc800_state *state = machine->driver_data<abc800_state>();
+	abc800_state *state = machine.driver_data<abc800_state>();
 
 	if (address >= 0x7c00 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, machine->region(Z80_TAG)->base() + 0x7c00);
+		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, machine.region(Z80_TAG)->base() + 0x7c00);
 
 		if (!state->m_fetch_charram)
 		{
@@ -1813,7 +1813,7 @@ DIRECT_UPDATE_HANDLER( abc800c_direct_update_handler )
 static DRIVER_INIT( abc800c )
 {
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc800c_direct_update_handler, machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800c_direct_update_handler), &machine));
 }
 
 
@@ -1823,11 +1823,11 @@ static DRIVER_INIT( abc800c )
 
 DIRECT_UPDATE_HANDLER( abc800m_direct_update_handler )
 {
-	abc800_state *state = machine->driver_data<abc800_state>();
+	abc800_state *state = machine.driver_data<abc800_state>();
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine->region(Z80_TAG)->base() + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine.region(Z80_TAG)->base() + 0x7800);
 
 		if (!state->m_fetch_charram)
 		{
@@ -1850,7 +1850,7 @@ DIRECT_UPDATE_HANDLER( abc800m_direct_update_handler )
 static DRIVER_INIT( abc800m )
 {
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc800m_direct_update_handler, machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800m_direct_update_handler), &machine));
 }
 
 
@@ -1860,13 +1860,13 @@ static DRIVER_INIT( abc800m )
 
 DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 {
-	abc802_state *state = machine->driver_data<abc802_state>();
+	abc802_state *state = machine.driver_data<abc802_state>();
 
 	if (state->m_lrs)
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine->region(Z80_TAG)->base() + 0x7800);
+			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine.region(Z80_TAG)->base() + 0x7800);
 			return ~0;
 		}
 	}
@@ -1877,7 +1877,7 @@ DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 static DRIVER_INIT( abc802 )
 {
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc802_direct_update_handler, machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc802_direct_update_handler), &machine));
 }
 
 
@@ -1887,11 +1887,11 @@ static DRIVER_INIT( abc802 )
 
 DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 {
-	abc806_state *state = machine->driver_data<abc806_state>();
+	abc806_state *state = machine.driver_data<abc806_state>();
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine->region(Z80_TAG)->base() + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine.region(Z80_TAG)->base() + 0x7800);
 
 		if (!state->m_fetch_charram)
 		{
@@ -1914,7 +1914,7 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 static DRIVER_INIT( abc806 )
 {
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate_create_static(abc806_direct_update_handler, machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc806_direct_update_handler), &machine));
 }
 
 

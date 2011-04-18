@@ -114,7 +114,7 @@ isa8_adlib_device::isa8_adlib_device(running_machine &_machine, const isa8_adlib
 void isa8_adlib_device::device_start()
 {        
 	m_isa->add_isa_card(this, m_config.m_isa_num);
-	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, ym3812_16_r, ym3812_16_w );	
+	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );	
 }
 
 //-------------------------------------------------

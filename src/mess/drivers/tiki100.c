@@ -55,7 +55,7 @@ void tiki100_state::bankswitch()
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
-			program->install_readwrite_handler(0x0000, 0x7fff, read8_delegate_create(tiki100_state, gfxram_r, *this), write8_delegate_create(tiki100_state, gfxram_w, *this));
+			program->install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(tiki100_state::gfxram_r), this), write8_delegate(FUNC(tiki100_state::gfxram_w), this));
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			memory_set_bank(m_machine, "bank1", BANK_VIDEO_RAM);

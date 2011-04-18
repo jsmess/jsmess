@@ -109,11 +109,17 @@ public:
 
 	/* misc */
 	write8_space_func   m_mmc_write_low;
+	const char  		*m_mmc_write_low_name;
 	write8_space_func   m_mmc_write_mid;
+	const char  		*m_mmc_write_mid_name;
 	write8_space_func   m_mmc_write;
+	const char  		*m_mmc_write_name;
 	read8_space_func    m_mmc_read_low;
+	const char  		*m_mmc_read_low_name;
 	read8_space_func    m_mmc_read_mid;
+	const char  		*m_mmc_read_mid_name;
 	read8_space_func    m_mmc_read;
+	const char  		*m_mmc_read_name;
 	emu_timer	        *m_irq_timer;
 
 	nes_prg_callback    m_mmc3_prg_cb;	// these are used to simplify a lot emulation of some MMC3 pirate clones

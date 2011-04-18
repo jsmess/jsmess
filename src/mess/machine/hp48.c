@@ -796,7 +796,7 @@ static void hp48_apply_modules( running_machine &machine, void* param )
 		else
 		{
 			if (state->m_modules[i].read != NULL)
-				space->install_legacy_read_handler( base, end, 0, mirror, FUNC(state->m_modules[i].read) );
+				space->install_legacy_read_handler( base, end, 0, mirror, state->m_modules[i].read, state->m_modules[i].read_name);
 		}
 
 		if (state->m_modules[i].isnop)
@@ -808,7 +808,7 @@ static void hp48_apply_modules( running_machine &machine, void* param )
 			else
 			{
 				if (state->m_modules[i].write != NULL)
-					space->install_legacy_write_handler( base, end, 0, mirror, FUNC(state->m_modules[i].write) );
+					space->install_legacy_write_handler( base, end, 0, mirror, state->m_modules[i].write, state->m_modules[i].write_name );
 			}
 		}
 
@@ -1184,7 +1184,9 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 	/* I/O RAM */
 	state->m_modules[0].off_mask = 0x0003f;  /* 32 B */
 	state->m_modules[0].read     = hp48_io_r;
+	state->m_modules[0].read_name     = "hp48_io_r";	
 	state->m_modules[0].write    = hp48_io_w;
+	state->m_modules[0].write_name    = "hp48_io_w";
 
 	/* internal RAM */
 	state->m_modules[1].off_mask = 2 * ram_size - 1;
@@ -1197,6 +1199,7 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 		/* bank switcher */
 		state->m_modules[2].off_mask = 0x00fff;  /* 2 KB */
 		state->m_modules[2].read     = hp48_bank_r;
+		state->m_modules[2].read_name    = "hp48_bank_r";
 		state->m_modules[2].write    = NULL;
 	}
 
