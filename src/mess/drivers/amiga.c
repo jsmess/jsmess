@@ -348,15 +348,15 @@ static const mos6526_interface cia_1_cdtv_intf =
 
 static const tpi6525_interface cdtv_tpi_intf =
 {
-	NULL,
-	NULL,
-	amigacd_tpi6525_portc_r,
-	NULL,
-	amigacd_tpi6525_portb_w,
-	NULL,
-	NULL,
-	NULL,
-	amigacd_tpi6525_irq
+	DEVCB_LINE(amigacd_tpi6525_irq),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(amigacd_tpi6525_portb_w),
+	DEVCB_HANDLER(amigacd_tpi6525_portc_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

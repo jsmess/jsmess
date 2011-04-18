@@ -59,12 +59,12 @@ WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_a );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
-void cbmb_irq(device_t *device, int level);
+WRITE_LINE_DEVICE_HANDLER( cbmb_irq );
 
 int cbmb_dma_read(running_machine &machine, int offset);
 int cbmb_dma_read_color(running_machine &machine, int offset);
 
-WRITE8_DEVICE_HANDLER( cbmb_change_font );
+WRITE_LINE_DEVICE_HANDLER( cbmb_change_font );
 
 DRIVER_INIT( p500 );
 DRIVER_INIT( cbm600 );

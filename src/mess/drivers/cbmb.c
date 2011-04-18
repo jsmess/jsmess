@@ -2,7 +2,7 @@
     commodore b series computer
 
     PeT mess@utanet.at
-
+	
     documentation
      vice emulator
      www.funet.fi
@@ -387,28 +387,28 @@ static const vic2_interface p500_vic2_intf = {
 
 static const tpi6525_interface cbmb_tpi_0_intf =
 {
-	cbmb_tpi0_port_a_r,
-	cbmb_tpi0_port_b_r,
-	NULL,
-	cbmb_tpi0_port_a_w,
-	cbmb_tpi0_port_b_w,
-	NULL,
-	cbmb_change_font,
-	NULL,
-	cbmb_irq
+	DEVCB_LINE(cbmb_irq),
+	DEVCB_HANDLER(cbmb_tpi0_port_a_r),
+	DEVCB_HANDLER(cbmb_tpi0_port_a_w),
+	DEVCB_HANDLER(cbmb_tpi0_port_b_r),
+	DEVCB_HANDLER(cbmb_tpi0_port_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(cbmb_change_font),
+	DEVCB_NULL
 };
 
 static const tpi6525_interface cbmb_tpi_1_intf =
 {
-	cbmb_keyboard_line_a,
-	cbmb_keyboard_line_b,
-	cbmb_keyboard_line_c,
-	cbmb_keyboard_line_select_a,
-	cbmb_keyboard_line_select_b,
-	cbmb_keyboard_line_select_c,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_HANDLER(cbmb_keyboard_line_a),
+	DEVCB_HANDLER(cbmb_keyboard_line_select_a),
+	DEVCB_HANDLER(cbmb_keyboard_line_b),
+	DEVCB_HANDLER(cbmb_keyboard_line_select_b),
+	DEVCB_HANDLER(cbmb_keyboard_line_c),
+	DEVCB_HANDLER(cbmb_keyboard_line_select_c),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static IEEE488_DAISY( ieee488_daisy )

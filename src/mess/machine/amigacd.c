@@ -465,7 +465,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 }
 
-void amigacd_tpi6525_irq(device_t *device, int level)
+static void amigacd_tpi6525_irq_trampoline(device_t *device, int level)
 {
 	amiga_state *state = device->machine().driver_data<amiga_state>();
 	LOG(( "TPI6525 Interrupt: level = %d\n", level ));
@@ -484,12 +484,17 @@ void amigacd_tpi6525_irq(device_t *device, int level)
 	}
 }
 
+WRITE_LINE_DEVICE_HANDLER( amigacd_tpi6525_irq )
+{
+	amigacd_tpi6525_irq_trampoline(device, state);
+}
+
 static void cdrom_status_enabled( running_machine &machine, int level )
 {
 	device_t *tpi = machine.device("tpi6525");
 
 	/* PC3 on the 6525 */
-	tpi6525_irq3_level(tpi, level);
+	tpi6525_i3_w(tpi, level);
 }
 
 static void cdrom_status_change( running_machine &machine, int level )
@@ -500,7 +505,7 @@ static void cdrom_status_change( running_machine &machine, int level )
 	level = level ? 0 : 1;
 
 	/* PC2 on the 6525 */
-	tpi6525_irq2_level(tpi, level);
+	tpi6525_i2_w(tpi, level);
 }
 
 static void cdrom_subcode_ready( running_machine &machine, int level )
@@ -508,7 +513,7 @@ static void cdrom_subcode_ready( running_machine &machine, int level )
 	device_t *tpi = machine.device("tpi6525");
 
 	/* PC1 on the 6525 */
-	tpi6525_irq1_level(tpi, level);
+	tpi6525_i1_w(tpi, level);
 }
 
 MACHINE_START( amigacd )

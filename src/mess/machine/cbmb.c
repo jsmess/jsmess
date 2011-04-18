@@ -236,14 +236,14 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 	return data ^0xff;
 }
 
-void cbmb_irq( device_t *device, int level )
+WRITE_LINE_DEVICE_HANDLER( cbmb_irq )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
-	if (level != state->m_old_level)
+	cbmb_state *driver_state = device->machine().driver_data<cbmb_state>();
+	if (state != driver_state->m_old_level)
 	{
-		DBG_LOG(device->machine(), 3, "mos6509", ("irq %s\n", level ? "start" : "end"));
-		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, level);
-		state->m_old_level = level;
+		DBG_LOG(device->machine(), 3, "mos6509", ("irq %s\n", state ? "start" : "end"));
+		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, state);
+		driver_state->m_old_level = state;
 	}
 }
 
@@ -271,7 +271,7 @@ static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 const mos6526_interface cbmb_cia =
 {
 	60,
-	DEVCB_DEVICE_LINE("tpi6525_0", tpi6525_irq2_level),
+	DEVCB_DEVICE_LINE("tpi6525_0", tpi6525_i2_w),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -302,9 +302,9 @@ int cbmb_dma_read_color( running_machine &machine, int offset )
 	return state->m_colorram[offset & 0x3ff];
 }
 
-WRITE8_DEVICE_HANDLER( cbmb_change_font )
+WRITE_LINE_DEVICE_HANDLER( cbmb_change_font )
 {
-	cbmb_vh_set_font(device->machine(), data);
+	cbmb_vh_set_font(device->machine(), state);
 }
 
 static void cbmb_common_driver_init( running_machine &machine )
@@ -390,7 +390,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
 #endif
 
-	tpi6525_irq0_level(tpi_0, state->m_irq_level);
+	tpi6525_i0_w(tpi_0, state->m_irq_level);
 	state->m_irq_level = !state->m_irq_level;
 	if (state->m_irq_level) return ;
 

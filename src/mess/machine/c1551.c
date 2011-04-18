@@ -499,15 +499,15 @@ static WRITE8_DEVICE_HANDLER( tpi0_pc_w )
 
 static const tpi6525_interface tpi0_intf =
 {
-	tpi0_pa_r,
-	tpi0_pb_r,
-	tpi0_pc_r,
-	tpi0_pa_w,
-	tpi0_pb_w,
-	tpi0_pc_w,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_HANDLER(tpi0_pa_r),
+	DEVCB_HANDLER(tpi0_pa_w),
+	DEVCB_HANDLER(tpi0_pb_r),
+	DEVCB_HANDLER(tpi0_pb_w),
+	DEVCB_HANDLER(tpi0_pc_r),
+	DEVCB_HANDLER(tpi0_pc_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /*-------------------------------------------------
@@ -632,15 +632,15 @@ static WRITE8_DEVICE_HANDLER( tpi1_pc_w )
 
 static const tpi6525_interface tpi1_intf =
 {
-	tpi1_pa_r,
-	tpi1_pb_r,
-	tpi1_pc_r,
-	tpi1_pa_w,
-	NULL,
-	tpi1_pc_w,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_HANDLER(tpi1_pa_r),
+	DEVCB_HANDLER(tpi1_pa_w),
+	DEVCB_HANDLER(tpi1_pb_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(tpi1_pc_r),
+	DEVCB_HANDLER(tpi1_pc_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /*-------------------------------------------------

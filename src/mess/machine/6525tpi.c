@@ -109,8 +109,16 @@
 typedef struct _tpi6525_state tpi6525_state;
 struct _tpi6525_state
 {
-	const tpi6525_interface *intf;
-
+	devcb_resolved_write_line out_irq_func;
+	devcb_resolved_read8 in_pa_func;
+	devcb_resolved_write8 out_pa_func;
+	devcb_resolved_read8 in_pb_func;
+	devcb_resolved_write8 out_pb_func;
+	devcb_resolved_read8 in_pc_func;
+	devcb_resolved_write8 out_pc_func;
+	devcb_resolved_write_line out_ca_func;
+	devcb_resolved_write_line out_cb_func;	
+	
 	UINT8 port_a, ddr_a, in_a;
 	UINT8 port_b, ddr_b, in_b;
 	UINT8 port_c, ddr_c, in_c;
@@ -144,6 +152,18 @@ INLINE tpi6525_state *get_safe_token(device_t *device)
 static DEVICE_START( tpi6525 )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
+	const tpi6525_interface *intf = (const tpi6525_interface*)device->baseconfig().static_config();
+
+	// resolve callbacks
+	devcb_resolve_write_line(&tpi6525->out_irq_func, &intf->out_irq_func, device);
+	devcb_resolve_read8(&tpi6525->in_pa_func, &intf->in_pa_func, device);
+	devcb_resolve_write8(&tpi6525->out_pa_func, &intf->out_pa_func, device);
+	devcb_resolve_read8(&tpi6525->in_pb_func, &intf->in_pb_func, device);
+	devcb_resolve_write8(&tpi6525->out_pb_func, &intf->out_pb_func, device);
+	devcb_resolve_read8(&tpi6525->in_pc_func, &intf->in_pc_func, device);
+	devcb_resolve_write8(&tpi6525->out_pc_func, &intf->out_pc_func, device);
+	devcb_resolve_write_line(&tpi6525->out_ca_func, &intf->out_ca_func, device);
+	devcb_resolve_write_line(&tpi6525->out_cb_func, &intf->out_cb_func, device);
 
 	/* verify that we have an interface assigned */
 	assert(device->baseconfig().static_config() != NULL);
@@ -173,9 +193,6 @@ static DEVICE_RESET( tpi6525 )
 
 	/* clear old values */
 	memset(tpi6525, 0, sizeof(*tpi6525));
-
-	/* copy interface pointer */
-	tpi6525->intf = (const tpi6525_interface*)device->baseconfig().static_config();
 
 	/* setup some initial values */
 	tpi6525->in_a = 0xff;
@@ -220,8 +237,7 @@ static void tpi6525_set_interrupt(device_t *device)
 
 		DBG_LOG(device->machine(), 3, "tpi6525", ("%s set interrupt\n", device->tag()));
 
-		if (tpi6525->intf->irq_func != NULL)
-			tpi6525->intf->irq_func(device, tpi6525->interrupt_level);
+		devcb_call_write_line(&tpi6525->out_irq_func, tpi6525->interrupt_level);
 	}
 }
 
@@ -236,21 +252,20 @@ static void tpi6525_clear_interrupt(device_t *device)
 
 		DBG_LOG(device->machine(), 3, "tpi6525", ("%s clear interrupt\n", device->tag()));
 
-		if (tpi6525->intf->irq_func != NULL)
-			tpi6525->intf->irq_func(device, tpi6525->interrupt_level);
+		devcb_call_write_line(&tpi6525->out_irq_func, tpi6525->interrupt_level);
 	}
 }
 
 
-void tpi6525_irq0_level(device_t *device, int level)
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i0_w )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
-	if (INTERRUPT_MODE && (level != tpi6525->irq_level[0]))
+	if (INTERRUPT_MODE && (state != tpi6525->irq_level[0]))
 	{
-		tpi6525->irq_level[0] = level;
+		tpi6525->irq_level[0] = state;
 
-		if ((level == 0) && !(tpi6525->air & 1) && (tpi6525->ddr_c & 1))
+		if ((state == 0) && !(tpi6525->air & 1) && (tpi6525->ddr_c & 1))
 		{
 			tpi6525->air |= 1;
 			tpi6525_set_interrupt(device);
@@ -259,15 +274,15 @@ void tpi6525_irq0_level(device_t *device, int level)
 }
 
 
-void tpi6525_irq1_level(device_t *device, int level)
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i1_w )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
-	if (INTERRUPT_MODE && (level != tpi6525->irq_level[1]))
+	if (INTERRUPT_MODE && (state != tpi6525->irq_level[1]))
 	{
-		tpi6525->irq_level[1] = level;
+		tpi6525->irq_level[1] = state;
 
-		if ((level == 0) && !(tpi6525->air & 2) && (tpi6525->ddr_c & 2))
+		if ((state == 0) && !(tpi6525->air & 2) && (tpi6525->ddr_c & 2))
 		{
 			tpi6525->air |= 2;
 			tpi6525_set_interrupt(device);
@@ -276,15 +291,15 @@ void tpi6525_irq1_level(device_t *device, int level)
 }
 
 
-void tpi6525_irq2_level(device_t *device, int level)
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i2_w )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
-	if (INTERRUPT_MODE && (level != tpi6525->irq_level[2]))
+	if (INTERRUPT_MODE && (state != tpi6525->irq_level[2]))
 	{
-		tpi6525->irq_level[2] = level;
+		tpi6525->irq_level[2] = state;
 
-		if ((level == 0) && !(tpi6525->air & 4) && (tpi6525->ddr_c & 4))
+		if ((state == 0) && !(tpi6525->air & 4) && (tpi6525->ddr_c & 4))
 		{
 			tpi6525->air |= 4;
 			tpi6525_set_interrupt(device);
@@ -293,16 +308,16 @@ void tpi6525_irq2_level(device_t *device, int level)
 }
 
 
-void tpi6525_irq3_level(device_t *device, int level)
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i3_w )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
-	if (INTERRUPT_MODE && (level != tpi6525->irq_level[3]))
+	if (INTERRUPT_MODE && (state != tpi6525->irq_level[3]))
 	{
-		tpi6525->irq_level[3] = level;
+		tpi6525->irq_level[3] = state;
 
-		if (((INTERRUPT3_RISING_EDGE && (level == 1))
-			|| (!INTERRUPT3_RISING_EDGE && (level == 0)))
+		if (((INTERRUPT3_RISING_EDGE && (state == 1))
+			|| (!INTERRUPT3_RISING_EDGE && (state == 0)))
 			&& !(tpi6525->air & 8) && (tpi6525->ddr_c & 8))
 		{
 			tpi6525->air |= 8;
@@ -312,16 +327,16 @@ void tpi6525_irq3_level(device_t *device, int level)
 }
 
 
-void tpi6525_irq4_level(device_t *device, int level)
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i4_w )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
-	if (INTERRUPT_MODE && (level != tpi6525->irq_level[4]) )
+	if (INTERRUPT_MODE && (state != tpi6525->irq_level[4]) )
 	{
-		tpi6525->irq_level[4] = level;
+		tpi6525->irq_level[4] = state;
 
-		if (((INTERRUPT4_RISING_EDGE && (level == 1))
-			||(!INTERRUPT4_RISING_EDGE&&(level == 0)))
+		if (((INTERRUPT4_RISING_EDGE && (state == 1))
+			||(!INTERRUPT4_RISING_EDGE&&(state == 0)))
 			&& !(tpi6525->air & 0x10) && (tpi6525->ddr_c & 0x10))
 		{
 			tpi6525->air |= 0x10;
@@ -336,8 +351,8 @@ READ8_DEVICE_HANDLER( tpi6525_porta_r )
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	UINT8 data = tpi6525->in_a;
 
-	if (tpi6525->intf->in_a_func)
-		data = tpi6525->intf->in_a_func(device, offset);
+	if (tpi6525->in_pa_func.target != NULL)
+		data = devcb_call_read8(&tpi6525->in_pa_func, offset);
 
 	data = (data & ~tpi6525->ddr_a) | (tpi6525->ddr_a & tpi6525->port_a);
 
@@ -358,8 +373,8 @@ READ8_DEVICE_HANDLER( tpi6525_portb_r )
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	UINT8 data = tpi6525->in_b;
 
-	if (tpi6525->intf->in_b_func)
-		data = tpi6525->intf->in_b_func(device, offset);
+	if (tpi6525->in_pb_func.target != NULL)
+		data = devcb_call_read8(&tpi6525->in_pb_func, offset);
 
 	data = (data & ~tpi6525->ddr_b) | (tpi6525->ddr_b & tpi6525->port_b);
 
@@ -380,8 +395,8 @@ READ8_DEVICE_HANDLER( tpi6525_portc_r )
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	UINT8 data = tpi6525->in_c;
 
-	if (tpi6525->intf->in_c_func)
-		data &= tpi6525->intf->in_c_func(device, offset);
+	if (tpi6525->in_pc_func.target != NULL)
+		data &= devcb_call_read8(&tpi6525->in_pc_func, offset);
 
 	data = (data & ~tpi6525->ddr_c) | (tpi6525->ddr_c & tpi6525->port_c);
 
@@ -407,8 +422,8 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 	case 0:
 		data = tpi6525->in_a;
 
-		if (tpi6525->intf->in_a_func)
-			data &= tpi6525->intf->in_a_func(device, 0);
+		if (tpi6525->in_pa_func.target != NULL)
+			data &= devcb_call_read8(&tpi6525->in_pa_func, 0);
 
 		data = (data & ~tpi6525->ddr_a) | (tpi6525->ddr_a & tpi6525->port_a);
 
@@ -417,8 +432,8 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 	case 1:
 		data = tpi6525->in_b;
 
-		if (tpi6525->intf->in_b_func)
-			data &= tpi6525->intf->in_b_func(device, 0);
+		if (tpi6525->in_pb_func.target != NULL)
+			data &= devcb_call_read8(&tpi6525->in_pb_func, 0);
 
 		data = (data & ~tpi6525->ddr_b) | (tpi6525->ddr_b & tpi6525->port_b);
 
@@ -442,8 +457,8 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 		{
 			data = tpi6525->in_c;
 
-			if (tpi6525->intf->in_c_func)
-				data &= tpi6525->intf->in_c_func(device, 0);
+			if (tpi6525->in_pc_func.target != NULL)
+				data &= devcb_call_read8(&tpi6525->in_pc_func, 0);
 
 			data = (data & ~tpi6525->ddr_c) | (tpi6525->ddr_c & tpi6525->port_c);
 		}
@@ -523,50 +538,37 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 	{
 	case 0:
 		tpi6525->port_a = data;
-
-		if (tpi6525->intf->out_a_func)
-			tpi6525->intf->out_a_func(device, 0, tpi6525->port_a & tpi6525->ddr_a);
-
+		devcb_call_write8(&tpi6525->out_pa_func, 0, tpi6525->port_a & tpi6525->ddr_a);
 		break;
 
 	case 1:
 		tpi6525->port_b = data;
-
-		if (tpi6525->intf->out_b_func)
-			tpi6525->intf->out_b_func(device, 0, tpi6525->port_b & tpi6525->ddr_b);
-
+		devcb_call_write8(&tpi6525->out_pb_func, 0, tpi6525->port_b & tpi6525->ddr_b);
 		break;
 
 	case 2:
 		tpi6525->port_c = data;
 
-		if (!INTERRUPT_MODE && tpi6525->intf->out_c_func)
-			tpi6525->intf->out_c_func(device, 0, tpi6525->port_c & tpi6525->ddr_c);
-
+		if (!INTERRUPT_MODE)
+			devcb_call_write8(&tpi6525->out_pc_func, 0, tpi6525->port_c & tpi6525->ddr_c);
 		break;
 
 	case 3:
 		tpi6525->ddr_a = data;
-
-		if (tpi6525->intf->out_a_func)
-			tpi6525->intf->out_a_func(device, 0, tpi6525->port_a & tpi6525->ddr_a);
+		devcb_call_write8(&tpi6525->out_pa_func, 0, tpi6525->port_a & tpi6525->ddr_a);
 
 		break;
 
 	case 4:
 		tpi6525->ddr_b = data;
-
-		if (tpi6525->intf->out_b_func)
-			tpi6525->intf->out_b_func(device, 0, tpi6525->port_b & tpi6525->ddr_b);
-
+		devcb_call_write8(&tpi6525->out_pb_func, 0, tpi6525->port_b & tpi6525->ddr_b);
 		break;
 
 	case 5:
 		tpi6525->ddr_c = data;
 
-		if (!INTERRUPT_MODE && tpi6525->intf->out_c_func)
-			tpi6525->intf->out_c_func(device, 0, tpi6525->port_c & tpi6525->ddr_c);
-
+		if (!INTERRUPT_MODE)
+			devcb_call_write8(&tpi6525->out_pc_func, 0, tpi6525->port_c & tpi6525->ddr_c);
 		break;
 
 	case 6:
@@ -579,9 +581,7 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 				if (tpi6525->ca_level != CA_MANUAL_LEVEL)
 				{
 					tpi6525->ca_level = CA_MANUAL_LEVEL;
-
-					if (tpi6525->intf->out_ca_func)
-						tpi6525->intf->out_ca_func(device, 0, tpi6525->ca_level);
+					devcb_call_write_line(&tpi6525->out_ca_func, tpi6525->ca_level);
 				}
 			}
 			if (CB_MANUAL_OUT)
@@ -589,9 +589,7 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 				if (tpi6525->cb_level != CB_MANUAL_LEVEL)
 				{
 					tpi6525->cb_level = CB_MANUAL_LEVEL;
-
-					if (tpi6525->intf->out_cb_func)
-						tpi6525->intf->out_cb_func(device, 0, tpi6525->cb_level);
+					devcb_call_write_line(&tpi6525->out_cb_func, tpi6525->cb_level);
 				}
 			}
 		}

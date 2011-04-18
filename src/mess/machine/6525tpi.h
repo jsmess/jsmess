@@ -37,15 +37,19 @@
 typedef struct _tpi6525_interface tpi6525_interface;
 struct _tpi6525_interface
 {
-	read8_device_func in_a_func;
-	read8_device_func in_b_func;
-	read8_device_func in_c_func;
-	write8_device_func out_a_func;
-	write8_device_func out_b_func;
-	write8_device_func out_c_func;
-	write8_device_func out_ca_func;
-	write8_device_func out_cb_func;
-	void (*irq_func)(device_t *device, int level);
+	devcb_write_line out_irq_func;
+
+	devcb_read8 in_pa_func;
+	devcb_write8 out_pa_func;
+
+	devcb_read8 in_pb_func;
+	devcb_write8 out_pb_func;
+
+	devcb_read8 in_pc_func;
+	devcb_write8 out_pc_func;
+
+	devcb_write_line out_ca_func;
+	devcb_write_line out_cb_func;
 };
 
 
@@ -76,11 +80,11 @@ WRITE8_DEVICE_HANDLER( tpi6525_portb_w );
 READ8_DEVICE_HANDLER( tpi6525_portc_r );
 WRITE8_DEVICE_HANDLER( tpi6525_portc_w );
 
-void tpi6525_irq0_level(device_t *device, int level);
-void tpi6525_irq1_level(device_t *device, int level);
-void tpi6525_irq2_level(device_t *device, int level);
-void tpi6525_irq3_level(device_t *device, int level);
-void tpi6525_irq4_level(device_t *device, int level);
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i0_w );
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i1_w );
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i2_w );
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i3_w );
+WRITE_LINE_DEVICE_HANDLER( tpi6525_i4_w );
 
 UINT8 tpi6525_get_ddr_a(device_t *device);
 UINT8 tpi6525_get_ddr_b(device_t *device);
