@@ -28,6 +28,7 @@
         - When the internal keyboard works, get rid of the generic_terminal.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -36,6 +37,9 @@
 #include "machine/ins8250.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 #define H19_BEEP_FRQ (H19_CLOCK / 1024)
@@ -45,65 +49,80 @@ class h19_state : public driver_device
 {
 public:
 	h19_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_crtc(*this, "crtc"),
+	m_ace(*this, "ins8250"),
+	m_term(*this, TERMINAL_TAG),
+	m_beep(*this, "beep")
+	{ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_charrom;
-	device_t *m_beeper;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_ace;
+	required_device<device_t> m_term;
+	required_device<device_t> m_beep;
+	DECLARE_READ8_MEMBER(h19_80_r);
+	DECLARE_READ8_MEMBER(h19_a0_r);
+	DECLARE_WRITE8_MEMBER(h19_c0_w);
+	WRITE8_MEMBER(h19_kbd_put);
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_chargen;
 	UINT8 m_term_data;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
 static TIMER_CALLBACK( h19_beepoff )
 {
 	h19_state *state = machine.driver_data<h19_state>();
-	beep_set_state(state->m_beeper, 0);
+	beep_set_state(state->m_beep, 0);
 }
 
-static READ8_HANDLER( h19_80_r )
+READ8_MEMBER( h19_state::h19_80_r )
 {
 // keyboard data
-	h19_state *state = space->machine().driver_data<h19_state>();
-	UINT8 ret = state->m_term_data;
-	state->m_term_data = 0;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
 	return ret;
 }
 
-static READ8_HANDLER( h19_a0_r )
+READ8_MEMBER( h19_state::h19_a0_r )
 {
 // keyboard status
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 	return 0x7f; // says that a key is ready and no modifier keys are pressed
 }
 
-static WRITE8_HANDLER( h19_c0_w )
+WRITE8_MEMBER( h19_state::h19_c0_w )
 {
-	h19_state *state = space->machine().driver_data<h19_state>();
 /* Beeper control - a 96L02 contains 2 oneshots, one for bell and one for keyclick.
 - lengths need verifying
     offset 00-1F = keyclick
     offset 20-3F = terminal bell */
 
 	UINT8 length = (offset & 0x20) ? 200 : 4;
-	beep_set_state(state->m_beeper, 1);
-	space->machine().scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
+	beep_set_state(m_beep, 1);
+	machine().scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
 }
 
-static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(h19_state, m_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(m_p_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h19_io , AS_IO, 8)
+static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1F) AM_READ_PORT("S401")
 	AM_RANGE(0x20, 0x3F) AM_READ_PORT("S402")
-	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_r, ins8250_w )
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x80, 0x9F) AM_READ(h19_80_r)
 	AM_RANGE(0xA0, 0xBF) AM_READ(h19_a0_r)
 	AM_RANGE(0xC0, 0xFF) AM_WRITE(h19_c0_w)
@@ -276,23 +295,19 @@ static INPUT_PORTS_START( h19 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(h19)
+MACHINE_RESET_MEMBER(h19_state)
 {
-	h19_state *state = machine.driver_data<h19_state>();
-	state->m_beeper = machine.device("beep");
-	beep_set_frequency(state->m_beeper, H19_BEEP_FRQ);
+	beep_set_frequency(m_beep, H19_BEEP_FRQ);
 }
 
-static VIDEO_START( h19 )
+VIDEO_START_MEMBER( h19_state )
 {
-	h19_state *state = machine.driver_data<h19_state>();
-	state->m_charrom = machine.region("chargen")->base();
+	m_p_chargen = m_machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( h19 )
+SCREEN_UPDATE_MEMBER( h19_state )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_update(m_crtc, &bitmap, &cliprect);
 	return 0;
 }
 
@@ -308,7 +323,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 		UINT8 inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0x7ff;
-		chr = state->m_videoram[mem];
+		chr = state->m_p_videoram[mem];
 
 		if (chr & 0x80)
 		{
@@ -317,17 +332,17 @@ static MC6845_UPDATE_ROW( h19_update_row )
 		}
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_charrom[(chr<<4) | ra] ^ inv;
+		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = ( gfx & 0x80 ) ? 1 : 0;
-		*p++ = ( gfx & 0x40 ) ? 1 : 0;
-		*p++ = ( gfx & 0x20 ) ? 1 : 0;
-		*p++ = ( gfx & 0x10 ) ? 1 : 0;
-		*p++ = ( gfx & 0x08 ) ? 1 : 0;
-		*p++ = ( gfx & 0x04 ) ? 1 : 0;
-		*p++ = ( gfx & 0x02 ) ? 1 : 0;
-		*p++ = ( gfx & 0x01 ) ? 1 : 0;
+		*p++ = BIT(gfx, 7);
+		*p++ = BIT(gfx, 6);
+		*p++ = BIT(gfx, 5);
+		*p++ = BIT(gfx, 4);
+		*p++ = BIT(gfx, 3);
+		*p++ = BIT(gfx, 2);
+		*p++ = BIT(gfx, 1);
+		*p++ = BIT(gfx, 0);
 	}
 }
 
@@ -377,16 +392,15 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-static WRITE8_DEVICE_HANDLER( h19_kbd_put )
+WRITE8_MEMBER( h19_state::h19_kbd_put )
 {
-	h19_state *state = device->machine().driver_data<h19_state>();
-	state->m_term_data = data;
-	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+	m_term_data = data;
+	cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( h19_terminal_intf )
 {
-	DEVCB_HANDLER(h19_kbd_put)
+	DEVCB_DRIVER_MEMBER(h19_state, h19_kbd_put)
 };
 
 static MACHINE_CONFIG_START( h19, h19_state )
@@ -396,8 +410,6 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_CPU_IO_MAP(h19_io)
 	//MCFG_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // for testing, causes a keyboard scan
 
-	MCFG_MACHINE_RESET(h19)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -405,17 +417,13 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE( h19 )
-
 	MCFG_GFXDECODE(h19)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, h19_terminal_intf) // keyboard only
-
-	MCFG_VIDEO_START( h19 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
