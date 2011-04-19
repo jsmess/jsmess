@@ -506,7 +506,7 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 	mycom_state *state = timer.machine().driver_data<mycom_state>();
 	UINT8 x, y, scancode = 0;
 	UINT16 pressed[9];
-	char kbdrow[2];
+	char kbdrow[3];
 	UINT8 modifiers = input_port_read(timer.machine(), "XX");
 	UINT8 shift_pressed = (modifiers & 2) >> 1;
 	state->m_keyb_press_flag = 0;
