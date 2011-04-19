@@ -31,7 +31,7 @@ MACHINE_RESET( gamecom )
 static void gamecom_set_mmu( running_machine &machine, int mmu, UINT8 data )
 {
 	gamecom_state *state = machine.driver_data<gamecom_state>();
-	char bank[5];
+	char bank[6];
 	sprintf(bank,"bank%d",mmu);
 	if ( data < 0x20 )
 	{
