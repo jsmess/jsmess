@@ -403,7 +403,7 @@ c1581_device::c1581_device(running_machine &_machine, const c1581_device_config 
 	  m_cia(*this, M8520_TAG),
 	  m_fdc(*this, WD1770_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(m_machine.device(_config.m_bus_tag)),
+	  m_bus(machine().device(_config.m_bus_tag)),
       m_config(_config)
 {
 }

@@ -153,7 +153,7 @@ psxcd_device::psxcd_device(running_machine &_machine, const psxcd_device_config 
 
 void psxcd_device::device_start()
 {
-	unsigned int sysclk=m_machine.device<cpu_device>("maincpu")->clock()/2;
+	unsigned int sysclk=machine().device<cpu_device>("maincpu")->clock()/2;
 	start_read_delay=(sysclk/60);
 	read_sector_cycles=(sysclk/75);
 	preread_delay=(read_sector_cycles>>2)-500;
@@ -203,7 +203,7 @@ void psxcd_device::device_reset()
 		m_timerinuse[i] = false;
 	}
 
-	m_cddevice = m_machine.device(m_devname);
+	m_cddevice = machine().device(m_devname);
 	if (m_cddevice)
 	{
 		m_cd = cd_get_cdrom_file(m_cddevice);
@@ -212,7 +212,7 @@ void psxcd_device::device_reset()
 		{
 //			printf("psxcd: found disc!\n");
 			driver = open_mess_drv();
-			driver->set_machine(m_machine);
+			driver->set_machine(machine());
 			driver->set_cdrom_file(m_cd);
 		}
 		else
@@ -262,7 +262,7 @@ unsigned char psxcd_device::read_byte(const unsigned int addr)
 	}
 
 	#ifdef debug_cdrom_registers
-		printf("cdrom: read byte %08x = %02x (PC=%x)\n",addr,ret,cpu_get_pc(m_machine.device("maincpu")));
+		printf("cdrom: read byte %08x = %02x (PC=%x)\n",addr,ret,cpu_get_pc(machine().device("maincpu")));
 	#endif
 
 	return ret;
@@ -275,7 +275,7 @@ unsigned char psxcd_device::read_byte(const unsigned int addr)
 void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 {
 	#ifdef debug_cdrom_registers
-		printf("cdrom: write byte %08x = %02x (PC=%x)\n",addr,byte,cpu_get_pc(m_machine.device("maincpu")));
+		printf("cdrom: write byte %08x = %02x (PC=%x)\n",addr,byte,cpu_get_pc(machine().device("maincpu")));
 	#endif
 
 	switch (addr&3)
@@ -931,7 +931,7 @@ void psxcd_device::cmd_complete(command_result *res)
 
 	if (doint)
 	{
-		psx_irq_set(m_machine, 0x0004);
+		psx_irq_set(machine(), 0x0004);
 	}
 
 	add_result(res);
@@ -1011,7 +1011,7 @@ event *psxcd_device::send_result(const unsigned int res,
 	// Avoid returning results after sector read results -
 	// delay the sector read slightly if necessary
 
-	UINT64 systime = m_machine.device<cpu_device>("maincpu")->total_cycles();
+	UINT64 systime = machine().device<cpu_device>("maincpu")->total_cycles();
 	if ((next_read_event) && ((systime+ev->t)>(next_sector_t)))
 	{
 		UINT32 hz = m_sysclock / (delay + 2000);
@@ -1174,7 +1174,7 @@ void psxcd_device::read_sector()
 						if (xa_prefetch_sector==-1)
 						{
 							xa_prefetch_sector=cursec;
-							m_machine.device<spu_device>("spu")->flush_xa();
+							machine().device<spu_device>("spu")->flush_xa();
 						}
 
 						unsigned char *xaptr;
@@ -1205,13 +1205,13 @@ void psxcd_device::read_sector()
 									 ((xasub->file==sub->file) &&
 										(xasub->channel==sub->channel))))
 							{
-								if (! m_machine.device<spu_device>("spu")->play_xa(xa_prefetch_sector,xaptr))
+								if (! machine().device<spu_device>("spu")->play_xa(xa_prefetch_sector,xaptr))
 									break;
 							}
 							xa_prefetch_sector++;
 						}
 					#else
-						m_machine.device<spu_device>("spu")->play_xa(0,rawsec+16);
+						machine().device<spu_device>("spu")->play_xa(0,rawsec+16);
 					#endif
 
 					status|=status_playing;
@@ -1310,7 +1310,7 @@ bool psxcd_device::play_cdda_sector(const unsigned int sector,
 
 	if (! isdata)
 	{
-		return m_machine.device<spu_device>("spu")->play_cdda(sector,rawsec);
+		return machine().device<spu_device>("spu")->play_cdda(sector,rawsec);
 	} else
 	{
 		return true;
@@ -1341,7 +1341,7 @@ void psxcd_device::play_sector()
 			if (cdda_prefetch_sector==-1)
 			{
 				cdda_prefetch_sector=cursec;
-				m_machine.device<spu_device>("spu")->flush_cdda();
+				machine().device<spu_device>("spu")->flush_cdda();
 			}
 
 			unsigned char *cddaptr;
@@ -1421,7 +1421,7 @@ void psxcd_device::play_sector()
 		unsigned int cyc=read_sector_cycles;
 
 		event *ev=new event;
-		ev->t=next_sector_t - m_machine.device<cpu_device>("maincpu")->total_cycles();
+		ev->t=next_sector_t - machine().device<cpu_device>("maincpu")->total_cycles();
 		ev->type=event_play_sector;
 
 		next_sector_t+=cyc;
@@ -1455,7 +1455,7 @@ void psxcd_device::preread_sector()
 
 		unsigned int cyc=read_sector_cycles;
 		if (mode&mode_double_speed) cyc>>=1;
-		next_sector_t=ev->t+(cyc-preread_delay)+m_machine.device<cpu_device>("maincpu")->total_cycles();
+		next_sector_t=ev->t+(cyc-preread_delay)+machine().device<cpu_device>("maincpu")->total_cycles();
 	} else
 	{
 		memcpy(lastsechdr,buf+12,8);
@@ -1475,7 +1475,7 @@ void psxcd_device::preread_sector()
 
 		//
 
-		ev->t=next_sector_t - m_machine.device<cpu_device>("maincpu")->total_cycles();
+		ev->t=next_sector_t - machine().device<cpu_device>("maincpu")->total_cycles();
 		ev->type=event_read_sector;
 
 		//read_next_sector();
@@ -1505,7 +1505,7 @@ void psxcd_device::start_read()
 	unsigned int cyc=read_sector_cycles;
 	if (mode&mode_double_speed) cyc>>=1;
 
-	INT64 systime=m_machine.device<cpu_device>("maincpu")->total_cycles();
+	INT64 systime=machine().device<cpu_device>("maincpu")->total_cycles();
 
 	systime+=start_read_delay;
 
@@ -1556,10 +1556,10 @@ void psxcd_device::start_play()
 
 	unsigned int cyc=read_sector_cycles;
 
-	next_sector_t=m_machine.device<cpu_device>("maincpu")->total_cycles()+cyc;
+	next_sector_t=machine().device<cpu_device>("maincpu")->total_cycles()+cyc;
 
 	event *ev=new event;
-	ev->t=next_sector_t - m_machine.device<cpu_device>("maincpu")->total_cycles();
+	ev->t=next_sector_t - machine().device<cpu_device>("maincpu")->total_cycles();
 	ev->type=event_play_sector;
 
 	next_sector_t+=cyc;
@@ -1600,8 +1600,8 @@ void psxcd_device::stop_read()
 	}
 
 	unsigned int sector=msf_to_sector(curpos);
-	m_machine.device<spu_device>("spu")->flush_xa(sector);
-	m_machine.device<spu_device>("spu")->flush_cdda(sector);
+	machine().device<spu_device>("spu")->flush_xa(sector);
+	machine().device<spu_device>("spu")->flush_cdda(sector);
 }
 
 //

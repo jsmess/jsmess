@@ -85,10 +85,10 @@ static SCREEN_UPDATE( mirage )
 
 void mirage_state::machine_reset()
 {
-	es5503_set_base(m_machine.device("es5503"), m_machine.region("ensoniq")->base());
+	es5503_set_base(machine().device("es5503"), machine().region("ensoniq")->base());
 
 	last_sndram_bank = 0;
-	memory_set_bankptr(m_machine, "sndbank", m_machine.region("ensoniq")->base() );
+	memory_set_bankptr(machine(), "sndbank", machine().region("ensoniq")->base() );
 }
 
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )

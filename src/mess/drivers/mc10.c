@@ -87,14 +87,14 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(m_machine, "pb0");
-	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(m_machine, "pb1");
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(m_machine, "pb2");
-	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(m_machine, "pb3");
-	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(m_machine, "pb4");
-	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(m_machine, "pb5");
-	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(m_machine, "pb6");
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(m_machine, "pb7");
+	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0");
+	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(machine(), "pb1");
+	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2");
+	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(machine(), "pb3");
+	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(machine(), "pb4");
+	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
+	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
+	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
 
 	return result;
 }
@@ -141,9 +141,9 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	UINT8 result = 0xeb;
 
 	/* bit 1, keyboard line pa6 */
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(m_machine, "pb0") >> 5;
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(m_machine, "pb2") >> 5;
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(m_machine, "pb7") >> 5;
+	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0") >> 5;
+	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2") >> 5;
+	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7") >> 5;
 
 	/* bit 2, printer ots input */
 	result |= (printer_is_ready(m_printer) ? 0 : 4);

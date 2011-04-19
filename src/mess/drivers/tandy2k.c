@@ -273,18 +273,18 @@ READ8_MEMBER( tandy2k_state::keyboard_x0_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= input_port_read(m_machine, "Y0");
-	if (!BIT(m_keylatch, 1)) data &= input_port_read(m_machine, "Y1");
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(m_machine, "Y2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(m_machine, "Y3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(m_machine, "Y4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(m_machine, "Y5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(m_machine, "Y6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(m_machine, "Y7");
-	if (!BIT(m_keylatch, 8)) data &= input_port_read(m_machine, "Y8");
-	if (!BIT(m_keylatch, 9)) data &= input_port_read(m_machine, "Y9");
-	if (!BIT(m_keylatch, 10)) data &= input_port_read(m_machine, "Y10");
-	if (!BIT(m_keylatch, 11)) data &= input_port_read(m_machine, "Y11");
+	if (!BIT(m_keylatch, 0)) data &= input_port_read(machine(), "Y0");
+	if (!BIT(m_keylatch, 1)) data &= input_port_read(machine(), "Y1");
+	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "Y2");
+	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "Y3");
+	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "Y4");
+	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "Y5");
+	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "Y6");
+	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "Y7");
+	if (!BIT(m_keylatch, 8)) data &= input_port_read(machine(), "Y8");
+	if (!BIT(m_keylatch, 9)) data &= input_port_read(machine(), "Y9");
+	if (!BIT(m_keylatch, 10)) data &= input_port_read(machine(), "Y10");
+	if (!BIT(m_keylatch, 11)) data &= input_port_read(machine(), "Y11");
 
 	return ~data;
 }
@@ -852,23 +852,23 @@ void tandy2k_state::machine_start()
 	program->install_ram(0x00000, ram_size - 1, ram);
 
 	/* patch out i186 relocation register check */
-	UINT8 *rom = m_machine.region(I80186_TAG)->base();
+	UINT8 *rom = machine().region(I80186_TAG)->base();
 	rom[0x1f16] = 0x90;
 	rom[0x1f17] = 0x90;
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_dma_mux);
-	state_save_register_global(m_machine, m_kben);
-	state_save_register_global(m_machine, m_keylatch);
-	state_save_register_global(m_machine, m_extclk);
-	state_save_register_global(m_machine, m_rxrdy);
-	state_save_register_global(m_machine, m_txrdy);
-	state_save_register_global(m_machine, m_pb_sel);
-	state_save_register_global(m_machine, m_vidouts);
-	state_save_register_global(m_machine, m_clkspd);
-	state_save_register_global(m_machine, m_clkcnt);
-	state_save_register_global(m_machine, m_outspkr);
-	state_save_register_global(m_machine, m_spkrdata);
+	state_save_register_global(machine(), m_dma_mux);
+	state_save_register_global(machine(), m_kben);
+	state_save_register_global(machine(), m_keylatch);
+	state_save_register_global(machine(), m_extclk);
+	state_save_register_global(machine(), m_rxrdy);
+	state_save_register_global(machine(), m_txrdy);
+	state_save_register_global(machine(), m_pb_sel);
+	state_save_register_global(machine(), m_vidouts);
+	state_save_register_global(machine(), m_clkspd);
+	state_save_register_global(machine(), m_clkcnt);
+	state_save_register_global(machine(), m_outspkr);
+	state_save_register_global(machine(), m_spkrdata);
 }
 
 /* Machine Driver */

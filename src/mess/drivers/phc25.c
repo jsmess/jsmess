@@ -297,7 +297,7 @@ static const mc6847_interface vdg_intf =
 void phc25_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = m_machine.region(Z80_TAG)->base() + 0x5000;
+	m_char_rom = machine().region(Z80_TAG)->base() + 0x5000;
 }
 
 bool phc25_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

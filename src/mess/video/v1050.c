@@ -123,11 +123,11 @@ static PALETTE_INIT( v1050 )
 void v1050_state::video_start()
 {
 	/* allocate memory */
-	m_attr_ram = auto_alloc_array(m_machine, UINT8, V1050_VIDEORAM_SIZE);
+	m_attr_ram = auto_alloc_array(machine(), UINT8, V1050_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_attr);
-	state_save_register_global_pointer(m_machine, m_attr_ram, V1050_VIDEORAM_SIZE);
+	state_save_register_global(machine(), m_attr);
+	state_save_register_global_pointer(machine(), m_attr_ram, V1050_VIDEORAM_SIZE);
 }
 
 /* Video Update */

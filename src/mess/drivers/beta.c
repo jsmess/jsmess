@@ -102,14 +102,14 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 6: data &= input_port_read(m_machine, "Q6"); break;
-	case 7: data &= input_port_read(m_machine, "Q7"); break;
-	case 8: data &= input_port_read(m_machine, "Q8"); break;
-	case 9: data &= input_port_read(m_machine, "Q9"); break;
+	case 6: data &= input_port_read(machine(), "Q6"); break;
+	case 7: data &= input_port_read(machine(), "Q7"); break;
+	case 8: data &= input_port_read(machine(), "Q8"); break;
+	case 9: data &= input_port_read(machine(), "Q9"); break;
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
-			data = m_machine.region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff];
+			data = machine().region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", m_eprom_addr & 0x7ff, data);
 		}
 	}
@@ -196,7 +196,7 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	if (BIT(data, 6) && (!BIT(m_old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", m_eprom_addr & 0x7ff, m_eprom_data);
-		m_machine.region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
+		machine().region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
 	}
 
 	m_old_data = data;
@@ -224,7 +224,7 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 
 void beta_state::machine_start()
 {
-	m_led_refresh_timer = m_machine.scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_refresh_timer = machine().scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
 	save_item(NAME(m_eprom_oe));

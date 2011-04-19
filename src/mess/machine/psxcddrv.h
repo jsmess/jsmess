@@ -52,9 +52,10 @@ class cdrom_driver
 protected:
 	void cancel_io();
 	void set_native_sector_size(const unsigned int sz);
-	running_machine *m_machine;
 	UINT32 timestamp_frequency;
 	cdrom_file	*m_cd;
+private:
+	running_machine *m_machine;
 
 public:
 	cdrom_driver();

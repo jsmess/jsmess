@@ -68,13 +68,13 @@ void trs80m2_state::scan_keyboard()
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 	int table = 0, row, col;
 
-	if (input_port_read(m_machine, "ROW9") & 0x07)
+	if (input_port_read(machine(), "ROW9") & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
 	}
 
-	if (input_port_read(m_machine, "ROW9") & 0x18)
+	if (input_port_read(machine(), "ROW9") & 0x18)
 	{
 		/* ctrl */
 		table = 2;
@@ -83,7 +83,7 @@ void trs80m2_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(m_machine, keynames[row]);
+		UINT8 data = input_port_read(machine(), keynames[row]);
 
 		for (col = 0; col < 8; col++)
 		{
@@ -144,7 +144,7 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
 void trs80m2_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *rom = m_machine.region(Z80_TAG)->base();
+	UINT8 *rom = machine().region(Z80_TAG)->base();
 	UINT8 *ram = ram_get_ptr(m_ram);
 	int last_page = (ram_get_size(m_ram) / 0x8000) - 1;
 
@@ -304,7 +304,7 @@ READ8_MEMBER( trs80m2_state::keyboard_data_r )
 {
 	static const char *const KEY_ROW[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
 
-	return input_port_read(m_machine, KEY_ROW[m_key_latch]);
+	return input_port_read(machine(), KEY_ROW[m_key_latch]);
 }
 
 WRITE8_MEMBER( trs80m2_state::keyboard_ctrl_w )
@@ -691,14 +691,14 @@ static const mc6845_interface mc6845_intf =
 void trs80m2_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = m_machine.region(MC6845_TAG)->base();
+	m_char_rom = machine().region(MC6845_TAG)->base();
 }
 
 bool trs80m2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_blnkvid)
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
 	}
 	else
 	{

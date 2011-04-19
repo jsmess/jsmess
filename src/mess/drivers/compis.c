@@ -80,7 +80,7 @@ void compis_state::video_start()
 	// find memory regions
 //	m_char_rom = machine.region("pcg")->base();
 
-	VIDEO_START_NAME(generic_bitmapped)(m_machine);
+	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 bool compis_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

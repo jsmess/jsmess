@@ -33,7 +33,7 @@ public:
 
 READ8_MEMBER(nixieclock_state::data_r)
 {
-	return input_port_read(m_machine, "INPUT") & 0x0f;
+	return input_port_read(machine(), "INPUT") & 0x0f;
 }
 
 static UINT8 nixie_to_num(UINT16 val)

@@ -313,11 +313,11 @@ void ob68k1a_state::machine_reset()
 
 	// set reset vector
 	void *ram = program->get_write_ptr(0);
-	UINT8 *rom = m_machine.region(MC68000L10_TAG)->base();
+	UINT8 *rom = machine().region(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
 
-	m_machine.firstcpu->reset();
+	machine().firstcpu->reset();
 }
 
 

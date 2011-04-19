@@ -248,14 +248,14 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 	UINT8 data = 0;
 
-	if (BIT(m_keylatch, 0)) data |= input_port_read(m_machine, "ROW0") | input_port_read(m_machine, "JOY0");
-	if (BIT(m_keylatch, 1)) data |= input_port_read(m_machine, "ROW1") | input_port_read(m_machine, "JOY1");
-	if (BIT(m_keylatch, 2)) data |= input_port_read(m_machine, "ROW2");
-	if (BIT(m_keylatch, 3)) data |= input_port_read(m_machine, "ROW3");
-	if (BIT(m_keylatch, 4)) data |= input_port_read(m_machine, "ROW4");
-	if (BIT(m_keylatch, 5)) data |= input_port_read(m_machine, "ROW5");
-	if (BIT(m_keylatch, 6)) data |= input_port_read(m_machine, "ROW6");
-	if (BIT(m_keylatch, 7)) data |= input_port_read(m_machine, "ROW7");
+	if (BIT(m_keylatch, 0)) data |= input_port_read(machine(), "ROW0") | input_port_read(machine(), "JOY0");
+	if (BIT(m_keylatch, 1)) data |= input_port_read(machine(), "ROW1") | input_port_read(machine(), "JOY1");
+	if (BIT(m_keylatch, 2)) data |= input_port_read(machine(), "ROW2");
+	if (BIT(m_keylatch, 3)) data |= input_port_read(machine(), "ROW3");
+	if (BIT(m_keylatch, 4)) data |= input_port_read(machine(), "ROW4");
+	if (BIT(m_keylatch, 5)) data |= input_port_read(machine(), "ROW5");
+	if (BIT(m_keylatch, 6)) data |= input_port_read(machine(), "ROW6");
+	if (BIT(m_keylatch, 7)) data |= input_port_read(machine(), "ROW7");
 
 	return data;
 }
@@ -265,7 +265,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 	UINT8	result = 0;
 
 	if(LOG_DISK_READ)
-		logerror("%s DiskIO:Read of %08X\n",m_machine.describe_context(),m_disk_io_base+offset);
+		logerror("%s DiskIO:Read of %08X\n",machine().describe_context(),m_disk_io_base+offset);
 		
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 		case 0x0001	: result=wd17xx_r(m_fdc, offset); break; 
 		case 0x0002	: result=wd17xx_r(m_fdc, offset); break;
 		case 0x0003	: result=wd17xx_r(m_fdc, offset); break;
-		default		: logerror("%s DiskIO undefined read : from %08X\n",m_machine.describe_context(),m_disk_io_base+offset); break;	
+		default		: logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;	
 	}
 	
 	return result;
@@ -282,7 +282,7 @@ READ8_MEMBER( ql_state::disk_io_r )
 WRITE8_MEMBER( ql_state::disk_io_w )
 {
 	if(LOG_DISK_WRITE)
-		logerror("%s DiskIO:Write %02X to %08X\n",m_machine.describe_context(),data,m_disk_io_base+offset);
+		logerror("%s DiskIO:Write %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset);
 
 	switch (offset)
 	{
@@ -296,7 +296,7 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 					    m_printer_char=data;
 		case 0x2000	: if(m_disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
-		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",m_machine.describe_context(),data,m_disk_io_base+offset); break;		
+		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;		
 	}
 }
 
@@ -310,20 +310,20 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 		space.unmap_readwrite(0x0c0000, 0x0fffff);
 	
 	// Setup trumcard rom mapped to rom so unlink us
-	space.install_rom(0x010000, 0x018000, &m_machine.region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x010000, 0x018000, &machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
-	return m_machine.region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];	
+	return machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];	
 }
 
 READ8_MEMBER( ql_state::cart_rom_r )
 {
 	// Setup trumcard rom mapped in at $c0000	
-	space.install_rom(0x0c0000, 0x0c8000, &m_machine.region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x0c0000, 0x0c8000, &machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	// Setup cart rom to rom handler, so unlink us
-	space.install_rom(0x0c000, 0x0ffff, &m_machine.region(M68008_TAG)->base()[CART_ROM_BASE]);
+	space.install_rom(0x0c000, 0x0ffff, &machine().region(M68008_TAG)->base()[CART_ROM_BASE]);
 
-	return m_machine.region(M68008_TAG)->base()[CART_ROM_BASE+offset];
+	return machine().region(M68008_TAG)->base()[CART_ROM_BASE+offset];
 }
 
 void ql_state::trump_card_set_control(UINT8 data)
@@ -927,19 +927,19 @@ static MICRODRIVE_CONFIG( mdv2_config )
 void ql_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(m_machine, m_keylatch);
-	state_save_register_global(m_machine, m_ipl);
-	state_save_register_global(m_machine, m_comdata);
-	state_save_register_global(m_machine, m_baudx4);
-	state_save_register_global(m_machine, m_printer_char);
-	state_save_register_global(m_machine, m_disk_io_byte);
+	state_save_register_global(machine(), m_keylatch);
+	state_save_register_global(machine(), m_ipl);
+	state_save_register_global(machine(), m_comdata);
+	state_save_register_global(machine(), m_baudx4);
+	state_save_register_global(machine(), m_printer_char);
+	state_save_register_global(machine(), m_disk_io_byte);
 }
 
 void ql_state::machine_reset()
 {
 	address_space 	*program 	= m_maincpu->memory().space(AS_PROGRAM);
 
-	m_disk_type=input_port_read(m_machine,QL_CONFIG_PORT) & DISK_TYPE_MASK;
+	m_disk_type=input_port_read(machine(),QL_CONFIG_PORT) & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",m_disk_type);
 
 	m_printer_char=0;
@@ -974,7 +974,7 @@ void ql_state::machine_reset()
 	{
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
-			program->install_rom(0x0c0000, 0x0c3fff, &m_machine.region(M68008_TAG)->base()[SANDY_ROM_BASE]);
+			program->install_rom(0x0c0000, 0x0c3fff, &machine().region(M68008_TAG)->base()[SANDY_ROM_BASE]);
 			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
 			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=SANDY_IO_BASE;

@@ -93,7 +93,7 @@ static TIMER_DEVICE_CALLBACK( pegasus_firq )
 
 WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 {
-	cputag_set_input_line(m_machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
@@ -101,7 +101,7 @@ READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 	UINT8 bit,data = 0xff;
 	for (bit = 0; bit < 8; bit++)
-		if (!BIT(m_kbd_row, bit)) data &= input_port_read(m_machine, keynames[bit]);
+		if (!BIT(m_kbd_row, bit)) data &= input_port_read(machine(), keynames[bit]);
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
 	if (m_control_bits & 8) data<<=4;
@@ -317,7 +317,7 @@ static const cassette_config pegasus_cassette_config =
 
 VIDEO_START_MEMBER( pegasus_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 static const UINT8 mcm6571a_shift[] =
@@ -476,7 +476,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 
 MACHINE_START_MEMBER( pegasus_state )
 {
-	m_p_pcgram = m_machine.region("pcg")->base();
+	m_p_pcgram = machine().region("pcg")->base();
 }
 
 MACHINE_RESET_MEMBER( pegasus_state )

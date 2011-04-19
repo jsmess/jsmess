@@ -241,10 +241,10 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 	{
 		if (!BIT(m_digit, i))
 		{
-			if (!BIT(input_port_read(m_machine, "ROW0"), i)) data &= ~0x10;
-			if (!BIT(input_port_read(m_machine, "ROW1"), i)) data &= ~0x20;
-			if (!BIT(input_port_read(m_machine, "ROW2"), i)) data &= ~0x40;
-			if (!BIT(input_port_read(m_machine, "ROW3"), i)) data &= ~0x80;
+			if (!BIT(input_port_read(machine(), "ROW0"), i)) data &= ~0x10;
+			if (!BIT(input_port_read(machine(), "ROW1"), i)) data &= ~0x20;
+			if (!BIT(input_port_read(machine(), "ROW2"), i)) data &= ~0x40;
+			if (!BIT(input_port_read(machine(), "ROW3"), i)) data &= ~0x80;
 		}
 	}
 
@@ -279,20 +279,20 @@ void lc80_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
-	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(Z80_TAG)->base(), 0); // TODO
-	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region(Z80_TAG)->base(), 0);
-	memory_set_bank(m_machine, "bank1", 1);
+	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0); // TODO
+	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z80_TAG)->base(), 0);
+	memory_set_bank(machine(), "bank1", 1);
 
-	memory_configure_bank(m_machine, "bank2", 0, 1, m_machine.region(Z80_TAG)->base() + 0x800, 0); // TODO
-	memory_configure_bank(m_machine, "bank2", 1, 1, m_machine.region(Z80_TAG)->base() + 0x800, 0);
-	memory_set_bank(m_machine, "bank2", 1);
+	memory_configure_bank(machine(), "bank2", 0, 1, machine().region(Z80_TAG)->base() + 0x800, 0); // TODO
+	memory_configure_bank(machine(), "bank2", 1, 1, machine().region(Z80_TAG)->base() + 0x800, 0);
+	memory_set_bank(machine(), "bank2", 1);
 
-	memory_configure_bank(m_machine, "bank3", 0, 1, m_machine.region(Z80_TAG)->base() + 0x1000, 0); // TODO
-	memory_configure_bank(m_machine, "bank3", 1, 1, m_machine.region(Z80_TAG)->base() + 0x1000, 0);
-	memory_set_bank(m_machine, "bank3", 1);
+	memory_configure_bank(machine(), "bank3", 0, 1, machine().region(Z80_TAG)->base() + 0x1000, 0); // TODO
+	memory_configure_bank(machine(), "bank3", 1, 1, machine().region(Z80_TAG)->base() + 0x1000, 0);
+	memory_set_bank(machine(), "bank3", 1);
 
-	memory_configure_bank(m_machine, "bank4", 0, 1, m_machine.region(Z80_TAG)->base() + 0x2000, 0);
-	memory_set_bank(m_machine, "bank4", 0);
+	memory_configure_bank(machine(), "bank4", 0, 1, machine().region(Z80_TAG)->base() + 0x2000, 0);
+	memory_set_bank(machine(), "bank4", 0);
 
 	program->install_readwrite_bank(0x0000, 0x07ff, "bank1");
 	program->install_readwrite_bank(0x0800, 0x0fff, "bank2");

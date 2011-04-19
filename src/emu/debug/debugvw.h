@@ -165,6 +165,7 @@ public:
 	~debug_view_source_list();
 
 	// getters
+	running_machine &machine() const { return m_machine; }
 	const debug_view_source *head() const { return m_head; }
 	int count() const { return m_count; }
 	int index(const debug_view_source &source) const;
@@ -239,7 +240,6 @@ protected:
 protected:
 	// core view data
 	debug_view *			m_next;				// link to the next view
-	running_machine &		m_machine;			// machine associated with this view
 	debug_view_type			m_type;				// type of view
 	const debug_view_source *m_source;			// currently selected data source
 	debug_view_source_list	m_source_list;		// list of available data sources
@@ -263,6 +263,9 @@ protected:
 	bool					m_osd_update_pending; // true if there is a pending update
 	debug_view_char *		m_viewdata;			// current array of view data
 	int						m_viewdata_size;	// number of elements of the viewdata array
+
+private:
+	running_machine &		m_machine;			// machine associated with this view
 };
 
 
@@ -273,6 +276,9 @@ public:
 	// construction/destruction
 	debug_view_manager(running_machine &machine);
 	~debug_view_manager();
+	
+	// getters
+	running_machine &machine() const { return m_machine; }
 
 	// view allocation
 	debug_view *alloc_view(debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate);
@@ -301,6 +307,7 @@ public:
 	~debug_view_expression();
 
 	// getters
+	running_machine &machine() const { return m_machine; }
 	bool dirty() const { return m_dirty; }
 	UINT64 last_value() const { return m_result; }
 	UINT64 value() { recompute(); return m_result; }

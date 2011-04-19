@@ -165,17 +165,17 @@ READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
-	UINT8 data = input_port_read(m_machine, "LINE0")
-	           & input_port_read(m_machine, "LINE1")
-	           & input_port_read(m_machine, "LINE2")
-	           & input_port_read(m_machine, "LINE3");
+	UINT8 data = input_port_read(machine(), "LINE0")
+	           & input_port_read(machine(), "LINE1")
+	           & input_port_read(machine(), "LINE2")
+	           & input_port_read(machine(), "LINE3");
 
 	return (data==0xff) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
 {
-	return input_port_read(m_machine, "SPECIAL");
+	return input_port_read(machine(), "SPECIAL");
 }
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
@@ -210,10 +210,10 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 {
 	UINT8 data = 15;
 
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(m_machine, "LINE0");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(m_machine, "LINE1");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(m_machine, "LINE2");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(m_machine, "LINE3");
+	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "LINE0");
+	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "LINE1");
+	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "LINE2");
+	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "LINE3");
 
 	return data | m_keylatch;
 }

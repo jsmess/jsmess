@@ -774,7 +774,7 @@ void upd7220_device::device_start()
     devcb_resolve_write_line(&m_out_blank_func, &m_config.m_out_blank_func, this);
 
 	// find screen
-	m_screen = m_machine.device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_ra));
@@ -1589,7 +1589,7 @@ void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 
 void upd7220_device::draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
-	address_space *space = m_machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int sx;
 
 	for (sx = 0; sx < m_pitch * 2; sx++)

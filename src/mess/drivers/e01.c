@@ -95,8 +95,8 @@ void e01_state::hdc_irq_enable(int enabled)
 
 READ8_MEMBER( e01_state::ram_select_r )
 {
-	memory_set_bank(m_machine, "bank1", 0);
-	memory_set_bank(m_machine, "bank3", 0);
+	memory_set_bank(machine(), "bank1", 0);
+	memory_set_bank(machine(), "bank3", 0);
 
 	return 0;
 }
@@ -358,22 +358,22 @@ static const wd17xx_interface fdc_intf =
 void e01_state::machine_start()
 {
 	UINT8 *ram = ram_get_ptr(m_ram);
-	UINT8 *rom = m_machine.region(R65C102_TAG)->base();
+	UINT8 *rom = machine().region(R65C102_TAG)->base();
 
 	/* setup memory banking */
-	memory_configure_bank(m_machine, "bank1", 0, 1, ram, 0);
-	memory_configure_bank(m_machine, "bank1", 1, 1, rom, 0);
-	memory_set_bank(m_machine, "bank1", 1);
+	memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, rom, 0);
+	memory_set_bank(machine(), "bank1", 1);
 
-	memory_configure_bank(m_machine, "bank2", 0, 1, ram, 0);
-	memory_set_bank(m_machine, "bank2", 0);
+	memory_configure_bank(machine(), "bank2", 0, 1, ram, 0);
+	memory_set_bank(machine(), "bank2", 0);
 
-	memory_configure_bank(m_machine, "bank3", 0, 1, ram + 0xfd00, 0);
-	memory_configure_bank(m_machine, "bank3", 1, 1, rom + 0xfd00, 0);
-	memory_set_bank(m_machine, "bank3", 1);
+	memory_configure_bank(machine(), "bank3", 0, 1, ram + 0xfd00, 0);
+	memory_configure_bank(machine(), "bank3", 1, 1, rom + 0xfd00, 0);
+	memory_set_bank(machine(), "bank3", 1);
 
-	memory_configure_bank(m_machine, "bank4", 0, 1, ram + 0xfd00, 0);
-	memory_set_bank(m_machine, "bank4", 0);
+	memory_configure_bank(machine(), "bank4", 0, 1, ram + 0xfd00, 0);
+	memory_set_bank(machine(), "bank4", 0);
 
 	/* register for state saving */
 	save_item(NAME(m_adlc_ie));
@@ -391,8 +391,8 @@ void e01_state::machine_start()
 
 void e01_state::machine_reset()
 {
-	memory_set_bank(m_machine, "bank1", 1);
-	memory_set_bank(m_machine, "bank3", 1);
+	memory_set_bank(machine(), "bank1", 1);
+	memory_set_bank(machine(), "bank3", 1);
 }
 
 /***************************************************************************

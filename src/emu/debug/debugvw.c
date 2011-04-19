@@ -147,7 +147,7 @@ void debug_view_source_list::reset()
 	{
 		debug_view_source *source = m_head;
 		m_head = source->m_next;
-		auto_free(m_machine, source);
+		auto_free(machine(), source);
 	}
 
 	// reset the tail pointer and index
@@ -201,7 +201,6 @@ const debug_view_source *debug_view_source_list::match_device(device_t *device) 
 
 debug_view::debug_view(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: m_next(NULL),
-	  m_machine(machine),
 	  m_type(type),
 	  m_source(NULL),
 	  m_source_list(machine),
@@ -218,7 +217,8 @@ debug_view::debug_view(running_machine &machine, debug_view_type type, debug_vie
 	  m_update_pending(true),
 	  m_osd_update_pending(true),
 	  m_viewdata(NULL),
-	  m_viewdata_size(0)
+	  m_viewdata_size(0),
+	  m_machine(machine)
 {
 	// allocate memory for the buffer
 	m_viewdata_size = m_visible.y * m_visible.x;
@@ -256,8 +256,8 @@ void debug_view::end_update()
 			if (size > m_viewdata_size)
 			{
 				m_viewdata_size = size;
-				auto_free(m_machine, m_viewdata);
-				m_viewdata = auto_alloc_array(m_machine, debug_view_char, m_viewdata_size);
+				auto_free(machine(), m_viewdata);
+				m_viewdata = auto_alloc_array(machine(), debug_view_char, m_viewdata_size);
 			}
 
 			// update the view
@@ -450,7 +450,7 @@ debug_view_manager::~debug_view_manager()
 	{
 		debug_view *oldhead = m_viewlist;
 		m_viewlist = oldhead->m_next;
-		auto_free(m_machine, oldhead);
+		auto_free(machine(), oldhead);
 	}
 }
 
@@ -464,25 +464,25 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 	switch (type)
 	{
 		case DVT_CONSOLE:
-			return append(auto_alloc(m_machine, debug_view_console(m_machine, osdupdate, osdprivate)));
+			return append(auto_alloc(machine(), debug_view_console(machine(), osdupdate, osdprivate)));
 
 		case DVT_STATE:
-			return append(auto_alloc(m_machine, debug_view_state(m_machine, osdupdate, osdprivate)));
+			return append(auto_alloc(machine(), debug_view_state(machine(), osdupdate, osdprivate)));
 
 		case DVT_DISASSEMBLY:
-			return append(auto_alloc(m_machine, debug_view_disasm(m_machine, osdupdate, osdprivate)));
+			return append(auto_alloc(machine(), debug_view_disasm(machine(), osdupdate, osdprivate)));
 
 		case DVT_MEMORY:
-			return append(auto_alloc(m_machine, debug_view_memory(m_machine, osdupdate, osdprivate)));
+			return append(auto_alloc(machine(), debug_view_memory(machine(), osdupdate, osdprivate)));
 
 		case DVT_LOG:
-			return append(auto_alloc(m_machine, debug_view_log(m_machine, osdupdate, osdprivate)));
+			return append(auto_alloc(machine(), debug_view_log(machine(), osdupdate, osdprivate)));
 
 		case DVT_TIMERS:
-//          return append(auto_alloc(m_machine, debug_view_timers(m_machine, osdupdate, osdprivate)));
+//          return append(auto_alloc(machine(), debug_view_timers(machine(), osdupdate, osdprivate)));
 
 		case DVT_ALLOCS:
-//          return append(auto_alloc(m_machine, debug_view_allocs(m_machine, osdupdate, osdprivate)));
+//          return append(auto_alloc(machine(), debug_view_allocs(machine(), osdupdate, osdprivate)));
 
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);
@@ -502,7 +502,7 @@ void debug_view_manager::free_view(debug_view &view)
 		if (*viewptr == &view)
 		{
 			*viewptr = view.m_next;
-			auto_free(m_machine, &view);
+			auto_free(machine(), &view);
 			break;
 		}
 }
@@ -581,7 +581,7 @@ debug_view_expression::~debug_view_expression()
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_parsed.set_symbols((context != NULL) ? context : debug_cpu_get_global_symtable(m_machine));
+	m_parsed.set_symbols((context != NULL) ? context : debug_cpu_get_global_symtable(machine()));
 	m_dirty = true;
 }
 

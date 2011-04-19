@@ -120,8 +120,8 @@ public:
 
 VIDEO_START_MEMBER( mycom_state )
 {
-	m_p_videoram = m_machine.region("vram")->base();
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_videoram = machine().region("vram")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( mycom_state )
@@ -545,12 +545,12 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 
 MACHINE_START_MEMBER(mycom_state)
 {
-	m_p_ram = m_machine.region("maincpu")->base();
+	m_p_ram = machine().region("maincpu")->base();
 }
 
 MACHINE_RESET_MEMBER(mycom_state)
 {
-	memory_set_bank(m_machine, "boot", 1);
+	memory_set_bank(machine(), "boot", 1);
 	m_upper_sw = 0x10000;
 	m_0a = 0;
 }

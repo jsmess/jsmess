@@ -772,7 +772,7 @@ inline UINT8 x07_state::get_char(UINT16 pos)
 	}
 	else							//charset
 	{
-		return m_machine.region("gfx1")->base()[pos];
+		return machine().region("gfx1")->base()[pos];
 	}
 }
 
@@ -782,7 +782,7 @@ void x07_state::kb_fun_keys(running_machine &machine, UINT8 idx)
 
 	if (m_kb_on)
 	{
-		UINT8 shift = (input_port_read(m_machine, "A1") & 0x01);
+		UINT8 shift = (input_port_read(machine, "A1") & 0x01);
 		UINT16 udk_s = udk_offset[(shift*6) +  idx - 1];
 
 		/* First 3 chars are used for description */
@@ -803,8 +803,8 @@ void x07_state::kb_fun_keys(running_machine &machine, UINT8 idx)
 void x07_state::kb_scan_keys(running_machine &machine, UINT8 keycode)
 {
 	UINT8 modifier;
-	UINT8 a1 = input_port_read(m_machine, "A1");
-	UINT8 bz = input_port_read(m_machine, "BZ");
+	UINT8 a1 = input_port_read(machine, "A1");
+	UINT8 bz = input_port_read(machine, "BZ");
 
 	if (m_kb_on)
 	{
@@ -1339,50 +1339,50 @@ GFXDECODE_END
 
 void x07_state::machine_start()
 {
-	m_rsta_clear = m_machine.scheduler().timer_alloc(FUNC(rsta_clear));
-	m_rstb_clear = m_machine.scheduler().timer_alloc(FUNC(rstb_clear));
-	m_beep_stop = m_machine.scheduler().timer_alloc(FUNC(beep_stop));
-	m_k7irq = m_machine.scheduler().timer_alloc(FUNC(k7_irq));
+	m_rsta_clear = machine().scheduler().timer_alloc(FUNC(rsta_clear));
+	m_rstb_clear = machine().scheduler().timer_alloc(FUNC(rstb_clear));
+	m_beep_stop = machine().scheduler().timer_alloc(FUNC(beep_stop));
+	m_k7irq = machine().scheduler().timer_alloc(FUNC(k7_irq));
 
 	/* Save State */
-	state_save_register_global(m_machine, m_sleep);
-	state_save_register_global(m_machine, m_warm_start);
-	state_save_register_global(m_machine, m_udk_on);
-	state_save_register_global(m_machine, m_draw_udk);
-	state_save_register_global(m_machine, m_sp_on);
-	state_save_register_global(m_machine, m_font_code);
-	state_save_register_global(m_machine, m_lcd_on);
-	state_save_register_global(m_machine, m_scroll_min);
-	state_save_register_global(m_machine, m_scroll_max);
-	state_save_register_global(m_machine, m_blink);
-	state_save_register_global(m_machine, m_kb_on);
-	state_save_register_global(m_machine, m_repeat_key);
-	state_save_register_global(m_machine, m_kb_size);
-	state_save_register_global(m_machine, m_prn_sendbit);
-	state_save_register_global(m_machine, m_prn_char_code);
-	state_save_register_global(m_machine, m_prn_size);
-	state_save_register_global(m_machine, m_k7on);
-	state_save_register_global(m_machine, m_k7size);
-	state_save_register_global(m_machine, m_k7pos);
-	state_save_register_global_array(m_machine, m_t6834_ram);
-	state_save_register_global_array(m_machine, m_regs_r);
-	state_save_register_global_array(m_machine, m_regs_w);
-	state_save_register_global_array(m_machine, m_alarm);
-	state_save_register_global_2d_array(m_machine, m_lcd_map);
-	state_save_register_global_array(m_machine, m_prn_buffer);
-	state_save_register_global_pointer(m_machine, m_k7data, m_k7size);
-	state_save_register_global(m_machine, m_in.read);
-	state_save_register_global(m_machine, m_in.write);
-	state_save_register_global_array(m_machine, m_in.data);
-	state_save_register_global(m_machine, m_out.read);
-	state_save_register_global(m_machine, m_out.write);
-	state_save_register_global_array(m_machine, m_out.data);
-	state_save_register_global(m_machine, m_locate.x);
-	state_save_register_global(m_machine, m_locate.y);
-	state_save_register_global(m_machine, m_locate.on);
-	state_save_register_global(m_machine, m_cursor.x);
-	state_save_register_global(m_machine, m_cursor.y);
-	state_save_register_global(m_machine, m_cursor.on);
+	state_save_register_global(machine(), m_sleep);
+	state_save_register_global(machine(), m_warm_start);
+	state_save_register_global(machine(), m_udk_on);
+	state_save_register_global(machine(), m_draw_udk);
+	state_save_register_global(machine(), m_sp_on);
+	state_save_register_global(machine(), m_font_code);
+	state_save_register_global(machine(), m_lcd_on);
+	state_save_register_global(machine(), m_scroll_min);
+	state_save_register_global(machine(), m_scroll_max);
+	state_save_register_global(machine(), m_blink);
+	state_save_register_global(machine(), m_kb_on);
+	state_save_register_global(machine(), m_repeat_key);
+	state_save_register_global(machine(), m_kb_size);
+	state_save_register_global(machine(), m_prn_sendbit);
+	state_save_register_global(machine(), m_prn_char_code);
+	state_save_register_global(machine(), m_prn_size);
+	state_save_register_global(machine(), m_k7on);
+	state_save_register_global(machine(), m_k7size);
+	state_save_register_global(machine(), m_k7pos);
+	state_save_register_global_array(machine(), m_t6834_ram);
+	state_save_register_global_array(machine(), m_regs_r);
+	state_save_register_global_array(machine(), m_regs_w);
+	state_save_register_global_array(machine(), m_alarm);
+	state_save_register_global_2d_array(machine(), m_lcd_map);
+	state_save_register_global_array(machine(), m_prn_buffer);
+	state_save_register_global_pointer(machine(), m_k7data, m_k7size);
+	state_save_register_global(machine(), m_in.read);
+	state_save_register_global(machine(), m_in.write);
+	state_save_register_global_array(machine(), m_in.data);
+	state_save_register_global(machine(), m_out.read);
+	state_save_register_global(machine(), m_out.write);
+	state_save_register_global_array(machine(), m_out.data);
+	state_save_register_global(machine(), m_locate.x);
+	state_save_register_global(machine(), m_locate.y);
+	state_save_register_global(machine(), m_locate.on);
+	state_save_register_global(machine(), m_cursor.x);
+	state_save_register_global(machine(), m_cursor.y);
+	state_save_register_global(machine(), m_cursor.on);
 
 	/* install RAM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
@@ -1418,7 +1418,7 @@ void x07_state::machine_reset()
 	m_prn_char_code = 0;
 	m_prn_size = 0;
 
-	m_regs_r[2] = input_port_read(m_machine, "CARDBATTERY");
+	m_regs_r[2] = input_port_read(machine(), "CARDBATTERY");
 
 	cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
 }

@@ -473,31 +473,31 @@ void abc806_state::video_start()
 	m_40 = 1;
 
 	// find memory regions
-	m_char_rom = m_machine.region(MC6845_TAG)->base();
-	m_rad_prom = m_machine.region("rad")->base();
-	m_hru2_prom = m_machine.region("hru2")->base();
+	m_char_rom = machine().region(MC6845_TAG)->base();
+	m_rad_prom = machine().region("rad")->base();
+	m_hru2_prom = machine().region("hru2")->base();
 
 	// allocate memory
-	m_char_ram = auto_alloc_array(m_machine, UINT8, ABC806_CHAR_RAM_SIZE);
-	m_color_ram = auto_alloc_array(m_machine, UINT8, ABC806_ATTR_RAM_SIZE);
+	m_char_ram = auto_alloc_array(machine(), UINT8, ABC806_CHAR_RAM_SIZE);
+	m_color_ram = auto_alloc_array(machine(), UINT8, ABC806_ATTR_RAM_SIZE);
 
 	// register for state saving
-	state_save_register_global_pointer(m_machine, m_char_ram, ABC806_CHAR_RAM_SIZE);
-	state_save_register_global_pointer(m_machine, m_color_ram, ABC806_ATTR_RAM_SIZE);
-	state_save_register_global_pointer(m_machine, m_video_ram, ABC806_VIDEO_RAM_SIZE);
-	state_save_register_global(m_machine, m_txoff);
-	state_save_register_global(m_machine, m_40);
-	state_save_register_global(m_machine, m_flshclk_ctr);
-	state_save_register_global(m_machine, m_flshclk);
-	state_save_register_global(m_machine, m_attr_data);
-	state_save_register_global(m_machine, m_hrs);
-	state_save_register_global_array(m_machine, m_hrc);
-	state_save_register_global(m_machine, m_sync);
-	state_save_register_global(m_machine, m_v50_addr);
-	state_save_register_global(m_machine, m_hru2_a8);
-	state_save_register_global(m_machine, m_vsync_shift);
-	state_save_register_global(m_machine, m_vsync);
-	state_save_register_global(m_machine, m_d_vsync);
+	state_save_register_global_pointer(machine(), m_char_ram, ABC806_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(machine(), m_color_ram, ABC806_ATTR_RAM_SIZE);
+	state_save_register_global_pointer(machine(), m_video_ram, ABC806_VIDEO_RAM_SIZE);
+	state_save_register_global(machine(), m_txoff);
+	state_save_register_global(machine(), m_40);
+	state_save_register_global(machine(), m_flshclk_ctr);
+	state_save_register_global(machine(), m_flshclk);
+	state_save_register_global(machine(), m_attr_data);
+	state_save_register_global(machine(), m_hrs);
+	state_save_register_global_array(machine(), m_hrc);
+	state_save_register_global(machine(), m_sync);
+	state_save_register_global(machine(), m_v50_addr);
+	state_save_register_global(machine(), m_hru2_a8);
+	state_save_register_global(machine(), m_vsync_shift);
+	state_save_register_global(machine(), m_vsync);
+	state_save_register_global(machine(), m_d_vsync);
 }
 
 

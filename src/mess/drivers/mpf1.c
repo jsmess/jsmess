@@ -220,15 +220,15 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	UINT8 data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
-	if (!BIT(m_lednum, 0)) data &= input_port_read(m_machine, "PC0");
-	if (!BIT(m_lednum, 1)) data &= input_port_read(m_machine, "PC1");
-	if (!BIT(m_lednum, 2)) data &= input_port_read(m_machine, "PC2");
-	if (!BIT(m_lednum, 3)) data &= input_port_read(m_machine, "PC3");
-	if (!BIT(m_lednum, 4)) data &= input_port_read(m_machine, "PC4");
-	if (!BIT(m_lednum, 5)) data &= input_port_read(m_machine, "PC5");
+	if (!BIT(m_lednum, 0)) data &= input_port_read(machine(), "PC0");
+	if (!BIT(m_lednum, 1)) data &= input_port_read(machine(), "PC1");
+	if (!BIT(m_lednum, 2)) data &= input_port_read(machine(), "PC2");
+	if (!BIT(m_lednum, 3)) data &= input_port_read(machine(), "PC3");
+	if (!BIT(m_lednum, 4)) data &= input_port_read(machine(), "PC4");
+	if (!BIT(m_lednum, 5)) data &= input_port_read(machine(), "PC5");
 
 	/* bit 6, user key */
-	data &= input_port_read(m_machine, "SPECIAL") & 1 ? 0xff : 0xbf;
+	data &= input_port_read(machine(), "SPECIAL") & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
 	data |= (cassette_input(m_cassette) > 0 ? 1 : 0) << 7;
@@ -261,7 +261,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	}
 
 	/* bit 7, tape output, tone and led */
-	set_led_status(m_machine, 0, !BIT(data, 7));
+	set_led_status(machine(), 0, !BIT(data, 7));
 	speaker_level_w(m_speaker, BIT(data, 7));
 	cassette_output(m_cassette, BIT(data, 7));
 }
@@ -346,7 +346,7 @@ static TIMER_DEVICE_CALLBACK( check_halt_callback )
 
 void mpf1_state::machine_start()
 {
-	m_led_refresh_timer = m_machine.scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_refresh_timer = machine().scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
 	save_item(NAME(m_break));

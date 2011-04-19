@@ -216,7 +216,7 @@ MACHINE_RESET_MEMBER(bcs3_state)
 
 VIDEO_START_MEMBER( bcs3_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 static SCREEN_UPDATE( bcs3 )

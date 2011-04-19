@@ -47,19 +47,19 @@ READ8_MEMBER(plan80_state::plan80_04_r)
 	UINT8 data = 0xff;
 
 	if (m_kbd_row == 0xfe)
-		data = input_port_read(m_machine, "LINE0");
+		data = input_port_read(machine(), "LINE0");
 	else
 	if (m_kbd_row == 0xfd)
-		data = input_port_read(m_machine, "LINE1");
+		data = input_port_read(machine(), "LINE1");
 	else
 	if (m_kbd_row == 0xfb)
-		data = input_port_read(m_machine, "LINE2");
+		data = input_port_read(machine(), "LINE2");
 	else
 	if (m_kbd_row == 0xf7)
-		data = input_port_read(m_machine, "LINE3");
+		data = input_port_read(machine(), "LINE3");
 	else
 	if (m_kbd_row == 0xef)
-		data = input_port_read(m_machine, "LINE4");
+		data = input_port_read(machine(), "LINE4");
 
 	return data;
 }

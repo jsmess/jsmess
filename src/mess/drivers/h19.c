@@ -302,7 +302,7 @@ MACHINE_RESET_MEMBER(h19_state)
 
 VIDEO_START_MEMBER( h19_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( h19_state )

@@ -205,13 +205,13 @@ isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_devic
 void isa8_mda_device::device_start()
 {        
 	m_isa->add_isa_card(this, m_config.m_isa_num);
-	videoram = auto_alloc_array(m_machine, UINT8, 0x1000);
+	videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(pc_MDA_r), FUNC(pc_MDA_w) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);	
 	
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(m_machine, i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
+		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
 }
  
 //-------------------------------------------------
@@ -227,7 +227,7 @@ void isa8_mda_device::device_reset()
 	hsync = 0;
 	
 	astring tempstring;
-	chr_gen = m_machine.region(subtag(tempstring, "gfx1"))->base();	
+	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();	
 }
 
 /***************************************************************************
@@ -653,14 +653,14 @@ isa8_hercules_device::isa8_hercules_device(running_machine &_machine, const isa8
  
 void isa8_hercules_device::device_start()
 {        
-	videoram = auto_alloc_array(m_machine, UINT8, 0x10000);
+	videoram = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(hercules_r), FUNC(hercules_w) );
 	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", videoram);
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(m_machine, i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
+		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
 }
  
 //-------------------------------------------------
@@ -673,7 +673,7 @@ void isa8_hercules_device::device_reset()
 	configuration_switch = 0;
 
 	astring tempstring;
-	chr_gen = m_machine.region(subtag(tempstring, "gfx1"))->base();	
+	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();	
 }
 
 /***************************************************************************

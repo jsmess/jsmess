@@ -58,9 +58,9 @@ void tiki100_state::bankswitch()
 			program->install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(tiki100_state::gfxram_r), this), write8_delegate(FUNC(tiki100_state::gfxram_w), this));
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(m_machine, "bank1", BANK_VIDEO_RAM);
-			memory_set_bank(m_machine, "bank2", BANK_VIDEO_RAM);
-			memory_set_bank(m_machine, "bank3", BANK_RAM);
+			memory_set_bank(machine(), "bank1", BANK_VIDEO_RAM);
+			memory_set_bank(machine(), "bank2", BANK_VIDEO_RAM);
+			memory_set_bank(machine(), "bank3", BANK_RAM);
 		}
 	}
 	else
@@ -73,9 +73,9 @@ void tiki100_state::bankswitch()
 			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(m_machine, "bank1", BANK_ROM);
-			memory_set_bank(m_machine, "bank2", BANK_RAM);
-			memory_set_bank(m_machine, "bank3", BANK_RAM);
+			memory_set_bank(machine(), "bank1", BANK_ROM);
+			memory_set_bank(machine(), "bank2", BANK_RAM);
+			memory_set_bank(machine(), "bank3", BANK_RAM);
 		}
 		else
 		{
@@ -84,9 +84,9 @@ void tiki100_state::bankswitch()
 			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(m_machine, "bank1", BANK_RAM);
-			memory_set_bank(m_machine, "bank2", BANK_RAM);
-			memory_set_bank(m_machine, "bank3", BANK_RAM);
+			memory_set_bank(machine(), "bank1", BANK_RAM);
+			memory_set_bank(machine(), "bank2", BANK_RAM);
+			memory_set_bank(machine(), "bank3", BANK_RAM);
 		}
 	}
 }
@@ -96,7 +96,7 @@ void tiki100_state::bankswitch()
 READ8_MEMBER( tiki100_state::keyboard_r )
 {
 	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11", "ROW12" };
-	UINT8 data = input_port_read(m_machine, keynames[m_keylatch]);
+	UINT8 data = input_port_read(machine(), keynames[m_keylatch]);
 
 	m_keylatch++;
 
@@ -134,7 +134,7 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 		int color = data & 0x0f;
 		UINT8 colordata = ~m_palette;
 
-		palette_set_color_rgb(m_machine, color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
+		palette_set_color_rgb(machine(), color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
 }
 
@@ -189,10 +189,10 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	floppy_drive_set_ready_state(m_floppy1, BIT(data, 6), 1);
 
 	/* GRAFIKK key led */
-	set_led_status(m_machine, 1, BIT(data, 5));
+	set_led_status(machine(), 1, BIT(data, 5));
 
 	/* LOCK key led */
-	set_led_status(m_machine, 2, BIT(data, 7));
+	set_led_status(machine(), 2, BIT(data, 7));
 
 	/* bankswitch */
 	m_rome = BIT(data, 2);
@@ -548,19 +548,19 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 void tiki100_state::machine_start()
 {
 	/* allocate video RAM */
-	m_video_ram = auto_alloc_array(m_machine, UINT8, TIKI100_VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(machine(), UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
 	UINT8 *ram = ram_get_ptr(m_ram);
 
-	memory_configure_bank(m_machine, "bank1", BANK_ROM, 1, m_machine.region(Z80_TAG)->base(), 0);
-	memory_configure_bank(m_machine, "bank1", BANK_RAM, 1, ram, 0);
-	memory_configure_bank(m_machine, "bank1", BANK_VIDEO_RAM, 1, m_video_ram, 0);
+	memory_configure_bank(machine(), "bank1", BANK_ROM, 1, machine().region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine(), "bank1", BANK_RAM, 1, ram, 0);
+	memory_configure_bank(machine(), "bank1", BANK_VIDEO_RAM, 1, m_video_ram, 0);
 
-	memory_configure_bank(m_machine, "bank2", BANK_RAM, 1, ram + 0x4000, 0);
-	memory_configure_bank(m_machine, "bank2", BANK_VIDEO_RAM, 1, m_video_ram + 0x4000, 0);
+	memory_configure_bank(machine(), "bank2", BANK_RAM, 1, ram + 0x4000, 0);
+	memory_configure_bank(machine(), "bank2", BANK_VIDEO_RAM, 1, m_video_ram + 0x4000, 0);
 
-	memory_configure_bank(m_machine, "bank3", BANK_RAM, 1, ram + 0x8000, 0);
+	memory_configure_bank(machine(), "bank3", BANK_RAM, 1, ram + 0x8000, 0);
 
 	bankswitch();
 

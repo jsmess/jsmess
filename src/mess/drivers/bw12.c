@@ -78,7 +78,7 @@ void bw12_state::bankswitch()
 		break;
 	}
 
-	memory_set_bank(m_machine, "bank1", m_bank);
+	memory_set_bank(machine(), "bank1", m_bank);
 }
 
 void bw12_state::floppy_motor_off()
@@ -405,7 +405,7 @@ static const mc6845_interface bw12_mc6845_interface =
 void bw12_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 }
 
 bool bw12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -587,12 +587,12 @@ static const struct pit8253_config pit_intf =
 
 READ_LINE_MEMBER( bw12_state::ay3600_shift_r )
 {
-	return BIT(input_port_read(m_machine, "MODIFIERS"), 0);
+	return BIT(input_port_read(machine(), "MODIFIERS"), 0);
 }
 
 READ_LINE_MEMBER( bw12_state::ay3600_control_r )
 {
-	return BIT(input_port_read(m_machine, "MODIFIERS"), 1);
+	return BIT(input_port_read(machine(), "MODIFIERS"), 1);
 }
 
 WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
@@ -642,21 +642,21 @@ static AY3600_INTERFACE( bw12_ay3600_intf )
 void bw12_state::machine_start()
 {
 	/* setup memory banking */
-	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(Z80_TAG)->base(), 0);
-	memory_configure_bank(m_machine, "bank1", 1, 1, ram_get_ptr(m_ram), 0);
-	memory_configure_bank(m_machine, "bank1", 2, 2, ram_get_ptr(m_ram) + 0x10000, 0x8000);
+	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine(), "bank1", 2, 2, ram_get_ptr(m_ram) + 0x10000, 0x8000);
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_bank);
-	state_save_register_global(m_machine, m_pit_out2);
-	state_save_register_global_array(m_machine, m_key_data);
-	state_save_register_global(m_machine, m_key_sin);
-	state_save_register_global(m_machine, m_key_stb);
-	state_save_register_global(m_machine, m_key_shift);
-	state_save_register_global(m_machine, m_fdc_int);
-	state_save_register_global(m_machine, m_motor_on);
-	state_save_register_global(m_machine, m_motor0);
-	state_save_register_global(m_machine, m_motor1);
+	state_save_register_global(machine(), m_bank);
+	state_save_register_global(machine(), m_pit_out2);
+	state_save_register_global_array(machine(), m_key_data);
+	state_save_register_global(machine(), m_key_sin);
+	state_save_register_global(machine(), m_key_stb);
+	state_save_register_global(machine(), m_key_shift);
+	state_save_register_global(machine(), m_fdc_int);
+	state_save_register_global(machine(), m_motor_on);
+	state_save_register_global(machine(), m_motor0);
+	state_save_register_global(machine(), m_motor1);
 }
 
 void bw12_state::machine_reset()

@@ -135,12 +135,12 @@ READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
 
 READ_LINE_MEMBER( eacc_state::eacc_distance_r )
 {
-	return m_machine.rand() & 1; // needs random pulses to simulate movement
+	return machine().rand() & 1; // needs random pulses to simulate movement
 }
 
 READ_LINE_MEMBER( eacc_state::eacc_fuel_sensor_r )
 {
-	return m_machine.rand() & 1; // needs random pulses to simulate acceleration
+	return machine().rand() & 1; // needs random pulses to simulate acceleration
 }
 
 WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
@@ -153,13 +153,13 @@ READ8_MEMBER( eacc_state::eacc_keyboard_r )
 	UINT8 data = m_digit;
 
 	if (BIT(m_digit, 3))
-		data |= input_port_read(m_machine, "X0");
+		data |= input_port_read(machine(), "X0");
 	if (BIT(m_digit, 4))
-		data |= input_port_read(m_machine, "X1");
+		data |= input_port_read(machine(), "X1");
 	if (BIT(m_digit, 5))
-		data |= input_port_read(m_machine, "X2");
+		data |= input_port_read(machine(), "X2");
 	if (BIT(m_digit, 6))
-		data |= input_port_read(m_machine, "X3");
+		data |= input_port_read(machine(), "X3");
 
 	return data;
 }
@@ -198,7 +198,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 
 WRITE8_MEMBER( eacc_state::eacc_digit_w )
 {
-	device_set_input_line(m_machine.device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(machine().device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
 	m_digit = data & 0xf8;
 	eacc_display();
 }

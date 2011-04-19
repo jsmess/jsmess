@@ -173,11 +173,11 @@ zx8301_device::zx8301_device(running_machine &_machine, const zx8301_device_conf
 void zx8301_device::device_start()
 {
 	// get the CPU
-	m_cpu = m_machine.device<cpu_device>(m_config.cpu_tag);
+	m_cpu = machine().device<cpu_device>(m_config.cpu_tag);
 	assert(m_cpu != NULL);
 
 	// get the screen device
-	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(m_config.screen_tag);
 	assert(m_screen != NULL);
 
 	// resolve callbacks
@@ -380,6 +380,6 @@ void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(m_machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
 	}
 }

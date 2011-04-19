@@ -86,13 +86,13 @@ void newbrain_eim_state::bankswitch()
 		case 0:
 			/* ROM */
 			memory_install_rom_helper(program, bank_name, bank_start, bank_end);
-			memory_configure_bank(m_machine, bank_name, 0, 1, m_machine.region("eim")->base() + eim_bank_start, 0);
+			memory_configure_bank(machine(), bank_name, 0, 1, machine().region("eim")->base() + eim_bank_start, 0);
 			break;
 
 		case 2:
 			/* RAM */
 			memory_install_ram_helper(program, bank_name, bank_start, bank_end);
-			memory_configure_bank(m_machine, bank_name, 0, 1, m_eim_ram + eim_bank_start, 0);
+			memory_configure_bank(machine(), bank_name, 0, 1, m_eim_ram + eim_bank_start, 0);
 			break;
 
 		default:
@@ -118,11 +118,11 @@ void newbrain_state::bankswitch()
 		{
 			/* all banks point to ROM at 0xe000 */
 			memory_install_rom_helper(program, bank_name, bank_start, bank_end);
-			memory_configure_bank(m_machine, bank_name, 0, 1, m_machine.region(Z80_TAG)->base() + 0xe000, 0);
+			memory_configure_bank(machine(), bank_name, 0, 1, machine().region(Z80_TAG)->base() + 0xe000, 0);
 		}
 		else
 		{
-			memory_configure_bank(m_machine, bank_name, 0, 1, m_machine.region(Z80_TAG)->base() + bank_start, 0);
+			memory_configure_bank(machine(), bank_name, 0, 1, machine().region(Z80_TAG)->base() + bank_start, 0);
 
 			if (bank < 5)
 			{
@@ -132,16 +132,16 @@ void newbrain_state::bankswitch()
 			else if (bank == 5)
 			{
 				/* 0x8000-0x9fff */
-				if (m_machine.region("eim")->base())
+				if (machine().region("eim")->base())
 				{
 					/* expansion interface ROM */
 					memory_install_rom_helper(program, bank_name, bank_start, bank_end);
-					memory_configure_bank(m_machine, bank_name, 0, 1, m_machine.region("eim")->base() + 0x4000, 0);
+					memory_configure_bank(machine(), bank_name, 0, 1, machine().region("eim")->base() + 0x4000, 0);
 				}
 				else
 				{
 					/* mirror of 0xa000-0xbfff */
-					if (m_machine.region(Z80_TAG)->base()[0xa001] == 0)
+					if (machine().region(Z80_TAG)->base()[0xa001] == 0)
 					{
 						/* unmapped on the M model */
 						memory_install_unmapped(program, bank_name, bank_start, bank_end);
@@ -152,13 +152,13 @@ void newbrain_state::bankswitch()
 						memory_install_rom_helper(program, bank_name, bank_start, bank_end);
 					}
 
-					memory_configure_bank(m_machine, bank_name, 0, 1, m_machine.region(Z80_TAG)->base() + 0xa000, 0);
+					memory_configure_bank(machine(), bank_name, 0, 1, machine().region(Z80_TAG)->base() + 0xa000, 0);
 				}
 			}
 			else if (bank == 6)
 			{
 				/* 0xa000-0xbfff */
-				if (m_machine.region(Z80_TAG)->base()[0xa001] == 0)
+				if (machine().region(Z80_TAG)->base()[0xa001] == 0)
 				{
 					/* unmapped on the M model */
 					memory_install_unmapped(program, bank_name, bank_start, bank_end);
@@ -176,7 +176,7 @@ void newbrain_state::bankswitch()
 			}
 		}
 
-		memory_set_bank(m_machine, bank_name, 0);
+		memory_set_bank(machine(), bank_name, 0);
 	}
 }
 
@@ -472,7 +472,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 			m_keylatch = 0;
 		}
 
-		m_keydata = input_port_read(m_machine, keynames[m_keylatch]);
+		m_keydata = input_port_read(machine(), keynames[m_keylatch]);
 
 		output_set_digit_value(m_keylatch, m_segment_data[m_keylatch]);
 	}
@@ -1266,11 +1266,11 @@ void newbrain_state::machine_start()
 	m_copregint = 1;
 
 	/* allocate reset timer */
-	m_reset_timer = m_machine.scheduler().timer_alloc(FUNC(reset_tick));
+	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
 	m_reset_timer->adjust(attotime::from_usec(get_reset_t()));
 
 	/* allocate power up timer */
-	m_pwrup_timer = m_machine.scheduler().timer_alloc(FUNC(pwrup_tick));
+	m_pwrup_timer = machine().scheduler().timer_alloc(FUNC(pwrup_tick));
 	m_pwrup_timer->adjust(attotime::from_usec(get_pwrup_t()));
 
 	/* initialize variables */
@@ -1314,7 +1314,7 @@ void newbrain_eim_state::machine_start()
 	newbrain_state::machine_start();
 
 	/* allocate expansion RAM */
-	m_eim_ram = auto_alloc_array(m_machine, UINT8, NEWBRAIN_EIM_RAM_SIZE);
+	m_eim_ram = auto_alloc_array(machine(), UINT8, NEWBRAIN_EIM_RAM_SIZE);
 
 	/* register for state saving */
 	save_pointer(NAME(m_eim_ram), NEWBRAIN_EIM_RAM_SIZE);

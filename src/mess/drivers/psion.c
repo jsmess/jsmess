@@ -350,7 +350,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
         ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(m_machine) | input_port_read(m_machine, "BATTERY") | input_port_read(m_machine, "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
+		return kb_read(machine()) | input_port_read(machine(), "BATTERY") | input_port_read(machine(), "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		{
@@ -402,7 +402,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		{
 			m_ram_bank=0;
 			m_rom_bank=0;
-			update_banks(m_machine);
+			update_banks(machine());
 		}
 		else
 			m_kb_counter++;
@@ -411,7 +411,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		if (offset == 0x2a0 && m_ram_bank_count)
 		{
 			m_ram_bank++;
-			update_banks(m_machine);
+			update_banks(machine());
 		}
 		else
 			m_enable_nmi = 1;
@@ -420,7 +420,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		if (offset == 0x2e0 && m_rom_bank_count)
 		{
 			m_rom_bank++;
-			update_banks(m_machine);
+			update_banks(machine());
 		}
 		else
 			m_enable_nmi = 0;
@@ -636,22 +636,22 @@ static NVRAM_HANDLER( psion )
 
 void psion_state::machine_start()
 {
-	if (!strcmp(m_machine.system().name, "psionlam"))
+	if (!strcmp(machine().system().name, "psionlam"))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 0;
 	}
-	else if (!strcmp(m_machine.system().name, "psionp350"))
+	else if (!strcmp(machine().system().name, "psionp350"))
 	{
 		m_rom_bank_count = 0;
 		m_ram_bank_count = 5;
 	}
-	else if (!strncmp(m_machine.system().name, "psionlz", 7))
+	else if (!strncmp(machine().system().name, "psionlz", 7))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 3;
 	}
-	else if (!strcmp(m_machine.system().name, "psionp464"))
+	else if (!strcmp(machine().system().name, "psionp464"))
 	{
 		m_rom_bank_count = 3;
 		m_ram_bank_count = 9;
@@ -664,32 +664,32 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)m_machine.region("maincpu")->base();
+		UINT8* rom_base = (UINT8 *)machine().region("maincpu")->base();
 
-		memory_configure_bank(m_machine, "rombank", 0, 1, rom_base + 0x8000, 0x4000);
-		memory_configure_bank(m_machine, "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
-		memory_set_bank(m_machine, "rombank", 0);
+		memory_configure_bank(machine(), "rombank", 0, 1, rom_base + 0x8000, 0x4000);
+		memory_configure_bank(machine(), "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
+		memory_set_bank(machine(), "rombank", 0);
 	}
 
 	if (m_ram_bank_count)
 	{
-		m_paged_ram = auto_alloc_array(m_machine, UINT8, m_ram_bank_count * 0x4000);
-		memory_configure_bank(m_machine, "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
-		memory_set_bank(m_machine, "rambank", 0);
+		m_paged_ram = auto_alloc_array(machine(), UINT8, m_ram_bank_count * 0x4000);
+		memory_configure_bank(machine(), "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
+		memory_set_bank(machine(), "rambank", 0);
 	}
 
-	state_save_register_global(m_machine, m_kb_counter);
-	state_save_register_global(m_machine, m_enable_nmi);
-	state_save_register_global(m_machine, m_tcsr_value);
-	state_save_register_global(m_machine, m_stby_pwr);
-	state_save_register_global(m_machine, m_pulse);
-	state_save_register_global(m_machine, m_rom_bank);
-	state_save_register_global(m_machine, m_ram_bank);
-	state_save_register_global(m_machine, m_port2_ddr);
-	state_save_register_global(m_machine, m_port2);
-	state_save_register_global(m_machine, m_port6_ddr);
-	state_save_register_global(m_machine, m_port6);
-	state_save_register_global_pointer(m_machine, m_paged_ram, m_ram_bank_count * 0x4000);
+	state_save_register_global(machine(), m_kb_counter);
+	state_save_register_global(machine(), m_enable_nmi);
+	state_save_register_global(machine(), m_tcsr_value);
+	state_save_register_global(machine(), m_stby_pwr);
+	state_save_register_global(machine(), m_pulse);
+	state_save_register_global(machine(), m_rom_bank);
+	state_save_register_global(machine(), m_ram_bank);
+	state_save_register_global(machine(), m_port2_ddr);
+	state_save_register_global(machine(), m_port2);
+	state_save_register_global(machine(), m_port6_ddr);
+	state_save_register_global(machine(), m_port6);
+	state_save_register_global_pointer(machine(), m_paged_ram, m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()
@@ -701,7 +701,7 @@ void psion_state::machine_reset()
 	m_pulse=0;
 
 	if (m_rom_bank_count || m_ram_bank_count)
-		update_banks(m_machine);
+		update_banks(machine());
 }
 
 bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

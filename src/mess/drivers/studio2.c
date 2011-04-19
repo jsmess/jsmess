@@ -365,17 +365,17 @@ bool mpt02_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 READ_LINE_MEMBER( studio2_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "CLEAR"), 0);
+	return BIT(input_port_read(machine(), "CLEAR"), 0);
 }
 
 READ_LINE_MEMBER( studio2_state::ef3_r )
 {
-	return BIT(input_port_read(m_machine, "A"), m_keylatch);
+	return BIT(input_port_read(machine(), "A"), m_keylatch);
 }
 
 READ_LINE_MEMBER( studio2_state::ef4_r )
 {
-	return BIT(input_port_read(m_machine, "B"), m_keylatch);
+	return BIT(input_port_read(machine(), "B"), m_keylatch);
 }
 
 WRITE_LINE_MEMBER( studio2_state::q_w )

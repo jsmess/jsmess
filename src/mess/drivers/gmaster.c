@@ -16,7 +16,7 @@ static READ8_HANDLER( gmaster_io_r )
 {
 	gmaster_state *state = space->machine().driver_data<gmaster_state>();
     UINT8 data = 0;
-    if (state->m_machine.ports[2] & 1)
+    if (state->m_gmachine.ports[2] & 1)
 	{
 		data = space->machine().region("maincpu")->base()[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -39,12 +39,12 @@ static READ8_HANDLER( gmaster_io_r )
     return data;
 }
 
-#define BLITTER_Y ((state->m_machine.ports[2]&4)|(state->m_video.data[0]&3))
+#define BLITTER_Y ((state->m_gmachine.ports[2]&4)|(state->m_video.data[0]&3))
 
 static WRITE8_HANDLER( gmaster_io_w )
 {
 	gmaster_state *state = space->machine().driver_data<gmaster_state>();
-    if (state->m_machine.ports[2] & 1)
+    if (state->m_gmachine.ports[2] & 1)
 	{
 		space->machine().region("maincpu")->base()[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 static READ8_HANDLER( gmaster_port_r )
 {
 	//gmaster_state *state = space->machine().driver_data<gmaster_state>();
-//  UINT8 data = state->m_machine.ports[offset];
+//  UINT8 data = state->m_gmachine.ports[offset];
     UINT8 data = 0xff;
     switch (offset)
 	{
@@ -121,7 +121,7 @@ static READ8_HANDLER( gmaster_port_r )
 static WRITE8_HANDLER( gmaster_port_w )
 {
 	gmaster_state *state = space->machine().driver_data<gmaster_state>();
-    state->m_machine.ports[offset] = data;
+    state->m_gmachine.ports[offset] = data;
     logerror("%.4x port %d written %.2x\n", (int)cpu_get_reg(&space->device(), CPUINFO_INT_PC), offset, data);
     switch (offset)
 	{

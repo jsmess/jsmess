@@ -551,7 +551,7 @@ void osborne1_daisy_device::device_start()
 
 int osborne1_daisy_device::z80daisy_irq_state()
 {
-	osborne1_state *state = m_machine.driver_data<osborne1_state>();
+	osborne1_state *state = machine().driver_data<osborne1_state>();
 	return ( state->m_pia_1_irq_state ? Z80_DAISY_INT : 0 );
 }
 
@@ -563,7 +563,7 @@ int osborne1_daisy_device::z80daisy_irq_state()
 
 int osborne1_daisy_device::z80daisy_irq_ack()
 {
-	osborne1_state *state = m_machine.driver_data<osborne1_state>();
+	osborne1_state *state = machine().driver_data<osborne1_state>();
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8 old_bankswitch = state->m_bankswitch;
 	address_space* space = device().machine().device("maincpu")->memory().space(AS_PROGRAM);

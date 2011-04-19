@@ -77,13 +77,13 @@ void grip_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = -1;
 
-	if (input_port_read(m_machine, "ROW9") & 0x07)
+	if (input_port_read(machine(), "ROW9") & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
 	}
 
-	if (input_port_read(m_machine, "ROW9") & 0x18)
+	if (input_port_read(machine(), "ROW9") & 0x18)
 	{
 		/* ctrl */
 		table = 2;
@@ -92,7 +92,7 @@ void grip_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(m_machine, keynames[row]);
+		UINT8 data = input_port_read(machine(), keynames[row]);
 
 		for (col = 0; col < 8; col++)
 		{
@@ -136,7 +136,7 @@ void prof80_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
-	UINT8 *rom = m_machine.region(Z80_TAG)->base();
+	UINT8 *rom = machine().region(Z80_TAG)->base();
 	int bank;
 
 	for (bank = 0; bank < 16; bank++)
@@ -370,7 +370,7 @@ READ8_MEMBER( prof80_state::status2_r )
 	data |= !m_motor;
 
 	/* JS4 */
-	switch (input_port_read(m_machine, "J4"))
+	switch (input_port_read(machine(), "J4"))
 	{
 	case 0: js4 = 0; break;
 	case 1: js4 = 1; break;
@@ -382,7 +382,7 @@ READ8_MEMBER( prof80_state::status2_r )
 	data |= js4 << 4;
 
 	/* JS5 */
-	switch (input_port_read(m_machine, "J5"))
+	switch (input_port_read(machine(), "J5"))
 	{
 	case 0: js5 = 0; break;
 	case 1: js5 = 1; break;
@@ -459,7 +459,7 @@ WRITE8_MEMBER( grip_state::page_w )
 {
 	m_page = BIT(data, 7);
 
-	memory_set_bank(m_machine, "videoram", m_page);
+	memory_set_bank(machine(), "videoram", m_page);
 }
 
 READ8_MEMBER( grip_state::stat_r )
@@ -483,7 +483,7 @@ READ8_MEMBER( grip_state::stat_r )
 	int js0 = 0, js1 = 0;
 
 	/* JS0 */
-	switch (input_port_read(m_machine, "GRIP-J3A"))
+	switch (input_port_read(machine(), "GRIP-J3A"))
 	{
 	case 0: js0 = 0; break;
 	case 1: js0 = 1; break;
@@ -495,7 +495,7 @@ READ8_MEMBER( grip_state::stat_r )
 	data |= js0 << 4;
 
 	/* JS1 */
-	switch (input_port_read(m_machine, "GRIP-J3B"))
+	switch (input_port_read(machine(), "GRIP-J3B"))
 	{
 	case 0: js1 = 0; break;
 	case 1: js1 = 1; break;
@@ -1142,7 +1142,7 @@ void prof80_state::machine_start()
 	floppy_drive_set_index_pulse_callback(m_floppy0, prof80_fdc_index_callback);
 
 	/* allocate floppy motor off timer */
-	m_floppy_motor_off_timer = m_machine.scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
+	m_floppy_motor_off_timer = machine().scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
 
 	/* bank switch */
 	bankswitch();
@@ -1175,11 +1175,11 @@ void grip_state::machine_start()
 	prof80_state::machine_start();
 
 	/* allocate video RAM */
-	m_video_ram = auto_alloc_array(m_machine, UINT8, GRIP_VIDEORAM_SIZE);
+	m_video_ram = auto_alloc_array(machine(), UINT8, GRIP_VIDEORAM_SIZE);
 
 	/* setup GRIP memory banking */
-	memory_configure_bank(m_machine, "videoram", 0, 2, m_video_ram, 0x8000);
-	memory_set_bank(m_machine, "videoram", 0);
+	memory_configure_bank(machine(), "videoram", 0, 2, m_video_ram, 0x8000);
+	memory_set_bank(machine(), "videoram", 0);
 
 	/* register for state saving */
 	save_item(NAME(m_vol0));

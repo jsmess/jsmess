@@ -59,8 +59,8 @@ MACHINE_RESET_MEMBER(beehive_state)
 
 VIDEO_START_MEMBER( beehive_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
-	m_p_videoram = m_machine.region("maincpu")->base()+0x81fa;
+	m_p_chargen = machine().region("chargen")->base();
+	m_p_videoram = machine().region("maincpu")->base()+0x81fa;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.

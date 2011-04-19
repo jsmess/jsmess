@@ -273,7 +273,7 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER( nanos_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( nanos_state )
@@ -451,14 +451,14 @@ MACHINE_START_MEMBER(nanos_state)
 
 MACHINE_RESET_MEMBER(nanos_state)
 {
-	address_space *space = m_machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->install_write_bank(0x0000, 0x0fff, "bank3");
 	space->install_write_bank(0x1000, 0xffff, "bank2");
 
-	memory_set_bankptr(m_machine, "bank1", m_machine.region("maincpu")->base());
-	memory_set_bankptr(m_machine, "bank2", ram_get_ptr(m_machine.device(RAM_TAG)) + 0x1000);
-	memory_set_bankptr(m_machine, "bank3", ram_get_ptr(m_machine.device(RAM_TAG)));
+	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
+	memory_set_bankptr(machine(), "bank2", ram_get_ptr(machine().device(RAM_TAG)) + 0x1000);
+	memory_set_bankptr(machine(), "bank3", ram_get_ptr(machine().device(RAM_TAG)));
 
 	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);

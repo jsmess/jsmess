@@ -77,11 +77,11 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(sun1_state)
 {
-	UINT8* user1 = m_machine.region("user1")->base();
+	UINT8* user1 = machine().region("user1")->base();
 
 	memcpy((UINT8*)m_ram,user1,0x4000);
 
-	m_machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 	m_term_data = 0;
 }
 

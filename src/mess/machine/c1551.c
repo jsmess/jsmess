@@ -496,7 +496,7 @@ void c1551_device::device_start()
 	m_irq_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 
 	// map TPI1 to host CPU memory space
-	address_space *program = m_machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *program = machine().firstcpu->memory().space(AS_PROGRAM);
 	UINT32 start_address = m_config.m_address ? 0xfec0 : 0xfef0;
 
 	program->install_legacy_readwrite_handler(*m_tpi1, start_address, start_address + 7, FUNC(tpi6525_r), FUNC(tpi6525_w));

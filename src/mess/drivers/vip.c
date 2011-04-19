@@ -440,7 +440,7 @@ WRITE8_MEMBER( vip_state::colorram_w )
 
 bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	switch (input_port_read(m_machine, "VIDEO"))
+	switch (input_port_read(machine(), "VIDEO"))
 	{
 	case VIDEO_CDP1861:
 		m_vdc->update_screen(&bitmap, &cliprect);
@@ -458,27 +458,27 @@ bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 
 READ_LINE_MEMBER( vip_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "RUN"), 0);
+	return BIT(input_port_read(machine(), "RUN"), 0);
 }
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	set_led_status(m_machine, LED_TAPE, (cassette_input(m_cassette) > 0));
+	set_led_status(machine(), LED_TAPE, (cassette_input(m_cassette) > 0));
 
 	return cassette_input(m_cassette) < 0;
 }
 
 READ_LINE_MEMBER( vip_state::ef3_r )
 {
-	return BIT(input_port_read(m_machine, "KEYPAD"), m_keylatch);
+	return BIT(input_port_read(machine(), "KEYPAD"), m_keylatch);
 }
 
 READ_LINE_MEMBER( vip_state::ef4_r )
 {
-	switch (input_port_read(m_machine, "KEYBOARD"))
+	switch (input_port_read(machine(), "KEYBOARD"))
 	{
 	case KEYBOARD_VP580:
-		return BIT(input_port_read(m_machine, "VP-580"), m_keylatch);
+		return BIT(input_port_read(machine(), "VP-580"), m_keylatch);
 	}
 
 	return 0;
@@ -501,7 +501,7 @@ static COSMAC_SC_WRITE( vip_sc_w )
 WRITE_LINE_MEMBER( vip_state::q_w )
 {
 	// sound output
-	switch (input_port_read(m_machine, "SOUND"))
+	switch (input_port_read(machine(), "SOUND"))
 	{
 	case SOUND_SPEAKER:
 		discrete_sound_w(m_beeper, NODE_01, state);
@@ -524,7 +524,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	}
 
 	// Q led
-	set_led_status(m_machine, LED_Q, state);
+	set_led_status(machine(), LED_Q, state);
 
 	// tape output
 	cassette_output(m_cassette, state ? 1.0 : -1.0);
@@ -532,7 +532,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 
 WRITE8_MEMBER( vip_state::dma_w )
 {
-	switch (input_port_read(m_machine, "VIDEO"))
+	switch (input_port_read(machine(), "VIDEO"))
 	{
 	case VIDEO_CDP1861:
 		m_vdc->dma_w(space, offset, data);
@@ -581,14 +581,14 @@ void vip_state::machine_start()
 	/* randomize RAM contents */
 	for (UINT16 addr = 0; addr < ram_get_size(m_ram); addr++)
 	{
-		ram[addr] = m_machine.rand() & 0xff;
+		ram[addr] = machine().rand() & 0xff;
 	}
 
 	/* allocate color RAM */
-	m_colorram = auto_alloc_array(m_machine, UINT8, VP590_COLOR_RAM_SIZE);
+	m_colorram = auto_alloc_array(machine(), UINT8, VP590_COLOR_RAM_SIZE);
 
 	/* enable power LED */
-	set_led_status(m_machine, LED_POWER, 1);
+	set_led_status(machine(), LED_POWER, 1);
 
 	/* reset sound */
 	discrete_sound_w(m_beeper, NODE_01, 0);
@@ -597,9 +597,9 @@ void vip_state::machine_start()
 	vp550_q_w(m_vp551, 0);
 
 	/* register for state saving */
-	state_save_register_global_pointer(m_machine, m_colorram, VP590_COLOR_RAM_SIZE);
-	state_save_register_global(m_machine, m_color);
-	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global_pointer(machine(), m_colorram, VP590_COLOR_RAM_SIZE);
+	state_save_register_global(machine(), m_color);
+	state_save_register_global(machine(), m_keylatch);
 }
 
 void vip_state::machine_reset()
@@ -617,7 +617,7 @@ void vip_state::machine_reset()
 	m_vp551->reset();
 
 	/* configure video */
-	switch (input_port_read(m_machine, "VIDEO"))
+	switch (input_port_read(machine(), "VIDEO"))
 	{
 	case VIDEO_CDP1861:
 		io->unmap_write(0x05, 0x05);
@@ -631,7 +631,7 @@ void vip_state::machine_reset()
 	}
 
 	/* configure audio */
-	switch (input_port_read(m_machine, "SOUND"))
+	switch (input_port_read(machine(), "SOUND"))
 	{
 	case SOUND_SPEAKER:
 		vp595_install_write_handlers(m_vp595, io, 0);
@@ -659,7 +659,7 @@ void vip_state::machine_reset()
 	}
 
 	/* enable ROM all thru address space */
-	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, m_machine.region(CDP1802_TAG)->base());
+	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, machine().region(CDP1802_TAG)->base());
 }
 
 /* Machine Drivers */

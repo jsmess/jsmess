@@ -500,7 +500,7 @@ static TIMER_CALLBACK( sol20_boot )
 
 MACHINE_START_MEMBER( sol20_state )
 {
-	m_cassette_timer = m_machine.scheduler().timer_alloc(FUNC(sol20_cassette_tc));
+	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sol20_cassette_tc));
 }
 
 MACHINE_RESET_MEMBER( sol20_state )
@@ -521,7 +521,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart, AY31015_CS, 1 );
 
 	// set switched uart pins
-	data = input_port_read(m_machine, "S4");
+	data = input_port_read(machine(), "S4");
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 0 );
 	ay31015_set_input_pin( m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
 	ay31015_set_input_pin( m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
@@ -531,7 +531,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 1 );
 
 	// set rs232 baud rate
-	data = input_port_read(m_machine, "S3");
+	data = input_port_read(machine(), "S3");
 
 	if (data > 1)
 		do
@@ -541,7 +541,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 		}
 		while (!(data & 1) && (s_count < 7)); // find which switch is used
 
-	if ((s_count == 7) && (input_port_read(m_machine, "CONFIG")&1)) // if highest, look at jumper
+	if ((s_count == 7) && (input_port_read(machine(), "CONFIG")&1)) // if highest, look at jumper
 		s_clock = 9600 << 4;
 	else
 		s_clock = s_bauds[s_count] << 4;
@@ -551,8 +551,8 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_transmitter_clock( m_uart_s, s_clock);
 
 	// boot-bank
-	memory_set_bank(m_machine, "boot", 1);
-	m_machine.scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
+	memory_set_bank(machine(), "boot", 1);
+	machine().scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
 static DRIVER_INIT( sol20 )
@@ -563,7 +563,7 @@ static DRIVER_INIT( sol20 )
 
 VIDEO_START_MEMBER( sol20_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( sol20_state )

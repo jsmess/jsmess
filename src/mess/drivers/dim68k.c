@@ -204,16 +204,16 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(dim68k_state)
 {
-	UINT8* ROM = m_machine.region("bootrom")->base();
+	UINT8* ROM = machine().region("bootrom")->base();
 
 	memcpy((UINT8*)m_ram, ROM, 0x2000);
 
-	m_machine.device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 }
 
 VIDEO_START_MEMBER( dim68k_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( dim68k_state )

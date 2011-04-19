@@ -81,7 +81,7 @@ void fmscsi_device::device_start()
     // initialise SCSI devices, if any present
     for(x=0;x<m_config.scsidevs->devs_present;x++)
     {
-    	SCSIAllocInstance(m_machine, m_config.scsidevs->devices[x].scsiClass,
+    	SCSIAllocInstance(machine(), m_config.scsidevs->devices[x].scsiClass,
 				&m_SCSIdevices[m_config.scsidevs->devices[x].scsiID],
 				m_config.scsidevs->devices[x].diskregion );
     }
@@ -144,7 +144,7 @@ void fmscsi_device::fmscsi_rescan()
 //      if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
 		{
 			SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[i].scsiID] );
-			SCSIAllocInstance( m_machine,
+			SCSIAllocInstance( machine(),
 					m_config.scsidevs->devices[i].scsiClass,
 					&m_SCSIdevices[m_config.scsidevs->devices[i].scsiID],
 					m_config.scsidevs->devices[i].diskregion );

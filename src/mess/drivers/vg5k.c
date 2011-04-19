@@ -298,7 +298,7 @@ static TIMER_DEVICE_CALLBACK( vg5k_scanline )
 
 void vg5k_state::machine_start()
 {
-	state_save_register_global(m_machine, m_ef9345_offset);
+	state_save_register_global(machine(), m_ef9345_offset);
 }
 
 void vg5k_state::machine_reset()

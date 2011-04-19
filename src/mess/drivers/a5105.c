@@ -402,9 +402,9 @@ static PALETTE_INIT( gdc )
 void a5105_state::video_start()
 {
 	// find memory regions
-	m_char_rom = m_machine.region("pcg")->base();
+	m_char_rom = machine().region("pcg")->base();
 
-	VIDEO_START_NAME(generic_bitmapped)(m_machine);
+	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 bool a5105_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

@@ -70,7 +70,7 @@ void x1_keyboard_device::device_start()
 
 int x1_keyboard_device::z80daisy_irq_state()
 {
-	x1_state *state = m_machine.driver_data<x1_state>();
+	x1_state *state = machine().driver_data<x1_state>();
 	if(state->m_key_irq_flag != 0)
 		return Z80_DAISY_INT;
 	return 0;
@@ -84,7 +84,7 @@ int x1_keyboard_device::z80daisy_irq_state()
 
 int x1_keyboard_device::z80daisy_irq_ack()
 {
-	x1_state *state = m_machine.driver_data<x1_state>();
+	x1_state *state = machine().driver_data<x1_state>();
 	state->m_key_irq_flag = 0;
 	cputag_set_input_line(device().machine(),"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
 	return state->m_key_irq_vector;

@@ -480,7 +480,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 
 	if (m_keylatch == 1)
 	{
-		watchdog_reset(m_machine);
+		watchdog_reset(machine());
 	}
 
 	// beep

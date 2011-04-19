@@ -4,7 +4,7 @@
 void newbrain_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 
 	/* register for state saving */
 	save_item(NAME(m_tvcnsl));
@@ -109,7 +109,7 @@ bool newbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
 	}
 
 	return 0;

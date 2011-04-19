@@ -169,7 +169,7 @@ void tmc2000_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
-	UINT8 *rom = m_machine.region(CDP1802_TAG)->base();
+	UINT8 *rom = machine().region(CDP1802_TAG)->base();
 	
 	if (m_roc)
 	{
@@ -482,7 +482,7 @@ INPUT_PORTS_END
 
 READ_LINE_MEMBER( tmc1800_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "RUN"), 0);
+	return BIT(input_port_read(machine(), "RUN"), 0);
 }
 
 READ_LINE_MEMBER( tmc1800_state::ef2_r )
@@ -493,7 +493,7 @@ READ_LINE_MEMBER( tmc1800_state::ef2_r )
 READ_LINE_MEMBER( tmc1800_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -523,7 +523,7 @@ static COSMAC_INTERFACE( tmc1800_config )
 
 READ_LINE_MEMBER( osc1000b_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "RUN"), 0);
+	return BIT(input_port_read(machine(), "RUN"), 0);
 }
 
 READ_LINE_MEMBER( osc1000b_state::ef2_r )
@@ -534,7 +534,7 @@ READ_LINE_MEMBER( osc1000b_state::ef2_r )
 READ_LINE_MEMBER( osc1000b_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -564,7 +564,7 @@ static COSMAC_INTERFACE( osc1000b_config )
 
 READ_LINE_MEMBER( tmc2000_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "RUN"), 0);
+	return BIT(input_port_read(machine(), "RUN"), 0);
 }
 
 READ_LINE_MEMBER( tmc2000_state::ef2_r )
@@ -575,7 +575,7 @@ READ_LINE_MEMBER( tmc2000_state::ef2_r )
 READ_LINE_MEMBER( tmc2000_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	cdp1864_aoe_w(m_cti, state);
 
 	/* set Q led status */
-	set_led_status(m_machine, 1, state);
+	set_led_status(machine(), 1, state);
 
 	/* tape output */
 	cassette_output(m_cassette, state ? 1.0 : -1.0);
@@ -625,8 +625,8 @@ static TIMER_CALLBACK( nano_ef4_tick )
 
 READ_LINE_MEMBER( nano_state::clear_r )
 {
-	int run = BIT(input_port_read(m_machine, "RUN"), 0);
-	int monitor = BIT(input_port_read(m_machine, "MONITOR"), 0);
+	int run = BIT(input_port_read(machine(), "RUN"), 0);
+	int monitor = BIT(input_port_read(machine(), "MONITOR"), 0);
 
 	return run & monitor;
 }
@@ -639,7 +639,7 @@ READ_LINE_MEMBER( nano_state::ef2_r )
 READ_LINE_MEMBER( nano_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -650,7 +650,7 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	cdp1864_aoe_w(m_cti, state);
 
 	/* set Q led status */
-	set_led_status(m_machine, 1, state);
+	set_led_status(machine(), 1, state);
 
 	/* tape output */
 	cassette_output(m_cassette, state ? 1.0 : -1.0);
@@ -706,12 +706,12 @@ void tmc2000_state::machine_start()
 {
 	UINT16 addr;
 
-	m_colorram = auto_alloc_array(m_machine, UINT8, TMC2000_COLORRAM_SIZE);
+	m_colorram = auto_alloc_array(machine(), UINT8, TMC2000_COLORRAM_SIZE);
 
 	// randomize color RAM contents
 	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
-		m_colorram[addr] = m_machine.rand() & 0xff;
+		m_colorram[addr] = machine().rand() & 0xff;
 	}
 
 	// state saving
@@ -737,7 +737,7 @@ void tmc2000_state::machine_reset()
 void nano_state::machine_start()
 {
 	/* allocate monitor timer */
-	m_ef4_timer = m_machine.scheduler().timer_alloc(FUNC(nano_ef4_tick));
+	m_ef4_timer = machine().scheduler().timer_alloc(FUNC(nano_ef4_tick));
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
@@ -753,7 +753,7 @@ void nano_state::machine_reset()
 
 	/* enable ROM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *rom = m_machine.region(CDP1802_TAG)->base();
+	UINT8 *rom = machine().region(CDP1802_TAG)->base();
 	program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }
 

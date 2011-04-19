@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
 {
 	m_via0_irq = state;
 
-	device_set_input_line(m_machine.firstcpu, M6502_IRQ_LINE, (m_via0_irq | m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(machine().firstcpu, M6502_IRQ_LINE, (m_via0_irq | m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	device_set_input_line(m_machine.firstcpu, M6502_IRQ_LINE, (m_via0_irq | m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(machine().firstcpu, M6502_IRQ_LINE, (m_via0_irq | m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( vic1112_device::dio_r )
@@ -297,7 +297,7 @@ vic1112_device::vic1112_device(running_machine &_machine, const vic1112_device_c
     : device_t(_machine, _config),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
-	  m_bus(m_machine.device(_config.m_bus_tag)),
+	  m_bus(machine().device(_config.m_bus_tag)),
       m_config(_config)
 {
 }
@@ -309,7 +309,7 @@ vic1112_device::vic1112_device(running_machine &_machine, const vic1112_device_c
 
 void vic1112_device::device_start()
 {
-	address_space *program = m_machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *program = machine().firstcpu->memory().space(AS_PROGRAM);
 
 	// map VIAs to VIC-20 address space
 	program->install_readwrite_handler(0x9800, 0x980f, 0, 0, read8_delegate(FUNC(via6522_device::read), (via6522_device*)m_via0), write8_delegate(FUNC(via6522_device::write), (via6522_device*)m_via0));

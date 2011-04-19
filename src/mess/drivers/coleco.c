@@ -68,12 +68,12 @@
 
 READ8_MEMBER( coleco_state::paddle_1_r )
 {
-	return coleco_paddle1_read(m_machine, m_joy_mode, m_joy_status[0]);
+	return coleco_paddle1_read(machine(), m_joy_mode, m_joy_status[0]);
 }
 
 READ8_MEMBER( coleco_state::paddle_2_r )
 {
-	return coleco_paddle2_read(m_machine, m_joy_mode, m_joy_status[1]);
+	return coleco_paddle2_read(machine(), m_joy_mode, m_joy_status[1]);
 }
 
 WRITE8_MEMBER( coleco_state::paddle_off_w )
@@ -227,7 +227,7 @@ void coleco_state::machine_reset()
 
 	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 
-	memset(&m_machine.region(Z80_TAG)->base()[0x6000], 0xff, 0x400);	// initialize RAM
+	memset(&machine().region(Z80_TAG)->base()[0x6000], 0xff, 0x400);	// initialize RAM
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)

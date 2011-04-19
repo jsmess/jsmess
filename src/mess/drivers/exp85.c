@@ -185,9 +185,9 @@ void exp85_state::machine_start()
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x07ff, "bank1");
 	program->unmap_write(0x0000, 0x07ff);
-	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(I8085A_TAG)->base() + 0xf000, 0);
-	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region(I8085A_TAG)->base(), 0);
-	memory_set_bank(m_machine, "bank1", 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(I8085A_TAG)->base() + 0xf000, 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(I8085A_TAG)->base(), 0);
+	memory_set_bank(machine(), "bank1", 0);
 }
 
 /* Machine Driver */

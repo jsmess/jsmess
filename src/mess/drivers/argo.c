@@ -254,8 +254,8 @@ static TIMER_CALLBACK( argo_boot )
 
 MACHINE_RESET_MEMBER(argo_state)
 {
-	memory_set_bank(m_machine, "boot", 1);
-	m_machine.scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
+	memory_set_bank(machine(), "boot", 1);
+	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
 }
 
 DRIVER_INIT( argo )
@@ -266,7 +266,7 @@ DRIVER_INIT( argo )
 
 VIDEO_START_MEMBER( argo_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( argo_state )

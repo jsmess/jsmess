@@ -61,13 +61,13 @@ static TIMER_CALLBACK( c10_reset )
 
 MACHINE_RESET_MEMBER(c10_state)
 {
-	memory_set_bank(m_machine, "boot", 1);
-	m_machine.scheduler().timer_set(attotime::from_usec(4), FUNC(c10_reset));
+	memory_set_bank(machine(), "boot", 1);
+	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(c10_reset));
 }
 
 VIDEO_START_MEMBER( c10_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.

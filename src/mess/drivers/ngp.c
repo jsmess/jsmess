@@ -210,10 +210,10 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 	switch( offset )
 	{
 	case 0x30:	/* Read controls */
-		data = input_port_read( m_machine, "Controls" );
+		data = input_port_read( machine(), "Controls" );
 		break;
 	case 0x31:
-		data = input_port_read( m_machine, "Power" ) & 0x01;
+		data = input_port_read( machine(), "Power" ) & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
@@ -603,7 +603,7 @@ WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 
 void ngp_state::machine_start()
 {
-	m_seconds_timer = m_machine.scheduler().timer_alloc(FUNC(ngp_seconds_callback));
+	m_seconds_timer = machine().scheduler().timer_alloc(FUNC(ngp_seconds_callback));
 	m_seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
 }
 
@@ -611,12 +611,12 @@ void ngp_state::machine_start()
 void ngp_state::machine_reset()
 {
 	m_old_to3 = 0;
-	m_tlcs900 = m_machine.device( "maincpu" );
-	m_z80 = m_machine.device( "soundcpu" );
-	m_t6w28 = m_machine.device( "t6w28" );
-	m_dac_l = m_machine.device( "dac_l" );
-	m_dac_r = m_machine.device( "dac_r" );
-	m_k1ge = m_machine.device( "k1ge" );
+	m_tlcs900 = machine().device( "maincpu" );
+	m_z80 = machine().device( "soundcpu" );
+	m_t6w28 = machine().device( "t6w28" );
+	m_dac_l = machine().device( "dac_l" );
+	m_dac_r = machine().device( "dac_r" );
+	m_k1ge = machine().device( "k1ge" );
 
 	device_suspend( m_z80, SUSPEND_REASON_HALT, 1 );
 	device_set_input_line( m_z80, 0, CLEAR_LINE );

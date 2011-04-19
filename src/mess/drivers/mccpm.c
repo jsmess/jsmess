@@ -59,7 +59,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(mccpm_state)
 {
-	UINT8* bios = m_machine.region("maincpu")->base();
+	UINT8* bios = machine().region("maincpu")->base();
 	memcpy(m_ram, bios, 0x1000);
 }
 

@@ -101,7 +101,7 @@ void cgc7900_state::update_clut()
 		UINT8 g = (data >> 8) & 0xff;
 		UINT8 r = (data >> 16) & 0xff;
 
-		palette_set_color_rgb(m_machine, i + 8, r, g, b);
+		palette_set_color_rgb(machine(), i + 8, r, g, b);
 	}
 }
 
@@ -191,7 +191,7 @@ static PALETTE_INIT( cgc7900 )
 void cgc7900_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = m_machine.region("gfx1")->base();
+	m_char_rom = machine().region("gfx1")->base();
 }
 
 /*-------------------------------------------------

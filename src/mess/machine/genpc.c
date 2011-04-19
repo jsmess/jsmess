@@ -572,7 +572,7 @@ ibm5160_mb_device::ibm5160_mb_device(running_machine &_machine, const ibm5160_mb
  
 void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
 {	
-	int buswidth = m_machine.firstcpu->memory().space_config(AS_IO)->m_databus_width;
+	int buswidth = machine().firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -589,7 +589,7 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 
 void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler, const char *whandler_name)
 {	
-	int buswidth = m_machine.firstcpu->memory().space_config(AS_IO)->m_databus_width;
+	int buswidth = machine().firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -645,8 +645,8 @@ void ibm5160_mb_device::device_start()
 	install_device(this,    0x0080, 0x0087, 0, 0, FUNC(pc_page_r), FUNC(pc_page_w) );	
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, FUNC(nmi_enable_w));	
 	/* MESS managed RAM */
-	if ( ram_get_ptr(m_machine.device(RAM_TAG)) )
-		memory_set_bankptr( m_machine, "bank10", ram_get_ptr(m_machine.device(RAM_TAG)) );	
+	if ( ram_get_ptr(machine().device(RAM_TAG)) )
+		memory_set_bankptr( machine(), "bank10", ram_get_ptr(machine().device(RAM_TAG)) );	
 }
  
 IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
@@ -785,7 +785,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
          * 6-7  The number of floppy disk drives
          */
 		data = input_port_read(this, "DSW0") & 0xF3;
-		switch ( ram_get_size(m_machine.device(RAM_TAG)) )
+		switch ( ram_get_size(machine().device(RAM_TAG)) )
 		{
 		case 16 * 1024:
 			data |= 0x00;
@@ -823,7 +823,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( ram_get_size(m_machine.device(RAM_TAG)) - 64 * 1024 )
+		switch ( ram_get_size(machine().device(RAM_TAG)) - 64 * 1024 )
 		{
 		case 64 * 1024:		data |= 0x00; break;
 		case 128 * 1024:	data |= 0x02; break;
@@ -841,7 +841,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		case 896 * 1024:	data |= 0x0B; break;
 		case 960 * 1024:	data |= 0x0D; break;
 		}
-		if ( ram_get_size(m_machine.device(RAM_TAG)) > 960 * 1024 )
+		if ( ram_get_size(machine().device(RAM_TAG)) > 960 * 1024 )
 			data |= 0x0D;
 
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));

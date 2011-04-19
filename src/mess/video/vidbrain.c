@@ -333,14 +333,14 @@ static PALETTE_INIT( vidbrain )
 void vidbrain_state::video_start()
 {
 	// register for state saving
-	state_save_register_global_array(m_machine, m_vlsi_ram);
-	state_save_register_global(m_machine, m_y_int);
-	state_save_register_global(m_machine, m_fmod);
-	state_save_register_global(m_machine, m_bg);
-	state_save_register_global(m_machine, m_cmd);
-	state_save_register_global(m_machine, m_freeze_x);
-	state_save_register_global(m_machine, m_freeze_y);
-	state_save_register_global(m_machine, m_field);
+	state_save_register_global_array(machine(), m_vlsi_ram);
+	state_save_register_global(machine(), m_y_int);
+	state_save_register_global(machine(), m_fmod);
+	state_save_register_global(machine(), m_bg);
+	state_save_register_global(machine(), m_cmd);
+	state_save_register_global(machine(), m_freeze_x);
+	state_save_register_global(machine(), m_freeze_y);
+	state_save_register_global(machine(), m_field);
 }
 
 
@@ -354,7 +354,7 @@ bool vidbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 
 	if (!(m_cmd & COMMAND_ENB))
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(m_machine));
+		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
 		return 0;
 	}
 

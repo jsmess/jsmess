@@ -176,7 +176,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 		m_serial_timer->adjust(attotime::zero);
 #endif
 
-		UINT8 sound = input_port_read(m_machine, "CONFIG") & 8;
+		UINT8 sound = input_port_read(machine(), "CONFIG") & 8;
 
 		cassette_change_state(m_cass1,
 			((BIT(data, 4)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -216,7 +216,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 {
 	/* reading the config switch */
-	switch (input_port_read(m_machine, "CONFIG") & 0x06)
+	switch (input_port_read(machine(), "CONFIG") & 0x06)
 	{
 		case 0: /* speaker */
 			dac_data_w(m_dac, data);
@@ -275,10 +275,10 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 	};
 
 	/* bit 5 - vsync (inverted) */
-	data |= (((~input_port_read(m_machine, "VS")) & 0x01)<<5);
+	data |= (((~input_port_read(machine(), "VS")) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
-	data |= (input_port_read(m_machine, keynames[m_keyboard_line]) & 0x1f);
+	data |= (input_port_read(machine(), keynames[m_keyboard_line]) & 0x1f);
 
 	return data;
 }

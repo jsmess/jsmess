@@ -58,7 +58,7 @@ public:
 READ8_MEMBER( zrt80_state::zrt80_10_r )
 {
 	UINT8 ret = m_term_data;
-	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return ret;
 }
 
@@ -70,13 +70,13 @@ static TIMER_CALLBACK( zrt80_beepoff )
 
 WRITE8_MEMBER(zrt80_state::zrt80_30_w)
 {
-	m_machine.scheduler().timer_set(attotime::from_msec(100), FUNC(zrt80_beepoff));
+	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(zrt80_beepoff));
 	beep_set_state(m_beep, 1);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 {
-	m_machine.scheduler().timer_set(attotime::from_msec(400), FUNC(zrt80_beepoff));
+	machine().scheduler().timer_set(attotime::from_msec(400), FUNC(zrt80_beepoff));
 	beep_set_state(m_beep, 1);
 }
 
@@ -193,7 +193,7 @@ MACHINE_RESET_MEMBER(zrt80_state)
 
 VIDEO_START_MEMBER( zrt80_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( zrt80_state )
@@ -268,7 +268,7 @@ static const ins8250_interface zrt80_com_interface =
 WRITE8_MEMBER( zrt80_state::zrt80_kbd_put )
 {
 	m_term_data = data;
-	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( zrt80_terminal_intf )

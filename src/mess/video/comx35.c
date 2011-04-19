@@ -102,12 +102,12 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 void comx35_state::video_start()
 {
 	// allocate memory
-	m_charram = auto_alloc_array(m_machine, UINT8, COMX35_CHARRAM_SIZE);
-	m_videoram = auto_alloc_array(m_machine, UINT8, COMX35_VIDEORAM_SIZE);
+	m_charram = auto_alloc_array(machine(), UINT8, COMX35_CHARRAM_SIZE);
+	m_videoram = auto_alloc_array(machine(), UINT8, COMX35_VIDEORAM_SIZE);
 
 	// register for save state
-	state_save_register_global_pointer(m_machine, m_charram, COMX35_CHARRAM_SIZE);
-	state_save_register_global_pointer(m_machine, m_videoram, COMX35_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine(), m_charram, COMX35_CHARRAM_SIZE);
+	state_save_register_global_pointer(machine(), m_videoram, COMX35_VIDEORAM_SIZE);
 }
 
 bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

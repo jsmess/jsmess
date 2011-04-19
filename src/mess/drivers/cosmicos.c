@@ -87,7 +87,7 @@ READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 	{
 		if (BIT(m_keylatch, i))
 		{
-			UINT8 keydata = input_port_read(m_machine, keynames[i]);
+			UINT8 keydata = input_port_read(machine(), keynames[i]);
 
 			if (BIT(keydata, 0)) data |= 0x01;
 			if (BIT(keydata, 1)) data |= 0x02;
@@ -414,14 +414,14 @@ READ_LINE_MEMBER( cosmicos_state::clear_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef1_r )
 {
-	UINT8 special = input_port_read(m_machine, "SPECIAL");
+	UINT8 special = input_port_read(machine(), "SPECIAL");
 
 	return BIT(special, 0);
 }
 
 READ_LINE_MEMBER( cosmicos_state::ef2_r )
 {
-	UINT8 special = input_port_read(m_machine, "SPECIAL");
+	UINT8 special = input_port_read(machine(), "SPECIAL");
 	int casin = cassette_input(m_cassette) < 0.0;
 
 	output_set_led_value(LED_CASSETTE, casin);
@@ -431,14 +431,14 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef3_r )
 {
-	UINT8 special = input_port_read(m_machine, "SPECIAL");
+	UINT8 special = input_port_read(machine(), "SPECIAL");
 
 	return BIT(special, 2) | BIT(special, 3);
 }
 
 READ_LINE_MEMBER( cosmicos_state::ef4_r )
 {
-	return BIT(input_port_read(m_machine, "BUTTONS"), 0);
+	return BIT(input_port_read(machine(), "BUTTONS"), 0);
 }
 
 static COSMAC_SC_WRITE( cosmicos_sc_w )

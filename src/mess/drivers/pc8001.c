@@ -344,7 +344,7 @@ static PALETTE_INIT( pc8001 )
 void pc8001_state::video_start()
 {
 	// find memory regions
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 }
 
 bool pc8001_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -499,38 +499,38 @@ void pc8001_state::machine_start()
 	/* setup memory banking */
 	UINT8 *ram = ram_get_ptr(m_ram);
 	
-	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region("n80")->base(), 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("n80")->base(), 0);
 	program->install_read_bank(0x0000, 0x5fff, "bank1");
 	program->unmap_write(0x0000, 0x5fff);
 
 	switch (ram_get_size(m_ram))
 	{
 	case 16*1024:
-		memory_configure_bank(m_machine, "bank3", 0, 1, ram, 0);
+		memory_configure_bank(machine(), "bank3", 0, 1, ram, 0);
 		program->unmap_readwrite(0x6000, 0xbfff);
 		program->unmap_readwrite(0x8000, 0xbfff);
 		program->install_readwrite_bank(0xc000, 0xffff, "bank3");
 		break;
 
 	case 32*1024:
-		memory_configure_bank(m_machine, "bank3", 0, 1, ram, 0);
+		memory_configure_bank(machine(), "bank3", 0, 1, ram, 0);
 		program->unmap_readwrite(0x6000, 0xbfff);
 		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 		break;
 
 	case 64*1024:
-		memory_configure_bank(m_machine, "bank1", 0, 1, ram, 0);
-		memory_configure_bank(m_machine, "bank2", 0, 1, ram + 0x6000, 0);
-		memory_configure_bank(m_machine, "bank3", 0, 1, ram + 0x8000, 0);
+		memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
+		memory_configure_bank(machine(), "bank2", 0, 1, ram + 0x6000, 0);
+		memory_configure_bank(machine(), "bank3", 0, 1, ram + 0x8000, 0);
 		program->install_readwrite_bank(0x0000, 0x5fff, "bank1");
 		program->install_readwrite_bank(0x6000, 0xbfff, "bank2");
 		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
-		memory_set_bank(m_machine, "bank2", 0);
+		memory_set_bank(machine(), "bank2", 0);
 		break;
 	}
 
-	memory_set_bank(m_machine, "bank1", 1);
-	memory_set_bank(m_machine, "bank3", 0);
+	memory_set_bank(machine(), "bank1", 1);
+	memory_set_bank(machine(), "bank3", 0);
 
 	/* register for state saving */
 	save_item(NAME(m_width80));

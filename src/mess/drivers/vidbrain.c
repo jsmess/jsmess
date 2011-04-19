@@ -88,15 +88,15 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
 	UINT8 data = 0;//input_port_read(machine, "JOY-R");
 
-	if (BIT(m_keylatch, 0)) data |= input_port_read(m_machine, "IO00");
-	if (BIT(m_keylatch, 1)) data |= input_port_read(m_machine, "IO01");
-	if (BIT(m_keylatch, 2)) data |= input_port_read(m_machine, "IO02");
-	if (BIT(m_keylatch, 3)) data |= input_port_read(m_machine, "IO03");
-	if (BIT(m_keylatch, 4)) data |= input_port_read(m_machine, "IO04");
-	if (BIT(m_keylatch, 5)) data |= input_port_read(m_machine, "IO05");
-	if (BIT(m_keylatch, 6)) data |= input_port_read(m_machine, "IO06");
-	if (BIT(m_keylatch, 7)) data |= input_port_read(m_machine, "IO07");
-	if (!BIT(m_cmd, 4)) data |= input_port_read(m_machine, "UV201-31");
+	if (BIT(m_keylatch, 0)) data |= input_port_read(machine(), "IO00");
+	if (BIT(m_keylatch, 1)) data |= input_port_read(machine(), "IO01");
+	if (BIT(m_keylatch, 2)) data |= input_port_read(machine(), "IO02");
+	if (BIT(m_keylatch, 3)) data |= input_port_read(machine(), "IO03");
+	if (BIT(m_keylatch, 4)) data |= input_port_read(machine(), "IO04");
+	if (BIT(m_keylatch, 5)) data |= input_port_read(machine(), "IO05");
+	if (BIT(m_keylatch, 6)) data |= input_port_read(machine(), "IO06");
+	if (BIT(m_keylatch, 7)) data |= input_port_read(machine(), "IO07");
+	if (!BIT(m_cmd, 4)) data |= input_port_read(machine(), "UV201-31");
 
 	return data;
 }
@@ -429,13 +429,13 @@ void vidbrain_state::machine_start()
 	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
 
 	// register for state saving
-	state_save_register_global(m_machine, m_vector);
-	state_save_register_global(m_machine, m_int_enable);
-	state_save_register_global(m_machine, m_ext_int_latch);
-	state_save_register_global(m_machine, m_timer_int_latch);
-	state_save_register_global(m_machine, m_keylatch);
-	state_save_register_global(m_machine, m_joy_enable);
-	state_save_register_global(m_machine, m_sound_clk);
+	state_save_register_global(machine(), m_vector);
+	state_save_register_global(machine(), m_int_enable);
+	state_save_register_global(machine(), m_ext_int_latch);
+	state_save_register_global(machine(), m_timer_int_latch);
+	state_save_register_global(machine(), m_keylatch);
+	state_save_register_global(machine(), m_joy_enable);
+	state_save_register_global(machine(), m_sound_clk);
 }
 
 

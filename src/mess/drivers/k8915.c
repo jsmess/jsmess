@@ -84,7 +84,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(k8915_state)
 {
-	memory_set_bank(m_machine, "boot", 1);
+	memory_set_bank(machine(), "boot", 1);
 }
 
 static DRIVER_INIT(k8915)
@@ -95,7 +95,7 @@ static DRIVER_INIT(k8915)
 
 VIDEO_START_MEMBER( k8915_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( k8915_state )

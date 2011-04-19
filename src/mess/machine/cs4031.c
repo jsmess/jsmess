@@ -153,16 +153,16 @@ cs4031_device::cs4031_device(running_machine &_machine, const cs4031_device_conf
 
 void cs4031_device::device_start()
 {
-	device_t *ram_device = m_machine.device(RAM_TAG);
+	device_t *ram_device = machine().device(RAM_TAG);
 
 	// make sure the ram device is already running
 	if (!ram_device->started())
 		throw device_missing_dependencies();
 
-	device_t *cpu = m_machine.device(m_config.m_cputag);
+	device_t *cpu = machine().device(m_config.m_cputag);
 	m_space = cpu->memory().space(AS_PROGRAM);
-	m_isa = m_machine.region(m_config.m_isatag)->base();
-	m_bios = m_machine.region(m_config.m_biostag)->base();
+	m_isa = machine().region(m_config.m_isatag)->base();
+	m_bios = machine().region(m_config.m_biostag)->base();
 
 	m_ram = ram_get_ptr(ram_device);
 	UINT32 ram_size = ram_get_size(ram_device);

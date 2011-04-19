@@ -53,7 +53,7 @@ MACHINE_RESET_MEMBER(mes_state)
 
 VIDEO_START_MEMBER( mes_state )
 {
-	m_p_chargen = m_machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
 /* This system appears to have 2 screens. Not implemented.

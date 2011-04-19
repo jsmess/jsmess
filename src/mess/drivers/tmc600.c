@@ -196,7 +196,7 @@ INPUT_PORTS_END
 
 READ_LINE_MEMBER( tmc600_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "RUN"), 0);
+	return BIT(input_port_read(machine(), "RUN"), 0);
 }
 
 READ_LINE_MEMBER( tmc600_state::ef2_r )
@@ -207,7 +207,7 @@ READ_LINE_MEMBER( tmc600_state::ef2_r )
 READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -252,7 +252,7 @@ void tmc600_state::machine_start()
 	}
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_keylatch);
+	state_save_register_global(machine(), m_keylatch);
 }
 
 /* Machine Drivers */

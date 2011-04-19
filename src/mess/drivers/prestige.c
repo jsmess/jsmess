@@ -126,36 +126,36 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 	switch (offset)
 	{
 	case 0:
-		memory_set_bank(m_machine, "bank1", data & 0x3f);
+		memory_set_bank(machine(), "bank1", data & 0x3f);
 		break;
 
 	case 1:
 		if (m_bank[5] & 0x08)
-			memory_set_bank(m_machine, "bank2", 0x40 + (data & 1));
+			memory_set_bank(machine(), "bank2", 0x40 + (data & 1));
 		else
-			memory_set_bank(m_machine, "bank2", data & 0x3f);
+			memory_set_bank(machine(), "bank2", data & 0x3f);
 		break;
 
 	case 2:
 		if (m_bank[5] & 0x04)
-			memory_set_bank(m_machine, "bank3", 0x40 + (data & 1));
+			memory_set_bank(machine(), "bank3", 0x40 + (data & 1));
 		else
-			memory_set_bank(m_machine, "bank3", data & 0x3f);
+			memory_set_bank(machine(), "bank3", data & 0x3f);
 		break;
 
 	case 3:
 		if (m_bank[5] & 0x02)
-			memory_set_bank(m_machine, "bank4", 0x04 + (data & 0x03));
+			memory_set_bank(machine(), "bank4", 0x04 + (data & 0x03));
 		else
-			memory_set_bank(m_machine, "bank4", data & 0x03);
+			memory_set_bank(machine(), "bank4", data & 0x03);
 		break;
 
 	case 4:
-		memory_set_bank(m_machine, "bank5", data & 0x03);
+		memory_set_bank(machine(), "bank5", data & 0x03);
 		break;
 
 	case 5:
-		if (input_port_read(m_machine, "CART_TYPE") == 0x01)
+		if (input_port_read(machine(), "CART_TYPE") == 0x01)
 		{
 			//cartridge memory is writable
 			if (data & 0x08)
@@ -200,7 +200,7 @@ READ8_MEMBER( prestige_state::kb_r )
 
 	for (int line=0; line<8; line++)
 		if (!(m_kb_matrix & (1<<line)))
-			data &= input_port_read(m_machine, bitnames[offset][line]);
+			data &= input_port_read(machine(), bitnames[offset][line]);
 
 	return data;
 }
@@ -217,10 +217,10 @@ READ8_MEMBER( prestige_state::mouse_r )
 	switch( offset )
 	{
 		case 0:		//x-axis
-			data = (input_port_read(m_machine, "MOUSEX") - m_mousex);
+			data = (input_port_read(machine(), "MOUSEX") - m_mousex);
 			break;
 		case 1:		//y-axis
-			data = (input_port_read(m_machine, "MOUSEY") - m_mousey);
+			data = (input_port_read(machine(), "MOUSEY") - m_mousey);
 			break;
 	}
 
@@ -232,10 +232,10 @@ WRITE8_MEMBER( prestige_state::mouse_w )
 	switch( offset )
 	{
 		case 0:		//x-axis
-			m_mousex = input_port_read(m_machine, "MOUSEX");
+			m_mousex = input_port_read(machine(), "MOUSEX");
 			break;
 		case 1:		//y-axis
-			m_mousey = input_port_read(m_machine, "MOUSEY");
+			m_mousey = input_port_read(machine(), "MOUSEY");
 			break;
 	}
 }
@@ -420,20 +420,20 @@ void prestige_state::machine_start()
 
 	device_set_irq_callback(m_maincpu, prestige_int_ack);
 
-	memory_configure_bank(m_machine, "bank1", 0, 64, m_machine.region("maincpu")->base(), 0x4000);
-	memory_configure_bank(m_machine, "bank2", 0, 64, m_machine.region("maincpu")->base(), 0x4000);
-	memory_configure_bank(m_machine, "bank2", 64, 2, m_machine.region("cart")->base(), 0x4000);
-	memory_configure_bank(m_machine, "bank3", 0, 64, m_machine.region("maincpu")->base(), 0x4000);
-	memory_configure_bank(m_machine, "bank3", 64, 2, m_machine.region("cart")->base(), 0x4000);
-	memory_configure_bank(m_machine, "bank4", 0, 4, ram, 0x2000);
-	memory_configure_bank(m_machine, "bank4", 4, 4, m_machine.region("cart")->base(), 0x2000);
-	memory_configure_bank(m_machine, "bank5", 0, 4, ram, 0x2000);
+	memory_configure_bank(machine(), "bank1", 0, 64, machine().region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine(), "bank2", 0, 64, machine().region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine(), "bank2", 64, 2, machine().region("cart")->base(), 0x4000);
+	memory_configure_bank(machine(), "bank3", 0, 64, machine().region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine(), "bank3", 64, 2, machine().region("cart")->base(), 0x4000);
+	memory_configure_bank(machine(), "bank4", 0, 4, ram, 0x2000);
+	memory_configure_bank(machine(), "bank4", 4, 4, machine().region("cart")->base(), 0x2000);
+	memory_configure_bank(machine(), "bank5", 0, 4, ram, 0x2000);
 
-	memory_set_bank(m_machine, "bank1", 0);
-	memory_set_bank(m_machine, "bank2", 0);
-	memory_set_bank(m_machine, "bank3", 0);
-	memory_set_bank(m_machine, "bank4", 0);
-	memory_set_bank(m_machine, "bank5", 0);
+	memory_set_bank(machine(), "bank1", 0);
+	memory_set_bank(machine(), "bank2", 0);
+	memory_set_bank(machine(), "bank3", 0);
+	memory_set_bank(machine(), "bank4", 0);
+	memory_set_bank(machine(), "bank5", 0);
 
 	//pointer to the videoram
 	m_vram = ram;

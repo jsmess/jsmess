@@ -79,8 +79,10 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 const char *driverpath = m_enumerator.config().m_devicelist.find("root")->searchpath();
 
 	// iterate over ROM sources and regions
-	bool anyfound = false;
-	bool anyrequired = false;
+	int found = 0;
+	int required = 0;
+	int shared_found = 0;
+	int shared_required = 0;
 	for (const rom_source *source = rom_first_source(m_enumerator.config()); source != NULL; source = rom_next_source(*source))
 	{
 		// determine the search path for this source and iterate through the regions
@@ -89,19 +91,27 @@ const char *driverpath = m_enumerator.config().m_devicelist.find("root")->search
 		// also determine if this is the driver's specific ROMs or not
 		bool source_is_gamedrv = (dynamic_cast<const driver_device_config_base *>(source) != NULL);
 
-// temporary hack: add the driver path
-astring combinedpath(m_searchpath, ";", driverpath);
-m_searchpath = combinedpath;
-
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
+		{
+// temporary hack: add the driver path & region name
+astring combinedpath(source->searchpath(), ";", driverpath);
+if (ROMREGION_ISLOADBYNAME(region))
+	combinedpath.cat(";").cat(ROMREGION_GETTAG(region));
+m_searchpath = combinedpath;
+
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				hash_collection hashes(ROM_GETHASHDATA(rom));
+				bool shared = (also_used_by_parent(hashes) != -1);
 
 				// if a dump exists, then at least one entry is required
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
-					anyrequired = true;
+				{
+					required++;
+					if (shared)
+						shared_required++;
+				}
 
 				// audit a file
 				audit_record *record = NULL;
@@ -117,13 +127,18 @@ m_searchpath = combinedpath;
 					continue;
 
 				// if we got a record back,
-				if (record->status() != audit_record::STATUS_NOT_FOUND && source_is_gamedrv && also_used_by_parent(hashes) == -1)
-					anyfound = true;
+				if (record->status() != audit_record::STATUS_NOT_FOUND && source_is_gamedrv)
+				{
+					found++;
+					if (shared)
+						shared_found++;
+				}
 			}
+		}
 	}
 
-	// if we found nothing, we don't have the set at all
-	if (!anyfound && anyrequired)
+	// if we found nothing unique to this set & the set needs roms that aren't in the parent or the parent isn't found either, then we don't have the set at all
+	if (found == shared_found && required > 0 && (required != shared_required || shared_found == 0))
 		m_record_list.reset();
 
 	// return a summary

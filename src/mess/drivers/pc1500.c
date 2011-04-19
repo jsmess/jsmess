@@ -247,7 +247,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 
 	data |= (m_rtc->tp_r()<<5);
 	data |= (m_rtc->data_out_r()<<6);
-	data |= (input_port_read(m_machine, "ON")<<7);
+	data |= (input_port_read(machine(), "ON")<<7);
 
 	return data;
 }

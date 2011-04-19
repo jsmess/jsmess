@@ -627,16 +627,16 @@ READ8_MEMBER( fidelz80_state::fidelz80_portc_r )
 	switch (m_kp_matrix & 0xf0)
 	{
 		case 0xe0:
-			data = input_port_read(m_machine, "LINE1");
+			data = input_port_read(machine(), "LINE1");
 			break;
 		case 0xd0:
-			data = input_port_read(m_machine, "LINE2");
+			data = input_port_read(machine(), "LINE2");
 			break;
 		case 0xb0:
-			data = input_port_read(m_machine, "LINE3");
+			data = input_port_read(machine(), "LINE3");
 			break;
 		case 0x70:
-			data = input_port_read(m_machine, "LINE4");
+			data = input_port_read(machine(), "LINE4");
 			break;
 	}
 
@@ -652,7 +652,7 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 
 		m_led_selected = data;
 
-		update_display(m_machine);
+		update_display(machine());
 	}
 
 	// ignoring the language switch enable for now, is bit 0x40
@@ -670,7 +670,7 @@ READ8_MEMBER( fidelz80_state::cc10_portb_r )
     -xxx xxxx ??
     */
 
-	return input_port_read(m_machine, "LEVEL");
+	return input_port_read(machine(), "LEVEL");
 }
 
 WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
@@ -679,7 +679,7 @@ WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 
 	m_digit_data = data;
 
-	update_display(m_machine);
+	update_display(machine());
 }
 
 READ8_MEMBER( fidelz80_state::vcc_portb_r )
@@ -700,7 +700,7 @@ WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
 	{
 		m_digit_data = data;
 
-		update_display(m_machine);
+		update_display(machine());
 	}
 }
 
@@ -789,28 +789,28 @@ READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
 	switch (m_kp_matrix)
 	{
 		case 0x01:
-			data = input_port_read(m_machine, "LINE1");
+			data = input_port_read(machine(), "LINE1");
 			break;
 		case 0x02:
-			data = input_port_read(m_machine, "LINE2");
+			data = input_port_read(machine(), "LINE2");
 			break;
 		case 0x04:
-			data = input_port_read(m_machine, "LINE3");
+			data = input_port_read(machine(), "LINE3");
 			break;
 		case 0x08:
-			data = input_port_read(m_machine, "LINE4");
+			data = input_port_read(machine(), "LINE4");
 			break;
 		case 0x10:
-			data = input_port_read(m_machine, "LINE5");
+			data = input_port_read(machine(), "LINE5");
 			break;
 		case 0x20:
-			data = input_port_read(m_machine, "LINE6");
+			data = input_port_read(machine(), "LINE6");
 			break;
 		case 0x40:
-			data = input_port_read(m_machine, "LINE7");
+			data = input_port_read(machine(), "LINE7");
 			break;
 		case 0x80:
-			data = input_port_read(m_machine, "LINE8");
+			data = input_port_read(machine(), "LINE8");
 			break;
 		default:
 			data = 0xf0;

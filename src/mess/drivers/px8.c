@@ -77,7 +77,7 @@ void px8_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
-	UINT8 *ipl_rom = m_machine.region(UPD70008_TAG)->base();
+	UINT8 *ipl_rom = machine().region(UPD70008_TAG)->base();
 
 	if (!m_bank0)
 	{
@@ -452,16 +452,16 @@ UINT8 px8_state::krtn_read()
 
 	switch (m_ksc)
 	{
-	case 0: data = input_port_read(m_machine, "KSC0"); break;
-	case 1: data = input_port_read(m_machine, "KSC1"); break;
-	case 2: data = input_port_read(m_machine, "KSC2"); break;
-	case 3: data = input_port_read(m_machine, "KSC3"); break;
-	case 4: data = input_port_read(m_machine, "KSC4"); break;
-	case 5: data = input_port_read(m_machine, "KSC5"); break;
-	case 6: data = input_port_read(m_machine, "KSC6"); break;
-	case 7: data = input_port_read(m_machine, "KSC7"); break;
-	case 8: data = input_port_read(m_machine, "KSC8"); break;
-	case 9: data = input_port_read(m_machine, "SW4");  break;
+	case 0: data = input_port_read(machine(), "KSC0"); break;
+	case 1: data = input_port_read(machine(), "KSC1"); break;
+	case 2: data = input_port_read(machine(), "KSC2"); break;
+	case 3: data = input_port_read(machine(), "KSC3"); break;
+	case 4: data = input_port_read(machine(), "KSC4"); break;
+	case 5: data = input_port_read(machine(), "KSC5"); break;
+	case 6: data = input_port_read(machine(), "KSC6"); break;
+	case 7: data = input_port_read(machine(), "KSC7"); break;
+	case 8: data = input_port_read(machine(), "KSC8"); break;
+	case 9: data = input_port_read(machine(), "SW4");  break;
 	}
 
 	return data;

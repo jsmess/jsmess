@@ -100,16 +100,16 @@ void bullet_state::bankswitch()
 {
 	if (m_brom)
 	{
-		memory_set_bank(m_machine, "bank1", 2);
+		memory_set_bank(machine(), "bank1", 2);
 	}
 	else
 	{
-		memory_set_bank(m_machine, "bank1", m_segst);
+		memory_set_bank(machine(), "bank1", m_segst);
 	}
 
-	memory_set_bank(m_machine, "bank2", m_segst);
-	memory_set_bank(m_machine, "bank3", m_segst);
-	memory_set_bank(m_machine, "bank4", 0);
+	memory_set_bank(machine(), "bank2", m_segst);
+	memory_set_bank(machine(), "bank3", m_segst);
+	memory_set_bank(machine(), "bank4", 0);
 }
 
 
@@ -176,7 +176,7 @@ READ8_MEMBER( bullet_state::info_r )
 	UINT8 data = 0x10;
 
 	// DIP switches
-	data |= input_port_read(m_machine, "SW1") & 0x0f;
+	data |= input_port_read(machine(), "SW1") & 0x0f;
 
 	// floppy interrupt
 	data |= wd17xx_intrq_r(m_fdc) << 6;
@@ -653,23 +653,23 @@ void bullet_state::machine_start()
 	// setup memory banking
 	UINT8 *ram = ram_get_ptr(m_ram);
 
-	memory_configure_bank(m_machine, "bank1", 0, 2, ram, 0x10000);
-	memory_configure_bank(m_machine, "bank1", 2, 1, m_machine.region(Z80_TAG)->base(), 0);
-	memory_configure_bank(m_machine, "bank2", 0, 2, ram, 0x10000);
-	memory_configure_bank(m_machine, "bank3", 0, 2, ram + 0x0020, 0x10000);
-	memory_configure_bank(m_machine, "bank4", 0, 1, ram + 0xc000, 0);
+	memory_configure_bank(machine(), "bank1", 0, 2, ram, 0x10000);
+	memory_configure_bank(machine(), "bank1", 2, 1, machine().region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine(), "bank2", 0, 2, ram, 0x10000);
+	memory_configure_bank(machine(), "bank3", 0, 2, ram + 0x0020, 0x10000);
+	memory_configure_bank(machine(), "bank4", 0, 1, ram + 0xc000, 0);
 
 	// register for state saving
-	state_save_register_global(m_machine, m_segst);
-	state_save_register_global(m_machine, m_brom);
-	state_save_register_global(m_machine, m_exdma);
-	state_save_register_global(m_machine, m_buf);
-	state_save_register_global(m_machine, m_fdrdy);
-	state_save_register_global(m_machine, m_dartardy);
-	state_save_register_global(m_machine, m_dartbrdy);
-	state_save_register_global(m_machine, m_winrdy);
-	state_save_register_global(m_machine, m_exrdy1);
-	state_save_register_global(m_machine, m_exrdy2);
+	state_save_register_global(machine(), m_segst);
+	state_save_register_global(machine(), m_brom);
+	state_save_register_global(machine(), m_exdma);
+	state_save_register_global(machine(), m_buf);
+	state_save_register_global(machine(), m_fdrdy);
+	state_save_register_global(machine(), m_dartardy);
+	state_save_register_global(machine(), m_dartbrdy);
+	state_save_register_global(machine(), m_winrdy);
+	state_save_register_global(machine(), m_exrdy1);
+	state_save_register_global(machine(), m_exrdy2);
 }
 
 

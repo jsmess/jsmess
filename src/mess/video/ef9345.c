@@ -169,7 +169,7 @@ ef9345_device::ef9345_device( running_machine &_machine, const ef9345_device_con
 
 void ef9345_device::device_start()
 {
-	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(m_config.screen_tag);
 
 	assert(m_screen != NULL);
 
@@ -179,7 +179,7 @@ void ef9345_device::device_start()
 	m_videoram = space(0);
 	m_charset = region();
 
-	m_screen_out = auto_bitmap_alloc(m_machine, 496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
+	m_screen_out = auto_bitmap_alloc(machine(), 496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
 
 	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
 

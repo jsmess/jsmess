@@ -29,7 +29,7 @@ void mc1000_state::bankswitch()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
-	memory_set_bank(m_machine, "bank2", m_mc6845_bank);
+	memory_set_bank(machine(), "bank2", m_mc6845_bank);
 
 	/* extended RAM */
 	if (ram_get_size(m_ram) > 16*1024)
@@ -58,7 +58,7 @@ void mc1000_state::bankswitch()
 		program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
 	}
 
-	memory_set_bank(m_machine, "bank4", m_mc6847_bank);
+	memory_set_bank(machine(), "bank4", m_mc6847_bank);
 
 	/* extended RAM */
 	if (ram_get_size(m_ram) > 16*1024)
@@ -297,22 +297,22 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	if (!BIT(m_keylatch, 0))
 	{
-		data &= input_port_read(m_machine, "ROW0");
-		if (input_port_read(m_machine, "JOYBKEYMAP")) data &= input_port_read(m_machine, "JOYB");
+		data &= input_port_read(machine(), "ROW0");
+		if (input_port_read(machine(), "JOYBKEYMAP")) data &= input_port_read(machine(), "JOYB");
 	}
 	if (!BIT(m_keylatch, 1))
 	{
-		data &= input_port_read(m_machine, "ROW1");
-		if (input_port_read(m_machine, "JOYAKEYMAP")) data &= input_port_read(m_machine, "JOYA");
+		data &= input_port_read(machine(), "ROW1");
+		if (input_port_read(machine(), "JOYAKEYMAP")) data &= input_port_read(machine(), "JOYA");
 	}
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(m_machine, "ROW2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(m_machine, "ROW3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(m_machine, "ROW4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(m_machine, "ROW5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(m_machine, "ROW6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(m_machine, "ROW7");
+	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "ROW2");
+	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "ROW3");
+	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "ROW4");
+	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "ROW5");
+	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "ROW6");
+	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "ROW7");
 
-	data = (input_port_read(m_machine, "MODIFIERS") & 0xc0) | (data & 0x3f);
+	data = (input_port_read(machine(), "MODIFIERS") & 0xc0) | (data & 0x3f);
 
 	if (cassette_input(m_cassette) < +0.0)	data &= 0x7f;
 
@@ -336,29 +336,29 @@ void mc1000_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
-	UINT8 *rom = m_machine.region(Z80_TAG)->base();
+	UINT8 *rom = machine().region(Z80_TAG)->base();
 	
 	program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	memory_configure_bank(m_machine, "bank1", 0, 1, rom, 0);
-	memory_configure_bank(m_machine, "bank1", 1, 1, rom + 0xc000, 0);
-	memory_set_bank(m_machine, "bank1", 1);
+	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, rom + 0xc000, 0);
+	memory_set_bank(machine(), "bank1", 1);
 
 	m_rom0000 = 1;
 
 	program->install_readwrite_bank(0x2000, 0x27ff, "bank2");
-	memory_configure_bank(m_machine, "bank2", 0, 1, rom + 0x2000, 0);
-	memory_configure_bank(m_machine, "bank2", 1, 1, m_mc6845_video_ram, 0);
-	memory_set_bank(m_machine, "bank2", 0);
+	memory_configure_bank(machine(), "bank2", 0, 1, rom + 0x2000, 0);
+	memory_configure_bank(machine(), "bank2", 1, 1, m_mc6845_video_ram, 0);
+	memory_set_bank(machine(), "bank2", 0);
 
-	memory_configure_bank(m_machine, "bank3", 0, 1, rom + 0x4000, 0);
-	memory_set_bank(m_machine, "bank3", 0);
+	memory_configure_bank(machine(), "bank3", 0, 1, rom + 0x4000, 0);
+	memory_set_bank(machine(), "bank3", 0);
 
-	memory_configure_bank(m_machine, "bank4", 0, 1, m_mc6847_video_ram, 0);
-	memory_configure_bank(m_machine, "bank4", 1, 1, rom + 0x8000, 0);
-	memory_set_bank(m_machine, "bank4", 0);
+	memory_configure_bank(machine(), "bank4", 0, 1, m_mc6847_video_ram, 0);
+	memory_configure_bank(machine(), "bank4", 1, 1, rom + 0x8000, 0);
+	memory_set_bank(machine(), "bank4", 0);
 
-	memory_configure_bank(m_machine, "bank5", 0, 1, rom + 0x9800, 0);
-	memory_set_bank(m_machine, "bank5", 0);
+	memory_configure_bank(machine(), "bank5", 0, 1, rom + 0x9800, 0);
+	memory_set_bank(machine(), "bank5", 0);
 
 	bankswitch();
 
@@ -373,7 +373,7 @@ void mc1000_state::machine_start()
 
 void mc1000_state::machine_reset()
 {
-	memory_set_bank(m_machine, "bank1", 1);
+	memory_set_bank(machine(), "bank1", 1);
 
 	m_rom0000 = 1;
 }

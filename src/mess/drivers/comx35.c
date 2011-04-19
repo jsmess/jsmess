@@ -281,12 +281,12 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 READ_LINE_MEMBER( comx35_state::shift_r )
 {
-	return BIT(input_port_read(m_machine, "MODIFIERS"), 0);
+	return BIT(input_port_read(machine(), "MODIFIERS"), 0);
 }
 
 READ_LINE_MEMBER( comx35_state::control_r )
 {
-	return BIT(input_port_read(m_machine, "MODIFIERS"), 1);
+	return BIT(input_port_read(machine(), "MODIFIERS"), 1);
 }
 
 static CDP1871_INTERFACE( comx35_cdp1871_intf )

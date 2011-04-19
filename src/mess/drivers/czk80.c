@@ -76,7 +76,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(czk80_state)
 {
-	UINT8* bios = m_machine.region("maincpu")->base() + 0xe000;
+	UINT8* bios = machine().region("maincpu")->base() + 0xe000;
 	memcpy(m_ram, bios, 0x2000);
 	memcpy(m_ram+0xe000, bios, 0x2000);
 }

@@ -681,9 +681,9 @@ void abc80_state::machine_start()
 	}
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_key_data);
-	state_save_register_global(m_machine, m_key_strobe);
-	state_save_register_global(m_machine, m_pio_astb);
+	state_save_register_global(machine(), m_key_data);
+	state_save_register_global(machine(), m_key_strobe);
+	state_save_register_global(machine(), m_pio_astb);
 }
 
 

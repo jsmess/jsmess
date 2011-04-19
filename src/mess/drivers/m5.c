@@ -74,7 +74,7 @@ READ8_MEMBER( m5_state::sts_r )
 	data |= centronics_busy_r(m_centronics) << 1;
 
 	// RESET key
-	data |= input_port_read(m_machine, "RESET");
+	data |= input_port_read(machine(), "RESET");
 
 	return data;
 }
@@ -640,11 +640,11 @@ void m5_state::machine_start()
 	}
 
 	// register for state saving
-	state_save_register_global(m_machine, m_fd5_data);
-	state_save_register_global(m_machine, m_fd5_com);
-	state_save_register_global(m_machine, m_intra);
-	state_save_register_global(m_machine, m_ibfa);
-	state_save_register_global(m_machine, m_obfa);
+	state_save_register_global(machine(), m_fd5_data);
+	state_save_register_global(machine(), m_fd5_com);
+	state_save_register_global(machine(), m_intra);
+	state_save_register_global(machine(), m_ibfa);
+	state_save_register_global(machine(), m_obfa);
 }
 
 

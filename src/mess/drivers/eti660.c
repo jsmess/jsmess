@@ -131,7 +131,7 @@ bool eti660_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 READ_LINE_MEMBER( eti660_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "SPECIAL"), 0);
+	return BIT(input_port_read(machine(), "SPECIAL"), 0);
 }
 
 READ_LINE_MEMBER( eti660_state::ef2_r )
@@ -141,7 +141,7 @@ READ_LINE_MEMBER( eti660_state::ef2_r )
 
 READ_LINE_MEMBER( eti660_state::ef4_r )
 {
-	return BIT(input_port_read(m_machine, "SPECIAL"), 1);
+	return BIT(input_port_read(machine(), "SPECIAL"), 1);
 }
 
 WRITE_LINE_MEMBER( eti660_state::q_w )
@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	cdp1864_aoe_w(m_cti, state);
 
 	/* PULSE led */
-	set_led_status(m_machine, LED_PULSE, state);
+	set_led_status(machine(), LED_PULSE, state);
 
 	/* tape output */
 	cassette_output(m_cassette, state ? 1.0 : -1.0);
@@ -203,10 +203,10 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 
 	UINT8 data = 0xf0;
 
-	if (!BIT(m_keylatch, 0)) data &= input_port_read(m_machine, "PA0");
-	if (!BIT(m_keylatch, 1)) data &= input_port_read(m_machine, "PA1");
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(m_machine, "PA2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(m_machine, "PA3");
+	if (!BIT(m_keylatch, 0)) data &= input_port_read(machine(), "PA0");
+	if (!BIT(m_keylatch, 1)) data &= input_port_read(machine(), "PA1");
+	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "PA2");
+	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "PA3");
 
 	return data;
 }

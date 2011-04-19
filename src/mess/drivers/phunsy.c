@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 {
 	if (LOG)
-		logerror("%s: phunsy_ctrl_w %02x\n", m_machine.describe_context(), data);
+		logerror("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
 
 	m_u_bank = data >> 4;
 	m_q_bank = data & 0x0F;
@@ -79,25 +79,25 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 	switch( m_u_bank )
 	{
 	case 0x00:	/* RAM */
-		memory_set_bankptr( m_machine, "bank1", m_ram_1800 );
+		memory_set_bankptr( machine(), "bank1", m_ram_1800 );
 		break;
 	case 0x01:	/* MDCR program */
 	case 0x02:	/* Disassembler */
 	case 0x03:	/* Label handler */
-		memory_set_bankptr( m_machine, "bank1", m_machine.region("maincpu")->base() + ( 0x800 * m_u_bank ) );
+		memory_set_bankptr( machine(), "bank1", machine().region("maincpu")->base() + ( 0x800 * m_u_bank ) );
 		break;
 	default:	/* Not used */
 		break;
 	}
 
-	memory_set_bankptr( m_machine, "bank2", m_machine.region("ram_4000")->base() + 0x4000 * m_q_bank );
+	memory_set_bankptr( machine(), "bank2", machine().region("ram_4000")->base() + 0x4000 * m_q_bank );
 }
 
 
 WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 {
 	if (LOG)
-		logerror("%s: phunsy_data_w %02x\n", m_machine.describe_context(), data);
+		logerror("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
 
 	m_data_out = data;
 
@@ -124,7 +124,7 @@ READ8_MEMBER( phunsy_state::phunsy_data_r )
 	UINT8 data;
 
 	if (LOG)
-		logerror("%s: phunsy_data_r\n", m_machine.describe_context());
+		logerror("%s: phunsy_data_r\n", machine().describe_context());
 
 	if ( m_data_out & 0x02 )
 	{
@@ -184,8 +184,8 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 MACHINE_RESET_MEMBER(phunsy_state)
 {
-	memory_set_bankptr( m_machine, "bank1", m_ram_1800 );
-	memory_set_bankptr( m_machine, "bank2", m_machine.region("ram_4000")->base() );
+	memory_set_bankptr( machine(), "bank1", m_ram_1800 );
+	memory_set_bankptr( machine(), "bank2", machine().region("ram_4000")->base() );
 
 	m_u_bank = 0;
 	m_q_bank = 0;
@@ -206,7 +206,7 @@ static PALETTE_INIT( phunsy )
 
 VIDEO_START_MEMBER( phunsy_state )
 {
-	m_p_chargen = m_machine.region( "chargen" )->base();
+	m_p_chargen = machine().region( "chargen" )->base();
 }
 
 

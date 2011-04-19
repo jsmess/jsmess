@@ -123,12 +123,12 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 		case 1:		//bank 1 high
 		{
 			//bank 1 start at 0x8000
-			UINT8 *bank_base = get_bank_ptr(m_machine, MAKE_BANK(m_bank[0], m_bank[1]&0x0f) + 4);
+			UINT8 *bank_base = get_bank_ptr(machine(), MAKE_BANK(m_bank[0], m_bank[1]&0x0f) + 4);
 
 			if (bank_base != NULL)
 			{
 				program->install_readwrite_bank(0x8000, 0x9fff, "bank1");
-				memory_set_bankptr(m_machine, "bank1", bank_base);
+				memory_set_bankptr(machine(), "bank1", bank_base);
 			}
 			else
 			{
@@ -140,12 +140,12 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 		case 2:		//bank 2 low
 		case 3:		//bank 2 high
 		{
-			UINT8 *bank_base = get_bank_ptr(m_machine, MAKE_BANK(m_bank[2], m_bank[3]&0x1f));
+			UINT8 *bank_base = get_bank_ptr(machine(), MAKE_BANK(m_bank[2], m_bank[3]&0x1f));
 
 			if (bank_base != NULL)
 			{
 				program->install_readwrite_bank(0xa000, 0xbfff, "bank2");
-				memory_set_bankptr(m_machine, "bank2", bank_base);
+				memory_set_bankptr(machine(), "bank2", bank_base);
 			}
 			else
 			{
@@ -276,14 +276,14 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 
 READ8_MEMBER( rex6000_state::touchscreen_r )
 {
-	UINT16 x = input_port_read(m_machine, "PENX");
-	UINT16 y = input_port_read(m_machine, "PENY");
-	UINT16 battery = input_port_read(m_machine, "BATTERY");
+	UINT16 x = input_port_read(machine(), "PENX");
+	UINT16 y = input_port_read(machine(), "PENY");
+	UINT16 battery = input_port_read(machine(), "BATTERY");
 
 	switch (offset)
 	{
 		case 0x08:
-			return ((input_port_read(m_machine, "INPUT") & 0x40) ? 0x20 : 0x00) | 0X10;
+			return ((input_port_read(machine(), "INPUT") & 0x40) ? 0x20 : 0x00) | 0X10;
 		case 0x09:
 			if (m_touchscreen[4] & 0x80)
 				return (battery>>0) & 0xff;
@@ -369,9 +369,9 @@ void rex6000_state::machine_reset()
 {
 	UINT8 *ram = ram_get_ptr(m_ram);
 
-	memory_set_bankptr(m_machine, "bank1", (UINT8*)m_machine.region("flash0")->base() + 0x8000);
-	memory_set_bankptr(m_machine, "bank2", (UINT8*)m_machine.region("flash0")->base());
-	memory_set_bankptr(m_machine, "ram", ram + 0x4000);
+	memory_set_bankptr(machine(), "bank1", (UINT8*)machine().region("flash0")->base() + 0x8000);
+	memory_set_bankptr(machine(), "bank2", (UINT8*)machine().region("flash0")->base());
+	memory_set_bankptr(machine(), "ram", ram + 0x4000);
 
 	memset(ram, 0, ram_get_size(m_ram));
 	memset(m_bank, 0, sizeof(m_bank));
@@ -389,7 +389,7 @@ void rex6000_state::machine_reset()
 
 bool rex6000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	UINT8 *lcd_base = get_bank_ptr(m_machine, m_lcd_addr);
+	UINT8 *lcd_base = get_bank_ptr(machine(), m_lcd_addr);
 
 	if (m_lcd_enabled && lcd_base != NULL)
 	{

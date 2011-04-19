@@ -28,7 +28,7 @@ void sb2m600_state::video_start()
 	/* randomize video memory contents */
 	for (addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
 	{
-		m_video_ram[addr] = m_machine.rand() & 0xff;
+		m_video_ram[addr] = machine().rand() & 0xff;
 	}
 
 	/* randomize color memory contents */
@@ -36,7 +36,7 @@ void sb2m600_state::video_start()
 	{
 		for (addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 		{
-			m_color_ram[addr] = m_machine.rand() & 0x0f;
+			m_color_ram[addr] = machine().rand() & 0x0f;
 		}
 	}
 }
@@ -59,7 +59,7 @@ bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 			{
 				UINT8 videoram_data = m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = m_machine.region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = machine().region("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -92,7 +92,7 @@ bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 			{
 				UINT8 videoram_data = m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = m_machine.region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = machine().region("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -132,7 +132,7 @@ bool uk101_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 		{
 			UINT8 videoram_data = m_video_ram[videoram_addr++];
 			UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-			UINT8 charrom_data = m_machine.region("chargen")->base()[charrom_addr];
+			UINT8 charrom_data = machine().region("chargen")->base()[charrom_addr];
 
 			for (bit = 0; bit < 8; bit++)
 			{

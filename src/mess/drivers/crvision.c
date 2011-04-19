@@ -584,7 +584,7 @@ UINT8 crvision_state::read_keyboard(int pa)
 
 	for (i = 0; i < 8; i++)
 	{
-		value = input_port_read(m_machine, keynames[pa][i]);
+		value = input_port_read(machine(), keynames[pa][i]);
 
 		if (value != 0xff)
 		{
@@ -680,14 +680,14 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= input_port_read(m_machine, "ROW0");
-	if (!BIT(m_keylatch, 1)) data &= input_port_read(m_machine, "ROW1");
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(m_machine, "ROW2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(m_machine, "ROW3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(m_machine, "ROW4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(m_machine, "ROW5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(m_machine, "ROW6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(m_machine, "ROW7");
+	if (!BIT(m_keylatch, 0)) data &= input_port_read(machine(), "ROW0");
+	if (!BIT(m_keylatch, 1)) data &= input_port_read(machine(), "ROW1");
+	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "ROW2");
+	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "ROW3");
+	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "ROW4");
+	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "ROW5");
+	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "ROW6");
+	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "ROW7");
 
 	return data;
 }
@@ -712,10 +712,10 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_joylatch, 0)) data &= input_port_read(m_machine, "JOY0");
-	if (!BIT(m_joylatch, 1)) data &= input_port_read(m_machine, "JOY1");
-	if (!BIT(m_joylatch, 2)) data &= input_port_read(m_machine, "JOY2");
-	if (!BIT(m_joylatch, 3)) data &= input_port_read(m_machine, "JOY3");
+	if (!BIT(m_joylatch, 0)) data &= input_port_read(machine(), "JOY0");
+	if (!BIT(m_joylatch, 1)) data &= input_port_read(machine(), "JOY1");
+	if (!BIT(m_joylatch, 2)) data &= input_port_read(machine(), "JOY2");
+	if (!BIT(m_joylatch, 3)) data &= input_port_read(machine(), "JOY3");
 
 	return data;
 }

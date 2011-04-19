@@ -220,7 +220,7 @@ void portfolio_state::scan_keyboard()
 
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = input_port_read(m_machine, keynames[row]);
+		UINT8 data = input_port_read(machine(), keynames[row]);
 
 		if (data != 0xff)
 		{
@@ -361,7 +361,7 @@ READ8_MEMBER( portfolio_state::battery_r )
 	data |= (m_pid != PID_NONE) << 5;
 
 	/* battery status */
-	data |= BIT(input_port_read(m_machine, "BATTERY"), 0) << 6;
+	data |= BIT(input_port_read(machine(), "BATTERY"), 0) << 6;
 
 	return data;
 }
@@ -456,7 +456,7 @@ WRITE8_MEMBER( portfolio_state::ncc1_w )
 	if (BIT(data, 0))
 	{
 		// system ROM
-		UINT8 *rom = m_machine.region(M80C88A_TAG)->base();
+		UINT8 *rom = machine().region(M80C88A_TAG)->base();
 		program->install_rom(0xc0000, 0xdffff, rom);
 	}
 	else
@@ -784,7 +784,7 @@ void portfolio_state::machine_start()
 	device_set_irq_callback(m_maincpu, portfolio_int_ack);
 
 	/* memory expansions */
-	switch (ram_get_size(m_machine.device(RAM_TAG)))
+	switch (ram_get_size(machine().device(RAM_TAG)))
 	{
 	case 128 * 1024:
 		program->unmap_readwrite(0x1f000, 0x9efff);
@@ -801,13 +801,13 @@ void portfolio_state::machine_start()
 	m_pid = 0xff;
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_ip);
-	state_save_register_global(m_machine, m_ie);
-	state_save_register_global(m_machine, m_sivr);
-	state_save_register_global(m_machine, m_counter);
-	state_save_register_global(m_machine, m_keylatch);
-	state_save_register_global(m_machine, m_contrast);
-	state_save_register_global(m_machine, m_pid);
+	state_save_register_global(machine(), m_ip);
+	state_save_register_global(machine(), m_ie);
+	state_save_register_global(machine(), m_sivr);
+	state_save_register_global(machine(), m_counter);
+	state_save_register_global(machine(), m_keylatch);
+	state_save_register_global(machine(), m_contrast);
+	state_save_register_global(machine(), m_pid);
 }
 
 //-------------------------------------------------
@@ -819,7 +819,7 @@ void portfolio_state::machine_reset()
 	address_space *io = m_maincpu->memory().space(AS_IO);
 
 	// peripherals
-	m_pid = input_port_read(m_machine, "PERIPHERAL");
+	m_pid = input_port_read(machine(), "PERIPHERAL");
 
 	io->unmap_readwrite(0x8070, 0x807b);
 	io->unmap_readwrite(0x807d, 0x807e);

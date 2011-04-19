@@ -24,7 +24,7 @@ public:
 		: driver_device(machine, config) { }
 
 	GMASTER_VIDEO m_video;
-	GMASTER_MACHINE m_machine;
+	GMASTER_MACHINE m_gmachine;
 };
 
 

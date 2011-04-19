@@ -1790,7 +1790,7 @@ void towns_state::video_start()
 {
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
-	m_video.sprite_timer = m_machine.scheduler().timer_alloc(FUNC(towns_sprite_done));
+	m_video.sprite_timer = machine().scheduler().timer_alloc(FUNC(towns_sprite_done));
 }
 
 bool towns_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

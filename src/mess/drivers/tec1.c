@@ -132,7 +132,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
 
 READ8_MEMBER( tec1_state::tec1_kbd_r )
 {
-	cputag_set_input_line(m_machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return m_kbd;
 }
 
@@ -207,7 +207,7 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 
 MACHINE_START_MEMBER( tec1_state )
 {
-	m_kbd_timer = m_machine.scheduler().timer_alloc(FUNC(tec1_kbd_callback));
+	m_kbd_timer = machine().scheduler().timer_alloc(FUNC(tec1_kbd_callback));
 	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
 

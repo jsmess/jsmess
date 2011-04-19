@@ -92,7 +92,7 @@ WRITE8_MEMBER( vixen_state::ctl_w )
 {
 	logerror("CTL %u\n", data);
 
-	memory_set_bank(m_machine, "bank3", BIT(data, 0));
+	memory_set_bank(machine(), "bank3", BIT(data, 0));
 }
 
 
@@ -372,14 +372,14 @@ static TIMER_DEVICE_CALLBACK( vsync_tick )
 void vixen_state::video_start()
 {
 	// find memory regions
-	m_sync_rom = m_machine.region("video")->base();
-	m_char_rom = m_machine.region("chargen")->base();
+	m_sync_rom = machine().region("video")->base();
+	m_char_rom = machine().region("chargen")->base();
 
 	// register for state saving
-	state_save_register_global(m_machine, m_alt);
-	state_save_register_global(m_machine, m_256);
-	state_save_register_global(m_machine, m_vsync);
-	state_save_register_global_pointer(m_machine, m_video_ram, 0x1000);
+	state_save_register_global(machine(), m_alt);
+	state_save_register_global(machine(), m_256);
+	state_save_register_global(machine(), m_vsync);
+	state_save_register_global_pointer(machine(), m_video_ram, 0x1000);
 }
 
 
@@ -471,14 +471,14 @@ READ8_MEMBER( vixen_state::i8155_pa_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_col, 0)) data &= input_port_read(m_machine, "ROW0");
-	if (!BIT(m_col, 1)) data &= input_port_read(m_machine, "ROW1");
-	if (!BIT(m_col, 2)) data &= input_port_read(m_machine, "ROW2");
-	if (!BIT(m_col, 3)) data &= input_port_read(m_machine, "ROW3");
-	if (!BIT(m_col, 4)) data &= input_port_read(m_machine, "ROW4");
-	if (!BIT(m_col, 5)) data &= input_port_read(m_machine, "ROW5");
-	if (!BIT(m_col, 6)) data &= input_port_read(m_machine, "ROW6");
-	if (!BIT(m_col, 7)) data &= input_port_read(m_machine, "ROW7");
+	if (!BIT(m_col, 0)) data &= input_port_read(machine(), "ROW0");
+	if (!BIT(m_col, 1)) data &= input_port_read(machine(), "ROW1");
+	if (!BIT(m_col, 2)) data &= input_port_read(machine(), "ROW2");
+	if (!BIT(m_col, 3)) data &= input_port_read(machine(), "ROW3");
+	if (!BIT(m_col, 4)) data &= input_port_read(machine(), "ROW4");
+	if (!BIT(m_col, 5)) data &= input_port_read(machine(), "ROW5");
+	if (!BIT(m_col, 6)) data &= input_port_read(machine(), "ROW6");
+	if (!BIT(m_col, 7)) data &= input_port_read(machine(), "ROW7");
 
 	return data;
 }
@@ -741,23 +741,23 @@ void vixen_state::machine_start()
 	// configure memory banking
 	UINT8 *ram = ram_get_ptr(m_ram);
 
-	memory_configure_bank(m_machine, "bank1", 0, 1, ram, 0);
-	memory_configure_bank(m_machine, "bank1", 1, 1, m_machine.region(Z8400A_TAG)->base(), 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z8400A_TAG)->base(), 0);
 
-	memory_configure_bank(m_machine, "bank2", 0, 1, ram, 0);
-	memory_configure_bank(m_machine, "bank2", 1, 1, m_video_ram, 0);
+	memory_configure_bank(machine(), "bank2", 0, 1, ram, 0);
+	memory_configure_bank(machine(), "bank2", 1, 1, m_video_ram, 0);
 
-	memory_configure_bank(m_machine, "bank3", 0, 1, m_video_ram, 0);
-	memory_configure_bank(m_machine, "bank3", 1, 1, m_machine.region(Z8400A_TAG)->base(), 0);
+	memory_configure_bank(machine(), "bank3", 0, 1, m_video_ram, 0);
+	memory_configure_bank(machine(), "bank3", 1, 1, machine().region(Z8400A_TAG)->base(), 0);
 
-	memory_configure_bank(m_machine, "bank4", 0, 1, m_video_ram, 0);
+	memory_configure_bank(machine(), "bank4", 0, 1, m_video_ram, 0);
 
 	// register for state saving
-	state_save_register_global(m_machine, m_reset);
-	state_save_register_global(m_machine, m_col);
-	state_save_register_global(m_machine, m_cmd_d0);
-	state_save_register_global(m_machine, m_cmd_d1);
-	state_save_register_global(m_machine, m_fdint);
+	state_save_register_global(machine(), m_reset);
+	state_save_register_global(machine(), m_col);
+	state_save_register_global(machine(), m_cmd_d0);
+	state_save_register_global(machine(), m_cmd_d1);
+	state_save_register_global(machine(), m_fdint);
 }
 
 
@@ -772,9 +772,9 @@ void vixen_state::machine_reset()
 	program->install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
 	program->install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
 
-	memory_set_bank(m_machine, "bank1", 1);
-	memory_set_bank(m_machine, "bank2", 1);
-	memory_set_bank(m_machine, "bank3", 1);
+	memory_set_bank(machine(), "bank1", 1);
+	memory_set_bank(machine(), "bank2", 1);
+	memory_set_bank(machine(), "bank3", 1);
 
 	m_reset = 1;
 

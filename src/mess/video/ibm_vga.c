@@ -323,10 +323,10 @@ void ibm_vga_device::device_start()
 {
 	int buswidth;
 	astring tempstring;
-	address_space *spaceio = m_machine.firstcpu->memory().space(AS_IO);
-	address_space *space = m_machine.firstcpu->memory().space(AS_PROGRAM);
-	space->install_rom(0xc0000, 0xc5fff, m_machine.region(subtag(tempstring, "vga"))->base());
-	buswidth = m_machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	address_space *spaceio = machine().firstcpu->memory().space(AS_IO);
+	address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
+	space->install_rom(0xc0000, 0xc5fff, machine().region(subtag(tempstring, "vga"))->base());
+	buswidth = machine().firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -351,9 +351,9 @@ void ibm_vga_device::device_start()
 			fatalerror("VGA: Bus width %d not supported", buswidth);
 			break;
 	}
-	m_videoram = auto_alloc_array(m_machine, UINT8, 0x40000);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x40000);
 	space->install_readwrite_bank(0xa0000, 0xbffff, "vga_bank" );
-	memory_set_bankptr(m_machine,"vga_bank", m_videoram);
+	memory_set_bankptr(machine(),"vga_bank", m_videoram);
 }
 
 /*-------------------------------------------------
@@ -383,5 +383,5 @@ void ibm_vga_device::device_reset()
 	memset(m_dac_color,0,sizeof(m_dac_color));
 
 	for (int i = 0; i < 0x100; i++)	
-		palette_set_color_rgb(m_machine, i, 0, 0, 0);	
+		palette_set_color_rgb(machine(), i, 0, 0, 0);	
 }

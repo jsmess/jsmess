@@ -114,18 +114,18 @@ static CDP1869_INTERFACE( vis_intf )
 void tmc600_state::video_start()
 {
 	// allocate memory
-	m_color_ram = auto_alloc_array(m_machine, UINT8, TMC600_PAGE_RAM_SIZE);
+	m_color_ram = auto_alloc_array(machine(), UINT8, TMC600_PAGE_RAM_SIZE);
 
 	// find memory regions
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 
 	// register for state saving
-	state_save_register_global_pointer(m_machine, m_color_ram, TMC600_PAGE_RAM_SIZE);
+	state_save_register_global_pointer(machine(), m_color_ram, TMC600_PAGE_RAM_SIZE);
 
-	state_save_register_global(m_machine, m_vismac_reg_latch);
-	state_save_register_global(m_machine, m_vismac_color_latch);
-	state_save_register_global(m_machine, m_vismac_bkg_latch);
-	state_save_register_global(m_machine, m_blink);
+	state_save_register_global(machine(), m_vismac_reg_latch);
+	state_save_register_global(machine(), m_vismac_color_latch);
+	state_save_register_global(machine(), m_vismac_bkg_latch);
+	state_save_register_global(machine(), m_blink);
 }
 
 static const gfx_layout tmc600_charlayout =

@@ -93,7 +93,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 			data = m_timer_val;
 			break;
 		case 0x0d:
-			data = ((!m_on_key) << 9) | keypad_r(m_machine);
+			data = ((!m_on_key) << 9) | keypad_r(machine());
 			break;
 		default:
 			data= m_io_hw1[offset & 0x0f];
@@ -421,7 +421,7 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	UINT16 *rom = (UINT16 *)m_machine.region("flash")->base();
+	UINT16 *rom = (UINT16 *)machine().region("flash")->base();
 	int i;
 
 	m_flash_mem = !((rom[0x32] & 0x0f) != 0);

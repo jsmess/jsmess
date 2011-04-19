@@ -16,16 +16,16 @@
 #include "elf2.lh"
 
 #define RUN	\
-	BIT(input_port_read(m_machine, "SPECIAL"), 0)
+	BIT(input_port_read(machine(), "SPECIAL"), 0)
 
 #define LOAD \
-	BIT(input_port_read(m_machine, "SPECIAL"), 1)
+	BIT(input_port_read(machine(), "SPECIAL"), 1)
 
 #define MEMORY_PROTECT \
-	BIT(input_port_read(m_machine, "SPECIAL"), 2)
+	BIT(input_port_read(machine(), "SPECIAL"), 2)
 
 #define INPUT \
-	BIT(input_port_read(m_machine, "SPECIAL"), 3)
+	BIT(input_port_read(machine(), "SPECIAL"), 3)
 
 /* Read/Write Handlers */
 
@@ -254,8 +254,8 @@ void elf2_state::machine_start()
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
 	program->install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
-	memory_configure_bank(m_machine, "bank1", 0, 1, ram_get_ptr(m_ram), 0);
-	memory_set_bank(m_machine, "bank1", 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_set_bank(machine(), "bank1", 0);
 
 	/* register for state saving */
 	save_item(NAME(m_data));

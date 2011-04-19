@@ -230,7 +230,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 
 	for (bit = 0; bit < 8; bit++)
 	{
-		if (!BIT(m_keylatch, bit)) data &= input_port_read(m_machine, keynames[bit]);
+		if (!BIT(m_keylatch, bit)) data &= input_port_read(machine(), keynames[bit]);
 	}
 
 	return data;
@@ -640,8 +640,8 @@ void sb2m600_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM banking */
-	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(M6502_TAG)->base(), 0);
-	memory_set_bank(m_machine, "bank1", 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(M6502_TAG)->base(), 0);
+	memory_set_bank(machine(), "bank1", 0);
 
 	switch (ram_get_size(m_ram))
 	{
@@ -665,8 +665,8 @@ void c1p_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM banking */
-	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region(M6502_TAG)->base(), 0);
-	memory_set_bank(m_machine, "bank1", 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(M6502_TAG)->base(), 0);
+	memory_set_bank(machine(), "bank1", 0);
 
 	switch (ram_get_size(m_ram))
 	{

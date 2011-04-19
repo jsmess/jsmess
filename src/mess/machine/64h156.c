@@ -180,7 +180,7 @@ inline void c64h156_device::receive_bit()
 		if (!m_yb)
 		{
 			// simulate weak bits with randomness
-			m_yb = m_machine.rand() & 0xff;
+			m_yb = machine().rand() & 0xff;
 		}
 
 		set_byte_line(byte);

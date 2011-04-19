@@ -253,7 +253,7 @@ WRITE8_MEMBER( comxpl80_device::pa_w )
 		// read data from font ROM
 		int font_rom = (input_port_read(this, "FONT") & 0x03) * 0x2000;
 
-		m_plotter_data = m_machine.region("gfx2")->base()[font_rom | m_font_addr];
+		m_plotter_data = machine().region("gfx2")->base()[font_rom | m_font_addr];
 	}
 
 	if (!BIT(data, 6))

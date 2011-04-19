@@ -63,7 +63,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	{
 	case 0: /* IC24 A8 */
 		//logerror("IC24 A8 %u\n", d);
-		memory_set_bank(m_machine, "bank1", d);
+		memory_set_bank(machine(), "bank1", d);
 
 		if (d)
 		{
@@ -110,7 +110,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 		floppy_drive_set_ready_state(m_floppy0, d, 1);
 		floppy_drive_set_ready_state(m_floppy1, d, 1);
 
-		if (input_port_read(m_machine, "T5")) upd765_ready_w(m_fdc, d);
+		if (input_port_read(machine(), "T5")) upd765_ready_w(m_fdc, d);
 		break;
 	}
 }
@@ -323,9 +323,9 @@ static UPD7220_INTERFACE( hgdc_intf )
 void mm1_state::video_start()
 {
 	// find memory regions
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 
-	VIDEO_START_NAME(generic_bitmapped)(m_machine);
+	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 bool mm1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -561,8 +561,8 @@ void mm1_state::scan_keyboard()
 {
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
-	UINT8 data = input_port_read(m_machine, keynames[m_drive]);
-	UINT8 special = input_port_read(m_machine, "SPECIAL");
+	UINT8 data = input_port_read(machine(), keynames[m_drive]);
+	UINT8 special = input_port_read(machine(), "SPECIAL");
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
 	UINT8 keydata = 0xff;
@@ -658,25 +658,25 @@ void mm1_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* find memory regions */
-	m_key_rom = m_machine.region("keyboard")->base();
+	m_key_rom = machine().region("keyboard")->base();
 
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x0fff, "bank1");
 	program->unmap_write(0x0000, 0x0fff);
-	memory_configure_bank(m_machine, "bank1", 0, 1, m_machine.region("bios")->base(), 0);
-	memory_configure_bank(m_machine, "bank1", 1, 1, ram_get_ptr(m_machine.device(RAM_TAG)), 0);
-	memory_set_bank(m_machine, "bank1", 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, machine().region("bios")->base(), 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(machine().device(RAM_TAG)), 0);
+	memory_set_bank(machine(), "bank1", 0);
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_sense);
-	state_save_register_global(m_machine, m_drive);
-	state_save_register_global(m_machine, m_llen);
-	state_save_register_global(m_machine, m_intc);
-	state_save_register_global(m_machine, m_rx21);
-	state_save_register_global(m_machine, m_tx21);
-	state_save_register_global(m_machine, m_rcl);
-	state_save_register_global(m_machine, m_recall);
-	state_save_register_global(m_machine, m_dack3);
+	state_save_register_global(machine(), m_sense);
+	state_save_register_global(machine(), m_drive);
+	state_save_register_global(machine(), m_llen);
+	state_save_register_global(machine(), m_intc);
+	state_save_register_global(machine(), m_rx21);
+	state_save_register_global(machine(), m_tx21);
+	state_save_register_global(machine(), m_rcl);
+	state_save_register_global(machine(), m_recall);
+	state_save_register_global(machine(), m_dack3);
 }
 
 void mm1_state::machine_reset()
@@ -688,7 +688,7 @@ void mm1_state::machine_reset()
 	for (i = 0; i < 8; i++) ls259_w(*program, i, 0);
 
 	/* set FDC ready */
-	if (!input_port_read(m_machine, "T5")) upd765_ready_w(m_fdc, 1);
+	if (!input_port_read(machine(), "T5")) upd765_ready_w(m_fdc, 1);
 
 	/* reset FDC */
 	upd765_reset_w(m_fdc, 1);

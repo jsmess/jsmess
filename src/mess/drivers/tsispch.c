@@ -160,7 +160,7 @@ const msm8251_interface msm8251_config =
 
 WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
-	msm8251_receive_character(m_machine.device("i8251a_u15"), data);
+	msm8251_receive_character(machine().device("i8251a_u15"), data);
 }
 static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
@@ -199,7 +199,7 @@ READ8_MEMBER( tsispch_state::dsw_r )
 	 * which makes this register read 0xFC
 	 * When s4-7 is turned on, it reads 0xBC
 	 */
-	data = input_port_read(m_machine, "s4");
+	data = input_port_read(machine(), "s4");
 	return data;
 }
 
@@ -212,9 +212,9 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 	   When 0 is written to a bit, the led turns on.
 	   See notes at beginning of file for more info.
 	*/
-	tsispch_state *state = m_machine.driver_data<tsispch_state>();
+	tsispch_state *state = machine().driver_data<tsispch_state>();
 	state->m_paramReg = data;
-	cputag_set_input_line(m_machine, "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
+	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
 #ifdef DEBUG_PARAM
 	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
@@ -227,7 +227,7 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 *****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
-	upd7725_device *upd7725 = m_machine.device<upd7725_device>("dsp");
+	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
 	UINT8 temp;
 	temp = upd7725->snesdsp_read(true);
@@ -240,7 +240,7 @@ READ16_MEMBER( tsispch_state::dsp_data_r )
 
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
-	upd7725_device *upd7725 = m_machine.device<upd7725_device>("dsp");
+	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
 #endif
@@ -249,7 +249,7 @@ WRITE16_MEMBER( tsispch_state::dsp_data_w )
 
 READ16_MEMBER( tsispch_state::dsp_status_r )
 {
-	upd7725_device *upd7725 = m_machine.device<upd7725_device>("dsp");
+	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
 	UINT8 temp;
 	temp = upd7725->snesdsp_read(false);
@@ -263,7 +263,7 @@ READ16_MEMBER( tsispch_state::dsp_status_r )
 WRITE16_MEMBER( tsispch_state::dsp_status_w )
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
-	upd7725_device *upd7725 = m_machine.device<upd7725_device>("dsp");
+	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 	upd7725->snesdsp_write(false, data);
 }
 
@@ -276,7 +276,7 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) m_infifo[i] = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
-	device_set_irq_callback(m_machine.device("maincpu"), irq_callback);
+	device_set_irq_callback(machine().device("maincpu"), irq_callback);
 	fprintf(stderr,"machine reset\n");
 }
 

@@ -179,9 +179,9 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	{
 		if (BIT(m_digit, i))
 		{
-			if (!BIT(input_port_read(m_machine, "KI1"), i)) data &= ~0x10;
-			if (!BIT(input_port_read(m_machine, "KI2"), i)) data &= ~0x20;
-			if (!BIT(input_port_read(m_machine, "KI3"), i)) data &= ~0x80;
+			if (!BIT(input_port_read(machine(), "KI1"), i)) data &= ~0x10;
+			if (!BIT(input_port_read(machine(), "KI2"), i)) data &= ~0x20;
+			if (!BIT(input_port_read(machine(), "KI3"), i)) data &= ~0x80;
 		}
 	}
 

@@ -33,7 +33,7 @@ bool pc4_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 						else
 						{
 							//draw CGROM characters
-							*BITMAP_ADDR16(&bitmap, l*9 + y, i*6 + x) = BIT(m_machine.region("charset")->base()[m_ddram[char_pos]*8+y], 4-x);
+							*BITMAP_ADDR16(&bitmap, l*9 + y, i*6 + x) = BIT(machine().region("charset")->base()[m_ddram[char_pos]*8+y], 4-x);
 
 						}
 

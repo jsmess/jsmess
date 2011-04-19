@@ -124,7 +124,7 @@ static void data_from_i8031(device_t *device, int data)
 /* Port Handlers */
 WRITE8_MEMBER( pes_state::rsws_w )
 {
-	pes_state *state = m_machine.driver_data<pes_state>();
+	pes_state *state = machine().driver_data<pes_state>();
 	m_wsstate = data&0x1; // /ws is bit 0
 	m_rsstate = (data&0x2)>>1; // /rs is bit 1
 #ifdef DEBUG_PORTS
@@ -136,7 +136,7 @@ WRITE8_MEMBER( pes_state::rsws_w )
 
 WRITE8_MEMBER( pes_state::port1_w )
 {
-	pes_state *state = m_machine.driver_data<pes_state>();
+	pes_state *state = machine().driver_data<pes_state>();
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
@@ -147,7 +147,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 READ8_MEMBER( pes_state::port1_r )
 {
 	UINT8 data = 0xFF;
-	pes_state *state = m_machine.driver_data<pes_state>();
+	pes_state *state = machine().driver_data<pes_state>();
 	data = tms5220_status_r(state->m_speech, 0);
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
@@ -184,7 +184,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 READ8_MEMBER( pes_state::port3_r )
 {
 	UINT8 data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
-	pes_state *state = m_machine.driver_data<pes_state>();
+	pes_state *state = machine().driver_data<pes_state>();
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared
 	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr)
 	{
@@ -219,7 +219,7 @@ void pes_state::machine_reset()
 
 	m_port3_state = 0; // reset the openbus state of port 3
 	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
-	devtag_reset(m_machine, "tms5220"); // reset the 5220
+	devtag_reset(machine(), "tms5220"); // reset the 5220
 }
 
 /******************************************************************************

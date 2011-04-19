@@ -445,7 +445,7 @@ static const wd17xx_interface fdc_intf =
 void bigbord2_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 }
 
 
@@ -491,14 +491,14 @@ void bigbord2_state::machine_start()
 	floppy_install_load_proc(m_floppy1, bigbord2_load_proc);
 
 	/* register for state saving */
-	state_save_register_global(m_machine, m_term_data);
-	state_save_register_global(m_machine, m_scroll);
-	state_save_register_global(m_machine, m_ncset2);
-	state_save_register_global(m_machine, m_vatt);
-	state_save_register_global(m_machine, m_fdc_irq);
-	state_save_register_global(m_machine, m_fdc_drq);
-	state_save_register_global(m_machine, m_8n5);
-	state_save_register_global(m_machine, m_dsdd);
+	state_save_register_global(machine(), m_term_data);
+	state_save_register_global(machine(), m_scroll);
+	state_save_register_global(machine(), m_ncset2);
+	state_save_register_global(machine(), m_vatt);
+	state_save_register_global(machine(), m_fdc_irq);
+	state_save_register_global(machine(), m_fdc_drq);
+	state_save_register_global(machine(), m_8n5);
+	state_save_register_global(machine(), m_dsdd);
 }
 
 void bigbord2_state::machine_reset()

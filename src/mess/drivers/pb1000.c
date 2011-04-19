@@ -304,11 +304,11 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 	m_gatearray[offset] = data&0xff;
 
 	if (m_gatearray[0])
-		memory_set_bankptr(m_machine, "bank1", m_machine.region("card1")->base());
+		memory_set_bankptr(machine(), "bank1", machine().region("card1")->base());
 	else if (m_gatearray[1])
-		memory_set_bankptr(m_machine, "bank1", m_machine.region("card2")->base());
+		memory_set_bankptr(machine(), "bank1", machine().region("card2")->base());
 	else
-		memory_set_bankptr(m_machine, "bank1", m_machine.region("rom")->base());
+		memory_set_bankptr(machine(), "bank1", machine().region("rom")->base());
 }
 
 bool pb1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -495,9 +495,9 @@ static TIMER_CALLBACK( keyboard_timer )
 
 void pb1000_state::machine_start()
 {
-	memory_set_bankptr(m_machine, "bank1", m_machine.region("rom")->base());
+	memory_set_bankptr(machine(), "bank1", machine().region("rom")->base());
 
-	m_kb_timer = m_machine.scheduler().timer_alloc(FUNC(keyboard_timer));
+	m_kb_timer = machine().scheduler().timer_alloc(FUNC(keyboard_timer));
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 

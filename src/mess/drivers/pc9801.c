@@ -309,12 +309,12 @@ void pc9801_state::video_start()
 {
 	//pc9801_state *state = machine.driver_data<pc9801_state>();
 
-	m_tvram = auto_alloc_array(m_machine, UINT8, 0x4000);
+	m_tvram = auto_alloc_array(machine(), UINT8, 0x4000);
 
 	// find memory regions
-	m_char_rom = m_machine.region("chargen")->base();
+	m_char_rom = machine().region("chargen")->base();
 
-	VIDEO_START_NAME(generic_bitmapped)(m_machine);
+	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

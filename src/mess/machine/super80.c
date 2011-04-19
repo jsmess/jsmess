@@ -159,7 +159,7 @@ READ8_MEMBER( super80_state::super80_dc_r )
 
 READ8_MEMBER( super80_state::super80_f2_r )
 {
-	UINT8 data = input_port_read(m_machine, "DSW") & 0xf0;	// dip switches on pcb
+	UINT8 data = input_port_read(machine(), "DSW") & 0xf0;	// dip switches on pcb
 	data |= m_cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;				// bit 3 - not used
 	return data;
@@ -179,7 +179,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data;
 	speaker_level_w(m_speaker, BIT(data, 3));				/* bit 3 - speaker */
-	if (BIT(bits, 1)) super80_cassette_motor(m_machine, BIT(data, 1));	/* bit 1 - cassette motor */
+	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));	/* bit 1 - cassette motor */
 	cassette_output(m_cass, BIT(data, 0) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	m_last_data = data;
@@ -190,7 +190,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data | 0x14;
 	speaker_level_w(m_speaker, BIT(data, 3));				/* bit 3 - speaker */
-	if (BIT(bits, 1)) super80_cassette_motor(m_machine, BIT(data, 1));	/* bit 1 - cassette motor */
+	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));	/* bit 1 - cassette motor */
 	cassette_output(m_cass, BIT(data, 0) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	m_last_data = data;
@@ -201,8 +201,8 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 void super80_state::machine_reset()
 {
 	m_shared=0xff;
-	m_machine.scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
-	memory_set_bank(m_machine, "boot", 1);
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
+	memory_set_bank(machine(), "boot", 1);
 }
 
 static void driver_init_common( running_machine &machine )

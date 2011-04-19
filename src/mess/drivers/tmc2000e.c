@@ -158,7 +158,7 @@ bool tmc2000e_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 
 READ_LINE_MEMBER( tmc2000e_state::clear_r )
 {
-	return BIT(input_port_read(m_machine, "RUN"), 0);
+	return BIT(input_port_read(machine(), "RUN"), 0);
 }
 
 READ_LINE_MEMBER( tmc2000e_state::ef2_r )
@@ -169,7 +169,7 @@ READ_LINE_MEMBER( tmc2000e_state::ef2_r )
 READ_LINE_MEMBER( tmc2000e_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(m_machine, keynames[m_keylatch / 8]);
+	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 
 	// set Q led status
 
-	set_led_status(m_machine, 1, state);
+	set_led_status(machine(), 1, state);
 
 	// tape out
 
@@ -220,7 +220,7 @@ static COSMAC_INTERFACE( tmc2000e_config )
 void tmc2000e_state::machine_start()
 {
 	/* allocate color RAM */
-	m_colorram = auto_alloc_array(m_machine, UINT8, TMC2000E_COLORRAM_SIZE);
+	m_colorram = auto_alloc_array(machine(), UINT8, TMC2000E_COLORRAM_SIZE);
 
 	/* register for state saving */
 	save_pointer(NAME(m_colorram), TMC2000E_COLORRAM_SIZE);

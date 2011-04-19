@@ -406,7 +406,7 @@ void cgc7900_state::machine_start()
 
 void cgc7900_state::machine_reset()
 {
-	UINT8* user1 = m_machine.region(M68000_TAG)->base();
+	UINT8* user1 = machine().region(M68000_TAG)->base();
 
 	memcpy((UINT8*)m_chrom_ram,user1,8);
 

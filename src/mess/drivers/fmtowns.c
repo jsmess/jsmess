@@ -2263,26 +2263,26 @@ INPUT_PORTS_END
 
 void towns_state::driver_start()
 {
-	m_pic_master = m_machine.device("pic8259_master");
-	m_pic_slave = m_machine.device("pic8259_slave");
-	m_towns_vram = auto_alloc_array(m_machine,UINT32,0x20000);
-	m_towns_gfxvram = auto_alloc_array(m_machine,UINT8,0x80000);
-	m_towns_txtvram = auto_alloc_array(m_machine,UINT8,0x20000);
-	//towns_sprram = auto_alloc_array(m_machine,UINT8,0x20000);
-	m_towns_serial_rom = auto_alloc_array(m_machine,UINT8,256/8);
-	towns_init_serial_rom(m_machine);
-	towns_init_rtc(m_machine);
-	m_towns_rtc_timer = m_machine.scheduler().timer_alloc(FUNC(rtc_second));
-	m_towns_kb_timer = m_machine.scheduler().timer_alloc(FUNC(poll_keyboard));
-	m_towns_mouse_timer = m_machine.scheduler().timer_alloc(FUNC(towns_mouse_timeout));
-	m_towns_wait_timer = m_machine.scheduler().timer_alloc(FUNC(towns_wait_end));
-	m_towns_freerun_counter = m_machine.scheduler().timer_alloc(FUNC(towns_freerun_inc));
+	m_pic_master = machine().device("pic8259_master");
+	m_pic_slave = machine().device("pic8259_slave");
+	m_towns_vram = auto_alloc_array(machine(),UINT32,0x20000);
+	m_towns_gfxvram = auto_alloc_array(machine(),UINT8,0x80000);
+	m_towns_txtvram = auto_alloc_array(machine(),UINT8,0x20000);
+	//towns_sprram = auto_alloc_array(machine(),UINT8,0x20000);
+	m_towns_serial_rom = auto_alloc_array(machine(),UINT8,256/8);
+	towns_init_serial_rom(machine());
+	towns_init_rtc(machine());
+	m_towns_rtc_timer = machine().scheduler().timer_alloc(FUNC(rtc_second));
+	m_towns_kb_timer = machine().scheduler().timer_alloc(FUNC(poll_keyboard));
+	m_towns_mouse_timer = machine().scheduler().timer_alloc(FUNC(towns_mouse_timeout));
+	m_towns_wait_timer = machine().scheduler().timer_alloc(FUNC(towns_wait_end));
+	m_towns_freerun_counter = machine().scheduler().timer_alloc(FUNC(towns_freerun_inc));
 
 	// CD-ROM init
-	m_towns_cd.read_timer = m_machine.scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)m_machine.device("dma_1"));
+	m_towns_cd.read_timer = machine().scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine().device("dma_1"));
 
-	device_set_irq_callback(m_machine.device("maincpu"), towns_irq_callback);
-	m_machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x100000,ram_get_size(m_machine.device(RAM_TAG))-1,0xffffffff,0,NULL);
+	device_set_irq_callback(machine().device("maincpu"), towns_irq_callback);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x100000,ram_get_size(machine().device(RAM_TAG))-1,0xffffffff,0,NULL);
 
 }
 
@@ -2297,25 +2297,25 @@ void towns_state::machine_reset()
 {
 	address_space *program;
 
-	m_maincpu = m_machine.device("maincpu");
+	m_maincpu = machine().device("maincpu");
 	program = m_maincpu->memory().space(AS_PROGRAM);
-	m_dma_1 = m_machine.device("dma_1");
-	m_dma_2 = m_machine.device("dma_2");
-	m_fdc = m_machine.device("fdc");
-	m_pic_master = m_machine.device("pic8259_master");
-	m_pic_slave = m_machine.device("pic8259_slave");
-	m_pit = m_machine.device("pit");
-	m_messram = m_machine.device(RAM_TAG);
-	m_cdrom = m_machine.device("cdrom");
-	m_cdda = m_machine.device("cdda");
-	m_speaker = m_machine.device("speaker");
-	m_scsi = m_machine.device<fmscsi_device>("scsi");
-	m_hd0 = m_machine.device("harddisk0");
-	m_hd1 = m_machine.device("harddisk1");
-	m_hd2 = m_machine.device("harddisk2");
-	m_hd3 = m_machine.device("harddisk3");
-	m_hd4 = m_machine.device("harddisk4");
-	m_ram = m_machine.device(RAM_TAG);
+	m_dma_1 = machine().device("dma_1");
+	m_dma_2 = machine().device("dma_2");
+	m_fdc = machine().device("fdc");
+	m_pic_master = machine().device("pic8259_master");
+	m_pic_slave = machine().device("pic8259_slave");
+	m_pit = machine().device("pit");
+	m_messram = machine().device(RAM_TAG);
+	m_cdrom = machine().device("cdrom");
+	m_cdda = machine().device("cdda");
+	m_speaker = machine().device("speaker");
+	m_scsi = machine().device<fmscsi_device>("scsi");
+	m_hd0 = machine().device("harddisk0");
+	m_hd1 = machine().device("harddisk1");
+	m_hd2 = machine().device("harddisk2");
+	m_hd3 = machine().device("harddisk3");
+	m_hd4 = machine().device("harddisk4");
+	m_ram = machine().device(RAM_TAG);
 	m_ftimer = 0x00;
 	m_nmi_mask = 0x00;
 	m_compat_mode = 0x00;

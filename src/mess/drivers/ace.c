@@ -71,17 +71,17 @@ READ8_MEMBER( ace_state::io_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(offset, 8)) data &= input_port_read(m_machine, "A8");
-	if (!BIT(offset, 9)) data &= input_port_read(m_machine, "A9");
-	if (!BIT(offset, 10)) data &= input_port_read(m_machine, "A10");
-	if (!BIT(offset, 11)) data &= input_port_read(m_machine, "A11");
-	if (!BIT(offset, 12)) data &= input_port_read(m_machine, "A12");
-	if (!BIT(offset, 13)) data &= input_port_read(m_machine, "A13");
-	if (!BIT(offset, 14)) data &= input_port_read(m_machine, "A14");
+	if (!BIT(offset, 8)) data &= input_port_read(machine(), "A8");
+	if (!BIT(offset, 9)) data &= input_port_read(machine(), "A9");
+	if (!BIT(offset, 10)) data &= input_port_read(machine(), "A10");
+	if (!BIT(offset, 11)) data &= input_port_read(machine(), "A11");
+	if (!BIT(offset, 12)) data &= input_port_read(machine(), "A12");
+	if (!BIT(offset, 13)) data &= input_port_read(machine(), "A13");
+	if (!BIT(offset, 14)) data &= input_port_read(machine(), "A14");
 
 	if (!BIT(offset, 15))
 	{
-		data &= input_port_read(m_machine, "A15");
+		data &= input_port_read(machine(), "A15");
 
 		cassette_output(m_cassette, -1);
 		speaker_level_w(m_speaker, 0);
