@@ -566,7 +566,7 @@ static void vga_cpu_interface(running_machine &machine)
 	else if (vga.sequencer.data[4] & 4)
 	{
 		read_handler = vga_ega_r; read_handler_name = "vga_ega_r";
-		write_handler = vga_ega_w; read_handler_name = "vga_ega_w";
+		write_handler = vga_ega_w; write_handler_name = "vga_ega_w";
 		read_handler16 = vga_ega16_r;
 		write_handler16 = vga_ega16_w;
 		read_handler32 = vga_ega32_r;
@@ -577,7 +577,7 @@ static void vga_cpu_interface(running_machine &machine)
 	else
 	{
 		read_handler = vga_text_r; read_handler_name = "vga_text_r";
-		write_handler = vga_text_w; read_handler_name = "vga_text_w";
+		write_handler = vga_text_w; write_handler_name = "vga_text_w";
 		read_handler16 = vga_text16_r;
 		write_handler16 = vga_text16_w;
 		read_handler32 = vga_text32_r;
