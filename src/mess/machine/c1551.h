@@ -65,7 +65,7 @@ protected:
 
 private:
 	const char *m_cpu_tag;
-	int m_address;
+	int m_jp1;
 };
 
 
@@ -103,6 +103,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	inline void set_tcbm_dev(int dev);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_tpi0;
 	required_device<device_t> m_tpi1;
@@ -114,6 +116,7 @@ private:
 	int m_status;							// status
 	int m_dav;								// data valid
 	int m_ack;								// acknowledge
+	int m_dev;								// device number
 
 	// timers
 	emu_timer *m_irq_timer;

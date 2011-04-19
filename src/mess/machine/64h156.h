@@ -142,6 +142,7 @@ public:
 
 	void stp_w(int data);
 	void ds_w(int data);
+	void set_side(int side);
 
 	void on_disk_changed();
 
@@ -151,8 +152,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	inline void set_atn_line();
-	inline void set_sync_line(int state);
-	inline void set_byte_line(int state);
+	inline void set_sync_line();
+	inline void set_byte_line();
 	inline void read_current_track();
 	inline void spindle_motor(int mtr);
 	inline void step_motor(int mtr, int stp);
@@ -170,6 +171,7 @@ private:
 	int m_mtr;								// spindle motor on
 
 	// track
+	int m_side;								// disk side
 	UINT8 m_track_buffer[G64_BUFFER_SIZE];	// track data buffer
 	size_t m_track_len;						// track length
 	offs_t m_buffer_pos;					// current byte position within track buffer
@@ -184,10 +186,9 @@ private:
 	int m_soe;								// s? output enable
 	int m_byte;								// byte ready
 	int m_oe;								// output enable (0 = write, 1 = read)
-	int m_sync;								// sync character detected
+	int m_sync;								// sync character found
 
 	// IEC
-	int m_atn;								// attention
 	int m_atni;								// attention input
 	int m_atna;								// attention acknowledge
 

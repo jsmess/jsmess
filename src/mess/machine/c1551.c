@@ -13,7 +13,6 @@
 
     - byte latching does not match hardware behavior
       (CPU skips data bytes if implemented per schematics)
-    - activity LED
 
 */
 
@@ -76,7 +75,7 @@ void c1551_device_config::static_set_config(device_config *device, int address)
 
 	assert((address > 7) && (address < 10));
 
-	c1551->m_address = address - 8;
+	c1551->m_jp1 = address - 8;
 }
 
 
@@ -239,7 +238,7 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	UINT8 data = 0;
 
 	// JP1
-	data |= m_config.m_address << 5;
+	data |= m_config.m_jp1 << 5;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 6;
@@ -271,7 +270,8 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 	// TCBM status
 	m_status = data & 0x03;
 
-	// TODO TCBM device number
+	// TCBM device number
+	set_tcbm_dev(BIT(data, 2));
 
 	// TCBM acknowledge
 	m_ack = BIT(data, 3);
@@ -462,6 +462,31 @@ machine_config_constructor c1551_device_config::device_mconfig_additions() const
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  c1551_device - constructor
+//-------------------------------------------------
+
+inline void c1551_device::set_tcbm_dev(int dev)
+{
+	if (m_dev != dev)
+	{
+		address_space *program = machine().firstcpu->memory().space(AS_PROGRAM);
+		offs_t start_address = dev ? 0xfef0 : 0xfec0;
+
+		program->unmap_readwrite(0xfec0, 0xfec7);
+		program->unmap_readwrite(0xfef0, 0xfef7);
+		program->install_legacy_readwrite_handler(*m_tpi1, start_address, start_address + 5, FUNC(tpi6525_r), FUNC(tpi6525_w));
+
+		m_dev = dev;
+	}
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -476,10 +501,11 @@ c1551_device::c1551_device(running_machine &_machine, const c1551_device_config 
 	  m_tpi1(*this, M6523_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_tcbm_data(0),
-	  m_status(0),
-	  m_dav(0),
-	  m_ack(0),
+	  m_tcbm_data(0xff),
+	  m_status(1),
+	  m_dav(1),
+	  m_ack(1),
+	  m_dev(-1),
       m_config(_config)
 {
 }
@@ -493,13 +519,10 @@ void c1551_device::device_start()
 {
 	// allocate timers
 	m_irq_timer = timer_alloc();
-	m_irq_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
+	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);
 
-	// map TPI1 to host CPU memory space
-	address_space *program = machine().firstcpu->memory().space(AS_PROGRAM);
-	UINT32 start_address = m_config.m_address ? 0xfec0 : 0xfef0;
-
-	program->install_legacy_readwrite_handler(*m_tpi1, start_address, start_address + 7, FUNC(tpi6525_r), FUNC(tpi6525_w));
+	// map to host CPU memory space
+	set_tcbm_dev(1);
 
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1551_device::on_disk_change);
@@ -533,8 +556,18 @@ void c1551_device::device_reset()
 
 void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, param);
+
+	if (param == ASSERT_LINE)
+	{
+		// Ts = 0.7*R2*C1 = 0.7*100R*0.1uF = 7us
+		m_irq_timer->adjust(attotime::from_usec(7), CLEAR_LINE);
+	}
+	else
+	{
+		// Tm = 0.7*(R1+R2)*C1 = 0.7*(120K+100R)*0.1uF = 0.008407s
+		m_irq_timer->adjust(attotime::from_usec(8407), ASSERT_LINE);
+	}
 }
 
 

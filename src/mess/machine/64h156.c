@@ -27,11 +27,16 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+#define LOG 0
+
 #define SYNC \
-	!(m_oe && ((m_data & G64_SYNC_MARK) == G64_SYNC_MARK))
+	!(m_oe & m_sync)
 
 #define BYTE \
 	!(m_soe & m_byte)
+
+#define ATN \
+	(m_atni ^ m_atna)
 
 
 
@@ -84,9 +89,7 @@ void c64h156_device_config::device_config_complete()
 
 inline void c64h156_device::set_atn_line()
 {
-	m_atn = !m_atni; // TODO m_atna
-
-	devcb_call_write_line(&m_out_atn_func, m_atn);
+	devcb_call_write_line(&m_out_atn_func, ATN);
 }
 
 
@@ -94,11 +97,9 @@ inline void c64h156_device::set_atn_line()
 //  set_sync_line -
 //-------------------------------------------------
 
-inline void c64h156_device::set_sync_line(int state)
+inline void c64h156_device::set_sync_line()
 {
-	m_sync = state;
-
-	devcb_call_write_line(&m_out_sync_func, m_sync);
+	devcb_call_write_line(&m_out_sync_func, SYNC);
 }
 
 
@@ -106,10 +107,8 @@ inline void c64h156_device::set_sync_line(int state)
 //  set_byte_line -
 //-------------------------------------------------
 
-inline void c64h156_device::set_byte_line(int state)
+inline void c64h156_device::set_byte_line()
 {
-	m_byte = state;
-
 	devcb_call_write_line(&m_out_byte_func, BYTE);
 }
 
@@ -123,10 +122,10 @@ inline void c64h156_device::read_current_track()
 	int track_length = G64_BUFFER_SIZE;
 
 	// read track data
-	floppy_drive_read_track_data_info_buffer(m_image, 0, m_track_buffer, &track_length);
+	floppy_drive_read_track_data_info_buffer(m_image, m_side, m_track_buffer, &track_length);
 
 	// extract track length
-	m_track_len = floppy_drive_get_current_track_size(m_image, 0);
+	m_track_len = floppy_drive_get_current_track_size(m_image, m_side);
 
 	// set bit pointer to track start
 	m_buffer_pos = 0;
@@ -141,7 +140,11 @@ inline void c64h156_device::read_current_track()
 
 inline void c64h156_device::receive_bit()
 {
-	int byte = 0;
+	if (m_bit_count == 1)
+	{
+		m_byte = 0;
+		set_byte_line();
+	}
 
 	// shift in data from the read head
 	m_data <<= 1;
@@ -161,29 +164,33 @@ inline void c64h156_device::receive_bit()
 		}
 	}
 
-	set_sync_line(SYNC);
+	m_sync = ((m_data & G64_SYNC_MARK) == G64_SYNC_MARK);
+	set_sync_line();
 
-	if (!m_sync)
+	if (m_sync)
 	{
 		// SYNC detected
 		m_bit_count = 0;
+
+		if (LOG) logerror("SYNC\n");
 	}
 
 	if (m_bit_count > 7)
 	{
 		// byte ready
-		m_bit_count = 0;
-		byte = 1;
-
 		m_yb = m_data & 0xff;
+		m_bit_count = 0;
+		
+		m_byte = 1;
+		set_byte_line();
+
+		if (LOG) logerror("BYTE %02x\n", m_yb);
 
 		if (!m_yb)
 		{
 			// simulate weak bits with randomness
 			m_yb = machine().rand() & 0xff;
 		}
-
-		set_byte_line(byte);
 	}
 }
 
@@ -202,13 +209,13 @@ c64h156_device::c64h156_device(running_machine &_machine, const c64h156_device_c
 	  m_image(*this->owner(), FLOPPY_0),
 	  m_stp(-1),
 	  m_mtr(0),
+	  m_side(0),
 	  m_accl(1),
 	  m_ds(-1),
 	  m_soe(0),
 	  m_byte(0),
 	  m_oe(0),
 	  m_sync(1),
-	  m_atn(1),
 	  m_atni(1),
 	  m_atna(1),
       m_config(_config)
@@ -233,6 +240,7 @@ void c64h156_device::device_start()
 	// register for state saving
 	save_item(NAME(m_stp));
 	save_item(NAME(m_mtr));
+	save_item(NAME(m_side));
 	save_item(NAME(m_track_len));
 	save_item(NAME(m_buffer_pos));
 	save_item(NAME(m_bit_pos));
@@ -245,7 +253,6 @@ void c64h156_device::device_start()
 	save_item(NAME(m_byte));
 	save_item(NAME(m_oe));
 	save_item(NAME(m_sync));
-	save_item(NAME(m_atn));
 	save_item(NAME(m_atni));
 	save_item(NAME(m_atna));
 }
@@ -267,9 +274,16 @@ void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ8_MEMBER( c64h156_device::yb_r )
 {
-	set_byte_line(0); // TODO remove?
+	UINT8 data = 0;
 
-	return m_yb;
+	if (LOG) logerror("YB read %02x\n", m_yb);
+
+	if (m_soe)
+	{
+		data = m_yb;
+	}
+
+	return data;
 }
 
 
@@ -279,7 +293,7 @@ READ8_MEMBER( c64h156_device::yb_r )
 
 WRITE8_MEMBER( c64h156_device::yb_w )
 {
-	m_yb = data;
+	//m_yb = data;
 }
 
 
@@ -308,7 +322,7 @@ WRITE_LINE_MEMBER( c64h156_device::accl_w )
 
 READ_LINE_MEMBER( c64h156_device::sync_r )
 {
-	return m_sync;
+	return SYNC;
 }
 
 
@@ -351,6 +365,8 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 WRITE_LINE_MEMBER( c64h156_device::oe_w )
 {
 	m_oe = state;
+
+	set_sync_line();
 }
 
 
@@ -361,6 +377,8 @@ WRITE_LINE_MEMBER( c64h156_device::oe_w )
 WRITE_LINE_MEMBER( c64h156_device::soe_w )
 {
 	m_soe = state;
+
+	set_byte_line();
 }
 
 
@@ -370,7 +388,7 @@ WRITE_LINE_MEMBER( c64h156_device::soe_w )
 
 READ_LINE_MEMBER( c64h156_device::atn_r )
 {
-	return m_atn;
+	return ATN;
 }
 
 
@@ -451,4 +469,14 @@ void c64h156_device::ds_w(int data)
 void c64h156_device::on_disk_changed()
 {
 	read_current_track();
+}
+
+
+//-------------------------------------------------
+//  on_disk_changed - 
+//-------------------------------------------------
+
+void c64h156_device::set_side(int side)
+{
+	m_side = side;
 }
