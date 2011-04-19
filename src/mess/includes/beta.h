@@ -29,7 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
-	
+
 	virtual void machine_start();
 
 	DECLARE_READ8_MEMBER( riot_pa_r );

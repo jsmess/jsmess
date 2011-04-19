@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	IBM PC AT compatibles 8042 keyboard controller
+    IBM PC AT compatibles 8042 keyboard controller
 
 ***************************************************************************/
 
@@ -184,15 +184,15 @@ READ8_MEMBER( at_keyboard_controller_device::t1_r )
 }
 
 /*
-	Port 1 (Input port)
-	0 - P10 - Undefined
-	1 - P11 - Undefined
-	2 - P12 - Undefined
-	3 - P13 - Undefined
-	4 - P14 - External RAM (1 = Enable external RAM, 0 = Disable external RAM)
-	5 - P15 - Manufacturing setting (1 = Setting enabled, 0 = Setting disabled)
-	6 - P16 - Display type switch (1 = Monochrome display, 0 = Color display)
-	7 - P17 - Keyboard inhibit switch (1 = Keyboard enabled, 0 = Keyboard inhibited)
+    Port 1 (Input port)
+    0 - P10 - Undefined
+    1 - P11 - Undefined
+    2 - P12 - Undefined
+    3 - P13 - Undefined
+    4 - P14 - External RAM (1 = Enable external RAM, 0 = Disable external RAM)
+    5 - P15 - Manufacturing setting (1 = Setting enabled, 0 = Setting disabled)
+    6 - P16 - Display type switch (1 = Monochrome display, 0 = Color display)
+    7 - P17 - Keyboard inhibit switch (1 = Keyboard enabled, 0 = Keyboard inhibited)
 */
 READ8_MEMBER( at_keyboard_controller_device::p1_r )
 {
@@ -205,15 +205,15 @@ READ8_MEMBER( at_keyboard_controller_device::p2_r )
 }
 
 /*
-	Port 2 (Output port)
-	0 - P20 - System Reset (1 = Normal, 0 = Reset computer)
-	1 - P21 - Gate A20
-	2 - P22 - Undefined
-	3 - P23 - Undefined
-	4 - P24 - Input Buffer Full
-	5 - P25 - Output Buffer Empty
-	6 - P26 - Keyboard Clock (1 = Pull Clock low, 0 = High-Z)
-	7 - P27 - Keyboard Data (1 = Pull Data low, 0 = High-Z)
+    Port 2 (Output port)
+    0 - P20 - System Reset (1 = Normal, 0 = Reset computer)
+    1 - P21 - Gate A20
+    2 - P22 - Undefined
+    3 - P23 - Undefined
+    4 - P24 - Input Buffer Full
+    5 - P25 - Output Buffer Empty
+    6 - P26 - Keyboard Clock (1 = Pull Clock low, 0 = High-Z)
+    7 - P27 - Keyboard Data (1 = Pull Data low, 0 = High-Z)
 */
 WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
 {

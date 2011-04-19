@@ -101,7 +101,7 @@ void abcbus_device_config::device_config_complete()
 	{
 		fatalerror("Daisy chain not provided!");
 	}
-	
+
 	m_daisy = intf;
 }
 
@@ -129,7 +129,7 @@ abcbus_device::abcbus_device(running_machine &_machine, const abcbus_device_conf
 void abcbus_device::device_start()
 {
 	const abcbus_config *daisy = m_config.m_daisy;
-	
+
 	// create a linked list of devices
 	daisy_entry **tailptr = &m_daisy_list;
 	for ( ; daisy->devname != NULL; daisy++)
@@ -165,7 +165,7 @@ abcbus_device::daisy_entry::daisy_entry(device_t *device)
 
 
 //-------------------------------------------------
-//  cs_w - 
+//  cs_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::cs_w )
@@ -178,7 +178,7 @@ WRITE8_MEMBER( abcbus_device::cs_w )
 
 
 //-------------------------------------------------
-//  rst_r - 
+//  rst_r -
 //-------------------------------------------------
 
 READ8_MEMBER( abcbus_device::rst_r )
@@ -188,13 +188,13 @@ READ8_MEMBER( abcbus_device::rst_r )
 		daisy->m_interface->abcbus_rst(0);
 		daisy->m_interface->abcbus_rst(1);
 	}
-	
+
 	return 0xff;
 }
 
 
 //-------------------------------------------------
-//  inp_r - 
+//  inp_r -
 //-------------------------------------------------
 
 READ8_MEMBER( abcbus_device::inp_r )
@@ -205,13 +205,13 @@ READ8_MEMBER( abcbus_device::inp_r )
 	{
 		data &= daisy->m_interface->abcbus_inp();
 	}
-	
+
 	return data;
 }
 
 
 //-------------------------------------------------
-//  utp_w - 
+//  utp_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::utp_w )
@@ -224,7 +224,7 @@ WRITE8_MEMBER( abcbus_device::utp_w )
 
 
 //-------------------------------------------------
-//  stat_r - 
+//  stat_r -
 //-------------------------------------------------
 
 READ8_MEMBER( abcbus_device::stat_r )
@@ -235,13 +235,13 @@ READ8_MEMBER( abcbus_device::stat_r )
 	{
 		data &= daisy->m_interface->abcbus_stat();
 	}
-	
+
 	return data;
 }
 
 
 //-------------------------------------------------
-//  c1_w - 
+//  c1_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::c1_w )
@@ -254,7 +254,7 @@ WRITE8_MEMBER( abcbus_device::c1_w )
 
 
 //-------------------------------------------------
-//  c2_w - 
+//  c2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::c2_w )
@@ -267,7 +267,7 @@ WRITE8_MEMBER( abcbus_device::c2_w )
 
 
 //-------------------------------------------------
-//  c3_w - 
+//  c3_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::c3_w )
@@ -280,7 +280,7 @@ WRITE8_MEMBER( abcbus_device::c3_w )
 
 
 //-------------------------------------------------
-//  c4_w - 
+//  c4_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::c4_w )
@@ -293,7 +293,7 @@ WRITE8_MEMBER( abcbus_device::c4_w )
 
 
 //-------------------------------------------------
-//  resin_w - 
+//  resin_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abcbus_device::resin_w )
@@ -302,7 +302,7 @@ WRITE_LINE_MEMBER( abcbus_device::resin_w )
 
 
 //-------------------------------------------------
-//  int_w - 
+//  int_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abcbus_device::int_w )
@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER( abcbus_device::int_w )
 
 
 //-------------------------------------------------
-//  nmi_w - 
+//  nmi_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abcbus_device::nmi_w )
@@ -320,7 +320,7 @@ WRITE_LINE_MEMBER( abcbus_device::nmi_w )
 
 
 //-------------------------------------------------
-//  rdy_w - 
+//  rdy_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abcbus_device::rdy_w )

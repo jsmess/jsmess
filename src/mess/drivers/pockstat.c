@@ -769,7 +769,7 @@ static INPUT_CHANGED( input_update )
 	ps_intc_set_interrupt_line(field->port->machine(), PS_INT_BTN_RIGHT,	(buttons &  2) ? 1 : 0);
 	ps_intc_set_interrupt_line(field->port->machine(), PS_INT_BTN_LEFT,	(buttons &  4) ? 1 : 0);
 	ps_intc_set_interrupt_line(field->port->machine(), PS_INT_BTN_DOWN,	(buttons &  8) ? 1 : 0);
-	ps_intc_set_interrupt_line(field->port->machine(), PS_INT_BTN_UP, 	(buttons & 16) ? 1 : 0);
+	ps_intc_set_interrupt_line(field->port->machine(), PS_INT_BTN_UP,	(buttons & 16) ? 1 : 0);
 }
 
 static READ32_HANDLER(ps_rombank_r)

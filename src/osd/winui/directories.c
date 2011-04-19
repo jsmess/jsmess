@@ -135,7 +135,7 @@ INT_PTR CALLBACK DirectoriesDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARA
 }
 
 /***************************************************************************
-	Internal function definitions
+    Internal function definitions
  ***************************************************************************/
 
 static BOOL IsMultiDir(int nType)
@@ -196,7 +196,7 @@ static BOOL DirInfo_Modified(tDirInfo *pInfo, int nType)
 static TCHAR * FixSlash(TCHAR *s)
 {
 	int len = 0;
-	
+
 	if (s)
 		len = _tcslen(s);
 
@@ -249,7 +249,7 @@ static void UpdateDirectoryList(HWND hDlg)
 static void Directories_OnSelChange(HWND hDlg)
 {
 	UpdateDirectoryList(hDlg);
-	
+
 	if (ComboBox_GetCurSel(GetDlgItem(hDlg, IDC_DIR_COMBO)) == 0
 	||	ComboBox_GetCurSel(GetDlgItem(hDlg, IDC_DIR_COMBO)) == 1)
 	{
@@ -302,7 +302,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	memset(&LVCol, 0, sizeof(LVCOLUMN));
 	LVCol.mask	  = LVCF_WIDTH;
 	LVCol.cx	  = rectClient.right - rectClient.left - GetSystemMetrics(SM_CXHSCROLL);
-	
+
 	res = ListView_InsertColumn(GetDlgItem(hDlg, IDC_DIR_LIST), 0, &LVCol);
 
 	/* Keep a temporary copy of the directory strings in g_pDirInfo. */
@@ -494,7 +494,7 @@ static void Directories_OnBrowse(HWND hDlg)
 		/* Last item is placeholder for append */
 		if (nItem == ListView_GetItemCount(hList) - 1)
 		{
-			Directories_OnInsert(hDlg); 
+			Directories_OnInsert(hDlg);
 			return;
 		}
 	}
@@ -541,7 +541,7 @@ static void Directories_OnDelete(HWND hDlg)
 	}
 
 	UpdateDirectoryList(hDlg);
-	
+
 
 	nCount = ListView_GetItemCount(hList);
 	if (nCount <= 1)
@@ -710,16 +710,16 @@ static BOOL Directories_OnNotify(HWND hDlg, int id, NMHDR* pNMHDR)
 
 /**************************************************************************
 
-	Use the shell to select a Directory.
+    Use the shell to select a Directory.
 
  **************************************************************************/
 
 static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
 	/*
-		Called just after the dialog is initialized
-		Select the dir passed in BROWSEINFO.lParam
-	*/
+        Called just after the dialog is initialized
+        Select the dir passed in BROWSEINFO.lParam
+    */
 	if (uMsg == BFFM_INITIALIZED)
 	{
 		if ((const char*)lpData != NULL)
@@ -729,14 +729,14 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPAR
 	return 0;
 }
 
-BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult) 
+BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult)
 {
 	BOOL		bResult = FALSE;
 	IMalloc*	piMalloc = 0;
 	BROWSEINFO	Info;
 	LPITEMIDLIST pItemIDList = NULL;
 	TCHAR		buf[MAX_PATH];
-	
+
 	if (!SUCCEEDED(SHGetMalloc(&piMalloc)))
 		return FALSE;
 

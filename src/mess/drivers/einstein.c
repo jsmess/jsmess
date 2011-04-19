@@ -44,13 +44,13 @@
     Kevin Thacker [MESS driver]
 
 
-	2011-Mar-14, Phill Harvey-Smith.
-		Having traced out the circuit of the TK02 80 coumn card, I have changed the 
-		emulation to match what the hardware does, the emulation was mostly correct,
-		just some minor issues with the addressing of the VRAM, and bit 0 of the 
-		status register is the latched output of the 6845 DE, and not vblank.
-		
-		Also added defines to stop the log being flooded with keyboard messages :)
+    2011-Mar-14, Phill Harvey-Smith.
+        Having traced out the circuit of the TK02 80 coumn card, I have changed the
+        emulation to match what the hardware does, the emulation was mostly correct,
+        just some minor issues with the addressing of the VRAM, and bit 0 of the
+        status register is the latched output of the 6845 DE, and not vblank.
+
+        Also added defines to stop the log being flooded with keyboard messages :)
 
  ******************************************************************************/
 
@@ -95,12 +95,12 @@ static READ8_HANDLER( einstein_80col_ram_r )
 }
 
 /* TODO: Verify implementation */
-/* From traces of the TK02 board character ROM is addressed by the 6845 as follows 
-   bit 0..2 	ra0..ra2
-   bit 3..10	data 0..7 from VRAM
-   bit 11		ra3
-   bit 12		jumper M004, this could be used to select two different character 
-				sets.
+/* From traces of the TK02 board character ROM is addressed by the 6845 as follows
+   bit 0..2     ra0..ra2
+   bit 3..10    data 0..7 from VRAM
+   bit 11       ra3
+   bit 12       jumper M004, this could be used to select two different character
+                sets.
 */
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
@@ -433,7 +433,7 @@ static MACHINE_RESET( einstein )
 	TMS9928A_reset();
 
 	/* a reset causes the fire int, adc int, keyboard int mask
-	to be set to 1, which causes all these to be DISABLED */
+    to be set to 1, which causes all these to be DISABLED */
 	einstein->m_interrupt = 0;
 	einstein->m_interrupt_mask = 0;
 
@@ -785,7 +785,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_MACHINE_RESET(einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
-	driver. So we update at 50Hz and hope this is good enough. */
+    driver. So we update at 50Hz and hope this is good enough. */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)

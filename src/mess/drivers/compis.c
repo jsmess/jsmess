@@ -78,7 +78,7 @@ static PALETTE_INIT( compis_gdc )
 void compis_state::video_start()
 {
 	// find memory regions
-//	m_char_rom = machine.region("pcg")->base();
+//  m_char_rom = machine.region("pcg")->base();
 
 	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16 )
 	AM_RANGE( 0x60000, 0x6ffff) AM_RAM
 	AM_RANGE( 0x70000, 0x7ffff) AM_RAM
 
-//	AM_RANGE( 0x80000, 0xeffff) AM_NOP
+//  AM_RANGE( 0x80000, 0xeffff) AM_NOP
 	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
 ADDRESS_MAP_END

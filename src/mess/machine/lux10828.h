@@ -95,7 +95,7 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
-	
+
 private:
 	UINT8 m_sw1;				// single/double sided/density
 	UINT8 m_drive_type;			// drive type
@@ -106,7 +106,7 @@ private:
 // ======================> luxor_55_10828_device
 
 class luxor_55_10828_device :  public device_t,
-							   public device_abcbus_interface 
+							   public device_abcbus_interface
 {
     friend class luxor_55_10828_device_config;
 
@@ -131,7 +131,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-	
+
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
 	virtual void abcbus_rst(int state);

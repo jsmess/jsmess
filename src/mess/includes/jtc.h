@@ -31,7 +31,7 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_centronics(*this, CENTRONICS_TAG)
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_speaker;
@@ -41,11 +41,11 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
-	
+
 	UINT8 *m_video_ram;
 };
 
@@ -81,7 +81,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE8_MEMBER( banksel_w );
-	
+
 	UINT8 m_video_bank;
 	UINT8 *m_color_ram_r;
 	UINT8 *m_color_ram_g;

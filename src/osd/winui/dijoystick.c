@@ -50,7 +50,7 @@ static BOOL CALLBACK DIJoystick_EnumDeviceProc(LPDIDEVICEINSTANCE pdidi, LPVOID 
     External variables
  ***************************************************************************/
 
-const struct OSDJoystick  DIJoystick = 
+const struct OSDJoystick  DIJoystick =
 {
 	DIJoystick_init,                /* init              */
 	DIJoystick_exit,                /* exit              */
@@ -122,10 +122,10 @@ static struct tDIJoystick_private   This;
 static const GUID guidNULL = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
 /***************************************************************************
-    External OSD functions  
+    External OSD functions
  ***************************************************************************/
 /*
-    put here anything you need to do when the program is started. Return 0 if 
+    put here anything you need to do when the program is started. Return 0 if
     initialization was successful, nonzero otherwise.
 */
 static int DIJoystick_init(void)
@@ -167,12 +167,12 @@ static int DIJoystick_init(void)
 		/*ErrorMsg("DirectInput EnumDevices didn't find any joysticks");*/
 		return 0;
 	}
-	
+
 	return 0;
 }
 
 /*
-	put here cleanup routines to be executed when the program is terminated.
+    put here cleanup routines to be executed when the program is terminated.
 */
 static void DIJoystick_exit(void)
 {
@@ -185,7 +185,7 @@ static void DIJoystick_exit(void)
 
 	for (i = 0; i < This.num_joysticks; i++)
 		ExitJoystick(&This.joysticks[i]);
-	
+
 	This.num_joysticks = 0;
 }
 
@@ -193,7 +193,7 @@ static void DIJoystick_poll_joysticks(void)
 {
 	HRESULT hr;
 	DWORD	i;
-	
+
 	This.m_bCoinSlot = 0;
 
 	for (i = 0; i < This.num_joysticks; i++)
@@ -224,8 +224,8 @@ static void DIJoystick_poll_joysticks(void)
 }
 
 /*
-	check if the DIJoystick is moved in the specified direction, defined in
-	osdepend.h. Return 0 if it is not pressed, nonzero otherwise.
+    check if the DIJoystick is moved in the specified direction, defined in
+    osdepend.h. Return 0 if it is not pressed, nonzero otherwise.
 */
 
 static int DIJoystick_is_joy_pressed(int joycode)
@@ -246,7 +246,7 @@ static int DIJoystick_is_joy_pressed(int joycode)
 	if (joy_num == 0 || This.num_joysticks < joy_num)
 		return 0;
 	joy_num--;
-	
+
 	if (This.joysticks[joy_num].use_joystick == FALSE)
 		return 0;
 
@@ -305,10 +305,10 @@ static int DIJoystick_is_joy_pressed(int joycode)
 	}
 
 	/* sticks */
-	
+
 	axis = GET_JOYCODE_AXIS(joycode);
 	dir  = GET_JOYCODE_DIR(joycode);
-	
+
 	if (axis == 0 || This.joysticks[joy_num].num_axes < axis)
 		return 0;
 	axis--;
@@ -404,7 +404,7 @@ TCHAR* DIJoystick_GetPhysicalJoystickAxisName(int num_joystick, int num_axis)
 }
 
 /***************************************************************************
-	Internal functions
+    Internal functions
  ***************************************************************************/
 
 BOOL CALLBACK DIJoystick_EnumDeviceProc(LPDIDEVICEINSTANCE pdidi, LPVOID pv)
@@ -461,7 +461,7 @@ static BOOL CALLBACK DIJoystick_EnumAxisObjectsProc(LPCDIDEVICEOBJECTINSTANCE lp
 				 DirectXDecodeError(hr));
 	}
 #endif
-	
+
 	/* Set axis dead zone to 0; we need accurate #'s for analog joystick reading. */
 
 	hr = SetDIDwordProperty(joystick->did, DIPROP_DEADZONE, lpddoi->dwOfs, DIPH_BYOFFSET, 0);
@@ -533,7 +533,7 @@ static void InitJoystick(joystick_type *joystick)
 		ErrorMsg("DirectInput CreateDevice() joystick failed: %s\n", DirectXDecodeError(hr));
 		return;
 	}
-	
+
 	/* get a did2 interface to work with polling (most) joysticks */
 	hr = IDirectInputDevice_QueryInterface(didTemp,
 										   IID_IDirectInputDevice2,
@@ -551,7 +551,7 @@ static void InitJoystick(joystick_type *joystick)
 		return;
 	}
 
-	
+
 	hr = IDirectInputDevice2_SetCooperativeLevel(joystick->did, GetMainWindow(),
 												 DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
 	if (FAILED(hr))
@@ -622,7 +622,7 @@ static void InitJoystick(joystick_type *joystick)
 	}
 
 	hr = IDirectInputDevice2_Acquire(joystick->did);
-	if (FAILED(hr)) 
+	if (FAILED(hr))
 	{
 		ErrorMsg("DirectInputDevice Acquire joystick failed!\n");
 		return;
@@ -638,21 +638,21 @@ static void InitJoystick(joystick_type *joystick)
 static void ExitJoystick(joystick_type *joystick)
 {
 	DWORD i;
-	
+
 	if (joystick->did != NULL)
 	{
 		IDirectInputDevice_Unacquire(joystick->did);
 		IDirectInputDevice_Release(joystick->did);
 		joystick->did = NULL;
 	}
-	
+
 	for (i = 0; i < joystick->num_axes; i++)
 	{
 		if (joystick->axes[i].name)
 			free(joystick->axes[i].name);
 		joystick->axes[i].name = NULL;
 	}
-	
+
 	if (joystick->name != NULL)
 	{
 		free(joystick->name);

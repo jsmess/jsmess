@@ -770,7 +770,7 @@ static const z80_daisy_config p7_daisy[] =
 {
 	{ "ctc" },
 	{ "z80pio_0" },
-//	{ "upd765" }, /* TODO */
+//  { "upd765" }, /* TODO */
 	{ NULL }
 };
 

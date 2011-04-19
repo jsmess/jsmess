@@ -452,7 +452,7 @@ static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
 	mycom_state *state = device->machine().driver_data<mycom_state>();
 
 	state->m_rtc->address_w(data & 0x0f);
-	
+
 	state->m_rtc->hold_w(BIT(data, 4));
 	state->m_rtc->read_w(BIT(data, 5));
 	state->m_rtc->write_w(BIT(data, 6));

@@ -3,7 +3,7 @@
     Epson TF-20
 
     Dual floppy drive with HX-20 factory option
-	
+
 
     Status: Boots from system disk, missing ??PD7201 emulation
 

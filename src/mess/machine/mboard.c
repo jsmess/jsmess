@@ -209,7 +209,7 @@ WRITE16_HANDLER( mboard_write_board_16 )
 
 WRITE32_HANDLER( mboard_write_board_32 )
 {
-//	data |= data << 24;
+//  data |= data << 24;
 //printf("write board %08x %08x\n",offset,data);
 	logerror("write board 32 o: %08x d: %08x\n",offset,data);
 	if (offset) write_board(space->machine(),data);
@@ -230,12 +230,12 @@ WRITE16_HANDLER( mboard_write_LED_16 )
 
 WRITE32_HANDLER( mboard_write_LED_32 )
 {
-//	data = data | data << 24;
+//  data = data | data << 24;
 //printf("write LED %08x %08x\n",offset,data);
 	if (offset) write_LED(data);
 	else write_LED(data >> 24);
 	logerror("write LED   32 o: %08x d: %08x\n",offset,data);
-//	device_spin_until_time(&space->device(), ATTOTIME_IN_USEC(20));
+//  device_spin_until_time(&space->device(), ATTOTIME_IN_USEC(20));
 }
 
 

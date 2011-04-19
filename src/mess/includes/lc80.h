@@ -31,13 +31,13 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio2;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_ram;
-	
+
 	virtual void machine_start();
 
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
@@ -49,7 +49,7 @@ public:
 	DECLARE_READ8_MEMBER( pio2_pb_r );
 
 	void update_display();
-	
+
 	// display state
 	UINT8 m_digit;
 	UINT8 m_segment;

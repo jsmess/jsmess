@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         SacState 8008
 
         23/02/2009 Skeleton driver.
@@ -22,7 +22,7 @@ public:
 UINT8 val = 0x00;
 static READ8_HANDLER(status_r)
 {
-	UINT8 old_val = val;	
+	UINT8 old_val = val;
 	sacstate_state *state = space->machine().driver_data<sacstate_state>();
 	if (state->m_term_data!=0) old_val |= 0x04; // data in
 	val = val ^ 0x40;
@@ -52,7 +52,7 @@ static READ8_HANDLER(unknown_r)
 static ADDRESS_MAP_START(sacstate_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000,0x7ff) AM_ROM
-	AM_RANGE(0x800,0xfff) AM_RAM	
+	AM_RANGE(0x800,0xfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sacstate_io , AS_IO, 8)
@@ -79,18 +79,18 @@ static GENERIC_TERMINAL_INTERFACE( sacstate_terminal_intf )
 	DEVCB_HANDLER(sacstate_kbd_put)
 };
 
-static MACHINE_RESET(sacstate) 
-{	
+static MACHINE_RESET(sacstate)
+{
 }
 
 static MACHINE_CONFIG_START( sacstate, sacstate_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",I8008, 800000)
     MCFG_CPU_PROGRAM_MAP(sacstate_mem)
-    MCFG_CPU_IO_MAP(sacstate_io)	
+    MCFG_CPU_IO_MAP(sacstate_io)
 
     MCFG_MACHINE_RESET(sacstate)
-	
+
     /* video hardware */
     MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sacstate_terminal_intf)
@@ -112,5 +112,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sacstate,  0,       0, 	sacstate, 	sacstate, 	 0,  "SacState",   "SacState 8008",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, sacstate,  0,       0,	sacstate,	sacstate,	 0,  "SacState",   "SacState 8008",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

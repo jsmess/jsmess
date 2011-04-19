@@ -13,10 +13,10 @@
 
 /***************************************************************************
 
-	directdraw.c
+    directdraw.c
 
-	Direct Draw routines.
- 
+    Direct Draw routines.
+
  ***************************************************************************/
 
 // standard windows headers
@@ -35,18 +35,18 @@
 #include <tchar.h>
 
 /***************************************************************************
-	function prototypes
+    function prototypes
  ***************************************************************************/
 
 static BOOL WINAPI DDEnumInfo(GUID FAR *lpGUID,
-							  LPTSTR 	lpDriverDescription,
-							  LPTSTR 	lpDriverName,		 
+							  LPTSTR	lpDriverDescription,
+							  LPTSTR	lpDriverName,
 							  LPVOID	lpContext,
 							  HMONITOR	hm);
 
 static BOOL WINAPI DDEnumOldInfo(GUID FAR *lpGUID,
 								 LPTSTR	   lpDriverDescription,
-								 LPTSTR	   lpDriverName,		
+								 LPTSTR	   lpDriverName,
 								 LPVOID    lpContext);
 
 static void CalculateDisplayModes(void);
@@ -54,11 +54,11 @@ static HRESULT CALLBACK EnumDisplayModesCallback(LPDDSURFACEDESC pddsd, LPVOID C
 static HRESULT CALLBACK EnumDisplayModesCallback2(DDSURFACEDESC2* pddsd, LPVOID Context);
 
 /***************************************************************************
-	External variables
+    External variables
  ***************************************************************************/
 
 /***************************************************************************
-	Internal structures
+    Internal structures
  ***************************************************************************/
 
 typedef struct
@@ -71,7 +71,7 @@ typedef HRESULT (WINAPI *ddc_proc)(GUID FAR *lpGUID, LPDIRECTDRAW FAR *lplpDD,
 								   IUnknown FAR *pUnkOuter);
 
 /***************************************************************************
-	Internal variables
+    Internal variables
  ***************************************************************************/
 
 #define MAX_DISPLAYS 100
@@ -86,24 +86,24 @@ static IDirectDraw2*		g_pDirectDraw2;
 static IDirectDraw4*		g_pDirectDraw4;
 
 /***************************************************************************
-	External functions	
+    External functions
  ***************************************************************************/
 
 /****************************************************************************
- *		DirectDrawInitialize
+ *      DirectDrawInitialize
  *
- *		Initialize the DirectDraw variables.
+ *      Initialize the DirectDraw variables.
  *
- *		This entails the following functions:
+ *      This entails the following functions:
  *
- *			DirectDrawCreate
+ *          DirectDrawCreate
  *
  ****************************************************************************/
 
 #if !defined(LPDIRECTDRAWENUMERATE)
 #if defined(UNICODE)
 
-typedef HRESULT (WINAPI* LPDIRECTDRAWENUMERATEW)(LPDDENUMCALLBACKW lpCallback, LPVOID lpContext); 
+typedef HRESULT (WINAPI* LPDIRECTDRAWENUMERATEW)(LPDDENUMCALLBACKW lpCallback, LPVOID lpContext);
 
 #define LPDIRECTDRAWENUMERATE	LPDIRECTDRAWENUMERATEW
 
@@ -112,7 +112,7 @@ typedef HRESULT (WINAPI* LPDIRECTDRAWENUMERATEW)(LPDDENUMCALLBACKW lpCallback, L
 
 #else
 
-typedef HRESULT (WINAPI* LPDIRECTDRAWENUMERATEA)(LPDDENUMCALLBACKA lpCallback, LPVOID lpContext); 
+typedef HRESULT (WINAPI* LPDIRECTDRAWENUMERATEA)(LPDDENUMCALLBACKA lpCallback, LPVOID lpContext);
 
 #define LPDIRECTDRAWENUMERATE	LPDIRECTDRAWENUMERATEA
 
@@ -160,7 +160,7 @@ BOOL DirectDraw_Initialize(void)
 	g_pDirectDraw2 = NULL;
 	g_pDirectDraw4 = NULL;
 	hr = ddc(NULL, &pDirectDraw1, NULL);
-	if (FAILED(hr)) 
+	if (FAILED(hr))
 	{
 		ErrorMsg("DirectDrawCreate failed: %s", DirectXDecodeError(hr));
 		return FALSE;
@@ -179,7 +179,7 @@ BOOL DirectDraw_Initialize(void)
 			return FALSE;
 		}
 	}
-	
+
 	memset(&ddCaps,    0, sizeof(DDCAPS));
 	memset(&ddHelCaps, 0, sizeof(DDCAPS));
 	ddCaps.dwSize	 = sizeof(DDCAPS);
@@ -195,19 +195,19 @@ BOOL DirectDraw_Initialize(void)
 	IDirectDraw_Release(pDirectDraw1);
 
 	/*
-	   Note that you must know which version of the
-	   function to retrieve (see the following text).
-	   For this example, we use the ANSI version.
-	 */
+       Note that you must know which version of the
+       function to retrieve (see the following text).
+       For this example, we use the ANSI version.
+     */
 	pDDEnumEx = (LPDIRECTDRAWENUMERATEEX) GetProcAddress((HINSTANCE)g_hDLL, SDirectDrawEnumerateEx);
 
 	/*
-	   If the function is there, call it to enumerate all display devices
-	   attached to the desktop, and any non-display DirectDraw devices.
-	 */
+       If the function is there, call it to enumerate all display devices
+       attached to the desktop, and any non-display DirectDraw devices.
+     */
 	if (pDDEnumEx)
 	{
-		pDDEnumEx(DDEnumInfo, NULL, 
+		pDDEnumEx(DDEnumInfo, NULL,
 				  DDENUM_ATTACHEDSECONDARYDEVICES | DDENUM_DETACHEDSECONDARYDEVICES);
 	}
 	else
@@ -216,11 +216,11 @@ BOOL DirectDraw_Initialize(void)
 
 		lpDDEnum = (LPDIRECTDRAWENUMERATE) GetProcAddress((HINSTANCE)g_hDLL, SDirectDrawEnumerate);
 		/*
-		 * We must be running on an old version of ddraw. Therefore, 
-		 * by definiton, multimon isn't supported. Fall back on
-		 * DirectDrawEnumerate to enumerate standard devices on a 
-		 * single monitor system.
-		 */
+         * We must be running on an old version of ddraw. Therefore,
+         * by definiton, multimon isn't supported. Fall back on
+         * DirectDrawEnumerate to enumerate standard devices on a
+         * single monitor system.
+         */
 		if (lpDDEnum)
 		{
 			lpDDEnum(DDEnumOldInfo, NULL);
@@ -236,16 +236,16 @@ BOOL DirectDraw_Initialize(void)
 
 /****************************************************************************
  *
- *		DirectDraw_Close
+ *      DirectDraw_Close
  *
- *		Terminate our usage of DirectDraw.
+ *      Terminate our usage of DirectDraw.
  *
  ****************************************************************************/
 
 void DirectDraw_Close(void)
 {
 	int i;
-	
+
 	for (i = 0; i < g_nNumDisplays; i++)
 	{
 		free(g_Displays[i].name);
@@ -255,20 +255,20 @@ void DirectDraw_Close(void)
 			free(g_Displays[i].lpguid);
 			g_Displays[i].lpguid = NULL;
 		}
-		
+
 	}
 	g_nNumDisplays = 0;
-	
+
 	/*
-		Destroy any lingering IDirectDraw object.
-	*/
-	if (g_pDirectDraw2) 
+        Destroy any lingering IDirectDraw object.
+    */
+	if (g_pDirectDraw2)
 	{
 		IDirectDraw2_Release(g_pDirectDraw2);
 		g_pDirectDraw2 = NULL;
 	}
 
-	if (g_pDirectDraw4) 
+	if (g_pDirectDraw4)
 	{
 		IDirectDraw4_Release(g_pDirectDraw4);
 		g_pDirectDraw4 = NULL;
@@ -283,7 +283,7 @@ void DirectDraw_Close(void)
 
 /****************************************************************************/
 /*
-	Return a list of 16, 24 and 32 bit DirectDraw modes.
+    Return a list of 16, 24 and 32 bit DirectDraw modes.
 */
 struct tDisplayModes* DirectDraw_GetDisplayModes(void)
 {
@@ -318,14 +318,14 @@ LPCTSTR DirectDraw_GetDisplayName(int num_display)
 /****************************************************************************/
 
 static BOOL WINAPI DDEnumInfo(GUID FAR *lpGUID,
-							  LPTSTR 	lpDriverDescription,
-							  LPTSTR 	lpDriverName,		 
+							  LPTSTR	lpDriverDescription,
+							  LPTSTR	lpDriverName,
 							  LPVOID	lpContext,
 							  HMONITOR	hm)
 {
 	g_Displays[g_nNumDisplays].name = (TCHAR*)malloc((_tcslen(lpDriverDescription) + 1) * sizeof(TCHAR));
 	_tcscpy(g_Displays[g_nNumDisplays].name, lpDriverDescription);
-	
+
 	if (lpGUID == NULL)
 		g_Displays[g_nNumDisplays].lpguid = NULL;
 	else
@@ -333,7 +333,7 @@ static BOOL WINAPI DDEnumInfo(GUID FAR *lpGUID,
 		g_Displays[g_nNumDisplays].lpguid = (LPGUID)malloc(sizeof(GUID));
 		memcpy(g_Displays[g_nNumDisplays].lpguid, lpGUID, sizeof(GUID));
 	}
-	
+
 	g_nNumDisplays++;
 	if (g_nNumDisplays == MAX_DISPLAYS)
 		return DDENUMRET_CANCEL;
@@ -343,7 +343,7 @@ static BOOL WINAPI DDEnumInfo(GUID FAR *lpGUID,
 
 static BOOL WINAPI DDEnumOldInfo(GUID FAR *lpGUID,
 								 LPTSTR	   lpDriverDescription,
-								 LPTSTR	   lpDriverName,		
+								 LPTSTR	   lpDriverName,
 								 LPVOID    lpContext)
 {
 	return DDEnumInfo(lpGUID, lpDriverDescription, lpDriverName, lpContext, NULL);
@@ -390,7 +390,7 @@ static HRESULT CALLBACK EnumDisplayModesCallback2(DDSURFACEDESC2* pddsd2, LPVOID
 		if (pddsd2->dwRefreshRate != 0)
 			g_bRefresh = TRUE;
 	}
-	
+
 	if (pDisplayModes->m_nNumModes == MAXMODES)
 		return DDENUMRET_CANCEL;
 	else

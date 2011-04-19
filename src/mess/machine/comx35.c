@@ -127,7 +127,7 @@ enum
 UINT8 comx35_state::read_expansion()
 {
 	UINT8 result;
-	
+
 	switch (machine().phase())
 	{
 		case MACHINE_PHASE_RESET:

@@ -175,7 +175,7 @@ static const ERRORCODE g_ErrorCode[] =
 	{   DIERR_INCOMPLETEEFFECT,             "DIERR_INCOMPLETEEFFECT" },
 	{   DIERR_NOTBUFFERED,                  "DIERR_NOTBUFFERED" },
 	{   DIERR_EFFECTPLAYING,                "DIERR_EFFECTPLAYING" },
-//	{   DIERR_UNPLUGGED,                    "DIERR_UNPLUGGED" },
+//  {   DIERR_UNPLUGGED,                    "DIERR_UNPLUGGED" },
 
 	{   E_NOINTERFACE,                      "E_NOINTERFACE" }
 
@@ -192,7 +192,7 @@ const char * DirectXDecodeError(HRESULT errorval)
 {
 	int i;
 	static char tmp[64];
-	
+
 	for (i = 0; i < (sizeof(g_ErrorCode) / sizeof(g_ErrorCode[0])); i++)
 	{
 		if (g_ErrorCode[i].hr == errorval)

@@ -40,9 +40,9 @@ public:
 	DECLARE_WRITE8_MEMBER( pio1_pa_w );
 	DECLARE_READ8_MEMBER( pio1_pb_r );
 	DECLARE_WRITE8_MEMBER( pio1_pb_w );
-	
+
 	void update_display();
-	
+
 	/* display state */
 	UINT8 m_digit;
 	UINT8 m_segment;

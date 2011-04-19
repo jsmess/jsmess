@@ -10,7 +10,7 @@
   that you have read the license and understand and accept it fully.
 
  ***************************************************************************/
- 
+
 /***************************************************************************
 
   columnedit.c
@@ -38,8 +38,8 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 {
 	LV_ITEM lvi;
 	TCHAR	buf[80];
-	//int 	nFrom, nTo;
-	BOOL 	b_res;
+	//int   nFrom, nTo;
+	BOOL	b_res;
 
 	//nFrom = ListView_GetItemCount(hFrom);
 	//nTo   = ListView_GetItemCount(hTo);
@@ -76,11 +76,11 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	int 	nMaxpos;
-	BOOL 	b_res;
-	
+	BOOL	b_res;
+
 	lvi.iItem = ListView_GetNextItem(hWnd, -1, LVIS_SELECTED | LVIS_FOCUSED);
 	nMaxpos = ListView_GetItemCount(hWnd);
-	if (lvi.iItem == -1 || 
+	if (lvi.iItem == -1 ||
 		(lvi.iItem <  2 && bDown == FALSE) || // Disallow moving First column
 		(lvi.iItem == 0 && bDown == TRUE)  || // ""
 		(lvi.iItem == nMaxpos - 1 && bDown == TRUE))
@@ -137,34 +137,34 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 		hShown	   = GetDlgItem(hDlg, IDC_LISTSHOWCOLUMNS);
 		hAvailable = GetDlgItem(hDlg, IDC_LISTAVAILABLECOLUMNS);
 		/*Change Style to Always Show Selection */
-		dwShowStyle = GetWindowLong(hShown, GWL_STYLE); 
-		dwAvailableStyle = GetWindowLong(hAvailable, GWL_STYLE); 
+		dwShowStyle = GetWindowLong(hShown, GWL_STYLE);
+		dwAvailableStyle = GetWindowLong(hAvailable, GWL_STYLE);
 		dwView = LVS_SHOWSELALWAYS | LVS_LIST;
 
 		/* Only set the window style if the view bits have changed. */
-		if ((dwShowStyle & LVS_TYPEMASK) != dwView) 
-		SetWindowLong(hShown, GWL_STYLE, 
-			(dwShowStyle & ~LVS_TYPEMASK) | dwView); 
-		if ((dwAvailableStyle & LVS_TYPEMASK) != dwView) 
-		SetWindowLong(hAvailable, GWL_STYLE, 
-			(dwAvailableStyle & ~LVS_TYPEMASK) | dwView); 
+		if ((dwShowStyle & LVS_TYPEMASK) != dwView)
+		SetWindowLong(hShown, GWL_STYLE,
+			(dwShowStyle & ~LVS_TYPEMASK) | dwView);
+		if ((dwAvailableStyle & LVS_TYPEMASK) != dwView)
+		SetWindowLong(hAvailable, GWL_STYLE,
+			(dwAvailableStyle & ~LVS_TYPEMASK) | dwView);
 
 		pfnGetColumnInfo(order, shown);
 
 		showMsg = TRUE;
 		nShown	= 0;
 		nAvail	= 0;
-						
-		lvi.mask	  = LVIF_TEXT | LVIF_PARAM; 
-		lvi.stateMask = 0;				   
-		lvi.iSubItem  = 0; 
+
+		lvi.mask	  = LVIF_TEXT | LVIF_PARAM;
+		lvi.stateMask = 0;
+		lvi.iSubItem  = 0;
 		lvi.iImage	  = -1;
 
 		/* Get the Column Order and save it */
 		pfnGetRealColumnOrder(order);
 
 		for (i = 0 ; i < nColumnMax; i++)
-		{		 
+		{
 			lvi.pszText = (TCHAR *) names[order[i]];
 			lvi.lParam	= order[i];
 
@@ -200,7 +200,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			NMHDR *nm = (NMHDR *)lParam;
 			NM_LISTVIEW *pnmv;
 			int 		nPos;
-			
+
 			switch (nm->code)
 			{
 			case NM_DBLCLK:
@@ -231,7 +231,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 					break;
 				}
 				return TRUE;
-				
+
 			case LVN_ITEMCHANGED:
 				// Don't handle this message for now
 				pnmv = (NM_LISTVIEW *)nm;
@@ -284,7 +284,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						if (ListView_GetItemCount(nm->hwndFrom) != 0)
 						{
 							EnableWindow(GetDlgItem(hDlg, IDC_BUTTONADD),	   FALSE);
-							
+
 							if (ListView_GetNextItem(hShown, -1, LVIS_SELECTED | LVIS_FOCUSED) == 0 )
 							{
 								EnableWindow(GetDlgItem(hDlg, IDC_BUTTONREMOVE),   FALSE);

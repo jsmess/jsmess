@@ -94,7 +94,7 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
-	
+
 private:
 	UINT8 m_sw1;				// DS/DD
 	UINT8 m_sw2;				// drive type
@@ -105,7 +105,7 @@ private:
 // ======================> luxor_55_21046_device
 
 class luxor_55_21046_device :  public device_t,
-							   public device_abcbus_interface 
+							   public device_abcbus_interface
 {
     friend class luxor_55_21046_device_config;
 

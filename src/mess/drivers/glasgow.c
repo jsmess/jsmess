@@ -132,9 +132,9 @@ static WRITE16_HANDLER( write_lcd )
 static WRITE16_HANDLER( write_lcd_flag )
 {
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
-//	UINT8 lcd_flag;
+//  UINT8 lcd_flag;
 	mboard_lcd_invert = 0;
-//	lcd_flag=data >> 8;
+//  lcd_flag=data >> 8;
 	//beep_set_state(0, (data >> 8) & 1 ? 1 : 0);
 	if ((data >> 8) == 0) {
 		mboard_key_selector = 1;
@@ -145,10 +145,10 @@ static WRITE16_HANDLER( write_lcd_flag )
 
 //  The key function in the rom expects after writing to
 //  the  a value from the second key row;
-//	if (lcd_flag != 0)
-//		state->m_led7 = 255;
-//	else
-//		state->m_led7 = 0;
+//  if (lcd_flag != 0)
+//      state->m_led7 = 255;
+//  else
+//      state->m_led7 = 0;
 //
 	logerror("LCD Flag 16 = %x \n", data);
 }
@@ -207,7 +207,7 @@ static WRITE32_HANDLER( write_lcd32 )
 static WRITE32_HANDLER( write_lcd_flag32 )
 {
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
-//	UINT8 lcd_flag = data >> 24;
+//  UINT8 lcd_flag = data >> 24;
 
 	mboard_lcd_invert = 0;
 
@@ -221,10 +221,10 @@ static WRITE32_HANDLER( write_lcd_flag32 )
 	//logerror("LCD Flag 32 = %x \n", data >> 24);
 	//beep_set_state(0, (data >> 24) & 1 ? 1 : 0);
 
-//	if (lcd_flag != 0)
-//		state->m_led7 = 255;
-//	else
-//		state->m_led7 = 0;
+//  if (lcd_flag != 0)
+//      state->m_led7 = 255;
+//  else
+//      state->m_led7 = 0;
 }
 
 static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32

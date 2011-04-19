@@ -249,7 +249,7 @@ static struct
 	UINT8	vsync;
 	UINT8	hsync;
 	UINT8   p3df;
-	
+
 	size_t  videoram_size;
 	UINT8  *videoram;
 } cga;
@@ -1770,7 +1770,7 @@ static VIDEO_START( pc1512 )
 	internal_pc_cga_video_start(machine);
 	cga.videoram_size = 0x10000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
-	
+
 	address_space *space = machine.firstcpu->memory().space( AS_PROGRAM );
 	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
 
@@ -1780,7 +1780,7 @@ static VIDEO_START( pc1512 )
 
 	io_space->install_legacy_read_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_r) );
 	io_space->install_legacy_write_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_w) );
-	
+
 }
 
 

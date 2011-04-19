@@ -33,7 +33,7 @@
     - Blue Moon Story: moans with a kanji msg;.
     - Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
-	- Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
+    - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
     - Hang-On: typical busted attributes for a N-BASIC game
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
@@ -66,7 +66,7 @@
       * with 0x2000 ROM size you can load 2d and 2hd floppies;
     - Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
       This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
-	- password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
+    - password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
 
     Bankswitch Notes:
     - 0x31 - graphic banking

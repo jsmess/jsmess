@@ -878,8 +878,8 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	windows_options mame_opts;
 	astring error_string;
 	// set up MAME options
-//	mame_opts = mame_options_init(mame_win_options);
-	
+//  mame_opts = mame_options_init(mame_win_options);
+
 	// Tell mame were to get the INIs
 	mame_opts.set_value(OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE,error_string);
 
@@ -905,7 +905,7 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 
 	if (g_szSelectedSoftware[0] && g_szSelectedDevice[0]) {
 			mame_opts.set_value(g_szSelectedDevice, g_szSelectedSoftware, OPTION_PRIORITY_CMDLINE,error_string);
-			// Add params and clear so next start of driver is without parameters			
+			// Add params and clear so next start of driver is without parameters
 			g_szSelectedSoftware[0] = 0;
 			g_szSelectedDevice[0] = 0;
 	}
@@ -970,7 +970,7 @@ int MameUIMain(HINSTANCE    hInstance,
 		for (i = 0; i < __argc; i++)
 			osd_free(utf8_argv[i]);
 		free(utf8_argv);
-		
+
 		exit(rc);
 	}
 	if (!Win32UI_init(hInstance, lpCmdLine, nCmdShow))
@@ -1300,7 +1300,7 @@ void UpdateSoftware(void)
 		HWND hwndSoftwareList;
 
 		ShowWindow(GetDlgItem(hMain,IDC_SWTAB),SW_SHOW);
-		
+
 		hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 		hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 		hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
@@ -2104,7 +2104,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 static void Win32UI_exit()
 {
 	MySoftwareListClose();
-	
+
     if (g_bDoBroadcast == TRUE)
     {
         ATOM a = GlobalAddAtom(TEXT(""));
@@ -3368,7 +3368,7 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 			{
 				ResetListView();
 				MessUpdateSoftwareList();
-				UpdateScreenShot();				
+				UpdateScreenShot();
 			}
 		}
 		return TRUE;
@@ -5164,7 +5164,7 @@ static void CreateIcons(void)
 		win_message_box_utf8(hwndList, "Cannot allocate small icon image list", "Allocation error - Exiting", IDOK);
 		PostQuitMessage(0);
 	}
-	
+
 	hLarge = ImageList_Create(dwLargeIconSize, dwLargeIconSize,
 							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + grow);
 
@@ -5280,7 +5280,7 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		{
 			machine_config config1(driver_list::driver(index1),MameUIGlobal());
 			machine_config config2(driver_list::driver(index2),MameUIGlobal());
-			
+
 			value = isDriverVector(&config1) - isDriverVector(&config2);
 		}
 		break;
@@ -5697,7 +5697,7 @@ static void MameLoadState()
 		// call the MAME core function to check the save state file
 		//rc = state_manager::check_file(NULL, pSaveState, selected_filename, MameMessageBox);
 		//if (rc)
-//			return;
+//          return;
 
 		memset(&playopts, 0, sizeof(playopts));
 #ifdef MESS
@@ -5905,7 +5905,7 @@ static void ToggleSoftware(void)
 	/* Redraw list view */
 	if (hBackground != NULL && showSoftware)
 		InvalidateRect(hwndList, NULL, FALSE);
-#endif		
+#endif
 }
 
 static void AdjustMetrics(void)

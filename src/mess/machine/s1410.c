@@ -44,21 +44,21 @@ Notes:
     CN3     - 2x10 PCB header, ST-506 drive 0 data
     CN4     - 2x10 PCB header, ST-506 drive 1 data
     CN5     - 2x25 PCB header, SASI host interface
-	
-	
+
+
 ASSY 104766 REV C02 SN 231985P
 
 |-------------------------------------------|
 |                                           |
-| CN1							SY2158      |
+| CN1                           SY2158      |
 |                               CN7     CN6 |
-|								ROM         |
+|                               ROM         |
 | CN2                                       |
-|			XEBEC1			Z80	            |
+|           XEBEC1          Z80             |
 |                                       CN5 |
-| CN3       XEBEC2   20MHz		XEBEC3      |
+| CN3       XEBEC2   20MHz      XEBEC3      |
 |                                           |
-| CN4       XEBEC4				XEBEC5		|
+| CN4       XEBEC4              XEBEC5      |
 |                                           |
 |-------------------------------------------|
 
@@ -67,7 +67,7 @@ Notes:
 
     Z80     - Zilog Z8400APS Z80A CPU
     ROM     - 2732 pinout ROM "104788D"
-	SY2158	- Synertek SY2158A-3 1Kx8 RAM
+    SY2158  - Synertek SY2158A-3 1Kx8 RAM
     XEBEC1  - Xebec 3198-0046N8445
     XEBEC2  - Xebec 3198-0009
     XEBEC3  - Xebec 3198-0057
@@ -78,8 +78,8 @@ Notes:
     CN3     - 2x10 PCB header, ST-506 drive 0 data
     CN4     - 2x10 PCB header, ST-506 drive 1 data
     CN5     - 2x25 PCB header, SASI host interface
-	CN6		- 2x8 PCB header
-	CN7		- 2x10 PCB header (test only)
+    CN6     - 2x8 PCB header
+    CN7     - 2x10 PCB header (test only)
 
 */
 

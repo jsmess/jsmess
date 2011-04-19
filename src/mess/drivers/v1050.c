@@ -915,10 +915,10 @@ READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
         PC1
         PC2
         PC3                 clock busy
-        PC4                 
-        PC5                 
-        PC6                 
-        PC7                 
+        PC4
+        PC5
+        PC6
+        PC7
 
     */
 
@@ -934,7 +934,7 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
         PC0
         PC1
         PC2
-        PC3                 
+        PC3
         PC4                 clock address write
         PC5                 clock data write
         PC6                 clock data read

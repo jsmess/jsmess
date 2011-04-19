@@ -1,5 +1,5 @@
 /*
-    Amiga 1200 
+    Amiga 1200
 
     Preliminary MAME driver by Mariusz Wojcieszek
     CD-ROM controller by Ernesto Corvi

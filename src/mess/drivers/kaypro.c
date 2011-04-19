@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 
 	MCFG_VIDEO_START( kaypro )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)

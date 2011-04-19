@@ -505,7 +505,7 @@ static void machine_reset_common_disk(running_machine &machine)
 	mbee_state *state = machine.driver_data<mbee_state>();
 	/* These values need to be fine tuned or the fdc repaired */
 	wd17xx_set_pause_time(state->m_fdc, 45);       /* default is 40 usec if not set */
-//	wd17xx_set_complete_command_delay(state->m_fdc, 50);   /* default is 12 usec if not set */
+//  wd17xx_set_complete_command_delay(state->m_fdc, 50);   /* default is 12 usec if not set */
 }
 
 MACHINE_RESET( mbee )

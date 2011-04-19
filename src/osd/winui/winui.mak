@@ -43,7 +43,7 @@ endif
 ifndef DIRECTINPUT
 DIRECTINPUT = 7
 endif
- 
+
 
 
 ###########################################################################
@@ -52,7 +52,7 @@ endif
 
 
 #-------------------------------------------------
-# append "ui" to the emulator name 
+# append "ui" to the emulator name
 #-------------------------------------------------
 
 EMULATOR = $(PREFIX)$(NAME)ui$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(EXE)
@@ -202,7 +202,7 @@ CFLAGS += -include $(WINSRC)/winprefix.h -I$(WINSRC)
 ifdef WIN95_MULTIMON
 CFLAGS += -DWIN95_MULTIMON
 endif
- 
+
 
 # add the windows libaries, 3 additional libs at the end for UI
 LIBS += \
@@ -333,7 +333,7 @@ OSDOBJS += \
 endif
 
 # extra dependencies
-$(WINOBJ)/drawdd.o : 	$(SRC)/emu/rendersw.c
+$(WINOBJ)/drawdd.o :	$(SRC)/emu/rendersw.c
 $(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
 
 # add debug-specific files
@@ -370,7 +370,7 @@ TOOLS += ledutil$(EXE)
 
 
 #-------------------------------------------------
-# rules for creating helpids.c 
+# rules for creating helpids.c
 #-------------------------------------------------
 
 $(UISRC)/helpids.c : $(UIOBJ)/mkhelp$(EXE) $(UISRC)/resource.h $(UISRC)/resource.hm $(UISRC)/mameui.rc

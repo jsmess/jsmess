@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pio1_pa_w );
 	DECLARE_WRITE8_MEMBER( pio1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
-	
+
 	/* keyboard state */
 	int m_keylatch;
 

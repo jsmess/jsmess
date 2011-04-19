@@ -87,7 +87,7 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_READ8_MEMBER( mac_r );
 	DECLARE_WRITE8_MEMBER( mac_w );
 	DECLARE_READ8_MEMBER( cause_r );
@@ -168,12 +168,12 @@ public:
 	inline void write_videoram(UINT32 offset, UINT16 data, UINT16 mask);
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-	
+
 	// memory access controller
 	UINT8 m_task;
 	UINT8 m_segment_ram[0x400];
 	UINT16 m_page_ram[0x400];
-	
+
 	// DMA
 	UINT8 m_dmamap[8];
 	int m_dmadis;
@@ -209,11 +209,11 @@ public:
 	UINT16 m_yto;				// Y to
 	UINT32 m_mfa;				// mover from address
 	UINT32 m_mta;				// mover to address
-	UINT8 m_sh;					// 
-	UINT16 m_mdor;				// 
-	int m_hold_1w_cyk;			// 
-	int m_wrms0;				// 
-	int m_wrms1;				// 
+	UINT8 m_sh;					//
+	UINT16 m_mdor;				//
+	int m_hold_1w_cyk;			//
+	int m_wrms0;				//
+	int m_wrms1;				//
 	int m_rmc;					// row match count
 	int m_cmc;					// column match count
 	int m_amm;					// active mover mask

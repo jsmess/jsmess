@@ -55,7 +55,7 @@ public:
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_floppy;
 	required_device<device_t> m_ram;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 
@@ -78,10 +78,10 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( strobe_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	
+
 	void scan_keyboard();
 	void bankswitch();
-	
+
 	/* memory state */
 	int m_boot_rom;
 	int m_bank;

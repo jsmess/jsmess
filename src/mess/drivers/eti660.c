@@ -3,7 +3,7 @@
     TODO:
 
     - does not boot!
-	- reset key
+    - reset key
     - allocate color ram
     - quickload
     - color on

@@ -2334,7 +2334,7 @@ void towns_state::machine_reset()
 	m_towns_rtc_timer->adjust(attotime::zero,0,attotime::from_hz(1));
 	m_towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	/* Why does enabling this timer break the driver? */
-//	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
+//  m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
 }
 
 static const struct pit8253_config towns_pit8253_config =
@@ -2480,7 +2480,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
-	
+
 	//    MCFG_MACHINE_RESET(towns)
 
 	/* video hardware */
@@ -2490,7 +2490,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(768,512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
-	//	MCFG_SCREEN_UPDATE(towns)
+	//  MCFG_SCREEN_UPDATE(towns)
 
 	MCFG_GFXDECODE(towns)
 
@@ -2628,7 +2628,7 @@ ROM_START( fmtownshr )
   ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
 	// F20 ROM space appears to be all 0xFF on an HR, so it is assumed to be not present
-//	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) )
+//  ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
 	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
 	ROM_LOAD("fmthr_sys.rom",0x200000, 0x040000, CRC(8aeff982) SHA1(a4ebf2e247a8e15a5f1ff003b657bbe3a67203d8) )

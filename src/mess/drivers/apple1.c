@@ -227,7 +227,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 
 	MCFG_MACHINE_RESET( apple1 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
 	MCFG_SCREEN_UPDATE(apple1)
 
-	
+
 	MCFG_GFXDECODE(apple1)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

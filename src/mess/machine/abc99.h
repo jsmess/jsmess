@@ -80,7 +80,7 @@ class abc99_device :  public device_t
 
 public:
 	static INPUT_CHANGED( keyboard_reset );
-	
+
 	DECLARE_WRITE8_MEMBER( z2_led_w );
 	DECLARE_WRITE8_MEMBER( z2_p1_w );
 	DECLARE_READ8_MEMBER( z2_p2_r );

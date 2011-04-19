@@ -70,21 +70,21 @@ protected:
 private:
 	// internal state
 	const ibm_vga_device_config &m_config;
-	
+
 	UINT8 m_misc_out_reg;
-	
+
 	UINT8 m_feature_ctrl;
-	
-	UINT8 m_seq_idx;	
+
+	UINT8 m_seq_idx;
 	UINT8 m_seq_data[0x1f];
-	
+
 	UINT8 m_attr_idx;
 	UINT8 m_attr_data[0x1f];
 	UINT8 m_attr_state;
-	
+
 	UINT8 m_gc_idx;
 	UINT8 m_gc_data[0x1f];
-	
+
 	UINT8 m_dac_mask;
 	UINT8 m_dac_write_idx;
 	UINT8 m_dac_read_idx;

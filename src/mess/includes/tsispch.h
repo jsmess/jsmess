@@ -22,7 +22,7 @@ public:
 		  m_uart(*this, "i8251a_u15"),
 		  m_pic(*this, "pic8259")
 		{ }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<device_t> m_terminal;

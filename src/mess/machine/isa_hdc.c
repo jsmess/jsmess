@@ -126,43 +126,43 @@ ROM_END
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
- 
+
 const device_type ISA8_HDC = isa8_hdc_device_config::static_alloc_device_config;
- 
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_hdc_device_config - constructor
 //-------------------------------------------------
- 
+
 isa8_hdc_device_config::isa8_hdc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
         : device_config(mconfig, static_alloc_device_config, "ISA8_HDC", tag, owner, clock),
 			device_config_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "hdc";
 }
- 
+
 //-------------------------------------------------
 //  static_alloc_device_config - allocate a new
 //  configuration object
 //-------------------------------------------------
- 
+
 device_config *isa8_hdc_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
         return global_alloc(isa8_hdc_device_config(mconfig, tag, owner, clock));
 }
- 
+
 //-------------------------------------------------
 //  alloc_device - allocate a new device object
 //-------------------------------------------------
- 
+
 device_t *isa8_hdc_device_config::alloc_device(running_machine &machine) const
 {
         return auto_alloc(machine, isa8_hdc_device(machine, *this));
 }
- 
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -185,11 +185,11 @@ const rom_entry *isa8_hdc_device_config::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_hdc_device - constructor
 //-------------------------------------------------
- 
+
 isa8_hdc_device::isa8_hdc_device(running_machine &_machine, const isa8_hdc_device_config &config) :
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
@@ -197,16 +197,16 @@ isa8_hdc_device::isa8_hdc_device(running_machine &_machine, const isa8_hdc_devic
 		m_isa(*owner(),config.m_isa_tag)
 {
 }
- 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
- 
+
 void isa8_hdc_device::device_start()
-{        	
+{
 	m_isa->add_isa_card(this, m_config.m_isa_num);
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
-	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );	
+	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
 	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);
 	timer = machine().scheduler().timer_alloc(FUNC(pc_hdc_command), this);
 }
@@ -214,13 +214,13 @@ void isa8_hdc_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
- 
+
 void isa8_hdc_device::device_reset()
 {
 	drv = 0;
 	data_cnt = 0;
 	buffer_ptr = NULL;
-	hdc_control = 0;	
+	hdc_control = 0;
 	for (int i = 0; i < 2; i++)
 	{
 		cylinders[i] = 612;
@@ -255,9 +255,9 @@ hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 		break;
 	case 1:
 		img = dynamic_cast<device_image_interface *>(machine().device(subtag(tempstring,"slave")));
-		break;	
+		break;
 	}
-	if ( img == NULL ) 
+	if ( img == NULL )
 		return NULL;
 
 	if (!img->exists())
@@ -518,7 +518,7 @@ int isa8_hdc_device::test_ready()
 	return 1;
 }
 
-void isa8_hdc_device::hdc_command() 
+void isa8_hdc_device::hdc_command()
 {
 	int set_error_info = 1;
 	int old_error = error;			/* Previous error data is needed for CMD_SENSE */
@@ -817,10 +817,10 @@ static READ8_DEVICE_HANDLER(pc_HDC_r )
 {
 	UINT8 data = 0xff;
 	isa8_hdc_device	*hdc  = downcast<isa8_hdc_device *>(device);
-	
+
 	switch( offset )
 	{
-		case 0: data = hdc->pc_hdc_data_r(); 	 break;
+		case 0: data = hdc->pc_hdc_data_r();	 break;
 		case 1: data = hdc->pc_hdc_status_r();	 break;
 		case 2: data = hdc->pc_hdc_dipswitch_r(); break;
 		case 3: break;
@@ -854,8 +854,8 @@ UINT8 isa8_hdc_device::dack_r(int line)
 }
 
 void isa8_hdc_device::dack_w(int line,UINT8 data)
-{	
-	pc_hdc_dack_w(data);	
+{
+	pc_hdc_dack_w(data);
 }
 bool isa8_hdc_device::have_dack(int line)
 {

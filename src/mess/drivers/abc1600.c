@@ -10,15 +10,15 @@
 
     TODO:
 
-	- floppy
-		- sector 0 not boot
-	- BUS0I/0X/1/2
-	- M68K bus errors
-	- short/long reset (RSTBUT)
-	- SCC interrupt
+    - floppy
+        - sector 0 not boot
+    - BUS0I/0X/1/2
+    - M68K bus errors
+    - short/long reset (RSTBUT)
+    - SCC interrupt
     - CIO (interrupt controller)
-		- RTC
-		- NVRAM
+        - RTC
+        - NVRAM
     - hard disk (Xebec S1410)
 
 */
@@ -183,7 +183,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 data = 0;
-	
+
 	if (X12)
 	{
 		if (X11)
@@ -193,7 +193,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 			case IORD0:
 				data = iord0_r(*program, offset);
 				break;
-			
+
 			default:
 				logerror("Unmapped read from virtual I/O %06x\n", offset);
 			}
@@ -207,7 +207,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 				break;
 
 			case CRT:
-				if (A0) 
+				if (A0)
 					data = mc6845_register_r(m_crtc, 0);
 				else
 					data = mc6845_status_r(m_crtc, 0);
@@ -526,25 +526,25 @@ WRITE8_MEMBER( abc1600_state::mac_w )
 READ8_MEMBER( abc1600_state::cause_r )
 {
 	/*
-	
-		bit		description
-		
-		0		RSTBUT
-		1		1
-		2		DMAOK
-		3		X16
-		4		X17
-		5		X18
-		6		X19
-		7		X20
-	
-	*/
-	
+
+        bit     description
+
+        0       RSTBUT
+        1       1
+        2       DMAOK
+        3       X16
+        4       X17
+        5       X18
+        6       X19
+        7       X20
+
+    */
+
 	UINT8 data = 0x02;
-	
+
 	// DMA status
 	data |= m_cause;
-	
+
 	watchdog_reset(machine());
 
 	return data;
@@ -558,19 +558,19 @@ READ8_MEMBER( abc1600_state::cause_r )
 WRITE8_MEMBER( abc1600_state::task_w )
 {
 	/*
-	
-		bit		description
-		
-		0		SEGA5
-		1		SEGA6
-		2		SEGA7
-		3		SEGA8
-		4		
-		5		
-		6		BOOTE
-		7		READ_MAGIC
-	
-	*/
+
+        bit     description
+
+        0       SEGA5
+        1       SEGA6
+        2       SEGA7
+        3       SEGA8
+        4
+        5
+        6       BOOTE
+        7       READ_MAGIC
+
+    */
 
 	m_task = data;
 
@@ -585,19 +585,19 @@ WRITE8_MEMBER( abc1600_state::task_w )
 READ8_MEMBER( abc1600_state::segment_r )
 {
 	/*
-	
-		bit		description
-		
-		0		SEGD0
-		1		SEGD1
-		2		SEGD2
-		3		SEGD3
-		4		SEGD4
-		5		SEGD5
-		6		SEGD6
-		7		READ_MAGIC
-	
-	*/
+
+        bit     description
+
+        0       SEGD0
+        1       SEGD1
+        2       SEGD2
+        3       SEGD3
+        4       SEGD4
+        5       SEGD5
+        6       SEGD6
+        7       READ_MAGIC
+
+    */
 
 	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	UINT8 data = SEGMENT_DATA(segment);
@@ -613,23 +613,23 @@ READ8_MEMBER( abc1600_state::segment_r )
 WRITE8_MEMBER( abc1600_state::segment_w )
 {
 	/*
-	
-		bit		description
-		
-		0		SEGD0
-		1		SEGD1
-		2		SEGD2
-		3		SEGD3
-		4		SEGD4
-		5		SEGD5
-		6		SEGD6
-		7		
-	
-	*/
+
+        bit     description
+
+        0       SEGD0
+        1       SEGD1
+        2       SEGD2
+        3       SEGD3
+        4       SEGD4
+        5       SEGD5
+        6       SEGD6
+        7
+
+    */
 
 	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	SEGMENT_DATA(segment) = data & 0x7f;
-	
+
 	if (LOG) logerror("Task %u Segment %u : %02x\n", m_task & 0x0f, segment, data);
 }
 
@@ -641,28 +641,28 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 READ8_MEMBER( abc1600_state::page_r )
 {
 	/*
-	
-		bit		description
-		
-		0		X11
-		1		X12
-		2		X13
-		3		X14
-		4		X15
-		5		X16
-		6		X17
-		7		X18
 
-		8		X19
-		9		X20
-		10
-		11
-		12
-		13
-		14		_WP
-		15		NONX
-	
-	*/
+        bit     description
+
+        0       X11
+        1       X12
+        2       X13
+        3       X14
+        4       X15
+        5       X16
+        6       X17
+        7       X18
+
+        8       X19
+        9       X20
+        10
+        11
+        12
+        13
+        14      _WP
+        15      NONX
+
+    */
 
 	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	int page = (offset >> 11) & 0x0f;
@@ -679,28 +679,28 @@ READ8_MEMBER( abc1600_state::page_r )
 WRITE8_MEMBER( abc1600_state::page_w )
 {
 	/*
-	
-		bit		description
-		
-		0		X11
-		1		X12
-		2		X13
-		3		X14
-		4		X15
-		5		X16
-		6		X17
-		7		X18
 
-		8		X19
-		9		X20
-		10
-		11
-		12
-		13
-		14		_WP
-		15		NONX
-	
-	*/
+        bit     description
+
+        0       X11
+        1       X12
+        2       X13
+        3       X14
+        4       X15
+        5       X16
+        6       X17
+        7       X18
+
+        8       X19
+        9       X20
+        10
+        11
+        12
+        13
+        14      _WP
+        15      NONX
+
+    */
 
 	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	int page = (offset >> 11) & 0x0f;
@@ -724,7 +724,7 @@ WRITE8_MEMBER( abc1600_state::page_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_drdy0 - 
+//  update_drdy0 -
 //-------------------------------------------------
 
 inline void abc1600_state::update_drdy0()
@@ -743,7 +743,7 @@ inline void abc1600_state::update_drdy0()
 
 
 //-------------------------------------------------
-//  update_drdy1 - 
+//  update_drdy1 -
 //-------------------------------------------------
 
 inline void abc1600_state::update_drdy1()
@@ -762,7 +762,7 @@ inline void abc1600_state::update_drdy1()
 
 
 //-------------------------------------------------
-//  update_drdy2 - 
+//  update_drdy2 -
 //-------------------------------------------------
 
 inline void abc1600_state::update_drdy2()
@@ -771,9 +771,9 @@ inline void abc1600_state::update_drdy2()
 	m_dma2->rdy_w(1);
 }
 
-	
+
 //-------------------------------------------------
-//  get_dma_address - 
+//  get_dma_address -
 //-------------------------------------------------
 
 inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
@@ -781,7 +781,7 @@ inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
 	// A0 = DMA15, A1 = BA1, A2 = BA2
 	UINT8 dmamap_addr = index | BIT(offset, 15);
 	UINT8 dmamap = m_dmamap[dmamap_addr];
-	
+
 	m_cause = (dmamap & 0x1f) << 3;
 
 	return ((dmamap & 0x1f) << 16) | offset;
@@ -843,20 +843,20 @@ inline void abc1600_state::dma_iorq_w(int index, UINT16 offset, UINT8 data)
 WRITE8_MEMBER( abc1600_state::dmamap_w )
 {
 	/*
-	
-		bit		description
-		
-		0		X16
-		1		X17
-		2		X18
-		3		X19
-		4		X20
-		5		
-		6		
-		7		_R/W
-	
-	*/
-	
+
+        bit     description
+
+        0       X16
+        1       X17
+        2       X18
+        3       X19
+        4       X20
+        5
+        6
+        7       _R/W
+
+    */
+
 	m_dmamap[offset & 7] = data;
 }
 
@@ -873,19 +873,19 @@ WRITE8_MEMBER( abc1600_state::dmamap_w )
 WRITE8_MEMBER( abc1600_state::fw0_w )
 {
 	/*
-	
-		bit		description
-		
-		0		SEL1
-		1		SEL2
-		2		SEL3
-		3		MOTOR
-		4		LC/PC
-		5		LC/PC
-		6		
-		7		
-	
-	*/
+
+        bit     description
+
+        0       SEL1
+        1       SEL2
+        2       SEL3
+        3       MOTOR
+        4       LC/PC
+        5       LC/PC
+        6
+        7
+
+    */
 
 	logerror("FW0 %02x\n", data);
 
@@ -893,7 +893,7 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
 	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
 	if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
-	
+
 	// floppy motor
 	floppy_mon_w(m_floppy, !BIT(data, 3));
 }
@@ -906,25 +906,25 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 WRITE8_MEMBER( abc1600_state::fw1_w )
 {
 	/*
-	
-		bit		description
-		
-		0		MR
-		1		DDEN
-		2		HLT
-		3		MINI
-		4		HLD
-		5		P0
-		6		P1
-		7		P2
-	
-	*/
-	
+
+        bit     description
+
+        0       MR
+        1       DDEN
+        2       HLT
+        3       MINI
+        4       HLD
+        5       P0
+        6       P1
+        7       P2
+
+    */
+
 	logerror("FW1 %02x\n", data);
 
 	// FDC master reset
 	wd17xx_mr_w(m_fdc, BIT(data, 0));
-	
+
 	// density select
 	wd17xx_dden_w(m_fdc, BIT(data, 1));
 }
@@ -937,37 +937,37 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 {
 	int state = !BIT(data, 3);
-	
+
 	switch (data & 0x07)
 	{
 	case 0: // CS7
 		m_cs7 = state;
 		break;
-	
+
 	case 1:
 		break;
-	
+
 	case 2: // _BTCE
 		m_btce = state;
 		break;
-	
+
 	case 3: // _ATCE
 		m_atce = state;
 		break;
-	
+
 	case 4: // PARTST
 		m_partst = state;
 		break;
-	
+
 	case 5: // _DMADIS
 		m_dmadis = state;
 		break;
-	
+
 	case 6: // SYSSCC
 		m_sysscc = state;
 		update_drdy1();
 		break;
-	
+
 	case 7: // SYSFS
 		m_sysfs = state;
 		update_drdy0();
@@ -991,35 +991,35 @@ ADDRESS_MAP_END
 
 /*
 
-	Supervisor Data map
+    Supervisor Data map
 
-	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
-	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
-	AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
-	AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
-	AM_RANGE(0x80007, 0x80007) AM_READWRITE(cause_r, task_w)
+    AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
+    AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
+    AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
+    AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
+    AM_RANGE(0x80007, 0x80007) AM_READWRITE(cause_r, task_w)
 
-	Virtual Address Map
-	
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_MEMBER(m_video_ram)
-	AM_RANGE(0x1ff000, 0x1ff007) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w) // A2,A1
-	AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
-	AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x1ff200, 0x1ff207) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
-	AM_RANGE(0x1ff300, 0x1ff300) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff400, 0x1ff400) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff500, 0x1ff500) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff600, 0x1ff607) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w) // A2,A1
-	AM_RANGE(0x1ff700, 0x1ff707) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w) // A2,A1
-	AM_RANGE(0x1ff800, 0x1ff800) AM_READ(iord0_w)
-	AM_RANGE(0x1ff800, 0x1ff807) AM_WRITE(iowr0_w)
-	AM_RANGE(0x1ff900, 0x1ff907) AM_WRITE(iowr1_w)
-	AM_RANGE(0x1ffa00, 0x1ffa07) AM_WRITE(iowr2_w)
-	AM_RANGE(0x1ffb00, 0x1ffb00) AM_WRITE(fw0_w)
-	AM_RANGE(0x1ffb01, 0x1ffb01) AM_WRITE(fw1_w)
-	AM_RANGE(0x1ffd00, 0x1ffd07) AM_WRITE(dmamap_w)
-	AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(spec_contr_reg_w)
+    Virtual Address Map
+
+    AM_RANGE(0x000000, 0x0fffff) AM_RAM
+    AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_MEMBER(m_video_ram)
+    AM_RANGE(0x1ff000, 0x1ff007) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w) // A2,A1
+    AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
+    AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
+    AM_RANGE(0x1ff200, 0x1ff207) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
+    AM_RANGE(0x1ff300, 0x1ff300) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
+    AM_RANGE(0x1ff400, 0x1ff400) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
+    AM_RANGE(0x1ff500, 0x1ff500) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
+    AM_RANGE(0x1ff600, 0x1ff607) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w) // A2,A1
+    AM_RANGE(0x1ff700, 0x1ff707) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w) // A2,A1
+    AM_RANGE(0x1ff800, 0x1ff800) AM_READ(iord0_w)
+    AM_RANGE(0x1ff800, 0x1ff807) AM_WRITE(iowr0_w)
+    AM_RANGE(0x1ff900, 0x1ff907) AM_WRITE(iowr1_w)
+    AM_RANGE(0x1ffa00, 0x1ffa07) AM_WRITE(iowr2_w)
+    AM_RANGE(0x1ffb00, 0x1ffb00) AM_WRITE(fw0_w)
+    AM_RANGE(0x1ffb01, 0x1ffb01) AM_WRITE(fw1_w)
+    AM_RANGE(0x1ffd00, 0x1ffd07) AM_WRITE(dmamap_w)
+    AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(spec_contr_reg_w)
 
 */
 
@@ -1192,42 +1192,42 @@ static Z80DART_INTERFACE( dart_intf )
 READ8_MEMBER( abc1600_state::cio_pa_r )
 {
 	/*
-		
-		bit		description
-		
-		PA0		BUS2
-		PA1		BUS1
-		PA2		BUS0X*2
-		PA3		BUS0X*3
-		PA4		BUS0X*4
-		PA5		BUS0X*5
-		PA6		BUS0X
-		PA7		BUS0I
-		
-	*/
-	
+
+        bit     description
+
+        PA0     BUS2
+        PA1     BUS1
+        PA2     BUS0X*2
+        PA3     BUS0X*3
+        PA4     BUS0X*4
+        PA5     BUS0X*5
+        PA6     BUS0X
+        PA7     BUS0I
+
+    */
+
 	return 0;
 }
 
 READ8_MEMBER( abc1600_state::cio_pb_r )
 {
 	/*
-		
-		bit		description
-		
-		PB0		
-		PB1		POWERFAIL
-		PB2		
-		PB3		
-		PB4		MINT
-		PB5		_PREN-1
-		PB6		_PREN-0
-		PB7		FINT
-		
-	*/
-	
+
+        bit     description
+
+        PB0
+        PB1     POWERFAIL
+        PB2
+        PB3
+        PB4     MINT
+        PB5     _PREN-1
+        PB6     _PREN-0
+        PB7     FINT
+
+    */
+
 	UINT8 data = 0;
-	
+
 	// floppy interrupt
 	data |= wd17xx_intrq_r(m_fdc) << 7;
 
@@ -1237,19 +1237,19 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 WRITE8_MEMBER( abc1600_state::cio_pb_w )
 {
 	/*
-		
-		bit		description
-		
-		PB0		PRBR
-		PB1		
-		PB2		
-		PB3		
-		PB4		
-		PB5		
-		PB6		
-		PB7		
-		
-	*/
+
+        bit     description
+
+        PB0     PRBR
+        PB1
+        PB2
+        PB3
+        PB4
+        PB5
+        PB6
+        PB7
+
+    */
 
 	// printer baudrate
 	int prbr = BIT(data, 0);
@@ -1261,36 +1261,36 @@ WRITE8_MEMBER( abc1600_state::cio_pb_w )
 READ8_MEMBER( abc1600_state::cio_pc_r )
 {
 	/*
-		
-		bit		description
-		
-		PC0		1
-		PC1		DATA IN
-		PC2		1
-		PC3		1
-		
-	*/
+
+        bit     description
+
+        PC0     1
+        PC1     DATA IN
+        PC2     1
+        PC3     1
+
+    */
 
 	UINT8 data = 0x0d;
 
-	// data in	
+	// data in
 	data |= (m_rtc->dio_r() | m_nvram->do_r()) << 1;
-	
+
 	return data;
 }
 
 WRITE8_MEMBER( abc1600_state::cio_pc_w )
 {
 	/*
-		
-		bit		description
-		
-		PC0		CLOCK
-		PC1		DATA OUT
-		PC2		RTC CS
-		PC3		NVRAM CS
-		
-	*/
+
+        bit     description
+
+        PC0     CLOCK
+        PC1     DATA OUT
+        PC2     RTC CS
+        PC3     NVRAM CS
+
+    */
 
 	int clock = BIT(data, 0);
 	int data_out = BIT(data, 1);
@@ -1298,11 +1298,11 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 	int nvram_cs = BIT(data, 3);
 
 	logerror("CLK %u DATA %u RTC %u NVRAM %u\n", clock, data_out, rtc_cs, nvram_cs);
-	
+
 	m_rtc->cs_w(rtc_cs);
 	m_rtc->dio_w(data_out);
 	m_rtc->clk_w(clock);
-	
+
 	m_nvram->cs_w(nvram_cs);
 	m_nvram->di_w(data_out);
 	m_nvram->sk_w(clock);
@@ -1344,7 +1344,7 @@ WRITE_LINE_MEMBER( abc1600_state::drq_w )
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w), 
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, drq_w),
 	{ FLOPPY_0, NULL, NULL, NULL }
 };

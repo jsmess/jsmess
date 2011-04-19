@@ -18,16 +18,16 @@
     - incomplete / unimplemented FIGD / GCHRD draw modes
         - Arc
         - FIGD character
-		- slanted character
-    	- GCHRD character (needs rewrite)
+        - slanted character
+        - GCHRD character (needs rewrite)
     - read-modify-write cycle
         - read data
         - modify data
         - write data
-	- QX-10 diagnostic test has positioning bugs with the bitmap display test;
-	- QX-10 diagnostic test misses the zooming factor (external pin);
-	- compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
-	- A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up;
+    - QX-10 diagnostic test has positioning bugs with the bitmap display test;
+    - QX-10 diagnostic test misses the zooming factor (external pin);
+    - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
+    - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up;
 
     - honor visible area
     - wide mode (32-bit access)
@@ -152,7 +152,7 @@ ADDRESS_MAP_END
 // internal 128x14 control ROM
 ROM_START( upd7220 )
 	ROM_REGION( 0x100, "upd7220", 0 )
-	ROM_LOAD( "upd7220.bin", 0x000, 0x100, NO_DUMP ) 
+	ROM_LOAD( "upd7220.bin", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -246,7 +246,7 @@ void upd7220_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  fifo_clear - 
+//  fifo_clear -
 //-------------------------------------------------
 
 inline void upd7220_device::fifo_clear()
@@ -266,7 +266,7 @@ inline void upd7220_device::fifo_clear()
 
 
 //-------------------------------------------------
-//  fifo_param_count - 
+//  fifo_param_count -
 //-------------------------------------------------
 
 inline int upd7220_device::fifo_param_count()
@@ -283,7 +283,7 @@ inline int upd7220_device::fifo_param_count()
 
 
 //-------------------------------------------------
-//  fifo_set_direction - 
+//  fifo_set_direction -
 //-------------------------------------------------
 
 inline void upd7220_device::fifo_set_direction(int dir)
@@ -298,7 +298,7 @@ inline void upd7220_device::fifo_set_direction(int dir)
 
 
 //-------------------------------------------------
-//  queue - 
+//  queue -
 //-------------------------------------------------
 
 inline void upd7220_device::queue(UINT8 data, int flag)
@@ -326,7 +326,7 @@ inline void upd7220_device::queue(UINT8 data, int flag)
 
 
 //-------------------------------------------------
-//  dequeue - 
+//  dequeue -
 //-------------------------------------------------
 
 inline void upd7220_device::dequeue(UINT8 *data, int *flag)
@@ -357,7 +357,7 @@ inline void upd7220_device::dequeue(UINT8 *data, int *flag)
 
 
 //-------------------------------------------------
-//  update_vsync_timer - 
+//  update_vsync_timer -
 //-------------------------------------------------
 
 inline void upd7220_device::update_vsync_timer(int state)
@@ -371,7 +371,7 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 
 //-------------------------------------------------
-//  update_hsync_timer - 
+//  update_hsync_timer -
 //-------------------------------------------------
 
 inline void upd7220_device::update_hsync_timer(int state)
@@ -388,7 +388,7 @@ inline void upd7220_device::update_hsync_timer(int state)
 
 
 //-------------------------------------------------
-//  update_blank_timer - 
+//  update_blank_timer -
 //-------------------------------------------------
 
 inline void upd7220_device::update_blank_timer(int state)
@@ -405,7 +405,7 @@ inline void upd7220_device::update_blank_timer(int state)
 
 
 //-------------------------------------------------
-//  recompute_parameters - 
+//  recompute_parameters -
 //-------------------------------------------------
 
 inline void upd7220_device::recompute_parameters()
@@ -453,7 +453,7 @@ inline void upd7220_device::recompute_parameters()
 
 
 //-------------------------------------------------
-//  reset_figs_param - 
+//  reset_figs_param -
 //-------------------------------------------------
 
 inline void upd7220_device::reset_figs_param()
@@ -467,7 +467,7 @@ inline void upd7220_device::reset_figs_param()
 
 
 //-------------------------------------------------
-//  advance_ead - 
+//  advance_ead -
 //-------------------------------------------------
 
 inline void upd7220_device::advance_ead()
@@ -530,7 +530,7 @@ inline void upd7220_device::advance_ead()
 
 
 //-------------------------------------------------
-//  read_vram - 
+//  read_vram -
 //-------------------------------------------------
 
 inline void upd7220_device::read_vram(UINT8 type, UINT8 mod)
@@ -566,7 +566,7 @@ inline void upd7220_device::read_vram(UINT8 type, UINT8 mod)
 
 
 //-------------------------------------------------
-//  write_vram - 
+//  write_vram -
 //-------------------------------------------------
 
 inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
@@ -641,7 +641,7 @@ inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
 
 
 //-------------------------------------------------
-//  check_pattern - 
+//  check_pattern -
 //-------------------------------------------------
 
 inline UINT16 upd7220_device::check_pattern(UINT16 pattern)
@@ -661,7 +661,7 @@ inline UINT16 upd7220_device::check_pattern(UINT16 pattern)
 
 
 //-------------------------------------------------
-//  get_text_partition - 
+//  get_text_partition -
 //-------------------------------------------------
 
 inline void upd7220_device::get_text_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd)
@@ -674,7 +674,7 @@ inline void upd7220_device::get_text_partition(int index, UINT32 *sad, UINT16 *l
 
 
 //-------------------------------------------------
-//  get_graphics_partition - 
+//  get_graphics_partition -
 //-------------------------------------------------
 
 inline void upd7220_device::get_graphics_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd)
@@ -873,7 +873,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  draw_pixel - 
+//  draw_pixel -
 //-------------------------------------------------
 
 void upd7220_device::draw_pixel(int x, int y, UINT16 tile_data)
@@ -895,7 +895,7 @@ void upd7220_device::draw_pixel(int x, int y, UINT16 tile_data)
 
 
 //-------------------------------------------------
-//  draw_line - 
+//  draw_line -
 //-------------------------------------------------
 
 void upd7220_device::draw_line(int x, int y)
@@ -933,7 +933,7 @@ void upd7220_device::draw_line(int x, int y)
 
 
 //-------------------------------------------------
-//  draw_rectangle - 
+//  draw_rectangle -
 //-------------------------------------------------
 
 void upd7220_device::draw_rectangle(int x, int y)
@@ -996,7 +996,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 
 //-------------------------------------------------
-//  draw_char - 
+//  draw_char -
 //-------------------------------------------------
 
 void upd7220_device::draw_char(int x, int y)
@@ -1049,7 +1049,7 @@ void upd7220_device::draw_char(int x, int y)
 
 
 //-------------------------------------------------
-//  translate_command - 
+//  translate_command -
 //-------------------------------------------------
 
 int upd7220_device::translate_command(UINT8 data)
@@ -1098,7 +1098,7 @@ int upd7220_device::translate_command(UINT8 data)
 
 
 //-------------------------------------------------
-//  process_fifo - 
+//  process_fifo -
 //-------------------------------------------------
 
 void upd7220_device::process_fifo()
@@ -1353,7 +1353,7 @@ void upd7220_device::process_fifo()
 			m_figs.m_figure_type = (m_pr[1] & 0xf8) >> 3;
 
 			//if(m_figs.m_dir != 2)
-			//	printf("DIR %02x\n",m_pr[1]);
+			//  printf("DIR %02x\n",m_pr[1]);
 		}
 
 		if (m_param_ptr == 4)
@@ -1446,7 +1446,7 @@ void upd7220_device::process_fifo()
 
 
 //-------------------------------------------------
-//  read - 
+//  read -
 //-------------------------------------------------
 
 READ8_MEMBER( upd7220_device::read )
@@ -1475,7 +1475,7 @@ READ8_MEMBER( upd7220_device::read )
 
 
 //-------------------------------------------------
-//  write - 
+//  write -
 //-------------------------------------------------
 
 WRITE8_MEMBER( upd7220_device::write )
@@ -1498,7 +1498,7 @@ WRITE8_MEMBER( upd7220_device::write )
 
 
 //-------------------------------------------------
-//  dack_r - 
+//  dack_r -
 //-------------------------------------------------
 
 READ8_MEMBER( upd7220_device::dack_r )
@@ -1508,7 +1508,7 @@ READ8_MEMBER( upd7220_device::dack_r )
 
 
 //-------------------------------------------------
-//  dack_w - 
+//  dack_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( upd7220_device::dack_w )
@@ -1517,7 +1517,7 @@ WRITE8_MEMBER( upd7220_device::dack_w )
 
 
 //-------------------------------------------------
-//  ext_sync_w - 
+//  ext_sync_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7220_device::ext_sync_w )
@@ -1536,7 +1536,7 @@ WRITE_LINE_MEMBER( upd7220_device::ext_sync_w )
 
 
 //-------------------------------------------------
-//  ext_sync_w - 
+//  ext_sync_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7220_device::lpen_w )
@@ -1556,7 +1556,7 @@ WRITE_LINE_MEMBER( upd7220_device::lpen_w )
 
 
 //-------------------------------------------------
-//  update_text - 
+//  update_text -
 //-------------------------------------------------
 
 void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1574,7 +1574,7 @@ void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 		{
 			addr = sad + (y * m_pitch);
 
-			if (m_config.m_draw_text_func) 
+			if (m_config.m_draw_text_func)
 				m_config.m_draw_text_func(this, bitmap, m_vram, addr, y, wd, m_pitch, 0, 0, m_aw * 8 - 1, m_al - 1, m_lr, m_dc, m_ead);
 		}
 
@@ -1584,7 +1584,7 @@ void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 
 
 //-------------------------------------------------
-//  draw_graphics_line - 
+//  draw_graphics_line -
 //-------------------------------------------------
 
 void upd7220_device::draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, int wd)
@@ -1605,7 +1605,7 @@ void upd7220_device::draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, in
 
 
 //-------------------------------------------------
-//  update_graphics - 
+//  update_graphics -
 //-------------------------------------------------
 
 void upd7220_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect, int force_bitmap)
@@ -1646,7 +1646,7 @@ void upd7220_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect
 
 
 //-------------------------------------------------
-//  update_screen - 
+//  update_screen -
 //-------------------------------------------------
 
 void upd7220_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)

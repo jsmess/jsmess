@@ -44,7 +44,7 @@ public:
 	virtual void machine_reset();
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	READ8_MEMBER( gah40m_r );
 	WRITE8_MEMBER( gah40m_w );
 	READ8_MEMBER( gah40s_r );
@@ -53,10 +53,10 @@ public:
 	READ8_MEMBER( krtn_0_3_r );
 	READ8_MEMBER( krtn_4_7_r );
 	WRITE8_MEMBER( ksc_w );
-	
+
 	void bankswitch();
 	UINT8 krtn_read();
-	
+
 	/* GAH40M state */
 	UINT16 m_icr;				/* input capture register */
 	UINT16 m_frc;				/* free running counter */

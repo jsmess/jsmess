@@ -263,7 +263,7 @@ UINT32 cirrus_device::pci_read(device_t *busdevice, int function, int offset, UI
 
 	if (LOG_PCIACCESS)
 		logerror("cirrus5430_pci_read(): function=%d offset=0x%02X result=0x%04X\n", function, offset, result);
-	return result;	
+	return result;
 }
 
 

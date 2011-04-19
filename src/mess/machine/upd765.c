@@ -1242,7 +1242,7 @@ static int upd765_sector_count_complete(device_t *device)
 			if (floppy_get_heads_per_disk(flopimg_get_image(current_image(device)))==1) {
 				return 1;
 			} else {
-				if (fdc->side==1) 
+				if (fdc->side==1)
 					return 1;
 			}
 		}

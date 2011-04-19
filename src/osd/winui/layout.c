@@ -63,8 +63,8 @@ extern const FOLDERDATA g_folderData[] =
 	{"CPU",             "cpu",               FOLDER_CPU,          IDI_CPU,                  0,             0,            CreateCPUFolders },
 	{"Sound",           "sound",             FOLDER_SND,          IDI_SOUND,                0,             0,            CreateSoundFolders },
 	{"Imperfect",       "imperfect",         FOLDER_DEFICIENCY,   IDI_FOLDER,               0,             0,            CreateDeficiencyFolders },
-  	{"Dumping Status",  "dumping",           FOLDER_DUMPING,      IDI_FOLDER,               0,             0,            CreateDumpingFolders },
-  	{"Screens",         "screens",           FOLDER_SCREENS,      IDI_FOLDER,               0,             0,            CreateScreenFolders },
+	{"Dumping Status",  "dumping",           FOLDER_DUMPING,      IDI_FOLDER,               0,             0,            CreateDumpingFolders },
+	{"Screens",         "screens",           FOLDER_SCREENS,      IDI_FOLDER,               0,             0,            CreateScreenFolders },
 	{"Working",         "working",           FOLDER_WORKING,      IDI_WORKING,              F_WORKING,     F_NONWORKING, NULL,                       DriverIsBroken,          FALSE },
 	{"Not Working",     "nonworking",        FOLDER_NONWORKING,   IDI_NONWORKING,           F_NONWORKING,  F_WORKING,    NULL,                       DriverIsBroken,          TRUE },
 	{"Originals",       "originals",         FOLDER_ORIGINAL,     IDI_FOLDER,               F_ORIGINALS,   F_CLONES,     NULL,                       DriverIsClone,           FALSE },
@@ -75,11 +75,11 @@ extern const FOLDERDATA g_folderData[] =
 	{"Lightgun",        "lightgun",          FOLDER_LIGHTGUN,     IDI_FOLDER,               0,             0,            NULL,                       DriverUsesLightGun,      TRUE },
 	{"Stereo",          "stereo",            FOLDER_STEREO,       IDI_SOUND,                0,             0,            NULL,                       DriverIsStereo,          TRUE },
 	{"CHD",             "harddisk",          FOLDER_HARDDISK,     IDI_HARDDISK,             0,             0,            NULL,                       DriverIsHarddisk,        TRUE },
-  	{"Samples",    	    "samples",           FOLDER_SAMPLES,      IDI_FOLDER,               0,             0,            NULL,                       DriverUsesSamples,       TRUE },
-  	{"Save State",    	"savestate",         FOLDER_SAVESTATE,    IDI_FOLDER,               0,             0,            NULL,                       DriverSupportsSaveState, TRUE },
-  	{"BIOS",	    	"bios",		         FOLDER_BIOS,		  IDI_FOLDER,               0,             0,            NULL,                       DriverIsBios,			  TRUE },
-	{"Mechanical",      "mechanical",        FOLDER_MECHANICAL,   IDI_FOLDER,				0,             0,  			 NULL,                       DriverIsMechanical,      TRUE },
-	{"Non Mechanical",  "nonmechanical",     FOLDER_NONMECHANICAL,IDI_FOLDER,				0,             0,  			 NULL,                       DriverIsMechanical,      FALSE },
+	{"Samples", 	    "samples",           FOLDER_SAMPLES,      IDI_FOLDER,               0,             0,            NULL,                       DriverUsesSamples,       TRUE },
+	{"Save State",  	"savestate",         FOLDER_SAVESTATE,    IDI_FOLDER,               0,             0,            NULL,                       DriverSupportsSaveState, TRUE },
+	{"BIOS",	    	"bios",		         FOLDER_BIOS,		  IDI_FOLDER,               0,             0,            NULL,                       DriverIsBios,			  TRUE },
+	{"Mechanical",      "mechanical",        FOLDER_MECHANICAL,   IDI_FOLDER,				0,             0,			 NULL,                       DriverIsMechanical,      TRUE },
+	{"Non Mechanical",  "nonmechanical",     FOLDER_NONMECHANICAL,IDI_FOLDER,				0,             0,			 NULL,                       DriverIsMechanical,      FALSE },
 	{ NULL }
 };
 
@@ -132,7 +132,7 @@ extern const DIRECTORYINFO g_directoryInfo[] =
 extern const SPLITTERINFO g_splitterInfo[] =
 {
 	{ 0.25,	IDC_SPLITTER,	IDC_TREE,	IDC_LIST,		AdjustSplitter1Rect },
-//	{ 0.4,	IDC_SPLITTER2,	IDC_LIST,	IDC_SWTAB,		AdjustSplitter1Rect },
+//  { 0.4,  IDC_SPLITTER2,  IDC_LIST,   IDC_SWTAB,      AdjustSplitter1Rect },
 	{ 0.5,	IDC_SPLITTER2,	IDC_LIST,	IDC_SSFRAME,	AdjustSplitter2Rect },
 	{ -1 }
 };

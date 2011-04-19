@@ -1184,7 +1184,7 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 	/* I/O RAM */
 	state->m_modules[0].off_mask = 0x0003f;  /* 32 B */
 	state->m_modules[0].read     = hp48_io_r;
-	state->m_modules[0].read_name     = "hp48_io_r";	
+	state->m_modules[0].read_name     = "hp48_io_r";
 	state->m_modules[0].write    = hp48_io_w;
 	state->m_modules[0].write_name    = "hp48_io_w";
 

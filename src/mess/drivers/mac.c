@@ -786,7 +786,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(macrbv)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 
 	MCFG_VIDEO_START(macsonora)
 	MCFG_VIDEO_RESET(macrbv)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(macrbvvram)
 

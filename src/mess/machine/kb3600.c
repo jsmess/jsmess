@@ -11,7 +11,7 @@
 
     TODO:
 
-	- scan timer clock frequency
+    - scan timer clock frequency
     - more accurate emulation of real chip
 
 */
@@ -170,7 +170,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 //-------------------------------------------------
-//  b_r - 
+//  b_r -
 //-------------------------------------------------
 
 UINT16 ay3600_device::b_r()

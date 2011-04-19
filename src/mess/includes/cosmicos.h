@@ -84,12 +84,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_READ8_MEMBER( dma_r );
-	
+
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
 	void set_ram_mode();
-	
-	
+
+
 	/* CPU state */
 	int m_wait;
 	int m_clear;

@@ -695,7 +695,7 @@ int Picker_GetSelectedItem(HWND hWnd)
 void Picker_SetSelectedPick(HWND hWnd, int nIndex)
 {
 	BOOL res;
-	
+
 	if (nIndex < 0)
 		nIndex = 0;
 
@@ -1355,7 +1355,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		GetClientRect(hWnd, &rcClient);
 		rcTmpBmp.right = rcClient.right;
 		/* We also need to check whether it is the last item
-		   The update region has to be extended to the bottom if it is */
+           The update region has to be extended to the bottom if it is */
 		if (nItem == ListView_GetItemCount(hWnd) - 1)
 			rcTmpBmp.bottom = rcClient.bottom;
 
@@ -1398,7 +1398,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		res = ListView_GetItemRect_Modified(hWnd, nItem, &rect, LVIR_ICON);
 
 		/* indent width of icon + the space between the icon and text
-		 * so left of clone icon starts at text of parent
+         * so left of clone icon starts at text of parent
          */
 		indent_space = rect.right - rect.left + offset;
 	}

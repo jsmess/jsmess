@@ -35,15 +35,15 @@ Notes:
 
 /*
 
-	TODO:
+    TODO:
 
-	- verify cursor keys
-	- language DIP
-	- mouse
-	- investigate unknown ROMs
+    - verify cursor keys
+    - language DIP
+    - mouse
+    - investigate unknown ROMs
     - MCS-48 PC:01DC - Unimplemented opcode = 75
-		- 75 = ENT0 CLK : enable CLK (unscaled_clock/3) output on T0
-		- halt Z2 when Z5 is reset, resume Z2 when Z5 executes ENT0 CLK instruction
+        - 75 = ENT0 CLK : enable CLK (unscaled_clock/3) output on T0
+        - halt Z2 when Z5 is reset, resume Z2 when Z5 executes ENT0 CLK instruction
 
 */
 
@@ -457,7 +457,7 @@ const input_port_token *abc99_device_config::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( abc99 );
 }
-		
+
 
 
 //**************************************************************************
@@ -482,7 +482,7 @@ inline void abc99_device::serial_input()
 inline void abc99_device::serial_output()
 {
 	int so = m_so_z2 & m_so_z5;
-	
+
 	if (m_so != so)
 	{
 		m_so = so;
@@ -605,7 +605,7 @@ void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case TIMER_SERIAL:
 		serial_clock();
 		break;
-		
+
 	case TIMER_MOUSE:
 		scan_mouse();
 		break;
@@ -620,7 +620,7 @@ void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 WRITE8_MEMBER( abc99_device::z2_led_w )
 {
 	if (m_led_en) return;
-	
+
 	output_set_led_value(LED_1, BIT(data, 0));
 	output_set_led_value(LED_2, BIT(data, 1));
 	output_set_led_value(LED_3, BIT(data, 2));
@@ -639,23 +639,23 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 WRITE8_MEMBER( abc99_device::z2_p1_w )
 {
 	/*
-	
-		bit		description
-		
-		P10		serial output
-		P11		KEY DOWN
-		P12		transmit -> Z5 T1
-		P13		INS led
-		P14		ALT led
-		P15		CAPS LOCK led
-		P16		speaker output
-		P17		Z8 enable
-		
-	*/
+
+        bit     description
+
+        P10     serial output
+        P11     KEY DOWN
+        P12     transmit -> Z5 T1
+        P13     INS led
+        P14     ALT led
+        P15     CAPS LOCK led
+        P16     speaker output
+        P17     Z8 enable
+
+    */
 
 	// serial output
 	int so_z2 = BIT(data, 0);
-	
+
 	if (m_so_z2 != so_z2)
 	{
 		m_so_z2 = so_z2;
@@ -675,7 +675,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 
 	// speaker output
 	speaker_level_w(m_speaker, !BIT(data, 6));
-	
+
 	// Z8 enable
 	m_led_en = BIT(data, 7);
 }
@@ -688,20 +688,20 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 READ8_MEMBER( abc99_device::z2_p2_r )
 {
 	/*
-	
-		bit		description
-		
-		P20		
-		P21		
-		P22		
-		P23		
-		P24		
-		P25		DIP0
-		P26		DIP1
-		P27		DIP2
-		
-	*/
-	
+
+        bit     description
+
+        P20
+        P21
+        P22
+        P23
+        P24
+        P25     DIP0
+        P26     DIP1
+        P27     DIP2
+
+    */
+
 	UINT8 data = input_port_read(this, "Z14") << 5;
 
 	return data;
@@ -735,20 +735,20 @@ READ8_MEMBER( abc99_device::z2_t1_r )
 READ8_MEMBER( abc99_device::z5_p1_r )
 {
 	/*
-	
-		bit		description
-		
-		P10		XA
-		P11		XB
-		P12		YA
-		P13		YB
-		P14		LB
-		P15		MB
-		P16		RB
-		P17		input from host
-		
-	*/
-	
+
+        bit     description
+
+        P10     XA
+        P11     XB
+        P12     YA
+        P13     YB
+        P14     LB
+        P15     MB
+        P16     RB
+        P17     input from host
+
+    */
+
 	UINT8 data = 0;
 
 	// mouse buttons
@@ -768,23 +768,23 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 WRITE8_MEMBER( abc99_device::z5_p2_w )
 {
 	/*
-	
-		bit		description
-		
-		P20		
-		P21		
-		P22		
-		P23		
-		P24		Z2 serial input enable
-		P25		Z2 RESET
-		P26		serial output
-		P27		Z2 T1
-		
-	*/
+
+        bit     description
+
+        P20
+        P21
+        P22
+        P23
+        P24     Z2 serial input enable
+        P25     Z2 RESET
+        P26     serial output
+        P27     Z2 T1
+
+    */
 
 	// serial input enable
 	int si_en = BIT(data, 4);
-	
+
 	if (m_si_en != si_en)
 	{
 		m_si_en = si_en;
@@ -793,7 +793,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 
 	// Z2 reset
 	int reset = BIT(data, 5);
-	
+
 	if (m_reset != reset)
 	{
 		m_reset = reset;
@@ -802,7 +802,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 
 	// serial output
 	int so_z5 = BIT(data, 6);
-	
+
 	if (m_so_z5 != so_z5)
 	{
 		m_so_z5 = so_z5;

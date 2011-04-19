@@ -1,6 +1,6 @@
 /*
     psxcard.c - Sony PlayStation memory card device
- 
+
     by pSXAuthor
     MESS conversion by R. Belmont
 */
@@ -68,13 +68,13 @@ void psxcard_device::device_start()
 	memset(cache, 0, 128*1024);
 
 	// save state registrations
-/*	save_item(NAME(pkt));
-	save_item(NAME(pkt_ptr));
-	save_item(NAME(pkt_sz));
-	save_item(NAME(pkt));
-	save_item(NAME(cache));
-	save_item(NAME(addr));
-	save_item(NAME(state));*/
+/*  save_item(NAME(pkt));
+    save_item(NAME(pkt_ptr));
+    save_item(NAME(pkt_sz));
+    save_item(NAME(pkt));
+    save_item(NAME(cache));
+    save_item(NAME(addr));
+    save_item(NAME(state));*/
 }
 
 void psxcard_device::device_reset()
@@ -96,7 +96,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 		case state_illegal:
 			if (to == 0x81)
 			{
-//				printf("CARD: begin\n");
+//              printf("CARD: begin\n");
 				state = state_command;
 				*from = 0x00;
 			}
@@ -126,14 +126,14 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 
 		case state_addr_hi:
 			addr=(to<<8);
-//			printf("addr_hi: %02x, addr = %x\n", to, addr);
+//          printf("addr_hi: %02x, addr = %x\n", to, addr);
 			*from=0;
 			state=state_addr_lo;
 			break;
 
 		case state_addr_lo:
 			addr|=(to&0xff);
-//			printf("addr_lo: %02x, addr = %x, cmd = %x\n", to, addr, cmd);
+//          printf("addr_lo: %02x, addr = %x, cmd = %x\n", to, addr, cmd);
 			*from=(addr>>8);
 
 			switch (cmd)
@@ -169,7 +169,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 
 		case state_read:
 			//assert(to==0);
-//			printf("state_read: pkt_ptr = %d, pkt_sz = %d\n", pkt_ptr, pkt_sz);
+//          printf("state_read: pkt_ptr = %d, pkt_sz = %d\n", pkt_ptr, pkt_sz);
 			*from=pkt[pkt_ptr++];
 			if (pkt_ptr==pkt_sz)
 			{
@@ -228,7 +228,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 	}
 
 	#ifdef debug_card
-//		printf("card: transfer to=%02x from=%02x ret=%c\n",to,*from,ret ? 'T' : 'F');
+//      printf("card: transfer to=%02x from=%02x ret=%c\n",to,*from,ret ? 'T' : 'F');
 	#endif
 
 	return ret;

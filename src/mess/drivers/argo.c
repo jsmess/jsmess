@@ -293,7 +293,7 @@ SCREEN_UPDATE_MEMBER( argo_state )
 
 					/* Take care of flashing characters */
 					//if ((chr & 0x80) && (m_framecnt & 0x08))
-					//	chr = 0x20;
+					//  chr = 0x20;
 
 					chr &= 0x7f;
 

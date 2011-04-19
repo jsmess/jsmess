@@ -44,7 +44,7 @@
 #define VIC1112_INTERFACE(name) \
 	const vic1112_interface (name) =
 
-	
+
 #define VIC1112_IEEE488 \
 	VIC1112_TAG, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, \
 	DEVCB_DEVICE_LINE_MEMBER(VIC1112_TAG, vic1112_device, srq_w), DEVCB_NULL, DEVCB_NULL
@@ -84,7 +84,7 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
-	
+
 private:
 	const char *m_bus_tag;
 };

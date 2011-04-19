@@ -55,7 +55,7 @@ struct DirWatcher
 {
 	HMODULE hKernelModule;
 	READDIRECTORYCHANGESFUNC pfnReadDirectoryChanges;
-	
+
 	HWND hwndTarget;
 	UINT nMessage;
 
@@ -233,7 +233,7 @@ static DWORD WINAPI DirWatcher_ThreadProc(LPVOID lpParameter)
 			// allocate our own copy of the path list
 			pszPathList = (LPSTR) alloca(strlen(pWatcher->pszPathList) + 1);
 			strcpy(pszPathList, pWatcher->pszPathList);
-			
+
 			nSubIndex = 0;
 			do
 			{

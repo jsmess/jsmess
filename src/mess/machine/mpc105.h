@@ -15,7 +15,7 @@
     MCFG_DEVICE_ADD(_tag, MPC105, 0) \
     mpc105_device_config::static_set_cputag(device, _cputag); \
     mpc105_device_config::static_set_bank_base(device, _bankbase); \
-	
+
 // ======================> mpc105_device_config
 
 class mpc105_device_config :  public device_config
@@ -33,7 +33,7 @@ public:
 	// inline configuration helpers
 	static void static_set_bank_base(device_config *device, int bank_base);
 	static void static_set_cputag(device_config *device, const char *tag);
-	
+
 protected:
     // internal state goes here
     int m_bank_base;
@@ -59,7 +59,7 @@ protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-	
+
 	void update_memory();
 
     // internal state
@@ -68,8 +68,8 @@ protected:
 private:
 	int m_bank_base;
 	UINT8 m_bank_enable;
-	UINT32 m_bank_registers[8];	
-	
+	UINT32 m_bank_registers[8];
+
 	required_device<device_t>   m_maincpu;
 };
 

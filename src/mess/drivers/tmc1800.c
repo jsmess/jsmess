@@ -170,7 +170,7 @@ void tmc2000_state::bankswitch()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = ram_get_ptr(m_ram);
 	UINT8 *rom = machine().region(CDP1802_TAG)->base();
-	
+
 	if (m_roc)
 	{
 		// monitor ROM
@@ -356,7 +356,7 @@ static INPUT_PORTS_START( tmc2000 )
 
 	PORT_START("RUN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED(tmc2000_run_pressed, 0)
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')

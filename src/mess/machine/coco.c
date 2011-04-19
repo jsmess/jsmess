@@ -2986,8 +2986,8 @@ MACHINE_START( dgnalpha )
 MACHINE_RESET( dgnalpha )
 {
 	coco_state *state = machine.driver_data<coco_state>();
-//	device_t *fdc = machine.device("wd2797");
-//	wd17xx_set_complete_command_delay(fdc,20);
+//  device_t *fdc = machine.device("wd2797");
+//  wd17xx_set_complete_command_delay(fdc,20);
 
 	/* state->m_dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */

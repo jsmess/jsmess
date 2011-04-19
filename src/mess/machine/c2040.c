@@ -1685,7 +1685,7 @@ DEVICE_GET_INFO( c8050 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8050");							break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c8050");									break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c8050");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}
@@ -1706,7 +1706,7 @@ DEVICE_GET_INFO( c8250 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8250");							break;
 		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c8250");									break;
-	
+
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}
 }

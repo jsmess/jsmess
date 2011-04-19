@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	NeXT
+    NeXT
 
-	05/11/2009 Skeleton driver.
+    05/11/2009 Skeleton driver.
 
-	TODO:
-	- needs MCS1850 RTC device emulation to remove the ROM patch;
+    TODO:
+    - needs MCS1850 RTC device emulation to remove the ROM patch;
 
-	DASM notes:
-	- Jumping to 0x21ee means that the system POST failed
-	- 0x258c: ROM test (check with 0x1a)
+    DASM notes:
+    - Jumping to 0x21ee means that the system POST failed
+    - 0x258c: ROM test (check with 0x1a)
 
 ****************************************************************************/
 
@@ -93,26 +93,26 @@ static READ32_HANDLER( next_scr2_r )
 	if(!space->debugger_access())
 		printf("%08x\n",cpu_get_pc(&space->device()));
 	/*
-	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
-	-x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
-	--x- ---- ---- ---- ---- ---- ---- ---- dsp unpacked
-	---x ---- ---- ---- ---- ---- ---- ---- dsp mode b
-	---- x--- ---- ---- ---- ---- ---- ---- dsp mode a
-	---- -x-- ---- ---- ---- ---- ---- ---- remote int
-	---- ---x ---- ---- ---- ---- ---- ---- local int
-	---- ---- ---x ---- ---- ---- ---- ---- dram 256k
-	---- ---- ---- ---x ---- ---- ---- ---- dram 1m
-	---- ---- ---- ---- x--- ---- ---- ---- "timer on ipl7"
-	---- ---- ---- ---- -xxx ---- ---- ---- rom waitstates
-	---- ---- ---- ---- ---- x--- ---- ---- ROM 1M
-	---- ---- ---- ---- ---- -x-- ---- ---- MCS1850 rtdata
-	---- ---- ---- ---- ---- --x- ---- ---- MCS1850 rtclk
-	---- ---- ---- ---- ---- ---x ---- ---- MCS1850 rtce
-	---- ---- ---- ---- ---- ---- x--- ---- rom overlay
-	---- ---- ---- ---- ---- ---- -x-- ---- dsp ie
-	---- ---- ---- ---- ---- ---- --x- ---- mem en
-	---- ---- ---- ---- ---- ---- ---- ---x led
-	*/
+    x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
+    -x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
+    --x- ---- ---- ---- ---- ---- ---- ---- dsp unpacked
+    ---x ---- ---- ---- ---- ---- ---- ---- dsp mode b
+    ---- x--- ---- ---- ---- ---- ---- ---- dsp mode a
+    ---- -x-- ---- ---- ---- ---- ---- ---- remote int
+    ---- ---x ---- ---- ---- ---- ---- ---- local int
+    ---- ---- ---x ---- ---- ---- ---- ---- dram 256k
+    ---- ---- ---- ---x ---- ---- ---- ---- dram 1m
+    ---- ---- ---- ---- x--- ---- ---- ---- "timer on ipl7"
+    ---- ---- ---- ---- -xxx ---- ---- ---- rom waitstates
+    ---- ---- ---- ---- ---- x--- ---- ---- ROM 1M
+    ---- ---- ---- ---- ---- -x-- ---- ---- MCS1850 rtdata
+    ---- ---- ---- ---- ---- --x- ---- ---- MCS1850 rtclk
+    ---- ---- ---- ---- ---- ---x ---- ---- MCS1850 rtce
+    ---- ---- ---- ---- ---- ---- x--- ---- rom overlay
+    ---- ---- ---- ---- ---- ---- -x-- ---- dsp ie
+    ---- ---- ---- ---- ---- ---- --x- ---- mem en
+    ---- ---- ---- ---- ---- ---- ---- ---x led
+    */
 
 	return state->m_scr2;
 }
@@ -128,14 +128,14 @@ static WRITE32_HANDLER( next_scr2_w )
 static READ32_HANDLER( next_scr1_r )
 {
 	/*
-		xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
-		---- ---- xxxx xxxx ---- ---- ---- ---- DMA type
-		---- ---- ---- ---- xxxx ---- ---- ---- cpu type
-		---- ---- ---- ---- ---- xxxx ---- ---- board revision
-		---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
-		---- ---- ---- ---- ---- ---- ---x x--- mem speed
-		---- ---- ---- ---- ---- ---- ---- -xxx cpu speed
-	*/
+        xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
+        ---- ---- xxxx xxxx ---- ---- ---- ---- DMA type
+        ---- ---- ---- ---- xxxx ---- ---- ---- cpu type
+        ---- ---- ---- ---- ---- xxxx ---- ---- board revision
+        ---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
+        ---- ---- ---- ---- ---- ---- ---x x--- mem speed
+        ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed
+    */
 
 	return 0x00012002; // TODO
 }

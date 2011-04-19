@@ -1520,7 +1520,7 @@ void nes_partialhash(hash_collection &dest, const unsigned char *data,
 {
 	if (length <= 16)
 		return;
-	dest.compute(&data[16], length - 16, functions);	
+	dest.compute(&data[16], length - 16, functions);
 }
 
 /**************************

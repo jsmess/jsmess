@@ -1,10 +1,10 @@
 /***************************************************************************
 
     Skeleton driver for HP9816 (HP Series 200 series, Technical Desktops)
- 
+
     see for docs: http://www.hpmuseum.net/collection_document.php
- 
-	TODO: everything!
+
+    TODO: everything!
 
 ****************************************************************************/
 

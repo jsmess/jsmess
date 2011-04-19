@@ -61,7 +61,7 @@ static struct {
 	UINT8	cga_palette_lut_2bpp[4];
 	UINT8	vsync;
 	UINT8	hsync;
-	
+
 	UINT8  *videoram;
 } aga;
 

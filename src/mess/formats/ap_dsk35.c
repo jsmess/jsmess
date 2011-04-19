@@ -55,30 +55,30 @@
         761     pad byte where head is turned off (0xFF here)
 
     MFM Track layout for 1440K disks:
-    	Pos	
-	--------- track ID
-	0	0x4E (x80)
-	80	00 (x12)
-	92	C2 (x3) Mark byte
-	93	FC Index mark
-	94	4E (x50)
-	--------- sector ID
-	144	00 (x12)
-	156	A1 (x3) Mark byte
-	159	FE Address mark
-	160	xx Track number
-	161	xx Side number
-	162	xx Sector number
-	163	xx Sector length
-	164/165	xx CRC
-	166	4E (x22)
-	--------- sector data
-	188	00 (x12)
-	200	A1 (x3) Mark byte
-	203	FB Data address mark
-	204	xx (x256) data
-	460	4E (x54)
-	(repeat from sector ID to fill track; end of track is padded with 4E)
+        Pos
+    --------- track ID
+    0   0x4E (x80)
+    80  00 (x12)
+    92  C2 (x3) Mark byte
+    93  FC Index mark
+    94  4E (x50)
+    --------- sector ID
+    144 00 (x12)
+    156 A1 (x3) Mark byte
+    159 FE Address mark
+    160 xx Track number
+    161 xx Side number
+    162 xx Sector number
+    163 xx Sector length
+    164/165 xx CRC
+    166 4E (x22)
+    --------- sector data
+    188 00 (x12)
+    200 A1 (x3) Mark byte
+    203 FB Data address mark
+    204 xx (x256) data
+    460 4E (x54)
+    (repeat from sector ID to fill track; end of track is padded with 4E)
 
     Note : "Self synch refers to a technique whereby two zeroes are inserted
     between each synch byte written to the disk.", i.e. "0xFF, 0xFF, 0xFF,
@@ -476,7 +476,7 @@ static UINT32 apple35_get_offset(floppy_image *floppy, int head, int track, int 
 static floperr_t apple35_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	UINT32 data_offset;
-//	printf("Read sector: T %d S %d H %d\n", track, sector, head);
+//  printf("Read sector: T %d S %d H %d\n", track, sector, head);
 	data_offset = apple35_get_offset(floppy, head, track, sector, NULL);
 	if (data_offset == ~0)
 		return FLOPPY_ERROR_SEEKERROR;
@@ -506,7 +506,7 @@ static floperr_t apple35_read_sector_td(floppy_image *floppy, int head, int trac
 
 	assert(buflen == 524);
 
-//	printf("Read sector TD: T %d S %d H %d\n", track, sector, head);
+//  printf("Read sector TD: T %d S %d H %d\n", track, sector, head);
 
 	/* first read the sector */
 	err = apple35_read_sector(floppy, head, track, sector, ((UINT8 *) buffer) + 12, 512);

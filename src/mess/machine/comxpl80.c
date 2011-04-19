@@ -1,8 +1,8 @@
 /*
 
-	TODO:
+    TODO:
 
-	- CPU type?
+    - CPU type?
 
 */
 
@@ -173,7 +173,7 @@ const input_port_token *comxpl80_device_config::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( comxpl80 );
 }
-		
+
 
 
 //**************************************************************************
@@ -219,7 +219,7 @@ void comxpl80_device::device_reset()
 
 
 //-------------------------------------------------
-//  pa_w - 
+//  pa_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( comxpl80_device::pa_w )
@@ -271,7 +271,7 @@ WRITE8_MEMBER( comxpl80_device::pa_w )
 
 
 //-------------------------------------------------
-//  pb_w - 
+//  pb_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( comxpl80_device::pb_w )
@@ -298,7 +298,7 @@ WRITE8_MEMBER( comxpl80_device::pb_w )
 
 
 //-------------------------------------------------
-//  pc_w - 
+//  pc_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( comxpl80_device::pc_w )
@@ -328,7 +328,7 @@ WRITE8_MEMBER( comxpl80_device::pc_w )
 
 
 //-------------------------------------------------
-//  pd_r - 
+//  pd_r -
 //-------------------------------------------------
 
 READ8_MEMBER( comxpl80_device::pd_r )

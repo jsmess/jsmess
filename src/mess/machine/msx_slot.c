@@ -1193,7 +1193,7 @@ MSX_SLOT_LOADSRAM(gmaster2)
 	UINT8 *p;
 
 	p = state->m_cart.sram.mem;
-	
+
 	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_READ);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)

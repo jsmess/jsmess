@@ -1079,7 +1079,7 @@ int c128_dma_read_color(running_machine &machine, int offset)
 WRITE8_DEVICE_HANDLER(c128_m6510_port_write)
 {
 	c128_state *state = device->machine().driver_data<c128_state>();
-	
+
 	UINT8 direction = offset; // HACK ALERT!
 
 	/* if line is marked as input then keep current value */

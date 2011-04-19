@@ -50,11 +50,11 @@ public:
 	DECLARE_WRITE16_MEMBER( z_mode_w );
 	DECLARE_WRITE16_MEMBER( color_status_w );
 	DECLARE_READ16_MEMBER( sync_r );
-	
+
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_t *bitmap);
 	void draw_overlay(screen_device *screen, bitmap_t *bitmap);
-		
+
 	/* interrupt state */
 	UINT16 m_int_mask;
 

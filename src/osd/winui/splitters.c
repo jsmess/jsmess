@@ -10,12 +10,12 @@
   that you have read the license and understand and accept it fully.
 
  ***************************************************************************/
- 
+
  /***************************************************************************
 
   splitters.c
 
-  Splitter GUI code. - Tree, spliiter, list, splitter, pict 
+  Splitter GUI code. - Tree, spliiter, list, splitter, pict
 
   Created 12/03/98 (C) by Mike Haaland (mhaaland@hypertech.com)
 
@@ -56,13 +56,13 @@ BOOL InitSplitters(void)
 
 	splitter = (HZSPLITTER*)malloc(sizeof(HZSPLITTER) * nSplitterCount);
 	if (!splitter)
-		goto error;		
+		goto error;
 	memset(splitter, 0, sizeof(HZSPLITTER) * nSplitterCount);
 
 	nSplitterOffset = (int*)malloc(sizeof(int) * nSplitterCount);
 	if (!nSplitterOffset)
-		goto error;		
-	memset(nSplitterOffset, 0, sizeof(int) * nSplitterCount);	
+		goto error;
+	memset(nSplitterOffset, 0, sizeof(int) * nSplitterCount);
 
 	return TRUE;
 
@@ -142,13 +142,13 @@ void AdjustSplitter1Rect(HWND hWnd, LPRECT lpRect)
 void RecalcSplitters(void)
 {
 	int 	i;
-	
+
 	for (i = 0; i < numSplitters; i++)
 	{
 		CalcSplitter(GetParent(splitter[i].m_hWnd), &splitter[i]);
 		nSplitterOffset[i] = splitter[i].m_dragRect.left;
 	}
-	
+
 	for (i = numSplitters - 1; i >= 0; i--)
 	{
 		CalcSplitter(GetParent(splitter[i].m_hWnd), &splitter[i]);
@@ -332,7 +332,7 @@ void OnMouseMove(HWND hWnd, UINT nFlags, POINTS p)
 
 		// Erase the old tracking image
 		OnInvertTracker(hWnd, &lpCurSpltr->m_dragRect);
-		
+
 		// calc the new one based on p.x draw it
 		nWidth = lpCurSpltr->m_dragRect.right - lpCurSpltr->m_dragRect.left;
 		lpCurSpltr->m_dragRect.right = pt.x + nWidth / 2;

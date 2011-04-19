@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
 	MCFG_CPU_IO_MAP(kb_cop_io_map)
 	MCFG_CPU_CONFIG(cop_intf)
-	
+
 	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
 

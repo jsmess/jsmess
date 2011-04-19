@@ -307,7 +307,7 @@ const input_port_token *abc77_device_config::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( abc77 );
 }
-		
+
 
 
 //**************************************************************************
@@ -420,7 +420,7 @@ void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case TIMER_SERIAL:
 		serial_clock();
 		break;
-		
+
 	case TIMER_RESET:
 		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
 		break;
@@ -435,19 +435,19 @@ void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 READ8_MEMBER( abc77_device::p1_r )
 {
 	/*
-	
-		bit		description
-		
-		P10		Z17 Y0
-		P11		Z17 Y1
-		P12		Z17 Y2
-		P13		Z17 Y3
-		P14		Z17 Y4
-		P15		Z17 Y5
-		P16		Z17 Y6
-		P17		Z17 Y7
-		
-	*/
+
+        bit     description
+
+        P10     Z17 Y0
+        P11     Z17 Y1
+        P12     Z17 Y2
+        P13     Z17 Y3
+        P14     Z17 Y4
+        P15     Z17 Y5
+        P16     Z17 Y6
+        P17     Z17 Y7
+
+    */
 
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
 
@@ -462,19 +462,19 @@ READ8_MEMBER( abc77_device::p1_r )
 WRITE8_MEMBER( abc77_device::p2_w )
 {
 	/*
-	
-		bit		description
-		
-		P20		Z2 A0
-		P21		Z2 A1
-		P22		Z2 A2
-		P23		Z2 A3
-		P24		NE556 2,6
-		P25		TxD
-		P26		_KEYDOWN
-		P27		Z17 HYS
-		
-	*/
+
+        bit     description
+
+        P20     Z2 A0
+        P21     Z2 A1
+        P22     Z2 A2
+        P23     Z2 A3
+        P24     NE556 2,6
+        P25     TxD
+        P26     _KEYDOWN
+        P27     Z17 HYS
+
+    */
 
 	m_keylatch = data & 0x0f;
 

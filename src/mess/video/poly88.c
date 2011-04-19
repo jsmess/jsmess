@@ -90,9 +90,9 @@ SCREEN_UPDATE( poly88 )
 					for(b = 0; b < 7; b++ )
 						*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) =  (l >> (6-b)) & 1;
 
-				  	*BITMAP_ADDR16(bitmap, y*15+j, xpos+7 ) =  0;
-				  	*BITMAP_ADDR16(bitmap, y*15+j, xpos+8 ) =  0;
-				  	*BITMAP_ADDR16(bitmap, y*15+j, xpos+9 ) =  0;
+					*BITMAP_ADDR16(bitmap, y*15+j, xpos+7 ) =  0;
+					*BITMAP_ADDR16(bitmap, y*15+j, xpos+8 ) =  0;
+					*BITMAP_ADDR16(bitmap, y*15+j, xpos+9 ) =  0;
 				}
 			}
 			xpos += 10;

@@ -333,7 +333,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
 				hIcon = LoadIconFromFile(buffer);
 				if (hIcon)
 					break;
-				
+
 				int cl = driver_list::clone(*drv);
 				if (cl!=-1) drv = &driver_list::driver(cl); else drv = NULL;
 			}

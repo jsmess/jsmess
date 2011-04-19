@@ -16,7 +16,7 @@ void pc8401a_state::video_start()
 bool pc8401a_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	m_lcdc->update_screen(&bitmap, &cliprect);
-	
+
 	return 0;
 }
 
@@ -31,15 +31,15 @@ bool pc8500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	m_lcdc->update_screen(&bitmap, &cliprect);
 
 	/*
-	if (strcmp(screen.tag(), SCREEN_TAG) == 0)
-	{
-		sed1330_update(m_lcdc, &bitmap, &cliprect);
-	}
-	else
-	{
-		mc6845_update(m_crtc, &bitmap, &cliprect);
-	}
-	*/
+    if (strcmp(screen.tag(), SCREEN_TAG) == 0)
+    {
+        sed1330_update(m_lcdc, &bitmap, &cliprect);
+    }
+    else
+    {
+        mc6845_update(m_crtc, &bitmap, &cliprect);
+    }
+    */
 
 	return 0;
 }
@@ -62,7 +62,7 @@ static MC6845_UPDATE_ROW( pc8441a_update_row )
 {
 }
 
-static const mc6845_interface pc8441a_mc6845_interface = 
+static const mc6845_interface pc8441a_mc6845_interface =
 {
 	CRT_SCREEN_TAG,
 	6,
@@ -106,7 +106,7 @@ MACHINE_CONFIG_FRAGMENT( pc8500_video )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(480, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
-	
+
 	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8500_lcdc)
 
 	/* PC-8441A CRT */
@@ -116,6 +116,6 @@ MACHINE_CONFIG_FRAGMENT( pc8500_video )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
-	
+
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, 400000, pc8441a_mc6845_interface)
 MACHINE_CONFIG_END

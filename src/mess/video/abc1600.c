@@ -2,9 +2,9 @@
 
     TODO:
 
-	- FRAME POL
-	- landscape/portrait mode
-	- position image based on vsync/hsync
+    - FRAME POL
+    - landscape/portrait mode
+    - position image based on vsync/hsync
 
 */
 
@@ -103,7 +103,7 @@ READ8_MEMBER( abc1600_state::video_ram_r )
 {
 	UINT32 addr = (offset & 0x7fffe) >> 1;
 	UINT8 data = 0;
-	
+
 	if (offset & 0x01)
 	{
 		data = m_video_ram[addr] & 0xff;
@@ -140,7 +140,7 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 			if (LOG) logerror("GMDI LB %02x -> %04x\n", data, m_gmdi);
 		}
 
-//		m_wrm = 0xffff;
+//      m_wrm = 0xffff;
 		write_videoram(addr, m_gmdi, m_wrm & 0x00ff);
 
 		if (LOG) logerror("Video RAM write LB to %05x : %04x\n", addr, m_video_ram[addr]);
@@ -160,7 +160,7 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 			if (LOG) logerror("GMDI HB %02x -> %04x\n", data, m_gmdi);
 		}
 
-//		m_wrm = 0xffff;
+//      m_wrm = 0xffff;
 		write_videoram(addr, m_gmdi, m_wrm & 0xff00);
 
 		if (LOG) logerror("Video RAM write HB to %05x : %04x\n", addr, m_video_ram[addr]);
@@ -176,24 +176,24 @@ READ8_MEMBER( abc1600_state::iord0_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		0
-		1		SCREENPOS
-		2		
-		3		
-		4		
-		5		
-		6		VSYNC
-		7		BUSY
+        0       0
+        1       SCREENPOS
+        2
+        3
+        4
+        5
+        6       VSYNC
+        7       BUSY
 
-	*/
+    */
 
 	UINT8 data = 0;
 
 	// monitor orientation (portrait/landscape)
-//	data |= 0x02;
-	
+//  data |= 0x02;
+
 	// vertical sync
 	data |= m_vs << 6;
 
@@ -212,117 +212,117 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDSX_HB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		XSIZE8
-			1		XSIZE9
-			2		U/D* Y
-			3		U/D* X
-			4		
-			5		
-			6		
-			7		
+            0       XSIZE8
+            1       XSIZE9
+            2       U/D* Y
+            3       U/D* X
+            4
+            5
+            6
+            7
 
-		*/
-		
+        */
+
 		m_xsize = ((data & 0x03) << 8) | (m_xsize & 0xff);
 		m_udy = BIT(data, 2);
 		m_udx = BIT(data, 3);
 		break;
-		
+
 	case LDSX_LB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		XSIZE0
-			1		XSIZE1
-			2		XSIZE2
-			3		XSIZE3
-			4		XSIZE4
-			5		XSIZE5
-			6		XSIZE6
-			7		XSIZE7
+            0       XSIZE0
+            1       XSIZE1
+            2       XSIZE2
+            3       XSIZE3
+            4       XSIZE4
+            5       XSIZE5
+            6       XSIZE6
+            7       XSIZE7
 
-		*/
-		
+        */
+
 		m_xsize = (m_xsize & 0x300) | data;
 		break;
-		
+
 	case LDSY_HB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		Y size 8
-			1		Y size 9
-			2		Y size 10
-			3		Y size 11
-			4		
-			5		
-			6		
-			7		
+            0       Y size 8
+            1       Y size 9
+            2       Y size 10
+            3       Y size 11
+            4
+            5
+            6
+            7
 
-		*/
-		
+        */
+
 		m_ysize = ((data & 0x0f) << 8) | (m_ysize & 0xff);
 		break;
-		
+
 	case LDSY_LB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		Y size 0
-			1		Y size 1
-			2		Y size 2
-			3		Y size 3
-			4		Y size 4
-			5		Y size 5
-			6		Y size 6
-			7		Y size 7
+            0       Y size 0
+            1       Y size 1
+            2       Y size 2
+            3       Y size 3
+            4       Y size 4
+            5       Y size 5
+            6       Y size 6
+            7       Y size 7
 
-		*/
-		
+        */
+
 		m_ysize = (m_ysize & 0xf00) | data;
 		break;
-		
+
 	case LDTX_HB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		XTO8, MTA4
-			1		XTO9, MTA5
-			2		
-			3		
-			4		
-			5		
-			6		
-			7		
+            0       XTO8, MTA4
+            1       XTO9, MTA5
+            2
+            3
+            4
+            5
+            6
+            7
 
-		*/
-		
+        */
+
 		m_xto = ((data & 0x03) << 8) | (m_xto & 0xff);
 		m_mta = (m_mta & 0x3ffcf) | ((data & 0x03) << 4);
 		break;
-		
+
 	case LDTX_LB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		XTO0
-			1		XTO1
-			2		XTO2
-			3		XTO3
-			4		XTO4, MTA0
-			5		XTO5, MTA1
-			6		XTO6, MTA2
-			7		XTO7, MTA3
+            0       XTO0
+            1       XTO1
+            2       XTO2
+            3       XTO3
+            4       XTO4, MTA0
+            5       XTO5, MTA1
+            6       XTO6, MTA2
+            7       XTO7, MTA3
 
-		*/
-		
+        */
+
 		m_xto = (m_xto & 0x300) | data;
 		m_mta = (m_mta & 0x3fff0) | (data >> 4);
 		break;
@@ -330,19 +330,19 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDTY_HB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		YTO8, MTA14
-			1		YTO9, MTA15
-			2		YTO10, MTA16
-			3		YTO11, MTA17
-			4		
-			5		
-			6		
-			7		
+            0       YTO8, MTA14
+            1       YTO9, MTA15
+            2       YTO10, MTA16
+            3       YTO11, MTA17
+            4
+            5
+            6
+            7
 
-		*/
-		
+        */
+
 		m_yto = (data << 8) | (m_yto & 0xff);
 		m_mta = ((data & 0x0f) << 14) | (m_mta & 0x3fff);
 		break;
@@ -350,19 +350,19 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDTY_LB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		YTO0, MTA6
-			1		YTO1, MTA7
-			2		YTO2, MTA8
-			3		YTO3, MTA9
-			4		YTO4, MTA10
-			5		YTO5, MTA11
-			6		YTO6, MTA12
-			7		YTO7, MTA13
+            0       YTO0, MTA6
+            1       YTO1, MTA7
+            2       YTO2, MTA8
+            3       YTO3, MTA9
+            4       YTO4, MTA10
+            5       YTO5, MTA11
+            6       YTO6, MTA12
+            7       YTO7, MTA13
 
-		*/
-		
+        */
+
 		m_yto = (m_yto & 0xf00) | data;
 		m_mta = (m_mta & 0x3c03f) | (data << 6);
 		break;
@@ -381,98 +381,98 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case LDFX_HB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		XFROM8, MFA4
-			1		XFROM9, MFA5
-			2		
-			3		
-			4		
-			5		
-			6		
-			7		
+            0       XFROM8, MFA4
+            1       XFROM9, MFA5
+            2
+            3
+            4
+            5
+            6
+            7
 
-		*/
+        */
 
 		m_xfrom = ((data & 0x03) << 8) | (m_xfrom & 0xff);
 		m_mfa = (m_mfa & 0x3ffcf) | ((data & 0x03) << 4);
 		break;
-		
+
 	case LDFX_LB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		XFROM0
-			1		XFROM1
-			2		XFROM2
-			3		XFROM3
-			4		XFROM4, MFA0
-			5		XFROM5, MFA1
-			6		XFROM6, MFA2
-			7		XFROM7, MFA3
+            0       XFROM0
+            1       XFROM1
+            2       XFROM2
+            3       XFROM3
+            4       XFROM4, MFA0
+            5       XFROM5, MFA1
+            6       XFROM6, MFA2
+            7       XFROM7, MFA3
 
-		*/
+        */
 
 		m_xfrom = (m_xfrom & 0x300) | data;
 		m_mfa = (m_mfa & 0x3fff0) | (data >> 4);
 		break;
-		
+
 	case LDFY_HB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		MFA14
-			1		MFA15
-			2		MFA16
-			3		MFA17
-			4		
-			5		
-			6		
-			7		
+            0       MFA14
+            1       MFA15
+            2       MFA16
+            3       MFA17
+            4
+            5
+            6
+            7
 
-		*/
+        */
 
 		m_mfa = ((data & 0x0f) << 14) | (m_mfa & 0x3fff);
 		break;
-		
+
 	case LDFY_LB:
 		/*
 
-			bit		description
+            bit     description
 
-			0		MFA6
-			1		MFA7
-			2		MFA8
-			3		MFA9
-			4		MFA10
-			5		MFA11
-			6		MFA12
-			7		MFA13
+            0       MFA6
+            1       MFA7
+            2       MFA8
+            3       MFA9
+            4       MFA10
+            5       MFA11
+            6       MFA12
+            7       MFA13
 
-		*/
+        */
 
 		m_mfa = (m_mfa & 0x3c03f) | (data << 6);
-		
+
 		mover();
 		break;
-		
+
 	case WRML:
 		/*
 
-			bit		description
+            bit     description
 
-			0		MOVE CYK CLK
-			1		DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
-			2		DATA CLK
-			3		_DISP MEM WE
-			4		_CAS HB
-			5		DTACK CLK / BLANK TEST (+2 PIXCLK)
-			6		DISPREC CLK
-			7		_RAS HB
+            0       MOVE CYK CLK
+            1       DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
+            2       DATA CLK
+            3       _DISP MEM WE
+            4       _CAS HB
+            5       DTACK CLK / BLANK TEST (+2 PIXCLK)
+            6       DISPREC CLK
+            7       _RAS HB
 
-		*/
+        */
 
 		if (LOG) logerror("MS %u : %02x\n", (offset >> 4) & 0x0f, data);
 
@@ -481,22 +481,22 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 			m_ms[(offset >> 4) & 0x0f] = data;
 		}
 		break;
-		
+
 	case WRDL:
 		/*
 
-			bit		description
+            bit     description
 
-			0		MOVE CYK CLK
-			1		DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
-			2		DATA CLK
-			3		_DISP MEM WE
-			4		_CAS HB
-			5		DTACK CLK / BLANK TEST (+2 PIXCLK)
-			6		DISPREC CLK
-			7		_RAS HB
+            0       MOVE CYK CLK
+            1       DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
+            2       DATA CLK
+            3       _DISP MEM WE
+            4       _CAS HB
+            5       DTACK CLK / BLANK TEST (+2 PIXCLK)
+            6       DISPREC CLK
+            7       _RAS HB
 
-		*/
+        */
 
 		if (LOG) logerror("WS %u : %02x\n", (offset >> 4) & 0x0f, data);
 
@@ -531,7 +531,7 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 			if (LOG) logerror("WRM HB %04x\n", m_gmdi);
 		}
 		break;
-		
+
 	case WRMASK_STROBE_LB:
 		if (REPLACE)
 		{
@@ -551,27 +551,27 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 		if (LOG) logerror("ENABLE CLOCKS\n");
 		m_clocks_disabled = 0;
 		break;
-		
+
 	case FLAG_STROBE:
 		/*
-		
-			bit		description
-			
-			0		L/_P FLAG
-			1		BLANK FLAG
-			2		PIX POL
-			3		FRAME POL
-			4		HOLD FY
-			5		HOLD FX
-			6		COMP MOVE FLAG
-			7		REPLACE/SET & RESET
-		
-		*/
+
+            bit     description
+
+            0       L/_P FLAG
+            1       BLANK FLAG
+            2       PIX POL
+            3       FRAME POL
+            4       HOLD FY
+            5       HOLD FX
+            6       COMP MOVE FLAG
+            7       REPLACE/SET & RESET
+
+        */
 
 		m_flag = data;
 		if (LOG) logerror("FLAG %02x\n", m_flag);
 		break;
-		
+
 	case ENDISP:
 		if (LOG) logerror("ENDISP\n");
 		m_endisp = 1;
@@ -586,14 +586,14 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  clock_mfa_x - 
+//  clock_mfa_x -
 //-------------------------------------------------
 
 inline void abc1600_state::clock_mfa_x()
 {
 	UINT16 mfa_y = m_mfa >> 6;
 	UINT8 mfa_x = m_mfa & 0x3f;
-	
+
 	if (!HOLD_FX)
 	{
 		mfa_x += m_udx ? 1 : -1;
@@ -605,7 +605,7 @@ inline void abc1600_state::clock_mfa_x()
 
 
 //-------------------------------------------------
-//  clock_mfa_y - 
+//  clock_mfa_y -
 //-------------------------------------------------
 
 inline void abc1600_state::clock_mfa_y()
@@ -624,7 +624,7 @@ inline void abc1600_state::clock_mfa_y()
 
 
 //-------------------------------------------------
-//  clock_mta_x - 
+//  clock_mta_x -
 //-------------------------------------------------
 
 inline void abc1600_state::clock_mta_x()
@@ -640,7 +640,7 @@ inline void abc1600_state::clock_mta_x()
 
 
 //-------------------------------------------------
-//  clock_mta_y - 
+//  clock_mta_y -
 //-------------------------------------------------
 
 inline void abc1600_state::clock_mta_y()
@@ -656,7 +656,7 @@ inline void abc1600_state::clock_mta_y()
 
 
 //-------------------------------------------------
-//  load_mfa_x - 
+//  load_mfa_x -
 //-------------------------------------------------
 
 inline void abc1600_state::load_mfa_x()
@@ -669,7 +669,7 @@ inline void abc1600_state::load_mfa_x()
 
 
 //-------------------------------------------------
-//  load_mta_x - 
+//  load_mta_x -
 //-------------------------------------------------
 
 inline void abc1600_state::load_mta_x()
@@ -682,14 +682,14 @@ inline void abc1600_state::load_mta_x()
 
 
 //-------------------------------------------------
-//  compare_mta_x - 
+//  compare_mta_x -
 //-------------------------------------------------
 
 inline void abc1600_state::compare_mta_x()
 {
 	UINT8 mta_x_end = ((m_xto + m_xsize) >> 4) & 0x3f;
 	UINT8 mta_x = m_mta & 0x3f;
-	
+
 	if (mta_x == mta_x_end)
 	{
 		m_cmc = 0;
@@ -700,14 +700,14 @@ inline void abc1600_state::compare_mta_x()
 
 
 //-------------------------------------------------
-//  compare_mta_y - 
+//  compare_mta_y -
 //-------------------------------------------------
 
 inline void abc1600_state::compare_mta_y()
 {
 	int mta_y_end = (m_yto + m_ysize) & 0xfff;
 	UINT16 mta_y = m_mta >> 6;
-	
+
 	if (mta_y == mta_y_end)
 	{
 		m_rmc = 0;
@@ -716,27 +716,27 @@ inline void abc1600_state::compare_mta_y()
 
 
 //-------------------------------------------------
-//  get_shinf - 
+//  get_shinf -
 //-------------------------------------------------
 
 inline void abc1600_state::get_shinf()
 {
 	/*
-		
-		bit		description
-		
-		A0		XFROM0
-		A1		XFROM1
-		A2		XFROM2
-		A3		XFROM3
-		A4		XTO0
-		A5		XTO1
-		A6		XTO2
-		A7		XTO3
-		A8		U/D* X
-		
-	*/
-	
+
+        bit     description
+
+        A0      XFROM0
+        A1      XFROM1
+        A2      XFROM2
+        A3      XFROM3
+        A4      XTO0
+        A5      XTO1
+        A6      XTO2
+        A7      XTO3
+        A8      U/D* X
+
+    */
+
 	UINT16 shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
 	UINT8 shinf = m_shinf_rom[shinf_addr];
 
@@ -746,28 +746,28 @@ inline void abc1600_state::get_shinf()
 
 
 //-------------------------------------------------
-//  get_drmsk - 
+//  get_drmsk -
 //-------------------------------------------------
 
 inline UINT16 abc1600_state::get_drmsk()
 {
 	/*
-		
-		bit		description
-		
-		A0		SH0
-		A1		SH1
-		A2		SH2
-		A3		SH3
-		A4		U/D* X
-		
-	*/
-	
+
+        bit     description
+
+        A0      SH0
+        A1      SH1
+        A2      SH2
+        A3      SH3
+        A4      U/D* X
+
+    */
+
 	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
 	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
 	UINT8 drmskh = m_drmsk_rom[drmsk_addr + 0x20];
 	UINT16 drmsk = (drmskh << 8) | drmskl;
-	
+
 	return drmsk;
 }
 
@@ -779,35 +779,35 @@ inline UINT16 abc1600_state::get_drmsk()
 inline UINT16 abc1600_state::get_wrmsk()
 {
 	/*
-		
-		bit		description
-		
-		A0		XTO0
-		A1		XTO1
-		A2		XTO2
-		A3		XTO3
-		A4		XSIZE0
-		A5		XSIZE1
-		A6		XSIZE2
-		A7		XSIZE3
-		A8		U/D* X
-		A9		ANDED MASKS
-		A10		WRMS0
-		A11		WRMS1
-		
-	*/
-	
+
+        bit     description
+
+        A0      XTO0
+        A1      XTO1
+        A2      XTO2
+        A3      XTO3
+        A4      XSIZE0
+        A5      XSIZE1
+        A6      XSIZE2
+        A7      XSIZE3
+        A8      U/D* X
+        A9      ANDED MASKS
+        A10     WRMS0
+        A11     WRMS1
+
+    */
+
 	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 & !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
 	UINT8 wrmskl = m_wrmsk_rom[wrmsk_addr];
 	UINT8 wrmskh = m_wrmsk_rom[wrmsk_addr + 0x1000];
 	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
-	
+
 	return wrmsk ^ 0xffff;
 }
 
 
 //-------------------------------------------------
-//  barrel_shift - 
+//  barrel_shift -
 //-------------------------------------------------
 
 inline UINT16 abc1600_state::barrel_shift(UINT16 gmdr)
@@ -826,7 +826,7 @@ inline UINT16 abc1600_state::barrel_shift(UINT16 gmdr)
 
 
 //-------------------------------------------------
-//  word_mixer - 
+//  word_mixer -
 //-------------------------------------------------
 
 inline UINT16 abc1600_state::word_mixer(UINT16 rot)
@@ -838,7 +838,7 @@ inline UINT16 abc1600_state::word_mixer(UINT16 rot)
 	{
 		gmdi ^= 0xffff;
 	}
-	
+
 	m_mdor = rot;
 
 	return gmdi;
@@ -846,7 +846,7 @@ inline UINT16 abc1600_state::word_mixer(UINT16 rot)
 
 
 //-------------------------------------------------
-//  mover - 
+//  mover -
 //-------------------------------------------------
 
 void abc1600_state::mover()
@@ -857,7 +857,7 @@ void abc1600_state::mover()
 
 	m_rmc = 1;
 	get_shinf();
-	
+
 	do
 	{
 		compare_mta_y();
@@ -873,31 +873,31 @@ void abc1600_state::mover()
 			UINT16 gmdr = read_videoram(m_mfa);
 			UINT16 rot = barrel_shift(gmdr);
 			word_mixer(rot);
-			
+
 			clock_mfa_x();
 		}
-		
+
 		do
 		{
 			compare_mta_x();
-			
+
 			UINT16 gmdr = read_videoram(m_mfa);
 			UINT16 rot = barrel_shift(gmdr);
 			UINT16 gmdi = word_mixer(rot);
 			UINT16 mask = get_wrmsk();
-			
+
 			write_videoram(m_mta, gmdi, mask);
-		
+
 			clock_mfa_x();
 			clock_mta_x();
-			
+
 			m_wrms0 = 1;
 		}
 		while (m_cmc);
-		
+
 		clock_mfa_y();
 		clock_mta_y();
-	} 
+	}
 	while (m_rmc);
 
 	m_amm = 0;
@@ -916,27 +916,27 @@ void abc1600_state::mover()
 inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 {
 	/*
-		
-		bit			description
 
-		CRTCA0		0
-		CRTCA1		0
-		CRTCA2		CC1/MA1
-		CRTCA3		CC2/MA2
-		CRTCA4		CC3/MA3
-		CRTCA5		CC4/MA4
-		CRTCA6		RA0
-		CRTCA7		RA1
-		CRTCA8		RA2
-		CRTCA9		RA3
-		CRTCA10		CR0/MA8
-		CRTCA11		CR1/MA9
-		CRTCA12		CR2/MA10
-		CRTCA13		CR3/MA11
-		CRTCA14		CR4/MA12
-		CRTCA15		CR5/MA13
+        bit         description
 
-	*/
+        CRTCA0      0
+        CRTCA1      0
+        CRTCA2      CC1/MA1
+        CRTCA3      CC2/MA2
+        CRTCA4      CC3/MA3
+        CRTCA5      CC4/MA4
+        CRTCA6      RA0
+        CRTCA7      RA1
+        CRTCA8      RA2
+        CRTCA9      RA3
+        CRTCA10     CR0/MA8
+        CRTCA11     CR1/MA9
+        CRTCA12     CR2/MA10
+        CRTCA13     CR3/MA11
+        CRTCA14     CR4/MA12
+        CRTCA15     CR5/MA13
+
+    */
 
 	UINT8 cc = (ma & 0xff) + column;
 	UINT8 cr = ma >> 8;
@@ -951,18 +951,18 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const re
 	for (int column = 0; column < x_count; column += 2)
 	{
 		UINT16 dma = get_crtca(ma, ra, column);
-		
+
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
 		for (int cas = 0; cas < 4; cas++)
 		{
 			UINT16 data = m_video_ram[dma + cas];
-		
+
 			for (int bit = 0; bit < 16; bit++)
 			{
 				int color = (BIT(data, 15) ^ PIX_POL) & !BLANK;
 
 				*BITMAP_ADDR16(bitmap, y, x++) = color;
-			
+
 				data <<= 1;
 			}
 		}
@@ -1012,7 +1012,7 @@ void abc1600_state::video_start()
 {
 	// allocate video RAM
 	m_video_ram = auto_alloc_array(machine(), UINT16, VIDEORAM_SIZE);
-	
+
 	// find memory regions
 	m_wrmsk_rom = machine().region("wrmsk")->base();
 	m_shinf_rom = machine().region("shinf")->base();

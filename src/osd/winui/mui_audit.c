@@ -10,7 +10,7 @@
   that you have read the license and understand and accept it fully.
 
  ***************************************************************************/
- 
+
  /***************************************************************************
 
   mui_audit.c
@@ -75,7 +75,7 @@ static volatile BOOL bPaused = FALSE;
 static volatile BOOL bCancel = FALSE;
 
 /***************************************************************************
-    External functions  
+    External functions
  ***************************************************************************/
 
 void AuditDialog(HWND hParent)
@@ -121,7 +121,7 @@ const char * GetAuditString(int audit_result)
 		return "No";
 
 	//case UNKNOWN :
-//		return "?";
+//      return "?";
 
 	default:
 		dprintf("unknown audit value %i\n",audit_result);
@@ -149,36 +149,36 @@ BOOL IsAuditResultNo(int audit_result)
 /***************************************************************************
     Internal functions
  ***************************************************************************/
-// Verifies the ROM set while calling SetRomAuditResults	
+// Verifies the ROM set while calling SetRomAuditResults
 int MameUIVerifyRomSet(int game)
 {
 	driver_enumerator enumerator(MameUIGlobal(), driver_list::driver(game));
 	enumerator.next();
 	media_auditor auditor(enumerator);
 	media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-	
+
 	// output the summary of the audit
 	astring summary_string;
 	auditor.summarize(&summary_string);
-	DetailsPrintf("%s", summary_string.cstr());	
-	
+	DetailsPrintf("%s", summary_string.cstr());
+
 	SetRomAuditResults(game, summary);
 	return summary;
 }
 
-// Verifies the Sample set while calling SetSampleAuditResults	
+// Verifies the Sample set while calling SetSampleAuditResults
 int MameUIVerifySampleSet(int game)
 {
 	driver_enumerator enumerator(MameUIGlobal(), driver_list::driver(game));
 	enumerator.next();
 	media_auditor auditor(enumerator);
 	media_auditor::summary summary = auditor.audit_samples();
-	
+
 	// output the summary of the audit
 	astring summary_string;
 	auditor.summarize(&summary_string);
-	DetailsPrintf("%s", summary_string.cstr());	
-	
+	DetailsPrintf("%s", summary_string.cstr());
+
 	SetSampleAuditResults(game, summary);
 	return summary;
 }
@@ -255,7 +255,7 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 			{
 				bCancel = TRUE;
 				if (GetExitCodeThread(hThread, &dwExitCode) && (dwExitCode == STILL_ACTIVE))
-				{					
+				{
 					PostMessage(hDlg, WM_COMMAND, wParam, lParam);
 					return 1;
 				}
@@ -279,7 +279,7 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 		}
 		return 1;
 	}
-	return 0;	
+	return 0;
 }
 
 /* Callback for the Audit property sheet */
@@ -357,9 +357,9 @@ static void ProcessNextSample()
 {
 	int  retval;
 	TCHAR buffer[200];
-	
+
 	retval = MameUIVerifySampleSet(sample_index);
-	
+
 	switch (retval)
 	{
 	case media_auditor::CORRECT:
@@ -375,20 +375,20 @@ static void ProcessNextSample()
 
 	case media_auditor::NOTFOUND:
 		break;
-			
+
 	case media_auditor::INCORRECT:
 		samples_incorrect++;
 		_stprintf(buffer, TEXT("%i"), samples_incorrect);
 		SendDlgItemMessage(hAudit, IDC_SAMPLES_INCORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
 		_stprintf(buffer, TEXT("%i"), samples_correct + samples_incorrect);
 		SendDlgItemMessage(hAudit, IDC_SAMPLES_TOTAL, WM_SETTEXT, 0, (LPARAM)buffer);
-		
+
 		break;
 	}
 
 	sample_index++;
 	SendDlgItemMessage(hAudit, IDC_SAMPLES_PROGRESS, PBM_SETPOS, sample_index, 0);
-	
+
 	if (sample_index == driver_list::total())
 	{
 		DetailsPrintf("Audit complete.\n");
@@ -410,7 +410,7 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	hEdit = GetDlgItem(hAudit, IDC_AUDIT_DETAILS);
 	if (hEdit ==  NULL)
 		hEdit = GetDlgItem(hAudit, IDC_AUDIT_DETAILS_PROP);
-	
+
 	if (hEdit == NULL)
 	{
 		dprintf("audit detailsprintf() can't find any audit control\n");
@@ -418,9 +418,9 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	}
 
 	va_start(marker, fmt);
-	
+
 	vsprintf(buffer, fmt, marker);
-	
+
 	va_end(marker);
 
 	t_s = tstring_from_utf8(ConvertToWindowsNewlines(buffer));
@@ -430,7 +430,7 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	textLength = Edit_GetTextLength(hEdit);
 	Edit_SetSel(hEdit, textLength, textLength);
 	SendMessage( hEdit, EM_REPLACESEL, FALSE, (WPARAM)(LPCTSTR)win_tstring_strdup(t_s) );
-	
+
 	osd_free(t_s);
 }
 
@@ -445,15 +445,15 @@ static const char * StatusString(int iStatus)
 	case media_auditor::CORRECT:
 		ptr = "Passed";
 		break;
-		
+
 	case media_auditor::BEST_AVAILABLE:
 		ptr = "Best available";
 		break;
-		
+
 	case media_auditor::NOTFOUND:
 		ptr = "Not found";
 		break;
-		
+
 	case media_auditor::INCORRECT:
 		ptr = "Failed";
 		break;

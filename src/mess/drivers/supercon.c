@@ -46,7 +46,7 @@ public:
 	int m_remove_led_flag;
 	int m_selecting;
 	int m_save_key_data;
-	attotime m_wait_time; 
+	attotime m_wait_time;
 	int *m_current_field;
 	int m_confirm_board_click;
 	int m_board[64];
@@ -383,7 +383,7 @@ static READ8_HANDLER( supercon_port4_r )
 
 /* Only if valid data and mouse button is pressed */
 
-		if (key_data && input_port_read(space->machine(), "BUTTON_L")) 
+		if (key_data && input_port_read(space->machine(), "BUTTON_L"))
 		{
 
 /* Set or remove pieces */

@@ -13,7 +13,7 @@
 
 #define MCFG_CIRRUS_ADD(_tag) \
     MCFG_DEVICE_ADD(_tag, CIRRUS, 0) \
-	
+
 // ======================> cirrus_device_config
 
 class cirrus_device_config :  public device_config
@@ -27,7 +27,7 @@ public:
     // allocators
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
-	
+
 protected:
     // internal state goes here
 };
@@ -55,7 +55,7 @@ protected:
 	// internal state
     const cirrus_device_config &m_config;
 
-private:	
+private:
 };
 
 

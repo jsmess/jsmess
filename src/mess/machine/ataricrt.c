@@ -611,7 +611,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 	{
 		/* load an optional (dual) cartidge */
 		size = image.fread(&mem[0x4000], 0x8000);
-	} 
+	}
 	else
 	{
 		size = image.get_software_region_length("rom");

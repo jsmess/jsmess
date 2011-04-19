@@ -660,7 +660,7 @@ static DEVICE_NVRAM( hsgpl )
 			at29c040a_is_dirty(card->gromb))
 		{
 			card->flashrom[0] = NVVERSION;
-			
+
 			emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			filerr = nvfile.open(astring_c(hsname));
 			if (filerr != FILERR_NONE)

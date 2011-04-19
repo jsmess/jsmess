@@ -49,7 +49,7 @@ PORT A: 111xyzzz
 class mirage_state : public driver_device
 {
 public:
-    mirage_state(running_machine &machine, const driver_device_config_base &config) 
+    mirage_state(running_machine &machine, const driver_device_config_base &config)
     : driver_device(machine, config) { }
 
 	virtual void machine_reset();
@@ -101,23 +101,23 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_track_r,wd17xx_track_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_sector_r,wd17xx_sector_w)
 	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_data_r,wd17xx_data_w)
-//	AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE_LEGACY("es5503", es5503_r, es5503_w)
+//  AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE_LEGACY("es5503", es5503_r, es5503_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("osrom", 0)
 ADDRESS_MAP_END
 
 // port A: front panel
 static WRITE8_DEVICE_HANDLER( mirage_via_write_porta )
 {
-//	printf("PORT A: %02x\n", data);
+//  printf("PORT A: %02x\n", data);
 }
 
-// port B: 
-//	bit 7: OUT UART clock
-//	bit 4: OUT disk enable (motor on?)
-// 	bit 3: OUT sample/play
-//	bit 2: OUT mic line/in
-//	bit 1: OUT upper/lower bank (64k halves)
-//	bit 0: OUT bank 0/bank 1 (32k halves)
+// port B:
+//  bit 7: OUT UART clock
+//  bit 4: OUT disk enable (motor on?)
+//  bit 3: OUT sample/play
+//  bit 2: OUT mic line/in
+//  bit 1: OUT upper/lower bank (64k halves)
+//  bit 0: OUT bank 0/bank 1 (32k halves)
 
 static WRITE8_DEVICE_HANDLER( mirage_via_write_portb )
 {
@@ -140,9 +140,9 @@ static READ8_DEVICE_HANDLER( mirage_via_read_porta )
 	return 0;
 }
 
-// port B: 
-// 	bit 6: IN FDC disk loaded
-//	bit 5: IN 5503 sync (?)
+// port B:
+//  bit 6: IN FDC disk loaded
+//  bit 5: IN 5503 sync (?)
 static READ8_DEVICE_HANDLER( mirage_via_read_portb )
 {
 	return 0x60;

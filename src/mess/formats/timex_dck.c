@@ -114,7 +114,7 @@ DEVICE_IMAGE_LOAD( timex_cart )
 DEVICE_IMAGE_UNLOAD( timex_cart )
 {
 	if (timex_cart.data)
-  	{
+	{
 		free (timex_cart.data);
 		timex_cart.data = NULL;
 	}

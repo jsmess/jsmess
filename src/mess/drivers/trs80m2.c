@@ -311,18 +311,18 @@ WRITE8_MEMBER( trs80m2_state::keyboard_ctrl_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       DATA
-		1       CLOCK
-		2       LED
-		3
-		4       LED
-		5
-		6
-		7
+        0       DATA
+        1       CLOCK
+        2       LED
+        3
+        4       LED
+        5
+        6
+        7
 
-	*/
+    */
 
 	int kbdata = BIT(data, 0);
 	int kbclk = BIT(data, 1);
@@ -355,18 +355,18 @@ WRITE8_MEMBER( trs80m2_state::keyboard_latch_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       D
-		1       C
-		2       B
-		3       A
-		4
-		5
-		6
-		7
+        0       D
+        1       C
+        2       B
+        3       A
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	m_key_latch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 }

@@ -188,7 +188,7 @@ void prof80_state::floppy_motor_off()
 static TIMER_CALLBACK( floppy_motor_off_tick )
 {
 	prof80_state *state = machine.driver_data<prof80_state>();
-	
+
 	state->floppy_motor_off();
 }
 

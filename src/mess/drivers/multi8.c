@@ -40,20 +40,20 @@ public:
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display 		(state->m_crtc_vreg[1])
+#define mc6845_h_display		(state->m_crtc_vreg[1])
 #define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
 #define mc6845_sync_width		(state->m_crtc_vreg[3])
 #define mc6845_v_char_total		(state->m_crtc_vreg[4])
-#define mc6845_v_total_adj 		(state->m_crtc_vreg[5])
+#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
 #define mc6845_v_display		(state->m_crtc_vreg[6])
 #define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
 #define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
-#define mc6845_tile_height 		(state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start 	(state->m_crtc_vreg[0x0a])
+#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
 #define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr  		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
 #define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr  	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 static VIDEO_START( multi8 )
@@ -535,10 +535,10 @@ static READ8_DEVICE_HANDLER( porta_r )
 {
 	int vsync = (input_port_read(device->machine(), "VBLANK") & 0x1) << 5;
 	/*
-	-x-- ---- kanji rom is present (0) yes
-	--x- ---- vsync
-	---- --x- fdc rom is present (0) yes
-	*/
+    -x-- ---- kanji rom is present (0) yes
+    --x- ---- vsync
+    ---- --x- fdc rom is present (0) yes
+    */
 
 	return 0x9f | vsync | 0x00;
 }

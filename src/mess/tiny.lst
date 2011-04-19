@@ -1,7 +1,7 @@
 /******************************************************************************
 
     tiny.lst
-    
+
     List of all enabled drivers in the system. This file is parsed by
     makelist.exe, sorted, and output as C code describing the drivers.
 
@@ -38,7 +38,7 @@
 
 ******************************************************************************/
 
-coleco 		// ColecoVision (Original BIOS)
+coleco		// ColecoVision (Original BIOS)
 colecoa 	// ColecoVision (Thick Characters)
 colecob 	// Spectravideo SVI-603 Coleco Game Adapter
 

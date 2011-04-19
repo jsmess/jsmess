@@ -18,7 +18,7 @@
     - 8255 ports
     - MC6845 palette
     - MC6845 chargen ROM
-	- MC6845 screen update
+    - MC6845 screen update
 
     - peripherals
         * PC-8431A Dual Floppy Drive
@@ -64,7 +64,7 @@ void pc8401a_state::scan_keyboard()
 static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 {
 	pc8401a_state *state = timer.machine().driver_data<pc8401a_state>();
-	
+
 	state->scan_keyboard();
 }
 
@@ -644,7 +644,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(pc8500_video)
-	
+
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")

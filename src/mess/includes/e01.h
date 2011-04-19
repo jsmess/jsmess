@@ -40,7 +40,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	void update_interrupts();
 	void network_irq_enable(int enabled);
 	void hdc_irq_enable(int enabled);
@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	
+
 	/* interrupt state */
 	int m_adlc_ie;
 	int m_hdc_ie;

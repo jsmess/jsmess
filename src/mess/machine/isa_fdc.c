@@ -55,42 +55,42 @@ MACHINE_CONFIG_END
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
- 
+
 const device_type ISA8_FDC = isa8_fdc_device_config::static_alloc_device_config;
- 
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_fdc_device_config - constructor
 //-------------------------------------------------
- 
+
 isa8_fdc_device_config::isa8_fdc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
         : device_config(mconfig, static_alloc_device_config, "ISA8_FDC", tag, owner, clock),
 			device_config_isa8_card_interface(mconfig, *this)
 {
 }
- 
+
 //-------------------------------------------------
 //  static_alloc_device_config - allocate a new
 //  configuration object
 //-------------------------------------------------
- 
+
 device_config *isa8_fdc_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
         return global_alloc(isa8_fdc_device_config(mconfig, tag, owner, clock));
 }
- 
+
 //-------------------------------------------------
 //  alloc_device - allocate a new device object
 //-------------------------------------------------
- 
+
 device_t *isa8_fdc_device_config::alloc_device(running_machine &machine) const
 {
         return auto_alloc(machine, isa8_fdc_device(machine, *this));
 }
- 
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -104,11 +104,11 @@ machine_config_constructor isa8_fdc_device_config::device_mconfig_additions() co
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_fdc_device - constructor
 //-------------------------------------------------
- 
+
 isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_device_config &config) :
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
@@ -117,21 +117,21 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
 		m_isa(*owner(),config.m_isa_tag)
 {
 }
- 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
- 
+
 void isa8_fdc_device::device_start()
-{        
+{
 	m_isa->add_isa_card(this, m_config.m_isa_num);
-	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );	
+	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
- 
+
 void isa8_fdc_device::device_reset()
 {
 	status_register_a = 0;
@@ -144,7 +144,7 @@ void isa8_fdc_device::device_reset()
 	tc_state = 0;
 	dma_state = 0;
 	int_state = 0;
-	
+
 	upd765_reset(m_upd765,0);
 
 	/* set FDC at reset */
@@ -167,7 +167,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_fdc_set_tc_state)
 static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 {
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device->owner());
-	
+
 	fdc->int_state = state;
 
 	/* if dma is not enabled, irq's are masked */
@@ -313,7 +313,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 	UINT8 data = 0xff;
 
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
-	
+
 	switch(offset)
 	{
 		case 0: /* status register a */
@@ -347,7 +347,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 {
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
-	
+
 	if (LOG_FDC)
 		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
 
@@ -406,7 +406,7 @@ void isa8_fdc_device::dack_w(int line,UINT8 data)
 	{
 		/* dma acknowledge - and send byte to fdc */
 		upd765_dack_w(m_upd765, 0,data);
-	}	
+	}
 }
 void isa8_fdc_device::eop_w(int state)
 {

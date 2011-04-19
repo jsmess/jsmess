@@ -62,7 +62,7 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
-	
+
 private:
 	const char *m_cpu_tag;
 	int m_address;

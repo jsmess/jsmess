@@ -57,9 +57,9 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ8_MEMBER( keydata_r );
-	
+
 	void bankswitch();
-	
+
 	/* cpu state */
 	int m_ne555_int;
 

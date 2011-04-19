@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
 	required_device<device_t> m_cassette;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 
@@ -101,7 +101,7 @@ public:
 	virtual void machine_reset();
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_READ_LINE_MEMBER( clear_r );
@@ -112,13 +112,13 @@ public:
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
-	
+
 	void bankswitch();
-	
+
 	// memory
 	int m_rac;
 	int m_roc;
-	
+
 	/* video state */
 	UINT8 *m_colorram;		/* color memory */
 	UINT8 m_color;

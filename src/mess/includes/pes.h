@@ -20,7 +20,7 @@ public:
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_speech(*this, "tms5220")
 		{ }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_speech;

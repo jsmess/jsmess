@@ -453,14 +453,14 @@ WRITE8_MEMBER( pc8001_state::dma_mem_w )
 READ8_MEMBER( pc8001_state::dma_io_r )
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	
+
 	return program->read_byte(offset);
 }
 
 WRITE8_MEMBER( pc8001_state::dma_io_w )
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	
+
 	program->write_byte(offset, data);
 }
 
@@ -498,7 +498,7 @@ void pc8001_state::machine_start()
 
 	/* setup memory banking */
 	UINT8 *ram = ram_get_ptr(m_ram);
-	
+
 	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("n80")->base(), 0);
 	program->install_read_bank(0x0000, 0x5fff, "bank1");
 	program->unmap_write(0x0000, 0x5fff);

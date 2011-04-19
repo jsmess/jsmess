@@ -549,7 +549,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 {
 	c64_state *state = device->machine().driver_data<c64_state>();
-	
+
 	UINT8 direction = offset; // HACK ALERT!
 
 	/* if line is marked as input then keep current value */

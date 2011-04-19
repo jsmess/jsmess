@@ -1594,7 +1594,7 @@ static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
-	approximately 6usec) */
+    approximately 6usec) */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(tx0_reset_param)
 	MCFG_CPU_PROGRAM_MAP(tx0_8kw_map)

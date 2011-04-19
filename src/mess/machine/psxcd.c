@@ -210,7 +210,7 @@ void psxcd_device::device_reset()
 
 		if (m_cd)
 		{
-//			printf("psxcd: found disc!\n");
+//          printf("psxcd: found disc!\n");
 			driver = open_mess_drv();
 			driver->set_machine(machine());
 			driver->set_cdrom_file(m_cd);
@@ -218,13 +218,13 @@ void psxcd_device::device_reset()
 		else
 		{
 			driver = NULL;
-//			printf("psxcd: Found device, but no disc\n");
+//          printf("psxcd: Found device, but no disc\n");
 		}
 	}
 	else
 	{
 		driver = NULL;
-//		printf("psxcd: Device [%s] not found!\n", m_devname);
+//      printf("psxcd: Device [%s] not found!\n", m_devname);
 	}
 
 }
@@ -317,17 +317,17 @@ void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 					}
 				}
 				/*else
-				{
-					if (rdp>=cur_res->sz)
-					{
-						sr&=~(1<<5);
-					} else
-					{
-						sr|=~(1<<5);
-					 	res=cur_res->data[rdp++];
-					}
-				}
-				*/
+                {
+                    if (rdp>=cur_res->sz)
+                    {
+                        sr&=~(1<<5);
+                    } else
+                    {
+                        sr|=~(1<<5);
+                        res=cur_res->data[rdp++];
+                    }
+                }
+                */
 			}
 			break;
 
@@ -473,7 +473,7 @@ void psxcd_device::cdcmd_setloc()
 					 l[0],l[1],l[2]);
 	}
 
- 	send_result(intr_complete);
+	send_result(intr_complete);
 }
 
 void psxcd_device::cdcmd_play()
@@ -490,7 +490,7 @@ void psxcd_device::cdcmd_play()
 			(curpos[1]==0) &&
 			(curpos[2]==0))
 	{
-	 	send_result(intr_acknowledge);
+		send_result(intr_acknowledge);
 	} else
 	{
 		stop_read();
@@ -676,7 +676,7 @@ static void add_loc(unsigned char *dst, const unsigned char *src1, const unsigne
 	dst[1]=s;
 	dst[2]=f;
 }
-#endif  						 
+#endif
 static void sub_loc(unsigned char *dst, const unsigned char *src1, const unsigned char *src2)
 {
 	int f=src1[2]-src2[2],
@@ -729,7 +729,7 @@ void psxcd_device::cdcmd_getlocp()
 		decimal_to_bcd(tloc[2]),	// frame
 		decimal_to_bcd(loc[0]),	// amin
 		decimal_to_bcd(loc[1]),	// asec
-		decimal_to_bcd(loc[2]) 	// aframe
+		decimal_to_bcd(loc[2])	// aframe
 	};
 
 	//unsigned char data[8]={ 2,1,0,0xff,0xff,0xff,0xff,0xff };
@@ -972,8 +972,8 @@ void psxcd_device::add_result(command_result *res)
 //
 
 event *psxcd_device::send_result(const unsigned int res,
-													  	const unsigned char *data,
-													  	const unsigned int sz,
+														const unsigned char *data,
+														const unsigned int sz,
 															const unsigned int delay)
 {
 	// Update shell open status
@@ -981,7 +981,7 @@ event *psxcd_device::send_result(const unsigned int res,
 	if (! open)
 	{
 		status=status_error|status_shellopen;
-	} 
+	}
 	else
 	{
 		if (status&status_shellopen)
@@ -1041,7 +1041,7 @@ void psxcd_device::start_dma(UINT8 *mainram, UINT32 size)
 		printf("cdrom: dma past end of sector (secleft=%d sz=%d)\n",secleft,size);
 	}
 
-//	printf("cdrom: start dma %d bytes, %d remaining, secptr %p\n", size, secleft, secptr);
+//  printf("cdrom: start dma %d bytes, %d remaining, secptr %p\n", size, secleft, secptr);
 	#ifdef debug_cdrom
 	if (size==12)
 	{
@@ -1087,10 +1087,10 @@ bool psxcd_device::read_next_sector(const bool block)
 	assert(driver);
 	assert(secin<sector_buffer_size);
 
-//	printf("read_next_sector: sec %d, sechead %d, raw_sector_size %d\n", pos, sechead, raw_sector_size);
+//  printf("read_next_sector: sec %d, sechead %d, raw_sector_size %d\n", pos, sechead, raw_sector_size);
 	if (driver->read_sector(pos, buf, block))
 	{
-//		printf("buf contents = %02x %02x | %02x %02x\n", buf[0], buf[1], buf[0x20], buf[0x21]);
+//      printf("buf contents = %02x %02x | %02x %02x\n", buf[0], buf[1], buf[0x20], buf[0x21]);
 
 		sechead=(sechead+1)&(sector_buffer_size-1);
 		secin++;
@@ -1125,7 +1125,7 @@ void psxcd_device::read_sector()
 				rawsec=&secbuf[raw_sector_size*sectail];
 				secptr=rawsec+24;
 				secleft=2048;
-			} 
+			}
 			else
 			{
 				rawsec=&secbuf[raw_sector_size*sectail];
@@ -1250,8 +1250,8 @@ void psxcd_device::read_sector()
 
 			if ((streaming) && (isxa))
 			{
-			 	global_free(res);
-			 	res=NULL;
+				global_free(res);
+				res=NULL;
 			}
 
 			if (res)
@@ -1345,7 +1345,7 @@ void psxcd_device::play_sector()
 			}
 
 			unsigned char *cddaptr;
-//			bool full=false;
+//          bool full=false;
 			unsigned int cddasecsz;
 
 			while (1)
@@ -1544,14 +1544,14 @@ void psxcd_device::start_play()
 
 	status|=status_playing;
 
- 	secin=sechead=sectail=0;
+	secin=sechead=sectail=0;
 	cdda_prefetch_sector=-1;
 
 	if (mode&mode_autopause)
 	{
 		unsigned int pos=msf_to_sector(curpos);
 		driver->find_track(pos+150,NULL,&autopause_sector);
-//		printf("pos=%d auto=%d\n",pos,autopause_sector);
+//      printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
 
 	unsigned int cyc=read_sector_cycles;
@@ -1632,7 +1632,7 @@ void psxcd_device::set_driver(cdrom_driver *d)
 			}
 
 			first_open=false;
-		} 
+		}
 	} else
 	{
 		driver=NULL;
@@ -1654,7 +1654,7 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 {
 	event *ev = m_eventfortimer[tid];
 
-//	printf("timer %d fired, performing event type %d\n", tid, ev->type);
+//  printf("timer %d fired, performing event type %d\n", tid, ev->type);
 
 	switch (ev->type)
 	{
@@ -1684,7 +1684,7 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 	}
 
 	// free the timer
-//	printf("Freeing timer %d\n", tid);
+//  printf("Freeing timer %d\n", tid);
 	m_timers[tid]->adjust(attotime::never, 0, attotime::never);
 	m_timerinuse[tid] = false;
 	m_eventfortimer[tid] = NULL;
@@ -1717,7 +1717,7 @@ void psxcd_device::add_system_event(event *ev)
 
 	// ev->t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / ev->t;
-//	printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
+//  printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
 	timer->adjust(attotime::from_hz(hz), tnum, attotime::never);
 
 	// back-reference the timer from the event

@@ -87,7 +87,7 @@ void mpc105_device_config::static_set_cputag(device_config *device, const char *
 mpc105_device::mpc105_device(running_machine &_machine, const mpc105_device_config &config)
     : device_t(_machine, config),
       m_config(config),
-	  m_maincpu(*owner(), config.m_cputag)	  
+	  m_maincpu(*owner(), config.m_cputag)
 {
 }
 
@@ -112,7 +112,7 @@ void mpc105_device::device_reset()
 
 
 //-------------------------------------------------
-//  update_memory - MMU update 
+//  update_memory - MMU update
 //-------------------------------------------------
 
 void mpc105_device::update_memory()

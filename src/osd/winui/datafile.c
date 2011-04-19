@@ -339,7 +339,7 @@ static void ParseClose(void)
  ****************************************************************************/
 static UINT8 ParseOpen(const char *pszFilename)
 {
-        /* Open file up in binary mode */        
+        /* Open file up in binary mode */
 		fp =global_alloc(emu_file("", OPEN_FLAG_READ));
 		fp->open(pszFilename);
 
@@ -597,7 +597,7 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
 {
         static struct tDatafileIndex *hist_idx = 0;
         static struct tDatafileIndex *mame_idx = 0;
-//	const game_driver *clone_of = NULL;
+//  const game_driver *clone_of = NULL;
         int history = 0, mameinfo = 0;
         int err = 0;
 
@@ -662,9 +662,9 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
 					break;
 				err = load_datafile_text (gdrv, buffer+len, bufsize-len,
                                                                                   mame_idx, DATAFILE_TAG_MAME);
-				
+
 					int g = driver_list::clone(*gdrv);
-					if (g!=-1) gdrv = &driver_list::driver(g); else gdrv = NULL;				
+					if (g!=-1) gdrv = &driver_list::driver(g); else gdrv = NULL;
                         } while (err && gdrv);
 
                         if (err) mameinfo = 0;

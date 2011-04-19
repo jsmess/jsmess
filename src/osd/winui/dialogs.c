@@ -23,7 +23,7 @@
 
 #ifdef _MSC_VER
 #ifndef NONAMELESSUNION
-#define NONAMELESSUNION 
+#define NONAMELESSUNION
 #endif
 #endif
 
@@ -196,7 +196,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 		Button_SetCheck(GetDlgItem(hDlg,IDC_KEY_GUI),GetKeyGUI());
 		Button_SetCheck(GetDlgItem(hDlg,IDC_BROADCAST),GetBroadcast());
 		Button_SetCheck(GetDlgItem(hDlg,IDC_RANDOM_BG),GetRandomBackground());
-		
+
 		Button_SetCheck(GetDlgItem(hDlg,IDC_HIDE_MOUSE),GetHideMouseOnStartup());
 
 		// Get the current value of the control
@@ -295,7 +295,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 		case IDC_SCREENSHOT_BORDERCOLOR:
 		{
 			for (i=0;i<16;i++)
-		 		choice_colors[i] = GetCustomColor(i);
+				choice_colors[i] = GetCustomColor(i);
 
 			cc.lStructSize = sizeof(CHOOSECOLOR);
 			cc.hwndOwner   = hDlg;
@@ -304,8 +304,8 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 			cc.Flags       = CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR;
 			if (!ChooseColor(&cc))
 				return TRUE;
- 			for (i=0;i<16;i++)
- 				SetCustomColor(i,choice_colors[i]);
+			for (i=0;i<16;i++)
+				SetCustomColor(i,choice_colors[i]);
 			SetScreenshotBorderColor(cc.rgbResult);
 			UpdateScreenShot();
 			return TRUE;
@@ -319,7 +319,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 			SetKeyGUI(Button_GetCheck(GetDlgItem(hDlg, IDC_KEY_GUI)));
 			SetBroadcast(Button_GetCheck(GetDlgItem(hDlg, IDC_BROADCAST)));
 			SetRandomBackground(Button_GetCheck(GetDlgItem(hDlg, IDC_RANDOM_BG)));
-			
+
 			SetHideMouseOnStartup(Button_GetCheck(GetDlgItem(hDlg,IDC_HIDE_MOUSE)));
 
 			if( Button_GetCheck(GetDlgItem(hDlg,IDC_RESET_PLAYCOUNT ) ) )
@@ -356,14 +356,14 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 				SetFilterInherit(checked);
 				// LineUpIcons does just a ResetListView(), which is what we want here
 				PostMessage(GetMainWindow(),WM_COMMAND, MAKEWPARAM(ID_VIEW_LINEUPICONS, FALSE),(LPARAM)NULL);
- 			}
+			}
 			checked = Button_GetCheck(GetDlgItem(hDlg,IDC_NOOFFSET_CLONES));
 			if (checked != GetOffsetClones())
 			{
 				SetOffsetClones(checked);
 				// LineUpIcons does just a ResetListView(), which is what we want here
 				PostMessage(GetMainWindow(),WM_COMMAND, MAKEWPARAM(ID_VIEW_LINEUPICONS, FALSE),(LPARAM)NULL);
- 			}
+			}
 			nCurSelection = ComboBox_GetCurSel(GetDlgItem(hDlg,IDC_SNAPNAME));
 			if (nCurSelection != CB_ERR) {
 				const char* snapname_selection = (const char*)ComboBox_GetItemData(GetDlgItem(hDlg,IDC_SNAPNAME), nCurSelection);
@@ -403,7 +403,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 	static DWORD			dwFilters;
 	static DWORD			dwpFilters;
 	static LPCFOLDERDATA	lpFilterRecord;
-	char 					strText[250];
+	char					strText[250];
 	int 					i;
 
 	switch (Msg)
@@ -419,7 +419,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 		if (folder != NULL)
 		{
 			char tmp[80];
-			
+
 			win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText);
 			Edit_SetSel(GetDlgItem(hDlg, IDC_FILTER_EDIT), 0, -1);
 			// Mask out non filter flags
@@ -434,7 +434,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 				if( lpParent )
 				{
 					/* Check the Parent Filters and inherit them on child,
-					 * No need to promote all games to parent folder, works as is */
+                     * No need to promote all games to parent folder, works as is */
 					dwpFilters = lpParent->m_dwFlags & F_MASK;
 					/*Check all possible Filters if inherited solely from parent, e.g. not being set explicitly on our folder*/
 					if( (dwpFilters & F_CLONES) && !(dwFilters & F_CLONES) )
@@ -562,9 +562,9 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 		{
 		case IDOK:
 			dwFilters = 0;
-			
+
 			win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText, FILTERTEXT_LEN);
-			
+
 			// see which buttons are checked
 			for (i = 0; g_lpFilterList[i].m_dwFilterType; i++)
 			{
@@ -587,7 +587,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 		case IDCANCEL:
 			EndDialog(hDlg, 0);
 			return TRUE;
-			
+
 		default:
 			// Handle unchecking mutually exclusive filters
 			if (wNotifyCode == BN_CLICKED)
@@ -672,7 +672,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 #else
 					tvis.DUMMYUNIONNAME.item = tvi;
 #endif
-					
+
 					hti = TreeView_InsertItem(GetDlgItem(hDlg,IDC_CUSTOM_TREE),&tvis);
 
 					/* look for children of this custom folder */
@@ -692,7 +692,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 					        tvis.item = tvi;
 #else
 					        tvis.DUMMYUNIONNAME.item = tvi;
-#endif							
+#endif
 							hti_child = TreeView_InsertItem(GetDlgItem(hDlg,IDC_CUSTOM_TREE),&tvis);
 							if (folders[jj] == default_selection)
 							    res = TreeView_SelectItem(GetDlgItem(hDlg,IDC_CUSTOM_TREE),hti_child);
@@ -707,10 +707,10 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 					}
 
 				}
-				
+
 			}
 		}
-		
+
 		win_set_window_text_utf8(GetDlgItem(hDlg,IDC_CUSTOMFILE_GAME),
 					  ModifyThe(driver_list::driver(driver_index).description));
 
@@ -727,7 +727,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 		   if (TreeView_GetItem(GetDlgItem(hDlg,IDC_CUSTOM_TREE),&tvi) == TRUE)
 		   {
 			  /* should look for New... */
-		   
+
 			  default_selection = (LPTREEFOLDER)tvi.lParam; /* start here next time */
 
 			  AddToCustomFolder((LPTREEFOLDER)tvi.lParam,driver_index);

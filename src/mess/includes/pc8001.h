@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_mem_w );
 	DECLARE_READ8_MEMBER( dma_io_r );
 	DECLARE_WRITE8_MEMBER( dma_io_w );
-	
+
 	/* video state */
 	UINT8 *m_char_rom;
 	int m_width80;

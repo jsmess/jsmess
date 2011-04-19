@@ -9,43 +9,43 @@
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - Fix the 0xe80/0xe83 kanji ROM readback;
     - Fixe the 0xb00 RAM banking;
- 	- x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
+    - x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
     - Hook-up remaining .tap image formats;
     - Implement APSS tape commands;
     - Sort out / redump the BIOS gfx roms;
     - X1Turbo: Implement SIO.
     - X1Twin: Hook-up the PC Engine part (actually needs his own driver?);
     - Implement SASI HDD interface;
- 	- clean-ups!
+    - clean-ups!
     - There are various unclear video things, these are:
         - Implement the remaining scrn regs;
         - Implement the new features of the x1turboz, namely the 4096 color feature amongst other things
         - (anything else?)
- 	- Driver Configuration switches:
-		- OPN for X1
-		- EMM, and hook-up for X1 too
-		- RAM size for EMM
-		- specific x1turboz features?
+    - Driver Configuration switches:
+        - OPN for X1
+        - EMM, and hook-up for X1 too
+        - RAM size for EMM
+        - specific x1turboz features?
 
     per-game/program specific TODO:
-	- CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
-	- Chack'n Pop: game is too fast, presumably missing wait states;
+    - CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
+    - Chack'n Pop: game is too fast, presumably missing wait states;
     - Dragon Buster: it crashed to me once with a obj flag hang;
     - The Goonies (x1 only): goes offsync with the PCG beam positions;
-	- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
- 	- Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
- 	- Hydlide 3: can't get the user disk to work properly, could be a bad dump;
+    - Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
+    - Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
+    - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
     - Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
-	- Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
-	- "newtype": trips a z80dma assert, worked around for now;
-	- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
-	- Shilver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
-	- Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
-	- Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
-	- Trivia-Q: dunno what to do on the selection screen, missing inputs?
+    - Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
+    - "newtype": trips a z80dma assert, worked around for now;
+    - Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
+    - Shilver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
+    - Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
+    - Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
+    - Trivia-Q: dunno what to do on the selection screen, missing inputs?
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
-	- X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
+    - X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
     - Ys 2: crashes after the disclaimer screen;
     - Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
     - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
@@ -65,12 +65,12 @@
       cartridge slot and it doesn't exceed 64k (0x10000) of size.
     - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (btanb)
     - Maidum: you need to load BOTH disk without write protection disabled, otherwise it refuses to run. (btanb)
-	- Marvelous: needs write protection disabled (btanb)
-	- Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
-	  Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
-	- Faeries Residence: to load this game, put a basic v2.0 in drive 0, then execute a NEWON command. Load game disks into drive 0 and 1 then
-	  type run"START" (case sensitive)
-	- POPLEMON: same as above, but you need to type run"POP"
+    - Marvelous: needs write protection disabled (btanb)
+    - Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
+      Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
+    - Faeries Residence: to load this game, put a basic v2.0 in drive 0, then execute a NEWON command. Load game disks into drive 0 and 1 then
+      type run"START" (case sensitive)
+    - POPLEMON: same as above, but you need to type run"POP"
 
 =================================================================================================
 
@@ -246,12 +246,12 @@
 
 static VIDEO_START( x1 )
 {
-//	x1_state *state = machine.driver_data<x1_state>();
-//	state->m_avram = auto_alloc_array(machine, UINT8, 0x800);
-//	state->m_tvram = auto_alloc_array(machine, UINT8, 0x800);
-//	state->m_kvram = auto_alloc_array(machine, UINT8, 0x800);
-//	state->m_gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
-//	state->m_pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
+//  x1_state *state = machine.driver_data<x1_state>();
+//  state->m_avram = auto_alloc_array(machine, UINT8, 0x800);
+//  state->m_tvram = auto_alloc_array(machine, UINT8, 0x800);
+//  state->m_kvram = auto_alloc_array(machine, UINT8, 0x800);
+//  state->m_gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
+//  state->m_pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
 }
 
 static void x1_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
@@ -281,20 +281,20 @@ static void x1_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x
 }
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display 		(state->m_crtc_vreg[1])
+#define mc6845_h_display		(state->m_crtc_vreg[1])
 #define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
 #define mc6845_sync_width		(state->m_crtc_vreg[3])
 #define mc6845_v_char_total		(state->m_crtc_vreg[4])
-#define mc6845_v_total_adj 		(state->m_crtc_vreg[5])
+#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
 #define mc6845_v_display		(state->m_crtc_vreg[6])
 #define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
 #define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
-#define mc6845_tile_height 		(state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start 	(state->m_crtc_vreg[0x0a])
+#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
 #define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr  		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
 #define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr  	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 /* adjust tile index when we are under double height condition */
@@ -327,20 +327,20 @@ static UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,i
 static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap)
 {
 	/*
-		attribute table:
-		x--- ---- double width
-		-x-- ---- double height
-		--x- ---- PCG select
-		---x ---- color blinking
-		---- x--- reverse color
-		---- -xxx color pen
+        attribute table:
+        x--- ---- double width
+        -x-- ---- double height
+        --x- ---- PCG select
+        ---x ---- color blinking
+        ---- x--- reverse color
+        ---- -xxx color pen
 
-		x--- ---- select Kanji ROM
-		-x-- ---- Kanji side (0=left, 1=right)
-		--x- ---- Underline
-		---x ---- Kanji ROM select (0=level 1, 1=level 2) (TODO: implement this)
-		---- xxxx Kanji upper 4 bits
-	*/
+        x--- ---- select Kanji ROM
+        -x-- ---- Kanji side (0=left, 1=right)
+        --x- ---- Underline
+        ---x ---- Kanji ROM select (0=level 1, 1=level 2) (TODO: implement this)
+        ---- xxxx Kanji upper 4 bits
+    */
 
 	x1_state *state = machine.driver_data<x1_state>();
 	int y,x,res_x,res_y;
@@ -773,9 +773,9 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
 	// E9 06 - APSS Rewind
 	// E9 0A - Record
 	/*
-	APSS is a Sharp invention and stands for Automatic Program Search System, it scans the tape for silent parts that are bigger than 4 seconds.
-	It's basically used for audio tapes in order to jump over the next/previous "track".
-	*/
+    APSS is a Sharp invention and stands for Automatic Program Search System, it scans the tape for silent parts that are bigger than 4 seconds.
+    It's basically used for audio tapes in order to jump over the next/previous "track".
+    */
 	state->m_cmt_current_cmd = cmd;
 
 	if(cassette_get_image(machine.device("cass")) == NULL) //avoid a crash if a disk game tries to access this
@@ -1394,12 +1394,12 @@ static READ8_HANDLER( x1_blackclip_r )
 static WRITE8_HANDLER( x1_blackclip_w )
 {
 	/*
-	-x-- ---- replace blanking duration with black
-	--x- ---- replace bitmap palette 1 with black
-	---x ---- replace bitmap palette 0 with black
-	---- x--- enable text blackclip
-	---- -xxx palette color number for text black
-	*/
+    -x-- ---- replace blanking duration with black
+    --x- ---- replace bitmap palette 1 with black
+    ---x ---- replace bitmap palette 0 with black
+    ---- x--- enable text blackclip
+    ---- -xxx palette color number for text black
+    */
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_scrn_reg.blackclip = data;
 	if(data & 0x40)
@@ -1513,7 +1513,7 @@ static WRITE8_HANDLER( x1_kanji_w )
 		case 0: state->m_kanji_addr_latch = (data & 0xff)|(state->m_kanji_addr_latch&0xff00); break;
 		case 1: state->m_kanji_addr_latch = (data<<8)|(state->m_kanji_addr_latch&0x00ff);
 			//if(state->m_kanji_addr_latch != 0x720 && state->m_kanji_addr_latch != 0x730)
-			//	printf("%08x\n",state->m_kanji_addr_latch);
+			//  printf("%08x\n",state->m_kanji_addr_latch);
 			break;
 		case 2:
 		{
@@ -1584,14 +1584,14 @@ static WRITE8_HANDLER( x1_emm_w )
 }
 
 /*
-	CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
-	TODO: still not quite right
+    CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
+    TODO: still not quite right
 */
 static READ8_HANDLER( x1turbo_bank_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
-//	printf("BANK access read\n");
+//  printf("BANK access read\n");
 	return state->m_ex_bank & 0x3f;
 }
 
@@ -1600,13 +1600,13 @@ static WRITE8_HANDLER( x1turbo_bank_w )
 	x1_state *state = space->machine().driver_data<x1_state>();
 	//UINT8 *RAM = space->machine().region("maincpu")->base();
 	/*
-	--x- ---- BML5: latch bit (doesn't have any real function)
-	---x ---- BMCS: select bank RAM, active low
-	---- xxxx BMNO: Bank memory ID
-	*/
+    --x- ---- BML5: latch bit (doesn't have any real function)
+    ---x ---- BMCS: select bank RAM, active low
+    ---- xxxx BMNO: Bank memory ID
+    */
 
 	state->m_ex_bank = data & 0x3f;
-//	printf("BANK access write %02x\n",data);
+//  printf("BANK access write %02x\n",data);
 }
 
 /* TODO: waitstate penalties */
@@ -1701,7 +1701,7 @@ static WRITE8_HANDLER( x1_io_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
-	if(state->m_io_bank_mode == 1)                    	{ x1_ex_gfxram_w(space, offset, data); }
+	if(state->m_io_bank_mode == 1)                  	{ x1_ex_gfxram_w(space, offset, data); }
 	// TODO: user could install ym2151 on plain X1 too
 	//0x700, 0x701
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(space->machine().device("ctc"), offset-0x0704,data); }
@@ -1900,8 +1900,8 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	state->m_vdisp = (device->machine().primary_screen->vpos() < vblank_line) ? 0x80 : 0x00;
 	state->m_vsync = (device->machine().primary_screen->vpos() < vsync_line) ? 0x00 : 0x04;
 
-//	popmessage("%d",vsync_line);
-//	popmessage("%d",vblank_line);
+//  popmessage("%d",vsync_line);
+//  popmessage("%d",vblank_line);
 
 	res = state->m_ram_bank | state->m_sub_obf | state->m_vsync | state->m_vdisp;
 
@@ -2485,7 +2485,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	if(state->m_key_irq_vector)
 	{
 		//if(key1 == 0 && key2 == 0 && key3 == 0 && key4 == 0 && f_key == 0)
-		//	return;
+		//  return;
 
 		if((key1 != state->m_old_key1) || (key2 != state->m_old_key2) || (key3 != state->m_old_key3) || (key4 != state->m_old_key4) || (f_key != state->m_old_fkey))
 		{
@@ -2510,10 +2510,10 @@ static TIMER_CALLBACK(x1_rtc_increment)
 
 	state->m_rtc.sec++;
 
-	if((state->m_rtc.sec & 0x0f) >= 0x0a) 				{ state->m_rtc.sec+=0x10; state->m_rtc.sec&=0xf0; }
-	if((state->m_rtc.sec & 0xf0) >= 0x60) 				{ state->m_rtc.min++; state->m_rtc.sec = 0; }
-	if((state->m_rtc.min & 0x0f) >= 0x0a) 				{ state->m_rtc.min+=0x10; state->m_rtc.min&=0xf0; }
-	if((state->m_rtc.min & 0xf0) >= 0x60) 				{ state->m_rtc.hour++; state->m_rtc.min = 0; }
+	if((state->m_rtc.sec & 0x0f) >= 0x0a)				{ state->m_rtc.sec+=0x10; state->m_rtc.sec&=0xf0; }
+	if((state->m_rtc.sec & 0xf0) >= 0x60)				{ state->m_rtc.min++; state->m_rtc.sec = 0; }
+	if((state->m_rtc.min & 0x0f) >= 0x0a)				{ state->m_rtc.min+=0x10; state->m_rtc.min&=0xf0; }
+	if((state->m_rtc.min & 0xf0) >= 0x60)				{ state->m_rtc.hour++; state->m_rtc.min = 0; }
 	if((state->m_rtc.hour & 0x0f) >= 0x0a)				{ state->m_rtc.hour+=0x10; state->m_rtc.hour&=0xf0; }
 	if((state->m_rtc.hour & 0xff) >= 0x24)				{ state->m_rtc.day++; state->m_rtc.wday++; state->m_rtc.hour = 0; }
 	if((state->m_rtc.wday & 0x0f) >= 0x07)				{ state->m_rtc.wday = 0; }
@@ -2708,7 +2708,7 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MCFG_MACHINE_RESET(x1turbo)
 
-//	MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
+//  MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
 	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , sio_intf )
 	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
 
@@ -2747,7 +2747,7 @@ MACHINE_CONFIG_END
 
 	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1",  0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_COPY("font", 	0x1000, 0x00800, 0x1000 )
+	ROM_COPY("font",	0x1000, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2777,7 +2777,7 @@ ROM_START( x1twin )
 
 	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("ank8.rom", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_COPY("font", 	 0x00000, 0x00800, 0x1000 )
+	ROM_COPY("font",	 0x00000, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2813,7 +2813,7 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x4800, "cgrom", 0)
 	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
-	ROM_COPY("font", 	         0x01000, 0x00800, 0x1000 )
+	ROM_COPY("font",	         0x01000, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2847,7 +2847,7 @@ ROM_START( x1turbo40 )
 
 	ROM_REGION(0x4800, "cgrom", 0)
 	ROM_LOAD("fnt0808_turbo.x1",0x00000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
-	ROM_COPY("font", 	        0x01000, 0x0800, 0x1000 )
+	ROM_COPY("font",	        0x01000, 0x0800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 

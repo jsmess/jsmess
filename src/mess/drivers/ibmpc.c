@@ -157,7 +157,7 @@ IBM Roms thanks to Frode
 59x7268.bin: Second late IBM 5160 PC/XT BIOS/BASIC 1.1. vissible in memory at F8000-FFFFF. (EPROM)
   ROM_LOAD( "62x0819.bin", 0xf0000, 0x8000, CRC(758ff036) SHA1(045e27a70407d89b7956ecae4d275bd2f6b0f8e2))
   ROM_LOAD( "59x7268.bin", 0xf8000, 0x8000, CRC(4f417635) SHA1(daa61762d3afdd7262e34edf1a3d2df9a05bcebb))
-  
+
 78x7460.bin: IBM 5162 PC/XT 286 BIOS. vissible in even memory at F0000-FFFFF (mirror at E0000-EFFFF).
 78x7461.bin: IBM 5162 PC/XT 286 BIOS. vissible in odd memory at F0000-FFFFF (mirror at E0000-EFFFF).
   ROM_LOAD16_BYTE( "78x7460.bin", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31))
@@ -207,7 +207,7 @@ IBM Roms thanks to Frode
 
 59x7291.bin: Second version Hard drive controller ROM. Visible in memory at C8000-C8FFF.
   ROM_LOAD( "59x7291.bin", 0xc8000, 0x1000, CRC(25920437) SHA1(de970bcc5c6f1b588fbc4c76617165ce8eb2bf1d))
-  
+
 104839e.bin: Hard drive controller Z80 firmware ROM. Not mapped in PC memory. (Mapped in Z80 microcontroller memory at 0000-7FFF)
   ROM_LOAD( "104839e.bin", 0x0000, 0x1000, CRC(3ad32fcc) SHA1(0127fa520aaee91285cb46a640ed835b4554e4b3))
 
@@ -225,7 +225,7 @@ ___MISSING___ 6137560.bin: Professional Graphics Controller, CGA emulation font.
   ROM_LOAD( "6137322.bin", 0x8000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5))
   ROM_LOAD( "6137323.bin", 0x0000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526))
 
-  
+
 XC215 C 0.bin: IBM Music feature card Z80 firmware ROM. Not mapped in PC memory. (Mapped in Z80 microcontroller memory at 0000-7FFF)
   ROM_LOAD( "xc215 c 0.bin", 0x0000, 0x8000, CRC(28c58a4f) SHA1(e7edf28d20e6c146e3144526c89cd6beea64663b))
 
@@ -288,8 +288,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ibm5150 )
 	PORT_INCLUDE( kb_keytronic_pc )		/* IN4 - IN11 */
-//	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
-//	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+//  PORT_INCLUDE( pc_mouse_microsoft )  /* IN12 - IN14 */
+//  PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
@@ -297,7 +297,7 @@ static const unsigned i86_address_mask = 0x000fffff;
 
 static const kb_keytronic_interface pc_keytronic_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),	
+	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),
 	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_data_w)
 };
 
@@ -307,7 +307,7 @@ static const motherboard_interface pc_keytronic_keyboard_intf =
 	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
 };
 
-static DEVICE_INPUT_DEFAULTS_START(cga) 
+static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")

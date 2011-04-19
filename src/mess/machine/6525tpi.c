@@ -117,8 +117,8 @@ struct _tpi6525_state
 	devcb_resolved_read8		in_pc_func;
 	devcb_resolved_write8		out_pc_func;
 	devcb_resolved_write_line	out_ca_func;
-	devcb_resolved_write_line	out_cb_func;	
-	
+	devcb_resolved_write_line	out_cb_func;
+
 	UINT8 port_a, ddr_a, in_a;
 	UINT8 port_b, ddr_b, in_b;
 	UINT8 port_c, ddr_c, in_c;

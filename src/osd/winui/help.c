@@ -14,9 +14,9 @@
 /***************************************************************************
 
   help.c
-  
-	Help wrapper code.
-	
+
+    Help wrapper code.
+
 ***************************************************************************/
 
 // standard windows headers
@@ -95,7 +95,7 @@ HWND HelpFunction(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwDa
 }
 
 /***************************************************************************
- Internal functions  
+ Internal functions
 ***************************************************************************/
 
 static void Help_Load(void)

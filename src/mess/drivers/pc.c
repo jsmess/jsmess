@@ -1921,7 +1921,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
@@ -2481,7 +2481,7 @@ ROM_START( poisk1 )
 	ROMX_LOAD( "p1_t_pls.rf4", 0xfe000, 0x2000, CRC(c8210ffb) SHA1(f2d1a6c90e4708bcc56186b2fb906fa852667084), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "t3", "Test RAM")
 	ROMX_LOAD( "p1_t_ram.rf4", 0xfe000, 0x2000, CRC(e42f5a61) SHA1(ce2554eae8f0d2b6d482890dd198cf7e2d29c655), ROM_BIOS(5))
-	
+
 	ROM_LOAD( "boot_net.rf4", 0x0000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BUIS
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD( "poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
@@ -2562,13 +2562,13 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  	MACHINE     INPUT       INIT        COMPANY     FULLNAME */
+/*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
 COMP(  1984,	dgone,      ibm5150,	0,	pccga,  	pccga,		pccga,	"Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
 COMP(  1985,	bw230,      ibm5150,	0,	pccga,		bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
 COMP(  1988,	europc,     ibm5150,	0,	europc, 	europc,		europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr, 	tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr,	tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
 COMP(  1985,	ibmpcjx,    ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
 
 // tandy 1000

@@ -129,13 +129,13 @@
     - Copied multi-sector write code from r7263, for some reason this had been
       silently removed, but is required for the rmnimbus driver.
 
-	2011-Mar-08 Phill Harvey-Smith
-	- Triggering intrq now clears the DRQ bit in the status as well as the busy bit.
-	  Execution of the READ_DAM command now correctly sets w->command.
+    2011-Mar-08 Phill Harvey-Smith
+    - Triggering intrq now clears the DRQ bit in the status as well as the busy bit.
+      Execution of the READ_DAM command now correctly sets w->command.
 
-	2011-Apr-01 Curt Coder
-	- Set complete command delay to 16 usec (DD) / 32 usec (SD) and removed
-	  the external delay setting hack.
+    2011-Apr-01 Curt Coder
+    - Set complete command delay to 16 usec (DD) / 32 usec (SD) and removed
+      the external delay setting hack.
 
     TODO:
         - What happens if a track is read that doesn't have any id's on it?
@@ -399,9 +399,9 @@ static void wd17xx_timed_read_sector_request(device_t *device);
 INLINE wd1770_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == WD1770 || device->type() == WD1771 || device->type() == WD1772 || device->type() == WD1773 || 
-		device->type() == WD1793 ||	device->type() == WD1795 || device->type() == WD1797 || 
-		device->type() == WD2793 || device->type() == WD2795 || device->type() == WD2797 || 
+	assert(device->type() == WD1770 || device->type() == WD1771 || device->type() == WD1772 || device->type() == WD1773 ||
+		device->type() == WD1793 ||	device->type() == WD1795 || device->type() == WD1797 ||
+		device->type() == WD2793 || device->type() == WD2795 || device->type() == WD2797 ||
 		device->type() == WD177X || device->type() == WD179X || device->type() == MB8877);
 
 	return (wd1770_state *)downcast<legacy_device_base *>(device)->token();
@@ -414,7 +414,7 @@ INLINE wd1770_state *get_safe_token(device_t *device)
 
 static int wd17xx_has_side_select(device_t *device)
 {
-	return (device->type() == WD1795 || device->type() == WD1797 || 
+	return (device->type() == WD1795 || device->type() == WD1797 ||
 			device->type() == WD2795 || device->type() == WD2797);
 }
 

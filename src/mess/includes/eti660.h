@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	
+
 	/* keyboard state */
 	UINT8 m_keylatch;
 

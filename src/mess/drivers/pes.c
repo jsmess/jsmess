@@ -104,7 +104,7 @@ static int data_to_i8031(device_t *device)
 	UINT8 data;
 	data = state->m_infifo[state->m_infifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr) state->m_infifo_tail_ptr++; 
+	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr) state->m_infifo_tail_ptr++;
 	state->m_infifo_tail_ptr&=0x1F;
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: input to i8031/pes from pc/terminal: %02X\n",data);
@@ -141,7 +141,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
 	tms5220_data_w(state->m_speech, 0, data);
-	
+
 }
 
 READ8_MEMBER( pes_state::port1_r )
@@ -227,7 +227,7 @@ void pes_state::machine_reset()
 ******************************************************************************/
 /*static TIMER_CALLBACK( serial_read_cb )
 {
-	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+    machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 }*/
 
 DRIVER_INIT( pes )
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( pes, pes_state )
     MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(i80c31_mem)
     MCFG_CPU_IO_MAP(i80c31_io)
-	
+
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
@@ -293,5 +293,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME	PARENT	COMPAT	MACHINE		INPUT	INIT	COMPANY     FULLNAME            FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME            FLAGS */
 COMP( 1987, pes,	0,		0,		pes,		pes,	pes,	"Pacific Educational Systems",	"VPU-01 Speech box",	GAME_NOT_WORKING )

@@ -203,7 +203,7 @@ static TIMER_CALLBACK( scc8530_baud_expire )
 		rate = scc->clock / brconst;
 	}
 	else
-	{	
+	{
 		rate = 0;
 	}
 
@@ -701,60 +701,60 @@ DEFINE_LEGACY_DEVICE(SCC8530, scc8530);
 AppleTalk check:
 
 SCC: port B reg 9 write 0x40      Channel Reset B
-SCC: port B reg 4 write 0x20	  SDLC mode
-SCC: port B reg 10 write 0xe0	  CRC preset + FM0
-SCC: port B reg 6 write 0x00	  SDLC address
-SCC: port B reg 7 write 0x7e	  SDLC flag
-SCC: port B reg 12 write 0x06	  baud rate low
-SCC: port B reg 13 write 0x00	  baud rate high
-SCC: port B reg 14 write 0xc0	  Set FM mode
-SCC: port B reg 3 write 0xdd	  Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
-SCC: port B reg 2 write 0x00	  interrupt vector 0
-SCC: port B reg 15 write 0x08	  DCD interrupt enable
-SCC: port B reg 1 write 0x09	  Rx IRQ on first char or special, ext int enable
-SCC: port B reg 9 write 0x0a	  Master IRQ enable, no-vector mode
-SCC: port B reg 11 write 0x70	  Rx clock = DPLL output, Tx clock = BR generator
-SCC: port B reg 14 write 0x21	  Enter search mode, BR generator enable
-SCC: port B reg 5 write 0x60	  Tx 8 bits/char
-SCC: port B reg 6 write 0x2a	  SDLC address
+SCC: port B reg 4 write 0x20      SDLC mode
+SCC: port B reg 10 write 0xe0     CRC preset + FM0
+SCC: port B reg 6 write 0x00      SDLC address
+SCC: port B reg 7 write 0x7e      SDLC flag
+SCC: port B reg 12 write 0x06     baud rate low
+SCC: port B reg 13 write 0x00     baud rate high
+SCC: port B reg 14 write 0xc0     Set FM mode
+SCC: port B reg 3 write 0xdd      Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
+SCC: port B reg 2 write 0x00      interrupt vector 0
+SCC: port B reg 15 write 0x08     DCD interrupt enable
+SCC: port B reg 1 write 0x09      Rx IRQ on first char or special, ext int enable
+SCC: port B reg 9 write 0x0a      Master IRQ enable, no-vector mode
+SCC: port B reg 11 write 0x70     Rx clock = DPLL output, Tx clock = BR generator
+SCC: port B reg 14 write 0x21     Enter search mode, BR generator enable
+SCC: port B reg 5 write 0x60      Tx 8 bits/char
+SCC: port B reg 6 write 0x2a      SDLC address
 SCC: port B reg 0 read 0x00
-SCC: port B reg 15 write 0x88	  DCD interrupt enable, break/abort interrupt enable
+SCC: port B reg 15 write 0x88     DCD interrupt enable, break/abort interrupt enable
 
 (repeats)
 SCC: port B reg 1 read 0x09
 SCC: port B reg 3 write 0xd0
-SCC: port B reg 3 write 0xdd	  Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable 
-SCC: port B reg 15 write 0x08	  DCD interrupt enable
+SCC: port B reg 3 write 0xdd      Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
+SCC: port B reg 15 write 0x08     DCD interrupt enable
 SCC: port B reg 0 read 0x00
 SCC: port B reg 15 write 0x88
 
 System 7:
 
-SCC: port B reg 9 write 0x40	  Channel Reset B                                                       
-SCC: port B reg 4 write 0x20	  SDLC mode
-SCC: port B reg 10 write 0xe0	  CRC preset + FM0
-SCC: port B reg 6 write 0x00	  SDLC address
-SCC: port B reg 7 write 0x7e	  SDLC flag
-SCC: port B reg 12 write 0x06	  baud rate low
-SCC: port B reg 13 write 0x00	  baud rate high
-SCC: port B reg 14 write 0xc0	  Set FM mode
-SCC: port B reg 3 write 0xdd	  Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
-SCC: port B reg 2 write 0x00	  interrupt vector 0
-SCC: port B reg 15 write 0x08	  DCD interrupt enable
-SCC: port B reg 1 write 0x09	  Rx IRQ on first char or special, ext int enable
-SCC: port B reg 9 write 0x0a	  Master IRQ enable, no-vector mode
-SCC: port B reg 11 write 0x70	  Rx clock = DPLL output, Tx clock = BR generator
-SCC: port B reg 14 write 0x21	  Enter search mode, BR generator enable
-SCC: port B reg 5 write 0x60	  Tx 8 bits/char
-SCC: port B reg 6 write 0x01	  SDLC address
-SCC: port B reg 3 write 0xdd	  Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
+SCC: port B reg 9 write 0x40      Channel Reset B
+SCC: port B reg 4 write 0x20      SDLC mode
+SCC: port B reg 10 write 0xe0     CRC preset + FM0
+SCC: port B reg 6 write 0x00      SDLC address
+SCC: port B reg 7 write 0x7e      SDLC flag
+SCC: port B reg 12 write 0x06     baud rate low
+SCC: port B reg 13 write 0x00     baud rate high
+SCC: port B reg 14 write 0xc0     Set FM mode
+SCC: port B reg 3 write 0xdd      Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
+SCC: port B reg 2 write 0x00      interrupt vector 0
+SCC: port B reg 15 write 0x08     DCD interrupt enable
+SCC: port B reg 1 write 0x09      Rx IRQ on first char or special, ext int enable
+SCC: port B reg 9 write 0x0a      Master IRQ enable, no-vector mode
+SCC: port B reg 11 write 0x70     Rx clock = DPLL output, Tx clock = BR generator
+SCC: port B reg 14 write 0x21     Enter search mode, BR generator enable
+SCC: port B reg 5 write 0x60      Tx 8 bits/char
+SCC: port B reg 6 write 0x01      SDLC address
+SCC: port B reg 3 write 0xdd      Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
 
 (repeats)
 
 SCC: port B reg 0 read 0x00
-SCC: port B reg 15 write 0x88	  DCD interrupt enable, break/abort interrupt enable 
-SCC: port B reg 15 write 0x08	  DCD interrupt enable
-SCC: port B reg 1 read 0x09	  Rx IRQ on first char or special, ext int enable                        
-SCC: port B reg 3 write 0xdd	  Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable 
+SCC: port B reg 15 write 0x88     DCD interrupt enable, break/abort interrupt enable
+SCC: port B reg 15 write 0x08     DCD interrupt enable
+SCC: port B reg 1 read 0x09   Rx IRQ on first char or special, ext int enable
+SCC: port B reg 3 write 0xdd      Rx 8 bits, enter hunt mode, CRC enable, address search mode, Rx enable
 
 */

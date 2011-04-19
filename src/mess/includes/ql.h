@@ -94,7 +94,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( ipc_w );
@@ -114,7 +114,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( zx8302_raw1_r );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_raw2_w );
 	DECLARE_READ_LINE_MEMBER( zx8302_raw2_r );
-	
+
 	/* IPC state */
 	UINT8 m_keylatch;
 	int m_ipl;
@@ -126,10 +126,10 @@ public:
 	DECLARE_WRITE8_MEMBER( disk_io_w );
 	DECLARE_READ8_MEMBER( trump_card_rom_r );
 	DECLARE_READ8_MEMBER( cart_rom_r );
-	
+
 	void trump_card_set_control(UINT8 data);
 	void sandy_set_control(UINT8 data);
-	
+
 	int		m_disk_type;
 	int		m_disk_io_base;
 	UINT8	m_disk_io_byte;

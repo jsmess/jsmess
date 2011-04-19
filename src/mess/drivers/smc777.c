@@ -7,13 +7,13 @@
     TODO:
     - no real documentation, the entire driver is just a bunch of educated
       guesses ...
-	- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
-	  We currently use an hackish implementation until the MAME/MESS framework can
-	  support that ...
-	- keyboard input is very sluggish;
-	- cursor stuck in Bird Crash;
-	- add mc6845 features;
-	- many other missing features;
+    - ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
+      We currently use an hackish implementation until the MAME/MESS framework can
+      support that ...
+    - keyboard input is very sluggish;
+    - cursor stuck in Bird Crash;
+    - add mc6845 features;
+    - many other missing features;
 
 **************************************************************************************/
 
@@ -126,10 +126,10 @@ static SCREEN_UPDATE( smc777 )
 		for(x=0;x<x_width;x++)
 		{
 			/*
-			-x-- ---- blink
-			--xx x--- bg color (00 transparent, 01 white, 10 black, 11 complementary to fg color
-			---- -xxx fg color
-			*/
+            -x-- ---- blink
+            --xx x--- bg color (00 transparent, 01 white, 10 black, 11 complementary to fg color
+            ---- -xxx fg color
+            */
 			int tile = vram[count];
 			int color = attr[count] & 7;
 			int bk_color = (attr[count] & 0x18) >> 3;
@@ -396,10 +396,10 @@ static READ8_HANDLER( key_r )
 {
 	smc777_state *state = space->machine().driver_data<smc777_state>();
 	/*
-	-x-- ---- shift key
-	---- -x-- MCU data ready
-	---- ---x handshake bit?
-	*/
+    -x-- ---- shift key
+    ---- -x-- MCU data ready
+    ---- ---x handshake bit?
+    */
 
 	switch(state->m_keyb_cmd)
 	{
@@ -414,7 +414,7 @@ static READ8_HANDLER( key_r )
 		default:
 		{
 			//if(offset == 1)
-			//	printf("Unknown keyboard command %02x read-back\n",state->m_keyb_cmd);
+			//  printf("Unknown keyboard command %02x read-back\n",state->m_keyb_cmd);
 
 			return (offset == 0) ? 0x00 : (space->machine().rand() & 0x5);
 		}
@@ -467,7 +467,7 @@ static WRITE8_HANDLER( system_output_w )
 {
 	smc777_state *state = space->machine().driver_data<smc777_state>();
 	/*
-	---x 0000 ram inibit signal
+    ---x 0000 ram inibit signal
     ---x 1001 beep
     all the rest is unknown at current time
     */
@@ -615,7 +615,7 @@ static READ8_HANDLER( smc777_io_r )
 
 	low_offs = offset & 0xff;
 
-	if(low_offs <= 0x07) 						  { return smc777_vram_r(space,offset & 0xff07); }
+	if(low_offs <= 0x07)						  { return smc777_vram_r(space,offset & 0xff07); }
 	else if(low_offs >= 0x08 && low_offs <= 0x0f) { return smc777_attr_r(space,offset & 0xff07); }
 	else if(low_offs >= 0x10 && low_offs <= 0x17) { return smc777_pcg_r(space,offset & 0xff07); }
 	else if(low_offs >= 0x18 && low_offs <= 0x19) { logerror("6845 read %02x",low_offs & 1); }
@@ -641,7 +641,7 @@ static READ8_HANDLER( smc777_io_r )
 	else if(low_offs == 0x74)					  { logerror("IEEE-488 ROM read\n"); }
 	else if(low_offs == 0x75)					  { logerror("VTR Controller ROM read\n"); }
 	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM read %02x\n",low_offs & 1); }
-	else if(low_offs >= 0x80) 					  { return smc777_fbuf_r(space,offset & 0xff7f); }
+	else if(low_offs >= 0x80)					  { return smc777_fbuf_r(space,offset & 0xff7f); }
 
 	logerror("Undefined read at %04x offset = %02x\n",cpu_get_pc(&space->device()),low_offs);
 	return 0xff;
@@ -653,7 +653,7 @@ static WRITE8_HANDLER( smc777_io_w )
 
 	low_offs = offset & 0xff;
 
-	if(low_offs <= 0x07) 	 					  { smc777_vram_w(space,offset & 0xff07,data); }
+	if(low_offs <= 0x07)						  { smc777_vram_w(space,offset & 0xff07,data); }
 	else if(low_offs >= 0x08 && low_offs <= 0x0f) { smc777_attr_w(space,offset & 0xff07,data); }
 	else if(low_offs >= 0x10 && low_offs <= 0x17) { smc777_pcg_w(space,offset & 0xff07,data); }
 	else if(low_offs >= 0x18 && low_offs <= 0x19) { smc777_6845_w(space,low_offs & 1,data); }
@@ -684,8 +684,8 @@ static WRITE8_HANDLER( smc777_io_w )
 	else if(low_offs == 0x74)					  { logerror("IEEE-488 ROM write %02x\n",data); }
 	else if(low_offs == 0x75)					  { logerror("VTR Controller ROM write %02x\n",data); }
 	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM write [%02x] %02x\n",low_offs & 1,data); }
-	else if(low_offs >= 0x80) 					  { smc777_fbuf_w(space,offset & 0xff7f,data); }
-	else 										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(&space->device()),low_offs,data); }
+	else if(low_offs >= 0x80)					  { smc777_fbuf_w(space,offset & 0xff7f,data); }
+	else										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(&space->device()),low_offs,data); }
 }
 
 static ADDRESS_MAP_START( smc777_io , AS_IO, 8)
@@ -829,55 +829,55 @@ static INPUT_PORTS_START( smc777 )
 INPUT_PORTS_END
 
 /*
-	Keyboard data:
-	kana lock |= 0x80
-	numpad 0 to 9 = 0x30 - 0x39
-	/ pad = 0x2f
-	* pad = 0x2a
-	- pad = 0x2d
-	+ pad = 0x2b
-	ENTER pad = 0x0d
-	. pad = 0x2e
-	enter = 0x0d
-	space = 0x20
-	backspace = 0x08
-	CTRL (TAB?) = 0x09
-	cursor up = 0x17
-	cursor down = 0x1c
-	cursor left = 0x16
-	cursor right = 0x19
-	0 to 9 -> 0x30 to 0x39
-	S + 0 = 0x29
-	S + 1 = 0x21
-	S + 2 = 0x40
-	S + 3 = 0x23
-	S + 4 = 0x24
-	S + 5 = 0x25
-	S + 6 = 0x5e
-	S + 7 = 0x26
-	S + 8 = 0x2a
-	S + 9 = 0x28
-	F1 = 0x01 / 0x15
-	F2 = 0x02 / 0x18
-	F3 = 0x04 / 0x12
-	F4 = 0x06 / 0x05
-	F5 = 0x0b / 0x03
-	ESC = 0x1b
-	INS = 0x0f
-	DEL = 0x11
-	PG UP = 0x12
-	PG DOWN = 0x03
-	HOME = 0x14
-	END = 0x0e
-	' = 0x2d / 0x5f
-	"P" row 1 ] = 0x5d / 0x7d
-	"P" row 2 ' / ~ = 0x60 / 0x7e
-	"L" row 1 ; / : = 0x3b / 0x3a
-	"L" row 2 = (unused)
-	"L" row 3 Yen / | = 0x5c / 0x7c
-	"M" row 1 , / < = 0x2c / 0x3c
-	"M" row 2 . / > = 0x2e / 0x3e
-	"M" row 3 / / ? = 0x2f / 0x3f
+    Keyboard data:
+    kana lock |= 0x80
+    numpad 0 to 9 = 0x30 - 0x39
+    / pad = 0x2f
+    * pad = 0x2a
+    - pad = 0x2d
+    + pad = 0x2b
+    ENTER pad = 0x0d
+    . pad = 0x2e
+    enter = 0x0d
+    space = 0x20
+    backspace = 0x08
+    CTRL (TAB?) = 0x09
+    cursor up = 0x17
+    cursor down = 0x1c
+    cursor left = 0x16
+    cursor right = 0x19
+    0 to 9 -> 0x30 to 0x39
+    S + 0 = 0x29
+    S + 1 = 0x21
+    S + 2 = 0x40
+    S + 3 = 0x23
+    S + 4 = 0x24
+    S + 5 = 0x25
+    S + 6 = 0x5e
+    S + 7 = 0x26
+    S + 8 = 0x2a
+    S + 9 = 0x28
+    F1 = 0x01 / 0x15
+    F2 = 0x02 / 0x18
+    F3 = 0x04 / 0x12
+    F4 = 0x06 / 0x05
+    F5 = 0x0b / 0x03
+    ESC = 0x1b
+    INS = 0x0f
+    DEL = 0x11
+    PG UP = 0x12
+    PG DOWN = 0x03
+    HOME = 0x14
+    END = 0x0e
+    ' = 0x2d / 0x5f
+    "P" row 1 ] = 0x5d / 0x7d
+    "P" row 2 ' / ~ = 0x60 / 0x7e
+    "L" row 1 ; / : = 0x3b / 0x3a
+    "L" row 2 = (unused)
+    "L" row 3 Yen / | = 0x5c / 0x7c
+    "M" row 1 , / < = 0x2c / 0x3c
+    "M" row 2 . / > = 0x2e / 0x3e
+    "M" row 3 / / ? = 0x2f / 0x3f
 */
 
 static const UINT8 smc777_keytable[2][0xa0] =

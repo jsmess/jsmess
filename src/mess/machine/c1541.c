@@ -1288,7 +1288,7 @@ DEVICE_GET_INFO( c1540 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1540");						break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1540");									break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1540");									break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
@@ -1310,8 +1310,8 @@ DEVICE_GET_INFO( c1541 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1541");						break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1541");									break;		
-		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1541");									break;
+
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
 }
@@ -1330,7 +1330,7 @@ DEVICE_GET_INFO( c1541c )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541C");							break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1541c");								break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1541c");								break;
 
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
@@ -1350,7 +1350,7 @@ DEVICE_GET_INFO( c1541ii )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541-II");						break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1541ii");								break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "vic1541ii");								break;
 
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
@@ -1370,7 +1370,7 @@ DEVICE_GET_INFO( sx1541 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore SX1541");						break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "sx1541");									break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "sx1541");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
@@ -1390,7 +1390,7 @@ DEVICE_GET_INFO( c2031 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 2031");							break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c2031");									break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c2031");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
@@ -1410,7 +1410,7 @@ DEVICE_GET_INFO( oc118 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Oceanic OC-118");							break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "oc118");									break;		
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "oc118");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}

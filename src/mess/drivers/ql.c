@@ -38,37 +38,37 @@
     - CST Thor XVI W40FF (40MB Winchester, 2 Floppies)
 
 
-	2011-02-22, P.Harvey-Smith,
-		Implemented Miracle Trump Card disk and ram interface.
-		
-		The trump card has some interesting memory mapping and re-mapping during initialisation which goes like this
-		
-		On rest the card ram is mapped into the entire $40000-$fffff area, this is the official 512K expansion ram area
-		plus the area set aside for addon card roms. The trump card onboard rom is also mapped in at $10000-$17fff.
-		
-		The main bios then performs a series of loops that initialise and size the ram, this will find either 
-		0K, 256K, 512K or 768K of expansion ram depending on how many banks of ram are populated.
-		
-		After the ram test, the main bios looks for the signature longword of a cartridge rom at $0c000, this read 
-		triggers the Trump Card to also map it's rom in at $c0000-$c7fff, the first addon rom area. If a cartridge 
-		rom is found it is first initialised.
-		
-		The main bios goes on to search the addon card rom area from $c0000 by searching for the signature word for
-		an addon rom at $c0000 and upwards in 16K steps (there is a bug in JM and before that means they only find
-		the first addon, but this does not matter).
-		
-		The main bios finds the trump card addon rom at $c0000, and calls it's initialisation routine at $c011e, this 
-		contains a jump instruction to jump to $10124 (in the lower mapped copy of the trumpcard rom). 
-		
-		The first memory access in the $10000-$17fff range triggers the trumcard to page out the rom at $c0000, and 
-		page the ram back in. Once it arrives at this state the ram will remain paged in until the next reset.
-		
-		I have implemented this with a pair of read handlers at $0c000-$0cfff and $10000-$17fff which do the apropreate 
-		re-map of the upper area and then remove themselves from the address map and return it to simple rom handlers.
-		
-		On the Trump card the above is implemented with a pair of 16L8 PAL chips, the logic of these was decoded with
-		the assistance of Malcolm Lear, without who's help working all this out would have been a much harder process.
-				
+    2011-02-22, P.Harvey-Smith,
+        Implemented Miracle Trump Card disk and ram interface.
+
+        The trump card has some interesting memory mapping and re-mapping during initialisation which goes like this
+
+        On rest the card ram is mapped into the entire $40000-$fffff area, this is the official 512K expansion ram area
+        plus the area set aside for addon card roms. The trump card onboard rom is also mapped in at $10000-$17fff.
+
+        The main bios then performs a series of loops that initialise and size the ram, this will find either
+        0K, 256K, 512K or 768K of expansion ram depending on how many banks of ram are populated.
+
+        After the ram test, the main bios looks for the signature longword of a cartridge rom at $0c000, this read
+        triggers the Trump Card to also map it's rom in at $c0000-$c7fff, the first addon rom area. If a cartridge
+        rom is found it is first initialised.
+
+        The main bios goes on to search the addon card rom area from $c0000 by searching for the signature word for
+        an addon rom at $c0000 and upwards in 16K steps (there is a bug in JM and before that means they only find
+        the first addon, but this does not matter).
+
+        The main bios finds the trump card addon rom at $c0000, and calls it's initialisation routine at $c011e, this
+        contains a jump instruction to jump to $10124 (in the lower mapped copy of the trumpcard rom).
+
+        The first memory access in the $10000-$17fff range triggers the trumcard to page out the rom at $c0000, and
+        page the ram back in. Once it arrives at this state the ram will remain paged in until the next reset.
+
+        I have implemented this with a pair of read handlers at $0c000-$0cfff and $10000-$17fff which do the apropreate
+        re-map of the upper area and then remove themselves from the address map and return it to simple rom handlers.
+
+        On the Trump card the above is implemented with a pair of 16L8 PAL chips, the logic of these was decoded with
+        the assistance of Malcolm Lear, without who's help working all this out would have been a much harder process.
+
 */
 
 #define ADDRESS_MAP_MODERN
@@ -266,16 +266,16 @@ READ8_MEMBER( ql_state::disk_io_r )
 
 	if(LOG_DISK_READ)
 		logerror("%s DiskIO:Read of %08X\n",machine().describe_context(),m_disk_io_base+offset);
-		
+
 	switch (offset)
 	{
-		case 0x0000	: result=wd17xx_r(m_fdc, offset); break; 
-		case 0x0001	: result=wd17xx_r(m_fdc, offset); break; 
+		case 0x0000	: result=wd17xx_r(m_fdc, offset); break;
+		case 0x0001	: result=wd17xx_r(m_fdc, offset); break;
 		case 0x0002	: result=wd17xx_r(m_fdc, offset); break;
 		case 0x0003	: result=wd17xx_r(m_fdc, offset); break;
-		default		: logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;	
+		default		: logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
-	
+
 	return result;
 }
 
@@ -286,8 +286,8 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 
 	switch (offset)
 	{
-		case 0x0000	: wd17xx_w(m_fdc, offset, data); break; 
-		case 0x0001	: wd17xx_w(m_fdc, offset, data); break; 
+		case 0x0000	: wd17xx_w(m_fdc, offset, data); break;
+		case 0x0001	: wd17xx_w(m_fdc, offset, data); break;
 		case 0x0002	: wd17xx_w(m_fdc, offset, data); break;
 		case 0x0003	: wd17xx_w(m_fdc, offset, data); break;
 		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
@@ -296,7 +296,7 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 					    m_printer_char=data;
 		case 0x2000	: if(m_disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
-		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;		
+		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;
 	}
 }
 
@@ -305,19 +305,19 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 	// If we have more than 640K them map extra ram into top 256K
 	// else just map to unmap.
 	if (ram_get_size(m_ram)>(640*1024))
-		space.install_ram(0x0c0000, 0x0fffff, NULL); 
+		space.install_ram(0x0c0000, 0x0fffff, NULL);
 	else
 		space.unmap_readwrite(0x0c0000, 0x0fffff);
-	
+
 	// Setup trumcard rom mapped to rom so unlink us
 	space.install_rom(0x010000, 0x018000, &machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
-	return machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];	
+	return machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];
 }
 
 READ8_MEMBER( ql_state::cart_rom_r )
 {
-	// Setup trumcard rom mapped in at $c0000	
+	// Setup trumcard rom mapped in at $c0000
 	space.install_rom(0x0c0000, 0x0c8000, &machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	// Setup cart rom to rom handler, so unlink us
@@ -330,9 +330,9 @@ void ql_state::trump_card_set_control(UINT8 data)
 {
 	if(data & TRUMP_DRIVE0_MASK)
 		wd17xx_set_drive(m_fdc,0);
-		
+
 	if(data & TRUMP_DRIVE1_MASK)
-		wd17xx_set_drive(m_fdc,1);	
+		wd17xx_set_drive(m_fdc,1);
 
 	wd17xx_set_side(m_fdc,(data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
 }
@@ -345,9 +345,9 @@ void ql_state::sandy_set_control(UINT8 data)
 
 	if(data & SANDY_DRIVE0_MASK)
 		wd17xx_set_drive(m_fdc,0);
-		
+
 	if(data & SANDY_DRIVE1_MASK)
-		wd17xx_set_drive(m_fdc,1);	
+		wd17xx_set_drive(m_fdc,1);
 
 	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
 	if (data & SANDY_SIDE_MASK)
@@ -359,16 +359,16 @@ void ql_state::sandy_set_control(UINT8 data)
 	{
 		if(data & SANDY_PRINTER_STROBE)
 			printer_output(m_printer,m_printer_char);
-			
-		if(data & SANDY_PRINTER_INTMASK) 
+
+		if(data & SANDY_PRINTER_INTMASK)
 			m_zx8302->extint_w(ASSERT_LINE);
 	}
-}	
+}
 
 static READ_LINE_DEVICE_HANDLER( disk_io_dden_r )
 {
 	ql_state *state = device->machine().driver_data<ql_state>();
-	
+
 	if(state->m_disk_type==DISK_TYPE_SANDY)
 		return ((state->m_disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
 	else
@@ -397,7 +397,7 @@ static WRITE_LINE_DEVICE_HANDLER( disk_io_drq_w )
 static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP 						// 16K Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_UNMAP 									// Trump card ROM is mapped in here
+	AM_RANGE(0x010000, 0x017fff) AM_UNMAP									// Trump card ROM is mapped in here
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
 	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
 	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP 									// 16K Expansion I/O
+	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP									// 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
 	AM_RANGE(0x040000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -878,7 +878,7 @@ static const floppy_config ql_floppy_config =
 	NULL
 };
 
-wd17xx_interface ql_wd17xx_interface = 
+wd17xx_interface ql_wd17xx_interface =
 {
 	DEVCB_LINE(disk_io_dden_r),
 	DEVCB_LINE(disk_io_intrq_w),
@@ -916,11 +916,11 @@ static MICRODRIVE_CONFIG( mdv2_config )
 //  MACHINE_START( ql )
 //-------------------------------------------------
 
-// 
+//
 // The 896K option is dealt with once the machine is up and running as
-// the Trump Card ROM is initally mapped in at $C0000-$C8000, as this is 
+// the Trump Card ROM is initally mapped in at $C0000-$C8000, as this is
 // oficially the expansion card rom area. Once the Trump Card has initialised
-// it maps the last 256K of ram into this area (asuming that it has 768K 
+// it maps the last 256K of ram into this area (asuming that it has 768K
 // onboard).
 //
 
@@ -937,7 +937,7 @@ void ql_state::machine_start()
 
 void ql_state::machine_reset()
 {
-	address_space 	*program 	= m_maincpu->memory().space(AS_PROGRAM);
+	address_space	*program	= m_maincpu->memory().space(AS_PROGRAM);
 
 	m_disk_type=input_port_read(machine(),QL_CONFIG_PORT) & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",m_disk_type);
@@ -968,7 +968,7 @@ void ql_state::machine_reset()
 		case 640*1024:
 			program->unmap_readwrite(0x0c0000, 0x0fffff);
 			break;
-	}	
+	}
 
 	switch (m_disk_type)
 	{
@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
-	
+
 	// Parallel printer port on Sandy disk interface
 	MCFG_PRINTER_ADD(PRINTER_TAG)
 MACHINE_CONFIG_END

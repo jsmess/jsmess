@@ -192,7 +192,7 @@ void luxor_55_10828_device_config::device_config_complete()
 	m_sw1 = intf->m_sw1;
 	m_drive_type = intf->m_drive_type;
 	m_s1 = intf->m_s1;
-	
+
 	m_shortname = "lux10828";
 }
 
@@ -526,7 +526,7 @@ void luxor_55_10828_device::device_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//	abcbus_cs - 
+//  abcbus_cs -
 //-------------------------------------------------
 
 void luxor_55_10828_device::abcbus_cs(UINT8 data)
@@ -538,7 +538,7 @@ void luxor_55_10828_device::abcbus_cs(UINT8 data)
 
 
 //-------------------------------------------------
-//  abcbus_rst - 
+//  abcbus_rst -
 //-------------------------------------------------
 
 void luxor_55_10828_device::abcbus_rst(int state)
@@ -551,7 +551,7 @@ void luxor_55_10828_device::abcbus_rst(int state)
 
 
 //-------------------------------------------------
-//  abcbus_stat - 
+//  abcbus_stat -
 //-------------------------------------------------
 
 UINT8 luxor_55_10828_device::abcbus_stat()
@@ -568,7 +568,7 @@ UINT8 luxor_55_10828_device::abcbus_stat()
 
 
 //-------------------------------------------------
-//  abcbus_inp - 
+//  abcbus_inp -
 //-------------------------------------------------
 
 UINT8 luxor_55_10828_device::abcbus_inp()
@@ -591,7 +591,7 @@ UINT8 luxor_55_10828_device::abcbus_inp()
 
 
 //-------------------------------------------------
-//  abcbus_utp - 
+//  abcbus_utp -
 //-------------------------------------------------
 
 void luxor_55_10828_device::abcbus_utp(UINT8 data)
@@ -609,7 +609,7 @@ void luxor_55_10828_device::abcbus_utp(UINT8 data)
 
 
 //-------------------------------------------------
-//  abcbus_c1 - 
+//  abcbus_c1 -
 //-------------------------------------------------
 
 void luxor_55_10828_device::abcbus_c1(UINT8 data)
@@ -623,7 +623,7 @@ void luxor_55_10828_device::abcbus_c1(UINT8 data)
 
 
 //-------------------------------------------------
-//  abcbus_c3 - 
+//  abcbus_c3 -
 //-------------------------------------------------
 
 void luxor_55_10828_device::abcbus_c3(UINT8 data)
@@ -642,7 +642,7 @@ void luxor_55_10828_device::abcbus_c3(UINT8 data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  ctrl_w - 
+//  ctrl_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
@@ -688,7 +688,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 
 
 //-------------------------------------------------
-//  status_w - 
+//  status_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_10828_device::status_w )
@@ -716,7 +716,7 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
 
 //-------------------------------------------------
-//  fdc_r - 
+//  fdc_r -
 //-------------------------------------------------
 
 READ8_MEMBER( luxor_55_10828_device::fdc_r )
@@ -743,7 +743,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 
 //-------------------------------------------------
-//  fdc_w - 
+//  fdc_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_10828_device::fdc_w )

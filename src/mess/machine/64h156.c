@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- serial IEC protocol handling
-	- write to disk image
+    - serial IEC protocol handling
+    - write to disk image
 
 */
 
@@ -79,7 +79,7 @@ void c64h156_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_atn_line - 
+//  set_atn_line -
 //-------------------------------------------------
 
 inline void c64h156_device::set_atn_line()
@@ -91,7 +91,7 @@ inline void c64h156_device::set_atn_line()
 
 
 //-------------------------------------------------
-//  set_sync_line - 
+//  set_sync_line -
 //-------------------------------------------------
 
 inline void c64h156_device::set_sync_line(int state)
@@ -103,7 +103,7 @@ inline void c64h156_device::set_sync_line(int state)
 
 
 //-------------------------------------------------
-//  set_byte_line - 
+//  set_byte_line -
 //-------------------------------------------------
 
 inline void c64h156_device::set_byte_line(int state)
@@ -115,7 +115,7 @@ inline void c64h156_device::set_byte_line(int state)
 
 
 //-------------------------------------------------
-//  read_current_track - 
+//  read_current_track -
 //-------------------------------------------------
 
 inline void c64h156_device::read_current_track()
@@ -136,7 +136,7 @@ inline void c64h156_device::read_current_track()
 
 
 //-------------------------------------------------
-//  receive_bit - 
+//  receive_bit -
 //-------------------------------------------------
 
 inline void c64h156_device::receive_bit()
@@ -262,7 +262,7 @@ void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  yb_r - 
+//  yb_r -
 //-------------------------------------------------
 
 READ8_MEMBER( c64h156_device::yb_r )
@@ -274,7 +274,7 @@ READ8_MEMBER( c64h156_device::yb_r )
 
 
 //-------------------------------------------------
-//  yb_w - 
+//  yb_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( c64h156_device::yb_w )
@@ -284,7 +284,7 @@ WRITE8_MEMBER( c64h156_device::yb_w )
 
 
 //-------------------------------------------------
-//  test_w - 
+//  test_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::test_w )
@@ -293,7 +293,7 @@ WRITE_LINE_MEMBER( c64h156_device::test_w )
 
 
 //-------------------------------------------------
-//  accl_w - 
+//  accl_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::accl_w )
@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER( c64h156_device::accl_w )
 
 
 //-------------------------------------------------
-//  sync_r - 
+//  sync_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( c64h156_device::sync_r )
@@ -313,7 +313,7 @@ READ_LINE_MEMBER( c64h156_device::sync_r )
 
 
 //-------------------------------------------------
-//  byte_r - 
+//  byte_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( c64h156_device::byte_r )
@@ -323,7 +323,7 @@ READ_LINE_MEMBER( c64h156_device::byte_r )
 
 
 //-------------------------------------------------
-//  stp_w - 
+//  stp_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::mtr_w )
@@ -345,7 +345,7 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 
 
 //-------------------------------------------------
-//  oe_w - 
+//  oe_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::oe_w )
@@ -355,7 +355,7 @@ WRITE_LINE_MEMBER( c64h156_device::oe_w )
 
 
 //-------------------------------------------------
-//  soe_w - 
+//  soe_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::soe_w )
@@ -365,7 +365,7 @@ WRITE_LINE_MEMBER( c64h156_device::soe_w )
 
 
 //-------------------------------------------------
-//  atn_r - 
+//  atn_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( c64h156_device::atn_r )
@@ -375,7 +375,7 @@ READ_LINE_MEMBER( c64h156_device::atn_r )
 
 
 //-------------------------------------------------
-//  atni_w - 
+//  atni_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::atni_w )
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( c64h156_device::atni_w )
 
 
 //-------------------------------------------------
-//  atna_w - 
+//  atna_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64h156_device::atna_w )
@@ -399,7 +399,7 @@ WRITE_LINE_MEMBER( c64h156_device::atna_w )
 
 
 //-------------------------------------------------
-//  stp_w - 
+//  stp_w -
 //-------------------------------------------------
 
 void c64h156_device::stp_w(int data)
@@ -445,7 +445,7 @@ void c64h156_device::ds_w(int data)
 
 
 //-------------------------------------------------
-//  on_disk_changed - 
+//  on_disk_changed -
 //-------------------------------------------------
 
 void c64h156_device::on_disk_changed()

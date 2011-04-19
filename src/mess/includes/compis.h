@@ -126,7 +126,7 @@ public:
 	compis_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_hgdc(*this, "upd7220")
- 		  { }
+		  { }
 
 	required_device<upd7220_device> m_hgdc;
 

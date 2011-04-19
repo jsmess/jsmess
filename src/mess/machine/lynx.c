@@ -1879,7 +1879,7 @@ void lynx_crc_keyword(device_image_interface &image)
 
 	info = hashfile_extrainfo(image);
 
-	state->m_rotate0 = 0;	
+	state->m_rotate0 = 0;
 	if (info)
 	{
 		if(strcmp(info, "ROTATE90DEGREE") == 0)

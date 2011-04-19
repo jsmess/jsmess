@@ -113,8 +113,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
 	MCFG_GFXDECODE(pcmda)
-	
-	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)	
+
+	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
 MACHINE_CONFIG_END
 
 ROM_START( mda )
@@ -126,43 +126,43 @@ ROM_END
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
- 
+
 const device_type ISA8_MDA = isa8_mda_device_config::static_alloc_device_config;
- 
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_mda_device_config - constructor
 //-------------------------------------------------
- 
+
 isa8_mda_device_config::isa8_mda_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
         : device_config(mconfig, static_alloc_device_config, "ISA8_MDA", tag, owner, clock),
 			device_config_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "mda";
 }
- 
+
 //-------------------------------------------------
 //  static_alloc_device_config - allocate a new
 //  configuration object
 //-------------------------------------------------
- 
+
 device_config *isa8_mda_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
         return global_alloc(isa8_mda_device_config(mconfig, tag, owner, clock));
 }
- 
+
 //-------------------------------------------------
 //  alloc_device - allocate a new device object
 //-------------------------------------------------
- 
+
 device_t *isa8_mda_device_config::alloc_device(running_machine &machine) const
 {
         return auto_alloc(machine, isa8_mda_device(machine, *this));
 }
- 
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -185,11 +185,11 @@ const rom_entry *isa8_mda_device_config::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_mda_device - constructor
 //-------------------------------------------------
- 
+
 isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_device_config &config) :
         device_t(_machine, config),
 		device_isa8_card_interface( _machine, config, *this ),
@@ -197,27 +197,27 @@ isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_devic
 		m_isa(*owner(),config.m_isa_tag)
 {
 }
- 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
- 
+
 void isa8_mda_device::device_start()
-{        
+{
 	m_isa->add_isa_card(this, m_config.m_isa_num);
 	videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(pc_MDA_r), FUNC(pc_MDA_w) );
-	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);	
-	
+	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);
+
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
+		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
 }
- 
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
- 
+
 void isa8_mda_device::device_reset()
 {
 	update_row = NULL;
@@ -225,9 +225,9 @@ void isa8_mda_device::device_reset()
 	mode_control = 0;
 	vsync = 0;
 	hsync = 0;
-	
+
 	astring tempstring;
-	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();	
+	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();
 }
 
 /***************************************************************************
@@ -492,7 +492,7 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 			break;
 		case 12: case 13:  case 14:
 			pc_lpt_w(lpt, offset - 12, data);
-			break;			
+			break;
 	}
 }
 
@@ -567,7 +567,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 
 	MCFG_GFXDECODE(pcherc)
 
-	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)	
+	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
 MACHINE_CONFIG_END
 
 ROM_START( hercules )
@@ -578,42 +578,42 @@ ROM_END
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
- 
+
 const device_type ISA8_HERCULES = isa8_hercules_device_config::static_alloc_device_config;
- 
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_mda_device_config - constructor
 //-------------------------------------------------
- 
+
 isa8_hercules_device_config::isa8_hercules_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
         : isa8_mda_device_config(mconfig, tag, owner, clock)
 {
 	m_shortname = "hercules";
 }
- 
+
 //-------------------------------------------------
 //  static_alloc_device_config - allocate a new
 //  configuration object
 //-------------------------------------------------
- 
+
 device_config *isa8_hercules_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
         return global_alloc(isa8_hercules_device_config(mconfig, tag, owner, clock));
 }
- 
+
 //-------------------------------------------------
 //  alloc_device - allocate a new device object
 //-------------------------------------------------
- 
+
 device_t *isa8_hercules_device_config::alloc_device(running_machine &machine) const
 {
         return auto_alloc(machine, isa8_hercules_device(machine, *this));
 }
- 
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -636,23 +636,23 @@ const rom_entry *isa8_hercules_device_config::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
- 
+
 //-------------------------------------------------
 //  isa8_hercules_device - constructor
 //-------------------------------------------------
- 
+
 isa8_hercules_device::isa8_hercules_device(running_machine &_machine, const isa8_hercules_device_config &config) :
         isa8_mda_device(_machine, config),
 		m_config(config)
 {
 }
- 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
- 
+
 void isa8_hercules_device::device_start()
-{        
+{
 	videoram = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(hercules_r), FUNC(hercules_w) );
@@ -660,20 +660,20 @@ void isa8_hercules_device::device_start()
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);	
+		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
 }
- 
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
- 
+
 void isa8_hercules_device::device_reset()
 {
 	isa8_mda_device::device_reset();
 	configuration_switch = 0;
 
 	astring tempstring;
-	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();	
+	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();
 }
 
 /***************************************************************************
@@ -766,7 +766,7 @@ static WRITE8_DEVICE_HANDLER(hercules_config_w)
 static WRITE8_DEVICE_HANDLER ( hercules_w )
 {
 	device_t *devconf = device->subdevice(HERCULES_MC6845_NAME);
-	device_t *lpt = device->subdevice("lpt");	
+	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
@@ -780,7 +780,7 @@ static WRITE8_DEVICE_HANDLER ( hercules_w )
 		break;
 	case 12: case 13:  case 14:
 		pc_lpt_w(lpt, offset - 12, data);
-		break;					
+		break;
 	case 15:
 		hercules_config_w(device, offset, data);
 		break;
@@ -825,7 +825,7 @@ static READ8_DEVICE_HANDLER ( hercules_r )
 	/* 12, 13, 14  are the LPT ports */
 	case 12: case 13:  case 14:
 		data = pc_lpt_r(lpt, offset - 12);
-		break;		
+		break;
 	}
 	return data;
 }

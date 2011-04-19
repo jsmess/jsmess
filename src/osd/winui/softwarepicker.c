@@ -214,7 +214,7 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 
 
 //static void ComputeFileHash(software_picker_info *pPickerInfo,
-//	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
+//  file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
 //{
 	//const char *functions;
 
@@ -229,94 +229,94 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 
 /*static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 {
-	software_picker_info *pPickerInfo;
-	file_info *pFileInfo;
-	LPSTR pszZipName;
-	BOOL rc = FALSE;
-	unsigned char *pBuffer;
-	unsigned int nLength;
-	HANDLE hFile, hFileMapping;
-	LVFINDINFO lvfi;
-	BOOL res;
+    software_picker_info *pPickerInfo;
+    file_info *pFileInfo;
+    LPSTR pszZipName;
+    BOOL rc = FALSE;
+    unsigned char *pBuffer;
+    unsigned int nLength;
+    HANDLE hFile, hFileMapping;
+    LVFINDINFO lvfi;
+    BOOL res;
 
-	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
-	assert((nIndex >= 0) && (nIndex < pPickerInfo->file_index_length));
-	pFileInfo = pPickerInfo->file_index[nIndex];
+    pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
+    assert((nIndex >= 0) && (nIndex < pPickerInfo->file_index_length));
+    pFileInfo = pPickerInfo->file_index[nIndex];
 
-	if (pFileInfo->zip_entry_name)
-	{
-		// this is in a ZIP file
-		zip_file *zip;
-		zip_error ziperr;
-		const zip_file_header *zipent;
+    if (pFileInfo->zip_entry_name)
+    {
+        // this is in a ZIP file
+        zip_file *zip;
+        zip_error ziperr;
+        const zip_file_header *zipent;
 
-		// open the ZIP file
-		nLength = pFileInfo->zip_entry_name - pFileInfo->file_name;
-		pszZipName = (LPSTR) alloca(nLength);
-		memcpy(pszZipName, pFileInfo->file_name, nLength);
-		pszZipName[nLength - 1] = '\0';
+        // open the ZIP file
+        nLength = pFileInfo->zip_entry_name - pFileInfo->file_name;
+        pszZipName = (LPSTR) alloca(nLength);
+        memcpy(pszZipName, pFileInfo->file_name, nLength);
+        pszZipName[nLength - 1] = '\0';
 
-		// get the entry name
-		ziperr = zip_file_open(pszZipName, &zip);
-		if (ziperr == ZIPERR_NONE)
-		{
-			zipent = zip_file_first_file(zip);
-			while(!rc && zipent)
-			{
-				if (!mame_stricmp(zipent->filename, pFileInfo->zip_entry_name))
-				{
-					pBuffer = (unsigned char *)malloc(zipent->uncompressed_length);
-					if (pBuffer)
-					{
-						ziperr = zip_file_decompress(zip, pBuffer, zipent->uncompressed_length);
-						if (ziperr == ZIPERR_NONE)
-						{
-							ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, zipent->uncompressed_length);
-							rc = TRUE;
-						}
-						free(pBuffer);
-					}
-				}
-				zipent = zip_file_next_file(zip);
-			}
-			zip_file_close(zip);
-		}
-	}
-	else
-	{
-		// plain open file; map it into memory and calculate the hash
-		hFile = win_create_file_utf8(pFileInfo->file_name, GENERIC_READ, FILE_SHARE_READ, NULL,
-			OPEN_EXISTING, 0, NULL);
-		if (hFile != INVALID_HANDLE_VALUE)
-		{
-			nLength = GetFileSize(hFile, NULL);
-			hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-			if (hFileMapping)
-			{
-				pBuffer = (unsigned char *)MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
-				if (pBuffer)
-				{
-					ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, nLength);
-					UnmapViewOfFile(pBuffer);
-					rc = TRUE;
-				}
-				CloseHandle(hFileMapping);
-			}
-			CloseHandle(hFile);
-		}
-	}
+        // get the entry name
+        ziperr = zip_file_open(pszZipName, &zip);
+        if (ziperr == ZIPERR_NONE)
+        {
+            zipent = zip_file_first_file(zip);
+            while(!rc && zipent)
+            {
+                if (!mame_stricmp(zipent->filename, pFileInfo->zip_entry_name))
+                {
+                    pBuffer = (unsigned char *)malloc(zipent->uncompressed_length);
+                    if (pBuffer)
+                    {
+                        ziperr = zip_file_decompress(zip, pBuffer, zipent->uncompressed_length);
+                        if (ziperr == ZIPERR_NONE)
+                        {
+                            ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, zipent->uncompressed_length);
+                            rc = TRUE;
+                        }
+                        free(pBuffer);
+                    }
+                }
+                zipent = zip_file_next_file(zip);
+            }
+            zip_file_close(zip);
+        }
+    }
+    else
+    {
+        // plain open file; map it into memory and calculate the hash
+        hFile = win_create_file_utf8(pFileInfo->file_name, GENERIC_READ, FILE_SHARE_READ, NULL,
+            OPEN_EXISTING, 0, NULL);
+        if (hFile != INVALID_HANDLE_VALUE)
+        {
+            nLength = GetFileSize(hFile, NULL);
+            hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+            if (hFileMapping)
+            {
+                pBuffer = (unsigned char *)MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
+                if (pBuffer)
+                {
+                    ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, nLength);
+                    UnmapViewOfFile(pBuffer);
+                    rc = TRUE;
+                }
+                CloseHandle(hFileMapping);
+            }
+            CloseHandle(hFile);
+        }
+    }
 
-	if (rc)
-	{
-		memset(&lvfi, 0, sizeof(lvfi));
-		lvfi.flags = LVFI_PARAM;
-		lvfi.lParam = nIndex;
-		nIndex = ListView_FindItem(hwndPicker, -1, &lvfi);
-		if (nIndex > 0)
-			res = ListView_RedrawItems(hwndPicker, nIndex, nIndex);
-	}
+    if (rc)
+    {
+        memset(&lvfi, 0, sizeof(lvfi));
+        lvfi.flags = LVFI_PARAM;
+        lvfi.lParam = nIndex;
+        nIndex = ListView_FindItem(hwndPicker, -1, &lvfi);
+        if (nIndex > 0)
+            res = ListView_RedrawItems(hwndPicker, nIndex, nIndex);
+    }
 
-	return rc;
+    return rc;
 }
 
 */
@@ -325,9 +325,9 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 {
 	software_picker_info *pPickerInfo;
 	file_info *pFileInfo;
-//	const char *nHashFunctionsUsed = NULL;
+//  const char *nHashFunctionsUsed = NULL;
 	//unsigned int nCalculatedHashes = 0;
-//	iodevice_t type;
+//  iodevice_t type;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	assert((nIndex >= 0) && (nIndex < pPickerInfo->file_index_length));
@@ -336,26 +336,26 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 	// Determine which hash functions we need to use for this file, and which hashes
 	// have already been calculated
 	/*if ((pPickerInfo->config->hashfile != NULL) && (pFileInfo->device != NULL))
-	{
-		type = pFileInfo->device->image_type();
-		if (type < IO_COUNT)
-	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->config->hashfile, type);
-		nCalculatedHashes = hash_data_used_functions(pFileInfo->hash_string);
-	}*/
+    {
+        type = pFileInfo->device->image_type();
+        if (type < IO_COUNT)
+            nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->config->hashfile, type);
+        nCalculatedHashes = hash_data_used_functions(pFileInfo->hash_string);
+    }*/
 
 	// Did we fully compute all hashes?
-/*	if ((nHashFunctionsUsed & ~nCalculatedHashes) == 0)
-	{
-		// We have calculated all hashs for this file; mark it as realized
-		pPickerInfo->file_index[nIndex]->hash_realized = TRUE;
-		pPickerInfo->hashes_realized++;
+/*  if ((nHashFunctionsUsed & ~nCalculatedHashes) == 0)
+    {
+        // We have calculated all hashs for this file; mark it as realized
+        pPickerInfo->file_index[nIndex]->hash_realized = TRUE;
+        pPickerInfo->hashes_realized++;
 
-		if (pPickerInfo->config->hashfile)
-		{
-			pPickerInfo->file_index[nIndex]->hashinfo = hashfile_lookup(pPickerInfo->config->hashfile,
-				pPickerInfo->file_index[nIndex]->hashes);
-		}
-	}*/
+        if (pPickerInfo->config->hashfile)
+        {
+            pPickerInfo->file_index[nIndex]->hashinfo = hashfile_lookup(pPickerInfo->config->hashfile,
+                pPickerInfo->file_index[nIndex]->hashes);
+        }
+    }*/
 }
 
 
@@ -690,12 +690,12 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		pFileInfo = pPickerInfo->file_index[pPickerInfo->current_position];
 		if (!pFileInfo->hash_realized)
 		{
-/*			if (hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type()))
-			{
-				// only calculate the hash if it is appropriate for this device
-				if (!SoftwarePicker_CalculateHash(hwndPicker, pPickerInfo->current_position))
-					return FALSE;
-			}*/
+/*          if (hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type()))
+            {
+                // only calculate the hash if it is appropriate for this device
+                if (!SoftwarePicker_CalculateHash(hwndPicker, pPickerInfo->current_position))
+                    return FALSE;
+            }*/
 			SoftwarePicker_RealizeHash(hwndPicker, pPickerInfo->current_position);
 
 			// under normal circumstances this will be redundant, but in the unlikely
@@ -727,7 +727,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	LPCTSTR s = NULL;
 	//const char *pszUtf8 = NULL;
 	unsigned int nHashFunction = 0;
-//	char szBuffer[256];
+//  char szBuffer[256];
 	TCHAR* t_buf;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -751,33 +751,33 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 		case MESS_COLUMN_MANUFACTURER:
 		case MESS_COLUMN_YEAR:
 		case MESS_COLUMN_PLAYABLE:
-/*			if (pFileInfo->hashinfo)
-			{
-				switch(nColumn)
-				{
-					case MESS_COLUMN_GOODNAME:
-						pszUtf8 = pFileInfo->hashinfo->longname;
-						break;
-					case MESS_COLUMN_MANUFACTURER:
-						pszUtf8 = pFileInfo->hashinfo->manufacturer;
-						break;
-					case MESS_COLUMN_YEAR:
-						pszUtf8 = pFileInfo->hashinfo->year;
-						break;
-					case MESS_COLUMN_PLAYABLE:
-						pszUtf8 = pFileInfo->hashinfo->playable;
-						break;
-				}
-				if (pszUtf8)
-				{
-					t_buf = tstring_from_utf8(pszUtf8);
-					if( !t_buf )
-						return s;
-					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
-					s = pszBuffer;
-					osd_free(t_buf);
-				}
-			}*/
+/*          if (pFileInfo->hashinfo)
+            {
+                switch(nColumn)
+                {
+                    case MESS_COLUMN_GOODNAME:
+                        pszUtf8 = pFileInfo->hashinfo->longname;
+                        break;
+                    case MESS_COLUMN_MANUFACTURER:
+                        pszUtf8 = pFileInfo->hashinfo->manufacturer;
+                        break;
+                    case MESS_COLUMN_YEAR:
+                        pszUtf8 = pFileInfo->hashinfo->year;
+                        break;
+                    case MESS_COLUMN_PLAYABLE:
+                        pszUtf8 = pFileInfo->hashinfo->playable;
+                        break;
+                }
+                if (pszUtf8)
+                {
+                    t_buf = tstring_from_utf8(pszUtf8);
+                    if( !t_buf )
+                        return s;
+                    _sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+                    s = pszBuffer;
+                    osd_free(t_buf);
+                }
+            }*/
 			break;
 
 		case MESS_COLUMN_CRC:
@@ -789,15 +789,15 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 				case MESS_COLUMN_MD5:	nHashFunction = hash_collection::HASH_MD5;	break;
 				case MESS_COLUMN_SHA1:	nHashFunction = hash_collection::HASH_SHA1;	break;
 			}
-/*			if (hash_data_extract_printable_checksum(pFileInfo->hash_string, nHashFunction, szBuffer))
-			{
-				t_buf = tstring_from_utf8(szBuffer);
-				if( !t_buf )
-					return s;
-				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
-				s = pszBuffer;
-				osd_free(t_buf);
-			}*/
+/*          if (hash_data_extract_printable_checksum(pFileInfo->hash_string, nHashFunction, szBuffer))
+            {
+                t_buf = tstring_from_utf8(szBuffer);
+                if( !t_buf )
+                    return s;
+                _sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+                s = pszBuffer;
+                osd_free(t_buf);
+            }*/
 			break;
 	}
 	return s;

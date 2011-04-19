@@ -33,7 +33,7 @@ UINT8 ibm_vga_device::vga_crtc_r(int offset)
 
 void ibm_vga_device::vga_crtc_w(int offset, UINT8 data)
 {
-	switch(offset) 
+	switch(offset)
 	{
 		case 4:
 			mc6845_address_w( m_crtc, offset, data );
@@ -43,12 +43,12 @@ void ibm_vga_device::vga_crtc_w(int offset, UINT8 data)
 			break;
 	}
 }
-	
+
 READ8_MEMBER(ibm_vga_device::vga_port_03b0_r)
 {
 	UINT8 retVal = 0xff;
 	if (CRTC_PORT_ADDR == 0x3b0)
-		retVal = vga_crtc_r(offset);	
+		retVal = vga_crtc_r(offset);
 	//if (LOG_ACCESSES)
 		//logerror("vga_port_03b0_r(): port=0x%04x data=0x%02x\n", offset + 0x3b0, retVal);
 	return retVal;
@@ -76,7 +76,7 @@ READ8_MEMBER( ibm_vga_device::vga_port_03c0_r)
 					{
 						retVal = m_attr_data[m_attr_idx & 0x1f];
 					}
-					break;	
+					break;
 		case 0x04 : // Sequencer Index Register
 					retVal = m_seq_idx;
 					break;
@@ -106,11 +106,11 @@ READ8_MEMBER( ibm_vga_device::vga_port_03c0_r)
 						}
 					}
 					break;
-		case 0x0a : // 
+		case 0x0a : //
 					retVal = m_feature_ctrl;
 		case 0x0c : // Miscellaneous Output Register
 					retVal = m_misc_out_reg;
-					break;					
+					break;
 		case 0x0e : // Graphics Index Register
 					retVal = m_gc_idx;
 					break;
@@ -120,7 +120,7 @@ READ8_MEMBER( ibm_vga_device::vga_port_03c0_r)
 	}
 
 	if (LOG_ACCESSES)
-		logerror("vga_port_03c0_r(): port=0x%04x data=0x%02x\n", offset + 0x3c0, retVal);	
+		logerror("vga_port_03c0_r(): port=0x%04x data=0x%02x\n", offset + 0x3c0, retVal);
 	return retVal;
 }
 
@@ -128,7 +128,7 @@ WRITE8_MEMBER( ibm_vga_device::vga_port_03c0_w )
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03c0_w(): port=0x%04x data=0x%02x\n", offset + 0x3c0, data);
-		
+
 	switch(offset) {
 		case 0x00:  // Attribute Controller
 					if (m_attr_state==0)
@@ -140,7 +140,7 @@ WRITE8_MEMBER( ibm_vga_device::vga_port_03c0_w )
 						m_attr_data[m_attr_idx & 0x1f] = data;
 					}
 					m_attr_state=!m_attr_state;
-					break;	
+					break;
 		case 0x02 : // Miscellaneous Output Register
 					m_misc_out_reg = data;
 					break;
@@ -152,7 +152,7 @@ WRITE8_MEMBER( ibm_vga_device::vga_port_03c0_w )
 					break;
 		case 0x06 : // Video DAC Pel Mask Register
 					m_dac_mask = data;
-					break;					
+					break;
 		case 0x07 : // Video DAC Index (CLUT Reads)
 					m_dac_read_idx = data;
 					m_dac_state = 0;
@@ -161,24 +161,24 @@ WRITE8_MEMBER( ibm_vga_device::vga_port_03c0_w )
 		case 0x08 : // Video DAC Index (CLUT Writes)
 					m_dac_write_idx = data;
 					m_dac_state = 0;
-					m_dac_read = 0;		
+					m_dac_read = 0;
 					break;
 		case 0x09 : // Video DAC Data Register
 					if (!m_dac_read)
 					{
 						m_dac_color[m_dac_state++][m_dac_write_idx] = data;
 						if (m_dac_state==3) {
-							m_dac_state=0; 
+							m_dac_state=0;
 							m_dac_write_idx++;
 						}
-					}		
+					}
 					break;
 		case 0x0e : // Graphics Index Register
 					m_gc_idx = data;
 					break;
 		case 0x0f : // Graphics Data Register
 					m_gc_data[m_gc_idx & 0x1f] = data;
-					break;					
+					break;
 	}
 }
 
@@ -186,15 +186,15 @@ READ8_MEMBER( ibm_vga_device::vga_port_03d0_r)
 {
 	UINT8 retVal = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
-		retVal = vga_crtc_r(offset);		
+		retVal = vga_crtc_r(offset);
 	//if (LOG_ACCESSES)
-//		logerror("vga_port_03d0_r(): port=0x%04x data=0x%02x\n", offset + 0x3d0, retVal);
+//      logerror("vga_port_03d0_r(): port=0x%04x data=0x%02x\n", offset + 0x3d0, retVal);
 	return retVal;
 }
 
 WRITE8_MEMBER( ibm_vga_device::vga_port_03d0_w )
 {
-//	if (LOG_ACCESSES)
+//  if (LOG_ACCESSES)
 		//logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
 	if (CRTC_PORT_ADDR == 0x3d0)
 		vga_crtc_w(offset, data);
@@ -346,7 +346,7 @@ void ibm_vga_device::device_start()
 
 		case 64:
 			break;
-			
+
 		default:
 			fatalerror("VGA: Bus width %d not supported", buswidth);
 			break;
@@ -362,19 +362,19 @@ void ibm_vga_device::device_start()
 
 void ibm_vga_device::device_reset()
 {
-	m_misc_out_reg = 0;	
+	m_misc_out_reg = 0;
 	m_feature_ctrl = 0;
-	
+
 	m_seq_idx = 0;
 	memset(m_seq_data,0xff,0x1f);
-	
+
 	m_attr_idx = 0;
 	memset(m_attr_data,0xff,0x1f);
 	m_attr_state = 0;
-	
+
 	m_gc_idx = 0;
 	memset(m_gc_data,0xff,0x1f);
-	
+
 	m_dac_mask = 0;
 	m_dac_write_idx = 0;
 	m_dac_read_idx = 0;
@@ -382,6 +382,6 @@ void ibm_vga_device::device_reset()
 	m_dac_state = 0;
 	memset(m_dac_color,0,sizeof(m_dac_color));
 
-	for (int i = 0; i < 0x100; i++)	
-		palette_set_color_rgb(machine(), i, 0, 0, 0);	
+	for (int i = 0; i < 0x100; i++)
+		palette_set_color_rgb(machine(), i, 0, 0, 0);
 }

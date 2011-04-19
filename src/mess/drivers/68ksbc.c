@@ -3,9 +3,9 @@
     Skeleton driver for 68k Single Board Computer
 
     29/03/2011
- 
+
     http://www.kmitl.ac.th/~kswichit/68k/68k.html
- 
+
     TODO:
     - Add RTC (type DS12887)
     - Add UART (type mc6850)
@@ -49,7 +49,7 @@ public:
 	UINT8 m_term_data;
 };
 
-//bit 0 high = a key is ready; bit 1 high = ready to output to terminal 
+//bit 0 high = a key is ready; bit 1 high = ready to output to terminal
 READ16_MEMBER( c68ksbc_state::c68ksbc_status_r )
 {
 	if (m_term_data)

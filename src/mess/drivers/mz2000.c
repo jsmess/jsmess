@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	Sharp MZ-2000
+    Sharp MZ-2000
 
-	driver by Angelo Salese
-	font conversion by Tomasz Slanina
+    driver by Angelo Salese
+    font conversion by Tomasz Slanina
 
-	Basically a simpler version of Sharp MZ-2500
+    Basically a simpler version of Sharp MZ-2500
 
-	TODO:
-	- cassette interface;
-	- implement remaining video capabilities
+    TODO:
+    - cassette interface;
+    - implement remaining video capabilities
 
 ****************************************************************************/
 
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START(mz2000_io, AS_IO, 8)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
-//	AM_RANGE(0xf4, 0xf7) CRTC
+//  AM_RANGE(0xf4, 0xf7) CRTC
 	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
@@ -557,13 +557,13 @@ static READ8_DEVICE_HANDLER( mz2000_porta_r )
 static READ8_DEVICE_HANDLER( mz2000_portb_r )
 {
 	/*
-	x--- ---- break key
-	-x-- ---- read tape data
-	--x- ---- no tape signal
-	---x ---- no tape write signal
-	---- x--- end of tape reached
-	---- ---x "blank" control
-	*/
+    x--- ---- break key
+    -x-- ---- read tape data
+    --x- ---- no tape signal
+    ---x ---- no tape write signal
+    ---- x--- end of tape reached
+    ---- ---x "blank" control
+    */
 	UINT8 res = 0xff ^ 0xe0;
 
 	res |= (cassette_input(device->machine().device("cassette")) > 0.00) ? 0x40 : 0x00;
@@ -583,15 +583,15 @@ static READ8_DEVICE_HANDLER( mz2000_portc_r )
 static WRITE8_DEVICE_HANDLER( mz2000_porta_w )
 {
 	/*
-	x--- ---- tape "APSS"
-	-x-- ---- tape "APLAY"
-	--x- ---- tape "AREW"
-	---x ---- reverse video
-	---- x--- tape stop
-	---- -x-- tape play
-	---- --x- tape ff
-	---- ---x tape rewind
-	*/
+    x--- ---- tape "APSS"
+    -x-- ---- tape "APLAY"
+    --x- ---- tape "AREW"
+    ---x ---- reverse video
+    ---- x--- tape stop
+    ---- -x-- tape play
+    ---- --x- tape ff
+    ---- ---x tape rewind
+    */
 	//printf("A W %02x\n",data);
 
 	// ...
@@ -608,13 +608,13 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
 {
 	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 	/*
-		x--- ---- tape data write
-		-x-- ---- tape rec
-		--x- ---- tape ?
-		---x ---- tape open
-		---- x--- 0->1 transition = IPL reset
-	    ---- -x-- beeper state
-	    ---- --x- 0->1 transition = Work RAM reset
+        x--- ---- tape data write
+        -x-- ---- tape rec
+        --x- ---- tape ?
+        ---x ---- tape open
+        ---- x--- 0->1 transition = IPL reset
+        ---- -x-- beeper state
+        ---- --x- 0->1 transition = Work RAM reset
     */
 	printf("C W %02x\n",data);
 
@@ -799,7 +799,7 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1800, "chargen", 0 )
-//	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
+//  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 	/* these are hand-crafted roms, converted from bmps floating around the net */
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
 	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
@@ -820,7 +820,7 @@ ROM_START( mz2200 )
 	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1800, "chargen", 0 )
-//	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
+//  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 	/* these are hand-crafted roms, converted from bmps floating around the net */
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
 	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )

@@ -456,7 +456,7 @@ static MACHINE_CONFIG_DERIVED( specialp, special )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-    MCFG_VIDEO_START(specialp)	
+    MCFG_VIDEO_START(specialp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specimx, special )
@@ -469,7 +469,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
     /* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(specimx)
-	
+
 	MCFG_VIDEO_START(specimx)
 
 	MCFG_PALETTE_LENGTH(16)

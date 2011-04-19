@@ -264,13 +264,13 @@ NOTE: RE is not wired into the matrix, and is run separately out.
 
 There are 8 LEDs, and an 8 digit 14 segment VFD with commas and periods.
 This display is the same one as can be found on the speak and spell.
- 
+
        A       * comma
   ***********  *
  * *I  *J K* *
 F*  *  *  *  *B
  *   * * *   *
-  G**** *****H 
+  G**** *****H
  *   * * *   *
 E*  *  *  *  *C
  * *N  *M L* *
@@ -378,16 +378,16 @@ output # (selected turns this column on, and all others off)
 6 - LED column G, button column G
 7 - LED column H, button column H
 8 - button column I
-9 - 
+9 -
 
 The rows/columns are indicated on the game board:
 
 
- ABCDEFGH   I 
+ ABCDEFGH   I
 --------------
 |            | 8
 |            | 7
-|            | 6 
+|            | 6
 |            | 5
 |            | 4
 |            | 3
@@ -436,7 +436,7 @@ to different port chips this time.
 Hardware:
 ---------
 
-On the board are 13 chips. 
+On the board are 13 chips.
 
 The CPU is a Z80A running at 3.9MHz, with 20K of ROM and 1K of RAM mapped.
 I/O is composed of an 8255 triple port adaptor, and a Z80A PIO parallel I/O
@@ -446,7 +446,7 @@ There's the usual TSI S14001A speech synth with its requisite 4K ROM which is th
 same as on the other talking chess boards.  The TSI chip is running at 26.37KHz.
 It uses a 470K resistor and a 100pf capacitor.
 
-The "perfect" clock would be 1/RC most likely (actually this will be skewed a tad by 
+The "perfect" clock would be 1/RC most likely (actually this will be skewed a tad by
 duty cycle of the oscillator) which with those parts values gives 21.27KHz.  The
 formula is probably more likely to be 1/1.2RC or so.
 
@@ -461,7 +461,7 @@ RST connects to a power-on reset circuit
 Memory map:
 -----------
 
-0000-1FFF: 8K ROM 101-64018 
+0000-1FFF: 8K ROM 101-64018
 2000-3FFF: 8K ROM 101-64019 (also used on the sensory champ. chess challenger)
 4000-5FFF: 4K ROM 101-32024
 6000-7FFF: 1K of RAM (2114 * 2)
@@ -475,7 +475,7 @@ parallel input/output device.
 
 Decoding isn't performed using a selector, but instead address lines are used.
 
-A2 connects to /CE on the 8255 
+A2 connects to /CE on the 8255
 A3 connects to /CE on the Z80A PIO
 
 A1 connects to control/data select on PIO & A0 of 8255
@@ -1169,7 +1169,7 @@ ROM_START(vbc)
 
     ROM_REGION(0x1000, "mcu", 0)
     ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
-	
+
     ROM_REGION(0x2000, "speech", 0)
     ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
 ROM_END
@@ -1182,7 +1182,7 @@ ROM_START(abc)
 
     ROM_REGION(0x1000, "mcu", 0)
     ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
-	
+
     ROM_REGION(0x2000, "speech", 0)
     ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
 ROM_END

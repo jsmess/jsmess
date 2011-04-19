@@ -17,7 +17,7 @@
     banking:
     - 0x1c = 0
     AM_RANGE(0x0000,0x1fff) ROM
-	AM_RANGE(0x2000,0xdfff) NOP
+    AM_RANGE(0x2000,0xdfff) NOP
     AM_RANGE(0xe000,0xffff) RAM
     - 0x1c = 1 0x20 = 1
     AM_RANGE(0x0000,0x7fff) RAM (0x18 selects bank)
@@ -624,7 +624,7 @@ static WRITE8_HANDLER( vram_bank_w )
 		if(data != 1 && data != 2 && data != 4)
 			printf("%02x\n",data);
 
-		if(data & 1) 	  { state->m_hgdc->bank_w(*space, 0, 0); } // B
+		if(data & 1)	  { state->m_hgdc->bank_w(*space, 0, 0); } // B
 		else if(data & 2) { state->m_hgdc->bank_w(*space, 0, 2); } // G
 		else if(data & 4) { state->m_hgdc->bank_w(*space, 0, 4); } // R
 	}
@@ -655,13 +655,13 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8)
 	AM_RANGE(0x34, 0x34) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, read, write)
-//	AM_RANGE(0x3a, 0x3a) GDC zoom
-//	AM_RANGE(0x3b, 0x3b) GDC light pen req
+//  AM_RANGE(0x3a, 0x3a) GDC zoom
+//  AM_RANGE(0x3b, 0x3b) GDC light pen req
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_r, i8237_w)
 	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", i8237_r, i8237_w)
-//	AM_RANGE(0xfc, 0xfd) Multi-Font comms
+//  AM_RANGE(0xfc, 0xfd) Multi-Font comms
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1034,7 +1034,7 @@ ROM_START( qx10 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-//	ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))  //this one contains special characters only
+//  ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))  //this one contains special characters only
 	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 ROM_END
 
@@ -1049,7 +1049,7 @@ ROM_START( qc10 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132)) //mfont.rom
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-//	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(04a6da6d) SHA1(ef9743476f6fb30ca9209cf700e985a7f85066bb)) //this one contains normal characters
+//  ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(04a6da6d) SHA1(ef9743476f6fb30ca9209cf700e985a7f85066bb)) //this one contains normal characters
 	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 ROM_END
 

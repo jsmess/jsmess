@@ -2,7 +2,7 @@
     commodore b series computer
 
     PeT mess@utanet.at
-	
+
     documentation
      vice emulator
      www.funet.fi

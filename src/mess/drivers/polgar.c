@@ -135,7 +135,7 @@ static WRITE8_HANDLER ( write_io )
 			output_set_led_value(i,!BIT(state->m_latch_data,i));
 			output_set_led_value(10+i,!BIT(state->m_latch_data,7-i));
 		}
-		
+
 
 	//logerror("LCD Status  Data = %d\n",data);
 
@@ -160,7 +160,7 @@ static WRITE8_HANDLER ( milano_write_led )
 	else
 		output_set_led_value(LED_offset+offset,0);
 
-//	logerror("milano_write_led Offset = %d Data = %d\n",offset,data);
+//  logerror("milano_write_led Offset = %d Data = %d\n",offset,data);
 }
 
 static WRITE8_HANDLER ( write_led )
@@ -214,7 +214,7 @@ static READ8_HANDLER(milano_read_board)
 	{
 		line=get_first_cleared_bit(state->m_latch_data);
 		tmp=input_port_read(space->machine(),  board_lines[line]);
-		
+
 		if (tmp != 0xff)
 			data=convert_imputmask(tmp);
 

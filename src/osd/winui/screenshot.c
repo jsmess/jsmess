@@ -14,11 +14,11 @@
 /***************************************************************************
 
   Screenshot.c
-  
+
     Win32 DIB handling.
-    
+
       Created 7/1/98 by Mike Haaland (mhaaland@hypertech.com)
-      
+
 ***************************************************************************/
 
 // standard windows headers
@@ -145,7 +145,7 @@ BOOL LoadScreenShot(int nGame, int nType)
 		HDC hdc = GetDC(GetMainWindow());
 		m_hDDB = DIBToDDB(hdc, m_hDIB, NULL);
 		ReleaseDC(GetMainWindow(),hdc);
-		
+
 		current_image_game = nGame;
 		current_image_type = nType;
 
@@ -198,7 +198,7 @@ static const zip_file_header *zip_file_seek_file(zip_file *zip, const char *file
 	new_filename = (char*)malloc(strlen(filename) + 1);
 	if (!new_filename)
 		return NULL;
-	
+
 	// change all backslashes to forward slashes
 	for (i = 0; filename[i]; i++)
 		new_filename[i] = (filename[i] != '\\') ? filename[i] : '/';
@@ -365,8 +365,8 @@ HBITMAP DIBToDDB(HDC hDC, HANDLE hDIB, LPMYBITMAPINFO desc)
 	nColors = lpbi->biClrUsed ? lpbi->biClrUsed : 1 << lpbi->biBitCount;
 
 	if (bmInfo->bmiHeader.biBitCount > 8)
-		lpDIBBits = (LPVOID)((LPDWORD)(bmInfo->bmiColors + 
-			bmInfo->bmiHeader.biClrUsed) + 
+		lpDIBBits = (LPVOID)((LPDWORD)(bmInfo->bmiColors +
+			bmInfo->bmiHeader.biClrUsed) +
 			((bmInfo->bmiHeader.biCompression == BI_BITFIELDS) ? 3 : 0));
 	else
 		lpDIBBits = (LPVOID)(bmInfo->bmiColors + nColors);
@@ -380,7 +380,7 @@ HBITMAP DIBToDDB(HDC hDC, HANDLE hDIB, LPMYBITMAPINFO desc)
 	}
 
 	hBM = CreateDIBitmap(hDC,					  /* handle to device context */
-						(LPBITMAPINFOHEADER)lpbi, /* pointer to bitmap info header	*/
+						(LPBITMAPINFOHEADER)lpbi, /* pointer to bitmap info header  */
 						(LONG)CBM_INIT, 		  /* initialization flag */
 						lpDIBBits,				  /* pointer to initialization data  */
 						(LPBITMAPINFO)lpbi, 	  /* pointer to bitmap info */
@@ -419,28 +419,28 @@ BOOL AllocatePNG(png_info *p, HGLOBAL *phDIB, HPALETTE *pPal)
 	pixel_ptr = 0;
 	row 	  = p->height - 1;
 	lineWidth = p->width;
-	
+
 	if (p->color_type != 2 && p->num_palette <= 256)
 		nColors =  p->num_palette;
 
-	bi.biSize			= sizeof(BITMAPINFOHEADER); 
+	bi.biSize			= sizeof(BITMAPINFOHEADER);
 	bi.biWidth			= p->width;
 	bi.biHeight 		= p->height;
 	bi.biPlanes 		= 1;
 	bi.biBitCount		= (p->color_type == 3) ? 8 : 24; /* bit_depth; */
-	
-	bi.biCompression	= BI_RGB; 
-	bi.biSizeImage		= 0; 
-	bi.biXPelsPerMeter	= 0; 
-	bi.biYPelsPerMeter	= 0; 
+
+	bi.biCompression	= BI_RGB;
+	bi.biSizeImage		= 0;
+	bi.biXPelsPerMeter	= 0;
+	bi.biYPelsPerMeter	= 0;
 	bi.biClrUsed		= nColors;
 	bi.biClrImportant	= nColors;
-	
+
 	effWidth = (long)(((long)lineWidth*bi.biBitCount + 31) / 32) * 4;
-	
+
 	dibSize = (effWidth * bi.biHeight);
 	hDIB = GlobalAlloc(GMEM_FIXED, bi.biSize + (nColors * sizeof(RGBQUAD)) + dibSize);
-	
+
 	if (!hDIB)
 	{
 		return FALSE;
@@ -454,24 +454,24 @@ BOOL AllocatePNG(png_info *p, HGLOBAL *phDIB, HPALETTE *pPal)
 	{
 		int i;
 		/*
-		  Convert a PNG palette (3 byte RGBTRIPLEs) to a new
-		  color table (4 byte RGBQUADs)
-		*/
+          Convert a PNG palette (3 byte RGBTRIPLEs) to a new
+          color table (4 byte RGBQUADs)
+        */
 		for (i = 0; i < nColors; i++)
 		{
 			RGBQUAD rgb;
-			
+
 			rgb.rgbRed		= p->palette[i * 3 + 0];
 			rgb.rgbGreen	= p->palette[i * 3 + 1];
 			rgb.rgbBlue 	= p->palette[i * 3 + 2];
 			rgb.rgbReserved = (BYTE)0;
-			
-			pRgb[i] = rgb; 
-		} 
-	} 
-	
+
+			pRgb[i] = rgb;
+		}
+	}
+
 	bmInfo = (LPBITMAPINFO)hDIB;
-	
+
 	/* Create a halftone palette if colors > 256. */
 	if (0 == nColors || nColors > 256)
 	{
@@ -484,23 +484,23 @@ BOOL AllocatePNG(png_info *p, HGLOBAL *phDIB, HPALETTE *pPal)
 		UINT nSize = sizeof(LOGPALETTE) + (sizeof(PALETTEENTRY) * nColors);
 		LOGPALETTE *pLP = (LOGPALETTE *)malloc(nSize);
 		int  i;
-		
+
 		pLP->palVersion 	= 0x300;
 		pLP->palNumEntries	= nColors;
-		
+
 		for (i = 0; i < nColors; i++)
 		{
 			pLP->palPalEntry[i].peRed	= bmInfo->bmiColors[i].rgbRed;
-			pLP->palPalEntry[i].peGreen = bmInfo->bmiColors[i].rgbGreen; 
+			pLP->palPalEntry[i].peGreen = bmInfo->bmiColors[i].rgbGreen;
 			pLP->palPalEntry[i].peBlue	= bmInfo->bmiColors[i].rgbBlue;
 			pLP->palPalEntry[i].peFlags = 0;
 		}
-		
+
 		*pPal = CreatePalette(pLP);
-		
+
 		free (pLP);
 	}
-	
+
 	copy_size = dibSize;
 	pixel_ptr = (char*)lpDIBBits;
 	*phDIB = hDIB;
@@ -513,7 +513,7 @@ static int png_read_bitmap_gui(LPVOID mfile, HGLOBAL *phDIB, HPALETTE *pPAL)
 	png_info p;
 	UINT32 i;
 	int bytespp;
-	
+
 	if (png_read_file((core_file*)mfile, &p) != PNGERR_NONE)
 		return 0;
 
@@ -529,10 +529,10 @@ static int png_read_bitmap_gui(LPVOID mfile, HGLOBAL *phDIB, HPALETTE *pPAL)
 		png_free(&p);
 		return 0;
 	}
- 
+
 	/* Convert < 8 bit to 8 bit */
 	png_expand_buffer_8bit(&p);
-	
+
 	if (!AllocatePNG(&p, phDIB, pPAL))
 	{
 		logerror("Unable to allocate memory for artwork\n");
@@ -558,7 +558,7 @@ static int png_read_bitmap_gui(LPVOID mfile, HGLOBAL *phDIB, HPALETTE *pPAL)
 				ptr[2] = bTmp;
 				ptr += 3;
 			}
-		}	
+		}
 		store_pixels(p.image + i * (p.width * bytespp), p.width * bytespp);
 	}
 

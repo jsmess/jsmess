@@ -940,7 +940,7 @@ static VIDEO_START( pc_t1t )
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
-	
+
 	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
@@ -957,7 +957,7 @@ static VIDEO_START( pc_t1t )
 		default:
 			fatalerror("T1T: Bus width %d not supported", buswidth);
 			break;
-	}	
+	}
 }
 
 
@@ -971,7 +971,7 @@ static VIDEO_START( pc_pcjr )
 	pcjr.bank = 0;
 	pcjr.mode_control = 0x08;
 	pcjr.chr_size = 8;
-	
+
 	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
@@ -982,5 +982,5 @@ static VIDEO_START( pc_pcjr )
 		default:
 			fatalerror("PCJR: Bus width %d not supported", buswidth);
 			break;
-	}	
+	}
 }

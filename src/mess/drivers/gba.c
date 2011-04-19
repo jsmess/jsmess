@@ -2086,25 +2086,25 @@ static TIMER_CALLBACK( perform_scan )
 	if (scanline == 224)
 	{
 		// FIXME: some games are very picky with this trigger!
-		// * Mario & Luigi SuperStar Saga loses pieces of gfx for 225-227. 
+		// * Mario & Luigi SuperStar Saga loses pieces of gfx for 225-227.
 		// * Driver 2 does not work with values > 217.
-		// * Prince of Persia Sands of Time, Rayman Hoodlum's Revenge, Rayman 3 breaks for large 
+		// * Prince of Persia Sands of Time, Rayman Hoodlum's Revenge, Rayman 3 breaks for large
 		//   values (say > 200, but exact threshold varies).
-		// * Scooby-Doo Unmasked and Mystery Mayhem have problems with large values (missing dialogue 
+		// * Scooby-Doo Unmasked and Mystery Mayhem have problems with large values (missing dialogue
 		//   text).
-		// * Nicktoons Racign does not start with 227; and it resets before going to the race with 
+		// * Nicktoons Racign does not start with 227; and it resets before going to the race with
 		//   values > 206.
 		// * Phil of Future does not start for values > 221.
-		// * Sabrina Teenage Witch does not even reach the Ubi Soft logo if we use the VBL exit value 
-		//   227; it does not display title screen graphics when using 225-226; the intro is broken 
+		// * Sabrina Teenage Witch does not even reach the Ubi Soft logo if we use the VBL exit value
+		//   227; it does not display title screen graphics when using 225-226; the intro is broken
 		//   with anything between 207-224.
 		// * Anstoss Action has broken field graphics for values > 223.
-		// However, taking smaller values breaks raster effects in a LOT of games (e.g. Castlevania 
-		// series, Final Fantasy series, Tales of Phantasia, Banjo Pilot, NES 'collections' by Hudson, 
-		// Jaleco and Technos, plus tons of racing games, which show garbage in the lower half of the 
-		// screen with smaller values). 
+		// However, taking smaller values breaks raster effects in a LOT of games (e.g. Castlevania
+		// series, Final Fantasy series, Tales of Phantasia, Banjo Pilot, NES 'collections' by Hudson,
+		// Jaleco and Technos, plus tons of racing games, which show garbage in the lower half of the
+		// screen with smaller values).
 		// Already choosing 224 instead of 227 makes some glitches to appear in the bottom scanlines.
-		// Other test cases are EA Sport games (like FIFA or Madden) which have various degrees of 
+		// Other test cases are EA Sport games (like FIFA or Madden) which have various degrees of
 		// glitchness depending on the value used here.
 		// More work on IRQs is definitely necessary!
 		int ch, ctrl;

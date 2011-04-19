@@ -329,7 +329,7 @@ int AY3600_init(running_machine &machine)
 	state->m_keystilldown = 0;
 	state->m_keymodreg = A2_KEYMOD_CAPSLOCK;	// caps lock on
 
-	state->m_last_key = 0xff; 	/* necessary for special repeat key behaviour */
+	state->m_last_key = 0xff;	/* necessary for special repeat key behaviour */
 	state->m_last_key_unmodified = 0xff;	/* necessary for special repeat key behaviour */
 	state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
 

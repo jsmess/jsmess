@@ -337,7 +337,7 @@ void mc1000_state::machine_start()
 
 	/* setup memory banking */
 	UINT8 *rom = machine().region(Z80_TAG)->base();
-	
+
 	program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0);
 	memory_configure_bank(machine(), "bank1", 1, 1, rom + 0xc000, 0);
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	
+
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)

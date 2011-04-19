@@ -234,7 +234,7 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	device_t *beta = machine.device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE);
-	
+
 	state->m_ram_disabled_by_beta = 0;
 	if (betadisk_is_active(beta))
 	{

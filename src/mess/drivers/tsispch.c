@@ -194,11 +194,11 @@ READ8_MEMBER( tsispch_state::dsw_r )
 {
 	UINT8 data;
 	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
-	 * The switches are, for normal operation on my unit:
-	 * ON ON OFF OFF OFF OFF OFF OFF
-	 * which makes this register read 0xFC
-	 * When s4-7 is turned on, it reads 0xBC
-	 */
+     * The switches are, for normal operation on my unit:
+     * ON ON OFF OFF OFF OFF OFF OFF
+     * which makes this register read 0xFC
+     * When s4-7 is turned on, it reads 0xBC
+     */
 	data = input_port_read(machine(), "s4");
 	return data;
 }
@@ -206,12 +206,12 @@ READ8_MEMBER( tsispch_state::dsw_r )
 WRITE8_MEMBER( tsispch_state::peripheral_w )
 {
 	/* These are the 4 debug leds on the pcb inside the case.
-	   They are called on the silkscreen, '6','5','4',and '3', and
-	   are connected to bits 1, 2, 3, and 4 of this register.
-	   Bit 4 also connects to the 'talking' LED on the front panel.
-	   When 0 is written to a bit, the led turns on.
-	   See notes at beginning of file for more info.
-	*/
+       They are called on the silkscreen, '6','5','4',and '3', and
+       are connected to bits 1, 2, 3, and 4 of this register.
+       Bit 4 also connects to the 'talking' LED on the front panel.
+       When 0 is written to a bit, the led turns on.
+       See notes at beginning of file for more info.
+    */
 	tsispch_state *state = machine().driver_data<tsispch_state>();
 	state->m_paramReg = data;
 	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
@@ -525,5 +525,5 @@ ROM_START( prose2k )
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME	PARENT	COMPAT	MACHINE		INPUT	INIT	COMPANY     FULLNAME            FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME            FLAGS */
 COMP( 1985, prose2k,	0,		0,		prose2k,		prose2k,	prose2k,	"Telesensory Systems Inc/Speech Plus",	"Prose 2000/2020",	GAME_NOT_WORKING | GAME_NO_SOUND )

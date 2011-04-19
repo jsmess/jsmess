@@ -1480,7 +1480,7 @@ static I8255A_INTERFACE( r232c_ctrl_intf )
 };
 
 static IRQ_CALLBACK(pc88va_irq_callback)
-{	
+{
 	return pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
 }
 

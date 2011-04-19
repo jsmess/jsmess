@@ -658,12 +658,12 @@ static void setup_fdc_buffer( device_t *device,int drive )
 		*(dest + 62) = (UINT8) ((even & 0xff00)>>8);
 		*(dest + 63) = (UINT8) (even & 0xff);
 	}
-	
+
 	// update MFM data with proper CLK signal
 	int lastbit= 0;
 	for(int i=0;i<MAX_TRACK_BYTES ;i++)
 	{
-		UINT8 c=fdc->fdc_status[drive].mfm[i];		
+		UINT8 c=fdc->fdc_status[drive].mfm[i];
 		UINT8 dat = 0;
 		for(int j=0;j<8;j=j+2)
 		{
@@ -677,7 +677,7 @@ static void setup_fdc_buffer( device_t *device,int drive )
 			{
 				if(lastbit==0 && (c1&0x2))
 				{
-					dat |= (0x02<<(6-j));					
+					dat |= (0x02<<(6-j));
 				}
 				else
 				{

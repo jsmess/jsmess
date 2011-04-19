@@ -40,7 +40,7 @@ public:
 	required_device<device_t> m_ctc;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_cassette;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 

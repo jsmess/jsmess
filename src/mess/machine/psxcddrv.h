@@ -7,10 +7,10 @@ class io_status
 {
 protected:
 	virtual ~io_status() {}
-	
+
 public:
 	io_status() { }
-	
+
 	virtual void cancel()=0;
 	virtual void release()=0;
 	virtual bool complete() const=0;
@@ -96,7 +96,7 @@ inline unsigned int msf_to_sector(const unsigned char *msf)
 	if (sec>=150)
 	{
 		return sec-150;
-	} 
+	}
 	else
 	{
 		return 0;

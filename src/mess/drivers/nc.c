@@ -478,7 +478,7 @@ static void nc_common_open_stream_for_writing(running_machine &machine)
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
 	sprintf(filename,"%s.hack", machine.system().name);
-	
+
 	state->m_file = global_alloc(emu_file(machine.options().memcard_directory(), OPEN_FLAG_WRITE));
 	state->m_file->open(filename);
 }

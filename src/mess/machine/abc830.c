@@ -1,6 +1,6 @@
 /*
 
-	Luxor ABC 830
+    Luxor ABC 830
 
     Type                    Size        Tracks  Sides   Sectors/track   Sectors     Speed           Drives
 

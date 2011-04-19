@@ -166,7 +166,7 @@ void a7800_partialhash(hash_collection &dest, const unsigned char *data,
 {
 	if (length <= 128)
 		return;
-	dest.compute(&data[128], length - 128, functions);	
+	dest.compute(&data[128], length - 128, functions);
 }
 
 

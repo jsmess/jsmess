@@ -117,7 +117,7 @@ static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypo
 
 	if ((depth == 4) && (state->m_DISPCNT & DISPCNT_FRAMESEL))
 		src16 += 0xa000/2;
-	
+
 	// sign extend roz parameters
 	if (X & 0x08000000) X |= 0xf0000000;
 	if (Y & 0x08000000) Y |= 0xf0000000;

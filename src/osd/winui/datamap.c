@@ -708,32 +708,32 @@ static void populate_control(datamap *map, HWND control, windows_options *opts, 
 
 		case CT_TRACKBAR:
 			// do we need to set the trackbar options?
-/*			if (!entry->use_trackbar_options)
-			{
-				switch(options_get_range_type(opts, option_name))
-				{
-					case OPTION_RANGE_NONE:
-						// do nothing
-						break;
+/*          if (!entry->use_trackbar_options)
+            {
+                switch(options_get_range_type(opts, option_name))
+                {
+                    case OPTION_RANGE_NONE:
+                        // do nothing
+                        break;
 
-					case OPTION_RANGE_INT:
-						options_get_range_int(opts, option_name, &minval_int, &maxval_int);
-						entry->use_trackbar_options = TRUE;
-						entry->trackbar_min = minval_int;
-						entry->trackbar_max = maxval_int;
-						entry->trackbar_increments = 1;
-						break;
+                    case OPTION_RANGE_INT:
+                        options_get_range_int(opts, option_name, &minval_int, &maxval_int);
+                        entry->use_trackbar_options = TRUE;
+                        entry->trackbar_min = minval_int;
+                        entry->trackbar_max = maxval_int;
+                        entry->trackbar_increments = 1;
+                        break;
 
-					case OPTION_RANGE_FLOAT:
-						options_get_range_float(opts, option_name, &minval_float, &maxval_float);
-						entry->use_trackbar_options = TRUE;
-						entry->trackbar_min = minval_float;
-						entry->trackbar_max = maxval_float;
-						entry->trackbar_increments = (float)0.05;
-						break;
-				}
-			}
-		*/
+                    case OPTION_RANGE_FLOAT:
+                        options_get_range_float(opts, option_name, &minval_float, &maxval_float);
+                        entry->use_trackbar_options = TRUE;
+                        entry->trackbar_min = minval_float;
+                        entry->trackbar_max = maxval_float;
+                        entry->trackbar_increments = (float)0.05;
+                        break;
+                }
+            }
+        */
 
 			// do we specify default options for this control?  if so, we need to specify
 			// the range

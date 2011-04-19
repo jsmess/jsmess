@@ -110,16 +110,16 @@ READ8_MEMBER( c1551_device::port_r )
 
         bit     description
 
-        P0      
-        P1      
-        P2      
-        P3      
+        P0
+        P1
+        P2
+        P3
         P4      WPS
-        P5      
-        P6      
+        P5
+        P6
         P7      BYTE LTCHED
 
-	*/   
+    */
 
 	UINT8 data = 0;
 
@@ -143,12 +143,12 @@ WRITE8_MEMBER( c1551_device::port_w )
         P1      STP0B
         P2      MTR0
         P3      ACT0
-        P4      
+        P4
         P5      DS0
         P6      DS1
-        P7      
+        P7
 
-	*/
+    */
 
 	// spindle motor
 	m_ga->mtr_w(BIT(data, 2));
@@ -192,7 +192,7 @@ READ8_MEMBER( c1551_device::tcbm_data_r )
         PA6     TCBM PA6
         PA7     TCBM PA7
 
-	*/
+    */
 
 	return m_tcbm_data;
 }
@@ -213,7 +213,7 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
         PA6     TCBM PA6
         PA7     TCBM PA7
 
-	*/
+    */
 
 	m_tcbm_data = data;
 }
@@ -225,16 +225,16 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 
         bit     description
 
-        PC0     
-        PC1     
-        PC2     
-        PC3     
-        PC4     
+        PC0
+        PC1
+        PC2
+        PC3
+        PC4
         PC5     JP1
         PC6     _SYNC
         PC7     TCBM DAV
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -262,11 +262,11 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
         PC2     TCBM DEV
         PC3     TCBM ACK
         PC4     MODE
-        PC5     
-        PC6     
-        PC7     
+        PC5
+        PC6
+        PC7
 
-	*/
+    */
 
 	// TCBM status
 	m_status = data & 0x03;
@@ -314,7 +314,7 @@ READ8_MEMBER( c1551_device::tpi1_pb_r )
         PB6
         PB7
 
-	*/
+    */
 
 	return m_status & 0x03;
 }
@@ -332,10 +332,10 @@ READ8_MEMBER( c1551_device::tpi1_pc_r )
         PC3
         PC4
         PC5
-        PC6     
+        PC6
         PC7     TCBM ACK
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -359,9 +359,9 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
         PC4
         PC5
         PC6     TCBM DAV
-        PC7     
+        PC7
 
-	*/
+    */
 
 	// TCBM data valid
 	m_dav = BIT(data, 6);
@@ -539,7 +539,7 @@ void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 
 //-------------------------------------------------
-//  on_disk_change - 
+//  on_disk_change -
 //-------------------------------------------------
 
 void c1551_device::on_disk_change(device_image_interface &image)

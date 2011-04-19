@@ -142,7 +142,7 @@ void luxor_55_21046_device_config::device_config_complete()
 	{
 		fatalerror("Interface not provided!");
 	}
-	
+
 	m_sw1 = intf->m_sw1;
 	m_sw2 = intf->m_sw2;
 	m_sw3 = intf->m_sw3;
@@ -458,10 +458,10 @@ void luxor_55_21046_device::device_start()
 	save_item(NAME(m_force_busy));
 
 	// patch out sector skew table
-/*	UINT8 *rom = subregion("conkort")->base();
+/*  UINT8 *rom = subregion("conkort")->base();
 
-	for (int i = 0; i < 16; i++)
-		rom[0x2dd3 + i] = i + 1;*/
+    for (int i = 0; i < 16; i++)
+        rom[0x2dd3 + i] = i + 1;*/
 }
 
 
@@ -486,7 +486,7 @@ void luxor_55_21046_device::device_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  abcbus_cs - 
+//  abcbus_cs -
 //-------------------------------------------------
 
 void luxor_55_21046_device::abcbus_cs(UINT8 data)
@@ -496,7 +496,7 @@ void luxor_55_21046_device::abcbus_cs(UINT8 data)
 
 
 //-------------------------------------------------
-//  abcbus_rst - 
+//  abcbus_rst -
 //-------------------------------------------------
 
 void luxor_55_21046_device::abcbus_rst(int state)
@@ -509,7 +509,7 @@ void luxor_55_21046_device::abcbus_rst(int state)
 
 
 //-------------------------------------------------
-//  abcbus_stat - 
+//  abcbus_stat -
 //-------------------------------------------------
 
 UINT8 luxor_55_21046_device::abcbus_stat()
@@ -527,7 +527,7 @@ UINT8 luxor_55_21046_device::abcbus_stat()
 
 
 //-------------------------------------------------
-//  abcbus_inp - 
+//  abcbus_inp -
 //-------------------------------------------------
 
 UINT8 luxor_55_21046_device::abcbus_inp()
@@ -545,7 +545,7 @@ UINT8 luxor_55_21046_device::abcbus_inp()
 
 
 //-------------------------------------------------
-//  abcbus_utp - 
+//  abcbus_utp -
 //-------------------------------------------------
 
 void luxor_55_21046_device::abcbus_utp(UINT8 data)
@@ -559,7 +559,7 @@ void luxor_55_21046_device::abcbus_utp(UINT8 data)
 
 
 //-------------------------------------------------
-//  abcbus_c1 - 
+//  abcbus_c1 -
 //-------------------------------------------------
 
 void luxor_55_21046_device::abcbus_c1(UINT8 data)
@@ -573,7 +573,7 @@ void luxor_55_21046_device::abcbus_c1(UINT8 data)
 
 
 //-------------------------------------------------
-//  abcbus_c3 - 
+//  abcbus_c3 -
 //-------------------------------------------------
 
 void luxor_55_21046_device::abcbus_c3(UINT8 data)
@@ -592,7 +592,7 @@ void luxor_55_21046_device::abcbus_c3(UINT8 data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  3d_r - 
+//  3d_r -
 //-------------------------------------------------
 
 READ8_MEMBER( luxor_55_21046_device::_3d_r )
@@ -607,7 +607,7 @@ READ8_MEMBER( luxor_55_21046_device::_3d_r )
 
 
 //-------------------------------------------------
-//  4d_w - 
+//  4d_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_21046_device::_4d_w )
@@ -622,7 +622,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_4d_w )
 
 
 //-------------------------------------------------
-//  4b_w - 
+//  4b_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
@@ -653,7 +653,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
 
 
 //-------------------------------------------------
-//  9b_w - 
+//  9b_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
@@ -691,7 +691,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 
 
 //-------------------------------------------------
-//  8a_w - 
+//  8a_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
@@ -722,7 +722,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 
 
 //-------------------------------------------------
-//  9a_r - 
+//  9a_r -
 //-------------------------------------------------
 
 READ8_MEMBER( luxor_55_21046_device::_9a_r )

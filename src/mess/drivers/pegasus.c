@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_GFXDECODE(pegasus)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	
+
 	/* devices */
 	MCFG_PIA6821_ADD( "pia_s", pegasus_pia_s_intf )
 	MCFG_PIA6821_ADD( "pia_u", pegasus_pia_u_intf )

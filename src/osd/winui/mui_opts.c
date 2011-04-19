@@ -294,8 +294,8 @@ const options_entry winui_options::s_option_entries[] =
 	{ MUIOPTION_OFFSET_CLONES,				"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_STRETCH_SCREENSHOT_LARGER,	"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_CYCLE_SCREENSHOT,			"0",        OPTION_INTEGER,                 NULL },
- 	{ MUIOPTION_SCREENSHOT_BORDER_SIZE,		"11",       OPTION_INTEGER,                 NULL },
- 	{ MUIOPTION_SCREENSHOT_BORDER_COLOR,	"-1",       OPTION_INTEGER,                 NULL },
+	{ MUIOPTION_SCREENSHOT_BORDER_SIZE,		"11",       OPTION_INTEGER,                 NULL },
+	{ MUIOPTION_SCREENSHOT_BORDER_COLOR,	"-1",       OPTION_INTEGER,                 NULL },
 	{ MUIOPTION_EXEC_COMMAND,				"",         OPTION_STRING,                 NULL },
 	{ MUIOPTION_EXEC_WAIT,					"0",        OPTION_INTEGER,                 NULL },
 
@@ -316,18 +316,18 @@ const options_entry winui_options::s_option_entries[] =
 	{ MUIOPTION_MAMEINFO_FILE,				MUIMAMEINFO_FILE, OPTION_STRING,             NULL },
 
 	{ NULL,									NULL,       OPTION_HEADER,     "NAVIGATION KEY CODES" },
-	{ MUIOPTION_UI_KEY_UP,					"KEYCODE_UP", 						OPTION_STRING,          NULL },
+	{ MUIOPTION_UI_KEY_UP,					"KEYCODE_UP",						OPTION_STRING,          NULL },
 	{ MUIOPTION_UI_KEY_DOWN,				"KEYCODE_DOWN", 					OPTION_STRING,          NULL },
 	{ MUIOPTION_UI_KEY_LEFT,				"KEYCODE_LEFT", 					OPTION_STRING,          NULL },
-	{ MUIOPTION_UI_KEY_RIGHT,				"KEYCODE_RIGHT", 					OPTION_STRING,          NULL },
-	{ MUIOPTION_UI_KEY_START,				"KEYCODE_ENTER NOT KEYCODE_LALT",	OPTION_STRING, 			NULL },
+	{ MUIOPTION_UI_KEY_RIGHT,				"KEYCODE_RIGHT",					OPTION_STRING,          NULL },
+	{ MUIOPTION_UI_KEY_START,				"KEYCODE_ENTER NOT KEYCODE_LALT",	OPTION_STRING,			NULL },
 	{ MUIOPTION_UI_KEY_PGUP,				"KEYCODE_PGUP", 					OPTION_STRING,          NULL },
 	{ MUIOPTION_UI_KEY_PGDWN,				"KEYCODE_PGDN", 					OPTION_STRING,          NULL },
 	{ MUIOPTION_UI_KEY_HOME,				"KEYCODE_HOME", 					OPTION_STRING,          NULL },
-	{ MUIOPTION_UI_KEY_END,					"KEYCODE_END", 						OPTION_STRING,          NULL },
-	{ MUIOPTION_UI_KEY_SS_CHANGE,			"KEYCODE_INSERT", 					OPTION_STRING,          NULL },
-	{ MUIOPTION_UI_KEY_HISTORY_UP,			"KEYCODE_DEL", 						OPTION_STRING,          NULL },
-	{ MUIOPTION_UI_KEY_HISTORY_DOWN,		"KEYCODE_LALT KEYCODE_0", 			OPTION_STRING,   		NULL },
+	{ MUIOPTION_UI_KEY_END,					"KEYCODE_END",						OPTION_STRING,          NULL },
+	{ MUIOPTION_UI_KEY_SS_CHANGE,			"KEYCODE_INSERT",					OPTION_STRING,          NULL },
+	{ MUIOPTION_UI_KEY_HISTORY_UP,			"KEYCODE_DEL",						OPTION_STRING,          NULL },
+	{ MUIOPTION_UI_KEY_HISTORY_DOWN,		"KEYCODE_LALT KEYCODE_0",			OPTION_STRING,  		NULL },
 
 	{ MUIOPTION_UI_KEY_CONTEXT_FILTERS,		"KEYCODE_LCONTROL KEYCODE_F", OPTION_STRING, NULL },
 	{ MUIOPTION_UI_KEY_SELECT_RANDOM,		"KEYCODE_LCONTROL KEYCODE_R", OPTION_STRING, NULL },
@@ -431,53 +431,53 @@ winui_options::winui_options()
 
 /*static void memory_error(const char *message)
 {
-	win_message_box_utf8(NULL, message, NULL, MB_OK);
-	exit(-1);
+    win_message_box_utf8(NULL, message, NULL, MB_OK);
+    exit(-1);
 }
 */
 /*
 
 void AddOptions(winui_options *opts, const options_entry *entrylist, BOOL is_global)
 {
-	static const char *blacklist[] =
-	{
-		WINOPTION_SCREEN,
-		WINOPTION_ASPECT,
-		WINOPTION_RESOLUTION,
-		WINOPTION_VIEW
-	};
-	options_entry entries[2];
-	BOOL good_option;
-	int i;
+    static const char *blacklist[] =
+    {
+        WINOPTION_SCREEN,
+        WINOPTION_ASPECT,
+        WINOPTION_RESOLUTION,
+        WINOPTION_VIEW
+    };
+    options_entry entries[2];
+    BOOL good_option;
+    int i;
 
-	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER); entrylist++)
-	{
-		good_option = TRUE;
+    for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER); entrylist++)
+    {
+        good_option = TRUE;
 
-		// check blacklist
-		if (entrylist->name != NULL)
-		{
-			for (i = 0; i < ARRAY_LENGTH(blacklist); i++)
-			{
-				if (!strcmp(entrylist->name, blacklist[i]))
-				{
-					good_option = FALSE;
-					break;
-				}
-			}
-		}
+        // check blacklist
+        if (entrylist->name != NULL)
+        {
+            for (i = 0; i < ARRAY_LENGTH(blacklist); i++)
+            {
+                if (!strcmp(entrylist->name, blacklist[i]))
+                {
+                    good_option = FALSE;
+                    break;
+                }
+            }
+        }
 #ifndef MESS
-		// if is_global is FALSE, blacklist global options
-		if (entrylist->name && !is_global && IsGlobalOption(entrylist->name))
-			good_option = FALSE;
+        // if is_global is FALSE, blacklist global options
+        if (entrylist->name && !is_global && IsGlobalOption(entrylist->name))
+            good_option = FALSE;
 #endif
-		if (good_option)
-		{
-			memcpy(entries, entrylist, sizeof(options_entry));
-			memset(&entries[1], 0, sizeof(entries[1]));
-			//options_add_entries(opts, entries);
-		}
-	}
+        if (good_option)
+        {
+            memcpy(entries, entrylist, sizeof(options_entry));
+            memset(&entries[1], 0, sizeof(entries[1]));
+            //options_add_entries(opts, entries);
+        }
+    }
 }
 
 */
@@ -506,7 +506,7 @@ BOOL OptionsInit()
 	// create a memory pool for our data
 	//options_memory_pool = pool_alloc_lib(memory_error);
 	//if (!options_memory_pool)
-//		return FALSE;
+//      return FALSE;
 
 	// set up the MAME32 settings (these get placed in MAME32ui.ini
 	//settings = options_create(memory_error);
@@ -528,7 +528,7 @@ BOOL OptionsInit()
 			{
 				options_entry entry[2] = { { 0 }, { 0 } };
 				snprintf(buffer, ARRAY_LENGTH(buffer), "%s%s", driver_list::driver(i).name, perGameOptions[j].name);
-				
+
 				entry[0].name = core_strdup(buffer);
 				entry[0].defvalue = perGameOptions[j].defvalue;
 				entry[0].flags = perGameOptions[j].flags;
@@ -652,12 +652,12 @@ static void options_set_color_default(winui_options &opts, const char *name, COL
 
 static input_seq *options_get_input_seq(winui_options &opts, const char *name)
 {
-/*	static input_seq seq;
-	const char *seq_string;
+/*  static input_seq seq;
+    const char *seq_string;
 
-	seq_string = opts.value( name);
-	input_seq_from_tokens(NULL, seq_string, &seq);	// HACK
-	return &seq;*/
+    seq_string = opts.value( name);
+    input_seq_from_tokens(NULL, seq_string, &seq);  // HACK
+    return &seq;*/
 	return NULL;
 }
 
@@ -1151,7 +1151,7 @@ int GetHistoryTab(void)
 
 void SetHistoryTab(int tab, BOOL show)
 {
-	astring error_string;	
+	astring error_string;
 	if (show)
 		settings.set_value(MUIOPTION_HISTORY_TAB, tab, OPTION_PRIORITY_CMDLINE,error_string);
 	else
@@ -2374,7 +2374,7 @@ static file_error LoadSettingsFile(winui_options &opts, const char *filename)
 {
 	file_error filerr;
 	core_file *file;
-	
+
 
 	filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
@@ -2389,7 +2389,7 @@ static file_error LoadSettingsFile(windows_options &opts, const char *filename)
 {
 	file_error filerr;
 	core_file *file;
-	
+
 
 	filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
@@ -2413,8 +2413,8 @@ static file_error SaveSettingsFile(winui_options &opts, winui_options *baseopts,
 		if (filerr == FILERR_NONE)
 		{
 			astring inistring;
-			#ifdef MESS		
-			opts.output_ini(inistring);			
+			#ifdef MESS
+			opts.output_ini(inistring);
 			#else
 			opts.output_ini(inistring,baseopts);
 			#endif
@@ -2423,9 +2423,9 @@ static file_error SaveSettingsFile(winui_options &opts, winui_options *baseopts,
 		}
 	}
 	/*else
-	{
-		filerr = osd_rmfile(filename);
-	}*/
+    {
+        filerr = osd_rmfile(filename);
+    }*/
 
 	return filerr;
 }
@@ -2440,8 +2440,8 @@ static file_error SaveSettingsFile(windows_options &opts, windows_options *baseo
 		if (filerr == FILERR_NONE)
 		{
 			astring inistring;
-			#ifdef MESS		
-			opts.output_ini(inistring);			
+			#ifdef MESS
+			opts.output_ini(inistring);
 			#else
 			opts.output_ini(inistring,baseopts);
 			#endif
@@ -2450,9 +2450,9 @@ static file_error SaveSettingsFile(windows_options &opts, windows_options *baseo
 		}
 	}
 	/*else
-	{
-		filerr = osd_rmfile(filename);
-	}*/
+    {
+        filerr = osd_rmfile(filename);
+    }*/
 
 	return filerr;
 }
@@ -2562,7 +2562,7 @@ void LoadFolderFlags(void)
 	LPTREEFOLDER lpFolder;
 	int i;
 	options_entry entries[2] = { { 0 }, { 0 } };
-	
+
 	memcpy(entries, filterOptions, sizeof(filterOptions));
 
 	numFolders = GetNumFolders();
@@ -2726,39 +2726,39 @@ const char * GetVersionString(void)
 
 BOOL IsGlobalOption(const char *option_name)
 {
-/*	static const char *global_options[] =
-	{
-		OPTION_ROMPATH,
-		OPTION_HASHPATH,
-		OPTION_SAMPLEPATH,
-		OPTION_ARTPATH,
-		OPTION_CTRLRPATH,
-		OPTION_INIPATH,
-		OPTION_FONTPATH,
-		OPTION_CFG_DIRECTORY,
-		OPTION_NVRAM_DIRECTORY,
-		OPTION_MEMCARD_DIRECTORY,
-		OPTION_INPUT_DIRECTORY,
-		OPTION_STATE_DIRECTORY,
-		OPTION_SNAPSHOT_DIRECTORY,
-		OPTION_DIFF_DIRECTORY,
-		OPTION_COMMENT_DIRECTORY
-	};
-	int i;
-	char command_name[128];
-	char *s;
+/*  static const char *global_options[] =
+    {
+        OPTION_ROMPATH,
+        OPTION_HASHPATH,
+        OPTION_SAMPLEPATH,
+        OPTION_ARTPATH,
+        OPTION_CTRLRPATH,
+        OPTION_INIPATH,
+        OPTION_FONTPATH,
+        OPTION_CFG_DIRECTORY,
+        OPTION_NVRAM_DIRECTORY,
+        OPTION_MEMCARD_DIRECTORY,
+        OPTION_INPUT_DIRECTORY,
+        OPTION_STATE_DIRECTORY,
+        OPTION_SNAPSHOT_DIRECTORY,
+        OPTION_DIFF_DIRECTORY,
+        OPTION_COMMENT_DIRECTORY
+    };
+    int i;
+    char command_name[128];
+    char *s;
 
-	// determine command name
-	snprintf(command_name, ARRAY_LENGTH(command_name), "%s", option_name);
-	s = strchr(command_name, ';');
-	if (s)
-		*s = '\0';
+    // determine command name
+    snprintf(command_name, ARRAY_LENGTH(command_name), "%s", option_name);
+    s = strchr(command_name, ';');
+    if (s)
+        *s = '\0';
 
-	for (i = 0; i < ARRAY_LENGTH(global_options); i++)
-	{
-		if (!strcmp(command_name, global_options[i]))
-			return TRUE;
-	}*/
+    for (i = 0; i < ARRAY_LENGTH(global_options); i++)
+    {
+        if (!strcmp(command_name, global_options[i]))
+            return TRUE;
+    }*/
 	return FALSE;
 }
 
@@ -2781,7 +2781,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 	const game_driver *driver = NULL;
 
 	CreateGameOptions(opts, game_num);
-	// Copy over the defaults 
+	// Copy over the defaults
 	ui_parse_ini_file(opts, CONFIGNAME);
 
 	if (opt_type == OPTIONS_GLOBAL)
@@ -2789,7 +2789,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 		return;
 	}
 
-	// debug builds: parse "debug.ini" as well 
+	// debug builds: parse "debug.ini" as well
 #ifdef MAME_DEBUG
 	ui_parse_ini_file(opts, "debug");
 #endif
@@ -2798,7 +2798,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 		driver = &driver_list::driver(game_num);
 	}
 
-	// if we have a valid game driver, parse game-specific INI files 
+	// if we have a valid game driver, parse game-specific INI files
 	if (driver != NULL)
 	{
 		const game_driver *parent = NULL;
@@ -2810,13 +2810,13 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 		if (parent != NULL) {
 			if (gp!=-1) gparent= &driver_list::driver(gp);
 		}
-		
+
 
 		astring *basename;
 		astring *srcname;
 		machine_config config(*driver,opts);
 
-		// parse "vector.ini" for vector games 
+		// parse "vector.ini" for vector games
 		if (isDriverVector(&config))
 		{
 			ui_parse_ini_file(opts, "vector");
@@ -2825,7 +2825,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 		{
 			return;
 		}
-		// parse "horizont.ini" for horizontal games 
+		// parse "horizont.ini" for horizontal games
 		if (!DriverIsVertical(game_num))
 		{
 			ui_parse_ini_file(opts, "horizont");
@@ -2834,7 +2834,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 		{
 			return;
 		}
-		// parse "vertical.ini" for vertical games 
+		// parse "vertical.ini" for vertical games
 		if (DriverIsVertical(game_num))
 		{
 			ui_parse_ini_file(opts, "vertical");
@@ -2845,7 +2845,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 		}
 
 
-		// then parse "<sourcefile>.ini" 
+		// then parse "<sourcefile>.ini"
 		basename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
 		srcname = astring_assemble_3(astring_alloc(), "source", PATH_SEPARATOR, astring_c(basename));
 		ui_parse_ini_file(opts, astring_c(srcname));
@@ -2857,7 +2857,7 @@ void load_options(windows_options &opts, OPTIONS_TYPE opt_type, int game_num)
 			return;
 		}
 
-		// then parent the grandparent, parent, and game-specific INIs 
+		// then parent the grandparent, parent, and game-specific INIs
 		if (gparent != NULL)
 			ui_parse_ini_file(opts, gparent->name);
 		if (parent != NULL)
@@ -2892,17 +2892,17 @@ void save_options(OPTIONS_TYPE opt_type, windows_options &opts, int game_num)
 	const game_driver *driver = NULL;
 	astring *filename = NULL;
 
-/*	if (OPTIONS_GLOBAL != opt_type) // && NULL != opts && !options_equal(opts, global))
-	{
-		if (OPTIONS_VERTICAL == opt_type) {
-			//since VERTICAL and HORIZONTAL are equally ranked
-			//we need to subtract 2 from vertical to also get to global
-			load_options(baseopts,(OPTIONS_TYPE)(opt_type - 2), game_num);
-		}
-		else {
-			load_options(baseopts,(OPTIONS_TYPE)(opt_type - 1), game_num);
-		}
-	}*/
+/*  if (OPTIONS_GLOBAL != opt_type) // && NULL != opts && !options_equal(opts, global))
+    {
+        if (OPTIONS_VERTICAL == opt_type) {
+            //since VERTICAL and HORIZONTAL are equally ranked
+            //we need to subtract 2 from vertical to also get to global
+            load_options(baseopts,(OPTIONS_TYPE)(opt_type - 2), game_num);
+        }
+        else {
+            load_options(baseopts,(OPTIONS_TYPE)(opt_type - 1), game_num);
+        }
+    }*/
 
 	if (game_num >= 0)
 	{
@@ -2911,7 +2911,7 @@ void save_options(OPTIONS_TYPE opt_type, windows_options &opts, int game_num)
 
 	if (opt_type == OPTIONS_GLOBAL)
 	{
-		// Don't try to save a null global options file,  or it will be erased. 
+		// Don't try to save a null global options file,  or it will be erased.
 		//if (NULL == opts)
 			//return;
 		global = opts;
@@ -2932,7 +2932,7 @@ void save_options(OPTIONS_TYPE opt_type, windows_options &opts, int game_num)
 		switch (opt_type)
 		{
 		case OPTIONS_SOURCE:
-			// determine the <sourcefile> 
+			// determine the <sourcefile>
 			basename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
 			srcname = astring_assemble_3(astring_alloc(), "source", PATH_SEPARATOR, astring_c(basename));
 			filename = astring_cpyc(astring_alloc(),astring_c(srcname));
@@ -2965,9 +2965,9 @@ static void remove_all_source_options(void) {
 	char* utf8_filename;
 
 	/*
-	 * Easiest to just open the ini/source folder if it exists,
-	 * then remove all the files in it that end in ini.
-	 */
+     * Easiest to just open the ini/source folder if it exists,
+     * then remove all the files in it that end in ini.
+     */
 	pathname = astring_assemble_3(astring_alloc(), GetIniDir(), PATH_SEPARATOR, "source");
 	match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, "*.ini");
 	if ((hFindFile = win_find_first_file_utf8(astring_c(match), &findFileData)) != INVALID_HANDLE_VALUE)

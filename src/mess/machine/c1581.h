@@ -72,7 +72,7 @@ public:
 protected:
     // device_config overrides
     virtual void device_config_complete();
-	
+
 private:
 	const char *m_bus_tag;
 	int m_address;

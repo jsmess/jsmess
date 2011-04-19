@@ -798,7 +798,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_PC_LPT_ADD("lpt_1", at_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
 
-	/* harddisk */	
+	/* harddisk */
 	MCFG_HARDDISK_ADD("harddisk")
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 

@@ -188,7 +188,7 @@ SCREEN_UPDATE( pcw )
 SCREEN_UPDATE( pcw_printer )
 {
 	pcw_state *state = screen->machine().driver_data<pcw_state>();
-	
+
 	// printer output
 	rectangle rect;
 	INT32 feed;

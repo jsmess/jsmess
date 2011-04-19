@@ -80,7 +80,7 @@ static const saa5050_interface a6809_saa5050_intf =
 	"screen",
 	0,	/* starting gfxnum */
 	40, 25, 40,  /* x, y, size */
-	0 	/* rev y order */
+	0	/* rev y order */
 };
 
 static const via6522_interface via_intf =

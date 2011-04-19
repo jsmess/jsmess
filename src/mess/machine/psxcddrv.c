@@ -27,7 +27,7 @@ cdrom_driver::cdrom_driver()
 	m_cd = NULL;
 	m_machine = NULL;
 
-//	printf("cdrom_driver base class init, pf_buffer size is %d\n", num_pf_sectors*num_pf_buffers*raw_sector_size);
+//  printf("cdrom_driver base class init, pf_buffer size is %d\n", num_pf_sectors*num_pf_buffers*raw_sector_size);
 
 	pf_buffer=new unsigned char [num_pf_sectors*num_pf_buffers*raw_sector_size];
 
@@ -72,7 +72,7 @@ void cdrom_driver::prefetch_sector(const unsigned int sec)
 	int numpfsec=num_pf*num_pf_sectors,
 			pfsec=sec-pf_head_sector;
 
-//	printf("prefetch_sector: %d\n", sec);
+//  printf("prefetch_sector: %d\n", sec);
 
 	if ((pfsec<0) || (pfsec>numpfsec))
 	{
@@ -131,7 +131,7 @@ bool cdrom_driver::is_prefetch_sector_loaded(const unsigned int sec)
 
 	if (! comp)
 	{
-		INT64 curtime=m_machine->device<cpu_device>("maincpu")->total_cycles(); 
+		INT64 curtime=m_machine->device<cpu_device>("maincpu")->total_cycles();
 
 		if (last_pf_status!=pf_status)
 		{
@@ -210,8 +210,8 @@ unsigned char *cdrom_driver::get_prefetch_sector(const unsigned int sec, unsigne
 			pfsec=sec-pf_head_sector;
 	if ((pfsec>=0) && (pfsec<numpfsec))
 	{
-	 	int	blk=(pf_head+(pfsec/num_pf_sectors))%num_pf_buffers,
-		 		off=((blk*num_pf_sectors)+(pfsec%num_pf_sectors))*native_sector_size;
+		int	blk=(pf_head+(pfsec/num_pf_sectors))%num_pf_buffers,
+				off=((blk*num_pf_sectors)+(pfsec%num_pf_sectors))*native_sector_size;
 		*sz=native_sector_size;
 		return pf_buffer+off;
 	} else
@@ -228,7 +228,7 @@ bool cdrom_driver::read_sector(const unsigned int sec, unsigned char *buf, const
 {
 	bool loaded=is_prefetch_sector_loaded(sec);
 
-//	printf("read_sector: %d (loaded=%c)\n", sec, loaded ? 'Y' : 'N');
+//  printf("read_sector: %d (loaded=%c)\n", sec, loaded ? 'Y' : 'N');
 
 	if ((! loaded) && (block))
 	{
@@ -242,7 +242,7 @@ bool cdrom_driver::read_sector(const unsigned int sec, unsigned char *buf, const
 		unsigned char *ptr=get_prefetch_sector(sec,&secsz);
 		assert(ptr);
 
-//		printf("got sector %d @ %p, size %d = %02x %02x | %02x %02x\n", sec, ptr, secsz, ptr[0], ptr[1], ptr[0x20], ptr[0x21]);
+//      printf("got sector %d @ %p, size %d = %02x %02x | %02x %02x\n", sec, ptr, secsz, ptr[0], ptr[1], ptr[0x20], ptr[0x21]);
 
 		if (secsz<2352)
 		{
@@ -291,11 +291,11 @@ void cdrom_driver::set_machine(const running_machine &machine)
 
 	timestamp_frequency = m_machine->device<cpu_device>("maincpu")->clock();
 
-//	printf("cdrom_driver::set_machine: timestamp frequency = %d\n", timestamp_frequency);
+//  printf("cdrom_driver::set_machine: timestamp frequency = %d\n", timestamp_frequency);
 }
 
 /*
-	MAME/MESS driver implementation 
+    MAME/MESS driver implementation
 */
 
 class mess_cdrom_driver : public cdrom_driver
@@ -345,7 +345,7 @@ mess_cdrom_driver::mess_cdrom_driver()
 {
 	for (int i=0; i<100; i++)
 		toc[i].type=track_illegal;
-	num_tracks=0; 
+	num_tracks=0;
 	num_sectors=0;
 }
 
@@ -382,7 +382,7 @@ bool mess_cdrom_driver::read_toc()
 		set_native_sector_size(bin_sector_size);
 		num_sectors = cdrom_get_track_start(m_cd, num_tracks) + toc->tracks[num_tracks].frames;
 
-//		printf("mess_cdrom_driver: %d sectors, native size %d\n",num_sectors, bin_sector_size);
+//      printf("mess_cdrom_driver: %d sectors, native size %d\n",num_sectors, bin_sector_size);
 
 		return true;
 	}
@@ -406,19 +406,19 @@ io_status *mess_cdrom_driver::read_sectors(const unsigned int startsec, const un
 
 	if ((startsec>=0)) // && ((int)startsec<num_sectors))
 	{
-//		fin->seek((INT64)startsec*(INT64)bin_sector_size);
+//      fin->seek((INT64)startsec*(INT64)bin_sector_size);
 
-//		io_status *ios=fin->async_read(buf,numsec*bin_sector_size);
-//		if (! ios)
+//      io_status *ios=fin->async_read(buf,numsec*bin_sector_size);
+//      if (! ios)
 		for (int i = 0; i < numsec; i++)
 		{
-//			printf("[%d/%d] Reading to pf_buffer %p at offset %d, size %d\n", i, numsec, &buf[secsize*i], secsize*i, secsize);
+//          printf("[%d/%d] Reading to pf_buffer %p at offset %d, size %d\n", i, numsec, &buf[secsize*i], secsize*i, secsize);
 			cdrom_read_data(m_cd, startsec+i, &buf[secsize*i], CD_TRACK_RAW_DONTCARE);
 		}
 
 		return NULL;
 
-//		return ios;
+//      return ios;
 	}
 	else
 	{
@@ -442,7 +442,7 @@ unsigned int mess_cdrom_driver::get_first_track() const
 
 unsigned int mess_cdrom_driver::get_num_tracks() const
 {
-//	printf("get_num_tracks = %d\n", num_tracks);
+//  printf("get_num_tracks = %d\n", num_tracks);
 	return num_tracks;
 }
 
@@ -458,10 +458,10 @@ bool mess_cdrom_driver::get_track_address(const unsigned int track, unsigned cha
 		address[1] = address[1];
 		address[2] = address[2];
 
-//		printf("get_track_address %d = %02x:%02x:%02x\n", track, address[0], address[1], address[2]);
+//      printf("get_track_address %d = %02x:%02x:%02x\n", track, address[0], address[1], address[2]);
 
 		return true;
-	} 
+	}
 	else
 	{
 		address[0]=address[1]=address[2]=0;
@@ -475,7 +475,7 @@ unsigned int mess_cdrom_driver::find_track(const unsigned int sector, unsigned i
 	UINT32 track = cdrom_get_track(m_cd, sector);
 	int start;
 
-	start = cdrom_get_track_start(m_cd, track); 
+	start = cdrom_get_track_start(m_cd, track);
 
 	if (start_sector != NULL)
 	{
@@ -498,7 +498,7 @@ unsigned int mess_cdrom_driver::find_track(const unsigned int sector, unsigned i
 
 cdromtype mess_cdrom_driver::get_type() const
 {
-//	printf("get_type\n");
+//  printf("get_type\n");
 	return cdromtype_cd;
 }
 
@@ -510,7 +510,7 @@ tracktype mess_cdrom_driver::get_track_type(const unsigned int track) const
 {
 	const cdrom_toc *toc = cdrom_get_toc(m_cd);
 
-//	printf("get_track_type %d = %d\n", track, toc->tracks[track].trktype);
+//  printf("get_track_type %d = %d\n", track, toc->tracks[track].trktype);
 
 	switch (toc->tracks[track].trktype)
 	{

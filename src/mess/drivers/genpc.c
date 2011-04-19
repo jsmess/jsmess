@@ -2,7 +2,7 @@
 
     drivers/genpc.c
 
-	Driver file for geenric PC machines
+    Driver file for geenric PC machines
 
 ***************************************************************************/
 
@@ -76,12 +76,12 @@ static INPUT_PORTS_START( pccga )
 	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
-	
+
 static const unsigned i86_address_mask = 0x000fffff;
 
 static const kb_keytronic_interface pc_keytronic_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),	
+	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),
 	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_data_w)
 };
 
@@ -91,11 +91,11 @@ static const motherboard_interface pc_keytronic_keyboard_intf =
 	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
 };
 
-static DEVICE_INPUT_DEFAULTS_START(cga) 
+static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-static DEVICE_INPUT_DEFAULTS_START(vga) 
+static DEVICE_INPUT_DEFAULTS_START(vga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
@@ -106,7 +106,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_CPU_IO_MAP(pc8_io)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
-	
+
 	/* video hardware */
 	MCFG_PALETTE_LENGTH( 256 )
 
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "adlib", ISA8_ADLIB)
-	
+
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
@@ -130,9 +130,9 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	MCFG_CPU_ADD("maincpu", V20, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
-	
+
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
-	
+
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 0, "hercules", ISA8_HERCULES)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH( 256 )
-	
+
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 	/* internal ram */
@@ -152,14 +152,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pccga, genpc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  I8086, 4772720)				
-	MCFG_CPU_PROGRAM_MAP(pc16_map)	
-	MCFG_CPU_IO_MAP(pc16_io)		
+	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
+	MCFG_CPU_PROGRAM_MAP(pc16_map)
+	MCFG_CPU_IO_MAP(pc16_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
-	
+
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_PALETTE_LENGTH( 256 )
@@ -180,19 +180,19 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xtvga, genpc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  I8086, 4772720)				
-	MCFG_CPU_PROGRAM_MAP(pc16_map)	
-	MCFG_CPU_IO_MAP(pc16_io)	
+	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
+	MCFG_CPU_PROGRAM_MAP(pc16_map)
+	MCFG_CPU_IO_MAP(pc16_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
-	
+
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
-		
+
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
 	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "sblaster", ISA8_SOUND_BLASTER_1_0)
-	
+
 	/* video hardware */
 	MCFG_IBM_VGA_ADD( "vga" )
 	MCFG_PALETTE_LENGTH( 256 )
@@ -240,7 +240,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,   		"<generic>",  "PC (CGA)" , GAME_NO_SOUND)
-COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,    		"<generic>",  "PC (MDA)" , GAME_NO_SOUND)
-COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,    		"<generic>",  "PC (Hercules)" , GAME_NO_SOUND)
+COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,  		"<generic>",  "PC (CGA)" , GAME_NO_SOUND)
+COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,  		"<generic>",  "PC (MDA)" , GAME_NO_SOUND)
+COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,  		"<generic>",  "PC (Hercules)" , GAME_NO_SOUND)
 COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      pcgen,		0,			"<generic>",  "PC (VGA)" , GAME_NOT_WORKING | GAME_NO_SOUND)

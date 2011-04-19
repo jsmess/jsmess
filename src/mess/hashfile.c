@@ -250,7 +250,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				/* do we use this hash? */
 				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, &hashes))
 				{
-					hi = (hash_info*)pool_malloc_lib(state->hashfile->pool, sizeof(hash_info));					
+					hi = (hash_info*)pool_malloc_lib(state->hashfile->pool, sizeof(hash_info));
 					if (!hi)
 						return;
 					memset(hi, 0, sizeof(*hi));
@@ -277,11 +277,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			else if (!strcmp(tagname, "pcb")){
 			}
 			else if (!strcmp(tagname, "extrainfo")) {
-				text_dest = (char **) &state->hi->extrainfo;		
+				text_dest = (char **) &state->hi->extrainfo;
 			}
 			else
 				unknown_tag(state, tagname);
-			
+
 			if (text_dest && state->hi)
 				state->text_dest = text_dest;
 			break;
@@ -526,7 +526,7 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
 
 	param.hashes = hashes;
 	param.hi = NULL;
-	
+
 	for (i = 0; i < hashfile->preloaded_hash_count; i++)
 	{
 		if (singular_selector_proc(hashfile, &param, NULL, hashfile->preloaded_hashes[i]->hashes))
@@ -544,37 +544,37 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 {
 	hash_file *hashfile = NULL;
 	const hash_info *info = NULL;
-	
+
 	/* open the hash file */
 	hashfile = hashfile_open(image.device().machine().options(), sysname, FALSE, NULL);
 	if (!hashfile)
 		return NULL;
-	
+
 	/* look up this entry in the hash file */
 	info = hashfile_lookup(hashfile, &image.hash());
-	
+
 	if (!info || !info->extrainfo)
 	{
 		hashfile_close(hashfile);
 		return NULL;
 	}
-	
+
 	extra_info = auto_strdup(image.device().machine(),info->extrainfo);
 	if (!extra_info)
 	{
 		hashfile_close(hashfile);
 		return NULL;
 	}
-		
+
 	/* copy the relevant entries */
 	hashfile_close(hashfile);
-	
+
 	return extra_info;
 }
 
 const char *hashfile_extrainfo(device_image_interface &image)
 {
-	const char *rc;	
+	const char *rc;
 
 	/* now read the hash file */
 	image.crc();

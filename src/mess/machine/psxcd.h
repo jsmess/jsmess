@@ -27,7 +27,7 @@ const int num_commands=0x20;
 #define MCFG_PSXCD_ADD(_devname) \
     MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, 0) \
 	MCFG_PSXCD_DEVNAME(_devname)
-	
+
 #define MCFG_PSXCD_DEVNAME(_name) \
 	psxcd_device_config::static_set_devname(device, _name); \
 
@@ -71,7 +71,7 @@ class psxcd_device : public device_t
 		command_result *next;
 	};
 
-	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;	//480;	//8000;	//2000<<2;
+	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;	//480;  //8000; //2000<<2;
 
 	unsigned char sr,res,ir,cmdmode,
 								cmdbuf[64],*cbp,

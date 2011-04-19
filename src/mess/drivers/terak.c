@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Terak 8510A
 
         23/02/2009 Skeleton driver.
@@ -36,7 +36,7 @@ static WRITE16_HANDLER(terak_fdc_command_w)
 	terak_state *state = space->machine().driver_data<terak_state>();
 	state->m_unit = (data >> 8) & 0x03;
 	state->m_cmd  = (data >> 1) & 0x07;
-	logerror("terak_fdc_command_w %04x [%d %d]\n",data,state->m_unit,state->m_cmd);	
+	logerror("terak_fdc_command_w %04x [%d %d]\n",data,state->m_unit,state->m_cmd);
 }
 
 static READ16_HANDLER(terak_fdc_data_r)
@@ -53,7 +53,7 @@ static WRITE16_HANDLER(terak_fdc_data_w)
 static ADDRESS_MAP_START(terak_mem, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000,  0xf5ff ) AM_RAM // RAM
-	
+
 	AM_RANGE( 0173000, 0173177 ) AM_ROM // ROM
 	AM_RANGE( 0177000, 0177001 ) AM_READWRITE(terak_fdc_status_r,terak_fdc_command_w)
 	AM_RANGE( 0177002, 0177003 ) AM_READWRITE(terak_fdc_data_r,terak_fdc_data_w)
@@ -64,8 +64,8 @@ INPUT_PORTS_START( terak )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(terak) 
-{	
+static MACHINE_RESET(terak)
+{
 }
 
 static VIDEO_START( terak )
@@ -89,7 +89,7 @@ static MACHINE_CONFIG_START( terak, terak_state )
     MCFG_CPU_PROGRAM_MAP(terak_mem)
 
     MCFG_MACHINE_RESET(terak)
-	
+
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -114,5 +114,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT  COMPANY   FULLNAME       FLAGS */
-COMP( ????, terak,  0,       0, 	terak, 	terak, 	 0,  	   "Terak",   "Terak 8510A",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, terak,  0,       0, 	terak,	terak,	 0, 	   "Terak",   "Terak 8510A",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

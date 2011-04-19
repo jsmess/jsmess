@@ -1,12 +1,12 @@
 /***************************************************************************
 
     Skeleton driver for Applix 1616 computer
- 
+
     See for docs: http;//www.microbee-mspp.org.au
     You need to sign up and make an introductory thread.
     Then you will be granted permission to visit the repository.
- 
-	TODO: everything!
+
+    TODO: everything!
     - Required device Z8530 Z80SCC (not emulated, but it is just a dual-channel
       serial controller, possibly just like the other ones)
     - Keyboard is a standard pc keyboard
