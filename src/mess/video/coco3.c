@@ -821,7 +821,7 @@ static void internal_video_start_coco3(running_machine &machine, m6847_type type
 	state_save_register_global(machine, video->legacy_video);
 	state_save_register_global(machine, video->top_border_scanlines);
 	state_save_register_global(machine, video->display_scanlines);
-	machine.state().register_postload(coco3_video_postload, NULL);
+	machine.save().register_postload(coco3_video_postload, NULL);
 }
 
 

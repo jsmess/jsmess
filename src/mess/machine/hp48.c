@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "timer.h"
-#include "state.h"
 #include "sound/dac.h"
 #include "cpu/saturn/saturn.h"
 
@@ -1234,8 +1233,8 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 	state->save_item(NAME(state->m_io) );
 	//state_save_register_global_pointer(machine,  machine.generic.nvram.u8, machine.generic.nvram_size );
 
-	machine.state().register_postload( hp48_update_annunciators, NULL );
-	machine.state().register_postload( hp48_apply_modules, NULL );
+	machine.save().register_postload( hp48_update_annunciators, NULL );
+	machine.save().register_postload( hp48_apply_modules, NULL );
 
 #ifdef CHARDEV
 	/* direct I/O */

@@ -1910,7 +1910,7 @@ void m6847_init(running_machine &machine, const m6847_config *cfg)
 	m6847->fs_rise_timer->adjust(attotime::zero, 0, attotime(0, frame_period));
 
 	/* setup save states */
-	machine.state().register_postload(m6847_postload, NULL);
+	machine.save().register_postload(m6847_postload, NULL);
 
 	/* build font */
 	build_fontdata(v);

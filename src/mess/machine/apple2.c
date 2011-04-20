@@ -1638,7 +1638,7 @@ void apple2_init_common(running_machine &machine)
 
 	/* state save registers */
 	state->save_item(NAME(state->m_flags));
-	machine.state().register_postload(apple2_update_memory_postload, NULL);
+	machine.save().register_postload(apple2_update_memory_postload, NULL);
 
 	/* --------------------------------------------- *
      * set up the softswitch mask/set                *

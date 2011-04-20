@@ -272,7 +272,7 @@ static void nes_state_register( running_machine &machine )
 	if (state->m_battery)
 		state->save_pointer(NAME(state->m_battery_ram), state->m_battery_size);
 
-	machine.state().register_postload(nes_banks_restore, NULL);
+	machine.save().register_postload(nes_banks_restore, NULL);
 }
 
 MACHINE_START( nes )

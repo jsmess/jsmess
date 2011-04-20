@@ -265,7 +265,7 @@ static void common_start(device_t *device, SAM6883_VERSION device_type)
 	/* save state registration */
 	state_save_register_item(device->machine(), "6883sam", NULL, 0, sam->state);
 	state_save_register_item(device->machine(), "6883sam", NULL, 0, sam->video_position);
-	device->machine().state().register_postload(update_sam_postload, (void*)device);
+	device->machine().save().register_postload(update_sam_postload, (void*)device);
 }
 
 static DEVICE_START( sam6883 )

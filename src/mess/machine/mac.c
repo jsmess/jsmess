@@ -3233,7 +3233,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	mac->m_inquiry_timeout = machine.scheduler().timer_alloc(FUNC(inquiry_timeout_func));
 
 	/* save state stuff */
-	machine.state().register_postload(mac_state_load, NULL);
+	machine.save().register_postload(mac_state_load, NULL);
 }
 
 #define MAC_DRIVER_INIT(label, model)	\

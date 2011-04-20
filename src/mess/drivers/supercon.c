@@ -556,8 +556,8 @@ static MACHINE_START( supercon )
 
 
     state->save_item(NAME(state->m_save_board));
-    machine.state().register_postload(m_board_postload,NULL);
-    machine.state().register_presave(m_board_presave,NULL);
+    machine.save().register_postload(m_board_postload,NULL);
+    machine.save().register_presave(m_board_presave,NULL);
 
 }
 

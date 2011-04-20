@@ -764,7 +764,7 @@ static void common_start(device_t *device, int device_type)
 
 	/* register for state saving */
 
-	device->machine().state().register_postload(crtc_ega_state_save_postload, crtc_ega);
+	device->machine().save().register_postload(crtc_ega_state_save_postload, crtc_ega);
 
 	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->clock);
 	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->hpixels_per_column);

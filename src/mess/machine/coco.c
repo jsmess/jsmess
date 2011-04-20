@@ -3084,7 +3084,7 @@ MACHINE_START( coco3 )
 	state->save_item(NAME(state->m_interupt_line));
 	state->save_item(NAME(state->m_gime_irq));
 	state->save_item(NAME(state->m_gime_firq));
-	machine.state().register_postload(coco3_state_postload, NULL);
+	machine.save().register_postload(coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */
 	machine.scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
