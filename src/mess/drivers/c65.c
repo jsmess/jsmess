@@ -202,7 +202,6 @@ static const sid6581_interface c65_sound_interface =
 
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
-	{ "cia_1" },
 	{ NULL}
 };
 
@@ -322,7 +321,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_MOS6526R1_ADD("cia_1", 3500000, c65_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD("serial_bus", cbm_iec_daisy)
+	MCFG_CBM_IEC_ADD(cbm_iec_daisy)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 
