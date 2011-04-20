@@ -161,10 +161,10 @@ READ8_MEMBER( c1571_device::via0_pa_r )
 
 	UINT8 data = 0;
 
-	/* track 0 sense */
+	// track 0 sense
 	data |= floppy_tk00_r(m_image);
 
-	/* byte ready */
+	// byte ready
 	data |= m_ga->byte_r() << 7;
 
 	return data;
@@ -188,7 +188,7 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 
     */
 
-	/* 1/2 MHz */
+	// 1/2 MHz
 	int clock_1_2 = BIT(data, 5);
 
 	if (m_1_2mhz != clock_1_2)
@@ -204,7 +204,7 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 		m_1_2mhz = clock_1_2;
 	}
 
-	/* fast serial direction */
+	// fast serial direction
 	int ser_dir = BIT(data, 1);
 
 	if (m_ser_dir != ser_dir)
@@ -221,10 +221,10 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 		}
 	}
 
-	/* side select */
+	// side select
 	m_ga->set_side(BIT(data, 2));
 
-	/* attention out */
+	// attention out
 	cbm_iec_atn_w(m_bus, this, !BIT(data, 6));
 }
 
@@ -248,16 +248,16 @@ READ8_MEMBER( c1571_device::via0_pb_r )
 
 	UINT8 data = 0;
 
-	/* data in */
+	// data in
 	data = !cbm_iec_data_r(m_bus);
 
-	/* clock in */
+	// clock in
 	data |= !cbm_iec_clk_r(m_bus) << 2;
 
-	/* serial bus address */
+	// serial bus address
 	data |= m_config.m_address << 5;
 
-	/* attention in */
+	// attention in
 	data |= !cbm_iec_atn_r(m_bus) << 7;
 
 	return data;
@@ -281,13 +281,13 @@ WRITE8_MEMBER( c1571_device::via0_pb_w )
 
     */
 
-	/* data out */
+	// data out
 	m_data_out = BIT(data, 1);
 
-	/* attention acknowledge */
+	// attention acknowledge
 	m_ga->atna_w(BIT(data, 4));
 
-	/* clock out */
+	// clock out
 	cbm_iec_clk_w(m_bus, this, !BIT(data, 3));
 }
 
@@ -355,10 +355,10 @@ READ8_MEMBER( c1571_device::via1_pb_r )
 
 	UINT8 data = 0;
 
-	/* write protect sense */
+	// write protect sense
 	data |= !floppy_wpt_r(m_image) << 4;
 
-	/* SYNC detect line */
+	// SYNC detect line
 	data |= m_ga->sync_r() << 7;
 
 	return data;
@@ -381,16 +381,16 @@ WRITE8_MEMBER( c1571_device::via1_pb_w )
 
     */
 
-	/* spindle motor */
+	// spindle motor
 	m_ga->mtr_w(BIT(data, 2));
 
-	/* stepper motor */
+	// stepper motor
 	m_ga->stp_w(data & 0x03); // TODO actually STP1=0, STP0=!(PB0^PB1), Y0=PB1, Y2=!PB1
 
-	/* activity LED */
+	// activity LED
 	output_set_led_value(LED_ACT, BIT(data, 3));
 
-	/* density select */
+	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
 }
 
@@ -429,7 +429,7 @@ WRITE_LINE_MEMBER( c1571_device::cia_irq_w )
 
 WRITE_LINE_MEMBER( c1571_device::cia_cnt_w )
 {
-	/* fast serial clock out */
+	// fast serial clock out
 	m_cnt_out = state;
 	set_iec_srq();
 }
@@ -437,7 +437,7 @@ WRITE_LINE_MEMBER( c1571_device::cia_cnt_w )
 
 WRITE_LINE_MEMBER( c1571_device::cia_sp_w )
 {
-	/* fast serial data out */
+	// fast serial data out
 	m_sp_out = state;
 	set_iec_data();
 }
@@ -571,7 +571,7 @@ inline void c1571_device::set_iec_data()
 {
 	int data = !m_data_out & !m_ga->atn_r();
 
-	/* fast serial data */
+	// fast serial data
 	if (m_ser_dir) data &= m_sp_out;
 
 	cbm_iec_data_w(m_bus, this, data);
@@ -586,7 +586,7 @@ inline void c1571_device::set_iec_srq()
 {
 	int srq = 1;
 
-	/* fast serial clock */
+	// fast serial clock
 	if (m_ser_dir) srq &= m_cnt_out;
 
 	cbm_iec_srq_w(m_bus, this, srq);
@@ -635,7 +635,7 @@ void c1571_device::device_start()
 	floppy_install_unload_proc(m_image, c1571_device::on_disk_change);
 	floppy_install_load_proc(m_image, c1571_device::on_disk_change);
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_1_2mhz));
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_ser_dir));

@@ -7,84 +7,183 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __C1541__
 #define __C1541__
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
+#include "cpu/m6502/m6502.h"
+#include "imagedev/flopdrv.h"
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
+#include "machine/64h156.h"
+#include "machine/6522via.h"
+#include "machine/cbmiec.h"
+#include "machine/ieee488.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(C1540, c1540);
-DECLARE_LEGACY_DEVICE(C1541, c1541);
-DECLARE_LEGACY_DEVICE(C1541C, c1541c);
-DECLARE_LEGACY_DEVICE(C1541II, c1541ii);
-DECLARE_LEGACY_DEVICE(SX1541, sx1541);
-DECLARE_LEGACY_DEVICE(C2031, c2031);
-DECLARE_LEGACY_DEVICE(OC118, oc118);
 
-#define MCFG_C1540_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C1540, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MCFG_C1541_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C1541, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+    MCFG_DEVICE_ADD(_tag, C1541, 0) \
+	c1541_device_config::static_set_config(device, _bus_tag, _address);
 
-#define MCFG_C1541C_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C1541C, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
-
-#define MCFG_C1541II_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C1541II, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
-
-#define MCFG_SX1541_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, SX1541, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
-
-#define MCFG_C2031_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C2031, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
-
-#define MCFG_OC118_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, OC118, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
 #define C1541_IEC(_tag) \
-	_tag, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1541_iec_atn_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1541_iec_reset_w)
+	_tag, \
+	DEVCB_NULL, \
+	DEVCB_DEVICE_LINE_MEMBER(_tag, c1541_device, iec_atn_w), \
+	DEVCB_NULL, \
+	DEVCB_NULL, \
+	DEVCB_DEVICE_LINE_MEMBER(_tag, c1541_device, iec_reset_w)
 
-#define C2031_IEEE488(_tag) \
-	_tag, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c2031_ieee488_ifc_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c2031_ieee488_atn_w), DEVCB_NULL
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _c1541_config c1541_config;
-struct _c1541_config
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> c1541_device_config
+
+class c1541_device_config :   public device_config
 {
-	const char *bus_tag;		/* bus device */
-	int address;				/* bus address */
+    friend class c1541_device;
+
+    // construction/destruction
+    c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+	// inline configuration helpers
+	static void static_set_config(device_config *device, const char *bus_tag, int address);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+	
+	const char *m_bus_tag;
+	int m_address;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* IEC interface */
-WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w );
-WRITE_LINE_DEVICE_HANDLER( c1541_iec_reset_w );
 
-/* IEEE-488 interface */
-WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_atn_w );
-WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_ifc_w );
+// ======================> c1541_device
+
+class c1541_device :  public device_t
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    c1541_device(running_machine &_machine, const c1541_device_config &_config);
+
+public:
+	DECLARE_WRITE_LINE_MEMBER( iec_atn_w );
+	DECLARE_WRITE_LINE_MEMBER( iec_reset_w );
+
+	// not really public
+	static void on_disk_change(device_image_interface &image);
+
+	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	DECLARE_READ8_MEMBER( via0_pa_r );
+	DECLARE_WRITE8_MEMBER( via0_pa_w );
+	DECLARE_READ8_MEMBER( via0_pb_r );
+	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	DECLARE_READ_LINE_MEMBER( atn_in_r );
+	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	DECLARE_READ8_MEMBER( via1_pb_r );
+	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( atn_w );
+	DECLARE_WRITE_LINE_MEMBER( byte_w );
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+
+	inline void set_iec_data();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
+	required_device<c64h156_device> m_ga;
+	required_device<device_t> m_image;
+	device_t *m_bus;
+
+	// IEC bus
+	int m_data_out;							// serial data out
+
+	// interrupts
+	int m_via0_irq;							// VIA #0 interrupt request
+	int m_via1_irq;							// VIA #1 interrupt request
+
+    const c1541_device_config &m_config;
+};
+
+
+// ======================> c1541_device
+
+class c1541c_device :  public c1541_device
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    c1541c_device(running_machine &_machine, const c1541_device_config &_config);
+
+public:
+	// not really public
+	DECLARE_READ8_MEMBER( via0_pa_r );
+};
+
+
+// ======================> c2031_device
+
+class c2031_device :  public c1541_device
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    c2031_device(running_machine &_machine, const c1541_device_config &_config);
+
+public:
+	DECLARE_WRITE_LINE_MEMBER( ieee488_atn_w );
+	DECLARE_WRITE_LINE_MEMBER( ieee488_ifc_w );
+
+	// not really public
+	DECLARE_READ8_MEMBER( via0_pa_r );
+	DECLARE_WRITE8_MEMBER( via0_pa_w );
+	DECLARE_READ8_MEMBER( via0_pb_r );
+	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	DECLARE_READ_LINE_MEMBER( via0_ca1_r );
+	DECLARE_READ_LINE_MEMBER( via0_ca2_r );
+
+protected:
+	int m_nrfd_out;				// not ready for data
+	int m_ndac_out;				// not data accepted
+	int m_atna;					// attention acknowledge
+};
+
+
+// device type definition
+extern const device_type C1540;
+extern const device_type C1541;
+extern const device_type C1541C;
+extern const device_type C1541II;
+extern const device_type SX1541;
+extern const device_type OC118;
+extern const device_type C2031;
+
+
 
 #endif
