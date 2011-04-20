@@ -424,7 +424,7 @@ static CBM_IEC_DAISY( c16_iec_no_drives )
 
 static CBM_IEC_DAISY( c16_iec_1541 )
 {
-	{ "c1541" },
+	{ C1541_TAG },
 	{ NULL }
 };
 
@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 
 	/* IEC serial bus */
 	MCFG_CBM_IEC_ADD(c16_iec_no_drives)
-
+	
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -509,7 +509,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c16c, c16 )
 
-	MCFG_C1551_ADD("c1551", 8)
+	MCFG_C1551_ADD(C1551_TAG, 8)
 
 #ifdef CPU_SYNC
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_DERIVED( c16v, c16 )
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_REMOVE()
 	MCFG_CBM_IEC_ADD(c16_iec_1541)
-	MCFG_C1541_ADD("c1541", 8)
+	MCFG_C1541_ADD(C1541_TAG, 8)
 #ifdef CPU_SYNC
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
@@ -555,7 +555,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( plus4c, plus4 )
 
-	MCFG_C1551_ADD("c1551", 8)
+	MCFG_C1551_ADD(C1551_TAG, 8)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -572,7 +572,7 @@ static MACHINE_CONFIG_DERIVED( plus4v, plus4 )
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_REMOVE()
 	MCFG_CBM_IEC_ADD(c16_iec_1541)
-	MCFG_C1541_ADD("c1541", 8)
+	MCFG_C1541_ADD(C1541_TAG, 8)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

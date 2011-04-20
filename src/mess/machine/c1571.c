@@ -11,8 +11,6 @@
 
     TODO:
 
-	- C1570
-	- C1571CR
     - fast serial
     - 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
     - CP/M disks
@@ -47,7 +45,9 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
+const device_type C1570 = c1571_device_config::static_alloc_device_config;
 const device_type C1571 = c1571_device_config::static_alloc_device_config;
+const device_type C1571CR = c1571_device_config::static_alloc_device_config;
 
 
 
@@ -103,13 +103,14 @@ void c1571_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1571_device_config::static_set_config(device_config *device, int address)
+void c1571_device_config::static_set_config(device_config *device, int address, const char *rom_region)
 {
 	c1571_device_config *c1571 = downcast<c1571_device_config *>(device);
 
 	assert((address > 7) && (address < 12));
 
 	c1571->m_address = address - 8;
+	c1571->m_rom_region = rom_region;
 }
 
 
@@ -152,7 +153,7 @@ static ADDRESS_MAP_START( c1571_mem, AS_PROGRAM, 8, c1571_device )
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_LEGACY(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE_LEGACY(M6526_TAG, mos6526_r, mos6526_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1571:c1571", 0)
+	AM_RANGE(0x8000, 0xffff) // AM_ROM
 ADDRESS_MAP_END
 
 
@@ -638,7 +639,7 @@ c1571_device::c1571_device(running_machine &_machine, const c1571_device_config 
 	  m_fdc(*this, WD1770_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(machine().device<cbm_iec_device>(CBM_IEC_TAG)),
+	  m_bus(*this->owner(), CBM_IEC_TAG),
 	  m_1_2mhz(0),
 	  m_data_out(1),
 	  m_ser_dir(0),
@@ -658,6 +659,10 @@ c1571_device::c1571_device(running_machine &_machine, const c1571_device_config 
 
 void c1571_device::device_start()
 {
+	// map ROM
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	program->install_rom(0x8000, 0xffff, subregion(m_config.m_rom_region)->base());
+
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1571_device::on_disk_change);
 	floppy_install_load_proc(m_image, c1571_device::on_disk_change);

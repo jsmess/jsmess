@@ -25,12 +25,24 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define C1581_TAG			"c1581"
+
+
+
+//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 #define MCFG_C1581_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1581, 0) \
-	c1581_device_config::static_set_config(device, _address);
+	c1581_device_config::static_set_config(device, _address, "c1581");
+
+#define MCFG_C1563_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1563, 0) \
+	c1581_device_config::static_set_config(device, _address, "c1563");
 
 
 
@@ -44,6 +56,7 @@ class c1581_device_config :   public device_config,
 							  public device_config_cbm_iec_interface
 {
     friend class c1581_device;
+    friend class c1563_device;
 
     // construction/destruction
     c1581_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
@@ -54,7 +67,7 @@ public:
     virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address);
+	static void static_set_config(device_config *device, int address, const char *rom_region);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -66,6 +79,7 @@ protected:
 
 private:
 	int m_address;
+	const char *m_rom_region;
 };
 
 
@@ -107,7 +121,7 @@ private:
 	required_device<mos6526_device> m_cia;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_image;
-	cbm_iec_device *m_bus;
+	required_device<cbm_iec_device> m_bus;
 
 	int m_data_out;				// serial data out
 	int m_atn_ack;				// attention acknowledge
@@ -119,9 +133,20 @@ private:
 };
 
 
+// ======================> c1563_device
+
+class c1563_device :  public c1581_device
+{
+    friend class c1581_device_config;
+
+    // construction/destruction
+    c1563_device(running_machine &_machine, const c1581_device_config &_config);
+};
+
 
 // device type definition
 extern const device_type C1581;
+extern const device_type C1563;
 
 
 

@@ -10,8 +10,6 @@
 #define M6522_1_TAG		"uab1"
 #define M6560_TAG		"ub7"
 #define M6561_TAG		"ub7"
-#define C1540_TAG		"c1541"
-#define C2031_TAG		"c2031"
 #define IEC_TAG			"iec"
 #define IEEE488_TAG		"ieee488"
 #define CASSETTE_TAG	"cassette"

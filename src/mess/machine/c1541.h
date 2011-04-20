@@ -27,12 +27,45 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define C1541_TAG			"c1541"
+#define C2031_TAG			"c2031"
+
+
+
+//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_C1540_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1540, 0) \
+	c1541_device_config::static_set_config(device, _address, "c1540");
+
 #define MCFG_C1541_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541, 0) \
-	c1541_device_config::static_set_config(device, _address);
+	c1541_device_config::static_set_config(device, _address, "c1541");
+
+#define MCFG_C1541C_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1541C, 0) \
+	c1541_device_config::static_set_config(device, _address, "c1541c");
+
+#define MCFG_C1541II_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1541II, 0) \
+	c1541_device_config::static_set_config(device, _address, "c1541ii");
+
+#define MCFG_SX1541_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, SX1541, 0) \
+	c1541_device_config::static_set_config(device, _address, "sx1541");
+
+#define MCFG_OC118_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, OC118, 0) \
+	c1541_device_config::static_set_config(device, _address, "oc118");
+
+#define MCFG_C2031_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C2031, 0) \
+	c1541_device_config::static_set_config(device, _address, "c2031");
 
 
 
@@ -45,7 +78,13 @@
 class c1541_device_config :   public device_config,
 							  public device_config_cbm_iec_interface
 {
+    friend class c1540_device;
     friend class c1541_device;
+    friend class c1541c_device;
+    friend class c1541ii_device;
+    friend class sx1541_device;
+    friend class oc118_device;
+    friend class c2031_device;
 
     // construction/destruction
     c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
@@ -56,7 +95,7 @@ public:
     virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address);
+	static void static_set_config(device_config *device, int address, const char *rom_region);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -67,6 +106,7 @@ protected:
     virtual void device_config_complete();
 	
 	int m_address;
+	const char *m_rom_region;
 };
 
 
@@ -112,7 +152,7 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	cbm_iec_device *m_bus;
+	required_device<cbm_iec_device> m_bus;
 
 	// IEC bus
 	int m_data_out;							// serial data out
@@ -125,7 +165,18 @@ protected:
 };
 
 
-// ======================> c1541_device
+// ======================> c1540_device
+
+class c1540_device :  public c1541_device
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    c1540_device(running_machine &_machine, const c1541_device_config &_config);
+};
+
+
+// ======================> c1541c_device
 
 class c1541c_device :  public c1541_device
 {
@@ -137,6 +188,39 @@ class c1541c_device :  public c1541_device
 public:
 	// not really public
 	DECLARE_READ8_MEMBER( via0_pa_r );
+};
+
+
+// ======================> c1541ii_device
+
+class c1541ii_device :  public c1541_device
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    c1541ii_device(running_machine &_machine, const c1541_device_config &_config);
+};
+
+
+// ======================> sx1541_device
+
+class sx1541_device :  public c1541_device
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    sx1541_device(running_machine &_machine, const c1541_device_config &_config);
+};
+
+
+// ======================> oc118_device
+
+class oc118_device :  public c1541_device
+{
+    friend class c1541_device_config;
+
+    // construction/destruction
+    oc118_device(running_machine &_machine, const c1541_device_config &_config);
 };
 
 

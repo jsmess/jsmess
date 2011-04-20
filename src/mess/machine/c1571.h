@@ -28,12 +28,28 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define C1571_TAG			"c1571"
+
+
+
+//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_C1570_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1570, 0) \
+	c1571_device_config::static_set_config(device, _address, "c1570");
+
 #define MCFG_C1571_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1571, 0) \
-	c1571_device_config::static_set_config(device, _address);
+	c1571_device_config::static_set_config(device, _address, "c1571");
+
+#define MCFG_C1571CR_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C1571CR, 0) \
+	c1571_device_config::static_set_config(device, _address, "c1571cr");
 
 
 
@@ -46,7 +62,9 @@
 class c1571_device_config :   public device_config,
 							  public device_config_cbm_iec_interface
 {
+    friend class c1570_device;
     friend class c1571_device;
+    friend class c1571cr_device;
 
     // construction/destruction
     c1571_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
@@ -57,7 +75,7 @@ public:
     virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address);
+	static void static_set_config(device_config *device, int address, const char *rom_region);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -69,6 +87,7 @@ protected:
 	
 private:
 	int m_address;
+	const char *m_rom_region;
 };
 
 
@@ -125,7 +144,7 @@ private:
 	required_device<device_t> m_fdc;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	cbm_iec_device *m_bus;
+	required_device<cbm_iec_device> m_bus;
 
 	// signals
 	int m_1_2mhz;							// clock speed
@@ -145,9 +164,32 @@ private:
 };
 
 
+// ======================> c1570_device
+
+class c1570_device :  public c1571_device
+{
+    friend class c1571_device_config;
+
+    // construction/destruction
+    c1570_device(running_machine &_machine, const c1571_device_config &_config);
+};
+
+
+// ======================> c1571cr_device
+
+class c1571cr_device :  public c1571_device
+{
+    friend class c1571_device_config;
+
+    // construction/destruction
+    c1571cr_device(running_machine &_machine, const c1571_device_config &_config);
+};
+
 
 // device type definition
+extern const device_type C1570;
 extern const device_type C1571;
+extern const device_type C1571CR;
 
 
 

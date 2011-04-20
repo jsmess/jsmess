@@ -7,14 +7,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - C1563 device
-
-*/
-
 #include "c1581.h"
 
 
@@ -41,6 +33,7 @@ enum
 //**************************************************************************
 
 const device_type C1581 = c1581_device_config::static_alloc_device_config;
+const device_type C1563 = c1581_device_config::static_alloc_device_config;
 
 
 
@@ -97,13 +90,14 @@ void c1581_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1581_device_config::static_set_config(device_config *device, int address)
+void c1581_device_config::static_set_config(device_config *device, int address, const char *rom_region)
 {
 	c1581_device_config *c1581 = downcast<c1581_device_config *>(device);
 
 	assert((address > 7) && (address < 12));
 
 	c1581->m_address = address - 8;
+	c1581->m_rom_region = rom_region;
 }
 
 
@@ -432,7 +426,7 @@ c1581_device::c1581_device(running_machine &_machine, const c1581_device_config 
 	  m_cia(*this, M8520_TAG),
 	  m_fdc(*this, WD1770_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(machine().device<cbm_iec_device>(CBM_IEC_TAG)),
+	  m_bus(*this->owner(), CBM_IEC_TAG),
       m_config(_config)
 {
 }
@@ -444,6 +438,10 @@ c1581_device::c1581_device(running_machine &_machine, const c1581_device_config 
 
 void c1581_device::device_start()
 {
+	// map ROM
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	program->install_rom(0x8000, 0xbfff, subregion(m_config.m_rom_region)->base());
+
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));

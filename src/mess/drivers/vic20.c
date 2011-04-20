@@ -433,7 +433,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
-	{ C1540_TAG },
+	{ C1541_TAG },
 	{ NULL }
 };
 
@@ -685,7 +685,6 @@ static INTERRUPT_GEN( vic20_raster_interrupt )
 }
 
 static MACHINE_CONFIG_START( vic20_common, vic20_state )
-
 	MCFG_TIMER_ADD_PERIODIC(TIMER_C1530_TAG, cassette_tick, attotime::from_hz(44100))
 
 	/* devices */
@@ -695,8 +694,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
 	MCFG_CBM_IEC_CONFIG_ADD(cbm_iec_daisy, cbm_iec_intf)
-	//MCFG_C1540_ADD(C1540_TAG, 8)
-	MCFG_C1541_ADD(C1540_TAG, 8)
+	MCFG_C1540_ADD(C1541_TAG, 8)
 #ifdef INCLUDE_C2031
     MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
     MCFG_VIC1112_ADD(vic1112_intf)
@@ -718,7 +716,6 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
@@ -747,7 +744,6 @@ static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vic20_pal, vic20_common )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
