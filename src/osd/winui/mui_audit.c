@@ -401,7 +401,7 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 {
 	HWND	hEdit;
 	va_list marker;
-	char	buffer[2000];
+	char	buffer[8000];
 	TCHAR*  t_s;
 	int		textLength;
 
