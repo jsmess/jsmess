@@ -11,7 +11,7 @@
 
     TODO:
 
-	- 1541C/2031
+	- C1540 does not work
 	- some copy protections fail
     - more accurate timing
     - power/activity LEDs
@@ -222,15 +222,26 @@ void c1541_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1541_device_config::static_set_config(device_config *device, int address, const char *rom_region)
+void c1541_device_config::static_set_config(device_config *device, int address, int variant)
 {
 	c1541_device_config *c1541 = downcast<c1541_device_config *>(device);
 
 	assert((address > 7) && (address < 12));
 
 	c1541->m_address = address - 8;
-	c1541->m_rom_region = rom_region;
+	c1541->m_variant = variant;
 }
+
+
+//-------------------------------------------------
+//  ROM( c1540 )
+//-------------------------------------------------
+
+ROM_START( c1540 )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+	ROM_LOAD( "325303-01.uab5", 0x2000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
+ROM_END
 
 
 //-------------------------------------------------
@@ -238,11 +249,7 @@ void c1541_device_config::static_set_config(device_config *device, int address, 
 //-------------------------------------------------
 
 ROM_START( c1541 )
-	ROM_REGION( 0x4000, "c1540", 0 )
-	ROM_LOAD_OPTIONAL( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD_OPTIONAL( "325303-01.uab5", 0x2000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
-
-	ROM_REGION( 0x6000, "c1541", 0 )
+	ROM_REGION( 0x6000, M6502_TAG, 0 )
 	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD_OPTIONAL( "901229-01.uab5", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
 	ROM_LOAD_OPTIONAL( "901229-02.uab5", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
@@ -251,29 +258,64 @@ ROM_START( c1541 )
 	ROM_LOAD_OPTIONAL( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
 	ROM_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 	ROM_LOAD_OPTIONAL( "jiffydos 1541.uab5", 0x4000, 0x2000, CRC(bc7e4aeb) SHA1(db6cfaa6d9b78d58746c811de29f3b1f44d99ddf) )
+ROM_END
 
-	ROM_REGION( 0x4000, "c1541c", 0 )
-	ROM_LOAD_OPTIONAL( "251968-01.ua2", 0x0000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765) )
-	ROM_LOAD_OPTIONAL( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704) )
 
-	ROM_REGION( 0x8000, "c1541ii", 0 )
-	ROM_LOAD_OPTIONAL( "251968-03.u4", 0x0000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3) )
-	ROM_LOAD_OPTIONAL( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
+//-------------------------------------------------
+//  ROM( c1541c )
+//-------------------------------------------------
+
+ROM_START( c1541c )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "251968-01.ua2", 0x0000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765) )
+	ROM_LOAD( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c1541ii )
+//-------------------------------------------------
+
+ROM_START( c1541ii )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
+	ROM_LOAD( "251968-03.u4", 0x0000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3) )
+	ROM_LOAD( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
 	ROM_LOAD_OPTIONAL( "jiffydos 1541-ii.u4", 0x4000, 0x4000, CRC(dd409902) SHA1(b1a5b826304d3df2a27d7163c6a81a532e040d32) )
+ROM_END
 
-	ROM_REGION( 0xa000, "sx1541", 0 )
-	ROM_LOAD_OPTIONAL( "325302-01.uab4",    0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD_OPTIONAL( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
+
+//-------------------------------------------------
+//  ROM( sx1541 )
+//-------------------------------------------------
+
+ROM_START( sx1541 )
+	ROM_REGION( 0xa000, M6502_TAG, 0 )
+	ROM_LOAD( "325302-01.uab4",    0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+	ROM_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
 	ROM_LOAD_OPTIONAL( "jiffydos sx1541",   0x4000, 0x4000, CRC(783575f6) SHA1(36ccb9ff60328c4460b68522443ecdb7f002a234) )
 	ROM_LOAD_OPTIONAL( "1541 flash.uab5",   0x8000, 0x2000, CRC(22f7757e) SHA1(86a1e43d3d22b35677064cca400a6bd06767a3dc) )
+ROM_END
 
-	ROM_REGION( 0x4000, "c2031", 0 )
-	ROM_LOAD_OPTIONAL( "901484-03.u5f", 0x0000, 0x2000, CRC(ee4b893b) SHA1(54d608f7f07860f24186749f21c96724dd48bc50) )
-	ROM_LOAD_OPTIONAL( "901484-05.u5h", 0x2000, 0x2000, CRC(6a629054) SHA1(ec6b75ecfdd4744e5d57979ef6af990444c11ae1) )
 
-	ROM_REGION( 0x4000, "oc118", 0 )
+//-------------------------------------------------
+//  ROM( c2031 )
+//-------------------------------------------------
+
+ROM_START( c2031 )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "901484-03.u5f", 0x0000, 0x2000, CRC(ee4b893b) SHA1(54d608f7f07860f24186749f21c96724dd48bc50) )
+	ROM_LOAD( "901484-05.u5h", 0x2000, 0x2000, CRC(6a629054) SHA1(ec6b75ecfdd4744e5d57979ef6af990444c11ae1) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( oc118 )
+//-------------------------------------------------
+
+ROM_START( oc118 )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROM_LOAD_OPTIONAL( "oc118.u3", 0x0000, 0x4000, NO_DUMP )
-	ROM_LOAD_OPTIONAL( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8) )
+	ROM_LOAD( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8) )
 ROM_END
 
 
@@ -283,7 +325,30 @@ ROM_END
 
 const rom_entry *c1541_device_config::device_rom_region() const
 {
-	return ROM_NAME( c1541 );
+	switch (m_variant)
+	{
+	case TYPE_1540:
+		return ROM_NAME( c1540 );
+
+	default:
+	case TYPE_1541:
+		return ROM_NAME( c1541 );
+
+	case TYPE_1541C:
+		return ROM_NAME( c1541c );
+
+	case TYPE_1541II:
+		return ROM_NAME( c1541ii );
+
+	case TYPE_SX1541:
+		return ROM_NAME( sx1541 );
+
+	case TYPE_OC118:
+		return ROM_NAME( oc118 );
+
+	case TYPE_C2031:
+		return ROM_NAME( c2031 );
+	}
 }
 
 
@@ -788,13 +853,55 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_DRIVER( c1541c )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c1541c )
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1541_mem)
+
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541c_via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_DRIVER( c2031 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c2031 )
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1541_mem)
+
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c2031_via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
 machine_config_constructor c1541_device_config::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( c1541 );
+	switch (m_variant)
+	{
+	case TYPE_1541C:
+		return MACHINE_CONFIG_NAME( c1541c );
+
+	case TYPE_C2031:
+		return MACHINE_CONFIG_NAME( c2031 );
+
+	default:
+		return MACHINE_CONFIG_NAME( c1541 );
+	}
 }
 
 
@@ -849,7 +956,7 @@ void c1541_device::device_start()
 {
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	program->install_rom(0x8000, 0xbfff, 0, 0x4000, subregion(m_config.m_rom_region)->base());
+	program->install_rom(0x8000, 0xbfff, 0, 0x4000, subregion(M6502_TAG)->base());
 
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1541_device::on_disk_change);

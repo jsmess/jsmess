@@ -103,15 +103,25 @@ void c1571_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1571_device_config::static_set_config(device_config *device, int address, const char *rom_region)
+void c1571_device_config::static_set_config(device_config *device, int address, int variant)
 {
 	c1571_device_config *c1571 = downcast<c1571_device_config *>(device);
 
 	assert((address > 7) && (address < 12));
 
 	c1571->m_address = address - 8;
-	c1571->m_rom_region = rom_region;
+	c1571->m_variant = variant;
 }
+
+
+//-------------------------------------------------
+//  ROM( c1570 )
+//-------------------------------------------------
+
+ROM_START( c1570 )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
+	ROM_LOAD( "315090-01.u2", 0x0000, 0x8000, CRC(5a0c7937) SHA1(5fc06dc82ff6840f183bd43a4d9b8a16956b2f56) )
+ROM_END
 
 
 //-------------------------------------------------
@@ -119,15 +129,19 @@ void c1571_device_config::static_set_config(device_config *device, int address, 
 //-------------------------------------------------
 
 ROM_START( c1571 )
-	ROM_REGION( 0x8000, "c1570", 0 )
-	ROM_LOAD( "315090-01.u2", 0x0000, 0x8000, CRC(5a0c7937) SHA1(5fc06dc82ff6840f183bd43a4d9b8a16956b2f56) )
-
-	ROM_REGION( 0x8000, "c1571", 0 )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_LOAD_OPTIONAL( "jiffydos 1571.u2", 0x0000, 0x8000, CRC(fe6cac6d) SHA1(d4b79b60cf1eaa399d0932200eb7811e00455249) )
 	ROM_LOAD_OPTIONAL( "310654-03.u2", 0x0000, 0x8000, CRC(3889b8b8) SHA1(e649ef4419d65829d2afd65e07d31f3ce147d6eb) )
 	ROM_LOAD( "310654-05.u2", 0x0000, 0x8000, CRC(5755bae3) SHA1(f1be619c106641a685f6609e4d43d6fc9eac1e70) )
+ROM_END
 
-	ROM_REGION( 0x8000, "c1571cr", 0 )
+
+//-------------------------------------------------
+//  ROM( c1571cr )
+//-------------------------------------------------
+
+ROM_START( c1571cr )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_LOAD_OPTIONAL( "jiffydos 1571d.u102", 0x0000, 0x8000, CRC(9cba146d) SHA1(823b178561302b403e6bfd8dd741d757efef3958) )
 	ROM_LOAD( "318047-01.u102", 0x0000, 0x8000, CRC(f24efcc4) SHA1(14ee7a0fb7e1c59c51fbf781f944387037daa3ee) )
 ROM_END
@@ -139,7 +153,18 @@ ROM_END
 
 const rom_entry *c1571_device_config::device_rom_region() const
 {
-	return ROM_NAME( c1571 );
+	switch (m_variant)
+	{
+	case TYPE_1570:
+		return ROM_NAME( c1570 );
+	
+	default:
+	case TYPE_1571:
+		return ROM_NAME( c1571 );
+
+	case TYPE_1571CR:
+		return ROM_NAME( c1571cr );
+	}
 }
 
 
@@ -557,6 +582,33 @@ static const floppy_config c1571_floppy_config =
 
 
 //-------------------------------------------------
+//  FLOPPY_OPTIONS( c1570 )
+//-------------------------------------------------
+
+static FLOPPY_OPTIONS_START( c1570 )
+	FLOPPY_OPTION( c1570, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1570, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+FLOPPY_OPTIONS_END
+
+
+//-------------------------------------------------
+//  floppy_config c1570_floppy_config
+//-------------------------------------------------
+
+static const floppy_config c1570_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1571_device, wpt_w),
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_SSDD,
+	FLOPPY_OPTIONS_NAME(c1570),
+	NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1571 )
 //-------------------------------------------------
 
@@ -575,13 +627,38 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_DRIVER( c1570 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c1570 )
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1571_mem)
+
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MCFG_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, cia_intf)
+	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
+
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
+	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
 machine_config_constructor c1571_device_config::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( c1571 );
+	switch (m_variant)
+	{
+	case TYPE_1570:
+		return MACHINE_CONFIG_NAME( c1570 );
+	
+	default:
+		return MACHINE_CONFIG_NAME( c1571 );
+	}
 }
 
 
@@ -661,7 +738,7 @@ void c1571_device::device_start()
 {
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	program->install_rom(0x8000, 0xffff, subregion(m_config.m_rom_region)->base());
+	program->install_rom(0x8000, 0xffff, subregion(M6502_TAG)->base());
 
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1571_device::on_disk_change);

@@ -90,14 +90,14 @@ void c1581_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1581_device_config::static_set_config(device_config *device, int address, const char *rom_region)
+void c1581_device_config::static_set_config(device_config *device, int address, int variant)
 {
 	c1581_device_config *c1581 = downcast<c1581_device_config *>(device);
 
 	assert((address > 7) && (address < 12));
 
 	c1581->m_address = address - 8;
-	c1581->m_rom_region = rom_region;
+	c1581->m_variant = variant;
 }
 
 
@@ -106,14 +106,21 @@ void c1581_device_config::static_set_config(device_config *device, int address, 
 //-------------------------------------------------
 
 ROM_START( c1581 )
-	ROM_REGION( 0x8000, "c1581", 0 )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_LOAD_OPTIONAL( "jiffydos 1581.u2", 0x0000, 0x8000, CRC(98873d0f) SHA1(65bbf2be7bcd5bdcbff609d6c66471ffb9d04bfe) )
 	ROM_LOAD_OPTIONAL( "beta.u2",	       0x0000, 0x8000, CRC(ecc223cd) SHA1(a331d0d46ead1f0275b4ca594f87c6694d9d9594) )
 	ROM_LOAD_OPTIONAL( "318045-01.u2",	   0x0000, 0x8000, CRC(113af078) SHA1(3fc088349ab83e8f5948b7670c866a3c954e6164) )
 	ROM_LOAD(		   "318045-02.u2",	   0x0000, 0x8000, CRC(a9011b84) SHA1(01228eae6f066bd9b7b2b6a7fa3f667e41dad393) )
+ROM_END
 
-	ROM_REGION( 0x8000, "c1563", 0 )
-	ROM_LOAD_OPTIONAL( "1563-rom.bin",     0x0000, 0x8000, CRC(1d184687) SHA1(2c5111a9c15be7b7955f6c8775fea25ec10c0ca0) )
+
+//-------------------------------------------------
+//  ROM( c1563 )
+//-------------------------------------------------
+
+ROM_START( c1563 )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
+	ROM_LOAD( "1563-rom.bin",     0x0000, 0x8000, CRC(1d184687) SHA1(2c5111a9c15be7b7955f6c8775fea25ec10c0ca0) )
 ROM_END
 
 
@@ -123,7 +130,15 @@ ROM_END
 
 const rom_entry *c1581_device_config::device_rom_region() const
 {
-	return ROM_NAME( c1581 );
+	switch (m_variant)
+	{
+	default:
+	case TYPE_1581:
+		return ROM_NAME( c1581 );
+
+	case TYPE_1563:
+		return ROM_NAME( c1563 );
+	}
 }
 
 
@@ -440,7 +455,7 @@ void c1581_device::device_start()
 {
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	program->install_rom(0x8000, 0xbfff, subregion(m_config.m_rom_region)->base());
+	program->install_rom(0x8000, 0xbfff, subregion(M6502_TAG)->base());
 
 	// state saving
 	save_item(NAME(m_data_out));

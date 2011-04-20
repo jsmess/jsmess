@@ -41,31 +41,31 @@
 
 #define MCFG_C1540_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1540, 0) \
-	c1541_device_config::static_set_config(device, _address, "c1540");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1540);
 
 #define MCFG_C1541_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541, 0) \
-	c1541_device_config::static_set_config(device, _address, "c1541");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1541);
 
 #define MCFG_C1541C_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541C, 0) \
-	c1541_device_config::static_set_config(device, _address, "c1541c");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1541C);
 
 #define MCFG_C1541II_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541II, 0) \
-	c1541_device_config::static_set_config(device, _address, "c1541ii");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1541II);
 
 #define MCFG_SX1541_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, SX1541, 0) \
-	c1541_device_config::static_set_config(device, _address, "sx1541");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_SX1541);
 
 #define MCFG_OC118_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, OC118, 0) \
-	c1541_device_config::static_set_config(device, _address, "oc118");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_OC118);
 
 #define MCFG_C2031_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C2031, 0) \
-	c1541_device_config::static_set_config(device, _address, "c2031");
+	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_C2031);
 
 
 
@@ -90,23 +90,34 @@ class c1541_device_config :   public device_config,
     c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
-    // allocators
+	enum
+	{
+		TYPE_1540 = 0,
+		TYPE_1541,
+		TYPE_1541C,
+		TYPE_1541II,
+		TYPE_SX1541,
+		TYPE_OC118,
+		TYPE_C2031
+	};
+	
+	// allocators
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address, const char *rom_region);
+	static void static_set_config(device_config *device, int address, int variant);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device_config overrides
+	// device_config overrides
     virtual void device_config_complete();
 	
 	int m_address;
-	const char *m_rom_region;
+	int m_variant;
 };
 
 

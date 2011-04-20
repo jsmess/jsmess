@@ -694,7 +694,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
 	MCFG_CBM_IEC_CONFIG_ADD(cbm_iec_daisy, cbm_iec_intf)
-	MCFG_C1540_ADD(C1541_TAG, 8)
+	MCFG_C1541_ADD(C1541_TAG, 8)
 #ifdef INCLUDE_C2031
     MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
     MCFG_VIC1112_ADD(vic1112_intf)

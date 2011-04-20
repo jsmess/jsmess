@@ -38,11 +38,11 @@
 
 #define MCFG_C1581_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1581, 0) \
-	c1581_device_config::static_set_config(device, _address, "c1581");
+	c1581_device_config::static_set_config(device, _address, c1581_device_config::TYPE_1581);
 
 #define MCFG_C1563_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1563, 0) \
-	c1581_device_config::static_set_config(device, _address, "c1563");
+	c1581_device_config::static_set_config(device, _address, c1581_device_config::TYPE_1563);
 
 
 
@@ -62,12 +62,18 @@ class c1581_device_config :   public device_config,
     c1581_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
-    // allocators
+	enum
+	{
+		TYPE_1581 = 0,
+		TYPE_1563
+	};
+	
+	// allocators
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address, const char *rom_region);
+	static void static_set_config(device_config *device, int address, int variant);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -79,7 +85,7 @@ protected:
 
 private:
 	int m_address;
-	const char *m_rom_region;
+	int m_variant;
 };
 
 
