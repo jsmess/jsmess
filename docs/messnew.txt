@@ -1,4 +1,171 @@
-﻿0.142
+﻿0.142u1
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Ensoniq Mirage Sampler [R. Belmont]
+- Laser Compumate2 [thanks to DMEnduro , Robbbert]
+
+System Driver Changes:
+----------------------
+- tec1: Fixed a bug that has been there since the driver was 
+	first written [reported by maguman21]
+
+- ob68k1a: Fixed keyboard [Robbbert]
+
+- apple2gs: fix ram sizes to reflect reality, fixed ram mapping to match real 
+  system, added readback of bank number from unpopulated RAM areas. [R Belmont]
+
+- sun: Added terminal keyboard. [Robbbert]
+
+- x1: Implemented stereophonic sound output [Angelo Salese]
+
+- ti85: moved T6A04 emulation into a device. [Sandro Ronco]
+
+- tec1: Enabled tec1b bios at user request. Added some ram for 
+	the expansion socket. [Robbbert]
+
+- next: Allow NeXT machine to display the initial splash screen [Angelo Salese]
+
+- apple2gs: Fixed AppleWorks GS hang on launch. [R. Belmont]
+
+- at: Added cascade mode support in DMA code and enabled AT floppy to 
+	boot again [Wilbert Pol, Miodrag Milanovic]
+
+- tms5220.c: updates to comments and nonstandard feature
+	defines. [Lord Nightmare]
+
+- argo: Improved video, added makeshift cursor. [Robbbert]
+
+- at: Implemented AT IDE support [Miodrag Milanovic]
+	hdd boot's now on all except 586 machines
+
+- next: add 3 more dumped NeXT bioses (one 68030, 
+	two 68040-non-turbo) [Lord Nightmare, Balrog]
+
+- upd7725 and upd96050: Implementation of the p0 and p1 output bits as device lines; 
+	preliminary implementation of INT input line. This is attempt 2 at this code, 
+	and actually links properly.  [Lord Nightmare]
+
+- at: add pals and proms from IBM 5170 AT [Lord Nightmare, Kevtris]
+
+- at: add pals and proms from IBM 5170 AT to 5170 8mhz, 
+	and add common ones to 5162 [Lord Nightmare, Kevtris]
+
+- megadriv: added proper megacd dumps to the mess driver. [ElBarto]
+
+- Added a newer revision of the Xebec S1410 Winchester 
+	controller ROM. [Ola Andersson]
+
+- Converted Atari Jaguar driver to properly use a stock 68k instead of 
+	a 68ec020 [David Haywood]
+
+- hector,interact, pce and pc8801 - driver_device conversions [Atari Ace]
+
+- Fixed pixel clock in Atari Jaguar (it was previously running 
+	at half speed) [Angelo Salese]
+
+- a5200: fixed crash when loading carts (bug #2047) [Fabio Priuli]
+
+- sgi - moving variables into structs rather than having
+	dozens of individual variables, and makes all drivers call
+	sgi_mc_init [Atari Ace]
+
+- sonydriv, apf_apt, oric_tap, td0_dsk, timex_dck, amigacrt,
+	amigakbd, and i82720 - reorganize of variables and calls to be
+	more device-like, to simplify future device conversions. [Atari Ace]
+
+- 8530scc: Don't crash on 0 baud divisor (fixes original 
+	Apple IIgs Tour) [R.Belmont]
+
+- Fixed RP5C01 alarm output. [Curt Coder]
+
+- Removed the old incomplete TC8521 emulation, and refactored all drivers 
+	to use RP5C01 instead, as it is the same chip. [Curt Coder]
+
+- nc100: Removed deprecated serial device and fixed screen size. [Curt Coder]
+
+- nc200: Demoted to GNW as it does not boot due to a bug 
+	in MC146818 UIP bit. [Curt Coder]
+
+- abc802 - Added an earlier revision of the BIOS and a correct dump of the 
+	character generator ROM. [robcfg]
+
+- apple2gs Implement monochrome double hi-res bit in $C029 - 
+	fixes original Your Apple Tour of the Apple IIgs and Apple II DeskTop 
+	on early IIgs system disks. [R.Belmont]
+
+- lisa - Added correct COP421 ROM dump. [Visual6502 team,
+	Lord Nightmare, Segher]
+
+- swtpc - hooked up terminal keyboard, system responds to commands. [Robbbert] 
+
+- a2600: hooked up softlist [Fabio Priuli]
+
+Software Lists:
+----------------
+- nes.xml: added the long awaited Bio Force Ape dump [thanks to Frank Cifaldi 
+	and the Lost Levels guys which made this possible]
+
+- 32x.xml: confirmed some dumps and replaced a few sets 
+	with proper dumps [ElBarto]
+
+- a2600 added softlist containing games whose names start with #-A [Kaylee]
+
+Source Changes:
+----------------
+- The core is based on MAME 0.142u1.  This incorporates all features of the
+  update to this core.  [MAME team]
+
+- Update compiling.htm and howto.htm to latest wiki versions [Justin Kerk]
+
+- Fix wimgtool compile with OSD=winui [Justin Kerk]
+  
+- uiimage.c: added reset of the char input buffer when selecting an entry in 
+	the file manager [Fabio Priuli]
+
+- softlist.c: rewritten part of the Internal UI handling for softlists to
+	match the code used by the file selector 
+	(this will allow more improvements soon). [Fabio Priuli]
+
+- softlist.c: softlists entries are now ordered by shortname in the 
+	File Manager, so that it's easier to find the set you want to load 
+	(first of the promised improvements ;) ). [Fabio Priuli]
+
+- softlist.c: simplified softlist navigation (from the internal UI) by 
+	catching char inputs and searching for matching names among list 
+	shortnames, like in the file selector. [Fabio Priuli]
+
+- softlist: moved software list handling (in the Internal UI) to a 
+	separate source. [Fabio Priuli]
+
+- uiswlist.c: properly made non-clickable the "[compatible lists]" 
+	separator entry between main lists and compatible ones. [Fabio Priuli]
+
+- uiswlist.c: added a switch to choose between shortname order or 
+	description order for softlist entries (in the Internal UI), 
+	and adapted the char input code to match shortnames or descriptions 
+	accordingly [Fabio Priuli]
+
+- cartslot.c/chd_cd.c: added support for a callback function to test softlist 
+	sharedfeat (e.g. 'compatibility') and display a warning message 
+	accordingly. updated cdi.c as an example [Fabio Priuli]
+
+- clifront.c: fixed -listmedia output (extensions were messed up) [Fabio Priuli]
+
+- uiimage.c: File Manager now displays the brief name of the image device to 
+	make easier to decide where to mount images (see e.g. smssdisp or atom)
+	[Fabio Priuli]
+
+
+0.142
 
 New System Drivers Supported:
 -----------------------------
