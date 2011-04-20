@@ -181,13 +181,13 @@ const mos6526_interface c65_pal_cia0 =
  */
 static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 {
+	c65_state *state = device->machine().driver_data<c65_state>();
 	UINT8 value = 0xff;
-	device_t *serbus = device->machine().device("serial_bus");
 
-	if (!cbm_iec_clk_r(serbus))
+	if (!state->m_iec->clk_r())
 		value &= ~0x40;
 
-	if (!cbm_iec_data_r(serbus))
+	if (!state->m_iec->data_r())
 		value &= ~0x80;
 
 	return value;
@@ -197,11 +197,10 @@ static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 {
 	c65_state *state = device->machine().driver_data<c65_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	device_t *serbus = device->machine().device("serial_bus");
 
-	cbm_iec_atn_w(serbus, device, !BIT(data, 3));
-	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
-	cbm_iec_data_w(serbus, device, !BIT(data, 5));
+	state->m_iec->atn_w(!BIT(data, 3));
+	state->m_iec->clk_w(!BIT(data, 4));
+	state->m_iec->data_w(!BIT(data, 5));
 
 	state->m_vicaddr = state->m_memory + helper[data & 0x03];
 }

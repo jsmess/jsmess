@@ -135,7 +135,6 @@
 */
 
 #include "c1541.h"
-#include "machine/devhelpr.h"
 
 
 
@@ -175,7 +174,36 @@ const device_type C2031 = c1541_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(c1541, "C1541");
+//-------------------------------------------------
+//  c1541_device_config - constructor
+//-------------------------------------------------
+
+c1541_device_config::c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "C1541", tag, owner, clock),
+	  device_config_cbm_iec_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *c1541_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(c1541_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *c1541_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, c1541_device(machine, *this));
+}
 
 
 //-------------------------------------------------
@@ -194,14 +222,12 @@ void c1541_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1541_device_config::static_set_config(device_config *device, const char *bus_tag, int address)
+void c1541_device_config::static_set_config(device_config *device, int address)
 {
 	c1541_device_config *c1541 = downcast<c1541_device_config *>(device);
 
-	assert(bus_tag != NULL);
 	assert((address > 7) && (address < 12));
 
-	c1541->m_bus_tag = bus_tag;
 	c1541->m_address = address - 8;
 }
 
@@ -311,16 +337,16 @@ READ8_MEMBER( c1541_device::via0_pb_r )
 	UINT8 data = 0;
 
 	// data in
-	data = !cbm_iec_data_r(m_bus);
+	data = !m_bus->data_r();
 
 	// clock in
-	data |= !cbm_iec_clk_r(m_bus) << 2;
+	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
 	data |= m_config.m_address << 5;
 
 	// attention in
-	data |= !cbm_iec_atn_r(m_bus) << 7;
+	data |= !m_bus->atn_r() << 7;
 
 	return data;
 }
@@ -350,13 +376,13 @@ WRITE8_MEMBER( c1541_device::via0_pb_w )
 	m_ga->atna_w(BIT(data, 4));
 
 	// clock out
-	cbm_iec_clk_w(m_bus, this, !BIT(data, 3));
+	m_bus->clk_w(this, !BIT(data, 3));
 }
 
 
 READ_LINE_MEMBER( c1541_device::atn_in_r )
 {
-	return !cbm_iec_atn_r(m_bus);
+	return !m_bus->atn_r();
 }
 
 
@@ -784,7 +810,7 @@ inline void c1541_device::set_iec_data()
 {
 	int data = !m_data_out & !m_ga->atn_r();
 
-	cbm_iec_data_w(m_bus, this, data);
+	m_bus->data_w(this, data);
 }
 
 
@@ -799,12 +825,13 @@ inline void c1541_device::set_iec_data()
 
 c1541_device::c1541_device(running_machine &_machine, const c1541_device_config &_config)
     : device_t(_machine, _config),
+	  device_cbm_iec_interface(_machine, _config, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(machine().device(_config.m_bus_tag)),
+	  m_bus(machine().device<cbm_iec_device>(CBM_IEC_TAG)),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0),
@@ -843,7 +870,7 @@ void c1541_device::device_reset()
 //  iec_atn_w - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1541_device::iec_atn_w )
+void c1541_device::cbm_iec_atn(int state)
 {
 	m_via0->write_ca1(!state);
 	m_ga->atni_w(!state);
@@ -856,7 +883,7 @@ WRITE_LINE_MEMBER( c1541_device::iec_atn_w )
 //  iec_reset_w - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1541_device::iec_reset_w )
+void c1541_device::cbm_iec_reset(int state)
 {
 	if (!state)
 	{

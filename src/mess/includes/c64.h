@@ -14,6 +14,7 @@
 #define C64_H_
 
 #include "machine/6526cia.h"
+#include "machine/cbmiec.h"
 #include "imagedev/cartslot.h"
 
 #define C64_MAX_ROMBANK 64 // .crt files contain multiple 'CHIPs', i.e. rom banks (of variable size) with headers. Known carts have at most 64 'CHIPs'.
@@ -35,7 +36,11 @@ class c64_state : public driver_device
 {
 public:
 	c64_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_iec(*this, CBM_IEC_TAG)
+    { }
+
+	required_device<cbm_iec_device> m_iec;
 
 	int m_old_level;
 	int m_old_data;

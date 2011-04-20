@@ -554,9 +554,8 @@ static const m6502_interface c64_m6510_interface =
 
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
-	{ "cia_1" },
-	{ C1541_IEC("c1541") },
-	{ NULL}
+	{ "c1541" },
+	{ NULL }
 };
 
 
@@ -717,8 +716,8 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c64_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD("iec", cbm_iec_daisy)
-	MCFG_C1541_ADD("c1541", "iec", 8)
+	MCFG_CBM_IEC_ADD(cbm_iec_daisy)
+	MCFG_C1541_ADD("c1541", 8)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 MACHINE_CONFIG_END
@@ -767,8 +766,8 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD("iec", cbm_iec_daisy)
-	MCFG_C1541_ADD("c1541", "iec", 8)
+	MCFG_CBM_IEC_ADD(cbm_iec_daisy)
+	MCFG_C1541_ADD("c1541", 8)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 MACHINE_CONFIG_END
@@ -785,7 +784,7 @@ static MACHINE_CONFIG_DERIVED( ultimax, c64 )
 	MCFG_DEVICE_REMOVE("vic2")
 	MCFG_VIC2_ADD("vic2", ultimax_vic2_intf)
 
-	MCFG_DEVICE_REMOVE("iec")
+	MCFG_CBM_IEC_REMOVE()
 	MCFG_DEVICE_REMOVE("c1541")
 	MCFG_DEVICE_REMOVE("cart1")
 	MCFG_DEVICE_REMOVE("cart2")
@@ -802,7 +801,7 @@ static MACHINE_CONFIG_DERIVED( c64gs, c64pal )
 	MCFG_DEVICE_REMOVE( "dac" )
 	MCFG_DEVICE_REMOVE( "cassette" )
 	MCFG_DEVICE_REMOVE( "quickload" )
-	//MCFG_DEVICE_REMOVE("iec")
+	//MCFG_CBM_IEC_REMOVE()
 	//MCFG_DEVICE_REMOVE("c1541")
 MACHINE_CONFIG_END
 
@@ -810,7 +809,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sx64, c64pal )
 
 //	MCFG_DEVICE_REMOVE( "c1541" )
-//	MCFG_SX1541_ADD("c1541", "iec", 8)
+//	MCFG_SX1541_ADD("c1541", 8)
 
 	MCFG_DEVICE_REMOVE( "dac" )
 	MCFG_DEVICE_REMOVE( "cassette" )

@@ -660,18 +660,23 @@ static const m6502_interface c128_m8502_interface =
 
 static CBM_IEC_DAISY( c128_iec_bus )
 {
-	{ "cia_0", DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("cia_0", c128_iec_data_w) },
-	{ "cia_1" },
-	{ C1571_IEC("c1571") },
-	{ NULL}
+	{ "c1571" },
+	{ NULL }
 };
 
 static CBM_IEC_DAISY( c128d81_iec_bus )
 {
-	{ "cia_0", DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("cia_0", c128_iec_data_w) },
-	{ "cia_1" },
-	{ C1581_IEC("c1581") },
-	{ NULL}
+	{ "c1581" },
+	{ NULL }
+};
+
+static CBM_IEC_INTERFACE( c128_iec_intf )
+{
+	DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("cia_0", c128_iec_data_w),
+	DEVCB_NULL
 };
 
 /*************************************
@@ -790,8 +795,8 @@ static MACHINE_CONFIG_START( c128, c128_state )
 	MCFG_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c128_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD("iec", c128_iec_bus)
-	MCFG_C1571_ADD("c1571", "iec", 8)
+	MCFG_CBM_IEC_CONFIG_ADD(c128_iec_bus, c128_iec_intf)
+	MCFG_C1571_ADD("c1571", 8)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 MACHINE_CONFIG_END
@@ -808,12 +813,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c128d81, c128 )
 
-	MCFG_DEVICE_REMOVE("iec")
+	MCFG_CBM_IEC_REMOVE()
 	MCFG_DEVICE_REMOVE("c1571")
 
-	MCFG_CBM_IEC_ADD("iec", c128d81_iec_bus)
-//  MCFG_C1563_ADD("c1563", "iec", 8)
-	MCFG_C1581_ADD("c1581", "iec", 8)
+	MCFG_CBM_IEC_CONFIG_ADD(c128d81_iec_bus, c128_iec_intf)
+//  MCFG_C1563_ADD("c1563", 8)
+	MCFG_C1581_ADD("c1581", 8)
 MACHINE_CONFIG_END
 
 

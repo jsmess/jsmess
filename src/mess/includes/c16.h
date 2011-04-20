@@ -7,12 +7,18 @@
 #ifndef __C16_H__
 #define __C16_H__
 
+#include "machine/cbmiec.h"
+
 class c16_state : public driver_device
 {
 public:
 	c16_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
+		: driver_device(machine, config),
+		  m_iec(*this, CBM_IEC_TAG)
+    { }
+	
+	required_device<cbm_iec_device> m_iec;
+	
 	/* memory pointers */
 	UINT8 *      m_mem10000;
 	UINT8 *      m_mem14000;
@@ -34,7 +40,6 @@ public:
 	/* devices */
 	legacy_cpu_device *m_maincpu;
 	device_t *m_ted7360;
-	device_t *m_serbus;
 	device_t *m_cassette;
 	device_t *m_messram;
 	device_t *m_sid;

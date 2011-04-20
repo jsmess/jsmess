@@ -188,10 +188,10 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	UINT8 data = 0xfc;
 
 	/* serial clock in */
-	data |= cbm_iec_clk_r(state->m_iec);
+	data |= state->m_iec->clk_r();
 
 	/* serial data in */
-	data |= cbm_iec_data_r(state->m_iec) << 1;
+	data |= state->m_iec->data_r() << 1;
 
 	/* joystick */
 	data &= ~(input_port_read(device->machine(), "JOY") & 0x3c);
@@ -225,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	/* serial attention out */
-	cbm_iec_atn_w(state->m_iec, device, !BIT(data, 7));
+	state->m_iec->atn_w(!BIT(data, 7));
 }
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
@@ -389,7 +389,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 	vic20_state *driver_state = device->machine().driver_data<vic20_state>();
 
 	/* serial clock out */
-	cbm_iec_clk_w(driver_state->m_iec, device, !state);
+	driver_state->m_iec->clk_w(!state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
@@ -397,7 +397,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 	vic20_state *driver_state = device->machine().driver_data<vic20_state>();
 
 	/* serial data out */
-	cbm_iec_data_w(driver_state->m_iec, device, !state);
+	driver_state->m_iec->data_w(!state);
 }
 
 static const via6522_interface vic20_via1_intf =
@@ -433,10 +433,17 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
-	{ M6522_0_TAG },
-	{ M6522_1_TAG, DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_cb1), },
-	{ C1541_IEC(C1540_TAG) },
-	{ NULL}
+	{ C1540_TAG },
+	{ NULL }
+};
+
+static CBM_IEC_INTERFACE( cbm_iec_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_cb1),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* IEEE-488 Bus */
@@ -526,16 +533,7 @@ static MACHINE_START( vic20 )
 	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	/* find devices */
-	state->m_via0 = machine.device<via6522_device>(M6522_0_TAG);
-	state->m_via1 = machine.device<via6522_device>(M6522_1_TAG);
-	state->m_iec = machine.device(IEC_TAG);
-	state->m_cassette = machine.device(CASSETTE_TAG);
 	state->m_cassette_timer = machine.device<timer_device>(TIMER_C1530_TAG);
-	state->m_mos6560 = machine.device(M6560_TAG);
-
-	/* set VIA clocks */
-	state->m_via0->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
-	state->m_via1->set_unscaled_clock(machine.device(M6502_TAG)->unscaled_clock());
 
 	/* memory expansions */
 	switch (ram_get_size(machine.device(RAM_TAG)))
@@ -696,9 +694,9 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
-	MCFG_CBM_IEC_ADD(IEC_TAG, cbm_iec_daisy)
-	//MCFG_C1540_ADD(C1540_TAG, IEC_TAG, 8)
-	MCFG_C1541_ADD(C1540_TAG, IEC_TAG, 8)
+	MCFG_CBM_IEC_CONFIG_ADD(cbm_iec_daisy, cbm_iec_intf)
+	//MCFG_C1540_ADD(C1540_TAG, 8)
+	MCFG_C1541_ADD(C1540_TAG, 8)
 #ifdef INCLUDE_C2031
     MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
     MCFG_VIC1112_ADD(vic1112_intf)

@@ -20,7 +20,6 @@
 */
 
 #include "c1571.h"
-#include "machine/devhelpr.h"
 
 
 
@@ -56,7 +55,36 @@ const device_type C1571 = c1571_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(c1571, "C1571");
+//-------------------------------------------------
+//  c1571_device_config - constructor
+//-------------------------------------------------
+
+c1571_device_config::c1571_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "C1571", tag, owner, clock),
+	  device_config_cbm_iec_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *c1571_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(c1571_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *c1571_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, c1571_device(machine, *this));
+}
 
 
 //-------------------------------------------------
@@ -75,14 +103,12 @@ void c1571_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1571_device_config::static_set_config(device_config *device, const char *bus_tag, int address)
+void c1571_device_config::static_set_config(device_config *device, int address)
 {
 	c1571_device_config *c1571 = downcast<c1571_device_config *>(device);
 
-	assert(bus_tag != NULL);
 	assert((address > 7) && (address < 12));
 
-	c1571->m_bus_tag = bus_tag;
 	c1571->m_address = address - 8;
 }
 
@@ -216,8 +242,8 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 	
 		if (!m_ser_dir)
 		{
-			//m_cia->cnt_w(cbm_iec_srq_r(m_bus));
-			//m_cia->sp_w(cbm_iec_data_r(m_bus));
+			//m_cia->cnt_w(m_bus->srq_r());
+			//m_cia->sp_w(m_bus->data_r());
 		}
 	}
 
@@ -225,7 +251,7 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 	m_ga->set_side(BIT(data, 2));
 
 	// attention out
-	cbm_iec_atn_w(m_bus, this, !BIT(data, 6));
+	m_bus->atn_w(this, !BIT(data, 6));
 }
 
 
@@ -249,16 +275,16 @@ READ8_MEMBER( c1571_device::via0_pb_r )
 	UINT8 data = 0;
 
 	// data in
-	data = !cbm_iec_data_r(m_bus);
+	data = !m_bus->data_r();
 
 	// clock in
-	data |= !cbm_iec_clk_r(m_bus) << 2;
+	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
 	data |= m_config.m_address << 5;
 
 	// attention in
-	data |= !cbm_iec_atn_r(m_bus) << 7;
+	data |= !m_bus->atn_r() << 7;
 
 	return data;
 }
@@ -288,13 +314,13 @@ WRITE8_MEMBER( c1571_device::via0_pb_w )
 	m_ga->atna_w(BIT(data, 4));
 
 	// clock out
-	cbm_iec_clk_w(m_bus, this, !BIT(data, 3));
+	m_bus->clk_w(this, !BIT(data, 3));
 }
 
 
 READ_LINE_MEMBER( c1571_device::atn_in_r )
 {
-	return !cbm_iec_atn_r(m_bus);
+	return !m_bus->atn_r();
 }
 
 
@@ -574,7 +600,7 @@ inline void c1571_device::set_iec_data()
 	// fast serial data
 	if (m_ser_dir) data &= m_sp_out;
 
-	cbm_iec_data_w(m_bus, this, data);
+	m_bus->data_w(this, data);
 }
 
 
@@ -589,7 +615,7 @@ inline void c1571_device::set_iec_srq()
 	// fast serial clock
 	if (m_ser_dir) srq &= m_cnt_out;
 
-	cbm_iec_srq_w(m_bus, this, srq);
+	m_bus->srq_w(this, srq);
 }
 
 
@@ -604,6 +630,7 @@ inline void c1571_device::set_iec_srq()
 
 c1571_device::c1571_device(running_machine &_machine, const c1571_device_config &_config)
     : device_t(_machine, _config),
+	  device_cbm_iec_interface(_machine, _config, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
@@ -611,7 +638,7 @@ c1571_device::c1571_device(running_machine &_machine, const c1571_device_config 
 	  m_fdc(*this, WD1770_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(machine().device(_config.m_bus_tag)),
+	  m_bus(machine().device<cbm_iec_device>(CBM_IEC_TAG)),
 	  m_1_2mhz(0),
 	  m_data_out(1),
 	  m_ser_dir(0),
@@ -662,23 +689,10 @@ void c1571_device::device_reset()
 
 
 //-------------------------------------------------
-//  iec_atn_w - 
+//  cbm_iec_srq - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_device::iec_atn_w )
-{
-	m_via0->write_ca1(!state);
-	m_ga->atni_w(!state);
-
-	set_iec_data();
-}
-
-
-//-------------------------------------------------
-//  iec_srq_w - 
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( c1571_device::iec_srq_w )
+void c1571_device::cbm_iec_srq(int state)
 {
 	if (!m_ser_dir)
 	{
@@ -688,10 +702,23 @@ WRITE_LINE_MEMBER( c1571_device::iec_srq_w )
 
 
 //-------------------------------------------------
-//  iec_data_w - 
+//  cbm_iec_atn - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_device::iec_data_w )
+void c1571_device::cbm_iec_atn(int state)
+{
+	m_via0->write_ca1(!state);
+	m_ga->atni_w(!state);
+
+	set_iec_data();
+}
+
+
+//-------------------------------------------------
+//  cbm_iec_data - 
+//-------------------------------------------------
+
+void c1571_device::cbm_iec_data(int state)
 {
 	if (!m_ser_dir)
 	{
@@ -701,10 +728,10 @@ WRITE_LINE_MEMBER( c1571_device::iec_data_w )
 
 
 //-------------------------------------------------
-//  iec_reset_w - 
+//  cbm_iec_reset - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_device::iec_reset_w )
+void c1571_device::cbm_iec_reset(int state)
 {
 	if (!state)
 	{

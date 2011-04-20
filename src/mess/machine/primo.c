@@ -104,27 +104,27 @@ READ8_HANDLER( primo_be_1_r )
 
 READ8_HANDLER( primo_be_2_r )
 {
+	primo_state *state = space->machine().driver_data<primo_state>();
 	UINT8 data = 0xff;
-	device_t *serbus = space->machine().device("serial_bus");
 
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	if (!cbm_iec_clk_r(serbus))
+	if (!state->m_iec->clk_r())
 		data &= ~0x20;
 
 	// bit 4 - SDATA
-	if (!cbm_iec_data_r(serbus))
+	if (!state->m_iec->data_r())
 		data &= ~0x10;
 
 	// bit 3 - SRQ
-	if (!cbm_iec_srq_r(serbus))
+	if (!state->m_iec->srq_r())
 		data &= ~0x08;
 
 	// bit 2 - joystic 2 (not implemeted yet)
 
 	// bit 1 - ATN
-	if (!cbm_iec_atn_r(serbus))
+	if (!state->m_iec->atn_r())
 		data &= ~0x02;
 
 	// bit 0 - joystic 1 (not implemeted yet)
@@ -173,23 +173,23 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 WRITE8_HANDLER( primo_ki_2_w )
 {
-	device_t *serbus = space->machine().device("serial_bus");
+	primo_state *state = space->machine().driver_data<primo_state>();
 
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	cbm_iec_clk_w(serbus, NULL, !BIT(data, 5));
+	state->m_iec->clk_w(!BIT(data, 5));
 
 	// bit 4 - SDATA
-	cbm_iec_data_w(serbus, NULL, !BIT(data, 4));
+	state->m_iec->data_w(!BIT(data, 4));
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	cbm_iec_srq_w(serbus, NULL, !BIT(data, 2));
+	state->m_iec->srq_w(!BIT(data, 2));
 
 	// bit 1 - ATN
-	cbm_iec_atn_w(serbus, NULL, !BIT(data, 1));
+	state->m_iec->atn_w(!BIT(data, 1));
 
 	// bit 0 - not used
 

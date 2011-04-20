@@ -419,15 +419,13 @@ static const m6502_interface c16_m7501_interface =
 
 static CBM_IEC_DAISY( c16_iec_no_drives )
 {
-	{ "maincpu" },
-	{ NULL}
+	{ NULL }
 };
 
 static CBM_IEC_DAISY( c16_iec_1541 )
 {
-	{ "maincpu" },
-	{ C1541_IEC("c1541") },
-	{ NULL}
+	{ "c1541" },
+	{ NULL }
 };
 
 static SCREEN_UPDATE( c16 )
@@ -450,7 +448,6 @@ static MACHINE_START( c16 )
 
 	state->m_maincpu = machine.device<legacy_cpu_device>("maincpu");
 	state->m_ted7360 = machine.device("ted7360");
-	state->m_serbus = machine.device("iec");
 	state->m_cassette = machine.device("cassette");
 	state->m_messram = machine.device(RAM_TAG);
 	state->m_sid = machine.device("sid");
@@ -501,7 +498,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_FRAGMENT_ADD(c16_cartslot)
 
 	/* IEC serial bus */
-	MCFG_CBM_IEC_ADD("iec", c16_iec_no_drives)
+	MCFG_CBM_IEC_ADD(c16_iec_no_drives)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -525,9 +522,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( c16v, c16 )
 
 	/* floppy from serial bus */
-	MCFG_DEVICE_REMOVE("iec")
-	MCFG_CBM_IEC_ADD("iec", c16_iec_1541)
-	MCFG_C1541_ADD("c1541", "iec", 8)
+	MCFG_CBM_IEC_REMOVE()
+	MCFG_CBM_IEC_ADD(c16_iec_1541)
+	MCFG_C1541_ADD("c1541", 8)
 #ifdef CPU_SYNC
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
@@ -573,9 +570,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( plus4v, plus4 )
 
 	/* floppy from serial bus */
-	MCFG_DEVICE_REMOVE("iec")
-	MCFG_CBM_IEC_ADD("iec", c16_iec_1541)
-	MCFG_C1541_ADD("c1541", "iec", 8)
+	MCFG_CBM_IEC_REMOVE()
+	MCFG_CBM_IEC_ADD(c16_iec_1541)
+	MCFG_C1541_ADD("c1541", 8)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

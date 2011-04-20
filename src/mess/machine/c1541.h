@@ -30,18 +30,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_C1541_ADD(_tag, _bus_tag, _address) \
+#define MCFG_C1541_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541, 0) \
-	c1541_device_config::static_set_config(device, _bus_tag, _address);
-
-
-#define C1541_IEC(_tag) \
-	_tag, \
-	DEVCB_NULL, \
-	DEVCB_DEVICE_LINE_MEMBER(_tag, c1541_device, iec_atn_w), \
-	DEVCB_NULL, \
-	DEVCB_NULL, \
-	DEVCB_DEVICE_LINE_MEMBER(_tag, c1541_device, iec_reset_w)
+	c1541_device_config::static_set_config(device, _address);
 
 
 
@@ -51,7 +42,8 @@
 
 // ======================> c1541_device_config
 
-class c1541_device_config :   public device_config
+class c1541_device_config :   public device_config,
+							  public device_config_cbm_iec_interface
 {
     friend class c1541_device;
 
@@ -64,7 +56,7 @@ public:
     virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_config(device_config *device, const char *bus_tag, int address);
+	static void static_set_config(device_config *device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -74,14 +66,14 @@ protected:
     // device_config overrides
     virtual void device_config_complete();
 	
-	const char *m_bus_tag;
 	int m_address;
 };
 
 
 // ======================> c1541_device
 
-class c1541_device :  public device_t
+class c1541_device :  public device_t,
+					  public device_cbm_iec_interface
 {
     friend class c1541_device_config;
 
@@ -89,9 +81,6 @@ class c1541_device :  public device_t
     c1541_device(running_machine &_machine, const c1541_device_config &_config);
 
 public:
-	DECLARE_WRITE_LINE_MEMBER( iec_atn_w );
-	DECLARE_WRITE_LINE_MEMBER( iec_reset_w );
-
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
@@ -112,6 +101,10 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 
+	// device_cbm_iec_interface overrides
+	void cbm_iec_atn(int state);
+	void cbm_iec_reset(int state);
+
 	inline void set_iec_data();
 
 	required_device<cpu_device> m_maincpu;
@@ -119,7 +112,7 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	device_t *m_bus;
+	cbm_iec_device *m_bus;
 
 	// IEC bus
 	int m_data_out;							// serial data out

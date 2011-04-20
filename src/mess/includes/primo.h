@@ -8,13 +8,17 @@
 #define PRIMO_H_
 
 #include "imagedev/snapquik.h"
-
+#include "machine/cbmiec.h"
 
 class primo_state : public driver_device
 {
 public:
 	primo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_iec(*this, CBM_IEC_TAG)
+    { }
+
+	required_device<cbm_iec_device> m_iec;
 
 	UINT16 m_video_memory_base;
 	UINT8 m_port_FD;

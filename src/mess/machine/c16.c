@@ -73,9 +73,9 @@ WRITE8_DEVICE_HANDLER(c16_m7501_port_write)
 	c16_state *state = device->machine().driver_data<c16_state>();
 
 	/* bit zero then output 0 */
-	cbm_iec_atn_w(state->m_serbus, device, !BIT(data, 2));
-	cbm_iec_clk_w(state->m_serbus, device, !BIT(data, 1));
-	cbm_iec_data_w(state->m_serbus, device, !BIT(data, 0));
+	state->m_iec->atn_w(!BIT(data, 2));
+	state->m_iec->clk_w(!BIT(data, 1));
+	state->m_iec->data_w(!BIT(data, 0));
 
 	cassette_output(state->m_cassette, !BIT(data, 1) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
@@ -88,10 +88,10 @@ READ8_DEVICE_HANDLER(c16_m7501_port_read)
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = m6510_get_port(state->m_maincpu);
 
-	if (BIT(c16_port7501, 0) || !cbm_iec_data_r(state->m_serbus))
+	if (BIT(c16_port7501, 0) || !state->m_iec->data_r())
 		data &= ~0x80;
 
-	if (BIT(c16_port7501, 1) || !cbm_iec_clk_r(state->m_serbus))
+	if (BIT(c16_port7501, 1) || !state->m_iec->clk_r())
 		data &= ~0x40;
 
 //  data &= ~0x20; // port bit not in pinout
