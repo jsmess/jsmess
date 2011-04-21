@@ -765,6 +765,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c1551.o		\
 	$(MESS_MACHINE)/c1571.o		\
 	$(MESS_MACHINE)/c1581.o		\
+	$(MESS_MACHINE)/c2031.o		\
 	$(MESS_MACHINE)/c2040.o		\
 	$(MESS_DRIVERS)/clcd.o		\
 	$(MESS_MACHINE)/6525tpi.o	\

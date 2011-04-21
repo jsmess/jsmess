@@ -79,7 +79,7 @@ block of RAM instead of 8.
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/c1541.h"
-#include "machine/c2040.h"
+#include "machine/c2031.h"
 #include "machine/cbmiec.h"
 #include "machine/ieee488.h"
 #include "machine/vic1112.h"
@@ -452,7 +452,7 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 #ifdef INCLUDE_VIC1112
 static IEEE488_DAISY( ieee488_daisy )
 {
-	{ C4040_TAG },
+	{ C2031_TAG },
 	{ NULL}
 };
 
@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_C1541_ADD(C1541_TAG, 8)
 #ifdef INCLUDE_VIC1112
     MCFG_VIC1112_ADD(ieee488_daisy)
-    MCFG_C4040_ADD(C4040_TAG, 9)
+    MCFG_C2031_ADD(C2031_TAG, 9)
 #endif
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")

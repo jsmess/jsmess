@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Commodore 1540/1541/1541C/1541-II/2031 Single Disk Drive emulation
+    Commodore 1540/1541/1541C/1541-II Single Disk Drive emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -166,7 +166,6 @@ const device_type C1541C = c1541_device_config::static_alloc_device_config;
 const device_type C1541II = c1541_device_config::static_alloc_device_config;
 const device_type SX1541 = c1541_device_config::static_alloc_device_config;
 const device_type OC118 = c1541_device_config::static_alloc_device_config;
-const device_type C2031 = c1541_device_config::static_alloc_device_config;
 
 
 
@@ -239,10 +238,6 @@ void c1541_device_config::device_config_complete()
 
 	case TYPE_OC118:
 		m_shortname = "oc118";
-		break;
-
-	case TYPE_C2031:
-		m_shortname = "c2031";
 		break;
 	}
 }
@@ -328,17 +323,6 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c2031 )
-//-------------------------------------------------
-
-ROM_START( c2031 )
-	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD( "901484-03.u5f", 0x0000, 0x2000, CRC(ee4b893b) SHA1(54d608f7f07860f24186749f21c96724dd48bc50) )
-	ROM_LOAD( "901484-05.u5h", 0x2000, 0x2000, CRC(6a629054) SHA1(ec6b75ecfdd4744e5d57979ef6af990444c11ae1) )
-ROM_END
-
-
-//-------------------------------------------------
 //  ROM( oc118 )
 //-------------------------------------------------
 
@@ -375,9 +359,6 @@ const rom_entry *c1541_device_config::device_rom_region() const
 
 	case TYPE_OC118:
 		return ROM_NAME( oc118 );
-
-	case TYPE_C2031:
-		return ROM_NAME( c2031 );
 	}
 }
 
@@ -542,180 +523,6 @@ static const via6522_interface c1541c_via0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_irq_w)
-};
-
-
-//-------------------------------------------------
-//  via6522_interface c2031_via0_intf
-//-------------------------------------------------
-
-READ8_MEMBER( c2031_device::via0_pa_r )
-{
-	/*
-
-        bit     description
-
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
-
-    */
-
-	return m_bus->dio_r();
-}
-
-
-WRITE8_MEMBER( c2031_device::via0_pa_w )
-{
-	/*
-
-        bit     description
-
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
-
-    */
-
-	m_bus->dio_w(this, data);
-}
-
-
-READ8_MEMBER( c2031_device::via0_pb_r )
-{
-	/*
-
-        bit     description
-
-        PB0     ATNA
-        PB1     NRFD
-        PB2     NDAC
-        PB3     EOI
-        PB4     T/_R
-        PB5     HD SEL
-        PB6     DAV
-        PB7     _ATN
-
-    */
-
-	UINT8 data = 0;
-
-	// not ready for data
-	data |= m_bus->nrfd_r() << 1;
-
-	// not data accepted
-	data |= m_bus->ndac_r() << 2;
-
-	// end or identify
-	data |= m_bus->eoi_r() << 3;
-
-	// data valid
-	data |= m_bus->dav_r() << 6;
-
-	// attention
-	data |= !m_bus->atn_r() << 7;
-
-	return data;
-}
-
-
-WRITE8_MEMBER( c2031_device::via0_pb_w )
-{
-	/*
-
-        bit     description
-
-        PB0     ATNA
-        PB1     NRFD
-        PB2     NDAC
-        PB3     EOI
-        PB4     T/_R
-        PB5     HD SEL
-        PB6     DAV
-        PB7     _ATN
-
-    */
-
-	int atna = BIT(data, 0);
-	int nrfd = BIT(data, 1);
-	int ndac = BIT(data, 2);
-
-	// not ready for data
-	m_nrfd_out = nrfd;
-
-	// not data accepted
-	m_ndac_out = ndac;
-
-	// end or identify
-	m_bus->eoi_w(this, BIT(data, 3));
-
-	// data valid
-	m_bus->dav_w(this, BIT(data, 6));
-
-	// attention acknowledge
-	m_atna = atna;
-
-	if (!m_bus->atn_r() ^ atna)
-	{
-		nrfd = ndac = 0;
-	}
-
-	m_bus->nrfd_w(this, nrfd);
-	m_bus->ndac_w(this, ndac);
-}
-
-
-READ_LINE_MEMBER( c2031_device::via0_ca1_r )
-{
-	return !m_bus->atn_r();
-}
-
-
-READ_LINE_MEMBER( c2031_device::via0_ca2_r )
-{
-	int state = 0;
-
-	/*
-	switch (m_config.m_address)
-	{
-	case 0: state = (m_atna | m_nrfd_out);	break;
-	case 1: state = m_atna;					break;
-	case 2: state = m_nrfd_out;				break;
-	case 3: state = 0;						break;
-	}
-	*/
-
-	return state;
-}
-
-
-static const via6522_interface c2031_via0_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_ca1_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_ca2_r),
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL, // PLL SYN
 
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_irq_w)
 };
@@ -899,22 +706,6 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c2031 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( c2031 )
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MCFG_CPU_PROGRAM_MAP(c1541_mem)
-
-	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c2031_via0_intf)
-	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
-
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
@@ -925,9 +716,6 @@ machine_config_constructor c1541_device_config::device_mconfig_additions() const
 	{
 	case TYPE_1541C:
 		return MACHINE_CONFIG_NAME( c1541c );
-
-	case TYPE_C2031:
-		return MACHINE_CONFIG_NAME( c2031 );
 
 	default:
 		return MACHINE_CONFIG_NAME( c1541 );
@@ -1026,40 +814,6 @@ void c1541_device::cbm_iec_atn(int state)
 //-------------------------------------------------
 
 void c1541_device::cbm_iec_reset(int state)
-{
-	if (!state)
-	{
-		device_reset();
-	}
-}
-
-
-//-------------------------------------------------
-//  ieee488_atn_w - 
-//-------------------------------------------------
-
-void c2031_device::ieee488_atn(int state)
-{
-	int nrfd = m_nrfd_out;
-	int ndac = m_ndac_out;
-
-	m_via0->write_ca1(!state);
-
-	if (!state ^ m_atna)
-	{
-		nrfd = ndac = 0;
-	}
-
-	m_bus->nrfd_w(this, nrfd);
-	m_bus->ndac_w(this, ndac);
-}
-
-
-//-------------------------------------------------
-//  ieee488_ifc_w - 
-//-------------------------------------------------
-
-void c2031_device::ieee488_ifc(int state)
 {
 	if (!state)
 	{

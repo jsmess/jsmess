@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Commodore 1540/1541/1541C/1541-II/2031 Single Disk Drive emulation
+    Commodore 1540/1541/1541C/1541-II Single Disk Drive emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -22,7 +22,6 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
-#include "machine/ieee488.h"
 
 
 
@@ -31,7 +30,6 @@
 //**************************************************************************
 
 #define C1541_TAG			"c1541"
-#define C2031_TAG			"c2031"
 
 
 
@@ -63,10 +61,6 @@
     MCFG_DEVICE_ADD(_tag, OC118, 0) \
 	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_OC118);
 
-#define MCFG_C2031_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C2031, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_C2031);
-
 
 
 //**************************************************************************
@@ -84,7 +78,6 @@ class c1541_device_config :   public device_config,
     friend class c1541ii_device;
     friend class sx1541_device;
     friend class oc118_device;
-    friend class c2031_device;
 
     // construction/destruction
     c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
@@ -97,8 +90,7 @@ public:
 		TYPE_1541C,
 		TYPE_1541II,
 		TYPE_SX1541,
-		TYPE_OC118,
-		TYPE_C2031
+		TYPE_OC118
 	};
 	
 	// allocators
@@ -235,38 +227,6 @@ class oc118_device :  public c1541_device
 };
 
 
-// ======================> c2031_device
-
-class c2031_device :  public c1541_device,
-					  public device_ieee488_interface
-{
-    friend class c1541_device_config;
-
-    // construction/destruction
-    c2031_device(running_machine &_machine, const c1541_device_config &_config);
-
-public:
-	// not really public
-	DECLARE_READ8_MEMBER( via0_pa_r );
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
-	DECLARE_READ_LINE_MEMBER( via0_ca1_r );
-	DECLARE_READ_LINE_MEMBER( via0_ca2_r );
-
-protected:
-	// device_ieee488_interface overrides
-	void ieee488_atn(int state);
-	void ieee488_ifc(int state);
-
-	required_device<ieee488_device> m_bus;
-
-	int m_nrfd_out;				// not ready for data
-	int m_ndac_out;				// not data accepted
-	int m_atna;					// attention acknowledge
-};
-
-
 // device type definition
 extern const device_type C1540;
 extern const device_type C1541;
@@ -274,7 +234,6 @@ extern const device_type C1541C;
 extern const device_type C1541II;
 extern const device_type SX1541;
 extern const device_type OC118;
-extern const device_type C2031;
 
 
 
