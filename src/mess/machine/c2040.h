@@ -174,8 +174,8 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
-	required_device<device_t> m_riot0;
-	required_device<device_t> m_riot1;
+	required_device<riot6532_device> m_riot0;
+	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<device_t> m_image0;

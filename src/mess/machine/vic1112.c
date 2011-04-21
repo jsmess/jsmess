@@ -43,21 +43,25 @@ GENERIC_DEVICE_CONFIG_SETUP(vic1112, "VIC-1112")
 
 void vic1112_device_config::device_config_complete()
 {
-	// inherit a copy of the static data
-	const vic1112_interface *intf = reinterpret_cast<const vic1112_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<vic1112_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		fatalerror("Interface not provided!");
-	}
-
-	m_bus_tag = intf->m_bus_tag;
-
 	m_shortname = "vic1112";
 }
+
+
+//-------------------------------------------------
+//  IEEE488_INTERFACE( vic1112_ieee488_intf )
+//-------------------------------------------------
+
+IEEE488_INTERFACE( vic1112_ieee488_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(VIC1112_TAG, vic1112_device, srq_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 
 //-------------------------------------------------

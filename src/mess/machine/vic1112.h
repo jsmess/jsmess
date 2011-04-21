@@ -36,18 +36,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_VIC1112_ADD(_config) \
+#define MCFG_VIC1112_ADD(_daisy) \
     MCFG_DEVICE_ADD(VIC1112_TAG, VIC1112, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
+	MCFG_IEEE488_CONFIG_ADD(_daisy, vic1112_ieee488_intf)
 
 #define VIC1112_INTERFACE(name) \
 	const vic1112_interface (name) =
 
-
-#define VIC1112_IEEE488 \
-	VIC1112_TAG, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, \
-	DEVCB_DEVICE_LINE_MEMBER(VIC1112_TAG, vic1112_device, srq_w), DEVCB_NULL, DEVCB_NULL
 
 
 //**************************************************************************
@@ -132,6 +127,10 @@ private:
 
 // device type definition
 extern const device_type VIC1112;
+
+
+// IEEE-488 interface
+extern const ieee488_stub_interface vic1112_ieee488_intf;
 
 
 
