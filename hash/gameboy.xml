@@ -8330,6 +8330,18 @@
 
 	<software name="lemmings">
 		<!-- Serial: DMG-L8? - Release Date:  -->
+		<description>Lemmings (Euro, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="lemmings (europe) (rev a).bin" size="131072" crc="560d71eb" sha1="c156d7ee57860a23754e87d42f952b17077994ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemmingsa" cloneof="lemmings">
+		<!-- Serial: DMG-L8? - Release Date:  -->
 		<description>Lemmings (Euro)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
