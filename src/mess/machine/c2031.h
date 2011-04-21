@@ -112,6 +112,8 @@ protected:
 	void ieee488_atn(int state);
 	void ieee488_ifc(int state);
 
+	inline int get_device_number();
+
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;

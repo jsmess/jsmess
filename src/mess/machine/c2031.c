@@ -96,7 +96,7 @@ void c2031_device_config::static_set_config(device_config *device, int address)
 
 	assert((address > 7) && (address < 12));
 
-	c2031->m_address = address - 8;
+	c2031->m_address = address;
 }
 
 
@@ -268,6 +268,8 @@ WRITE8_MEMBER( c2031_device::via0_pb_w )
 
 	m_bus->nrfd_w(this, nrfd);
 	m_bus->ndac_w(this, ndac);
+
+	m_via0->write_ca2(get_device_number());
 }
 
 
@@ -279,19 +281,7 @@ READ_LINE_MEMBER( c2031_device::via0_ca1_r )
 
 READ_LINE_MEMBER( c2031_device::via0_ca2_r )
 {
-	int state = 0;
-
-	/*
-	switch (m_config.m_address)
-	{
-	case 0: state = (m_atna | m_nrfd_out);	break;
-	case 1: state = m_atna;					break;
-	case 2: state = m_nrfd_out;				break;
-	case 3: state = 0;						break;
-	}
-	*/
-
-	return state;
+	return get_device_number();
 }
 
 
@@ -478,6 +468,31 @@ MACHINE_CONFIG_END
 machine_config_constructor c2031_device_config::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c2031 );
+}
+
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  get_device_number - 
+//-------------------------------------------------
+
+inline int c2031_device::get_device_number()
+{
+	int state = 1;
+
+	switch (m_config.m_address)
+	{
+	case 8: state = (m_atna & m_nrfd_out);	break;
+	case 9: state = m_nrfd_out;				break;
+	case 10: state = m_atna;				break;
+	case 11: state = 1;						break;
+	}
+
+	return state;
 }
 
 
