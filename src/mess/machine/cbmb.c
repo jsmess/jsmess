@@ -59,25 +59,25 @@ static TIMER_CALLBACK( cbmb_frame_interrupt );
  */
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 {
-	device_t *ieeebus = device->machine().device("ieee_bus");
+	cbmb_state *state = device->machine().driver_data<cbmb_state>();
 	UINT8 data = 0;
 
-	if (ieee488_nrfd_r(ieeebus))
+	if (state->m_ieee->nrfd_r())
 		data |= 0x80;
 
-	if (ieee488_ndac_r(ieeebus))
+	if (state->m_ieee->ndac_r())
 		data |= 0x40;
 
-	if (ieee488_eoi_r(ieeebus))
+	if (state->m_ieee->eoi_r())
 		data |= 0x20;
 
-	if (ieee488_dav_r(ieeebus))
+	if (state->m_ieee->dav_r())
 		data |= 0x10;
 
-	if (ieee488_atn_r(ieeebus))
+	if (state->m_ieee->atn_r())
 		data |= 0x08;
 
-	if (ieee488_ren_r(ieeebus))
+	if (state->m_ieee->ren_r())
         data |= 0x04;
 
 	return data;
@@ -85,25 +85,25 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 {
-	device_t *ieeebus = device->machine().device("ieee_bus");
+	cbmb_state *state = device->machine().driver_data<cbmb_state>();
 
-	ieee488_nrfd_w(ieeebus, device, BIT(data, 7));
-	ieee488_ndac_w(ieeebus, device, BIT(data, 6));
-	ieee488_eoi_w(ieeebus, device, BIT(data, 5));
-	ieee488_dav_w(ieeebus, device, BIT(data, 4));
-	ieee488_atn_w(ieeebus, device, BIT(data, 3));
-	ieee488_ren_w(ieeebus, device, BIT(data, 2));
+	state->m_ieee->nrfd_w(BIT(data, 7));
+	state->m_ieee->ndac_w(BIT(data, 6));
+	state->m_ieee->eoi_w(BIT(data, 5));
+	state->m_ieee->dav_w(BIT(data, 4));
+	state->m_ieee->atn_w(BIT(data, 3));
+	state->m_ieee->ren_w(BIT(data, 2));
 }
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 {
-	device_t *ieeebus = device->machine().device("ieee_bus");
+	cbmb_state *state = device->machine().driver_data<cbmb_state>();
 	UINT8 data = 0;
 
-	if (ieee488_srq_r(ieeebus))
+	if (state->m_ieee->srq_r())
 		data |= 0x02;
 
-	if (ieee488_ifc_r(ieeebus))
+	if (state->m_ieee->ifc_r())
 		data |= 0x01;
 
 	return data;
@@ -111,10 +111,10 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
 {
-	device_t *ieeebus = device->machine().device("ieee_bus");
+	cbmb_state *state = device->machine().driver_data<cbmb_state>();
 
-	ieee488_srq_w(ieeebus, device, BIT(data, 1));
-	ieee488_ifc_w(ieeebus, device, BIT(data, 0));
+	state->m_ieee->srq_w(BIT(data, 1));
+	state->m_ieee->ifc_w(BIT(data, 0));
 }
 
 /* tpi at 0xfdf00
@@ -256,17 +256,6 @@ WRITE_LINE_DEVICE_HANDLER( cbmb_irq )
   pb7 .. 4 gameport 2
   pb3 .. 0 gameport 1
  */
-static READ8_DEVICE_HANDLER( cbmb_cia_port_a_r )
-{
-	device_t *ieeebus = device->machine().device("ieee_bus");
-	return ieee488_dio_r(ieeebus, 0);
-}
-
-static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
-{
-	device_t *ieeebus = device->machine().device("ieee_bus");
-	ieee488_dio_w(ieeebus, device, data);
-}
 
 const mos6526_interface cbmb_cia =
 {
@@ -275,8 +264,8 @@ const mos6526_interface cbmb_cia =
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(cbmb_cia_port_a_r),
-	DEVCB_HANDLER(cbmb_cia_port_a_w),
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

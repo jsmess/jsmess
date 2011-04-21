@@ -648,12 +648,22 @@ static SCREEN_UPDATE( pet_crtc )
 
 static IEEE488_DAISY( ieee488_daisy )
 {
-	{ "pia_0" },
-	{ "pia_1", DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("pia_1", pia6821_cb1_w), DEVCB_DEVICE_LINE("pia_1", pia6821_ca1_w), DEVCB_NULL },
-	{ "via6522_0" },
-	{ C2040_IEEE488("drive") },
+	{ "drive" },
 	{ NULL}
 };
+
+static IEEE488_INTERFACE( ieee488_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("pia_1", pia6821_cb1_w),
+	DEVCB_DEVICE_LINE("pia_1", pia6821_ca1_w),
+	DEVCB_NULL
+};
+
 
 /*************************************
  *
@@ -705,8 +715,8 @@ static MACHINE_CONFIG_DERIVED( pet, pet_general )
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MCFG_C4040_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
+	MCFG_C4040_ADD("drive", 8)
 MACHINE_CONFIG_END
 
 
@@ -724,8 +734,8 @@ static MACHINE_CONFIG_DERIVED( pet2001, pet_general )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MCFG_C4040_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
+	MCFG_C4040_ADD("drive", 8)
 MACHINE_CONFIG_END
 
 
@@ -778,8 +788,8 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MCFG_C8050_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
+	MCFG_C8050_ADD("drive", 8)
 MACHINE_CONFIG_END
 
 

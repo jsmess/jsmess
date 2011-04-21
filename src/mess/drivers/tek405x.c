@@ -706,13 +706,13 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	output_set_led_value(3, !BIT(data, 7));
 
 	// end or identify
-	ieee488_eoi_w(m_ieee, m_gpib_pia, !BIT(data, 4));
+	m_gpib->eoi_w(!BIT(data, 4));
 
 	// speaker
 	speaker_level_w(m_speaker, !BIT(data, 7));
 
 	// remote enable
-	ieee488_ren_w(m_ieee, m_gpib_pia, !BIT(data, 7));
+	m_gpib->ren_w(!BIT(data, 7));
 }
 
 READ_LINE_MEMBER( tek4051_state::key_r )
@@ -885,7 +885,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 
 	if (m_talk)
 	{
-		ieee488_dio_w(m_ieee, m_gpib_pia, data);
+		m_gpib->dio_w(data);
 	}
 }
 
@@ -909,18 +909,18 @@ READ8_MEMBER( tek4051_state::gpib_pia_pb_r )
 	UINT8 data = 0;
 
 	// service request
-	data |= ieee488_srq_r(m_ieee) << 5;
+	data |= m_gpib->srq_r() << 5;
 
 	// data valid
-	data |= ieee488_dav_r(m_ieee) << 6;
+	data |= m_gpib->dav_r() << 6;
 
 	if (!m_talk)
 	{
 		// not ready for data
-		data |= ieee488_nrfd_r(m_ieee) << 4;
+		data |= m_gpib->nrfd_r() << 4;
 
 		// not data acknowledged
-		data |= ieee488_ndac_r(m_ieee) << 7;
+		data |= m_gpib->ndac_r() << 7;
 	}
 
 	return data;
@@ -944,21 +944,21 @@ WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
     */
 
 	// end or identify
-	ieee488_eoi_w(m_ieee, m_gpib_pia, !BIT(data, 0));
+	m_gpib->eoi_w(!BIT(data, 0));
 
 	// interface clear
-	ieee488_ifc_w(m_ieee, m_gpib_pia, !BIT(data, 1));
+	m_gpib->ifc_w(!BIT(data, 1));
 
 	// attention
-	ieee488_atn_w(m_ieee, m_gpib_pia, BIT(data, 3));
+	m_gpib->atn_w(BIT(data, 3));
 
 	if (m_talk)
 	{
 		// not ready for data
-		ieee488_nrfd_w(m_ieee, m_gpib_pia, !BIT(data, 4));
+		m_gpib->nrfd_w(!BIT(data, 4));
 
 		// not data acknowledged
-		ieee488_ndac_w(m_ieee, m_gpib_pia, !BIT(data, 7));
+		m_gpib->ndac_w(!BIT(data, 7));
 	}
 }
 
@@ -968,9 +968,9 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 
 	if (!m_talk)
 	{
-		ieee488_dio_w(m_ieee, m_gpib_pia, 0xff);
-		ieee488_nrfd_w(m_ieee, m_gpib_pia, 1);
-		ieee488_ndac_w(m_ieee, m_gpib_pia, 1);
+		m_gpib->dio_w(0xff);
+		m_gpib->nrfd_w(1);
+		m_gpib->ndac_w(1);
 	}
 }
 
@@ -988,10 +988,10 @@ WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
 
 static const pia6821_interface gpib_pia_intf =
 {
-	DEVCB_DEVICE_HANDLER(IEEE488_TAG, ieee488_dio_r),
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
 	DEVCB_DRIVER_MEMBER(tek4051_state, gpib_pia_pb_r),
-	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_eoi_r),
-	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_srq_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(tek4051_state, dio_w),
@@ -1149,7 +1149,6 @@ static ACIA6850_INTERFACE( acia_intf )
 
 static IEEE488_DAISY( ieee488_daisy )
 {
-	{ MC6820_GPIB_TAG },
 	{ NULL}
 };
 
@@ -1237,7 +1236,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_PIA6821_ADD(MC6820_GPIB_TAG, gpib_pia_intf)
 	MCFG_PIA6821_ADD(MC6820_COM_TAG, com_pia_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
-	MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
+	MCFG_IEEE488_ADD(ieee488_daisy)
 	//MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// internal ram

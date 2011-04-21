@@ -121,7 +121,7 @@ protected:
 private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
-	device_t *m_bus;
+	required_device<ieee488_device> m_bus;
 
 	int m_via0_irq;
 	int m_via1_irq;

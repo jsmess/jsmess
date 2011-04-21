@@ -62,15 +62,6 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( victor9k )
-	PORT_START("IEEE488")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_dav_r)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_eoi_r)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ren_r)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_atn_r)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ifc_r)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_srq_r)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_nrfd_r)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ndac_r)
 INPUT_PORTS_END
 
 /* Video */
@@ -272,7 +263,53 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 
     */
 
-	ieee488_dio_w(m_ieee488, m_via1, data);
+	m_ieee488->dio_w(data);
+}
+
+READ8_MEMBER( victor9k_state::via1_pb_r )
+{
+	/*
+
+        bit     description
+
+        PB0     DAV
+        PB1     EOI
+        PB2     REN
+        PB3     ATN
+        PB4     IFC
+        PB5     SRQ
+        PB6     NRFD
+        PB7     NDAC
+
+    */
+
+	UINT8 data = 0;
+
+	/* data valid */
+	data |= m_ieee488->dav_r();
+
+	/* end or identify */
+	data |= m_ieee488->eoi_r() << 1;
+
+	/* remote enable */
+	data |= m_ieee488->ren_r() << 2;
+
+	/* attention */
+	data |= m_ieee488->atn_r() << 3;
+
+	/* interface clear */
+	data |= m_ieee488->ifc_r() << 4;
+
+	/* service request */
+	data |= m_ieee488->srq_r() << 5;
+
+	/* not ready for data */
+	data |= m_ieee488->nrfd_r() << 6;
+
+	/* data not accepted */
+	data |= m_ieee488->ndac_r() << 7;
+
+	return data;
 }
 
 WRITE8_MEMBER( victor9k_state::via1_pb_w )
@@ -293,28 +330,28 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
     */
 
 	/* data valid */
-	ieee488_dav_w(m_ieee488, m_via1, BIT(data, 0));
+	m_ieee488->dav_w(BIT(data, 0));
 
 	/* end or identify */
-	ieee488_eoi_w(m_ieee488, m_via1, BIT(data, 1));
+	m_ieee488->eoi_w(BIT(data, 1));
 
 	/* remote enable */
-	ieee488_ren_w(m_ieee488, m_via1, BIT(data, 2));
+	m_ieee488->ren_w(BIT(data, 2));
 
 	/* attention */
-	ieee488_atn_w(m_ieee488, m_via1, BIT(data, 3));
+	m_ieee488->atn_w(BIT(data, 3));
 
 	/* interface clear */
-	ieee488_ifc_w(m_ieee488, m_via1, BIT(data, 4));
+	m_ieee488->ifc_w(BIT(data, 4));
 
 	/* service request */
-	ieee488_srq_w(m_ieee488, m_via1, BIT(data, 5));
+	m_ieee488->srq_w(BIT(data, 5));
 
 	/* not ready for data */
-	ieee488_nrfd_w(m_ieee488, m_via1, BIT(data, 6));
+	m_ieee488->nrfd_w(BIT(data, 6));
 
 	/* data not accepted */
-	ieee488_ndac_w(m_ieee488, m_via1, BIT(data, 7));
+	m_ieee488->ndac_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::codec_vol_w )
@@ -330,11 +367,11 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 
 static const via6522_interface via1_intf =
 {
-	DEVCB_DEVICE_HANDLER(IEEE488_TAG, ieee488_dio_r),
-	DEVCB_INPUT_PORT("IEEE488"),
-	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_nrfd_r),
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
+	DEVCB_DRIVER_MEMBER(victor9k_state, via1_pb_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, nrfd_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_ndac_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_r),
 	DEVCB_NULL,
 
 	DEVCB_DRIVER_MEMBER(victor9k_state, via1_pa_w),
@@ -845,8 +882,19 @@ static const floppy_config victor9k_floppy_config =
 
 static IEEE488_DAISY( ieee488_daisy )
 {
-	{ M6522_1_TAG, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_ca1), DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_ca2) },
 	{ NULL }
+};
+
+static IEEE488_INTERFACE( ieee488_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_ca1),
+	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_ca2),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
@@ -904,7 +952,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
+	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)

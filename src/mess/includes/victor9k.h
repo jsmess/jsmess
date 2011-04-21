@@ -38,7 +38,6 @@
 #define M6522_6_TAG		"m6522_6"
 #define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
-#define IEEE488_TAG		"ieee488"
 
 class victor9k_state : public driver_device
 {
@@ -60,7 +59,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdc_cpu;
-	required_device<device_t> m_ieee488;
+	required_device<ieee488_device> m_ieee488;
 	required_device<device_t> m_pic;
 	required_device<mc6852_device> m_ssda;
 	required_device<device_t> m_via1;
@@ -83,6 +82,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
+	DECLARE_READ8_MEMBER( via1_pb_r );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
 	DECLARE_READ8_MEMBER( via2_pa_r );

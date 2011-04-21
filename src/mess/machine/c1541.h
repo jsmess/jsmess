@@ -237,7 +237,8 @@ class oc118_device :  public c1541_device
 
 // ======================> c2031_device
 
-class c2031_device :  public c1541_device
+class c2031_device :  public c1541_device,
+					  public device_ieee488_interface
 {
     friend class c1541_device_config;
 
@@ -245,9 +246,6 @@ class c2031_device :  public c1541_device
     c2031_device(running_machine &_machine, const c1541_device_config &_config);
 
 public:
-	DECLARE_WRITE_LINE_MEMBER( ieee488_atn_w );
-	DECLARE_WRITE_LINE_MEMBER( ieee488_ifc_w );
-
 	// not really public
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
@@ -257,6 +255,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( via0_ca2_r );
 
 protected:
+	// device_ieee488_interface overrides
+	void ieee488_atn(int state);
+	void ieee488_ifc(int state);
+
+	required_device<ieee488_device> m_bus;
+
 	int m_nrfd_out;				// not ready for data
 	int m_ndac_out;				// not data accepted
 	int m_atna;					// attention acknowledge

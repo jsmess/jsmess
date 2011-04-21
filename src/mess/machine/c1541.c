@@ -214,7 +214,37 @@ device_t *c1541_device_config::alloc_device(running_machine &machine) const
 
 void c1541_device_config::device_config_complete()
 {
-	m_shortname = "c1541";
+	switch (m_variant)
+	{
+	case TYPE_1540:
+		m_shortname = "c1540";
+		break;
+
+	default:
+	case TYPE_1541:
+		m_shortname = "c1541";
+		break;
+
+	case TYPE_1541C:
+		m_shortname = "c1541c";
+		break;
+
+	case TYPE_1541II:
+		m_shortname = "c1541ii";
+		break;
+
+	case TYPE_SX1541:
+		m_shortname = "sx1541";
+		break;
+
+	case TYPE_OC118:
+		m_shortname = "oc118";
+		break;
+
+	case TYPE_C2031:
+		m_shortname = "c2031";
+		break;
+	}
 }
 
 
@@ -538,7 +568,7 @@ READ8_MEMBER( c2031_device::via0_pa_r )
 
     */
 
-	return ieee488_dio_r(m_bus, 0);
+	return m_bus->dio_r();
 }
 
 
@@ -559,7 +589,7 @@ WRITE8_MEMBER( c2031_device::via0_pa_w )
 
     */
 
-	ieee488_dio_w(m_bus, this, data);
+	m_bus->dio_w(this, data);
 }
 
 
@@ -583,19 +613,19 @@ READ8_MEMBER( c2031_device::via0_pb_r )
 	UINT8 data = 0;
 
 	// not ready for data
-	data |= ieee488_nrfd_r(m_bus) << 1;
+	data |= m_bus->nrfd_r() << 1;
 
 	// not data accepted
-	data |= ieee488_ndac_r(m_bus) << 2;
+	data |= m_bus->ndac_r() << 2;
 
 	// end or identify
-	data |= ieee488_eoi_r(m_bus) << 3;
+	data |= m_bus->eoi_r() << 3;
 
 	// data valid
-	data |= ieee488_dav_r(m_bus) << 6;
+	data |= m_bus->dav_r() << 6;
 
 	// attention
-	data |= !ieee488_atn_r(m_bus) << 7;
+	data |= !m_bus->atn_r() << 7;
 
 	return data;
 }
@@ -629,27 +659,27 @@ WRITE8_MEMBER( c2031_device::via0_pb_w )
 	m_ndac_out = ndac;
 
 	// end or identify
-	ieee488_eoi_w(m_bus, this, BIT(data, 3));
+	m_bus->eoi_w(this, BIT(data, 3));
 
 	// data valid
-	ieee488_dav_w(m_bus, this, BIT(data, 6));
+	m_bus->dav_w(this, BIT(data, 6));
 
 	// attention acknowledge
 	m_atna = atna;
 
-	if (!ieee488_atn_r(m_bus) ^ atna)
+	if (!m_bus->atn_r() ^ atna)
 	{
 		nrfd = ndac = 0;
 	}
 
-	ieee488_nrfd_w(m_bus, this, nrfd);
-	ieee488_ndac_w(m_bus, this, ndac);
+	m_bus->nrfd_w(this, nrfd);
+	m_bus->ndac_w(this, ndac);
 }
 
 
 READ_LINE_MEMBER( c2031_device::via0_ca1_r )
 {
-	return !ieee488_atn_r(m_bus);
+	return !m_bus->atn_r();
 }
 
 
@@ -832,7 +862,7 @@ static const floppy_config c1541_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(c1541),
-	NULL
+	"floppy_5_25"
 };
 
 
@@ -911,7 +941,7 @@ machine_config_constructor c1541_device_config::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  c1541_device - constructor
+//  set_iec_data - 
 //-------------------------------------------------
 
 inline void c1541_device::set_iec_data()
@@ -1008,7 +1038,7 @@ void c1541_device::cbm_iec_reset(int state)
 //  ieee488_atn_w - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c2031_device::ieee488_atn_w )
+void c2031_device::ieee488_atn(int state)
 {
 	int nrfd = m_nrfd_out;
 	int ndac = m_ndac_out;
@@ -1020,8 +1050,8 @@ WRITE_LINE_MEMBER( c2031_device::ieee488_atn_w )
 		nrfd = ndac = 0;
 	}
 
-	ieee488_nrfd_w(m_bus, this, nrfd);
-	ieee488_ndac_w(m_bus, this, ndac);
+	m_bus->nrfd_w(this, nrfd);
+	m_bus->ndac_w(this, ndac);
 }
 
 
@@ -1029,7 +1059,7 @@ WRITE_LINE_MEMBER( c2031_device::ieee488_atn_w )
 //  ieee488_ifc_w - 
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c2031_device::ieee488_ifc_w )
+void c2031_device::ieee488_ifc(int state)
 {
 	if (!state)
 	{

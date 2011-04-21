@@ -413,9 +413,7 @@ static const tpi6525_interface cbmb_tpi_1_intf =
 
 static IEEE488_DAISY( ieee488_daisy )
 {
-	{ "tpi6525_0" },
-	{ "cia" },
-	{ C2040_IEEE488("drive") },
+	{ "drive" },
 	{ NULL}
 };
 
@@ -459,8 +457,8 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MCFG_C8250_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD(ieee488_daisy)
+	MCFG_C8250_ADD("drive", 8)
 
 	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END
@@ -535,8 +533,8 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MCFG_C8250_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD(ieee488_daisy)
+	MCFG_C8250_ADD("drive", 8)
 
 	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END

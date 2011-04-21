@@ -82,7 +82,17 @@ device_t *c1581_device_config::alloc_device(running_machine &machine) const
 
 void c1581_device_config::device_config_complete()
 {
-	m_shortname = "c1581";
+	switch (m_variant)
+	{
+	default:
+	case TYPE_1581:
+		m_shortname = "c1581";
+		break;
+
+	case TYPE_1563:
+		m_shortname = "c1563";
+		break;
+	}
 }
 
 
@@ -359,7 +369,7 @@ static const floppy_config c1581_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	FLOPPY_OPTIONS_NAME(c1581),
-	NULL
+	"floppy_3_5"
 };
 
 

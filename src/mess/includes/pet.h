@@ -10,6 +10,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
+#include "machine/ieee488.h"
 #include "imagedev/cartslot.h"
 
 typedef struct
@@ -23,7 +24,11 @@ class pet_state : public driver_device
 {
 public:
 	pet_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_ieee(*this, IEEE488_TAG)
+	{ }
+
+	required_device<ieee488_device> m_ieee;
 
 	int m_pet_basic1; /* basic version 1 for quickloader */
 	int m_superpet;

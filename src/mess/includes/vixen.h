@@ -11,7 +11,6 @@
 #define P8155H_IO_TAG	"c7"
 #define P8251A_TAG		"c3"
 #define DISCRETE_TAG	"discrete"
-#define IEEE488_TAG		"j9"
 #define SCREEN_TAG		"screen"
 
 class vixen_state : public driver_device
@@ -41,7 +40,7 @@ public:
 	required_device<device_t> m_io_i8155;
 	required_device<device_t> m_usart;
 	required_device<device_t> m_discrete;
-	required_device<device_t> m_ieee488;
+	required_device<ieee488_device> m_ieee488;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
@@ -57,11 +56,11 @@ public:
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_READ8_MEMBER( ieee488_r );
 	DECLARE_READ8_MEMBER( port3_r );
 	DECLARE_READ8_MEMBER( i8155_pa_r );
 	DECLARE_WRITE8_MEMBER( i8155_pb_w );
 	DECLARE_WRITE8_MEMBER( i8155_pc_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pa_w );
 	DECLARE_WRITE8_MEMBER( io_i8155_pb_w );
 	DECLARE_WRITE8_MEMBER( io_i8155_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( io_i8155_to_w );

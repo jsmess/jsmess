@@ -13,7 +13,6 @@
 #define MC6820_GPIB_TAG		"u265"
 #define MC6820_COM_TAG		"u5"
 #define MC6850_TAG			"u25"
-#define IEEE488_TAG			"ieee488"
 #define RS232_TAG			"rs232"
 #define SPEAKER_TAG			"speaker"
 #define SCREEN_TAG			"screen"
@@ -29,7 +28,7 @@ public:
 		  m_gpib_pia(*this, MC6820_GPIB_TAG),
 		  m_com_pia(*this, MC6820_COM_TAG),
 		  m_acia(*this, MC6850_TAG),
-		  m_ieee(*this, IEEE488_TAG),
+		  m_gpib(*this, IEEE488_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_ram(*this, RAM_TAG)
 	 { }
@@ -38,7 +37,7 @@ public:
 	required_device<device_t> m_gpib_pia;
 	required_device<device_t> m_com_pia;
 	required_device<acia6850_device> m_acia;
-	required_device<device_t> m_ieee;
+	required_device<ieee488_device> m_gpib;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_ram;
 

@@ -172,6 +172,57 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 
 
 //-------------------------------------------------
+//  ieee488_r - IEEE488 bus read
+//-------------------------------------------------
+
+READ8_MEMBER( vixen_state::ieee488_r )
+{
+	/*
+
+        bit     description
+
+        0	    ATN
+        1		DAV
+        2		NDAC
+        3		NRFD
+        4		EOI
+        5		SRQ
+        6		IFC
+        7		REN
+
+    */
+
+	UINT8 data = 0;
+
+	/* attention */
+	data |= m_ieee488->atn_r();
+
+	/* data valid */
+	data |= m_ieee488->dav_r() << 1;
+
+	/* data not accepted */
+	data |= m_ieee488->ndac_r() << 2;
+
+	/* not ready for data */
+	data |= m_ieee488->nrfd_r() << 3;
+
+	/* end or identify */
+	data |= m_ieee488->eoi_r() << 4;
+
+	/* service request */
+	data |= m_ieee488->srq_r() << 5;
+
+	/* interface clear */
+	data |= m_ieee488->ifc_r() << 6;
+
+	/* remote enable */
+	data |= m_ieee488->ren_r() << 7;
+
+	return data;
+}
+
+
+//-------------------------------------------------
 //  port3_r - serial status read
 //-------------------------------------------------
 
@@ -231,8 +282,8 @@ static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x01) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x07) AM_DEVREAD_LEGACY(IEEE488_TAG, ieee488_dio_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0x07) AM_READ_PORT("IEEE488")
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x07) AM_DEVREAD(IEEE488_TAG, ieee488_device, dio_r)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0x07) AM_READ(ieee488_r)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x04) AM_DEVWRITE(P8155H_IO_TAG, i8155_device, ale_w)
 	AM_RANGE(0x28, 0x28) AM_MIRROR(0x05) AM_DEVREADWRITE(P8155H_IO_TAG, i8155_device, read, write)
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_data_r, msm8251_data_w)
@@ -331,16 +382,6 @@ INPUT_PORTS_START( vixen )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("IEEE488")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_atn_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_dav_r)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ndac_r)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_nrfd_r)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_eoi_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_srq_r)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ifc_r)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ren_r)
 INPUT_PORTS_END
 
 
@@ -366,7 +407,7 @@ static TIMER_DEVICE_CALLBACK( vsync_tick )
 
 
 //-------------------------------------------------
-//  VIDEO_START( vixenc )
+//  VIDEO_START( vixen )
 //-------------------------------------------------
 
 void vixen_state::video_start()
@@ -536,11 +577,6 @@ static I8155_INTERFACE( i8155_intf )
 //  I8155_INTERFACE( io_i8155_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( vixen_state::io_i8155_pa_w )
-{
-	ieee488_dio_w(m_ieee488, m_io_i8155, data);
-}
-
 WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 {
 	/*
@@ -559,28 +595,28 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
     */
 
 	/* data valid */
-	ieee488_atn_w(m_ieee488, m_io_i8155, BIT(data, 0));
+	m_ieee488->atn_w(BIT(data, 0));
 
 	/* end or identify */
-	ieee488_dav_w(m_ieee488, m_io_i8155, BIT(data, 1));
+	m_ieee488->dav_w(BIT(data, 1));
 
 	/* remote enable */
-	ieee488_ndac_w(m_ieee488, m_io_i8155, BIT(data, 2));
+	m_ieee488->ndac_w(BIT(data, 2));
 
 	/* attention */
-	ieee488_nrfd_w(m_ieee488, m_io_i8155, BIT(data, 3));
+	m_ieee488->nrfd_w(BIT(data, 3));
 
 	/* interface clear */
-	ieee488_eoi_w(m_ieee488, m_io_i8155, BIT(data, 4));
+	m_ieee488->eoi_w(BIT(data, 4));
 
 	/* service request */
-	ieee488_srq_w(m_ieee488, m_io_i8155, BIT(data, 5));
+	m_ieee488->srq_w(BIT(data, 5));
 
 	/* not ready for data */
-	ieee488_ifc_w(m_ieee488, m_io_i8155, BIT(data, 6));
+	m_ieee488->ifc_w(BIT(data, 6));
 
 	/* data not accepted */
-	ieee488_ren_w(m_ieee488, m_io_i8155, BIT(data, 7));
+	m_ieee488->ren_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
@@ -620,7 +656,7 @@ WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 static I8155_INTERFACE( io_i8155_intf )
 {
     DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pa_w),
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
     DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pb_w),
 	DEVCB_NULL,
@@ -677,8 +713,19 @@ WRITE_LINE_MEMBER( vixen_state::atn_w )
 
 static IEEE488_DAISY( ieee488_daisy )
 {
-	{ P8155H_IO_TAG, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(vixen_state, srq_w), DEVCB_DRIVER_LINE_MEMBER(vixen_state, atn_w), DEVCB_NULL },
 	{ NULL }
+};
+
+static IEEE488_INTERFACE( ieee488_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(vixen_state, srq_w),
+	DEVCB_DRIVER_LINE_MEMBER(vixen_state, atn_w),
+	DEVCB_NULL
 };
 
 
@@ -821,7 +868,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_MSM8251_ADD(P8251A_TAG, usart_intf)
 	MCFG_WD179X_ADD(FDC1797_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(vixen_floppy_config)
-	MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
+	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","vixen")

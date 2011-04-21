@@ -513,6 +513,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/i82439tx.o	\
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/ieee488.o	\
+	$(MESS_MACHINE)/ieeestub.o	\
 	$(MESS_MACHINE)/isa.o		\
 	$(MESS_MACHINE)/kb3600.o	\
 	$(MESS_MACHINE)/kr2376.o	\
@@ -764,8 +765,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c1571.o		\
 	$(MESS_MACHINE)/c1581.o		\
 	$(MESS_MACHINE)/c2040.o		\
-	$(MESS_MACHINE)/c8280.o		\
-	$(MESS_MACHINE)/c9060.o		\
 	$(MESS_DRIVERS)/clcd.o		\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
@@ -782,6 +781,8 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_FORMATS)/d81_dsk.o	\
 	$(MESS_FORMATS)/cbm_tap.o	\
 	$(MESS_FORMATS)/cbm_snqk.o	\
+#	$(MESS_MACHINE)/c8280.o		\
+#	$(MESS_MACHINE)/c9060.o		\
 
 $(MESSOBJ)/cccp.a:				\
 	$(MESS_DRIVERS)/argo.o		\

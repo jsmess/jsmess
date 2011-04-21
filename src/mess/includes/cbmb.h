@@ -13,13 +13,18 @@
 
 #include "video/mc6845.h"
 #include "machine/6526cia.h"
+#include "machine/ieee488.h"
 #include "imagedev/cartslot.h"
 
 class cbmb_state : public driver_device
 {
 public:
 	cbmb_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_ieee(*this, IEEE488_TAG)
+	{ }
+
+	required_device<ieee488_device> m_ieee;
 
 	/* keyboard lines */
 	int m_cbmb_keyline_a;
