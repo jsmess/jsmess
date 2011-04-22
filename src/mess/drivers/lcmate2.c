@@ -6,8 +6,7 @@
         DMEnduro. He owns one of these machines.
         21/04/2011 Hooked up the lcd controller and added keyboard
         input. [Sandro Ronco]
-
-        If you have further info, this driver is yours!
+        22/04/2011 Small adjustments resulting from team investigations.
 
         Chips: Z80 CPU, 8K of RAM, 32K ROM, 'VTCL', '8826KX',
                RP5C15 RTC.
@@ -17,10 +16,15 @@
         There are no devices for file saving or loading, is more of
         a PDA format with all programs (address book, etc) in the ROM.
 
-        Sound: a piezo device which is assumed to be a beeper at this time.
+        Sound: a piezo speaker.
 
         ToDo:
-        - Absolutely everything!
+        - RTC doesn't remember the time
+        - Alarm doesn't work
+        - All RAM needs to be battery-backed up.
+        - Reset/On button to be added
+        - The ROM has INT and NMI code; investigate if something uses it.
+        - Possible rom banking
 
 
 ****************************************************************************/
@@ -30,7 +34,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 #include "video/hd44780.h"
-#include "sound/beep.h"
+#include "sound/speaker.h"
 #include "rendlay.h"
 
 
@@ -42,35 +46,22 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_lcdc(*this, "hd44780"),
 	m_rtc(*this, "rtc"),
-	m_beep(*this, "beep")
+	m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<rp5c01_device> m_rtc;
-	required_device<device_t> m_beep;
+	required_device<device_t> m_speaker;
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_READ8_MEMBER( kb_r );
+	DECLARE_WRITE8_MEMBER( speaker_w );
 };
 
-READ8_MEMBER( lcmate2_state::kb_r )
+WRITE8_MEMBER( lcmate2_state::speaker_w )
 {
-	static const char *const bitnames[] = {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7"};
-	UINT8 data = 0xff;
-
-	for (int line=0; line<8; line++)
-		if (!(offset & (1<<line)))
-			data &= input_port_read(machine(), bitnames[line]);
-
-	return data;
-}
-
-WRITE8_MEMBER( lcmate2_state::beep_w )
-{
-	beep_set_state(m_beep, data&0x40);
+	speaker_level_w(m_speaker, BIT(data, 6));
 }
 
 static ADDRESS_MAP_START(lcmate2_mem, AS_PROGRAM, 8, lcmate2_state)
@@ -82,15 +73,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(lcmate2_io, AS_IO, 8, lcmate2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(beep_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)
 
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("hd44780", hd44780_device, control_write)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("hd44780", hd44780_device, data_write)
 	AM_RANGE(0x3002, 0x3002) AM_DEVREAD("hd44780", hd44780_device, control_read)
 	AM_RANGE(0x3003, 0x3003) AM_DEVREAD("hd44780", hd44780_device, data_read)
-
-	//keyboard read, offset used as matrix
-	AM_RANGE(0x5000, 0x50ff) AM_READ(kb_r)
+	AM_RANGE(0x50fe, 0x50fe) AM_READ_PORT("LINE0")
+	AM_RANGE(0x50fd, 0x50fd) AM_READ_PORT("LINE1")
+	AM_RANGE(0x50fb, 0x50fb) AM_READ_PORT("LINE2")
+	AM_RANGE(0x50f7, 0x50f7) AM_READ_PORT("LINE3")
+	AM_RANGE(0x50ef, 0x50ef) AM_READ_PORT("LINE4")
+	AM_RANGE(0x50df, 0x50df) AM_READ_PORT("LINE5")
+	AM_RANGE(0x50bf, 0x50bf) AM_READ_PORT("LINE6")
+	AM_RANGE(0x507f, 0x507f) AM_READ_PORT("LINE7")
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -220,7 +216,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -239,4 +235,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1984, lcmate2,  0,       0,	lcmate2,	lcmate2,	 0,   "Vtech",   "Laser Compumate 2", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1984, lcmate2,  0,       0,	lcmate2,	lcmate2,	 0,   "Vtech",   "Laser Compumate 2", GAME_NOT_WORKING )
