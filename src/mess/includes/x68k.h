@@ -9,6 +9,8 @@
 #ifndef X68K_H_
 #define X68K_H_
 
+#include "machine/rp5c15.h"
+
 #define MC68901_TAG		"mc68901"
 #define RP5C15_TAG		"rp5c15"
 
