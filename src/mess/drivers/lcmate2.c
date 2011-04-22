@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/rp5c01.h"
+#include "machine/rp5c15.h"
 #include "video/hd44780.h"
 #include "sound/speaker.h"
 #include "rendlay.h"
@@ -51,7 +51,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
-	required_device<rp5c01_device> m_rtc;
+	required_device<rp5c15_device> m_rtc;
 	required_device<device_t> m_speaker;
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lcmate2_io, AS_IO, 8, lcmate2_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c15_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)
 
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("hd44780", hd44780_device, control_write)
@@ -220,8 +220,9 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static RP5C01_INTERFACE( rtc_intf )
+static RP5C15_INTERFACE( rtc_intf )
 {
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -251,7 +252,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_RP5C15_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1277,7 +1277,7 @@ static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
 	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE_LEGACY(RP5C15_TAG, rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1355,7 +1355,7 @@ static ADDRESS_MAP_START( megaste_map, AS_PROGRAM, 16, megaste_state )
     AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(cache_r, cache_w)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(fpu_r, fpu_w)*/
 	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8_LEGACY(Z8530_TAG, scc8530_r, scc8530_w, 0x00ff)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE_LEGACY(RP5C15_TAG, rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -2154,12 +2154,13 @@ static RS232_INTERFACE( rs232_intf )
 
 
 //-------------------------------------------------
-//  rp5c15_interface rtc_intf
+//  RP5C15_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
-static const struct rp5c15_interface rtc_intf =
+static RP5C15_INTERFACE( rtc_intf )
 {
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -2449,7 +2450,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RP5C15_ADD(RP5C15_TAG, rtc_intf)
+	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2530,7 +2531,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
-	MCFG_RP5C15_ADD(RP5C15_TAG, rtc_intf)
+	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4)
 
 	MCFG_FLOPPY_2_DRIVES_MODIFY(megaste_floppy_config)

@@ -57,12 +57,17 @@
 #include "imagedev/flopimg.h"
 #include "formats/basicdsk.h"
 
+#define RP5C15_TAG		"rp5c15"
 
 class mz2500_state : public driver_device
 {
 public:
 	mz2500_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_rtc(*this, RP5C15_TAG)
+	{ }
+
+	required_device<rp5c15_device> m_rtc;
 
 	UINT8 m_bank_val[8];
 	UINT8 m_bank_addr;
@@ -1411,22 +1416,20 @@ static WRITE8_HANDLER( mz2500_kanji_w )
 	(offset & 1) ? (state->m_kanji_index = (data << 8) | (state->m_kanji_index & 0xff)) : (state->m_kanji_index = (data & 0xff) | (state->m_kanji_index & 0xff00));
 }
 
-static READ8_DEVICE_HANDLER( rp5c15_8_r )
+static READ8_HANDLER( rp5c15_8_r )
 {
-	UINT8 rtc_index;
+	mz2500_state *state = space->machine().driver_data<mz2500_state>();
+	UINT8 rtc_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
 
-	rtc_index = (cpu_get_reg(device->machine().device("maincpu"), Z80_B));
-
-	return rp5c15_r(device,rtc_index,0xff);
+	return state->m_rtc->read(*space, rtc_index);
 }
 
-static WRITE8_DEVICE_HANDLER( rp5c15_8_w )
+static WRITE8_HANDLER( rp5c15_8_w )
 {
-	UINT8 rtc_index;
+	mz2500_state *state = space->machine().driver_data<mz2500_state>();
+	UINT8 rtc_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
 
-	rtc_index = (cpu_get_reg(device->machine().device("maincpu"), Z80_B));
-
-	rp5c15_w(device,rtc_index,data,0xff);
+	state->m_rtc->write(*space, rtc_index, data);
 }
 
 
@@ -1495,7 +1498,7 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
-	AM_RANGE(0xcc, 0xcc) AM_DEVREADWRITE("rp5c15", rp5c15_8_r, rp5c15_8_w)
+	AM_RANGE(0xcc, 0xcc) AM_READWRITE(rp5c15_8_r, rp5c15_8_w)
 	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
@@ -2046,7 +2049,7 @@ static const struct pit8253_config mz2500_pit8253_intf =
 	}
 };
 
-static void mz2500_rtc_alarm_irq(running_machine &machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( mz2500_rtc_alarm_irq )
 {
 	//mz2500_state *drvstate = device->machine().driver_data<mz2500_state>();
 	/* TODO: doesn't work yet */
@@ -2054,9 +2057,10 @@ static void mz2500_rtc_alarm_irq(running_machine &machine, int state)
 //      cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,drvstate->m_irq_vector[3]);
 }
 
-static const struct rp5c15_interface rtc_intf =
+static RP5C15_INTERFACE( rtc_intf )
 {
-	mz2500_rtc_alarm_irq
+	DEVCB_LINE(mz2500_rtc_alarm_irq),
+	DEVCB_NULL
 };
 
 static const z80sio_interface mz2500_sio_intf =
@@ -2081,7 +2085,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_I8255A_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 6000000, mz2500_sio_intf )
-	MCFG_RP5C15_ADD( "rp5c15" , rtc_intf)
+	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_PIT8253_ADD("pit", mz2500_pit8253_intf)
 
 	MCFG_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)

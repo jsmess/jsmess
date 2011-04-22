@@ -9,7 +9,8 @@
 #ifndef X68K_H_
 #define X68K_H_
 
-#define MC68901_TAG	"mc68901"
+#define MC68901_TAG		"mc68901"
+#define RP5C15_TAG		"rp5c15"
 
 #define GFX16     0
 #define GFX256    1
@@ -41,9 +42,12 @@ public:
 	x68k_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_mfpdev(*this, MC68901_TAG),
-		  m_nvram(*this, "nvram") { }
+		  m_rtc(*this, RP5C15_TAG),
+		  m_nvram(*this, "nvram")
+	{ }
 
 	required_device<mc68901_device> m_mfpdev;
+	required_device<rp5c15_device> m_rtc;
 	required_shared_ptr<UINT32>	m_nvram;
 
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
