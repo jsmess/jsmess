@@ -190,6 +190,22 @@ static const hd44780_interface lcmate2_display =
 	NULL				// custom display layout
 };
 
+static const gfx_layout lcmate2_charlayout =
+{
+	5, 8,	/* 5 x 8 characters */
+	256,	/* 256 characters */
+	1,	/* 1 bits per pixel */
+	{ 0 },	/* no bitplanes */
+	{ 3, 4, 5, 6, 7},
+	{ 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	8*8	/* 8 bytes */
+};
+
+static GFXDECODE_START( lcmate2 )
+	GFXDECODE_ENTRY( "hd44780", 0x0000, lcmate2_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static RP5C01_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL
@@ -211,6 +227,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_GFXDECODE(lcmate2)
 
 	MCFG_HD44780_ADD("hd44780", lcmate2_display)
 
