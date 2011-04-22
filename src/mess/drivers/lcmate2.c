@@ -24,7 +24,7 @@
         - All RAM needs to be battery-backed up.
         - Reset/On button to be added
         - The ROM has INT and NMI code; investigate if something uses it.
-        - Possible rom banking
+        - Add rom banking of the spelling-check library.
 
 
 ****************************************************************************/
@@ -56,6 +56,7 @@ public:
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( speaker_w );
 };
 
@@ -63,6 +64,25 @@ WRITE8_MEMBER( lcmate2_state::speaker_w )
 {
 	speaker_level_w(m_speaker, BIT(data, 6));
 }
+
+// offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
+READ8_MEMBER( lcmate2_state::key_r )
+{
+	UINT8 i,data = 0xff;
+	char kbdrow[8];
+
+	for (i=0; i<8; i++)
+	{
+		if (BIT(offset, i)==0)
+		{
+			sprintf(kbdrow,"LINE%d", i);
+			data &= input_port_read(machine(), kbdrow);
+		}
+	}
+
+	return data;
+}
+
 
 static ADDRESS_MAP_START(lcmate2_mem, AS_PROGRAM, 8, lcmate2_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -79,14 +99,8 @@ static ADDRESS_MAP_START(lcmate2_io, AS_IO, 8, lcmate2_state)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("hd44780", hd44780_device, data_write)
 	AM_RANGE(0x3002, 0x3002) AM_DEVREAD("hd44780", hd44780_device, control_read)
 	AM_RANGE(0x3003, 0x3003) AM_DEVREAD("hd44780", hd44780_device, data_read)
-	AM_RANGE(0x50fe, 0x50fe) AM_READ_PORT("LINE0")
-	AM_RANGE(0x50fd, 0x50fd) AM_READ_PORT("LINE1")
-	AM_RANGE(0x50fb, 0x50fb) AM_READ_PORT("LINE2")
-	AM_RANGE(0x50f7, 0x50f7) AM_READ_PORT("LINE3")
-	AM_RANGE(0x50ef, 0x50ef) AM_READ_PORT("LINE4")
-	AM_RANGE(0x50df, 0x50df) AM_READ_PORT("LINE5")
-	AM_RANGE(0x50bf, 0x50bf) AM_READ_PORT("LINE6")
-	AM_RANGE(0x507f, 0x507f) AM_READ_PORT("LINE7")
+
+	AM_RANGE(0x5000, 0x50ff) AM_READ(key_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -242,8 +256,9 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( lcmate2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "u2.bin",  0x0000, 0x8000, CRC(521931b9) SHA1(743a6e2928c4365fbf5ed9a173e2c1bfe695850f) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "u2.bin",  0x00000, 0x08000, CRC(521931b9) SHA1(743a6e2928c4365fbf5ed9a173e2c1bfe695850f) )
+	ROM_LOAD( "u3.bin",  0x10000, 0x20000, CRC(84fe767a) SHA1(8dd306f203e1220f0eab1a284be3095e2642c5b6) ) // spell library
 
 	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
