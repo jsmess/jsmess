@@ -4,29 +4,71 @@
 
         17/12/2009 Skeleton driver.
 
+        22/04/2011 Connected to a terminal, it responds. Modernised.
+
+        When started, you must press Space, then it will start to work.
+
+        ToDo:
+        - Everything!
+        - Find missing rom F800-FFFF
+
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/terminal.h"
+
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 
 class ipc_state : public driver_device
 {
 public:
 	ipc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( ipc_f4_r );
+	DECLARE_READ8_MEMBER( ipc_f5_r );
+	DECLARE_WRITE8_MEMBER( kbd_put );
+	UINT8 *m_ram;
+	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
+READ8_MEMBER( ipc_state::ipc_f4_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
 
-static ADDRESS_MAP_START(ipc_mem, AS_PROGRAM, 8)
+// bit 0 high = ok to send to terminal; bit 1 high = key is pressed
+READ8_MEMBER( ipc_state::ipc_f5_r )
+{
+	if (m_term_data)
+		return 3;
+	else
+		return 1;
+}
+
+
+static ADDRESS_MAP_START(ipc_mem, AS_PROGRAM, 8, ipc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
-	AM_RANGE(0xe800, 0xf7ff) AM_ROM
+	AM_RANGE(0xe800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ipc_io , AS_IO, 8)
+static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ipc_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf4, 0xf4) AM_READ(ipc_f4_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xf5, 0xf5) AM_READ(ipc_f5_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -34,51 +76,43 @@ static INPUT_PORTS_START( ipc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ipc)
+MACHINE_RESET_MEMBER(ipc_state)
 {
-	cpu_set_reg(machine.device("maincpu"), I8085_PC, 0xE800);
+	cpu_set_reg(machine().device("maincpu"), I8085_PC, 0xE800);
 }
 
-static VIDEO_START( ipc )
+WRITE8_MEMBER( ipc_state::kbd_put )
 {
+	m_term_data = data;
 }
 
-static SCREEN_UPDATE( ipc )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-    return 0;
-}
+	DEVCB_DRIVER_MEMBER(ipc_state, kbd_put)
+};
 
 static MACHINE_CONFIG_START( ipc, ipc_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
-    MCFG_CPU_PROGRAM_MAP(ipc_mem)
-    MCFG_CPU_IO_MAP(ipc_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(ipc_mem)
+	MCFG_CPU_IO_MAP(ipc_io)
 
-    MCFG_MACHINE_RESET(ipc)
-
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(ipc)
-
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(ipc)
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ipc )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipc_u82_v1.3_104584-001.bin", 0xe800, 0x1000, CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2))
+
+	// required rom is missing. Using this one from 'ipb' for now.
+	ROM_LOAD( "ipb_f8_v1.3.bin", 0xf800, 0x0800, BAD_DUMP CRC(966ba421) SHA1(d6a904c7d992a05ed0f451d7d34c1fc8de9547ee))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, ipc,  0,       0,			ipc,	ipc,	 0, 	 "Intel",   "iPC",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, ipc,  ipb,       0,			ipc,	ipc,	 0, 	 "Intel",   "iPC",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
