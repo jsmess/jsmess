@@ -1503,8 +1503,9 @@ ROM_START( trsm100 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m100rom.m12",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
 
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
+	// increased to 0x30000 to fully load 'Booster Pack', but its banking is still unknown
+	ROM_REGION( 0x30000, "option", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart", 0x0000, 0x30000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( m10 )
