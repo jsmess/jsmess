@@ -78,9 +78,9 @@ public:
 	required_device<cdp1862_device> m_cgc;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_beeper;
-	required_device<device_t> m_vp595;
-	required_device<device_t> m_vp550;
-	required_device<device_t> m_vp551;
+	required_device<vp595_device> m_vp595;
+	required_device<vp550_device> m_vp550;
+	required_device<vp550_device> m_vp551;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();

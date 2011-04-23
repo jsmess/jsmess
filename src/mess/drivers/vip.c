@@ -486,14 +486,16 @@ READ_LINE_MEMBER( vip_state::ef4_r )
 
 static COSMAC_SC_WRITE( vip_sc_w )
 {
+	vip_state *state = device->machine().driver_data<vip_state>();
+
 	switch (input_port_read(device->machine(), "SOUND"))
 	{
 	case SOUND_VP550:
-		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls device_set_input_line on it!
+		state->m_vp550->sc1_w(BIT(sc, 1));
 		break;
 
 	case SOUND_VP551:
-		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls device_set_input_line on it!
+		state->m_vp551->sc1_w(BIT(sc, 1));
 		break;
 	}
 }
@@ -505,21 +507,21 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	{
 	case SOUND_SPEAKER:
 		discrete_sound_w(m_beeper, NODE_01, state);
-		vp595_q_w(m_vp595, 0);
-		vp550_q_w(m_vp550, 0);
+		m_vp595->q_w(0);
+		m_vp550->q_w(0);
 		break;
 
 	case SOUND_VP595:
 		discrete_sound_w(m_beeper, NODE_01, 0);
-		vp595_q_w(m_vp595, state);
-		vp550_q_w(m_vp550, 0);
+		m_vp595->q_w(state);
+		m_vp550->q_w(0);
 		break;
 
 	case SOUND_VP550:
 	case SOUND_VP551:
 		discrete_sound_w(m_beeper, NODE_01, 0);
-		vp595_q_w(m_vp595, 0);
-		vp550_q_w(m_vp550, state);
+		m_vp595->q_w(0);
+		m_vp550->q_w(state);
 		break;
 	}
 
@@ -592,9 +594,9 @@ void vip_state::machine_start()
 
 	/* reset sound */
 	discrete_sound_w(m_beeper, NODE_01, 0);
-	vp595_q_w(m_vp595, 0);
-	vp550_q_w(m_vp550, 0);
-	vp550_q_w(m_vp551, 0);
+	m_vp595->q_w(0);
+	m_vp550->q_w(0);
+	m_vp551->q_w(0);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine(), m_colorram, VP590_COLOR_RAM_SIZE);
@@ -634,27 +636,27 @@ void vip_state::machine_reset()
 	switch (input_port_read(machine(), "SOUND"))
 	{
 	case SOUND_SPEAKER:
-		vp595_install_write_handlers(m_vp595, io, 0);
-		vp550_install_write_handlers(m_vp550, program, 0);
-		vp551_install_write_handlers(m_vp551, program, 0);
+		m_vp595->install_write_handlers(io, false);
+		m_vp550->install_write_handlers(program, false);
+		m_vp551->install_write_handlers(program, false);
 		break;
 
 	case SOUND_VP595:
-		vp550_install_write_handlers(m_vp550, program, 0);
-		vp551_install_write_handlers(m_vp551, program, 0);
-		vp595_install_write_handlers(m_vp595, io, 1);
+		m_vp595->install_write_handlers(io, true);
+		m_vp550->install_write_handlers(program, false);
+		m_vp551->install_write_handlers(program, false);
 		break;
 
 	case SOUND_VP550:
-		vp595_install_write_handlers(m_vp595, io, 0);
-		vp551_install_write_handlers(m_vp551, program, 0);
-		vp550_install_write_handlers(m_vp550, program, 1);
+		m_vp595->install_write_handlers(io, false);
+		m_vp550->install_write_handlers(program, true);
+		m_vp551->install_write_handlers(program, false);
 		break;
 
 	case SOUND_VP551:
-		vp595_install_write_handlers(m_vp595, io, 0);
-		vp550_install_write_handlers(m_vp550, program, 0);
-		vp551_install_write_handlers(m_vp551, program, 1);
+		m_vp595->install_write_handlers(io, false);
+		m_vp550->install_write_handlers(program, false);
+		m_vp551->install_write_handlers(program, true);
 		break;
 	}
 
@@ -695,7 +697,7 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_SOUND_CONFIG_DISCRETE(vip)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_VP595_ADD
+	MCFG_VP595_ADD()
 	MCFG_VP550_ADD(XTAL_3_52128MHz/2)
 	MCFG_VP551_ADD(XTAL_3_52128MHz/2)
 
