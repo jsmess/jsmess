@@ -200,7 +200,7 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 	{
 		/* shift keyboard data to latch */
 		m_data <<= 4;
-		m_data |= mm74c922_r(m_kb, 0) & 0x0f;
+		m_data |= m_kb->data_out_r() & 0x0f;
 
 		if (LOAD)
 		{
@@ -211,16 +211,16 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 	}
 }
 
-static MM74C922_INTERFACE( keyboard_intf )
+static MM74C923_INTERFACE( keyboard_intf )
 {
+	CAP_U(0.15),
+	CAP_U(1),
+	DEVCB_DRIVER_LINE_MEMBER(elf2_state, da_w),
 	DEVCB_INPUT_PORT("X1"),
 	DEVCB_INPUT_PORT("X2"),
 	DEVCB_INPUT_PORT("X3"),
 	DEVCB_INPUT_PORT("X4"),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(elf2_state, da_w),
-	CAP_U(0.15),
-	CAP_U(1)
+	DEVCB_NULL
 };
 
 /* CDP1861 Interface */

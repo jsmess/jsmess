@@ -39,7 +39,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
-	required_device<device_t> m_kb;
+	required_device<mm74c922_device> m_kb;
 	required_device<dm9368_device> m_led_l;
 	required_device<dm9368_device> m_led_h;
 	required_device<device_t> m_cassette;
