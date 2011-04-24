@@ -766,6 +766,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c2031.o		\
 	$(MESS_MACHINE)/c2040.o		\
 	$(MESS_MACHINE)/c8280.o		\
+	$(MESS_MACHINE)/c9060.o		\
 	$(MESS_DRIVERS)/clcd.o		\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
@@ -782,7 +783,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_FORMATS)/d81_dsk.o	\
 	$(MESS_FORMATS)/cbm_tap.o	\
 	$(MESS_FORMATS)/cbm_snqk.o	\
-#	$(MESS_MACHINE)/c9060.o		\
 
 $(MESSOBJ)/cccp.a:				\
 	$(MESS_DRIVERS)/argo.o		\

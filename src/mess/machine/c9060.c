@@ -7,26 +7,13 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - everything
-
-*/
-
-#include "emu.h"
 #include "c9060.h"
-#include "cpu/m6502/m6502.h"
-#include "machine/6522via.h"
-#include "machine/6532riot.h"
-#include "machine/ieee488.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
 
-#define LOG 0
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
 #define M6502_TAG		"7e"
 #define M6532_0_TAG		"7f"
@@ -35,130 +22,146 @@
 #define M6504_TAG		"4a"
 #define M6522_TAG		"4b"
 
-#define C9060_REGION	"c9060"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _c9060_t c9060_t;
-struct _c9060_t
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type C9060 = c9060_device_config::static_alloc_device_config;
+const device_type C9090 = c9060_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  c9060_device_config - constructor
+//-------------------------------------------------
+
+c9060_device_config::c9060_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "C9060", tag, owner, clock),
+	  device_config_ieee488_interface(mconfig, *this)
 {
-	/* IEEE-488 bus */
-	int address;						/* device address - 8 */
-	int rfdo;							/* not ready for data output */
-	int daco;							/* not data accepted output */
-	int atna;							/* attention acknowledge */
-
-	/* devices */
-	device_t *cpu_dos;
-	device_t *cpu_hdc;
-	device_t *riot0;
-	device_t *riot1;
-	device_t *via;
-	device_t *bus;
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE c9060_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert((device->type() == C9060) || (device->type() == C9090));
-	return (c9060_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE c9060_config *get_safe_config(device_t *device)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *c9060_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	assert(device != NULL);
-	assert((device->type() == C9060) || (device->type() == C9090));
-	return (c9060_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return global_alloc(c9060_device_config(mconfig, tag, owner, clock));
 }
 
-INLINE void update_ieee_signals(device_t *device)
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *c9060_device_config::alloc_device(running_machine &machine) const
 {
-	c9060_t *c9060 = get_safe_token(device);
-
-	int atn = ieee488_atn_r(c9060->bus);
-	int atna = c9060->atna;
-	int rfdo = c9060->rfdo;
-	int daco = c9060->daco;
-
-	int nrfd = !(!(!(atn&atna)&rfdo)|!(atn|atna));
-	int ndac = !(daco|!(atn|atna));
-
-	ieee488_nrfd_w(c9060->bus, device, nrfd);
-	ieee488_ndac_w(c9060->bus, device, ndac);
+	return auto_alloc(machine, c9060_device(machine, *this));
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    c9060_ieee488_atn_w - IEEE-488 bus attention
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( c9060_ieee488_atn_w )
+void c9060_device_config::device_config_complete()
 {
-	c9060_t *c9060 = get_safe_token(device);
-
-	update_ieee_signals(device);
-
-	/* set RIOT PA7 */
-	riot6532_porta_in_set(c9060->riot1, !state << 7, 0x80);
+	m_shortname = "c9060";
 }
 
-/*-------------------------------------------------
-    c9060_ieee488_ifc_w - IEEE-488 bus reset
--------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( c9060_ieee488_ifc_w )
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void c9060_device_config::static_set_config(device_config *device, int address, int variant)
 {
-	if (!state)
-	{
-		device->reset();
-	}
+	c9060_device_config *c9060 = downcast<c9060_device_config *>(device);
+
+	assert((address > 7) && (address < 12));
+
+	c9060->m_variant = variant;
+	c9060->m_address = address - 8;
 }
 
-/*-------------------------------------------------
-    ADDRESS_MAP( c9060_dos_map )
--------------------------------------------------*/
 
-static ADDRESS_MAP_START( c9060_dos_map, AS_PROGRAM, 8 )
+//-------------------------------------------------
+//  ROM( c9060 )
+//-------------------------------------------------
+
+ROM_START( c9060 )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD_OPTIONAL( "300516-revb.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd) )
+	ROM_LOAD( "300516-revc.7c", 0x0000, 0x2000, CRC(d6a3e88f) SHA1(bb1ddb5da94a86266012eca54818aa21dc4cef6a) )
+	ROM_LOAD_OPTIONAL( "300517-reva.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9) )
+	ROM_LOAD_OPTIONAL( "300517-revb.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1) )
+	ROM_LOAD( "300517-revc.7d", 0x2000, 0x2000, CRC(2a9ad4ad) SHA1(4c17d014de48c906871b9b6c7d037d8736b1fd52) )
+
+	ROM_REGION( 0x800, M6504_TAG, 0 )
+	ROM_LOAD_OPTIONAL( "300515-reva.4c", 0x000, 0x800, CRC(99e096f7) SHA1(a3d1deb27bf5918b62b89c27fa3e488eb8f717a4) )
+	ROM_LOAD( "300515-revb.4c", 0x000, 0x800, CRC(49adf4fb) SHA1(59dafbd4855083074ba8dc96a04d4daa5b76e0d6) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c9060_device_config::device_rom_region() const
+{
+	return ROM_NAME( c9060 );
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( c9060_main_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( c9060_main_mem, AS_PROGRAM, 8, c9060_device )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE_LEGACY(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE_LEGACY(M6532_1_TAG, riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c9060:c9060", 0x0000)
+	AM_RANGE(0xc000, 0xffff) // AM_ROM
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    ADDRESS_MAP( c9060_fdc_map )
--------------------------------------------------*/
 
-static ADDRESS_MAP_START( c9060_fdc_map, AS_PROGRAM, 8 )
+//-------------------------------------------------
+//  ADDRESS_MAP( c9060_hdc_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( c9060_hdc_mem, AS_PROGRAM, 8, c9060_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE_MODERN(M6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("c9060:c9060", 0x2000) // 6530
+	AM_RANGE(0x1800, 0x1fff) // AM_ROM 6530
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    riot6532_interface riot0_intf 7f
--------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( dio_r )
+//-------------------------------------------------
+//  riot6532_interface riot0_intf
+//-------------------------------------------------
+
+READ8_MEMBER( c9060_device::dio_r )
 {
 	/*
 
@@ -175,12 +178,11 @@ static READ8_DEVICE_HANDLER( dio_r )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner());
-
-	return ieee488_dio_r(c9060->bus, 0);
+	return m_bus->dio_r();
 }
 
-static WRITE8_DEVICE_HANDLER( dio_w )
+
+WRITE8_MEMBER( c9060_device::dio_w )
 {
 	/*
 
@@ -197,25 +199,25 @@ static WRITE8_DEVICE_HANDLER( dio_w )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner());
-
-	ieee488_dio_w(c9060->bus, device->owner(), data);
+	m_bus->dio_w(this, data);
 }
+
 
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_HANDLER(dio_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(dio_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, dio_w),
 	DEVCB_NULL
 };
 
-/*-------------------------------------------------
-    riot6532_interface riot1_intf ue1
--------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( riot1_pa_r )
+//-------------------------------------------------
+//  riot6532_interface riot1_intf
+//-------------------------------------------------
+
+READ8_MEMBER( c9060_device::riot1_pa_r )
 {
 	/*
 
@@ -231,24 +233,23 @@ static READ8_DEVICE_HANDLER( riot1_pa_r )
         PA7     _ATN
 
     */
-
-	c9060_t *c9060 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
 	/* end or identify in */
-	data |= ieee488_eoi_r(c9060->bus) << 5;
+	data |= m_bus->eoi_r() << 5;
 
 	/* data valid in */
-	data |= ieee488_dav_r(c9060->bus) << 6;
+	data |= m_bus->dav_r() << 6;
 
 	/* attention */
-	data |= !ieee488_atn_r(c9060->bus) << 7;
+	data |= !m_bus->atn_r() << 7;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( riot1_pa_w )
+
+WRITE8_MEMBER( c9060_device::riot1_pa_w )
 {
 	/*
 
@@ -265,27 +266,26 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner());
-
 	/* attention acknowledge */
-	c9060->atna = BIT(data, 0);
+	m_atna = BIT(data, 0);
 
 	/* data accepted out */
-	c9060->daco = BIT(data, 1);
+	m_daco = BIT(data, 1);
 
 	/* not ready for data out */
-	c9060->rfdo = BIT(data, 2);
+	m_rfdo = BIT(data, 2);
 
 	/* end or identify out */
-	ieee488_eoi_w(c9060->bus, device->owner(), BIT(data, 3));
+	m_bus->eoi_w(this, BIT(data, 3));
 
 	/* data valid out */
-	ieee488_dav_w(c9060->bus, device->owner(), BIT(data, 4));
+	m_bus->dav_w(this, BIT(data, 4));
 
-	update_ieee_signals(device->owner());
+	update_ieee_signals();
 }
 
-static READ8_DEVICE_HANDLER( riot1_pb_r )
+
+READ8_MEMBER( c9060_device::riot1_pb_r )
 {
 	/*
 
@@ -301,21 +301,20 @@ static READ8_DEVICE_HANDLER( riot1_pb_r )
         PB7     RFDI
 
     */
-
-	c9060_t *c9060 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
 	/* data accepted in */
-	data |= ieee488_ndac_r(c9060->bus) << 6;
+	data |= m_bus->ndac_r() << 6;
 
 	/* ready for data in */
-	data |= ieee488_nrfd_r(c9060->bus) << 7;
+	data |= m_bus->nrfd_r() << 7;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( riot1_pb_w )
+
+WRITE8_MEMBER( c9060_device::riot1_pb_w )
 {
 	/*
 
@@ -333,27 +332,22 @@ static WRITE8_DEVICE_HANDLER( riot1_pb_w )
     */
 }
 
-static WRITE_LINE_DEVICE_HANDLER( riot1_irq_w )
-{
-	c9060_t *c9060 = get_safe_token(device->owner());
-
-	device_set_input_line(c9060->cpu_dos, M6502_IRQ_LINE, state);
-}
 
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_HANDLER(riot1_pa_r),
-	DEVCB_HANDLER(riot1_pb_r),
-	DEVCB_HANDLER(riot1_pa_w),
-	DEVCB_HANDLER(riot1_pb_w),
-	DEVCB_LINE(riot1_irq_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pb_w),
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
 
-/*-------------------------------------------------
-    via6522_interface via_intf 4b
--------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( via_pa_r )
+//-------------------------------------------------
+//  via6522_interface via_intf
+//-------------------------------------------------
+
+READ8_MEMBER( c9060_device::via_pa_r )
 {
 	/*
 
@@ -373,7 +367,7 @@ static READ8_DEVICE_HANDLER( via_pa_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( via_pa_w )
+WRITE8_MEMBER( c9060_device::via_pa_w )
 {
 	/*
 
@@ -391,7 +385,7 @@ static WRITE8_DEVICE_HANDLER( via_pa_w )
     */
 }
 
-static READ8_DEVICE_HANDLER( via_pb_r )
+READ8_MEMBER( c9060_device::via_pb_r )
 {
 	/*
 
@@ -411,7 +405,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( via_pb_w )
+WRITE8_MEMBER( c9060_device::via_pb_w )
 {
 	/*
 
@@ -431,15 +425,15 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
 static const via6522_interface via_intf =
 {
-	DEVCB_HANDLER(via_pa_r),
-	DEVCB_HANDLER(via_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pb_r),
 	DEVCB_NULL, // ACK
 	DEVCB_NULL,
 	DEVCB_NULL, // MSG
 	DEVCB_NULL, // ?
 
-	DEVCB_HANDLER(via_pa_w),
-	DEVCB_HANDLER(via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -448,143 +442,161 @@ static const via6522_interface via_intf =
 	DEVCB_NULL
 };
 
-/*-------------------------------------------------
-    MACHINE_DRIVER( c9060 )
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( c9060 )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c9060 )
-	/* DOS */
+	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MCFG_CPU_PROGRAM_MAP(c9060_dos_map)
+	MCFG_CPU_PROGRAM_MAP(c9060_main_mem)
 
 	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
 	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
 
-	/* controller */
+	// controller
 	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_16MHz/16)
-	MCFG_CPU_PROGRAM_MAP(c9060_fdc_map)
+	MCFG_CPU_PROGRAM_MAP(c9060_hdc_mem)
 
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 
 	// Tandon TM602S
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------
-    MACHINE_DRIVER( c9090 )
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( c9090 )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c9090 )
 	MCFG_FRAGMENT_ADD(c9060)
-
 	// Tandon TM603S
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------
-    ROM( c9060 )
--------------------------------------------------*/
 
-ROM_START( c9060 ) // schematic 300010
-	ROM_REGION( 0x4800, C9060_REGION, ROMREGION_LOADBYNAME )
-	ROM_LOAD_OPTIONAL( "300516-revb.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd) )
-	ROM_LOAD( "300516-revc.7c", 0x0000, 0x2000, CRC(d6a3e88f) SHA1(bb1ddb5da94a86266012eca54818aa21dc4cef6a) )
-	ROM_LOAD_OPTIONAL( "300517-reva.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9) )
-	ROM_LOAD_OPTIONAL( "300517-revb.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1) )
-	ROM_LOAD( "300517-revc.7d", 0x2000, 0x2000, CRC(2a9ad4ad) SHA1(4c17d014de48c906871b9b6c7d037d8736b1fd52) )
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
 
-	ROM_LOAD_OPTIONAL( "300515-reva.4c", 0x4000, 0x0800, CRC(99e096f7) SHA1(a3d1deb27bf5918b62b89c27fa3e488eb8f717a4) )
-	ROM_LOAD( "300515-revb.4c", 0x4000, 0x0800, CRC(49adf4fb) SHA1(59dafbd4855083074ba8dc96a04d4daa5b76e0d6) )
-ROM_END
-
-/*-------------------------------------------------
-    DEVICE_START( c9060 )
--------------------------------------------------*/
-
-static DEVICE_START( c9060 )
+machine_config_constructor c9060_device_config::device_mconfig_additions() const
 {
-	c9060_t *c9060 = get_safe_token(device);
-	const c9060_config *config = get_safe_config(device);
-
-	/* find our CPU */
-	c9060->cpu_dos = device->subdevice(M6502_TAG);
-	c9060->cpu_hdc = device->subdevice(M6504_TAG);
-
-	/* find devices */
-	c9060->riot0 = device->subdevice(M6532_0_TAG);
-	c9060->riot1 = device->subdevice(M6532_1_TAG);
-	c9060->via = device->subdevice(M6522_TAG);
-	c9060->bus = device->machine().device(config->bus_tag);
-
-	/* register for state saving */
-//  device->save_item(NAME(c9060->));
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( c9060 )
--------------------------------------------------*/
-
-static DEVICE_RESET( c9060 )
-{
-	c9060_t *c9060 = get_safe_token(device);
-
-	/* reset devices */
-	c9060->cpu_dos->reset();
-	c9060->cpu_hdc->reset();
-	c9060->riot0->reset();
-	c9060->riot1->reset();
-	c9060->via->reset();
-
-	/* toggle M6502 SO */
-	device_set_input_line(c9060->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
-	device_set_input_line(c9060->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( c9060 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( c9060 )
-{
-	switch (state)
+	switch (m_variant)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c9060_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c9060_config);								break;
+	default:
+	case TYPE_9060:
+		return MACHINE_CONFIG_NAME( c9060 );
 
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c9060);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c9060);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c9060);						break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c9060);						break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 9060");							break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore PET");							break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	case TYPE_9090:
+		return MACHINE_CONFIG_NAME( c9090 );
 	}
 }
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( c9090 )
--------------------------------------------------*/
 
-DEVICE_GET_INFO( c9090 )
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  update_ieee_signals - 
+//-------------------------------------------------
+
+inline void c9060_device::update_ieee_signals()
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c9090);			break;
+	int atn = m_bus->atn_r();
+	int nrfd = !(!(!(atn & m_atna) & m_rfdo) | !(atn | m_atna));
+	int ndac = !(m_daco | !(atn | m_atna));
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 9090");							break;
-
-		default:										DEVICE_GET_INFO_CALL(c9060);								break;
-	}
+	m_bus->nrfd_w(this, nrfd);
+	m_bus->ndac_w(this, ndac);
 }
 
-DEFINE_LEGACY_DEVICE(C9060, c9060);
-DEFINE_LEGACY_DEVICE(C9090, c9090);
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  c9060_device - constructor
+//-------------------------------------------------
+
+c9060_device::c9060_device(running_machine &_machine, const c9060_device_config &_config)
+    : device_t(_machine, _config),
+	  device_ieee488_interface(_machine, _config, *this),
+	  m_maincpu(*this, M6502_TAG),
+	  m_hdccpu(*this, M6504_TAG),
+	  m_riot0(*this, M6532_0_TAG),
+	  m_riot1(*this, M6532_1_TAG),
+	  m_via(*this, M6522_TAG),
+	  m_bus(*this->owner(), IEEE488_TAG),
+      m_config(_config)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c9060_device::device_start()
+{
+	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *hdc = m_hdccpu->memory().space(AS_PROGRAM);
+
+	main->install_rom(0xc000, 0xffff, subregion(M6502_TAG)->base());
+	hdc->install_rom(0x1800, 0x1fff, subregion(M6504_TAG)->base());
+
+	// state saving
+	save_item(NAME(m_rfdo));
+	save_item(NAME(m_daco));
+	save_item(NAME(m_atna));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void c9060_device::device_reset()
+{
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void c9060_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+}
+
+
+//-------------------------------------------------
+//  m_bus->atn - 
+//-------------------------------------------------
+
+void c9060_device::ieee488_atn(int state)
+{
+	update_ieee_signals();
+
+	// set RIOT PA7
+	riot6532_porta_in_set(m_riot1, !state << 7, 0x80);
+}
+
+
+//-------------------------------------------------
+//  m_bus->ifc - 
+//-------------------------------------------------
+
+void c9060_device::ieee488_ifc(int state)
+{
+	if (!state)
+	{
+		device_reset();
+	}
+}

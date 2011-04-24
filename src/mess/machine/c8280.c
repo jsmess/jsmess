@@ -250,8 +250,8 @@ void c8280_device::device_start()
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
 
-	main->install_rom(0x5000, 0x7fff, subregion(M6502_DOS_TAG)->base());
-	fdc->install_rom(0x1c00, 0x1fff, subregion(M6502_FDC_TAG)->base());
+	main->install_rom(0xc000, 0xffff, subregion(M6502_DOS_TAG)->base());
+	fdc->install_rom(0x1800, 0x1fff, subregion(M6502_FDC_TAG)->base());
 }
 
 

@@ -99,7 +99,7 @@ protected:
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_image0;
-	optional_device<device_t> m_image1;
+	required_device<device_t> m_image1;
 	required_device<ieee488_device> m_bus;
 
     const c8280_device_config &m_config;

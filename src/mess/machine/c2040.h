@@ -184,44 +184,44 @@ protected:
 	required_device<ieee488_device> m_bus;
 
 	struct {
-		/* motors */
-		int m_stp;								/* stepper motor phase */
-		int m_mtr;								/* spindle motor on */
+		// motors
+		int m_stp;								// stepper motor phase
+		int m_mtr;								// spindle motor on
 
-		/* track */
-		UINT8 m_track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
-		int m_track_len;						/* track length */
-		int m_buffer_pos;						/* byte position within track buffer */
-		int m_bit_pos;							/* bit position within track buffer byte */
+		// track
+		UINT8 m_track_buffer[G64_BUFFER_SIZE];	// track data buffer
+		int m_track_len;						// track length
+		int m_buffer_pos;						// byte position within track buffer
+		int m_bit_pos;							// bit position within track buffer byte
 
-		/* devices */
+		// devices
 		device_t *m_image;
 	} m_unit[2];
 
-	int m_drive;						/* selected drive */
-	int m_side;							/* selected side */
+	int m_drive;						// selected drive
+	int m_side;							// selected side
 
-	/* IEEE-488 bus */
-	int m_rfdo;							/* not ready for data output */
-	int m_daco;							/* not data accepted output */
-	int m_atna;							/* attention acknowledge */
+	// IEEE-488 bus
+	int m_rfdo;							// not ready for data output
+	int m_daco;							// not data accepted output
+	int m_atna;							// attention acknowledge
 
-	/* track */
-	int m_ds;							/* density select */
-	int m_bit_count;					/* GCR bit counter */
-	UINT16 m_sr;						/* GCR data shift register */
-	UINT8 m_pi;							/* parallel data input */
-	UINT8* m_gcr;						/* GCR encoder/decoder ROM */
-	UINT16 m_i;							/* GCR encoder/decoded ROM address */
-	UINT8 m_e;							/* GCR encoder/decoded ROM data */
+	// track
+	int m_ds;							// density select
+	int m_bit_count;					// GCR bit counter
+	UINT16 m_sr;						// GCR data shift register
+	UINT8 m_pi;							// parallel data input
+	UINT8* m_gcr;						// GCR encoder/decoder ROM
+	UINT16 m_i;							// GCR encoder/decoded ROM address
+	UINT8 m_e;							// GCR encoder/decoded ROM data
 
-	/* signals */
-	int m_ready;						/* byte ready */
-	int m_mode;							/* mode select */
-	int m_rw;							/* read/write select */
-	int m_miot_irq;						/* MIOT interrupt */
+	// signals
+	int m_ready;						// byte ready
+	int m_mode;							// mode select
+	int m_rw;							// read/write select
+	int m_miot_irq;						// MIOT interrupt
 
-	/* timers */
+	// timers
 	emu_timer *m_bit_timer;
 
     const c2040_device_config &m_config;
