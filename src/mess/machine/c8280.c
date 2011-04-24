@@ -7,103 +7,137 @@
 
 **********************************************************************/
 
-#include "emu.h"
 #include "c8280.h"
-#include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
-#include "machine/6532riot.h"
-#include "machine/ieee488.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
 
-#define LOG 0
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
 #define M6502_DOS_TAG	"5c"
 #define M6502_FDC_TAG	"9e"
 #define M6532_0_TAG		"9f"
 #define M6532_1_TAG		"9g"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _c8280_t c8280_t;
-struct _c8280_t
-{
-	/* abstractions */
-	int address;						/* bus address - 8 */
 
-	/* devices */
-	device_t *cpu_dos;
-	device_t *cpu_fdc;
-	device_t *riot0;
-	device_t *riot1;
-	device_t *bus;
-	device_t *image[2];
-};
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+const device_type C8280 = c8280_device_config::static_alloc_device_config;
 
-INLINE c8280_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == C8280);
-	return (c8280_t *)downcast<legacy_device_base *>(device)->token();
-}
 
-INLINE c8280_config *get_safe_config(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == C8280);
-	return (c8280_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-}
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-/*-------------------------------------------------
-    c8280_ieee488_atn_w - IEEE-488 bus attention
--------------------------------------------------*/
+//-------------------------------------------------
+//  c8280_device_config - constructor
+//-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( c8280_ieee488_atn_w )
+c8280_device_config::c8280_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "C8280", tag, owner, clock),
+	  device_config_ieee488_interface(mconfig, *this)
 {
 }
 
-/*-------------------------------------------------
-    c8280_ieee488_ifc_w - IEEE-488 bus reset
--------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( c8280_ieee488_ifc_w )
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *c8280_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	if (!state)
-	{
-		device->reset();
-	}
+	return global_alloc(c8280_device_config(mconfig, tag, owner, clock));
 }
 
-/*-------------------------------------------------
-    ADDRESS_MAP( c8280_dos_map )
--------------------------------------------------*/
 
-static ADDRESS_MAP_START( c8280_dos_map, AS_PROGRAM, 8 )
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c8280", 0x0000)
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *c8280_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, c8280_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void c8280_device_config::device_config_complete()
+{
+	m_shortname = "c8280";
+}
+
+
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void c8280_device_config::static_set_config(device_config *device, int address, int variant)
+{
+	c8280_device_config *c8280 = downcast<c8280_device_config *>(device);
+
+	assert((address > 7) && (address < 12));
+
+	c8280->m_address = address - 8;
+}
+
+
+//-------------------------------------------------
+//  ROM( c8280 )
+//-------------------------------------------------
+
+ROM_START( c8280 )
+	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
+	ROM_LOAD( "300542-001.10c", 0x0000, 0x2000, CRC(3c6eee1e) SHA1(0726f6ab4de4fc9c18707fe87780ffd9f5ed72ab) )
+	ROM_LOAD( "300543-001.10d", 0x2000, 0x2000, CRC(f58e665e) SHA1(9e58b47c686c91efc6ef1a27f72dbb5e26c485ec) )
+	
+	ROM_REGION( 0x800, M6502_FDC_TAG, 0 )
+	ROM_LOAD( "300541-001.3c",  0x000, 0x800, CRC(cb07b2db) SHA1(a1f9c5a7bd3798f5a97dc0b465c3bf5e3513e148) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c8280_device_config::device_rom_region() const
+{
+	return ROM_NAME( c8280 );
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( c8280_main_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( c8280_main_mem, AS_PROGRAM, 8, c8280_device )
+	AM_RANGE(0xc000, 0xffff) // AM_ROM
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    ADDRESS_MAP( c8280_fdc_map )
--------------------------------------------------*/
 
-static ADDRESS_MAP_START( c8280_fdc_map, AS_PROGRAM, 8 )
+//-------------------------------------------------
+//  ADDRESS_MAP( c8280_fdc_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( c8280_fdc_mem, AS_PROGRAM, 8, c8280_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x1c00, 0x1fff) // AM_ROM 6530
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    riot6532_interface riot0_intf
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  riot6532_interface riot0_intf
+//-------------------------------------------------
 
 static const riot6532_interface riot0_intf =
 {
@@ -114,9 +148,10 @@ static const riot6532_interface riot0_intf =
 	DEVCB_NULL
 };
 
-/*-------------------------------------------------
-    riot6532_interface riot1_intf
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  riot6532_interface riot1_intf
+//-------------------------------------------------
 
 static const riot6532_interface riot1_intf =
 {
@@ -127,16 +162,18 @@ static const riot6532_interface riot1_intf =
 	DEVCB_NULL
 };
 
-/*-------------------------------------------------
-    FLOPPY_OPTIONS( c8280 )
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  FLOPPY_OPTIONS( c8280 )
+//-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( c8280 )
 FLOPPY_OPTIONS_END
 
-/*-------------------------------------------------
-    floppy_config c8280_floppy_config
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  floppy_config c8280_floppy_config
+//-------------------------------------------------
 
 static const floppy_config c8280_floppy_config =
 {
@@ -145,97 +182,114 @@ static const floppy_config c8280_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_8_DSDD,
 	FLOPPY_OPTIONS_NAME(c8280),
-	NULL
+	"floppy_8"
 };
 
-/*-------------------------------------------------
-    MACHINE_DRIVER( c8280 )
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( c8280 )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(c8280_dos_map)
+	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
 
 	MCFG_RIOT6532_ADD(M6532_0_TAG, 1000000, riot0_intf)
 	MCFG_RIOT6532_ADD(M6532_1_TAG, 1000000, riot1_intf)
 
 	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(c8280_fdc_map)
+	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(c8280_floppy_config)
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------
-    ROM( c8280 )
--------------------------------------------------*/
 
-ROM_START( c8280 )
-	ROM_REGION( 0x4800, "c8280", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "300542-001.10c", 0x0000, 0x2000, CRC(3c6eee1e) SHA1(0726f6ab4de4fc9c18707fe87780ffd9f5ed72ab) )
-	ROM_LOAD( "300543-001.10d", 0x2000, 0x2000, CRC(f58e665e) SHA1(9e58b47c686c91efc6ef1a27f72dbb5e26c485ec) )
-	ROM_LOAD( "300541-001.3c",  0x4000, 0x0800, CRC(cb07b2db) SHA1(a1f9c5a7bd3798f5a97dc0b465c3bf5e3513e148) )
-ROM_END
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    DEVICE_START( c8280 )
--------------------------------------------------*/
-
-static DEVICE_START( c8280 )
+machine_config_constructor c8280_device_config::device_mconfig_additions() const
 {
-	c8280_t *c8280 = get_safe_token(device);
-	const c8280_config *config = get_safe_config(device);
-
-	/* set serial address */
-	assert((config->address > 7) && (config->address < 16));
-	c8280->address = config->address - 8;
-
-	/* find our CPU */
-	c8280->cpu_dos = device->subdevice(M6502_DOS_TAG);
-	c8280->cpu_fdc = device->subdevice(M6502_FDC_TAG);
+	return MACHINE_CONFIG_NAME( c8280 );
 }
 
-/*-------------------------------------------------
-    DEVICE_RESET( c8280 )
--------------------------------------------------*/
 
-static DEVICE_RESET( c8280 )
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  c8280_device - constructor
+//-------------------------------------------------
+
+c8280_device::c8280_device(running_machine &_machine, const c8280_device_config &_config)
+    : device_t(_machine, _config),
+	  device_ieee488_interface(_machine, _config, *this),
+	  m_maincpu(*this, M6502_DOS_TAG),
+	  m_fdccpu(*this, M6502_FDC_TAG),
+	  m_riot0(*this, M6532_0_TAG),
+	  m_riot1(*this, M6532_1_TAG),
+	  m_image0(*this, FLOPPY_0),
+	  m_image1(*this, FLOPPY_1),
+	  m_bus(*this->owner(), IEEE488_TAG),
+      m_config(_config)
 {
-	c8280_t *c8280 = get_safe_token(device);
-
-	c8280->cpu_dos->reset();
-	c8280->cpu_fdc->reset();
 }
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( c8280 )
--------------------------------------------------*/
 
-DEVICE_GET_INFO( c8280 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c8280_device::device_start()
 {
-	switch (state)
+	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
+
+	main->install_rom(0x5000, 0x7fff, subregion(M6502_DOS_TAG)->base());
+	fdc->install_rom(0x1c00, 0x1fff, subregion(M6502_FDC_TAG)->base());
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void c8280_device::device_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void c8280_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+}
+
+
+//-------------------------------------------------
+//  ieee488_atn - 
+//-------------------------------------------------
+
+void c8280_device::ieee488_atn(int state)
+{
+}
+
+
+//-------------------------------------------------
+//  ieee488_ifc - 
+//-------------------------------------------------
+
+void c8280_device::ieee488_ifc(int state)
+{
+	if (!state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c8280_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c8280_config);								break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c8280);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(c8280);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c8280);						break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c8280);						break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8280");							break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore PET");							break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+		device_reset();
 	}
 }
-
-DEFINE_LEGACY_DEVICE(C8280, c8280);

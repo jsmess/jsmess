@@ -7,41 +7,108 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __C8280__
 #define __C8280__
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
+#include "cpu/m6502/m6502.h"
+#include "imagedev/flopdrv.h"
+#include "machine/6532riot.h"
+#include "machine/ieee488.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(C8280, c8280);
 
-#define MCFG_C8280_ADD(_tag, _bus_tag, _address) \
-	MCFG_DEVICE_ADD(_tag, C8280, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(c8280_config, bus_tag, _bus_tag) \
-	MCFG_DEVICE_CONFIG_DATA32(c8280_config, address, _address)
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
-#define C8280_IEEE488(_tag) \
-	_tag, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c8280_ieee488_ifc_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c8280_ieee488_atn_w), DEVCB_NULL
+#define C8280_TAG			"c8280"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _c8280_config c8280_config;
-struct _c8280_config
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_C8280_ADD(_tag, _address) \
+    MCFG_DEVICE_ADD(_tag, C8280, 0) \
+	c8280_device_config::static_set_config(device, _address);
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> c8280_device_config
+
+class c8280_device_config :   public device_config,
+							  public device_config_ieee488_interface
 {
-	const char *bus_tag;		/* bus device */
-	int address;				/* bus address */
+    friend class c8280_device;
+
+    // construction/destruction
+    c8280_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+	// inline configuration helpers
+	static void static_set_config(device_config *device, int address, int variant);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+protected:
+	// device_config overrides
+    virtual void device_config_complete();
+	
+	int m_address;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* IEEE-488 interface */
-WRITE_LINE_DEVICE_HANDLER( c8280_ieee488_atn_w );
-WRITE_LINE_DEVICE_HANDLER( c8280_ieee488_ifc_w );
+
+// ======================> c8280_device
+
+class c8280_device :  public device_t,
+					  public device_ieee488_interface
+{
+    friend class c8280_device_config;
+
+    // construction/destruction
+    c8280_device(running_machine &_machine, const c8280_device_config &_config);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_ieee488_interface overrides
+	void ieee488_atn(int state);
+	void ieee488_ifc(int state);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_fdccpu;
+	required_device<riot6532_device> m_riot0;
+	required_device<riot6532_device> m_riot1;
+	required_device<device_t> m_image0;
+	optional_device<device_t> m_image1;
+	required_device<ieee488_device> m_bus;
+
+    const c8280_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type C8280;
+
+
 
 #endif

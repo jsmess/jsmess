@@ -154,6 +154,7 @@ public:
 	DECLARE_WRITE8_MEMBER( c8050_via_pb_w );
 	DECLARE_READ8_MEMBER( c8050_miot_pb_r );
 	DECLARE_WRITE8_MEMBER( c8050_miot_pb_w );
+
 protected:
     // device-level overrides
     virtual void device_start();
