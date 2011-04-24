@@ -1354,7 +1354,7 @@ $(MESSOBJ)/sanyo.a:				\
 	$(MESS_VIDEO)/mbc55x.o  	\
 
 $(MESSOBJ)/sega.a:				\
-	$(MESS_DRIVERS)/saturn.o	\
+	$(MAME_DRIVERS)/saturn.o	\
 	$(MESS_VIDEO)/smsvdp.o		\
 	$(MESS_MACHINE)/sms.o		\
 	$(MESS_DRIVERS)/sms.o		\
