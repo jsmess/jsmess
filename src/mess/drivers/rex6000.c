@@ -22,6 +22,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 #include "machine/ram.h"
+#include "machine/intelfsh.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "rendlay.h"
@@ -36,6 +37,14 @@
 #define	IRQ_FLAG_IRQ2		0x20
 #define	IRQ_FLAG_IRQ1		0x40
 #define	IRQ_FLAG_EVENT		0x80
+
+//memory bank types
+#define BANK_FLASH0_B0		0x00
+#define BANK_FLASH0_B1		0x01
+#define BANK_FLASH1_B0		0x02
+#define BANK_FLASH1_B1		0x03
+#define BANK_RAM			0x10
+#define BANK_UNKNOWN		0xff
 
 #define TC8521_TAG	"rtc"
 
@@ -52,6 +61,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_beep;
+	fujitsu_29dl16x_device *m_flash[4];
 
 	UINT8 m_bank[4];
 	UINT8 m_beep_io[5];
@@ -59,15 +69,20 @@ public:
 	UINT8 m_touchscreen[0x10];
 	UINT8 m_lcd_enabled;
 	UINT8 m_lcd_cmd;
+	UINT8 *m_ram_base;
 
-	UINT32 m_lcd_addr;
 	UINT8 m_irq_mask;
 	UINT8 m_irq_flag;
 	UINT8 m_port6;
 	UINT8 m_beep_mode;
 
-	UINT8* get_bank_ptr(running_machine &machine, UINT32 bank);
+	struct
+	{
+		UINT8 type;
+		UINT16 page;
+	} m_banks[2];
 
+	virtual void machine_start();
 	virtual void machine_reset();
 	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -83,27 +98,44 @@ public:
 	DECLARE_WRITE8_MEMBER( irq_w );
 	DECLARE_READ8_MEMBER( touchscreen_r );
 	DECLARE_WRITE8_MEMBER( touchscreen_w );
+
+	DECLARE_READ8_MEMBER( flash_0x0000_r );
+	DECLARE_WRITE8_MEMBER( flash_0x0000_w );
+	DECLARE_READ8_MEMBER( flash_0x8000_r );
+	DECLARE_WRITE8_MEMBER( flash_0x8000_w );
+	DECLARE_READ8_MEMBER( flash_0xa000_r );
+	DECLARE_WRITE8_MEMBER( flash_0xa000_w );
+
+	UINT8 identify_bank_type(UINT32 bank);
 };
 
 
-UINT8* rex6000_state::get_bank_ptr(running_machine &machine, UINT32 bank)
+UINT8 rex6000_state::identify_bank_type(UINT32 bank)
 {
-	if (bank < 0x100)
+	if (bank < 0x080)
 	{
-		return (UINT8*)machine.region("flash0")->base() + ((bank&0xff)<<13);
+		return BANK_FLASH0_B0;
 	}
-	else if ((bank >= 0xb00 && bank < 0xc00) || (bank >= 0x600 && bank < 0x700))
+	else if (bank >= 0x080 && bank < 0x100)
 	{
-		return (UINT8*)machine.region("flash1")->base() + ((bank&0xff)<<13);
+		return BANK_FLASH0_B1;
+	}
+	else if ((bank >= 0xb00 && bank < 0xb80) || (bank >= 0x600 && bank < 0x680))
+	{
+		return BANK_FLASH1_B0;
+	}
+	else if ((bank >= 0xb80 && bank < 0xc00) || (bank >= 0x680 && bank < 0x700))
+	{
+		return BANK_FLASH1_B1;
 	}
 	else if (bank >= 0x1000 && bank < 0x1004)
 	{
-		return (UINT8*)ram_get_ptr(m_ram) + ((bank&0x03)<<13);
+		return BANK_RAM;
 	}
 	else
 	{
-		logerror("%04x: unkonwn memory bank %x\n", cpu_get_pc(m_maincpu), bank);
-		return NULL;
+		//logerror("%04x: unkonwn memory bank %x\n", cpu_get_pc(m_maincpu), bank);
+		return BANK_UNKNOWN;
 	}
 }
 
@@ -114,7 +146,8 @@ READ8_MEMBER( rex6000_state::bankswitch_r )
 
 WRITE8_MEMBER( rex6000_state::bankswitch_w )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space* program = m_maincpu->memory().space(AS_PROGRAM);
+
 	m_bank[offset&3] = data;
 
 	switch (offset)
@@ -123,12 +156,12 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 		case 1:		//bank 1 high
 		{
 			//bank 1 start at 0x8000
-			UINT8 *bank_base = get_bank_ptr(machine(), MAKE_BANK(m_bank[0], m_bank[1]&0x0f) + 4);
+			m_banks[0].page = (MAKE_BANK(m_bank[0], m_bank[1]&0x0f) + 4);
+			m_banks[0].type = identify_bank_type(m_banks[0].page);
 
-			if (bank_base != NULL)
+			if (m_banks[0].type != BANK_UNKNOWN)
 			{
-				program->install_readwrite_bank(0x8000, 0x9fff, "bank1");
-				memory_set_bankptr(machine(), "bank1", bank_base);
+				program->install_readwrite_handler(0x8000, 0x9fff, 0, 0, read8_delegate(FUNC(rex6000_state::flash_0x8000_r), this), write8_delegate(FUNC(rex6000_state::flash_0x8000_w), this));
 			}
 			else
 			{
@@ -140,12 +173,16 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 		case 2:		//bank 2 low
 		case 3:		//bank 2 high
 		{
-			UINT8 *bank_base = get_bank_ptr(machine(), MAKE_BANK(m_bank[2], m_bank[3]&0x1f));
+			m_banks[1].page = MAKE_BANK(m_bank[2], m_bank[3]&0x1f);
+			m_banks[1].type = identify_bank_type(m_banks[1].page);
 
-			if (bank_base != NULL)
+			if (m_banks[1].type == BANK_RAM)
 			{
-				program->install_readwrite_bank(0xa000, 0xbfff, "bank2");
-				memory_set_bankptr(machine(), "bank2", bank_base);
+				program->install_ram(0xa000, 0xbfff, m_ram_base + ((m_banks[1].page & 0x03)<<13));
+			}
+			else if (m_banks[1].type != BANK_UNKNOWN)
+			{
+				program->install_readwrite_handler(0xa000, 0xbfff, 0, 0, read8_delegate(FUNC(rex6000_state::flash_0xa000_r), this), write8_delegate(FUNC(rex6000_state::flash_0xa000_w), this));
 			}
 			else
 			{
@@ -192,6 +229,9 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 			}
 			break;
 		case 4:		//select alarm/tone mode
+			if (m_beep_mode != BIT(data, 0))
+				beep_set_state(m_beep, 0);		//turned off when mode changes
+
 			m_beep_mode = BIT(data, 0);
 			break;
 		break;
@@ -208,7 +248,6 @@ READ8_MEMBER( rex6000_state::lcd_base_r )
 WRITE8_MEMBER( rex6000_state::lcd_base_w )
 {
 	m_lcd_base[offset&1] = data;
-	m_lcd_addr = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]&0x1f);
 }
 
 READ8_MEMBER( rex6000_state::lcd_io_r )
@@ -308,11 +347,42 @@ WRITE8_MEMBER( rex6000_state::touchscreen_w )
 	m_touchscreen[offset&0x0f] = data;
 }
 
+READ8_MEMBER( rex6000_state::flash_0x0000_r )
+{
+	return m_flash[0]->read(offset);
+}
+
+WRITE8_MEMBER( rex6000_state::flash_0x0000_w )
+{
+	m_flash[0]->write(offset, data);
+}
+
+READ8_MEMBER( rex6000_state::flash_0x8000_r )
+{
+	return m_flash[m_banks[0].type]->read(((m_banks[0].page & 0x7f)<<13) | offset);
+}
+
+WRITE8_MEMBER( rex6000_state::flash_0x8000_w )
+{
+	m_flash[m_banks[0].type]->write(((m_banks[0].page & 0x7f)<<13) | offset, data);
+}
+
+READ8_MEMBER( rex6000_state::flash_0xa000_r )
+{
+	return m_flash[m_banks[1].type]->read(((m_banks[1].page & 0x7f)<<13) | offset);
+}
+
+WRITE8_MEMBER( rex6000_state::flash_0xa000_w )
+{
+	m_flash[m_banks[1].type]->write(((m_banks[1].page & 0x7f)<<13) | offset, data);
+}
+
+
 static ADDRESS_MAP_START(rex6000_mem, AS_PROGRAM, 8, rex6000_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM	AM_REGION("flash0", 0)
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0x0000, 0x7fff ) AM_READWRITE(flash_0x0000_r, flash_0x0000_w)
+	AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(flash_0x8000_r, flash_0x8000_w)
+	AM_RANGE( 0xa000, 0xbfff ) AM_READWRITE(flash_0xa000_r, flash_0xa000_w)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("ram")			//system RAM
 ADDRESS_MAP_END
 
@@ -365,22 +435,35 @@ INPUT_PORTS_START( rex6000 )
 	PORT_BIT(0x3ff, 0x00, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_CROSSHAIR(Y, 1, 0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_INVERT
 INPUT_PORTS_END
 
+void rex6000_state::machine_start()
+{
+	m_flash[0] = machine().device<fujitsu_29dl16x_device>("flash0a");
+	m_flash[1] = machine().device<fujitsu_29dl16x_device>("flash0b");
+	m_flash[2] = machine().device<fujitsu_29dl16x_device>("flash1a");
+	m_flash[3] = machine().device<fujitsu_29dl16x_device>("flash1b");
+
+	m_ram_base = ram_get_ptr(m_ram);
+	memory_set_bankptr(machine(), "ram", m_ram_base + 0x4000);
+}
 void rex6000_state::machine_reset()
 {
-	UINT8 *ram = ram_get_ptr(m_ram);
+	address_space* program = m_maincpu->memory().space(AS_PROGRAM);
 
-	memory_set_bankptr(machine(), "bank1", (UINT8*)machine().region("flash0")->base() + 0x8000);
-	memory_set_bankptr(machine(), "bank2", (UINT8*)machine().region("flash0")->base());
-	memory_set_bankptr(machine(), "ram", ram + 0x4000);
+	program->install_readwrite_handler(0x8000, 0x9fff, 0, 0, read8_delegate(FUNC(rex6000_state::flash_0x8000_r), this), write8_delegate(FUNC(rex6000_state::flash_0x8000_w), this));
+	program->install_readwrite_handler(0xa000, 0xbfff, 0, 0, read8_delegate(FUNC(rex6000_state::flash_0xa000_r), this), write8_delegate(FUNC(rex6000_state::flash_0xa000_w), this));
 
-	memset(ram, 0, ram_get_size(m_ram));
+	m_banks[0].type = 0x04;
+	m_banks[0].type = 0;
+	m_banks[1].type = 0x00;
+	m_banks[1].type = 0;
+
+	memset(m_ram_base, 0, ram_get_size(m_ram));
 	memset(m_bank, 0, sizeof(m_bank));
 	memset(m_beep_io, 0, sizeof(m_beep_io));
 	memset(m_lcd_base, 0, sizeof(m_lcd_base));
 	memset(m_touchscreen, 0, sizeof(m_touchscreen));
 	m_lcd_enabled = 0;
 	m_lcd_cmd = 0;
-	m_lcd_addr = 0;
 	m_irq_mask = 0;
 	m_irq_flag = 0;
 	m_port6 = 0;
@@ -389,14 +472,25 @@ void rex6000_state::machine_reset()
 
 bool rex6000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	UINT8 *lcd_base = get_bank_ptr(machine(), m_lcd_addr);
+	UINT16 lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]&0x1f);
+	UINT8 mem_type = identify_bank_type(lcd_bank);
 
-	if (m_lcd_enabled && lcd_base != NULL)
+	if (m_lcd_enabled && mem_type != BANK_UNKNOWN)
 	{
 		for (int y=0; y<120; y++)
 			for (int x=0; x<30; x++)
 			{
-				UINT8 data = lcd_base[y*30 + x];
+				UINT8 data = 0;
+
+				if (mem_type == BANK_RAM)
+				{
+					data = (m_ram_base + ((lcd_bank & 0x03)<<13))[y*30 + x];
+				}
+				else
+				{
+					data =  m_flash[mem_type]->memory().space(0)->read_byte(((lcd_bank & 0x7f)<<13) | (y*30 + x));
+				}
+
 
 				for (int b=0; b<8; b++)
 				{
@@ -461,6 +555,7 @@ static QUICKLOAD_LOAD(rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
 	running_machine &machine = image.device().machine();
+	address_space* flash = machine.device("flash0b")->memory().space(0);
 	UINT32 img_start = 0;
 	UINT8 *data;
 
@@ -473,7 +568,9 @@ static QUICKLOAD_LOAD(rex6000)
 	img_start = strlen((const char*)data) + 5;
 	img_start += 0xa0;	//skip the icon (40x32 pixel)
 
-	memcpy((UINT8*)machine.region("flash0")->base() + 0x100000, data + img_start, image.length() - img_start);
+	for (int i=0; i<image.length() - img_start ;i++)
+		flash->write_byte(i, data[img_start + i]);
+
 	auto_free(machine, data);
 
 	return IMAGE_INIT_PASS;
@@ -521,10 +618,10 @@ static const gfx_layout rex6000_graph_charlayout =
 };
 
 static GFXDECODE_START( rex6000 )
-	GFXDECODE_ENTRY( "flash0", 0x0f0000, rex6000_bold_charlayout,  0, 0 )	//normal
-	GFXDECODE_ENTRY( "flash0", 0x0f2000, rex6000_bold_charlayout,  0, 0 )	//bold
-	GFXDECODE_ENTRY( "flash0", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )	//tiny
-	GFXDECODE_ENTRY( "flash0", 0x0f6000, rex6000_graph_charlayout, 0, 0 )	//graphic
+	GFXDECODE_ENTRY( "flash0a", 0x0f0000, rex6000_bold_charlayout,  0, 0 )	//normal
+	GFXDECODE_ENTRY( "flash0a", 0x0f2000, rex6000_bold_charlayout,  0, 0 )	//bold
+	GFXDECODE_ENTRY( "flash0a", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )	//tiny
+	GFXDECODE_ENTRY( "flash0a", 0x0f6000, rex6000_graph_charlayout, 0, 0 )	//graphic
 GFXDECODE_END
 
 
@@ -560,6 +657,18 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 
 	MCFG_RP5C01_ADD(TC8521_TAG, XTAL_32_768kHz, rtc_intf)
 
+	/*
+    Fujitsu 29DL16X have feature which is capability of reading data from one
+    bank of memory while a program or erase operation is in progress in the
+    other bank of memory (simultaneous operation). This is not supported yet
+    by the flash emulation and I have splitted every bank into a separate
+    device for have a similar behavior.
+    */
+	MCFG_FUJITSU_29DL16X_ADD("flash0a")	//bank 0 of first flash
+	MCFG_FUJITSU_29DL16X_ADD("flash0b")	//bank 1 of first flash
+	MCFG_FUJITSU_29DL16X_ADD("flash1a")	//bank 0 of second flash
+	MCFG_FUJITSU_29DL16X_ADD("flash1b")	//bank 1 of second flash
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -572,19 +681,31 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rex6000 )
-    ROM_REGION( 0x200000, "flash0", ROMREGION_ERASE )
-	ROM_LOAD( "rex6000.dat", 0x0000, 0x200000, CRC(b476f7e0) SHA1(46a56634576408a5b0dca80aea08513e856c3bb1))
+    ROM_REGION( 0x200000, "flash0a", ROMREGION_ERASE )
+	ROM_LOAD( "rex6000_0.dat", 0x0000, 0x100000, BAD_DUMP CRC(e7a7324f) SHA1(01adcd469c93984438cbd4bf6e5a46e74da500d0))
 
-    ROM_REGION( 0x200000, "flash1", ROMREGION_ERASE )
-	ROM_LOAD( "rex6000_1.dat", 0x0000, 0x200000, NO_DUMP)
+    ROM_REGION( 0x200000, "flash0b", ROMREGION_ERASE )
+	ROM_LOAD( "rex6000_1.dat", 0x0000, 0x100000, BAD_DUMP CRC(cc4b51db) SHA1(73b655e21ece30e8dc60f2f09719bc446492cc0f))
+
+    ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASE )
+	ROM_LOAD( "rex6000_2.dat", 0x0000, 0x100000, NO_DUMP)
+
+    ROM_REGION( 0x200000, "flash1b", ROMREGION_ERASE )
+	ROM_LOAD( "rex6000_3.dat", 0x0000, 0x100000, NO_DUMP)
 ROM_END
 
 ROM_START( ds2 )
-    ROM_REGION( 0x200000, "flash0", ROMREGION_ERASE )
-	ROM_LOAD( "ds2.dat", 0x0000, 0x200000, BAD_DUMP CRC(67d675b3) SHA1(fcdc6a736cfbc83103b6613ab7fac96dbbda4948))
+    ROM_REGION( 0x200000, "flash0a", ROMREGION_ERASE )
+	ROM_LOAD( "ds2_0.dat", 0x0000, 0x100000, BAD_DUMP CRC(3197bed3) SHA1(9f826fd6d23ced797daae666d88ced14d24b64c3))
 
-	ROM_REGION( 0x200000, "flash1", ROMREGION_ERASE )
-	ROM_LOAD( "ds2_1.dat", 0x0000, 0x200000, NO_DUMP)
+	ROM_REGION( 0x200000, "flash0b", ROMREGION_ERASE )
+	ROM_LOAD( "ds2_1.dat", 0x0000, 0x100000, BAD_DUMP CRC(a909b755) SHA1(4db8a44539b9f94d418c33bbd794afb9bacbbadd))
+
+    ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASE )
+	ROM_LOAD( "ds2_2.dat", 0x0000, 0x100000, NO_DUMP)
+
+    ROM_REGION( 0x200000, "flash1b", ROMREGION_ERASE )
+	ROM_LOAD( "ds2_3.dat", 0x0000, 0x100000, NO_DUMP)
 ROM_END
 
 /* Driver */
