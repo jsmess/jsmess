@@ -250,9 +250,9 @@ static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, mpt02_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_io_map, AS_IO, 8, mpt02_state )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE_BASE(studio2_state, keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -348,6 +348,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
+	DEVCB_NULL,
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -356,7 +357,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 bool mpt02_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	cdp1864_update(m_cti, &bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -405,8 +406,8 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 
 	m_color = m_color_ram[addr];
 
-	cdp1864_con_w(m_cti, 0); // HACK
-	cdp1864_dma_w(m_cti, offset, data);
+	m_cti->con_w(0); // HACK
+	m_cti->dma_w(space, offset, data);
 }
 
 static COSMAC_INTERFACE( mpt02_cosmac_intf )

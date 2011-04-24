@@ -214,7 +214,7 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 	m_rac = BIT(data, 0);
 	bankswitch();
 
-	cdp1864_tone_latch_w(m_cti, 0, data);
+	m_cti->tone_latch_w(space, 0, data);
 }
 
 WRITE8_MEMBER( nano_state::bankswitch_w )
@@ -225,7 +225,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 	program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
-	cdp1864_tone_latch_w(m_cti, 0, data);
+	m_cti->tone_latch_w(space, 0, data);
 }
 
 READ8_MEMBER( tmc1800_state::dispon_r )
@@ -277,9 +277,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000_io_map, AS_IO, 8, tmc2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CDP1864_TAG, cdp1864_dispoff_r) AM_WRITE(bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD(CDP1864_TAG, cdp1864_device, dispoff_r) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 // OSCOM Nano
@@ -290,9 +290,9 @@ static ADDRESS_MAP_START( nano_map, AS_PROGRAM, 8, nano_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nano_io_map, AS_IO, 8, nano_state )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CDP1864_TAG, cdp1864_dispoff_r) AM_WRITE(bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD(CDP1864_TAG, cdp1864_device, dispoff_r) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -583,7 +583,7 @@ READ_LINE_MEMBER( tmc2000_state::ef3_r )
 WRITE_LINE_MEMBER( tmc2000_state::q_w )
 {
 	/* CDP1864 audio output enable */
-	cdp1864_aoe_w(m_cti, state);
+	m_cti->aoe_w(state);
 
 	/* set Q led status */
 	set_led_status(machine(), 1, state);
@@ -596,8 +596,8 @@ WRITE8_MEMBER( tmc2000_state::dma_w )
 {
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 
-	cdp1864_con_w(m_cti, 0); // HACK
-	cdp1864_dma_w(m_cti, offset, data);
+	m_cti->con_w(0); // HACK
+	m_cti->dma_w(space, offset, data);
 }
 
 static COSMAC_INTERFACE( tmc2000_config )
@@ -647,7 +647,7 @@ READ_LINE_MEMBER( nano_state::ef3_r )
 WRITE_LINE_MEMBER( nano_state::q_w )
 {
 	/* CDP1864 audio output enable */
-	cdp1864_aoe_w(m_cti, state);
+	m_cti->aoe_w(state);
 
 	/* set Q led status */
 	set_led_status(machine(), 1, state);
@@ -666,7 +666,7 @@ static COSMAC_INTERFACE( nano_config )
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(nano_state, q_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CDP1864_TAG, cdp1864_dma_w),
+	DEVCB_DEVICE_MEMBER(CDP1864_TAG, cdp1864_device, dma_w),
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

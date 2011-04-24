@@ -70,7 +70,7 @@ public:
 		  m_cti(*this, CDP1864_TAG)
 	{ }
 
-	required_device<device_t> m_cti;
+	required_device<cdp1864_device> m_cti;
 
 	virtual void machine_reset();
 

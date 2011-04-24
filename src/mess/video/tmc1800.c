@@ -51,6 +51,7 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
+	DEVCB_NULL,
 	RES_K(1.21),	// RL64
 	RES_K(2.05),	// RL63
 	RES_K(2.26),	// RL61
@@ -59,7 +60,7 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 
 bool tmc2000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	cdp1864_update(m_cti, &bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -77,6 +78,7 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
+	DEVCB_NULL,
 	RES_K(1.21), // R18 unconfirmed
 	0, // not connected
 	0, // not connected
@@ -85,7 +87,7 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 
 bool nano_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	cdp1864_update(m_cti, &bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }

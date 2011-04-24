@@ -83,8 +83,8 @@ static ADDRESS_MAP_START( tmc2000e_map, AS_PROGRAM, 8, tmc2000e_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000e_io_map, AS_IO, 8, tmc2000e_state )
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY(CDP1864_TAG, cdp1864_tone_latch_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY(CDP1864_TAG, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1864_TAG, cdp1864_device, tone_latch_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(CDP1864_TAG, cdp1864_device, step_bgcolor_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
@@ -141,6 +141,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
+	DEVCB_NULL,
 	RES_K(2.2),	// unverified
 	RES_K(1),	// unverified
 	RES_K(5.1),	// unverified
@@ -149,7 +150,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 
 bool tmc2000e_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	cdp1864_update(m_cti, &bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -177,15 +178,12 @@ READ_LINE_MEMBER( tmc2000e_state::ef3_r )
 WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 {
 	// turn CDP1864 sound generator on/off
-
-	cdp1864_aoe_w(m_cti, state);
+	m_cti->aoe_w(state);
 
 	// set Q led status
-
 	set_led_status(machine(), 1, state);
 
 	// tape out
-
 	cassette_output(m_cassette, state ? -1.0 : +1.0);
 
 	// floppy control (FDC-6)
@@ -195,8 +193,8 @@ WRITE8_MEMBER( tmc2000e_state::dma_w )
 {
 	m_color = (m_colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
 
-	cdp1864_con_w(m_cti, 0); // HACK
-	cdp1864_dma_w(m_cti, offset, data);
+	m_cti->con_w(0); // HACK
+	m_cti->dma_w(space, offset, data);
 }
 
 static COSMAC_INTERFACE( tmc2000e_config )

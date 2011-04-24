@@ -37,7 +37,7 @@ public:
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<device_t> m_cti;
+	required_device<cdp1864_device> m_cti;
 	required_device<device_t> m_pia;
 	required_device<device_t> m_cassette;
 

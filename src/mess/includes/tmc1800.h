@@ -93,7 +93,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cti;
+	required_device<cdp1864_device> m_cti;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_ram;
 
@@ -139,7 +139,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cti;
+	required_device<cdp1864_device> m_cti;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_ram;
 

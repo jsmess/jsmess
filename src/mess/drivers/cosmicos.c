@@ -51,7 +51,7 @@ READ8_MEMBER( cosmicos_state::video_off_r )
 
 	if (!m_q)
 	{
-		data = cdp1864_dispoff_r(m_cti, 0);
+		data = m_cti->dispoff_r(space, 0);
 	}
 
 	return data;
@@ -63,7 +63,7 @@ READ8_MEMBER( cosmicos_state::video_on_r )
 
 	if (!m_q)
 	{
-		data = cdp1864_dispon_r(m_cti, 0);
+		data = m_cti->dispon_r(space, 0);
 	}
 
 	return data;
@@ -73,7 +73,7 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 {
 	if (m_q)
 	{
-		cdp1864_tone_latch_w(m_cti, 0, data);
+		m_cti->tone_latch_w(space, 0, data);
 	}
 }
 
@@ -387,6 +387,7 @@ static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
 	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, dmaout_w),
 	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, efx_w),
+	DEVCB_NULL,
 	RES_K(2), // R2
 	0, // not connected
 	0, // not connected
@@ -395,7 +396,7 @@ static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
 
 bool cosmicos_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	cdp1864_update(m_cti, &bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -470,7 +471,7 @@ WRITE_LINE_MEMBER( cosmicos_state::q_w )
 	if (state) m_boot = 0;
 
 	/* CDP1864 audio enable */
-	cdp1864_aoe_w(m_cti, state);
+	m_cti->aoe_w(state);
 
 	m_q = state;
 }
