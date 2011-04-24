@@ -731,8 +731,8 @@ $(MESSOBJ)/cantab.a:			\
 	$(MESS_FORMATS)/ace_tap.o	\
 
 $(MESSOBJ)/capcom.a:			\
-	$(MESS_DRIVERS)/cpschngr.o	\
-	$(MESS_VIDEO)/cpschngr.o	\
+	$(MAME_DRIVERS)/cps1.o	\
+	$(MAME_VIDEO)/cps1.o	\
 
 $(MESSOBJ)/casio.a:				\
 	$(MESS_DRIVERS)/pv1000.o	\
