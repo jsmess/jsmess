@@ -677,7 +677,7 @@ $(MESSOBJ)/atari.a:				\
 	$(MESS_DRIVERS)/a7800.o		\
 	$(MESS_VIDEO)/a7800.o		\
 	$(MESS_DRIVERS)/a2600.o		\
-	$(MESS_DRIVERS)/jaguar.o	\
+	$(MAME_DRIVERS)/jaguar.o	\
 	$(MESS_FORMATS)/a26_cas.o	\
 	$(MESS_FORMATS)/atarist_dsk.o	\
 	$(MESS_DRIVERS)/atarist.o	\
