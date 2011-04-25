@@ -1,7 +1,4 @@
 
-
-
-
 class armedf_state : public driver_device
 {
 public:
@@ -12,7 +9,8 @@ public:
 	UINT16 *  m_text_videoram;
 	UINT16 *  m_bg_videoram;
 	UINT16 *  m_fg_videoram;
-	UINT16 *  m_legion_cmd;	// legion only!
+	UINT16 *  m_spr_pal_clut;
+	UINT16 m_legion_cmd[4];	// legiono only!
 //  UINT16 *  m_spriteram;    // currently this uses generic buffered_spriteram
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
@@ -28,12 +26,23 @@ public:
 	UINT16   m_bg_scrolly;
 	int      m_scroll_type;
 	int      m_sprite_offy;
-	int      m_mcu_mode;
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
-	int      m_oldmode;
 };
 
+class bigfghtr_state : public armedf_state
+{
+public:
+	bigfghtr_state(running_machine &machine, const driver_device_config_base &config)
+		: armedf_state(machine, config) { }
+
+	UINT16 *      m_sharedram;
+
+	/* misc */
+	int           m_read_latch;
+	UINT8		  m_mcu_input_snippet;
+	UINT8		  m_mcu_jsr_snippet;
+};
 
 /*----------- defined in video/armedf.c -----------*/
 
@@ -51,4 +60,5 @@ WRITE16_HANDLER( armedf_fg_scrollx_w );
 WRITE16_HANDLER( armedf_fg_scrolly_w );
 WRITE16_HANDLER( armedf_bg_scrollx_w );
 WRITE16_HANDLER( armedf_bg_scrolly_w );
-WRITE16_HANDLER( armedf_mcu_cmd );
+
+void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd);

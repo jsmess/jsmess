@@ -7,9 +7,11 @@ driver by Carlos A. Lozano <calb@gsyc.inf.uc3m.es>
 
 TODO:
 ----
+- Fix priority kludge (see video/cop01.c)
 mightguy:
-- crashes during the confrontation with the final boss (only tested with Invincibility on)
 - missing emulation of the 1412M2 protection chip, used by the sound CPU.
+  This is probably an extra CPU (program rom is the ic2 one), presumably
+  with data / address line scrambling
 
 
 Mighty Guy board layout:
@@ -57,8 +59,10 @@ Mighty Guy board layout:
 
 
 #define MIGHTGUY_HACK	 0
-#define TIMER_RATE       12000	/* total guess */
+#define TIMER_RATE       11475	/* unknown, hand-tuned to match audio reference */
 
+#define MAINCPU_CLOCK    XTAL_12MHz
+#define AUDIOCPU_CLOCK   XTAL_8MHz
 
 /*************************************
  *
@@ -70,7 +74,7 @@ static WRITE8_HANDLER( cop01_sound_command_w )
 {
 	cop01_state *state = space->machine().driver_data<cop01_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
@@ -99,6 +103,20 @@ static CUSTOM_INPUT( mightguy_area_r )
 	return (input_port_read(field->port->machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
+static WRITE8_HANDLER( cop01_irq_ack_w )
+{
+	cop01_state *state = space->machine().driver_data<cop01_state>();
+
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE );
+}
+
+static READ8_HANDLER( cop01_sound_irq_ack_w )
+{
+	cop01_state *state = space->machine().driver_data<cop01_state>();
+
+	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE );
+	return 0;
+}
 
 /*************************************
  *
@@ -123,7 +141,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x43) AM_WRITE(cop01_vreg_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(watchdog_reset_w) /* ? */
+	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8 )
@@ -135,12 +153,12 @@ static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x43) AM_WRITE(cop01_vreg_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(watchdog_reset_w) /* ? */
+	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READNOP	/* irq ack? */
+	AM_RANGE(0x8000, 0x8000) AM_READ(cop01_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -416,6 +434,7 @@ static MACHINE_START( cop01 )
 {
 	cop01_state *state = machine.driver_data<cop01_state>();
 
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_pulse));
@@ -439,12 +458,12 @@ static MACHINE_RESET( cop01 )
 static MACHINE_CONFIG_START( cop01, cop01_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
+	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)	/* unknown clock / divider */
 	MCFG_CPU_PROGRAM_MAP(cop01_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3MHz)	/* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
@@ -469,25 +488,25 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mightguy, cop01_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
+	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)	/* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(cop01_map)
 	MCFG_CPU_IO_MAP(mightguy_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
+	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2)	/* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
 
@@ -512,7 +531,7 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -551,12 +570,13 @@ ROM_START( cop01 )
 	ROM_LOAD( "cop12.6e",     0x0c000, 0x2000, CRC(257a6706) SHA1(9e7ef1f40630b94849bdc3fd13ee6e7311fffd45) )
 	ROM_LOAD( "cop13.8e",     0x0e000, 0x2000, CRC(07c4ea66) SHA1(12665c0fb648fd208805e81d056ab377d65b267a) )
 
-	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )	/* red */
 	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )	/* green */
 	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )	/* blue */
 	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )	/* tile lookup table */
 	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )	/* sprite lookup table */
+	ROM_LOAD( "13b",          0x0500, 0x0100, NO_DUMP ) /* state machine data used for video signals generation (not used in emulation)*/
 ROM_END
 
 ROM_START( cop01a )
@@ -586,13 +606,13 @@ ROM_START( cop01a )
 	ROM_LOAD( "cop12.6e",     0x0c000, 0x2000, CRC(257a6706) SHA1(9e7ef1f40630b94849bdc3fd13ee6e7311fffd45) )
 	ROM_LOAD( "cop13.8e",     0x0e000, 0x2000, CRC(07c4ea66) SHA1(12665c0fb648fd208805e81d056ab377d65b267a) )
 
-	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )	/* red */
 	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )	/* green */
 	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )	/* blue */
 	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )	/* tile lookup table */
 	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )	/* sprite lookup table */
-	/* a timing PROM (13B?) is probably missing */
+	ROM_LOAD( "13b",          0x0500, 0x0100, NO_DUMP ) /* state machine data used for video signals generation (not used in emulation)*/
 ROM_END
 
 ROM_START( mightguy )
@@ -604,7 +624,7 @@ ROM_START( mightguy )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound cpu) */
 	ROM_LOAD( "11.15b",     0x0000, 0x4000, CRC(576183ea) SHA1(e3f28e8e8c34ab396d158da122584ed226729c99) )
 
-	ROM_REGION( 0x8000, "user1", 0 ) /* 1412M2 protection data */
+	ROM_REGION( 0x8000, "user1", 0 ) /* 1412M2 protection data, z80 encrypted code presumably */
 	ROM_LOAD( "10.ic2",     0x0000, 0x8000, CRC(1a5d2bb1) SHA1(0fd4636133a980ba9ffa076f9010474586d37635) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) /* alpha */
@@ -660,4 +680,4 @@ static DRIVER_INIT( mightguy )
 
 GAME( 1985, cop01,    0,     cop01,    cop01,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, cop01a,   cop01, cop01,    cop01,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy, ROT270, "Nichibutsu", "Mighty Guy", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy, ROT270, "Nichibutsu", "Mighty Guy", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
