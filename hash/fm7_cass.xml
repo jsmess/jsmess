@@ -43,7 +43,7 @@
 	<software name="alienfld">
 		<description>Alien Field in 7</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="301842">
 				<rom name="ali.t77" size="301842" crc="7E52BC75" sha1="7972DC3783150A76702A69E3D030F8809AA95A11" offset="000000" />
@@ -67,7 +67,7 @@
 	<software name="anko">
 		<description>暗黒城</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5857184">
 				<rom name="anko_a.t77" size="5857184" crc="905A90DA" sha1="CF5B91A356F915A6EE10FD8554DA3F6E7D95427F" offset="000000" />
@@ -96,7 +96,7 @@
 	<software name="battlep">
 		<description>Battle Pod</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1403934">
 				<rom name="bat.t77" size="1403934" crc="A4ECF4CA" sha1="6700AE58952C628A3DF96B8E3CDE558029B98E89" offset="000000" />
@@ -108,7 +108,7 @@
 	<software name="bgammon">
 		<description>Backgammon</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="903036">
 				<rom name="b.t77" size="903036" crc="B612C0F4" sha1="6FC700AEBC5E7A9A7FF860F1A7712B7A1FAE8433" offset="000000" />
@@ -120,7 +120,7 @@
 	<software name="blacko">
 		<description>ブラックオニキス</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="16">
 				<rom name="azusa_chara.t77" size="16" crc="24B4D6C4" sha1="0F397F343CC74993777E10DEFFE6F9579713FB8E" offset="000000" />
@@ -229,7 +229,7 @@
 	<software name="bushman">
 		<description>ハッピーブッシュマン</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1642830">
 				<rom name="bushman.t77" size="1642830" crc="728062AB" sha1="8B0CD10F01585F12CE33179AC6F7D8FC999F2D91" offset="000000" />
@@ -300,7 +300,7 @@
 	<software name="choplift">
 		<description>チョップリフター</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2073552">
 				<rom name="chop.t77" size="2073552" crc="CF49F0A8" sha1="899E5D4A8E1D8E7DC1D5014979F9928066C9B856" offset="000000" />
@@ -312,7 +312,7 @@
 	<software name="cockpit">
 		<description>ｻﾞ･コクピット</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="987856">
 				<rom name="fli.t77" size="987856" crc="76FE23AF" sha1="EC50D145BE3EED6B1D1DA43C4E6D25E7023784F9" offset="000000" />
@@ -482,7 +482,7 @@
 	<software name="eggbomb">
 		<description>Egg Bomb</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="904832">
 				<rom name="egg.t77" size="904832" crc="AA938B89" sha1="50CB41C0B2DEF21BED19032B9C3F3F81D6F4A521" offset="000000" />
@@ -494,7 +494,7 @@
 	<software name="explorer">
 		<description>Explorer</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1425504">
 				<rom name="exp.t77" size="1425504" crc="DFCB722E" sha1="B77E76996717AEB501AE0AA16449ABE0D7225E2B" offset="000000" />
@@ -518,7 +518,7 @@
 	<software name="fire">
 		<description>Fire Crystal</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5482702">
 				<rom name="fire1.t77" size="5482702" crc="4A58F1D5" sha1="7143CAFC29201997FCD5B2725E686CDFC041416D" offset="000000" />
@@ -571,7 +571,7 @@
 	<software name="field">
 		<description>フィールドウォーズ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1071104">
 				<rom name="field.t77" size="1071104" crc="2FE91960" sha1="97E492727545FE72981FD0717468B95EA3D9B325" offset="000000" />
@@ -582,7 +582,7 @@
 	<software name="fighter">
 		<description>Fighter</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="875804">
 				<rom name="fig.t77" size="875804" crc="D213688D" sha1="1B53AC3843D53492E704C72F352057197838245E" offset="000000" />
@@ -630,7 +630,7 @@
 	<software name="galaxy">
 		<description>Galaxy Fly</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="400880">
 				<rom name="gala.t77" size="400880" crc="1FB3BA9F" sha1="D70DE0BB8FDC66DE4AEC8781DF7BB1F98F41682E" offset="000000" />
@@ -654,7 +654,7 @@
 	<software name="jelda2">
 		<description>ジェルダ２</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="445632">
 				<rom name="g2_1.t77" size="445632" crc="852C8110" sha1="A209A1EBDF1D29B12BDDEE153C1E2069BAD8A1C3" offset="000000" />
@@ -671,7 +671,7 @@
 	<software name="golfsim">
 		<description>ゴルフシミュレーション</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4150660">
 				<rom name="golf.t77" size="4150660" crc="9F244C8F" sha1="C7EFCC07B2A1FD132938F0AC5F0B8DED9AB1335C" offset="000000" />
@@ -695,7 +695,7 @@
 	<software name="gundam">
 		<description>ガンダム</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2693198">
 				<rom name="gun.t77" size="2693198" crc="1F6D8270" sha1="5E2D665EA152BAF866015FB3A1A8587E5CCE38FE" offset="000000" />
@@ -719,7 +719,7 @@
 	<software name="hanafuda">
 		<description>花札狂</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="84398">
 				<rom name="hanafuda1.t77" size="84398" crc="986BABE7" sha1="F66F2D069649BB68BB815F3074766B922F8F36A0" offset="000000" />
@@ -741,7 +741,7 @@
 	<software name="hhouse">
 		<description>Haunted House</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1657464">
 				<rom name="house.t77" size="1657464" crc="E6B10029" sha1="1B7112208394E58D699BD77A2DEE3D326C10FDA6" offset="000000" />
@@ -753,7 +753,7 @@
 	<software name="hisha">
 		<description>飛車</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1408932">
 				<rom name="ous.t77" size="1408932" crc="B49BBCC1" sha1="16A839D74A0AE410C3A01CDFCA708FE48A343DAB" offset="000000" />
@@ -856,7 +856,7 @@
 	<software name="kaito">
 		<description>華麗なる怪盗</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="969610">
 				<rom name="kaito.t77" size="969610" crc="4AF88A53" sha1="D24549E5CA4B4919AC5B0B61EDC2FE7507DB9181" offset="000000" />
@@ -868,7 +868,7 @@
 	<software name="kami">
 		<description>カムイの剣</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2390932">
 				<rom name="kam1a_b.t77" size="2390932" crc="F486A854" sha1="C6C1BA1213F409E4AAF62A2EF49C8260ACB13167" offset="000000" />
@@ -895,7 +895,7 @@
 	<software name="karu">
 		<description>軽井沢誘拐案内</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2670614">
 				<rom name="karu1.t77" size="2670614" crc="157131A0" sha1="586CA6B034A3EDBEA9452545A6072A9D26140E55" offset="000000" />
@@ -946,7 +946,7 @@
 	<software name="kscope">
 		<description>カレイドスコープ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1124694">
 				<rom name="kalei_s.t77" size="1124694" crc="6EE69EB0" sha1="57947F1195834F2089B453D1BFAF7133EE5BDFBD" offset="000000" />
@@ -969,7 +969,7 @@
 	<software name="littleg">
 		<description>Little Gang</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1425834">
 				<rom name="littleg.t77" size="1425834" crc="3B9E282E" sha1="0DC0B0AAA87397C40D72B1C59DC4435F1A3946EA" offset="000000" />
@@ -993,7 +993,7 @@
 	<software name="lode">
 		<description>Lode Runner</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2258856">
 				<rom name="lode.t77" size="2258856" crc="557CE206" sha1="5C779FF3449384AD391F0E024B454B758D167BD2" offset="000000" />
@@ -1032,7 +1032,7 @@
 	<software name="mainroyl">
 		<description>Main Royal</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1227180">
 				<rom name="main.t77" size="1227180" crc="448B5B8C" sha1="388FBD175D5587447ECD1D84D5B3A795E1FCAEC8" offset="000000" />
@@ -1103,7 +1103,7 @@
 	<software name="mrbatfry">
 		<description>ミスターバタフライ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1102476">
 				<rom name="mr_bat.t77" size="1102476" crc="ABB98B5C" sha1="57E56B8C62A78A3942298AA824427DFE680C36FC" offset="000000" />
@@ -1127,7 +1127,7 @@
 	<software name="mysteryh">
 		<description>Mystery House</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1742136">
 				<rom name="mystery.t77" size="1742136" crc="8A4F3C6B" sha1="A036C565FA3753AC581EBEC9FA6A409B7C1B6A97" offset="000000" />
@@ -1139,7 +1139,7 @@
 	<software name="nampa">
 		<description>Tokyo-Nampa-Street</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2665584">
 				<rom name="nan_a.t77" size="2665584" crc="20E8CF54" sha1="88D768698FCCEFBC03678075309ED6BC8437CB1C" offset="000000" />
@@ -1173,7 +1173,7 @@
 	<software name="nihon">
 		<description>日本海海戦</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1064148">
 				<rom name="nihon.t77" size="1064148" crc="29E895E6" sha1="EA8B398C673EEB8DE9882F354984B8E14F68642B" offset="000000" />
@@ -1185,7 +1185,7 @@
 	<software name="nobu">
 		<description>信長の野望(初代)</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1390214">
 				<rom name="nobu.t77" size="1390214" crc="BD35FDBE" sha1="A3E7EDA42AB9C04330B28D471DD87997EEF240A3" offset="000000" />
@@ -1221,7 +1221,7 @@
 	<software name="pacman">
 		<description>パックマン</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1126162">
 				<rom name="pac.t77" size="1126162" crc="03B4E2A9" sha1="8BF1931C788F0EC442603C6965A9103D801C9CB1" offset="000000" />
@@ -1257,7 +1257,7 @@
 	<software name="per">
 		<description>カレイジアス・ペルセウス</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="42158">
 				<rom name="per.t77" size="42158" crc="83B6CED1" sha1="DA468FFC4D331FDB8C4584E11349D093281A301D" offset="000000" />
@@ -1274,7 +1274,7 @@
 	<software name="portpia">
 		<description>ポートピア連続殺人事件</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55320">
 				<rom name="portpia1.t77" size="55320" crc="C828949F" sha1="5A45CA2C832EB41122816BED92F76AF0BAC605B7" offset="000000" />
@@ -1296,7 +1296,7 @@
 	<software name="priv">
 		<description>女子大生プライベート</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2097526">
 				<rom name="priv.t77" size="2097526" crc="6B81E064" sha1="A619775D7B380DB5FE918066B739D5058E9080CF" offset="000000" />
@@ -1308,7 +1308,7 @@
 	<software name="proyakyu">
 		<description>プロ野球スーパーシミュレーション</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2627702">
 				<rom name="pro.t77" size="2627702" crc="40E064E3" sha1="AB1C1FBE5093C47A84E5C012C12F5EF9BEA4DED3" offset="000000" />
@@ -1320,7 +1320,7 @@
 	<software name="psychic">
 		<description>サイキックシティ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="222184">
 				<rom name="data.t77" size="222184" crc="4FE8CA64" sha1="9353A973BEC6774DAA92273486F65883B9346F11" offset="000000" />
@@ -1365,7 +1365,7 @@
 	<software name="raizer">
 		<description>地球戦士ライーザ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3385768">
 				<rom name="raizer1_a.t77" size="3385768" crc="C2D37BBB" sha1="62092C3517445BB1D98AB4FD0F8D7741DEC510CB" offset="000000" />
@@ -1414,7 +1414,7 @@
 	<software name="ren">
 		<description>連珠</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="352882">
 				<rom name="ren.t77" size="352882" crc="9CEA162B" sha1="737DA555921890E13FD3B80B6C44FE811B31584F" offset="000000" />
@@ -1426,7 +1426,7 @@
 	<software name="riguras">
 		<description>リグラス</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="8374364">
 				<rom name="riguras1.t77" size="8374364" crc="4BEE872A" sha1="DDAD41626E967E40E8F981F1B92C183CA976E969" offset="000000" />
@@ -1455,7 +1455,7 @@
 	<software name="salada">
 		<description>サラダの国のトマト姫</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="34030">
 				<rom name="salada3.t77" size="34030" crc="BB3AD189" sha1="1A959989704B3616E9E9EA8112595A86E6E2936C" offset="000000" />
@@ -1477,7 +1477,7 @@
 	<software name="sanjutsu">
 		<description>医は算術なり</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1232372">
 				<rom name="san.t77" size="1232372" crc="6FC56674" sha1="22F36CB798CF3059C2A890532FCEDFFC5461FFEF" offset="000000" />
@@ -1501,7 +1501,7 @@
 	<software name="selaphis">
 		<description>セラピスの神殿</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1521974">
 				<rom name="ser.t77" size="1521974" crc="3C023DFA" sha1="6356CAAD4C17CA4EF27F447B8145D53AB88E94D1" offset="000000" />
@@ -1513,7 +1513,7 @@
 	<software name="sokoban">
 		<description>倉庫番</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1292496">
 				<rom name="soko.t77" size="1292496" crc="43D2305E" sha1="D186C7B109996D81D996BD195F06CCCE7C1C24BF" offset="000000" />
@@ -1525,7 +1525,7 @@
 	<software name="sokoban2">
 		<description>倉庫番２</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1161332">
 				<rom name="sokoban.t77" size="1161332" crc="40D4F9EA" sha1="D962A6B54099160C059B4EE11EFEB9E3002EA89D" offset="000000" />
@@ -1542,7 +1542,7 @@
 	<software name="sonic">
 		<description>Sonicboom</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3569132">
 				<rom name="son.t77" size="3569132" crc="6D5EC3DD" sha1="E23D352DCED43C546698F89EC79BD81C6E8BF007" offset="000000" />
@@ -1554,7 +1554,7 @@
 	<software name="sou">
 		<description>サザンクロス</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="26822">
 				<rom name="1-sou.t77" size="26822" crc="35003F53" sha1="144FCF3A183CCB789637ABDA933D100B0171C2E9" offset="000000" />
@@ -1639,7 +1639,7 @@
 	<software name="star">
 		<description>スターアーサー伝説</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5392962">
 				<rom name="tera_1.t77" size="5392962" crc="5F45F75F" sha1="6223A4F21D2D2F6155AA34514C8DF1D707E02421" offset="000000" />
@@ -1693,7 +1693,7 @@
 	<software name="strhouse">
 		<description>Strange House</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1212934">
 				<rom name="str.t77" size="1212934" crc="88069CEF" sha1="2F98669DC652B9D139D6902133ECAE7175604D35" offset="000000" />
@@ -1705,7 +1705,7 @@
 	<software name="tankgame">
 		<description>タンクゲーム</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="408904">
 				<rom name="tank.t77" size="408904" crc="4E9C78BF" sha1="9D1D3EC37962618B0DDAC528E51AC1A49C527A7C" offset="000000" />
@@ -1717,7 +1717,7 @@
 	<software name="tdfever">
 		<description>タッチダウンフィーバー</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1409672">
 				<rom name="tac.t77" size="1409672" crc="653FEB50" sha1="5E1314A9A8B1FA3F56DD695219D85532FE8630CF" offset="000000" />
@@ -1752,7 +1752,7 @@
 	<software name="tritorn">
 		<description>トリトーン</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="194560">
 				<rom name="tri1.t77" size="194560" crc="C4A686F7" sha1="2FFBBA4B9FF644C4E1C7237C66DD32D9DBC93EB4" offset="000000" />
@@ -1769,7 +1769,7 @@
 	<software name="udice">
 		<description>ウルトラダイス</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="447614">
 				<rom name="ult.t77" size="447614" crc="C7F51123" sha1="5C3286552B0B2B572B531834A4EA8EA7C4BC9C8A" offset="000000" />
@@ -1793,7 +1793,7 @@
 	<software name="uootoy">
 		<description>ウットイ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1882972">
 				<rom name="uootoy.t77" size="1882972" crc="3BF4D54C" sha1="73E072DAADBAC3FE36325BEC0489A42323CB8AFE" offset="000000" />
@@ -1810,7 +1810,7 @@
 	<software name="vip">
 		<description>簡易言語ＶＩＰ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1030788">
 				<rom name="vip.t77" size="1030788" crc="CFF9CB8A" sha1="986E705617F0401A506B310715366B89CDA61DE4" offset="000000" />
@@ -1858,7 +1858,7 @@
 	<software name="wired2">
 		<description>Wired 2</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3114060">
 				<rom name="wir2.t77" size="3114060" crc="3E27A3BA" sha1="31401D73BFBBA1E52B5F704DE55AAEEBB87A39BE" offset="000000" />
@@ -1875,7 +1875,7 @@
 	<software name="wldgolf">
 		<description>ワールドゴルフ</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="8156366">
 				<rom name="golf.t77" size="8156366" crc="065B7DC1" sha1="F98A36EA743EF60B0AEA6069F583622740F96902" offset="000000" />
@@ -1904,7 +1904,7 @@
 	<software name="yakyuken">
 		<description>野球拳</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="598028">
 				<rom name="yakyu.t77" size="598028" crc="D70A43CF" sha1="BA87E6104B4A150C0F2CC345D989B2EA212D1B93" offset="000000" />
@@ -1916,7 +1916,7 @@
 	<software name="yama">
 		<description>山手線アドベンチャー</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1221136">
 				<rom name="yama.t77" size="1221136" crc="08EACB43" sha1="51EBB742424385A8DD736266E1435DD7D57A7637" offset="000000" />
@@ -1928,7 +1928,7 @@
 	<software name="zaiko">
 		<description>在庫管理</description>
 		<year>1981</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="886402">
 				<rom name="zaiko.t77" size="886402" crc="BB7F5770" sha1="D158F99543B30731279E95C90D6C73882323D002" offset="000000" />
@@ -1940,7 +1940,7 @@
 	<software name="zero">
 		<description>零戦</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2977554">
 				<rom name="zero.t77" size="2977554" crc="C317096E" sha1="CB71110C08B2C59C0C2CAD3570A7AB09DA1B96C5" offset="000000" />

@@ -194,7 +194,7 @@
 	<software name="mm1">
 		<description>Might and Magic I</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mm1_a.d77" size="348848" crc="40f89403" sha1="a474db8952f91443ebaf79957cca0237d7d58e36" offset="000000" />
@@ -220,7 +220,7 @@
 	<software name="nobunaga">
 		<description>信長の野望全国版</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380848">
 				<rom name="nobunaga_a.d77" size="380848" crc="32dff63d" sha1="9127dfcd4b42fc40581e32ceed1ce9d40c9c380b" offset="000000" />
@@ -257,7 +257,7 @@
 	<software name="seles">
 		<description>Seles</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="seles_a.d77" size="348848" crc="b75dc08f" sha1="ab085cafa1fd4c0ab0f0ff93301abce5ffda334d" offset="000000" />
@@ -305,7 +305,7 @@
 	<software name="wiz4">
 		<description>Wizardry IV</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380448">
 				<rom name="wiz4a.d77" size="380448" crc="2bc2e6a2" sha1="3e821ffec654301d3d3643a0c84a003e63dd21e7" offset="000000" />
