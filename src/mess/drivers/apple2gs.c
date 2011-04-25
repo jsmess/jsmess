@@ -60,7 +60,6 @@
 #include "machine/8530scc.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "deprecat.h"
 
@@ -163,7 +162,7 @@ static const floppy_config apple2gs_floppy35_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple35_iigs),
-	NULL
+	"floppy_3_5"
 };
 
 static const floppy_config apple2gs_floppy525_floppy_config =
@@ -175,16 +174,9 @@ static const floppy_config apple2gs_floppy525_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple2),
-	NULL
+	"floppy_5_25"
 };
 
-static const cassette_config apple2gs_cassette_config =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	NULL
-};
 
 static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
 	/* nothing in the address map - everything is added dynamically */
@@ -257,13 +249,14 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 
 	MCFG_NVRAM_HANDLER( apple2gs )
 
-	MCFG_CASSETTE_ADD( "cassette", apple2gs_cassette_config )
-
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")      // 1M on board + 1M in the expansion slot was common for ROM 03
 	MCFG_RAM_EXTRA_OPTIONS("1M,3M,4M,5M,6M,7M,8M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
+
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","apple2gs")
+    MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop525_list", "apple2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2gsr1, apple2gs )
