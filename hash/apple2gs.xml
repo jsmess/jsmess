@@ -451,7 +451,7 @@
 	<software name="bcauldrn">
 		<description>The Black Cauldron</description>
 		<year>1987</year>
-		<publisher>MESS</publisher>
+		<publisher>Sierra</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -480,7 +480,7 @@
 	<software name="beglwrit">
 		<description>BeagleWrite GS v3.2</description>
 		<year>1987</year>
-		<publisher>MESS</publisher>
+		<publisher>Beagle Bros.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -2532,7 +2532,7 @@
 	<software name="iorock">
 		<description>It's Only Rock'n'Roll (for Instant Music)</description>
 		<year>1987</year>
-		<publisher>MESS</publisher>
+		<publisher>Electronic Arts</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -2791,7 +2791,7 @@
 	<software name="kngsqst2">
 		<description>King's Quest II - Romancing The Throne</description>
 		<year>1988</year>
-		<publisher>MESS</publisher>
+		<publisher>Sierra</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -2808,7 +2808,7 @@
 	<software name="kngsqst3">
 		<description>King's Quest III</description>
 		<year>1988</year>
-		<publisher>MESS</publisher>
+		<publisher>Sierra</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819269">
@@ -2997,7 +2997,7 @@
 	<software name="lslarry">
 		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
 		<year>1987</year>
-		<publisher>MESS</publisher>
+		<publisher>Sierra</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -3191,7 +3191,7 @@
 	<software name="manoir">
 		<description>Le Manoir de Mortevielle</description>
 		<year>1999</year>
-		<publisher>MESS</publisher>
+		<publisher>Lankhor</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -5404,7 +5404,7 @@
 	<software name="ssinsts">
 		<description>FUN Instruments vols. 1-5 (for SoundSmith)</description>
 		<year>1999</year>
-		<publisher>MESS</publisher>
+		<publisher>Huibert Aalbers</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -5436,7 +5436,7 @@
 	<software name="ssxmas">
 		<description>SoundSmith Christmas Songs</description>
 		<year>1999</year>
-		<publisher>MESS</publisher>
+		<publisher>Unknown</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -6847,7 +6847,7 @@
 	<software name="wordpfct">
 		<description>WordPerfect v2.1</description>
 		<year>1999</year>
-		<publisher>MESS</publisher>
+		<publisher>WordPerfect Corp.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
