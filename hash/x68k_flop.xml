@@ -591,17 +591,6 @@
 		</part>
 	</software>
 
-	<software name="atennis">
-		<description>Alien Tennis Chikyuu no Kiki</description>
-		<year>19??</year>
-		<publisher>Killer</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261824">
-				<rom name="alien tennis chikyuu no kiki (19xx)(killer).dim" size="1261824" crc="fae4eb4a" sha1="cb3e498639801ad8344015d09566a9a6d56ba8ea" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alshark">
 		<description>Alshark</description>
 		<year>1991</year>
@@ -719,6 +708,7 @@
 		</part>
 	</software>
 
+	<!-- Requires zMusic for sound, which is not included on the disk -->
 	<software name="angeldiv">
 		<description>Angel Dive</description>
 		<year>1996</year>
@@ -1147,6 +1137,17 @@
 		</part>
 	</software>
 
+	<software name="atennis">
+		<description>Alien Tennis Chikyuu no Kiki</description>
+		<year>19??</year>
+		<publisher>Killer</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="alien tennis chikyuu no kiki (19xx)(killer).dim" size="1261824" crc="fae4eb4a" sha1="cb3e498639801ad8344015d09566a9a6d56ba8ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ayachan">
 		<description>Ayachan Suupurekkusu II</description>
 		<year>19??</year>
@@ -1159,6 +1160,1101 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="ayachan suupurekkusu ii (19xx)(kankyouken)(disk 2 of 2)(disk b).dim" size="1261824" crc="0ad505c9" sha1="670c81863707d4749d3d38a8bf586cc45f592091" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="babafgt2">
+		<description>Baba Fighter II</description>
+		<year>199?</year>
+		<publisher>Tsururinkun</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baba fighter ii (199x)(tsururinkun)(disk 1 of 3)(disk a).dim" size="1261824" crc="f71f427f" sha1="81fc5587f2a4889bb1ccb50285885eb250040f06" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baba fighter ii (199x)(tsururinkun)(disk 2 of 3)(disk b).dim" size="1261824" crc="54fd3f05" sha1="57e9d103fa79a4ced940836db4b76dc37a56913b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baba fighter ii (199x)(tsururinkun)(disk 3 of 3)(disk c).dim" size="1261824" crc="256b7e7f" sha1="7816da249f7dd59e148c5e88b4e6d2b71accd7e7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="babel">
+		<description>Babel</description>
+		<year>1995</year>
+		<publisher>Gamma AWC</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="babel (1995)(gamma awc).dim" size="1261824" crc="01ae3e3b" sha1="71b37f9294bc302b1ce507b7a1d51757bb8bdd9e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="babeltou">
+		<description>Babel no Tou</description>
+		<year>1997</year>
+		<publisher>Gamma AWC</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="babel no tou (1995)(gamma awc).dim" size="1261824" crc="8db487f4" sha1="92afc271e6a1b64e25292a03df11085dff9e3566" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="badroad">
+		<description>Bad Road</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bad road (19xx)(-).dim" size="1261824" crc="2169524f" sha1="d295409885ff6bf13f9ab1217244be75b5962047" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakamed">
+		<description>Bakamedesu</description>
+		<year>1993</year>
+		<publisher>Surpasser Gin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bakamedesu (1993)(surpasser gin).dim" size="1261824" crc="417c5d22" sha1="97f2fa50bf6f8471c082adbc400ef0a8dd5a8b51" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakaniki">
+		<description>Bakuretsu Aniki</description>
+		<year>1995</year>
+		<publisher>Catsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bakuretsu aniki (1995)(catsoft).dim" size="1261824" crc="e0f3a2f7" sha1="7bc658762f7d29cfc920c45a16dc1564d9392b8c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakudanm">
+		<description>Bakudanma (v1.00)</description>
+		<year>1988</year>
+		<publisher>Kyoushirou</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bakudanma v1.00 (19xx)(kyoushirou).dim" size="1261824" crc="bb228106" sha1="eee9269e35c983772d7b3f3716c5d17e5ab5ba90" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakuyugi">
+		<description>Bakudan Yuugi</description>
+		<year>1988</year>
+		<publisher>X-Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bakudan yuugi (1988)(x-soft).dim" size="1261824" crc="8b5d4df0" sha1="eaa6327e4b004b6bf6dabf1497c00a72d39109b5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baraduke">
+		<description>Baraduke</description>
+		<year>1995</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baraduke (1995)(dempa).dim" size="1261824" crc="f46145c4" sha1="7921d4d8cf98ce507e02007db00f8c08db7af886" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barcelono" cloneof="barcelon">
+		<description>Barcelona Fighter 92 - Bangaihen Sekaiichi Ha Ore Da (v1.00)</description>
+		<year>1992</year>
+		<publisher>LTT - Kuma</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="barcelona fighter 92 bangaihen sekaiichi ha ore da (1992)(ltt - kuma).dim" size="1261824" crc="6e14dc8f" sha1="d42afb7c6b8189ce50dd8d553b0d9a960d8194e7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barcelon">
+		<description>Barcelona Fighter 92 (v2.00.05)</description>
+		<year>1992</year>
+		<publisher>LTT - Kuma</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="barcelona fighter 92 v2.00 (1992)(ltt - kuma).dim" size="1261824" crc="93d90423" sha1="ff61eb9e68052c97273000b590648b734d56ada9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baribar3">
+		<description>Bari Bari Attack 3 - Erice</description>
+		<year>1990</year>
+		<publisher>Studio KBO</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bari bari attack 3 erice (1990)(studio kbo).dim" size="1261824" crc="545cb21e" sha1="ee25489edb0fcdb98bf91f64d899b1a9243b684e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baruusa">
+		<description>Baruusa no Fukushuu</description>
+		<year>1991</year>
+		<publisher>Zain Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baruusa no fukushuu (1991)(zain soft)(disk 1 of 3)(disk a).dim" size="1261824" crc="620c407d" sha1="88839522368865d98e8e836ed047c1300c997137" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baruusa no fukushuu (1991)(zain soft)(disk 2 of 3)(disk b).dim" size="1261824" crc="d2ae19ad" sha1="07307d6df8a0ad7e53d76b80481552582540eff7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baruusa no fukushuu (1991)(zain soft)(disk 3 of 3)(opening).dim" size="1261824" crc="d56358dc" sha1="86e30ff1f51d69e5b19f231cc577180cb117a523" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbknuckl">
+		<description>The Baseball Knuckles '94</description>
+		<year>1994</year>
+		<publisher>DCS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="baseball knuckles '94, the (1994)(dcs).dim" size="1261824" crc="0d42be49" sha1="52c0fec68987a383fe93ef731a010702b4657a39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beast">
+		<description>Beast Injuu no Yakata</description>
+		<year>19??</year>
+		<publisher>Birdy Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="beast injuu no yakata (19xx)(birdy soft)(disk 1 of 3)(disk a).dim" size="1261824" crc="a5a19ed7" sha1="a658a8e161308f143bfda587c454c4b195652f2c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="beast injuu no yakata (19xx)(birdy soft)(disk 2 of 3)(disk b).dim" size="1261824" crc="0df3edea" sha1="d17d1b6a45d8326dbfbafc9101bc718369e0e997" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="beast injuu no yakata (19xx)(birdy soft)(disk 3 of 3)(disk c).dim" size="1261824" crc="7cb1b3a1" sha1="163cfbbe0c35c7f9126d18f90d494d9b105e3dd4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bellsave">
+		<description>Bell's Avenue</description>
+		<year>1993</year>
+		<publisher>Wendy's Magazine</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bell's avenue (1993)(wendy's magazine)(disk 1 of 2)(disk a).dim" size="1261824" crc="c135f634" sha1="f4f6e901aabef2294fb678579f37c32139e791b1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bell's avenue (1993)(wendy's magazine)(disk 2 of 2)(disk b).dim" size="1261824" crc="999f3929" sha1="91e6128639c4a1e482936ef16b05be5f612c9418" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="binbinmj">
+		<description>Binbin Mahjongg Peach Angel</description>
+		<year>1994</year>
+		<publisher>Takeru Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="binbin mahjongg peach angel (1994)(takeru soft).dim" size="1261824" crc="8f1bb11e" sha1="b33a6dcfd6ffa09cbd7d58fbe2ae4afb52dc1723" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- black screen after loading -->
+	<software name="birdywld">
+		<description>Birdy World</description>
+		<year>1991</year>
+		<publisher>Birdy Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="birdy world (1991)(birdy soft)(disk 1 of 3)(disk a).dim" size="1261824" crc="6e23b61b" sha1="104a5f7234d08df45df505fccd142ff8d2d0afdd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="birdy world (1991)(birdy soft)(disk 2 of 3)(disk b).dim" size="1261824" crc="8d536562" sha1="e71f44b0f5ce4db9623345fb6204cfbdb2f0342c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="birdy world (1991)(birdy soft)(disk 3 of 3)(disk c).dim" size="1261824" crc="1680caf6" sha1="bedd5b0f42a6eebdf53f3a8bf7c9f43ef47cb559" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biyoyonc">
+		<description>Biyoyon Car Game</description>
+		<year>199?</year>
+		<publisher>Eins-Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="biyoyon car game (199x)(eins-soft).dim" size="1261824" crc="d798d940" sha1="ba9d8538ffc175a1d12e5c0e4af993e3a4e0b357" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blanka">
+		<description>Blanka in Shura no Kuni</description>
+		<year>1997</year>
+		<publisher>Haiteidoradorazu</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blanka in shura no kuni (1997)(haiteidoradorazu).dim" size="1261824" crc="0b587bfb" sha1="700cc3018118b3622a329044f290d5a399d46d3c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bleedout">
+		<description>Bleed Out Sakuretsu</description>
+		<year>1996</year>
+		<publisher>Gold Cats Project</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bleed out sakuretsu (1996)(gold cats project).dim" size="1261824" crc="11433d1f" sha1="4b4de8ff60247d3dea83dc56b4baf0f0a4d48be4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't start, locks up waiting for MIDI, which should trigger a bus error, but doesn't for some odd reason -->
+	<software name="blindspt">
+		<description>Blind Spot</description>
+		<year>1991</year>
+		<publisher>Dolphin Game Studio</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blind spot (1991)(dolphin game studio).dim" size="1261824" crc="b45ccba5" sha1="5ad121b3e8a04c663339b3bf31f683d01dc412f0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blitzkre">
+		<description>Blitzkrieg Toubu Sensen 1941-45</description>
+		<year>199?</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blitzkrieg toubu sensen 1941-45 (199x)(system soft)(disk 1 of 2).dim" size="1261824" crc="07aad994" sha1="1b3576d2b7ea5f853f25517a0f24de907946f7f2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blitzkrieg toubu sensen 1941-45 (199x)(system soft)(disk 2 of 2).dim" size="1261824" crc="2d9bcf6a" sha1="1c0f026613f6d738772933c3fe10803899d7d5d4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bljack2">
+		<description>Black Jack 68K II Animation Version</description>
+		<year>19??</year>
+		<publisher>KZO</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="black jack 68k ii animation version (19xx)(kzo).dim" size="1261824" crc="2e8f8421" sha1="9aadf45240ba904f386a6868c97c01bb80fda3b5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bnoriko">
+		<description>Bishoujo Noriko</description>
+		<year>19??</year>
+		<publisher>System House Oh!</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo noriko (19xx)(system house oh!).dim" size="1261824" crc="6694c68b" sha1="fd7af7ffeb894beaadb68462e55577ec619bfd9d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockout">
+		<description>Blockout Modori</description>
+		<year>19??</year>
+		<publisher>Bee</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blockout modoki (19xx)(bee).dim" size="1261824" crc="64480633" sha1="050cdb7829fd8565836bee66d219a0043186f1dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blocksto">
+		<description>Block Stocker (v2.00)</description>
+		<year>1989</year>
+		<publisher>X-Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="block stocker v2.00 (1989)(x-soft).dim" size="1261824" crc="e9abf3b1" sha1="2ad9a2308da3080082492d985b5f76fffedeaa3e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blodia">
+		<description>Blodia</description>
+		<year>19??</year>
+		<publisher>Broderbund</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blodia (19xx)(broderbund)(disk 1 of 2)(disk a).dim" size="1261824" crc="49802113" sha1="8402f5c76819416e892e28b83fd9ce7cc971f216" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blodia (19xx)(broderbund)(disk 2 of 2)(disk b).dim" size="1261824" crc="958940d1" sha1="3b0346c483e11a730563b38d6e2b7082313cb9d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluwaver">
+		<description>Blue Waver Special</description>
+		<year>1989</year>
+		<publisher>Simokouchi M.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blue waver special (1989)(simokouchi m.).dim" size="1261824" crc="2f9ae3dc" sha1="46ff9e56ab82aa5f0e0df915547729a6beac1de0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Locks up in-game -->
+	<software name="bluwing2">
+		<description>Blue Wings 2 - Blue Knights</description>
+		<year>1993</year>
+		<publisher>OS Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blue wings 2 blue knights (1993)(os software)(disk 1 of 2)(disk a).dim" size="1261824" crc="887f26e1" sha1="d10ef06806641583ab8b29b21ba39bfa768b45ce" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="blue wings 2 blue knights (1993)(os software)(disk 2 of 2)(disk b).dim" size="1261824" crc="e789138a" sha1="46449619ac668c041f8ba214f6c9f11c447939e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
+	<software name="bodhidh2">
+		<description>Bodhidharma Mark 2 (v0.01)</description>
+		<year>1996</year>
+		<publisher>Take Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bodhidharma mark 2 v0.01 (1996)(take soft).dim" size="1261824" crc="2489fbc3" sha1="fdbff95c72e8443449805d819cabb7bc970ee790" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
+	<software name="bodhidha030" cloneof="bodhidha">
+		<description>Bodhidharma (v0.30)</description>
+		<year>1994</year>
+		<publisher>Take Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bodhidharma v0.30 (1994)(take soft).dim" size="1261824" crc="f67ff051" sha1="3892231cfeee3aaff8ad8b9d31c4a2533bda6f67" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
+	<software name="bodhidha">
+		<description>Bodhidharma (v1.01) Hehebereke</description>
+		<year>1995</year>
+		<publisher>Take Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bodhidharma v1.01 hehebereke (1995)(take soft).dim" size="1261824" crc="d190994e" sha1="54f9c9900d386f0ae1589b95159ea29476704194" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombermn">
+		<description>Bomber Man</description>
+		<year>1990</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bomber man (1990)(system soft).dim" size="1261824" crc="d1be07e7" sha1="ab4edc1d365d4d3885354d57c01d9cf07480d3e4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonanzab">
+		<description>Bonanza Bros.</description>
+		<year>1991</year>
+		<publisher>Sharp - SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonanza bros (1991)(sharp - sps)(disk 1 of 2)(disk a).dim" size="1261824" crc="03b40eed" sha1="3c6b81b93d9e91b85c57ad27ab7088be650b6a74" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonanza bros (1991)(sharp - sps)(disk 2 of 2)(disk b).dim" size="1261824" crc="8a380aea" sha1="616b4ea3c7b0216aa620fc0ccd61d0077f3c7305" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Displays "Disk Read Error" -->
+	<software name="bonnou2">
+		<description>Bonnou 2</description>
+		<year>19??</year>
+		<publisher>Team Phantom - Midy House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou 2 (19xx)(team phantom - midy house)(disk 1 of 2)(system).dim" size="1261824" crc="4ba86978" sha1="0cf42a5841fee8576d03863fdb86ab2491abb2c5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou 2 (19xx)(team phantom - midy house)(disk 2 of 2)(data).dim" size="1261824" crc="b4722089" sha1="8a10d4b5dd3afc26bb05bca4c2e07011923d9f42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Displays "Disk Read Error" -->
+	<software name="bonnou2d">
+		<description>Bonnou 2 Das</description>
+		<year>19??</year>
+		<publisher>Team Phantom - Midy House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou 2 das (19xx)(team phantom - midy house).dim" size="1261824" crc="14386119" sha1="ef79c6327da5eb90e110190ff8a4a06b53e94c5a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonnoumu">
+		<description>Bonnou Muyou</description>
+		<year>1991</year>
+		<publisher>Team Phantom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou muyou (1991)(team phantom).dim" size="1261824" crc="3fb49d3d" sha1="f543d34fe8210a9542d96babaa578a5c892fcd42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonnouy2">
+		<description>Bonnou Yobikou 2</description>
+		<year>1991</year>
+		<publisher>Software House Parsley</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou yobikou 2 (1991)(software house parsley)(disk 1 of 2)(disk a).dim" size="1261824" crc="b44ec5de" sha1="151fd839aff8df602b74b0e942f118123fe8ce6e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou yobikou 2 (1991)(software house parsley)(disk 2 of 2)(disk b).dim" size="1261824" crc="ab06dcd3" sha1="4b26ac403e4e06dec23599a8d0dfe8b899315801" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonnouy3">
+		<description>Bonnou Yobikou 3</description>
+		<year>199?</year>
+		<publisher>Software House Parsley</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou yobikou 3 (199x)(software house parsley)(disk 1 of 2)(disk a).dim" size="1261824" crc="475b8642" sha1="9e24f7346c82a3b7dc7c6198f1ea8675503b1303" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou yobikou 3 (199x)(software house parsley)(disk 2 of 2)(disk b).dim" size="1261824" crc="b138149a" sha1="d8886a52cb9cadfbeaa0344054fc4e12abdbf8f4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bonnouyo">
+		<description>Bonnou Yobikou</description>
+		<year>1991</year>
+		<publisher>Software House Parsley</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou yobikou (1991)(software house parsley)(disk 1 of 2)(disk a).dim" size="1261824" crc="c9f34c04" sha1="27e08509eed98696e9ead7c708cd3be1f7a5ffd8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bonnou yobikou (1991)(software house parsley)(disk 2 of 2)(disk b).dim" size="1261824" crc="45a88a74" sha1="548ffd3c0c0154d44c98bd6c0426400ef4f1596f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bosco">
+		<description>Bosconian</description>
+		<year>1988</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bosconian (1988)(dempa).dim" size="1261824" crc="699e42ab" sha1="797cef06c703296bbec81d0c2bb894830fa55b3d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bottoro2">
+		<description>Bottoro 2</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bottoro 2 (19xx)(-).dim" size="1261824" crc="0d7afc2a" sha1="52423e8ff774cab8274b88cf431532bb8e5d4bca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boynboyn">
+		<description>Boyon Boyon (v1.03)</description>
+		<year>1990</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="boyon boyon (1990)(-).dim" size="1261824" crc="f5c8cf88" sha1="417b70aa58f6e875a206e49a43825b87ae94f2ef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 1.44MB image -->
+	<software name="boyoyon">
+		<description>Boyoyon (v3.31)</description>
+		<year>1996</year>
+		<publisher>Noz</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="boyoyon v3.31 (1996)(noz).dim" size="1474816" crc="d8be3893" sha1="449e665c22a1e029afabd63d9d36aaa955593027" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bpoint">
+		<description>B-Point</description>
+		<year>1990</year>
+		<publisher>WIPL</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="b-point (1990)(wipl).dim" size="1261824" crc="d0a1c0f3" sha1="abee5105ee3f0eb2cf7847b5f8c5575ba53837f8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="branmrkr">
+		<description>Branmarker</description>
+		<year>1991</year>
+		<publisher>DO</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 1 of 8)(disk a).dim" size="1261824" crc="c9cf9079" sha1="a8cf218248766308512744add14d4272ea80575a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 2 of 8)(disk b).dim" size="1261824" crc="4c7f0529" sha1="162e0c695387259b81d03ed2a8d8443b3f0eae95" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 3 of 8)(disk c).dim" size="1261824" crc="26b0cd8c" sha1="a2a69bee971f7381072c2743ea4ca0d159e0753c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 4 of 8)(disk d).dim" size="1261824" crc="3af8906e" sha1="ccc52640d8cfbd3aaae86895da624e5d00e82ba9" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 5 of 8)(disk e).dim" size="1261824" crc="0ff03a9a" sha1="a7b10ccdefaa7f9e2d2b8916b83347da1e6940bb" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 6 of 8)(disk f).dim" size="1261824" crc="6117286e" sha1="cb51f83e256990532e308973307199c4abe5d5a7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 7 of 8)(disk g).dim" size="1261824" crc="a5e53d73" sha1="ab4ada3680fed8c4d54002e3d980d485411656b1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="branmarker (1991)(do)(disk 8 of 8)(disk h).dim" size="1261824" crc="bb058380" sha1="0aa4086434351b449eeb245fa81b0d69c8584707" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakdwn">
+		<description>Break Down</description>
+		<year>1989</year>
+		<publisher>Slime Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="break down (1989)(slime soft)(disk 1 of 2).dim" size="1261824" crc="4232a5eb" sha1="5530c30c4c0a126bc599c1b1e9b1ac9b88955bb2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="break down (1989)(slime soft)(disk 2 of 2).dim" size="1261824" crc="a2e860f9" sha1="1c0d8913a76deeda1d7c1c59d01eb6602818cdf8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breed">
+		<description>Breed</description>
+		<year>1989</year>
+		<publisher>Imai Takashi</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="breed (1989)(imai takashi).dim" size="1261824" crc="c35c22ed" sha1="2311db7a756c064efa6a5081cd23490ab3122046" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bretonne">
+		<description>Bretonne Lais</description>
+		<year>1990</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais (1990)(system soft)(disk 1 of 3)(opening).dim" size="1261824" crc="4c4daa75" sha1="0a2cf92cc7bbaa5997f39749e09b286bd826f960" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais (1990)(system soft)(disk 2 of 3)(game 1).dim" size="1261824" crc="6e27d80b" sha1="b70d175a1caf9306b6dfc87efda8d0ab20454602" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais (1990)(system soft)(disk 3 of 3)(game 2).dim" size="1261824" crc="5cb0a6aa" sha1="c18a8c354c5a38eb951a7bafff1472ecdd664fd3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bretscen">
+		<description>Bretonne Lais Scenario Data</description>
+		<year>19??</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais scenario data (19xx)(system soft)(disk 1 of 2).dim" size="1261824" crc="0277be5c" sha1="c43524bb33688bf1217574301977f18ef6a18fe5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais scenario data (19xx)(system soft)(disk 2 of 2).dim" size="1261824" crc="2da1909c" sha1="216ec25ede71b70cc8e59e5de5aeb91812fac3ef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bretsce1">
+		<description>Bretonne Lais Scenario Shuu 1 Kaname</description>
+		<year>19??</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais scenario shuu 1 kaname (19xx)(system soft)(disk 1 of 2).dim" size="1261824" crc="62bcbfc3" sha1="b832c28cf0d4bd816adc7399bfc4e2d2c55937e5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais scenario shuu 1 kaname (19xx)(system soft)(disk 2 of 2).dim" size="1261824" crc="281f0d15" sha1="88e396ed6978e37b59eb1d3f0570c8ff6c5b5aeb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bretsce2">
+		<description>Bretonne Lais Scenario Shuu 2 Kaname</description>
+		<year>19??</year>
+		<publisher>System Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais scenario shuu 2 kaname (19xx)(system soft)(disk 1 of 2).dim" size="1261824" crc="97ff6b8e" sha1="b0a68362ba60d640483a17a09be83127d5c6105a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bretonne lais scenario shuu 2 kaname (19xx)(system soft)(disk 2 of 2).dim" size="1261824" crc="a1cda373" sha1="00506da9e03d7bf230953fd440631fd3623ad94a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- locks up after a bit, likely a missed IRQ or two -->
+	<software name="bslfght000" cloneof="bslfght">
+		<description>Bishoujo Senshi Lady Fighter (v0.00)</description>
+		<year>1993</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi lady fighter v0.00 (1993)(sprite).dim" size="1261824" crc="65bf7855" sha1="3eababb98975156523bdb52695892b10f86ffadd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- locks up after a bit, likely a missed IRQ or two -->
+	<software name="bslfght">
+		<description>Bishoujo Senshi Lady Fighter (v1.00)</description>
+		<year>1993</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi lady fighter v1.00 (1993)(sprite).dim" size="1261824" crc="fc1d5cd7" sha1="f6cc9e9f29f89f026f6ab8e460b2d5d1c36fae58" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- locks up after a bit, likely a missed IRQ or two -->
+	<software name="bsmnfght210" cloneof="bsmnfght">
+		<description>Bishoujo Senshi Moon Fighter (v2.10)</description>
+		<year>1993</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi moon fighter v2.10 (1993)(sprite).dim" size="1261824" crc="6259af86" sha1="34353ca10ae3611651bcf1c45b992f9023be6c75" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- locks up after a bit, likely a missed IRQ or two -->
+	<software name="bsmnfght">
+		<description>Bishoujo Senshi Moon Fighter (v2.11)</description>
+		<year>1993</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi moon fighter v2.11 (1993)(sprite).dim" size="1261824" crc="ca933566" sha1="d1a163f5ea35df5bfafe9f958737706cf7f6005d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- does not startup after loading -->
+	<software name="bssmnfgt">
+		<description>Bishoujo Senshi Super Moon Fighter (v1.02)</description>
+		<year>1994</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi super moon fighter v1.02 (1994)(sprite).dim" size="1261824" crc="925e03a1" sha1="2cd21cf13b05a2013296bbfebd768892ec38cbb3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssmnfgx">
+		<description>Bishoujo Senshi Super Moon Fighter X</description>
+		<year>1995</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi super moon fighter x (1995)(sprite)(disk 1 of 2).dim" size="1261824" crc="1b1e6783" sha1="84b5c9a7a93ca8d1c23d15725ab74ad833272b97" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi super moon fighter x (1995)(sprite)(disk 2 of 2).dim" size="1261824" crc="43a516af" sha1="1116b05f43ffaff8e7dd5b52916855b2229a78f0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1989</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bubble bobble (1989)(dempa).dim" size="1261824" crc="2d4e07b3" sha1="4d53ebbf875d4d076e6554353bc5d2197ddb59e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="butarian">
+		<description>Butarian</description>
+		<year>1994</year>
+		<publisher>68 Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="butarian (1994)(68 bank).dim" size="1261824" crc="42f15a7d" sha1="3e60d13684d948c342d96527fe4c0c37ef37a2a2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="butasan">
+		<description>Butasan</description>
+		<year>1993</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="butasan (1993)(dempa).dim" size="1261824" crc="af2b8a91" sha1="36e2628e31026f61ed191d2d1a3d09f6a9bb4ea9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game area is black.  Probably priority or layer masking issues. -->
+	<software name="butasanq">
+		<description>Butasan Quest</description>
+		<year>1994</year>
+		<publisher>Tehehe-Net</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="butasan quest (1994)(tehehe-net).dim" size="1261824" crc="240550e5" sha1="a46e95c54f95fc55453067f2c9a912807a21bbe2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byakuya">
+		<description>Byakuya Monogatari</description>
+		<year>1989</year>
+		<publisher>East Cube</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="byakuya monogatari (1989)(east cube)(disk 1 of 3).dim" size="1261824" crc="acf52e33" sha1="498e445a3e77a69bc29b94f3aa0b2f4601d9f7d4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="byakuya monogatari (1989)(east cube)(disk 2 of 3).dim" size="1261824" crc="49ba4113" sha1="00f7f6a2938e0e733b9b47034277f989c735e2ad" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="byakuya monogatari (1989)(east cube)(disk 3 of 3).dim" size="1261824" crc="8ffdbec0" sha1="42d56f4dc1a47f46260eb0db0125d6e866b9b310" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="movingsc">
+		<description>Bishoujo Shashinkan Moving School</description>
+		<year>1988</year>
+		<publisher>Hard</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo shashinkan moving school (1988)(hard).dim" size="1261824" crc="ad52494b" sha1="1863e6275490ccc0a512d17712a263bf28195128" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ADPCM issues -->
+	<software name="sailrv3p">
+		<description>Bishoujo Senshi Sailor V (3 players)</description>
+		<year>199?</year>
+		<publisher>DK Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailor v (199x)(dk software)[3 player version].dim" size="1261824" crc="fa8eb1f5" sha1="f59112f524ca89a7185fd6444cdd72c31ab833df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ADPCM issues -->
+	<software name="sailrv5p" cloneof="sailrv3p">
+		<description>Bishoujo Senshi Sailor V (5 players)</description>
+		<year>199?</year>
+		<publisher>DK Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailor v (199x)(dk software)[5 player version].dim" size="1261824" crc="692e7aa8" sha1="8950bee4050e183037b2f4532289017a7a647d43" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ADPCM issues -->
+	<software name="sailrvf3">
+		<description>Bishoujo Senshi Sailor V Final v3</description>
+		<year>1995</year>
+		<publisher>DK Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailor v final v3 (1995)(dk software)(disk 1 of 2)(disk a).dim" size="1261824" crc="6e40b36c" sha1="ea2abdb2772fadeebfaa19d5240f9c7887cda2dd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailor v final v3 (1995)(dk software)(disk 2 of 2)(disk b).dim" size="1261824" crc="8edb45b5" sha1="5b1a689f7fbfa54213371ef0df03e006fb9cb93d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ADPCM issues -->
+	<software name="sailrv2">
+		<description>Bishoujo Senshi Sailor V v2</description>
+		<year>1994</year>
+		<publisher>DK Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailor v v2 (1994)(dk software)(disk 1 of 2).dim" size="1261824" crc="86033d65" sha1="9f8f0cb7d4a5fae31cf4f3ca101f48dbdc73993f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailor v v2 (1994)(dk software)(disk 2 of 2).dim" size="1261824" crc="c2e3367f" sha1="19d298e5966f824da99a163c6195b602d9e0e9eb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skirt1">
+		<description>Bishoujo Skirt Mekuri Shinkei Suijaki Vol. 1</description>
+		<year>19??</year>
+		<publisher>Onoe Network</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo skirt mekuri shinkei suijaku vol. 1 (19xx)(onoe network).dim" size="1261824" crc="523c459d" sha1="dfa42dfc759f9fedfb8e163a494f64fd50644cbc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skirt2">
+		<description>Bishoujo Skirt Mekuri Shinkei Suijaki Vol. 2</description>
+		<year>19??</year>
+		<publisher>Onoe Network</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo skirt mekuri shinkei suijaku vol. 2 (19xx)(onoe network).dim" size="1261824" crc="736e1df9" sha1="25a9ae9e2adc95eb1bea0a86d25a6663b90394f5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skirt3">
+		<description>Bishoujo Skirt Mekuri Shinkei Suijaki Vol. 3</description>
+		<year>19??</year>
+		<publisher>Onoe Network</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo skirt mekuri shinkei suijaku vol. 3 (19xx)(onoe network).dim" size="1261824" crc="ca71bcf1" sha1="2707cca2453aa4cd45f6bb7877d2bfb2c5d5a987" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slrmnkdk">
+		<description>Bishoujo Senshi Sailor Moon Kessen Dark Kingdom</description>
+		<year>1993</year>
+		<publisher>Black HCS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailormoon kessen dark kingdom (1993)(black hcs)(disk 1 of 2).dim" size="1261824" crc="8df3590b" sha1="f561bdd947fbe057f88bd6f1dc396685396e5ee8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailormoon kessen dark kingdom (1993)(black hcs)(disk 2 of 2).dim" size="1261824" crc="a70d9345" sha1="e5375917e351a1dfa83984fe0310ccd968c9c1d4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slrmntia">
+		<description>Bishoujo Senshi Sailor Moon Moon Tiara Question</description>
+		<year>1992</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="bishoujo senshi sailormoon moon tiara question (1992)(-).dim" size="1261824" crc="b9ee609f" sha1="086badfacac2d735ee82d896bba3d05031b3899e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess">
+		<description>Battle Chess</description>
+		<year>1989</year>
+		<publisher>Pack-in-Video</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battle chess (1989)(pack-in-video)(disk 1 of 2)(disk a).dim" size="1261824" crc="bf20b0ec" sha1="d310615eb320da9beed18e44b60fc4486b1d4663" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battle chess (1989)(pack-in-video)(disk 2 of 2)(disk b).dim" size="1261824" crc="c00d2c06" sha1="ebdcec58a8b9035614e8e82a5a3e19d61176ae3c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlgame">
+		<description>Battle Game</description>
+		<year>1989</year>
+		<publisher>Imai Takashi</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battle game (1989)(imai takashi).dim" size="1261824" crc="38d2dec6" sha1="3f1037483d0823bbc5a6f52b88d115600df41bc0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Untested, needs 1.44MB disk support for Human68k -->
+	<software name="btlmania">
+		<description>Battle Mania</description>
+		<year>1992</year>
+		<publisher>Biwahosi Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="battle mania' (1992)(biwahosi software).dim" size="1474816" crc="374d9976" sha1="9f049bcaaf9f55a120855bc0ee578e8ee3e9de40" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btltech">
+		<description>Battletech</description>
+		<year>1992</year>
+		<publisher>Crossmedia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battletech (1992)(crossmedia)(disk 1 of 3)(disk a).dim" size="1261824" crc="20ba737a" sha1="b37903a7b114a179f7f8052e4bcb8b4565f08f2e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battletech (1992)(crossmedia)(disk 2 of 3)(disk b).dim" size="1261824" crc="1df4077e" sha1="47e0d53c9e8985751d557b4886858ee4d25c4735" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battletech (1992)(crossmedia)(disk 3 of 3)(opening).dim" size="1261824" crc="bab3c811" sha1="f81e18e98cc3be079a9dadc919b07650cc1c3666" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlunit">
+		<description>Battle Unit</description>
+		<year>199?</year>
+		<publisher>Pan-Q</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battle unit (199x)(pan-q).dim" size="1261824" crc="2d1fd0b9" sha1="8df41aff3094bce767cc2f32eefb67b6150d9551" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlunit2">
+		<description>Batle Unit II</description>
+		<year>1992</year>
+		<publisher>Takumi Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="battle unit ii (1992)(takumi soft).dim" size="1261824" crc="a82d7378" sha1="c2c7a17324cb43e4a96f62c9a92bdad954c8df92" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
