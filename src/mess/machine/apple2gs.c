@@ -465,6 +465,7 @@ static void adb_do_command(apple2gs_state *state)
 			break;
 
 		case 0x0a: /* ??? */
+		case 0x0b: /* ??? */
 			break;
 
 		case 0x0d:	/* get version */
@@ -581,6 +582,7 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 					break;
 
 				case 0x0a:  /* ??? */
+				case 0x0b:  /* ??? */
 					state->m_adb_command_length = 0;
 					break;
 
