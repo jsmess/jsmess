@@ -1080,7 +1080,7 @@
 	<software name="arururu">
 		<description>Arururu</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="arururu (19xx)(-).dim" size="1261824" crc="6d36fa6d" sha1="e77a255cea3d01e7731cf89d46659e42e69a22ea" offset="000000" />
@@ -1210,7 +1210,7 @@
 	<software name="badroad">
 		<description>Bad Road</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="bad road (19xx)(-).dim" size="1261824" crc="2169524f" sha1="d295409885ff6bf13f9ab1217244be75b5962047" offset="000000" />
@@ -1722,7 +1722,7 @@
 	<software name="bottoro2">
 		<description>Bottoro 2</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="bottoro 2 (19xx)(-).dim" size="1261824" crc="0d7afc2a" sha1="52423e8ff774cab8274b88cf431532bb8e5d4bca" offset="000000" />
@@ -1733,7 +1733,7 @@
 	<software name="boynboyn">
 		<description>Boyon Boyon (v1.03)</description>
 		<year>1990</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="boyon boyon (1990)(-).dim" size="1261824" crc="f5c8cf88" sha1="417b70aa58f6e875a206e49a43825b87ae94f2ef" offset="000000" />
@@ -2169,7 +2169,7 @@
 	<software name="slrmntia">
 		<description>Bishoujo Senshi Sailor Moon Moon Tiara Question</description>
 		<year>1992</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="bishoujo senshi sailormoon moon tiara question (1992)(-).dim" size="1261824" crc="b9ee609f" sha1="086badfacac2d735ee82d896bba3d05031b3899e" offset="000000" />
@@ -11773,7 +11773,7 @@
 	<software name="sion2">
 		<description>Sion 2</description>
 		<year>1992</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="sion 2 (1992) [xdf].xdf" size="1261568" crc="fb55d51b" sha1="abc2ae650f505702f265cbd688f493e869a81fe3" offset="0" /> 
