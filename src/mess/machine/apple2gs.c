@@ -464,6 +464,9 @@ static void adb_do_command(apple2gs_state *state)
 			adb_post_response_1(state, adb_read_memory(state, address));
 			break;
 
+		case 0x0a: /* ??? */
+			break;
+
 		case 0x0d:	/* get version */
 			adb_post_response_1(state, 0x06);
 			break;
@@ -575,6 +578,10 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 				case 0x08:	/* write memory */
 				case 0x09:	/* read memory */
 					state->m_adb_command_length = 2;
+					break;
+
+				case 0x0a:  /* ??? */
+					state->m_adb_command_length = 0;
 					break;
 
 				case 0x0d:	/* get version */
