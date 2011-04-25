@@ -248,6 +248,8 @@ SOUNDS += TMS5200
 #SOUNDS += TMC0281
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
+SOUNDS += LMC1992
+
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -487,7 +489,6 @@ $(MESSOBJ)/mame.a: \
 #-------------------------------------------------
 
 $(MESSOBJ)/shared.a: \
-	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\
 	$(MESS_AUDIO)/spchroms.o	\
 	$(MESS_FORMATS)/imd_dsk.o	\

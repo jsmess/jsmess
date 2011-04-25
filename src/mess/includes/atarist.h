@@ -3,6 +3,26 @@
 #ifndef __ATARI_ST__
 #define __ATARI_ST__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6800/m6800.h"
+#include "formats/atarist_dsk.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/flopdrv.h"
+#include "machine/ram.h"
+#include "machine/6850acia.h"
+#include "machine/8530scc.h"
+#include "machine/ctronics.h"
+#include "machine/mc68901.h"
+#include "machine/rescap.h"
+#include "machine/rp5c15.h"
+#include "machine/rs232.h"
+#include "machine/wd17xx.h"
+#include "sound/ay8910.h"
+#include "sound/lmc1992.h"
+
 #define M68000_TAG		"m68000"
 #define HD6301V1_TAG	"hd6301"
 #define YM2149_TAG		"ym2149"
@@ -269,7 +289,7 @@ public:
 		  m_lmc1992(*this, LMC1992_TAG)
 	{ }
 
-	optional_device<device_t> m_lmc1992;
+	optional_device<lmc1992_device> m_lmc1992;
 
 	void machine_start();
 

@@ -1,24 +1,5 @@
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6800/m6800.h"
-#include "audio/lmc1992.h"
-#include "formats/atarist_dsk.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/6850acia.h"
-#include "machine/8530scc.h"
-#include "machine/ctronics.h"
-#include "machine/mc68901.h"
-#include "machine/rescap.h"
-#include "machine/rp5c15.h"
-#include "machine/rs232.h"
-#include "machine/wd17xx.h"
-#include "sound/ay8910.h"
-#include "video/atarist.h"
 #include "includes/atarist.h"
+#include "video/atarist.h"
 
 /*
 
@@ -980,9 +961,9 @@ void ste_state::microwire_shift()
 {
 	if (BIT(m_mw_mask, 15))
 	{
-		lmc1992_data_w(m_lmc1992, BIT(m_mw_data, 15));
-		lmc1992_clock_w(m_lmc1992, 1);
-		lmc1992_clock_w(m_lmc1992, 0);
+		m_lmc1992->data_w(BIT(m_mw_data, 15));
+		m_lmc1992->clock_w(1);
+		m_lmc1992->clock_w(0);
 	}
 
 	// rotate mask and data left
@@ -1001,7 +982,7 @@ void ste_state::microwire_tick()
 	switch (m_mw_shift)
 	{
 	case 0:
-		lmc1992_enable_w(m_lmc1992, 0);
+		m_lmc1992->enable_w(0);
 		microwire_shift();
 		break;
 
@@ -1011,7 +992,7 @@ void ste_state::microwire_tick()
 
 	case 15:
 		microwire_shift();
-		lmc1992_enable_w(m_lmc1992, 1);
+		m_lmc1992->enable_w(1);
 		m_mw_shift = 0;
 		m_microwire_timer->enable(0);
 		break;
