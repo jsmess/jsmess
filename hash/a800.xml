@@ -25,6 +25,7 @@ Compiled by K1W1
     - Protector II (Synapse)
     - Shamus (Synapse)
     - Slime (Synapse)
+    - Speedway Blast (IDSI)
     - Kangaroo (Atari)
     - Letter Perfect- 40 Column Version (LJK)
     - Danger Ranger (Microdeal)
@@ -37,7 +38,7 @@ Compiled by K1W1
   * Cartridge Types : -
   
   	- Standard 2k cartridges are 8k roms with 2k of program data and map to address area $A000-$BFFF.
-    - Standard 4k cartridges are 8k roms with 4k of program data and map to address area $A000-$BFFF.
+	- Standard 4k cartridges are 8k roms with 4k of program data and map to address area $A000-$BFFF.
   	- Standard 8k cartridges are 8k roms with 8k of program data and map to address area $A000-$BFFF.
    	- Standard 12k cartridges are 16k roms with 12k of program data and map to address area $8000-$BFFF. 	
   	- Standard 16k cartridges are 16k roms with 16k of program data and map to address area $8000-$BFFF.
@@ -89,22 +90,20 @@ Compiled by K1W1
                A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
              
       
-  * Re-releases mentioned in the comments below were bit copies of the originals re-packaged in different cartridges.
-
+  * Re-releases mentioned in the comments below were generally bit copies of the originals re-packaged in different cartridges.
+  
   * In 1983, Romox released some games on EEPROM cartridges. Customers could purchase a blank ECPC (Edge Connector Programmable Cartridge), and
     then have a game of their choice burned into its EEPROM at a Romox Programming Terminal. These are marked by "ECPC" in the cart "Serial: " number area below.
 
   * Missing Cartridges (Publisher, Cart #, Rarity, Year, Title) : -
   
     - Hacked/Pirate/Homemeade              	   Blue Max: 2001 
-    - Hacked/Pirate/Homemeade              	   Bruce Lee 
     - Hacked/Pirate/Homemeade              	   Cavernia 
     - Hacked/Pirate/Homemeade              	   Green Beret 
     - Hacked/Pirate/Homemeade              	   Jet Boot Jack 
     - Hacked/Pirate/Homemeade              	   Mr.Robot 
     - Hacked/Pirate/Homemeade             	   Neptune's Daughter 
     - Hacked/Pirate/Homemeade            1984  Parrot Phone Test 1.1 
-    - Hacked/Pirate/Homemeade              	   Satan's Hollow 
     - Hacked/Pirate/Homemeade              	   Shadow World 
     - Hacked/Pirate/Homemeade              	   Tapper 
     - Hacked/Pirate/Homemeade              	   Tank Commander 
@@ -148,10 +147,9 @@ Compiled by K1W1
     - Atari                              1981  Paddle Jitter Test (REV A)
     - Atari                              1982  Paddle Jitter Test (REV C with games)
     - Atari                                    RAM Extension Module Test Rev 1.0
-    - Atari                RX8036     U  1984  AtariWriter (ver C)
     - Atari                RX8050     PR       1400 Telecommunicator
+    - Atari                           PR       Berzerk
     - Atari                RX8061     PR 1984  Jr.Pac-Man
-    - Atari                RX8067     U  1987  Final Legacy (with Graphics Menu)
     - Atari France         RXF8036    ER 1982  AtariTexte
     - Atari Germany        RXG8036    ER 1982  AtariSchreiber
     - Atari Mexico                    ER       MicroCalc XE version 2.2
@@ -171,8 +169,7 @@ Compiled by K1W1
     - Beaumont                        ER       PUP (Primary Utility Pack)
 
     - Chalkboard Inc.                 ER       Leo's Links
-    - Chalkboard Inc.      10016A-3   ER       Micro Illustrator
-
+    
     - Citibank                        ER 1984  Direct Access
 
     - Convologic                               WAM
@@ -329,7 +326,9 @@ Compiled by K1W1
 
 <softwarelist name="a800" description="Atari 800 cartridges">
 
-<software name="salt100">
+<!-- ROM's that have been dumped from at least 2 independant sources and have the same CRC's, have been marked as "Verified". -->
+
+	<software name="salt100">
 		<description>400/800 SALT Diagnostic Cartridge v1.00</description>
 		<!-- Serial: N/A -->
 		<year>1979</year>
@@ -389,7 +388,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="3d tic-tac-toe.rom" size="8192" crc="1cf50ebe" sha1="2fd4c292d08d73dad61675206869746f58a401d2" offset="0" />
+				<rom name="3d tic-tac-toe.rom" size="8192" crc="4660c404" sha1="9e70098ab2598edd9c2913d787554590733c49a0" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -402,7 +401,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="abracadabra.rom" size="16384" crc="a35c775d" sha1="ed888289ee6c37ac3fa8b80e7e3250c7ca718fcd" offset="0" />
+				<rom name="abracadabra.rom" size="16384" crc="a35c775d" sha1="ed888289ee6c37ac3fa8b80e7e3250c7ca718fcd" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -422,14 +421,27 @@ Compiled by K1W1
 	</software>
 
 	<software name="action">
-		<description>Action! Programming Language</description>
+		<description>Action! Programming Language (OSS Type A)</description>
+		<!-- Serial: N/A -->
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss 034m" />
+			<dataarea name="rom" size="16384">
+				<rom name="action! programming language  (oss type a).rom" size="16384" crc="b2611fd3" sha1="e87becc0346d0ad40ffc7aac12a1a0353210ffef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actionb" cloneof="action">
+		<description>Action! Programming Language (OSS Type B)</description>
 		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language.rom" size="16384" crc="0bcd70c6" sha1="4bfa22c5b788b2c9eeeb5c917717d35a4bc82c7c" offset="0" />
+				<rom name="action! programming language (oss type b) .rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -442,7 +454,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="adventure creator.rom" size="16384" crc="8746d9da" sha1="2e457c53969f6d8995049ce89b13204fcb79627d" offset="0" />
+				<rom name="adventure creator.rom" size="16384" crc="8746d9da" sha1="2e457c53969f6d8995049ce89b13204fcb79627d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +467,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="alf in the color caves.rom" size="16384" crc="79df7f9d" sha1="d197de362de419f5963af89fc7ce34074c84ce10" offset="0" />
+				<rom name="alf in the color caves.rom" size="16384" crc="79df7f9d" sha1="d197de362de419f5963af89fc7ce34074c84ce10" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -468,7 +480,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atarilab light module.rom" size="16384" crc="9be1c9e4" sha1="f2dbf1ce1b49361492dafc5d09b91b1de07dc247" offset="0" />
+				<rom name="atarilab light module.rom" size="16384" crc="9be1c9e4" sha1="f2dbf1ce1b49361492dafc5d09b91b1de07dc247" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +493,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atarilab temperature module.rom" size="16384" crc="4036e465" sha1="5119a0ac7cc7c6d27954b7522a2f40c47f136f08" offset="0" />
+				<rom name="atarilab temperature module.rom" size="16384" crc="4036e465" sha1="5119a0ac7cc7c6d27954b7522a2f40c47f136f08" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -507,7 +519,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="alien garden.rom" size="8192" crc="3e27ed0f" sha1="2a37f69183eb708dc843d3c38590c30f83a89ccd" offset="0" />
+				<rom name="alien garden.rom" size="8192" crc="3e27ed0f" sha1="2a37f69183eb708dc843d3c38590c30f83a89ccd" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -520,7 +532,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="alpha shield.rom" size="8192" crc="12db4ef9" sha1="801dd49e1d36f7161f723eb4e0cdfa718ca29e03" offset="0" />
+				<rom name="alpha shield.rom" size="8192" crc="484e8443" sha1="1374b53f9c8c759edc933db96fe3ad13b241a5ad" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -533,7 +545,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="alphabet zoo.rom" size="16384" crc="c9613ecd" sha1="d7fe5688cf754615db87b5d031361fae9fcaada4" offset="0" />
+				<rom name="alphabet zoo.rom" size="16384" crc="c9613ecd" sha1="d7fe5688cf754615db87b5d031361fae9fcaada4" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +605,7 @@ Compiled by K1W1
 	<software name="asmedt" cloneof="editasm">
 		<description>Assembler Editor Computing Language</description>
 		<!-- Serial: CXL4003 or RXG4003 (GER) -->
-		<!-- This is a later version of the "Editor Assembler", release name changed to "Assembler Editor". -->
+		<!-- This is a later version of the "Editor Assembler", release name changed to "Assembler Editor". Shows error count after assembling. -->
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
@@ -656,7 +668,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="asteroids.rom" size="8192" crc="f9fff4a4" sha1="71b795834e575e17bf1deb259fc699315218454c" offset="0" />
+				<rom name="asteroids.rom" size="8192" crc="f9fff4a4" sha1="71b795834e575e17bf1deb259fc699315218454c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -682,7 +694,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="astro chase (parker brothers)(1983).rom" size="16384" crc="11f1c7fa" sha1="36cca84a113e3adf6759a7c71df30cbed16924f2" offset="0" />
+				<rom name="astro chase (parker brothers)(1983).rom" size="16384" crc="11f1c7fa" sha1="36cca84a113e3adf6759a7c71df30cbed16924f2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -696,7 +708,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="astro grover.rom" size="16384" crc="f44a0aeb" sha1="31b052644ca700fb2aa1952ecfd6ab53d0f47da6" offset="0" />
+				<rom name="astro grover.rom" size="16384" crc="85b67797" sha1="b7d9eef4516457fa6301bff1e436ea1f5860956b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -709,7 +721,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="atari basic programming language (revision a).rom" size="8192" crc="4bec4de2" sha1="70cdf57469a208528f78a14275837352e90e20f1" offset="0" />
+				<rom name="atari basic programming language (revision a).rom" size="8192" crc="4bec4de2" sha1="70cdf57469a208528f78a14275837352e90e20f1" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -722,7 +734,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="atari basic programming language (revision b).rom" size="8192" crc="f0202fb3" sha1="7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6" offset="0" />
+				<rom name="atari basic programming language (revision b).rom" size="8192" crc="f0202fb3" sha1="7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -735,7 +747,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="atari basic programming language (revision c).rom" size="8192" crc="7d684184" sha1="3693c9cb9bf3b41bae1150f7a8264992468fc8c0" offset="0" />
+				<rom name="atari basic programming language (revision c).rom" size="8192" crc="7d684184" sha1="3693c9cb9bf3b41bae1150f7a8264992468fc8c0" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -780,15 +792,44 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="awriter" supported="partial">
-		<description>AtariWriter</description>
+	<software name="awriterc" supported="partial">
+		<description>AtariWriter (Version C)</description>
+		<!-- Serial: RX8084 -->
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="atariwriter (ver. c).rom" size="16384" crc="b4ddbec7" sha1="3b6ced3aeb08dafeac0b8c7f22d3c8b1aa6eebde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awriterb" supported="partial">
+		<description>AtariWriter (Version B)</description>
 		<!-- Serial: RX8084 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atariwriter.rom" size="16384" crc="7be4533d" sha1="69a842a3b89e3f4780f3266262a4dabb57b2afb0" offset="0" />
+				<rom name="atariwriter (ver. b).rom" size="16384" crc="7be4533d" sha1="69a842a3b89e3f4780f3266262a4dabb57b2afb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awritera" cloneof="awriterc" supported="partial">
+		<description>AtariWriter (Version A)</description>
+		<!-- Serial: RX8084 -->
+		<!-- Contains a joystick-checking routine at $8563. While in the main menu, it checks if the value under $8278 (stick 0) equals $8.
+		     If so, it displays the author's name on the screen. However, the author's name (stored at $8585) is erased from this image, so nothing gets displayed.
+		     It appears Atari noticed the easter egg and removed it in later version. -->
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="atariwriter (ver. a).rom" size="16384" crc="1c2498a4" sha1="a13863ad3ec72a92744b6e4d0e6c17faf51d17a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -801,27 +842,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="atlantis.rom" size="8192" crc="6a9a1405" sha1="e3cb735692e39ebf42f87a58031a0411ee65eb5a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="atlantisa" cloneof="atlantis">
-		<!-- File Difference -->
-		<!-- 0x109c : 0xea 0xea 0xea ('atlantis') - 0x8d 0x98 0xb0 ('atlantisa') -->
-		<!-- 0x1267 : 0xea 0xa9 0x98 ('atlantis') - 0xad 0x9d 0xb0 ('atlantisa') -->
-		<!-- 0x12a5 : 0xea 0xea 0xea ('atlantis') - 0x8d 0x6f 0xb2 ('atlantisa') -->
-		<!-- 0x148e : 0xea 0xa9 ('atlantis') - 0xad 0x9e ('atlantisa') -->
-		<!-- 0x14ec : 0xea 0xa9 0x8d ('atlantis') - 0xad 0x9c 0xb0 ('atlantisa') -->
-		<!-- 0x1bb7 : 0xea 0xea 0xea ('atlantis') - 0x8d 0x8d 0xbb ('atlantisa') -->
-		<description>Atlantis (Alt)</description>
-		<!-- Serial: 720125 -->
-		<year>1983</year>
-		<publisher>Imagic</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 4k" />
-			<dataarea name="rom" size="8192">
-				<rom name="atlantis (alt).rom" size="8192" crc="a3bc3eb5" sha1="f9463c75b595882b93f6407b8ce133d7e4ca6530" offset="0" />
+				<rom name="atlantis.rom" size="8192" crc="f929f40f" sha1="c795029c69b7b88efad659e107cad415ff3e066e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -834,7 +855,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 12k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
-				<rom name="attack at ep-cyg-4.rom" size="16384" crc="dca02ca0" sha1="78d394217f9ad68907e7dd86464b02f751c2321b" offset="0" />
+				<rom name="attack at ep-cyg-4.rom" size="16384" crc="dca02ca0" sha1="78d394217f9ad68907e7dd86464b02f751c2321b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -874,7 +895,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="baseball.rom" size="16384" crc="065c3fd2" sha1="79e161cc29cf2e0b8ca1db8f42a8da3f5693254e" offset="0" />
+				<rom name="baseball.rom" size="16384" crc="43c9d2a0" sha1="3f811800d2c616602d809b4d5496b64a0fc27972" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -892,15 +913,41 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="basxl102">
-		<description>Basic XL Programming Language v1.02</description>
+	<software name="bxl102a">
+		<description>Basic XL Programming Language v1.02 (OSS Type A)</description>
 		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss 034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02.rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" />
+				<rom name="basic xl programming language v1.02 (oss type a).rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bxl102aa">
+		<description>Basic XL Programming Language v1.02 (OSS Type A)(Alt)</description>
+		<!-- Serial: N/A -->
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss 034m" />
+			<dataarea name="rom" size="16384">
+				<rom name="basic xl programming language v1.02 (oss type a) (alt).rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bxl102b">
+		<description>Basic XL Programming Language v1.02 (OSS Type B)</description>
+		<!-- Serial: N/A -->
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss m091" />
+			<dataarea name="rom" size="16384">
+				<rom name="basic xl programming language v1.02 (oss type b).rom" size="16384" crc="81383e8b" sha1="101edda4bbe8d81af386b0cf3f7cc4f6d35e2fed" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -921,12 +968,13 @@ Compiled by K1W1
 	<software name="beefdrop">
 		<description>Beef Drop (Homebrew)</description>
 		<!-- Serial: N/A -->
-		<year>2004</year>
-		<publisher>Atari Age</publisher>
+		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
+		<year>2005</year>
+		<publisher>Ken Siders</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="xegs 32k" />
 			<dataarea name="rom" size="32768">
-				<rom name="beef drop (wip 2005-02-16).rom" size="32768" crc="6dd9e838" sha1="e95467917f873820580b5aca6b683bd0d13f1df6" offset="0" />
+				<rom name="beef drop (wip 2005-02-16).rom" size="32768" crc="6dd9e838" sha1="e95467917f873820580b5aca6b683bd0d13f1df6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -939,7 +987,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="basketball.rom" size="8192" crc="230682eb" sha1="36bf8d77751a3dffc2fd192986684a92ad2e67ff" offset="0" />
+				<rom name="basketball.rom" size="8192" crc="1ba8d718" sha1="c6b2f72fdae8be916fe408a208727a18e19b8a0d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -952,7 +1000,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="bc&apos;s quest for tires.rom" size="16384" crc="dddc6e36" sha1="c28f029ac5a388d791f22344ea078ed18660be4b" offset="0" />
+				<rom name="bc&apos;s quest for tires.rom" size="16384" crc="dddc6e36" sha1="c28f029ac5a388d791f22344ea078ed18660be4b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -965,49 +1013,21 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="beamrider.rom" size="16384" crc="2b05b8df" sha1="836b957e769632aace671a457fc07b7d0be1ca3a" offset="0" />
+				<rom name="beamrider.rom" size="16384" crc="2b05b8df" sha1="836b957e769632aace671a457fc07b7d0be1ca3a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bearjam">
-		<description>BearJam</description>
+	<software name="bearjamf">
+		<description>BearJam (Fixed)</description>
 		<!-- Serial: 10031A-3 -->
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="bearjam.rom" size="8192" crc="1889c707" sha1="f6df83d8ef0410edd2eb177d503fe8e0e0be908f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="berzerk">
-		<description>Berzerk (Prototype)</description>
-		<!-- Serial: N/A -->
-		<year>1983</year>
-		<publisher>Atari</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="berzerk.rom" size="16384" crc="1921f704" sha1="48b5735b2efdc19f91dde2f1b57f97a67d0f35ea" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="berzerka" cloneof="berzerk">
-		<!-- File Difference -->
-		<!-- 0x3a88 : 0x65 ('berzerk') - 0x66 ('berzerka') -->
-		<description>Berzerk (Prototype, Alt)</description>
-		<!-- Serial: N/A -->
-		<year>1983</year>
-		<publisher>Atari</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="berzerk (alt).rom" size="16384" crc="5a8f3353" sha1="e753f81aaac679f5061a7ef4816d470ec5454f45" offset="0" />
+				<rom name="bearjam (fixed).rom" size="8192" crc="1889c707" sha1="f6df83d8ef0410edd2eb177d503fe8e0e0be908f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1021,7 +1041,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="big bird&apos;s funhouse.rom" size="16384" crc="9fd095e0" sha1="f2bc6a83a31d8f1224026365558123ce5c9ef261" offset="0" />
+				<rom name="big bird&apos;s funhouse.rom" size="16384" crc="9fd095e0" sha1="f2bc6a83a31d8f1224026365558123ce5c9ef261" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1034,7 +1054,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="big bird&apos;s special delivery.rom" size="16384" crc="6d93b4fa" sha1="d8167ee465116425c6bd9ad254b2ba96844d000e" offset="0" />
+				<rom name="big bird&apos;s special delivery.rom" size="16384" crc="6d93b4fa" sha1="d8167ee465116425c6bd9ad254b2ba96844d000e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1073,7 +1093,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="boulders and bombs.rom" size="8192" crc="d6d51d3e" sha1="90901cd874f4ece8e18d9fff63e2368b4a315624" offset="0" />
+				<rom name="boulders and bombs.rom" size="8192" crc="d6d51d3e" sha1="90901cd874f4ece8e18d9fff63e2368b4a315624" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1104,6 +1124,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="brucelee">
+		<description>Bruce Lee (Prototype)</description>
+		<!-- Serial: N/A -->
+		<year>1984</year>
+		<publisher>Video 61 / Datasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="xegs 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="bruce lee (proto).rom" size="65536" crc="255dfc59" sha1="cad3ca79d8233df5068f3af99666889603c6dab2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="buckrog">
 		<description>Buck Rogers : Planet of Zoom</description>
 		<!-- Serial: 005-03 -->
@@ -1112,7 +1145,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="buck rogers - planet of zoom.rom" size="16384" crc="84dd597c" sha1="cfea37ea951fede973faccba882afc7b64d02fcb" offset="0" />
+				<rom name="buck rogers - planet of zoom.rom" size="16384" crc="84dd597c" sha1="cfea37ea951fede973faccba882afc7b64d02fcb" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1125,7 +1158,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="captain beeble.rom" size="16384" crc="ad8400b1" sha1="bee1157a64578b1b714f17c644db5af2ac6980c9" offset="0" />
+				<rom name="captain beeble.rom" size="16384" crc="ad8400b1" sha1="bee1157a64578b1b714f17c644db5af2ac6980c9" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1133,6 +1166,7 @@ Compiled by K1W1
 	<software name="carnmass">
 		<description>Carnival Massacre</description>
 		<!-- Serial: THB12011 -->
+		<!-- Version with copy protection. -->
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<part name="cart" interface="a800_cart">
@@ -1143,15 +1177,30 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="carnmasa" cloneof="carnmass">
+		<description>Carnival Massacre (Earlier Version)</description>
+		<!-- Serial: THB12011 -->
+		<!-- Version without copy protection. -->
+		<year>1983</year>
+		<publisher>Thorn EMI</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 12k" />
+			<dataarea name="rom" size="16384">
+				<rom name="carnival massacre (earlier version).rom " size="16384" crc="ea764851" sha1="41ee0cfcc3dd9fc850bb9639a12674774966160e" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ccrisis">
-		<description>Castle Crisis</description>
+		<description>Castle Crisis (Homebrew)</description>
 		<!-- Serial: N/A -->
+		<!-- This is the last WIP version by Bryan Edewaard, dated 2003-12-036. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
 		<year>2003</year>
-		<publisher>Atari Age</publisher>
+		<publisher>Bryan Edewaard</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="xegs 32k" />
 			<dataarea name="rom" size="32768">
-				<rom name="castle crisis.rom" size="32768" crc="47acda14" sha1="e48d4c05dc4d889806ae30016eac00bfff859f95" offset="0" />
+				<rom name="castle crisis (wip 2003-12-03).rom" size="32768" crc="47acda14" sha1="e48d4c05dc4d889806ae30016eac00bfff859f95" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1164,7 +1213,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="castle hassle.rom" size="16384" crc="844f7294" sha1="7411bf159b9ac31ed289c0ef3276b2e9e878ae86" offset="0" />
+				<rom name="castle hassle.rom" size="16384" crc="5a9e938a" sha1="964769d2fbb1092f06247e71fa8f1b86fb01b33c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1191,7 +1240,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="caverns of mars.rom" size="16384" crc="8b9b2f5e" sha1="08b05c7a118530c9e3ac79eaef9514422b1bb5dc" offset="0" />
+				<rom name="caverns of mars.rom" size="16384" crc="8b9b2f5e" sha1="08b05c7a118530c9e3ac79eaef9514422b1bb5dc" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1205,7 +1254,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="centipede.rom" size="8192" crc="44bb1842" sha1="2eed9a6bbc4c0396a0efc48fc810f9363c23a3c3" offset="0" />
+				<rom name="centipede.rom" size="8192" crc="44bb1842" sha1="2eed9a6bbc4c0396a0efc48fc810f9363c23a3c3" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1231,7 +1280,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="chess.rom" size="8192" crc="72860db1" sha1="0502b3946c80e064f46a607fc4df0a2977e8761f" offset="0" />
+				<rom name="chess.rom" size="8192" crc="72860db1" sha1="0502b3946c80e064f46a607fc4df0a2977e8761f" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1244,7 +1293,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="chicken.rom" size="8192" crc="1ab4d8d8" sha1="ca13ce6116370cae7b464b53393ac801c6914a90" offset="0" />
+				<rom name="chicken.rom" size="8192" crc="1ab4d8d8" sha1="ca13ce6116370cae7b464b53393ac801c6914a90" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1270,7 +1319,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="choplifter!.rom" size="16384" crc="3ebc05ff" sha1="a8a28c18e249272c27f7d72f7c40dab2e8d712f2" offset="0" />
+				<rom name="choplifter!.rom" size="16384" crc="3ebc05ff" sha1="a8a28c18e249272c27f7d72f7c40dab2e8d712f2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1283,7 +1332,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 12k" />
 			<dataarea name="rom" size="16384">
-				<rom name="claim jumper.rom" size="16384" crc="fae1b7e4" sha1="3ab10714fe115d6ea229458c847db26a314e9adf" offset="0" />
+				<rom name="claim jumper.rom" size="16384" crc="374d14d9" sha1="fc5993fbe43683239268c6e40cea8bec6457908e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1296,7 +1345,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="cloudburst.rom" size="8192" crc="32e5629e" sha1="56f2ec0ee4fd2f2c7532cd6a792a0a193cb5e91d" offset="0" />
+				<rom name="cloudburst.rom" size="8192" crc="32e5629e" sha1="56f2ec0ee4fd2f2c7532cd6a792a0a193cb5e91d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1309,7 +1358,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="coconotes.rom" size="16384" crc="f93c615b" sha1="d70ef079097293256a9b0d2bb34f8b8a49eac565" offset="0" />
+				<rom name="coconotes.rom" size="16384" crc="f93c615b" sha1="d70ef079097293256a9b0d2bb34f8b8a49eac565" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1322,7 +1371,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="computer chess.rom" size="8192" crc="5ce06e94" sha1="94ee63b7d0e65209575f576e78ba320f04c3eb20" offset="0" />
+				<rom name="computer chess.rom" size="8192" crc="c9614423" sha1="dc3c2ab6736546975de16282c44b4b445c312ff6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1349,7 +1398,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 12k" />
 			<dataarea name="rom" size="16384">
-				<rom name="computer war.rom" size="16384" crc="8a44d135" sha1="624e781b22e191f4aeb524f00997e1e8dfd05a0a" offset="0" />
+				<rom name="computer war.rom" size="16384" crc="4922aac6" sha1="d4fa88f4f8dd3b2c7fac3c6f57fe6ccff4075108" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1362,7 +1411,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="congo bongo.rom" size="16384" crc="7a588045" sha1="64c0a80e7dc289a62669e6e770f0d2b622b01036" offset="0" />
+				<rom name="congo bongo.rom" size="16384" crc="7a588045" sha1="64c0a80e7dc289a62669e6e770f0d2b622b01036" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1401,7 +1450,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="crossfire.rom" size="8192" crc="4d7e0503" sha1="f307396c6230d79275f0a3d8898eca84c8b97209" offset="0" />
+				<rom name="crossfire.rom" size="8192" crc="4d7e0503" sha1="f307396c6230d79275f0a3d8898eca84c8b97209" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1467,7 +1516,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="dance fantasy.rom" size="8192" crc="faec94e7" sha1="85e64f5d599b8c9a69d2e4cdb09535731897bca9" offset="0" />
+				<rom name="dance fantasy.rom" size="8192" crc="faec94e7" sha1="85e64f5d599b8c9a69d2e4cdb09535731897bca9" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1485,22 +1534,6 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="decathlna" cloneof="decathln">
-		<!-- File Difference -->
-		<!-- 0x0abd : 0xbf ('decathln') - 0x7f ('decatlna') -->
-		<!-- 0x0b92 : 0xea ('decathln') - 0x60 ('decatlna') -->
-		<description>Decathalon (Alt)</description>
-		<!-- Serial: CC-008 -->
-		<year>1983</year>
-		<publisher>Activision</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="decathlon (alt).rom" size="16384" crc="76845603" sha1="b084f54f142ac9c6e9c010e0ae8d7427dbd5230c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="defender">
 		<description>Defender</description>
 		<!-- Serial: CXL4025 -->
@@ -1510,7 +1543,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="defender.rom" size="16384" crc="782a81e4" sha1="eda6e6b875a76176384e356e7b9ded3bb7699ba2" offset="0" />
+				<rom name="defender.rom" size="16384" crc="782a81e4" sha1="eda6e6b875a76176384e356e7b9ded3bb7699ba2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1523,7 +1556,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="delta drawing - learning program.rom" size="8192" crc="20cbad07" sha1="ca9165d3ce9b77cc7e6f099ff24b0db0bec19c71" offset="0" />
+				<rom name="delta drawing - learning program.rom" size="8192" crc="20cbad07" sha1="ca9165d3ce9b77cc7e6f099ff24b0db0bec19c71" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1536,7 +1569,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="deluxe invaders.rom" size="8192" crc="15dc9b31" sha1="c168b06d66afc07f0f49d21bc3e52ddf02ee5c91" offset="0" />
+				<rom name="deluxe invaders.rom" size="8192" crc="15dc9b31" sha1="c168b06d66afc07f0f49d21bc3e52ddf02ee5c91" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1549,7 +1582,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="demon attack.rom" size="8192" crc="f6471dd9" sha1="cb618400311aefa5b004208405a030231b983f2f" offset="0" />
+				<rom name="demon attack.rom" size="8192" crc="1cb8b52d" sha1="5b279412afd8338622c33ff7f5e1a64d0b41c247" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1601,7 +1634,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="diamond mine.rom" size="16384" crc="d8f9b867" sha1="1a88faf57a90ee5a69f9a1bdcc98ec436b38b867" offset="0" />
+				<rom name="diamond mine.rom" size="16384" crc="d8f9b867" sha1="1a88faf57a90ee5a69f9a1bdcc98ec436b38b867" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1615,7 +1648,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="dig dug.rom" size="16384" crc="fdbc57ed" sha1="cbdf46cb6bc168a3473e3f5b958c22059080e11c" offset="0" />
+				<rom name="dig dug.rom" size="16384" crc="fdbc57ed" sha1="cbdf46cb6bc168a3473e3f5b958c22059080e11c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1628,7 +1661,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="dig dug (earlier release).rom" size="16384" crc="6d68114e" sha1="de7ff90bb9c2b9f890a2cc8d3bb54766d6103684" offset="0" />
+				<rom name="dig dug (earlier release).rom" size="16384" crc="6d68114e" sha1="de7ff90bb9c2b9f890a2cc8d3bb54766d6103684" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1642,7 +1675,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="donkey kong.rom" size="16384" crc="f2b76a27" sha1="0b081e5447c0a4a24b11c9cec819b5b11b40afff" offset="0" />
+				<rom name="donkey kong.rom" size="16384" crc="8a406275" sha1="6f5c069ff6b156a1dc4a4b64c4fad12eec70244a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1656,7 +1689,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="donkey kong jr..rom" size="16384" crc="a4eb70ef" sha1="7870e05a20765e4536db21239cbffb83590dc706" offset="0" />
+				<rom name="donkey kong jr..rom" size="16384" crc="a3e2d833" sha1="f6d917daf916683a4785792c72d30a914769846a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1682,7 +1715,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="ducks ahoy!.rom" size="16384" crc="6b7a42bd" sha1="9c1f5d49eec4c65be86eaa01e97dd4a64f720282" offset="0" />
+				<rom name="ducks ahoy!.rom" size="16384" crc="4cdfceb9" sha1="e2bb6270e2646b9c721c4c038c0fddfccf7218a4" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1709,7 +1742,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="e.t. phone home!.rom" size="16384" crc="bce4ef51" sha1="c4a10ce59ee183ef4299e50a0825ec23b4315b56" offset="0" />
+				<rom name="e.t. phone home!.rom" size="16384" crc="bce4ef51" sha1="c4a10ce59ee183ef4299e50a0825ec23b4315b56" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1723,7 +1756,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 12k" />
 			<dataarea name="rom" size="16384">
-				<rom name="eastern front - 1941.rom" size="16384" crc="ccff4a03" sha1="aee71f33534cf566994358a909b4b2dca63a84f1" offset="0" />
+				<rom name="eastern front - 1941.rom" size="16384" crc="ccff4a03" sha1="aee71f33534cf566994358a909b4b2dca63a84f1" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1736,7 +1769,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 2k" />
 			<dataarea name="rom" size="8192">
-				<rom name="educational system master cartridge.rom" size="8192" crc="18cc7c94" sha1="9fd7936767b0a193da9b01e27dac78e68b5f52b6" offset="0" />
+				<rom name="educational system master cartridge.rom" size="8192" crc="baacbad4" sha1="15567104105e91aeffc704158d7a4d1143ccd9b3" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1762,7 +1795,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="embargo.rom" size="8192" crc="07b1560c" sha1="464a127b9abb0700a34eb5068ef5c7a1c858e238" offset="0" />
+				<rom name="embargo.rom" size="8192" crc="07b1560c" sha1="464a127b9abb0700a34eb5068ef5c7a1c858e238" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1775,7 +1808,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="ernie&apos;s magic shapes.rom" size="16384" crc="435f5aba" sha1="05b935e0a1cae9b72fad28e7ec0b443080ede57a" offset="0" />
+				<rom name="ernie&apos;s magic shapes.rom" size="16384" crc="435f5aba" sha1="05b935e0a1cae9b72fad28e7ec0b443080ede57a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1883,7 +1916,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="facemaker.rom" size="8192" crc="382d859e" sha1="e1dae8e5b6b5cac1745e7ccacd1f5b7530276fd8" offset="0" />
+				<rom name="facemaker.rom" size="8192" crc="382d859e" sha1="e1dae8e5b6b5cac1745e7ccacd1f5b7530276fd8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1896,7 +1929,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="fantastic voyage.rom" size="8192" crc="97d744ad" sha1="8978c158f7283a3d418c92b0df71f040cc873bfc" offset="0" />
+				<rom name="fantastic voyage.rom" size="8192" crc="cd428e17" sha1="88edeb54c1afa5831802b2f509c88bb76d9235d0" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1922,7 +1955,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="final legacy (text menu version).rom" size="16384" crc="6bd0d8e4" sha1="4bdfbab83e336c58e4cc2e3dbb096f29976f5761" offset="0" />
+				<rom name="final legacy (text menu version).rom" size="16384" crc="6bd0d8e4" sha1="4bdfbab83e336c58e4cc2e3dbb096f29976f5761" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1961,7 +1994,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="final orbit.rom" size="8192" crc="177007e9" sha1="35fa2e686b717feafafa132020e6f40bd5fffb66" offset="0" />
+				<rom name="final orbit.rom" size="8192" crc="4de5cd53" sha1="0bfa27e1e588d15c6fdfea1a3bb2c9c610234eea" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1974,7 +2007,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="firebird.rom" size="8192" crc="97fe581c" sha1="8acce98d6cc74e09bfb0244091e729c1b77a352a" offset="0" />
+				<rom name="firebird.rom" size="8192" crc="b9557f4b" sha1="109556634f015a993501dd2c3889065127f408b1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2013,7 +2046,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
-				<rom name="fort apocalypse.rom" size="16384" crc="f79b33f0" sha1="cd3b8efa5d1b0960961c566eec63be3ff399885d" offset="0" />
+				<rom name="fort apocalypse.rom" size="16384" crc="f79b33f0" sha1="cd3b8efa5d1b0960961c566eec63be3ff399885d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2026,7 +2059,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="fortune hunter.rom" size="8192" crc="c0fea1f7" sha1="912ee49f3bab3aff5e4a6a59cf2c5de806cff6a9" offset="0" />
+				<rom name="fortune hunter.rom" size="8192" crc="5cee3180" sha1="5ea0655ff8fcdb2f0db41831fb0781b53541036f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2052,7 +2085,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="frogger.rom" size="8192" crc="40e9476c" sha1="a4863c26c9e6752211684c9efe10b86c1650314a" offset="0" />
+				<rom name="frogger.rom" size="8192" crc="40e9476c" sha1="a4863c26c9e6752211684c9efe10b86c1650314a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2065,7 +2098,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 12k" />
 			<dataarea name="rom" size="16384">
-				<rom name="frogger ii - threedeep!.rom" size="16384" crc="6d55ee51" sha1="19a5f290a3d1824b00e942eecae24ca4400a4e16" offset="0" />
+				<rom name="frogger ii - threedeep!.rom" size="16384" crc="7a5b4f65" sha1="a70678dbc4f00059faeff8f15896c535730256cb" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2092,7 +2125,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="galaxian.rom" size="8192" crc="d60027be" sha1="aa54b46b90d3f5d639dcb63f0e629803dbd369e2" offset="0" />
+				<rom name="galaxian.rom" size="8192" crc="d60027be" sha1="aa54b46b90d3f5d639dcb63f0e629803dbd369e2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2105,7 +2138,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="gateway to apshai.rom" size="16384" crc="3a0c6eb0" sha1="643b34c7c1ab4b7310c8aaf0d078cc8bb60bd515" offset="0" />
+				<rom name="gateway to apshai.rom" size="16384" crc="4ccdbef0" sha1="4214638ed6a7ea3409b96dcfb3210617f05c441b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2132,7 +2165,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="gorf.rom" size="8192" crc="90d0c7d7" sha1="15b20d50c70c383b84060efc7bb5149b1de73b3b" offset="0" />
+				<rom name="gorf.rom" size="8192" crc="90d0c7d7" sha1="15b20d50c70c383b84060efc7bb5149b1de73b3b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2145,7 +2178,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="gridrunner.rom" size="8192" crc="752dd5fe" sha1="417f69188fddd2f20f1b5d747268d786225ead81" offset="0" />
+				<rom name="gridrunner.rom" size="8192" crc="02f44555" sha1="04490bb51662713913087fbc33af507b56ca80dd" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2158,7 +2191,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="gyruss.rom" size="16384" crc="1da47d01" sha1="865f06d66c4749d4bb12f2100f5b14a1aeeb9113" offset="0" />
+				<rom name="gyruss.rom" size="16384" crc="1da47d01" sha1="865f06d66c4749d4bb12f2100f5b14a1aeeb9113" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2171,7 +2204,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="hero.rom" size="16384" crc="6062d3ce" sha1="24986c3cb59b0f9324929be3173eccd694445aa6" offset="0" />
+				<rom name="hero.rom" size="16384" crc="6062d3ce" sha1="24986c3cb59b0f9324929be3173eccd694445aa6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2184,7 +2217,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="halftime battlin&apos; bands.rom" size="16384" crc="8d14b5d3" sha1="ed8f805bdc947f1d9590db1e098f9f77f413f9db" offset="0" />
+				<rom name="halftime battlin&apos; bands.rom" size="16384" crc="8d14b5d3" sha1="ed8f805bdc947f1d9590db1e098f9f77f413f9db" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2262,7 +2295,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="in-store demonstration.rom" size="16384" crc="9bedcdf3" sha1="c20260e9150c4dc6489dc45af0df49bd56e20002" offset="0" />
+				<rom name="in-store demonstration.rom" size="16384" crc="9bedcdf3" sha1="c20260e9150c4dc6489dc45af0df49bd56e20002" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2275,7 +2308,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="james bond 007.rom" size="16384" crc="19b4e3a1" sha1="00fc2ee7d1085a348a9260915d34a4130b22ad09" offset="0" />
+				<rom name="james bond 007.rom" size="16384" crc="19b4e3a1" sha1="00fc2ee7d1085a348a9260915d34a4130b22ad09" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2301,7 +2334,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="journey to the planets.rom" size="16384" crc="dce59b65" sha1="447144eee522fd1d9c05aabf99fe6b2cccc69815" offset="0" />
+				<rom name="journey to the planets.rom" size="16384" crc="dce59b65" sha1="447144eee522fd1d9c05aabf99fe6b2cccc69815" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2315,7 +2348,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="joust.rom" size="16384" crc="f6ec618c" sha1="975c5b3f818d20c5feb868a25159a678f8c34e1b" offset="0" />
+				<rom name="joust.rom" size="16384" crc="f6ec618c" sha1="975c5b3f818d20c5feb868a25159a678f8c34e1b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2341,7 +2374,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="jumbo jet pilot.rom" size="16384" crc="f046332b" sha1="2f37f7e9f4ead4c425ab24c6dad342e723bd8973" offset="0" />
+				<rom name="jumbo jet pilot.rom" size="16384" crc="f046332b" sha1="2f37f7e9f4ead4c425ab24c6dad342e723bd8973" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2354,7 +2387,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="jumpman junior.rom" size="16384" crc="6c79bbad" sha1="286cdc4434cd20e6e65e1a00bc88c0a17c0cfe12" offset="0" />
+				<rom name="jumpman junior.rom" size="16384" crc="6c79bbad" sha1="286cdc4434cd20e6e65e1a00bc88c0a17c0cfe12" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2367,7 +2400,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="jungle hunt.rom" size="16384" crc="1847a7d4" sha1="f35d0bb1a67d63d222403a77d1e6cd489eddbc84" offset="0" />
+				<rom name="jungle hunt.rom" size="16384" crc="1847a7d4" sha1="f35d0bb1a67d63d222403a77d1e6cd489eddbc84" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2380,7 +2413,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="k-razy antiks.rom" size="8192" crc="ab7bdb79" sha1="05c2e139053fc07571395a162b16a8c907036454" offset="0" />
+				<rom name="k-razy antiks.rom" size="8192" crc="ab7bdb79" sha1="05c2e139053fc07571395a162b16a8c907036454" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2393,7 +2426,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="k-razy kritters (cbs).rom" size="8192" crc="f854a3b4" sha1="b050ebad797f05fc94276f79cd7e4dcfa5f36f34" offset="0" />
+				<rom name="k-razy kritters (cbs).rom" size="8192" crc="f854a3b4" sha1="b050ebad797f05fc94276f79cd7e4dcfa5f36f34" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2419,7 +2452,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="k-razy shoot out (cbs).rom" size="8192" crc="636a01f5" sha1="a863ddeb8bdf8c39fc77e28d9aaa435c057928d4" offset="0" />
+				<rom name="k-razy shoot out (cbs).rom" size="8192" crc="636a01f5" sha1="a863ddeb8bdf8c39fc77e28d9aaa435c057928d4" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2432,7 +2465,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="k-razy shoot out (k-byte).rom" size="8192" crc="4300f6ff" sha1="4533c4c2847d9aab094337ec2b53148f289a0119" offset="0" />
+				<rom name="k-razy shoot out (k-byte).rom" size="8192" crc="4300f6ff" sha1="4533c4c2847d9aab094337ec2b53148f289a0119" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2458,7 +2491,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="kaboom!.rom" size="8192" crc="98772cff" sha1="a1907eb88f5d74472d06016d12fa7aed968af96c" offset="0" />
+				<rom name="kaboom!.rom" size="8192" crc="c2e2e645" sha1="f9275d682581e6a07f2e23831bdf40ab3757ae12" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2484,7 +2517,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="keystone kapers.rom" size="8192" crc="465e1763" sha1="1eb11b8d792960578958054fd3c5593910fa22ee" offset="0" />
+				<rom name="keystone kapers.rom" size="8192" crc="465e1763" sha1="1eb11b8d792960578958054fd3c5593910fa22ee" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2497,7 +2530,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="kickback.rom" size="8192" crc="2480ed0a" sha1="47f290c86d5456d1e0ac24085c2a64d7513a597c" offset="0" />
+				<rom name="kickback.rom" size="8192" crc="2480ed0a" sha1="47f290c86d5456d1e0ac24085c2a64d7513a597c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2523,7 +2556,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="kindercomp.rom" size="8192" crc="f1c45e24" sha1="c5a37311aba5c38121aea120b8a37ff4b26660d3" offset="0" />
+				<rom name="kindercomp.rom" size="8192" crc="f1c45e24" sha1="c5a37311aba5c38121aea120b8a37ff4b26660d3" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2563,21 +2596,21 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="learning with leeper.rom" size="16384" crc="a77b5c4c" sha1="796c98eaffee56f10eccaa24b417c14e1afca714" offset="0" />
+				<rom name="learning with leeper.rom" size="16384" crc="5af1b0ec" sha1="eed7c2f10faeb9b8b8b15f322de08ec7bce9b741" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="llpaint">
-		<description>Leo's 'Lectric Paintbrush</description>
+	<software name="llpaintf">
+		<description>Leo's 'Lectric Paintbrush (Fixed)</description>
 		<!-- Serial: 10011A-3 -->
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="leo&apos;s &apos;lectric paintbrush.rom" size="8192" crc="3c66ea77" sha1="eca7d0c68c969ecce479258d05852ac3dba8ef0f" offset="0" />
+				<rom name="leo&apos;s &apos;lectric paintbrush (fixed).rom" size="8192" crc="3c66ea77" sha1="eca7d0c68c969ecce479258d05852ac3dba8ef0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2630,7 +2663,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="linking logic.rom" size="8192" crc="2484be4c" sha1="4620e341807cc061847dfdc954a537511762f81a" offset="0" />
+				<rom name="linking logic.rom" size="8192" crc="2484be4c" sha1="4620e341807cc061847dfdc954a537511762f81a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2643,7 +2676,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="logic levels.rom" size="8192" crc="c643f703" sha1="8aa85ccacd64a9b35193a7281ff729ea617f89b7" offset="0" />
+				<rom name="logic levels.rom" size="8192" crc="c643f703" sha1="8aa85ccacd64a9b35193a7281ff729ea617f89b7" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2651,13 +2684,27 @@ Compiled by K1W1
 	<software name="logcmstr">
 		<description>LogicMaster</description>
 		<!-- Serial: 10042A-3 -->
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. Will not run without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="logicmaster.rom" size="8192" crc="552127ce" sha1="e52d91314c59087edb4eb279c5e7ab7c6892ef2a" offset="0" />
+				<rom name="logicmaster.rom" size="8192" crc="618bf3db" sha1="addaf5244108f9a7ae7fb40641cf152f149f27b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgcmstrf" cloneof="logcmstr">
+		<description>LogicMaster (Fixed)</description>
+		<!-- Serial: 10042A-3 -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
+		<year>1983</year>
+		<publisher>Chalkboard</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
+			<dataarea name="rom" size="8192">
+				<rom name="logicmaster (fixed).rom" size="8192" crc="552127ce" sha1="e52d91314c59087edb4eb279c5e7ab7c6892ef2a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2688,15 +2735,28 @@ Compiled by K1W1
 		</part>
 	</software>
 	
-	<software name="mac65101">
-		<description>MAC-65 Macro Assembler v1.01</description>
+	<software name="mac6511a">
+		<description>MAC-65 Macro Assembler v1.01 (OSS Type A)</description>
+		<!-- Serial: N/A -->
+		<year>1984</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss 034m" />
+			<dataarea name="rom" size="16384">
+				<rom name="mac-65 macro assembler v1.01 (oss type a).rom" size="16384" crc="a91560ad" sha1="150e33ad1dfd07ad2d731ce121a8f4cc65ce93b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mac6511b">
+		<description>MAC-65 Macro Assembler v1.01 (OSS Type B)</description>
 		<!-- Serial: N/A -->
 		<year>1984</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="mac-65 macro assembler v1.01.rom" size="16384" crc="4102ca4f" sha1="2143a8317e85ec7eb27770a9f38e63867e41014b" offset="0" />
+				<rom name="mac-65 macro assembler v1.01 (oss type b).rom" size="16384" crc="4102ca4f" sha1="2143a8317e85ec7eb27770a9f38e63867e41014b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2722,7 +2782,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="major league hockey.rom" size="8192" crc="4ffbc999" sha1="82a1728e385d842a5a921c9cfd18661a186c914a" offset="0" />
+				<rom name="major league hockey.rom" size="8192" crc="4ffbc999" sha1="82a1728e385d842a5a921c9cfd18661a186c914a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2735,7 +2795,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="master type.rom" size="16384" crc="972ed894" sha1="edea6b93e57a5ca6e2c7962b774ea1c2b5fb6962" offset="0" />
+				<rom name="master type.rom" size="16384" crc="972ed894" sha1="edea6b93e57a5ca6e2c7962b774ea1c2b5fb6962" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2748,7 +2808,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="math encounter.rom" size="8192" crc="9eaba275" sha1="a38a53102200b5f942dce204abfcd9dedca3c997" offset="0" />
+				<rom name="math encounter.rom" size="8192" crc="9eaba275" sha1="a38a53102200b5f942dce204abfcd9dedca3c997" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2761,7 +2821,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="math mileage.rom" size="8192" crc="c8b311bf" sha1="864834bac2a5a005151fbe7579b6881cae3a9de6" offset="0" />
+				<rom name="math mileage.rom" size="8192" crc="c8b311bf" sha1="864834bac2a5a005151fbe7579b6881cae3a9de6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2839,7 +2899,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="megamania.rom" size="8192" crc="b3c5130c" sha1="ff4a574183168c3e98b2530d69734251a4b12508" offset="0" />
+				<rom name="megamania.rom" size="8192" crc="b3c5130c" sha1="ff4a574183168c3e98b2530d69734251a4b12508" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2852,7 +2912,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="memory manor.rom" size="8192" crc="aedcbd0b" sha1="e67e5c494a71727a526b9af6af8746401531af8c" offset="0" />
+				<rom name="memory manor.rom" size="8192" crc="aedcbd0b" sha1="e67e5c494a71727a526b9af6af8746401531af8c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2883,16 +2943,44 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="microill">
+		<description>MicroIllustrator</description>
+		<!-- Serial: 10016A-3 -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. Will not run without device attached. -->
+		<year>1983</year>
+		<publisher>Chalkboard</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
+			<dataarea name="rom" size="16384">
+				<rom name="micro illustrator.rom" size="16384" crc="5d5f76f6" sha1="72a3d1efb6d8582680fa61067139d4eb27128906" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="maestro">
 		<description>MicroMaestro</description>
 		<!-- Serial: 10021A-3 -->
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. Will not run without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="micromaestro.rom" size="8192" crc="1d45435f" sha1="19da5dbb8606f2e42a3d034ba0c92b49435e7da8" offset="0" />
+				<rom name="micromaestro.rom" size="8192" crc="98915118" sha1="179106c5653023271974379d58496194f9ab20cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maestrof" cloneof="maestro">
+		<description>MicroMaestro (Fixed)</description>
+		<!-- Serial: 10021A-3 -->
+		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
+		<year>1983</year>
+		<publisher>Chalkboard</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
+			<dataarea name="rom" size="8192">
+				<rom name="micromaestro (fixed).rom" size="8192" crc="1d45435f" sha1="19da5dbb8606f2e42a3d034ba0c92b49435e7da8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2906,7 +2994,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="millipede.rom" size="16384" crc="fb7e45da" sha1="957ae30c14efaa8c05d270fd232676b0d03a1b41" offset="0" />
+				<rom name="millipede.rom" size="16384" crc="fb7e45da" sha1="957ae30c14efaa8c05d270fd232676b0d03a1b41" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2932,7 +3020,20 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="miner 2049er.rom" size="16384" crc="c46031ca" sha1="c893210598fc5972b5e46b3073309ba9384f843d" offset="0" />
+				<rom name="miner 2049er.rom" size="16384" crc="7df1adfb" sha1="0564b1867a0b570d66dfcbc11adc3e51a2c6f28c" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="min2049a" cloneof="mine2049">
+		<description>Miner 2049er (Alt)</description>
+		<!-- Serial: N/A -->
+		<year>1982</year>
+		<publisher>Big Five Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="miner 2049er (alt).rom" size="16384" crc="c46031ca" sha1="c893210598fc5972b5e46b3073309ba9384f843d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2946,7 +3047,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="missile command.rom" size="8192" crc="d2e36392" sha1="df5474e89183ca0313f50ea4fc72c67bf81c7351" offset="0" />
+				<rom name="missile command.rom" size="8192" crc="d2e36392" sha1="df5474e89183ca0313f50ea4fc72c67bf81c7351" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2986,7 +3087,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="monster maze.rom" size="8192" crc="37049e57" sha1="4f5d333118e2bc69a4c6e18c36c9364f53470baf" offset="0" />
+				<rom name="monster maze.rom" size="8192" crc="37049e57" sha1="4f5d333118e2bc69a4c6e18c36c9364f53470baf" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3013,7 +3114,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="moon patrol.rom" size="16384" crc="b845edb8" sha1="55b66f8e5dda90035f8c53f5317e95d3b55d57c8" offset="0" />
+				<rom name="moon patrol.rom" size="16384" crc="b845edb8" sha1="55b66f8e5dda90035f8c53f5317e95d3b55d57c8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3026,7 +3127,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mountain king.rom" size="8192" crc="79748c93" sha1="5e8efb41e2051627a9f0397d405f5f852e522490" offset="0" />
+				<rom name="mountain king.rom" size="8192" crc="79748c93" sha1="5e8efb41e2051627a9f0397d405f5f852e522490" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3039,7 +3140,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="movie musical madness.rom" size="16384" crc="0d8f719b" sha1="1e5bf12d472e795a8cb1f8abf9c7456211416d1c" offset="0" />
+				<rom name="movie musical madness.rom" size="16384" crc="0d8f719b" sha1="1e5bf12d472e795a8cb1f8abf9c7456211416d1c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3065,7 +3166,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr cool.rom" size="8192" crc="1345d10c" sha1="e3073791797c18dfd7ca8e73e0bfb5637ddb48e0" offset="0" />
+				<rom name="mr cool.rom" size="8192" crc="1345d10c" sha1="e3073791797c18dfd7ca8e73e0bfb5637ddb48e0" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3092,7 +3193,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="ms pac-man (red cherry).rom" size="16384" crc="4ad748b2" sha1="7c0ff13751169854fc5a80b1375ea4ee1d7ff0c1" offset="0" />
+				<rom name="ms pac-man (red cherry).rom" size="16384" crc="4ad748b2" sha1="7c0ff13751169854fc5a80b1375ea4ee1d7ff0c1" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3106,7 +3207,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="ms pac-man (green cherry).rom" size="16384" crc="f91d18cf" sha1="c8620e435ca7a49252dad309a4cba600c59d95ea" offset="0" />
+				<rom name="ms pac-man (green cherry).rom" size="16384" crc="f91d18cf" sha1="c8620e435ca7a49252dad309a4cba600c59d95ea" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3145,7 +3246,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="night strike!.rom" size="8192" crc="42da2cf3" sha1="d4b3241f88f421ef8e65055b6c4d019e93590f71" offset="0" />
+				<rom name="night strike!.rom" size="8192" crc="61245a75" sha1="b307df40cc03d7f990aebf5e3ec7c9087087e343" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3158,7 +3259,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="oil&apos;s well.rom" size="16384" crc="030ecad6" sha1="f982c17a8daef1874456baae72f77dca86cb48a8" offset="0" />
+				<rom name="oil&apos;s well.rom" size="16384" crc="030ecad6" sha1="f982c17a8daef1874456baae72f77dca86cb48a8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3171,7 +3272,20 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="orc attack.rom" size="16384" crc="fbfaefcd" sha1="4e42caa95764f33f988bd7bab75268d66d203530" offset="0" />
+				<rom name="orc attack.rom" size="16384" crc="5e9849b1" sha1="bad95db8dd81824d19484c3543b617e30fccb735" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orcattka" cloneof="orcattk">
+		<description>Orc Attack (Alt)</description>
+		<!-- Serial: THA12008 -->
+		<year>1983</year>
+		<publisher>Thorn EMI</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="orc attack (alt).rom" size="16384" crc="fbfaefcd" sha1="4e42caa95764f33f988bd7bab75268d66d203530" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3184,7 +3298,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="ozzy&apos;s orchard.rom" size="16384" crc="1554b983" sha1="334254c392cc14d0f64f71954292322772ab514c" offset="0" />
+				<rom name="ozzy&apos;s orchard.rom" size="16384" crc="1554b983" sha1="334254c392cc14d0f64f71954292322772ab514c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3198,7 +3312,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="pac-man.rom" size="8192" crc="61cf6167" sha1="bc600ef63f8d1bdd3911981c2752ea23db959960" offset="0" />
+				<rom name="pac-man.rom" size="8192" crc="61cf6167" sha1="bc600ef63f8d1bdd3911981c2752ea23db959960" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3237,7 +3351,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="peanut butter panic.rom" size="8192" crc="cdeb7759" sha1="ed857bebe7502f97322fe108952591dbd001f61c" offset="0" />
+				<rom name="peanut butter panic.rom" size="8192" crc="cdeb7759" sha1="ed857bebe7502f97322fe108952591dbd001f61c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3250,7 +3364,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="pengo.rom" size="16384" crc="d8a9fe0a" sha1="2c0cb48caeb77b25551d27fade419454fa2fd114"  offset="0" />
+				<rom name="pengo.rom" size="16384" crc="d8a9fe0a" sha1="2c0cb48caeb77b25551d27fade419454fa2fd114" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3263,7 +3377,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
-				<rom name="picnic paranoia.rom" size="16384" crc="e386a621" sha1="b63514aa944b8771a4a12d5f8c661cac8e04dd06"  offset="0" />
+				<rom name="picnic paranoia.rom" size="16384" crc="e386a621" sha1="b63514aa944b8771a4a12d5f8c661cac8e04dd06" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3276,7 +3390,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="pilot computing language.rom" size="8192" crc="3a695b4c" sha1="8a11ed7befcd5919440db16734d41c5c4e5c1776"  offset="0" />
+				<rom name="pilot computing language.rom" size="8192" crc="3a695b4c" sha1="8a11ed7befcd5919440db16734d41c5c4e5c1776" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3289,7 +3403,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="pitfall!.rom" size="8192" crc="b58bdf1c" sha1="9487baa01e3ba56d082fadec56e8ddee1cde3486"  offset="0" />
+				<rom name="pitfall!.rom" size="8192" crc="b58bdf1c" sha1="9487baa01e3ba56d082fadec56e8ddee1cde3486" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3302,7 +3416,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="pitfall! 2 - lost caverns.rom" size="16384" crc="1668cf3b" sha1="74483a0bf38c61b495268591396d65e1a9518101"  offset="0" />
+				<rom name="pitfall! 2 - lost caverns.rom" size="16384" crc="1668cf3b" sha1="74483a0bf38c61b495268591396d65e1a9518101" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3315,7 +3429,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="pitstop.rom" size="16384" crc="d49ebf91" sha1="a3b7541c57a51ced98084027e0b9b15637359c54"  offset="0" />
+				<rom name="pitstop.rom" size="16384" crc="d49ebf91" sha1="a3b7541c57a51ced98084027e0b9b15637359c54" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3328,7 +3442,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="plattermania.rom" size="8192" crc="6cef6f94" sha1="a09bfd7864220582ec8317ea914d0b25247146b7"  offset="0" />
+				<rom name="plattermania.rom" size="8192" crc="6cef6f94" sha1="a09bfd7864220582ec8317ea914d0b25247146b7" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3342,7 +3456,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="pole position.rom" size="16384" crc="82ce0ca6" sha1="e5a844a537f509295dd5d77e38b306084a975a6a"  offset="0" />
+				<rom name="pole position.rom" size="16384" crc="581570c4" sha1="57bbb668072241925cc8d19561cc0d47b3d6a570" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3355,7 +3469,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="pool 400.rom" size="8192" crc="a6c2130f" sha1="55d2118259e58d33f99dbebdaff43df531ce6585"  offset="0" />
+				<rom name="pool 400.rom" size="8192" crc="a6c2130f" sha1="55d2118259e58d33f99dbebdaff43df531ce6585" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3368,7 +3482,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="rack &apos;em up!.rom" size="16384" crc="92b875f5" sha1="19c2e6570d7294c5031e0cce7c74bb605717aaf0"  offset="0" />
+				<rom name="rack &apos;em up!.rom" size="16384" crc="5335d935" sha1="e5d2a855b46883d6247c591a7ecd30bd240c6aad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3381,7 +3495,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="popeye (us).rom" size="16384" crc="00fce79a" sha1="c1c4499bf7cbb3ebeb1f10eed2fe8962df6a8ad3"  offset="0" />
+				<rom name="popeye (us).rom" size="16384" crc="00fce79a" sha1="c1c4499bf7cbb3ebeb1f10eed2fe8962df6a8ad3" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3394,7 +3508,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="popeye (eu).rom" size="16384" crc="a35d5e6a" sha1="5dcef8b50bc32b305846867ff9039b65841490c0"  offset="0" />
+				<rom name="popeye (eu).rom" size="16384" crc="a35d5e6a" sha1="5dcef8b50bc32b305846867ff9039b65841490c0" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3407,7 +3521,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="porky&apos;s.rom" size="16384" crc="1733d3fc" sha1="139f9075247ca1526ae5a7ac68927b496a940226"  offset="0" />
+				<rom name="porky&apos;s.rom" size="16384" crc="1733d3fc" sha1="139f9075247ca1526ae5a7ac68927b496a940226" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3420,7 +3534,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="powerstar.rom" size="16384" crc="dc0dca6e" sha1="7e636709a2612018f409561680b26bb92fab2e56"  offset="0" />
+				<rom name="powerstar.rom" size="16384" crc="dc0dca6e" sha1="7e636709a2612018f409561680b26bb92fab2e56" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3434,7 +3548,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="preppie.rom" size="16384" crc="52ae50e3" sha1="65b801796ba970b391d983a488c11a23c3f76d6b"  offset="0" />
+				<rom name="preppie.rom" size="16384" crc="52ae50e3" sha1="65b801796ba970b391d983a488c11a23c3f76d6b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3447,7 +3561,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="princess and the frog.rom" size="8192" crc="dbb30884" sha1="c57a7ff102f67acbe748ac5392ec8b8e1d331097"  offset="0" />
+				<rom name="princess and the frog.rom" size="8192" crc="7ce79281" sha1="eaa63bb404248aae516872b069e78840932d18c5" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3460,7 +3574,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="pronto electronic banking.rom" size="16384" crc="f87e5a14" sha1="dbea9539300f676e659f71c2ff9b808d77fc7bc4"  offset="0" />
+				<rom name="pronto electronic banking.rom" size="16384" crc="f87e5a14" sha1="dbea9539300f676e659f71c2ff9b808d77fc7bc4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3473,7 +3587,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
-				<rom name="protector 2.rom" size="16384" crc="374f311f" sha1="f31ae258139acf1bdf7fcfa26784b17fe42874ed"  offset="0" />
+				<rom name="protector 2.rom" size="16384" crc="374f311f" sha1="f31ae258139acf1bdf7fcfa26784b17fe42874ed" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3486,7 +3600,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="qbert.rom" size="8192" crc="ff3f0472" sha1="03fda6774715cc1005f46b18b995dd4a92ce903c"  offset="0" />
+				<rom name="qbert.rom" size="8192" crc="ff3f0472" sha1="03fda6774715cc1005f46b18b995dd4a92ce903c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3499,7 +3613,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="qix.rom" size="8192" crc="ba7cac35" sha1="1993dff73922e3beb742221130ccbf9deb08af98"  offset="0" />
+				<rom name="qix.rom" size="8192" crc="967b8051" sha1="0454ced8bdf47402dcda261ad12f6b805645bdbc" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3512,7 +3626,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="rally speedway.rom" size="16384" crc="0a0f6ea2" sha1="30b418c246ea43b16b9f70fdd875c6acbd9395ea"  offset="0" />
+				<rom name="rally speedway.rom" size="16384" crc="0a0f6ea2" sha1="30b418c246ea43b16b9f70fdd875c6acbd9395ea" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3526,7 +3640,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="realsports football.rom" size="16384" crc="5e8951f4" sha1="2f615847f073d68b7f4718ed06e7054bab6888e9"  offset="0" />
+				<rom name="realsports football.rom" size="16384" crc="5e8951f4" sha1="2f615847f073d68b7f4718ed06e7054bab6888e9" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3540,7 +3654,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="tennis.rom" size="16384" crc="9a34cbdc" sha1="c9ec768a4a3de523d66b2d331e48bcc18d2f1a30"  offset="0" />
+				<rom name="tennis.rom" size="16384" crc="9a34cbdc" sha1="c9ec768a4a3de523d66b2d331e48bcc18d2f1a30" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3553,7 +3667,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="river raid.rom" size="8192" crc="6e601d81" sha1="107cb8847329f7d68282f54c95ae5533452b87fd"  offset="0" />
+				<rom name="river raid.rom" size="8192" crc="6e601d81" sha1="107cb8847329f7d68282f54c95ae5533452b87fd" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3566,7 +3680,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="river rescue.rom" size="16384" crc="1bdd7e47" sha1="01b33a1fe61dba58c9ade67013179925bc7d2848"  offset="0" />
+				<rom name="river rescue.rom" size="16384" crc="a7d2e0e8" sha1="6ed64649f000ddd44eaf46c0334301c7e9d75aac" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3579,23 +3693,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="robotron 2084.rom" size="16384" crc="528fc44a" sha1="604486feacd59499426e2f2d5cc66eabe25bfc68"  offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rob2084a" cloneof="robo2084">
-		<!-- File Difference -->
-		<!-- 0x14e6 : 0xa4 0x73 0xa5 ('robo2084') - 0xfc 0xd2 0x7f ('rob2084a') -->
-		<!-- 0x206f : 0xa5 0xbd 0x85 ('robo2084') - 0x4c 0xbc 0x7f ('rob2084a') -->
-		<description>Robotron 2084 (Alt)</description>
-		<!-- Serial: RX8033 -->
-		<year>1983</year>
-		<publisher>Atari</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="robotron 2084 (alt).rom" size="16384" crc="ee9d43c4" sha1="62ffb053f8aadff3d97abb11e8f4dc7ac1774b20"  offset="0" />
+				<rom name="robotron 2084.rom" size="16384" crc="528fc44a" sha1="604486feacd59499426e2f2d5cc66eabe25bfc68" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3608,7 +3706,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="satan&apos;s hollow.rom" size="16384" crc="0f7c7934" sha1="654b64d0bad44d9cdb3a3211470ba4cf1c8876b0"  offset="0" />
+				<rom name="satan&apos;s hollow.rom" size="16384" crc="0f7c7934" sha1="654b64d0bad44d9cdb3a3211470ba4cf1c8876b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3621,7 +3719,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="sea chase.rom" size="8192" crc="99b5a1dd" sha1="4e511d2d935039d514889583a7584f718e02f09c"  offset="0" />
+				<rom name="sea chase.rom" size="8192" crc="99b5a1dd" sha1="4e511d2d935039d514889583a7584f718e02f09c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3634,7 +3732,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="sea fox.rom" size="16384" crc="932cc9a8" sha1="7eeb3208453f22bcc8d8c7a06b54075c7ff8c9dd"  offset="0" />
+				<rom name="sea fox.rom" size="16384" crc="932cc9a8" sha1="7eeb3208453f22bcc8d8c7a06b54075c7ff8c9dd" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3647,7 +3745,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="sea horse hide &apos;n seek.rom" size="16384" crc="52964146" sha1="3ea5a49e59a13624b69b9450a7264d7051f81f0e"  offset="0" />
+				<rom name="sea horse hide &apos;n seek.rom" size="16384" crc="52964146" sha1="3ea5a49e59a13624b69b9450a7264d7051f81f0e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3660,7 +3758,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="serpentine.rom" size="8192" crc="1b555b41" sha1="4f1dfee65bedb0626d4964ab0a5393416376c920"  offset="0" />
+				<rom name="serpentine.rom" size="8192" crc="1b555b41" sha1="4f1dfee65bedb0626d4964ab0a5393416376c920" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3674,7 +3772,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="sesame street letter-go-round.rom" size="16384" crc="5c68d891" sha1="23464aa620a4bb6d0f135c22956e1c4cb4b84051"  offset="0" />
+				<rom name="sesame street letter-go-round.rom" size="16384" crc="f525b904" sha1="14851876e2bb843559dc9d13a8afc5595bf1646b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3687,7 +3785,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
-				<rom name="shamus.rom" size="16384" crc="bd3f06ee" sha1="175d5dc0142ee092bcd263bd029e77f191322121"  offset="0" />
+				<rom name="shamus.rom" size="16384" crc="bd3f06ee" sha1="175d5dc0142ee092bcd263bd029e77f191322121" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3697,10 +3795,11 @@ Compiled by K1W1
 		<!-- Serial: 664R -->
 		<year>1983</year>
 		<publisher>Epyx</publisher>
+		
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="silicon warrior.rom" size="16384" crc="a7ecc8f7" sha1="e8d3fd99c5aba88688f2e9023ff06e62fd5267db"  offset="0" />
+				<rom name="silicon warrior.rom" size="16384" crc="a7ecc8f7" sha1="e8d3fd99c5aba88688f2e9023ff06e62fd5267db" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3713,7 +3812,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="sky writer.rom" size="16384" crc="0a73a8f5" sha1="2c13733c770b2bd02bb7572b2831b86dfa9205f3"  offset="0" />
+				<rom name="sky writer.rom" size="16384" crc="0a73a8f5" sha1="2c13733c770b2bd02bb7572b2831b86dfa9205f3" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3726,12 +3825,12 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
-				<rom name="slime.rom" size="16384" crc="1babcad6" sha1="d2705b7990029dbfbd0282239aec80606753c760"  offset="0" />
+				<rom name="slime.rom" size="16384" crc="1babcad6" sha1="d2705b7990029dbfbd0282239aec80606753c760" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="smart14">
+	<software name="smart41">
 		<description>Smart Terminal v4.1</description>
 		<!-- Serial: N/A -->
 		<year>1983</year>
@@ -3739,7 +3838,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="smart terminal v4.1.rom" size="8192" crc="f5c34344" sha1="73917bed05776d6f3cdd2590479bf2e86f14c2d4"  offset="0" />
+				<rom name="smart terminal v4.1.rom" size="8192" crc="f5c34344" sha1="73917bed05776d6f3cdd2590479bf2e86f14c2d4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3752,7 +3851,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="soccer.rom" size="8192" crc="784c7060" sha1="efa59cd8919287e2cd1bc8149dc9867ec7d5e171"  offset="0" />
+				<rom name="soccer.rom" size="8192" crc="784c7060" sha1="efa59cd8919287e2cd1bc8149dc9867ec7d5e171" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3766,7 +3865,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="space invaders.rom" size="8192" crc="6c811a10" sha1="075455bd1090a2d00e7dd47adf81919782aa3828"  offset="0" />
+				<rom name="space invaders.rom" size="8192" crc="3614d0aa" sha1="963fc3625a38fd5042a0efef4465274aa849dadc" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3779,7 +3878,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="space journey.rom" size="16384" crc="161657f0" sha1="857439afc9d9f834175601ea8cede17ab1301dcf"  offset="0" />
+				<rom name="space journey.rom" size="16384" crc="161657f0" sha1="857439afc9d9f834175601ea8cede17ab1301dcf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3792,7 +3891,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="space shuttle - a journey into space.rom" size="16384" crc="66832f68" sha1="d4b96474939ef906fa5980f298cc7226d5778b6e"  offset="0" />
+				<rom name="space shuttle - a journey into space.rom" size="16384" crc="66832f68" sha1="d4b96474939ef906fa5980f298cc7226d5778b6e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3805,7 +3904,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="spark bugs.rom" size="8192" crc="f56eced2" sha1="70af5a7a19a7a03650c2e91b1e825c4b3e310432"  offset="0" />
+				<rom name="spark bugs.rom" size="8192" crc="f56eced2" sha1="70af5a7a19a7a03650c2e91b1e825c4b3e310432" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3818,7 +3917,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="65536">
-				<rom name="spartados x v4.18.rom" size="65536" crc="e825e9ab" sha1="ffdaff6873ccd7641afc46546a5fdc8acb7d5d32"  offset="0" />
+				<rom name="spartados x v4.18.rom" size="65536" crc="e825e9ab" sha1="ffdaff6873ccd7641afc46546a5fdc8acb7d5d32" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3831,7 +3930,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="65536">
-				<rom name="spartados x v4.19.rom" size="65536" crc="6bb5733c" sha1="57bcad630e7be290aa5d5436e886bb8fd2cec97a"  offset="0" />
+				<rom name="spartados x v4.19.rom" size="65536" crc="6bb5733c" sha1="57bcad630e7be290aa5d5436e886bb8fd2cec97a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3844,7 +3943,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="65536">
-				<rom name="spartados x v4.2a.rom" size="65536" crc="e9f82c76" sha1="3ce5bb28e583748b66e2dbcc38ecd30bca6f2aae"  offset="0" />
+				<rom name="spartados x v4.2a.rom" size="65536" crc="e9f82c76" sha1="3ce5bb28e583748b66e2dbcc38ecd30bca6f2aae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3857,7 +3956,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="65536">
-				<rom name="spartados x v4.20.rom" size="65536" crc="781e045c" sha1="9c4296cd8b520e75cbe6fa7dfc06b12ef7ca5ce1"  offset="0" />
+				<rom name="spartados x v4.20.rom" size="65536" crc="781e045c" sha1="9c4296cd8b520e75cbe6fa7dfc06b12ef7ca5ce1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3870,7 +3969,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="65536">
-				<rom name="spartados x v4.21.rom" size="65536" crc="db0ca1eb" sha1="8b190e7fa5f77a7ccf609af3cbab09b64da7c923"  offset="0" />
+				<rom name="spartados x v4.21.rom" size="65536" crc="db0ca1eb" sha1="8b190e7fa5f77a7ccf609af3cbab09b64da7c923" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3883,7 +3982,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="65536">
-				<rom name="spartados x v4.22.rom" size="65536" crc="de1ebece" sha1="b8170d8d3fda45ba09a3b0f67decd56cf3f9bd76"  offset="0" />
+				<rom name="spartados x v4.22.rom" size="65536" crc="de1ebece" sha1="b8170d8d3fda45ba09a3b0f67decd56cf3f9bd76" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3894,9 +3993,9 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>IDSI</publisher>
 		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 8k" />
+			<feature name="cart_type" value="standard 8k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="speedway blast.rom" size="8192" crc="f895cc47" sha1="a2531e4c9d7ea7ae90b21feba288f3113eea0acb"  offset="0" />
+				<rom name="speedway blast.rom" size="8192" crc="8e67192b" sha1="d819708553249cd63462a7001fb28702f4f165b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3909,7 +4008,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="spider city.rom" size="8192" crc="8f8c3841" sha1="479615ac114f25fac8c0b16634d4fddd04bdd810"  offset="0" />
+				<rom name="spider city.rom" size="8192" crc="d519f2fb" sha1="41132f0aad74ac73e4c15bd6a7d4ea7e650ef417" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3922,7 +4021,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="springer.rom" size="16384" crc="81466b55" sha1="7272ee5135be828c60af0565ac6c21f5d210388d"  offset="0" />
+				<rom name="springer.rom" size="16384" crc="81466b55" sha1="7272ee5135be828c60af0565ac6c21f5d210388d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3936,7 +4035,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="spy hunter.rom" size="16384" crc="34df8ffc" sha1="999969fc114e5ba8ccaa1079ae0c613f07a898d2"  offset="0" />
+				<rom name="spy hunter.rom" size="16384" crc="34df8ffc" sha1="999969fc114e5ba8ccaa1079ae0c613f07a898d2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3949,7 +4048,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="squish &apos;em!.rom" size="8192" crc="aac0f7d6" sha1="c5235ff89adb86f35e1fd3e2b21e41d2048c6b88"  offset="0" />
+				<rom name="squish &apos;em!.rom" size="8192" crc="f0553d6c" sha1="e2f2ac31793bc587fc977137c08f83aa162198a4" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3962,7 +4061,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="star maze.rom" size="16384" crc="6fd9daff" sha1="76c9b4dacaafdbf594727842413b2c680e60daad"  offset="0" />
+				<rom name="star maze.rom" size="16384" crc="6fd9daff" sha1="76c9b4dacaafdbf594727842413b2c680e60daad" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3975,7 +4074,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="star raiders.rom" size="8192" crc="5ec023ba" sha1="32b8ed4fcb95ba013a6b5b9c0676cb16f7672e43"  offset="0" />
+				<rom name="star raiders.rom" size="8192" crc="5ec023ba" sha1="32b8ed4fcb95ba013a6b5b9c0676cb16f7672e43" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3988,7 +4087,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="star trek - strategic operations simulator.rom" size="16384" crc="9df169d9" sha1="d91f27803065f6b88f2f595c4b6503b76d16a4e4"  offset="0" />
+				<rom name="star trek - strategic operations simulator.rom" size="16384" crc="9df169d9" sha1="d91f27803065f6b88f2f595c4b6503b76d16a4e4" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4001,7 +4100,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="star wars - return of the jedi - death star battle.rom" size="8192" crc="a40e15e5" sha1="2612a52591bb678d86af240ddc5619513941e6a6"  offset="0" />
+				<rom name="star wars - return of the jedi - death star battle.rom" size="8192" crc="a40e15e5" sha1="2612a52591bb678d86af240ddc5619513941e6a6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4014,7 +4113,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="star wars - the arcade game.rom" size="16384" crc="aea795f7" sha1="42c4e1685bad6847c5b6ee58d172a9bf9148bffa"  offset="0" />
+				<rom name="star wars - the arcade game.rom" size="16384" crc="aea795f7" sha1="42c4e1685bad6847c5b6ee58d172a9bf9148bffa" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4027,7 +4126,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="stargate (proto).rom" size="16384" crc="f527b721" sha1="ae833c0cfbb985193e53fbca84ca2893ce01c601"  offset="0" />
+				<rom name="stargate (proto).rom" size="16384" crc="f527b721" sha1="ae833c0cfbb985193e53fbca84ca2893ce01c601" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4040,7 +4139,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="starion.rom" size="16384" crc="23faf9b3" sha1="835d389dba0a61efe854346d22d78333ef5f88d8"  offset="0" />
+				<rom name="starion.rom" size="16384" crc="23faf9b3" sha1="835d389dba0a61efe854346d22d78333ef5f88d8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4053,7 +4152,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="story machine.rom" size="16384" crc="b3e7fe47" sha1="30012766920a7191c56ed9eddfd7c7307b99debc"  offset="0" />
+				<rom name="story machine.rom" size="16384" crc="b3e7fe47" sha1="30012766920a7191c56ed9eddfd7c7307b99debc" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4066,7 +4165,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 12k" />
 			<dataarea name="rom" size="16384">
-				<rom name="submarine commander.rom" size="16384" crc="77198b2b" sha1="284ab6fe2da11f6a080398333c706f2e87de074a"  offset="0" />
+				<rom name="submarine commander.rom" size="16384" crc="ce9562eb" sha1="54dd71f5b65ce7f6ac467e67c392d54c4b34efd8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4080,7 +4179,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="super breakout.rom" size="8192" crc="17348643" sha1="a3e27fd8fccaf84e0a017d4c3e83339a8f07d21e"  offset="0" />
+				<rom name="super breakout.rom" size="8192" crc="4da14cf9" sha1="e0e3cfee1deec5f57fcbd3c98f61225913fc6fb7" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4093,7 +4192,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="super cobra.rom" size="8192" crc="2af38d2f" sha1="5417f31e11e9b07cb35bd7454b3b9dbe8da53827"  offset="0" />
+				<rom name="super cobra.rom" size="8192" crc="2af38d2f" sha1="5417f31e11e9b07cb35bd7454b3b9dbe8da53827" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4106,7 +4205,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="super e-burner.rom" size="8192" crc="21516e15" sha1="f81598ee460a7f1d643df49a92424e9084b3b7e5"  offset="0" />
+				<rom name="super e-burner.rom" size="8192" crc="21516e15" sha1="f81598ee460a7f1d643df49a92424e9084b3b7e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4119,7 +4218,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="super pac-man (proto).rom" size="16384" crc="4b9b00f5" sha1="fc67c588060fe85eb169b5e7467f8b96772afcce"  offset="0" />
+				<rom name="super pac-man (proto).rom" size="16384" crc="4b9b00f5" sha1="fc67c588060fe85eb169b5e7467f8b96772afcce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4133,7 +4232,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="super sketch graphics master.rom" size="8192" crc="0e1c20c5" sha1="73272680f87ae4af625b99144b561864eb59f596"  offset="0" />
+				<rom name="super sketch graphics master.rom" size="8192" crc="0e1c20c5" sha1="73272680f87ae4af625b99144b561864eb59f596" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4146,7 +4245,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="super zaxxon.rom" size="16384" crc="9e64e13b" sha1="60752c2cfed01095ec01be96b15977166509503e"  offset="0" />
+				<rom name="super zaxxon.rom" size="16384" crc="9e64e13b" sha1="60752c2cfed01095ec01be96b15977166509503e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4159,7 +4258,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="superman iii (proto).rom" size="16384" crc="639846d6" sha1="bbb315e92b5508a7fb14e5a8b83ebd9f44997f5d"  offset="0" />
+				<rom name="superman iii (proto).rom" size="16384" crc="639846d6" sha1="bbb315e92b5508a7fb14e5a8b83ebd9f44997f5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4172,7 +4271,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="survival of the fittest.rom" size="8192" crc="7f48fbc5" sha1="d585d92eb5f471a485576ab702bd070cad742a4a"  offset="0" />
+				<rom name="survival of the fittest.rom" size="8192" crc="7f48fbc5" sha1="d585d92eb5f471a485576ab702bd070cad742a4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4185,7 +4284,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="N/A" />
 			<dataarea name="rom" size="16384">
-				<rom name="target electronic banking.rom" size="16384" crc="60c2a5ae" sha1="3c4976c118a9aefba8f8895e9b8c818dbc641371"  offset="0" />
+				<rom name="target electronic banking.rom" size="16384" crc="60c2a5ae" sha1="3c4976c118a9aefba8f8895e9b8c818dbc641371" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4198,7 +4297,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 2k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="8192">
-				<rom name="telelink 1.rom" size="8192" crc="19044c21" sha1="88206602e7aa8c2985b79d23340f497dda0e3f90"  offset="0" />
+				<rom name="telelink 1.rom" size="8192" crc="bb648a61" sha1="172ab373068cf28cd0bade302d79880757b90d9c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4211,7 +4310,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="N/A" /> <!-- Runs in OSb only --> 
 			<dataarea name="rom" size="8192">
-				<rom name="telelink 2.rom" size="8192" crc="f0163f90" sha1="15d1dc9591b7306453087c94746ba1622e46d0ad"  offset="0" />
+				<rom name="telelink 2.rom" size="8192" crc="f0163f90" sha1="15d1dc9591b7306453087c94746ba1622e46d0ad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4237,7 +4336,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="the designer&apos;s pencil.rom" size="16384" crc="6ed64678" sha1="ecff0515340a0fe0f072f74ed3996cf2adc053ad"  offset="0" />
+				<rom name="the designer&apos;s pencil.rom" size="16384" crc="6ed64678" sha1="ecff0515340a0fe0f072f74ed3996cf2adc053ad" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4250,7 +4349,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="the dreadnaught factor.rom" size="8192" crc="c26fbb5b" sha1="e6da0ac55054f43ab612345d787a1ff2b505383a"  offset="0" />
+				<rom name="the dreadnaught factor.rom" size="8192" crc="c26fbb5b" sha1="e6da0ac55054f43ab612345d787a1ff2b505383a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4263,7 +4362,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="thera-med zahnschutz-spiel, das.rom" size="8192" crc="10df011f" sha1="5cd6905ae627a8549640c83eb31f015b1cf4947b"  offset="0" />
+				<rom name="thera-med zahnschutz-spiel, das.rom" size="8192" crc="10df011f" sha1="5cd6905ae627a8549640c83eb31f015b1cf4947b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4276,7 +4375,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="the last starfighter (proto).rom" size="16384" crc="b4c640f1" sha1="18390545ea0bb8818908a9dc9e8372ec9bb56cba"  offset="0" />
+				<rom name="the last starfighter (proto).rom" size="16384" crc="b4c640f1" sha1="18390545ea0bb8818908a9dc9e8372ec9bb56cba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4289,7 +4388,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="the last starfighter (proto)(alt).rom" size="16384" crc="4de95774" sha1="901fbef6ffdf00a631f9fab35b65e238c8e3af7f"  offset="0" />
+				<rom name="the last starfighter (proto)(alt).rom" size="16384" crc="4de95774" sha1="901fbef6ffdf00a631f9fab35b65e238c8e3af7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4302,7 +4401,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="the learning phone.rom" size="8192" crc="5b101922" sha1="4808b54b0671f94cd995f4230aacf0496bf9a1c1"  offset="0" />
+				<rom name="the learning phone.rom" size="8192" crc="5b101922" sha1="4808b54b0671f94cd995f4230aacf0496bf9a1c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4316,7 +4415,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 4k" /> <!-- Runs in OSb only --> 
 			<dataarea name="rom" size="8192">
-				<rom name="the monkey wrench.rom" size="8192" crc="147541a4" sha1="d397911ef8828a5ebc4e366e38b80a42fa42f169"  offset="0" />
+				<rom name="the monkey wrench.rom" size="8192" crc="4ee08b1e" sha1="cdd962ca6d427339715df7d466f91b8cd87518b6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4330,7 +4429,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 8k" /> <!-- Runs in OSb only --> 
 			<dataarea name="rom" size="8192">
-				<rom name="the monkey wrench 2.rom" size="8192" crc="1e8d6042" sha1="e33ef9d5e72b875dd5beb81ea9a13c2f5d776ed9"  offset="0" />
+				<rom name="the monkey wrench 2.rom" size="8192" crc="7191a903" sha1="318a3e7629565db8554a627da56e778a2c0155a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4344,7 +4443,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="the writer&apos;s tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2"  offset="0" />
+				<rom name="the writer&apos;s tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4358,7 +4457,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss 034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="the writer&apos;s tool [fixed].rom" size="16384" crc="a1cb09bc" sha1="a2ce17cf15a7df539de45aed7b920aa374856905"  offset="0" />
+				<rom name="the writer&apos;s tool [fixed].rom" size="16384" crc="a1cb09bc" sha1="a2ce17cf15a7df539de45aed7b920aa374856905" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4371,7 +4470,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="timebound.rom" size="16384" crc="d3e98044" sha1="df971026c7e7be858e60a7e6e254738d003dfa58"  offset="0" />
+				<rom name="timebound.rom" size="16384" crc="d3e98044" sha1="df971026c7e7be858e60a7e6e254738d003dfa58" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4384,7 +4483,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="topper.rom" size="16384" crc="0286eea6" sha1="7e127d80dc7a7b38cc842b0d4cb653c24cb07c70"  offset="0" />
+				<rom name="topper.rom" size="16384" crc="0286eea6" sha1="7e127d80dc7a7b38cc842b0d4cb653c24cb07c70" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4393,12 +4492,13 @@ Compiled by K1W1
 		<description>Track and Field</description>
 		<!-- Serial: RX8069 -->
 		<!-- Works with Track & Field controller -->
+		<!-- When run in PAL the title screen says "Los Angeles 1984 Games" -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="track and field.rom" size="16384" crc="9e2484c8" sha1="899305b96e204e8091183733bec43fbd84c18d4a"  offset="0" />
+				<rom name="track and field.rom" size="16384" crc="9e2484c8" sha1="899305b96e204e8091183733bec43fbd84c18d4a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4411,7 +4511,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="turmoil.rom" size="8192" crc="a4dd6065" sha1="0763a472b3da20b2e5da0d8639a334c26057e6c5"  offset="0" />
+				<rom name="turmoil.rom" size="8192" crc="fe48aadf" sha1="f7a22a9c750d1df595272231bc9cc2568420b9a8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4424,7 +4524,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="trion.rom" size="16384" crc="2c42362f" sha1="10e5c565deff279b907755d015d2b1e499993482"  offset="0" />
+				<rom name="trion.rom" size="16384" crc="2c42362f" sha1="10e5c565deff279b907755d015d2b1e499993482" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4437,7 +4537,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="typo.rom" size="8192" crc="fe47d621" sha1="a04c25ba99941c108ca2bc6233013dbbaab90150"  offset="0" />
+				<rom name="typo.rom" size="8192" crc="70585854" sha1="a6d3de8600f460e6912385a7cccfc7797cdda4e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4450,7 +4550,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="typo attack.rom" size="8192" crc="4ba52450" sha1="00163aacba56a207b08b2f96b02d6ca8cd5b5418"  offset="0" />
+				<rom name="typo attack.rom" size="8192" crc="ed6f714c" sha1="106f2a3680f27955b231edcf911529faa8d2f2ab" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4463,7 +4563,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="up for grabs.rom" size="8192" crc="fc62c1ce" sha1="ef2b552602067ebcc781710d36a1dde783b34209"  offset="0" />
+				<rom name="up for grabs.rom" size="8192" crc="fc62c1ce" sha1="ef2b552602067ebcc781710d36a1dde783b34209" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4476,7 +4576,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="up &apos;n down.rom" size="16384" crc="53ea3bf6" sha1="1a1833abf8961d5b0c68a93785ead6121c3adeaf"  offset="0" />
+				<rom name="up &apos;n down.rom" size="16384" crc="53ea3bf6" sha1="1a1833abf8961d5b0c68a93785ead6121c3adeaf" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4489,7 +4589,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="up up and away (proto).rom" size="16384" crc="a8261044" sha1="5d9988c4305213356f9459a900bcd411a5db43cb"  offset="0" />
+				<rom name="up up and away (proto).rom" size="16384" crc="a8261044" sha1="5d9988c4305213356f9459a900bcd411a5db43cb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4502,7 +4602,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="xegs 64k" />
 			<dataarea name="rom" size="65536">
-				<rom name="vanguard.rom" size="65536" crc="688ef8bd" sha1="3a47fc61a9f4c1a22c9fe180da3fd5057f186d67"  offset="0" />
+				<rom name="vanguard.rom" size="65536" crc="688ef8bd" sha1="3a47fc61a9f4c1a22c9fe180da3fd5057f186d67" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4515,7 +4615,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="video easel.rom" size="8192" crc="7dc702a7" sha1="b3ab9bad4b61db1ed3685db5561f8c34aca9dcbf"  offset="0" />
+				<rom name="video easel.rom" size="8192" crc="276d7acc" sha1="d288675f4de7696e729125c2b3b2cb8887f042f2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4528,7 +4628,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="video poker card game.rom" size="16384" crc="dc492963" sha1="55c6ed5c2388a8cd228bc9fd5a69fa93180ee7ea"  offset="0" />
+				<rom name="video poker card game.rom" size="16384" crc="dc492963" sha1="55c6ed5c2388a8cd228bc9fd5a69fa93180ee7ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4541,7 +4641,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="webster - the word game.rom" size="8192" crc="6fffb4a9" sha1="48563de83e2217cc01fb13503deece29baca8272"  offset="0" />
+				<rom name="webster - the word game.rom" size="8192" crc="6fffb4a9" sha1="48563de83e2217cc01fb13503deece29baca8272" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4554,7 +4654,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="weltraumkolonie.rom" size="8192" crc="06fd2cdb" sha1="865c2255a5eb02f9cbd801e54a4ba252544d2302"  offset="0" />
+				<rom name="weltraumkolonie.rom" size="8192" crc="06fd2cdb" sha1="865c2255a5eb02f9cbd801e54a4ba252544d2302" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4567,7 +4667,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="whiz kid.rom" size="8192" crc="4b0634d5" sha1="7306d7207f7a01c1bcc41984f99c4a44db427a7b"  offset="0" />
+				<rom name="whiz kid.rom" size="8192" crc="11c2c963" sha1="aee11312bf19153e0f20ee0c19b1ce4f0f87b79c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4580,7 +4680,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="wizard of wor.rom" size="16384" crc="8017e56a" sha1="b4447b12d04c907eea66f6c09629408e847b2305"  offset="0" />
+				<rom name="wizard of wor.rom" size="16384" crc="8017e56a" sha1="b4447b12d04c907eea66f6c09629408e847b2305" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4593,7 +4693,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
-				<rom name="worm war 1.rom" size="8192" crc="8324ea4e" sha1="585a267fb5796d492893bb09aba83ca8b2f185df"  offset="0" />
+				<rom name="worm war 1.rom" size="8192" crc="d9b120f4" sha1="b7517334bdaf111a8afa8b2536db3c43e76b2b5c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4606,7 +4706,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="zaxxon.rom" size="16384" crc="21579706" sha1="5604b114476c14d256324f80355aa6cfc410570c"  offset="0" />
+				<rom name="zaxxon.rom" size="16384" crc="21579706" sha1="5604b114476c14d256324f80355aa6cfc410570c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4619,7 +4719,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="zenji.rom" size="8192" crc="ebc6ec2e" sha1="48e358d1688e672ae4798c8751c9d886e4ed817c"  offset="0" />
+				<rom name="zenji.rom" size="8192" crc="ebc6ec2e" sha1="48e358d1688e672ae4798c8751c9d886e4ed817c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4632,7 +4732,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="zone ranger.rom" size="16384" crc="1b6c7b78" sha1="bd5c67f16132af3b60f78f47c3a337382ff94618"  offset="0" />
+				<rom name="zone ranger.rom" size="16384" crc="1b6c7b78" sha1="bd5c67f16132af3b60f78f47c3a337382ff94618" offset="0" />
 			</dataarea>
 		</part>
 	</software>
