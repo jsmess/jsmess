@@ -181,14 +181,14 @@ READ8_MEMBER( vixen_state::ieee488_r )
 
         bit     description
 
-        0	    ATN
-        1		DAV
-        2		NDAC
-        3		NRFD
-        4		EOI
-        5		SRQ
-        6		IFC
-        7		REN
+        0       ATN
+        1       DAV
+        2       NDAC
+        3       NRFD
+        4       EOI
+        5       SRQ
+        6       IFC
+        7       REN
 
     */
 

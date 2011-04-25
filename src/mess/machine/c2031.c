@@ -323,13 +323,13 @@ READ8_MEMBER( c2031_device::via1_pb_r )
 
         bit     signal      description
 
-        PB0     
-        PB1     
-        PB2     
-        PB3     
+        PB0
+        PB1
+        PB2
+        PB3
         PB4     WPS         write protect sense
-        PB5     
-        PB6     
+        PB5
+        PB6
         PB7     SYNC        SYNC detect line
 
     */
@@ -356,7 +356,7 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
         PB1     STP1        stepping motor bit 1
         PB2     MTR         motor ON/OFF
         PB3     ACT         drive 0 LED
-        PB4     
+        PB4
         PB5     DS0         density select 0
         PB6     DS1         density select 1
         PB7     SYNC        SYNC detect line
@@ -477,7 +477,7 @@ machine_config_constructor c2031_device_config::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_device_number - 
+//  get_device_number -
 //-------------------------------------------------
 
 inline int c2031_device::get_device_number()
@@ -557,7 +557,7 @@ void c2031_device::device_reset()
 
 
 //-------------------------------------------------
-//  ieee488_atn_w - 
+//  ieee488_atn_w -
 //-------------------------------------------------
 
 void c2031_device::ieee488_atn(int state)
@@ -578,7 +578,7 @@ void c2031_device::ieee488_atn(int state)
 
 
 //-------------------------------------------------
-//  ieee488_ifc_w - 
+//  ieee488_ifc_w -
 //-------------------------------------------------
 
 void c2031_device::ieee488_ifc(int state)
@@ -591,7 +591,7 @@ void c2031_device::ieee488_ifc(int state)
 
 
 //-------------------------------------------------
-//  on_disk_change - 
+//  on_disk_change -
 //-------------------------------------------------
 
 void c2031_device::on_disk_change(device_image_interface &image)

@@ -117,7 +117,7 @@ void ieee488_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_signal - 
+//  set_signal -
 //-------------------------------------------------
 
 inline void ieee488_device::set_signal(device_t *device, int signal, int state)
@@ -185,7 +185,7 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 
 
 //-------------------------------------------------
-//  get_signal - 
+//  get_signal -
 //-------------------------------------------------
 
 inline int ieee488_device::get_signal(int signal)
@@ -206,7 +206,7 @@ inline int ieee488_device::get_signal(int signal)
 
 
 //-------------------------------------------------
-//  set_data - 
+//  set_data -
 //-------------------------------------------------
 
 inline void ieee488_device::set_data(device_t *device, UINT8 data)
@@ -226,7 +226,7 @@ inline void ieee488_device::set_data(device_t *device, UINT8 data)
 
 
 //-------------------------------------------------
-//  get_data - 
+//  get_data -
 //-------------------------------------------------
 
 inline UINT8 ieee488_device::get_data()

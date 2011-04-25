@@ -46,7 +46,7 @@ class interpod_device_config :   public device_config,
 
     // construction/destruction
     interpod_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	
+
 public:
 	// allocators
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);

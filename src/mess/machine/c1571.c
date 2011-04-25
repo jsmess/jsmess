@@ -171,7 +171,7 @@ const rom_entry *c1571_device_config::device_rom_region() const
 	{
 	case TYPE_1570:
 		return ROM_NAME( c1570 );
-	
+
 	default:
 	case TYPE_1571:
 		return ROM_NAME( c1571 );
@@ -215,12 +215,12 @@ READ8_MEMBER( c1571_device::via0_pa_r )
         bit     description
 
         PA0     TRK0 SNS
-        PA1     
-        PA2     
+        PA1
+        PA2
         PA3
         PA4
-        PA5     
-        PA6     
+        PA5
+        PA6
         PA7     BYTE RDY
 
     */
@@ -242,15 +242,15 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 	/*
 
         bit     description
-		
-        PA0     
+
+        PA0
         PA1     SER DIR
         PA2     SIDE
         PA3
         PA4
         PA5     _1/2 MHZ
         PA6     ATN OUT
-        PA7     
+        PA7
 
     */
 
@@ -276,10 +276,10 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 	if (m_ser_dir != ser_dir)
 	{
 		m_ser_dir = ser_dir;
-		
+
 		set_iec_data();
 		set_iec_srq();
-	
+
 		if (!m_ser_dir)
 		{
 			//m_cia->cnt_w(m_bus->srq_r());
@@ -302,10 +302,10 @@ READ8_MEMBER( c1571_device::via0_pb_r )
         bit     description
 
         PB0     DATA IN
-        PB1     
+        PB1
         PB2     CLK IN
-        PB3     
-        PB4     
+        PB3
+        PB4
         PB5     DEV# SEL
         PB6     DEV# SEL
         PB7     ATN IN
@@ -336,14 +336,14 @@ WRITE8_MEMBER( c1571_device::via0_pb_w )
 
         bit     description
 
-        PB0     
+        PB0
         PB1     DATA OUT
-        PB2     
+        PB2
         PB3     CLK OUT
         PB4     ATN ACK
-        PB5     
-        PB6     
-        PB7     
+        PB5
+        PB6
+        PB7
 
     */
 
@@ -408,13 +408,13 @@ READ8_MEMBER( c1571_device::via1_pb_r )
 
         bit     signal      description
 
-        PB0     
-        PB1     
-        PB2     
-        PB3     
+        PB0
+        PB1
+        PB2
+        PB3
         PB4     _WPRT       write protect sense
-        PB5     
-        PB6     
+        PB5
+        PB6
         PB7     _SYNC       SYNC detect line
 
     */
@@ -440,10 +440,10 @@ WRITE8_MEMBER( c1571_device::via1_pb_w )
         PB1     STP1        stepping motor bit 1
         PB2     MTR         motor ON/OFF
         PB3     ACT         drive 0 LED
-        PB4     
+        PB4
         PB5     DS0         density select 0
         PB6     DS1         density select 1
-        PB7     
+        PB7
 
     */
 
@@ -669,7 +669,7 @@ machine_config_constructor c1571_device_config::device_mconfig_additions() const
 	{
 	case TYPE_1570:
 		return MACHINE_CONFIG_NAME( c1570 );
-	
+
 	default:
 		return MACHINE_CONFIG_NAME( c1571 );
 	}
@@ -785,7 +785,7 @@ void c1571_device::device_reset()
 
 
 //-------------------------------------------------
-//  cbm_iec_srq - 
+//  cbm_iec_srq -
 //-------------------------------------------------
 
 void c1571_device::cbm_iec_srq(int state)
@@ -798,7 +798,7 @@ void c1571_device::cbm_iec_srq(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_atn - 
+//  cbm_iec_atn -
 //-------------------------------------------------
 
 void c1571_device::cbm_iec_atn(int state)
@@ -811,7 +811,7 @@ void c1571_device::cbm_iec_atn(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_data - 
+//  cbm_iec_data -
 //-------------------------------------------------
 
 void c1571_device::cbm_iec_data(int state)
@@ -824,7 +824,7 @@ void c1571_device::cbm_iec_data(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_reset - 
+//  cbm_iec_reset -
 //-------------------------------------------------
 
 void c1571_device::cbm_iec_reset(int state)
@@ -837,7 +837,7 @@ void c1571_device::cbm_iec_reset(int state)
 
 
 //-------------------------------------------------
-//  on_disk_change - 
+//  on_disk_change -
 //-------------------------------------------------
 
 void c1571_device::on_disk_change(device_image_interface &image)

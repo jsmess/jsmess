@@ -78,7 +78,7 @@ protected:
 
 private:
 	required_device<cdp1863_device> m_pfg;
-	
+
 	const vp595_device_config &m_config;
 };
 

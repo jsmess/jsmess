@@ -85,7 +85,7 @@ void vp595_device::device_start()
 
 
 //-------------------------------------------------
-//  latch_w - 
+//  latch_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( vp595_device::latch_w )
@@ -97,7 +97,7 @@ WRITE8_MEMBER( vp595_device::latch_w )
 
 
 //-------------------------------------------------
-//  q_w - 
+//  q_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vp595_device::q_w )
@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER( vp595_device::q_w )
 
 
 //-------------------------------------------------
-//  install_write_handlers - 
+//  install_write_handlers -
 //-------------------------------------------------
 
 void vp595_device::install_write_handlers(address_space *space, bool enabled)

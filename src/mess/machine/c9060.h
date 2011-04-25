@@ -82,7 +82,7 @@ public:
 protected:
 	// device_config overrides
     virtual void device_config_complete();
-	
+
 	int m_address;
 	int m_variant;
 };
@@ -130,7 +130,7 @@ private:
 	required_device<riot6532_device> m_riot1;
 	required_device<via6522_device> m_via;
 	required_device<ieee488_device> m_bus;
-	
+
 	// IEEE-488 bus
 	int m_rfdo;							// not ready for data output
 	int m_daco;							// not data accepted output

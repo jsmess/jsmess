@@ -103,7 +103,7 @@ void cbm_iec_stub_device::device_start()
 
 
 //-------------------------------------------------
-//  cbm_iec_srq - 
+//  cbm_iec_srq -
 //-------------------------------------------------
 
 void cbm_iec_stub_device::cbm_iec_srq(int state)
@@ -113,7 +113,7 @@ void cbm_iec_stub_device::cbm_iec_srq(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_atn - 
+//  cbm_iec_atn -
 //-------------------------------------------------
 
 void cbm_iec_stub_device::cbm_iec_atn(int state)
@@ -123,7 +123,7 @@ void cbm_iec_stub_device::cbm_iec_atn(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_clk - 
+//  cbm_iec_clk -
 //-------------------------------------------------
 
 void cbm_iec_stub_device::cbm_iec_clk(int state)
@@ -133,7 +133,7 @@ void cbm_iec_stub_device::cbm_iec_clk(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_data - 
+//  cbm_iec_data -
 //-------------------------------------------------
 
 void cbm_iec_stub_device::cbm_iec_data(int state)
@@ -143,7 +143,7 @@ void cbm_iec_stub_device::cbm_iec_data(int state)
 
 
 //-------------------------------------------------
-//  cbm_iec_reset - 
+//  cbm_iec_reset -
 //-------------------------------------------------
 
 void cbm_iec_stub_device::cbm_iec_reset(int state)

@@ -180,7 +180,7 @@ inline void c64h156_device::receive_bit()
 		// byte ready
 		m_yb = m_data & 0xff;
 		m_bit_count = 0;
-		
+
 		m_byte = 1;
 		set_byte_line();
 
@@ -477,7 +477,7 @@ void c64h156_device::on_disk_changed()
 
 
 //-------------------------------------------------
-//  on_disk_changed - 
+//  on_disk_changed -
 //-------------------------------------------------
 
 void c64h156_device::set_side(int side)

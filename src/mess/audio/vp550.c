@@ -108,7 +108,7 @@ machine_config_constructor vp550_device_config::device_mconfig_additions() const
 	default:
 	case TYPE_VP550:
 		return MACHINE_CONFIG_NAME( vp550 );
-	
+
 	case TYPE_VP551:
 		return MACHINE_CONFIG_NAME( vp551 );
 	}
@@ -187,7 +187,7 @@ WRITE8_MEMBER( vp550_device::octave_w )
 	case CHANNEL_C: if (m_pfg_c) m_pfg_c->set_clk2(clock2); break;
 	case CHANNEL_D: if (m_pfg_d) m_pfg_d->set_clk2(clock2); break;
 	}
-	
+
 	if (LOG) logerror("VP550 '%s' Clock %c: %u Hz\n", tag(), 'A' + channel, clock2);
 }
 
@@ -225,7 +225,7 @@ WRITE8_MEMBER( vp550_device::sync_w )
 
 
 //-------------------------------------------------
-//  q_w - 
+//  q_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vp550_device::q_w )
@@ -238,7 +238,7 @@ WRITE_LINE_MEMBER( vp550_device::q_w )
 
 
 //-------------------------------------------------
-//  sc1_w - 
+//  sc1_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vp550_device::sc1_w )
@@ -246,14 +246,14 @@ WRITE_LINE_MEMBER( vp550_device::sc1_w )
 	if (state)
 	{
 		if (LOG) logerror("VP550 '%s' Clear Interrupt\n", tag());
-	
+
 		device_set_input_line(machine().firstcpu, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 	}
 }
 
 
 //-------------------------------------------------
-//  install_write_handlers - 
+//  install_write_handlers -
 //-------------------------------------------------
 
 void vp550_device::install_write_handlers(address_space *space, bool enabled)

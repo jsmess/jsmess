@@ -8,46 +8,46 @@ PCB Layout
 INTERPOD 1000 ISS.3
 
 |---------------------------------------|
-|										|
-|		ACIA		ROM			CPU		|
-|										|
-|CN1	75188	LS73	LS04	RIOT	|
-|		75189							|
-|						7417	VIA		|
-|CN2									|
-|					3446  3446	3446	|
-|		CN3	CN4			LD1				|
-|---------------------------|	CN5	  |-|
-							|---------|
+|                                       |
+|       ACIA        ROM         CPU     |
+|                                       |
+|CN1    75188   LS73    LS04    RIOT    |
+|       75189                           |
+|                       7417    VIA     |
+|CN2                                    |
+|                   3446  3446  3446    |
+|       CN3 CN4         LD1             |
+|---------------------------|   CN5   |-|
+                            |---------|
 
 Notes:
     All IC's shown.
 
     ROM     - 2716 "1.4"
-    CPU		- Rockwell R6502P
-	RIOT	- Rockwell R6532AP
-	VIA		- Rockwell R6522P
-	ACIA	- Thomson-CSF EF6850P
-	3446	- Motorola MC3446AP
-	CN1		- DB25 serial connector
-	CN2		- power connector
-	CN3		- DIN5 IEC connector
-	CN4		- DIN5 IEC connector
-	CN5		- 2x12 PCB edge IEEE-488 connector
-	LD1		- LED
+    CPU     - Rockwell R6502P
+    RIOT    - Rockwell R6532AP
+    VIA     - Rockwell R6522P
+    ACIA    - Thomson-CSF EF6850P
+    3446    - Motorola MC3446AP
+    CN1     - DB25 serial connector
+    CN2     - power connector
+    CN3     - DIN5 IEC connector
+    CN4     - DIN5 IEC connector
+    CN5     - 2x12 PCB edge IEEE-488 connector
+    LD1     - LED
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- everything
+    - everything
 
-		0 OPEN 2,4,31 : INPUT #2, A$ : CLOSE #2
-		1 PRINT A$
+        0 OPEN 2,4,31 : INPUT #2, A$ : CLOSE #2
+        1 PRINT A$
 
-	http://mikenaberezny.com/hardware/projects/interpod-ieee-488-interface/
+    http://mikenaberezny.com/hardware/projects/interpod-ieee-488-interface/
 
 */
 

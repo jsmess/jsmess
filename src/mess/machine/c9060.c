@@ -500,7 +500,7 @@ machine_config_constructor c9060_device_config::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_ieee_signals - 
+//  update_ieee_signals -
 //-------------------------------------------------
 
 inline void c9060_device::update_ieee_signals()
@@ -577,7 +577,7 @@ void c9060_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 
 //-------------------------------------------------
-//  m_bus->atn - 
+//  m_bus->atn -
 //-------------------------------------------------
 
 void c9060_device::ieee488_atn(int state)
@@ -590,7 +590,7 @@ void c9060_device::ieee488_atn(int state)
 
 
 //-------------------------------------------------
-//  m_bus->ifc - 
+//  m_bus->ifc -
 //-------------------------------------------------
 
 void c9060_device::ieee488_ifc(int state)

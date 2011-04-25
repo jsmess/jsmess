@@ -1,9 +1,9 @@
 /*
 
-	TODO:
+    TODO:
 
-	- add IEEE488 bus here, not in the driver
-	- SRQ IN -> VIA1 CB1
+    - add IEEE488 bus here, not in the driver
+    - SRQ IN -> VIA1 CB1
 
 */
 

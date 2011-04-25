@@ -67,7 +67,7 @@ public:
 		TYPE_1581 = 0,
 		TYPE_1563
 	};
-	
+
 	// allocators
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;

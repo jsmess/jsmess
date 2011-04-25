@@ -109,7 +109,7 @@ private:
 
 	// timers
 	emu_timer *m_sync_timer;
-	
+
 	const vp550_device_config &m_config;
 };
 

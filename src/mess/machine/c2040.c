@@ -12,7 +12,7 @@
     TODO:
 
     - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
-	
+
         FE70: jsr  $104D
         104D: m6502_brk#$00
 
@@ -1241,7 +1241,7 @@ machine_config_constructor c2040_device_config::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_ieee_signals - 
+//  update_ieee_signals -
 //-------------------------------------------------
 
 inline void c2040_device::update_ieee_signals()
@@ -1256,7 +1256,7 @@ inline void c2040_device::update_ieee_signals()
 
 
 //-------------------------------------------------
-//  update_gcr_data - 
+//  update_gcr_data -
 //-------------------------------------------------
 
 inline void c2040_device::update_gcr_data()
@@ -1311,7 +1311,7 @@ inline void c2040_device::update_gcr_data()
 
 
 //-------------------------------------------------
-//  update_ieee_signals - 
+//  update_ieee_signals -
 //-------------------------------------------------
 
 inline void c2040_device::read_current_track(int unit)
@@ -1330,7 +1330,7 @@ inline void c2040_device::read_current_track(int unit)
 
 
 //-------------------------------------------------
-//  spindle_motor - 
+//  spindle_motor -
 //-------------------------------------------------
 
 inline void c2040_device::spindle_motor(int unit, int mtr)
@@ -1351,7 +1351,7 @@ inline void c2040_device::spindle_motor(int unit, int mtr)
 
 
 //-------------------------------------------------
-//  micropolis_step_motor - 
+//  micropolis_step_motor -
 //-------------------------------------------------
 
 inline void c2040_device::micropolis_step_motor(int unit, int stp)
@@ -1383,7 +1383,7 @@ inline void c2040_device::micropolis_step_motor(int unit, int stp)
 
 
 //-------------------------------------------------
-//  mpi_step_motor - 
+//  mpi_step_motor -
 //-------------------------------------------------
 
 inline void c2040_device::mpi_step_motor(int unit, int stp)
@@ -1415,7 +1415,7 @@ inline void c2040_device::mpi_step_motor(int unit, int stp)
 
 
 //-------------------------------------------------
-//  initialize - 
+//  initialize -
 //-------------------------------------------------
 
 inline void c2040_device::initialize(int drives)
@@ -1425,7 +1425,7 @@ inline void c2040_device::initialize(int drives)
 
 	// install image callbacks
 	m_unit[0].m_image = m_image0;
-	
+
 	floppy_install_unload_proc(m_image0, c2040_device::on_disk0_change);
 	floppy_install_load_proc(m_image0, c2040_device::on_disk0_change);
 
@@ -1619,8 +1619,8 @@ void c2040_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_via->write_ca1(ready);
 		m_via->write_cb1(ERROR);
 
-		if ((m_config.m_variant == c2040_device_config::TYPE_8050) || 
-			(m_config.m_variant == c2040_device_config::TYPE_8250) || 
+		if ((m_config.m_variant == c2040_device_config::TYPE_8050) ||
+			(m_config.m_variant == c2040_device_config::TYPE_8250) ||
 			(m_config.m_variant == c2040_device_config::TYPE_SFD1001))
 		{
 			m_fdccpu->set_input_line(M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
@@ -1630,7 +1630,7 @@ void c2040_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 
 //-------------------------------------------------
-//  ieee488_atn - 
+//  ieee488_atn -
 //-------------------------------------------------
 
 void c2040_device::ieee488_atn(int state)
@@ -1643,7 +1643,7 @@ void c2040_device::ieee488_atn(int state)
 
 
 //-------------------------------------------------
-//  ieee488_ifc - 
+//  ieee488_ifc -
 //-------------------------------------------------
 
 void c2040_device::ieee488_ifc(int state)
@@ -1656,7 +1656,7 @@ void c2040_device::ieee488_ifc(int state)
 
 
 //-------------------------------------------------
-//  on_disk0_change - 
+//  on_disk0_change -
 //-------------------------------------------------
 
 void c2040_device::on_disk0_change(device_image_interface &image)
@@ -1668,7 +1668,7 @@ void c2040_device::on_disk0_change(device_image_interface &image)
 
 
 //-------------------------------------------------
-//  on_disk_change - 
+//  on_disk_change -
 //-------------------------------------------------
 
 void c2040_device::on_disk1_change(device_image_interface &image)

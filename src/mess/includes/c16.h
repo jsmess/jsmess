@@ -16,9 +16,9 @@ public:
 		: driver_device(machine, config),
 		  m_iec(*this, CBM_IEC_TAG)
     { }
-	
+
 	required_device<cbm_iec_device> m_iec;
-	
+
 	/* memory pointers */
 	UINT8 *      m_mem10000;
 	UINT8 *      m_mem14000;

@@ -299,7 +299,7 @@ void cbm_iec_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_signal - 
+//  set_signal -
 //-------------------------------------------------
 
 inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
@@ -353,7 +353,7 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 
 
 //-------------------------------------------------
-//  get_signal - 
+//  get_signal -
 //-------------------------------------------------
 
 inline int cbm_iec_device::get_signal(int signal)

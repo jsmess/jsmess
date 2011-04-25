@@ -69,7 +69,7 @@ public:
 protected:
 	// device_config overrides
     virtual void device_config_complete();
-	
+
 	int m_address;
 };
 

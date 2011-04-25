@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 
 	/* IEC serial bus */
 	MCFG_CBM_IEC_ADD(c16_iec_no_drives)
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

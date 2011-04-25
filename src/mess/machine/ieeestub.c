@@ -109,7 +109,7 @@ void ieee488_stub_device::device_start()
 
 
 //-------------------------------------------------
-//  ieee488_eoi - 
+//  ieee488_eoi -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_eoi(int state)
@@ -119,7 +119,7 @@ void ieee488_stub_device::ieee488_eoi(int state)
 
 
 //-------------------------------------------------
-//  ieee488_dav - 
+//  ieee488_dav -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_dav(int state)
@@ -129,7 +129,7 @@ void ieee488_stub_device::ieee488_dav(int state)
 
 
 //-------------------------------------------------
-//  ieee488_nrfd - 
+//  ieee488_nrfd -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_nrfd(int state)
@@ -139,7 +139,7 @@ void ieee488_stub_device::ieee488_nrfd(int state)
 
 
 //-------------------------------------------------
-//  ieee488_ndac - 
+//  ieee488_ndac -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_ndac(int state)
@@ -149,7 +149,7 @@ void ieee488_stub_device::ieee488_ndac(int state)
 
 
 //-------------------------------------------------
-//  ieee488_ifc - 
+//  ieee488_ifc -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_ifc(int state)
@@ -159,7 +159,7 @@ void ieee488_stub_device::ieee488_ifc(int state)
 
 
 //-------------------------------------------------
-//  ieee488_srq - 
+//  ieee488_srq -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_srq(int state)
@@ -169,7 +169,7 @@ void ieee488_stub_device::ieee488_srq(int state)
 
 
 //-------------------------------------------------
-//  ieee488_atn - 
+//  ieee488_atn -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_atn(int state)
@@ -179,7 +179,7 @@ void ieee488_stub_device::ieee488_atn(int state)
 
 
 //-------------------------------------------------
-//  ieee488_ren - 
+//  ieee488_ren -
 //-------------------------------------------------
 
 void ieee488_stub_device::ieee488_ren(int state)

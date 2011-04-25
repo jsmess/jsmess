@@ -100,7 +100,7 @@ ROM_START( c8280 )
 	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
 	ROM_LOAD( "300542-001.10c", 0x0000, 0x2000, CRC(3c6eee1e) SHA1(0726f6ab4de4fc9c18707fe87780ffd9f5ed72ab) )
 	ROM_LOAD( "300543-001.10d", 0x2000, 0x2000, CRC(f58e665e) SHA1(9e58b47c686c91efc6ef1a27f72dbb5e26c485ec) )
-	
+
 	ROM_REGION( 0x800, M6502_FDC_TAG, 0 )
 	ROM_LOAD( "300541-001.3c",  0x000, 0x800, CRC(cb07b2db) SHA1(a1f9c5a7bd3798f5a97dc0b465c3bf5e3513e148) )
 ROM_END
@@ -274,7 +274,7 @@ void c8280_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 
 //-------------------------------------------------
-//  ieee488_atn - 
+//  ieee488_atn -
 //-------------------------------------------------
 
 void c8280_device::ieee488_atn(int state)
@@ -283,7 +283,7 @@ void c8280_device::ieee488_atn(int state)
 
 
 //-------------------------------------------------
-//  ieee488_ifc - 
+//  ieee488_ifc -
 //-------------------------------------------------
 
 void c8280_device::ieee488_ifc(int state)

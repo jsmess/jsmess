@@ -11,8 +11,8 @@
 
     TODO:
 
-	- C1540 does not work
-	- some copy protections fail
+    - C1540 does not work
+    - some copy protections fail
     - more accurate timing
     - power/activity LEDs
 
@@ -401,10 +401,10 @@ READ8_MEMBER( c1541_device::via0_pb_r )
         bit     description
 
         PB0     DATA IN
-        PB1     
+        PB1
         PB2     CLK IN
-        PB3     
-        PB4     
+        PB3
+        PB4
         PB5     J1
         PB6     J2
         PB7     ATN IN
@@ -435,14 +435,14 @@ WRITE8_MEMBER( c1541_device::via0_pb_w )
 
         bit     description
 
-        PB0     
+        PB0
         PB1     DATA OUT
-        PB2     
+        PB2
         PB3     CLK OUT
         PB4     ATNA
-        PB5     
-        PB6     
-        PB7     
+        PB5
+        PB6
+        PB7
 
     */
 
@@ -546,13 +546,13 @@ READ8_MEMBER( c1541_device::via1_pb_r )
 
         bit     signal      description
 
-        PB0     
-        PB1     
-        PB2     
-        PB3     
+        PB0
+        PB1
+        PB2
+        PB3
         PB4     WPS         write protect sense
-        PB5     
-        PB6     
+        PB5
+        PB6
         PB7     SYNC        SYNC detect line
 
     */
@@ -579,7 +579,7 @@ WRITE8_MEMBER( c1541_device::via1_pb_w )
         PB1     STP1        stepping motor bit 1
         PB2     MTR         motor ON/OFF
         PB3     ACT         drive 0 LED
-        PB4     
+        PB4
         PB5     DS0         density select 0
         PB6     DS1         density select 1
         PB7     SYNC        SYNC detect line
@@ -729,7 +729,7 @@ machine_config_constructor c1541_device_config::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_iec_data - 
+//  set_iec_data -
 //-------------------------------------------------
 
 inline void c1541_device::set_iec_data()
@@ -797,7 +797,7 @@ void c1541_device::device_reset()
 
 
 //-------------------------------------------------
-//  iec_atn_w - 
+//  iec_atn_w -
 //-------------------------------------------------
 
 void c1541_device::cbm_iec_atn(int state)
@@ -810,7 +810,7 @@ void c1541_device::cbm_iec_atn(int state)
 
 
 //-------------------------------------------------
-//  iec_reset_w - 
+//  iec_reset_w -
 //-------------------------------------------------
 
 void c1541_device::cbm_iec_reset(int state)
@@ -823,7 +823,7 @@ void c1541_device::cbm_iec_reset(int state)
 
 
 //-------------------------------------------------
-//  on_disk_change - 
+//  on_disk_change -
 //-------------------------------------------------
 
 void c1541_device::on_disk_change(device_image_interface &image)

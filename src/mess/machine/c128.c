@@ -309,7 +309,7 @@ static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 {
 	c128_state *state = device->machine().driver_data<c128_state>();
 	UINT8 value = 0xff;
-	
+
 	if (!state->m_iec->clk_r())
 		value &= ~0x40;
 
