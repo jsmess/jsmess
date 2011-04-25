@@ -2564,8 +2564,8 @@
 
 	<software name="aliceyk2">
 		<description>Alice no Yakata 2</description>
-		<publisher>Alice Soft</publisher>
 		<year>199?</year>
+		<publisher>Alice Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="alice no yakata 2 [disk 1] (y) (alice soft) [xdf].xdf" size="1261568" crc="7f4ec53b" sha1="e68e928d1580e280eab1ddbc5e53978224408a9c" offset="0" />

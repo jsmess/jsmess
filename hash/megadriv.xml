@@ -1038,9 +1038,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-15225-T" />
 			<dataarea name="rom" size="1048576">
-				<feature name="pcb" value="171-5978BA" />
-				<feature name="ic1" value="MPR-15225-T" />
 				<rom name="mpr-15225.ic1" size="1048576" crc="33b1979f" sha1="20b282ff8220291d98853888cfe504692c04e654" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -1053,9 +1053,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1991</year>
 		<publisher>CRI ~ Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-14248B-F" />
 			<dataarea name="rom" size="1048576">
-				<feature name="pcb" value="171-5978BA" />
-				<feature name="ic1" value="MPR-14248B-F" />
 				<rom name="mpr-14248b.ic1" size="1048576" crc="d15f5c3c" sha1="db1615fc239cb0ed9fdc792217964c33e1e700fc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -1095,9 +1095,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1994</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-15709-S" />
 			<dataarea name="rom" size="1048576">
-				<feature name="pcb" value="171-5978BA" />
-				<feature name="ic1" value="MPR-15709-S" />
 				<rom name="mpr-15709.ic1" size="1048576" crc="4a4414ea" sha1="978dabcc7d098edebc9d3f2fef04f27fd6aeab19" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
