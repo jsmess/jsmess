@@ -1041,7 +1041,6 @@ $(MESSOBJ)/interact.a:			\
 $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/basic52.o	\
 	$(MESS_DRIVERS)/isbc.o		\
-	$(MESS_DRIVERS)/ipb.o		\
 	$(MESS_DRIVERS)/ipc.o		\
 	$(MESS_DRIVERS)/ipds.o		\
 	$(MESS_DRIVERS)/sdk85.o		\
