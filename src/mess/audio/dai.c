@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "machine/pit8253.h"
-#include "machine/i8255a.h"
 #include "includes/dai.h"
 
 static STREAM_UPDATE( dai_sh_update );

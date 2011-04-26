@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
@@ -33,8 +33,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( b2m_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w )
@@ -49,8 +49,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_3", i8255a_r, i8255a_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_MODERN("ppi8255_3", i8255_device, read, write)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w )
@@ -222,11 +222,11 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_PIT8253_ADD( "pit8253", b2m_pit8253_intf )
 
-	MCFG_I8255A_ADD( "ppi8255_1", b2m_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_1", b2m_ppi8255_interface_1 )
 
-	MCFG_I8255A_ADD( "ppi8255_2", b2m_ppi8255_interface_2 )
+	MCFG_I8255_ADD( "ppi8255_2", b2m_ppi8255_interface_2 )
 
-	MCFG_I8255A_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
+	MCFG_I8255_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
 
 	MCFG_PIC8259_ADD( "pic8259", b2m_pic8259_config )
 

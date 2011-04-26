@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/mikro80.h"
 
 /* Driver initialization */
@@ -66,13 +66,13 @@ static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255
 static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset); }
 static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset, data); }
 
-I8255A_INTERFACE( mikro80_ppi8255_interface )
+I8255_INTERFACE( mikro80_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(mikro80_8255_portb_device_r),
-	DEVCB_HANDLER(mikro80_8255_portc_device_r),
 	DEVCB_HANDLER(mikro80_8255_porta_device_w),
+	DEVCB_HANDLER(mikro80_8255_portb_device_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(mikro80_8255_portc_device_r),
 	DEVCB_NULL,
 };
 
@@ -91,14 +91,16 @@ MACHINE_RESET( mikro80 )
 }
 
 
-READ8_DEVICE_HANDLER( mikro80_keyboard_r )
+READ8_HANDLER( mikro80_keyboard_r )
 {
-	return i8255a_r(device, offset^0x03);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	return ppi->read(*space, offset^0x03);
 }
 
-WRITE8_DEVICE_HANDLER( mikro80_keyboard_w )
+WRITE8_HANDLER( mikro80_keyboard_w )
 {
-	i8255a_w(device, offset^0x03, data);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	ppi->write(*space, offset^0x03, data);
 }
 
 

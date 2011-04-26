@@ -71,28 +71,28 @@ static int instruction_hook(device_t &device, offs_t curpc);
 
 READ8_HANDLER(ppi8255_r)
 {
-	device_t *ppi8255 = space->machine().device(PPI8255_TAG);
+	i8255_device *ppi8255 = space->machine().device<i8255_device>(PPI8255_TAG);
 
 	switch(offset)
 	{
-		case 0	: return i8255a_r(ppi8255,0); break;
-		case 2	: return i8255a_r(ppi8255,1); break;
-		case 4	: return i8255a_r(ppi8255,2); break;
-		case 6	: return i8255a_r(ppi8255,3); break;
+		case 0	: return ppi8255->read(*space, 0); break;
+		case 2	: return ppi8255->read(*space, 1); break;
+		case 4	: return ppi8255->read(*space, 2); break;
+		case 6	: return ppi8255->read(*space, 3); break;
 		default : return 0;
 	}
 }
 
 WRITE8_HANDLER(ppi8255_w)
 {
-	device_t *ppi8255 = space->machine().device(PPI8255_TAG);
+	i8255_device *ppi8255 = space->machine().device<i8255_device>(PPI8255_TAG);
 
 	switch(offset)
 	{
-		case 0	: i8255a_w(ppi8255,0,data); break;
-		case 2	: i8255a_w(ppi8255,1,data); break;
-		case 4	: i8255a_w(ppi8255,2,data); break;
-		case 6	: i8255a_w(ppi8255,3,data); break;
+		case 0	: ppi8255->write(*space, 0, data); break;
+		case 2	: ppi8255->write(*space, 1, data); break;
+		case 4	: ppi8255->write(*space, 2, data); break;
+		case 6	: ppi8255->write(*space, 3, data); break;
 	}
 }
 
@@ -127,13 +127,13 @@ WRITE8_DEVICE_HANDLER(mbc55x_ppi_portc_w)
 	wd17xx_set_side(wd17xx,((data & 0x04) >> 2));
 }
 
-I8255A_INTERFACE( mbc55x_ppi8255_interface )
+I8255_INTERFACE( mbc55x_ppi8255_interface )
 {
 	DEVCB_HANDLER(mbc55x_ppi_porta_r),
-	DEVCB_HANDLER(mbc55x_ppi_portb_r),
-	DEVCB_HANDLER(mbc55x_ppi_portc_r),
 	DEVCB_HANDLER(mbc55x_ppi_porta_w),
+	DEVCB_HANDLER(mbc55x_ppi_portb_r),
 	DEVCB_HANDLER(mbc55x_ppi_portb_w),
+	DEVCB_HANDLER(mbc55x_ppi_portc_r),
 	DEVCB_HANDLER(mbc55x_ppi_portc_w)
 };
 

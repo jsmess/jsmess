@@ -10,7 +10,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ctronics.h"
 #include "machine/8257dma.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"

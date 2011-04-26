@@ -18,7 +18,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "amico2k.lh"
 
 
@@ -31,22 +31,12 @@ public:
 };
 
 
-
-static READ8_DEVICE_HANDLER( amico2k_i8255a_r )
-{
-	return 0xff;
-}
-
-static WRITE8_DEVICE_HANDLER( amico2k_i8255a_w )
-{
-}
-
 static ADDRESS_MAP_START(amico2k_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 //  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
 	AM_RANGE(0xfb00, 0xfcff) AM_ROM
-	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("i8255a", amico2k_i8255a_r, amico2k_i8255a_w)
+	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE_MODERN("i8255", i8255_device, read, write)
 	AM_RANGE(0xfe00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -59,7 +49,7 @@ static MACHINE_RESET(amico2k)
 {
 }
 
-static I8255A_INTERFACE( amico_8255_intf )
+static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,							// Port A read
 	DEVCB_NULL,							// Port B read
@@ -79,7 +69,7 @@ static MACHINE_CONFIG_START( amico2k, amico2k_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_amico2k )
 
-	MCFG_I8255A_ADD( "i8255a", amico_8255_intf )
+	MCFG_I8255_ADD("i8255", ppi_intf)
 MACHINE_CONFIG_END
 
 

@@ -174,7 +174,7 @@ I/O ports
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "includes/pmd85.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 #include "formats/pmd_pmd.h"
@@ -586,13 +586,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pmd851, pmd85 )
 
-	MCFG_I8255A_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
+	MCFG_I8255_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
 
-	MCFG_I8255A_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
+	MCFG_I8255_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
 
-	MCFG_I8255A_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
+	MCFG_I8255_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
 
-	MCFG_I8255A_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
+	MCFG_I8255_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pmd852a, pmd851 )
@@ -609,11 +609,11 @@ static MACHINE_CONFIG_DERIVED( alfa, pmd85 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alfa_mem)
 
-	MCFG_I8255A_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
+	MCFG_I8255_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
 
-	MCFG_I8255A_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
+	MCFG_I8255_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
 
-	MCFG_I8255A_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
+	MCFG_I8255_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
 
 MACHINE_CONFIG_END
 
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_DERIVED( mato, pmd85 )
 	MCFG_CPU_PROGRAM_MAP(mato_mem)
 	MCFG_CPU_IO_MAP(mato_io_map)
 
-	MCFG_I8255A_ADD( "ppi8255_0", mato_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255_0", mato_ppi8255_interface )
 
 	/* no uart */
 	MCFG_DEVICE_REMOVE( "uart" )

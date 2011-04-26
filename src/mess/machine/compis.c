@@ -13,7 +13,7 @@
 /*-------------------------------------------------------------------------*/
 
 #include "emu.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
 #include "includes/compis.h"
@@ -318,9 +318,9 @@ static WRITE8_DEVICE_HANDLER( compis_ppi_port_c_w )
 I8255A_INTERFACE( compis_ppi_interface )
 {
 	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
 	DEVCB_DEVICE_HANDLER("centronics", compis_ppi_port_b_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", compis_ppi_port_c_w)
 };

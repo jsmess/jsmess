@@ -17,7 +17,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
 #include "sound/beep.h"
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START(mz2000_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2000_wd17xx_r, mz2000_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE_MODERN("i8255_0", i8255_device, read, write)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
     AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
@@ -633,13 +633,13 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
 	state->m_old_portc = data;
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
+static I8255_INTERFACE( ppi8255_intf )
 {
 	DEVCB_HANDLER(mz2000_porta_r),						/* Port A read */
-	DEVCB_HANDLER(mz2000_portb_r),						/* Port B read */
-	DEVCB_HANDLER(mz2000_portc_r),						/* Port C read */
 	DEVCB_HANDLER(mz2000_porta_w),						/* Port A write */
+	DEVCB_HANDLER(mz2000_portb_r),						/* Port B read */
 	DEVCB_HANDLER(mz2000_portb_w),						/* Port B write */
+	DEVCB_HANDLER(mz2000_portc_r),						/* Port C read */
 	DEVCB_HANDLER(mz2000_portc_w)						/* Port C write */
 };
 
@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 
 	MCFG_MACHINE_RESET(mz2000)
 
-	MCFG_I8255A_ADD( "i8255_0", ppi8255_intf )
+	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, mz2000_pio1_intf )
 	MCFG_PIT8253_ADD("pit", mz2000_pit8253_intf)
 

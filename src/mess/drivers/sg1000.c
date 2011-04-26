@@ -73,7 +73,7 @@ Notes:
 #include "imagedev/printer.h"
 #include "formats/basicdsk.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
@@ -223,13 +223,13 @@ static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE_LEGACY(UPD9255_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
 static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE_LEGACY(UPD9255_TAG, i8255a_r, i8255a_w)
+    AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
     AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
@@ -255,10 +255,10 @@ static ADDRESS_MAP_START( sf7000_io_map, AS_IO, 8, sf7000_state )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE_LEGACY(UPD9255_0_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY(UPD9255_1_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(UPD9255_1_TAG, i8255_device, read, write)
 	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE_LEGACY(UPD8251_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE_LEGACY(UPD8251_TAG, msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
@@ -553,7 +553,7 @@ static const TMS9928a_interface tms9928a_interface =
 };
 
 /*-------------------------------------------------
-    I8255A_INTERFACE( sc3000_ppi_intf )
+    I8255_INTERFACE( sc3000_ppi_intf )
 -------------------------------------------------*/
 
 READ8_MEMBER( sc3000_state::ppi_pa_r )
@@ -632,13 +632,13 @@ WRITE8_MEMBER( sc3000_state::ppi_pc_w )
 	/* TODO printer */
 }
 
-static I8255A_INTERFACE( sc3000_ppi_intf )
+static I8255_INTERFACE( sc3000_ppi_intf )
 {
 	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pa_r),	// Port A read
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pb_r),	// Port B read
-	DEVCB_NULL,										// Port C read
 	DEVCB_NULL,										// Port A write
+	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pb_r),	// Port B read
 	DEVCB_NULL,										// Port B write
+	DEVCB_NULL,										// Port C read
 	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pc_w),	// Port C write
 };
 
@@ -655,7 +655,7 @@ static const cassette_config sc3000_cassette_config =
 };
 
 /*-------------------------------------------------
-    I8255A_INTERFACE( sf7000_ppi_intf )
+    I8255_INTERFACE( sf7000_ppi_intf )
 -------------------------------------------------*/
 
 READ8_MEMBER( sf7000_state::ppi_pa_r )
@@ -717,13 +717,13 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	centronics_strobe_w(m_centronics, BIT(data, 7));
 }
 
-static I8255A_INTERFACE( sf7000_ppi_intf )
+static I8255_INTERFACE( sf7000_ppi_intf )
 {
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pa_r),				// Port A read
-	DEVCB_NULL,													// Port B read
-	DEVCB_NULL,													// Port C read
 	DEVCB_NULL,													// Port A write
+	DEVCB_NULL,													// Port B read
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port B write
+	DEVCB_NULL,													// Port C read
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)					// Port C write
 };
 
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_I8255A_ADD(UPD9255_TAG, sc3000_ppi_intf)
+	MCFG_I8255_ADD(UPD9255_TAG, sc3000_ppi_intf)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
@@ -1161,8 +1161,8 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_I8255A_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
-	MCFG_I8255A_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
+	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
+	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
 	MCFG_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
 	MCFG_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)

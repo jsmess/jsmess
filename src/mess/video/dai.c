@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/i8255a.h"
 #include "includes/dai.h"
 
 #define DEBUG_DAI_VIDEO	0

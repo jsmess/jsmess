@@ -32,7 +32,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8_LEGACY(I8272A_TAG, upd765_status_r, 0x00ff)
 	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
-	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8_LEGACY(I8255A_TAG, i8255a_r, i8255a_w, 0x00ff)
+	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8_LEGACY(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8_LEGACY(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
@@ -751,10 +751,10 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 static I8255A_INTERFACE( i8255_intf )
 {
 	DEVCB_NULL,													// Port A read
-	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),				// Port B write
-	DEVCB_NULL,													// Port C read
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port A write
+	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),				// Port B write
 	DEVCB_NULL,													// Port B write
+	DEVCB_NULL,													// Port C read
 	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pc_w)				// Port C write
 };
 
@@ -835,7 +835,7 @@ static const struct upd765_interface i8272_intf =
 static const centronics_interface centronics_intf =
 {
 	0,												/* is IBM PC? */
-	DEVCB_DEVICE_LINE(I8255A_TAG, i8255a_pc6_w),	/* ACK output */
+	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc6_w),	/* ACK output */
 	DEVCB_NULL,										/* BUSY output */
 	DEVCB_NULL										/* NOT BUSY output */
 };

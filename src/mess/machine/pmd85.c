@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "imagedev/cassette.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/pmd85.h"
 #include "machine/msm8251.h"
 #include "machine/pit8253.h"
@@ -530,7 +530,7 @@ READ8_HANDLER ( pmd85_io_r )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return i8255a_r(space->machine().device("ppi8255_0"), offset & 0x03);
+							return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 0x03);
 				}
 				break;
 		case 0x08:	/* ROM module connector */
@@ -546,7 +546,7 @@ READ8_HANDLER ( pmd85_io_r )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-									return i8255a_r(space->machine().device("ppi8255_3"), offset & 0x03);
+									return space->machine().device<i8255_device>("ppi8255_3")->read(*space, offset & 0x03);
 							}
 						}
 						break;
@@ -566,11 +566,11 @@ READ8_HANDLER ( pmd85_io_r )
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return i8255a_r(space->machine().device("ppi8255_1"), offset & 0x03);
+										return space->machine().device<i8255_device>("ppi8255_1")->read(*space, offset & 0x03);
 								case 0x50:	/* 8253 */
 										return pit8253_r( space->machine().device("pit8253"), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return i8255a_r(space->machine().device("ppi8255_2"), offset & 0x03);
+										return space->machine().device<i8255_device>("ppi8255_2")->read(*space, offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -598,7 +598,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							i8255a_w(space->machine().device("ppi8255_0"), offset & 0x03, data);
+							space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
@@ -621,7 +621,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										i8255a_w(space->machine().device("ppi8255_3"), offset & 0x03, data);
+										space->machine().device<i8255_device>("ppi8255_3")->write(*space, offset & 0x03, data);
 										break;
 							}
 						}
@@ -642,14 +642,14 @@ WRITE8_HANDLER ( pmd85_io_w )
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										i8255a_w(space->machine().device("ppi8255_1"), offset & 0x03, data);
+										space->machine().device<i8255_device>("ppi8255_1")->write(*space, offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
 										pit8253_w(space->machine().device("pit8253"), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										i8255a_w(space->machine().device("ppi8255_2"), offset & 0x03, data);
+										space->machine().device<i8255_device>("ppi8255_2")->write(*space, offset & 0x03, data);
 										break;
 							}
 							break;
@@ -684,7 +684,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return i8255a_r(space->machine().device("ppi8255_0"), offset & 0x03);
+							return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 0x03);
 				}
 				break;
 	}
@@ -708,84 +708,84 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							i8255a_w(space->machine().device("ppi8255_0"), offset & 0x03, data);
+							return space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 0x03, data);
 							break;
 				}
 				break;
 	}
 }
 
-const i8255a_interface pmd85_ppi8255_interface[4] =
+const i8255_interface pmd85_ppi8255_interface[4] =
 {
 	{
 		DEVCB_HANDLER(pmd85_ppi_0_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_0_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_0_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_0_portc_w)
 	},
 	{
 		DEVCB_HANDLER(pmd85_ppi_1_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_1_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_1_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_1_portc_w)
 	},
 	{
 		DEVCB_HANDLER(pmd85_ppi_2_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_2_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_2_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_2_portc_w)
 	},
 	{
 		DEVCB_HANDLER(pmd85_ppi_3_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_3_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_3_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_3_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_3_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_3_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_3_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_3_portc_w)
 	}
 };
 
-const i8255a_interface alfa_ppi8255_interface[3] =
+const i8255_interface alfa_ppi8255_interface[3] =
 {
 	{
 		DEVCB_HANDLER(pmd85_ppi_0_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_0_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_0_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_0_portc_w)
 	},
 	{
 		DEVCB_HANDLER(pmd85_ppi_1_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_1_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_1_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_1_portc_w)
 	},
 	{
 		DEVCB_HANDLER(pmd85_ppi_2_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_2_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
 		DEVCB_HANDLER(pmd85_ppi_2_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
 		DEVCB_HANDLER(pmd85_ppi_2_portc_w)
 	}
 };
 
-I8255A_INTERFACE( mato_ppi8255_interface )
+I8255_INTERFACE( mato_ppi8255_interface )
 {
 	DEVCB_HANDLER(pmd85_ppi_0_porta_r),
-	DEVCB_HANDLER(mato_ppi_0_portb_r),
-	DEVCB_HANDLER(mato_ppi_0_portc_r),
 	DEVCB_HANDLER(pmd85_ppi_0_porta_w),
+	DEVCB_HANDLER(mato_ppi_0_portb_r),
 	DEVCB_HANDLER(pmd85_ppi_0_portb_w),
+	DEVCB_HANDLER(mato_ppi_0_portc_r),
 	DEVCB_HANDLER(mato_ppi_0_portc_w)
 };
 

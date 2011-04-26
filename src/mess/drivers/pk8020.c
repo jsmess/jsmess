@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
@@ -221,9 +221,9 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	MCFG_VIDEO_START(pk8020)
 
-	MCFG_I8255A_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
-	MCFG_I8255A_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )
-	MCFG_I8255A_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
+	MCFG_I8255_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )
+	MCFG_I8255_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
 	MCFG_PIT8253_ADD( "pit8253", pk8020_pit8253_intf )
 	MCFG_PIC8259_ADD( "pic8259", pk8020_pic8259_config )
 	MCFG_MSM8251_ADD( "rs232", default_msm8251_interface)

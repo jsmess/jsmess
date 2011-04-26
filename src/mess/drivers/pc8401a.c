@@ -376,7 +376,7 @@ static ADDRESS_MAP_START( pc8500_io, AS_IO, 8, pc8401a_state )
 	AM_RANGE(0xb0, 0xb3) AM_WRITE(io_rom_addr_w)
 	AM_RANGE(0xb3, 0xb3) AM_READ(io_rom_data_r)
 //  AM_RANGE(0xc8, 0xc8)
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -564,10 +564,10 @@ static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pc8401a_state, ppi_pc_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc8401a_state, ppi_pc_w),
+	DEVCB_DRIVER_MEMBER(pc8401a_state, ppi_pc_w)
 };
 
 /* uPD1990A Interface */

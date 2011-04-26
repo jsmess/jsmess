@@ -212,7 +212,7 @@
 #include "machine/z80ctc.h"
 //#include "machine/z80sio.h"
 #include "machine/z80dart.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/z80dma.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -1678,7 +1678,7 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return i8255a_r(space->machine().device("ppi8255_0"), (offset-0x1a00) & 3); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return space->machine().device<i8255_device>("ppi8255_0")->read(*space, (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(space->machine().device("ay"), 0); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(space->machine().device("dma"), 0); }
 //  else if(offset >= 0x1f90 && offset <= 0x1f91)   { return z80sio_c_r(space->machine().device("sio"), (offset-0x1f90) & 1); }
@@ -1716,7 +1716,7 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ i8255a_w(space->machine().device("ppi8255_0"), (offset-0x1a00) & 3,data); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ space->machine().device<i8255_device>("ppi8255_0")->write(*space, (offset-0x1a00) & 3,data); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(space->machine().device("ay"), 0,data); }
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(space->machine().device("ay"), 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
@@ -1765,7 +1765,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return i8255a_r(space->machine().device("ppi8255_0"), (offset-0x1a00) & 3); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return space->machine().device<i8255_device>("ppi8255_0")->read(*space, (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(space->machine().device("ay"), 0); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(space->machine().device("dma"), 0); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return z80dart_ba_cd_r(space->machine().device("sio"), (offset-0x1f90) & 3); }
@@ -1817,7 +1817,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ i8255a_w(space->machine().device("ppi8255_0"), (offset-0x1a00) & 3,data); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ space->machine().device<i8255_device>("ppi8255_0")->write(*space, (offset-0x1a00) & 3,data); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(space->machine().device("ay"), 0,data); }
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(space->machine().device("ay"), 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
@@ -1965,10 +1965,10 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_HANDLER(x1_porta_r),						/* Port A read */
-	DEVCB_HANDLER(x1_portb_r),						/* Port B read */
-	DEVCB_HANDLER(x1_portc_r),						/* Port C read */
 	DEVCB_HANDLER(x1_porta_w),						/* Port A write */
+	DEVCB_HANDLER(x1_portb_r),						/* Port B read */
 	DEVCB_HANDLER(x1_portb_w),						/* Port B write */
+	DEVCB_HANDLER(x1_portc_r),						/* Port C read */
 	DEVCB_HANDLER(x1_portc_w)						/* Port C write */
 };
 

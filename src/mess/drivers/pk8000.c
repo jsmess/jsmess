@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "formats/fmsx_cas.h"
 #include "sound/speaker.h"
@@ -121,12 +121,12 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 	cassette_output(cassette_device_image(device->machine()), (BIT(data,6)) ? +1.0 : 0.0);
 }
 
-static I8255A_INTERFACE( pk8000_ppi8255_interface_1 )
+static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
+	DEVCB_HANDLER(pk8000_80_porta_w),
 	DEVCB_HANDLER(pk8000_80_portb_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(pk8000_80_porta_w),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pk8000_80_portc_w)
 };
@@ -145,12 +145,12 @@ static WRITE8_DEVICE_HANDLER(pk8000_84_portc_w)
 {
 	pk8000_video_enable = BIT(data,4);
 }
-static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
+static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 {
 	DEVCB_HANDLER(pk8000_84_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(pk8000_84_porta_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(pk8000_84_portc_w)
 };
@@ -178,8 +178,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pk8000_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)
 	AM_RANGE(0x8c, 0x8c) AM_READ(pk8000_joy_1_r)
 	AM_RANGE(0x8d, 0x8d) AM_READ(pk8000_joy_2_r)
@@ -360,8 +360,8 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 
 	MCFG_VIDEO_START(pk8000)
 
-	MCFG_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
-	MCFG_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

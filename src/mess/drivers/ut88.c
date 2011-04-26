@@ -44,7 +44,7 @@ static ADDRESS_MAP_START( ut88mini_io , AS_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ut88_io , AS_IO, 8)
-	AM_RANGE( 0x04, 0x07) AM_DEVREADWRITE ( "ppi8255", ut88_keyboard_r, ut88_keyboard_w )
+	AM_RANGE( 0x04, 0x07) AM_READWRITE ( ut88_keyboard_r, ut88_keyboard_w )
 	AM_RANGE( 0xA1, 0xA1) AM_READWRITE ( ut88_tape_r,	  ut88_sound_w	  )
 ADDRESS_MAP_END
 

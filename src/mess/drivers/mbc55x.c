@@ -16,7 +16,7 @@
 #include "formats/pc_dsk.h"
 #include "includes/mbc55x.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/speaker.h"
@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 
 	MCFG_PIT8253_ADD( PIT8253_TAG, mbc55x_pit8253_config )
 	MCFG_PIC8259_ADD( PIC8259_TAG, mbc55x_pic8259_config )
-	MCFG_I8255A_ADD( PPI8255_TAG, mbc55x_ppi8255_interface )
+	MCFG_I8255_ADD( PPI8255_TAG, mbc55x_ppi8255_interface )
 
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cartslot.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"

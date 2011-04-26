@@ -284,7 +284,7 @@ Timings:
 #include "cpu/i8085/i8085.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/lviv.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -434,9 +434,9 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 
 	MCFG_MACHINE_RESET( lviv )
 
-	MCFG_I8255A_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
+	MCFG_I8255_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
 
-	MCFG_I8255A_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

@@ -225,7 +225,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i386/i386.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
@@ -576,7 +576,7 @@ static READ8_HANDLER( pc9801_30_r )
 	}
 	else // odd
 	{
-		return i8255a_r(space->machine().device("ppi8255_sys"), (offset & 6) >> 1);
+		return space->machine().device<i8255_device>("ppi8255_sys")->read(*space, (offset & 6) >> 1);
 	}
 }
 
@@ -591,7 +591,7 @@ static WRITE8_HANDLER( pc9801_30_w )
 	}
 	else // odd
 	{
-		i8255a_w(space->machine().device("ppi8255_sys"), (offset & 6) >> 1,data);
+		space->machine().device<i8255_device>("ppi8255_sys")->write(*space, (offset & 6) >> 1,data);
 	}
 }
 
@@ -601,7 +601,7 @@ static READ8_HANDLER( pc9801_40_r )
 
 	if((offset & 1) == 0)
 	{
-		return i8255a_r(space->machine().device("ppi8255_prn"), (offset & 6) >> 1);
+		space->machine().device<i8255_device>("ppi8255_prn")->read(*space, (offset & 6) >> 1);
 	}
 	else // odd
 	{
@@ -630,7 +630,7 @@ static WRITE8_HANDLER( pc9801_40_w )
 {
 	if((offset & 1) == 0)
 	{
-		i8255a_w(space->machine().device("ppi8255_prn"), (offset & 6) >> 1,data);
+		space->machine().device<i8255_device>("ppi8255_prn")->write(*space, (offset & 6) >> 1,data);
 	}
 	else // odd
 	{
@@ -656,7 +656,7 @@ static READ8_HANDLER( pc9801_50_r )
 	}
 	else // odd
 	{
-		return i8255a_r(space->machine().device("ppi8255_fdd"), (offset & 6) >> 1);
+		return space->machine().device<i8255_device>("ppi8255_fdd")->read(*space, (offset & 6) >> 1);
 	}
 }
 
@@ -674,7 +674,7 @@ static WRITE8_HANDLER( pc9801_50_w )
 	}
 	else // odd
 	{
-		i8255a_w(space->machine().device("ppi8255_fdd"), (offset & 6) >> 1,data);
+		space->machine().device<i8255_device>("ppi8255_fdd")->write(*space, (offset & 6) >> 1,data);
 	}
 }
 
@@ -2050,20 +2050,20 @@ static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 static I8255A_INTERFACE( ppi_system_intf )
 {
 	DEVCB_HANDLER(ppi_sys_porta_r),					/* Port A read */
-	DEVCB_HANDLER(ppi_sys_portb_r),					/* Port B read */
-	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
+	DEVCB_HANDLER(ppi_sys_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
+	DEVCB_NULL,					/* Port C read */
 	DEVCB_HANDLER(ppi_sys_portc_w)					/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi_printer_intf )
 {
 	DEVCB_NULL,					/* Port A read */
-	DEVCB_HANDLER(ppi_prn_portb_r),					/* Port B read */
-	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
+	DEVCB_HANDLER(ppi_prn_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
+	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL					/* Port C write */
 };
 
@@ -2090,10 +2090,10 @@ static WRITE8_DEVICE_HANDLER( ppi_fdd_portc_w )
 static I8255A_INTERFACE( ppi_fdd_intf )
 {
 	DEVCB_HANDLER(ppi_fdd_porta_r),					/* Port A read */
-	DEVCB_HANDLER(ppi_fdd_portb_r),					/* Port B read */
-	DEVCB_HANDLER(ppi_fdd_portc_r),					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
+	DEVCB_HANDLER(ppi_fdd_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
+	DEVCB_HANDLER(ppi_fdd_portc_r),					/* Port C read */
 	DEVCB_HANDLER(ppi_fdd_portc_w)					/* Port C write */
 };
 
@@ -2295,9 +2295,9 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8237_ADD( "dma8237", 5000000, dma8237_config ) //unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
-	MCFG_I8255A_ADD( "ppi8255_sys", ppi_system_intf )
-	MCFG_I8255A_ADD( "ppi8255_prn", ppi_printer_intf )
-	MCFG_I8255A_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
+	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
+	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
@@ -2346,9 +2346,9 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
-	MCFG_I8255A_ADD( "ppi8255_sys", ppi_system_intf )
-	MCFG_I8255A_ADD( "ppi8255_prn", ppi_printer_intf )
-	MCFG_I8255A_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
+	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
+	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
@@ -2395,9 +2395,9 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
-	MCFG_I8255A_ADD( "ppi8255_sys", ppi_system_intf )
-	MCFG_I8255A_ADD( "ppi8255_prn", ppi_printer_intf )
-	MCFG_I8255A_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
+	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
+	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)

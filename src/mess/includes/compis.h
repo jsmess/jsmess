@@ -142,7 +142,7 @@ public:
 
 /*----------- defined in machine/compis.c -----------*/
 
-extern const i8255a_interface compis_ppi_interface;
+extern const i8255_interface compis_ppi_interface;
 extern const struct pit8253_config compis_pit8253_config;
 extern const struct pit8253_config compis_pit8254_config;
 extern const struct pic8259_interface compis_pic8259_master_config;

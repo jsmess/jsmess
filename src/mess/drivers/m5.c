@@ -30,7 +30,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -123,7 +123,7 @@ WRITE8_MEMBER( m5_state::com_w )
 
 READ8_MEMBER( m5_state::fd5_data_r )
 {
-	i8255a_pc6_w(m_ppi, 0);
+	m_ppi->pc6_w(0);
 
 	return m_fd5_data;
 }
@@ -137,7 +137,7 @@ WRITE8_MEMBER( m5_state::fd5_data_w )
 {
 	m_fd5_data = data;
 
-	i8255a_pc4_w(m_ppi, 0);
+	m_ppi->pc4_w(0);
 }
 
 
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
 //  AM_RANGE(0x60, 0x63) SIO
 //  AM_RANGE(0x6c, 0x6c) EM-64/64KBI bank select
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 //  AM_RANGE(0x7f, 0x7f) 64KRD/64KRX bank select
 ADDRESS_MAP_END
 
@@ -466,7 +466,7 @@ static const TMS9928a_interface pal_vdp_intf =
 };
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( m5_state::ppi_pa_r )
@@ -552,13 +552,13 @@ WRITE8_MEMBER( m5_state::ppi_pc_w )
 	m_obfa = BIT(data, 7);
 }
 
-static I8255A_INTERFACE( ppi_intf )
+static I8255_INTERFACE( ppi_intf )
 {
 	DEVCB_DRIVER_MEMBER(m5_state, ppi_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_r),
 	DEVCB_DRIVER_MEMBER(m5_state, ppi_pa_w),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(m5_state, ppi_pb_w),
+	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_r),
 	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_w)
 };
 
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_I8255_ADD(I8255A_TAG, ppi_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, m5_floppy_config)
 

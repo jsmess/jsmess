@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "video/mc6845.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "sound/beep.h"
 
 
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( multi8_io , AS_IO, 8)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
 //  AM_RANGE(0x20, 0x21) //sio, cmt
 //  AM_RANGE(0x24, 0x27) //pit
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
 //  AM_RANGE(0x2c, 0x2d) //i8259
 	AM_RANGE(0x30, 0x37) AM_READWRITE(pal_r,pal_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(multi8_kanji_r,multi8_kanji_w) //kanji regs
@@ -572,13 +572,13 @@ static WRITE8_DEVICE_HANDLER( portc_w )
 }
 
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
+static I8255_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_HANDLER(porta_r),			/* Port A read */
 	DEVCB_NULL,						/* Port B read */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL,						/* Port A write */
 	DEVCB_HANDLER(portb_w),			/* Port B write */
+	DEVCB_NULL,						/* Port A write */
 	DEVCB_HANDLER(portc_w)			/* Port C write */
 };
 
@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
     MCFG_MACHINE_START(multi8)
     MCFG_MACHINE_RESET(multi8)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)

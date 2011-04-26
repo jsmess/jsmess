@@ -7,7 +7,7 @@
 #ifndef partner_H_
 #define partner_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8257dma.h"
 #include "machine/wd17xx.h"
 

@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "includes/genpc.h"
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
@@ -409,9 +409,9 @@ I8255A_INTERFACE( pc_ppi8255_interface )
 {
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_porta_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portc_r),
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portc_r),
 	DEVCB_NULL
 };
 
@@ -641,7 +641,22 @@ void ibm5160_mb_device::device_start()
 	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, FUNC(i8237_r), FUNC(i8237_w) );
 	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, FUNC(pic8259_r), FUNC(pic8259_w) );
 	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, FUNC(pit8253_r), FUNC(pit8253_w) );
-	install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, FUNC(i8255a_r), FUNC(i8255a_w) );
+
+	//	install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, FUNC(i8255a_r), FUNC(i8255a_w) );
+	int buswidth = machine().firstcpu->memory().space_config(AS_IO)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(0x0060, 0x0063, 0, 0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi8255), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi8255), 0);
+			break;
+		case 16:
+			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(0x0060, 0x0063, 0, 0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi8255), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi8255), 0xffff);
+			break;
+		default:
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			break;
+	}
+
 	install_device(this,    0x0080, 0x0087, 0, 0, FUNC(pc_page_r), FUNC(pc_page_w) );
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, FUNC(nmi_enable_w));
 	/* MESS managed RAM */

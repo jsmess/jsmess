@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
@@ -83,10 +83,10 @@ static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 I8255A_INTERFACE( radio86_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(radio86_8255_portb_r2),
-	DEVCB_HANDLER(radio86_8255_portc_r2),
 	DEVCB_HANDLER(radio86_8255_porta_w2),
+	DEVCB_HANDLER(radio86_8255_portb_r2),
 	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portc_r2),
 	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
@@ -94,9 +94,9 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(radio86_8255_portb_r2),
 	DEVCB_NULL,
-	DEVCB_HANDLER(radio86_8255_portc_r2),
 	DEVCB_NULL,
 	DEVCB_HANDLER(radio86_8255_porta_w2),
+	DEVCB_HANDLER(radio86_8255_portc_r2),
 	DEVCB_NULL,
 };
 
@@ -125,10 +125,10 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 I8255A_INTERFACE( rk7007_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(radio86_8255_portb_r2),
-	DEVCB_HANDLER(rk7007_8255_portc_r),
 	DEVCB_HANDLER(radio86_8255_porta_w2),
+	DEVCB_HANDLER(radio86_8255_portb_r2),
 	DEVCB_NULL,
+	DEVCB_HANDLER(rk7007_8255_portc_r),
 	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
@@ -225,8 +225,8 @@ I8255A_INTERFACE( radio86_ppi8255_interface_2 )
 	DEVCB_HANDLER(radio86_romdisk_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(radio86_romdisk_portb_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(radio86_romdisk_portc_w)
 };
 
@@ -241,8 +241,8 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(mikrosha_8255_font_page_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

@@ -106,8 +106,8 @@ void grip_state::scan_keyboard()
 					m_keydata = keydata;
 
 					/* trigger GRIP 8255 port C bit 2 (_STBB) */
-					i8255a_pc2_w(m_ppi, 0);
-					i8255a_pc2_w(m_ppi, 1);
+					m_ppi->pc2_w(0);
+					m_ppi->pc2_w(1);
 					return;
 				}
 			}
@@ -422,8 +422,8 @@ READ8_MEMBER( prof80_state::gripd_r )
 	//logerror("GRIP data read %02x\n", m_gripd);
 
 	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
-	i8255a_pc6_w(m_ppi, 0);
-	i8255a_pc6_w(m_ppi, 1);
+	m_ppi->pc6_w(0);
+	m_ppi->pc6_w(1);
 
 	return m_gripd;
 }
@@ -434,8 +434,8 @@ WRITE8_MEMBER( prof80_state::gripd_w )
 	//logerror("GRIP data write %02x\n", data);
 
 	/* trigger GRIP 8255 port C bit 4 (_STBA) */
-	i8255a_pc4_w(m_ppi, 0);
-	i8255a_pc4_w(m_ppi, 1);
+	m_ppi->pc4_w(0);
+	m_ppi->pc4_w(1);
 }
 
 /* GRIP */
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( grip_io, AS_IO, 8, grip_state )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD_LEGACY(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 //  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
 //  AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
 //  AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
@@ -655,7 +655,7 @@ static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip_state )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD_LEGACY(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 
 //  AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
 //  AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
@@ -1065,16 +1065,16 @@ WRITE8_MEMBER( grip_state::ppi_pc_w )
 	z80sti_i7_w(m_sti, BIT(data, 3));
 
 	/* PROF-80 handshaking */
-	m_gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (i8255a_pa_r(m_ppi, 0) & 0x3f);
+	m_gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
 }
 
 static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_DRIVER_MEMBER(grip_state, ppi_pa_r),	// Port A read
-	DEVCB_DRIVER_MEMBER(grip_state, ppi_pb_r),	// Port B read
-	DEVCB_NULL,							// Port C read
 	DEVCB_DRIVER_MEMBER(grip_state, ppi_pa_w),	// Port A write
+	DEVCB_DRIVER_MEMBER(grip_state, ppi_pb_r),	// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_NULL,							// Port C read
 	DEVCB_DRIVER_MEMBER(grip_state, ppi_pc_w)		// Port C write
 };
 

@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/z80pio.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
@@ -588,6 +588,9 @@ static READ8_HANDLER( pasopia7_io_r )
 {
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
 	UINT16 io_port;
+	i8255_device *ppi0 = space->machine().device<i8255_device>("ppi8255_0");
+	i8255_device *ppi1 = space->machine().device<i8255_device>("ppi8255_1");
+	i8255_device *ppi2 = space->machine().device<i8255_device>("ppi8255_2");
 
 	if(state->m_mio_sel)
 	{
@@ -604,14 +607,14 @@ static READ8_HANDLER( pasopia7_io_r )
 	if(io_port >= 0x30 && io_port <= 0x33)
 		printf("[%02x]\n",offset & 3);
 
-	if(io_port >= 0x08 && io_port <= 0x0b)		{ return i8255a_r(space->machine().device("ppi8255_0"), (io_port-0x08) & 3); }
-	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine().device("ppi8255_1"), (io_port-0x0c) & 3); }
+	if(io_port >= 0x08 && io_port <= 0x0b)		{ return ppi0->read(*space, (io_port-0x08) & 3); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { return ppi1->read(*space, (io_port-0x0c) & 3); }
 //  else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, (io_port-0x18) & 3);  }
 	else if(io_port >= 0x20 && io_port <= 0x23)
 	{
 		pasopia_nmi_trap(space->machine());
-		return i8255a_r(space->machine().device("ppi8255_2"), (io_port-0x20) & 3);
+		return ppi2->read(*space, (io_port-0x20) & 3);
 	}
 	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine().device("ctc"), (io_port-0x28) & 3);  }
 	else if(io_port == 0x30)					{ return z80pio_d_r(space->machine().device("z80pio_0"), (io_port-0x30) & 1); }
@@ -631,6 +634,9 @@ static READ8_HANDLER( pasopia7_io_r )
 static WRITE8_HANDLER( pasopia7_io_w )
 {
 	pasopia_state *state = space->machine().driver_data<pasopia_state>();
+	i8255_device *ppi0 = space->machine().device<i8255_device>("ppi8255_0");
+	i8255_device *ppi1 = space->machine().device<i8255_device>("ppi8255_1");
+	i8255_device *ppi2 = space->machine().device<i8255_device>("ppi8255_2");
 	UINT16 io_port;
 
 	if(state->m_mio_sel)
@@ -646,13 +652,13 @@ static WRITE8_HANDLER( pasopia7_io_w )
 	if(io_port >= 0x30 && io_port <= 0x33)
 		printf("[%02x] <- %02x\n",offset & 3,data);
 
-	if(io_port >= 0x08 && io_port <= 0x0b)		{ i8255a_w(space->machine().device("ppi8255_0"), (io_port-0x08) & 3, data); }
-	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine().device("ppi8255_1"), (io_port-0x0c) & 3, data); }
+	if(io_port >= 0x08 && io_port <= 0x0b)		{ ppi0->write(*space, (io_port-0x08) & 3, data); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { ppi1->write(*space, (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, (io_port-0x18) & 3, data);  }
 	else if(io_port >= 0x20 && io_port <= 0x23)
 	{
-		i8255a_w(space->machine().device("ppi8255_2"), (io_port-0x20) & 3, data);
+		ppi2->write(*space, (io_port-0x20) & 3, data);
 		pasopia_nmi_trap(space->machine());
 	}
 	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine().device("ctc"), (io_port-0x28) & 3,data);  }
@@ -890,33 +896,33 @@ static READ8_DEVICE_HANDLER( nmi_portb_r )
 	return 0xf9 | state->m_nmi_trap | state->m_nmi_reset;
 }
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
+static I8255_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_HANDLER(unk_r),			/* Port A read */
-	DEVCB_HANDLER(crtc_portb_r),	/* Port B read */
-	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(screen_mode_w),	/* Port A write */
+	DEVCB_HANDLER(crtc_portb_r),	/* Port B read */
 	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
 	DEVCB_NULL						/* Port C write */
 };
 
-static I8255A_INTERFACE( ppi8255_intf_1 )
+static I8255_INTERFACE( ppi8255_intf_1 )
 {
 	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(plane_reg_w),		/* Port A write */
+	DEVCB_NULL,						/* Port B read */
 	DEVCB_HANDLER(video_attr_w),	/* Port B write */
+	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(video_misc_w)		/* Port C write */
 };
 
-static I8255A_INTERFACE( ppi8255_intf_2 )
+static I8255_INTERFACE( ppi8255_intf_2 )
 {
 	DEVCB_HANDLER(nmi_porta_r),		/* Port A read */
-	DEVCB_HANDLER(nmi_portb_r),		/* Port B read */
-	DEVCB_HANDLER(nmi_reg_r),		/* Port C read */
 	DEVCB_HANDLER(nmi_mask_w),		/* Port A write */
+	DEVCB_HANDLER(nmi_portb_r),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
+	DEVCB_HANDLER(nmi_reg_r),		/* Port C read */
 	DEVCB_HANDLER(nmi_reg_w)		/* Port C write */
 };
 
@@ -988,9 +994,9 @@ static MACHINE_CONFIG_START( paso7, pasopia_state )
 
     MCFG_MACHINE_RESET(paso7)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
 
 	MCFG_UPD765A_ADD("upd765", pasopia7_upd765_interface)

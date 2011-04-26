@@ -123,7 +123,7 @@ irq vector 0x26:                                                                
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
@@ -138,7 +138,11 @@ class pc6001_state : public driver_device
 {
 public:
 	pc6001_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_ppi(*this, "ppi8255")
+	{ }
+
+	required_device<i8255_device> m_ppi;
 
 	UINT8 *m_ram;
 	UINT8 *m_video_ram;
@@ -717,9 +721,9 @@ static UINT8 pc6001_get_char_rom(running_machine &machine, UINT8 ch, int line)
 #endif
 
 
-static READ8_DEVICE_HANDLER(nec_ppi8255_r)
+static READ8_HANDLER(nec_ppi8255_r)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
+	pc6001_state *state = space->machine().driver_data<pc6001_state>();
 	if (offset==2)
 		return state->m_port_c_8255;
 	else if(offset==0)
@@ -730,12 +734,12 @@ static READ8_DEVICE_HANDLER(nec_ppi8255_r)
 		return res;
 	}
 
-	return i8255a_r(device,offset);
+	return state->m_ppi->read(*space, offset);
 }
 
-static WRITE8_DEVICE_HANDLER(nec_ppi8255_w)
+static WRITE8_HANDLER(nec_ppi8255_w)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
+	pc6001_state *state = space->machine().driver_data<pc6001_state>();
 	if (offset==3)
 	{
 		if(data & 1)
@@ -754,18 +758,18 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w)
 		state->m_port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *gfx_data = device->machine().region("gfx1")->base();
-			UINT8 *ext_rom = device->machine().region("cart_img")->base();
+			UINT8 *gfx_data = space->machine().region("gfx1")->base();
+			UINT8 *ext_rom = space->machine().region("cart_img")->base();
 
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
-				memory_set_bankptr(device->machine(), "bank1", &ext_rom[0x2000]);
+				memory_set_bankptr(space->machine(), "bank1", &ext_rom[0x2000]);
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(device->machine(), "bank1", &gfx_data[0]);
+				memory_set_bankptr(space->machine(), "bank1", &gfx_data[0]);
 		}
 	}
-	i8255a_w(device,offset,data);
+	state->m_ppi->write(*space,offset,data);
 }
 
 static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8)
@@ -781,7 +785,7 @@ static ADDRESS_MAP_START( pc6001_io , AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, nec_ppi8255_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
@@ -1092,9 +1096,9 @@ static WRITE8_HANDLER( work_ram7_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
+static WRITE8_HANDLER(necmk2_ppi8255_w)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
+	pc6001_state *state = space->machine().driver_data<pc6001_state>();
 	if (offset==3)
 	{
 		if(data & 1)
@@ -1113,24 +1117,24 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 		state->m_port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *ROM = device->machine().region("maincpu")->base();
-			UINT8 *gfx_data = device->machine().region("gfx1")->base();
+			UINT8 *ROM = space->machine().region("maincpu")->base();
+			UINT8 *gfx_data = space->machine().region("gfx1")->base();
 
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
 			{
 				state->m_gfx_bank_on = 0;
-				memory_set_bankptr(device->machine(), "bank4", &ROM[banksw_table_r0[((state->m_bank_r0 & 0xf0)>>4)+(state->m_bank_opt*0x10)][3]]);
+				memory_set_bankptr(space->machine(), "bank4", &ROM[banksw_table_r0[((state->m_bank_r0 & 0xf0)>>4)+(state->m_bank_opt*0x10)][3]]);
 			}
 			if((data & 0x0f) == 0x04)
 			{
 				state->m_gfx_bank_on = 1;
-				memory_set_bankptr(device->machine(), "bank4", &gfx_data[state->m_cgrom_bank_addr]);
+				memory_set_bankptr(space->machine(), "bank4", &gfx_data[state->m_cgrom_bank_addr]);
 			}
 		}
 	}
-	i8255a_w(device,offset,data);
+	state->m_ppi->write(*space,offset,data);
 }
 
 static void vram_bank_change(running_machine &machine,UINT8 vram_bank)
@@ -1346,7 +1350,7 @@ static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
@@ -1389,7 +1393,7 @@ static ADDRESS_MAP_START( pc6601_io , AS_IO, 8)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necmk2_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
@@ -1551,9 +1555,9 @@ static WRITE8_HANDLER ( pc6001sr_system_latch_w )
 	//printf("%02x B0\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER(necsr_ppi8255_w)
+static WRITE8_HANDLER(necsr_ppi8255_w)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
+	pc6001_state *state = space->machine().driver_data<pc6001_state>();
 	if (offset==3)
 	{
 		if(data & 1)
@@ -1573,18 +1577,18 @@ static WRITE8_DEVICE_HANDLER(necsr_ppi8255_w)
 
 		if(0)
 		{
-			UINT8 *gfx_data = device->machine().region("gfx1")->base();
-			UINT8 *ext_rom = device->machine().region("cart_img")->base();
+			UINT8 *gfx_data = space->machine().region("gfx1")->base();
+			UINT8 *ext_rom = space->machine().region("cart_img")->base();
 
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
-				memory_set_bankptr(device->machine(), "bank1", &ext_rom[0x2000]);
+				memory_set_bankptr(space->machine(), "bank1", &ext_rom[0x2000]);
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(device->machine(), "bank1", &gfx_data[0]);
+				memory_set_bankptr(space->machine(), "bank1", &gfx_data[0]);
 		}
 	}
-	i8255a_w(device,offset,data);
+	state->m_ppi->write(*space,offset,data);
 }
 
 
@@ -1608,7 +1612,7 @@ static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, necsr_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necsr_ppi8255_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
@@ -1849,13 +1853,13 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
 
 
 
-static I8255A_INTERFACE( pc6001_ppi8255_interface )
+static I8255_INTERFACE( pc6001_ppi8255_interface )
 {
 	DEVCB_HANDLER(pc6001_8255_porta_r),
-	DEVCB_HANDLER(pc6001_8255_portb_r),
-	DEVCB_HANDLER(pc6001_8255_portc_r),
 	DEVCB_HANDLER(pc6001_8255_porta_w),
+	DEVCB_HANDLER(pc6001_8255_portb_r),
 	DEVCB_HANDLER(pc6001_8255_portb_w),
+	DEVCB_HANDLER(pc6001_8255_portc_r),
 	DEVCB_HANDLER(pc6001_8255_portc_w)
 };
 
@@ -2294,7 +2298,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_PALETTE_LENGTH(16+4)
 	MCFG_PALETTE_INIT(pc6001)
 
-	MCFG_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
 	MCFG_MSM8251_ADD("uart", pc6001_usart_interface)
 

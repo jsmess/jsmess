@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "video/i8275.h"
 
@@ -38,7 +38,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sm1800_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x3c, 0x3d ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)
-	AM_RANGE( 0x6c, 0x6f ) AM_DEVREADWRITE("i8255", i8255a_r, i8255a_w)
+	AM_RANGE( 0x6c, 0x6f ) AM_DEVREADWRITE_MODERN("i8255", i8255_device, read, write)
 	//AM_RANGE( 0x74, 0x75 ) AM_DEVREADWRITE("i8279", i8279_r, i8279_w)
 	AM_RANGE( 0x5c, 0x5c) AM_DEVREADWRITE("i8251", msm8251_data_r,msm8251_data_w)
 	AM_RANGE( 0x5d, 0x5d) AM_DEVREADWRITE("i8251", msm8251_status_r,msm8251_control_w)
@@ -125,9 +125,9 @@ I8255A_INTERFACE( sm1800_ppi8255_interface )
 {
 	DEVCB_HANDLER(sm1800_8255_porta_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(sm1800_8255_portc_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(sm1800_8255_portb_w),
+	DEVCB_HANDLER(sm1800_8255_portc_r),
 	DEVCB_HANDLER(sm1800_8255_portc_w)
 };
 
@@ -151,7 +151,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 
     MCFG_MACHINE_RESET(sm1800)
 
-	MCFG_I8255A_ADD ("i8255", sm1800_ppi8255_interface )
+	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )
 	MCFG_I8275_ADD	("i8275", sm1800_i8275_interface)
 	MCFG_MSM8251_ADD("i8251", default_msm8251_interface)
     /* video hardware */

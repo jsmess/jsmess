@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/pit8253.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
@@ -69,13 +69,13 @@ static WRITE8_DEVICE_HANDLER( apricot_sysctrl_w )
 	mc6845_set_hpixels_per_column(state->m_mc6845, state->m_video_mode ? 10 : 16);
 }
 
-static const i8255a_interface apricot_i8255a_intf =
+static const i8255_interface apricot_i8255a_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(apricot_sysctrl_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(apricot_sysctrl_w),
+	DEVCB_HANDLER(apricot_sysctrl_r),
 	DEVCB_NULL
 };
 
@@ -272,7 +272,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( apricot_io, AS_IO, 16 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("ic68", wd17xx_r, wd17xx_w, 0x00ff)
-	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255a_r, i8255a_w, 0x00ff)
+	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8_MODERN("ic17", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76496_w, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", z80sio_ba_cd_r, z80sio_ba_cd_w, 0x00ff)

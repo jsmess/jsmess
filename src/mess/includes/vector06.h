@@ -7,7 +7,7 @@
 #ifndef VECTOR06_H_
 #define VECTOR06_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 class vector06_state : public driver_device
 {
@@ -26,8 +26,8 @@ public:
 
 /*----------- defined in machine/vector06.c -----------*/
 
-extern const i8255a_interface vector06_ppi8255_interface;
-extern const i8255a_interface vector06_ppi8255_2_interface;
+extern const i8255_interface vector06_ppi8255_interface;
+extern const i8255_interface vector06_ppi8255_2_interface;
 
 extern MACHINE_START( vector06 );
 extern MACHINE_RESET( vector06 );

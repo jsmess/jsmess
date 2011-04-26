@@ -18,7 +18,7 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"	/* for floppy disc controller */
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
@@ -180,20 +180,20 @@ static WRITE8_DEVICE_HANDLER(i8255_port_c_w)
 	centronics_strobe_w(printer, (data >> 7) & 0x01);
 }
 
-static I8255A_INTERFACE(elwro800jr_ppi8255_interface)
+static I8255_INTERFACE(elwro800jr_ppi8255_interface)
 {
 	DEVCB_INPUT_PORT("JOY"),
-	DEVCB_DEVICE_HANDLER("centronics", centronics_data_r),
-	DEVCB_HANDLER(i8255_port_c_r),
 	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_r),
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
+	DEVCB_HANDLER(i8255_port_c_r),
 	DEVCB_HANDLER(i8255_port_c_w)
 };
 
 static const centronics_interface elwro800jr_centronics_interface =
 {
 	FALSE,
-	DEVCB_DEVICE_LINE("ppi8255", i8255a_pc2_w),
+	DEVCB_DEVICE_LINE_MEMBER("ppi8255", i8255_device, pc2_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -277,8 +277,8 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		device_t *ppi = space->machine().device("ppi8255");
-		return i8255a_r(ppi, (offset & 0x03) ^ 0x03);
+		i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+		return ppi->read(*space, (offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
@@ -335,8 +335,8 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		device_t *ppi = space->machine().device("ppi8255");
-		i8255a_w(ppi, (offset & 0x03) ^ 0x03, data);
+		i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+		ppi->write(*space, (offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{

@@ -34,7 +34,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ctronics.h"
 #include "includes/compis.h"
 #include "imagedev/flopdrv.h"
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, AS_IO, 16 )
-	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xff00)
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8_MODERN("ppi8255", i8255_device, read, write, 0xff00)
 	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
 
-	MCFG_I8255A_ADD( "ppi8255", compis_ppi_interface )
+	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

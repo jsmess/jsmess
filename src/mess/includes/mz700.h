@@ -12,7 +12,7 @@
 #ifndef MZ700_H_
 #define MZ700_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/z80pio.h"
 
@@ -26,7 +26,7 @@ public:
 	int m_mz700;				/* 1 if running on an mz700 */
 
 	device_t *m_pit;
-	device_t *m_ppi;
+	i8255_device *m_ppi;
 
 	int m_cursor_timer;
 	int m_other_timer;
@@ -59,7 +59,7 @@ public:
 
 extern const struct pit8253_config mz700_pit8253_config;
 extern const struct pit8253_config mz800_pit8253_config;
-extern const i8255a_interface mz700_ppi8255_interface;
+extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 
 DRIVER_INIT( mz700 );

@@ -35,7 +35,7 @@
 #include "machine/pic8259.h"
 #include "machine/upd7201.h"
 #include "machine/mc146818.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8237dma.h"
 #include "video/upd7220.h"
 #include "machine/upd765.h"
@@ -375,7 +375,7 @@ static I8237_INTERFACE( qx10_dma8237_2_interface )
 /*
     8255
 */
-static I8255A_INTERFACE(qx10_i8255_interface)
+static I8255_INTERFACE(qx10_i8255_interface)
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -645,7 +645,7 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_r, pic8259_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(upd7201_r,upd7201_w) //AM_DEVREADWRITE_MODERN("upd7201", upd7201_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("i8255", i8255a_r, i8255a_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE_MODERN("i8255", i8255_device, read, write)
 	AM_RANGE(0x18, 0x1b) AM_READ_PORT("DSW") AM_WRITE(qx10_18_w)
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(prom_sel_w)
 	AM_RANGE(0x20, 0x23) AM_WRITE(cmos_sel_w)
@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PIC8259_ADD("pic8259_master", qx10_pic8259_master_config)
 	MCFG_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
 	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
-	MCFG_I8255A_ADD("i8255", qx10_i8255_interface)
+	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)

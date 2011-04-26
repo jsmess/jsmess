@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
@@ -87,13 +87,13 @@ static WRITE_LINE_DEVICE_HANDLER( pit_out2_changed )
 	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 }
 
-I8255A_INTERFACE( mz80k_8255_int )
+I8255_INTERFACE( mz80k_8255_int )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(mz80k_8255_portb_r),
-	DEVCB_HANDLER(mz80k_8255_portc_r),
 	DEVCB_HANDLER(mz80k_8255_porta_w),
+	DEVCB_HANDLER(mz80k_8255_portb_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(mz80k_8255_portc_r),
 	DEVCB_HANDLER(mz80k_8255_portc_w),
 };
 

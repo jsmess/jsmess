@@ -577,7 +577,7 @@ expect that the software reads these once on startup only.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
@@ -712,23 +712,23 @@ WRITE8_MEMBER( fidelz80_state::abc_speech_w )
 	s14001a_rst_w(m_speech, (data & 0x80)>>7);
 }
 
-static I8255A_INTERFACE( cc10_ppi8255_intf )
+static I8255_INTERFACE( cc10_ppi8255_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(fidelz80_state, cc10_portb_r),
-	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_r),
 	DEVCB_DRIVER_MEMBER(fidelz80_state, cc10_porta_w),
+	DEVCB_DRIVER_MEMBER(fidelz80_state, cc10_portb_r),
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portb_w),
+	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_r),
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_w)
 };
 
-static I8255A_INTERFACE( vcc_ppi8255_intf )
+static I8255_INTERFACE( vcc_ppi8255_intf )
 {
 	DEVCB_NULL, // only bit 6 is readable (and only sometimes) and I'm not emulating the language latch unless needed
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vcc_portb_r), // bit 7 is readable and is the done line from the s14001a
-	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_r), // bits 0,1,2,3 are readable, have to do with input
 	DEVCB_DRIVER_MEMBER(fidelz80_state, vcc_porta_w), // display segments and s14001a lines
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vcc_portb_r), // bit 7 is readable and is the done line from the s14001a
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portb_w), // display digits and led dots
+	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_r), // bits 0,1,2,3 are readable, have to do with input
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_w), // bits 4,5,6,7 are writable, have to do with input
 };
 
@@ -938,7 +938,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(fidel_z80_io, AS_IO, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE_LEGACY("ppi8255", i8255a_r, i8255a_w) // 8255 i/o chip
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // 8255 i/o chip
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(abc_z80_io, AS_IO, 8, fidelz80_state)
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
-	MCFG_I8255A_ADD("ppi8255", cc10_ppi8255_intf)
+	MCFG_I8255_ADD("ppi8255", cc10_ppi8255_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
@@ -1101,7 +1101,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
-	MCFG_I8255A_ADD("ppi8255", vcc_ppi8255_intf)
+	MCFG_I8255_ADD("ppi8255", vcc_ppi8255_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

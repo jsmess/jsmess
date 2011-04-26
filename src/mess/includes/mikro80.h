@@ -7,7 +7,7 @@
 #ifndef MIKRO80_H_
 #define MIKRO80_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 class mikro80_state : public driver_device
 {
@@ -24,13 +24,13 @@ public:
 
 /*----------- defined in machine/mikro80.c -----------*/
 
-extern const i8255a_interface mikro80_ppi8255_interface;
+extern const i8255_interface mikro80_ppi8255_interface;
 
 extern DRIVER_INIT( mikro80 );
 extern DRIVER_INIT( radio99 );
 extern MACHINE_RESET( mikro80 );
-extern READ8_DEVICE_HANDLER( mikro80_keyboard_r );
-extern WRITE8_DEVICE_HANDLER( mikro80_keyboard_w );
+extern READ8_HANDLER( mikro80_keyboard_r );
+extern WRITE8_HANDLER( mikro80_keyboard_w );
 extern READ8_HANDLER( mikro80_tape_r );
 extern WRITE8_HANDLER( mikro80_tape_w );
 

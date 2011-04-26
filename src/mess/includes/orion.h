@@ -8,7 +8,7 @@
 #define ORION_H_
 
 #include "includes/radio86.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 class orion_state : public radio86_state
 {
@@ -39,7 +39,7 @@ public:
 
 /*----------- defined in machine/orion.c -----------*/
 
-extern const i8255a_interface orion128_ppi8255_interface_1;
+extern const i8255_interface orion128_ppi8255_interface_1;
 
 extern MACHINE_START( orion128 );
 extern MACHINE_RESET( orion128 );

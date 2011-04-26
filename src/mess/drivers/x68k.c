@@ -120,7 +120,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/mc68901.h"
 #include "machine/upd765.h"
 #include "sound/2151intf.h"
@@ -1485,14 +1485,16 @@ static WRITE16_HANDLER( x68k_mfp_w )
 }
 
 
-static WRITE16_DEVICE_HANDLER( x68k_ppi_w )
+static WRITE16_HANDLER( x68k_ppi_w )
 {
-	i8255a_w(device,offset & 0x03,data);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	ppi->write(*space,offset & 0x03,data);
 }
 
-static READ16_DEVICE_HANDLER( x68k_ppi_r )
+static READ16_HANDLER( x68k_ppi_r )
 {
-	return i8255a_r(device,offset & 0x03);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	return ppi->read(*space,offset & 0x03);
 }
 
 static READ16_HANDLER( x68k_rtc_r )
@@ -1991,7 +1993,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE("ppi8255", x68k_ppi_r, x68k_ppi_w)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
 	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
@@ -2029,7 +2031,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE("ppi8255", x68k_ppi_r, x68k_ppi_w)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
 	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
@@ -2066,7 +2068,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE16("ppi8255", x68k_ppi_r, x68k_ppi_w,0xffffffff)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16(x68k_ppi_r, x68k_ppi_w,0xffffffff)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
 	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
@@ -2109,10 +2111,10 @@ static MC68901_INTERFACE( mfp_interface )
 static I8255A_INTERFACE( ppi_interface )
 {
 	DEVCB_HANDLER(ppi_port_a_r),
+	DEVCB_NULL,
 	DEVCB_HANDLER(ppi_port_b_r),
+	DEVCB_NULL,
 	DEVCB_HANDLER(ppi_port_c_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(ppi_port_c_w)
 };
 

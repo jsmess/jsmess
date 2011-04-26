@@ -8,7 +8,7 @@
 #define LVIV_H_
 
 #include "imagedev/snapquik.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 class lviv_state : public driver_device
 {
@@ -25,8 +25,8 @@ public:
 
 /*----------- defined in machine/lviv.c -----------*/
 
-extern const i8255a_interface lviv_ppi8255_interface_0;
-extern const i8255a_interface lviv_ppi8255_interface_1;
+extern const i8255_interface lviv_ppi8255_interface_0;
+extern const i8255_interface lviv_ppi8255_interface_1;
 
  READ8_HANDLER ( lviv_io_r );
 WRITE8_HANDLER ( lviv_io_w );

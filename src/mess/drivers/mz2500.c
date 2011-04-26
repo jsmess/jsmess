@@ -45,7 +45,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
 #include "sound/2203intf.h"
@@ -1504,7 +1504,7 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xde, 0xde) AM_WRITENOP
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255a_r, i8255a_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE_MODERN("i8255_0", i8255_device, read, write)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
@@ -1875,13 +1875,13 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 		logerror("PPI PORTC W %02x\n",data & ~0x0e);
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
+static I8255_INTERFACE( ppi8255_intf )
 {
 	DEVCB_HANDLER(mz2500_porta_r),						/* Port A read */
-	DEVCB_HANDLER(mz2500_portb_r),						/* Port B read */
-	DEVCB_HANDLER(mz2500_portc_r),						/* Port C read */
 	DEVCB_HANDLER(mz2500_porta_w),						/* Port A write */
+	DEVCB_HANDLER(mz2500_portb_r),						/* Port B read */
 	DEVCB_HANDLER(mz2500_portb_w),						/* Port B write */
+	DEVCB_HANDLER(mz2500_portc_r),						/* Port C read */
 	DEVCB_HANDLER(mz2500_portc_w)						/* Port C write */
 };
 
@@ -2082,7 +2082,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 
     MCFG_MACHINE_RESET(mz2500)
 
-	MCFG_I8255A_ADD( "i8255_0", ppi8255_intf )
+	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 6000000, mz2500_sio_intf )
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)

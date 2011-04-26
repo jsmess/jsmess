@@ -75,20 +75,7 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
 #include "includes/portfoli.h"
-#include "cpu/i86/i86.h"
-#include "imagedev/cartslot.h"
-#include "machine/ram.h"
-#include "imagedev/printer.h"
-#include "machine/ctronics.h"
-#include "machine/i8255a.h"
-#include "machine/ins8250.h"
-#include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "video/hd61830.h"
 #include "rendlay.h"
 
 //**************************************************************************
@@ -524,7 +511,7 @@ static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
 	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
 	AM_RANGE(0x8060, 0x8060) AM_RAM AM_BASE(m_contrast)
 //  AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE_LEGACY(M82C50A_TAG, ins8250_r, ins8250_w) // Serial Interface
-//  AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE_LEGACY(M82C55A_TAG, i8255a_r, i8255a_w) // Parallel Interface
+//  AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE(M82C55A_TAG, i8255_device, read, write) // Parallel Interface
 	AM_RANGE(0x807c, 0x807c) AM_WRITE(ncc1_w)
 	AM_RANGE(0x807f, 0x807f) AM_READWRITE(pid_r, sivr_w)
 ADDRESS_MAP_END
@@ -710,16 +697,16 @@ GFXDECODE_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
-static I8255A_INTERFACE( ppi_intf )
+static I8255_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,													// Port A read
-	DEVCB_NULL,													// Port B read
-	DEVCB_INPUT_PORT("PPI-PC"),									// Port C read
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port A write
+	DEVCB_NULL,													// Port B read
 	DEVCB_INPUT_PORT("PPI-PB"),									// Port B write
+	DEVCB_INPUT_PORT("PPI-PC"),									// Port C read
 	DEVCB_NULL													// Port C write
 };
 
@@ -831,7 +818,7 @@ void portfolio_state::machine_reset()
 		break;
 
 	case PID_PARALLEL:
-		io->install_legacy_readwrite_handler(*m_ppi, 0x8078, 0x807b, FUNC(i8255a_r), FUNC(i8255a_w));
+		io->install_readwrite_handler(0x8078, 0x807b, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
 		break;
 	}
 }

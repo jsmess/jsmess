@@ -34,8 +34,8 @@ static ADDRESS_MAP_START(pp01_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pp01_io, AS_IO, 8 )
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
-	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xcc, 0xcf) AM_WRITE(pp01_video_write_mode_w)
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0xe0, 0xef) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)

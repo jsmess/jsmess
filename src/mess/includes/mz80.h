@@ -7,6 +7,8 @@
 #ifndef MZ80_H_
 #define MZ80_H_
 
+#include "machine/i8255.h"
+
 class mz80_state : public driver_device
 {
 public:
@@ -30,7 +32,7 @@ extern MACHINE_RESET( mz80k );
 extern READ8_HANDLER( mz80k_strobe_r );
 extern WRITE8_HANDLER( mz80k_strobe_w );
 
-extern const i8255a_interface mz80k_8255_int;
+extern const i8255_interface mz80k_8255_int;
 extern const struct pit8253_config mz80k_pit8253_config;
 
 

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/terminal.h"
 
 
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( basic52_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)  // PPI-8255
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
@@ -58,13 +58,13 @@ static GENERIC_TERMINAL_INTERFACE( basic52_terminal_intf )
 	DEVCB_HANDLER(basic52_kbd_put)
 };
 
-static I8255A_INTERFACE( ppi8255_intf )
+static I8255_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,					/* Port A read */
-	DEVCB_NULL,					/* Port B read */
-	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
+	DEVCB_NULL,					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
+	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL					/* Port C write */
 };
 
@@ -80,7 +80,7 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
     MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
-	MCFG_I8255A_ADD("ppi8255", ppi8255_intf )
+	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( basic52, basic52_state )
@@ -95,7 +95,7 @@ static MACHINE_CONFIG_START( basic52, basic52_state )
     MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
-	MCFG_I8255A_ADD("ppi8255", ppi8255_intf )
+	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
 /* ROM definition */

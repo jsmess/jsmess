@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/bk.h"
 
 

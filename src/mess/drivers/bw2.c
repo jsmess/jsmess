@@ -244,7 +244,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY(PIT8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE(MSM6255_TAG, msm6255_device, read, write)
 //  AM_RANGE( 0x30, 0x3f ) SLOT
@@ -506,10 +506,10 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pb_r),
-	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pc_r),
 	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pa_w),
+	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pb_r),
 	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pc_r),
 	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pc_w),
 };
 

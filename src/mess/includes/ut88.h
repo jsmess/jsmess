@@ -7,7 +7,7 @@
 #ifndef UT88_H_
 #define UT88_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 class ut88_state : public driver_device
 {
@@ -23,12 +23,12 @@ public:
 
 /*----------- defined in machine/ut88.c -----------*/
 
-extern const i8255a_interface ut88_ppi8255_interface;
+extern const i8255_interface ut88_ppi8255_interface;
 
 extern DRIVER_INIT( ut88 );
 extern MACHINE_RESET( ut88 );
-extern READ8_DEVICE_HANDLER( ut88_keyboard_r );
-extern WRITE8_DEVICE_HANDLER( ut88_keyboard_w );
+extern READ8_HANDLER( ut88_keyboard_r );
+extern WRITE8_HANDLER( ut88_keyboard_w );
 extern WRITE8_HANDLER( ut88_sound_w );
 extern READ8_HANDLER( ut88_tape_r );
 

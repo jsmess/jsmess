@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/mikro80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mikro80_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x01, 0x01) AM_READWRITE ( mikro80_tape_r, mikro80_tape_w )
-	AM_RANGE( 0x04, 0x07) AM_DEVREADWRITE ( "ppi8255", mikro80_keyboard_r, mikro80_keyboard_w )
+	AM_RANGE( 0x04, 0x07) AM_READWRITE ( mikro80_keyboard_r, mikro80_keyboard_w )
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( radio99_dac_w )	{ dac_data_w(device, data); }
@@ -172,7 +172,7 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_CPU_IO_MAP(mikro80_io)
 	MCFG_MACHINE_RESET( mikro80 )
 
-	MCFG_I8255A_ADD( "ppi8255", mikro80_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", mikro80_ppi8255_interface )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

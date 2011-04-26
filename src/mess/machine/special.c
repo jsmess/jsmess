@@ -12,7 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 #include "includes/special.h"
@@ -108,13 +108,13 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 
 }
 
-I8255A_INTERFACE( specialist_ppi8255_interface )
+I8255_INTERFACE( specialist_ppi8255_interface )
 {
 	DEVCB_HANDLER(specialist_8255_porta_r),
-	DEVCB_HANDLER(specialist_8255_portb_r),
-	DEVCB_HANDLER(specialist_8255_portc_r),
 	DEVCB_HANDLER(specialist_8255_porta_w),
+	DEVCB_HANDLER(specialist_8255_portb_r),
 	DEVCB_HANDLER(specialist_8255_portb_w),
+	DEVCB_HANDLER(specialist_8255_portc_r),
 	DEVCB_HANDLER(specialist_8255_portc_w)
 };
 
@@ -128,16 +128,6 @@ MACHINE_RESET( special )
 {
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(special_reset));
 	memory_set_bank(machine, "bank1", 1);
-}
-
-READ8_HANDLER( specialist_keyboard_r )
-{
-	return i8255a_r(space->machine().device("ppi8255"), (offset & 3));
-}
-
-WRITE8_HANDLER( specialist_keyboard_w )
-{
-	i8255a_w(space->machine().device("ppi8255"), (offset & 3) , data );
 }
 
 
@@ -376,8 +366,8 @@ static void erik_set_bank(running_machine &machine)
 						memory_set_bankptr(machine, "bank4", mem + 0x1c000);
 						space->unmap_write(0xf000, 0xf7ff);
 						space->nop_read(0xf000, 0xf7ff);
-						space->install_legacy_write_handler(0xf800, 0xffff, FUNC(specialist_keyboard_w));
-						space->install_legacy_read_handler(0xf800, 0xffff, FUNC(specialist_keyboard_r));
+						i8255_device *ppi = machine.device<i8255_device>("ppi8255");
+						space->install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, read8_delegate(FUNC(i8255_device::read), (i8255_device*)ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)ppi));
 						break;
 	}
 }

@@ -48,7 +48,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "sound/sn76496.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
@@ -81,9 +81,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ppi0;
-	required_device<device_t> m_ppi1;
-	required_device<device_t> m_ppi2;
+	required_device<i8255_device> m_ppi0;
+	required_device<i8255_device> m_ppi1;
+	required_device<i8255_device> m_ppi2;
 	required_device<device_t> m_cass;
 	required_device<device_t> m_wave;
 	required_device<device_t> m_crtc;
@@ -229,9 +229,9 @@ static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_LEGACY("crtc", mc6845_status_r,mc6845_address_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r,mc6845_register_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", i8255a_r, i8255a_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", i8255a_r, i8255a_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
 ADDRESS_MAP_END
 
@@ -459,33 +459,33 @@ static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
 	state->m_rtc->cs_w(BIT(data, 7));
 }
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
+static I8255_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_NULL,			/* Port A read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_05_r),	/* Port B read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_r),	/* Port C read */
 	DEVCB_DRIVER_MEMBER(mycom_state, mycom_04_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_05_r),	/* Port B read */
 	DEVCB_NULL,			/* Port B write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_r),	/* Port C read */
 	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_w)	/* Port C write */
 };
 
-static I8255A_INTERFACE( ppi8255_intf_1 )
+static I8255_INTERFACE( ppi8255_intf_1 )
 {
 	DEVCB_DRIVER_MEMBER(mycom_state, mycom_08_r),	/* Port A read */
-	DEVCB_NULL,			/* Port B read */
-	DEVCB_NULL,			/* Port C read */
 	DEVCB_NULL,			/* Port A write */
+	DEVCB_NULL,			/* Port B read */
 	DEVCB_NULL,			/* Port B write */
+	DEVCB_NULL,			/* Port C read */
 	DEVCB_DRIVER_MEMBER(mycom_state, mycom_0a_w)	/* Port C write */
 };
 
-static I8255A_INTERFACE( ppi8255_intf_2 )
+static I8255_INTERFACE( ppi8255_intf_2 )
 {
 	DEVCB_NULL,			/* Port A read */
-	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),			/* Port B read */
-	DEVCB_NULL,			/* Port C read */
 	DEVCB_NULL,			/* Port A write */
+	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),			/* Port B read */
 	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_w),			/* Port B write */
+	DEVCB_NULL,			/* Port C read */
 	DEVCB_HANDLER(mycom_rtc_w)			/* Port C write */
 };
 
@@ -567,9 +567,9 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_CPU_PROGRAM_MAP(mycom_map)
 	MCFG_CPU_IO_MAP(mycom_io)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

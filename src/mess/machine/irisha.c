@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
@@ -97,10 +97,10 @@ static WRITE8_DEVICE_HANDLER (irisha_8255_portc_w )
 I8255A_INTERFACE( irisha_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(irisha_8255_portb_r),
-	DEVCB_HANDLER(irisha_8255_portc_r),
 	DEVCB_HANDLER(irisha_8255_porta_w),
+	DEVCB_HANDLER(irisha_8255_portb_r),
 	DEVCB_HANDLER(irisha_8255_portb_w),
+	DEVCB_HANDLER(irisha_8255_portc_r),
 	DEVCB_HANDLER(irisha_8255_portc_w),
 };
 

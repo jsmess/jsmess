@@ -15,7 +15,7 @@
 #include "video/mc6845.h"
 #include "includes/svi318.h"
 #include "video/tms9928a.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
 #include "imagedev/flopdrv.h"
@@ -52,8 +52,8 @@ static ADDRESS_MAP_START( svi318_io, AS_IO, 8 )
 	AM_RANGE( 0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_address_w )
 	AM_RANGE( 0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_data_w )
 	AM_RANGE( 0x90, 0x90) AM_DEVREAD("ay8910", ay8910_r )
-	AM_RANGE( 0x96, 0x97) AM_DEVWRITE("ppi8255", svi318_ppi_w )
-	AM_RANGE( 0x98, 0x9a) AM_DEVREAD("ppi8255", svi318_ppi_r )
+	AM_RANGE( 0x96, 0x97) AM_WRITE(svi318_ppi_w)
+	AM_RANGE( 0x98, 0x9a) AM_DEVREAD_MODERN("ppi8255", i8255_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8 )
@@ -67,8 +67,8 @@ static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8 )
 	AM_RANGE( 0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_address_w )
 	AM_RANGE( 0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_data_w )
 	AM_RANGE( 0x90, 0x90) AM_DEVREAD("ay8910", ay8910_r )
-	AM_RANGE( 0x96, 0x97) AM_DEVWRITE("ppi8255", svi318_ppi_w )
-	AM_RANGE( 0x98, 0x9a) AM_DEVREAD("ppi8255", svi318_ppi_r )
+	AM_RANGE( 0x96, 0x97) AM_WRITE(svi318_ppi_w)
+	AM_RANGE( 0x98, 0x9a) AM_DEVREAD_MODERN("ppi8255", i8255_device, read)
 ADDRESS_MAP_END
 
 /*
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_MACHINE_START( svi318_pal )
 	MCFG_MACHINE_RESET( svi318 )
 
-	MCFG_I8255A_ADD( "ppi8255", svi318_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", svi318_ppi8255_interface )
 
 	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0] )
 	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )

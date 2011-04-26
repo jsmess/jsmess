@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 #include "imagedev/cassette.h"
@@ -22,8 +22,8 @@
 static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
-    //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
+    //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
@@ -36,14 +36,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rk7007_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x80, 0x83 ) AM_DEVREADWRITE("ms7007", i8255a_r, i8255a_w)
+	AM_RANGE( 0x80, 0x83 ) AM_DEVREADWRITE_MODERN("ms7007", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(radio86rom_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
-    AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
@@ -54,9 +54,9 @@ static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x1000, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_ROM  // System ROM page 2
     AM_RANGE( 0xe800, 0xf5ff ) AM_RAM  // RAM
-    AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+    AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
     AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) // video
-    AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+    AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
 	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE( radio86_pagesel )
     AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START(radio86_16_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x3fff ) AM_RAM  // RAM
     AM_RANGE( 0x4000, 0x7fff ) AM_READ(radio_cpu_state_r)
-    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
     //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mikron2_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)
+    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
     //AM_RANGE( 0xc100, 0xc103 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)
     AM_RANGE( 0xc200, 0xc201 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x00fe) // video
     AM_RANGE( 0xc300, 0xc3ff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(impuls03_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
+    AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Basic ROM
     AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_CPU_IO_MAP(radio86_io)
 	MCFG_MACHINE_RESET( radio86 )
 
-	MCFG_I8255A_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
 	MCFG_I8275_ADD	( "i8275", radio86_i8275_interface)
     /* video hardware */
@@ -391,7 +391,7 @@ static MACHINE_CONFIG_DERIVED( radiorom, radio86 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86rom_mem)
 
-	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
+	MCFG_I8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_DERIVED( radioram, radio86 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86ram_mem)
 
-	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
+	MCFG_I8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
 
-	MCFG_I8255A_ADD( "ms7007", rk7007_ppi8255_interface )
+	MCFG_I8255_ADD( "ms7007", rk7007_ppi8255_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
 
-	MCFG_I8255A_ADD( "ms7007", rk7007_ppi8255_interface )
+	MCFG_I8255_ADD( "ms7007", rk7007_ppi8255_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mikron2, radio86 )

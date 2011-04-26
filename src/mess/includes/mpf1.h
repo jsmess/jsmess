@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"

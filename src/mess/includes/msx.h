@@ -49,12 +49,13 @@ public:
 	UINT8 m_korean90in1_bank;
 	UINT8 *m_top_page;
 	int m_port_c_old;
+	int keylatch;
 };
 
 
 /*----------- defined in machine/msx.c -----------*/
 
-extern const i8255a_interface msx_ppi8255_interface;
+extern const i8255_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
 extern DRIVER_INIT( msx );

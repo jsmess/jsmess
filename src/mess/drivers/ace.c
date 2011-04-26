@@ -48,7 +48,7 @@ Ports:
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
@@ -111,24 +111,24 @@ WRITE8_MEMBER( ace_state::io_w )
 //   ppi_r -
 //-------------------------------------------------
 
-static READ8_DEVICE_HANDLER( ppi_pa_r )
+READ8_MEMBER( ace_state::ppi_pa_r )
 {
-	return i8255a_r(device, 0);
+	return m_ppi->read(space, 0);
 }
 
-static READ8_DEVICE_HANDLER( ppi_pb_r )
+READ8_MEMBER( ace_state::ppi_pb_r )
 {
-	return i8255a_r(device, 1);
+	return m_ppi->read(space, 1);
 }
 
-static READ8_DEVICE_HANDLER( ppi_pc_r )
+READ8_MEMBER( ace_state::ppi_pc_r )
 {
-	return i8255a_r(device, 2);
+	return m_ppi->read(space, 2);
 }
 
-static READ8_DEVICE_HANDLER( ppi_control_r )
+READ8_MEMBER( ace_state::ppi_control_r )
 {
-	return i8255a_r(device, 3);
+	return m_ppi->read(space, 3);
 }
 
 
@@ -136,24 +136,24 @@ static READ8_DEVICE_HANDLER( ppi_control_r )
 //   ppi_w -
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( ppi_pa_w )
+WRITE8_MEMBER( ace_state::ppi_pa_w )
 {
-	i8255a_w(device, 0, data);
+	m_ppi->write(space, 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi_pb_w )
+WRITE8_MEMBER( ace_state::ppi_pb_w )
 {
-	i8255a_w(device, 1, data);
+	m_ppi->write(space, 1, data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi_pc_w )
+WRITE8_MEMBER( ace_state::ppi_pc_w )
 {
-	i8255a_w(device, 2, data);
+	m_ppi->write(space, 2, data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi_control_w )
+WRITE8_MEMBER( ace_state::ppi_control_w )
 {
-	i8255a_w(device, 3, data);
+	m_ppi->write(space, 3, data);
 }
 
 
@@ -232,10 +232,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfffe) AM_MASK(0xff00) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pa_r, ppi_pa_w)
-	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pb_r, ppi_pb_w)
-	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pc_r, ppi_pc_w)
-	AM_RANGE(0x47, 0x47) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_control_r, ppi_control_w)
+	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_READWRITE(ppi_pa_r, ppi_pa_w)
+	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_READWRITE(ppi_pb_r, ppi_pb_w)
+	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff80) AM_READWRITE(ppi_pc_r, ppi_pc_w)
+	AM_RANGE(0x47, 0x47) AM_MIRROR(0xff80) AM_READWRITE(ppi_control_r, ppi_control_w)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_ad_r, pio_ad_w)
 	AM_RANGE(0x83, 0x83) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_bd_r, pio_bd_w)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_ac_r, pio_ac_w)

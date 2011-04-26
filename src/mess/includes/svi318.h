@@ -9,7 +9,7 @@
 #ifndef SVI318_H_
 #define SVI318_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 
@@ -61,7 +61,7 @@ public:
 
 /*----------- defined in machine/svi318.c -----------*/
 
-extern const i8255a_interface svi318_ppi8255_interface;
+extern const i8255_interface svi318_ppi8255_interface;
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
 
@@ -85,9 +85,7 @@ WRITE8_HANDLER( svi318_writemem4 );
 READ8_HANDLER( svi318_io_ext_r );
 WRITE8_HANDLER( svi318_io_ext_w );
 
-READ8_DEVICE_HANDLER( svi318_ppi_r );
-WRITE8_DEVICE_HANDLER( svi318_ppi_w );
-
+WRITE8_HANDLER( svi318_ppi_w );
 WRITE8_HANDLER( svi318_psg_port_b_w );
 READ8_HANDLER( svi318_psg_port_a_r );
 

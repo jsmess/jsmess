@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/ut88.h"
 
 
@@ -54,10 +54,10 @@ static WRITE8_DEVICE_HANDLER (ut88_8255_porta_w )
 I8255A_INTERFACE( ut88_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(ut88_8255_portb_r),
-	DEVCB_HANDLER(ut88_8255_portc_r),
 	DEVCB_HANDLER(ut88_8255_porta_w),
+	DEVCB_HANDLER(ut88_8255_portb_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(ut88_8255_portc_r),
 	DEVCB_NULL,
 };
 
@@ -75,15 +75,17 @@ MACHINE_RESET( ut88 )
 }
 
 
-READ8_DEVICE_HANDLER( ut88_keyboard_r )
+READ8_HANDLER( ut88_keyboard_r )
 {
-	return i8255a_r(device, offset^0x03);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	return ppi->read(*space, offset^0x03);
 }
 
 
-WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
+WRITE8_HANDLER( ut88_keyboard_w )
 {
-	i8255a_w(device, offset^0x03, data);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	ppi->write(*space, offset^0x03, data);
 }
 
 WRITE8_HANDLER( ut88_sound_w )

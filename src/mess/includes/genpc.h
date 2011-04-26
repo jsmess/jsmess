@@ -8,7 +8,7 @@
 #define GENPC_H_
 
 #include "machine/ins8250.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8237dma.h"
 #include "machine/isa.h"
 
@@ -78,7 +78,7 @@ public:
 		required_device<device_t>  m_pic8259;
 		required_device<device_t>  m_dma8237;
 		required_device<device_t>  m_pit8253;
-		required_device<device_t>  m_ppi8255;
+		required_device<i8255_device>  m_ppi8255;
 		required_device<device_t>  m_speaker;
 		required_device<isa8_device>  m_isabus;
 

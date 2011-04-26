@@ -231,10 +231,10 @@ static READ8_DEVICE_HANDLER (pp01_8255_portc_r )
 I8255A_INTERFACE( pp01_ppi8255_interface )
 {
 	DEVCB_HANDLER(pp01_8255_porta_r),
-	DEVCB_HANDLER(pp01_8255_portb_r),
-	DEVCB_HANDLER(pp01_8255_portc_r),
 	DEVCB_HANDLER(pp01_8255_porta_w),
+	DEVCB_HANDLER(pp01_8255_portb_r),
 	DEVCB_HANDLER(pp01_8255_portb_w),
+	DEVCB_HANDLER(pp01_8255_portc_r),
 	DEVCB_HANDLER(pp01_8255_portc_w)
 };
 

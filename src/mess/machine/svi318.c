@@ -10,7 +10,7 @@
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
@@ -222,24 +222,20 @@ static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 	state->m_svi.keyboard_row = data & 0x0F;
 }
 
-I8255A_INTERFACE( svi318_ppi8255_interface )
+I8255_INTERFACE( svi318_ppi8255_interface )
 {
 	DEVCB_HANDLER(svi318_ppi_port_a_r),
-	DEVCB_HANDLER(svi318_ppi_port_b_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(svi318_ppi_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(svi318_ppi_port_c_w)
 };
 
-READ8_DEVICE_HANDLER( svi318_ppi_r )
+WRITE8_HANDLER( svi318_ppi_w )
 {
-	return i8255a_r(device, offset);
-}
-
-WRITE8_DEVICE_HANDLER( svi318_ppi_w )
-{
-	i8255a_w(device, offset + 2, data);
+	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
+	ppi->write(*space, offset + 2, data);
 }
 
 

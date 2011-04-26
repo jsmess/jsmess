@@ -395,16 +395,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(I8255A_DISP_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255A_DISP_TAG, i8255_device, read, write)
 //  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE_LEGACY(I8251A_KB_TAG, msm8251_data_r, msm8251_data_w)
 //  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE_LEGACY(I8251A_KB_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x88, 0x88) AM_READ(kb_data_r) AM_DEVWRITE_LEGACY(I8251A_KB_TAG, msm8251_data_w)
 	AM_RANGE(0x89, 0x89) AM_READ(kb_status_r) AM_DEVWRITE_LEGACY(I8251A_KB_TAG, msm8251_control_w)
 	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE_LEGACY(I8251A_SIO_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE_LEGACY(I8251A_SIO_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY(I8255A_MISC_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255_device, read, write)
 	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE_LEGACY(I8255A_RTC_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY(H46505_TAG, mc6845_address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE_LEGACY(H46505_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE_LEGACY(I8255A_M6502_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255A_M6502_TAG, i8255_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(attr_r, attr_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(dint_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(dvint_clr_w)
@@ -723,33 +723,37 @@ static MSM58321_INTERFACE( rtc_intf )
 
 static WRITE8_DEVICE_HANDLER( disp_ppi_pc_w )
 {
-	i8255a_pc2_w(device, BIT(data, 6));
-	i8255a_pc4_w(device, BIT(data, 7));
+	i8255_device *ppi = reinterpret_cast<i8255_device*>(device);
+	
+	ppi->pc2_w(BIT(data, 6));
+	ppi->pc4_w(BIT(data, 7));
 }
 
 static I8255A_INTERFACE( disp_ppi_intf )
 {
-	DEVCB_DEVICE_HANDLER(I8255A_M6502_TAG, i8255a_pb_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_NULL,							// Port C read
+	DEVCB_DEVICE_MEMBER(I8255A_M6502_TAG, i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_NULL,							// Port C read
 	DEVCB_DEVICE_HANDLER(I8255A_M6502_TAG, disp_ppi_pc_w)		// Port C write
 };
 
 static WRITE8_DEVICE_HANDLER( m6502_ppi_pc_w )
 {
-	i8255a_pc2_w(device, BIT(data, 7));
-	i8255a_pc4_w(device, BIT(data, 6));
+	i8255_device *ppi = reinterpret_cast<i8255_device*>(device);
+
+	ppi->pc2_w(BIT(data, 7));
+	ppi->pc4_w(BIT(data, 6));
 }
 
 static I8255A_INTERFACE( m6502_ppi_intf )
 {
-	DEVCB_DEVICE_HANDLER(I8255A_DISP_TAG, i8255a_pb_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_NULL,							// Port C read
+	DEVCB_DEVICE_MEMBER(I8255A_DISP_TAG, i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_NULL,							// Port C read
 	DEVCB_DEVICE_HANDLER(I8255A_DISP_TAG, m6502_ppi_pc_w)	// Port C write
 };
 
@@ -876,10 +880,10 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 static I8255A_INTERFACE( misc_ppi_intf )
 {
 	DEVCB_NULL,							// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, misc_ppi_pc_r),		// Port C read
 	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pa_w),		// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, misc_ppi_pb_w),		// Port B write
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, misc_ppi_pc_r),		// Port C read
 	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pc_w)		// Port C write
 };
 
@@ -951,10 +955,10 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
 static I8255A_INTERFACE( rtc_ppi_intf )
 {
 	DEVCB_DEVICE_MEMBER(MSM58321RS_TAG, msm58321_device, read),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_r),
 	DEVCB_DEVICE_MEMBER(MSM58321RS_TAG, msm58321_device, write),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pb_w),
+	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_r),
 	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_w)
 };
 

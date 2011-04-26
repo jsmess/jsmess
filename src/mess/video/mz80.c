@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "includes/mz80.h"
 

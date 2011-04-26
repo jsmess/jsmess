@@ -121,7 +121,7 @@ Hardware:   PPIA 8255
 #include "formats/uef_cas.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/i8271.h"
 #include "sound/speaker.h"
 #include "video/m6847.h"
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_MEMBER(atom_state, m_video_ram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("a000", 0)
-	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE_MODERN(INS8255_TAG, i8255_device, read, write)
 //  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_r, mc6854_w)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
 	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE_MODERN(R6522_TAG, via6522_device, read, write)
@@ -376,7 +376,7 @@ static SCREEN_UPDATE( atom )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    I8255A_INTERFACE( ppi_intf )
+    I8255_INTERFACE( ppi_intf )
 -------------------------------------------------*/
 
 static WRITE8_DEVICE_HANDLER( ppi_pa_w )
@@ -513,13 +513,13 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 	mc6847_css_w(state->m_mc6847, BIT(data, 3));
 }
 
-static I8255A_INTERFACE( ppi_intf )
+static I8255_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(ppi_pb_r),
-	DEVCB_HANDLER(ppi_pc_r),
 	DEVCB_HANDLER(ppi_pa_w),
+	DEVCB_HANDLER(ppi_pb_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(ppi_pc_r),
 	DEVCB_DEVICE_HANDLER(SPEAKER_TAG, ppi_pc_w)
 };
 
@@ -855,7 +855,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	/* devices */
 	MCFG_TIMER_ADD_PERIODIC("hz2400", cassette_output_tick, attotime::from_hz(X2/4/416))
 	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
-	MCFG_I8255A_ADD(INS8255_TAG, ppi_intf)
+	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, atom_centronics_config)

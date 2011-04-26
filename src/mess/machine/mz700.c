@@ -13,7 +13,7 @@
 #include "includes/mz700.h"
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
 #include "machine/ctronics.h"
@@ -41,13 +41,13 @@ static READ8_DEVICE_HANDLER ( pio_port_c_r );
 static WRITE8_DEVICE_HANDLER ( pio_port_a_w );
 static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 
-I8255A_INTERFACE( mz700_ppi8255_interface )
+I8255_INTERFACE( mz700_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ls145", pio_port_b_r),
-	DEVCB_HANDLER(pio_port_c_r),
 	DEVCB_DEVICE_HANDLER("ls145", pio_port_a_w),
+	DEVCB_DEVICE_HANDLER("ls145", pio_port_b_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(pio_port_c_r),
 	DEVCB_HANDLER(pio_port_c_w)
 };
 
@@ -111,7 +111,7 @@ MACHINE_START( mz700 )
 	mz_state *mz = machine.driver_data<mz_state>();
 
 	mz->m_pit = machine.device("pit8253");
-	mz->m_ppi = machine.device("ppi8255");
+	mz->m_ppi = machine.device<i8255_device>("ppi8255");
 
 	/* reset memory map to defaults */
 	mz700_bank_4_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
@@ -290,13 +290,13 @@ WRITE8_HANDLER( mz700_bank_3_w )
 			/* switch in memory mapped i/o devices */
 			if (mz->m_mz700)
 			{
-				spc->install_legacy_readwrite_handler(*mz->m_ppi, 0xe000, 0xfff3, 0, 0x1ff0, FUNC(i8255a_r), FUNC(i8255a_w));
+				spc->install_readwrite_handler(0xe000, 0xfff3, 0, 0x1ff0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)mz->m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)mz->m_ppi));
 				spc->install_legacy_readwrite_handler(*mz->m_pit, 0xe004, 0xfff7, 0, 0x1ff0, FUNC(pit8253_r), FUNC(pit8253_w));
 				spc->install_legacy_readwrite_handler(0xe008, 0xfff8, 0, 0x1ff0, FUNC(mz700_e008_r), FUNC(mz700_e008_w));
 			}
 			else
 			{
-				spc->install_legacy_readwrite_handler(*mz->m_ppi, 0xe000, 0xe003, FUNC(i8255a_r), FUNC(i8255a_w));
+				spc->install_readwrite_handler(0xe000, 0xe003, read8_delegate(FUNC(i8255_device::read), (i8255_device*)mz->m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)mz->m_ppi));
 				spc->install_legacy_readwrite_handler(*mz->m_pit, 0xe004, 0xe007, FUNC(pit8253_r), FUNC(pit8253_w));
 				spc->install_legacy_readwrite_handler(0xe008, 0xe008, FUNC(mz700_e008_r), FUNC(mz700_e008_w));
 			}

@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
 //  AM_RANGE(0xe6, 0xe6) AM_WRITE(irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_WRITE(pc8012_memory_mode_w)
 //  AM_RANGE(0xe8, 0xfb) unused
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8001mk2_mem, AS_PROGRAM, 8, pc8001mk2_state )

@@ -8,7 +8,7 @@
 #define PC_H_
 
 #include "machine/ins8250.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8237dma.h"
 
 class pc_state : public driver_device
@@ -49,10 +49,10 @@ extern const struct pit8253_config pcjr_pit8253_config;
 extern const struct pic8259_interface ibm5150_pic8259_config;
 extern const struct pic8259_interface pcjr_pic8259_config;
 extern const ins8250_interface ibm5150_com_interface[4];
-extern const i8255a_interface ibm5150_ppi8255_interface;
-extern const i8255a_interface ibm5160_ppi8255_interface;
-extern const i8255a_interface pc_ppi8255_interface;
-extern const i8255a_interface pcjr_ppi8255_interface;
+extern const i8255_interface ibm5150_ppi8255_interface;
+extern const i8255_interface ibm5160_ppi8255_interface;
+extern const i8255_interface pc_ppi8255_interface;
+extern const i8255_interface pcjr_ppi8255_interface;
 
 UINT8 pc_speaker_get_spk(running_machine &machine);
 void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data);

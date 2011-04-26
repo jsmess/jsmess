@@ -37,7 +37,7 @@ This gives a total of 19968 NOPs per frame.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
 #include "machine/ctronics.h"
@@ -227,7 +227,7 @@ WRITE_LINE_DEVICE_HANDLER( aleste_interrupt )
 /* on PC2. Apparently PC2 is always low on the CPC. ?!? */
 static TIMER_CALLBACK(amstrad_pc2_low)
 {
-	i8255a_pc2_w( machine.device("ppi8255"), 0 );
+	machine.device<i8255_device>("ppi8255")->pc2_w(0);
 }
 
 
@@ -2130,7 +2130,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = i8255a_r(space->machine().device("ppi8255" ), r1r0);
+			data = space->machine().device<i8255_device>("ppi8255")->read(*space, r1r0);
 	}
 
 /* if b10 = 0 : Expansion Peripherals Read selected
@@ -2299,7 +2299,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		unsigned int Index = ((offset & 0x0300) >> 8);
 
-		i8255a_w(space->machine().device("ppi8255" ), Index, data);
+		space->machine().device<i8255_device>("ppi8255")->write(*space, Index, data);
 	}
 
 	/* if b10 = 0 : Expansion Peripherals Write selected */
@@ -2473,11 +2473,11 @@ static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSn
 	state->m_gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	i8255a_w(machine.device("ppi8255"),3,pSnapshot[0x059] & 0x0ff);
+	space->machine().device<i8255_device>("ppi8255")->write(*space, 3, pSnapshot[0x059] & 0x0ff);
 
-	i8255a_w(machine.device("ppi8255"),0,pSnapshot[0x056] & 0x0ff);
-	i8255a_w(machine.device("ppi8255"),1,pSnapshot[0x057] & 0x0ff);
-	i8255a_w(machine.device("ppi8255"),2,pSnapshot[0x058] & 0x0ff);
+	space->machine().device<i8255_device>("ppi8255")->write(*space, 0, pSnapshot[0x056] & 0x0ff);
+	space->machine().device<i8255_device>("ppi8255")->write(*space, 1, pSnapshot[0x057] & 0x0ff);
+	space->machine().device<i8255_device>("ppi8255")->write(*space, 2, pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)

@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 #include "machine/pic8259.h"
@@ -198,10 +198,10 @@ static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
 I8255A_INTERFACE( b2m_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(b2m_8255_portb_r),
-	DEVCB_NULL,
 	DEVCB_HANDLER(b2m_8255_porta_w),
+	DEVCB_HANDLER(b2m_8255_portb_r),
 	DEVCB_HANDLER(b2m_8255_portb_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(b2m_8255_portc_w)
 };
 
@@ -265,8 +265,8 @@ I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 	DEVCB_HANDLER(b2m_romdisk_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(b2m_romdisk_portb_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(b2m_romdisk_portc_w)
 };
 

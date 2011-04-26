@@ -11,7 +11,7 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "machine/terminal.h"
@@ -62,7 +62,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_ppi;
+	optional_device<i8255_device> m_ppi;
 	required_device<upd1990a_device> m_rtc;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_ram;

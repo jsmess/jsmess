@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/8257dma.h"
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
@@ -35,7 +35,7 @@ static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK("bank9")
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK("bank10")
 	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)  // video
-	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
 	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
 	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK("bank11")
@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
     MCFG_MACHINE_START( partner )
     MCFG_MACHINE_RESET( partner )
 
-	MCFG_I8255A_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
 	MCFG_I8275_ADD	( "i8275", partner_i8275_interface)
     /* video hardware */

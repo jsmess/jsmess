@@ -3,6 +3,18 @@
 #ifndef __PORTFOLIO__
 #define __PORTFOLIO__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/i86/i86.h"
+#include "imagedev/cartslot.h"
+#include "machine/ram.h"
+#include "imagedev/printer.h"
+#include "machine/ctronics.h"
+#include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/nvram.h"
+#include "sound/speaker.h"
 #include "video/hd61830.h"
 
 #define SCREEN_TAG		"screen"
@@ -29,7 +41,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
-	required_device<device_t> m_ppi;
+	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_uart;
 	required_device<device_t> m_speaker;
 	required_device<timer_device> m_timer_tick;

@@ -157,9 +157,9 @@ static WRITE8_HANDLER(gzu_w)
 
 static READ8_HANDLER(devices_r)
 {
-	device_t *ppi1 = space->machine().device("ppi8255_1");
-	device_t *ppi2 = space->machine().device("ppi8255_2");
-	device_t *ppi3 = space->machine().device("ppi8255_3");
+	i8255_device *ppi1 = space->machine().device<i8255_device>("ppi8255_1");
+	i8255_device *ppi2 = space->machine().device<i8255_device>("ppi8255_2");
+	i8255_device *ppi3 = space->machine().device<i8255_device>("ppi8255_3");
 	device_t *pit = space->machine().device("pit8253");
 	device_t *pic = space->machine().device("pic8259");
 	device_t *rs232 = space->machine().device("rs232");
@@ -169,7 +169,7 @@ static READ8_HANDLER(devices_r)
 	switch(offset & 0x38)
 	{
 		case 0x00: return pit8253_r(pit,offset & 3);
-		case 0x08: return i8255a_r(ppi3,offset & 3);
+		case 0x08: return ppi3->read(*space,offset & 3);
 		case 0x10: switch(offset & 1) {
 						case 0 : return msm8251_data_r(rs232,0);
 						case 1 : return msm8251_status_r(rs232,0);
@@ -188,17 +188,17 @@ static READ8_HANDLER(devices_r)
 				   }
 				   break;
 		case 0x28: return pic8259_r(pic,offset & 1);
-		case 0x30: return i8255a_r(ppi2,offset & 3);
-		case 0x38: return i8255a_r(ppi1,offset & 3);
+		case 0x30: return ppi2->read(*space,offset & 3);
+		case 0x38: return ppi1->read(*space,offset & 3);
 	}
 	return 0xff;
 }
 
 static WRITE8_HANDLER(devices_w)
 {
-	device_t *ppi1 = space->machine().device("ppi8255_1");
-	device_t *ppi2 = space->machine().device("ppi8255_2");
-	device_t *ppi3 = space->machine().device("ppi8255_3");
+	i8255_device *ppi1 = space->machine().device<i8255_device>("ppi8255_1");
+	i8255_device *ppi2 = space->machine().device<i8255_device>("ppi8255_2");
+	i8255_device *ppi3 = space->machine().device<i8255_device>("ppi8255_3");
 	device_t *pit = space->machine().device("pit8253");
 	device_t *pic = space->machine().device("pic8259");
 	device_t *rs232 = space->machine().device("rs232");
@@ -208,7 +208,7 @@ static WRITE8_HANDLER(devices_w)
 	switch(offset & 0x38)
 	{
 		case 0x00: pit8253_w(pit,offset & 3,data); break;
-		case 0x08: i8255a_w(ppi3,offset & 3,data); break;
+		case 0x08: ppi3->write(*space,offset & 3,data); break;
 		case 0x10: switch(offset & 1) {
 						case 0 : msm8251_data_w(rs232,0,data); break;
 						case 1 : msm8251_control_w(rs232,0,data); break;
@@ -227,8 +227,8 @@ static WRITE8_HANDLER(devices_w)
 				   }
 				   break;
 		case 0x28: pic8259_w(pic,offset & 1,data);break;
-		case 0x30: i8255a_w(ppi2,offset & 3,data); break;
-		case 0x38: i8255a_w(ppi1,offset & 3,data); break;
+		case 0x30: ppi2->write(*space,offset & 3,data); break;
+		case 0x38: ppi1->write(*space,offset & 3,data); break;
 	}
 }
 
@@ -907,9 +907,9 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(pk8020_porta_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(pk8020_portc_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pk8020_portb_w),
+	DEVCB_HANDLER(pk8020_portc_r),
 	DEVCB_HANDLER(pk8020_portc_w)
 };
 

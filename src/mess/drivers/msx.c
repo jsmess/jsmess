@@ -278,7 +278,7 @@ PCB Layouts missing
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
 #include "video/tms9928a.h"
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START (msx_io_map, AS_IO, 8)
 	AM_RANGE( 0x90, 0x90) AM_DEVREADWRITE("centronics", msx_printer_status_r, msx_printer_strobe_w)
 	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("centronics", msx_printer_data_w)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVREADWRITE("ay8910", ay8910_r, msx_ay8910_w )
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w )
+	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
 	AM_RANGE( 0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
 	AM_RANGE( 0xd8, 0xd9) AM_READWRITE( msx_kanji_r, msx_kanji_w )
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START (msx2_io_map, AS_IO, 8)
 	AM_RANGE( 0x90, 0x90) AM_DEVREADWRITE("centronics", msx_printer_status_r, msx_printer_strobe_w)
 	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("centronics", msx_printer_data_w)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVREADWRITE("ay8910", ay8910_r, msx_ay8910_w )
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w )
+	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x98, 0x98) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
 	AM_RANGE( 0x99, 0x99) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
 	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_MACHINE_START( msx )
 	MCFG_MACHINE_RESET( msx )
 
-	MCFG_I8255A_ADD( "ppi8255", msx_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", msx_ppi8255_interface )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(tms9928a)
@@ -1118,7 +1118,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_MACHINE_START( msx2 )
 	MCFG_MACHINE_RESET( msx2 )
 
-	MCFG_I8255A_ADD( "ppi8255", msx_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", msx_ppi8255_interface )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

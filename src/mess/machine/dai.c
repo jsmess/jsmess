@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "imagedev/cassette.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/dai.h"
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
@@ -87,10 +87,10 @@ const tms5501_interface dai_tms5501_interface =
 I8255A_INTERFACE( dai_ppi82555_intf )
 {
 	DEVCB_NULL,	/* Port A read */
-	DEVCB_NULL,	/* Port B read */
-	DEVCB_NULL,	/* Port C read */
 	DEVCB_NULL,	/* Port A write */
+	DEVCB_NULL,	/* Port B read */
 	DEVCB_NULL,	/* Port B write */
+	DEVCB_NULL,	/* Port C read */
 	DEVCB_NULL	/* Port C write */
 };
 

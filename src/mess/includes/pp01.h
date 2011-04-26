@@ -8,7 +8,7 @@
 #define PP01_H_
 
 #include "machine/pit8253.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 class pp01_state : public driver_device
 {
@@ -25,7 +25,7 @@ public:
 
 /*----------- defined in machine/pp01.c -----------*/
 extern const struct pit8253_config pp01_pit8253_intf;
-extern const i8255a_interface pp01_ppi8255_interface;
+extern const i8255_interface pp01_ppi8255_interface;
 extern MACHINE_START( pp01 );
 extern MACHINE_RESET( pp01 );
 extern WRITE8_HANDLER (pp01_mem_block_w);

@@ -19,7 +19,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
 #include "machine/wd17xx.h"

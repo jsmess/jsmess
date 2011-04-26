@@ -51,8 +51,8 @@ I8255A_INTERFACE( orion128_ppi8255_interface_1)
 	DEVCB_HANDLER(orion_romdisk_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(orion_romdisk_portb_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(orion_romdisk_portc_w)
 };
 
@@ -65,22 +65,22 @@ MACHINE_START( orion128 )
 
 READ8_HANDLER ( orion128_system_r )
 {
-	return i8255a_r(space->machine().device("ppi8255_2"), offset & 3);
+	return space->machine().device<i8255_device>("ppi8255_2")->read(*space, offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_system_w )
 {
-	i8255a_w(space->machine().device("ppi8255_2"), offset & 3, data);
+	space->machine().device<i8255_device>("ppi8255_2")->write(*space, offset & 3, data);
 }
 
 READ8_HANDLER ( orion128_romdisk_r )
 {
-	return i8255a_r(space->machine().device("ppi8255_1"), offset & 3);
+	return space->machine().device<i8255_device>("ppi8255_1")->read(*space, offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_romdisk_w )
 {
-	i8255a_w(space->machine().device("ppi8255_1"), offset & 3, data);
+	space->machine().device<i8255_device>("ppi8255_1")->write(*space, offset & 3, data);
 }
 
 static void orion_set_video_mode(running_machine &machine, int width)

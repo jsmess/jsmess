@@ -66,7 +66,7 @@
 #include "emu.h"
 #include "includes/mz700.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( mz800_io, AS_IO, 8 )
 	AM_RANGE(0xcd, 0xcd) AM_WRITE( mz800_read_format_w )
 	AM_RANGE(0xce, 0xce) AM_READWRITE( mz800_crtc_r, mz800_display_mode_w )
 	AM_RANGE(0xcf, 0xcf) AM_WRITE( mz800_scroll_border_w )
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xd4, 0xd7) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0xe0, 0xe0) AM_READWRITE(mz800_bank_0_r, mz800_bank_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(mz800_bank_1_r, mz700_bank_1_w)
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 
 	/* devices */
 	MCFG_PIT8253_ADD("pit8253", mz700_pit8253_config)
-	MCFG_I8255A_ADD("ppi8255", mz700_ppi8255_interface)
+	MCFG_I8255_ADD("ppi8255", mz700_ppi8255_interface)
 	MCFG_TTL74145_ADD("ls145", default_ttl74145)
 
 	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_config )

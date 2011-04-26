@@ -26,7 +26,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "savia84.lh"
 
 class savia84_state : public driver_device
@@ -39,7 +39,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ppi8255;
+	required_device<i8255_device> m_ppi8255;
 	DECLARE_READ8_MEMBER( savia84_8255_portc_r );
 	DECLARE_WRITE8_MEMBER( savia84_8255_porta_w );
 	DECLARE_WRITE8_MEMBER( savia84_8255_portb_w );
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( savia84_io , AS_IO, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ppi8255", i8255a_r, i8255a_w) // ports F8-FB
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -165,10 +165,10 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 I8255A_INTERFACE( savia84_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portc_r),
 	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_porta_w),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portb_w),
+	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portc_r),
 	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portc_w)
 };
 
@@ -184,7 +184,7 @@ static MACHINE_CONFIG_START( savia84, savia84_state )
 	MCFG_DEFAULT_LAYOUT(layout_savia84)
 
 	/* Devices */
-	MCFG_I8255A_ADD( "ppi8255", savia84_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", savia84_ppi8255_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -7,7 +7,7 @@
 #ifndef SPECIAL_H_
 #define SPECIAL_H_
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 
 class special_state : public driver_device
@@ -34,13 +34,10 @@ public:
 /*----------- defined in machine/special.c -----------*/
 
 extern const struct pit8253_config specimx_pit8253_intf;
-extern const i8255a_interface specialist_ppi8255_interface;
+extern const i8255_interface specialist_ppi8255_interface;
 
 DRIVER_INIT( special );
 MACHINE_RESET( special );
-
-READ8_HANDLER( specialist_keyboard_r );
-WRITE8_HANDLER( specialist_keyboard_w );
 
 MACHINE_RESET( specimx );
 MACHINE_START ( specimx );

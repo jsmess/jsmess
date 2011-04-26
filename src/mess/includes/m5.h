@@ -32,7 +32,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fd5cpu;
 	required_device<device_t> m_ctc;
-	required_device<device_t> m_ppi;
+	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_centronics;

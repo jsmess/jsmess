@@ -14,7 +14,7 @@
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "includes/special.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
@@ -31,7 +31,7 @@ static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
-    AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
+    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8)
@@ -40,7 +40,7 @@ static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8)
     AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
-    AM_RANGE( 0xf800, 0xffff ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
+    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8)
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK("bank3")
     AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
-    AM_RANGE( 0xffe0, 0xffe3 ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
+    AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
     AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
     AM_RANGE( 0xffe8, 0xffe8 ) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
     AM_RANGE( 0xffe9, 0xffe9 ) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( special, special_state )
 
 	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
 
-	MCFG_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 
     MCFG_MACHINE_RESET( erik )
 
-	MCFG_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

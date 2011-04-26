@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
@@ -178,9 +178,9 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_MACHINE_START( vector06 )
 	MCFG_MACHINE_RESET( vector06 )
 
-	MCFG_I8255A_ADD( "ppi8255", vector06_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", vector06_ppi8255_interface )
 
-	MCFG_I8255A_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
+	MCFG_I8255_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -22,7 +22,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "debug/debugcpu.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
@@ -1090,7 +1090,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16 )
 //  AM_RANGE(0x00e6, 0x00e6) 8214 IRQ mask (*)
 //  AM_RANGE(0x00e8, 0x00e9) ? (*)
 //  AM_RANGE(0x00ec, 0x00ed) ? (*)
-	AM_RANGE(0x00fc, 0x00ff) AM_DEVREADWRITE8("d8255_2", i8255a_r,i8255a_w,0xffff) // d8255 2, FDD
+	AM_RANGE(0x00fc, 0x00ff) AM_DEVREADWRITE8_MODERN("d8255_2", i8255_device, read, write, 0xffff) // d8255 2, FDD
 
 	AM_RANGE(0x0100, 0x0101) AM_READWRITE(screen_ctrl_r,screen_ctrl_w) // Screen Control Register
 //  AM_RANGE(0x0102, 0x0103) Graphic Screen Control Register
@@ -1125,7 +1125,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16 )
 	AM_RANGE(0x01b0, 0x01bb) AM_READWRITE8(pc88va_fdc_r,pc88va_fdc_w,0x00ff)// FDC related (765)
 //  AM_RANGE(0x01c0, 0x01c1) ?
 	AM_RANGE(0x01c6, 0x01c7) AM_WRITENOP // ???
-	AM_RANGE(0x01c8, 0x01cf) AM_DEVREADWRITE8("d8255_3", i8255a_r,i8255a_w,0xff00) //i8255 3 (byte access)
+	AM_RANGE(0x01c8, 0x01cf) AM_DEVREADWRITE8_MODERN("d8255_3", i8255_device, read, write,0xff00) //i8255 3 (byte access)
 //  AM_RANGE(0x01d0, 0x01d1) Expansion RAM bank selection
 	AM_RANGE(0x0200, 0x021f) AM_RAM // Frame buffer 0 control parameter
 	AM_RANGE(0x0220, 0x023f) AM_RAM // Frame buffer 1 control parameter
@@ -1158,7 +1158,7 @@ static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8 )
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_2s", i8255a_r,i8255a_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_MODERN("d8255_2s", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1395,11 +1395,11 @@ static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 
 static I8255A_INTERFACE( master_fdd_intf )
 {
-	DEVCB_DEVICE_HANDLER("d8255_2s", i8255a_pb_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
+	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
 	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
 };
 
@@ -1419,11 +1419,11 @@ static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 
 static I8255A_INTERFACE( slave_fdd_intf )
 {
-	DEVCB_DEVICE_HANDLER("d8255_2", i8255a_pb_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
+	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
@@ -1469,13 +1469,13 @@ static WRITE8_DEVICE_HANDLER( r232_ctrl_portc_w )
 	// ...
 }
 
-static I8255A_INTERFACE( r232c_ctrl_intf )
+static I8255_INTERFACE( r232c_ctrl_intf )
 {
 	DEVCB_HANDLER(r232_ctrl_porta_r),						/* Port A read */
-	DEVCB_HANDLER(r232_ctrl_portb_r),						/* Port B read */
-	DEVCB_HANDLER(r232_ctrl_portc_r),						/* Port C read */
 	DEVCB_HANDLER(r232_ctrl_porta_w),						/* Port A write */
+	DEVCB_HANDLER(r232_ctrl_portb_r),						/* Port B read */
 	DEVCB_HANDLER(r232_ctrl_portb_w),						/* Port B write */
+	DEVCB_HANDLER(r232_ctrl_portc_r),						/* Port C read */
 	DEVCB_HANDLER(r232_ctrl_portc_w)						/* Port C write */
 };
 
@@ -1655,10 +1655,10 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_MACHINE_START( pc88va )
 	MCFG_MACHINE_RESET( pc88va )
 
-	MCFG_I8255A_ADD( "d8255_2", master_fdd_intf )
-	MCFG_I8255A_ADD( "d8255_3", r232c_ctrl_intf )
+	MCFG_I8255_ADD( "d8255_2", master_fdd_intf )
+	MCFG_I8255_ADD( "d8255_3", r232c_ctrl_intf )
 
-	MCFG_I8255A_ADD( "d8255_2s", slave_fdd_intf )
+	MCFG_I8255_ADD( "d8255_2s", slave_fdd_intf )
 
 	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )

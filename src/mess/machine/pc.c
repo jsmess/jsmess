@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "includes/pc.h"
 
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
@@ -737,13 +737,13 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 }
 
 
-I8255A_INTERFACE( ibm5160_ppi8255_interface )
+I8255_INTERFACE( ibm5160_ppi8255_interface )
 {
 	DEVCB_HANDLER(ibm5160_ppi_porta_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(ibm5160_ppi_portc_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(ibm5160_ppi_portb_w),
+	DEVCB_HANDLER(ibm5160_ppi_portc_r),
 	DEVCB_NULL
 };
 
@@ -794,13 +794,13 @@ static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 }
 
 
-I8255A_INTERFACE( pc_ppi8255_interface )
+I8255_INTERFACE( pc_ppi8255_interface )
 {
 	DEVCB_HANDLER(pc_ppi_porta_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(ibm5160_ppi_portc_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pc_ppi_portb_w),
+	DEVCB_HANDLER(ibm5160_ppi_portc_r),
 	DEVCB_NULL
 };
 
@@ -881,13 +881,13 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 }
 
 
-I8255A_INTERFACE( pcjr_ppi8255_interface )
+I8255_INTERFACE( pcjr_ppi8255_interface )
 {
 	DEVCB_HANDLER(pcjr_ppi_porta_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(pcjr_ppi_portc_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pcjr_ppi_portb_w),
+	DEVCB_HANDLER(pcjr_ppi_portc_r),
 	DEVCB_NULL
 };
 

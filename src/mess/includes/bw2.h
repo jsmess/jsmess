@@ -7,7 +7,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
 #include "machine/pit8253.h"

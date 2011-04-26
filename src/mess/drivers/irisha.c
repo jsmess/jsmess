@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
@@ -27,7 +27,7 @@ static ADDRESS_MAP_START( irisha_io , AS_IO, 8)
 	AM_RANGE( 0x07, 0x07) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE( 0x08, 0x0B) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0x0C, 0x0F) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w ) AM_MASK( 0x01 )
-	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w )
+	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -161,7 +161,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_MACHINE_START( irisha )
 	MCFG_MACHINE_RESET( irisha )
 
-	MCFG_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )
+	MCFG_I8255_ADD( "ppi8255", irisha_ppi8255_interface )
 
 	MCFG_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 

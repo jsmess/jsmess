@@ -40,7 +40,7 @@
 #include "machine/ram.h"
 #include "machine/com8116.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "machine/terminal.h"
 #include "machine/wd17xx.h"
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(I8251_A_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY(I8251_B_TAG, msm8251_data_r) AM_WRITE(i8251_b_data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY(I8251_B_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(prom_toggle_w)
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
@@ -445,17 +445,17 @@ static READ8_DEVICE_HANDLER( i8255_pc_r )
 static I8255A_INTERFACE( printer_8255_intf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, i8255_pc_r),
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, i8255_pc_r),
 	DEVCB_NULL
 };
 
 static const centronics_interface xor100_centronics_intf =
 {
 	0,
-	DEVCB_DEVICE_LINE(I8255A_TAG, i8255a_pc4_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

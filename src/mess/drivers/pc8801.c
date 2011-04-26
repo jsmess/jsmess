@@ -150,7 +150,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ctronics.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "machine/i8214.h"
@@ -1484,7 +1484,7 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8 )
 //  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
 //  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
 //  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown) */
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255a_r, i8255a_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_MODERN("d8255_master", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
@@ -1505,11 +1505,11 @@ static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 
 static I8255A_INTERFACE( master_fdd_intf )
 {
-	DEVCB_DEVICE_HANDLER("d8255_slave", i8255a_pb_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
+	DEVCB_DEVICE_MEMBER("d8255_slave", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
 	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
 };
 
@@ -1531,11 +1531,11 @@ static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 
 static I8255A_INTERFACE( slave_fdd_intf )
 {
-	DEVCB_DEVICE_HANDLER("d8255_master", i8255a_pb_r),	// Port A read
-	DEVCB_NULL,							// Port B read
-	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
+	DEVCB_DEVICE_MEMBER("d8255_master", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
@@ -1591,7 +1591,7 @@ static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8 )
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_slave", i8255a_r, i8255a_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_MODERN("d8255_slave", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -2241,8 +2241,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_MACHINE_START( pc8801 )
 	MCFG_MACHINE_RESET( pc8801 )
 
-	MCFG_I8255A_ADD( "d8255_master", master_fdd_intf )
-	MCFG_I8255A_ADD( "d8255_slave", slave_fdd_intf )
+	MCFG_I8255_ADD( "d8255_master", master_fdd_intf )
+	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
 
 	MCFG_UPD765A_ADD("upd765", pc8801_upd765_interface)
 	#ifdef USE_PROPER_I8214

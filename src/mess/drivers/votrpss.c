@@ -74,7 +74,7 @@ public:
 /* Components */
 //#include "sound/ay8910.h"
 //#include "sound/votrax.h"
-//#include "machine/i8255a.h"
+//#include "machine/i8255.h"
 //#include "machine/pit8253.h"
 //#include "machine/msm8251.h"
 

@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 
 class tk80bs_state : public driver_device
@@ -49,7 +49,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tk80_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+	//AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START(tk80bs_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	AM_RANGE(0x7df8, 0x7df9) AM_NOP // i8251 sio
-//  AM_RANGE(0x7dfc, 0x7dff) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+//  AM_RANGE(0x7dfc, 0x7dff) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x7dfc, 0x7dff) AM_READWRITE(ppi_custom_r,ppi_custom_w)
 	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_BASE_MEMBER(tk80bs_state, m_vram) // video ram
 	AM_RANGE(0x8000, 0xcfff) AM_RAM // RAM
@@ -335,13 +335,13 @@ static WRITE8_DEVICE_HANDLER( serial_out_w )
 {
 }
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
+static I8255_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_HANDLER(key_matrix_r),		/* Port A read */
-	DEVCB_HANDLER(serial_in_r),			/* Port B read */
-	DEVCB_NULL,							/* Port C read */
 	DEVCB_NULL,							/* Port A write */
+	DEVCB_HANDLER(serial_in_r),			/* Port B read */
 	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
 	DEVCB_HANDLER(serial_out_w)			/* Port C write */
 };
 
@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( tk80, tk80bs_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 
 	MCFG_VIDEO_START(tk80)
 MACHINE_CONFIG_END
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
 
-//  MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+//  MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 
 	MCFG_MACHINE_START(tk80bs)
 	MCFG_MACHINE_RESET(tk80bs)

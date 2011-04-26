@@ -25,6 +25,7 @@ public:
 	ace_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, Z80_TAG),
+		  m_ppi(*this, I8255_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
@@ -32,6 +33,7 @@ public:
 	 { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_centronics;
@@ -43,6 +45,14 @@ public:
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pa_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pb_w );
+	DECLARE_READ8_MEMBER( ppi_pc_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_READ8_MEMBER( ppi_control_r );
+	DECLARE_WRITE8_MEMBER( ppi_control_w );
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 
