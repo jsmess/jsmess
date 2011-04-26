@@ -5,54 +5,99 @@
         17/12/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
+#include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class ipds_state : public driver_device
 {
 public:
 	ipds_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_crtc(*this, "i8275"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER(ipds_b0_r);
+	DECLARE_READ8_MEMBER(ipds_b1_r);
+	DECLARE_READ8_MEMBER(ipds_c0_r);
+	DECLARE_WRITE8_MEMBER(ipds_b1_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
+READ8_MEMBER( ipds_state::ipds_b0_r )
+{
+	if (m_term_data)
+		return 0xc0;
+	else
+		return 0x80;
+}
 
-static ADDRESS_MAP_START(ipds_mem, AS_PROGRAM, 8)
+READ8_MEMBER( ipds_state::ipds_b1_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER( ipds_state::ipds_c0_r ) { return 0x55; }
+
+WRITE8_MEMBER( ipds_state::ipds_b1_w )
+{
+}
+
+static ADDRESS_MAP_START(ipds_mem, AS_PROGRAM, 8, ipds_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ipds_io , AS_IO, 8)
+static ADDRESS_MAP_START( ipds_io, AS_IO, 8, ipds_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xb0, 0xb0) AM_READ(ipds_b0_r)
+	AM_RANGE(0xb1, 0xb1) AM_READWRITE(ipds_b1_r,ipds_b1_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ(ipds_c0_r)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( ipds )
 INPUT_PORTS_END
 
+MACHINE_RESET_MEMBER(ipds_state)
+{
+}
+
 
 static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = device->machine().generic.tmpbitmap;
-	UINT8 *charmap = device->machine().region("gfx1")->base();
+	UINT8 *charmap = device->machine().region("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp) {
+
+	if (vsp)
 		pixels = 0;
-	}
-	if (lten) {
+
+	if (lten)
 		pixels = 0xff;
-	}
-	if (rvv) {
+
+	if (rvv)
 		pixels ^= 0xff;
-	}
-	for(i=0;i<6;i++) {
+
+	for(i=0;i<6;i++)
 		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
-	}
 }
 
 const i8275_interface ipds_i8275_interface = {
@@ -64,14 +109,9 @@ const i8275_interface ipds_i8275_interface = {
 	ipds_display_pixels
 };
 
-static MACHINE_RESET(ipds)
-{
-	cpu_set_reg(machine.device("maincpu"), I8085_PC, (UINT64)0x0000);
-}
-
 static SCREEN_UPDATE( ipds )
 {
-    device_t *devconf = screen->machine().device("i8275");
+	device_t *devconf = screen->machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;
@@ -92,43 +132,55 @@ static const gfx_layout ipds_charlayout =
 };
 
 static GFXDECODE_START( ipds )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, ipds_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, ipds_charlayout, 0, 1 )
 GFXDECODE_END
 
+
+WRITE8_MEMBER( ipds_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(ipds_state, kbd_put)
+};
+
+
 static MACHINE_CONFIG_START( ipds, ipds_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
-    MCFG_CPU_PROGRAM_MAP(ipds_mem)
-    MCFG_CPU_IO_MAP(ipds_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(ipds_mem)
+	MCFG_CPU_IO_MAP(ipds_io)
 
-    MCFG_MACHINE_RESET(ipds)
-
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(ipds)
-
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_SCREEN_UPDATE(ipds)
 	MCFG_GFXDECODE(ipds)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_I8275_ADD	( "i8275", ipds_i8275_interface)
 
-    MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ipds )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "164180.bin", 0x0000, 0x0800, CRC(10ba23ce) SHA1(67a9d03a08cdd7c70a867fb7e069703c7a0b9094))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "164180.bin", 0x0000, 0x0800, CRC(10ba23ce) SHA1(67a9d03a08cdd7c70a867fb7e069703c7a0b9094) )
+
 	ROM_REGION( 0x10000, "slavecpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "164196.bin", 0x0000, 0x1000, CRC(d3e18bc6) SHA1(01bc233be154bdfea9e8015839c5885cdaa08f11))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD( "163642.bin", 0x0000, 0x0800, CRC(3d81b2d1) SHA1(262a42920f15f1156ad0717c876cc0b2ed947ec5))
+	ROM_LOAD( "164196.bin", 0x0000, 0x1000, CRC(d3e18bc6) SHA1(01bc233be154bdfea9e8015839c5885cdaa08f11) )
+
+	ROM_REGION(0x0800, "chargen",0)
+	ROM_LOAD( "163642.bin", 0x0000, 0x0800, CRC(3d81b2d1) SHA1(262a42920f15f1156ad0717c876cc0b2ed947ec5) )
 ROM_END
 
 /* Driver */
