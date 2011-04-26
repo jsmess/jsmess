@@ -1704,6 +1704,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/casloopy.o	\
 	$(MESS_DRIVERS)/chaos.o 	\
 	$(MESS_DRIVERS)/cd2650.o	\
+	$(MESS_DRIVERS)/cm1800.o 	\
 	$(MESS_DRIVERS)/codata.o	\
 	$(MESS_DRIVERS)/cosmicos.o	\
 	$(MESS_DRIVERS)/czk80.o		\
