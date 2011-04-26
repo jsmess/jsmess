@@ -1,4 +1,50 @@
-﻿0.142u1
+﻿0.142u2
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+- lcmate2: Hooked up the lcd controller and added keyboard input.[Sandro Ronco]
+- lcmate2: Made some adjustments found by team investigation. 
+	[Robbbert, Cowering, Lord Nightmare, DMEnduro]
+- lcmate2: Added what we assume is the spellcheck library ROM. Reverted 
+	keyscan routine back, to handle port 5000 case. [Robbbert]
+- ipc: Modernised. Added terminal connection. After pressing Space, 
+	it will start up and respond to your inputs. [Robbbert]
+- rex6000: Convert the driver to use the intelfsh device. [Sandro Ronco]
+- apple2gs: removed cassette (real h/w doesn't have one) [R. Belmont]
+- apple2gs: Handle ADB command 0xa, fixes Qix [R. Belmont]
+- apple2gs: handle another ADB command, Pirates! works now [R. Belmont]
+- a7800: fixed bug #2039 [Fabio Priuli]
+- apple2: don't crash on $C060 access on IIgs, fixes Rastan [R. Belmont]
+
+Software Lists:
+----------------
+- apple2gs : added & hooked up softlist [R. Belmont]
+- added verification of many dumps to a800.xml and xegs.xml [k1w1]
+
+Source Changes:
+----------------
+- Added skeleton for Interpod IEC to IEEE-488 converter device. [Curt Coder]
+- Created device_rtc_interface which can be used to initialize RTC's to a 
+	certain date/time at driver startup, useful for regression testing. 
+	Implemented the interface in most of the modern RTC devices. 
+	Note: this is not yet plumbed down to the command line. [Curt Coder]
+- es5503: Properly mask oscillator enable bits.  
+	Fixes crashes in e.g. ACS Demo Disk 2. [R.Belmont]
+
+
+0.142u1
 
 New System Drivers Supported:
 -----------------------------
