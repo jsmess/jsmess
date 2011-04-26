@@ -1,7 +1,7 @@
 /**********************************************************************
 
-    LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with
-    Four-Channel Input-Selector emulation
+    LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with 
+	Four-Channel Input-Selector emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -13,11 +13,11 @@
     TODO:
 
     - inputs
-    - outputs
-    - bass
-    - treble
-    - volume
-    - balance
+	- outputs
+	- bass
+	- treble
+	- volume
+	- balance
 
 */
 
@@ -110,7 +110,7 @@ device_t *lmc1992_device_config::alloc_device(running_machine &machine) const
 //**************************************************************************
 
 //-------------------------------------------------
-//  execute_command -
+//  execute_command - 
 //-------------------------------------------------
 
 inline void lmc1992_device::execute_command(int addr, int data)
@@ -195,7 +195,7 @@ void lmc1992_device::device_start()
 	// register for state saving
 	save_item(NAME(m_enable));
 	save_item(NAME(m_data));
-//  save_item(NAME(m_clock)); - duplicate in devintrf.c
+	save_item(NAME(m_clock));
 	save_item(NAME(m_si));
 	save_item(NAME(m_input));
 	save_item(NAME(m_bass));
@@ -219,7 +219,7 @@ void lmc1992_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 
 //-------------------------------------------------
-//  clock_w -
+//  clock_w - 
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( lmc1992_device::clock_w )
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER( lmc1992_device::clock_w )
 
 
 //-------------------------------------------------
-//  data_w -
+//  data_w - 
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( lmc1992_device::data_w )
@@ -250,7 +250,7 @@ WRITE_LINE_MEMBER( lmc1992_device::data_w )
 
 
 //-------------------------------------------------
-//  enable_w -
+//  enable_w - 
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( lmc1992_device::enable_w )

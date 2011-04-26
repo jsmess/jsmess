@@ -76,7 +76,6 @@ Dip locations and factory settings verified from dip listing
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -402,7 +401,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,60*60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
 	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
