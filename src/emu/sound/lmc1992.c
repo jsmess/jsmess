@@ -195,7 +195,7 @@ void lmc1992_device::device_start()
 	// register for state saving
 	save_item(NAME(m_enable));
 	save_item(NAME(m_data));
-//	save_item(NAME(m_clock)); - duplicate in devintrf.c
+//  save_item(NAME(m_clock)); - duplicate in devintrf.c
 	save_item(NAME(m_si));
 	save_item(NAME(m_input));
 	save_item(NAME(m_bass));

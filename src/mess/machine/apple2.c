@@ -1377,7 +1377,7 @@ READ8_HANDLER ( apple2_c06x_r )
 				/* Cassette input */
 				{
 					device_t *dev = cassette_device_image(space->machine());
-	
+
 					if (dev)
 					{
 						result = cassette_input(dev) > 0.0 ? 0x80 : 0;
