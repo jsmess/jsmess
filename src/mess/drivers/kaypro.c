@@ -28,22 +28,18 @@
     - Kaypro 4 plus 88 does work as a normal Kaypro, but the extra processor needs
       to be worked out.
 
+    - RTC type MM58167A to be added.
+
+    - All models: Cannot read the floppy disk any more since someone modified the WD controller.
 
 **************************************************************************************************/
-
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/ctronics.h"
-#include "sound/beep.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "includes/kaypro.h"
 
 
-static READ8_HANDLER( kaypro2x_87 ) { return 0x7f; }	/* to bypass unemulated HD controller */
+READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }	/* to bypass unemulated HD controller */
 
 /***********************************************************
 
@@ -51,35 +47,35 @@ static READ8_HANDLER( kaypro2x_87 ) { return 0x7f; }	/* to bypass unemulated HD 
 
 ************************************************************/
 
-static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8, kaypro_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE_MEMBER(kaypro_state, m_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE(m_p_videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kayproii_io, AS_IO, 8 )
+static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro_sio_r, kaypro_sio_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("z80sio", kaypro_sio_r, kaypro_sio_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("z80pio_g", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(kayproii_baud_b_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("wd1793", wd17xx_r, wd17xx_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8 )
+static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8, kaypro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro_sio_r, kaypro_sio_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("z80sio", kaypro_sio_r, kaypro_sio_w)
 	AM_RANGE(0x08, 0x0b) AM_WRITE(kaypro2x_baud_a_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80sio_2x", z80sio_cd_ba_r, z80sio_cd_ba_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("wd1793", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("z80sio_2x", z80sio_cd_ba_r, z80sio_cd_ba_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro2x_system_port_r,kaypro2x_system_port_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVWRITE_LEGACY("centronics", centronics_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_READWRITE(kaypro2x_status_r,kaypro2x_index_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREAD("crtc", mc6845_register_r) AM_WRITE(kaypro2x_register_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVREAD_LEGACY("crtc", mc6845_register_r) AM_WRITE(kaypro2x_register_w)
 	AM_RANGE(0x1f, 0x1f) AM_READWRITE(kaypro2x_videoram_r,kaypro2x_videoram_w)
 
 	/* The below are not emulated */
@@ -94,7 +90,7 @@ static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8 )
     AM_RANGE(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
     AM_RANGE(0x87, 0x87) Hard Drive READ status register, WRITE command register */
 	AM_RANGE(0x20, 0x86) AM_NOP
-	AM_RANGE(0x87, 0x87) AM_READ(kaypro2x_87)
+	AM_RANGE(0x87, 0x87) AM_READ(kaypro2x_87_r)
 ADDRESS_MAP_END
 
 
@@ -130,11 +126,11 @@ static const gfx_layout kaypro2x_charlayout =
 };
 
 static GFXDECODE_START( kayproii )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, kayproii_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, kayproii_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( kaypro2x )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, kaypro2x_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, kaypro2x_charlayout, 0, 1 )
 GFXDECODE_END
 
 /***************************************************************
@@ -236,13 +232,11 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*7, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
+	MCFG_VIDEO_START( kaypro )
 	MCFG_SCREEN_UPDATE( kayproii )
-
 	MCFG_GFXDECODE(kayproii)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(kaypro)
-
-	MCFG_VIDEO_START( kaypro )
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -274,7 +268,6 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_CPU_VBLANK_INT("screen", kay_kbd_interrupt)
 	MCFG_CPU_CONFIG(kaypro2x_daisy_chain)
 
-	MCFG_MACHINE_START( kaypro2x )
 	MCFG_MACHINE_RESET( kaypro2x )
 
 	/* video hardware */
@@ -284,15 +277,11 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*8, 25*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
+	MCFG_VIDEO_START( kaypro )
 	MCFG_SCREEN_UPDATE( kaypro2x )
-
 	MCFG_GFXDECODE(kaypro2x)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(kaypro)
-
-	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
-
-	MCFG_VIDEO_START( kaypro )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -300,6 +289,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
+	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 	MCFG_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
 	MCFG_WD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
@@ -330,7 +320,7 @@ ROM_START(kayproii)
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
 ROM_END
 
@@ -341,7 +331,7 @@ ROM_START(kaypro4)
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
 ROM_END
 
@@ -352,7 +342,7 @@ ROM_START(kaypro4p88) // "KAYPRO-88" board has 128k or 256k of its own ram on it
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
 
 	ROM_REGION(0x1000, "8088cpu",0)
@@ -366,7 +356,7 @@ ROM_START(omni2)
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("omni2.u43",    0x0000, 0x0800, CRC(049b3381) SHA1(46f1d4f038747ba9048b075dc617361be088f82a) )
 ROM_END
 
@@ -377,7 +367,7 @@ ROM_START(kaypro2x)
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x1000, "gfx1",0)
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
@@ -388,7 +378,7 @@ ROM_START(kaypro4a)
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x1000, "gfx1",0)
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
@@ -399,7 +389,7 @@ ROM_START(kaypro10)
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
-	ROM_REGION(0x1000, "gfx1",0)
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-817.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 

@@ -1,37 +1,67 @@
 
-/* These are needed here otherwise the "extern const" gives compile errors */
-#include "video/mc6845.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
+#include "machine/ctronics.h"
 #include "machine/wd17xx.h"
+#include "formats/basicdsk.h"
 #include "imagedev/snapquik.h"
+#include "imagedev/flopdrv.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
 
 
 class kaypro_state : public driver_device
 {
 public:
 	kaypro_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_pio_g(*this, "z80pio_g"),
+	m_pio_s(*this, "z80pio_s"),
+	m_sio(*this, "z80sio"),
+	m_sio2x(*this, "z80sio_2x"),
+	m_printer(*this, "centronics"),
+	m_fdc(*this, "wd1793"),
+	m_crtc(*this, "crtc"),
+	m_beep(*this, "beep")
+	{ }
 
-	UINT8 *m_videoram;
-	device_t *m_kayproii_z80pio_g;
-	device_t *m_kayproii_z80pio_s;
-	device_t *m_z80sio;
-	device_t *m_kaypro2x_z80sio;
-	device_t *m_printer;
-	device_t *m_fdc;
+	required_device<cpu_device> m_maincpu;
+	optional_device<device_t> m_pio_g;
+	optional_device<device_t> m_pio_s;
+	required_device<device_t> m_sio;
+	optional_device<device_t> m_sio2x;
+	required_device<device_t> m_printer;
+	required_device<device_t> m_fdc;
+	optional_device<device_t> m_crtc;
+	required_device<device_t> m_beep;
+	DECLARE_READ8_MEMBER( kaypro2x_87_r );
+	DECLARE_READ8_MEMBER( kaypro2x_system_port_r );
+	DECLARE_READ8_MEMBER( kaypro2x_status_r );
+	DECLARE_READ8_MEMBER( kaypro2x_videoram_r );
+	DECLARE_WRITE8_MEMBER( kaypro_baud_a_w );
+	DECLARE_WRITE8_MEMBER( kayproii_baud_b_w );
+	DECLARE_WRITE8_MEMBER( kaypro2x_baud_a_w );
+	DECLARE_WRITE8_MEMBER( kaypro2x_system_port_w );
+	DECLARE_WRITE8_MEMBER( kaypro2x_index_w );
+	DECLARE_WRITE8_MEMBER( kaypro2x_register_w );
+	DECLARE_WRITE8_MEMBER( kaypro2x_videoram_w );
+	const UINT8 *m_p_chargen;
+	UINT8 *m_p_videoram;
 	UINT8 m_system_port;
 	UINT8 m_mc6845_cursor[16];
 	UINT8 m_mc6845_reg[32];
 	UINT8 m_mc6845_ind;
-	device_t *m_mc6845;
-	const UINT8 *m_FNT;
 	UINT8 m_speed;
 	UINT8 m_flash;
 	UINT8 m_framecnt;
 	UINT16 m_cursor;
 	UINT16 m_mc6845_video_address;
 	struct _kay_kbd_t *m_kbd;
+	void mc6845_cursor_configure();
+	void mc6845_screen_configure();
 };
 
 
@@ -54,20 +84,11 @@ extern const z80sio_interface kaypro_sio_intf;
 extern const wd17xx_interface kaypro_wd1793_interface;
 
 READ8_DEVICE_HANDLER( kaypro_sio_r );
-
-READ8_HANDLER( kaypro2x_system_port_r );
-
 WRITE8_DEVICE_HANDLER( kaypro_sio_w );
-
-WRITE8_HANDLER( kaypro_baud_a_w );
-WRITE8_HANDLER( kayproii_baud_b_w );
-WRITE8_HANDLER( kaypro2x_baud_a_w );
-WRITE8_HANDLER( kaypro2x_system_port_w );
 
 MACHINE_RESET( kayproii );
 MACHINE_START( kayproii );
 MACHINE_RESET( kaypro2x );
-MACHINE_START( kaypro2x );
 
 QUICKLOAD_LOAD( kayproii );
 QUICKLOAD_LOAD( kaypro2x );
@@ -82,10 +103,5 @@ SCREEN_UPDATE( omni2 );
 SCREEN_UPDATE( kaypro2x );
 
 READ8_HANDLER( kaypro_videoram_r );
-READ8_HANDLER( kaypro2x_status_r );
-READ8_HANDLER( kaypro2x_videoram_r );
 
 WRITE8_HANDLER( kaypro_videoram_w );
-WRITE8_HANDLER( kaypro2x_index_w );
-WRITE8_HANDLER( kaypro2x_register_w );
-WRITE8_HANDLER( kaypro2x_videoram_w );
