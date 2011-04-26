@@ -2614,7 +2614,7 @@ The software list will be divided in four categories:
 	<software name="alien3">
 		<description>Alien³ (Euro)</description>
 		<year>1993</year>
-		<publisher>Acclaim</publisher>
+		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="alien 3 (europe).sfc" size="1048576" crc="378613b0" sha1="4d20445c4c366edf98c62df944e60c52f5c88c5d" offset="0x000000" />
@@ -2626,7 +2626,7 @@ The software list will be divided in four categories:
 		<!-- Serial: SHVC-A3 - Release Date: 1993-07-09 - Alt. Title: エイリアン3 -->
 		<description>Alien³ (Jpn)</description>
 		<year>1993</year>
-		<publisher>Acclaim</publisher>
+		<publisher>Acclaim Japan</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="alien 3 (japan).sfc" size="1048576" crc="8a21b63f" sha1="c719da33015b96c78a5233351bae7b9dd466c4eb" offset="0x000000" />
@@ -2635,7 +2635,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="alien3up" cloneof="alien3">
-		<description>Alien 3 (USA, Prototype)</description>
+		<description>Alien³ (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2647,7 +2647,7 @@ The software list will be divided in four categories:
 
 	<software name="alien3u" cloneof="alien3">
 		<!-- Serial:  - Release Date: 1993-05 -->
-		<description>Alien 3 (USA)</description>
+		<description>Alien³ (USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26006,7 +26006,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="ranmap" cloneof="ranma">
-		<description>Ranma 1/2 (Euro, Prototype)</description>
+		<description>Ranma ½ (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26017,7 +26017,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="ranma">
-		<description>Ranma 1/2 (Euro)</description>
+		<description>Ranma ½ (Euro)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26028,7 +26028,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="ranmaf" cloneof="ranma">
-		<description>Ranma 1/2 (Fra)</description>
+		<description>Ranma ½ (Fra)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26040,7 +26040,7 @@ The software list will be divided in four categories:
 
 	<software name="ranmaaka">
 		<!-- Serial: SHVC-R4 - Release Date: 1993-10-22 - Alt. Title: らんま1/2 朱猫団的秘宝 -->
-		<description>Ranma 1/2 - Akanekodan Teki Hihou (Jpn)</description>
+		<description>Ranma ½ - Akanekodan Teki Hihou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Toho</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26054,7 +26054,7 @@ The software list will be divided in four categories:
 
 	<software name="ranmabak">
 		<!-- Serial: SHVC-R2 - Release Date: 1992-12-25 - Alt. Title: らんま1/2 爆烈乱闘篇 -->
-		<description>Ranma 1/2 - Bakuretsu Rantou Hen (Jpn)</description>
+		<description>Ranma ½ - Bakuretsu Rantou Hen (Jpn)</description>
 		<year>1992</year>
 		<publisher>Masaya</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26066,7 +26066,7 @@ The software list will be divided in four categories:
 
 	<software name="ranmaran">
 		<!-- Serial: SHVC-5K - Release Date: 1994-04-28 -  Alt. Title: らんま1/2 超技乱舞篇 -->
-		<description>Ranma 1/2 - Chougi Ranbu Hen (Jpn)</description>
+		<description>Ranma ½ - Chougi Ranbu Hen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Shogakukan Production</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26078,7 +26078,7 @@ The software list will be divided in four categories:
 
 	<software name="ranmagek" cloneof="scombat">
 		<!-- Serial: SHVC-RA - Release Date: 1992-03-27 - Alt. Title: らんま1/2 町内激闘篇 -->
-		<description>Ranma 1/2 - Chounai Gekitou Hen (Jpn)</description>
+		<description>Ranma ½ - Chounai Gekitou Hen (Jpn)</description>
 		<year>1992</year>
 		<publisher>Masaya</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26090,7 +26090,7 @@ The software list will be divided in four categories:
 
 	<software name="ranmau" cloneof="ranma">
 		<!-- Serial:  - Release Date: 1993-11 -->
-		<description>Ranma 1/2 - Hard Battle (USA)</description>
+		<description>Ranma ½ - Hard Battle (USA)</description>
 		<year>1993</year>
 		<publisher>DTMC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26102,7 +26102,7 @@ The software list will be divided in four categories:
 
 	<software name="ranmajan">
 		<!-- Serial: SHVC-ARPJ - Release Date: 1995-07-21 - Alt. Title: らんま1/2 奥義邪暗拳 -->
-		<description>Ranma 1/2 - Ougi Jaanken (Jpn)</description>
+		<description>Ranma ½ - Ougi Jaanken (Jpn)</description>
 		<year>1995</year>
 		<publisher>Shogakukan Production</publisher>
 		<part name="cart" interface="snes_cart">

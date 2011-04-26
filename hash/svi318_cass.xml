@@ -785,7 +785,7 @@ SD-292T Ninja
 	<software name="gnfrght">
 		<description>Gun Fright</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="57344">

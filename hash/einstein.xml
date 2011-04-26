@@ -639,7 +639,7 @@ Xtal Systems (Xtal Research)
 	<software name="gronks">
 		<description>Gronks</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="215296">
 				<rom name="gronks.dsk" size="215296" crc="706fbb82" sha1="4be0e5f6c901fddbd0d4e3867a4686e24466f9eb" offset="000000" />
@@ -1192,7 +1192,7 @@ Xtal Systems (Xtal Research)
 	<software name="xmaster">
 		<description>X-master</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="215296">
 				<rom name="xmaster.dsk" size="215296" crc="15f20d52" sha1="31fca29a6de3e06c0209e95bb57b27d14a2aa832" offset="000000" />

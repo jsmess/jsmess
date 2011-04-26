@@ -862,7 +862,7 @@
          <!-- Alt title: -->
 		<description>MobileWonderGate</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mobilewondergate (japan).bin" size="2097152" crc="80de367d" sha1="92d4a6ff6f2b1152d8935025f38f910155e5d709" offset="000000" />

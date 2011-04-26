@@ -471,9 +471,9 @@
 		</part>
 	</software>
 
-	<software name="ranma12">
+	<software name="ranma">
 		<!-- Serial: T-25014 - Release Date: 1993-04-23 - Alt. Title: らんま½ 白蘭愛歌 -->
-		<description>Ranma 1/2 - Byakuranaika (Jpn)</description>
+		<description>Ranma ½ - Byakuranaika (Jpn)</description>
 		<year>1993</year>
 		<publisher>NCS</publisher>
 		<part name="cdrom" interface="scd_cdrom">

@@ -82,7 +82,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
  	<software name="ibmcopy">
 		<description>IBM Program Copy for CP/M-68K</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="378492">
@@ -95,7 +95,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 		<description>IBM Emulator</description>
 		<!-- Serial Number: 1015-1004-000000-->
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="269117">
