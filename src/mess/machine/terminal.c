@@ -352,14 +352,14 @@ static void generic_terminal_update(device_t *device, bitmap_t *bitmap, const re
 				}
 
 				/* Display a scanline of a character */
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = BIT( gfx, 7 );
+				*p++ = BIT( gfx, 6 );
+				*p++ = BIT( gfx, 5 );
+				*p++ = BIT( gfx, 4 );
+				*p++ = BIT( gfx, 3 );
+				*p++ = BIT( gfx, 2 );
+				*p++ = BIT( gfx, 1 );
+				*p++ = BIT( gfx, 0 );
 			}
 		}
 		ma+=TERMINAL_WIDTH;
@@ -507,7 +507,7 @@ MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MCFG_SCREEN_UPDATE(terminal)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_VIDEO_START(terminal)
 MACHINE_CONFIG_END
