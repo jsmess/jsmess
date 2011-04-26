@@ -60,15 +60,15 @@ public:
 
 	void bankswitch();
 	
-	READ8_MEMBER( eprom_r );
-	WRITE8_MEMBER( eprom_w );
-	WRITE8_MEMBER( ppi_pa_w );
-	READ8_MEMBER( ppi_pb_r );
-	READ8_MEMBER( ppi_pc_r );
-	WRITE8_MEMBER( ppi_pc_w );
-	READ8_MEMBER( printer_busy );
-	WRITE8_MEMBER( printer_data );
-	READ8_MEMBER( vdg_videoram_r );
+	DECLARE_READ8_MEMBER( eprom_r );
+	DECLARE_WRITE8_MEMBER( eprom_w );
+	DECLARE_WRITE8_MEMBER( ppi_pa_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_READ8_MEMBER( ppi_pc_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_READ8_MEMBER( printer_busy );
+	DECLARE_WRITE8_MEMBER( printer_data );
+	DECLARE_READ8_MEMBER( vdg_videoram_r );
 
 	/* eprom state */
 	int m_eprom;
