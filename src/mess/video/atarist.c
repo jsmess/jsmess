@@ -1136,3 +1136,12 @@ void ste_state::video_start()
 	state_save_register_global(machine(), m_shifter_lineofs);
 	state_save_register_global(machine(), m_shifter_pixelofs);
 }
+
+//-------------------------------------------------
+//  VIDEO_START( stbook )
+//-------------------------------------------------
+
+void stbook_state::video_start()
+{
+	VIDEO_START_NAME(generic_bitmapped)(machine());
+}

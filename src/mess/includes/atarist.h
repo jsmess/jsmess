@@ -376,6 +376,7 @@ public:
 	{ }
 
 	void machine_start();
+	void video_start();
 
 	DECLARE_READ16_MEMBER( config_r );
 	DECLARE_WRITE16_MEMBER( lcd_control_w );

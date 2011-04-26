@@ -2545,7 +2545,6 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_VIDEO_START(generic_bitmapped)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	// sound hardware
