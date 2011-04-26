@@ -1375,7 +1375,18 @@ READ8_HANDLER ( apple2_c06x_r )
 		{
 			case 0x00:
 				/* Cassette input */
-				result = cassette_input(cassette_device_image(space->machine())) > 0.0 ? 0x80 : 0;
+				{
+					device_t *dev = cassette_device_image(space->machine());
+	
+					if (dev)
+					{
+						result = cassette_input(dev) > 0.0 ? 0x80 : 0;
+					}
+					else
+					{
+						result = 0;
+					}
+				}
 				break;
 			case 0x01:
 				/* Open-Apple/Joystick button 0 */
