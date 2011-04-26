@@ -40,7 +40,7 @@ public:
 		  m_iec(*this, CBM_IEC_TAG)
     { }
 
-	required_device<cbm_iec_device> m_iec;
+	optional_device<cbm_iec_device> m_iec;
 
 	int m_old_level;
 	int m_old_data;
