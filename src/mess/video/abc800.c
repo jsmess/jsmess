@@ -116,7 +116,7 @@ bool abc800c_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	if (!BIT(m_fgctl, 7))
 	{
 		// draw text
-		saa5050_update(m_trom, &bitmap, &cliprect);
+		//saa5050_update(m_trom, &bitmap, &cliprect);
 	}
 
 	return 0;
