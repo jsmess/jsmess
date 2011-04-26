@@ -30,12 +30,18 @@ public:
 	amico2k_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	void machine_start();
+
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 
-	int m_ls145;
+	int m_ls145_p;
+	UINT8 m_segment;
+
+	// timers
+	emu_timer *m_led_refresh_timer;
 };
 
 
@@ -81,6 +87,16 @@ static INPUT_PORTS_START( amico2k )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static TIMER_CALLBACK( led_refresh )
+{
+	amico2k_state *state = machine.driver_data<amico2k_state>();
+
+	if (state->m_ls145_p > 3)
+	{
+		output_set_digit_value(state->m_ls145_p - 4, state->m_segment);
+	}
+}
+
 READ8_MEMBER( amico2k_state::ppi_pa_r )
 {
 	/*
@@ -98,7 +114,7 @@ READ8_MEMBER( amico2k_state::ppi_pa_r )
 
 	*/
 
-	switch (m_ls145)
+	switch (m_ls145_p)
 	{
 	case 0:		return input_port_read(machine(), "Q0");
 	case 1:		return input_port_read(machine(), "Q1");
@@ -123,11 +139,9 @@ WRITE8_MEMBER( amico2k_state::ppi_pa_w )
 		PA7		
 
 	*/
-
-	if (m_ls145 > 3)
-	{
-		output_set_digit_value(m_ls145 - 4, data);
-	}
+	
+	m_segment = data;
+	m_led_refresh_timer->adjust(attotime::from_usec(70));
 }
 
 READ8_MEMBER( amico2k_state::ppi_pb_r )
@@ -167,7 +181,7 @@ WRITE8_MEMBER( amico2k_state::ppi_pb_w )
 
 	*/
 
-	m_ls145 = (data >> 1) & 0x0f;
+	m_ls145_p = (data >> 1) & 0x0f;
 }
 
 static I8255_INTERFACE( ppi_intf )
@@ -179,6 +193,15 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_NULL,							// Port C read
 	DEVCB_NULL							// Port C write
 };
+
+void amico2k_state::machine_start()
+{
+	m_led_refresh_timer = machine().scheduler().timer_alloc(FUNC(led_refresh));
+
+	// state saving
+	save_item(NAME(m_ls145_p));
+	save_item(NAME(m_segment));
+}
 
 static MACHINE_CONFIG_START( amico2k, amico2k_state )
 	/* basic machine hardware */
