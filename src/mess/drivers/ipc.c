@@ -8,6 +8,22 @@
 
         --> When started, you must press Space, then it will start to work.
 
+        Monitor commands:
+        A
+        Dn n - dump memory
+        E
+        Fn n n - fill memory
+        G
+        Hn n - hex arithmetic
+        Mn n n - move (copy) memory block
+        N
+        Q
+        R
+        Sn - modify a byte of memory
+        W - display memory in Intel? format
+        X - show and modify registers
+
+
         Preliminary Memory Map
         E800-F7FF BIOS ROM area
         F800-FFFF Monitor ROM (or other user interface)
