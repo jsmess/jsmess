@@ -16,6 +16,8 @@
 
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/i8255.h"
@@ -28,34 +30,153 @@ public:
 	amico2k_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pa_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pb_w );
+
+	int m_ls145;
 };
 
 
-static ADDRESS_MAP_START(amico2k_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( amico2k_mem, AS_PROGRAM, 8, amico2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 //  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
 	AM_RANGE(0xfb00, 0xfcff) AM_ROM
-	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE_MODERN("i8255", i8255_device, read, write)
+	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 	AM_RANGE(0xfe00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( amico2k )
+	PORT_START("Q0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Q1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("Q2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PC") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static MACHINE_RESET(amico2k)
+READ8_MEMBER( amico2k_state::ppi_pa_r )
 {
+	/*
+
+		bit		description
+
+		PA0		keyboard data 0
+		PA1		keyboard data 1
+		PA2		keyboard data 2
+		PA3		keyboard data 3
+		PA4		keyboard data 4
+		PA5		keyboard data 5
+		PA6		keyboard data 6
+		PA7		reg out
+
+	*/
+
+	switch (m_ls145)
+	{
+	case 0:		return input_port_read(machine(), "Q0");
+	case 1:		return input_port_read(machine(), "Q1");
+	case 2:		return input_port_read(machine(), "Q2");
+	default:	return 0xff;
+	}
 }
 
-static I8255A_INTERFACE( ppi_intf )
+WRITE8_MEMBER( amico2k_state::ppi_pa_w )
 {
-	DEVCB_NULL,							// Port A read
-	DEVCB_NULL,							// Port B read
+	/*
+
+		bit		description
+
+		PA0		LED segment A
+		PA1		LED segment B
+		PA2		LED segment C
+		PA3		LED segment D
+		PA4		LED segment E
+		PA5		LED segment F
+		PA6		LED segment G
+		PA7		
+
+	*/
+
+	if (m_ls145 > 3)
+	{
+		output_set_digit_value(m_ls145 - 4, data);
+	}
+}
+
+READ8_MEMBER( amico2k_state::ppi_pb_r )
+{
+	/*
+
+		bit		description
+
+		PB0		reg out
+		PB1		
+		PB2		
+		PB3		
+		PB4		
+		PB5		
+		PB6		
+		PB7		
+
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( amico2k_state::ppi_pb_w )
+{
+	/*
+
+		bit		description
+
+		PB0		
+		PB1		LS145 P0
+		PB2		LS145 P1
+		PB3		LS145 P2
+		PB4		LS145 P3
+		PB5		reg in
+		PB6		reg in
+		PB7		led output enable
+
+	*/
+
+	m_ls145 = (data >> 1) & 0x0f;
+}
+
+static I8255_INTERFACE( ppi_intf )
+{
+	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pa_r),	// Port A read
+	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pa_w),	// Port A write
+	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pb_r),	// Port B read
+	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pb_w),	// Port B write
 	DEVCB_NULL,							// Port C read
-	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B write
 	DEVCB_NULL							// Port C write
 };
 
@@ -63,8 +184,6 @@ static MACHINE_CONFIG_START( amico2k, amico2k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)	/* 1MHz */
 	MCFG_CPU_PROGRAM_MAP(amico2k_mem)
-
-	MCFG_MACHINE_RESET(amico2k)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_amico2k )
