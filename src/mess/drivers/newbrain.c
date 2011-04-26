@@ -1242,7 +1242,7 @@ inline int newbrain_state::get_reset_t()
 
 static TIMER_CALLBACK( reset_tick )
 {
-	newbrain_state *state = machine.driver_data<newbrain_eim_state>();
+	newbrain_state *state = machine.driver_data<newbrain_state>();
 
 	state->m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	state->m_copcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
