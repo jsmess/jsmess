@@ -38,35 +38,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vp595_device_config
-
-class vp595_device_config :   public device_config
-{
-    friend class vp595_device;
-
-    // construction/destruction
-    vp595_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-};
-
-
 // ======================> vp595_device
 
 class vp595_device :	public device_t
 {
-    friend class vp595_device_config;
-
-    // construction/destruction
-    vp595_device(running_machine &_machine, const vp595_device_config &_config);
-
 public:
+    // construction/destruction
+    vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE8_MEMBER( latch_w );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
@@ -75,11 +54,10 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
 	required_device<cdp1863_device> m_pfg;
-
-	const vp595_device_config &m_config;
 };
 
 

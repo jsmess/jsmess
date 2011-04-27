@@ -12,44 +12,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8 = isa8_device_config::static_alloc_device_config;
+const device_type ISA8 = &device_creator<isa8_device>;
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_device_config - constructor
-//-------------------------------------------------
-
-isa8_device_config::isa8_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "ISA8", tag, owner, clock)
+void isa8_device::static_set_cputag(device_t &device, const char *tag)
 {
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(isa8_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, isa8_device(machine, *this));
-}
-
-void isa8_device_config::static_set_cputag(device_config *device, const char *tag)
-{
-	isa8_device_config *isa = downcast<isa8_device_config *>(device);
-	isa->m_cputag = tag;
+	isa8_device &isa = downcast<isa8_device &>(device);
+	isa.m_cputag = tag;
 }
 
 //-------------------------------------------------
@@ -58,7 +26,7 @@ void isa8_device_config::static_set_cputag(device_config *device, const char *ta
 //  complete
 //-------------------------------------------------
 
-void isa8_device_config::device_config_complete()
+void isa8_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const isabus_interface *intf = reinterpret_cast<const isabus_interface *>(static_config());
@@ -70,15 +38,15 @@ void isa8_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq2_func, 0, sizeof(m_out_irq2_func));
-    	memset(&m_out_irq3_func, 0, sizeof(m_out_irq3_func));
-    	memset(&m_out_irq4_func, 0, sizeof(m_out_irq4_func));
-    	memset(&m_out_irq5_func, 0, sizeof(m_out_irq5_func));
-    	memset(&m_out_irq6_func, 0, sizeof(m_out_irq6_func));
-    	memset(&m_out_irq7_func, 0, sizeof(m_out_irq7_func));
-    	memset(&m_out_drq1_func, 0, sizeof(m_out_drq1_func));
-    	memset(&m_out_drq2_func, 0, sizeof(m_out_drq2_func));
-    	memset(&m_out_drq3_func, 0, sizeof(m_out_drq3_func));
+    	memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
+    	memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));
+    	memset(&m_out_irq4_cb, 0, sizeof(m_out_irq4_cb));
+    	memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
+    	memset(&m_out_irq6_cb, 0, sizeof(m_out_irq6_cb));
+    	memset(&m_out_irq7_cb, 0, sizeof(m_out_irq7_cb));
+    	memset(&m_out_drq1_cb, 0, sizeof(m_out_drq1_cb));
+    	memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
+    	memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 	}
 }
 
@@ -91,10 +59,9 @@ void isa8_device_config::device_config_complete()
 //  isa8_device - constructor
 //-------------------------------------------------
 
-isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &config) :
-        device_t(_machine, config),
-        m_config(config),
-		m_maincpu(*(owner()->owner()), config.m_cputag)
+isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8, "ISA8", tag, owner, clock),
+		m_maincpu(*(owner->owner()), m_cputag)
 {
 	for(int i = 0; i < 8; i++)
 		m_isa_device[i] = NULL;
@@ -107,15 +74,15 @@ isa8_device::isa8_device(running_machine &_machine, const isa8_device_config &co
 void isa8_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_irq2_func, &m_config.m_out_irq2_func, this);
-	devcb_resolve_write_line(&m_out_irq3_func, &m_config.m_out_irq3_func, this);
-	devcb_resolve_write_line(&m_out_irq4_func, &m_config.m_out_irq4_func, this);
-	devcb_resolve_write_line(&m_out_irq5_func, &m_config.m_out_irq5_func, this);
-	devcb_resolve_write_line(&m_out_irq6_func, &m_config.m_out_irq6_func, this);
-	devcb_resolve_write_line(&m_out_irq7_func, &m_config.m_out_irq7_func, this);
-	devcb_resolve_write_line(&m_out_drq1_func, &m_config.m_out_drq1_func, this);
-	devcb_resolve_write_line(&m_out_drq2_func, &m_config.m_out_drq2_func, this);
-	devcb_resolve_write_line(&m_out_drq3_func, &m_config.m_out_drq3_func, this);
+	devcb_resolve_write_line(&m_out_irq2_func, &m_out_irq2_cb, this);
+	devcb_resolve_write_line(&m_out_irq3_func, &m_out_irq3_cb, this);
+	devcb_resolve_write_line(&m_out_irq4_func, &m_out_irq4_cb, this);
+	devcb_resolve_write_line(&m_out_irq5_func, &m_out_irq5_cb, this);
+	devcb_resolve_write_line(&m_out_irq6_func, &m_out_irq6_cb, this);
+	devcb_resolve_write_line(&m_out_irq7_func, &m_out_irq7_cb, this);
+	devcb_resolve_write_line(&m_out_drq1_func, &m_out_drq1_cb, this);
+	devcb_resolve_write_line(&m_out_drq2_func, &m_out_drq2_cb, this);
+	devcb_resolve_write_line(&m_out_drq3_func, &m_out_drq3_cb, this);
 }
 
 //-------------------------------------------------
@@ -209,34 +176,16 @@ void isa8_device::eop_w(int state)
 //  DEVICE CONFIG ISA8 CARD INTERFACE
 //**************************************************************************
 
-//-------------------------------------------------
-//  device_config_isa8_card_interface - constructor
-//-------------------------------------------------
-
-device_config_isa8_card_interface::device_config_isa8_card_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
+void device_isa8_card_interface::static_set_isa8_tag(device_t &device, const char *tag)
 {
+	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
+	isa_card.m_isa_tag = tag;
 }
 
-
-//-------------------------------------------------
-//  ~device_config_isa8_card_interface - destructor
-//-------------------------------------------------
-
-device_config_isa8_card_interface::~device_config_isa8_card_interface()
+void device_isa8_card_interface::static_set_isa8_num(device_t &device, int num)
 {
-}
-
-void device_config_isa8_card_interface::static_set_isa8_tag(device_config *device, const char *tag)
-{
-	device_config_isa8_card_interface *isa_card = dynamic_cast<device_config_isa8_card_interface *>(device);
-	isa_card->m_isa_tag = tag;
-}
-
-void device_config_isa8_card_interface::static_set_isa8_num(device_config *device, int num)
-{
-	device_config_isa8_card_interface *isa_card = dynamic_cast<device_config_isa8_card_interface *>(device);
-	isa_card->m_isa_num = num;
+	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
+	isa_card.m_isa_num = num;
 }
 
 
@@ -248,9 +197,8 @@ void device_config_isa8_card_interface::static_set_isa8_num(device_config *devic
 //  device_isa8_card_interface - constructor
 //-------------------------------------------------
 
-device_isa8_card_interface::device_isa8_card_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_isa8_card_config(dynamic_cast<const device_config_isa8_card_interface &>(config))
+device_isa8_card_interface::device_isa8_card_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
 {
 }
 

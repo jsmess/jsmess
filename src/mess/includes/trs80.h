@@ -17,8 +17,8 @@
 class trs80_state : public driver_device
 {
 public:
-	trs80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	trs80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	UINT8 m_model4;

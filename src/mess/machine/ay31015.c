@@ -692,7 +692,7 @@ static DEVICE_START(ay31015)
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
-	ay31015->config = (const ay31015_config*)device->baseconfig().static_config();
+	ay31015->config = (const ay31015_config*)device->static_config();
 
 	ay31015->tx_clock = ay31015->config->transmitter_clock;
 	ay31015->rx_clock = ay31015->config->receiver_clock;

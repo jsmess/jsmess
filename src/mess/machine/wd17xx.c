@@ -2000,9 +2000,9 @@ static DEVICE_START( wd1770 )
 {
 	wd1770_state *w = get_safe_token(device);
 
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	w->intf = (const wd17xx_interface*)device->baseconfig().static_config();
+	w->intf = (const wd17xx_interface*)device->static_config();
 
 	w->status = STA_1_TRACK0;
 	w->pause_time = 1000;

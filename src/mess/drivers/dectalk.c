@@ -151,8 +151,8 @@ DUART is INT level 6
 class dectalk_state : public driver_device
 {
 public:
-	dectalk_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
 	UINT8 m_x2214_sram[256]; // NVRAM chip's temp sram space

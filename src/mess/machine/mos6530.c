@@ -378,7 +378,7 @@ UINT8 mos6530_portb_out_get(device_t *device)
 static DEVICE_START( mos6530 )
 {
 	mos6530_state *miot = get_safe_token(device);
-	const mos6530_interface *intf = (const mos6530_interface*)device->baseconfig().static_config();
+	const mos6530_interface *intf = (const mos6530_interface*)device->static_config();
 
 	/* validate arguments */
 	assert(device != NULL);

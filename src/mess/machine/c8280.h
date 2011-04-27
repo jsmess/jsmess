@@ -36,7 +36,7 @@
 
 #define MCFG_C8280_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C8280, 0) \
-	c8280_device_config::static_set_config(device, _address);
+	c8280_device::static_set_config(*device, _address);
 
 
 
@@ -44,51 +44,28 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8280_device_config
+// ======================> c8280_device
 
-class c8280_device_config :   public device_config,
-							  public device_config_ieee488_interface
+class c8280_device :  public device_t,
+					  public device_ieee488_interface
 {
-    friend class c8280_device;
-
-    // construction/destruction
-    c8280_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-	// allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
+    // construction/destruction
+    c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address, int variant);
+	static void static_set_config(device_t &device, int address, int variant);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-	// device_config overrides
-    virtual void device_config_complete();
-
-	int m_address;
-};
-
-
-// ======================> c8280_device
-
-class c8280_device :  public device_t,
-					  public device_ieee488_interface
-{
-    friend class c8280_device_config;
-
-    // construction/destruction
-    c8280_device(running_machine &_machine, const c8280_device_config &_config);
-
-protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+    virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state);
@@ -102,7 +79,7 @@ protected:
 	required_device<device_t> m_image1;
 	required_device<ieee488_device> m_bus;
 
-    const c8280_device_config &m_config;
+	int m_address;
 };
 
 

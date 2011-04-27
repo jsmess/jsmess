@@ -999,7 +999,7 @@ const struct hp48_port_config hp48gx_port2_config = { 1, 4, 4*1024*1024, "p2", "
 static void hp48_fill_port( device_t* image )
 {
 	hp48_state *state = image->machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config();
+	struct hp48_port_config* conf = (struct hp48_port_config*) image->static_config();
 	int size = state->m_port_size[conf->port];
 	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", conf->name, conf->module, size, state->m_port_write[conf->port] ));
 	state->m_port_data[conf->port] = (UINT8*)malloc( 2 * size );
@@ -1019,7 +1019,7 @@ static void hp48_fill_port( device_t* image )
 static void hp48_unfill_port( device_t* image )
 {
 	hp48_state *state = image->machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config();
+	struct hp48_port_config* conf = (struct hp48_port_config*) image->static_config();
 	state->m_modules[conf->module].off_mask = 0x00fff;  /* 2 KB */
 	state->m_modules[conf->module].read     = NULL;
 	state->m_modules[conf->module].write    = NULL;
@@ -1030,7 +1030,7 @@ static void hp48_unfill_port( device_t* image )
 static DEVICE_IMAGE_LOAD( hp48_port )
 {
 	hp48_state *state = image.device().machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
+	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().static_config();
 	int size = image.length();
 	if ( size == 0 ) size = conf->max_size; /* default size */
 
@@ -1052,7 +1052,7 @@ static DEVICE_IMAGE_LOAD( hp48_port )
 static DEVICE_IMAGE_CREATE( hp48_port )
 {
 	hp48_state *state = image.device().machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
+	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().static_config();
 	int size = conf->max_size;
 	/* XXX defaults to max_size; get user-specified size instead */
 
@@ -1073,7 +1073,7 @@ static DEVICE_IMAGE_CREATE( hp48_port )
 static DEVICE_IMAGE_UNLOAD( hp48_port )
 {
 	hp48_state *state = image.device().machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
+	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().static_config();
 	LOG(( "hp48_port image unload: %s size=%i rw=%i\n",
 	      conf->name, state->m_port_size[conf->port] ,state->m_port_write[conf->port] ));
 	if ( state->m_port_write[conf->port] )

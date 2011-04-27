@@ -667,7 +667,7 @@ static DEVICE_START( mea8000 )
 {
 	mea8000_t* mea8000 = get_safe_token( device );
 	int i;
-	mea8000->iface = (const mea8000_interface*)device->baseconfig().static_config();
+	mea8000->iface = (const mea8000_interface*)device->static_config();
 
 	mea8000_init_tables(device->machine());
 

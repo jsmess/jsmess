@@ -26,45 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C8280 = c8280_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  c8280_device_config - constructor
-//-------------------------------------------------
-
-c8280_device_config::c8280_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "C8280", tag, owner, clock),
-	  device_config_ieee488_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *c8280_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(c8280_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *c8280_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, c8280_device(machine, *this));
-}
-
+const device_type C8280 = &device_creator<c8280_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -72,7 +34,7 @@ device_t *c8280_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void c8280_device_config::device_config_complete()
+void c8280_device::device_config_complete()
 {
 	m_shortname = "c8280";
 }
@@ -82,13 +44,13 @@ void c8280_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c8280_device_config::static_set_config(device_config *device, int address, int variant)
+void c8280_device::static_set_config(device_t &device, int address, int variant)
 {
-	c8280_device_config *c8280 = downcast<c8280_device_config *>(device);
+	c8280_device &c8280 = downcast<c8280_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c8280->m_address = address - 8;
+	c8280.m_address = address - 8;
 }
 
 
@@ -110,7 +72,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c8280_device_config::device_rom_region() const
+const rom_entry *c8280_device::device_rom_region() const
 {
 	return ROM_NAME( c8280 );
 }
@@ -211,7 +173,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c8280_device_config::device_mconfig_additions() const
+machine_config_constructor c8280_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c8280 );
 }
@@ -226,17 +188,16 @@ machine_config_constructor c8280_device_config::device_mconfig_additions() const
 //  c8280_device - constructor
 //-------------------------------------------------
 
-c8280_device::c8280_device(running_machine &_machine, const c8280_device_config &_config)
-    : device_t(_machine, _config),
-	  device_ieee488_interface(_machine, _config, *this),
+c8280_device::c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C8280, "C8280", tag, owner, clock),
+	  device_ieee488_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_DOS_TAG),
 	  m_fdccpu(*this, M6502_FDC_TAG),
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_image0(*this, FLOPPY_0),
 	  m_image1(*this, FLOPPY_1),
-	  m_bus(*this->owner(), IEEE488_TAG),
-      m_config(_config)
+	  m_bus(*this->owner(), IEEE488_TAG)
 {
 }
 

@@ -303,7 +303,7 @@ static DEVICE_START( xmodem )
 	LOG(( "xmodem: start\n" ));
 	state->m_state = XMODEM_NOIMAGE;
 	state->m_image = NULL;
-	state->m_conf = (xmodem_config*) device->baseconfig().static_config();
+	state->m_conf = (xmodem_config*) device->static_config();
 	state->m_machine = &device->machine();
 	state->m_timer = device->machine().scheduler().timer_alloc(FUNC(xmodem_nak_cb), state );
 }

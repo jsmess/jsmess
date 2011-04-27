@@ -172,8 +172,8 @@ typedef struct
 class pc8801_state : public driver_device
 {
 public:
-	pc8801_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_pic(*this, I8214_TAG),
 		  m_rtc(*this, UPD1990A_TAG)
 	{ }

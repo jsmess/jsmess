@@ -111,7 +111,7 @@ INLINE const tms5501_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS5501);
-	return (const tms5501_interface *) device->baseconfig().static_config();
+	return (const tms5501_interface *) device->static_config();
 }
 
 static const UINT8 timer_name[] = { TMS5501_TIMER_0_INT, TMS5501_TIMER_1_INT, TMS5501_TIMER_2_INT, TMS5501_TIMER_3_INT, TMS5501_TIMER_4_INT };

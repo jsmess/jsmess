@@ -38,12 +38,12 @@
 
 #define MCFG_C9060_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C9060, 0) \
-	c9060_device_config::static_set_config(device, _address, TYPE_9060);
+	c9060_device::static_set_config(*device, _address, TYPE_9060);
 
 
 #define MCFG_C9090_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C9090, 0) \
-	c9060_device_config::static_set_config(device, _address, TYPE_9090);
+	c9060_device::static_set_config(*device, _address, TYPE_9090);
 
 
 
@@ -51,54 +51,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c9060_device_config
-
-class c9060_device_config :   public device_config,
-							  public device_config_ieee488_interface
-{
-    friend class c9060_device;
-
-    // construction/destruction
-    c9060_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	enum
-	{
-		TYPE_9060 = 0,
-		TYPE_9090
-	};
-
-	// allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, int address, int variant);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-protected:
-	// device_config overrides
-    virtual void device_config_complete();
-
-	int m_address;
-	int m_variant;
-};
-
 
 // ======================> c9060_device
 
 class c9060_device :  public device_t,
 					  public device_ieee488_interface
 {
-    friend class c9060_device_config;
-
-    // construction/destruction
-    c9060_device(running_machine &_machine, const c9060_device_config &_config);
 
 public:
+    // construction/destruction
+    c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, int address, int variant);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	// not really public
 	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_WRITE8_MEMBER( dio_w );
@@ -110,12 +80,18 @@ public:
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
+	enum
+	{
+		TYPE_9060 = 0,
+		TYPE_9090
+	};
 
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+    virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state);
@@ -136,7 +112,8 @@ private:
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge
 
-    const c9060_device_config &m_config;
+	int m_address;
+	int m_variant;
 };
 
 

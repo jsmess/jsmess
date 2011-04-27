@@ -71,8 +71,8 @@ static const int receive_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 3072,
 class px4_state : public driver_device
 {
 public:
-	px4_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	px4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* internal ram */
 	device_t *m_ram;

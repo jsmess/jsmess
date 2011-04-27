@@ -93,25 +93,13 @@ struct abcbus_config
 };
 
 
-// ======================> device_config_abcbus_interface
-
-// device_config_abcbus_interface represents configuration information for a abcbus device
-class device_config_abcbus_interface : public device_config_interface
-{
-public:
-	// construction/destruction
-	device_config_abcbus_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_abcbus_interface();
-};
-
-
 // ======================> device_abcbus_interface
 
 class device_abcbus_interface : public device_interface
 {
 public:
 	// construction/destruction
-	device_abcbus_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_abcbus_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_abcbus_interface();
 
 	// required operation overrides
@@ -126,46 +114,17 @@ public:
 	virtual void abcbus_c2(UINT8 data) { };
 	virtual void abcbus_c3(UINT8 data) { };
 	virtual void abcbus_c4(UINT8 data) { };
-
-protected:
-	const device_config_abcbus_interface &m_abcbus_config;
 };
-
-
-// ======================> abcbus_device_config
-
-class abcbus_device_config :   public device_config,
-							   public abcbus_config
-{
-    friend class abcbus_device;
-
-    // construction/destruction
-    abcbus_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	const abcbus_config *m_daisy;
-};
-
 
 // ======================> abcbus_device
 
-class abcbus_device :  public device_t
+class abcbus_device :  public device_t,
+					   public abcbus_config
 {
-    friend class abcbus_device_config;
-
-    // construction/destruction
-    abcbus_device(running_machine &_machine, const abcbus_device_config &_config);
-
 public:
+    // construction/destruction
+    abcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE8_MEMBER( cs_w );
 	DECLARE_READ8_MEMBER( rst_r );
 	DECLARE_READ8_MEMBER( inp_r );
@@ -184,6 +143,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+    virtual void device_config_complete();
 
 	class daisy_entry
 	{
@@ -198,7 +158,7 @@ protected:
 	daisy_entry *			m_daisy_list;	// head of the daisy chain
 
 private:
-    const abcbus_device_config &m_config;
+    const abcbus_config *m_daisy;
 };
 
 

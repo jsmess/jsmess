@@ -212,7 +212,7 @@ void i82439tx_pci_write(device_t *busdevice, device_t *device, int function, int
 static DEVICE_START( i82439tx )
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
-	i82439tx_config *config = (i82439tx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	i82439tx_config *config = (i82439tx_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 	/* get address space we are working on */
 	device_t *cpu = device->machine().device(config->cputag);

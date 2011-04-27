@@ -19,8 +19,8 @@
 class cm1800_state : public driver_device
 {
 public:
-	cm1800_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	cm1800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER( term_ready_r );
 	DECLARE_READ8_MEMBER( term_r );

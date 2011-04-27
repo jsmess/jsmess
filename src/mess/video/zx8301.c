@@ -39,7 +39,7 @@ static const int ZX8301_COLOR_MODE4[] = { 0, 2, 4, 7 };
 //**************************************************************************
 
 // devices
-const device_type ZX8301 = zx8301_device_config::static_alloc_device_config;
+const device_type ZX8301 = &device_creator<zx8301_device>;
 
 
 // default address map
@@ -47,51 +47,12 @@ static ADDRESS_MAP_START( zx8301, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 ADDRESS_MAP_END
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  zx8301_device_config - constructor
-//-------------------------------------------------
-
-zx8301_device_config::zx8301_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Sinclair ZX8301", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301))
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *zx8301_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(zx8301_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *zx8301_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, zx8301_device(machine, *this));
-}
-
-
 //-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *zx8301_device_config::memory_space_config(address_spacenum spacenum) const
+const address_space_config *zx8301_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
@@ -103,7 +64,7 @@ const address_space_config *zx8301_device_config::memory_space_config(address_sp
 //  complete
 //-------------------------------------------------
 
-void zx8301_device_config::device_config_complete()
+void zx8301_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const zx8301_interface *intf = reinterpret_cast<const zx8301_interface *>(static_config());
@@ -113,7 +74,7 @@ void zx8301_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&out_vsync_func, 0, sizeof(out_vsync_func));
+		memset(&out_vsync_cb, 0, sizeof(out_vsync_cb));
 	}
 }
 
@@ -152,16 +113,16 @@ inline void zx8301_device::writebyte(offs_t address, UINT8 data)
 //  zx8301_device - constructor
 //-------------------------------------------------
 
-zx8301_device::zx8301_device(running_machine &_machine, const zx8301_device_config &config)
-    : device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
+zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
 	  m_dispoff(1),
 	  m_mode8(0),
 	  m_base(0),
 	  m_flash(1),
 	  m_vsync(1),
-	  m_vda(0),
-      m_config(config)
+	  m_vda(0)
 {
 }
 
@@ -173,15 +134,15 @@ zx8301_device::zx8301_device(running_machine &_machine, const zx8301_device_conf
 void zx8301_device::device_start()
 {
 	// get the CPU
-	m_cpu = machine().device<cpu_device>(m_config.cpu_tag);
+	m_cpu = machine().device<cpu_device>(cpu_tag);
 	assert(m_cpu != NULL);
 
 	// get the screen device
-	m_screen = machine().device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(screen_tag);
 	assert(m_screen != NULL);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_vsync_func, &m_config.out_vsync_func, this);
+    devcb_resolve_write_line(&m_out_vsync_func, &out_vsync_cb, this);
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);

@@ -107,11 +107,10 @@
  *  Device config
  */
 
-const device_type MB89352A = mb89352_device_config::static_alloc_device_config;
+const device_type MB89352A = &device_creator<mb89352_device>;
 
-GENERIC_DEVICE_CONFIG_SETUP(mb89352, "MB89352A")
 
-void mb89352_device_config::device_config_complete()
+void mb89352_device::device_config_complete()
 {
     // copy static configuration if present
 	const mb89352_interface *intf = reinterpret_cast<const mb89352_interface *>(static_config());
@@ -131,9 +130,8 @@ void mb89352_device_config::device_config_complete()
  * Device
  */
 
-mb89352_device::mb89352_device(running_machine &machine, const mb89352_device_config &config)
-    : device_t(machine, config),
-      m_config(config)
+mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MB89352A, "MB89352A", tag, owner, clock)
 {
 }
 
@@ -151,17 +149,17 @@ void mb89352_device::device_start()
     	m_spc_status |= SSTS_TC_ZERO;
     m_ints = 0x00;
 
-    devcb_resolve_write_line(&m_irq_func,&m_config.irq_callback,this);
-    devcb_resolve_write_line(&m_drq_func,&m_config.drq_callback,this);
+    devcb_resolve_write_line(&m_irq_func,&irq_callback,this);
+    devcb_resolve_write_line(&m_drq_func,&drq_callback,this);
 
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
     // initialise SCSI devices, if any present
-    for(x=0;x<m_config.scsidevs->devs_present;x++)
+    for(x=0;x<scsidevs->devs_present;x++)
     {
-    	SCSIAllocInstance(machine(), m_config.scsidevs->devices[x].scsiClass,
-				&m_SCSIdevices[m_config.scsidevs->devices[x].scsiID],
-				m_config.scsidevs->devices[x].diskregion );
+    	SCSIAllocInstance(machine(), scsidevs->devices[x].scsiClass,
+				&m_SCSIdevices[scsidevs->devices[x].scsiID],
+				scsidevs->devices[x].diskregion );
     }
 
     // allocate read timer
@@ -187,9 +185,9 @@ void mb89352_device::device_stop()
 	int x;
 
 	// clean up the devices
-	for (x=0;x<m_config.scsidevs->devs_present;x++)
+	for (x=0;x<scsidevs->devs_present;x++)
 	{
-		SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[x].scsiID] );
+		SCSIDeleteInstance( m_SCSIdevices[scsidevs->devices[x].scsiID] );
 	}
 }
 
@@ -214,16 +212,16 @@ void mb89352_device::mb89352_rescan()
 	int i;
 
 	// try to open the devices
-	for (i = 0; i < m_config.scsidevs->devs_present; i++)
+	for (i = 0; i < scsidevs->devs_present; i++)
 	{
 		// if a device wasn't already allocated
-//      if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
+//      if (!m_SCSIdevices[scsidevs->devices[i].scsiID])
 		{
-			SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[i].scsiID] );
+			SCSIDeleteInstance( m_SCSIdevices[scsidevs->devices[i].scsiID] );
 			SCSIAllocInstance( machine(),
-					m_config.scsidevs->devices[i].scsiClass,
-					&m_SCSIdevices[m_config.scsidevs->devices[i].scsiID],
-					m_config.scsidevs->devices[i].diskregion );
+					scsidevs->devices[i].scsiClass,
+					&m_SCSIdevices[scsidevs->devices[i].scsiID],
+					scsidevs->devices[i].diskregion );
 		}
 	}
 }
@@ -516,7 +514,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			}
 			if(m_phase == SCSI_PHASE_STATUS)
 			{
-				image = dynamic_cast<device_image_interface*>(machine().device(m_config.scsidevs->devices[m_target].diskregion));
+				image = dynamic_cast<device_image_interface*>(machine().device(scsidevs->devices[m_target].diskregion));
 				if(image->exists())
 					m_temp = 0x00;
 				else

@@ -28,8 +28,8 @@ enum
 class nc_state : public driver_device
 {
 public:
-	nc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	emu_timer *m_serial_timer;
 	char m_memory_config[4];

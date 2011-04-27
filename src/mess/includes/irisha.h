@@ -12,8 +12,8 @@
 class irisha_state : public driver_device
 {
 public:
-	irisha_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	irisha_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_keyboard_mask;
 	UINT8 m_keypressed;

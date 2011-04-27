@@ -181,7 +181,7 @@ INLINE asr_t *get_safe_token(device_t *device)
 static DEVICE_START( asr733 )
 {
 	asr_t *asr = get_safe_token(device);
-	const asr733_init_params_t *params = (const asr733_init_params_t *)device->baseconfig().static_config();
+	const asr733_init_params_t *params = (const asr733_init_params_t *)device->static_config();
 	screen_device *screen = device->machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();

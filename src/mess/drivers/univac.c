@@ -24,8 +24,8 @@
 class univac_state : public driver_device
 {
 public:
-	univac_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	univac_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
 	{ }
 

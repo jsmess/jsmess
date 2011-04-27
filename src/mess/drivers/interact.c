@@ -65,8 +65,8 @@
 class interact_state : public hec2hrp_state
 {
 public:
-	interact_state(running_machine &machine, const driver_device_config_base &config)
-		: hec2hrp_state(machine, config) { }
+	interact_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hec2hrp_state(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 };

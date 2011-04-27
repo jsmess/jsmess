@@ -23,8 +23,8 @@ typedef struct
 class pet_state : public driver_device
 {
 public:
-	pet_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	pet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_ieee(*this, IEEE488_TAG)
 	{ }
 

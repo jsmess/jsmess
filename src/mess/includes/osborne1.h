@@ -12,8 +12,8 @@
 class osborne1_state : public driver_device
 {
 public:
-	osborne1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	osborne1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8	m_bank2_enabled;
 	UINT8	m_bank3_enabled;
@@ -54,33 +54,15 @@ WRITE8_HANDLER( osborne1_bankswitch_w );
 DRIVER_INIT( osborne1 );
 MACHINE_RESET( osborne1 );
 
-// ======================>  osborne1_daisy_device_config
-
-class osborne1_daisy_device_config :	public device_config,
-								public device_config_z80daisy_interface
-{
-	friend class osborne1_daisy_device;
-
-	// construction/destruction
-	osborne1_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
 
 // ======================> osborne1_daisy_device
 
 class osborne1_daisy_device :	public device_t,
 						public device_z80daisy_interface
 {
-	friend class osborne1_daisy_device_config;
-
+public:
 	// construction/destruction
-	osborne1_daisy_device(running_machine &_machine, const osborne1_daisy_device_config &_config);
+	osborne1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
 	virtual void device_start();
@@ -88,9 +70,6 @@ private:
 	virtual int z80daisy_irq_state();
 	virtual int z80daisy_irq_ack();
 	virtual void z80daisy_irq_reti();
-
-	// internal state
-	const osborne1_daisy_device_config &m_config;
 };
 
 extern const device_type OSBORNE1_DAISY;

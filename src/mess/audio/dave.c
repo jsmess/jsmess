@@ -109,7 +109,7 @@ INLINE const dave_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DAVE);
-	return (const dave_interface *) device->baseconfig().static_config();
+	return (const dave_interface *) device->static_config();
 }
 
 

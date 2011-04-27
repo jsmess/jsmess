@@ -26,55 +26,19 @@
 //**************************************************************************
 
 // devices
-const device_type EF9345 = ef9345_device_config::static_alloc_device_config;
+const device_type EF9345 = &device_creator<ef9345_device>;
 
 // default address map
 static ADDRESS_MAP_START( ef9345, AS_0, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-//**************************************************************************
-//  device configuration
-//**************************************************************************
-
-//-------------------------------------------------
-//  ef9345_device_config - constructor
-//-------------------------------------------------
-
-ef9345_device_config::ef9345_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ):
-	device_config(mconfig, static_alloc_device_config, "ef9345", tag, owner, clock),
-	device_config_memory_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345))
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *ef9345_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc( ef9345_device_config( mconfig, tag, owner, clock ) );
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *ef9345_device_config::alloc_device( running_machine &machine ) const
-{
-	return auto_alloc(machine, ef9345_device( machine, *this ) );
-}
-
 //-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *ef9345_device_config::memory_space_config(address_spacenum spacenum) const
+const address_space_config *ef9345_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
@@ -85,7 +49,7 @@ const address_space_config *ef9345_device_config::memory_space_config(address_sp
 //  complete
 //-------------------------------------------------
 
-void ef9345_device_config::device_config_complete()
+void ef9345_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const ef9345_interface *intf = reinterpret_cast<const ef9345_interface *>(static_config());
@@ -156,10 +120,10 @@ inline void ef9345_device::inc_y(UINT8 r)
 //  ef9345_device - constructor
 //-------------------------------------------------
 
-ef9345_device::ef9345_device( running_machine &_machine, const ef9345_device_config &config ) :
-    device_t(_machine, config),
-	device_memory_interface(_machine, config, *this),
-    m_config(config)
+ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, EF9345, "EF9345", tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345))
 {
 }
 
@@ -169,7 +133,7 @@ ef9345_device::ef9345_device( running_machine &_machine, const ef9345_device_con
 
 void ef9345_device::device_start()
 {
-	m_screen = machine().device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(screen_tag);
 
 	assert(m_screen != NULL);
 

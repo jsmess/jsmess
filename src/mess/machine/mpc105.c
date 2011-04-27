@@ -17,52 +17,17 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MPC105 = mpc105_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  mpc105_device_config - constructor
-//-------------------------------------------------
-
-mpc105_device_config::mpc105_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "MPC105", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *mpc105_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(mpc105_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *mpc105_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, mpc105_device(machine, *this));
-}
-
+const device_type MPC105 = &device_creator<mpc105_device>;
 
 //-------------------------------------------------
 //  static_set_bank_base - configuration helper
 //  to set the bank base
 //-------------------------------------------------
 
-void mpc105_device_config::static_set_bank_base(device_config *device, int bank_base)
+void mpc105_device::static_set_bank_base(device_t &device, int bank_base)
 {
-	mpc105_device_config *mpc105 = downcast<mpc105_device_config *>(device);
-	mpc105->m_bank_base = bank_base;
+	mpc105_device &mpc105 = downcast<mpc105_device &>(device);
+	mpc105.m_bank_base = bank_base;
 }
 
 //-------------------------------------------------
@@ -70,10 +35,10 @@ void mpc105_device_config::static_set_bank_base(device_config *device, int bank_
 //  to set the cpu tag
 //-------------------------------------------------
 
-void mpc105_device_config::static_set_cputag(device_config *device, const char *tag)
+void mpc105_device::static_set_cputag(device_t &device, const char *tag)
 {
-	mpc105_device_config *mpc105 = downcast<mpc105_device_config *>(device);
-	mpc105->m_cputag = tag;
+	mpc105_device &mpc105 = downcast<mpc105_device &>(device);
+	mpc105.m_cputag = tag;
 }
 
 //**************************************************************************
@@ -84,10 +49,9 @@ void mpc105_device_config::static_set_cputag(device_config *device, const char *
 //  mpc105_device - constructor
 //-------------------------------------------------
 
-mpc105_device::mpc105_device(running_machine &_machine, const mpc105_device_config &config)
-    : device_t(_machine, config),
-      m_config(config),
-	  m_maincpu(*owner(), config.m_cputag)
+mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MPC105, "MPC105", tag, owner, clock),
+	  m_maincpu(*owner, m_cputag)
 {
 }
 
@@ -105,7 +69,7 @@ void mpc105_device::device_start()
 
 void mpc105_device::device_reset()
 {
-	m_bank_base = m_config.m_bank_base;
+	m_bank_base = m_bank_base;
 	m_bank_enable = 0;
 	memset(m_bank_registers,0,sizeof(m_bank_registers));
 }

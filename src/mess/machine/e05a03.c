@@ -67,10 +67,10 @@ INLINE e05a03_state *get_safe_token(device_t *device)
 static DEVICE_START( e05a03 )
 {
 	e05a03_state *e05a03 = get_safe_token(device);
-	const e05a03_interface *intf = (const e05a03_interface *)device->baseconfig().static_config();
+	const e05a03_interface *intf = (const e05a03_interface *)device->static_config();
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&e05a03->out_nlq_lp_func, &intf->out_nlq_lp_func, device);

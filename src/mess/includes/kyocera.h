@@ -51,8 +51,8 @@
 class kc85_state : public driver_device
 {
 public:
-	kc85_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	kc85_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I8085_TAG),
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_lcdc0(*this, HD44102_0_TAG),
@@ -118,8 +118,8 @@ public:
 class trsm100_state : public kc85_state
 {
 public:
-	trsm100_state(running_machine &machine, const driver_device_config_base &config)
-		: kc85_state(machine, config) { }
+	trsm100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kc85_state(mconfig, type, tag) { }
 
 	virtual void machine_start();
 };
@@ -127,8 +127,8 @@ public:
 class pc8201_state : public kc85_state
 {
 public:
-	pc8201_state(running_machine &machine, const driver_device_config_base &config)
-		: kc85_state(machine, config) { }
+	pc8201_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kc85_state(mconfig, type, tag) { }
 
 	virtual void machine_start();
 
@@ -154,8 +154,8 @@ public:
 class tandy200_state : public driver_device
 {
 public:
-	tandy200_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	tandy200_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I8085_TAG),
 		  m_rtc(*this, RP5C01A_TAG),
 		  m_lcdc(*this, HD61830_TAG),

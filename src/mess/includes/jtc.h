@@ -24,8 +24,8 @@
 class jtc_state : public driver_device
 {
 public:
-	jtc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, UB8830D_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
@@ -52,16 +52,16 @@ public:
 class jtces88_state : public jtc_state
 {
 public:
-	jtces88_state(running_machine &machine, const driver_device_config_base &config)
-		: jtc_state(machine, config)
+	jtces88_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jtc_state(mconfig, type, tag)
 	{ }
 };
 
 class jtces23_state : public jtc_state
 {
 public:
-	jtces23_state(running_machine &machine, const driver_device_config_base &config)
-		: jtc_state(machine, config)
+	jtces23_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jtc_state(mconfig, type, tag)
 	{ }
 
 	virtual void video_start();
@@ -71,8 +71,8 @@ public:
 class jtces40_state : public jtc_state
 {
 public:
-	jtces40_state(running_machine &machine, const driver_device_config_base &config)
-		: jtc_state(machine, config)
+	jtces40_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jtc_state(mconfig, type, tag)
 	{ }
 
 	virtual void video_start();

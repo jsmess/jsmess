@@ -62,8 +62,8 @@ TODO:
 class exelv_state : public driver_device
 {
 public:
-	exelv_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	exelv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* tms7020 i/o ports */
 	UINT8	m_tms7020_porta;

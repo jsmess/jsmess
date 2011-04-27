@@ -25,41 +25,15 @@ struct t6a04_interface
 	UINT8 width;			// pixels for line
 };
 
-
-// ======================> t6a04_device_config
-
-class t6a04_device_config :
-	public device_config,
-	public t6a04_interface
-{
-	friend class t6a04_device;
-
-	// construction/destruction
-	t6a04_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-	virtual device_t *alloc_device( running_machine &machine ) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-	virtual bool device_validity_check( const game_driver &driver ) const;
-};
-
-
 // ======================> t6a04_device
 
-class t6a04_device :
-	public device_t
+class t6a04_device : public device_t,
+					 public t6a04_interface
 {
-	friend class t6a04_device_config;
-
-	// construction/destruction
-	t6a04_device( running_machine &_machine, const t6a04_device_config &config );
-
 public:
+	// construction/destruction
+	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// device interface
 	DECLARE_WRITE8_MEMBER(control_write);
 	DECLARE_READ8_MEMBER(control_read);
@@ -72,11 +46,10 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete();
+	virtual bool device_validity_check( const game_driver &driver ) const;
 
 private:
-	// internal state
-	const t6a04_device_config &m_config;
-
 	UINT8 m_busy_flag;
 	UINT8 m_lcd_ram[960];	//7680 bit (64*120)
 	UINT8 m_display_on;

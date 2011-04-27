@@ -43,8 +43,8 @@ typedef enum
 class apple2gs_state : public apple2_state
 {
 public:
-	apple2gs_state(running_machine &machine, const driver_device_config_base &config)
-		: apple2_state(machine, config) { }
+	apple2gs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: apple2_state(mconfig, type, tag) { }
 
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;

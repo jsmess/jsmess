@@ -43,8 +43,8 @@ enum {
 class bw2_state : public driver_device
 {
 public:
-	bw2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	bw2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_uart(*this, MSM8251_TAG),
 		  m_fdc(*this, WD2797_TAG),

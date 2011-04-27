@@ -61,7 +61,7 @@ static DEVICE_START(hd63450)
 	hd63450_t* dmac = get_safe_token(device);
 	int x;
 
-	dmac->intf = (const hd63450_intf*)device->baseconfig().static_config();
+	dmac->intf = (const hd63450_intf*)device->static_config();
 
 	// Initialise timers and registers
 	for(x=0;x<4;x++)

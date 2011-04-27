@@ -230,7 +230,7 @@ static SCREEN_UPDATE( mc6845_vga )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IBM_VGA = ibm_vga_device_config::static_alloc_device_config;
+const device_type IBM_VGA = &device_creator<ibm_vga_device>;
 
 static MACHINE_CONFIG_FRAGMENT( ibm_vga )
 	MCFG_SCREEN_ADD(VGA_SCREEN_NAME, RASTER)
@@ -247,45 +247,12 @@ ROM_START( ibm_vga )
 ROM_END
 
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  ibm_vga_device_config - constructor
-//-------------------------------------------------
-
-ibm_vga_device_config::ibm_vga_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "IBM VGA", tag, owner, clock)
-{
-	m_shortname = "ibm_vga";
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *ibm_vga_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(ibm_vga_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *ibm_vga_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, ibm_vga_device(machine, *this));
-}
-
 //-------------------------------------------------
 //  rom_region - return a pointer to the device's
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *ibm_vga_device_config::device_rom_region() const
+const rom_entry *ibm_vga_device::device_rom_region() const
 {
 	return ROM_NAME(ibm_vga);
 }
@@ -295,7 +262,7 @@ const rom_entry *ibm_vga_device_config::device_rom_region() const
 //  the device's machine fragment
 //-------------------------------------------------
 
-machine_config_constructor ibm_vga_device_config::device_mconfig_additions() const
+machine_config_constructor ibm_vga_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(ibm_vga);
 }
@@ -308,11 +275,11 @@ machine_config_constructor ibm_vga_device_config::device_mconfig_additions() con
 //  ibm_vga_device - constructor
 //-------------------------------------------------
 
-ibm_vga_device::ibm_vga_device(running_machine &_machine, const ibm_vga_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
+ibm_vga_device::ibm_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, IBM_VGA, "IBM VGA", tag, owner, clock),
 	  m_crtc(*this, VGA_MC6845_NAME)
 {
+	m_shortname = "ibm_vga";
 }
 
 /*-------------------------------------------------

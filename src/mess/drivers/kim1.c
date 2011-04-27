@@ -91,8 +91,8 @@ change from 1 to 0.
 class kim1_state : public driver_device
 {
 public:
-	kim1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_u2_port_b;
 	UINT8 m_311_output;

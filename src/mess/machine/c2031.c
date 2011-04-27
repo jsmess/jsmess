@@ -34,45 +34,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2031 = c2031_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  c2031_device_config - constructor
-//-------------------------------------------------
-
-c2031_device_config::c2031_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "C2031", tag, owner, clock),
-	  device_config_ieee488_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *c2031_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(c2031_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *c2031_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, c2031_device(machine, *this));
-}
-
+const device_type C2031 = &device_creator<c2031_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -80,7 +42,7 @@ device_t *c2031_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void c2031_device_config::device_config_complete()
+void c2031_device::device_config_complete()
 {
 	m_shortname = "c2031";
 }
@@ -90,13 +52,13 @@ void c2031_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c2031_device_config::static_set_config(device_config *device, int address)
+void c2031_device::static_set_config(device_t &device, int address)
 {
-	c2031_device_config *c2031 = downcast<c2031_device_config *>(device);
+	c2031_device &c2031 = downcast<c2031_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c2031->m_address = address;
+	c2031.m_address = address;
 }
 
 
@@ -115,7 +77,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c2031_device_config::device_rom_region() const
+const rom_entry *c2031_device::device_rom_region() const
 {
 	return ROM_NAME( c2031 );
 }
@@ -465,7 +427,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c2031_device_config::device_mconfig_additions() const
+machine_config_constructor c2031_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c2031 );
 }
@@ -484,7 +446,7 @@ inline int c2031_device::get_device_number()
 {
 	int state = 1;
 
-	switch (m_config.m_address)
+	switch (m_address)
 	{
 	case 8: state = (m_atna & m_nrfd_out);	break;
 	case 9: state = m_nrfd_out;				break;
@@ -505,9 +467,9 @@ inline int c2031_device::get_device_number()
 //  c2031_device - constructor
 //-------------------------------------------------
 
-c2031_device::c2031_device(running_machine &_machine, const c2031_device_config &_config)
-    : device_t(_machine, _config),
-	  device_ieee488_interface(_machine, _config, *this),
+c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C2031, "C2031", tag, owner, clock),
+	  device_ieee488_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
@@ -518,8 +480,7 @@ c2031_device::c2031_device(running_machine &_machine, const c2031_device_config 
 	  m_ndac_out(1),
 	  m_atna(1),
 	  m_via0_irq(0),
-	  m_via1_irq(0),
-      m_config(_config)
+	  m_via1_irq(0)
 {
 }
 

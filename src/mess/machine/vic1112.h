@@ -56,45 +56,15 @@ struct vic1112_interface
 	const char *m_bus_tag;
 };
 
-
-// ======================> vic1112_device_config
-
-class vic1112_device_config :   public device_config,
-							    public vic1112_interface
-{
-    friend class vic1112_device;
-
-    // construction/destruction
-    vic1112_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	const char *m_bus_tag;
-};
-
-
 // ======================> vic1112_device
 
-class vic1112_device :  public device_t
+class vic1112_device :  public device_t,
+						public vic1112_interface
 {
-    friend class vic1112_device_config;
-
-    // construction/destruction
-    vic1112_device(running_machine &_machine, const vic1112_device_config &_config);
-
 public:
+    // construction/destruction
+    vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE_LINE_MEMBER( srq_w );
 
 	// not really public, but won't compile otherwise
@@ -108,10 +78,14 @@ public:
 	DECLARE_READ_LINE_MEMBER( srq_r );
 	DECLARE_WRITE_LINE_MEMBER( eoi_w );
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+    virtual void device_config_complete();
 
 private:
 	required_device<via6522_device> m_via0;
@@ -121,7 +95,7 @@ private:
 	int m_via0_irq;
 	int m_via1_irq;
 
-    const vic1112_device_config &m_config;
+   	const char *m_bus_tag;
 };
 
 

@@ -1041,10 +1041,10 @@ static DEVICE_START(tap_990)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	/* verify that we have an interface assigned */
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* copy interface pointer */
-	tpc->intf = (const ti990_tpc_interface*)device->baseconfig().static_config();
+	tpc->intf = (const ti990_tpc_interface*)device->static_config();
 
 	memset(tpc->w, 0, sizeof(tpc->w));
 	/* The PE bit is always set for the MT3200 (but not MT1600) */

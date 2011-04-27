@@ -49,8 +49,8 @@ text screen in the superior part of the graphical screen.
 class apf_state : public driver_device
 {
 public:
-	apf_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	apf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	unsigned char m_keyboard_data;
 	unsigned char m_pad_data;

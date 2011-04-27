@@ -70,59 +70,36 @@ struct zx8302_interface
 	int rtc_clock;				// the RTC clock (pin 30) of the chip
 
 	// serial
-	devcb_write_line	out_ipl1l_func;
-	devcb_write_line	out_baudx4_func;
-	devcb_write_line	out_comdata_func;
-	devcb_write_line	out_txd1_func;
-	devcb_write_line	out_txd2_func;
-	devcb_read_line		in_dtr1_func;
-	devcb_read_line		in_cts2_func;
-	devcb_write_line	out_netout_func;
-	devcb_read_line		in_netin_func;
+	devcb_write_line	out_ipl1l_cb;
+	devcb_write_line	out_baudx4_cb;
+	devcb_write_line	out_comdata_cb;
+	devcb_write_line	out_txd1_cb;
+	devcb_write_line	out_txd2_cb;
+	devcb_read_line		in_dtr1_cb;
+	devcb_read_line		in_cts2_cb;
+	devcb_write_line	out_netout_cb;
+	devcb_read_line		in_netin_cb;
 
 	// microdrive
-	devcb_write_line	out_mdselck_func;
-	devcb_write_line	out_mdseld_func;
-	devcb_write_line	out_mdrdw_func;
-	devcb_write_line	out_erase_func;
-	devcb_write_line	out_raw1_func;
-	devcb_read_line		in_raw1_func;
-	devcb_write_line	out_raw2_func;
-	devcb_read_line		in_raw2_func;
+	devcb_write_line	out_mdselck_cb;
+	devcb_write_line	out_mdseld_cb;
+	devcb_write_line	out_mdrdw_cb;
+	devcb_write_line	out_erase_cb;
+	devcb_write_line	out_raw1_cb;
+	devcb_read_line		in_raw1_cb;
+	devcb_write_line	out_raw2_cb;
+	devcb_read_line		in_raw2_cb;
 };
-
-
-// ======================> zx8302_device_config
-
-class zx8302_device_config :   public device_config,
-                                public zx8302_interface
-{
-    friend class zx8302_device;
-
-    // construction/destruction
-    zx8302_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
 
 // ======================> zx8302_device
 
-class zx8302_device :  public device_t
+class zx8302_device :  public device_t,
+                       public zx8302_interface
 {
-    friend class zx8302_device_config;
-
-    // construction/destruction
-    zx8302_device(running_machine &_machine, const zx8302_device_config &_config);
-
 public:
+    // construction/destruction
+    zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -142,7 +119,8 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
+	virtual void device_config_complete();
+	
 	inline void trigger_interrupt(UINT8 line);
 	inline void transmit_ipc_data();
 	inline void transmit_bit(int state);
@@ -203,8 +181,6 @@ private:
 	emu_timer *m_rtc_timer;			// real time clock timer
 	emu_timer *m_gap_timer;			// microdrive gap timer
 	emu_timer *m_ipc_timer;			// delayed IPC command timer
-
-	const zx8302_device_config &m_config;
 };
 
 

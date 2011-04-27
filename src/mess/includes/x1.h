@@ -9,33 +9,14 @@
 
 #include "cpu/z80/z80daisy.h"
 
-// ======================>  x1_keyboard_device_config
-
-class x1_keyboard_device_config :	public device_config,
-								public device_config_z80daisy_interface
-{
-	friend class x1_keyboard_device;
-
-	// construction/destruction
-	x1_keyboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-
 // ======================> x1_keyboard_device
 
 class x1_keyboard_device :	public device_t,
 						public device_z80daisy_interface
 {
-	friend class x1_keyboard_device_config;
-
+public:
 	// construction/destruction
-	x1_keyboard_device(running_machine &_machine, const x1_keyboard_device_config &_config);
+	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
 	virtual void device_start();
@@ -43,9 +24,6 @@ private:
 	virtual int z80daisy_irq_state();
 	virtual int z80daisy_irq_ack();
 	virtual void z80daisy_irq_reti();
-
-	// internal state
-	const x1_keyboard_device_config &m_config;
 };
 
 typedef struct
@@ -77,8 +55,8 @@ typedef struct
 class x1_state : public driver_device
 {
 public:
-	x1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	x1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_tvram[0x800];
 	UINT8 m_avram[0x800];

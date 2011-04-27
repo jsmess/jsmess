@@ -482,40 +482,7 @@ DRIVER_INIT( osborne1 )
     Osborne1 specific daisy chain code
 ****************************************************************/
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  osborne1_daisy_device_config - constructor
-//-------------------------------------------------
-
-osborne1_daisy_device_config::osborne1_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Osborne 1 daisy", tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *osborne1_daisy_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(osborne1_daisy_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *osborne1_daisy_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, osborne1_daisy_device(machine, *this));
-}
+const device_type OSBORNE1_DAISY = &device_creator<osborne1_daisy_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -524,11 +491,9 @@ device_t *osborne1_daisy_device_config::alloc_device(running_machine &machine) c
 //-------------------------------------------------
 //  z80ctc_device - constructor
 //-------------------------------------------------
-
-osborne1_daisy_device::osborne1_daisy_device(running_machine &_machine, const osborne1_daisy_device_config &_config)
-	: device_t(_machine, _config),
-	  device_z80daisy_interface(_machine, _config, *this),
-	  m_config(_config)
+osborne1_daisy_device::osborne1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, OSBORNE1_DAISY, "Osborne 1 daisy", tag, owner, clock),
+	  device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -582,5 +547,3 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 void osborne1_daisy_device::z80daisy_irq_reti()
 {
 }
-
-const device_type OSBORNE1_DAISY = osborne1_daisy_device_config::static_alloc_device_config;

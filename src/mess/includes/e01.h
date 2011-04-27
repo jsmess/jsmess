@@ -25,8 +25,8 @@
 class e01_state : public driver_device
 {
 public:
-	e01_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	e01_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, R65C102_TAG),
 		  m_fdc(*this, WD2793_TAG),
 		  m_rtc(*this, HD146818_TAG),

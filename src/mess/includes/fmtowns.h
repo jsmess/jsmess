@@ -99,8 +99,8 @@ struct towns_video_controller
 class towns_state : public driver_device
 {
 	public:
-	towns_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	towns_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_nvram(*this, "nvram")
 	{ }
 
@@ -251,8 +251,8 @@ class towns_state : public driver_device
 class marty_state : public towns_state
 {
 	public:
-	marty_state(running_machine &machine, const driver_device_config_base &config)
-		: towns_state(machine, config)
+	marty_state(const machine_config &mconfig, device_type type, const char *tag)
+		: towns_state(mconfig, type, tag)
 	{ }
 
 	virtual void driver_start();

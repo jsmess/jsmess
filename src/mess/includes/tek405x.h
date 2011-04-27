@@ -22,8 +22,8 @@
 class tek4051_state : public driver_device
 {
 public:
-	tek4051_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	tek4051_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, MC6800_TAG),
 		  m_gpib_pia(*this, MC6820_GPIB_TAG),
 		  m_com_pia(*this, MC6820_COM_TAG),
@@ -130,8 +130,8 @@ public:
 class tek4052_state : public driver_device
 {
 public:
-	tek4052_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	tek4052_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, AM2901A_TAG),
 		  m_ram(*this, RAM_TAG)
 	 { }

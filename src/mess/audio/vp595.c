@@ -26,16 +26,7 @@
 //**************************************************************************
 
 // devices
-const device_type VP595 = vp595_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(vp595, "VP595")
-
+const device_type VP595 = &device_creator<vp595_device>;
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( vp595 )
@@ -52,7 +43,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor vp595_device_config::device_mconfig_additions() const
+machine_config_constructor vp595_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vp595 );
 }
@@ -67,10 +58,9 @@ machine_config_constructor vp595_device_config::device_mconfig_additions() const
 //  vp595_device - constructor
 //-------------------------------------------------
 
-vp595_device::vp595_device(running_machine &_machine, const vp595_device_config &config)
-    : device_t(_machine, config),
-	  m_pfg(*this, CDP1863_TAG),
-      m_config(config)
+vp595_device::vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, VP595, "VP595", tag, owner, clock),
+	  m_pfg(*this, CDP1863_TAG)
 {
 }
 

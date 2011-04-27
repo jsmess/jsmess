@@ -342,7 +342,7 @@ static TIMER_CALLBACK( upd1771c_callback )
 
 static DEVICE_START( upd1771c )
 {
-    const upd1771_interface *intf = (const upd1771_interface *)device->baseconfig().static_config();
+    const upd1771_interface *intf = (const upd1771_interface *)device->static_config();
     upd1771_state *state = get_safe_token( device );
     int sample_rate = device->clock() / 4;
 

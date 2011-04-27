@@ -24,16 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1112 = vic1112_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(vic1112, "VIC-1112")
-
+const device_type VIC1112 = &device_creator<vic1112_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -41,7 +32,7 @@ GENERIC_DEVICE_CONFIG_SETUP(vic1112, "VIC-1112")
 //  complete
 //-------------------------------------------------
 
-void vic1112_device_config::device_config_complete()
+void vic1112_device::device_config_complete()
 {
 	m_shortname = "vic1112";
 }
@@ -78,7 +69,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *vic1112_device_config::device_rom_region() const
+const rom_entry *vic1112_device::device_rom_region() const
 {
 	return ROM_NAME( vic1112 );
 }
@@ -291,7 +282,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor vic1112_device_config::device_mconfig_additions() const
+machine_config_constructor vic1112_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vic1112 );
 }
@@ -306,12 +297,11 @@ machine_config_constructor vic1112_device_config::device_mconfig_additions() con
 //  vic1112_device - constructor
 //-------------------------------------------------
 
-vic1112_device::vic1112_device(running_machine &_machine, const vic1112_device_config &_config)
-    : device_t(_machine, _config),
+vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
-	  m_bus(*this->owner(), IEEE488_TAG),
-      m_config(_config)
+	  m_bus(*this->owner(), IEEE488_TAG)
 {
 }
 

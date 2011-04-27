@@ -82,47 +82,14 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SOUND_BLASTER_1_0 = isa8_sblaster_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_sblaster_device_config - constructor
-//-------------------------------------------------
-
-isa8_sblaster_device_config::isa8_sblaster_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "ISA8_SOUND_BLASTER_1_0", tag, owner, clock),
-			device_config_isa8_card_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_sblaster_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-        return global_alloc(isa8_sblaster_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_sblaster_device_config::alloc_device(running_machine &machine) const
-{
-        return auto_alloc(machine, isa8_sblaster_device(machine, *this));
-}
+const device_type ISA8_SOUND_BLASTER_1_0 = &device_creator<isa8_sblaster_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_sblaster_device_config::device_mconfig_additions() const
+machine_config_constructor isa8_sblaster_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( sblaster_config );
 }
@@ -135,11 +102,10 @@ machine_config_constructor isa8_sblaster_device_config::device_mconfig_additions
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
-isa8_sblaster_device::isa8_sblaster_device(running_machine &_machine, const isa8_sblaster_device_config &config) :
-        device_t(_machine, config),
-		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config),
-		m_isa(*owner(),config.m_isa_tag)
+isa8_sblaster_device::isa8_sblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_SOUND_BLASTER_1_0, "ISA8_SOUND_BLASTER_1_0", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
+		m_isa(*owner,m_isa_tag)
 {
 }
 
@@ -149,7 +115,7 @@ isa8_sblaster_device::isa8_sblaster_device(running_machine &_machine, const isa8
 
 void isa8_sblaster_device::device_start()
 {
-	m_isa->add_isa_card(this, m_config.m_isa_num);
+	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );

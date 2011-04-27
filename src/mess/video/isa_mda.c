@@ -127,48 +127,15 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_MDA = isa8_mda_device_config::static_alloc_device_config;
+const device_type ISA8_MDA = &device_creator<isa8_mda_device>;
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_mda_device_config - constructor
-//-------------------------------------------------
-
-isa8_mda_device_config::isa8_mda_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "ISA8_MDA", tag, owner, clock),
-			device_config_isa8_card_interface(mconfig, *this)
-{
-	m_shortname = "mda";
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_mda_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-        return global_alloc(isa8_mda_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_mda_device_config::alloc_device(running_machine &machine) const
-{
-        return auto_alloc(machine, isa8_mda_device(machine, *this));
-}
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_mda_device_config::device_mconfig_additions() const
+machine_config_constructor isa8_mda_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pcvideo_mda );
 }
@@ -177,7 +144,7 @@ machine_config_constructor isa8_mda_device_config::device_mconfig_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_mda_device_config::device_rom_region() const
+const rom_entry *isa8_mda_device::device_rom_region() const
 {
 	return ROM_NAME( mda );
 }
@@ -190,12 +157,12 @@ const rom_entry *isa8_mda_device_config::device_rom_region() const
 //  isa8_mda_device - constructor
 //-------------------------------------------------
 
-isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_device_config &config) :
-        device_t(_machine, config),
-		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config),
-		m_isa(*owner(),config.m_isa_tag)
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_MDA, "ISA8_MDA", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
+		m_isa(*owner,m_isa_tag)
 {
+	m_shortname = "mda";
 }
 
 //-------------------------------------------------
@@ -204,7 +171,7 @@ isa8_mda_device::isa8_mda_device(running_machine &_machine, const isa8_mda_devic
 
 void isa8_mda_device::device_start()
 {
-	m_isa->add_isa_card(this, m_config.m_isa_num);
+	m_isa->add_isa_card(this, m_isa_num);
 	videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(pc_MDA_r), FUNC(pc_MDA_w) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);
@@ -579,47 +546,14 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_HERCULES = isa8_hercules_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_mda_device_config - constructor
-//-------------------------------------------------
-
-isa8_hercules_device_config::isa8_hercules_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : isa8_mda_device_config(mconfig, tag, owner, clock)
-{
-	m_shortname = "hercules";
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_hercules_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-        return global_alloc(isa8_hercules_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_hercules_device_config::alloc_device(running_machine &machine) const
-{
-        return auto_alloc(machine, isa8_hercules_device(machine, *this));
-}
+const device_type ISA8_HERCULES = &device_creator<isa8_hercules_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_hercules_device_config::device_mconfig_additions() const
+machine_config_constructor isa8_hercules_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pcvideo_hercules );
 }
@@ -628,7 +562,7 @@ machine_config_constructor isa8_hercules_device_config::device_mconfig_additions
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_hercules_device_config::device_rom_region() const
+const rom_entry *isa8_hercules_device::device_rom_region() const
 {
 	return ROM_NAME( hercules );
 }
@@ -641,10 +575,10 @@ const rom_entry *isa8_hercules_device_config::device_rom_region() const
 //  isa8_hercules_device - constructor
 //-------------------------------------------------
 
-isa8_hercules_device::isa8_hercules_device(running_machine &_machine, const isa8_hercules_device_config &config) :
-        isa8_mda_device(_machine, config),
-		m_config(config)
+isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        isa8_mda_device(mconfig, tag, owner, clock)
 {
+	m_shortname = "hercules";
 }
 
 //-------------------------------------------------

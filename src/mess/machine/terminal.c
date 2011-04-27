@@ -43,7 +43,7 @@ INLINE const terminal_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GENERIC_TERMINAL);
-	return (const terminal_interface *) device->baseconfig().static_config();
+	return (const terminal_interface *) device->static_config();
 }
 
 /***************************************************************************

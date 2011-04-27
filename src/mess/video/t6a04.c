@@ -12,38 +12,8 @@
 #include "emu.h"
 #include "video/t6a04.h"
 
-//**************************************************************************
-//  device configuration
-//**************************************************************************
-
-//-------------------------------------------------
-//  t6a04_device_config - constructor
-//-------------------------------------------------
-
-t6a04_device_config::t6a04_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ):
-	device_config(mconfig, static_alloc_device_config, "T6A04", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *t6a04_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc( t6a04_device_config( mconfig, tag, owner, clock ) );
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *t6a04_device_config::alloc_device( running_machine &machine ) const
-{
-	return auto_alloc(machine, t6a04_device( machine, *this ) );
-}
+// devices
+const device_type T6A04 = &device_creator<t6a04_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -51,7 +21,7 @@ device_t *t6a04_device_config::alloc_device( running_machine &machine ) const
 //  complete
 //-------------------------------------------------
 
-void t6a04_device_config::device_config_complete()
+void t6a04_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const t6a04_interface *intf = reinterpret_cast<const t6a04_interface *>(static_config());
@@ -72,7 +42,7 @@ void t6a04_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool t6a04_device_config::device_validity_check( const game_driver &driver ) const
+bool t6a04_device::device_validity_check( const game_driver &driver ) const
 {
 	bool error = false;
 
@@ -93,9 +63,8 @@ bool t6a04_device_config::device_validity_check( const game_driver &driver ) con
 //  t6a04_device - constructor
 //-------------------------------------------------
 
-t6a04_device::t6a04_device( running_machine &_machine, const t6a04_device_config &config ) :
-	device_t( _machine, config ),
-	m_config( config )
+t6a04_device::t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, T6A04, "T6A04", tag, owner, clock)
 {
 }
 
@@ -151,8 +120,8 @@ void t6a04_device::device_reset()
 
 int t6a04_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 ypages = m_config.width>>3;
-	UINT8 last_line = m_zpos + m_config.height;
+	UINT8 ypages = width>>3;
+	UINT8 last_line = m_zpos + height;
 
 	if (m_display_on)
 	{
@@ -296,6 +265,3 @@ READ8_MEMBER(t6a04_device::data_read)
 
 	return data;
 }
-
-// devices
-const device_type T6A04 = t6a04_device_config::static_alloc_device_config;

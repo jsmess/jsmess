@@ -56,47 +56,14 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_FDC = isa8_fdc_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_fdc_device_config - constructor
-//-------------------------------------------------
-
-isa8_fdc_device_config::isa8_fdc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "ISA8_FDC", tag, owner, clock),
-			device_config_isa8_card_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_fdc_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-        return global_alloc(isa8_fdc_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_fdc_device_config::alloc_device(running_machine &machine) const
-{
-        return auto_alloc(machine, isa8_fdc_device(machine, *this));
-}
+const device_type ISA8_FDC = &device_creator<isa8_fdc_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_fdc_device_config::device_mconfig_additions() const
+machine_config_constructor isa8_fdc_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( fdc_config );
 }
@@ -109,12 +76,11 @@ machine_config_constructor isa8_fdc_device_config::device_mconfig_additions() co
 //  isa8_fdc_device - constructor
 //-------------------------------------------------
 
-isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_device_config &config) :
-        device_t(_machine, config),
-		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config),
+isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_FDC, "ISA8_FDC", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
 		m_upd765(*this, "upd765"),
-		m_isa(*owner(),config.m_isa_tag)
+		m_isa(*owner,m_isa_tag)
 {
 }
 
@@ -124,7 +90,7 @@ isa8_fdc_device::isa8_fdc_device(running_machine &_machine, const isa8_fdc_devic
 
 void isa8_fdc_device::device_start()
 {
-	m_isa->add_isa_card(this, m_config.m_isa_num);
+	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );
 }
 

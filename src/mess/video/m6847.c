@@ -1820,8 +1820,8 @@ static STATE_POSTLOAD( mc6847_postload )
 static DEVICE_START( mc6847 )
 {
 	mc6847_state *mc6847 = get_safe_token(device);
-	const mc6847_interface *intf = (mc6847_interface *)device->baseconfig().static_config();
-	const mc6847_config *cfg = (mc6847_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const mc6847_interface *intf = (mc6847_interface *)device->static_config();
+	const mc6847_config *cfg = (mc6847_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 	const m6847_variant *v;
 	UINT32 frequency;
@@ -1829,8 +1829,8 @@ static DEVICE_START( mc6847 )
 	double total_scanlines;
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config() != NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(device->static_config() != NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* identify proper M6847 variant */
 	assert(cfg->type < ARRAY_LENGTH(variants));

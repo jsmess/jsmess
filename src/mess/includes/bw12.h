@@ -21,8 +21,8 @@
 class bw12_state : public driver_device
 {
 public:
-	bw12_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	bw12_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_pia(*this, PIA6821_TAG),
 		  m_fdc(*this, UPD765_TAG),

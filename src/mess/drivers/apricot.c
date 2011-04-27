@@ -28,8 +28,8 @@
 class apricot_state : public driver_device
 {
 public:
-	apricot_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	apricot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	device_t *m_pic8259;
 	device_t *m_wd2793;

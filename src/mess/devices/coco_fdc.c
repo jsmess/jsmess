@@ -228,7 +228,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
-    const fdc_hardware_type *hwtype = (const fdc_hardware_type *)downcast<const legacy_cart_slot_device_config_base *>(&device->baseconfig())->get_config_ptr(FDCINFO_PTR_HWTYPE);
+    const fdc_hardware_type *hwtype = (const fdc_hardware_type *)downcast<const legacy_cart_slot_device_base *>(device)->get_legacy_ptr(FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */
 	memset(fdc, 0, sizeof(*fdc));
@@ -248,7 +248,7 @@ static DEVICE_START(fdc)
     DEVICE_GET_INFO( fdc ) - general FDC get info func
 -------------------------------------------------*/
 
-static void general_fdc_get_info(const device_config *device, UINT32 state, deviceinfo *info,
+static void general_fdc_get_info(const device_t *device, UINT32 state, deviceinfo *info,
 	const fdc_hardware_type *hwtype)
 {
 	switch (state)

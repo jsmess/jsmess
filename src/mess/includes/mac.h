@@ -177,8 +177,8 @@ void mac_sh_updatebuffer(device_t *device);
 class mac_state : public driver_device
 {
 public:
-	mac_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mac_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),

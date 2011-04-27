@@ -188,7 +188,7 @@ INLINE const ti99_peb_config *get_config(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == PBOX4 || device->type() == PBOX4A || device->type() == PBOX8 || device->type() == PBOXEV || device->type() == PBOXSG || device->type() == PBOXGEN);
 
-	return (const ti99_peb_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const ti99_peb_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 /* Callbacks */

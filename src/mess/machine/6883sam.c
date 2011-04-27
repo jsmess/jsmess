@@ -253,9 +253,9 @@ static void common_start(device_t *device, SAM6883_VERSION device_type)
 	// validate arguments
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	sam->intf = (const sam6883_interface*)device->baseconfig().static_config();
+	sam->intf = (const sam6883_interface*)device->static_config();
 
 	sam->type = device_type;
 

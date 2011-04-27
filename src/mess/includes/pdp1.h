@@ -231,8 +231,8 @@ typedef struct lightpen_t
 class pdp1_state : public driver_device
 {
 public:
-	pdp1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pdp1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	pdp1_reset_param_t m_reset_param;
 	int m_io_status;

@@ -1542,9 +1542,9 @@ static DEVICE_START( i8271 )
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	i8271->intf = (const i8271_interface*)device->baseconfig().static_config();
+	i8271->intf = (const i8271_interface*)device->static_config();
 
 	i8271->data_timer = device->machine().scheduler().timer_alloc(FUNC(i8271_data_timer_callback), (void *)device);
 	i8271->command_complete_timer = device->machine().scheduler().timer_alloc(FUNC(i8271_timed_command_complete_callback), (void *)device);

@@ -353,7 +353,7 @@ static DEVICE_RESET( datamux )
 	}
 
 	if (dmux->ram16b==NULL) dmux->ram16b = (UINT16*)malloc(32768);
-	bus_device *cons = (bus_device*)device->baseconfig().static_config();
+	bus_device *cons = (bus_device*)device->static_config();
 	while (!done)
 	{
 		if (cons[i].name != NULL)

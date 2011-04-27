@@ -55,8 +55,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 class gizmondo_state : public driver_device
 {
 public:
-	gizmondo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	gizmondo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 m_port[9];
 	device_t *m_s3c2440;

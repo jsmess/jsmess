@@ -823,7 +823,7 @@ static DEVICE_START( k1ge )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
-	k1ge->intf = (const k1ge_interface*)device->baseconfig().static_config();
+	k1ge->intf = (const k1ge_interface*)device->static_config();
 
 	devcb_resolve_write8( &k1ge->vblank_pin_w, &k1ge->intf->vblank_pin_w, device );
 	devcb_resolve_write8( &k1ge->hblank_pin_w, &k1ge->intf->hblank_pin_w, device );

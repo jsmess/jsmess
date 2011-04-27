@@ -2325,9 +2325,9 @@ static void common_start(device_t *device, int device_type)
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	fdc->intf = (const upd765_interface*)device->baseconfig().static_config();
+	fdc->intf = (const upd765_interface*)device->static_config();
 
 	fdc->version = (UPD765_VERSION)device_type;
 	fdc->timer = device->machine().scheduler().timer_alloc(FUNC(upd765_timer_callback), (void*)device);

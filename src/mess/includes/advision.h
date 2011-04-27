@@ -14,8 +14,8 @@
 class advision_state : public driver_device
 {
 public:
-	advision_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	advision_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I8048_TAG),
 		  m_soundcpu(*this, COP411_TAG),
 		  m_dac(*this, "dac")

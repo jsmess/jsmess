@@ -98,56 +98,16 @@ static const unsigned int max_xa_prefetch_distance=32,
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PSXCD = psxcd_device_config::static_alloc_device_config;
+const device_type PSXCD = &device_creator<psxcd_device>;
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-void psxcd_device_config::static_set_devname(device_config *device, const char *devname)
+void psxcd_device::static_set_devname(device_t &device, const char *devname)
 {
-	psxcd_device_config *psxcd = downcast<psxcd_device_config *>(device);
-	psxcd->m_devname = devname;
+	psxcd_device &psxcd = downcast<psxcd_device &>(device);
+	psxcd.m_devname = devname;
 }
 
-//-------------------------------------------------
-//  psxcd_device_config - constructor
-//-------------------------------------------------
-
-psxcd_device_config::psxcd_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "PSXCD", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *psxcd_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(psxcd_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *psxcd_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, psxcd_device(machine, *this));
-}
-
-//
-//
-//
-
-psxcd_device::psxcd_device(running_machine &_machine, const psxcd_device_config &_config)
-	: device_t(_machine, _config),
-	  m_config(_config),
-	  m_devname(m_config.m_devname)
+psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PSXCD, "PSXCD", tag, owner, clock)
 {
 }
 

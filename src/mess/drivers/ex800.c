@@ -135,8 +135,8 @@ TODO:  - The UPD7810 core is missing analog port emulation
 class ex800_state : public driver_device
 {
 public:
-	ex800_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ex800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_irq_state;
 };

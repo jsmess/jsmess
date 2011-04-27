@@ -2136,9 +2136,9 @@ WRITE8_DEVICE_HANDLER( smc92x4_w )
 static DEVICE_START( smc92x4 )
 {
 	smc92x4_state *w = get_safe_token(device);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	w->intf = (const smc92x4_interface*)device->baseconfig().static_config();
+	w->intf = (const smc92x4_interface*)device->static_config();
 	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
 	devcb_resolve_write_line(&w->out_dip_func, &w->intf->out_dip_func, device);
 	devcb_resolve_write8(&w->out_auxbus_func, &w->intf->out_auxbus_func, device);

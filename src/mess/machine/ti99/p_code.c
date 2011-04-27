@@ -203,7 +203,7 @@ static DEVICE_START( ti99_pcoden )
 	ti99_pcoden_state *pcode = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	devcb_resolve_write_line(&pcode->lines.ready, &topeb->ready, device);
 }
 

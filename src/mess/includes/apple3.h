@@ -26,8 +26,8 @@
 class apple3_state : public apple2_state
 {
 public:
-	apple3_state(running_machine &machine, const driver_device_config_base &config)
-		: apple2_state(machine, config) { }
+	apple3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: apple2_state(mconfig, type, tag) { }
 
 	UINT32 m_flags;
 	UINT8 m_via_0_a;

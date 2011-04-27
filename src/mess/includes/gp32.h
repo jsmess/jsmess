@@ -85,8 +85,8 @@ typedef struct
 class gp32_state : public driver_device
 {
 public:
-	gp32_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	gp32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_s3c240x_ram;
 	UINT8 *m_eeprom_data;

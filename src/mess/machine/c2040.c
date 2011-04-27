@@ -59,58 +59,36 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2040 = c2040_device_config::static_alloc_device_config;
-const device_type C3040 = c2040_device_config::static_alloc_device_config;
-const device_type C4040 = c2040_device_config::static_alloc_device_config;
-const device_type C8050 = c2040_device_config::static_alloc_device_config;
-const device_type C8250 = c2040_device_config::static_alloc_device_config;
-const device_type SFD1001 = c2040_device_config::static_alloc_device_config;
+const device_type C2040 = &device_creator<c2040_device>;
+const device_type C3040 = &device_creator<c3040_device>;
+const device_type C4040 = &device_creator<c4040_device>;
+const device_type C8050 = &device_creator<c8050_device>;
+const device_type C8250 = &device_creator<c8250_device>;
+const device_type SFD1001 = &device_creator<sfd1001_device>;
 
+c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c2040_device(mconfig, tag, owner, clock) { }
 
+c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c2040_device(mconfig, tag, owner, clock) { }
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
+c8050_device::c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c2040_device(mconfig, tag, owner, clock) { }
 
-//-------------------------------------------------
-//  c2040_device_config - constructor
-//-------------------------------------------------
+c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c8050_device(mconfig, tag, owner, clock) { }
 
-c2040_device_config::c2040_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "C2040", tag, owner, clock),
-	  device_config_ieee488_interface(mconfig, *this)
-{
-}
+sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c8050_device(mconfig, tag, owner, clock) { }
 
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *c2040_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(c2040_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *c2040_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, c2040_device(machine, *this));
-}
-
-
+	
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
 
-void c2040_device_config::device_config_complete()
+void c2040_device::device_config_complete()
 {
 	switch (m_variant)
 	{
@@ -143,14 +121,14 @@ void c2040_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c2040_device_config::static_set_config(device_config *device, int address, int variant)
+void c2040_device::static_set_config(device_t &device, int address, int variant)
 {
-	c2040_device_config *c2040 = downcast<c2040_device_config *>(device);
+	c2040_device &c2040 = downcast<c2040_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c2040->m_address = address - 8;
-	c2040->m_variant = variant;
+	c2040.m_address = address - 8;
+	c2040.m_variant = variant;
 }
 
 
@@ -261,7 +239,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c2040_device_config::device_rom_region() const
+const rom_entry *c2040_device::device_rom_region() const
 {
 	switch (m_variant)
 	{
@@ -517,7 +495,7 @@ READ8_MEMBER( c2040_device::riot1_pb_r )
 	UINT8 data = 0;
 
 	// device number selection
-	data |= m_config.m_address;
+	data |= m_address;
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
@@ -919,7 +897,7 @@ READ8_MEMBER( c2040_device::c8050_miot_pb_r )
 	data |= 0x10;
 
 	// single/dual sided
-	if (m_config.m_variant == c2040_device_config::TYPE_8050)
+	if (m_variant == c2040_device::TYPE_8050)
 	{
 		data |= 0x40;
 	}
@@ -945,8 +923,8 @@ WRITE8_MEMBER( c2040_device::c8050_miot_pb_w )
     */
 
 	// drive select
-	if ((m_config.m_variant == c2040_device_config::TYPE_8050) ||
-		(m_config.m_variant == c2040_device_config::TYPE_8250))
+	if ((m_variant == c2040_device::TYPE_8050) ||
+		(m_variant == c2040_device::TYPE_8250))
 	{
 		m_drive = BIT(data, 0);
 	}
@@ -961,8 +939,8 @@ WRITE8_MEMBER( c2040_device::c8050_miot_pb_w )
 	}
 
 	// side select
-	if ((m_config.m_variant == c2040_device_config::TYPE_8250) ||
-		(m_config.m_variant == c2040_device_config::TYPE_SFD1001))
+	if ((m_variant == c2040_device::TYPE_8250) ||
+		(m_variant == c2040_device::TYPE_SFD1001))
 	{
 		m_side = !BIT(data, 4);
 	}
@@ -1211,7 +1189,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c2040_device_config::device_mconfig_additions() const
+machine_config_constructor c2040_device::device_mconfig_additions() const
 {
 	switch (m_variant)
 	{
@@ -1479,9 +1457,9 @@ inline void c2040_device::initialize(int drives)
 //  c2040_device - constructor
 //-------------------------------------------------
 
-c2040_device::c2040_device(running_machine &_machine, const c2040_device_config &_config)
-    : device_t(_machine, _config),
-	  device_ieee488_interface(_machine, _config, *this),
+c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C2040, "C2040", tag, owner, clock),
+	  device_ieee488_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_fdccpu(*this, M6504_TAG),
 	  m_riot0(*this, M6532_0_TAG),
@@ -1502,8 +1480,7 @@ c2040_device::c2040_device(running_machine &_machine, const c2040_device_config 
 	  m_mode(0),
 	  m_rw(0),
 	  m_miot_irq(CLEAR_LINE),
-	  m_bit_timer(timer_alloc()),
-      m_config(_config)
+	  m_bit_timer(timer_alloc())
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -1525,7 +1502,7 @@ void c2040_device::device_start()
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
 
-	switch (m_config.m_variant)
+	switch (m_variant)
 	{
 	default:
 		main->install_rom(0x5000, 0x7fff, subregion(M6502_TAG)->base());
@@ -1534,15 +1511,15 @@ void c2040_device::device_start()
 		initialize(2);
 		break;
 
-	case c2040_device_config::TYPE_8050:
-	case c2040_device_config::TYPE_8250:
+	case c2040_device::TYPE_8050:
+	case c2040_device::TYPE_8250:
 		main->install_rom(0xc000, 0xffff, subregion(M6502_TAG)->base());
 		fdc->install_rom(0x1c00, 0x1fff, subregion(M6504_TAG)->base());
 
 		initialize(2);
 		break;
 
-	case c2040_device_config::TYPE_SFD1001:
+	case c2040_device::TYPE_SFD1001:
 		main->install_rom(0xc000, 0xffff, subregion(M6502_TAG)->base());
 		fdc->install_rom(0x1800, 0x1fff, subregion(M6504_TAG)->base());
 
@@ -1619,9 +1596,9 @@ void c2040_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_via->write_ca1(ready);
 		m_via->write_cb1(ERROR);
 
-		if ((m_config.m_variant == c2040_device_config::TYPE_8050) ||
-			(m_config.m_variant == c2040_device_config::TYPE_8250) ||
-			(m_config.m_variant == c2040_device_config::TYPE_SFD1001))
+		if ((m_variant == c2040_device::TYPE_8050) ||
+			(m_variant == c2040_device::TYPE_8250) ||
+			(m_variant == c2040_device::TYPE_SFD1001))
 		{
 			m_fdccpu->set_input_line(M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
 		}

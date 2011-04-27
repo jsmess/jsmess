@@ -78,8 +78,8 @@ $8000-$FFF ROM
 class mephisto_state : public driver_device
 {
 public:
-	mephisto_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_lcd_shift_counter;
 	UINT8 m_led_status;

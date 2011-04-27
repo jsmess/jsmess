@@ -162,8 +162,8 @@ typedef struct {
 class _3do_state : public driver_device
 {
 public:
-	_3do_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	legacy_cpu_device* m_maincpu;
 	UINT32 *m_dram;

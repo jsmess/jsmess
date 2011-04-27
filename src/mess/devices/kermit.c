@@ -644,7 +644,7 @@ static DEVICE_START( kermit )
 	kermit* state = get_safe_token(device);
 	LOG(( "kermit: start\n" ));
 	state->image = NULL;
-	state->conf = (kermit_config*) device->baseconfig().static_config();
+	state->conf = (kermit_config*) device->static_config();
 	state->machine = &device->machine();
 	state->resend = device->machine().scheduler().timer_alloc(FUNC(kermit_resend_cb), state );
 	kermit_reset( state );

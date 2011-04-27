@@ -104,16 +104,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S1410 = s1410_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(s1410, "Xebec S1410")
-
+const device_type S1410 = &device_creator<s1410_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -121,7 +112,7 @@ GENERIC_DEVICE_CONFIG_SETUP(s1410, "Xebec S1410")
 //  complete
 //-------------------------------------------------
 
-void s1410_device_config::device_config_complete()
+void s1410_device::device_config_complete()
 {
 	m_shortname = "s1410";
 }
@@ -145,7 +136,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s1410_device_config::device_rom_region() const
+const rom_entry *s1410_device::device_rom_region() const
 {
 	return ROM_NAME( s1410 );
 }
@@ -196,7 +187,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor s1410_device_config::device_mconfig_additions() const
+machine_config_constructor s1410_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( s1410 );
 }
@@ -211,9 +202,8 @@ machine_config_constructor s1410_device_config::device_mconfig_additions() const
 //  s1410_device - constructor
 //-------------------------------------------------
 
-s1410_device::s1410_device(running_machine &_machine, const s1410_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, S1410, "Xebec S1410", tag, owner, clock)
 {
 }
 

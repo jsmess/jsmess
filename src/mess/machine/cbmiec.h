@@ -69,25 +69,13 @@ struct cbm_iec_config
 };
 
 
-// ======================> device_config_cbm_iec_interface
-
-// device_config_cbm_iec_interface represents configuration information for a cbm_iec device
-class device_config_cbm_iec_interface : public device_config_interface
-{
-public:
-	// construction/destruction
-	device_config_cbm_iec_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_cbm_iec_interface();
-};
-
-
 // ======================> device_cbm_iec_interface
 
 class device_cbm_iec_interface : public device_interface
 {
 public:
 	// construction/destruction
-	device_cbm_iec_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_cbm_iec_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cbm_iec_interface();
 
 	// optional operation overrides
@@ -96,33 +84,6 @@ public:
 	virtual void cbm_iec_data(int state) { };
 	virtual void cbm_iec_srq(int state) { };
 	virtual void cbm_iec_reset(int state) { };
-
-protected:
-	const device_config_cbm_iec_interface &m_cbm_iec_config;
-};
-
-
-// ======================> cbm_iec_device_config
-
-class cbm_iec_device_config :   public device_config,
-							    public cbm_iec_config
-{
-    friend class cbm_iec_device;
-
-    // construction/destruction
-    cbm_iec_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	const cbm_iec_config *m_daisy;
 };
 
 
@@ -130,14 +91,13 @@ private:
 
 class cbm_iec_stub_device;
 
-class cbm_iec_device :  public device_t
+class cbm_iec_device :  public device_t,
+						public cbm_iec_config
 {
-    friend class cbm_iec_device_config;
-
-    // construction/destruction
-    cbm_iec_device(running_machine &_machine, const cbm_iec_device_config &_config);
-
 public:
+    // construction/destruction
+    cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// reads for both host and peripherals
 	DECLARE_READ_LINE_MEMBER( srq_r );
 	DECLARE_READ_LINE_MEMBER( atn_r );
@@ -172,6 +132,8 @@ protected:
 
 	// device-level overrides
     virtual void device_start();
+    // device_config overrides
+    virtual void device_config_complete();
 
 	class daisy_entry
 	{
@@ -193,7 +155,7 @@ private:
 
 	required_device<cbm_iec_stub_device> m_stub;
 
-    const cbm_iec_device_config &m_config;
+   	const cbm_iec_config *m_daisy;
 };
 
 
@@ -201,51 +163,29 @@ private:
 
 struct cbm_iec_stub_interface
 {
-	devcb_write_line	m_out_srq_func;
-	devcb_write_line	m_out_atn_func;
-	devcb_write_line	m_out_clk_func;
-	devcb_write_line	m_out_data_func;
-	devcb_write_line	m_out_reset_func;
+	devcb_write_line	m_out_srq_cb;
+	devcb_write_line	m_out_atn_cb;
+	devcb_write_line	m_out_clk_cb;
+	devcb_write_line	m_out_data_cb;
+	devcb_write_line	m_out_reset_cb;
 };
 
 const cbm_iec_stub_interface default_cbm_iec_stub_interface = { DEVCB_NULL, };
 
-
-// ======================> cbm_iec_stub_device_config
-
-class cbm_iec_stub_device_config :   public device_config,
-									 public cbm_iec_stub_interface,
-									 public device_config_cbm_iec_interface
-{
-    friend class cbm_iec_stub_device;
-
-    // construction/destruction
-    cbm_iec_stub_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
 // ======================> cbm_iec_stub_device
 
 class cbm_iec_stub_device :  public device_t,
-							 public device_cbm_iec_interface
+							 public device_cbm_iec_interface,
+							 public cbm_iec_stub_interface
 {
-    friend class cbm_iec_stub_device_config;
-
+public:
     // construction/destruction
-    cbm_iec_stub_device(running_machine &_machine, const cbm_iec_stub_device_config &_config);
+    cbm_iec_stub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
     // device-level overrides
     virtual void device_start();
+    virtual void device_config_complete();
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state);
@@ -260,8 +200,6 @@ private:
 	devcb_resolved_write_line	m_out_data_func;
 	devcb_resolved_write_line	m_out_srq_func;
 	devcb_resolved_write_line	m_out_reset_func;
-
-    const cbm_iec_stub_device_config &m_config;
 };
 
 

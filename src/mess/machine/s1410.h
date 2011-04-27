@@ -43,50 +43,25 @@ struct s1410_interface
 {
 };
 
+// ======================> s1410_device
 
-// ======================> s1410_device_config
-
-class s1410_device_config :   public device_config,
-                                public s1410_interface
+class s1410_device :  public device_t,
+                      public s1410_interface
 {
-    friend class s1410_device;
-
-    // construction/destruction
-    s1410_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
+    // construction/destruction
+    s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
-// ======================> s1410_device
-
-class s1410_device :  public device_t
-{
-    friend class s1410_device_config;
-
-    // construction/destruction
-    s1410_device(running_machine &_machine, const s1410_device_config &_config);
-
-public:
-
-protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
+    virtual void device_config_complete();
 
 private:
-    const s1410_device_config &m_config;
 };
 
 

@@ -67,8 +67,8 @@
 class ql_state : public driver_device
 {
 public:
-	ql_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	ql_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, M68008_TAG),
 		  m_ipc(*this, I8749_TAG),
 		  m_zx8301(*this, ZX8301_TAG),

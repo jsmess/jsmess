@@ -85,8 +85,8 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 class ti99_2_state : public driver_device
 {
 public:
-	ti99_2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ti99_2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	int m_ROM_paged;

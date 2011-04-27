@@ -15,8 +15,8 @@
 class mikrolab_state : public driver_device
 {
 public:
-	mikrolab_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mikrolab_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(kp_matrix_w);

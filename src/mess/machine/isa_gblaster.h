@@ -10,39 +10,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa8_gblaster_device_config
-
-class isa8_gblaster_device_config :
-		public device_config,
-		public device_config_isa8_card_interface
-{
-        friend class isa8_device;
-		friend class isa8_gblaster_device;
-
-        // construction/destruction
-        isa8_gblaster_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-        // allocators
-        static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-        virtual device_t *alloc_device(running_machine &machine) const;
-
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-};
-
-
 // ======================> isa8_gblaster_device
 
 class isa8_gblaster_device :
 		public device_t,
 		public device_isa8_card_interface
 {
-        friend class isa8_gblaster_device_config;
-
+public:
         // construction/destruction
-        isa8_gblaster_device(running_machine &_machine, const isa8_gblaster_device_config &config);
+        isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+		// optional information overrides
+		virtual machine_config_constructor device_mconfig_additions() const;
 protected:
         // device-level overrides
         virtual void device_start();
@@ -50,7 +29,6 @@ protected:
 
 private:
         // internal state
-        const isa8_gblaster_device_config &m_config;
 public:
 		required_device<isa8_device> m_isa;
 };

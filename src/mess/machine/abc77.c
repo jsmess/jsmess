@@ -28,16 +28,7 @@ Luxor ABC77
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC77 = abc77_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(abc77, "Luxor ABC 77")
-
+const device_type ABC77 = &device_creator<abc77_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -45,7 +36,7 @@ GENERIC_DEVICE_CONFIG_SETUP(abc77, "Luxor ABC 77")
 //  complete
 //-------------------------------------------------
 
-void abc77_device_config::device_config_complete()
+void abc77_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const abc77_interface *intf = reinterpret_cast<const abc77_interface *>(static_config());
@@ -55,9 +46,9 @@ void abc77_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_txd_func, 0, sizeof(m_out_txd_func));
-		memset(&m_out_clock_func, 0, sizeof(m_out_clock_func));
-		memset(&m_out_keydown_func, 0, sizeof(m_out_keydown_func));
+		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
+		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
+		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
 	}
 
 	m_shortname = "abc77";
@@ -78,7 +69,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc77_device_config::device_rom_region() const
+const rom_entry *abc77_device::device_rom_region() const
 {
 	return ROM_NAME( abc77 );
 }
@@ -149,7 +140,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor abc77_device_config::device_mconfig_additions() const
+machine_config_constructor abc77_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( abc77 );
 }
@@ -303,7 +294,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *abc77_device_config::device_input_ports() const
+const input_port_token *abc77_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( abc77 );
 }
@@ -364,11 +355,10 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(running_machine &_machine, const abc77_device_config &config)
-    : device_t(_machine, config),
+abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock),
 	  m_maincpu(*this, I8035_TAG),
-	  m_discrete(*this, DISCRETE_TAG),
-      m_config(config)
+	  m_discrete(*this, DISCRETE_TAG)
 {
 }
 
@@ -386,9 +376,9 @@ void abc77_device::device_start()
 	m_reset_timer = timer_alloc(TIMER_RESET);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_txd_func, &m_config.m_out_txd_func, this);
-    devcb_resolve_write_line(&m_out_clock_func, &m_config.m_out_clock_func, this);
-    devcb_resolve_write_line(&m_out_keydown_func, &m_config.m_out_keydown_func, this);
+    devcb_resolve_write_line(&m_out_txd_func, &m_out_txd_cb, this);
+    devcb_resolve_write_line(&m_out_clock_func, &m_out_clock_cb, this);
+    devcb_resolve_write_line(&m_out_keydown_func, &m_out_keydown_cb, this);
 }
 
 

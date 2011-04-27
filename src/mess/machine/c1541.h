@@ -39,27 +39,27 @@
 
 #define MCFG_C1540_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1540, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1540);
+	c1541_device::static_set_config(*device, _address, c1541_device::TYPE_1540);
 
 #define MCFG_C1541_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1541);
+	c1541_device::static_set_config(*device, _address, c1541_device::TYPE_1541);
 
 #define MCFG_C1541C_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541C, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1541C);
+	c1541_device::static_set_config(*device, _address, c1541_device::TYPE_1541C);
 
 #define MCFG_C1541II_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1541II, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_1541II);
+	c1541_device::static_set_config(*device, _address, c1541_device::TYPE_1541II);
 
 #define MCFG_SX1541_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, SX1541, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_SX1541);
+	c1541_device::static_set_config(*device, _address, c1541_device::TYPE_SX1541);
 
 #define MCFG_OC118_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, OC118, 0) \
-	c1541_device_config::static_set_config(device, _address, c1541_device_config::TYPE_OC118);
+	c1541_device::static_set_config(*device, _address, c1541_device::TYPE_OC118);
 
 
 
@@ -67,22 +67,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1541_device_config
+// ======================> c1541_device
 
-class c1541_device_config :   public device_config,
-							  public device_config_cbm_iec_interface
+class c1541_device :  public device_t,
+					  public device_cbm_iec_interface
 {
-    friend class c1540_device;
-    friend class c1541_device;
-    friend class c1541c_device;
-    friend class c1541ii_device;
-    friend class sx1541_device;
-    friend class oc118_device;
-
-    // construction/destruction
-    c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
+    // construction/destruction
+    c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	enum
 	{
 		TYPE_1540 = 0,
@@ -93,37 +86,6 @@ public:
 		TYPE_OC118
 	};
 
-	// allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, int address, int variant);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-protected:
-	// device_config overrides
-    virtual void device_config_complete();
-
-	int m_address;
-	int m_variant;
-};
-
-
-// ======================> c1541_device
-
-class c1541_device :  public device_t,
-					  public device_cbm_iec_interface
-{
-    friend class c1541_device_config;
-
-    // construction/destruction
-    c1541_device(running_machine &_machine, const c1541_device_config &_config);
-
-public:
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
@@ -138,12 +100,20 @@ public:
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	
+	// inline configuration helpers
+	static void static_set_config(device_t &device, int address, int variant);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-
+    virtual void device_config_complete();
+	
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state);
 	void cbm_iec_reset(int state);
@@ -164,7 +134,8 @@ protected:
 	int m_via0_irq;							// VIA #0 interrupt request
 	int m_via1_irq;							// VIA #1 interrupt request
 
-    const c1541_device_config &m_config;
+	int m_address;
+	int m_variant;
 };
 
 
@@ -172,10 +143,9 @@ protected:
 
 class c1540_device :  public c1541_device
 {
-    friend class c1541_device_config;
-
+public:
     // construction/destruction
-    c1540_device(running_machine &_machine, const c1541_device_config &_config);
+    c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -183,12 +153,9 @@ class c1540_device :  public c1541_device
 
 class c1541c_device :  public c1541_device
 {
-    friend class c1541_device_config;
-
-    // construction/destruction
-    c1541c_device(running_machine &_machine, const c1541_device_config &_config);
-
 public:
+    // construction/destruction
+    c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// not really public
 	DECLARE_READ8_MEMBER( via0_pa_r );
 };
@@ -198,10 +165,9 @@ public:
 
 class c1541ii_device :  public c1541_device
 {
-    friend class c1541_device_config;
-
+public:
     // construction/destruction
-    c1541ii_device(running_machine &_machine, const c1541_device_config &_config);
+    c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -209,10 +175,9 @@ class c1541ii_device :  public c1541_device
 
 class sx1541_device :  public c1541_device
 {
-    friend class c1541_device_config;
-
+public:
     // construction/destruction
-    sx1541_device(running_machine &_machine, const c1541_device_config &_config);
+    sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -220,10 +185,9 @@ class sx1541_device :  public c1541_device
 
 class oc118_device :  public c1541_device
 {
-    friend class c1541_device_config;
-
+public:
     // construction/destruction
-    oc118_device(running_machine &_machine, const c1541_device_config &_config);
+    oc118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

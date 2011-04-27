@@ -29,8 +29,8 @@
 class portfolio_state : public driver_device
 {
 public:
-	portfolio_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	portfolio_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, M80C88A_TAG),
 		  m_lcdc(*this, HD61830_TAG),
 		  m_ppi(*this, M82C55A_TAG),

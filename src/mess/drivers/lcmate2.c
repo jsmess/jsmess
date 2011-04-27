@@ -40,8 +40,8 @@
 class lcmate2_state : public driver_device
 {
 public:
-	lcmate2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_lcdc(*this, "hd44780"),
 	m_rtc(*this, "rtc"),

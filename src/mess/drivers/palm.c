@@ -20,8 +20,8 @@
 class palm_state : public driver_device
 {
 public:
-	palm_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	palm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_port_f_latch;
 	UINT16 m_spim_data;

@@ -121,8 +121,8 @@ typedef struct
 class wswan_state : public driver_device
 {
 public:
-	wswan_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	wswan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	VDP m_vdp;
 	UINT8 m_ws_portram[256];

@@ -483,7 +483,7 @@ static DEVICE_START( ti99_bwg )
 	ti99_bwg_state *card = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
 
 	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);

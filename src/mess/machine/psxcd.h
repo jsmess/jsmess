@@ -29,42 +29,21 @@ const int num_commands=0x20;
 	MCFG_PSXCD_DEVNAME(_devname)
 
 #define MCFG_PSXCD_DEVNAME(_name) \
-	psxcd_device_config::static_set_devname(device, _name); \
+	psxcd_device::static_set_devname(*device, _name); \
 
 struct psxcd_interface
 {
 };
 
-
-// ======================> psxcd_device_config
-
-class psxcd_device_config :   public device_config,
-                                public psxcd_interface
+class psxcd_device : public device_t,
+                     public psxcd_interface
 {
-    friend class psxcd_device;
-
-    // construction/destruction
-    psxcd_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
 
+    psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// inline configuration helpers
-	static void static_set_devname(device_config *device, const char *devname);
-
-protected:
-	// inline data
-	const char *m_devname;
-};
-
-class psxcd_device : public device_t
-{
-	friend class psxcd_device_config;
-
-    psxcd_device(running_machine &_machine, const psxcd_device_config &_config);
-
+	static void static_set_devname(device_t &device, const char *devname);
+private:
 	struct command_result
 	{
 		unsigned char data[32], sz, res;
@@ -175,7 +154,6 @@ public:
 	void write_byte(const unsigned int addr, const unsigned char byte);
 
 private:
-    const psxcd_device_config &m_config;
 	emu_timer *m_timer;
 	UINT32 m_sysclock;
 	const char *m_devname;
@@ -184,7 +162,7 @@ private:
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
 	event *m_eventfortimer[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
-
+	
 	void add_system_event(event *ev);
 };
 

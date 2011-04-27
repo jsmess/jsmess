@@ -508,7 +508,7 @@ INLINE const ted7360_interface *get_interface( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TED7360);
 
-	return (const ted7360_interface *) device->baseconfig().static_config();
+	return (const ted7360_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -1387,7 +1387,7 @@ static void ted7360_sound_start( device_t *device )
 static DEVICE_START( ted7360 )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
-	const ted7360_interface *intf = (ted7360_interface *)device->baseconfig().static_config();
+	const ted7360_interface *intf = (ted7360_interface *)device->static_config();
 	int width, height;
 
 	ted7360->screen = device->machine().device<screen_device>(intf->screen);

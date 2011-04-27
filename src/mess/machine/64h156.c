@@ -44,16 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64H156 = c64h156_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(c64h156, "64H156");
-
+const device_type C64H156 = &device_creator<c64h156_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -61,7 +52,7 @@ GENERIC_DEVICE_CONFIG_SETUP(c64h156, "64H156");
 //  complete
 //-------------------------------------------------
 
-void c64h156_device_config::device_config_complete()
+void c64h156_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const c64h156_interface *intf = reinterpret_cast<const c64h156_interface *>(static_config());
@@ -71,9 +62,9 @@ void c64h156_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_atn_func, 0, sizeof(m_out_atn_func));
-		memset(&m_out_sync_func, 0, sizeof(m_out_sync_func));
-		memset(&m_out_byte_func, 0, sizeof(m_out_byte_func));
+		memset(&m_out_atn_cb, 0, sizeof(m_out_atn_cb));
+		memset(&m_out_sync_cb, 0, sizeof(m_out_sync_cb));
+		memset(&m_out_byte_cb, 0, sizeof(m_out_byte_cb));
 	}
 }
 
@@ -204,8 +195,8 @@ inline void c64h156_device::receive_bit()
 //  c64h156_device - constructor
 //-------------------------------------------------
 
-c64h156_device::c64h156_device(running_machine &_machine, const c64h156_device_config &_config)
-    : device_t(_machine, _config),
+c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C64H156, "64H156", tag, owner, clock),
 	  m_image(*this->owner(), FLOPPY_0),
 	  m_stp(-1),
 	  m_mtr(0),
@@ -221,8 +212,7 @@ c64h156_device::c64h156_device(running_machine &_machine, const c64h156_device_c
 	  m_oe(0),
 	  m_sync(1),
 	  m_atni(1),
-	  m_atna(1),
-      m_config(_config)
+	  m_atna(1)
 {
 }
 
@@ -234,9 +224,9 @@ c64h156_device::c64h156_device(running_machine &_machine, const c64h156_device_c
 void c64h156_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_atn_func, &m_config.m_out_atn_func, this);
-	devcb_resolve_write_line(&m_out_sync_func, &m_config.m_out_sync_func, this);
-	devcb_resolve_write_line(&m_out_byte_func, &m_config.m_out_byte_func, this);
+	devcb_resolve_write_line(&m_out_atn_func, &m_out_atn_cb, this);
+	devcb_resolve_write_line(&m_out_sync_func, &m_out_sync_cb, this);
+	devcb_resolve_write_line(&m_out_byte_func, &m_out_byte_cb, this);
 
 	// allocate timers
 	m_bit_timer = timer_alloc();

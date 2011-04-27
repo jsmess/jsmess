@@ -994,7 +994,7 @@ static DEVICE_START( mc6854 )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 
-	mc6854->iface = (const mc6854_interface*)device->baseconfig().static_config();
+	mc6854->iface = (const mc6854_interface*)device->static_config();
 
 	mc6854->ttimer = device->machine().scheduler().timer_alloc(FUNC(mc6854_tfifo_cb), (void*) device );
 

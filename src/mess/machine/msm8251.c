@@ -95,7 +95,7 @@ INLINE const msm8251_interface *get_interface(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == MSM8251);
 
-	return (const msm8251_interface *) device->baseconfig().static_config();
+	return (const msm8251_interface *) device->static_config();
 }
 
 

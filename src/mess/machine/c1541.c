@@ -160,58 +160,35 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1540 = c1541_device_config::static_alloc_device_config;
-const device_type C1541 = c1541_device_config::static_alloc_device_config;
-const device_type C1541C = c1541_device_config::static_alloc_device_config;
-const device_type C1541II = c1541_device_config::static_alloc_device_config;
-const device_type SX1541 = c1541_device_config::static_alloc_device_config;
-const device_type OC118 = c1541_device_config::static_alloc_device_config;
+const device_type C1540 = &device_creator<c1540_device>;
+const device_type C1541 = &device_creator<c1541_device>;
+const device_type C1541C = &device_creator<c1541c_device>;
+const device_type C1541II = &device_creator<c1541ii_device>;
+const device_type SX1541 = &device_creator<sx1541_device>;
+const device_type OC118 = &device_creator<oc118_device>;
 
 
+c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c1541_device(mconfig, tag, owner, clock) { }
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
+c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c1541_device(mconfig, tag, owner, clock) { }
 
-//-------------------------------------------------
-//  c1541_device_config - constructor
-//-------------------------------------------------
+c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c1541_device(mconfig, tag, owner, clock) { }
 
-c1541_device_config::c1541_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "C1541", tag, owner, clock),
-	  device_config_cbm_iec_interface(mconfig, *this)
-{
-}
+sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c1541_device(mconfig, tag, owner, clock) { }
 
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *c1541_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(c1541_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *c1541_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, c1541_device(machine, *this));
-}
-
-
+oc118_device::oc118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c1541_device(mconfig, tag, owner, clock) { }
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
 
-void c1541_device_config::device_config_complete()
+void c1541_device::device_config_complete()
 {
 	switch (m_variant)
 	{
@@ -247,14 +224,14 @@ void c1541_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1541_device_config::static_set_config(device_config *device, int address, int variant)
+void c1541_device::static_set_config(device_t &device, int address, int variant)
 {
-	c1541_device_config *c1541 = downcast<c1541_device_config *>(device);
+	c1541_device &c1541 = downcast<c1541_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c1541->m_address = address - 8;
-	c1541->m_variant = variant;
+	c1541.m_address = address - 8;
+	c1541.m_variant = variant;
 }
 
 
@@ -337,7 +314,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541_device_config::device_rom_region() const
+const rom_entry *c1541_device::device_rom_region() const
 {
 	switch (m_variant)
 	{
@@ -420,7 +397,7 @@ READ8_MEMBER( c1541_device::via0_pb_r )
 	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
-	data |= m_config.m_address << 5;
+	data |= m_address << 5;
 
 	// attention in
 	data |= !m_bus->atn_r() << 7;
@@ -710,7 +687,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c1541_device_config::device_mconfig_additions() const
+machine_config_constructor c1541_device::device_mconfig_additions() const
 {
 	switch (m_variant)
 	{
@@ -749,9 +726,9 @@ inline void c1541_device::set_iec_data()
 //  c1541_device - constructor
 //-------------------------------------------------
 
-c1541_device::c1541_device(running_machine &_machine, const c1541_device_config &_config)
-    : device_t(_machine, _config),
-	  device_cbm_iec_interface(_machine, _config, *this),
+c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C1541, "C1541", tag, owner, clock),
+	  device_cbm_iec_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
@@ -760,8 +737,7 @@ c1541_device::c1541_device(running_machine &_machine, const c1541_device_config 
 	  m_bus(*this->owner(), CBM_IEC_TAG),
 	  m_data_out(1),
 	  m_via0_irq(0),
-	  m_via1_irq(0),
-      m_config(_config)
+	  m_via1_irq(0)
 {
 }
 

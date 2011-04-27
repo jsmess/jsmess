@@ -21,8 +21,8 @@
 class bbc_state : public driver_device
 {
 public:
-	bbc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	unsigned char m_vidmem[0x10000];
 	int m_RAMSize;

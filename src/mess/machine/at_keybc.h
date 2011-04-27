@@ -30,51 +30,26 @@
 struct at_keyboard_controller_interface
 {
 	// interface to the host pc
-	devcb_write_line	m_system_reset_func;
-	devcb_write_line	m_gate_a20_func;
-	devcb_write_line	m_input_buffer_full_func;
-	devcb_write_line	m_output_buffer_empty_func;
+	devcb_write_line	m_system_reset_cb;
+	devcb_write_line	m_gate_a20_cb;
+	devcb_write_line	m_input_buffer_full_cb;
+	devcb_write_line	m_output_buffer_empty_cb;
 
 	// interface to the keyboard
-	devcb_write_line	m_keyboard_clock_func;
-	devcb_write_line	m_keyboard_data_func;
+	devcb_write_line	m_keyboard_clock_cb;
+	devcb_write_line	m_keyboard_data_cb;
 };
-
-// ======================> at_keyboard_controller_device_config
-
-class at_keyboard_controller_device_config :	public device_config,
-												public at_keyboard_controller_interface
-{
-	friend class at_keyboard_controller_device;
-
-	// construction/destruction
-	at_keyboard_controller_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
 
 // ======================> at_keyboard_controller_device
 
-class at_keyboard_controller_device : public device_t
+class at_keyboard_controller_device : public device_t,
+									  public at_keyboard_controller_interface
 {
-	friend class at_keyboard_controller_device_config;
-
-	// construction/destruction
-	at_keyboard_controller_device(running_machine &_machine, const at_keyboard_controller_device_config &config);
 
 public:
+	// construction/destruction
+	at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// internal 8042 interface
 	DECLARE_READ8_MEMBER( t0_r );
 	DECLARE_READ8_MEMBER( t1_r );
@@ -96,11 +71,12 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-
+	virtual void device_config_complete();
+	
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;	
 private:
 	// internal state
-	const at_keyboard_controller_device_config &m_config;
-
 	device_t *m_cpu;
 
 	devcb_resolved_write_line	m_system_reset_func;

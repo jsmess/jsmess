@@ -14,8 +14,8 @@
 class partner_state : public radio86_state
 {
 public:
-	partner_state(running_machine &machine, const driver_device_config_base &config)
-		: radio86_state(machine, config) { }
+	partner_state(const machine_config &mconfig, device_type type, const char *tag)
+		: radio86_state(mconfig, type, tag) { }
 
 	UINT8 m_mem_page;
 	UINT8 m_win_mem_page;

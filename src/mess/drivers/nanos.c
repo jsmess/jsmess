@@ -26,8 +26,8 @@
 class nanos_state : public driver_device
 {
 public:
-	nanos_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	nanos_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pio(*this, "z80pio"),
 	m_pio_0(*this, "z80pio_0"),

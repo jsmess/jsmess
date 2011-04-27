@@ -71,49 +71,16 @@ struct luxor_55_10828_interface
 };
 
 
-// ======================> luxor_55_10828_device_config
-
-class luxor_55_10828_device_config :   public device_config,
-									   public device_config_abcbus_interface,
-									   public luxor_55_10828_interface
-{
-    friend class luxor_55_10828_device;
-
-    // construction/destruction
-    luxor_55_10828_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const input_port_token *device_input_ports() const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	UINT8 m_sw1;				// single/double sided/density
-	UINT8 m_drive_type;			// drive type
-	UINT8 m_s1;					// ABC bus address
-};
-
-
 // ======================> luxor_55_10828_device
 
 class luxor_55_10828_device :  public device_t,
-							   public device_abcbus_interface
+							   public device_abcbus_interface,
+							   public luxor_55_10828_interface
 {
-    friend class luxor_55_10828_device_config;
-
-    // construction/destruction
-    luxor_55_10828_device(running_machine &_machine, const luxor_55_10828_device_config &_config);
-
 public:
+    // construction/destruction
+    luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 	DECLARE_WRITE8_MEMBER( status_w );
 	DECLARE_READ8_MEMBER( fdc_r );
@@ -127,10 +94,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const input_port_token *device_input_ports() const;
+
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+    virtual void device_config_complete();
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
@@ -157,7 +130,9 @@ private:
 	int m_sel0;				// drive select 0
 	int m_sel1;				// drive select 1
 
-    const luxor_55_10828_device_config &m_config;
+   	UINT8 m_sw1;				// single/double sided/density
+	UINT8 m_drive_type;			// drive type
+	UINT8 m_s1;					// ABC bus address
 };
 
 

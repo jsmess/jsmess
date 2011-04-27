@@ -19,8 +19,8 @@
 class c80_state : public driver_device
 {
 public:
-	c80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	c80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_pio1(*this, Z80PIO1_TAG),
 		  m_cassette(*this, CASSETTE_TAG)

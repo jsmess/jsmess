@@ -32,7 +32,7 @@ INLINE const teleprinter_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GENERIC_TELEPRINTER);
-	return (const teleprinter_interface *) device->baseconfig().static_config();
+	return (const teleprinter_interface *) device->static_config();
 }
 
 /***************************************************************************

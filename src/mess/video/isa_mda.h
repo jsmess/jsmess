@@ -11,51 +11,25 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa8_mda_device_config
-
-class isa8_mda_device_config :
-		public device_config,
-		public device_config_isa8_card_interface
-{
-        friend class isa8_device;
-		friend class isa8_mda_device;
-		friend class isa8_hercules_device_config;
-
-        // construction/destruction
-        isa8_mda_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-        // allocators
-        static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-        virtual device_t *alloc_device(running_machine &machine) const;
-
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
-};
-
-
 // ======================> isa8_mda_device
 
 class isa8_mda_device :
 		public device_t,
 		public device_isa8_card_interface
 {
-        friend class isa8_mda_device_config;
-		friend class isa8_hercules_device_config;
+public:
 		friend class isa8_hercules_device;
 
         // construction/destruction
-        isa8_mda_device(running_machine &_machine, const isa8_mda_device_config &config);
+        isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// optional information overrides
+		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual const rom_entry *device_rom_region() const;
 
 protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-
-private:
-        // internal state
-        const isa8_mda_device_config &m_config;
 public:
 		required_device<isa8_device> m_isa;
 		int  framecnt;
@@ -73,38 +47,17 @@ public:
 // device type definition
 extern const device_type ISA8_MDA;
 
-// ======================> isa8_hercules_device_config
-
-class isa8_hercules_device_config :
-		public isa8_mda_device_config
-{
-        friend class isa8_hercules_device;
-		friend class isa8_mda_device;
-
-        // construction/destruction
-        isa8_hercules_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-        // allocators
-        static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-        virtual device_t *alloc_device(running_machine &machine) const;
-
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
-};
-
-
 // ======================> isa8_hercules_device
 
 class isa8_hercules_device :
 		public isa8_mda_device
 {
-        friend class isa8_hercules_device_config;
-		friend class isa8_mda_device_config;
-
+public:
         // construction/destruction
-        isa8_hercules_device(running_machine &_machine, const isa8_hercules_device_config &config);
+        isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// optional information overrides
+		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual const rom_entry *device_rom_region() const;
 
 protected:
         // device-level overrides
@@ -113,8 +66,6 @@ protected:
 
 private:
         // internal state
-        const isa8_hercules_device_config &m_config;
-
 public:
 		UINT8 configuration_switch; //hercules
 };

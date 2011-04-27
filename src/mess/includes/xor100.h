@@ -19,8 +19,8 @@
 class xor100_state : public driver_device
 {
 public:
-	xor100_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	xor100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_dbrg(*this, COM5016_TAG),
 		  m_uart_b(*this, I8251_B_TAG),

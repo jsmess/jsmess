@@ -900,8 +900,8 @@ static DEVICE_START( scsibus )
 {
     scsibus_t               *bus = get_token(device);
 
-	assert(device->baseconfig().static_config() != NULL);
-    bus->interface = (const SCSIBus_interface*)device->baseconfig().static_config();
+	assert(device->static_config() != NULL);
+    bus->interface = (const SCSIBus_interface*)device->static_config();
 
 	memset(bus->devices, 0, sizeof(bus->devices));
 

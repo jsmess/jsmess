@@ -28,46 +28,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C9060 = c9060_device_config::static_alloc_device_config;
-const device_type C9090 = c9060_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  c9060_device_config - constructor
-//-------------------------------------------------
-
-c9060_device_config::c9060_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "C9060", tag, owner, clock),
-	  device_config_ieee488_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *c9060_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(c9060_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *c9060_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, c9060_device(machine, *this));
-}
-
+const device_type C9060 = &device_creator<c9060_device>;
+const device_type C9090 = &device_creator<c9060_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -75,7 +37,7 @@ device_t *c9060_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void c9060_device_config::device_config_complete()
+void c9060_device::device_config_complete()
 {
 	m_shortname = "c9060";
 }
@@ -85,14 +47,14 @@ void c9060_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c9060_device_config::static_set_config(device_config *device, int address, int variant)
+void c9060_device::static_set_config(device_t &device, int address, int variant)
 {
-	c9060_device_config *c9060 = downcast<c9060_device_config *>(device);
+	c9060_device &c9060 = downcast<c9060_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c9060->m_variant = variant;
-	c9060->m_address = address - 8;
+	c9060.m_variant = variant;
+	c9060.m_address = address - 8;
 }
 
 
@@ -118,7 +80,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c9060_device_config::device_rom_region() const
+const rom_entry *c9060_device::device_rom_region() const
 {
 	return ROM_NAME( c9060 );
 }
@@ -480,7 +442,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c9060_device_config::device_mconfig_additions() const
+machine_config_constructor c9060_device::device_mconfig_additions() const
 {
 	switch (m_variant)
 	{
@@ -523,16 +485,15 @@ inline void c9060_device::update_ieee_signals()
 //  c9060_device - constructor
 //-------------------------------------------------
 
-c9060_device::c9060_device(running_machine &_machine, const c9060_device_config &_config)
-    : device_t(_machine, _config),
-	  device_ieee488_interface(_machine, _config, *this),
+c9060_device::c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C9060, "C9060", tag, owner, clock),
+	  device_ieee488_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_hdccpu(*this, M6504_TAG),
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_via(*this, M6522_TAG),
-	  m_bus(*this->owner(), IEEE488_TAG),
-      m_config(_config)
+	  m_bus(*this->owner(), IEEE488_TAG)
 {
 }
 

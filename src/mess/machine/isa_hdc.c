@@ -127,48 +127,14 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_HDC = isa8_hdc_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_hdc_device_config - constructor
-//-------------------------------------------------
-
-isa8_hdc_device_config::isa8_hdc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "ISA8_HDC", tag, owner, clock),
-			device_config_isa8_card_interface(mconfig, *this)
-{
-	m_shortname = "hdc";
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_hdc_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-        return global_alloc(isa8_hdc_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_hdc_device_config::alloc_device(running_machine &machine) const
-{
-        return auto_alloc(machine, isa8_hdc_device(machine, *this));
-}
+const device_type ISA8_HDC = &device_creator<isa8_hdc_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_hdc_device_config::device_mconfig_additions() const
+machine_config_constructor isa8_hdc_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( hdc_config );
 }
@@ -177,7 +143,7 @@ machine_config_constructor isa8_hdc_device_config::device_mconfig_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_hdc_device_config::device_rom_region() const
+const rom_entry *isa8_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( hdc );
 }
@@ -190,12 +156,12 @@ const rom_entry *isa8_hdc_device_config::device_rom_region() const
 //  isa8_hdc_device - constructor
 //-------------------------------------------------
 
-isa8_hdc_device::isa8_hdc_device(running_machine &_machine, const isa8_hdc_device_config &config) :
-        device_t(_machine, config),
-		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config),
-		m_isa(*owner(),config.m_isa_tag)
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_HDC, "ISA8_HDC", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),        
+		m_isa(*owner,m_isa_tag)
 {
+	m_shortname = "hdc";
 }
 
 //-------------------------------------------------
@@ -204,7 +170,7 @@ isa8_hdc_device::isa8_hdc_device(running_machine &_machine, const isa8_hdc_devic
 
 void isa8_hdc_device::device_start()
 {
-	m_isa->add_isa_card(this, m_config.m_isa_num);
+	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
 	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);

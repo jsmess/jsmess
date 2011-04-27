@@ -51,8 +51,8 @@
 class abc80_state : public driver_device
 {
 public:
-	abc80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	abc80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_pio(*this, Z80PIO_TAG),
 		  m_rs232(*this, RS232_TAG),

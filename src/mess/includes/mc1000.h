@@ -26,8 +26,8 @@
 class mc1000_state : public driver_device
 {
 public:
-	mc1000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mc1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_vdg(*this, MC6847_TAG),
 		  m_crtc(*this, MC6845_TAG),

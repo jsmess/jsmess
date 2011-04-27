@@ -28,47 +28,16 @@ struct ef9345_interface
 	const char *screen_tag;		// screen we are acting on
 };
 
-
-// ======================> ef9345_device_config
-
-class ef9345_device_config :   public device_config,
-								public device_config_memory_interface,
-                                public ef9345_interface
-{
-    friend class ef9345_device;
-
-    // construction/destruction
-    ef9345_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
-};
-
-
-
 // ======================> ef9345_device
 
 class ef9345_device :	public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public ef9345_interface
 {
-    friend class ef9345_device_config;
-
-    // construction/destruction
-    ef9345_device(running_machine &_machine, const ef9345_device_config &_config);
-
 public:
+    // construction/destruction
+    ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// device interface
 	READ8_MEMBER( data_r );
 	WRITE8_MEMBER( data_w );
@@ -80,6 +49,14 @@ protected:
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	// device_config overrides
+	virtual void device_config_complete();
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
 
 	// inline helper
 	inline UINT16 indexram(UINT8 r);
@@ -109,7 +86,6 @@ private:
 	void ef9345_exec(UINT8 cmd);
 
 	// internal state
-	const ef9345_device_config &m_config;
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;
 

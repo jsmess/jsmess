@@ -110,7 +110,7 @@ typedef struct _ti99_pebcard_config
 INLINE const ti99_pebcard_config *get_pebcard_config(device_t *device)
 {
 	assert(device != NULL);
-	return (const ti99_pebcard_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const ti99_pebcard_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 /*

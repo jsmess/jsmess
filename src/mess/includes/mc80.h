@@ -14,8 +14,8 @@
 class mc80_state : public driver_device
 {
 public:
-	mc80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mc80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8* m_mc8020_video_ram;
 	UINT8 *m_mc8030_video_mem;

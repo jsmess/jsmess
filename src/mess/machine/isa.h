@@ -54,12 +54,12 @@
 #define MCFG_ISA8_BUS_ADD(_tag, _cputag, _config) \
     MCFG_DEVICE_ADD(_tag, ISA8, 0) \
     MCFG_DEVICE_CONFIG(_config) \
-    isa8_device_config::static_set_cputag(device, _cputag); \
+    isa8_device::static_set_cputag(*device, _cputag); \
 
 #define MCFG_ISA8_BUS_DEVICE(_isatag, _num, _tag, _dev_type) \
     MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	device_config_isa8_card_interface::static_set_isa8_tag(device, _isatag); \
-	device_config_isa8_card_interface::static_set_isa8_num(device, _num); \
+	device_isa8_card_interface::static_set_isa8_tag(*device, _isatag); \
+	device_isa8_card_interface::static_set_isa8_num(*device, _num); \
 
 
 //**************************************************************************
@@ -71,124 +71,78 @@
 
 struct isabus_interface
 {
-    devcb_write_line	m_out_irq2_func;
-    devcb_write_line	m_out_irq3_func;
-    devcb_write_line	m_out_irq4_func;
-    devcb_write_line	m_out_irq5_func;
-    devcb_write_line	m_out_irq6_func;
-    devcb_write_line	m_out_irq7_func;
-    devcb_write_line	m_out_drq1_func;
-    devcb_write_line	m_out_drq2_func;
-    devcb_write_line	m_out_drq3_func;
-};
-
-
-// ======================> isa8_device_config
-
-class isa8_device_config : public device_config,
-                           public isabus_interface
-{
-	friend class isa8_device;
-
-	// construction/destruction
-	isa8_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration
-	static void static_set_cputag(device_config *device, const char *tag);
-
-	const char *m_cputag;
-
-protected:
-    // device_config overrides
-	virtual void device_config_complete();
-
+    devcb_write_line	m_out_irq2_cb;
+    devcb_write_line	m_out_irq3_cb;
+    devcb_write_line	m_out_irq4_cb;
+    devcb_write_line	m_out_irq5_cb;
+    devcb_write_line	m_out_irq6_cb;
+    devcb_write_line	m_out_irq7_cb;
+    devcb_write_line	m_out_drq1_cb;
+    devcb_write_line	m_out_drq2_cb;
+    devcb_write_line	m_out_drq3_cb;
 };
 
 
 // ======================> isa8_device
 class device_isa8_card_interface;
-class isa8_device : public device_t
+class isa8_device : public device_t,
+                    public isabus_interface
 {
-        friend class isa8_device_config;
-
-        // construction/destruction
-        isa8_device(running_machine &_machine, const isa8_device_config &config);
 public:
-		void add_isa_card(device_isa8_card_interface *card,int pos);
-		void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
-		void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
-		void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
+	// construction/destruction
+	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// inline configuration
+	static void static_set_cputag(device_t &device, const char *tag);
+	
+	void add_isa_card(device_isa8_card_interface *card,int pos);
+	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
+	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
 
-		DECLARE_WRITE_LINE_MEMBER( irq2_w );
-		DECLARE_WRITE_LINE_MEMBER( irq3_w );
-		DECLARE_WRITE_LINE_MEMBER( irq4_w );
-		DECLARE_WRITE_LINE_MEMBER( irq5_w );
-		DECLARE_WRITE_LINE_MEMBER( irq6_w );
-		DECLARE_WRITE_LINE_MEMBER( irq7_w );
+	DECLARE_WRITE_LINE_MEMBER( irq2_w );
+	DECLARE_WRITE_LINE_MEMBER( irq3_w );
+	DECLARE_WRITE_LINE_MEMBER( irq4_w );
+	DECLARE_WRITE_LINE_MEMBER( irq5_w );
+	DECLARE_WRITE_LINE_MEMBER( irq6_w );
+	DECLARE_WRITE_LINE_MEMBER( irq7_w );
 
-		DECLARE_WRITE_LINE_MEMBER( drq1_w );
-		DECLARE_WRITE_LINE_MEMBER( drq2_w );
-		DECLARE_WRITE_LINE_MEMBER( drq3_w );
+	DECLARE_WRITE_LINE_MEMBER( drq1_w );
+	DECLARE_WRITE_LINE_MEMBER( drq2_w );
+	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 
-		UINT8 dack_r(int line);
-		void dack_w(int line,UINT8 data);
-		void eop_w(int state);
+	UINT8 dack_r(int line);
+	void dack_w(int line,UINT8 data);
+	void eop_w(int state);
 
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete();
 
 private:
-        // internal state
-        const isa8_device_config &m_config;
+	// internal state
 
-        required_device<device_t>   m_maincpu;
+	required_device<device_t>   m_maincpu;
 
-    	devcb_resolved_write_line	m_out_irq2_func;
-    	devcb_resolved_write_line	m_out_irq3_func;
-    	devcb_resolved_write_line	m_out_irq4_func;
-    	devcb_resolved_write_line	m_out_irq5_func;
-    	devcb_resolved_write_line	m_out_irq6_func;
-    	devcb_resolved_write_line	m_out_irq7_func;
+	devcb_resolved_write_line	m_out_irq2_func;
+	devcb_resolved_write_line	m_out_irq3_func;
+	devcb_resolved_write_line	m_out_irq4_func;
+	devcb_resolved_write_line	m_out_irq5_func;
+	devcb_resolved_write_line	m_out_irq6_func;
+	devcb_resolved_write_line	m_out_irq7_func;
 
-    	devcb_resolved_write_line	m_out_drq1_func;
-    	devcb_resolved_write_line	m_out_drq2_func;
-    	devcb_resolved_write_line	m_out_drq3_func;
+	devcb_resolved_write_line	m_out_drq1_func;
+	devcb_resolved_write_line	m_out_drq2_func;
+	devcb_resolved_write_line	m_out_drq3_func;
 
-		device_isa8_card_interface *m_isa_device[8];
+	device_isa8_card_interface *m_isa_device[8];
+	const char *m_cputag;		
 };
 
 
 // device type definition
 extern const device_type ISA8;
-
-
-// ======================> device_config_isa8_card_interface
-
-// class representing interface-specific configuration isa8 card
-class device_config_isa8_card_interface : public device_config_interface
-{
-	friend class device_isa8_card_interface;
-
-public:
-	// construction/destruction
-	device_config_isa8_card_interface(const machine_config &mconfig, device_config &device);
-	virtual ~device_config_isa8_card_interface();
-    // inline configuration
-    static void static_set_isa8_tag(device_config *device, const char *tag);
-    static void static_set_isa8_num(device_config *device, int num);
-
-protected:
-	const char *m_isa_tag;
-	int m_isa_num;
-};
-
 
 // ======================> device_isa8_card_interface
 
@@ -196,15 +150,17 @@ protected:
 class device_isa8_card_interface : public device_interface
 {
 	friend class isa8_device;
-	friend class device_config_isa8_card_interface;
-
 public:
 	// construction/destruction
-	device_isa8_card_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_isa8_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_isa8_card_interface();
 
+    // inline configuration
+    static void static_set_isa8_tag(device_t &device, const char *tag);
+    static void static_set_isa8_num(device_t &device, int num);
+
 	// configuration access
-	const device_config_isa8_card_interface &isa8_card_config() const { return m_isa8_card_config; }
+//	const device_isa8_card_interface &isa8_card_config() const { return m_isa8_card_config; }
 
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line,UINT8 data);
@@ -212,8 +168,8 @@ public:
 	virtual bool have_dack(int line);
 protected:
 	// configuration
-	const device_config_isa8_card_interface &m_isa8_card_config;	// reference to our device_config_execute_interface
-
+	const char *m_isa_tag;
+	int m_isa_num;
 };
 
 #endif  /* __ISA_H__ */

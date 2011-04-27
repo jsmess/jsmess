@@ -49,8 +49,8 @@
 class prof80_state : public driver_device
 {
 public:
-	prof80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	prof80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_ppi(*this, I8255A_TAG),
 		  m_rtc(*this, UPD1990A_TAG),
@@ -111,8 +111,8 @@ public:
 class grip_state : public prof80_state
 {
 public:
-	grip_state(running_machine &machine, const driver_device_config_base &config)
-		: prof80_state(machine, config),
+	grip_state(const machine_config &mconfig, device_type type, const char *tag)
+		: prof80_state(mconfig, type, tag),
 		  m_crtc(*this, MC6845_TAG),
 		  m_sti(*this, Z80STI_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),

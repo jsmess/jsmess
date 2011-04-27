@@ -42,15 +42,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1551 = c1551_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(c1551, "C1551");
+const device_type C1551 = &device_creator<c1551_device>;
 
 
 //-------------------------------------------------
@@ -59,7 +51,7 @@ GENERIC_DEVICE_CONFIG_SETUP(c1551, "C1551");
 //  complete
 //-------------------------------------------------
 
-void c1551_device_config::device_config_complete()
+void c1551_device::device_config_complete()
 {
 	m_shortname = "c1551";
 }
@@ -69,13 +61,13 @@ void c1551_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1551_device_config::static_set_config(device_config *device, int address)
+void c1551_device::static_set_config(device_t &device, int address)
 {
-	c1551_device_config *c1551 = downcast<c1551_device_config *>(device);
+	c1551_device &c1551 = downcast<c1551_device &>(device);
 
 	assert((address > 7) && (address < 10));
 
-	c1551->m_jp1 = address - 8;
+	c1551.m_jp1 = address - 8;
 }
 
 
@@ -93,7 +85,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1551_device_config::device_rom_region() const
+const rom_entry *c1551_device::device_rom_region() const
 {
 	return ROM_NAME( c1551 );
 }
@@ -238,7 +230,7 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	UINT8 data = 0;
 
 	// JP1
-	data |= m_config.m_jp1 << 5;
+	data |= m_jp1 << 5;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 6;
@@ -454,7 +446,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c1551_device_config::device_mconfig_additions() const
+machine_config_constructor c1551_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c1551 );
 }
@@ -494,8 +486,8 @@ inline void c1551_device::set_tcbm_dev(int dev)
 //  c1551_device - constructor
 //-------------------------------------------------
 
-c1551_device::c1551_device(running_machine &_machine, const c1551_device_config &_config)
-    : device_t(_machine, _config),
+c1551_device::c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C1551, "C1551", tag, owner, clock),
 	  m_maincpu(*this, M6510T_TAG),
 	  m_tpi0(*this, M6523_0_TAG),
 	  m_tpi1(*this, M6523_1_TAG),
@@ -505,8 +497,7 @@ c1551_device::c1551_device(running_machine &_machine, const c1551_device_config 
 	  m_status(1),
 	  m_dav(1),
 	  m_ack(1),
-	  m_dev(-1),
-      m_config(_config)
+	  m_dev(-1)
 {
 }
 

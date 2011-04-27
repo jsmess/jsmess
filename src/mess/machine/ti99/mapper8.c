@@ -555,7 +555,7 @@ static DEVICE_START( mapper8 )
 	mapper->ioport = device->siblingdevice("peribox");
 	assert(mapper->ioport != NULL);
 
-	mapper8_dev_config *cons = (mapper8_dev_config*)device->baseconfig().static_config();
+	mapper8_dev_config *cons = (mapper8_dev_config*)device->static_config();
 
 	mapper->logindex = 0;
 	mapper->physindex = 0;

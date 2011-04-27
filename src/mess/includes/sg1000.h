@@ -29,8 +29,8 @@
 class sg1000_state : public driver_device
 {
 public:
-	sg1000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
@@ -57,8 +57,8 @@ public:
 class sc3000_state : public sg1000_state
 {
 public:
-	sc3000_state(running_machine &machine, const driver_device_config_base &config)
-		: sg1000_state(machine, config),
+	sc3000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sg1000_state(mconfig, type, tag),
 		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
@@ -76,8 +76,8 @@ public:
 class sf7000_state : public sc3000_state
 {
 public:
-	sf7000_state(running_machine &machine, const driver_device_config_base &config)
-		: sc3000_state(machine, config),
+	sf7000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sc3000_state(mconfig, type, tag),
 		  m_fdc(*this, UPD765_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_floppy0(*this, FLOPPY_0)

@@ -655,7 +655,7 @@ static DEVICE_START( ti99_hfdc )
 	ti99_hfdc_state *card = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 

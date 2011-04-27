@@ -39,7 +39,7 @@
 
 #define MCFG_C2031_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C2031, 0) \
-	c2031_device_config::static_set_config(device, _address);
+	c2031_device::static_set_config(*device, _address);
 
 
 
@@ -47,47 +47,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c2031_device_config
-
-class c2031_device_config :   public device_config,
-							  public device_config_ieee488_interface
-{
-    friend class c2031_device;
-
-    // construction/destruction
-    c2031_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, int address);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-protected:
-	// device_config overrides
-    virtual void device_config_complete();
-
-	int m_address;
-};
-
-
 // ======================> c2031_device
 
 class c2031_device :  public device_t,
 					  public device_ieee488_interface
 {
-    friend class c2031_device_config;
-
-    // construction/destruction
-    c2031_device(running_machine &_machine, const c2031_device_config &_config);
-
 public:
+    // construction/destruction
+    c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
@@ -102,11 +70,17 @@ public:
 	DECLARE_READ8_MEMBER( via1_pb_r );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	// inline configuration helpers
+	static void static_set_config(device_t &device, int address);
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+    virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state);
@@ -129,8 +103,8 @@ protected:
 	// interrupts
 	int m_via0_irq;							// VIA #0 interrupt request
 	int m_via1_irq;							// VIA #1 interrupt request
-
-    const c2031_device_config &m_config;
+    
+	int m_address;
 };
 
 

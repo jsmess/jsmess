@@ -27,8 +27,8 @@ typedef struct
 class nascom1_state : public driver_device
 {
 public:
-	nascom1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nascom1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	device_t *m_hd6402;

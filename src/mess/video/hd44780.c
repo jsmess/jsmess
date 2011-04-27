@@ -16,38 +16,8 @@
 #include "emu.h"
 #include "video/hd44780.h"
 
-//**************************************************************************
-//  device configuration
-//**************************************************************************
-
-//-------------------------------------------------
-//  hd44780_device_config - constructor
-//-------------------------------------------------
-
-hd44780_device_config::hd44780_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ):
-	device_config(mconfig, static_alloc_device_config, "HD44780", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *hd44780_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc( hd44780_device_config( mconfig, tag, owner, clock ) );
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *hd44780_device_config::alloc_device( running_machine &machine ) const
-{
-	return auto_alloc(machine, hd44780_device( machine, *this ) );
-}
+// devices
+const device_type HD44780 = &device_creator<hd44780_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -55,7 +25,7 @@ device_t *hd44780_device_config::alloc_device( running_machine &machine ) const
 //  complete
 //-------------------------------------------------
 
-void hd44780_device_config::device_config_complete()
+void hd44780_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const hd44780_interface *intf = reinterpret_cast<const hd44780_interface *>(static_config());
@@ -76,7 +46,7 @@ void hd44780_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool hd44780_device_config::device_validity_check( const game_driver &driver ) const
+bool hd44780_device::device_validity_check( const game_driver &driver ) const
 {
 	bool error = false;
 
@@ -98,9 +68,8 @@ bool hd44780_device_config::device_validity_check( const game_driver &driver ) c
 //  hd44780_device - constructor
 //-------------------------------------------------
 
-hd44780_device::hd44780_device( running_machine &_machine, const hd44780_device_config &config ) :
-	device_t( _machine, config ),
-	m_config( config )
+hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, HD44780, "HD44780", tag, owner, clock)
 {
 }
 
@@ -196,21 +165,21 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 
 int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	assert(m_config.height*9 <= bitmap->height && m_config.width*6 <= bitmap->width);
+	assert(height*9 <= bitmap->height && width*6 <= bitmap->width);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	if (m_display_on)
-		for (int l=0; l<m_config.height; l++)
-			for (int i=0; i<m_config.width; i++)
+		for (int l=0; l<height; l++)
+			for (int i=0; i<width; i++)
 			{
 				UINT8 line_base = l * 0x40;
 				UINT8 line_size = (m_num_line) ? 40 : 80;
 				INT8 char_pos = line_base + i;
 
 				// if specified uses the custom layout
-				if (m_config.custom_layout != NULL)
-					char_pos = m_config.custom_layout[l*m_config.width + i];
+				if (custom_layout != NULL)
+					char_pos = custom_layout[l*width + i];
 				else
 				{
 					char_pos += m_disp_shift;
@@ -395,6 +364,3 @@ READ8_MEMBER(hd44780_device::data_read)
 
 	return data;
 }
-
-// devices
-const device_type HD44780 = hd44780_device_config::static_alloc_device_config;

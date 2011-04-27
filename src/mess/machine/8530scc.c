@@ -96,7 +96,7 @@ INLINE const scc8530_interface *get_interface(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == SCC8530);
 
-	return (const scc8530_interface *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const scc8530_interface *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 

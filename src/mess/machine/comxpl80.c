@@ -27,16 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMXPL80 = comxpl80_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(comxpl80, "COMX PL-80")
-
+const device_type COMXPL80 = &device_creator<comxpl80_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -44,7 +35,7 @@ GENERIC_DEVICE_CONFIG_SETUP(comxpl80, "COMX PL-80")
 //  complete
 //-------------------------------------------------
 
-void comxpl80_device_config::device_config_complete()
+void comxpl80_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const comxpl80_interface *intf = reinterpret_cast<const comxpl80_interface *>(static_config());
@@ -78,7 +69,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *comxpl80_device_config::device_rom_region() const
+const rom_entry *comxpl80_device::device_rom_region() const
 {
 	return ROM_NAME( comxpl80 );
 }
@@ -136,7 +127,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor comxpl80_device_config::device_mconfig_additions() const
+machine_config_constructor comxpl80_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( comxpl80 );
 }
@@ -169,7 +160,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *comxpl80_device_config::device_input_ports() const
+const input_port_token *comxpl80_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( comxpl80 );
 }
@@ -184,9 +175,8 @@ const input_port_token *comxpl80_device_config::device_input_ports() const
 //  comxpl80_device - constructor
 //-------------------------------------------------
 
-comxpl80_device::comxpl80_device(running_machine &_machine, const comxpl80_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+comxpl80_device::comxpl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, COMXPL80, "COMX PL-80", tag, owner, clock)
 {
 }
 

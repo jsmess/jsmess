@@ -184,7 +184,7 @@ static DEVICE_START( ti99_speech )
 {
 	ti99_speech_state *adapter = get_safe_token(device);
 	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	devcb_resolve_write_line(&adapter->lines.ready, &topeb->ready, device);
 	adapter->vsp = device->subdevice("speechsyn");
 }

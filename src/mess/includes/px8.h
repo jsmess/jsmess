@@ -29,8 +29,8 @@
 class px8_state : public driver_device
 {
 public:
-	px8_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	px8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, UPD70008_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG)

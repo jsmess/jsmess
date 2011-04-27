@@ -66,7 +66,7 @@ INLINE const vt_video_interface *get_interface(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == VT100_VIDEO);
 
-	return (const vt_video_interface *) device->baseconfig().static_config();
+	return (const vt_video_interface *) device->static_config();
 }
 
 /***************************************************************************

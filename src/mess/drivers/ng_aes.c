@@ -59,8 +59,8 @@ typedef struct
 class ng_aes_state : public neogeo_state
 {
 public:
-	ng_aes_state(running_machine &machine, const driver_device_config_base &config)
-		: neogeo_state(machine, config) { }
+	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: neogeo_state(mconfig, type, tag) { }
 
 	UINT8 *m_memcard_data;
 	neocd_ctrl_t m_neocd_ctrl;

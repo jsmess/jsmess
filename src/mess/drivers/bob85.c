@@ -16,8 +16,8 @@
 class bob85_state : public driver_device
 {
 public:
-	bob85_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bob85_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_prev_key;
 	UINT8 m_count_key;

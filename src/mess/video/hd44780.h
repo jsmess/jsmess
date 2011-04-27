@@ -27,41 +27,16 @@ struct hd44780_interface
 	const UINT8 *custom_layout;	// custom display layout (NULL for default)
 };
 
-
-// ======================> hd44780_device_config
-
-class hd44780_device_config :
-	public device_config,
-	public hd44780_interface
-{
-	friend class hd44780_device;
-
-	// construction/destruction
-	hd44780_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-	virtual device_t *alloc_device( running_machine &machine ) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-	virtual bool device_validity_check( const game_driver &driver ) const;
-};
-
-
 // ======================> hd44780_device
 
-class hd44780_device :
-	public device_t
+class hd44780_device :	public device_t,
+						public hd44780_interface
 {
-	friend class hd44780_device_config;
-
-	// construction/destruction
-	hd44780_device( running_machine &_machine, const hd44780_device_config &config );
 
 public:
+	// construction/destruction
+	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
 	// device interface
 	DECLARE_WRITE8_MEMBER(control_write);
 	DECLARE_READ8_MEMBER(control_read);
@@ -75,13 +50,14 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete();
+	virtual bool device_validity_check( const game_driver &driver ) const;
 
 private:
 	// internal helper
 	void set_busy_flag(UINT16 usec);
 	void update_ac(void);
 	// internal state
-	const hd44780_device_config &m_config;
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;
 

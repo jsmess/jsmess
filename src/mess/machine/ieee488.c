@@ -28,32 +28,7 @@ static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", 
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IEEE488 = ieee488_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_ieee488_interface - constructor
-//-------------------------------------------------
-
-device_config_ieee488_interface::device_config_ieee488_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_config_ieee488_interface - destructor
-//-------------------------------------------------
-
-device_config_ieee488_interface::~device_config_ieee488_interface()
-{
-}
-
+const device_type IEEE488 = &device_creator<ieee488_device>;
 
 
 //**************************************************************************
@@ -64,9 +39,8 @@ device_config_ieee488_interface::~device_config_ieee488_interface()
 //  device_ieee488_interface - constructor
 //-------------------------------------------------
 
-device_ieee488_interface::device_ieee488_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_ieee488_config(dynamic_cast<const device_config_ieee488_interface &>(config))
+device_ieee488_interface::device_ieee488_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
 {
 }
 
@@ -79,22 +53,13 @@ device_ieee488_interface::~device_ieee488_interface()
 {
 }
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(ieee488, "IEEE488")
-
-
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
 
-void ieee488_device_config::device_config_complete()
+void ieee488_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const ieee488_config *intf = reinterpret_cast<const ieee488_config *>(static_config());
@@ -251,10 +216,9 @@ inline UINT8 ieee488_device::get_data()
 //  ieee488_device - constructor
 //-------------------------------------------------
 
-ieee488_device::ieee488_device(running_machine &_machine, const ieee488_device_config &_config)
-    : device_t(_machine, _config),
-	  m_stub(*this->owner(), IEEE488_STUB_TAG),
-      m_config(_config)
+ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, IEEE488, "IEEE488", tag, owner, clock),
+	  m_stub(*(this->owner()), IEEE488_STUB_TAG)
 {
 }
 
@@ -265,7 +229,7 @@ ieee488_device::ieee488_device(running_machine &_machine, const ieee488_device_c
 
 void ieee488_device::device_start()
 {
-	const ieee488_config *daisy = m_config.m_daisy;
+	const ieee488_config *daisy = m_daisy;
 
 	// create a linked list of devices
 	daisy_entry **tailptr = &m_daisy_list;

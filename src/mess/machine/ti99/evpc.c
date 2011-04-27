@@ -336,7 +336,7 @@ static DEVICE_START( ti99_evpc )
 	card->novram = (UINT8*)malloc(256); // need that already now for NVRAM handling
 
 	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
 }
 

@@ -14,8 +14,8 @@
 class tsispch_state : public driver_device
 {
 public:
-	tsispch_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	tsispch_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_dsp(*this, "dsp"),
 		  m_terminal(*this, TERMINAL_TAG),

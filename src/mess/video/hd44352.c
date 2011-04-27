@@ -20,37 +20,21 @@
 #define 	LCD_IRQ_FREQUENCY		0x0d
 #define 	LCD_CURSOR_POSITION		0x0e
 
+
+// devices
+const device_type HD44352 = &device_creator<hd44352_device>;
+
 //**************************************************************************
-//  device configuration
+//  live device
 //**************************************************************************
 
 //-------------------------------------------------
-//  hd44352_device_config - constructor
+//  hd44352_device - constructor
 //-------------------------------------------------
 
-hd44352_device_config::hd44352_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ):
-	device_config(mconfig, static_alloc_device_config, "hd44352", tag, owner, clock)
+hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
+	device_t(mconfig, HD44352, "hd44352", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *hd44352_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc( hd44352_device_config( mconfig, tag, owner, clock ) );
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *hd44352_device_config::alloc_device( running_machine &machine ) const
-{
-	return auto_alloc(machine, hd44352_device( machine, *this ) );
 }
 
 //-------------------------------------------------
@@ -59,7 +43,7 @@ device_t *hd44352_device_config::alloc_device( running_machine &machine ) const
 //  complete
 //-------------------------------------------------
 
-void hd44352_device_config::device_config_complete()
+void hd44352_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const hd44352_interface *intf = reinterpret_cast<const hd44352_interface *>(static_config());
@@ -78,36 +62,19 @@ void hd44352_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool hd44352_device_config::device_validity_check( const game_driver &driver ) const
+bool hd44352_device::device_validity_check( const game_driver &driver ) const
 {
 	bool error = false;
 
 	return error;
 }
-
-
-//**************************************************************************
-//  live device
-//**************************************************************************
-
-//-------------------------------------------------
-//  hd44352_device - constructor
-//-------------------------------------------------
-
-hd44352_device::hd44352_device( running_machine &_machine, const hd44352_device_config &_config ) :
-	device_t( _machine, _config ),
-	m_config( _config )
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void hd44352_device::device_start()
 {
-	devcb_resolve_write_line(&m_on, &m_config.m_on, this);
+	devcb_resolve_write_line(&m_on, &m_on_cb, this);
 
 	m_on_timer = timer_alloc(ON_TIMER);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
@@ -490,6 +457,3 @@ UINT8 hd44352_device::data_read()
 {
 	return m_data_bus;
 }
-
-// devices
-const device_type HD44352 = hd44352_device_config::static_alloc_device_config;

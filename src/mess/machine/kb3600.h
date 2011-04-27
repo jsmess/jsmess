@@ -83,53 +83,32 @@
 
 struct ay3600_interface
 {
-	devcb_read16		m_in_x0_func;
-	devcb_read16		m_in_x1_func;
-	devcb_read16		m_in_x2_func;
-	devcb_read16		m_in_x3_func;
-	devcb_read16		m_in_x4_func;
-	devcb_read16		m_in_x5_func;
-	devcb_read16		m_in_x6_func;
-	devcb_read16		m_in_x7_func;
-	devcb_read16		m_in_x8_func;
+	devcb_read16		m_in_x0_cb;
+	devcb_read16		m_in_x1_cb;
+	devcb_read16		m_in_x2_cb;
+	devcb_read16		m_in_x3_cb;
+	devcb_read16		m_in_x4_cb;
+	devcb_read16		m_in_x5_cb;
+	devcb_read16		m_in_x6_cb;
+	devcb_read16		m_in_x7_cb;
+	devcb_read16		m_in_x8_cb;
 
-	devcb_read_line		m_in_shift_func;
-	devcb_read_line		m_in_control_func;
+	devcb_read_line		m_in_shift_cb;
+	devcb_read_line		m_in_control_cb;
 
-	devcb_write_line	m_out_data_ready_func;
-	devcb_write_line	m_out_ako_func;
-};
-
-
-// ======================> ay3600_device_config
-
-class ay3600_device_config :   public device_config,
-                               public ay3600_interface
-{
-    friend class ay3600_device;
-
-    // construction/destruction
-    ay3600_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line	m_out_data_ready_cb;
+	devcb_write_line	m_out_ako_cb;
 };
 
 
 // ======================> ay3600_device
 
-class ay3600_device :	public device_t
+class ay3600_device :	public device_t,
+                        public ay3600_interface
 {
-    friend class ay3600_device_config;
-
+public:
     // construction/destruction
-    ay3600_device(running_machine &_machine, const ay3600_device_config &_config);
+    ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	UINT16 b_r();
@@ -137,6 +116,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -153,8 +133,6 @@ private:
 
 	// timers
 	emu_timer *m_scan_timer;	// keyboard scan timer
-
-	const ay3600_device_config &m_config;
 };
 
 

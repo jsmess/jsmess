@@ -349,7 +349,7 @@ static DEVICE_START( tn_ide )
 	card->rtc = device->subdevice("ide_rtc");
 	card->ide = device->subdevice("ide");
 
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 
 	card->ram = auto_alloc_array(device->machine(), UINT8, 0x080000);

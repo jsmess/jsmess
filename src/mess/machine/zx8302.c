@@ -106,16 +106,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ZX8302 = zx8302_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(zx8302, "Sinclair ZX8302")
-
+const device_type ZX8302 = &device_creator<zx8302_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -123,7 +114,7 @@ GENERIC_DEVICE_CONFIG_SETUP(zx8302, "Sinclair ZX8302")
 //  complete
 //-------------------------------------------------
 
-void zx8302_device_config::device_config_complete()
+void zx8302_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const zx8302_interface *intf = reinterpret_cast<const zx8302_interface *>(static_config());
@@ -133,23 +124,23 @@ void zx8302_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&out_ipl1l_func, 0, sizeof(out_ipl1l_func));
-		memset(&out_baudx4_func, 0, sizeof(out_baudx4_func));
-		memset(&out_comdata_func, 0, sizeof(out_comdata_func));
-		memset(&out_txd1_func, 0, sizeof(out_txd1_func));
-		memset(&out_txd2_func, 0, sizeof(out_txd2_func));
-		memset(&in_dtr1_func, 0, sizeof(in_dtr1_func));
-		memset(&in_cts2_func, 0, sizeof(in_cts2_func));
-		memset(&out_netout_func, 0, sizeof(out_netout_func));
-		memset(&in_netin_func, 0, sizeof(in_netin_func));
-		memset(&out_mdselck_func, 0, sizeof(out_mdselck_func));
-		memset(&out_mdseld_func, 0, sizeof(out_mdseld_func));
-		memset(&out_mdrdw_func, 0, sizeof(out_mdrdw_func));
-		memset(&out_erase_func, 0, sizeof(out_erase_func));
-		memset(&out_raw1_func, 0, sizeof(out_raw1_func));
-		memset(&in_raw1_func, 0, sizeof(in_raw1_func));
-		memset(&out_raw2_func, 0, sizeof(out_raw2_func));
-		memset(&in_raw2_func, 0, sizeof(in_raw2_func));
+		memset(&out_ipl1l_cb, 0, sizeof(out_ipl1l_cb));
+		memset(&out_baudx4_cb, 0, sizeof(out_baudx4_cb));
+		memset(&out_comdata_cb, 0, sizeof(out_comdata_cb));
+		memset(&out_txd1_cb, 0, sizeof(out_txd1_cb));
+		memset(&out_txd2_cb, 0, sizeof(out_txd2_cb));
+		memset(&in_dtr1_cb, 0, sizeof(in_dtr1_cb));
+		memset(&in_cts2_cb, 0, sizeof(in_cts2_cb));
+		memset(&out_netout_cb, 0, sizeof(out_netout_cb));
+		memset(&in_netin_cb, 0, sizeof(in_netin_cb));
+		memset(&out_mdselck_cb, 0, sizeof(out_mdselck_cb));
+		memset(&out_mdseld_cb, 0, sizeof(out_mdseld_cb));
+		memset(&out_mdrdw_cb, 0, sizeof(out_mdrdw_cb));
+		memset(&out_erase_cb, 0, sizeof(out_erase_cb));
+		memset(&out_raw1_cb, 0, sizeof(out_raw1_cb));
+		memset(&in_raw1_cb, 0, sizeof(in_raw1_cb));
+		memset(&out_raw2_cb, 0, sizeof(out_raw2_cb));
+		memset(&in_raw2_cb, 0, sizeof(in_raw2_cb));
 	}
 }
 
@@ -306,9 +297,8 @@ inline void zx8302_device::transmit_serial_data()
 //-------------------------------------------------
 //  zx8302_device - constructor
 //-------------------------------------------------
-
-zx8302_device::zx8302_device(running_machine &_machine, const zx8302_device_config &config)
-    : device_t(_machine, config),
+zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock),
 	  m_idr(1),
 	  m_irq(0),
 	  m_ctr(time(NULL) + RTC_BASE_ADJUST),
@@ -318,8 +308,7 @@ zx8302_device::zx8302_device(running_machine &_machine, const zx8302_device_conf
 	  m_ipc_state(0),
 	  m_ipc_rx(0),
 	  m_ipc_busy(0),
-	  m_track(0),
-      m_config(config)
+	  m_track(0)
 {
 }
 
@@ -331,23 +320,23 @@ zx8302_device::zx8302_device(running_machine &_machine, const zx8302_device_conf
 void zx8302_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_ipl1l_func, &m_config.out_ipl1l_func, this);
-	devcb_resolve_write_line(&m_out_baudx4_func, &m_config.out_baudx4_func, this);
-	devcb_resolve_write_line(&m_out_comdata_func, &m_config.out_comdata_func, this);
-	devcb_resolve_write_line(&m_out_txd1_func, &m_config.out_txd1_func, this);
-	devcb_resolve_write_line(&m_out_txd2_func, &m_config.out_txd2_func, this);
-	devcb_resolve_read_line(&m_in_dtr1_func, &m_config.in_dtr1_func, this);
-	devcb_resolve_read_line(&m_in_cts2_func, &m_config.in_cts2_func, this);
-	devcb_resolve_write_line(&m_out_netout_func, &m_config.out_netout_func, this);
-	devcb_resolve_read_line(&m_in_netin_func, &m_config.in_netin_func, this);
-	devcb_resolve_write_line(&m_out_mdselck_func, &m_config.out_mdselck_func, this);
-	devcb_resolve_write_line(&m_out_mdseld_func, &m_config.out_mdseld_func, this);
-	devcb_resolve_write_line(&m_out_mdrdw_func, &m_config.out_mdrdw_func, this);
-	devcb_resolve_write_line(&m_out_erase_func, &m_config.out_erase_func, this);
-	devcb_resolve_write_line(&m_out_raw1_func, &m_config.out_raw1_func, this);
-	devcb_resolve_read_line(&m_in_raw1_func, &m_config.in_raw1_func, this);
-	devcb_resolve_write_line(&m_out_raw2_func, &m_config.out_raw2_func, this);
-	devcb_resolve_read_line(&m_in_raw2_func, &m_config.in_raw2_func, this);
+	devcb_resolve_write_line(&m_out_ipl1l_func, &out_ipl1l_cb, this);
+	devcb_resolve_write_line(&m_out_baudx4_func, &out_baudx4_cb, this);
+	devcb_resolve_write_line(&m_out_comdata_func, &out_comdata_cb, this);
+	devcb_resolve_write_line(&m_out_txd1_func, &out_txd1_cb, this);
+	devcb_resolve_write_line(&m_out_txd2_func, &out_txd2_cb, this);
+	devcb_resolve_read_line(&m_in_dtr1_func, &in_dtr1_cb, this);
+	devcb_resolve_read_line(&m_in_cts2_func, &in_cts2_cb, this);
+	devcb_resolve_write_line(&m_out_netout_func, &out_netout_cb, this);
+	devcb_resolve_read_line(&m_in_netin_func, &in_netin_cb, this);
+	devcb_resolve_write_line(&m_out_mdselck_func, &out_mdselck_cb, this);
+	devcb_resolve_write_line(&m_out_mdseld_func, &out_mdseld_cb, this);
+	devcb_resolve_write_line(&m_out_mdrdw_func, &out_mdrdw_cb, this);
+	devcb_resolve_write_line(&m_out_erase_func, &out_erase_cb, this);
+	devcb_resolve_write_line(&m_out_raw1_func, &out_raw1_cb, this);
+	devcb_resolve_read_line(&m_in_raw1_func, &in_raw1_cb, this);
+	devcb_resolve_write_line(&m_out_raw2_func, &out_raw2_cb, this);
+	devcb_resolve_read_line(&m_in_raw2_func, &in_raw2_cb, this);
 
 	// allocate timers
 	m_txd_timer = timer_alloc(TIMER_TXD);
@@ -356,7 +345,7 @@ void zx8302_device::device_start()
 	m_gap_timer = timer_alloc(TIMER_GAP);
 	m_ipc_timer = timer_alloc(TIMER_IPC);
 
-	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.rtc_clock / 32768));
+	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_hz(rtc_clock / 32768));
 	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));
 
 	// register for state saving

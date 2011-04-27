@@ -248,7 +248,7 @@ INLINE vdt_t *get_safe_token(device_t *device)
 static DEVICE_START( vdt911 )
 {
 	vdt_t *vdt = get_safe_token(device);
-	const vdt911_init_params_t *params = (const vdt911_init_params_t *)device->baseconfig().static_config();
+	const vdt911_init_params_t *params = (const vdt911_init_params_t *)device->static_config();
 	vdt->last_key_pressed = 0x80;
 	vdt->screen_size = params->screen_size;
 	vdt->model = params->model;

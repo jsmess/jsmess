@@ -85,10 +85,10 @@ MACHINE_CONFIG_END
 static DEVICE_START( centronics )
 {
 	centronics_state *centronics = get_safe_token(device);
-	const centronics_interface *intf = (const centronics_interface *)device->baseconfig().static_config();
+	const centronics_interface *intf = (const centronics_interface *)device->static_config();
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* set some initial values */
 	centronics->pe = FALSE;
@@ -281,7 +281,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_strobe_w )
 
 WRITE_LINE_DEVICE_HANDLER( centronics_prime_w )
 {
-	assert(((const centronics_interface *)device->baseconfig().static_config())->is_ibmpc == FALSE);
+	assert(((const centronics_interface *)device->static_config())->is_ibmpc == FALSE);
 
 	/* reset printer if line is low */
 	if (state == FALSE)
@@ -296,7 +296,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_prime_w )
 
 WRITE_LINE_DEVICE_HANDLER( centronics_init_w )
 {
-	assert(((const centronics_interface *)device->baseconfig().static_config())->is_ibmpc == TRUE);
+	assert(((const centronics_interface *)device->static_config())->is_ibmpc == TRUE);
 
 	/* reset printer if line is low */
 	if (state == FALSE)
@@ -311,7 +311,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_init_w )
 WRITE_LINE_DEVICE_HANDLER( centronics_autofeed_w )
 {
 	centronics_state *centronics = get_safe_token(device);
-	assert(((const centronics_interface *)device->baseconfig().static_config())->is_ibmpc == TRUE);
+	assert(((const centronics_interface *)device->static_config())->is_ibmpc == TRUE);
 
 	centronics->auto_fd = state;
 }

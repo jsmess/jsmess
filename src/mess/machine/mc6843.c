@@ -807,7 +807,7 @@ static DEVICE_START( mc6843 )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 
-	mc6843->iface = (const mc6843_interface*)device->baseconfig().static_config();
+	mc6843->iface = (const mc6843_interface*)device->static_config();
 
 	mc6843->timer_cont = device->machine().scheduler().timer_alloc(FUNC(mc6843_cont), (void*) device) ;
 

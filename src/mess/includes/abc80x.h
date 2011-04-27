@@ -73,8 +73,8 @@
 class abc800_state : public driver_device
 {
 public:
-	abc800_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	abc800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
 		  m_dart(*this, Z80DART_TAG),
@@ -138,8 +138,8 @@ public:
 class abc800m_state : public abc800_state
 {
 public:
-	abc800m_state(running_machine &machine, const driver_device_config_base &config)
-		: abc800_state(machine, config),
+	abc800m_state(const machine_config &mconfig, device_type type, const char *tag)
+		: abc800_state(mconfig, type, tag),
 		  m_crtc(*this, MC6845_TAG)
 	{ }
 
@@ -153,8 +153,8 @@ public:
 class abc800c_state : public abc800_state
 {
 public:
-	abc800c_state(running_machine &machine, const driver_device_config_base &config)
-		: abc800_state(machine, config),
+	abc800c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: abc800_state(mconfig, type, tag),
 		  m_trom(*this, SAA5052_TAG)
 	{ }
 
@@ -170,8 +170,8 @@ public:
 class abc802_state : public abc800_state
 {
 public:
-	abc802_state(running_machine &machine, const driver_device_config_base &config)
-		: abc800_state(machine, config),
+	abc802_state(const machine_config &mconfig, device_type type, const char *tag)
+		: abc800_state(mconfig, type, tag),
 		  m_crtc(*this, MC6845_TAG),
 		  m_abc77(*this, ABC77_TAG)
 	{ }
@@ -212,8 +212,8 @@ public:
 class abc806_state : public abc800_state
 {
 public:
-	abc806_state(running_machine &machine, const driver_device_config_base &config)
-		: abc800_state(machine, config),
+	abc806_state(const machine_config &mconfig, device_type type, const char *tag)
+		: abc800_state(mconfig, type, tag),
 		  m_crtc(*this, MC6845_TAG),
 		  m_rtc(*this, E0516_TAG),
 		  m_abc77(*this, ABC77_TAG)

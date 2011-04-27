@@ -12,8 +12,8 @@
 class pt68k4_state : public driver_device
 {
 public:
-	pt68k4_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pt68k4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16* m_ram;
 };

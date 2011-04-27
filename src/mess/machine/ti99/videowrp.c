@@ -34,7 +34,7 @@ INLINE const ti99_video_config *get_config(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TIVIDEO);
 
-	return (const ti99_video_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const ti99_video_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 

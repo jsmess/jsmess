@@ -13,7 +13,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type AT_KEYBOARD_CONTROLLER = at_keyboard_controller_device_config::static_alloc_device_config;
+const device_type AT_KEYBOARD_CONTROLLER = &device_creator<at_keyboard_controller_device>;
 
 // i/o map for the 8042
 static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8 )
@@ -40,38 +40,19 @@ ROM_START( at_keybc )
 	ROM_LOAD("1503033.bin", 0x000, 0x800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
-
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  at_keyboard_controller_device_config - constructor
+//  at_keyboard_controller_device - constructor
 //-------------------------------------------------
 
-at_keyboard_controller_device_config::at_keyboard_controller_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "AT Keyboard Controller", tag, owner, clock)
+at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, "AT Keyboard Controller", tag, owner, clock),
+	  m_cpu(NULL)
 {
 	m_shortname = "at_keybc";
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *at_keyboard_controller_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(at_keyboard_controller_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *at_keyboard_controller_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, at_keyboard_controller_device(machine, *this));
 }
 
 //-------------------------------------------------
@@ -79,7 +60,7 @@ device_t *at_keyboard_controller_device_config::alloc_device(running_machine &ma
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *at_keyboard_controller_device_config::device_rom_region() const
+const rom_entry *at_keyboard_controller_device::device_rom_region() const
 {
 	return ROM_NAME(at_keybc);
 }
@@ -89,7 +70,7 @@ const rom_entry *at_keyboard_controller_device_config::device_rom_region() const
 //  the device's machine fragment
 //-------------------------------------------------
 
-machine_config_constructor at_keyboard_controller_device_config::device_mconfig_additions() const
+machine_config_constructor at_keyboard_controller_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(at_keybc);
 }
@@ -100,7 +81,7 @@ machine_config_constructor at_keyboard_controller_device_config::device_mconfig_
 //  complete
 //-------------------------------------------------
 
-void at_keyboard_controller_device_config::device_config_complete()
+void at_keyboard_controller_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const at_keyboard_controller_interface *intf = reinterpret_cast<const at_keyboard_controller_interface *>(static_config());
@@ -113,29 +94,13 @@ void at_keyboard_controller_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_system_reset_func, 0, sizeof(m_system_reset_func));
-		memset(&m_gate_a20_func, 0, sizeof(m_gate_a20_func));
-		memset(&m_input_buffer_full_func, 0, sizeof(m_input_buffer_full_func));
-		memset(&m_output_buffer_empty_func, 0, sizeof(m_output_buffer_empty_func));
-		memset(&m_keyboard_clock_func, 0, sizeof(m_keyboard_clock_func));
-		memset(&m_keyboard_data_func, 0, sizeof(m_keyboard_data_func));
+		memset(&m_system_reset_cb, 0, sizeof(m_system_reset_cb));
+		memset(&m_gate_a20_cb, 0, sizeof(m_gate_a20_cb));
+		memset(&m_input_buffer_full_cb, 0, sizeof(m_input_buffer_full_cb));
+		memset(&m_output_buffer_empty_cb, 0, sizeof(m_output_buffer_empty_cb));
+		memset(&m_keyboard_clock_cb, 0, sizeof(m_keyboard_clock_cb));
+		memset(&m_keyboard_data_cb, 0, sizeof(m_keyboard_data_cb));
 	}
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  at_keyboard_controller_device - constructor
-//-------------------------------------------------
-
-at_keyboard_controller_device::at_keyboard_controller_device(running_machine &_machine, const at_keyboard_controller_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
-	  m_cpu(NULL)
-{
 }
 
 /*-------------------------------------------------
@@ -148,12 +113,12 @@ void at_keyboard_controller_device::device_start()
 	m_cpu = downcast<device_t *>(subdevice("at_keybc"));
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_system_reset_func, &m_config.m_system_reset_func, this);
-	devcb_resolve_write_line(&m_gate_a20_func, &m_config.m_gate_a20_func, this);
-	devcb_resolve_write_line(&m_input_buffer_full_func, &m_config.m_input_buffer_full_func, this);
-	devcb_resolve_write_line(&m_output_buffer_empty_func, &m_config.m_output_buffer_empty_func, this);
-	devcb_resolve_write_line(&m_keyboard_clock_func, &m_config.m_keyboard_clock_func, this);
-	devcb_resolve_write_line(&m_keyboard_data_func, &m_config.m_keyboard_data_func, this);
+	devcb_resolve_write_line(&m_system_reset_func, &m_system_reset_cb, this);
+	devcb_resolve_write_line(&m_gate_a20_func, &m_gate_a20_cb, this);
+	devcb_resolve_write_line(&m_input_buffer_full_func, &m_input_buffer_full_cb, this);
+	devcb_resolve_write_line(&m_output_buffer_empty_func, &m_output_buffer_empty_cb, this);
+	devcb_resolve_write_line(&m_keyboard_clock_func, &m_keyboard_clock_cb, this);
+	devcb_resolve_write_line(&m_keyboard_data_func, &m_keyboard_data_cb, this);
 
 	// register for save states
 	save_item(NAME(m_clock_signal));

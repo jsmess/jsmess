@@ -26,8 +26,8 @@
 class tmc1800_state : public driver_device
 {
 public:
-	tmc1800_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vdc(*this, CDP1861_TAG),
 		  m_cassette(*this, CASSETTE_TAG)
@@ -57,8 +57,8 @@ public:
 class osc1000b_state : public driver_device
 {
 public:
-	osc1000b_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_cassette(*this, CASSETTE_TAG)
 	{ }
@@ -84,8 +84,8 @@ public:
 class tmc2000_state : public driver_device
 {
 public:
-	tmc2000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_cti(*this, CDP1864_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
@@ -130,8 +130,8 @@ public:
 class nano_state : public driver_device
 {
 public:
-	nano_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	nano_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_cti(*this, CDP1864_TAG),
 		  m_cassette(*this, CASSETTE_TAG),

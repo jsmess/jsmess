@@ -11,8 +11,8 @@
 class zx_state : public driver_device
 {
 public:
-	zx_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	zx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	emu_timer *m_ula_nmi;
 	int m_ula_irq_active;

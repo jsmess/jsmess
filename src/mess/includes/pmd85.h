@@ -13,8 +13,8 @@
 class pmd85_state : public driver_device
 {
 public:
-	pmd85_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pmd85_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_rom_module_present;
 	UINT8 m_ppi_port_outputs[4][3];

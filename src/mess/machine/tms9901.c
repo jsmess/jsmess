@@ -585,9 +585,9 @@ static DEVICE_START( tms9901 )
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	tms->intf = (const tms9901_interface*)device->baseconfig().static_config();
+	tms->intf = (const tms9901_interface*)device->static_config();
 
 	tms->timer = device->machine().scheduler().timer_alloc(FUNC(decrementer_callback), (void *) device);
 

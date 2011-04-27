@@ -32,8 +32,8 @@
 class swtpc_state : public driver_device
 {
 public:
-	swtpc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	swtpc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER(swtpc_status_r);
 	DECLARE_READ8_MEMBER(swtpc_terminal_r);

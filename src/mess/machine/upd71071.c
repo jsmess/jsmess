@@ -242,7 +242,7 @@ static DEVICE_START(upd71071)
 	upd71071_t* dmac = get_safe_token(device);
 	int x;
 
-	dmac->intf = (const upd71071_intf*)device->baseconfig().static_config();
+	dmac->intf = (const upd71071_intf*)device->static_config();
 	for(x=0;x<4;x++)
 	{
 		dmac->timer[x] = device->machine().scheduler().timer_alloc(FUNC(dma_transfer_timer), (void*)device);

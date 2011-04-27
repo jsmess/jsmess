@@ -13,8 +13,8 @@
 class orion_state : public radio86_state
 {
 public:
-	orion_state(running_machine &machine, const driver_device_config_base &config)
-		: radio86_state(machine, config) { }
+	orion_state(const machine_config &mconfig, device_type type, const char *tag)
+		: radio86_state(mconfig, type, tag) { }
 
 	UINT8 m_orion128_video_mode;
 	UINT8 m_orion128_video_page;

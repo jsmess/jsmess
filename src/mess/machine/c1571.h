@@ -41,15 +41,15 @@
 
 #define MCFG_C1570_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1570, 0) \
-	c1571_device_config::static_set_config(device, _address, c1571_device_config::TYPE_1570);
+	c1571_device::static_set_config(*device, _address, c1571_device::TYPE_1570);
 
 #define MCFG_C1571_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1571, 0) \
-	c1571_device_config::static_set_config(device, _address, c1571_device_config::TYPE_1571);
+	c1571_device::static_set_config(*device, _address, c1571_device::TYPE_1571);
 
 #define MCFG_C1571CR_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1571CR, 0) \
-	c1571_device_config::static_set_config(device, _address, c1571_device_config::TYPE_1571CR);
+	c1571_device::static_set_config(*device, _address, c1571_device::TYPE_1571CR);
 
 
 
@@ -57,19 +57,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1571_device_config
+// ======================> c1571_device
 
-class c1571_device_config :   public device_config,
-							  public device_config_cbm_iec_interface
+class c1571_device :  public device_t,
+					  public device_cbm_iec_interface
 {
-    friend class c1570_device;
-    friend class c1571_device;
-    friend class c1571cr_device;
+public:
 
     // construction/destruction
-    c1571_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-public:
 	enum
 	{
 		TYPE_1570 = 0,
@@ -77,38 +74,13 @@ public:
 		TYPE_1571CR
 	};
 
-	// allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
 	// inline configuration helpers
-	static void static_set_config(device_config *device, int address, int variant);
+	static void static_set_config(device_t &device, int address, int variant);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	int m_address;
-	int m_variant;
-};
-
-
-// ======================> c1571_device
-
-class c1571_device :  public device_t,
-					  public device_cbm_iec_interface
-{
-    friend class c1571_device_config;
-
-    // construction/destruction
-    c1571_device(running_machine &_machine, const c1571_device_config &_config);
-
-public:
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
@@ -133,7 +105,8 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-
+	virtual void device_config_complete();
+	
 	// device_cbm_iec_interface overrides
 	void cbm_iec_srq(int state);
 	void cbm_iec_atn(int state);
@@ -167,7 +140,8 @@ private:
 	int m_via1_irq;							// VIA #1 interrupt request
 	int m_cia_irq;							// CIA interrupt request
 
-    const c1571_device_config &m_config;
+    int m_address;
+	int m_variant;
 };
 
 
@@ -175,10 +149,9 @@ private:
 
 class c1570_device :  public c1571_device
 {
-    friend class c1571_device_config;
-
+public:
     // construction/destruction
-    c1570_device(running_machine &_machine, const c1571_device_config &_config);
+    c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -186,10 +159,9 @@ class c1570_device :  public c1571_device
 
 class c1571cr_device :  public c1571_device
 {
-    friend class c1571_device_config;
-
+public:
     // construction/destruction
-    c1571cr_device(running_machine &_machine, const c1571_device_config &_config);
+    c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

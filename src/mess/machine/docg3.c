@@ -73,8 +73,8 @@ INLINE const diskonchip_g3_config *get_config( device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DISKONCHIP_G3);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
-	return (const diskonchip_g3_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
+	return (const diskonchip_g3_config *)downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 /***************************************************************************

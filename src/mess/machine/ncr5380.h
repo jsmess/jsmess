@@ -41,31 +41,13 @@ enum
     MCFG_DEVICE_ADD(_tag, NCR5380, _clock) \
     MCFG_DEVICE_CONFIG(_intrf)
 
-class ncr5380_device_config : public device_config, public NCR5380interface
+class ncr5380_device : public device_t,
+					   public NCR5380interface
 {
-	friend class ncr5380_device;
-
-	// construction/destruction
-	ncr5380_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
-class ncr5380_device : public device_t
-{
-	friend class ncr5380_device_config;
-
 	// construction/destruction
-	ncr5380_device(running_machine &_machine, const ncr5380_device_config &_config);
+	ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-public:
 	// our API
 	UINT8 ncr5380_read_reg(UINT32 offset);
 	void ncr5380_write_reg(UINT32 offset, UINT8 data);
@@ -81,6 +63,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_stop();
+	virtual void device_config_complete();
 
 private:
 	SCSIInstance *m_scsi_devices[8];
@@ -90,8 +73,6 @@ private:
 	UINT8 m_5380_Command[32];
 	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
 	UINT8 m_5380_Data[512];
-
-	const ncr5380_device_config &m_config;
 };
 
 // device type definition

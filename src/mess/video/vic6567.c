@@ -276,7 +276,7 @@ INLINE const vic2_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == VIC2));
-	return (const vic2_interface *) device->baseconfig().static_config();
+	return (const vic2_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -2597,7 +2597,7 @@ UINT32 vic2_video_update( device_t *device, bitmap_t *bitmap, const rectangle *c
 static DEVICE_START( vic2 )
 {
 	vic2_state *vic2 = get_safe_token(device);
-	const vic2_interface *intf = (vic2_interface *)device->baseconfig().static_config();
+	const vic2_interface *intf = (vic2_interface *)device->static_config();
 	int width, height;
 	int i;
 

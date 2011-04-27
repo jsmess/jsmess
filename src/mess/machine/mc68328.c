@@ -2798,7 +2798,7 @@ static DEVICE_START( mc68328 )
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
-    mc68328->iface = (const mc68328_interface*)device->baseconfig().static_config();
+    mc68328->iface = (const mc68328_interface*)device->static_config();
 
     mc68328->gptimer[0] = device->machine().scheduler().timer_alloc(FUNC(mc68328_timer1_hit));
     mc68328->gptimer[1] = device->machine().scheduler().timer_alloc(FUNC(mc68328_timer2_hit));

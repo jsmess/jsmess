@@ -147,8 +147,8 @@ static const x07_kb x07_keycodes[56] =
 class x07_state : public driver_device
 {
 public:
-	x07_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	x07_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_printer(*this, "printer"),
 		  m_beep(*this, "beep"),

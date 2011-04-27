@@ -499,9 +499,9 @@ static DEVICE_START( i8275 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	i8275->intf = (const i8275_interface*)device->baseconfig().static_config();
+	i8275->intf = (const i8275_interface*)device->static_config();
 
 	assert(i8275->intf->display_pixels != NULL);
 

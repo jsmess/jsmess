@@ -32,47 +32,11 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1581 = c1581_device_config::static_alloc_device_config;
-const device_type C1563 = c1581_device_config::static_alloc_device_config;
+const device_type C1581 = &device_creator<c1581_device>;
+const device_type C1563 = &device_creator<c1563_device>;
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-
-//-------------------------------------------------
-//  c1581_device_config - constructor
-//-------------------------------------------------
-
-c1581_device_config::c1581_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "C1581", tag, owner, clock),
-	  device_config_cbm_iec_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *c1581_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(c1581_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *c1581_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, c1581_device(machine, *this));
-}
-
+c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:c1581_device(mconfig, tag, owner, clock) { }
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -80,7 +44,7 @@ device_t *c1581_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void c1581_device_config::device_config_complete()
+void c1581_device::device_config_complete()
 {
 	switch (m_variant)
 	{
@@ -100,14 +64,14 @@ void c1581_device_config::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1581_device_config::static_set_config(device_config *device, int address, int variant)
+void c1581_device::static_set_config(device_t &device, int address, int variant)
 {
-	c1581_device_config *c1581 = downcast<c1581_device_config *>(device);
+	c1581_device &c1581 = downcast<c1581_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c1581->m_address = address - 8;
-	c1581->m_variant = variant;
+	c1581.m_address = address - 8;
+	c1581.m_variant = variant;
 }
 
 
@@ -138,7 +102,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1581_device_config::device_rom_region() const
+const rom_entry *c1581_device::device_rom_region() const
 {
 	switch (m_variant)
 	{
@@ -209,7 +173,7 @@ READ8_MEMBER( c1581_device::cia_pa_r )
 	data |= !(floppy_drive_get_flag_state(m_image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 1;
 
 	// device number
-	data |= m_config.m_address << 3;
+	data |= m_address << 3;
 
 	// disk change
 	data |= floppy_dskchg_r(m_image) << 7;
@@ -393,7 +357,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c1581_device_config::device_mconfig_additions() const
+machine_config_constructor c1581_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c1581 );
 }
@@ -444,15 +408,14 @@ inline void c1581_device::set_iec_srq()
 //  c1581_device - constructor
 //-------------------------------------------------
 
-c1581_device::c1581_device(running_machine &_machine, const c1581_device_config &_config)
-    : device_t(_machine, _config),
-	  device_cbm_iec_interface(_machine, _config, *this),
+c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, C1581, "C1581", tag, owner, clock),
+	  device_cbm_iec_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_cia(*this, M8520_TAG),
 	  m_fdc(*this, WD1770_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(*this->owner(), CBM_IEC_TAG),
-      m_config(_config)
+	  m_bus(*this->owner(), CBM_IEC_TAG)
 {
 }
 

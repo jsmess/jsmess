@@ -182,9 +182,9 @@ static DEVICE_START( uPD7002 )
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	uPD7002->intf = (const uPD7002_interface*)device->baseconfig().static_config();
+	uPD7002->intf = (const uPD7002_interface*)device->static_config();
 	uPD7002->status = 0;
 	uPD7002->data1 = 0;
 	uPD7002->data0 = 0;

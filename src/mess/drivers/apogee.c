@@ -21,8 +21,8 @@
 class apogee_state : public radio86_state
 {
 public:
-	apogee_state(running_machine &machine, const driver_device_config_base &config)
-		: radio86_state(machine, config) { }
+	apogee_state(const machine_config &mconfig, device_type type, const char *tag)
+		: radio86_state(mconfig, type, tag) { }
 
 };
 

@@ -190,7 +190,7 @@ READ_LINE_DEVICE_HANDLER( microdrive_data2_r )
 static DEVICE_START( microdrive )
 {
 	microdrive_t *mdv = get_safe_token(device);
-	const microdrive_config *config = (const microdrive_config*) device->baseconfig().static_config();
+	const microdrive_config *config = (const microdrive_config*) device->static_config();
 
 	// resolve callbacks
 	devcb_resolve_write_line(&mdv->out_comms_out_func, &config->out_comms_out_func, device);

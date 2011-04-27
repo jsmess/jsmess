@@ -32,53 +32,31 @@
 
 #define MCFG_CS4031_ADD(_tag, _cputag, _isatag, _biostag) \
     MCFG_DEVICE_ADD(_tag, CS4031, 0) \
-    cs4031_device_config::static_set_cputag(device, _cputag); \
-    cs4031_device_config::static_set_isatag(device, _isatag); \
-    cs4031_device_config::static_set_biostag(device, _biostag);
+    cs4031_device::static_set_cputag(*device, _cputag); \
+    cs4031_device::static_set_isatag(*device, _isatag); \
+    cs4031_device::static_set_biostag(*device, _biostag);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cs4031_device_config
-
-class cs4031_device_config : public device_config
-{
-	friend class cs4031_device;
-
-	// construction/destruction
-	cs4031_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration
-	static void static_set_cputag(device_config *device, const char *tag);
-	static void static_set_isatag(device_config *device, const char *tag);
-	static void static_set_biostag(device_config *device, const char *tag);
-
-	const char *m_cputag;
-	const char *m_isatag;
-	const char *m_biostag;
-};
-
-
 // ======================> cs4031_device
 
 class cs4031_device : public device_t
 {
-	friend class cs4031_device_config;
-
-	// construction/destruction
-	cs4031_device(running_machine &_machine, const cs4031_device_config &config);
-
 public:
+	// construction/destruction
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
+	
+	// inline configuration
+	static void static_set_cputag(device_t &device, const char *tag);
+	static void static_set_isatag(device_t &device, const char *tag);
+	static void static_set_biostag(device_t &device, const char *tag);
 
 protected:
 	// device-level overrides
@@ -92,8 +70,6 @@ private:
 	void update_write_regions();
 
 	// internal state
-	const cs4031_device_config &m_config;
-
 	address_space *m_space;
 	UINT8 *m_isa;
 	UINT8 *m_bios;
@@ -102,6 +78,11 @@ private:
 	// address selection
 	UINT8 m_address;
 	bool m_address_valid;
+
+	const char *m_cputag;
+	const char *m_isatag;
+	const char *m_biostag;
+	
 
 	UINT8 m_registers[0x20];
 };

@@ -3403,7 +3403,7 @@ static DEVICE_START( saa505x )
 	tt->lookup=teletext_saa5050_characters;
 	tt->graphics=teletext_graphics;
 	tt->colour=7;
-	tt->intf = (const saa505x_interface *)device->baseconfig().static_config();
+	tt->intf = (const saa505x_interface *)device->static_config();
 }
 
 DEVICE_GET_INFO( saa505x )

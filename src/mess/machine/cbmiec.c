@@ -210,32 +210,7 @@ static const char *const SIGNAL_NAME[] = { "SRQ", "ATN", "CLK", "DATA", "RESET" 
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM_IEC = cbm_iec_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_cbm_iec_interface - constructor
-//-------------------------------------------------
-
-device_config_cbm_iec_interface::device_config_cbm_iec_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_config_cbm_iec_interface - destructor
-//-------------------------------------------------
-
-device_config_cbm_iec_interface::~device_config_cbm_iec_interface()
-{
-}
-
+const device_type CBM_IEC = &device_creator<cbm_iec_device>;
 
 
 //**************************************************************************
@@ -246,9 +221,8 @@ device_config_cbm_iec_interface::~device_config_cbm_iec_interface()
 //  device_cbm_iec_interface - constructor
 //-------------------------------------------------
 
-device_cbm_iec_interface::device_cbm_iec_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_cbm_iec_config(dynamic_cast<const device_config_cbm_iec_interface &>(config))
+device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
 {
 }
 
@@ -267,8 +241,6 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(cbm_iec, "CBM IEC")
-
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -276,7 +248,7 @@ GENERIC_DEVICE_CONFIG_SETUP(cbm_iec, "CBM IEC")
 //  complete
 //-------------------------------------------------
 
-void cbm_iec_device_config::device_config_complete()
+void cbm_iec_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const cbm_iec_config *intf = reinterpret_cast<const cbm_iec_config *>(static_config());
@@ -382,10 +354,9 @@ inline int cbm_iec_device::get_signal(int signal)
 //  cbm_iec_device - constructor
 //-------------------------------------------------
 
-cbm_iec_device::cbm_iec_device(running_machine &_machine, const cbm_iec_device_config &_config)
-    : device_t(_machine, _config),
-	  m_stub(*this->owner(), CBM_IEC_STUB_TAG),
-      m_config(_config)
+cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CBM_IEC, "CBM_IEC", tag, owner, clock),
+	  m_stub(*this->owner(), CBM_IEC_STUB_TAG)
 {
 }
 
@@ -396,7 +367,7 @@ cbm_iec_device::cbm_iec_device(running_machine &_machine, const cbm_iec_device_c
 
 void cbm_iec_device::device_start()
 {
-	const cbm_iec_config *daisy = m_config.m_daisy;
+	const cbm_iec_config *daisy = m_daisy;
 
 	// create a linked list of devices
 	daisy_entry **tailptr = &m_daisy_list;

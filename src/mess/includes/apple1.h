@@ -30,8 +30,8 @@ typedef struct
 class apple1_state : public driver_device
 {
 public:
-	apple1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_vh_clrscrn_pressed;
 	int m_kbd_data;

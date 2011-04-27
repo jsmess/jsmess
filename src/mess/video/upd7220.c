@@ -140,7 +140,7 @@ static const int y_dir_dot[8] = { 0,-1,-1,-1, 0, 1, 1, 1};
 //**************************************************************************
 
 // devices
-const device_type UPD7220 = upd7220_device_config::static_alloc_device_config;
+const device_type UPD7220 = &device_creator<upd7220_device>;
 
 
 // default address map
@@ -156,51 +156,12 @@ ROM_START( upd7220 )
 ROM_END
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  upd7220_device_config - constructor
-//-------------------------------------------------
-
-upd7220_device_config::upd7220_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "uPD7220", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
-{
-	m_shortname = "upd7220";
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *upd7220_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(upd7220_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *upd7220_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, upd7220_device(machine, *this));
-}
-
-
 //-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *upd7220_device_config::memory_space_config(address_spacenum spacenum) const
+const address_space_config *upd7220_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
@@ -210,7 +171,7 @@ const address_space_config *upd7220_device_config::memory_space_config(address_s
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *upd7220_device_config::device_rom_region() const
+const rom_entry *upd7220_device::device_rom_region() const
 {
 	return ROM_NAME( upd7220 );
 }
@@ -222,7 +183,7 @@ const rom_entry *upd7220_device_config::device_rom_region() const
 //  complete
 //-------------------------------------------------
 
-void upd7220_device_config::device_config_complete()
+void upd7220_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const upd7220_interface *intf = reinterpret_cast<const upd7220_interface *>(static_config());
@@ -232,10 +193,10 @@ void upd7220_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_drq_func, 0, sizeof(m_out_drq_func));
-		memset(&m_out_hsync_func, 0, sizeof(m_out_hsync_func));
-		memset(&m_out_vsync_func, 0, sizeof(m_out_vsync_func));
-		memset(&m_out_blank_func, 0, sizeof(m_out_blank_func));
+		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
+		memset(&m_out_hsync_cb, 0, sizeof(m_out_hsync_cb));
+		memset(&m_out_vsync_cb, 0, sizeof(m_out_vsync_cb));
+		memset(&m_out_blank_cb, 0, sizeof(m_out_blank_cb));
 	}
 }
 
@@ -695,9 +656,9 @@ inline void upd7220_device::get_graphics_partition(int index, UINT32 *sad, UINT1
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-upd7220_device::upd7220_device(running_machine &_machine, const upd7220_device_config &config)
-    : device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
+upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
 	  m_mask(0),
 	  m_pitch(0),
 	  m_ead(0),
@@ -731,8 +692,9 @@ upd7220_device::upd7220_device(running_machine &_machine, const upd7220_device_c
 	  m_gchr(0),
 	  m_vram_bank(0),
 	  m_bitmap_mod(0),
-      m_config(config)
+  	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
+	m_shortname = "upd7220";
 	for (int i = 0; i < 16; i++)
 	{
 		m_fifo[i] = 0;
@@ -768,13 +730,13 @@ void upd7220_device::device_start()
 	m_blank_timer = timer_alloc(TIMER_BLANK);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_drq_func, &m_config.m_out_drq_func, this);
-    devcb_resolve_write_line(&m_out_hsync_func, &m_config.m_out_hsync_func, this);
-    devcb_resolve_write_line(&m_out_vsync_func, &m_config.m_out_vsync_func, this);
-    devcb_resolve_write_line(&m_out_blank_func, &m_config.m_out_blank_func, this);
+    devcb_resolve_write_line(&m_out_drq_func, &m_out_drq_cb, this);
+    devcb_resolve_write_line(&m_out_hsync_func, &m_out_hsync_cb, this);
+    devcb_resolve_write_line(&m_out_vsync_func, &m_out_vsync_cb, this);
+    devcb_resolve_write_line(&m_out_blank_func, &m_out_blank_cb, this);
 
 	// find screen
-	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_ra));
@@ -1574,8 +1536,8 @@ void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 		{
 			addr = sad + (y * m_pitch);
 
-			if (m_config.m_draw_text_func)
-				m_config.m_draw_text_func(this, bitmap, m_vram, addr, y, wd, m_pitch, 0, 0, m_aw * 8 - 1, m_al - 1, m_lr, m_dc, m_ead);
+			if (m_draw_text_cb)
+				m_draw_text_cb(this, bitmap, m_vram, addr, y, wd, m_pitch, 0, 0, m_aw * 8 - 1, m_al - 1, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1597,7 +1559,7 @@ void upd7220_device::draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, in
 		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff); //TODO: remove me
 
 		if((sx << 3) < m_aw * 16 && y < m_al)
-			m_config.m_display_func(this, bitmap, y, sx << 3, addr, data, m_vram);
+			m_display_cb(this, bitmap, y, sx << 3, addr, data, m_vram);
 
 		if (wd) addr += 2; else addr++;
 	}
@@ -1625,7 +1587,7 @@ void upd7220_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect
 			{
 				addr = (sad & 0x3ffff) + (y * m_pitch * 2);
 
-				if (m_config.m_display_func)
+				if (m_display_cb)
 					draw_graphics_line(bitmap, addr, y + bsy, wd);
 			}
 			else
@@ -1633,8 +1595,8 @@ void upd7220_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect
 				/* TODO: text params are more limited compared to graphics */
 				addr = (sad & 0x3ffff) + (y * m_pitch);
 
-				if (m_config.m_draw_text_func)
-					m_config.m_draw_text_func(this, bitmap, m_vram, addr, y + tsy, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
+				if (m_draw_text_cb)
+					m_draw_text_cb(this, bitmap, m_vram, addr, y + tsy, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
 			}
 		}
 

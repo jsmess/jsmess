@@ -74,8 +74,8 @@ enum
 class st_state : public driver_device
 {
 public:
-	st_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	st_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, M68000_TAG),
 		  m_fdc(*this, WD1772_TAG),
 		  m_mfp(*this, MC68901_TAG),
@@ -273,8 +273,8 @@ public:
 class megast_state : public st_state
 {
 public:
-	megast_state(running_machine &machine, const driver_device_config_base &config)
-		: st_state(machine, config)
+	megast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_READ16_MEMBER( fpu_r );
@@ -284,8 +284,8 @@ public:
 class ste_state : public st_state
 {
 public:
-	ste_state(running_machine &machine, const driver_device_config_base &config)
-		: st_state(machine, config),
+	ste_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st_state(mconfig, type, tag),
 		  m_lmc1992(*this, LMC1992_TAG)
 	{ }
 
@@ -356,8 +356,8 @@ public:
 class megaste_state : public ste_state
 {
 public:
-	megaste_state(running_machine &machine, const driver_device_config_base &config)
-		: ste_state(machine, config)
+	megaste_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ste_state(mconfig, type, tag)
 	{ }
 
 	void machine_start();
@@ -371,8 +371,8 @@ public:
 class stbook_state : public ste_state
 {
 public:
-	stbook_state(running_machine &machine, const driver_device_config_base &config)
-		: ste_state(machine, config)
+	stbook_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ste_state(mconfig, type, tag)
 	{ }
 
 	void machine_start();

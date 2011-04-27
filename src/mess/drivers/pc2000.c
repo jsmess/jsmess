@@ -25,8 +25,8 @@
 class pc2000_state : public driver_device
 {
 public:
-	pc2000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	pc2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_lcdc(*this, "hd44780"),
 		  m_beep(*this, "beep")
 		{ }

@@ -214,8 +214,8 @@ Known Issues (MZ, 2010-11-07)
 class ti99_8_state : public driver_device
 {
 public:
-	ti99_8_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 };
 

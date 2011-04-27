@@ -31,11 +31,9 @@
  *  Device config
  */
 
-const device_type FMSCSI = fmscsi_device_config::static_alloc_device_config;
+const device_type FMSCSI = &device_creator<fmscsi_device>;
 
-GENERIC_DEVICE_CONFIG_SETUP(fmscsi, "FM-SCSI")
-
-void fmscsi_device_config::device_config_complete()
+void fmscsi_device::device_config_complete()
 {
     // copy static configuration if present
 	const FMSCSIinterface *intf = reinterpret_cast<const FMSCSIinterface *>(static_config());
@@ -55,9 +53,8 @@ void fmscsi_device_config::device_config_complete()
  * Device
  */
 
-fmscsi_device::fmscsi_device(running_machine &machine, const fmscsi_device_config &config)
-    : device_t(machine, config),
-      m_config(config)
+fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock)
 {
 }
 
@@ -73,17 +70,17 @@ void fmscsi_device::device_start()
     m_target = 0;
     m_phase = SCSI_PHASE_BUS_FREE;
 
-    devcb_resolve_write_line(&m_irq_func,&m_config.irq_callback,this);
-    devcb_resolve_write_line(&m_drq_func,&m_config.drq_callback,this);
+    devcb_resolve_write_line(&m_irq_func,&irq_callback,this);
+    devcb_resolve_write_line(&m_drq_func,&drq_callback,this);
 
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
     // initialise SCSI devices, if any present
-    for(x=0;x<m_config.scsidevs->devs_present;x++)
+    for(x=0;x<scsidevs->devs_present;x++)
     {
-    	SCSIAllocInstance(machine(), m_config.scsidevs->devices[x].scsiClass,
-				&m_SCSIdevices[m_config.scsidevs->devices[x].scsiID],
-				m_config.scsidevs->devices[x].diskregion );
+    	SCSIAllocInstance(machine(), scsidevs->devices[x].scsiClass,
+				&m_SCSIdevices[scsidevs->devices[x].scsiID],
+				scsidevs->devices[x].diskregion );
     }
 
     // allocate read timer
@@ -111,9 +108,9 @@ void fmscsi_device::device_stop()
 	int x;
 
 	// clean up the devices
-	for (x=0;x<m_config.scsidevs->devs_present;x++)
+	for (x=0;x<scsidevs->devs_present;x++)
 	{
-		SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[x].scsiID] );
+		SCSIDeleteInstance( m_SCSIdevices[scsidevs->devices[x].scsiID] );
 	}
 }
 
@@ -138,16 +135,16 @@ void fmscsi_device::fmscsi_rescan()
 	int i;
 
 	// try to open the devices
-	for (i = 0; i < m_config.scsidevs->devs_present; i++)
+	for (i = 0; i < scsidevs->devs_present; i++)
 	{
 		// if a device wasn't already allocated
-//      if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
+//      if (!m_SCSIdevices[scsidevs->devices[i].scsiID])
 		{
-			SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[i].scsiID] );
+			SCSIDeleteInstance( m_SCSIdevices[scsidevs->devices[i].scsiID] );
 			SCSIAllocInstance( machine(),
-					m_config.scsidevs->devices[i].scsiClass,
-					&m_SCSIdevices[m_config.scsidevs->devices[i].scsiID],
-					m_config.scsidevs->devices[i].diskregion );
+					scsidevs->devices[i].scsiClass,
+					&m_SCSIdevices[scsidevs->devices[i].scsiID],
+					scsidevs->devices[i].diskregion );
 		}
 	}
 }
@@ -404,7 +401,7 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 
 	if(line == FMSCSI_LINE_SEL)
 	{
-		image = dynamic_cast<device_image_interface*>(machine().device(m_config.scsidevs->devices[m_target].diskregion));
+		image = dynamic_cast<device_image_interface*>(machine().device(scsidevs->devices[m_target].diskregion));
 		if(state != 0 && !(m_output_lines & FMSCSI_LINE_SEL)) // low to high transition
 		{
 			if (image->exists())  // if device is mounted

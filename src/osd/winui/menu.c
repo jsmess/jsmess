@@ -883,7 +883,7 @@ static void build_generic_filter(device_t *device, int is_save, char *filter, si
 	const char *file_extension;
 
 	/* copy the string */
-	file_extension = downcast<const legacy_image_device_config_base *>(&device->baseconfig())->file_extensions();
+	file_extension = downcast<const legacy_image_device_base *>(device)->file_extensions();
 
 	// start writing the filter
 	s = filter;
@@ -1372,7 +1372,7 @@ static void prepare_menus(HWND wnd)
 
 	int cnt = 0;
 	// then set up the actual devices
-	for (bool gotone = window->machine().m_devicelist.first(img); gotone; gotone = img->next(img))
+	for (bool gotone = window->machine().devicelist().first(img); gotone; gotone = img->next(img))
 	{
 		new_item = ID_DEVICE_0 + (cnt * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;
@@ -1387,7 +1387,7 @@ static void prepare_menus(HWND wnd)
 		sub_menu = CreateMenu();
 		win_append_menu_utf8(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		"Mount...");
 
-		if (img->image_config().is_creatable())
+		if (img->is_creatable())
 			win_append_menu_utf8(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	"Create...");
 
 		win_append_menu_utf8(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	"Unmount");
@@ -1405,7 +1405,7 @@ static void prepare_menus(HWND wnd)
 		}
 		s = img->exists() ? img->filename() : "[empty slot]";
 
-		snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", img->image_config().devconfig().name(), s);
+		snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", img->device().name(), s);
 		win_append_menu_utf8(device_menu, MF_POPUP, (UINT_PTR)sub_menu, buf);
 
 		cnt++;

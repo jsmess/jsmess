@@ -70,7 +70,7 @@ INLINE crt_t *get_safe_token(device_t *device)
 static DEVICE_START( crt )
 {
 	crt_t *crt = get_safe_token(device);
-	const crt_interface *intf = (const crt_interface *)device->baseconfig().static_config();
+	const crt_interface *intf = (const crt_interface *)device->static_config();
 	int width = intf->width;
 	int height = intf->height;
 	int i;

@@ -23,32 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABCBUS = abcbus_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_abcbus_interface - constructor
-//-------------------------------------------------
-
-device_config_abcbus_interface::device_config_abcbus_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_config_abcbus_interface - destructor
-//-------------------------------------------------
-
-device_config_abcbus_interface::~device_config_abcbus_interface()
-{
-}
-
+const device_type ABCBUS = &device_creator<abcbus_device>;
 
 
 //**************************************************************************
@@ -59,9 +34,8 @@ device_config_abcbus_interface::~device_config_abcbus_interface()
 //  device_abcbus_interface - constructor
 //-------------------------------------------------
 
-device_abcbus_interface::device_abcbus_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_abcbus_config(dynamic_cast<const device_config_abcbus_interface &>(config))
+device_abcbus_interface::device_abcbus_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
 {
 }
 
@@ -75,21 +49,13 @@ device_abcbus_interface::~device_abcbus_interface()
 }
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(abcbus, "Luxor ABC bus")
-
-
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
 
-void abcbus_device_config::device_config_complete()
+void abcbus_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const abcbus_config *intf = reinterpret_cast<const abcbus_config *>(static_config());
@@ -115,9 +81,8 @@ void abcbus_device_config::device_config_complete()
 //  abcbus_device - constructor
 //-------------------------------------------------
 
-abcbus_device::abcbus_device(running_machine &_machine, const abcbus_device_config &_config)
-    : device_t(_machine, _config),
-      m_config(_config)
+abcbus_device::abcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, ABCBUS, "Luxor ABC bus", tag, owner, clock)
 {
 }
 
@@ -128,7 +93,7 @@ abcbus_device::abcbus_device(running_machine &_machine, const abcbus_device_conf
 
 void abcbus_device::device_start()
 {
-	const abcbus_config *daisy = m_config.m_daisy;
+	const abcbus_config *daisy = m_daisy;
 
 	// create a linked list of devices
 	daisy_entry **tailptr = &m_daisy_list;

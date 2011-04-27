@@ -14,8 +14,8 @@
 class ti85_state : public driver_device
 {
 public:
-	ti85_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	ti85_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_speaker(*this, "speaker"),
 		  m_serial(*this, "tiserial"),

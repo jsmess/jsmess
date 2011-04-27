@@ -20,8 +20,8 @@
 class xerox820_state : public driver_device
 {
 public:
-	xerox820_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	xerox820_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_kbpio(*this, Z80KBPIO_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
@@ -81,8 +81,8 @@ public:
 class xerox820ii_state : public xerox820_state
 {
 public:
-	xerox820ii_state(running_machine &machine, const driver_device_config_base &config)
-		: xerox820_state(machine, config)
+	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xerox820_state(mconfig, type, tag)
 	{ }
 
 	virtual void machine_reset();

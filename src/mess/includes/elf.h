@@ -26,8 +26,8 @@
 class elf2_state : public driver_device
 {
 public:
-	elf2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	elf2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vdc(*this, CDP1861_TAG),
 		  m_kb(*this, MM74C923_TAG),

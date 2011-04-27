@@ -123,8 +123,8 @@ typedef struct
 class compis_state : public driver_device
 {
 public:
-	compis_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	compis_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_hgdc(*this, "upd7220")
 		  { }
 

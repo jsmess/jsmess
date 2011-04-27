@@ -79,47 +79,14 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_COM = isa8_com_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_com_device_config - constructor
-//-------------------------------------------------
-
-isa8_com_device_config::isa8_com_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-        : device_config(mconfig, static_alloc_device_config, "ISA8_COM", tag, owner, clock),
-			device_config_isa8_card_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *isa8_com_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-        return global_alloc(isa8_com_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *isa8_com_device_config::alloc_device(running_machine &machine) const
-{
-        return auto_alloc(machine, isa8_com_device(machine, *this));
-}
+const device_type ISA8_COM = &device_creator<isa8_com_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_com_device_config::device_mconfig_additions() const
+machine_config_constructor isa8_com_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( com_config );
 }
@@ -132,11 +99,10 @@ machine_config_constructor isa8_com_device_config::device_mconfig_additions() co
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_device::isa8_com_device(running_machine &_machine, const isa8_com_device_config &config) :
-        device_t(_machine, config),
-		device_isa8_card_interface( _machine, config, *this ),
-        m_config(config),
-		m_isa(*owner(),config.m_isa_tag)
+isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_COM, "ISA8_COM", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
+		m_isa(*owner,m_isa_tag)
 {
 }
 
@@ -146,7 +112,7 @@ isa8_com_device::isa8_com_device(running_machine &_machine, const isa8_com_devic
 
 void isa8_com_device::device_start()
 {
-	m_isa->add_isa_card(this, m_config.m_isa_num);
+	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(subdevice("ins8250_0"), 0x03f8, 0x03ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
 	m_isa->install_device(subdevice("ins8250_1"), 0x02f8, 0x02ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
 	m_isa->install_device(subdevice("ins8250_2"), 0x03e8, 0x03ef, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );

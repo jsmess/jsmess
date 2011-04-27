@@ -72,8 +72,8 @@ typedef struct
 class rvoice_state : public driver_device
 {
 public:
-	rvoice_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	rvoice_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;

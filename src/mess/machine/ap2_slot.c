@@ -36,7 +36,7 @@ INLINE void assert_valid(device_t *device)
 INLINE const apple2_slot_config *get_config(device_t *device)
 {
 	assert_valid(device);
-	return (const apple2_slot_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const apple2_slot_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 

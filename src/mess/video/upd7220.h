@@ -77,58 +77,25 @@ struct upd7220_interface
 {
 	const char *m_screen_tag;
 
-	upd7220_display_pixels_func	m_display_func;
-	upd7220_draw_text_line m_draw_text_func;
+	upd7220_display_pixels_func	m_display_cb;
+	upd7220_draw_text_line m_draw_text_cb;
 
-	devcb_write_line		m_out_drq_func;
-	devcb_write_line		m_out_hsync_func;
-	devcb_write_line		m_out_vsync_func;
-	devcb_write_line		m_out_blank_func;
+	devcb_write_line		m_out_drq_cb;
+	devcb_write_line		m_out_hsync_cb;
+	devcb_write_line		m_out_vsync_cb;
+	devcb_write_line		m_out_blank_cb;
 };
-
-
-// ======================> upd7220_device_config
-
-class upd7220_device_config :   public device_config,
-								public device_config_memory_interface,
-                                public upd7220_interface
-{
-    friend class upd7220_device;
-
-    // construction/destruction
-    upd7220_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
-};
-
 
 // ======================> upd7220_device
 
 class upd7220_device :	public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+                        public upd7220_interface
 {
-    friend class upd7220_device_config;
-
-    // construction/destruction
-    upd7220_device(running_machine &_machine, const upd7220_device_config &_config);
-
 public:
+    // construction/destruction
+    upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
@@ -143,12 +110,15 @@ public:
     DECLARE_WRITE8_MEMBER( vram_w );
 
 	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	virtual const rom_entry *device_rom_region() const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete();
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
@@ -255,7 +225,7 @@ private:
 
 	UINT8 m_bitmap_mod;
 
-	const upd7220_device_config &m_config;
+	const address_space_config		m_space_config;
 };
 
 

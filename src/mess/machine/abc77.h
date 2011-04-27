@@ -37,48 +37,25 @@
 
 struct abc77_interface
 {
-	devcb_write_line	m_out_txd_func;
-	devcb_write_line	m_out_clock_func;
-	devcb_write_line	m_out_keydown_func;
+	devcb_write_line	m_out_txd_cb;
+	devcb_write_line	m_out_clock_cb;
+	devcb_write_line	m_out_keydown_cb;
 };
 
+// ======================> abc77_device
 
-// ======================> abc77_device_config
-
-class abc77_device_config :   public device_config,
-                                public abc77_interface
+class abc77_device :  public device_t,
+                      public abc77_interface
 {
-    friend class abc77_device;
-
-    // construction/destruction
-    abc77_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
+    // construction/destruction
+    abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const input_port_token *device_input_ports() const;
 
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
-// ======================> abc77_device
-
-class abc77_device :  public device_t
-{
-    friend class abc77_device_config;
-
-    // construction/destruction
-    abc77_device(running_machine &_machine, const abc77_device_config &_config);
-
-public:
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( t1_r );
@@ -92,7 +69,8 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
+	virtual void device_config_complete();
+	
 private:
 	static const device_timer_id TIMER_SERIAL = 0;
 	static const device_timer_id TIMER_RESET = 1;
@@ -118,8 +96,6 @@ private:
 	// timers
 	emu_timer *m_serial_timer;
 	emu_timer *m_reset_timer;
-
-    const abc77_device_config &m_config;
 };
 
 

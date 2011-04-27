@@ -23,8 +23,8 @@
 class czk80_state : public driver_device
 {
 public:
-	czk80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	czk80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
 	{ }

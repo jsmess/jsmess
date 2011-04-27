@@ -175,8 +175,8 @@ typedef struct
 class rmnimbus_state : public driver_device
 {
 public:
-	rmnimbus_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 m_debug_machine;
 	i186_state m_i186;

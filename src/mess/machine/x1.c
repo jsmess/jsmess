@@ -1,53 +1,20 @@
 #include "emu.h"
 #include "includes/x1.h"
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  x1_keyboard_device_config - constructor
-//-------------------------------------------------
-
-x1_keyboard_device_config::x1_keyboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "X1 Keyboard", tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *x1_keyboard_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(x1_keyboard_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *x1_keyboard_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, x1_keyboard_device(machine, *this));
-}
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
+const device_type X1_KEYBOARD = &device_creator<x1_keyboard_device>;
+
 //-------------------------------------------------
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-x1_keyboard_device::x1_keyboard_device(running_machine &_machine, const x1_keyboard_device_config &_config)
-	: device_t(_machine, _config),
-	  device_z80daisy_interface(_machine, _config, *this),
-	  m_config(_config)
+x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, X1_KEYBOARD, "X1 Keyboard", tag, owner, clock),
+	  device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -98,5 +65,3 @@ int x1_keyboard_device::z80daisy_irq_ack()
 void x1_keyboard_device::z80daisy_irq_reti()
 {
 }
-
-const device_type X1_KEYBOARD = x1_keyboard_device_config::static_alloc_device_config;

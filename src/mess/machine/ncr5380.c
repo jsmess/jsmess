@@ -65,32 +65,13 @@ static int get_cmd_len(int cbyte)
 	return 6;
 }
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-ncr5380_device_config::ncr5380_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "5380 SCSI", tag, owner, clock)
-{
-}
-
-device_config *ncr5380_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(ncr5380_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *ncr5380_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, ncr5380_device(machine, *this));
-}
-
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
 
-void ncr5380_device_config::device_config_complete()
+void ncr5380_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const NCR5380interface *intf = reinterpret_cast<const NCR5380interface *>(static_config());
@@ -109,15 +90,14 @@ void ncr5380_device_config::device_config_complete()
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type NCR5380 = ncr5380_device_config::static_alloc_device_config;
+const device_type NCR5380 = &device_creator<ncr5380_device>;
 
 //-------------------------------------------------
 //  ncr5380_device - constructor/destructor
 //-------------------------------------------------
 
-ncr5380_device::ncr5380_device(running_machine &_machine, const ncr5380_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock)
 {
 }
 
@@ -136,12 +116,12 @@ void ncr5380_device::device_start()
 	m_next_req_flag = 0;
 
 	// try to open the devices
-	for (i = 0; i < m_config.scsidevs->devs_present; i++)
+	for (i = 0; i < scsidevs->devs_present; i++)
 	{
 		SCSIAllocInstance( machine(),
-				m_config.scsidevs->devices[i].scsiClass,
-				&m_scsi_devices[m_config.scsidevs->devices[i].scsiID],
-				m_config.scsidevs->devices[i].diskregion );
+				scsidevs->devices[i].scsiClass,
+				&m_scsi_devices[scsidevs->devices[i].scsiID],
+				scsidevs->devices[i].diskregion );
 	}
 
 	save_item(NAME(m_5380_Registers));
@@ -181,9 +161,9 @@ void ncr5380_device::device_stop()
 	int i;
 
 	// clean up the devices
-	for (i = 0; i < m_config.scsidevs->devs_present; i++)
+	for (i = 0; i < scsidevs->devs_present; i++)
 	{
-		SCSIDeleteInstance( m_scsi_devices[m_config.scsidevs->devices[i].scsiID] );
+		SCSIDeleteInstance( m_scsi_devices[scsidevs->devices[i].scsiID] );
 	}
 }
 
@@ -512,15 +492,15 @@ void ncr5380_device::ncr5380_scan_devices()
 	int i;
 
 	// try to open the devices
-	for (i = 0; i < m_config.scsidevs->devs_present; i++)
+	for (i = 0; i < scsidevs->devs_present; i++)
 	{
 		// if a device wasn't already allocated
-		if (!m_scsi_devices[m_config.scsidevs->devices[i].scsiID])
+		if (!m_scsi_devices[scsidevs->devices[i].scsiID])
 		{
 			SCSIAllocInstance( machine(),
-					m_config.scsidevs->devices[i].scsiClass,
-					&m_scsi_devices[m_config.scsidevs->devices[i].scsiID],
-					m_config.scsidevs->devices[i].diskregion );
+					scsidevs->devices[i].scsiClass,
+					&m_scsi_devices[scsidevs->devices[i].scsiID],
+					scsidevs->devices[i].diskregion );
 		}
 	}
 }

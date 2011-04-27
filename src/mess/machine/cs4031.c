@@ -30,7 +30,7 @@
 #define LOG_REGISTER	1
 #define LOG_MEMORY		1
 
-const device_type CS4031 = cs4031_device_config::static_alloc_device_config;
+const device_type CS4031 = &device_creator<cs4031_device>;
 
 enum
 {
@@ -81,57 +81,6 @@ static const char *const register_names[] =
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cs4031_device_config - constructor
-//-------------------------------------------------
-
-cs4031_device_config::cs4031_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "CS4031", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cs4031_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(cs4031_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *cs4031_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, cs4031_device(machine, *this));
-}
-
-void cs4031_device_config::static_set_cputag(device_config *device, const char *tag)
-{
-	cs4031_device_config *cs4031 = downcast<cs4031_device_config *>(device);
-	cs4031->m_cputag = tag;
-}
-
-void cs4031_device_config::static_set_isatag(device_config *device, const char *tag)
-{
-	cs4031_device_config *cs4031 = downcast<cs4031_device_config *>(device);
-	cs4031->m_isatag = tag;
-}
-
-void cs4031_device_config::static_set_biostag(device_config *device, const char *tag)
-{
-	cs4031_device_config *cs4031 = downcast<cs4031_device_config *>(device);
-	cs4031->m_biostag = tag;
-}
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -139,12 +88,29 @@ void cs4031_device_config::static_set_biostag(device_config *device, const char 
 //  cs4031_device - constructor
 //-------------------------------------------------
 
-cs4031_device::cs4031_device(running_machine &_machine, const cs4031_device_config &config) :
-	device_t(_machine, config),
-	m_config(config),
-	m_address(0),
-	m_address_valid(false)
+cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CS4031, "CS4031", tag, owner, clock),
+	  m_address(0),
+	  m_address_valid(false)
 {
+}
+
+void cs4031_device::static_set_cputag(device_t &device, const char *tag)
+{
+	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
+	cs4031.m_cputag = tag;
+}
+
+void cs4031_device::static_set_isatag(device_t &device, const char *tag)
+{
+	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
+	cs4031.m_isatag = tag;
+}
+
+void cs4031_device::static_set_biostag(device_t &device, const char *tag)
+{
+	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
+	cs4031.m_biostag = tag;
 }
 
 //-------------------------------------------------
@@ -159,10 +125,10 @@ void cs4031_device::device_start()
 	if (!ram_device->started())
 		throw device_missing_dependencies();
 
-	device_t *cpu = machine().device(m_config.m_cputag);
+	device_t *cpu = machine().device(m_cputag);
 	m_space = cpu->memory().space(AS_PROGRAM);
-	m_isa = machine().region(m_config.m_isatag)->base();
-	m_bios = machine().region(m_config.m_biostag)->base();
+	m_isa = machine().region(m_isatag)->base();
+	m_bios = machine().region(m_biostag)->base();
 
 	m_ram = ram_get_ptr(ram_device);
 	UINT32 ram_size = ram_get_size(ram_device);

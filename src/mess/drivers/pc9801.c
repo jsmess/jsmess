@@ -242,8 +242,8 @@
 class pc9801_state : public driver_device
 {
 public:
-	pc9801_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_hgdc1(*this, "upd7220_chr"),
 		  m_hgdc2(*this, "upd7220_btm")

@@ -14,8 +14,8 @@
 class z1013_state : public driver_device
 {
 public:
-	z1013_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_video_ram;
 	UINT8 m_keyboard_line;

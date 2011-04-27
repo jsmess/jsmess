@@ -66,8 +66,8 @@ typedef struct
 class mbc55x_state : public driver_device
 {
 public:
-	mbc55x_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	device_t	*m_maincpu;
 	device_t	*m_pic8259;

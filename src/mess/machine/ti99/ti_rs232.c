@@ -504,7 +504,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(TI99_PIO, ti99_piodev);
 static DEVICE_START( ti_rs232 )
 {
 	ti_rs232_state *card = get_safe_token(device);
-	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
+	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", ser_region);

@@ -23,44 +23,19 @@
 
 struct hd44352_interface
 {
-    devcb_write_line	m_on;		// ON line
+    devcb_write_line	m_on_cb;		// ON line
 };
-
-
-// ======================> hd44352_device_config
-
-class hd44352_device_config :
-	public device_config,
-	public hd44352_interface
-{
-	friend class hd44352_device;
-
-	// construction/destruction
-	hd44352_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-	virtual device_t *alloc_device( running_machine &machine ) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-	virtual bool device_validity_check( const game_driver &driver ) const;
-};
-
 
 // ======================> hd44352_device
 
 class hd44352_device :
-	public device_t
+						public device_t,
+						public hd44352_interface
 {
-	friend class hd44352_device_config;
-
-	// construction/destruction
-	hd44352_device( running_machine &_machine, const hd44352_device_config &config );
-
 public:
+	// construction/destruction
+	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// device interface
 	UINT8 data_read();
 	void data_write(UINT8 data);
@@ -73,6 +48,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete();
+	virtual bool device_validity_check( const game_driver &driver ) const;
 
 private:
 	UINT8 compute_newval(UINT8 type, UINT8 oldval, UINT8 newval);
@@ -102,7 +79,6 @@ private:
 	UINT8 m_cursor_lcd;
 
 	devcb_resolved_write_line m_on;			// ON line callback
-	const hd44352_device_config &m_config;
 };
 
 // device type definition

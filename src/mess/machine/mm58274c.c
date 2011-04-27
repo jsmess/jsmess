@@ -448,9 +448,9 @@ static DEVICE_START( mm58274c )
 	// validate arguments
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	mm58274c->intf = (const mm58274c_interface*)device->baseconfig().static_config();
+	mm58274c->intf = (const mm58274c_interface*)device->static_config();
 	// register for state saving
 	state_save_register_item(device->machine(), "mm58274c", device->tag(), 0, mm58274c->status);
 	state_save_register_item(device->machine(), "mm58274c", device->tag(), 0, mm58274c->control);

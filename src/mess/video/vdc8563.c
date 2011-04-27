@@ -169,7 +169,7 @@ INLINE const vdc8563_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == VDC8563));
-	return (const vdc8563_interface *) device->baseconfig().static_config();
+	return (const vdc8563_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -595,7 +595,7 @@ UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle
 static DEVICE_START( vdc8563 )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
-	const vdc8563_interface *intf = (vdc8563_interface *)device->baseconfig().static_config();
+	const vdc8563_interface *intf = (vdc8563_interface *)device->static_config();
 
 	vdc8563->screen = device->machine().device<screen_device>(intf->screen);
 

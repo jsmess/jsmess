@@ -40,27 +40,20 @@ enum
 //**************************************************************************
 
 // devices
-const device_type VP550 = vp550_device_config::static_alloc_device_config;
-const device_type VP551 = vp550_device_config::static_alloc_device_config;
+const device_type VP550 = &device_creator<vp550_device>;
+const device_type VP551 = &device_creator<vp550_device>;
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(vp550, "VP550")
 
 
 //-------------------------------------------------
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void vp550_device_config::static_set_config(device_config *device, int variant)
+void vp550_device::static_set_config(device_t &device, int variant)
 {
-	vp550_device_config *vp550 = downcast<vp550_device_config *>(device);
+	vp550_device &vp550 = downcast<vp550_device &>(device);
 
-	vp550->m_variant = variant;
+	vp550.m_variant = variant;
 }
 
 
@@ -101,7 +94,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor vp550_device_config::device_mconfig_additions() const
+machine_config_constructor vp550_device::device_mconfig_additions() const
 {
 	switch (m_variant)
 	{
@@ -124,13 +117,12 @@ machine_config_constructor vp550_device_config::device_mconfig_additions() const
 //  vp550_device - constructor
 //-------------------------------------------------
 
-vp550_device::vp550_device(running_machine &_machine, const vp550_device_config &config)
-    : device_t(_machine, config),
+vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, VP550, "VP550", tag, owner, clock),
 	  m_pfg_a(*this, CDP1863_A_TAG),
 	  m_pfg_b(*this, CDP1863_B_TAG),
 	  m_pfg_c(*this, CDP1863_C_TAG),
-	  m_pfg_d(*this, CDP1863_D_TAG),
-      m_config(config)
+	  m_pfg_d(*this, CDP1863_D_TAG)
 {
 }
 

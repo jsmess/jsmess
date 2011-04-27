@@ -601,7 +601,7 @@ ROM_END
 static DEVICE_START( kb_keytr )
 {
 	kb_keytr_state *keytronic = get_safe_token(device);
-	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->baseconfig().static_config();
+	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->static_config();
 
 	/* find our cpu */
 	keytronic->cpu = device->subdevice("kb_keytr");

@@ -107,8 +107,8 @@ struct _apple2_memmap_config
 class apple2_state : public driver_device
 {
 public:
-	apple2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 m_flags;
 	INT32 m_a2_cnxx_slot;

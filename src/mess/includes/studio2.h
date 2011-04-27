@@ -23,8 +23,8 @@
 class studio2_state : public driver_device
 {
 public:
-	studio2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_speaker(*this, BEEP_TAG),
 		  m_vdc(*this, CDP1861_TAG)
@@ -54,8 +54,8 @@ public:
 class visicom_state : public studio2_state
 {
 public:
-	visicom_state(running_machine &machine, const driver_device_config_base &config)
-		: studio2_state(machine, config)
+	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: studio2_state(mconfig, type, tag)
 	{ }
 
 	UINT8 *m_color_ram;
@@ -65,8 +65,8 @@ public:
 class mpt02_state : public studio2_state
 {
 public:
-	mpt02_state(running_machine &machine, const driver_device_config_base &config)
-		: studio2_state(machine, config),
+	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
+		: studio2_state(mconfig, type, tag),
 		  m_cti(*this, CDP1864_TAG)
 	{ }
 

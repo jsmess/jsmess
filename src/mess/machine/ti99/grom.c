@@ -102,7 +102,7 @@ INLINE const ti99grom_config *get_config(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == GROM);
 
-	return (const ti99grom_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const ti99grom_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 /*

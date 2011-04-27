@@ -77,8 +77,8 @@ typedef struct
 class lynx_state : public driver_device
 {
 public:
-	lynx_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_mem_0000;
 	UINT8 *m_mem_fc00;

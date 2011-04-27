@@ -31,8 +31,8 @@
 class pc8401a_state : public driver_device
 {
 public:
-	pc8401a_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	pc8401a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_lcdc(*this, SED1330_TAG),
@@ -86,8 +86,8 @@ public:
 class pc8500_state : public pc8401a_state
 {
 public:
-	pc8500_state(running_machine &machine, const driver_device_config_base &config)
-		: pc8401a_state(machine, config)
+	pc8500_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc8401a_state(mconfig, type, tag)
 	{ }
 
 	virtual void video_start();

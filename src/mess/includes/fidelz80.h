@@ -12,8 +12,8 @@
 class fidelz80_state : public driver_device
 {
 public:
-	fidelz80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_speech(*this, "speech"),
 		  m_beep(*this, "beep"),

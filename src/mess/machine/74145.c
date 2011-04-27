@@ -142,11 +142,11 @@ READ16_DEVICE_HANDLER( ttl74145_r )
 
 static DEVICE_START( ttl74145 )
 {
-	const ttl74145_interface *intf = (const ttl74145_interface *)device->baseconfig().static_config();
+	const ttl74145_interface *intf = (const ttl74145_interface *)device->static_config();
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* initialize with 0 */
 	ttl74145->number = 0;

@@ -69,26 +69,13 @@ struct ieee488_config
 	const char *m_tag;
 };
 
-
-// ======================> device_config_ieee488_interface
-
-// device_config_ieee488_interface represents configuration information for a ieee488 device
-class device_config_ieee488_interface : public device_config_interface
-{
-public:
-	// construction/destruction
-	device_config_ieee488_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_ieee488_interface();
-};
-
-
 // ======================> device_ieee488_interface
 
 class device_ieee488_interface : public device_interface
 {
 public:
 	// construction/destruction
-	device_ieee488_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_ieee488_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_ieee488_interface();
 
 	// optional operation overrides
@@ -100,48 +87,20 @@ public:
 	virtual void ieee488_srq(int state) { };
 	virtual void ieee488_atn(int state) { };
 	virtual void ieee488_ren(int state) { };
-
-protected:
-	const device_config_ieee488_interface &m_ieee488_config;
 };
-
-
-// ======================> ieee488_device_config
-
-class ieee488_device_config :   public device_config,
-							    public ieee488_config
-{
-    friend class ieee488_device;
-
-    // construction/destruction
-    ieee488_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	const ieee488_config *m_daisy;
-};
-
 
 // ======================> ieee488_device
 
 class ieee488_stub_device;
 
-class ieee488_device :  public device_t
+class ieee488_device :  public device_t,
+						public ieee488_config
 {
-    friend class ieee488_device_config;
-
-    // construction/destruction
-    ieee488_device(running_machine &_machine, const ieee488_device_config &_config);
 
 public:
+    // construction/destruction
+    ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// reads for both host and peripherals
 	UINT8 dio_r();
 	READ8_MEMBER( dio_r );
@@ -193,6 +152,7 @@ protected:
 
 	// device-level overrides
     virtual void device_start();
+    virtual void device_config_complete();
 
 	class daisy_entry
 	{
@@ -217,7 +177,7 @@ private:
 
 	required_device<ieee488_stub_device> m_stub;
 
-    const ieee488_device_config &m_config;
+   	const ieee488_config *m_daisy;
 };
 
 
@@ -225,54 +185,33 @@ private:
 
 struct ieee488_stub_interface
 {
-	devcb_write_line	m_out_eoi_func;
-	devcb_write_line	m_out_dav_func;
-	devcb_write_line	m_out_nrfd_func;
-	devcb_write_line	m_out_ndac_func;
-	devcb_write_line	m_out_ifc_func;
-	devcb_write_line	m_out_srq_func;
-	devcb_write_line	m_out_atn_func;
-	devcb_write_line	m_out_ren_func;
+	devcb_write_line	m_out_eoi_cb;
+	devcb_write_line	m_out_dav_cb;
+	devcb_write_line	m_out_nrfd_cb;
+	devcb_write_line	m_out_ndac_cb;
+	devcb_write_line	m_out_ifc_cb;
+	devcb_write_line	m_out_srq_cb;
+	devcb_write_line	m_out_atn_cb;
+	devcb_write_line	m_out_ren_cb;
 };
 
 const ieee488_stub_interface default_ieee488_stub_interface = { DEVCB_NULL, };
 
 
-// ======================> ieee488_stub_device_config
-
-class ieee488_stub_device_config :   public device_config,
-									 public ieee488_stub_interface,
-									 public device_config_ieee488_interface
-{
-    friend class ieee488_stub_device;
-
-    // construction/destruction
-    ieee488_stub_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
 // ======================> ieee488_stub_device
 
 class ieee488_stub_device :  public device_t,
+							 public ieee488_stub_interface,
 							 public device_ieee488_interface
 {
-    friend class ieee488_stub_device_config;
-
-    // construction/destruction
-    ieee488_stub_device(running_machine &_machine, const ieee488_stub_device_config &_config);
+public:    
+	// construction/destruction
+    ieee488_stub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
     // device-level overrides
     virtual void device_start();
+    virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
 	void ieee488_eoi(int state);
@@ -293,8 +232,6 @@ private:
 	devcb_resolved_write_line	m_out_srq_func;
 	devcb_resolved_write_line	m_out_atn_func;
 	devcb_resolved_write_line	m_out_ren_func;
-
-    const ieee488_stub_device_config &m_config;
 };
 
 

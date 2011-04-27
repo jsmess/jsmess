@@ -46,8 +46,8 @@
 class mekd2_state : public driver_device
 {
 public:
-	mekd2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pia_s(*this, "pia_s"),
 	m_pia_u(*this, "pia_u"),

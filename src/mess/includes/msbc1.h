@@ -11,8 +11,8 @@
 class msbc1_state : public driver_device
 {
 public:
-	msbc1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	msbc1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	virtual void machine_reset();
 };

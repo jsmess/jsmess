@@ -38,7 +38,7 @@
 
 #define MCFG_C1551_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1551, 0) \
-	c1551_device_config::static_set_config(device, _address);
+	c1551_device::static_set_config(*device, _address);
 
 
 
@@ -46,47 +46,20 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1551_device_config
+// ======================> c1551_device
 
-class c1551_device_config :   public device_config
+class c1551_device :  public device_t
 {
-    friend class c1551_device;
-
-    // construction/destruction
-    c1551_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
+    // construction/destruction
+    c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_config(device_config *device, int address);
+	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	const char *m_cpu_tag;
-	int m_jp1;
-};
-
-
-// ======================> c1551_device
-
-class c1551_device :  public device_t
-{
-    friend class c1551_device_config;
-
-    // construction/destruction
-    c1551_device(running_machine &_machine, const c1551_device_config &_config);
-
-public:
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
@@ -109,6 +82,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+    virtual void device_config_complete();
 
 private:
 	inline void set_tcbm_dev(int dev);
@@ -129,7 +103,8 @@ private:
 	// timers
 	emu_timer *m_irq_timer;
 
-    const c1551_device_config &m_config;
+    const char *m_cpu_tag;
+	int m_jp1;
 };
 
 

@@ -26,8 +26,8 @@
 class mbee_state : public driver_device
 {
 public:
-	mbee_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mbee_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pio(*this, "z80pio"),
 	m_cass(*this, "cassette"),

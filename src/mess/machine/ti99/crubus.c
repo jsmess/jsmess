@@ -122,7 +122,7 @@ static DEVICE_START( crubus )
 {
 	int i = 0;
 	int done=FALSE;
-	cruconf_device *cons = (cruconf_device*)device->baseconfig().static_config();
+	cruconf_device *cons = (cruconf_device*)device->static_config();
 	crubus_state *crubus = get_safe_token(device);
 
 	logerror("start CRU bus\n");

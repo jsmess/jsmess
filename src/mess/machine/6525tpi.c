@@ -152,7 +152,7 @@ INLINE tpi6525_state *get_safe_token(device_t *device)
 static DEVICE_START( tpi6525 )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
-	const tpi6525_interface *intf = (const tpi6525_interface*)device->baseconfig().static_config();
+	const tpi6525_interface *intf = (const tpi6525_interface*)device->static_config();
 
 	// resolve callbacks
 	devcb_resolve_write_line(&tpi6525->out_irq_func, &intf->out_irq_func, device);
@@ -166,7 +166,7 @@ static DEVICE_START( tpi6525 )
 	devcb_resolve_write_line(&tpi6525->out_cb_func, &intf->out_cb_func, device);
 
 	/* verify that we have an interface assigned */
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* register for state saving */
 	device->save_item(NAME(tpi6525->port_a));

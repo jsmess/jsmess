@@ -67,8 +67,8 @@ typedef void (*nes_chr_callback)(running_machine &machine, int start, int bank, 
 class nes_state : public driver_device
 {
 public:
-	nes_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
 	nes_input m_in_0, m_in_1, m_in_2, m_in_3;

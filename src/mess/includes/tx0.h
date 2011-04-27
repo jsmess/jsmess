@@ -127,8 +127,8 @@ typedef struct magtape_t
 class tx0_state : public driver_device
 {
 public:
-	tx0_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	tx0_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tape_reader_t m_tape_reader;
 	tape_puncher_t m_tape_puncher;

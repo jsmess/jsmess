@@ -45,31 +45,13 @@ struct FMSCSIinterface
     MCFG_DEVICE_ADD(_tag, FMSCSI, 0) \
     MCFG_DEVICE_CONFIG(_intrf)
 
-class fmscsi_device_config : public device_config, public FMSCSIinterface
+class fmscsi_device : public device_t, 
+					  public FMSCSIinterface
 {
-	friend class fmscsi_device;
-
-	// construction/destruction
-	fmscsi_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
-class fmscsi_device : public device_t
-{
-	friend class fmscsi_device_config;
-
     // construction/destruction
-    fmscsi_device(running_machine &machine, const fmscsi_device_config &config);
+    fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-public:
     // any publically accessible interfaces needed for runtime
     UINT8 fmscsi_data_r(void);
     void fmscsi_data_w(UINT8 data);
@@ -91,10 +73,10 @@ protected:
     virtual void device_reset();
     virtual void device_stop();
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
+	virtual void device_config_complete();
+	
 private:
     // internal device state goes here
-    const fmscsi_device_config &m_config;
     static const device_timer_id TIMER_TRANSFER = 0;
     static const device_timer_id TIMER_PHASE = 1;
 

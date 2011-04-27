@@ -16,8 +16,8 @@ DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 class d65010_state : public driver_device
 {
 public:
-	d65010_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	d65010_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8	m_io_regs[8];
 	UINT8	m_fd_data;

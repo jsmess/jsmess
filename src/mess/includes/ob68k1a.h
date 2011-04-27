@@ -16,8 +16,8 @@
 class ob68k1a_state : public driver_device
 {
 public:
-	ob68k1a_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	ob68k1a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, MC68000L10_TAG),
 		  m_dbrg(*this, COM8116_TAG),
 		  m_acia0(*this, MC6850_0_TAG),

@@ -75,9 +75,9 @@ INLINE pc_lpt_state *get_safe_token(device_t *device)
 static DEVICE_START( pc_lpt )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->baseconfig().static_config();
+	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->static_config();
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* get centronics device */
 	lpt->centronics = device->subdevice("centronics");

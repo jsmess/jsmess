@@ -70,51 +70,20 @@ struct zx8301_interface
 	const char *cpu_tag;
 	const char *screen_tag;
 
-	devcb_write_line	out_vsync_func;
+	devcb_write_line	out_vsync_cb;
 };
-
-
-
-// ======================> zx8301_device_config
-
-class zx8301_device_config :   public device_config,
-								public device_config_memory_interface,
-                                public zx8301_interface
-{
-    friend class zx8301_device;
-
-    // construction/destruction
-    zx8301_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
-};
-
 
 
 // ======================> zx8301_device
 
 class zx8301_device :	public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public zx8301_interface
 {
-    friend class zx8301_device_config;
-
-    // construction/destruction
-    zx8301_device(running_machine &_machine, const zx8301_device_config &_config);
-
 public:
+    // construction/destruction
+    zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE8_MEMBER( control_w );
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( data_w );
@@ -125,6 +94,13 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete();
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+    // address space configurations
+	const address_space_config		m_space_config;
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
@@ -151,8 +127,6 @@ private:
 
 	emu_timer *m_vsync_timer;		// vertical sync timer
 	emu_timer *m_flash_timer;		// flash timer
-
-	const zx8301_device_config &m_config;
 };
 
 

@@ -12,8 +12,8 @@
 class amu880_state : public driver_device
 {
 public:
-	amu880_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	amu880_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_key_d6(0),
 		  m_key_d7(0),

@@ -28,8 +28,8 @@ One i/o port is used:
 class zexall_state : public driver_device
 {
 public:
-	zexall_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_terminal(*this, TERMINAL_TAG)
 	{ }

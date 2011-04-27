@@ -37,48 +37,25 @@
 
 struct abc99_interface
 {
-	devcb_write_line	m_out_txd_func;
-	devcb_write_line	m_out_clock_func;
-	devcb_write_line	m_out_keydown_func;
+	devcb_write_line	m_out_txd_cb;
+	devcb_write_line	m_out_clock_cb;
+	devcb_write_line	m_out_keydown_cb;
 };
 
+// ======================> abc99_device
 
-// ======================> abc99_device_config
-
-class abc99_device_config :   public device_config,
-                                public abc99_interface
+class abc99_device :  public device_t,
+                      public abc99_interface
 {
-    friend class abc99_device;
-
-    // construction/destruction
-    abc99_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
+    // construction/destruction
+    abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const input_port_token *device_input_ports() const;
 
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
-// ======================> abc99_device
-
-class abc99_device :  public device_t
-{
-    friend class abc99_device_config;
-
-    // construction/destruction
-    abc99_device(running_machine &_machine, const abc99_device_config &_config);
-
-public:
 	static INPUT_CHANGED( keyboard_reset );
 
 	DECLARE_WRITE8_MEMBER( z2_led_w );
@@ -100,6 +77,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+    virtual void device_config_complete();
 
 private:
 	static const device_timer_id TIMER_SERIAL = 0;
@@ -132,8 +110,6 @@ private:
 	int m_t1_z5;
 	int m_led_en;
 	int m_reset;
-
-    const abc99_device_config &m_config;
 };
 
 

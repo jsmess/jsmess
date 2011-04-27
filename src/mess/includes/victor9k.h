@@ -42,8 +42,8 @@
 class victor9k_state : public driver_device
 {
 public:
-	victor9k_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	victor9k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I8088_TAG),
 		  m_fdc_cpu(*this, I8048_TAG),
 		  m_ieee488(*this, IEEE488_TAG),

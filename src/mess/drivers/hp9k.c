@@ -18,8 +18,8 @@
 class hp9k_state : public driver_device
 {
 public:
-	hp9k_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
 	{ }
 

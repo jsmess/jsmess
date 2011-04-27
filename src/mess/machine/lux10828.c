@@ -130,45 +130,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_10828 = luxor_55_10828_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  luxor_55_10828_device_config - constructor
-//-------------------------------------------------
-
-luxor_55_10828_device_config::luxor_55_10828_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Luxor 55 10828", tag, owner, clock),
-	  device_config_abcbus_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *luxor_55_10828_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(luxor_55_10828_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *luxor_55_10828_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, luxor_55_10828_device(machine, *this));
-}
-
+const device_type LUXOR_55_10828 = &device_creator<luxor_55_10828_device>;
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -176,7 +138,7 @@ device_t *luxor_55_10828_device_config::alloc_device(running_machine &machine) c
 //  complete
 //-------------------------------------------------
 
-void luxor_55_10828_device_config::device_config_complete()
+void luxor_55_10828_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const luxor_55_10828_interface *intf = reinterpret_cast<const luxor_55_10828_interface *>(static_config());
@@ -221,7 +183,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *luxor_55_10828_device_config::device_rom_region() const
+const rom_entry *luxor_55_10828_device::device_rom_region() const
 {
 	return ROM_NAME( luxor_55_10828 );
 }
@@ -413,7 +375,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor luxor_55_10828_device_config::device_mconfig_additions() const
+machine_config_constructor luxor_55_10828_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( luxor_55_10828 );
 }
@@ -449,7 +411,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *luxor_55_10828_device_config::device_input_ports() const
+const input_port_token *luxor_55_10828_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( luxor_55_10828 );
 }
@@ -464,9 +426,10 @@ const input_port_token *luxor_55_10828_device_config::device_input_ports() const
 //  luxor_55_10828_device - constructor
 //-------------------------------------------------
 
-luxor_55_10828_device::luxor_55_10828_device(running_machine &_machine, const luxor_55_10828_device_config &_config)
-    : device_t(_machine, _config),
-	  device_abcbus_interface(_machine, _config, *this),
+
+luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock),
+	  device_abcbus_interface(mconfig, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
@@ -477,8 +440,7 @@ luxor_55_10828_device::luxor_55_10828_device(running_machine &_machine, const lu
 	  m_fdc_drq(0),
 	  m_wait_enable(0),
 	  m_sel0(0),
-	  m_sel1(0),
-      m_config(_config)
+	  m_sel1(0)
 {
 }
 

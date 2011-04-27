@@ -134,41 +134,7 @@ static pc_video_update_proc cirrus_choosevideomode(const UINT8 *sequencer,
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CIRRUS = cirrus_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cirrus_device_config - constructor
-//-------------------------------------------------
-
-cirrus_device_config::cirrus_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "CIRRUS", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cirrus_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(cirrus_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *cirrus_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, cirrus_device(machine, *this));
-}
+const device_type CIRRUS = &device_creator<cirrus_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -178,9 +144,8 @@ device_t *cirrus_device_config::alloc_device(running_machine &machine) const
 //  cirrus_device - constructor
 //-------------------------------------------------
 
-cirrus_device::cirrus_device(running_machine &_machine, const cirrus_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+     : device_t(mconfig, CIRRUS, "CIRRUS", tag, owner, clock)
 {
 }
 

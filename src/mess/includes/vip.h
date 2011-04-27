@@ -60,8 +60,8 @@ enum
 class vip_state : public driver_device
 {
 public:
-	vip_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	vip_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vdc(*this, CDP1861_TAG),
 		  m_cgc(*this, CDP1862_TAG),

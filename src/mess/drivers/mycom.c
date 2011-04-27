@@ -66,8 +66,8 @@
 class mycom_state : public driver_device
 {
 public:
-	mycom_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mycom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ppi0(*this, "ppi8255_0"),
 	m_ppi1(*this, "ppi8255_1"),

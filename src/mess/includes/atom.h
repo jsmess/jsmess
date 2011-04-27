@@ -40,8 +40,8 @@
 class atom_state : public driver_device
 {
 public:
-	atom_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	atom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, SY6502_TAG),
 		  m_vdg(*this, MC6847_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
@@ -91,8 +91,8 @@ public:
 class atomeb_state : public atom_state
 {
 public:
-	atomeb_state(running_machine &machine, const driver_device_config_base &config)
-		: atom_state(machine, config)
+	atomeb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atom_state(mconfig, type, tag)
 	{ }
 
 	virtual void machine_start();

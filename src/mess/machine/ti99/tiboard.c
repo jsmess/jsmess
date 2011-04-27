@@ -54,7 +54,7 @@ INLINE const tiboard_config *get_config(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TIBOARD);
 
-	return (const tiboard_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const tiboard_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 /****************************************************************************

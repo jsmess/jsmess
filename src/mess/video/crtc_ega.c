@@ -722,7 +722,7 @@ static void common_start(device_t *device, int device_type)
 	assert(device->tag() != NULL);
 	assert(device->clock() > 0);
 
-	crtc_ega->intf = (const crtc_ega_interface*)device->baseconfig().static_config();
+	crtc_ega->intf = (const crtc_ega_interface*)device->static_config();
 	crtc_ega->device_type = device_type;
 
 	if (crtc_ega->intf != NULL)

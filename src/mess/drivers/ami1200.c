@@ -30,8 +30,8 @@
 class ami1200_state : public cd32_state
 {
 public:
-	ami1200_state(running_machine &machine, const driver_device_config_base &config)
-		: cd32_state(machine, config) { }
+	ami1200_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cd32_state(mconfig, type, tag) { }
 
 	UINT16 potgo_value;
 	int cd32_shifter[2];

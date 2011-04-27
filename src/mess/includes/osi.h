@@ -31,8 +31,8 @@
 class sb2m600_state : public driver_device
 {
 public:
-	sb2m600_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, M6502_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
@@ -71,8 +71,8 @@ public:
 class c1p_state : public sb2m600_state
 {
 public:
-	c1p_state(running_machine &machine, const driver_device_config_base &config)
-		: sb2m600_state(machine, config),
+	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sb2m600_state(mconfig, type, tag),
 		  m_beep(*this, BEEP_TAG)
 	{ }
 
@@ -87,8 +87,8 @@ public:
 class c1pmf_state : public c1p_state
 {
 public:
-	c1pmf_state(running_machine &machine, const driver_device_config_base &config)
-		: c1p_state(machine, config),
+	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c1p_state(mconfig, type, tag),
 		  m_floppy(*this, FLOPPY_0)
 	{ }
 
@@ -105,8 +105,8 @@ public:
 class uk101_state : public sb2m600_state
 {
 public:
-	uk101_state(running_machine &machine, const driver_device_config_base &config)
-		: sb2m600_state(machine, config)
+	uk101_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sb2m600_state(mconfig, type, tag)
 	{ }
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);

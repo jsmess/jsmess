@@ -175,8 +175,8 @@ INLINE const applefdc_interface *get_interface(device_t *device)
 	static const applefdc_interface dummy_interface = {0, };
 
 	assert_is_applefdc(device);
-	return (device->baseconfig().static_config() != NULL)
-		? (const applefdc_interface *) device->baseconfig().static_config()
+	return (device->static_config() != NULL)
+		? (const applefdc_interface *) device->static_config()
 		: &dummy_interface;
 }
 

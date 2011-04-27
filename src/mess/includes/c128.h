@@ -20,8 +20,8 @@
 class c128_state : public c64_state
 {
 public:
-	c128_state(running_machine &machine, const driver_device_config_base &config)
-		: c64_state(machine, config) { }
+	c128_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c64_state(mconfig, type, tag) { }
 
 	UINT8 *m_c128_basic;
 	UINT8 *m_c128_kernal;

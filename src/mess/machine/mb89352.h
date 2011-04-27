@@ -54,31 +54,13 @@ struct mb89352_interface
     MCFG_DEVICE_ADD(_tag, MB89352A, 0) \
     MCFG_DEVICE_CONFIG(_intrf)
 
-class mb89352_device_config : public device_config, public mb89352_interface
+class mb89352_device : public device_t, 
+					   public mb89352_interface
 {
-	friend class mb89352_device;
-
-	// construction/destruction
-	mb89352_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
-class mb89352_device : public device_t
-{
-	friend class mb89352_device_config;
-
     // construction/destruction
-    mb89352_device(running_machine &machine, const mb89352_device_config &config);
+    mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-public:
     // any publically accessible interfaces needed for runtime
     DECLARE_READ8_MEMBER( mb89352_r );
     DECLARE_WRITE8_MEMBER( mb89352_w );
@@ -91,11 +73,11 @@ protected:
     virtual void device_start();
     virtual void device_reset();
     virtual void device_stop();
+	virtual void device_config_complete();
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
     // internal device state goes here
-    const mb89352_device_config &m_config;
     static const device_timer_id TIMER_TRANSFER = 0;
 
     void mb89352_rescan(void);

@@ -343,7 +343,7 @@ static DEVICE_START( kr2376 )
 	assert(device != NULL);
 	assert(device->tag() != NULL);
 
-	kr2376->intf = (const kr2376_interface*)device->baseconfig().static_config();
+	kr2376->intf = (const kr2376_interface*)device->static_config();
 
 	assert(kr2376->intf != NULL);
 	assert(kr2376->intf->clock > 0);

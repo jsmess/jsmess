@@ -22,8 +22,8 @@
 class mikrosha_state : public radio86_state
 {
 public:
-	mikrosha_state(running_machine &machine, const driver_device_config_base &config)
-		: radio86_state(machine, config) { }
+	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
+		: radio86_state(mconfig, type, tag) { }
 
 };
 

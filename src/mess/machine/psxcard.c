@@ -19,7 +19,7 @@
 //
 //
 
-const device_type PSXCARD = psxcard_device_config::static_alloc_device_config;
+const device_type PSXCARD = &device_creator<psxcard_device>;
 
 enum transfer_states
 {
@@ -36,28 +36,8 @@ enum transfer_states
 	state_writechk
 };
 
-//
-//
-//
-
-psxcard_device_config::psxcard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Sony PSX Memory Card", tag, owner, clock)
-{
-}
-
-device_config *psxcard_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(psxcard_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *psxcard_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, psxcard_device(machine, *this));
-}
-
-psxcard_device::psxcard_device(running_machine &_machine, const psxcard_device_config &_config)
-    : device_t(_machine, _config),
-      m_config(_config)
+psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock)
 {
 }
 

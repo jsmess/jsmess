@@ -38,8 +38,8 @@ For BIOS CRC confirmation
 class pv2000_state : public driver_device
 {
 public:
-	pv2000_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { m_last_state = 0; }
+	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { m_last_state = 0; }
 
 	int		m_last_state;
 	UINT8	m_keyb_column;

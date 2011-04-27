@@ -34,8 +34,8 @@
 class elwro800_state : public spectrum_state
 {
 public:
-	elwro800_state(running_machine &machine, const driver_device_config_base &config)
-		: spectrum_state(machine, config) { }
+	elwro800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spectrum_state(mconfig, type, tag) { }
 
 	/* for elwro800 */
 	/* RAM mapped at 0 */

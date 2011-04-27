@@ -634,9 +634,9 @@ static DEVICE_START( tms9902 )
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config() != NULL);
+	assert(device->static_config() != NULL);
 
-	tms9902->intf = (const tms9902_interface*)device->baseconfig().static_config();
+	tms9902->intf = (const tms9902_interface*)device->static_config();
 
 	tms9902->clock_rate = tms9902->intf->clock_rate;
 
