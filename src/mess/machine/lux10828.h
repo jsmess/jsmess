@@ -118,8 +118,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<device_t> m_fdc;
-	device_t *m_image0;
-	device_t *m_image1;
+	required_device<device_t> m_image0;
+	required_device<device_t> m_image1;
 
 	bool m_cs;				// card selected
 	UINT8 m_status;			// ABC BUS status
