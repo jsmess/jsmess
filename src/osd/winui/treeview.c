@@ -913,7 +913,7 @@ void CreateCPUFolders(int parent_index)
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
 	LPTREEFOLDER folder;
-	const device_config_execute_interface *device = NULL;
+	const device_execute_interface *device = NULL;
 	int nFolder = numFolders;
 
 	for (i = 0; i < driver_list::total(); i++)
@@ -921,11 +921,11 @@ void CreateCPUFolders(int parent_index)
 		machine_config config(driver_list::driver(i),MameUIGlobal());
 
 		// enumerate through all devices
-		for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = config.devicelist().first(device); gotone; gotone = device->next(device))
 		{
 
 			// get the name
-			const char *dev_name = device->devconfig().name();
+			const char *dev_name = device->device().name();
 
 			// do we have a folder for this device?
 			folder = NULL;
@@ -943,7 +943,7 @@ void CreateCPUFolders(int parent_index)
 			{
 				LPTREEFOLDER lpTemp;
 
-				lpTemp = NewFolder(device->devconfig().name(), next_folder_id, parent_index, IDI_CPU,
+				lpTemp = NewFolder(device->device().name(), next_folder_id, parent_index, IDI_CPU,
 								   GetFolderFlags(numFolders));
 				ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 				memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
@@ -952,7 +952,7 @@ void CreateCPUFolders(int parent_index)
 				ExtraFolderData[next_folder_id]->m_nIconId = IDI_CPU;
 				ExtraFolderData[next_folder_id]->m_nParent = treeFolders[parent_index]->m_nFolderId;
 				ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
-				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->devconfig().name() );
+				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->device().name() );
 				ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
 				AddFolder(lpTemp);
 				folder = treeFolders[nFolder++];
@@ -973,7 +973,7 @@ void CreateSoundFolders(int parent_index)
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
 	LPTREEFOLDER folder;
-	const device_config_sound_interface *device = NULL;
+	const device_sound_interface *device = NULL;
 	int nFolder = numFolders;
 
 	for (i = 0; i < driver_list::total(); i++)
@@ -982,10 +982,10 @@ void CreateSoundFolders(int parent_index)
 
 		// enumerate through all devices
 
-		for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = config.devicelist().first(device); gotone; gotone = device->next(device))
 		{
 			// get the name
-			const char *dev_name = device->devconfig().name();
+			const char *dev_name = device->device().name();
 
 			// do we have a folder for this device?
 			folder = NULL;
@@ -1003,7 +1003,7 @@ void CreateSoundFolders(int parent_index)
 			{
 				LPTREEFOLDER lpTemp;
 
-				lpTemp = NewFolder(device->devconfig().name(), next_folder_id, parent_index, IDI_SOUND,
+				lpTemp = NewFolder(device->device().name(), next_folder_id, parent_index, IDI_SOUND,
 								   GetFolderFlags(numFolders));
 				ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 				memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
@@ -1012,7 +1012,7 @@ void CreateSoundFolders(int parent_index)
 				ExtraFolderData[next_folder_id]->m_nIconId = IDI_SOUND;
 				ExtraFolderData[next_folder_id]->m_nParent = treeFolders[parent_index]->m_nFolderId;
 				ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
-				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->devconfig().name() );
+				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->device().name() );
 				ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
 				AddFolder(lpTemp);
 				folder = treeFolders[nFolder++];

@@ -210,7 +210,7 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv)
 {
-	return (drv->m_devicelist.first(RAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
+	return (drv->devicelist().first(RAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
 }
 
 
@@ -392,7 +392,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, windows_
 	UINT32 ram, current_ram;
 	const char *this_ram_string;
 	TCHAR* t_ramstring;
-	const device_config *device;
+	const device_t *device;
 
 	// identify the driver
 	driver_index = PropertiesCurrentGame(dialog);
@@ -405,14 +405,14 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, windows_
 	machine_config cfg(*gamedrv,*opts);
 
 	// identify how many options that we have
-	device = cfg.m_devicelist.first(RAM);
+	device = cfg.devicelist().first(RAM);
 
 	EnableWindow(control, (device != NULL));
 	i = 0;
 	// we can only do something meaningful if there is more than one option
 	if (device != NULL)
 	{
-		ram_config *config = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+		ram_config *config = (ram_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 		// identify the current amount of RAM
 		this_ram_string = opts->value(OPTION_RAMSIZE);

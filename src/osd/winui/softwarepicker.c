@@ -39,7 +39,7 @@
 typedef struct _file_info file_info;
 struct _file_info
 {
-	const device_config_image_interface *device;
+	const device_image_interface *device;
 
 	// hash information
 	//hash_collection hashes;
@@ -147,7 +147,7 @@ LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
 
 
 
-const device_config_image_interface *SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
+const device_image_interface *SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
 {
 	software_picker_info *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -179,7 +179,7 @@ int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
 iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 {
 	iodevice_t type;
-	const device_config_image_interface *device = SoftwarePicker_LookupDevice(hwndPicker, nIndex);
+	const device_image_interface *device = SoftwarePicker_LookupDevice(hwndPicker, nIndex);
 
 	if (device != NULL)
 	{
@@ -368,7 +368,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	file_info *pInfo;
 	int nIndex, nSize;
 	LPCSTR pszExtension = NULL;
-	const device_config_image_interface *device = NULL;
+	const device_image_interface *device = NULL;
 
 	// first check to see if it is already here
 	if (SoftwarePicker_LookupIndex(hwndPicker, pszFilename) >= 0)
@@ -381,7 +381,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		pszExtension = strrchr(pszFilename, '.');
 	if ((pszExtension != NULL) && (pPickerInfo->config != NULL))
 	{
-		for (bool gotone = pPickerInfo->config->mconfig->m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = pPickerInfo->config->mconfig->devicelist().first(device); gotone; gotone = device->next(device))
 		{
 			if (device->uses_file_extension(pszExtension)) {
 				break;

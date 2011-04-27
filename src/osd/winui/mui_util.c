@@ -321,7 +321,7 @@ const char * GetDriverFilename(int nIndex)
 
 BOOL isDriverVector(const machine_config *config)
 {
-	const screen_device_config *screen  = config->first_screen();
+	const screen_device *screen  = config->first_screen();
 
 	if (screen != NULL) {
 		// parse "vector.ini" for vector games
@@ -335,7 +335,7 @@ BOOL isDriverVector(const machine_config *config)
 
 int numberOfScreens(const machine_config *config)
 {
-	const screen_device_config *screen  = config->first_screen();
+	const screen_device *screen  = config->first_screen();
 	int i=0;
 	for (; screen != NULL; screen = screen->next_screen()) {
 		i++;
@@ -347,7 +347,7 @@ int numberOfScreens(const machine_config *config)
 
 int numberOfSpeakers(const machine_config *config)
 {
-	return config->m_devicelist.count(SPEAKER);
+	return config->devicelist().count(SPEAKER);
 }
 
 static struct DriversInfo* GetDriversInfo(int driver_index)
@@ -411,12 +411,12 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->usesSamples = FALSE;
 
 			{
-				const device_config_sound_interface *sound = NULL;
+				const device_sound_interface *sound = NULL;
 				const char * const * samplenames = NULL;
-				for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound)) {
-					if (sound->devconfig().type() == SAMPLES)
+				for (bool gotone = config.devicelist().first(sound); gotone; gotone = sound->next(sound)) {
+					if (sound->device().type() == SAMPLES)
 					{
-						const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
+						const samples_interface *intf = (const samples_interface *)sound->device().static_config();
 						samplenames = intf->samplenames;
 
 						if (samplenames != 0 && samplenames[0] != 0)
@@ -436,7 +436,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 				ioport_list portlist;
 
 				input_port_list_init(portlist, gamedrv->ipt, NULL, 0, FALSE, NULL);
-				for (device_config *cfg = config.m_devicelist.first(); cfg != NULL; cfg = cfg->next())
+				for (device_t *cfg = config.devicelist().first(); cfg != NULL; cfg = cfg->next())
 				{
 					if (cfg->input_ports()!=NULL) {
 						input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);

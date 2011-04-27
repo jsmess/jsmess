@@ -25,12 +25,12 @@ BOOL DriverIsModified(int driver_index)
 BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 {
 	BOOL b = FALSE;
-	const device_config_image_interface *device;
+	const device_image_interface *device;
 
 	// allocate the machine config
 	machine_config config(*gamedrv,MameUIGlobal());
 
-	for (bool gotone = config.m_devicelist.first(device); gotone; gotone = device->next(device))
+	for (bool gotone = config.devicelist().first(device); gotone; gotone = device->next(device))
 	{
 		if (device->image_type() == type)
 		{

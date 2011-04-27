@@ -147,7 +147,7 @@ void SetHashDirs(const char *paths)
 	assert(!error_string);
 }
 
-void SetSelectedSoftware(int driver_index, const machine_config *config, const device_config_image_interface *dev, const char *software)
+void SetSelectedSoftware(int driver_index, const machine_config *config, const device_image_interface *dev, const char *software)
 {
 	const char *opt_name = dev->instance_name();
 	windows_options o;
@@ -165,7 +165,7 @@ void SetSelectedSoftware(int driver_index, const machine_config *config, const d
 	save_options(OPTIONS_GAME, o, driver_index);
 }
 
-const char *GetSelectedSoftware(int driver_index, const machine_config *config, const device_config_image_interface *dev)
+const char *GetSelectedSoftware(int driver_index, const machine_config *config, const device_image_interface *dev)
 {
 	const char *opt_name = dev->instance_name();
 	const char *software;
