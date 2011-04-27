@@ -21,10 +21,8 @@
         ToDo:
         - RTC doesn't remember the time
         - Alarm doesn't work
-        - All RAM needs to be battery-backed up.
         - Reset/On button to be added
         - The ROM has INT and NMI code; investigate if something uses it.
-        - Add rom banking of the spelling-check library.
 
 
 ****************************************************************************/
@@ -33,6 +31,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/rp5c15.h"
+#include "machine/nvram.h"
 #include "video/hd44780.h"
 #include "sound/speaker.h"
 #include "rendlay.h"
@@ -54,10 +53,12 @@ public:
 	required_device<rp5c15_device> m_rtc;
 	required_device<device_t> m_speaker;
 
+	virtual void machine_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( bankswitch_w );
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -83,17 +84,23 @@ READ8_MEMBER( lcmate2_state::key_r )
 	return data;
 }
 
+WRITE8_MEMBER( lcmate2_state::bankswitch_w )
+{
+	memory_set_bank(machine(), "rombank", data&0x0f);
+}
 
 static ADDRESS_MAP_START(lcmate2_mem, AS_PROGRAM, 8, lcmate2_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAM	AM_MIRROR(0x6000)
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
+	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("rombank")
+	AM_RANGE( 0x8000, 0x9fff ) AM_RAM	AM_MIRROR(0x6000) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lcmate2_io, AS_IO, 8, lcmate2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c15_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)
+	AM_RANGE(0x1fff, 0x1fff) AM_WRITE(bankswitch_w)
 
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("hd44780", hd44780_device, control_write)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("hd44780", hd44780_device, data_write)
@@ -192,6 +199,11 @@ static PALETTE_INIT( lcmate2 )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
+void lcmate2_state::machine_start()
+{
+	memory_configure_bank(machine(), "rombank", 0, 0x10, (UINT8*)machine().region("maincpu")->base(), 0x4000);
+}
+
 bool lcmate2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return m_lcdc->video_update(&bitmap, &cliprect);
@@ -246,6 +258,8 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 
 	MCFG_HD44780_ADD("hd44780", lcmate2_display)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -257,9 +271,9 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( lcmate2 )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "u2.bin",  0x00000, 0x08000, CRC(521931b9) SHA1(743a6e2928c4365fbf5ed9a173e2c1bfe695850f) )
-	ROM_LOAD( "u3.bin",  0x10000, 0x20000, CRC(84fe767a) SHA1(8dd306f203e1220f0eab1a284be3095e2642c5b6) ) // spell library
+	ROM_LOAD( "u3.bin",  0x20000, 0x20000, CRC(84fe767a) SHA1(8dd306f203e1220f0eab1a284be3095e2642c5b6) ) // spell library
 
 	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
