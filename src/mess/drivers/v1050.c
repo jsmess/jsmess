@@ -723,7 +723,7 @@ static MSM58321_INTERFACE( rtc_intf )
 
 static WRITE8_DEVICE_HANDLER( disp_ppi_pc_w )
 {
-	i8255_device *ppi = reinterpret_cast<i8255_device*>(device);
+	i8255_device *ppi = static_cast<i8255_device*>(device);
 	
 	ppi->pc2_w(BIT(data, 6));
 	ppi->pc4_w(BIT(data, 7));
@@ -741,7 +741,7 @@ static I8255A_INTERFACE( disp_ppi_intf )
 
 static WRITE8_DEVICE_HANDLER( m6502_ppi_pc_w )
 {
-	i8255_device *ppi = reinterpret_cast<i8255_device*>(device);
+	i8255_device *ppi = static_cast<i8255_device*>(device);
 
 	ppi->pc2_w(BIT(data, 7));
 	ppi->pc4_w(BIT(data, 6));
