@@ -47,16 +47,15 @@ public:
 	craft_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{
-    	m_timer0_timer = machine().scheduler().timer_alloc(FUNC(avr8_timer0_tick));
 		m_timer0_increment = 1;
 
-    	m_timer1_timer = machine().scheduler().timer_alloc(FUNC(avr8_timer1_tick));
 		m_timer1_increment = 1;
 
-    	m_timer2_timer = machine().scheduler().timer_alloc(FUNC(avr8_timer2_tick));
 		m_timer2_increment = 1;
 	}
 
+	virtual void machine_start();
+	
 	UINT8 m_regs[0x100];
 
 	emu_timer* m_timer0_timer;
@@ -72,6 +71,12 @@ public:
 	INT32 m_timer2_increment;
 };
 
+void craft_state::machine_start()
+{
+	m_timer0_timer = machine().scheduler().timer_alloc(FUNC(avr8_timer0_tick));
+	m_timer1_timer = machine().scheduler().timer_alloc(FUNC(avr8_timer1_tick));
+	m_timer2_timer = machine().scheduler().timer_alloc(FUNC(avr8_timer2_tick));
+}
 enum
 {
 	AVR8_REG_A = 0,

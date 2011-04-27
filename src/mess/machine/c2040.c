@@ -1479,8 +1479,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 	  m_ready(0),
 	  m_mode(0),
 	  m_rw(0),
-	  m_miot_irq(CLEAR_LINE),
-	  m_bit_timer(timer_alloc())
+	  m_miot_irq(CLEAR_LINE)	 
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -1501,7 +1500,9 @@ void c2040_device::device_start()
 {
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
-
+	
+	m_bit_timer = timer_alloc();
+	
 	switch (m_variant)
 	{
 	default:

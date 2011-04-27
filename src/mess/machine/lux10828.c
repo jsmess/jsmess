@@ -433,8 +433,6 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
-	  m_image0(machine().device(FLOPPY_0)),
-	  m_image1(machine().device(FLOPPY_1)),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_fdc_drq(0),
@@ -451,6 +449,8 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 
 void luxor_55_10828_device::device_start()
 {
+	m_image0 = machine().device(FLOPPY_0);
+	m_image1 = machine().device(FLOPPY_1);
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
