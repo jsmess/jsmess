@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/chd_cd.h"
 #include "includes/psx.h"
