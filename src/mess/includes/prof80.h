@@ -25,7 +25,7 @@
 #define UPD765_TAG				"z38"
 #define UPD1990A_TAG			"z43"
 
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
 
 #define SCREEN_TAG				"screen"
 #define GRIP_Z80_TAG			"grip_z1"
@@ -38,7 +38,7 @@
 #define GRIP_VIDEORAM_SIZE	0x10000
 #define GRIP_VIDEORAM_MASK	0xffff
 
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
 
 #define UNIO_Z80STI_TAG			"z5"
 #define UNIO_Z80SIO_TAG			"z15"
@@ -73,37 +73,37 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	WRITE8_MEMBER( flr_w );
-	READ8_MEMBER( status_r );
-	READ8_MEMBER( status2_r );
-	WRITE8_MEMBER( par_w );
-	READ8_MEMBER( gripc_r );
-	READ8_MEMBER( gripd_r );
-	WRITE8_MEMBER( gripd_w );
-	WRITE8_MEMBER( unio_ctrl_w );
+	DECLARE_WRITE8_MEMBER( flr_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_READ8_MEMBER( status2_r );
+	DECLARE_WRITE8_MEMBER( par_w );
+	DECLARE_READ8_MEMBER( gripc_r );
+	DECLARE_READ8_MEMBER( gripd_r );
+	DECLARE_WRITE8_MEMBER( gripd_w );
+	DECLARE_WRITE8_MEMBER( unio_ctrl_w );
 
 	void bankswitch();
 	void ls259_w(int fa, int sa, int fb, int sb);
 	void floppy_motor_off();
 
-	/* memory state */
-	UINT8 m_mmu[16];			/* MMU block register */
-	int m_init;				/* MMU enable */
+	// memory state
+	UINT8 m_mmu[16];		// MMU block register
+	int m_init;				// MMU enable
 
-	/* RTC state */
+	// RTC state
 	int m_c0;
 	int m_c1;
 	int m_c2;
 
-	/* floppy state */
-	int	m_fdc_index;			/* floppy index hole sensor */
-	int m_motor;				/* floppy motor */
+	// floppy state
+	int	m_fdc_index;		// floppy index hole sensor
+	int m_motor;			// floppy motor
 
-	/* GRIP state */
-	UINT8 m_gripd;			/* GRIP data */
-	UINT8 m_gripc;			/* GRIP status */
+	// GRIP state
+	UINT8 m_gripd;			// GRIP data
+	UINT8 m_gripc;			// GRIP status
 
-	/* timers */
+	// timers
 	emu_timer	*m_floppy_motor_off_timer;
 
 };
@@ -120,7 +120,7 @@ public:
 	{ }
 
 	required_device<device_t> m_crtc;
-	required_device<device_t> m_sti;
+	required_device<z80sti_device> m_sti;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
 
@@ -128,37 +128,43 @@ public:
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	WRITE8_MEMBER( vol0_w );
-	WRITE8_MEMBER( vol1_w );
-	WRITE8_MEMBER( flash_w );
-	WRITE8_MEMBER( page_w );
-	READ8_MEMBER( stat_r );
-	READ8_MEMBER( lrs_r );
-	WRITE8_MEMBER( lrs_w );
-	READ8_MEMBER( cxstb_r );
-	WRITE8_MEMBER( cxstb_w );
-	READ8_MEMBER( ppi_pa_r );
-	WRITE8_MEMBER( ppi_pa_w );
-	READ8_MEMBER( ppi_pb_r );
-	WRITE8_MEMBER( ppi_pc_w );
-	READ8_MEMBER( sti_gpio_r );
-	WRITE_LINE_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( vol0_w );
+	DECLARE_WRITE8_MEMBER( vol1_w );
+	DECLARE_WRITE8_MEMBER( flash_w );
+	DECLARE_WRITE8_MEMBER( page_w );
+	DECLARE_READ8_MEMBER( stat_r );
+	DECLARE_READ8_MEMBER( lrs_r );
+	DECLARE_WRITE8_MEMBER( lrs_w );
+	DECLARE_READ8_MEMBER( cxstb_r );
+	DECLARE_WRITE8_MEMBER( cxstb_w );
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pa_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_READ8_MEMBER( sti_gpio_r );
+	DECLARE_WRITE_LINE_MEMBER( speaker_w );
+	DECLARE_WRITE_LINE_MEMBER( de_w );
+	DECLARE_WRITE_LINE_MEMBER( cursor_w );
 
 	void scan_keyboard();
 
-	/* sound state */
+	// sound state
 	int m_vol0;
 	int m_vol1;
 
-	/* keyboard state */
-	UINT8 m_keydata;			/* keyboard data */
-	int m_kbf;				/* keyboard buffer full */
+	// keyboard state
+	int m_ia;				// PPI port A interrupt
+	int m_ib;				// PPI port B interrupt
+	UINT8 m_keydata;		// keyboard data
+	int m_kbf;				// keyboard buffer full
 
-	/* video state */
-	UINT8 *m_video_ram;		/* video RAM */
-	int m_lps;				/* light pen sense */
-	int m_page;				/* video page */
-	int m_flash;				/* flash */
+	// video state
+	UINT8 *m_video_ram;		// video RAM
+	int m_lps;				// light pen sense
+	int m_page;				// video page
+	int m_flash;			// flash
+	int m_de;				// display enable
+	int m_cursor;			// cursor
 };
 
 #endif

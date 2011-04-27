@@ -27,11 +27,11 @@
 
 #include "includes/prof80.h"
 
-/* Keyboard HACK */
+// Keyboard HACK
 
 static const UINT8 KEYCODES[3][9][8] =
 {
-	/* unshifted */
+	// unshifted
 	{
 	{ 0x1e, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 },
 	{ 0x38, 0x39, 0x30, 0x2d, 0x3d, 0x08, 0x7f, 0x2d },
@@ -44,7 +44,7 @@ static const UINT8 KEYCODES[3][9][8] =
 	{ 0x04, 0x02, 0x03, 0x30, 0x2e, 0x20, 0x00, 0x00 }
 	},
 
-	/* shifted */
+	// shifted
 	{
 	{ 0x1e, 0x21, 0x40, 0x23, 0x24, 0x25, 0x5e, 0x26 },
 	{ 0x2a, 0x28, 0x29, 0x5f, 0x2b, 0x08, 0x7f, 0x2d },
@@ -57,7 +57,7 @@ static const UINT8 KEYCODES[3][9][8] =
 	{ 0x04, 0x02, 0x03, 0x30, 0x2e, 0x20, 0x00, 0x00 }
 	},
 
-	/* control */
+	// control
 	{
 	{ 0x9e, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97 },
 	{ 0x98, 0x99, 0x90, 0x1f, 0x9a, 0x88, 0xff, 0xad },
@@ -79,17 +79,17 @@ void grip_state::scan_keyboard()
 
 	if (input_port_read(machine(), "ROW9") & 0x07)
 	{
-		/* shift, upper case */
+		// shift, upper case
 		table = 1;
 	}
 
 	if (input_port_read(machine(), "ROW9") & 0x18)
 	{
-		/* ctrl */
+		// ctrl
 		table = 2;
 	}
 
-	/* scan keyboard */
+	// scan keyboard
 	for (row = 0; row < 9; row++)
 	{
 		UINT8 data = input_port_read(machine(), keynames[row]);
@@ -98,14 +98,14 @@ void grip_state::scan_keyboard()
 		{
 			if (!BIT(data, col))
 			{
-				/* latch key data */
+				// latch key data
 				keydata = KEYCODES[table][row][col];
 
 				if (m_keydata != keydata)
 				{
 					m_keydata = keydata;
 
-					/* trigger GRIP 8255 port C bit 2 (_STBB) */
+					// trigger GRIP 8255 port C bit 2 (_STBB)
 					m_ppi->pc2_w(0);
 					m_ppi->pc2_w(1);
 					return;
@@ -124,7 +124,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 	if (!state->m_kbf) state->scan_keyboard();
 }
 
-/* PROF-80 */
+// PROF-80
 
 #define BLK_RAM1	0x0b
 #define BLK_RAM2	0x0a
@@ -196,44 +196,44 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 {
 	switch (sa)
 	{
-	case 0: /* C0/TDI */
+	case 0: // C0/TDI
 		m_rtc->data_in_w(fa);
 		m_rtc->c0_w(fa);
 		m_c0 = fa;
 		break;
 
-	case 1: /* C1 */
+	case 1: // C1
 		m_rtc->c1_w(fa);
 		m_c1 = fa;
 		break;
 
-	case 2: /* C2 */
+	case 2: // C2
 		m_rtc->c2_w(fa);
 		m_c2 = fa;
 		break;
 
-	case 3:	/* READY */
+	case 3:	// READY
 		break;
 
-	case 4: /* TCK */
+	case 4: // TCK
 		m_rtc->clk_w(fa);
 		break;
 
-	case 5:	/* IN USE */
+	case 5:	// IN USE
 		output_set_led_value(0, fa);
 		break;
 
-	case 6:	/* _MOTOR */
+	case 6:	// _MOTOR
 		if (fa)
 		{
-			/* trigger floppy motor off NE555 timer */
+			// trigger floppy motor off NE555 timer
 			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
 			m_floppy_motor_off_timer->adjust(attotime::from_msec(t));
 		}
 		else
 		{
-			/* turn on floppy motor */
+			// turn on floppy motor
 			floppy_mon_w(m_floppy0, 0);
 			floppy_mon_w(m_floppy1, 0);
 			floppy_drive_set_ready_state(m_floppy0, 1, 1);
@@ -241,47 +241,47 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 
 			m_motor = 1;
 
-			/* reset floppy motor off NE555 timer */
+			// reset floppy motor off NE555 timer
 			m_floppy_motor_off_timer->enable(0);
 		}
 		break;
 
-	case 7:	/* SELECT */
+	case 7:	// SELECT
 		break;
 	}
 
 	switch (sb)
 	{
-	case 0: /* RESF */
+	case 0: // RESF
 		if (fb) upd765_reset(m_fdc, 0);
 		break;
 
-	case 1: /* MINI */
+	case 1: // MINI
 		break;
 
-	case 2: /* _RTS */
+	case 2: // _RTS
 		break;
 
-	case 3: /* TX */
+	case 3: // TX
 		if (m_terminal) terminal_serial_w(m_terminal, fb);
 		break;
 
-	case 4: /* _MSTOP */
+	case 4: // _MSTOP
 		if (!fb)
 		{
-			/* immediately turn off floppy motor */
+			// immediately turn off floppy motor
 			m_floppy_motor_off_timer->adjust(attotime::zero);
 		}
 		break;
 
-	case 5: /* TXP */
+	case 5: // TXP
 		break;
 
-	case 6: /* TSTB */
+	case 6: // TSTB
 		m_rtc->stb_w(fb);
 		break;
 
-	case 7: /* MME */
+	case 7: // MME
 		//logerror("INIT %u\n", fb);
 		m_init = fb;
 		bankswitch();
@@ -366,10 +366,10 @@ READ8_MEMBER( prof80_state::status2_r )
 	UINT8 data = 0;
 	int js4 = 0, js5 = 0;
 
-	/* floppy motor */
+	// floppy motor
 	data |= !m_motor;
 
-	/* JS4 */
+	// JS4
 	switch (input_port_read(machine(), "J4"))
 	{
 	case 0: js4 = 0; break;
@@ -381,7 +381,7 @@ READ8_MEMBER( prof80_state::status2_r )
 
 	data |= js4 << 4;
 
-	/* JS5 */
+	// JS5
 	switch (input_port_read(machine(), "J5"))
 	{
 	case 0: js5 = 0; break;
@@ -393,7 +393,7 @@ READ8_MEMBER( prof80_state::status2_r )
 
 	data |= js5 << 4;
 
-	/* RTC data */
+	// RTC data
 	data |= !m_rtc->data_out_r() << 7;
 
 	return data;
@@ -421,7 +421,7 @@ READ8_MEMBER( prof80_state::gripd_r )
 {
 	//logerror("GRIP data read %02x\n", m_gripd);
 
-	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
+	// trigger GRIP 8255 port C bit 6 (_ACKA)
 	m_ppi->pc6_w(0);
 	m_ppi->pc6_w(1);
 
@@ -433,12 +433,12 @@ WRITE8_MEMBER( prof80_state::gripd_w )
 	m_gripd = data;
 	//logerror("GRIP data write %02x\n", data);
 
-	/* trigger GRIP 8255 port C bit 4 (_STBA) */
+	// trigger GRIP 8255 port C bit 4 (_STBA)
 	m_ppi->pc4_w(0);
 	m_ppi->pc4_w(1);
 }
 
-/* GRIP */
+// GRIP
 
 WRITE8_MEMBER( grip_state::vol0_w )
 {
@@ -482,7 +482,7 @@ READ8_MEMBER( grip_state::stat_r )
 	UINT8 data = 0;
 	int js0 = 0, js1 = 0;
 
-	/* JS0 */
+	// JS0
 	switch (input_port_read(machine(), "GRIP-J3A"))
 	{
 	case 0: js0 = 0; break;
@@ -494,7 +494,7 @@ READ8_MEMBER( grip_state::stat_r )
 
 	data |= js0 << 4;
 
-	/* JS1 */
+	// JS1
 	switch (input_port_read(machine(), "GRIP-J3B"))
 	{
 	case 0: js1 = 0; break;
@@ -506,10 +506,10 @@ READ8_MEMBER( grip_state::stat_r )
 
 	data |= js1 << 5;
 
-	/* centronics fault */
+	// centronics fault
 	data |= centronics_fault_r(m_centronics) << 6;
 
-	/* light pen strobe */
+	// light pen strobe
 	data |= m_lps << 7;
 
 	return data;
@@ -541,7 +541,7 @@ WRITE8_MEMBER( grip_state::cxstb_w )
 	centronics_strobe_w(m_centronics, 1);
 }
 
-/* UNIO */
+// UNIO
 
 WRITE8_MEMBER( prof80_state::unio_ctrl_w )
 {
@@ -550,19 +550,19 @@ WRITE8_MEMBER( prof80_state::unio_ctrl_w )
 
 	switch (flad)
 	{
-	case 0: /* CG1 */
-	case 1: /* CG2 */
-	case 2: /* _STB1 */
-	case 3: /* _STB2 */
-	case 4: /* _INIT */
-	case 5: /* JSO0 */
-	case 6: /* JSO1 */
-	case 7: /* JSO2 */
+	case 0: // CG1
+	case 1: // CG2
+	case 2: // _STB1
+	case 3: // _STB2
+	case 4: // _INIT
+	case 5: // JSO0
+	case 6: // JSO1
+	case 7: // JSO2
 		break;
 	}
 }
 
-/* Memory Maps */
+// Memory Maps
 
 static ADDRESS_MAP_START( prof80_mem, AS_PROGRAM, 8, prof80_state )
 ADDRESS_MAP_END
@@ -673,7 +673,7 @@ static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip_state )
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
-/* Input Ports */
+// Input Ports
 
 static INPUT_PORTS_START( ascii_keyboard )
 	PORT_START("ROW0")
@@ -907,7 +907,7 @@ static INPUT_PORTS_START( grip )
 	PORT_CONFSETTING( 0x01, "Internal" )
 INPUT_PORTS_END
 
-/* Video */
+// Video
 
 static MC6845_UPDATE_ROW( grip_update_row )
 {
@@ -929,6 +929,20 @@ static MC6845_UPDATE_ROW( grip_update_row )
 	}
 }
 
+WRITE_LINE_MEMBER( grip_state::de_w )
+{
+	m_de = state;
+
+	z80sti_i1_w(m_sti, state);
+}
+
+WRITE_LINE_MEMBER( grip_state::cursor_w )
+{
+	m_cursor = state;
+
+	z80sti_i2_w(m_sti, state);
+}
+
 static const mc6845_interface crtc_intf =
 {
 	SCREEN_TAG,
@@ -936,8 +950,8 @@ static const mc6845_interface crtc_intf =
 	NULL,
 	grip_update_row,
 	NULL,
-	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i1_w),
-	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i2_w),
+	DEVCB_DRIVER_LINE_MEMBER(grip_state, de_w),
+	DEVCB_DRIVER_LINE_MEMBER(grip_state, cursor_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL
@@ -950,15 +964,15 @@ bool grip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 	return 0;
 }
 
-/* uPD1990A Interface */
+// uPD1990A Interface
 
-static UPD1990A_INTERFACE( prof80_upd1990a_intf )
+static UPD1990A_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-/* UPD765 Interface */
+// UPD765 Interface
 
 static void prof80_fdc_index_callback(device_t *controller, device_t *img, int state)
 {
@@ -967,7 +981,7 @@ static void prof80_fdc_index_callback(device_t *controller, device_t *img, int s
 	driver_state->m_fdc_index = state;
 }
 
-static const struct upd765_interface prof80_upd765_interface =
+static const struct upd765_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -976,7 +990,7 @@ static const struct upd765_interface prof80_upd765_interface =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-/* PPI8255 Interface */
+// PPI8255 Interface
 
 READ8_MEMBER( grip_state::ppi_pa_r )
 {
@@ -984,14 +998,14 @@ READ8_MEMBER( grip_state::ppi_pa_r )
 
         bit     description
 
-        PA0     ECB bus
-        PA1     ECB bus
-        PA2     ECB bus
-        PA3     ECB bus
-        PA4     ECB bus
-        PA5     ECB bus
-        PA6     ECB bus
-        PA7     ECB bus
+        PA0     ECB bus D0
+        PA1     ECB bus D1
+        PA2     ECB bus D2
+        PA3     ECB bus D3
+        PA4     ECB bus D4
+        PA5     ECB bus D5
+        PA6     ECB bus D6
+        PA7     ECB bus D7
 
     */
 
@@ -1004,14 +1018,14 @@ WRITE8_MEMBER( grip_state::ppi_pa_w )
 
         bit     description
 
-        PA0     ECB bus
-        PA1     ECB bus
-        PA2     ECB bus
-        PA3     ECB bus
-        PA4     ECB bus
-        PA5     ECB bus
-        PA6     ECB bus
-        PA7     ECB bus
+        PA0     ECB bus D0
+        PA1     ECB bus D1
+        PA2     ECB bus D2
+        PA3     ECB bus D3
+        PA4     ECB bus D4
+        PA5     ECB bus D5
+        PA6     ECB bus D6
+        PA7     ECB bus D7
 
     */
 
@@ -1055,16 +1069,18 @@ WRITE8_MEMBER( grip_state::ppi_pc_w )
 
     */
 
-	/* keyboard interrupt */
-	z80sti_i4_w(m_sti, BIT(data, 0));
+	// keyboard interrupt
+	m_ib = BIT(data, 0);
+	z80sti_i4_w(m_sti, m_ib);
 
-	/* keyboard buffer full */
+	// keyboard buffer full
 	m_kbf = BIT(data, 1);
 
-	/* PROF-80 interrupt */
-	z80sti_i7_w(m_sti, BIT(data, 3));
+	// PROF-80 interrupt
+	m_ia = BIT(data, 3);
+	z80sti_i7_w(m_sti, m_ia);
 
-	/* PROF-80 handshaking */
+	// PROF-80 handshaking
 	m_gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
 }
 
@@ -1073,12 +1089,12 @@ static I8255A_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(grip_state, ppi_pa_r),	// Port A read
 	DEVCB_DRIVER_MEMBER(grip_state, ppi_pa_w),	// Port A write
 	DEVCB_DRIVER_MEMBER(grip_state, ppi_pb_r),	// Port B read
-	DEVCB_NULL,							// Port B write
-	DEVCB_NULL,							// Port C read
-	DEVCB_DRIVER_MEMBER(grip_state, ppi_pc_w)		// Port C write
+	DEVCB_NULL,									// Port B write
+	DEVCB_NULL,									// Port C read
+	DEVCB_DRIVER_MEMBER(grip_state, ppi_pc_w)	// Port C write
 };
 
-/* Z80-STI Interface */
+// Z80-STI Interface
 
 READ8_MEMBER( grip_state::sti_gpio_r )
 {
@@ -1086,18 +1102,35 @@ READ8_MEMBER( grip_state::sti_gpio_r )
 
         bit     signal      description
 
-        I0      CTS         RS-232 clear to send input
+        I0      _CTS        RS-232 clear to send input
         I1      DE          MC6845 display enable input
         I2      CURSOR      MC6845 cursor input
         I3      BUSY        Centronics busy input
-        I4      PC0         PPI8255 PC0 input
-        I5      SKBD        Serial keyboard input
+        I4      IB          PPI8255 PC0 input
+        I5      _SKBD       Serial keyboard input
         I6      EXIN        External interrupt input
-        I7      PC3         PPI8255 PC3 input
+        I7      IA          PPI8255 PC3 input
 
     */
 
-	return centronics_busy_r(m_centronics) << 3;
+	UINT8 data = 0x20;
+
+	// display enable
+	data |= m_de << 1;
+
+	// cursor
+	data |= m_cursor << 2;
+
+	// centronics busy
+	data |= centronics_busy_r(m_centronics) << 3;
+
+	// keyboard interrupt
+	data |= m_ib << 4;
+
+	// PROF-80 interrupt
+	data |= m_ia << 7;
+
+	return data;
 }
 
 WRITE_LINE_MEMBER( grip_state::speaker_w )
@@ -1109,20 +1142,20 @@ WRITE_LINE_MEMBER( grip_state::speaker_w )
 
 static Z80STI_INTERFACE( sti_intf )
 {
-	0,														/* serial receive clock */
-	0,														/* serial transmit clock */
-	DEVCB_CPU_INPUT_LINE(GRIP_Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt */
-	DEVCB_DRIVER_MEMBER(grip_state, sti_gpio_r),			/* GPIO read */
-	DEVCB_NULL,												/* GPIO write */
-	DEVCB_NULL,												/* serial input */
-	DEVCB_NULL,												/* serial output */
-	DEVCB_NULL,												/* timer A output */
-	DEVCB_DRIVER_LINE_MEMBER(grip_state, speaker_w),		/* timer B output */
-	DEVCB_LINE(z80sti_tc_w),								/* timer C output */
-	DEVCB_LINE(z80sti_rc_w)									/* timer D output */
+	0,														// serial receive clock
+	0,														// serial transmit clock
+	DEVCB_CPU_INPUT_LINE(GRIP_Z80_TAG, INPUT_LINE_IRQ0),	// interrupt
+	DEVCB_DRIVER_MEMBER(grip_state, sti_gpio_r),			// GPIO read
+	DEVCB_NULL,												// GPIO write
+	DEVCB_NULL,												// serial input
+	DEVCB_NULL,												// serial output
+	DEVCB_NULL,												// timer A output
+	DEVCB_DRIVER_LINE_MEMBER(grip_state, speaker_w),		// timer B output
+	DEVCB_LINE(z80sti_tc_w),								// timer C output
+	DEVCB_LINE(z80sti_rc_w)									// timer D output
 };
 
-/* Z80 Daisy Chain */
+// Z80 Daisy Chain
 
 static const z80_daisy_config grip_daisy_chain[] =
 {
@@ -1130,24 +1163,24 @@ static const z80_daisy_config grip_daisy_chain[] =
 	{ NULL }
 };
 
-/* Machine Initialization */
+// Machine Initialization
 
 void prof80_state::machine_start()
 {
-	/* initialize RTC */
+	// initialize RTC
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	/* configure FDC */
+	// configure FDC
 	floppy_drive_set_index_pulse_callback(m_floppy0, prof80_fdc_index_callback);
 
-	/* allocate floppy motor off timer */
+	// allocate floppy motor off timer
 	m_floppy_motor_off_timer = machine().scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
 
-	/* bank switch */
+	// bank switch
 	bankswitch();
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_c0));
 	save_item(NAME(m_c1));
 	save_item(NAME(m_c2));
@@ -1174,14 +1207,14 @@ void grip_state::machine_start()
 {
 	prof80_state::machine_start();
 
-	/* allocate video RAM */
+	// allocate video RAM
 	m_video_ram = auto_alloc_array(machine(), UINT8, GRIP_VIDEORAM_SIZE);
 
-	/* setup GRIP memory banking */
+	// setup GRIP memory banking
 	memory_configure_bank(machine(), "videoram", 0, 2, m_video_ram, 0x8000);
 	memory_set_bank(machine(), "videoram", 0);
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_vol0));
 	save_item(NAME(m_vol1));
 	save_item(NAME(m_keydata));
@@ -1212,45 +1245,45 @@ static const speaker_interface speaker_intf =
 	speaker_levels
 };
 
-static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_NULL
 };
 
-/* Machine Drivers */
+// Machine Drivers
 
 static MACHINE_CONFIG_START( common, prof80_state )
-    /* basic machine hardware */
+    // basic machine hardware
     MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
     MCFG_CPU_PROGRAM_MAP(prof80_mem)
     MCFG_CPU_IO_MAP(prof80_io)
 
-    /* video hardware */
+    // video hardware
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
-	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, prof80_upd765_interface)
+	// devices
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prof80, common )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( grip, common, grip_state )
-    /* basic machine hardware */
+    // basic machine hardware
     MCFG_CPU_MODIFY(Z80_TAG)
     MCFG_CPU_IO_MAP(prof80_grip_io)
 
@@ -1259,16 +1292,16 @@ static MACHINE_CONFIG_DERIVED_CLASS( grip, common, grip_state )
     MCFG_CPU_PROGRAM_MAP(grip_mem)
     MCFG_CPU_IO_MAP(grip_io)
 
-	/* keyboard hack */
+	// keyboard hack
 	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(50))
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_CONFIG(speaker_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* devices */
+	// devices
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/4, crtc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, sti_intf)
@@ -1282,12 +1315,12 @@ static MACHINE_CONFIG_DERIVED( grip3, grip )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grip5, grip )
-    /* basic machine hardware */
+    // basic machine hardware
 	MCFG_CPU_MODIFY(GRIP_Z80_TAG)
     MCFG_CPU_IO_MAP(grip5_io)
 MACHINE_CONFIG_END
 
-/* ROMs */
+// ROMs
 
 #define ROM_PROF80 \
 	ROM_REGION( 0x2000, Z80_TAG, 0 ) \
@@ -1338,9 +1371,9 @@ ROM_START( prof80g562 )
 	ROM_LOAD( "grip562.z2", 0x0000, 0x8000, CRC(74be0455) SHA1(1c423ecca6363345a8690ddc45dbafdf277490d3) )
 ROM_END
 
-/* System Drivers */
+// System Drivers
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME                FLAGS */
+//    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME                FLAGS
 COMP( 1984, prof80,     0,		0,		prof80,	prof80,	0,		"Conitec Datensysteme",	"PROF-80",				GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1984, prof80g21,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.1)",	GAME_NOT_WORKING )
 COMP( 1984, prof80g25,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.5)",	GAME_NOT_WORKING )
