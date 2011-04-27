@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( cm1800_io , AS_IO, 8, cm1800_state)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( cm1800 )
+static INPUT_PORTS_START( cm1800 )
 INPUT_PORTS_END
 
 
@@ -81,26 +81,26 @@ static GENERIC_TERMINAL_INTERFACE( cm1800_terminal_intf )
 };
 
 static MACHINE_CONFIG_START( cm1800, cm1800_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
-    MCFG_CPU_PROGRAM_MAP(cm1800_mem)
-    MCFG_CPU_IO_MAP(cm1800_io)	
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(cm1800_mem)
+	MCFG_CPU_IO_MAP(cm1800_io)	
 
-    MCFG_MACHINE_RESET(cm1800)
+	MCFG_MACHINE_RESET(cm1800)
 	
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_terminal )
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,cm1800_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( cm1800 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "cm1800.rom", 0x0000, 0x0800, CRC(85d71d25) SHA1(42dc87d2eddc2906fa26d35db88a2e29d50fb481))
+	ROM_LOAD( "cm1800.rom", 0x0000, 0x0800, CRC(85d71d25) SHA1(42dc87d2eddc2906fa26d35db88a2e29d50fb481) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, cm1800,  0,       0, 	cm1800, 	cm1800, 	 0,  "<unknown>",   "CM-1800",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, cm1800,  0,       0,    cm1800,    cm1800,     0,  "<unknown>", "CM-1800", GAME_NOT_WORKING | GAME_NO_SOUND)
 
