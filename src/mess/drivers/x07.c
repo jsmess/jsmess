@@ -667,7 +667,7 @@ void x07_state::t6834_w (running_machine &machine)
 
 void x07_state::cassette_r(running_machine &machine)
 {
-	if (m_k7size && m_k7on && (m_k7pos<=m_k7size))
+	if (m_k7size && m_k7on && (m_k7pos<m_k7size))
 	{
 		m_regs_r[6] |= 2;
 		m_regs_r[7] = m_k7data[m_k7pos++];
