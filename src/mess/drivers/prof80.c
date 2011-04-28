@@ -13,7 +13,6 @@
 
     TODO:
 
-    - GRIP does not ack display bytes sent by PROF
     - keyboard
     - NE555 timeout is 10x too high
     - convert GRIP models to devices
@@ -213,6 +212,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		break;
 
 	case 3:	// READY
+		upd765_ready_w(m_fdc, fa);
 		break;
 
 	case 4: // TCK
@@ -916,7 +916,7 @@ static MC6845_UPDATE_ROW( grip_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT16 address = (state->m_page << 12) | ((ma + column) << 3) | (ra & 0x07);
+		UINT16 address = (state->m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
 		UINT8 data = state->m_video_ram[address];
 
 		for (bit = 0; bit < 8; bit++)
@@ -986,7 +986,7 @@ static const struct upd765_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL,
-	UPD765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
