@@ -38,12 +38,12 @@
 
 #define MCFG_C9060_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C9060, 0) \
-	c9060_device::static_set_config(*device, _address, TYPE_9060);
+	base_c9060_device::static_set_config(*device, _address);
 
 
 #define MCFG_C9090_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C9090, 0) \
-	c9060_device::static_set_config(*device, _address, TYPE_9090);
+	base_c9060_device::static_set_config(*device, _address);
 
 
 
@@ -52,18 +52,24 @@
 //**************************************************************************
 
 
-// ======================> c9060_device
+// ======================> base_c9060_device
 
-class c9060_device :  public device_t,
+class base_c9060_device :  public device_t,
 					  public device_ieee488_interface
 {
 
 public:
-    // construction/destruction
-    c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	enum
+	{
+		TYPE_9060,
+		TYPE_9090
+	};
+
+	// construction/destruction
+    base_c9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	// inline configuration helpers
-	static void static_set_config(device_t &device, int address, int variant);
+	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -80,11 +86,6 @@ public:
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
-	enum
-	{
-		TYPE_9060 = 0,
-		TYPE_9090
-	};
 
 protected:
     // device-level overrides
@@ -108,12 +109,32 @@ private:
 	required_device<ieee488_device> m_bus;
 
 	// IEEE-488 bus
+	int m_address;						// bus address
 	int m_rfdo;							// not ready for data output
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge
 
-	int m_address;
 	int m_variant;
+};
+
+
+// ======================> c9060_device
+
+class c9060_device :  public base_c9060_device
+{
+public:
+    // construction/destruction
+    c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> c9090_device
+
+class c9090_device :  public base_c9060_device
+{
+public:
+    // construction/destruction
+    c9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

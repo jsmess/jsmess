@@ -54,7 +54,7 @@ public:
     c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// inline configuration helpers
-	static void static_set_config(device_t &device, int address, int variant);
+	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

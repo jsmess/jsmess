@@ -44,7 +44,7 @@ void c8280_device::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c8280_device::static_set_config(device_t &device, int address, int variant)
+void c8280_device::static_set_config(device_t &device, int address)
 {
 	c8280_device &c8280 = downcast<c8280_device &>(device);
 

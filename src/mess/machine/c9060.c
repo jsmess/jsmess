@@ -29,7 +29,8 @@
 //**************************************************************************
 
 const device_type C9060 = &device_creator<c9060_device>;
-const device_type C9090 = &device_creator<c9060_device>;
+const device_type C9090 = &device_creator<c9090_device>;
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -37,7 +38,7 @@ const device_type C9090 = &device_creator<c9060_device>;
 //  complete
 //-------------------------------------------------
 
-void c9060_device::device_config_complete()
+void base_c9060_device::device_config_complete()
 {
 	m_shortname = "c9060";
 }
@@ -47,13 +48,12 @@ void c9060_device::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c9060_device::static_set_config(device_t &device, int address, int variant)
+void base_c9060_device::static_set_config(device_t &device, int address)
 {
-	c9060_device &c9060 = downcast<c9060_device &>(device);
+	base_c9060_device &c9060 = downcast<base_c9060_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
-	c9060.m_variant = variant;
 	c9060.m_address = address - 8;
 }
 
@@ -80,7 +80,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c9060_device::device_rom_region() const
+const rom_entry *base_c9060_device::device_rom_region() const
 {
 	return ROM_NAME( c9060 );
 }
@@ -90,7 +90,7 @@ const rom_entry *c9060_device::device_rom_region() const
 //  ADDRESS_MAP( c9060_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c9060_main_mem, AS_PROGRAM, 8, c9060_device )
+static ADDRESS_MAP_START( c9060_main_mem, AS_PROGRAM, 8, base_c9060_device )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE_LEGACY(M6532_0_TAG, riot6532_r, riot6532_w)
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c9060_hdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c9060_hdc_mem, AS_PROGRAM, 8, c9060_device )
+static ADDRESS_MAP_START( c9060_hdc_mem, AS_PROGRAM, 8, base_c9060_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 //  riot6532_interface riot0_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c9060_device::dio_r )
+READ8_MEMBER( base_c9060_device::dio_r )
 {
 	/*
 
@@ -144,7 +144,7 @@ READ8_MEMBER( c9060_device::dio_r )
 }
 
 
-WRITE8_MEMBER( c9060_device::dio_w )
+WRITE8_MEMBER( base_c9060_device::dio_w )
 {
 	/*
 
@@ -167,10 +167,10 @@ WRITE8_MEMBER( c9060_device::dio_w )
 
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, dio_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, dio_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, dio_w),
 	DEVCB_NULL
 };
 
@@ -179,7 +179,7 @@ static const riot6532_interface riot0_intf =
 //  riot6532_interface riot1_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c9060_device::riot1_pa_r )
+READ8_MEMBER( base_c9060_device::riot1_pa_r )
 {
 	/*
 
@@ -211,7 +211,7 @@ READ8_MEMBER( c9060_device::riot1_pa_r )
 }
 
 
-WRITE8_MEMBER( c9060_device::riot1_pa_w )
+WRITE8_MEMBER( base_c9060_device::riot1_pa_w )
 {
 	/*
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER( c9060_device::riot1_pa_w )
 }
 
 
-READ8_MEMBER( c9060_device::riot1_pb_r )
+READ8_MEMBER( base_c9060_device::riot1_pb_r )
 {
 	/*
 
@@ -276,7 +276,7 @@ READ8_MEMBER( c9060_device::riot1_pb_r )
 }
 
 
-WRITE8_MEMBER( c9060_device::riot1_pb_w )
+WRITE8_MEMBER( base_c9060_device::riot1_pb_w )
 {
 	/*
 
@@ -297,10 +297,10 @@ WRITE8_MEMBER( c9060_device::riot1_pb_w )
 
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, riot1_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, riot1_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, riot1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, riot1_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, riot1_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
 
@@ -309,7 +309,7 @@ static const riot6532_interface riot1_intf =
 //  via6522_interface via_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c9060_device::via_pa_r )
+READ8_MEMBER( base_c9060_device::via_pa_r )
 {
 	/*
 
@@ -329,7 +329,7 @@ READ8_MEMBER( c9060_device::via_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( c9060_device::via_pa_w )
+WRITE8_MEMBER( base_c9060_device::via_pa_w )
 {
 	/*
 
@@ -347,7 +347,7 @@ WRITE8_MEMBER( c9060_device::via_pa_w )
     */
 }
 
-READ8_MEMBER( c9060_device::via_pb_r )
+READ8_MEMBER( base_c9060_device::via_pb_r )
 {
 	/*
 
@@ -367,7 +367,7 @@ READ8_MEMBER( c9060_device::via_pb_r )
 	return 0;
 }
 
-WRITE8_MEMBER( c9060_device::via_pb_w )
+WRITE8_MEMBER( base_c9060_device::via_pb_w )
 {
 	/*
 
@@ -387,15 +387,15 @@ WRITE8_MEMBER( c9060_device::via_pb_w )
 
 static const via6522_interface via_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, via_pb_r),
 	DEVCB_NULL, // ACK
 	DEVCB_NULL,
 	DEVCB_NULL, // MSG
 	DEVCB_NULL, // ?
 
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c9060_device, via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, via_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -442,7 +442,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c9060_device::device_mconfig_additions() const
+machine_config_constructor base_c9060_device::device_mconfig_additions() const
 {
 	switch (m_variant)
 	{
@@ -465,7 +465,7 @@ machine_config_constructor c9060_device::device_mconfig_additions() const
 //  update_ieee_signals -
 //-------------------------------------------------
 
-inline void c9060_device::update_ieee_signals()
+inline void base_c9060_device::update_ieee_signals()
 {
 	int atn = m_bus->atn_r();
 	int nrfd = !(!(!(atn & m_atna) & m_rfdo) | !(atn | m_atna));
@@ -482,27 +482,44 @@ inline void c9060_device::update_ieee_signals()
 //**************************************************************************
 
 //-------------------------------------------------
-//  c9060_device - constructor
+//  base_c9060_device - constructor
 //-------------------------------------------------
 
-c9060_device::c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, C9060, "C9060", tag, owner, clock),
+base_c9060_device::base_c9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+    : device_t(mconfig, type, name, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_hdccpu(*this, M6504_TAG),
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_via(*this, M6522_TAG),
-	  m_bus(*this->owner(), IEEE488_TAG)
+	  m_bus(*this->owner(), IEEE488_TAG),
+	  m_variant(variant)
 {
 }
+
+
+//-------------------------------------------------
+//  c9060_device - constructor
+//-------------------------------------------------
+
+c9060_device::c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: base_c9060_device(mconfig, C9060, "C9060", tag, owner, clock, TYPE_9060) { }
+
+
+//-------------------------------------------------
+//  c9090_device - constructor
+//-------------------------------------------------
+
+c9090_device::c9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: base_c9060_device(mconfig, C9090, "C9090", tag, owner, clock, TYPE_9090) { }
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void c9060_device::device_start()
+void base_c9060_device::device_start()
 {
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *hdc = m_hdccpu->memory().space(AS_PROGRAM);
@@ -521,7 +538,7 @@ void c9060_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c9060_device::device_reset()
+void base_c9060_device::device_reset()
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
@@ -532,7 +549,7 @@ void c9060_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c9060_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void base_c9060_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 }
 
@@ -541,7 +558,7 @@ void c9060_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  m_bus->atn -
 //-------------------------------------------------
 
-void c9060_device::ieee488_atn(int state)
+void base_c9060_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
@@ -554,7 +571,7 @@ void c9060_device::ieee488_atn(int state)
 //  m_bus->ifc -
 //-------------------------------------------------
 
-void c9060_device::ieee488_ifc(int state)
+void base_c9060_device::ieee488_ifc(int state)
 {
 	if (!state)
 	{

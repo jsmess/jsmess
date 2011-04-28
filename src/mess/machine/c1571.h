@@ -41,15 +41,17 @@
 
 #define MCFG_C1570_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1570, 0) \
-	c1571_device::static_set_config(*device, _address, c1571_device::TYPE_1570);
+	base_c1571_device::static_set_config(*device, _address);
+
 
 #define MCFG_C1571_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1571, 0) \
-	c1571_device::static_set_config(*device, _address, c1571_device::TYPE_1571);
+	base_c1571_device::static_set_config(*device, _address);
+
 
 #define MCFG_C1571CR_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1571CR, 0) \
-	c1571_device::static_set_config(*device, _address, c1571_device::TYPE_1571CR);
+	base_c1571_device::static_set_config(*device, _address);
 
 
 
@@ -59,23 +61,22 @@
 
 // ======================> c1571_device
 
-class c1571_device :  public device_t,
-					  public device_cbm_iec_interface
+class base_c1571_device :  public device_t,
+						   public device_cbm_iec_interface
 {
 public:
-
-    // construction/destruction
-    c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
 	enum
 	{
-		TYPE_1570 = 0,
+		TYPE_1570,
 		TYPE_1571,
 		TYPE_1571CR
 	};
 
+    // construction/destruction
+    base_c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+
 	// inline configuration helpers
-	static void static_set_config(device_t &device, int address, int variant);
+	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -113,7 +114,6 @@ protected:
 	void cbm_iec_data(int state);
 	void cbm_iec_reset(int state);
 
-private:
 	inline void set_iec_data();
 	inline void set_iec_srq();
 
@@ -130,6 +130,7 @@ private:
 	int m_1_2mhz;							// clock speed
 
 	// IEC bus
+    int m_address;							// serial address
 	int m_data_out;							// serial data out
 	int m_ser_dir;							// fast serial direction
 	int m_sp_out;							// fast serial data out
@@ -140,14 +141,13 @@ private:
 	int m_via1_irq;							// VIA #1 interrupt request
 	int m_cia_irq;							// CIA interrupt request
 
-    int m_address;
 	int m_variant;
 };
 
 
 // ======================> c1570_device
 
-class c1570_device :  public c1571_device
+class c1570_device :  public base_c1571_device
 {
 public:
     // construction/destruction
@@ -155,9 +155,19 @@ public:
 };
 
 
+// ======================> c1571_device
+
+class c1571_device :  public base_c1571_device
+{
+public:
+    // construction/destruction
+    c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // ======================> c1571cr_device
 
-class c1571cr_device :  public c1571_device
+class c1571cr_device :  public base_c1571_device
 {
 public:
     // construction/destruction

@@ -38,11 +38,12 @@
 
 #define MCFG_C1581_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1581, 0) \
-	c1581_device::static_set_config(*device, _address, c1581_device::TYPE_1581);
+	base_c1581_device::static_set_config(*device, _address);
+
 
 #define MCFG_C1563_ADD(_tag, _address) \
     MCFG_DEVICE_ADD(_tag, C1563, 0) \
-	c1581_device::static_set_config(*device, _address, c1581_device::TYPE_1563);
+	base_c1581_device::static_set_config(*device, _address);
 
 
 
@@ -50,24 +51,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1581_device
+// ======================> base_c1581_device
 
-class c1581_device :  public device_t,
-					  public device_cbm_iec_interface
+class base_c1581_device :  public device_t,
+						   public device_cbm_iec_interface
 {
 
 public:
     // construction/destruction
-    c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    base_c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	enum
 	{
-		TYPE_1581 = 0,
-		TYPE_1563
+		TYPE_1563,
+		TYPE_1581
 	};
 
 	// inline configuration helpers
-	static void static_set_config(device_t &device, int address, int variant);
+	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -92,7 +93,6 @@ protected:
 	void cbm_iec_data(int state);
 	void cbm_iec_reset(int state);
 
-private:
 	inline void set_iec_data();
 	inline void set_iec_srq();
 
@@ -115,7 +115,7 @@ private:
 
 // ======================> c1563_device
 
-class c1563_device :  public c1581_device
+class c1563_device :  public base_c1581_device
 {
 public:
     // construction/destruction
@@ -123,9 +123,19 @@ public:
 };
 
 
+// ======================> c1581_device
+
+class c1581_device :  public base_c1581_device
+{
+public:
+    // construction/destruction
+    c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // device type definition
-extern const device_type C1581;
 extern const device_type C1563;
+extern const device_type C1581;
 
 
 
