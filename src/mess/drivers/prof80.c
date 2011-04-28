@@ -1371,12 +1371,20 @@ ROM_START( prof80g562 )
 	ROM_LOAD( "grip562.z2", 0x0000, 0x8000, CRC(74be0455) SHA1(1c423ecca6363345a8690ddc45dbafdf277490d3) )
 ROM_END
 
+ROM_START( prof80g115 )
+	ROM_PROF80
+
+	ROM_REGION( 0x4000, GRIP_Z80_TAG, 0 )
+	ROM_LOAD( "grips115.z2", 0x0000, 0x4000, CRC(505706ef) SHA1(05fb032fb1a504c534c30c352ba4bd47623503d0) )
+ROM_END
+
 // System Drivers
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME                FLAGS
 COMP( 1984, prof80,     0,		0,		prof80,	prof80,	0,		"Conitec Datensysteme",	"PROF-80",				GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1984, prof80g21,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.1)",	GAME_NOT_WORKING )
-COMP( 1984, prof80g25,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.5)",	GAME_NOT_WORKING )
-COMP( 1984, prof80g26,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.6)",	GAME_NOT_WORKING )
-COMP( 1984, prof80g31,	prof80,	0,		grip3,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-3.1)",	GAME_NOT_WORKING )
-COMP( 1984, prof80g562,	prof80,	0,		grip5,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-5.62)",	GAME_NOT_WORKING )
+COMP( 1984, prof80g21,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP 2.1)",	GAME_NOT_WORKING )
+COMP( 1984, prof80g25,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP 2.5)",	GAME_NOT_WORKING )
+COMP( 1984, prof80g26,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP 2.6)",	GAME_NOT_WORKING )
+COMP( 1984, prof80g31,	prof80,	0,		grip3,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP 3.1)",	GAME_NOT_WORKING )
+COMP( 1984, prof80g562,	prof80,	0,		grip5,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP 5.62)",	GAME_NOT_WORKING )
+COMP( 1986, prof80g115,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GripS 1.15)",	GAME_NOT_WORKING )
