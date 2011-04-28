@@ -2288,7 +2288,7 @@
 	<software name="hypcrdgs">
 		<description>HyperCard IIgs v1.1</description>
 		<year>1990</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4735,7 +4735,7 @@
 	<software name="salesdmo">
 		<description>Apple IIgs Sales Demo</description>
 		<year>1986</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -5796,7 +5796,7 @@
 	</software>
 
 	<software name="sys504">
-		<description>System Software v5.0.4</description>
+		<description>sys504</description>
 		<year>1990</year>
 		<publisher>Apple Computer, Inc.</publisher>
 
@@ -5813,43 +5813,43 @@
 	</software>
 
 	<software name="sys601">
-		<description>System Software v6.0.1</description>
+		<description>sys601</description>
 		<year>1993</year>
 		<publisher>Apple Computer, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 1 install.dsk" size="819200" crc="a96c423b" sha1="cf73b3ff224adc3bcd3dcc615d88ac345cae39b9" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 2 of 7)(system).2mg" size="819264" crc="cbb76cfb" sha1="e2c07b0ca441b6ea69df2bf8ce58bb5482e5fd4c" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 2 system disk.dsk" size="819200" crc="71e6cc27" sha1="c2af5288f85b432f7c3aea23de59f37f9d8e3ba3" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 1 of 7)(install).2mg" size="819264" crc="e13be8fb" sha1="25c101b03a5b784f0182e835f952246fe64cdf29" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 3 system tools 1.dsk" size="819200" crc="5c6a7d00" sha1="987ae7acea616625f81aa98bebd6f472579e6024" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 3 of 7)(system tools 1).2mg" size="819264" crc="76c23587" sha1="c704ac5e5342ef27764ce42bb3956d02cbb848a1" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 4 system tools 2.dsk" size="819200" crc="a0be3ede" sha1="695e0e5f018ac2d12f01c6061eb803ddc86f149b" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 4 of 7)(system tools 2).2mg" size="819264" crc="8a167659" sha1="32321c47a31fb23f218050dfaa003e531b832261" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 5 fonts.dsk" size="819200" crc="eecc4cb5" sha1="7369be6f179e7622f1cd533dc427655314a8b839" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 5 of 7)(fonts).2mg" size="819264" crc="c4640432" sha1="bc6518fd33de67c8ba3fe2027e2ac4062539f357" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 6 synthlab.dsk" size="819200" crc="2c3e319b" sha1="5b319ff2fc1a041ef4d26d50e7ddf6b0bda46d7a" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 6 of 7)(synth lab).2mg" size="819264" crc="0696791c" sha1="a5b08ef997db9a6bfcd95b91f58b2a1a69fb6a4e" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="system 6.0.1 - disk 7 apple ii setup.dsk" size="819200" crc="07775274" sha1="77004fb7a9cf35f994edbf72b141c3683771a8ee" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="system 6.0.1 (1993)(apple)(fw)(disk 7 of 7)(apple ii setup).2mg" size="819264" crc="2ddf1af3" sha1="7cb87c0f267858a64aed2eada077fa80b10fa909" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
