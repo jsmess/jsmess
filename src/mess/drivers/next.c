@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/flopdrv.h"
 
 
 class next_state : public driver_device
@@ -203,6 +204,19 @@ static PALETTE_INIT(next)
 	palette_set_color(machine, 3,MAKE_RGB(0xff,0xff,0xff));
 }
 
+
+static const floppy_config next_floppy_config =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_3_5_DSED,
+    FLOPPY_OPTIONS_NAME(default),
+    "floppy_3_5"
+};
+
 static MACHINE_CONFIG_START( next, next_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",M68030, XTAL_25MHz)
@@ -223,6 +237,12 @@ static MACHINE_CONFIG_START( next, next_state )
     MCFG_PALETTE_INIT(next)
 
     MCFG_VIDEO_START(next)
+
+	// devices
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_config)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next040, next )
@@ -276,8 +296,8 @@ static DRIVER_INIT( next )
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                FLAGS */
-COMP( 1987, next,   0,          0,   next,      next,    next,   "Next Software Inc",   "NeXT",				GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nextnt, next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Non Turbo)",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1992, nexttrb,next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME               FLAGS */
+COMP( 1987, next,   0,          0,   next,      next,    next,   "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextnt, next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Non Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1992, nexttrb,next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Turbo)",			GAME_NOT_WORKING | GAME_NO_SOUND)
 
