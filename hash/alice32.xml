@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="alice32" description="Matra Alice 32/90 Cassette">
+<softwarelist name="alice32" description="Matra Alice 32 Cassette">
 	<software name="alberthe">
 		<description>Al*berthe</description>
 		<year>1985</year>
@@ -31,17 +31,6 @@
 		<part name="cass" interface="alice32_cass">
 			<dataarea name="cass" size="17775">
 				<rom name="budget.k7" size="17775" crc="3d8d713e" sha1="7d84787bdd274f0f5f7d93075a291b090d89e43c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="budget90">
-		<description>Budget Familial (Alice 90)</description>
-		<year>1985</year>
-		<publisher>Matra</publisher>
-		<part name="cass" interface="alice32_cass">
-			<dataarea name="cass" size="20242">
-				<rom name="budget90.k7" size="20242" crc="228e4b62" sha1="31f838d7490b8484ddbabf036119654ac5bf45fe" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -123,17 +112,6 @@
 		</part>
 	</software>
 
-	<software name="dessin90">
-		<description>Dessine Moi 90</description>
-		<year>1985</year>
-		<publisher>Matra</publisher>
-		<part name="cass" interface="alice32_cass">
-			<dataarea name="cass" size="31324">
-				<rom name="dessin90.k7" size="31324" crc="4fed7561" sha1="6f7a1bf3717b67f5e54bd5fb4feb479844187346" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dialsaut">
 		<description>Dialogue Avec une Sauterelle</description>
 		<year>1984</year>
@@ -173,17 +151,6 @@
 		<part name="cass2" interface="alice32_cass">
 			<dataarea name="cass" size="79023">
 				<rom name="maths2_b.k7" size="68317" crc="87e841df" sha1="4edcf1aa149852fd4dd55d8d4dc271deac42e9da" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fringale">
-		<description>Fringale (Alice 90)</description>
-		<year>1985</year>
-		<publisher>EH Services</publisher>
-		<part name="cass" interface="alice32_cass">
-			<dataarea name="cass" size="52953">
-				<rom name="fringale.k7" size="52953" crc="b55fa035" sha1="f3c1e95a434d3e11905952caed3210addf319eee" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -485,17 +452,6 @@
 		</part>
 	</software>
 
-	<software name="planvl90">
-		<description>Plan de Vol (Alice90)</description>
-		<year>1985</year>
-		<publisher>EH Services</publisher>
-		<part name="cass" interface="alice32_cass">
-			<dataarea name="cass" size="19968">
-				<rom name="planvl90.k7" size="19968" crc="ec0838be" sha1="335f775e45b84fb15c142440eaee12649637210b" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sousmar">
 		<description>Sous-Marin</description>
 		<year>1984</year>
@@ -525,17 +481,6 @@
 		<part name="cass" interface="alice32_cass">
 			<dataarea name="cass" size="7769">
 				<rom name="textra.k7" size="7769" crc="ef64062d" sha1="145e763d62d96c716708f946a59559466888da86" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="textra90">
-		<description>T'extra (Alice90)</description>
-		<year>1985</year>
-		<publisher>Matra</publisher>
-		<part name="cass" interface="alice32_cass">
-			<dataarea name="cass" size="17947">
-				<rom name="textra90.k7" size="17947" crc="eda0fdd4" sha1="92044736d0780e4b331a412631fbee94027bafe4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
