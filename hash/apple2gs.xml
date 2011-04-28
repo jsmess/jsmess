@@ -11,7 +11,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="first letters &amp; words (1987)(first byte).2mg" size="407313" crc="d09526fd" sha1="d63fdae6b2cfb8d891577b036f2fe1a051ddb0b5" offset="0x0000" />
+				<rom name="first letters &amp; words (1987)(first byte).2mg" size="819264" crc="d09526fd" sha1="d63fdae6b2cfb8d891577b036f2fe1a051ddb0b5" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23,7 +23,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="first shapes (1987)(first byte).2mg" size="399279" crc="a058b6af" sha1="09a39e48fcce081ac879b398327e5b5f6a2e808c" offset="0x0000" />
+				<rom name="first shapes (1987)(first byte).2mg" size="819264" crc="a058b6af" sha1="09a39e48fcce081ac879b398327e5b5f6a2e808c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,12 +35,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819279">
-				<rom name="three stooges, the (1990)(cinemaware)(disk 1 of 2)[cr][b].2mg" size="471985" crc="2530745b" sha1="84aca696fb4218718e6039a970c7bd74069ae9aa" offset="0x0000" />
+				<rom name="three stooges, the (1990)(cinemaware)(disk 1 of 2)[cr][b].2mg" size="819279" crc="2530745b" sha1="84aca696fb4218718e6039a970c7bd74069ae9aa" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819279">
-				<rom name="three stooges, the (1990)(cinemaware)(disk 2 of 2)[cr][b].2mg" size="520892" crc="190b8d64" sha1="31e89eb7633c5a0ca5cb0e0339a112662c9f3890" offset="0x0000" />
+				<rom name="three stooges, the (1990)(cinemaware)(disk 2 of 2)[cr][b].2mg" size="819279" crc="190b8d64" sha1="31e89eb7633c5a0ca5cb0e0339a112662c9f3890" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52,12 +52,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="4th &amp; inches (1988)(accolade)(disk 1 of 2).2mg" size="591879" crc="36fe7e66" sha1="f8652ef569be48d63b5e8122853cd05a0927c818" offset="0x0000" />
+				<rom name="4th &amp; inches (1988)(accolade)(disk 1 of 2).2mg" size="819264" crc="36fe7e66" sha1="f8652ef569be48d63b5e8122853cd05a0927c818" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="4th &amp; inches (1988)(accolade)(disk 2 of 2).2mg" size="621683" crc="7cb5a5a4" sha1="77cd9331dd0e44cb41c8bfad3d7a7f93b902dfb4" offset="0x0000" />
+				<rom name="4th &amp; inches (1988)(accolade)(disk 2 of 2).2mg" size="819264" crc="7cb5a5a4" sha1="77cd9331dd0e44cb41c8bfad3d7a7f93b902dfb4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="8-16 paint (1988)(baudville).2mg" size="368680" crc="3c076e6c" sha1="a5fd00fd538f63a4807d03462556937bae8324a3" offset="0x0000" />
+				<rom name="8-16 paint (1988)(baudville).2mg" size="819264" crc="3c076e6c" sha1="a5fd00fd538f63a4807d03462556937bae8324a3" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819269">
-				<rom name="aaargh! (1988)(arcadia software).2mg" size="419146" crc="471c34ce" sha1="68c0cc33aff2a98f370ad4c7f475c6036baf4981" offset="0x0000" />
+				<rom name="aaargh! (1988)(arcadia software).2mg" size="819269" crc="471c34ce" sha1="68c0cc33aff2a98f370ad4c7f475c6036baf4981" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="demo disk 1 (1988)(apple chemical software).2mg" size="316093" crc="2d60e1de" sha1="3d003fe3c4fc86af87e0b0568264501d3271cc56" offset="0x0000" />
+				<rom name="demo disk 1 (1988)(apple chemical software).2mg" size="819264" crc="2d60e1de" sha1="3d003fe3c4fc86af87e0b0568264501d3271cc56" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="demo disk 2 (1989)(apple chemical software).2mg" size="331744" crc="d480e6a0" sha1="aa0333670b39cad736b011f41e7efed69e2161eb" offset="0x0000" />
+				<rom name="demo disk 2 (1989)(apple chemical software).2mg" size="819264" crc="d480e6a0" sha1="aa0333670b39cad736b011f41e7efed69e2161eb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="acs musique disk (1989)(apple chemical software).2mg" size="286067" crc="78e350e8" sha1="5219073c054f6a61735ca7af1887282dfad590bc" offset="0x0000" />
+				<rom name="acs musique disk (1989)(apple chemical software).2mg" size="819264" crc="78e350e8" sha1="5219073c054f6a61735ca7af1887282dfad590bc" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -129,12 +129,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="adventures of sinbad (1988)(unicorn software)(disk 1 of 2).2mg" size="355458" crc="f17b9f38" sha1="73a9626118fd90f7e0d1dd41f892316998dda02a" offset="0x0000" />
+				<rom name="adventures of sinbad (1988)(unicorn software)(disk 1 of 2).2mg" size="819264" crc="f17b9f38" sha1="73a9626118fd90f7e0d1dd41f892316998dda02a" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="adventures of sinbad (1988)(unicorn software)(disk 2 of 2).2mg" size="412498" crc="db032980" sha1="ba2b15a79e9a03eb6cc3cf12eaea425f28e24973" offset="0x0000" />
+				<rom name="adventures of sinbad (1988)(unicorn software)(disk 2 of 2).2mg" size="819264" crc="db032980" sha1="ba2b15a79e9a03eb6cc3cf12eaea425f28e24973" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -146,12 +146,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="aesop's fables (1988)(unicorn software)(disk 1 of 2).2mg" size="406558" crc="45bde0a4" sha1="46bf5d3201c2744e9f20926898ead0ea9de96b77" offset="0x0000" />
+				<rom name="aesop's fables (1988)(unicorn software)(disk 1 of 2).2mg" size="819264" crc="45bde0a4" sha1="46bf5d3201c2744e9f20926898ead0ea9de96b77" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="aesop's fables (1988)(unicorn software)(disk 2 of 2).2mg" size="454985" crc="37c77c85" sha1="fddaaad06fb7476879c321a2f5c897c03d48cfdd" offset="0x0000" />
+				<rom name="aesop's fables (1988)(unicorn software)(disk 2 of 2).2mg" size="819264" crc="37c77c85" sha1="fddaaad06fb7476879c321a2f5c897c03d48cfdd" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
-				<rom name="airball (1989)(microdeal).2mg" size="327443" crc="f85a1195" sha1="bce3c52854d56e68116c5dec0476e7d25cbb7fee" offset="0x0000" />
+				<rom name="airball (1989)(microdeal).2mg" size="819271" crc="f85a1195" sha1="bce3c52854d56e68116c5dec0476e7d25cbb7fee" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -175,22 +175,22 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819276">
-				<rom name="alien mind (1988)(pbi software)(disk 1 of 3)[b][non boot].2mg" size="214843" crc="baae3009" sha1="3abea5b3addb2b15a84df868ba6220b281f975d3" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)(disk 1 of 3)[b][non boot].2mg" size="819276" crc="baae3009" sha1="3abea5b3addb2b15a84df868ba6220b281f975d3" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819276">
-				<rom name="alien mind (1988)(pbi software)(disk 2 of 3)[b][non boot].2mg" size="155281" crc="0be77419" sha1="0a50c0bf1258cc52c75317d4ae8f7f127be851ee" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)(disk 2 of 3)[b][non boot].2mg" size="819276" crc="0be77419" sha1="0a50c0bf1258cc52c75317d4ae8f7f127be851ee" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="819276">
-				<rom name="alien mind (1988)(pbi software)(disk 3 of 3)[b][non boot].2mg" size="80995" crc="182c6208" sha1="72f85088b30714975357a0358cf9e88a6c41c477" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)(disk 3 of 3)[b][non boot].2mg" size="819276" crc="182c6208" sha1="72f85088b30714975357a0358cf9e88a6c41c477" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
-				<rom name="alien mind (1988)(pbi software)[b][save non boot].2mg" size="240898" crc="ba560a62" sha1="1759df55fde32efe1e99683cebb5fb4af8487451" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)[b][save non boot].2mg" size="819271" crc="ba560a62" sha1="1759df55fde32efe1e99683cebb5fb4af8487451" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -202,12 +202,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="all about america (1988)(unicorn software)(disk 1 of 2).2mg" size="431194" crc="fe6caad4" sha1="a548ec3377932d6aed648da690d364b14bb1c585" offset="0x0000" />
+				<rom name="all about america (1988)(unicorn software)(disk 1 of 2).2mg" size="819264" crc="fe6caad4" sha1="a548ec3377932d6aed648da690d364b14bb1c585" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="all about america (1988)(unicorn software)(disk 2 of 2).2mg" size="370628" crc="dbc50936" sha1="faf94b81dfe45af084ceb82dcc2a08e750aa24f3" offset="0x0000" />
+				<rom name="all about america (1988)(unicorn software)(disk 2 of 2).2mg" size="819264" crc="dbc50936" sha1="faf94b81dfe45af084ceb82dcc2a08e750aa24f3" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -219,12 +219,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
-				<rom name="ancient land of ys (1989)(kyodai)(disk 1 of 2).2mg" size="145489" crc="d7f1daf9" sha1="e14e46e1d000d82efed1d657c90dcdf9ea020e11" offset="0x0000" />
+				<rom name="ancient land of ys (1989)(kyodai)(disk 1 of 2).2mg" size="819271" crc="d7f1daf9" sha1="e14e46e1d000d82efed1d657c90dcdf9ea020e11" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819268">
-				<rom name="ancient land of ys (1989)(kyodai)(disk 2 of 2).2mg" size="367931" crc="9135ad26" sha1="afbba04e3ad0884750dad3b3d1246f72f2452412" offset="0x0000" />
+				<rom name="ancient land of ys (1989)(kyodai)(disk 2 of 2).2mg" size="819268" crc="9135ad26" sha1="afbba04e3ad0884750dad3b3d1246f72f2452412" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -236,12 +236,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="ancient glory (1993)(big red computer club)(disk 1 of 2).2mg" size="395772" crc="3f722e94" sha1="2997379828b75ccae165d1034be1e1a83c1dec21" offset="0x0000" />
+				<rom name="ancient glory (1993)(big red computer club)(disk 1 of 2).2mg" size="819264" crc="3f722e94" sha1="2997379828b75ccae165d1034be1e1a83c1dec21" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="ancient glory (1993)(big red computer club)(disk 2 of 2).2mg" size="415319" crc="22faa8ca" sha1="e1bcfda7e4b195a673704da17f1eedd6b0092eae" offset="0x0000" />
+				<rom name="ancient glory (1993)(big red computer club)(disk 2 of 2).2mg" size="819264" crc="22faa8ca" sha1="e1bcfda7e4b195a673704da17f1eedd6b0092eae" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -253,22 +253,22 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animal tracker (1988)(nature boy software)(disk 1 of 4)(orange).2mg" size="380807" crc="fe01b486" sha1="a64af9a3784d9a0729a6855f4009530e1fec7d1d" offset="0x0000" />
+				<rom name="animal tracker (1988)(nature boy software)(disk 1 of 4)(orange).2mg" size="819264" crc="fe01b486" sha1="a64af9a3784d9a0729a6855f4009530e1fec7d1d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animal tracker (1988)(nature boy software)(disk 2 of 4)(red).2mg" size="410299" crc="1210d6fe" sha1="4d020fe9a50ab8f6e99fd1271dcd4d4298cc6675" offset="0x0000" />
+				<rom name="animal tracker (1988)(nature boy software)(disk 2 of 4)(red).2mg" size="819264" crc="1210d6fe" sha1="4d020fe9a50ab8f6e99fd1271dcd4d4298cc6675" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animal tracker (1988)(nature boy software)(disk 3 of 4)(blue).2mg" size="374918" crc="477843a6" sha1="c4dad6c172698fa30fa2bff18fa7a9a6e4e38a3e" offset="0x0000" />
+				<rom name="animal tracker (1988)(nature boy software)(disk 3 of 4)(blue).2mg" size="819264" crc="477843a6" sha1="c4dad6c172698fa30fa2bff18fa7a9a6e4e38a3e" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animal tracker (1988)(nature boy software)(disk 4 of 4)(green).2mg" size="350821" crc="426101fd" sha1="614f3876b9fffb2d561427f974909a5beeacf61c" offset="0x0000" />
+				<rom name="animal tracker (1988)(nature boy software)(disk 4 of 4)(green).2mg" size="819264" crc="426101fd" sha1="614f3876b9fffb2d561427f974909a5beeacf61c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -280,22 +280,22 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animasia 3d (1994)(animasia)(disk 1 of 4).2mg" size="297359" crc="6b93d0bc" sha1="28caad32afed0df08fc37318f10a8cb088cb600f" offset="0x0000" />
+				<rom name="animasia 3d (1994)(animasia)(disk 1 of 4).2mg" size="819264" crc="6b93d0bc" sha1="28caad32afed0df08fc37318f10a8cb088cb600f" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animasia 3d (1994)(animasia)(disk 2 of 4).2mg" size="468943" crc="62f6962e" sha1="4b4ee9199858193d2b5615ca3dca0ff8eb1200f1" offset="0x0000" />
+				<rom name="animasia 3d (1994)(animasia)(disk 2 of 4).2mg" size="819264" crc="62f6962e" sha1="4b4ee9199858193d2b5615ca3dca0ff8eb1200f1" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animasia 3d (1994)(animasia)(disk 3 of 4).2mg" size="501600" crc="e6a2599a" sha1="b8d7345e9bbefb5fc4c06082693704a7661d95c6" offset="0x0000" />
+				<rom name="animasia 3d (1994)(animasia)(disk 3 of 4).2mg" size="819264" crc="e6a2599a" sha1="b8d7345e9bbefb5fc4c06082693704a7661d95c6" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animasia 3d (1994)(animasia)(disk 4 of 4).2mg" size="145615" crc="ace50039" sha1="c24cd270a02fde36cf166c204409bdee7ffb68bf" offset="0x0000" />
+				<rom name="animasia 3d (1994)(animasia)(disk 4 of 4).2mg" size="819264" crc="ace50039" sha1="c24cd270a02fde36cf166c204409bdee7ffb68bf" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -307,7 +307,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animation second sight software (1991)(-).2mg" size="496312" crc="f193ae7b" sha1="f423bc8b356b835e2db4d4e0901c5543427ebfc9" offset="0x0000" />
+				<rom name="animation second sight software (1991)(-).2mg" size="819264" crc="f193ae7b" sha1="f423bc8b356b835e2db4d4e0901c5543427ebfc9" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -319,12 +319,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animal kingdom (1988)(unicorn software)(disk 1 of 2).2mg" size="424510" crc="fbe79519" sha1="f77b8abca71856310872b01d116d343aac493d5d" offset="0x0000" />
+				<rom name="animal kingdom (1988)(unicorn software)(disk 1 of 2).2mg" size="819264" crc="fbe79519" sha1="f77b8abca71856310872b01d116d343aac493d5d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="animal kingdom (1988)(unicorn software)(disk 2 of 2).2mg" size="428696" crc="efbc1c99" sha1="9e77da8388feeb16f2cc8668b83e4a33a97a85ef" offset="0x0000" />
+				<rom name="animal kingdom (1988)(unicorn software)(disk 2 of 2).2mg" size="819264" crc="efbc1c99" sha1="9e77da8388feeb16f2cc8668b83e4a33a97a85ef" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -336,7 +336,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819272">
-				<rom name="arkanoid (1988)(taito)(us).2mg" size="274445" crc="47a1f89e" sha1="c470e02678154f2f502b9cfaa7ec21dab0038155" offset="0x0000" />
+				<rom name="arkanoid (1988)(taito)(us).2mg" size="819272" crc="47a1f89e" sha1="c470e02678154f2f502b9cfaa7ec21dab0038155" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -348,7 +348,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819275">
-				<rom name="arkanoid ii - revenge of doh (1989)(taito)(us).2mg" size="269950" crc="803bc367" sha1="6c314fc3ce0be8017ad4f82770fb920c5c714a42" offset="0x0000" />
+				<rom name="arkanoid ii - revenge of doh (1989)(taito)(us).2mg" size="819275" crc="803bc367" sha1="6c314fc3ce0be8017ad4f82770fb920c5c714a42" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -360,12 +360,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="arabian nights (1988)(unicorn software)(disk 1 of 2).2mg" size="435933" crc="30db61df" sha1="f8152b3ddbc8d66146fd61d028c1215b2a8a7549" offset="0x0000" />
+				<rom name="arabian nights (1988)(unicorn software)(disk 1 of 2).2mg" size="819264" crc="30db61df" sha1="f8152b3ddbc8d66146fd61d028c1215b2a8a7549" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="arabian nights (1988)(unicorn software)(disk 2 of 2).2mg" size="416013" crc="830a2ff1" sha1="ae9595c488245860435472191be3856697414ad4" offset="0x0000" />
+				<rom name="arabian nights (1988)(unicorn software)(disk 2 of 2).2mg" size="819264" crc="830a2ff1" sha1="ae9595c488245860435472191be3856697414ad4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -377,17 +377,17 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="art &amp; film director (1989)(epyx)(disk 1 of 3).2mg" size="329428" crc="eba0bf52" sha1="3e305cde7b130ed896963319adaa952c8550d33c" offset="0x0000" />
+				<rom name="art &amp; film director (1989)(epyx)(disk 1 of 3).2mg" size="819264" crc="eba0bf52" sha1="3e305cde7b130ed896963319adaa952c8550d33c" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="art &amp; film director (1989)(epyx)(disk 2 of 3).2mg" size="320655" crc="492707f4" sha1="fb3891bd8e51042315882764334142f6ae64fd1a" offset="0x0000" />
+				<rom name="art &amp; film director (1989)(epyx)(disk 2 of 3).2mg" size="819264" crc="492707f4" sha1="fb3891bd8e51042315882764334142f6ae64fd1a" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="art &amp; film director (1989)(epyx)(disk 3 of 3)(graphics).2mg" size="329211" crc="44b0aee6" sha1="69edd858958d96017e1fca38abeef79ef6ded7e5" offset="0x0000" />
+				<rom name="art &amp; film director (1989)(epyx)(disk 3 of 3)(graphics).2mg" size="819264" crc="44b0aee6" sha1="69edd858958d96017e1fca38abeef79ef6ded7e5" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,7 +399,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="as the link turns (1988)(rogue systems)(sw).2mg" size="354441" crc="9d0372f9" sha1="c7812cf7427597906b13a5dbdecabade3c28849f" offset="0x0000" />
+				<rom name="as the link turns (1988)(rogue systems)(sw).2mg" size="819264" crc="9d0372f9" sha1="c7812cf7427597906b13a5dbdecabade3c28849f" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -411,22 +411,22 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="appleworks gs v1.1 (1988)(claris)(disk 2 of 4)(system).2mg" size="385262" crc="d8aa8364" sha1="9885c7d07b1b470af3c32c426f39cca97cc04109" offset="0x0000" />
+				<rom name="appleworks gs v1.1 (1988)(claris)(disk 2 of 4)(system).2mg" size="819264" crc="d8aa8364" sha1="9885c7d07b1b470af3c32c426f39cca97cc04109" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="appleworks gs v1.1 (1988)(claris)(disk 1 of 4)(program).2mg" size="415388" crc="4ef4516f" sha1="a00f91e9fe7634215745b0ff7595519773cfcb0c" offset="0x0000" />
+				<rom name="appleworks gs v1.1 (1988)(claris)(disk 1 of 4)(program).2mg" size="819264" crc="4ef4516f" sha1="a00f91e9fe7634215745b0ff7595519773cfcb0c" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="appleworks gs v1.1 (1988)(claris)(disk 3 of 4)(tools).2mg" size="332480" crc="6def169f" sha1="5f78628507df49d56fae3e9f0a0e96d188485535" offset="0x0000" />
+				<rom name="appleworks gs v1.1 (1988)(claris)(disk 3 of 4)(tools).2mg" size="819264" crc="6def169f" sha1="5f78628507df49d56fae3e9f0a0e96d188485535" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="appleworks gs v1.1 (1988)(claris)(disk 4 of 4)(utilities).2mg" size="532841" crc="94ddd854" sha1="fdf646bfe827679f8fdb09bb3d3100d5582e513d" offset="0x0000" />
+				<rom name="appleworks gs v1.1 (1988)(claris)(disk 4 of 4)(utilities).2mg" size="819264" crc="94ddd854" sha1="fdf646bfe827679f8fdb09bb3d3100d5582e513d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
