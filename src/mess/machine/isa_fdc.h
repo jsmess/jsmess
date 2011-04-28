@@ -57,7 +57,7 @@ public:
 
 		required_device<device_t> m_upd765;
 public:
-		required_device<isa8_device> m_isa;
+		isa8_device  *m_isa;
 };
 
 

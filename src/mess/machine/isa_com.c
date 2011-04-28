@@ -101,8 +101,7 @@ machine_config_constructor isa8_com_device::device_mconfig_additions() const
 
 isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_COM, "ISA8_COM", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this),
-		m_isa(*owner,m_isa_tag)
+		device_isa8_card_interface(mconfig, *this)
 {
 }
 
@@ -112,6 +111,7 @@ isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag,
 
 void isa8_com_device::device_start()
 {
+	m_isa = machine().device<isa8_device>(m_isa_tag);
 	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(subdevice("ins8250_0"), 0x03f8, 0x03ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
 	m_isa->install_device(subdevice("ins8250_1"), 0x02f8, 0x02ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );

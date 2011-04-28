@@ -31,7 +31,7 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 public:
-		required_device<isa8_device> m_isa;
+		isa8_device  *m_isa;
 		int  framecnt;
 
 		UINT8 mode_control;

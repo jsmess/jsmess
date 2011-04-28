@@ -79,8 +79,7 @@ machine_config_constructor isa8_fdc_device::device_mconfig_additions() const
 isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_FDC, "ISA8_FDC", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this),
-		m_upd765(*this, "upd765"),
-		m_isa(*owner,m_isa_tag)
+		m_upd765(*this, "upd765")
 {
 }
 
@@ -90,6 +89,7 @@ isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, const char *tag,
 
 void isa8_fdc_device::device_start()
 {
+	m_isa = machine().device<isa8_device>(m_isa_tag);
 	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );
 }

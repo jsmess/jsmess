@@ -123,7 +123,7 @@ protected:
 private:
 	// internal state
 
-	required_device<device_t>   m_maincpu;
+	device_t   *m_maincpu;
 
 	devcb_resolved_write_line	m_out_irq2_func;
 	devcb_resolved_write_line	m_out_irq3_func;
@@ -160,8 +160,6 @@ public:
     static void static_set_isa8_num(device_t &device, int num);
 
 	// configuration access
-//	const device_isa8_card_interface &isa8_card_config() const { return m_isa8_card_config; }
-
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line,UINT8 data);
 	virtual void eop_w(int state);

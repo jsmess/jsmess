@@ -60,8 +60,7 @@ void isa8_device::device_config_complete()
 //-------------------------------------------------
 
 isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8, "ISA8", tag, owner, clock),
-		m_maincpu(*(owner->owner()), m_cputag)
+        device_t(mconfig, ISA8, "ISA8", tag, owner, clock)
 {
 	for(int i = 0; i < 8; i++)
 		m_isa_device[i] = NULL;
@@ -73,6 +72,7 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 
 void isa8_device::device_start()
 {
+	m_maincpu = machine().device(m_cputag);
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_irq2_func, &m_out_irq2_cb, this);
 	devcb_resolve_write_line(&m_out_irq3_func, &m_out_irq3_cb, this);
@@ -100,6 +100,7 @@ void isa8_device::add_isa_card(device_isa8_card_interface *card,int pos)
 
 void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
 {
+	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{

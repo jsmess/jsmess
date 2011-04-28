@@ -69,7 +69,7 @@ private:
 
         // internal state
 public:
-		required_device<isa8_device> m_isa;
+		isa8_device  *m_isa;
 public:
 		virtual UINT8 dack_r(int line);
 		virtual void dack_w(int line,UINT8 data);

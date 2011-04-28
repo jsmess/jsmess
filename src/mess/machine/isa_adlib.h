@@ -30,7 +30,7 @@ protected:
 private:
         // internal state
 public:
-		required_device<isa8_device> m_isa;
+		isa8_device  *m_isa;
 };
 
 

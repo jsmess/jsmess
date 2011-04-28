@@ -65,8 +65,7 @@ machine_config_constructor isa8_gblaster_device::device_mconfig_additions() cons
 
 isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_GAME_BLASTER, "ISA8_GAME_BLASTER", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this),
-		m_isa(*owner,m_isa_tag)
+		device_isa8_card_interface(mconfig, *this)
 {
 }
 
@@ -76,6 +75,7 @@ isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const 
 
 void isa8_gblaster_device::device_start()
 {
+	m_isa = machine().device<isa8_device>(m_isa_tag);
 	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );

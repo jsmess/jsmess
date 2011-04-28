@@ -68,8 +68,7 @@ machine_config_constructor isa8_adlib_device::device_mconfig_additions() const
 
 isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, ISA8_ADLIB, "ISA8_ADLIB", tag, owner, clock),
-		device_isa8_card_interface( mconfig, *this ),
-		m_isa(*owner, m_isa_tag)
+		device_isa8_card_interface( mconfig, *this )
 {
 }
 
@@ -79,6 +78,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 
 void isa8_adlib_device::device_start()
 {
+	m_isa = machine().device<isa8_device>(m_isa_tag);
 	m_isa->add_isa_card(this, m_isa_num);
 	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 }

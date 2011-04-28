@@ -531,7 +531,7 @@ void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
 
 ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
        : device_t(mconfig, IBM5160_MOTHERBOARD, "IBM5160_MOTHERBOARD", tag, owner, clock),
-		m_maincpu(*owner, m_cputag),
+		m_maincpu(*owner, "maincpu"),
 		m_pic8259(*this, "pic8259"),
 		m_dma8237(*this, "dma8237"),
 		m_pit8253(*this, "pit8253"),
