@@ -1093,7 +1093,7 @@ MACHINE_START( bebox )
 	pc_fdc_init(machine, &bebox_fdc_interface);
 	/* SCSI */
 	lsi53c810_init(machine, &scsi53c810_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, bebox_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(bebox_exit),&machine));
 }
 
 DRIVER_INIT( bebox )

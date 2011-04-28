@@ -1813,7 +1813,7 @@ MACHINE_START( lynx )
 
 	memset(&state->m_suzy, 0, sizeof(state->m_suzy));
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, lynx_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lynx_reset),&machine));
 
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(machine, i);

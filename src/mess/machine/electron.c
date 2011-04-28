@@ -351,6 +351,6 @@ MACHINE_START( electron )
 	state->m_ula.interrupt_control = 0x00;
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 	state->m_tape_timer = machine.scheduler().timer_alloc(FUNC(electron_tape_timer_handler));
-	machine.add_notifier(MACHINE_NOTIFY_RESET, electron_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(electron_reset),&machine));
 }
 

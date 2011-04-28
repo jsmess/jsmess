@@ -60,7 +60,7 @@ MACHINE_START( tx0 )
 	state->m_typewriter.prt_timer = machine.scheduler().timer_alloc(FUNC(prt_callback));
 	state->m_dis_timer = machine.scheduler().timer_alloc(FUNC(dis_callback));
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, tx0_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_machine_stop),&machine));
 }
 
 

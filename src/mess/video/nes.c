@@ -41,7 +41,7 @@ VIDEO_START( nes )
 
 	state->m_last_frame_flip =  0;
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, nes_vh_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(nes_vh_reset),&machine));
 }
 
 PALETTE_INIT( nes )

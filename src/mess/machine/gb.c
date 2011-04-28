@@ -245,7 +245,7 @@ static void gb_init(running_machine &machine)
 MACHINE_START( gb )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine));
 
 	/* Allocate the serial timer, and disable it */
 	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
@@ -257,7 +257,7 @@ MACHINE_START( gb )
 MACHINE_START( gbc )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine));
 
 	/* Allocate the serial timer, and disable it */
 	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
@@ -289,7 +289,7 @@ MACHINE_START( sgb )
 	state->m_sgb_packets = -1;
 	state->m_sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine));
 
 	/* Allocate the serial timer, and disable it */
 	state->m_gb_serial_timer = machine.scheduler().timer_alloc(FUNC(gb_serial_timer_proc));

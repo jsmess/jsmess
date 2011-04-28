@@ -222,7 +222,7 @@ static void snes_machine_stop(running_machine &machine)
 
 MACHINE_START( snes_mess )
 {
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, snes_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(snes_machine_stop),&machine));
 	MACHINE_START_CALL(snes);
 }
 
@@ -290,7 +290,7 @@ static void sufami_machine_stop(running_machine &machine)
 
 MACHINE_START( snesst )
 {
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, sufami_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sufami_machine_stop),&machine));
 	MACHINE_START_CALL(snes);
 }
 

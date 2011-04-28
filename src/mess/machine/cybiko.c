@@ -225,7 +225,7 @@ MACHINE_START( cybikov1 )
 	// serial port
 	cybiko_rs232_init(machine);
 	// other
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_stop_cybikov1);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov1),&machine));
 }
 
 MACHINE_START( cybikov2 )
@@ -243,7 +243,7 @@ MACHINE_START( cybikov2 )
 	// serial port
 	cybiko_rs232_init(machine);
 	// other
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_stop_cybikov2);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov2),&machine));
 }
 
 MACHINE_START( cybikoxt )
@@ -258,7 +258,7 @@ MACHINE_START( cybikoxt )
 	// serial port
 	cybiko_rs232_init(machine);
 	// other
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_stop_cybikoxt);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikoxt),&machine));
 }
 
 ///////////////////

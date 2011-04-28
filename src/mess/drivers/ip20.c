@@ -501,7 +501,7 @@ static void ip204415_exit(running_machine &machine)
 
 static DRIVER_INIT( ip204415 )
 {
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, ip204415_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip204415_exit),&machine));
 }
 
 static TIMER_CALLBACK(ip20_timer)

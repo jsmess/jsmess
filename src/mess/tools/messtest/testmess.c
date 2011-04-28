@@ -514,7 +514,7 @@ static void testmess_exit(running_machine &machine)
 
 void osd_init(running_machine &machine)
 {
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, testmess_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(testmess_exit),&machine));
 	target = machine.render().target_alloc();
 	target->set_orientation(0);
 }

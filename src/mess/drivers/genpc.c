@@ -157,20 +157,20 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_CPU_IO_MAP(pc16_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	//MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_PALETTE_LENGTH( 256 )
 
-    MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "gblaster", ISA8_GAME_BLASTER)
+    //MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
+	//MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
+	//MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
+	//MCFG_ISA8_BUS_DEVICE("mb:isa", 4, "gblaster", ISA8_GAME_BLASTER)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	//MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

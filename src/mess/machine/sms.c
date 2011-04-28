@@ -1704,7 +1704,7 @@ MACHINE_START( sms )
 {
 	sms_state *state = machine.driver_data<sms_state>();
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sms_machine_stop),&machine));
 	state->m_rapid_fire_timer = machine.scheduler().timer_alloc(FUNC(rapid_fire_callback));
 	state->m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 

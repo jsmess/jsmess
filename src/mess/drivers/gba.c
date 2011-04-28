@@ -2194,7 +2194,7 @@ static MACHINE_START( gba )
 	gba_state *state = machine.driver_data<gba_state>();
 
 	/* add a hook for battery save */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, gba_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_machine_stop),&machine));
 
 	/* create a timer to fire scanline functions */
 	state->m_scan_timer = machine.scheduler().timer_alloc(FUNC(perform_scan));

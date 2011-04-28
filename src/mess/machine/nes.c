@@ -280,7 +280,7 @@ MACHINE_START( nes )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	init_nes_core(machine);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, nes_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine));
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_ppu = machine.device("ppu");

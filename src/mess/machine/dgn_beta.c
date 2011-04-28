@@ -1117,7 +1117,7 @@ MACHINE_START( dgnbeta )
 		machine.device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
 	}
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, dgnbeta_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(dgnbeta_reset),&machine));
 	dgnbeta_reset(machine);
 	/* setup debug commands */
 	if (machine.debug_flags & DEBUG_FLAG_ENABLED)

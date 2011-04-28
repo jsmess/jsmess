@@ -550,7 +550,7 @@ void dreamcast_atapi_init(running_machine &machine)
 
 	gdrom_device = NULL;
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, dreamcast_atapi_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(dreamcast_atapi_exit),&machine));
 
 	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 

@@ -658,7 +658,7 @@ static MACHINE_START( pdp1 )
 	dst = machine.region("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, pdp1_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_machine_stop),&machine));
 
 	state->m_tape_reader.timer = machine.scheduler().timer_alloc(FUNC(reader_callback));
 	state->m_tape_puncher.timer = machine.scheduler().timer_alloc(FUNC(puncher_callback));

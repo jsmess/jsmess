@@ -963,7 +963,7 @@ static MACHINE_START( nc100 )
 	nc_state *state = machine.driver_data<nc_state>();
     state->m_type = NC_TYPE_1xx;
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, nc100_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc100_machine_stop),&machine));
 
 	/* keyboard timer */
 	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
@@ -1359,7 +1359,7 @@ static MACHINE_START( nc200 )
 	nc_state *state = machine.driver_data<nc_state>();
 	state->m_type = NC_TYPE_200;
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, nc200_machine_stop);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc200_machine_stop),&machine));
 
 	/* keyboard timer */
 	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));

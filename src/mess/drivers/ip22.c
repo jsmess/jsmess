@@ -1544,7 +1544,7 @@ static MACHINE_START( ip22 )
 
 	// SCSI init
 	wd33c93_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, ip225015_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip225015_exit),&machine));
 }
 
 static DRIVER_INIT( ip225015 )

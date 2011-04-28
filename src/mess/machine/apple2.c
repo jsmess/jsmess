@@ -1645,7 +1645,7 @@ void apple2_init_common(running_machine &machine)
 	state->m_fdc_diskreg = 0;
 
 	AY3600_init(machine);
-	machine.add_notifier(MACHINE_NOTIFY_RESET, apple2_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(apple2_reset),&machine));
 
 	/* state save registers */
 	state->save_item(NAME(state->m_flags));
