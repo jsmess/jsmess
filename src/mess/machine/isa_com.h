@@ -29,8 +29,6 @@ protected:
 
 private:
         // internal state
-public:
-		isa8_device  *m_isa;
 };
 
 

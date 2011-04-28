@@ -168,6 +168,8 @@ protected:
 	// configuration
 	const char *m_isa_tag;
 	int m_isa_num;
+public:	
+	isa8_device  *m_isa;	
 };
 
 #endif  /* __ISA_H__ */

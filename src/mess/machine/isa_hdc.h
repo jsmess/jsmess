@@ -69,8 +69,6 @@ private:
 
         // internal state
 public:
-		isa8_device  *m_isa;
-public:
 		virtual UINT8 dack_r(int line);
 		virtual void dack_w(int line,UINT8 data);
 		virtual bool have_dack(int line);
