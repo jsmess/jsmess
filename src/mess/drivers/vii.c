@@ -836,6 +836,16 @@ static INPUT_PORTS_START( vsmile )
 		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("X Button")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( walle )
+	PORT_START("P1")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+INPUT_PORTS_END
+
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	vii_state *state = image.device().machine().driver_data<vii_state>();
@@ -1057,6 +1067,14 @@ static DRIVER_INIT( vsmile )
 	state->m_centered_coordinates = 1;
 }
 
+static DRIVER_INIT( walle )
+{
+	vii_state *state = machine.driver_data<vii_state>();
+
+	state->m_spg243_mode = SPG243_BATMAN;
+	state->m_centered_coordinates = 1;
+}
+
 ROM_START( vii )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
@@ -1075,7 +1093,13 @@ ROM_START( vsmile )
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( walle )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
+ROM_END
+
 /*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
 CONS( 2004, batmantv, 0,        0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                "The Batman", GAME_NO_SOUND )
 CONS( 2005, vsmile,  0,        0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
 CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
+CONS( 2008, walle,  0,        0,        batman,   walle,   walle,   "JAKKS Pacific Inc",                                            "Wall-E",    GAME_NO_SOUND | GAME_NOT_WORKING )
