@@ -1151,8 +1151,8 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC99_TAG, abc99_device, txd_r),
-	DEVCB_DEVICE_LINE_MEMBER(ABC99_TAG, abc99_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, txd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, rxd_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc802_state, lrs_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc802_state, mux80_40_w),
 	DEVCB_NULL,
@@ -1184,8 +1184,8 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC99_TAG, abc99_device, txd_r),
-	DEVCB_DEVICE_LINE_MEMBER(ABC99_TAG, abc99_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, txd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, rxd_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc806_state, keydtr_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1200,18 +1200,6 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 //-------------------------------------------------
 
 static ABC77_INTERFACE( abc77_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
-};
-
-
-//-------------------------------------------------
-//  ABC99_INTERFACE( abc99_intf )
-//-------------------------------------------------
-
-static ABC99_INTERFACE( abc99_intf )
 {
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
@@ -1531,8 +1519,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
-	//MCFG_ABC77_ADD(abc77_intf)
-	MCFG_ABC99_ADD(abc99_intf)
+	MCFG_ABC77_ADD(abc77_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
@@ -1567,8 +1554,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
-	//MCFG_ABC77_ADD(abc77_intf)
-	MCFG_ABC99_ADD(abc99_intf)
+	MCFG_ABC77_ADD(abc77_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 

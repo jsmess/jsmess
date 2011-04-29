@@ -3,7 +3,13 @@
 #ifndef __ABC77__
 #define __ABC77__
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/devhelpr.h"
+#include "sound/discrete.h"
+#include "sound/speaker.h"
 
 
 
@@ -42,6 +48,7 @@ struct abc77_interface
 	devcb_write_line	m_out_keydown_cb;
 };
 
+
 // ======================> abc77_device
 
 class abc77_device :  public device_t,
@@ -55,10 +62,14 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const input_port_token *device_input_ports() const;
+	
+	static INPUT_CHANGED( keyboard_reset );
 
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( t1_r );
+	DECLARE_WRITE8_MEMBER( prog_w );
+	DECLARE_WRITE8_MEMBER( j3_w );
 
 	DECLARE_WRITE_LINE_MEMBER( rxd_w );
 	DECLARE_READ_LINE_MEMBER( txd_r );
@@ -92,6 +103,8 @@ private:
 	int m_clock;					// transmit clock
 	int m_hys;						// hysteresis
 	int m_reset;					// reset
+	int m_stb;						// strobe
+	UINT8 m_j3;
 
 	// timers
 	emu_timer *m_serial_timer;

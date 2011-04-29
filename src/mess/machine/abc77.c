@@ -1,17 +1,41 @@
 /*
 
-Luxor ABC77
+Luxor ABC55/77
+
+Keyboard PCB Layout
+-------------------
+
+KTC A65-02486-232
+
+|-----------------------------------------------------------------------|
+|	SW1		  CN1		LS393											|
+|	4020	7406	LS132		7407  LS02  7407		NE556	 LS1	|
+|                                                                       |
+|	22-950-3B	XTAL	CPU		ROM0	ROM1	LS373  LS240  22-908-03	|
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|-----------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    CPU			- Signetics SCN8035A 8035 CPU
+    ROM0		- NEC D2716D 2Kx8 ROM "-78"
+    ROM1		- not populated
+	22-950-3B	- Exar Semiconductor XR22-950-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
+	22-908-03	- Exar Semiconductor XR22-908-03 keyboard matrix capacitive readout latch
+    CN1			- 1x12 PCB header
+	LS1			- loudspeaker
+    SW1			- reset switch
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
 #include "abc77.h"
-#include "cpu/mcs48/mcs48.h"
-#include "machine/devhelpr.h"
-#include "sound/discrete.h"
-#include "sound/speaker.h"
 
 
 
@@ -29,6 +53,7 @@ Luxor ABC77
 //**************************************************************************
 
 const device_type ABC77 = &device_creator<abc77_device>;
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -60,8 +85,9 @@ void abc77_device::device_config_complete()
 //-------------------------------------------------
 
 ROM_START( abc77 )
-	ROM_LOAD( "65-02486.z10", 0x0000, 0x0800, NO_DUMP ) // Swedish
-	ROM_LOAD( "keyboard.z14", 0x0800, 0x0800, NO_DUMP ) // non-Swedish
+	ROM_REGION( 0x1000, I8035_TAG, 0 )
+	ROM_LOAD( "-78.z10", 0x000, 0x800, CRC(635986ce) SHA1(04a30141ac611d0544bbb786061515040c23480c) )
+//	ROM_LOAD( "keyboard.z14", 0x0800, 0x0800, NO_DUMP ) // non-Swedish keyboard encoding ROM
 ROM_END
 
 
@@ -89,10 +115,12 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc77_io, AS_IO, 8, abc77_device )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVWRITE(DEVICE_SELF_OWNER, abc77_device, j3_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("DSW")
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREAD(DEVICE_SELF_OWNER, abc77_device, p1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE(DEVICE_SELF_OWNER, abc77_device, p2_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD(DEVICE_SELF_OWNER, abc77_device, t1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ_PORT("DSW")
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE(DEVICE_SELF_OWNER, abc77_device, prog_w)
 ADDRESS_MAP_END
 
 
@@ -106,6 +134,7 @@ static const discrete_555_desc abc77_ne556_a =
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES
 };
+
 
 static DISCRETE_SOUND_START( abc77 )
 	DISCRETE_INPUT_LOGIC(NODE_01)
@@ -125,7 +154,7 @@ static MACHINE_CONFIG_FRAGMENT( abc77 )
 	MCFG_CPU_IO_MAP(abc77_io)
 
 	// watchdog
-	MCFG_WATCHDOG_TIME_INIT(MCS48_ALE_CLOCK(XTAL_4_608MHz))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_4_608MHz/3/5/4096))
 
 	// discrete sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -143,6 +172,21 @@ MACHINE_CONFIG_END
 machine_config_constructor abc77_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( abc77 );
+}
+
+
+//-------------------------------------------------
+//  INPUT_CHANGED( keyboard_reset )
+//-------------------------------------------------
+
+INPUT_CHANGED( abc77_device::keyboard_reset )
+{
+    abc77_device *keyboard = static_cast<abc77_device *>(field->port->machine().device(ABC77_TAG));
+
+	if (oldval && !newval)
+	{
+		keyboard->device_reset();
+	}
 }
 
 
@@ -173,7 +217,7 @@ INPUT_PORTS_START( abc77 )
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
@@ -274,19 +318,22 @@ INPUT_PORTS_START( abc77 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Keyboard Program" )
 	PORT_DIPSETTING(    0x00, "Internal (8048)" )
-	PORT_DIPSETTING(    0x01, "External PROM" )
-	PORT_DIPNAME( 0x02, 0x00, "Character Set" )
-	PORT_DIPSETTING(    0x00, "Swedish" )
-	PORT_DIPSETTING(    0x02, "US ASCII" )
-	PORT_DIPNAME( 0x04, 0x04, "External PROM" )
+	PORT_DIPSETTING(    0x01, "External PROM" ) // @ Z10
+	PORT_DIPNAME( 0x02, 0x02, "Character Set" )
+	PORT_DIPSETTING(    0x02, "Swedish" )
+	PORT_DIPSETTING(    0x00, "US ASCII" )
+	PORT_DIPNAME( 0x04, 0x04, "External Encoding PROM" ) // @ Z14
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Keyboard Language" )
-	PORT_DIPSETTING(    0x00, "Danish" )
-	PORT_DIPSETTING(    0x10, DEF_STR( French ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( German ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Spanish ) )
+	PORT_DIPNAME( 0x18, 0x18, "Keyboard Language" ) PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "Danish" )			PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( French ) )	PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, DEF_STR( German ) )	PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, DEF_STR( Spanish ) )	PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED(abc77_device::keyboard_reset, 0)
 INPUT_PORTS_END
 
 
@@ -328,7 +375,7 @@ inline void abc77_device::serial_clock()
 {
 	m_clock = !m_clock;
 
-	devcb_call_write_line(&m_out_clock_func, m_clock);
+	devcb_call_write_line(&m_out_clock_func, !m_clock);
 }
 
 
@@ -358,7 +405,11 @@ inline void abc77_device::key_down(int state)
 abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock),
 	  m_maincpu(*this, I8035_TAG),
-	  m_discrete(*this, DISCRETE_TAG)
+	  m_discrete(*this, DISCRETE_TAG),
+	  m_txd(1),
+	  m_keydown(1),
+	  m_clock(0),
+	  m_stb(1)
 {
 }
 
@@ -371,7 +422,7 @@ void abc77_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_4_608MHz*2), 0, MCS48_ALE_CLOCK(XTAL_4_608MHz*2));
+	m_serial_timer->adjust(attotime::from_hz(19200), 0, attotime::from_hz(19200)); // ALE/32
 
 	m_reset_timer = timer_alloc(TIMER_RESET);
 
@@ -440,8 +491,14 @@ READ8_MEMBER( abc77_device::p1_r )
     */
 
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
+	UINT8 data = 0xff;
+	
+	if (m_stb && m_keylatch < 12)
+	{
+		data = input_port_read(this, keynames[m_keylatch]);
+	}
 
-	return input_port_read(this, keynames[m_keylatch]);
+	return data;
 }
 
 
@@ -466,11 +523,14 @@ WRITE8_MEMBER( abc77_device::p2_w )
 
     */
 
-	m_keylatch = data & 0x0f;
-
-	if (m_keylatch == 1)
+	if (!m_stb)
 	{
-		watchdog_reset(machine());
+		m_keylatch = data & 0x0f;
+
+		if (m_keylatch == 1)
+		{
+			watchdog_reset(machine());
+		}
 	}
 
 	// beep
@@ -494,6 +554,26 @@ WRITE8_MEMBER( abc77_device::p2_w )
 READ8_MEMBER( abc77_device::t1_r )
 {
 	return m_clock;
+}
+
+
+//-------------------------------------------------
+//  prog_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc77_device::prog_w )
+{
+	m_stb = BIT(data, 0);
+}
+
+
+//-------------------------------------------------
+//  j3_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc77_device::j3_w )
+{
+	m_j3 = data;
 }
 
 
