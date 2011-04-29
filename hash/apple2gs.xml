@@ -2856,18 +2856,6 @@
 		</part>
 	</software>
 
-	<software name="lemmings">
-		<description>Lemmings</description>
-		<year>1996</year>
-		<publisher>Psygnosis</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="3145792">
-				<rom name="lemmings (1996)(psyognosis).2mg" size="3145797" crc="a84367f3" sha1="dcbe3e9a30c9318bf512934fdc951927648e2e3a" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lifedeth">
 		<description>Life &amp; Death</description>
 		<year>1989</year>
@@ -5169,18 +5157,6 @@
 		<part name="flop9" interface="floppy_3_5">
 			<dataarea name="flop" size="819269">
 				<rom name="space ace (1990)(readysoft)(disk 9 of 9).2mg" size="819269" crc="77b00239" sha1="5df41382ed6979134bfd75992d5b2876d0b716bd" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacefox">
-		<description>Space Fox</description>
-		<year>1992</year>
-		<publisher>Seven Hills Software</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1536064">
-				<rom name="space fox (1992)(seven hills software).2mg" size="153606" crc="5498fa99" sha1="46d40f62d5d243c1a0432e004be11de2c9b2ca7b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
