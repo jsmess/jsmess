@@ -111,10 +111,19 @@ static void load_track_data(device_t *device,int floppy_select)
 	f = &sony.floppy[floppy_select];
 	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select));
 
-	track_size = floppy_get_track_size(flopimg_get_image(&cur_image->device()), f->head, floppy_drive_get_current_track(&cur_image->device()));
+	floppy_image *fimg = flopimg_get_image(&cur_image->device());
+
+	if (!fimg)
+	{
+		return;
+	}
+
+	track_size = floppy_get_track_size(fimg, f->head, floppy_drive_get_current_track(&cur_image->device()));
 	new_data = (UINT8*)cur_image->image_realloc(f->loadedtrack_data, track_size);
 	if (!new_data)
+	{
 		return;
+	}
 
 	floppy_drive_read_track_data_info_buffer(&cur_image->device(), f->head, new_data, &track_size);
 	f->loadedtrack_valid = 1;
@@ -162,6 +171,11 @@ UINT8 sony_read_data(device_t *device)
 	if (!f->loadedtrack_valid)
 		load_track_data(device, sony.floppy_select);
 
+	if (!f->loadedtrack_data)
+	{
+		return 0xFF;
+	}
+
 	result = sony_fetchtrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos);
 	return result;
 }
@@ -180,6 +194,12 @@ void sony_write_data(device_t *device,UINT8 data)
 
 	if (!f->loadedtrack_valid)
 		load_track_data(device,sony.floppy_select);
+
+	if (!f->loadedtrack_data)
+	{
+		return;
+	}
+
 	sony_filltrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos, data);
 	f->loadedtrack_dirty = 1;
 }
@@ -303,7 +323,13 @@ int sony_read_status(device_t *device)
 			break;
 		case 0x09:	/* Number of sides: 0=single sided, 1=double sided */
 			if (cur_image)
-				result = floppy_get_heads_per_disk(flopimg_get_image(&cur_image->device())) - 1;
+			{
+				floppy_image *fimg = flopimg_get_image(&cur_image->device());
+				if (fimg)
+				{
+					result = floppy_get_heads_per_disk(fimg) - 1;
+				}
+			}
 			break;
 		case 0x0a:	/* At track 0: 0=track zero 1=not track zero */
 			logerror("sony.status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine().firstcpu));
