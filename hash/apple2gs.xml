@@ -6147,6 +6147,100 @@
 		</part>
 	</software>
 
+	<software name="tboxmag1">
+		<description>Toolbox Mag #1</description>
+		<year>1990</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_01.po" size="819200" crc="39a51c07" sha1="5c5f4f9fd7edee448137ca658fac14d5511129ea" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tboxmag2">
+		<description>Toolbox Mag #2</description>
+		<year>1990</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_02.po" size="819200" crc="27e55cf4" sha1="05b1473c2e6ee9d604e2ec9c72f84d059232ac4c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tboxmag3">
+		<description>Toolbox Mag #3</description>
+		<year>1990</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_03.po" size="819200" crc="78a36964" sha1="2378b37edf92f26146d871e8aa2967a7e5486bae" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tboxmag4">
+		<description>Toolbox Mag #4</description>
+		<year>1990</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_04.po" size="819200" crc="107bc34d" sha1="19f0864811343e6cf05ec4007f4fffc183f7e1da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tboxmag5">
+		<description>Toolbox Mag #5</description>
+		<year>1991</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_05.po" size="819200" crc="48fd1b6c" sha1="de81b79a124dacf6358e70672ad09465ae1a4a89" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tboxmag6">
+		<description>Toolbox Mag #6</description>
+		<year>1991</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_06a.po" size="819200" crc="339fc678" sha1="18173faec2bca0a76f446c16b0b447e6050b7d17" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_06b.po" size="819200" crc="f8901b20" sha1="87ad733d6ea430ec741c7abc255c77fceedd830e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tboxmag7">
+		<description>Toolbox Mag #7</description>
+		<year>1991</year>
+		<publisher>Toolbox</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_07a.po" size="819200" crc="fd5cc198" sha1="863eff63e344a434c8df9e8a072ff3f37be50a5a" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolboxmag_07b.po" size="819200" crc="e632f830" sha1="d136c96d41dbbd585b2a87b91ca97194dac16914" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tdrive2">
 		<description>Test Drive II: The Duel</description>
 		<year>1989</year>
