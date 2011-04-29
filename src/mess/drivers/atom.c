@@ -84,9 +84,20 @@ Hardware:   PPIA 8255
 
     TODO:
 
+    - ERROR repeats forever after entering incorrect command
+
+		C26D: bcs  $C2AA
+		C26F: sta  $53
+		C271: lda  $C0EE,x
+		C274: bcc  $C29F
+		C29F: sta  $52
+		C2A1: sty  $03
+		C2A3: ldx  $04
+		C2A5: jmp  ($0052)
+		F251: ora  $0C0D		<---- Table of Base Address Value for Mnemonics, should not jump here!!
+
     - connect to softwarelist
     - e000 EPROM switching
-    - ERROR repeats ad infinitum
     - display should be monochrome
     - ram expansion
     - tap files
@@ -626,7 +637,7 @@ static const cassette_config atom_cassette_config =
 };
 
 /*-------------------------------------------------
-    mc6847_interface atom_vdg_intf
+    mc6847_interface vdg_intf
 -------------------------------------------------*/
 
 READ8_MEMBER( atom_state::vdg_videoram_r )
@@ -638,7 +649,7 @@ READ8_MEMBER( atom_state::vdg_videoram_r )
 	return m_video_ram[offset];
 }
 
-static const mc6847_interface atom_vdg_intf =
+static const mc6847_interface vdg_intf =
 {
 	DEVCB_DRIVER_MEMBER(atom_state, vdg_videoram_r),
 	DEVCB_NULL,
@@ -789,9 +800,8 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 
 
 static MACHINE_CONFIG_START( atom, atom_state )
-
 	/* basic machine hardware */
-	MCFG_CPU_ADD(SY6502_TAG, M65C02, X2/4)
+	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
@@ -801,7 +811,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MCFG_MC6847_ADD(MC6847_TAG, atom_vdg_intf)
+	MCFG_MC6847_ADD(MC6847_TAG, vdg_intf)
 	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
@@ -810,7 +820,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_TIMER_ADD_PERIODIC("hz2400", cassette_output_tick, attotime::from_hz(X2/4/416))
+	MCFG_TIMER_ADD_PERIODIC("hz2400", cassette_output_tick, attotime::from_hz(4806)) // X2/4/416
 	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
