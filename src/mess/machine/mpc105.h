@@ -45,7 +45,7 @@ private:
 
 	const char *m_cputag;
 
-	required_device<device_t>   m_maincpu;
+	device_t*   m_maincpu;
 };
 
 

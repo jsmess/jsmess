@@ -51,7 +51,7 @@ void mpc105_device::static_set_cputag(device_t &device, const char *tag)
 
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, MPC105, "MPC105", tag, owner, clock),
-	  m_maincpu(*owner, m_cputag)
+	m_maincpu(NULL)
 {
 }
 
@@ -61,6 +61,7 @@ mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, dev
 
 void mpc105_device::device_start()
 {
+	m_maincpu = machine().device(m_cputag);
 }
 
 //-------------------------------------------------
@@ -69,7 +70,6 @@ void mpc105_device::device_start()
 
 void mpc105_device::device_reset()
 {
-	m_bank_base = m_bank_base;
 	m_bank_enable = 0;
 	memset(m_bank_registers,0,sizeof(m_bank_registers));
 }
