@@ -211,15 +211,13 @@ static TIMER_CALLBACK( nes_irq_callback )
 	state->m_irq_timer->adjust(attotime::never);
 }
 
-static STATE_POSTLOAD( nes_banks_restore )
+static void nes_banks_restore(nes_state *state)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
-	memory_set_bank(machine, "bank1", state->m_prg_bank[0]);
-	memory_set_bank(machine, "bank2", state->m_prg_bank[1]);
-	memory_set_bank(machine, "bank3", state->m_prg_bank[2]);
-	memory_set_bank(machine, "bank4", state->m_prg_bank[3]);
-	memory_set_bank(machine, "bank5", state->m_prg_bank[4]);
+	memory_set_bank(state->machine(), "bank1", state->m_prg_bank[0]);
+	memory_set_bank(state->machine(), "bank2", state->m_prg_bank[1]);
+	memory_set_bank(state->machine(), "bank3", state->m_prg_bank[2]);
+	memory_set_bank(state->machine(), "bank4", state->m_prg_bank[3]);
+	memory_set_bank(state->machine(), "bank5", state->m_prg_bank[4]);
 }
 
 static void nes_state_register( running_machine &machine )
@@ -272,7 +270,7 @@ static void nes_state_register( running_machine &machine )
 	if (state->m_battery)
 		state->save_pointer(NAME(state->m_battery_ram), state->m_battery_size);
 
-	machine.save().register_postload(nes_banks_restore, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(nes_banks_restore), state));
 }
 
 MACHINE_START( nes )

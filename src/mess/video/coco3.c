@@ -752,9 +752,9 @@ static UINT32 get_rgb_color(int color)
 
 
 
-static STATE_POSTLOAD( coco3_video_postload )
+static void coco3_video_postload(coco3_state *state)
 {
-	coco3_set_dirty(machine);
+	coco3_set_dirty(state->machine());
 }
 
 
@@ -821,7 +821,7 @@ static void internal_video_start_coco3(running_machine &machine, m6847_type type
 	state_save_register_global(machine, video->legacy_video);
 	state_save_register_global(machine, video->top_border_scanlines);
 	state_save_register_global(machine, video->display_scanlines);
-	machine.save().register_postload(coco3_video_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(coco3_video_postload), state));
 }
 
 

@@ -545,10 +545,8 @@ DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 	return address;
 }
 
-static STATE_POSTLOAD( comx35_state_save_postload )
+static void comx35_state_save_postload(comx35_state *state)
 {
-	comx35_state *state = machine.driver_data<comx35_state>();
-
 	state->set_active_bank();
 }
 
@@ -602,7 +600,7 @@ void comx35_state::machine_start()
 	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
 
 	/* register for state saving */
-	machine().save().register_postload(comx35_state_save_postload, NULL);
+	machine().save().register_postload(save_prepost_delegate(FUNC(comx35_state_save_postload), this));
 	state_save_register_global(machine(), m_reset);
 	state_save_register_global(machine(), m_cdp1802_q);
 	state_save_register_global(machine(), m_cdp1802_ef4);

@@ -1221,12 +1221,12 @@ static READ16_HANDLER(aes_in2_r)
  *
  *************************************/
 
-static STATE_POSTLOAD( aes_postload )
+static void aes_postload(neogeo_state *state)
 {
-	_set_main_cpu_bank_address(machine);
-	_set_main_cpu_vector_table_source(machine);
-	set_audio_cpu_banking(machine);
-	_set_audio_cpu_rom_source(machine.device("maincpu")->memory().space(AS_PROGRAM));
+	_set_main_cpu_bank_address(state->machine());
+	_set_main_cpu_vector_table_source(state->machine());
+	set_audio_cpu_banking(state->machine());
+	_set_audio_cpu_rom_source(state->machine().device("maincpu")->memory().space(AS_PROGRAM));
 }
 
 static void common_machine_start(running_machine &machine)
@@ -1273,7 +1273,7 @@ static void common_machine_start(running_machine &machine)
 	state->save_item(NAME(state->m_led2_value));
 	state->save_item(NAME(state->m_recurse));
 
-	machine.save().register_postload(aes_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(aes_postload), state));
 }
 
 static MACHINE_START( neogeo )

@@ -703,22 +703,6 @@ static READ32_HANDLER( lightgun_r )
 
 static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
-	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
-	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
-	AM_RANGE(0x1f80100c, 0x1f80102f) AM_WRITENOP
-	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_READNOP
-	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
-	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
-	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
-	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
-	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
-	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
-	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_NOP
-	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
-	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_BASE_MEMBER(namcos11_state, m_sharedram) /* shared ram with C76 */
 	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_BASE_SIZE_MEMBER(namcos11_state, m_keycus, m_keycus_size) /* keycus */
 	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
@@ -982,7 +966,7 @@ static DRIVER_INIT( namcos11 )
 		n_game++;
 	}
 
-	if( strcmp( machine.system().name, "ptblank2a" ) == 0 )
+	if( strcmp( machine.system().name, "ptblank2ua" ) == 0 )
 	{
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );
@@ -999,8 +983,8 @@ static MACHINE_RESET( namcos11 )
 
 static MACHINE_CONFIG_START( coh100, namcos11_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map)
+	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
 
 	MCFG_CPU_ADD("c76", M37702, 16384000)
@@ -1035,6 +1019,10 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh110, coh100 )
+	MCFG_CPU_REPLACE( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
+
 	MCFG_VIDEO_START( psx_type2 )
 
 	MCFG_SCREEN_MODIFY("screen")

@@ -291,7 +291,7 @@ public:
 // ======================> address_space
 
 // address_space holds live information about an address space
-class address_space : public bindable_object
+class address_space
 {
 	friend class address_table;
 	friend class address_table_read;
@@ -303,7 +303,7 @@ class address_space : public bindable_object
 protected:
 	// construction/destruction
 	address_space(device_memory_interface &memory, address_spacenum spacenum, bool large);
-	~address_space();
+	virtual ~address_space();
 
 public:
 	// public allocator

@@ -417,7 +417,7 @@ private:
 // ======================> handler_entry
 
 // a handler entry contains information about a memory handler
-class handler_entry : public bindable_object
+class handler_entry
 {
 	DISABLE_COPYING(handler_entry);
 
@@ -669,7 +669,7 @@ private:
 // ======================> address_table
 
 // address_table contains information about read/write accesses within an address space
-class address_table : public bindable_object
+class address_table
 {
 	// address map lookup table definitions
 	static const int LEVEL1_BITS	= 18;						// number of address bits in the level 1 table
@@ -1541,7 +1541,7 @@ UINT8 address_table::s_watchpoint_table[1 << LEVEL1_BITS];
 //**************************************************************************
 
 // banking helpers
-static STATE_POSTLOAD( bank_reattach );
+static void bank_reattach(running_machine &machine);
 
 // debugging
 static void generate_memdump(running_machine &machine);
@@ -1590,7 +1590,7 @@ void memory_init(running_machine &machine)
 		space->locate_memory();
 
 	// register a callback to reset banks when reloading state
-	machine.save().register_postload(bank_reattach, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(bank_reattach), &machine));
 
 	// dump the final memory configuration
 	generate_memdump(machine);
@@ -1773,7 +1773,7 @@ static void generate_memdump(running_machine &machine)
 //  bank_reattach - reconnect banks after a load
 //-------------------------------------------------
 
-static STATE_POSTLOAD( bank_reattach )
+static void bank_reattach(running_machine &machine)
 {
 	// for each non-anonymous bank, explicitly reset its entry
 	for (memory_bank *bank = machine.memory_data->banklist.first(); bank != NULL; bank = bank->next())
@@ -2039,7 +2039,7 @@ void address_space::populate_from_map()
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
 	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
-	bindable_object *object;
+	void *object;
 	device_t *device;
 
 	// based on the handler type, alter the bits, name, funcptr, and object

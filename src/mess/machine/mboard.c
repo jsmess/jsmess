@@ -241,14 +241,14 @@ WRITE32_HANDLER( mboard_write_LED_32 )
 
 /* save states callback */
 
-static STATE_PRESAVE( m_board_presave )
+static void board_presave(running_machine *machine)
 {
 	int i;
 	for (i=0;i<64;i++)
 		save_board[i]=m_board[i];
 }
 
-static STATE_POSTLOAD( m_board_postload )
+static void board_postload(running_machine *machine)
 {
 	int i;
 	for (i=0;i<64;i++)
@@ -259,8 +259,8 @@ static STATE_POSTLOAD( m_board_postload )
 void mboard_savestate_register(running_machine &machine)
 {
 	state_save_register_global_array(machine,save_board);
-	machine.save().register_postload(m_board_postload,NULL);
-	machine.save().register_presave(m_board_presave,NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(board_postload),&machine));
+	machine.save().register_presave(save_prepost_delegate(FUNC(board_presave),&machine));
 }
 
 void mboard_set_board( void )

@@ -1812,9 +1812,9 @@ static void set_dirty(mc6847_state *mc6847)
     DEVICE INTERFACE
 *****************************************************************************/
 
-static STATE_POSTLOAD( mc6847_postload )
+static void mc6847_postload(mc6847_state *state)
 {
-	set_dirty((mc6847_state *)param);
+	set_dirty(state);
 }
 
 static DEVICE_START( mc6847 )
@@ -1935,7 +1935,7 @@ static DEVICE_START( mc6847 )
 	devcb_resolve_read_line(&mc6847->in_css_func, &intf->in_css_func, device);
 
 	/* setup save states */
-	device->machine().save().register_postload(mc6847_postload, mc6847);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(mc6847_postload), mc6847));
 }
 
 static DEVICE_RESET( mc6847 )

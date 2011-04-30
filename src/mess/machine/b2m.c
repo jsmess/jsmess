@@ -319,10 +319,9 @@ READ8_HANDLER ( b2m_localmachine_r )
 	return state->m_b2m_localmachine;
 }
 
-static STATE_POSTLOAD( b2m_postload )
+static void b2m_postload(b2m_state *state)
 {
-	b2m_state *state = machine.driver_data<b2m_state>();
-	b2m_set_bank(machine, state->m_b2m_8255_portc & 7);
+	b2m_set_bank(state->machine(), state->m_b2m_8255_portc & 7);
 }
 
 MACHINE_START(b2m)
@@ -347,7 +346,7 @@ MACHINE_START(b2m)
 	state->save_item(NAME(state->m_b2m_localmachine));
 	state->save_item(NAME(state->m_vblank_state));
 
-	machine.save().register_postload(b2m_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(b2m_postload), state));
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)

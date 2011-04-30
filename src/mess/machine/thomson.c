@@ -547,9 +547,9 @@ static void to7_update_cart_bank(running_machine &machine)
 
 
 
-static STATE_POSTLOAD( to7_update_cart_bank_postload )
+static void to7_update_cart_bank_postload(running_machine *machine)
 {
-	to7_update_cart_bank(machine);
+	to7_update_cart_bank(*machine);
 }
 
 
@@ -1601,7 +1601,7 @@ MACHINE_START ( to7 )
 	state_save_register_global( machine, to7_lightpen );
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( to7_update_cart_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(to7_update_cart_bank_postload), &machine));
 }
 
 
@@ -1681,9 +1681,9 @@ static void to770_update_ram_bank(running_machine &machine)
 
 
 
-static STATE_POSTLOAD ( to770_update_ram_bank_postload )
+static void to770_update_ram_bank_postload(running_machine *machine)
 {
-	to770_update_ram_bank(machine);
+	to770_update_ram_bank(*machine);
 }
 
 
@@ -1847,8 +1847,8 @@ MACHINE_START ( to770 )
 	state_save_register_global( machine, to7_lightpen );
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( to770_update_ram_bank_postload, NULL );
-	machine.save().register_postload( to7_update_cart_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(to770_update_ram_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(to7_update_cart_bank_postload), &machine));
 }
 
 
@@ -2109,9 +2109,9 @@ static void mo5_update_cart_bank(running_machine &machine)
 
 
 
-static STATE_POSTLOAD( mo5_update_cart_bank_postload )
+static void mo5_update_cart_bank_postload(running_machine *machine)
 {
-	mo5_update_cart_bank(machine);
+	mo5_update_cart_bank(*machine);
 }
 
 
@@ -2223,7 +2223,7 @@ MACHINE_START ( mo5 )
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global( machine, mo5_reg_cart );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( mo5_update_cart_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(mo5_update_cart_bank_postload), &machine));
 }
 
 
@@ -2475,9 +2475,9 @@ static void to9_update_cart_bank(running_machine &machine)
 
 
 
-static STATE_POSTLOAD( to9_update_cart_bank_postload )
+static void to9_update_cart_bank_postload(running_machine *machine)
 {
-	to9_update_cart_bank(machine);
+	to9_update_cart_bank(*machine);
 }
 
 
@@ -2559,9 +2559,9 @@ static void to9_update_ram_bank (running_machine &machine)
 
 
 
-static STATE_POSTLOAD( to9_update_ram_bank_postload )
+static void to9_update_ram_bank_postload(running_machine *machine)
 {
-	to9_update_ram_bank(machine);
+	to9_update_ram_bank(*machine);
 }
 
 
@@ -3188,8 +3188,8 @@ MACHINE_START ( to9 )
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global( machine, to9_soft_bank );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( to9_update_ram_bank_postload, NULL );
-	machine.save().register_postload( to9_update_cart_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(to9_update_ram_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(to9_update_cart_bank_postload), &machine));
 }
 
 
@@ -3563,9 +3563,9 @@ static void to8_update_floppy_bank( running_machine &machine )
 
 
 
-static STATE_POSTLOAD( to8_update_floppy_bank_postload )
+static void to8_update_floppy_bank_postload(running_machine *machine)
 {
-	to8_update_floppy_bank(machine);
+	to8_update_floppy_bank(*machine);
 }
 
 
@@ -3634,9 +3634,9 @@ static void to8_update_ram_bank (running_machine &machine)
 
 
 
-static STATE_POSTLOAD( to8_update_ram_bank_postload )
+static void to8_update_ram_bank_postload(running_machine *machine)
 {
-	to8_update_ram_bank(machine);
+	to8_update_ram_bank(*machine);
 }
 
 
@@ -3702,9 +3702,9 @@ static void to8_update_cart_bank (running_machine &machine)
 
 
 
-static STATE_POSTLOAD( to8_update_cart_bank_postload )
+static void to8_update_cart_bank_postload(running_machine *machine)
 {
-	to8_update_cart_bank(machine);
+	to8_update_cart_bank(*machine);
 }
 
 
@@ -4198,9 +4198,9 @@ MACHINE_START ( to8 )
 	state_save_register_global( machine, to8_data_vpage );
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( to8_update_ram_bank_postload, NULL );
-	machine.save().register_postload( to8_update_cart_bank_postload, NULL );
-	machine.save().register_postload( to8_update_floppy_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(to8_update_ram_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(to8_update_cart_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(to8_update_floppy_bank_postload), &machine));
 }
 
 
@@ -4369,9 +4369,9 @@ MACHINE_START ( to9p )
 	state_save_register_global( machine, to8_data_vpage );
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( to8_update_ram_bank_postload, NULL );
-	machine.save().register_postload( to8_update_cart_bank_postload, NULL );
-	machine.save().register_postload( to8_update_floppy_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(to8_update_ram_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(to8_update_cart_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(to8_update_floppy_bank_postload), &machine));
 }
 
 
@@ -4401,9 +4401,9 @@ static void mo6_update_ram_bank ( running_machine &machine )
 
 
 
-static STATE_POSTLOAD( mo6_update_ram_bank_postload )
+static void mo6_update_ram_bank_postload(running_machine *machine)
 {
-	mo6_update_ram_bank(machine);
+	mo6_update_ram_bank(*machine);
 }
 
 
@@ -4495,9 +4495,9 @@ static void mo6_update_cart_bank (running_machine &machine)
 
 
 
-static STATE_POSTLOAD( mo6_update_cart_bank_postload )
+static void mo6_update_cart_bank_postload(running_machine *machine)
 {
-	mo6_update_cart_bank(machine);
+	mo6_update_cart_bank(*machine);
 }
 
 
@@ -4994,8 +4994,8 @@ MACHINE_START ( mo6 )
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global( machine, mo5_reg_cart );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( mo6_update_ram_bank_postload, NULL );
-	machine.save().register_postload( mo6_update_cart_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(mo6_update_ram_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(mo6_update_cart_bank_postload), &machine));
 }
 
 
@@ -5255,6 +5255,6 @@ MACHINE_START ( mo5nr )
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global( machine, mo5_reg_cart );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	machine.save().register_postload( mo6_update_ram_bank_postload, NULL );
-	machine.save().register_postload( mo6_update_cart_bank_postload, NULL );
+	machine.save().register_postload(save_prepost_delegate(FUNC(mo6_update_ram_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(mo6_update_cart_bank_postload), &machine));
 }

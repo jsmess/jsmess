@@ -1815,10 +1815,10 @@ static void build_fontdata(const m6847_variant *v)
 
 
 
-static STATE_POSTLOAD( m6847_postload )
+static void m6847_postload(running_machine *machine)
 {
-	set_field_sync(machine);
-	set_horizontal_sync(machine);
+	set_field_sync(*machine);
+	set_horizontal_sync(*machine);
 	set_dirty();
 }
 
@@ -1910,7 +1910,7 @@ void m6847_init(running_machine &machine, const m6847_config *cfg)
 	m6847->fs_rise_timer->adjust(attotime::zero, 0, attotime(0, frame_period));
 
 	/* setup save states */
-	machine.save().register_postload(m6847_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(m6847_postload), &machine));
 
 	/* build font */
 	build_fontdata(v);

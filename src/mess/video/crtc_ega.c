@@ -101,7 +101,6 @@ struct _crtc_ega_t
 
 //static DEVICE_GET_INFO( crtc_vga );
 
-static STATE_POSTLOAD( crtc_ega_state_save_postload );
 static void recompute_parameters(crtc_ega_t *crtc_ega, int postload);
 static void update_de_changed_timer(crtc_ega_t *crtc_ega);
 static void update_hsync_changed_timers(crtc_ega_t *crtc_ega);
@@ -120,9 +119,9 @@ INLINE crtc_ega_t *get_safe_token(device_t *device)
 }
 
 
-static STATE_POSTLOAD( crtc_ega_state_save_postload )
+static void crtc_ega_state_save_postload(crtc_ega_t *state)
 {
-	recompute_parameters((crtc_ega_t*)param, TRUE);
+	recompute_parameters(state, TRUE);
 }
 
 
@@ -764,7 +763,7 @@ static void common_start(device_t *device, int device_type)
 
 	/* register for state saving */
 
-	device->machine().save().register_postload(crtc_ega_state_save_postload, crtc_ega);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(crtc_ega_state_save_postload), crtc_ega));
 
 	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->clock);
 	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->hpixels_per_column);

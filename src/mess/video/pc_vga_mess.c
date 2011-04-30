@@ -91,7 +91,7 @@ static const unsigned short vga_colortable[] =
     15, 0,15, 1,15, 2,15, 3,15, 4,15, 5,15, 6,15, 7,15, 8,15, 9,15,10,15,11,15,12,15,13,15,14,15,15
 };
 
-static STATE_POSTLOAD( pc_video_postload )
+static void pc_video_postload(running_machine *machine)
 {
 	pc_anythingdirty = 1;
 	pc_current_height = -1;
@@ -124,7 +124,7 @@ struct mscrtc6845 *pc_video_start(running_machine &machine, const struct mscrtc6
 		video_start_generic_bitmapped(machine);
 	}
 
-	machine.save().register_postload(pc_video_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(pc_video_postload), &machine));
 	return pc_crtc;
 }
 

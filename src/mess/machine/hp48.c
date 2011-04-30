@@ -97,7 +97,7 @@ static const UINT8 hp48_module_addr_id[6] = { 0x19, 0xf4, 0xf6, 0xf8, 0xf2, 0x00
     FUNCTIONS
 ***************************************************************************/
 
-static void hp48_apply_modules( running_machine &machine, void* param );
+static void hp48_apply_modules(hp48_state *state);
 
 
 static void hp48_pulse_irq( running_machine &machine, int irq_line)
@@ -355,9 +355,8 @@ void hp48_rsi( device_t *device )
 
 /* ------------- annonciators ------------ */
 
-static void hp48_update_annunciators( running_machine &machine, void* param )
+static void hp48_update_annunciators(hp48_state *state)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
 	/* bit 0: left shift
        bit 1: right shift
        bit 2: alpha
@@ -403,7 +402,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 	case 0x0b:
 	case 0x0c:
 		state->m_io[offset] = data;
-		hp48_update_annunciators( space->machine(), NULL );
+		hp48_update_annunciators(state);
 		break;
 
 	/* cntrl ROM */
@@ -413,7 +412,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		state->m_io[offset] = data;
 		if ( old_cntrl != (data & 8) )
 		{
-			hp48_apply_modules( space->machine(), NULL );
+			hp48_apply_modules(state);
 		}
 		break;
 	}
@@ -623,7 +622,7 @@ static READ8_HANDLER ( hp48_bank_r )
 	{
 		LOG(( "%05x %f hp48_bank_r: off=%03x\n", cpu_get_previouspc(&space->device()), space->machine().time().as_double(), offset ));
 		state->m_bank_switch = offset;
-		hp48_apply_modules( space->machine(), NULL );
+		hp48_apply_modules(state);
 	}
 	return 0;
 }
@@ -723,12 +722,11 @@ static TIMER_CALLBACK( hp48_timer2_cb )
 
 
 /* remap all modules according to hp48_modules */
-static void hp48_apply_modules( running_machine &machine, void* param )
+static void hp48_apply_modules(hp48_state *state)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
 	int i;
 	int nce2_enable = 1;
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = state->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_io_addr = 0x100000;
 
@@ -846,7 +844,7 @@ static void hp48_reset_modules( running_machine &machine )
 	state->m_modules[5].base = 0;
 	state->m_modules[5].mask = 0;
 
-	hp48_apply_modules( machine, NULL );
+	hp48_apply_modules(state);
 }
 
 
@@ -884,7 +882,7 @@ void hp48_mem_config( device_t *device, int v )
 			state->m_modules[i].state = HP48_MODULE_CONFIGURED;
 			LOG(( "hp48_mem_config: module %s configured base=%05x, mask=%05x\n",
 			      hp48_module_names[i], state->m_modules[i].base, state->m_modules[i].mask ));
-			hp48_apply_modules( device->machine(), NULL );
+			hp48_apply_modules(state);
 			break;
 		}
 	}
@@ -907,7 +905,7 @@ void hp48_mem_unconfig( device_t *device, int v )
 		{
 			state->m_modules[i].state = i> 0 ? HP48_MODULE_UNCONFIGURED : HP48_MODULE_MASK_KNOWN;
 			LOG(( "hp48_mem_unconfig: module %s\n", hp48_module_names[i] ));
-			hp48_apply_modules( device->machine(), NULL );
+			hp48_apply_modules(state);
 			break;
 		}
 	}
@@ -1012,7 +1010,7 @@ static void hp48_fill_port( device_t* image )
 		state->m_modules[conf->module].isnop    = 1;
 	}
 	state->m_modules[conf->module].data     = state->m_port_data[conf->port];
-	hp48_apply_modules(image->machine(), NULL );
+	hp48_apply_modules(state);
 }
 
 /* helper for start and unload */
@@ -1084,7 +1082,7 @@ static DEVICE_IMAGE_UNLOAD( hp48_port )
 	}
 	free( state->m_port_data[conf->port] );
 	hp48_unfill_port( image );
-	hp48_apply_modules( image.device().machine(), NULL );
+	hp48_apply_modules(state);
 }
 
 static DEVICE_START( hp48_port )
@@ -1141,9 +1139,10 @@ DRIVER_INIT( hp48 )
 
 MACHINE_RESET( hp48 )
 {
+	hp48_state *state = machine.driver_data<hp48_state>();
 	LOG(( "hp48: machine reset called\n" ));
 	hp48_reset_modules( machine );
-	hp48_update_annunciators( machine, NULL );
+	hp48_update_annunciators(state);
 }
 
 static void hp48_machine_start( running_machine &machine, hp48_models model )
@@ -1233,8 +1232,8 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 	state->save_item(NAME(state->m_io) );
 	//state_save_register_global_pointer(machine,  machine.generic.nvram.u8, machine.generic.nvram_size );
 
-	machine.save().register_postload( hp48_update_annunciators, NULL );
-	machine.save().register_postload( hp48_apply_modules, NULL );
+	machine.save().register_postload( save_prepost_delegate(FUNC(hp48_update_annunciators), state ));
+	machine.save().register_postload( save_prepost_delegate(FUNC(hp48_apply_modules), state ));
 
 #ifdef CHARDEV
 	/* direct I/O */

@@ -126,7 +126,7 @@ typedef void (*write_line_device_func)(device_t *device, int state);
 // ======================> tagged_device_list
 
 // tagged_device_list is a tagged_list with additional searching based on type
-class device_list : public tagged_list<device_t>, public bindable_object
+class device_list : public tagged_list<device_t>
 {
 	typedef tagged_list<device_t> super;
 
@@ -164,8 +164,8 @@ public:
 private:
 	// internal helpers
 	void exit();
-	static void static_pre_save(running_machine &machine, void *param);
-	static void static_post_load(running_machine &machine, void *param);
+	void presave_all();
+	void postload_all();
 
 	// internal state
 	running_machine *m_machine;
@@ -176,7 +176,7 @@ private:
 // ======================> device_t
 
 // device_t represents a device
-class device_t : public virtual bindable_object
+class device_t
 {
 	DISABLE_COPYING(device_t);
 
@@ -459,7 +459,7 @@ private:
 // ======================> device_interface
 
 // device_interface represents runtime information for a particular device interface
-class device_interface : public virtual bindable_object
+class device_interface
 {
 	DISABLE_COPYING(device_interface);
 

@@ -142,9 +142,8 @@ static void update_sam(device_t *device)
 
 
 
-static STATE_POSTLOAD( update_sam_postload )
+static void update_sam_postload(device_t *device)
 {
-	device_t *device = (device_t *)param;
 	update_sam(device);
 }
 
@@ -265,7 +264,7 @@ static void common_start(device_t *device, SAM6883_VERSION device_type)
 	/* save state registration */
 	state_save_register_item(device->machine(), "6883sam", NULL, 0, sam->state);
 	state_save_register_item(device->machine(), "6883sam", NULL, 0, sam->video_position);
-	device->machine().save().register_postload(update_sam_postload, (void*)device);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(update_sam_postload), device));
 }
 
 static DEVICE_START( sam6883 )

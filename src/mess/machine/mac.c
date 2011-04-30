@@ -3144,11 +3144,9 @@ void mac_state::machine_reset()
 
 
 
-static STATE_POSTLOAD( mac_state_load )
+static void mac_state_load(mac_state *mac)
 {
 	int overlay;
-	mac_state *mac = machine.driver_data<mac_state>();
-
 	overlay = mac->m_overlay;
 	mac->m_overlay = -1;
 	mac->set_memory_overlay(overlay);
@@ -3233,7 +3231,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	mac->m_inquiry_timeout = machine.scheduler().timer_alloc(FUNC(inquiry_timeout_func));
 
 	/* save state stuff */
-	machine.save().register_postload(mac_state_load, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(mac_state_load), mac));
 }
 
 #define MAC_DRIVER_INIT(label, model)	\

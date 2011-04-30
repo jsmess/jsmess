@@ -527,17 +527,15 @@ static TIMER_CALLBACK( update_irq )
 
 /* Save state call backs */
 
-static STATE_PRESAVE( m_board_presave )
+static void board_presave(supercon_state *state)
 {
-    supercon_state *state = machine.driver_data<supercon_state>();
     int i;
     for (i=0;i<64;i++)
         state->m_save_board[i]=state->m_board[i];
 }
 
-static STATE_POSTLOAD( m_board_postload )
+static void board_postload(supercon_state *state)
 {
-    supercon_state *state = machine.driver_data<supercon_state>();
     int i;
     for (i=0;i<64;i++)
         state->m_board[i]=state->m_save_board[i];
@@ -556,8 +554,8 @@ static MACHINE_START( supercon )
 
 
     state->save_item(NAME(state->m_save_board));
-    machine.save().register_postload(m_board_postload,NULL);
-    machine.save().register_presave(m_board_presave,NULL);
+    machine.save().register_postload(save_prepost_delegate(FUNC(board_postload),state));
+    machine.save().register_presave(save_prepost_delegate(FUNC(board_presave),state));
 
 }
 

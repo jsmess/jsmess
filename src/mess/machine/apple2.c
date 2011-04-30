@@ -325,9 +325,9 @@ void apple2_update_memory(running_machine &machine)
 
 
 
-static STATE_POSTLOAD( apple2_update_memory_postload )
+static void apple2_update_memory_postload(apple2_state *state)
 {
-	apple2_update_memory(machine);
+	apple2_update_memory(state->machine());
 }
 
 
@@ -1649,7 +1649,7 @@ void apple2_init_common(running_machine &machine)
 
 	/* state save registers */
 	state->save_item(NAME(state->m_flags));
-	machine.save().register_postload(apple2_update_memory_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(apple2_update_memory_postload), state));
 
 	/* --------------------------------------------- *
      * set up the softswitch mask/set                *
