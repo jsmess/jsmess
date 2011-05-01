@@ -4,6 +4,9 @@
 
     05/11/2009 Skeleton driver.
 
+	TODO:
+	- RTC check still fails
+
     DASM notes:
     - Jumping to 0x21ee means that the system POST failed
     - 0x258c: ROM test (check with 0x1a)
@@ -259,11 +262,11 @@ ROM_END
 
 static DRIVER_INIT( next )
 {
-	UINT32 *ROM = (UINT32 *)machine.region("user1")->base();
+	//UINT32 *ROM = (UINT32 *)machine.region("user1")->base();
 
-	ROM[0x61dc/4] = (0x6604 << 16) | (ROM[0x61dc/4] & 0xffff); //hack until I understand ...
+	//ROM[0x61dc/4] = (0x6604 << 16) | (ROM[0x61dc/4] & 0xffff); //hack until I understand ...
 
-	ROM[0x00b8/4] = (ROM[0x00b8/4] << 16) | (0x67ff & 0xffff); //patch ROM checksum
+	//ROM[0x00b8/4] = (ROM[0x00b8/4] << 16) | (0x67ff & 0xffff); //patch ROM checksum
 }
 
 /* Driver */
