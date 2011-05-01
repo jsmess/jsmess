@@ -153,7 +153,7 @@ private:
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);
 
-	required_device<cbm_iec_stub_device> m_stub;
+	cbm_iec_stub_device *m_stub;
 
    	const cbm_iec_config *m_daisy;
 };

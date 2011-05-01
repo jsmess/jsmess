@@ -124,7 +124,7 @@ protected:
 	required_device<device_t> m_fdc;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	required_device<cbm_iec_device> m_bus;
+	cbm_iec_device *m_bus;
 
 	// signals
 	int m_1_2mhz;							// clock speed

@@ -692,7 +692,7 @@ base_c1571_device::base_c1571_device(const machine_config &mconfig, device_type 
 	  m_fdc(*this, WD1770_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(*this->owner(), CBM_IEC_TAG),
+	  m_bus(NULL),
 	  m_1_2mhz(0),
 	  m_data_out(1),
 	  m_ser_dir(0),
@@ -736,6 +736,8 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 
 void base_c1571_device::device_start()
 {
+	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
+	
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	program->install_rom(0x8000, 0xffff, subregion(M6502_TAG)->base());

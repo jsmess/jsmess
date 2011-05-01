@@ -100,7 +100,7 @@ protected:
 	required_device<mos6526_device> m_cia;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_image;
-	required_device<cbm_iec_device> m_bus;
+	cbm_iec_device *m_bus;
 
 	int m_data_out;				// serial data out
 	int m_atn_ack;				// attention acknowledge

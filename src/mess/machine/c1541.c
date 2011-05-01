@@ -734,7 +734,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(*this->owner(), CBM_IEC_TAG),
+	  m_bus(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
@@ -748,6 +748,8 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 
 void c1541_device::device_start()
 {
+    m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
+
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	program->install_rom(0x8000, 0xbfff, 0, 0x4000, subregion(M6502_TAG)->base());
