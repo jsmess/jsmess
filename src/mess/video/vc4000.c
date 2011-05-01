@@ -498,8 +498,16 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *c
 			{
 				for (i=0; i<This->size; i++)
 				{
-					state->m_objects[This->data->x2 + i + j*This->size] |= This->scolor;
-					state->m_objects[This->data->x2 + i + j*This->size] &= 7;
+					int offset = This->data->x2 + i + j*This->size;
+
+					// clip objects outside the object buffer.
+					// someone who knows this hardware should look at
+					// it properly.
+					if (offset < 256)
+					{
+						state->m_objects[offset] |= This->scolor;
+						state->m_objects[offset] &= 7;
+					}
 				}
 			}
 		}

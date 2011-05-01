@@ -78,7 +78,7 @@ public:
 	UINT8 m_joy1_y;
 	UINT8 m_joy2_x;
 	UINT8 m_joy2_y;
-	UINT8 m_objects[256];
+	UINT8 m_objects[512];
 	UINT8 m_irq_pause;
 };
 
