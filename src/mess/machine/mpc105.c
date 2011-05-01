@@ -27,7 +27,7 @@ const device_type MPC105 = &device_creator<mpc105_device>;
 void mpc105_device::static_set_bank_base(device_t &device, int bank_base)
 {
 	mpc105_device &mpc105 = downcast<mpc105_device &>(device);
-	mpc105.m_bank_base = bank_base;
+	mpc105.m_bank_base_default = bank_base;
 }
 
 //-------------------------------------------------
@@ -70,6 +70,7 @@ void mpc105_device::device_start()
 
 void mpc105_device::device_reset()
 {
+	m_bank_base = m_bank_base_default;
 	m_bank_enable = 0;
 	memset(m_bank_registers,0,sizeof(m_bank_registers));
 }

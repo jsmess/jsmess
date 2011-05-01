@@ -40,6 +40,7 @@ protected:
 
 private:
 	int m_bank_base;
+	int m_bank_base_default;
 	UINT8 m_bank_enable;
 	UINT32 m_bank_registers[8];
 
