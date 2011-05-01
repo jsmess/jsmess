@@ -14,14 +14,14 @@ pbball96   Powerful Pro Baseball '96    GV999          GV017   JAPAN 1.03   96.0
 hyperath   Hyper Athlete                ZV610          GV021   JAPAN 1.00   96.06.09  19:00
 susume     Susume! Taisen Puzzle-Dama   ZV610          GV027   JAPAN 1.20   96.03.04  12:00
 btchamp    Beat the Champ               GV999          GV053   UAA01        ?
-kdeadeye   Dead Eye                     GV999          GV054   UA01         ?
+kdeadeye   Dead Eye                     GV999          GV054   UAA01        ?
 weddingr   Wedding Rhapsody             ?              GX624   JAA          97.05.29   9:12
 tokimosh   Tokimeki Memorial Oshiete    ?              GE755   JAA          97.08.06  11:52
            Your Heart
 tokimosp   Tokimeki Memorial Oshiete    ?              GE756   JAB          97.09.27   9:10
            Your Heart Seal version PLUS
 nagano98   Winter Olypmics in Nagano 98 GV999          GX720   EAA01 1.03   98.01.08  10:45
-simpbowl   Simpsons Bowling             ?              GQ829   UAA          ?
+simpbowl   Simpsons Bowling             GV999          GQ829   UAA          ?
 
 PCB Layouts
 -----------
@@ -75,8 +75,13 @@ GV999 PWB301949A
 |---------------------------------------|
 
 Notes:
-      - Simpsons Bowling uses an unknown board revision with 4 x 16M FLASHROMs & a trackball.
-
+      - Simpsons Bowling and Dead Eye use a GV999 with a daughtercard containing flash ROMs and CPLDs:
+		PWB402610
+		Xilinx XC3020A
+		Xilinx 1718DPC
+		74F244N (2 of these)
+		LVT245SS (2 of theses)
+ 
       - 000180 is used for driving the RGB output. It's a very thin piece of very brittle ceramic
         containing a circuit, a LM1203 chip, some smt transistors/caps/resistors etc (let's just say
         placing this thing on the edge of the PCB wasn't a good design choice!)
@@ -680,14 +685,7 @@ static DRIVER_INIT( tokimosh )
 
 /*
 Dead Eye
-
-Top board:
-    PWB402610
-    Xilinx XC3020A
-    Xilinx 1718DPC
-    74F244N (2 of these)
-    LVT245SS (2 of theses)
-
+ 
 CD:
     P/N 002715
     054
@@ -880,7 +878,7 @@ GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "P
 GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, susume,   konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, tokimosh, konamigv, konamigv, konamigv, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1997, tokimosp, konamigv, konamigv, konamigv, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
