@@ -4,39 +4,16 @@
 
     05/11/2009 Skeleton driver.
 
-    TODO:
-    - needs MCS1850 RTC device emulation to remove the ROM patch;
-
     DASM notes:
     - Jumping to 0x21ee means that the system POST failed
     - 0x258c: ROM test (check with 0x1a)
 
 ****************************************************************************/
 
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "imagedev/flopdrv.h"
+#include "includes/next.h"
 
-
-class next_state : public driver_device
+bool next_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-public:
-	next_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-	UINT32 m_scr2;
-	UINT32 m_irq_status;
-	UINT32 m_irq_mask;
-	UINT32 *m_vram;
-};
-
-static VIDEO_START( next )
-{
-}
-
-static SCREEN_UPDATE( next )
-{
-	next_state *state = screen->machine().driver_data<next_state>();
 	UINT32 count;
 	int x,y,xi;
 
@@ -48,14 +25,14 @@ static SCREEN_UPDATE( next )
 		{
 			for(xi=0;xi<16;xi++)
 			{
-				UINT8 pen = (state->m_vram[count] >> (30-(xi*2))) & 0x3;
+				UINT8 pen = (m_vram[count] >> (30-(xi*2))) & 0x3;
 
 				pen ^= 3;
 
-				if((x+xi)>screen->machine().primary_screen->visible_area().max_x || (y)>screen->machine().primary_screen->visible_area().max_y)
+				if((x+xi)>screen.machine().primary_screen->visible_area().max_x || (y)>screen.machine().primary_screen->visible_area().max_y)
 					continue;
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine().pens[pen];
+				*BITMAP_ADDR16(&bitmap, y, x+xi) = screen.machine().pens[pen];
 			}
 
 			count++;
@@ -66,33 +43,32 @@ static SCREEN_UPDATE( next )
 }
 
 /* Dummy catcher for any unknown r/w */
-static READ8_HANDLER( next_io_r )
+READ8_MEMBER( next_state::io_r )
 {
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 		printf("Read I/O register %08x\n",offset+0x02000000);
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( next_io_w )
+WRITE8_MEMBER( next_state::io_w )
 {
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 		printf("Write I/O register %08x %02x\n",offset+0x02000000,data);
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
-static READ32_HANDLER( next_rom_map_r )
+READ32_MEMBER( next_state::rom_map_r )
 {
-	if(!space->debugger_access())
-		printf("%08x ROM MAP?\n",cpu_get_pc(&space->device()));
+	if(!space.debugger_access())
+		printf("%08x ROM MAP?\n",cpu_get_pc(&space.device()));
 	return 0x01000000;
 }
 
-static READ32_HANDLER( next_scr2_r )
+READ32_MEMBER( next_state::scr2_r )
 {
-	next_state *state = space->machine().driver_data<next_state>();
-	if(!space->debugger_access())
-		printf("%08x\n",cpu_get_pc(&space->device()));
+	if(!space.debugger_access())
+		printf("%08x\n",cpu_get_pc(&space.device()));
 	/*
     x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
     -x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
@@ -115,18 +91,25 @@ static READ32_HANDLER( next_scr2_r )
     ---- ---- ---- ---- ---- ---- ---- ---x led
     */
 
-	return state->m_scr2;
+	UINT32 data = m_scr2 & 0xfffffbff;
+
+	data |= m_rtc->sdo_r() << 10;
+
+	return data;
 }
 
-static WRITE32_HANDLER( next_scr2_w )
+WRITE32_MEMBER( next_state::scr2_w )
 {
-	next_state *state = space->machine().driver_data<next_state>();
-	if(!space->debugger_access())
-		printf("%08x %08x\n",cpu_get_pc(&space->device()),data);
-	COMBINE_DATA(&state->m_scr2);
+	if(!space.debugger_access())
+		printf("%08x %08x\n",cpu_get_pc(&space.device()),data);
+	COMBINE_DATA(&m_scr2);
+
+	m_rtc->ce_w(BIT(m_scr2, 8));
+	m_rtc->sdi_w(BIT(m_scr2, 10));
+	m_rtc->sck_w(BIT(m_scr2, 9));
 }
 
-static READ32_HANDLER( next_scr1_r )
+READ32_MEMBER( next_state::scr1_r )
 {
 	/*
         xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
@@ -141,59 +124,46 @@ static READ32_HANDLER( next_scr1_r )
 	return 0x00012002; // TODO
 }
 
-static READ32_HANDLER( next_irq_status_r )
+READ32_MEMBER( next_state::irq_status_r )
 {
-	next_state *state = space->machine().driver_data<next_state>();
-
-	return state->m_irq_status;
+	return m_irq_status;
 }
 
-static WRITE32_HANDLER( next_irq_status_w )
+WRITE32_MEMBER( next_state::irq_status_w )
 {
-	next_state *state = space->machine().driver_data<next_state>();
-
-	COMBINE_DATA(&state->m_irq_status);
+	COMBINE_DATA(&m_irq_status);
 }
 
-static READ32_HANDLER( next_irq_mask_r )
+READ32_MEMBER( next_state::irq_mask_r )
 {
-	next_state *state = space->machine().driver_data<next_state>();
-
-	return state->m_irq_mask;
+	return m_irq_mask;
 }
 
-static WRITE32_HANDLER( next_irq_mask_w )
+WRITE32_MEMBER( next_state::irq_mask_w )
 {
-	next_state *state = space->machine().driver_data<next_state>();
-
-	COMBINE_DATA(&state->m_irq_mask);
+	COMBINE_DATA(&m_irq_mask);
 }
 
-static ADDRESS_MAP_START(next_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x02007000, 0x02007003) AM_MIRROR(0x100000) AM_READWRITE(next_irq_status_r,next_irq_status_w)
-	AM_RANGE(0x02007800, 0x02007803) AM_MIRROR(0x100000) AM_READWRITE(next_irq_mask_r,next_irq_mask_w)
+	AM_RANGE(0x02007000, 0x02007003) AM_MIRROR(0x100000) AM_READWRITE(irq_status_r,irq_status_w)
+	AM_RANGE(0x02007800, 0x02007803) AM_MIRROR(0x100000) AM_READWRITE(irq_mask_r,irq_mask_w)
 
-	AM_RANGE(0x0200c000, 0x0200c003) AM_MIRROR(0x100000) AM_READ(next_scr1_r)
-	AM_RANGE(0x0200c800, 0x0200c803) AM_MIRROR(0x100000) AM_READ(next_rom_map_r)
-	AM_RANGE(0x0200d000, 0x0200d003) AM_MIRROR(0x100000) AM_READWRITE(next_scr2_r,next_scr2_w)
+	AM_RANGE(0x0200c000, 0x0200c003) AM_MIRROR(0x100000) AM_READ(scr1_r)
+	AM_RANGE(0x0200c800, 0x0200c803) AM_MIRROR(0x100000) AM_READ(rom_map_r)
+	AM_RANGE(0x0200d000, 0x0200d003) AM_MIRROR(0x100000) AM_READWRITE(scr2_r,scr2_w)
 
-	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x100000) AM_READWRITE8(next_io_r,next_io_w,0xffffffff) //intentional fall-through
+	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x100000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
 
 	AM_RANGE(0x04000000, 0x07ffffff) AM_RAM //work ram
 
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE_MEMBER(next_state, m_vram) //vram
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(m_vram) //vram
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( next )
 INPUT_PORTS_END
-
-
-static MACHINE_RESET(next)
-{
-}
 
 static PALETTE_INIT(next)
 {
@@ -204,6 +174,12 @@ static PALETTE_INIT(next)
 	palette_set_color(machine, 3,MAKE_RGB(0xff,0xff,0xff));
 }
 
+static MCCS1850_INTERFACE( rtc_intf )
+{
+    DEVCB_NULL, // RTCINT
+    DEVCB_NULL,
+    DEVCB_NULL
+};
 
 static const floppy_config next_floppy_config =
 {
@@ -222,8 +198,6 @@ static MACHINE_CONFIG_START( next, next_state )
     MCFG_CPU_ADD("maincpu",M68030, XTAL_25MHz)
     MCFG_CPU_PROGRAM_MAP(next_mem)
 
-    MCFG_MACHINE_RESET(next)
-
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
@@ -231,14 +205,12 @@ static MACHINE_CONFIG_START( next, next_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(1120, 832)
     MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-    MCFG_SCREEN_UPDATE(next)
 
     MCFG_PALETTE_LENGTH(4)
     MCFG_PALETTE_INIT(next)
 
-    MCFG_VIDEO_START(next)
-
 	// devices
+	MCFG_MCCS1850_ADD(MCCS1850_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_config)
 
 	// software list
@@ -300,4 +272,3 @@ static DRIVER_INIT( next )
 COMP( 1987, next,   0,          0,   next,      next,    next,   "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1990, nextnt, next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Non Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1992, nexttrb,next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Turbo)",			GAME_NOT_WORKING | GAME_NO_SOUND)
-
