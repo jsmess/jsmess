@@ -151,7 +151,7 @@ private:
 	// track
 	int m_side;								// disk side
 	UINT8 m_track_buffer[G64_BUFFER_SIZE];	// track data buffer
-	size_t m_track_len;						// track length
+	int m_track_len;						// track length
 	offs_t m_buffer_pos;					// current byte position within track buffer
 	int m_bit_pos;							// current bit position within track buffer byte
 	int m_bit_count;						// current data byte bit counter
