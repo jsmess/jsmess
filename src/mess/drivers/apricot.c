@@ -311,7 +311,7 @@ static PALETTE_INIT( apricot )
 static FLOPPY_OPTIONS_START( apricot )
 	FLOPPY_OPTION
 	(
-		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct,
+		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct, NULL,
 		HEADS(1-[2])
 		TRACKS(70/[80])
 		SECTORS([9]/18)
