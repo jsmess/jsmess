@@ -507,7 +507,7 @@ static const cassette_config samcoupe_cassette_config =
 static FLOPPY_OPTIONS_START( samcoupe )
 	FLOPPY_OPTION
 	(
-		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct,
+		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS(9-[10])
@@ -516,7 +516,7 @@ static FLOPPY_OPTIONS_START( samcoupe )
 	)
 	FLOPPY_OPTION
 	(
-		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct,
+		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct, NULL,
 		HEADS(1-[2]-255)
 		TRACKS(1-[80]-255)
 		SECTORS(1-[10]-255)
@@ -525,7 +525,7 @@ static FLOPPY_OPTIONS_START( samcoupe )
 	)
 	FLOPPY_OPTION
 	(
-		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct,
+		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct, NULL,
 		HEADS(1-[2])
 		TRACKS(1-[80]-83)
 		SECTORS(1-[10]-12)
