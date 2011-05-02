@@ -497,7 +497,7 @@ static INTERRUPT_GEN( pyl601_interrupt )
 }
 
 static FLOPPY_OPTIONS_START(pyldin)
-	FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])

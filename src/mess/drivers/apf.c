@@ -667,7 +667,7 @@ static const cassette_config apf_cassette_config =
 };
 
 static FLOPPY_OPTIONS_START(apfimag)
-	FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([8])

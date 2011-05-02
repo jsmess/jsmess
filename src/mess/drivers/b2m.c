@@ -177,7 +177,7 @@ static INPUT_PORTS_START( b2m )
 INPUT_PORTS_END
 
 static FLOPPY_OPTIONS_START(b2m)
-	FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])

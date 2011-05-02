@@ -575,25 +575,25 @@ void tiki100_state::machine_start()
 }
 
 static FLOPPY_OPTIONS_START(tiki100)
-	FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(tiki100, "dsk", "SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(tiki100, "dsk", "SSDD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(tiki100, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(tiki100, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(tiki100, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(tiki100, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([10])

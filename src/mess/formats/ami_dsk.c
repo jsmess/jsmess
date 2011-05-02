@@ -76,6 +76,7 @@ FLOPPY_OPTIONS_START( amiga )
 		"Amiga floppy disk image",
 		amiga_dsk_identify,
 		amiga_dsk_construct,
+		NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([11]/22)
@@ -89,6 +90,7 @@ FLOPPY_OPTIONS_START( amiga_only )
 		"Amiga floppy disk image",
 		amiga_dsk_identify,
 		amiga_dsk_construct,
+		NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([11]/22)

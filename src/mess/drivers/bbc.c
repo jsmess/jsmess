@@ -739,7 +739,7 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 };
 
 static FLOPPY_OPTIONS_START(bbc)
-	FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([10])

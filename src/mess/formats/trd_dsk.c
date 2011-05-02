@@ -46,6 +46,6 @@ static FLOPPY_CONSTRUCT(trd_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( trd )
-	FLOPPY_OPTION( trd_dsk, "trd",		"TRD floppy disk image",	trd_dsk_identify, trd_dsk_construct, NULL)
+	FLOPPY_OPTION( trd_dsk, "trd",		"TRD floppy disk image",	trd_dsk_identify, trd_dsk_construct, NULL, NULL)
 FLOPPY_OPTIONS_END
 

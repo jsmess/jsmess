@@ -269,7 +269,7 @@ static INTERRUPT_GEN( act_f1_irq )
 }
 
 static FLOPPY_OPTIONS_START( act )
-	FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])

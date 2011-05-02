@@ -174,7 +174,7 @@ static const mc6845_interface kaypro2x_crtc = {
 
 ************************************************************/
 static FLOPPY_OPTIONS_START(kayproii)
-	FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
@@ -183,7 +183,7 @@ static FLOPPY_OPTIONS_START(kayproii)
 FLOPPY_OPTIONS_END
 
 static FLOPPY_OPTIONS_START(kaypro2x)
-	FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([10])

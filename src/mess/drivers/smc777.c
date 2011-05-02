@@ -1011,7 +1011,7 @@ static const wd17xx_interface smc777_mb8876_interface =
 };
 
 static FLOPPY_OPTIONS_START( smc777 )
-	FLOPPY_OPTION( img, "img", "SMC70 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( img, "img", "SMC70 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([70])
 		SECTORS([16])

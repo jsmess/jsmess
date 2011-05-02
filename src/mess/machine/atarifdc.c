@@ -794,6 +794,7 @@ FLOPPY_OPTIONS_START( atari_only )
 		"Atari floppy disk image",
 		atari_dsk_identify,
 		atari_dsk_construct,
+		NULL,
 		NULL
 	)
 FLOPPY_OPTIONS_END0

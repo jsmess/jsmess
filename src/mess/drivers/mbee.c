@@ -574,25 +574,25 @@ static GFXDECODE_START( mbeeppc )
 GFXDECODE_END
 
 static FLOPPY_OPTIONS_START(mbee)
-	FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ds40, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ds40, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ds80, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ds80, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([21]))
-	FLOPPY_OPTION(ds84, "ds82,ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ds84, "ds82,ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([10])

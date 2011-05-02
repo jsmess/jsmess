@@ -496,7 +496,7 @@ static const cassette_config cgenie_cassette_config =
 
 // This is currently broken
 static FLOPPY_OPTIONS_START(cgenie )
-	FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([10])

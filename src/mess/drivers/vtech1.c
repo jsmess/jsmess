@@ -467,6 +467,7 @@ FLOPPY_OPTIONS_START( vtech1_only )
 		"Laser floppy disk image",
 		vtech1_dsk_identify,
 		vtech1_dsk_construct,
+		NULL,
 		NULL
 	)
 FLOPPY_OPTIONS_END0

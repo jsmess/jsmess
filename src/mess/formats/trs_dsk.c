@@ -67,9 +67,9 @@ static FLOPPY_CONSTRUCT( trs80_jv1_construct )
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( trs80 )
-	FLOPPY_OPTION( trs80_jv1, "dsk",			"TRS-80 JV1 disk image",	trs80_jv1_identify,	trs80_jv1_construct,
+	FLOPPY_OPTION( trs80_jv1, "dsk",			"TRS-80 JV1 disk image",	trs80_jv1_identify,	trs80_jv1_construct, NULL,
 		TRACKS([35]-255))
-	FLOPPY_OPTION( trs80_dmk, "dsk,dmk",		"TRS-80 DMK disk image",	coco_dmk_identify,	coco_dmk_construct,
+	FLOPPY_OPTION( trs80_dmk, "dsk,dmk",		"TRS-80 DMK disk image",	coco_dmk_identify,	coco_dmk_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[10]-18)

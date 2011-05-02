@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 
 
 static FLOPPY_OPTIONS_START(kc85)
-	FLOPPY_OPTION(kc85, "img", "KC85 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(kc85, "img", "KC85 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])

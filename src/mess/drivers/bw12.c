@@ -670,19 +670,19 @@ void bw12_state::machine_reset()
 }
 
 static FLOPPY_OPTIONS_START( bw12 )
-	FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw12, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
@@ -703,31 +703,31 @@ static const floppy_config bw12_floppy_config =
 };
 
 static FLOPPY_OPTIONS_START( bw14 )
-	FLOPPY_OPTION(bw14, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw14, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw14, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw14, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw14, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw14, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw14, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw14, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw14, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw14, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])

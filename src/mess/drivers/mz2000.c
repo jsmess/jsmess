@@ -698,7 +698,7 @@ static const wd17xx_interface mz2000_mb8877a_interface =
 };
 
 static FLOPPY_OPTIONS_START( mz2000 )
-	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])

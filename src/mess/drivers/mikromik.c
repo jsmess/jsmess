@@ -615,7 +615,7 @@ static TIMER_DEVICE_CALLBACK( kbclk_tick )
 /* Floppy Configuration */
 
 static FLOPPY_OPTIONS_START( mm1 )
-	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([8]) /* 3:1 sector skew (1,4,7,2,5,8,3,6) */
@@ -624,14 +624,14 @@ static FLOPPY_OPTIONS_START( mm1 )
 FLOPPY_OPTIONS_END
 
 static FLOPPY_OPTIONS_START( mm2 )
-	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 
-	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([18])

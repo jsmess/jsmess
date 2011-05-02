@@ -313,7 +313,7 @@ static const wd17xx_interface fdc_intf =
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( c1581 )
-	FLOPPY_OPTION( c1581, "d81", "Commodore 1581 Disk Image", d81_dsk_identify, d81_dsk_construct, NULL )
+	FLOPPY_OPTION( c1581, "d81", "Commodore 1581 Disk Image", d81_dsk_identify, d81_dsk_construct, NULL, NULL )
 FLOPPY_OPTIONS_END
 
 

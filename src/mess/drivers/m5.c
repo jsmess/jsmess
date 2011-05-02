@@ -568,7 +568,7 @@ static I8255_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( m5 )
-	FLOPPY_OPTION( m5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( m5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])

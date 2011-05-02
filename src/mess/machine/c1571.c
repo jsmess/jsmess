@@ -528,9 +528,9 @@ static const wd17xx_interface fdc_intf =
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( c1571 )
-	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
-	FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
+	FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL, NULL )
 FLOPPY_OPTIONS_END
 
 
@@ -562,8 +562,8 @@ static const floppy_config c1571_floppy_config =
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( c1570 )
-	FLOPPY_OPTION( c1570, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-	FLOPPY_OPTION( c1570, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1570, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	FLOPPY_OPTION( c1570, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
 FLOPPY_OPTIONS_END
 
 

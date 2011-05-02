@@ -384,8 +384,8 @@ static C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( c2031 )
-	FLOPPY_OPTION( c2031, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-	FLOPPY_OPTION( c2031, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c2031, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	FLOPPY_OPTION( c2031, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
 FLOPPY_OPTIONS_END
 
 

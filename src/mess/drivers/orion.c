@@ -87,13 +87,13 @@ static const cassette_config orion_cassette_config =
 };
 
 static FLOPPY_OPTIONS_START(orion)
-	FLOPPY_OPTION(orion, "odi,img", "Orion disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(orion, "odi,img", "Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(orion_lk, "odi,img", "Lucksian Key Orion disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(orion_lk, "odi,img", "Lucksian Key Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])

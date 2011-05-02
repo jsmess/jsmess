@@ -1062,7 +1062,7 @@ static const wd17xx_interface fdc_intf =
 };
 
 static FLOPPY_OPTIONS_START( v1050 )
-	FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([10])

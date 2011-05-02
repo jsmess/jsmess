@@ -203,7 +203,7 @@ static ACIA6850_INTERFACE( mirage_acia6850_interface )
 };
 
 static FLOPPY_OPTIONS_START(mirage)
-	FLOPPY_OPTION(mirage, "img", "Mirage disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(mirage, "img", "Mirage disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([5])

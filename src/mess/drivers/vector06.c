@@ -138,7 +138,7 @@ static const cassette_config vector_cassette_config =
 };
 
 static FLOPPY_OPTIONS_START(vector)
-	FLOPPY_OPTION(vector, "fdd", "Vector disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(vector, "fdd", "Vector disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([82])
 		SECTORS([5])

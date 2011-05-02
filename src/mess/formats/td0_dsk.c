@@ -675,7 +675,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 
-	tag->data = (UINT8*)malloc(floppy_image_size(floppy));
+	tag->data = global_alloc_array_clear(UINT8,floppy_image_size(floppy));
 	if (tag->data==NULL) {
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	}
@@ -759,3 +759,10 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
+FLOPPY_DESTRUCT( td0_dsk_destruct )
+{
+	struct td0dsk_tag *tag = get_tag(floppy);
+	global_free(tag->data);
+	tag->data = NULL;
+	return FLOPPY_ERROR_SUCCESS;
+}

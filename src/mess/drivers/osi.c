@@ -697,7 +697,7 @@ void c1pmf_state::machine_start()
 }
 
 static FLOPPY_OPTIONS_START(osi)
-	FLOPPY_OPTION(osi, "img", "OSI disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(osi, "img", "OSI disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([36])
 		SECTORS([10])

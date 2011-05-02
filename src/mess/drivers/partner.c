@@ -147,7 +147,7 @@ static const cassette_config partner_cassette_config =
 };
 
 static FLOPPY_OPTIONS_START(partner)
-	FLOPPY_OPTION(partner, "cpm", "Partner disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(partner, "cpm", "Partner disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])

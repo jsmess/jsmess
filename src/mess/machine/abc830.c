@@ -39,7 +39,7 @@ static FLOPPY_OPTIONS_START( abc830 )
 	// you can use disk images with logical sector layout instead.
 	//
 	// Specify INTERLEAVE([7]) below if you prefer the physical layout.
-	FLOPPY_OPTION(abc830, "dsk", "Luxor ABC 830", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(abc830, "dsk", "Luxor ABC 830", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])
@@ -65,7 +65,7 @@ const floppy_config abc830_floppy_config =
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( abc832 )
-	FLOPPY_OPTION(abc832, "dsk", "Luxor ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(abc832, "dsk", "Luxor ABC 832/834", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])
@@ -91,7 +91,7 @@ const floppy_config abc832_floppy_config =
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( abc838 )
-	FLOPPY_OPTION(abc838, "dsk", "Luxor ABC 838", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(abc838, "dsk", "Luxor ABC 838", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([26])
@@ -119,7 +119,7 @@ const floppy_config abc838_floppy_config =
 static FLOPPY_OPTIONS_START( fd2 )
 	// NOTE: FD2 cannot be used with the Luxor controller card,
 	// it has a proprietary one. This is just for reference.
-	FLOPPY_OPTION(fd2, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(fd2, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([8])

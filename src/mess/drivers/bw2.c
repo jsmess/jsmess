@@ -585,13 +585,13 @@ static MSM6255_INTERFACE( lcdc_intf )
 };
 
 static FLOPPY_OPTIONS_START(bw2)
-	FLOPPY_OPTION(bw2, "dsk", "BW2 340K disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw2, "dsk", "BW2 340K disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw2, "dsk", "BW2 360K disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(bw2, "dsk", "BW2 360K disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([18])

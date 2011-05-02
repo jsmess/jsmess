@@ -839,7 +839,7 @@ FLOPPY_OPTIONS_START( z80ne )
      * 3125 byte/track unformatted
      * Rotation speed 300 rpm (5 rps)
      */
-	FLOPPY_OPTION( z80ne_dmk, "zmk",		"Z80NE DMK disk image",	z80ne_dmk_identify,	z80ne_dmk_construct,
+	FLOPPY_OPTION( z80ne_dmk, "zmk",		"Z80NE DMK disk image",	z80ne_dmk_identify,	z80ne_dmk_construct, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])

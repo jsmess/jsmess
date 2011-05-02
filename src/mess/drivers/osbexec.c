@@ -484,31 +484,31 @@ static const wd17xx_interface osbexec_wd17xx_interface =
  *
  */
 static FLOPPY_OPTIONS_START(osbexec )
-	FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( odd, "img", "Osborne double density", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( odd, "img", "Osborne double density", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( ibm, "img", "IBM Personal Computer", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( ibm, "img", "IBM Personal Computer", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([8])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( xerox, "img", "Xerox 820 Computer", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( xerox, "img", "Xerox 820 Computer", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( dec, "img", "DEC 1820 double density", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( dec, "img", "DEC 1820 double density", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([9])

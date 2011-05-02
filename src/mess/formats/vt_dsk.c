@@ -45,7 +45,7 @@ static FLOPPY_CONSTRUCT(vz_construct)
 
 
 FLOPPY_OPTIONS_START(vz)
-	FLOPPY_OPTION(vtech1, "dsk", "Laser/VZ disk image", vz_identify, vz_construct,
+	FLOPPY_OPTION(vtech1, "dsk", "Laser/VZ disk image", vz_identify, vz_construct, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])

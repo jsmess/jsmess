@@ -2390,7 +2390,7 @@ static const wd17xx_interface towns_mb8877a_interface =
 };
 
 static FLOPPY_OPTIONS_START( towns )
-	FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([8])

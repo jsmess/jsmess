@@ -423,7 +423,7 @@ static const wd17xx_interface enterp_wd1770_interface =
 };
 
 static FLOPPY_OPTIONS_START(enterprise)
-	FLOPPY_OPTION(enterprise, "dsk,img", "Enterprise disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(enterprise, "dsk,img", "Enterprise disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])

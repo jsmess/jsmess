@@ -312,13 +312,13 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(nascom2)
-	FLOPPY_OPTION(nascom2_ss, "dsk", "Nascom 2 SS disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(nascom2_ss, "dsk", "Nascom 2 SS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(nascom2_ds, "dsk", "Nascom 2 DS disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(nascom2_ds, "dsk", "Nascom 2 DS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])

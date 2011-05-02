@@ -750,7 +750,7 @@ static const struct upd765_interface sf7000_upd765_interface =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( sf7000 )
-	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])

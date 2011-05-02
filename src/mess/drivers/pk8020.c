@@ -149,7 +149,7 @@ static const cassette_config pk8020_cassette_config =
 };
 
 static FLOPPY_OPTIONS_START(pk8020)
-	FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])

@@ -87,7 +87,7 @@ static FLOPPY_CONSTRUCT(compis_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( compis )
-	FLOPPY_OPTION( compis_dsk, "dsk",		"Compis floppy disk image",	compis_dsk_identify, compis_dsk_construct,
+	FLOPPY_OPTION( compis_dsk, "dsk",		"Compis floppy disk image",	compis_dsk_identify, compis_dsk_construct, NULL,
 		TRACKS(40/[80])
 		SECTORS(8/[9]/15))
 FLOPPY_OPTIONS_END

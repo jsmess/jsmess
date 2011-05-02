@@ -1171,25 +1171,25 @@ FLOPPY_IDENTIFY(coco_dmk_identify)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( coco )
-	FLOPPY_OPTION( coco_jvc, "dsk",			"CoCo JVC disk image",	coco_jvc_identify,	coco_jvc_construct,
+	FLOPPY_OPTION( coco_jvc, "dsk",			"CoCo JVC disk image",	coco_jvc_identify,	coco_jvc_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[18]-255)
 		SECTOR_LENGTH(128/[256]/512/1024)
 		FIRST_SECTOR_ID(0-[1]))
-	FLOPPY_OPTION( coco_os9, "os9",			"CoCo OS-9 disk image",	coco_os9_identify,	coco_os9_construct,
+	FLOPPY_OPTION( coco_os9, "os9",			"CoCo OS-9 disk image",	coco_os9_identify,	coco_os9_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[18]-255)
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( coco_vdk, "vdk",			"CoCo VDK disk image",	coco_vdk_identify,	coco_vdk_construct,
+	FLOPPY_OPTION( coco_vdk, "vdk",			"CoCo VDK disk image",	coco_vdk_identify,	coco_vdk_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( coco_dmk, "dsk,dmk",	"CoCo DMK disk image",	coco_dmk_identify,	coco_dmk_construct,
+	FLOPPY_OPTION( coco_dmk, "dsk,dmk",	"CoCo DMK disk image",	coco_dmk_identify,	coco_dmk_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[18])

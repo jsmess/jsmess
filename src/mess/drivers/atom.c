@@ -584,7 +584,7 @@ static const centronics_interface atom_centronics_config =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( atom )
-	FLOPPY_OPTION(atom, "dsk,40t", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(atom, "dsk,40t", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])

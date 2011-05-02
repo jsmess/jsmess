@@ -1539,7 +1539,7 @@ static const cassette_config adam_cassette_config =
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( adam )
-	FLOPPY_OPTION( adam, "dsk", "Coleco Adam floppy disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( adam, "dsk", "Coleco Adam floppy disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([8])

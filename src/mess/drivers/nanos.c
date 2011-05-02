@@ -486,7 +486,7 @@ static const upd765_interface nanos_upd765_interface =
 };
 
 static FLOPPY_OPTIONS_START(nanos)
-	FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])

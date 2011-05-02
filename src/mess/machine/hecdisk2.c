@@ -129,9 +129,9 @@ static FLOPPY_CONSTRUCT(hector_disc2_dsk800_construct)
 }
 
 FLOPPY_OPTIONS_START( hector_disc2 )
-	FLOPPY_OPTION( hector_dsk, "HE2", "hector disc2 floppy disk image 200K", hector_disc2_dsk200_identify, hector_disc2_dsk200_construct, NULL)
-	FLOPPY_OPTION( hector_dsk, "HE7", "hector disc2 floppy disk image 720K", hector_disc2_dsk720_identify, hector_disc2_dsk720_construct, NULL)
-	FLOPPY_OPTION( hector_dsk, "HE8", "hector disc2 floppy disk image 800K", hector_disc2_dsk800_identify, hector_disc2_dsk800_construct, NULL)
+	FLOPPY_OPTION( hector_dsk, "HE2", "hector disc2 floppy disk image 200K", hector_disc2_dsk200_identify, hector_disc2_dsk200_construct, NULL, NULL)
+	FLOPPY_OPTION( hector_dsk, "HE7", "hector disc2 floppy disk image 720K", hector_disc2_dsk720_identify, hector_disc2_dsk720_construct, NULL, NULL)
+	FLOPPY_OPTION( hector_dsk, "HE8", "hector disc2 floppy disk image 800K", hector_disc2_dsk800_identify, hector_disc2_dsk800_construct, NULL, NULL)
 FLOPPY_OPTIONS_END
 
 // Define the hardware of the disk
