@@ -1236,22 +1236,22 @@ static offs_t scanline_to_address(mc6847_state *mc6847, int scanline)
 /* TODO: attributes should be read on demand rather then all at once */
 static UINT8 update_attributes(mc6847_state *mc6847)
 {
-	if (mc6847->in_gm0_func.read != NULL)
-		mc6847->gm0 = devcb_call_read_line(&mc6847->in_gm0_func);
-	if (mc6847->in_gm1_func.read != NULL)
-		mc6847->gm1 = devcb_call_read_line(&mc6847->in_gm1_func);
-	if (mc6847->in_gm2_func.read != NULL)
-		mc6847->gm2 = devcb_call_read_line(&mc6847->in_gm2_func);
-	if (mc6847->in_css_func.read != NULL)
-		mc6847->css = devcb_call_read_line(&mc6847->in_css_func);
-	if (mc6847->in_inv_func.read != NULL)
-		mc6847->inv = devcb_call_read_line(&mc6847->in_inv_func);
-	if (mc6847->in_intext_func.read != NULL)
-		mc6847->intext = devcb_call_read_line(&mc6847->in_intext_func);
-	if (mc6847->in_as_func.read != NULL)
-		mc6847->as = devcb_call_read_line(&mc6847->in_as_func);
-	if (mc6847->in_ag_func.read != NULL)
-		mc6847->ag = devcb_call_read_line(&mc6847->in_ag_func);
+	if (!mc6847->in_gm0_func.isnull())
+		mc6847->gm0 = mc6847->in_gm0_func();
+	if (!mc6847->in_gm1_func.isnull())
+		mc6847->gm1 = mc6847->in_gm1_func();
+	if (!mc6847->in_gm2_func.isnull())
+		mc6847->gm2 = mc6847->in_gm2_func();
+	if (!mc6847->in_css_func.isnull())
+		mc6847->css = mc6847->in_css_func();
+	if (!mc6847->in_inv_func.isnull())
+		mc6847->inv = mc6847->in_inv_func();
+	if (!mc6847->in_intext_func.isnull())
+		mc6847->intext = mc6847->in_intext_func();
+	if (!mc6847->in_as_func.isnull())
+		mc6847->as = mc6847->in_as_func();
+	if (!mc6847->in_ag_func.isnull())
+		mc6847->ag = mc6847->in_ag_func();
 
 	return (mc6847->ag << 7) | (mc6847->as << 6) | (mc6847->intext << 5) | (mc6847->inv << 4) |
 	       (mc6847->css << 3) | (mc6847->gm2 << 2) | (mc6847->gm1 << 1) | mc6847->gm0;
@@ -1312,7 +1312,7 @@ INLINE void prepare_scanline(running_machine &machine, mc6847_state *mc6847, int
 
 				for (i = xpos; i < 32; i++)
 				{
-					data = devcb_call_read8(&mc6847->in_dd_func, addr + i);
+					data = mc6847->in_dd_func(addr + i);
 					attr = update_attributes(mc6847);
 
 					if ((data != scanline_data[i].data)	|| (attr != scanline_data[i].attr))
@@ -1352,7 +1352,7 @@ static TIMER_CALLBACK( hs_fall )
 		logerror("hs_fall(): time=%s\n", machine.time().as_string(ATTOTIME_STRING_PRECISION));
 
 	mc6847->hs = ASSERT_LINE;
-	devcb_call_write_line(&mc6847->out_hs_func, mc6847->hs);
+	mc6847->out_hs_func(mc6847->hs);
 }
 
 static TIMER_CALLBACK( hs_rise )
@@ -1368,7 +1368,7 @@ static TIMER_CALLBACK( hs_rise )
 		attotime(0, mc6847->horizontal_sync_period), 0);
 
 	mc6847->hs = CLEAR_LINE;
-	devcb_call_write_line(&mc6847->out_hs_func, mc6847->hs);
+	mc6847->out_hs_func(mc6847->hs);
 
 	prepare_scanline(machine, mc6847, 0);
 }
@@ -1381,7 +1381,7 @@ static TIMER_CALLBACK( fs_fall )
 		logerror("fs_fall(): time=%s scanline=%d\n", machine.time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
 	mc6847->fs = ASSERT_LINE;
-	devcb_call_write_line(&mc6847->out_fs_func, mc6847->fs);
+	mc6847->out_fs_func(mc6847->fs);
 }
 
 static TIMER_CALLBACK( fs_rise )
@@ -1403,7 +1403,7 @@ static TIMER_CALLBACK( fs_rise )
 		mc6847->using_custom = !mc6847->new_frame_callback(machine);
 
 	mc6847->fs = CLEAR_LINE;
-	devcb_call_write_line(&mc6847->out_fs_func, mc6847->fs);
+	mc6847->out_fs_func(mc6847->fs);
 }
 
 
@@ -1922,17 +1922,17 @@ static DEVICE_START( mc6847 )
 
 
 	/* resolve callbacks */
-	devcb_resolve_read8(&mc6847->in_dd_func, &intf->in_dd_func, device);
-	devcb_resolve_read_line(&mc6847->in_gm2_func, &intf->in_gm2_func, device);
-	devcb_resolve_read_line(&mc6847->in_gm1_func, &intf->in_gm1_func, device);
-	devcb_resolve_read_line(&mc6847->in_gm0_func, &intf->in_gm0_func, device);
-	devcb_resolve_read_line(&mc6847->in_intext_func, &intf->in_intext_func, device);
-	devcb_resolve_read_line(&mc6847->in_inv_func, &intf->in_inv_func, device);
-	devcb_resolve_read_line(&mc6847->in_as_func, &intf->in_as_func, device);
-	devcb_resolve_read_line(&mc6847->in_ag_func, &intf->in_ag_func, device);
-	devcb_resolve_write_line(&mc6847->out_fs_func, &intf->out_fs_func, device);
-	devcb_resolve_write_line(&mc6847->out_hs_func, &intf->out_hs_func, device);
-	devcb_resolve_read_line(&mc6847->in_css_func, &intf->in_css_func, device);
+	mc6847->in_dd_func.resolve(intf->in_dd_func, *device);
+	mc6847->in_gm2_func.resolve(intf->in_gm2_func, *device);
+	mc6847->in_gm1_func.resolve(intf->in_gm1_func, *device);
+	mc6847->in_gm0_func.resolve(intf->in_gm0_func, *device);
+	mc6847->in_intext_func.resolve(intf->in_intext_func, *device);
+	mc6847->in_inv_func.resolve(intf->in_inv_func, *device);
+	mc6847->in_as_func.resolve(intf->in_as_func, *device);
+	mc6847->in_ag_func.resolve(intf->in_ag_func, *device);
+	mc6847->out_fs_func.resolve(intf->out_fs_func, *device);
+	mc6847->out_hs_func.resolve(intf->out_hs_func, *device);
+	mc6847->in_css_func.resolve(intf->in_css_func, *device);
 
 	/* setup save states */
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(mc6847_postload), mc6847));

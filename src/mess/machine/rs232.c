@@ -85,11 +85,11 @@ void rs232_td_w(device_t *bus, device_t *device, int state)
 
 	if (device == rs232->dte.device)
 	{
-		//devcb_call_write_line(&rs232->dce.out_rd_func, state);
+		//rs232->dce.out_rd_func(state);
 	}
 	else if (device == rs232->dce.device)
 	{
-		//devcb_call_write_line(&rs232->dte.out_rd_func, state);
+		//rs232->dte.out_rd_func(state);
 	}
 	else
 	{
@@ -114,7 +114,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_dcd_w )
 
 	if (LOG) logerror("RS232 '%s' DCD %u\n", device->tag(), state);
 
-	//devcb_call_write_line(&rs232->dte.out_dcd_func, state);
+	//rs232->dte.out_dcd_func(state);
 }
 
 READ_LINE_DEVICE_HANDLER( rs232_dtr_r )
@@ -132,7 +132,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_dtr_w )
 
 	if (LOG) logerror("RS232 '%s' DTR %u\n", device->tag(), state);
 
-	//devcb_call_write_line(&rs232->dce.out_dtr_func, state);
+	//rs232->dce.out_dtr_func(state);
 }
 
 READ_LINE_DEVICE_HANDLER( rs232_dsr_r )
@@ -150,7 +150,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_dsr_w )
 
 	if (LOG) logerror("RS232 '%s' DSR %u\n", device->tag(), state);
 
-	//devcb_call_write_line(&rs232->dte.out_dsr_func, state);
+	//rs232->dte.out_dsr_func(state);
 }
 
 READ_LINE_DEVICE_HANDLER( rs232_rts_r )
@@ -168,7 +168,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_rts_w )
 
 	if (LOG) logerror("RS232 '%s' RTS %u\n", device->tag(), state);
 
-	//devcb_call_write_line(&rs232->dce.out_rts_func, state);
+	//rs232->dce.out_rts_func(state);
 }
 
 READ_LINE_DEVICE_HANDLER( rs232_cts_r )
@@ -186,7 +186,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_cts_w )
 
 	if (LOG) logerror("RS232 '%s' CTS %u\n", device->tag(), state);
 
-	//devcb_call_write_line(&rs232->dte.out_cts_func, state);
+	//rs232->dte.out_cts_func(state);
 }
 
 READ_LINE_DEVICE_HANDLER( rs232_ri_r )
@@ -204,7 +204,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_ri_w )
 
 	if (LOG) logerror("RS232 '%s' RI %u\n", device->tag(), state);
 
-	//devcb_call_write_line(&rs232->dte.out_ri_func, state);
+	//rs232->dte.out_ri_func(state);
 }
 
 /*-------------------------------------------------

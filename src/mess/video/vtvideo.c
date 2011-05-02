@@ -118,7 +118,7 @@ WRITE8_DEVICE_HANDLER( vt_video_dc012_w )
 				break;
 			case 0x09:
 				// clear vertical frequency interrupt;
-				devcb_call_write8(&vt->clear_video_interrupt, 0, 0);
+				vt->clear_video_interrupt(0, 0);
 				break;
 			case 0x0A:
 				// set reverse field on
@@ -247,10 +247,10 @@ void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *clipre
 	UINT8 display_type = 3;  // binary 11
 	UINT16 temp =0;
 
-	if (devcb_call_read8(&vt->in_ram_func, 0) !=0x7f) return;
+	if (vt->in_ram_func(0) !=0x7f) return;
 
 	while(line < (vt->height + vt->skip_lines)) {
-		code =  devcb_call_read8(&vt->in_ram_func, addr + xpos);
+		code =  vt->in_ram_func(addr + xpos);
 		if (code == 0x7f) {
 			// end of line, fill empty till end of line
 			if (line >= vt->skip_lines) {
@@ -260,7 +260,7 @@ void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *clipre
 				}
 			}
 			// move to new data
-			temp = devcb_call_read8(&vt->in_ram_func, addr+xpos+1)*256 + devcb_call_read8(&vt->in_ram_func, addr+xpos+2);
+			temp = vt->in_ram_func(addr+xpos+1)*256 + vt->in_ram_func(addr+xpos+2);
 			addr = (temp) & 0x1fff;
 			// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
 			if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
@@ -303,8 +303,8 @@ static DEVICE_START( vt_video )
 	const vt_video_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
-	devcb_resolve_read8(&vt->in_ram_func, &intf->in_ram_func, device);
-	devcb_resolve_write8(&vt->clear_video_interrupt, &intf->clear_video_interrupt, device);
+	vt->in_ram_func.resolve(intf->in_ram_func, *device);
+	vt->clear_video_interrupt.resolve(intf->clear_video_interrupt, *device);
 
 	/* get the screen device */
 	vt->screen = device->machine().device<screen_device>(intf->screen_tag);

@@ -74,7 +74,7 @@ bool hd44352_device::device_validity_check( const game_driver &driver ) const
 
 void hd44352_device::device_start()
 {
-	devcb_resolve_write_line(&m_on, &m_on_cb, this);
+	m_on.resolve(m_on_cb, *this);
 
 	m_on_timer = timer_alloc(ON_TIMER);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
@@ -141,8 +141,8 @@ void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		case ON_TIMER:
 			if (m_control_lines & 0x40)
 			{
-				devcb_call_write_line(&m_on, ASSERT_LINE);
-				devcb_call_write_line(&m_on, CLEAR_LINE);
+				m_on(ASSERT_LINE);
+				m_on(CLEAR_LINE);
 			}
 			break;
 	}

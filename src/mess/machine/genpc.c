@@ -307,14 +307,14 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 						pic8259_ir1_w(m_pic8259, 1);
 						m_ppi_shift_enable = 0;
 						m_ppi_clock_signal = 0;
-						devcb_call_write_line(&m_kb_set_clock_signal_func, m_ppi_clock_signal);
+						m_kb_set_clock_signal_func(m_ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
 
-	devcb_call_write_line(&m_kb_set_clock_signal_func,m_ppi_clock_signal);
+	m_kb_set_clock_signal_func(m_ppi_clock_signal);
 }
 
 
@@ -322,7 +322,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_data_w )
 {
 	m_ppi_data_signal = state;
 
-	devcb_call_write_line(&m_kb_set_data_signal_func,m_ppi_data_signal);
+	m_kb_set_data_signal_func(m_ppi_data_signal);
 }
 
 READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
@@ -393,7 +393,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	devcb_call_write_line(&m_kb_set_clock_signal_func,m_ppi_clock_signal);
+	m_kb_set_clock_signal_func(m_ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( m_ppi_keyboard_clear )
@@ -606,8 +606,8 @@ void ibm5160_mb_device::device_config_complete()
 void ibm5160_mb_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_kb_set_clock_signal_func, &m_kb_set_clock_signal_cb, this);
-	devcb_resolve_write_line(&m_kb_set_data_signal_func,  &m_kb_set_data_signal_cb,  this);
+	m_kb_set_clock_signal_func.resolve(m_kb_set_clock_signal_cb, *this);
+	m_kb_set_data_signal_func.resolve(m_kb_set_data_signal_cb,  *this);
 
 	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, FUNC(i8237_r), FUNC(i8237_w) );
 	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, FUNC(pic8259_r), FUNC(pic8259_w) );
@@ -850,7 +850,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	cassette_change_state( m_cassette, ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-		devcb_call_write_line(&m_kb_set_clock_signal_func,m_ppi_clock_signal);
+		m_kb_set_clock_signal_func(m_ppi_clock_signal);
 
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */

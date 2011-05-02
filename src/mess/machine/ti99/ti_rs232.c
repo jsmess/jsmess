@@ -375,7 +375,7 @@ static TMS9902_INT_CALLBACK( int_callback_0 )
 	else
 		card->ila &= ~SENILA_0_BIT;
 
-	devcb_call_write_line(&card->lines.inta, INT);
+	card->lines.inta(INT);
 }
 
 static TMS9902_INT_CALLBACK( int_callback_1 )
@@ -387,7 +387,7 @@ static TMS9902_INT_CALLBACK( int_callback_1 )
 	else
 		card->ila &= ~SENILA_1_BIT;
 
-	devcb_call_write_line(&card->lines.inta, INT);
+	card->lines.inta(INT);
 }
 
 static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
@@ -509,7 +509,7 @@ static DEVICE_START( ti_rs232 )
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", ser_region);
 	card->rom = device->machine().region(astring_c(region))->base();
-	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
+	card->lines.inta.resolve(topeb->inta, *device);
 	// READY and INTB are not used
 	card->uart0 = device->subdevice("tms9902_0");
 	card->uart1 = device->subdevice("tms9902_1");

@@ -55,11 +55,11 @@ cbm_iec_stub_device::cbm_iec_stub_device(const machine_config &mconfig, const ch
 void cbm_iec_stub_device::device_start()
 {
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_srq_func, &m_out_srq_cb, this);
-    devcb_resolve_write_line(&m_out_atn_func, &m_out_atn_cb, this);
-    devcb_resolve_write_line(&m_out_clk_func, &m_out_clk_cb, this);
-    devcb_resolve_write_line(&m_out_data_func, &m_out_data_cb, this);
-    devcb_resolve_write_line(&m_out_reset_func, &m_out_reset_cb, this);
+    m_out_srq_func.resolve(m_out_srq_cb, *this);
+    m_out_atn_func.resolve(m_out_atn_cb, *this);
+    m_out_clk_func.resolve(m_out_clk_cb, *this);
+    m_out_data_func.resolve(m_out_data_cb, *this);
+    m_out_reset_func.resolve(m_out_reset_cb, *this);
 }
 
 
@@ -69,7 +69,7 @@ void cbm_iec_stub_device::device_start()
 
 void cbm_iec_stub_device::cbm_iec_srq(int state)
 {
-	devcb_call_write_line(&m_out_srq_func, state);
+	m_out_srq_func(state);
 }
 
 
@@ -79,7 +79,7 @@ void cbm_iec_stub_device::cbm_iec_srq(int state)
 
 void cbm_iec_stub_device::cbm_iec_atn(int state)
 {
-	devcb_call_write_line(&m_out_atn_func, state);
+	m_out_atn_func(state);
 }
 
 
@@ -89,7 +89,7 @@ void cbm_iec_stub_device::cbm_iec_atn(int state)
 
 void cbm_iec_stub_device::cbm_iec_clk(int state)
 {
-	devcb_call_write_line(&m_out_clk_func, state);
+	m_out_clk_func(state);
 }
 
 
@@ -99,7 +99,7 @@ void cbm_iec_stub_device::cbm_iec_clk(int state)
 
 void cbm_iec_stub_device::cbm_iec_data(int state)
 {
-	devcb_call_write_line(&m_out_data_func, state);
+	m_out_data_func(state);
 }
 
 
@@ -109,5 +109,5 @@ void cbm_iec_stub_device::cbm_iec_data(int state)
 
 void cbm_iec_stub_device::cbm_iec_reset(int state)
 {
-	devcb_call_write_line(&m_out_reset_func, state);
+	m_out_reset_func(state);
 }

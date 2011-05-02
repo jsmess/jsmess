@@ -245,7 +245,7 @@ static void generic_teleprinter_update(device_t *device, bitmap_t *bitmap, const
 static TIMER_CALLBACK(keyboard_callback)
 {
 	teleprinter_state *term = get_safe_token((device_t *)ptr);
-	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line, NULL, NULL, (device_t *)ptr);
+	term->last_code = terminal_keyboard_handler(machine, term->teleprinter_keyboard_func, term->last_code, &term->scan_line, NULL, NULL, (device_t *)ptr);
 }
 
 /***************************************************************************
@@ -288,9 +288,9 @@ static DEVICE_START( teleprinter )
 	teleprinter_state *term = get_safe_token(device);
 	const teleprinter_interface *intf = get_interface(device);
 
-	devcb_resolve_write8(&term->teleprinter_keyboard_func, &intf->teleprinter_keyboard_func, device);
+	term->teleprinter_keyboard_func.resolve(intf->teleprinter_keyboard_func, *device);
 
-	if (term->teleprinter_keyboard_func.target)
+	if (!term->teleprinter_keyboard_func.isnull())
 		device->machine().scheduler().timer_pulse(attotime::from_hz(240), FUNC(keyboard_callback), 0, (void*)device);
 }
 

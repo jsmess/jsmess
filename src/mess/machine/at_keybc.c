@@ -113,12 +113,12 @@ void at_keyboard_controller_device::device_start()
 	m_cpu = downcast<device_t *>(subdevice("at_keybc"));
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_system_reset_func, &m_system_reset_cb, this);
-	devcb_resolve_write_line(&m_gate_a20_func, &m_gate_a20_cb, this);
-	devcb_resolve_write_line(&m_input_buffer_full_func, &m_input_buffer_full_cb, this);
-	devcb_resolve_write_line(&m_output_buffer_empty_func, &m_output_buffer_empty_cb, this);
-	devcb_resolve_write_line(&m_keyboard_clock_func, &m_keyboard_clock_cb, this);
-	devcb_resolve_write_line(&m_keyboard_data_func, &m_keyboard_data_cb, this);
+	m_system_reset_func.resolve(m_system_reset_cb, *this);
+	m_gate_a20_func.resolve(m_gate_a20_cb, *this);
+	m_input_buffer_full_func.resolve(m_input_buffer_full_cb, *this);
+	m_output_buffer_empty_func.resolve(m_output_buffer_empty_cb, *this);
+	m_keyboard_clock_func.resolve(m_keyboard_clock_cb, *this);
+	m_keyboard_data_func.resolve(m_keyboard_data_cb, *this);
 
 	// register for save states
 	save_item(NAME(m_clock_signal));
@@ -182,16 +182,16 @@ READ8_MEMBER( at_keyboard_controller_device::p2_r )
 */
 WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
 {
-	devcb_call_write_line(&m_system_reset_func, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-	devcb_call_write_line(&m_gate_a20_func, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-	devcb_call_write_line(&m_input_buffer_full_func, BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
-	devcb_call_write_line(&m_output_buffer_empty_func, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+	m_system_reset_func(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_gate_a20_func(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_input_buffer_full_func(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_output_buffer_empty_func(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_clock_signal = !BIT(data, 6);
 	m_data_signal = BIT(data, 7);
 
-	devcb_call_write_line(&m_keyboard_data_func, m_data_signal);
-	devcb_call_write_line(&m_keyboard_clock_func, m_clock_signal);
+	m_keyboard_data_func(m_data_signal);
+	m_keyboard_clock_func(m_clock_signal);
 }
 
 

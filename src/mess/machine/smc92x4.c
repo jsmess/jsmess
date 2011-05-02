@@ -299,7 +299,7 @@ static void smc92x4_set_interrupt(device_t *device)
 	if ((w->register_r[INT_STATUS] & ST_INTPEND) == 0)
 	{
 		w->register_r[INT_STATUS] |= ST_INTPEND;
-		devcb_call_write_line(&w->out_intrq_func, ASSERT_LINE);
+		w->out_intrq_func(ASSERT_LINE);
 	}
 }
 
@@ -309,7 +309,7 @@ static void smc92x4_set_interrupt(device_t *device)
 static void smc92x4_set_dip(device_t *device, int value)
 {
 	smc92x4_state *w = get_safe_token(device);
-	devcb_call_write_line(&w->out_dip_func, value);
+	w->out_dip_func(value);
 }
 
 /*
@@ -354,7 +354,7 @@ static void smc92x4_clear_interrupt(device_t *device)
 	smc92x4_state *w = get_safe_token(device);
 	if ((w->register_r[INT_STATUS] & ST_INTPEND) != 0)
 	{
-		devcb_call_write_line(&w->out_intrq_func, CLEAR_LINE);
+		w->out_intrq_func(CLEAR_LINE);
 	}
 }
 
@@ -365,9 +365,9 @@ static void smc92x4_clear_interrupt(device_t *device)
 static void set_dma_address(device_t *device, int pos2316, int pos1508, int pos0700)
 {
 	smc92x4_state *w = get_safe_token(device);
-	devcb_call_write8(&w->out_auxbus_func, OUTPUT_DMA_ADDR, w->register_r[pos2316]);
-	devcb_call_write8(&w->out_auxbus_func, OUTPUT_DMA_ADDR, w->register_r[pos1508]);
-	devcb_call_write8(&w->out_auxbus_func, OUTPUT_DMA_ADDR, w->register_r[pos0700]);
+	w->out_auxbus_func(OUTPUT_DMA_ADDR, w->register_r[pos2316]);
+	w->out_auxbus_func(OUTPUT_DMA_ADDR, w->register_r[pos1508]);
+	w->out_auxbus_func(OUTPUT_DMA_ADDR, w->register_r[pos0700]);
 }
 
 static void dma_add_offset(device_t *device, int offset)
@@ -393,7 +393,7 @@ static void sync_status_in(device_t *device)
 	smc92x4_state *w = get_safe_token(device);
 
 	prev = w->register_r[DRIVE_STATUS];
-	w->register_r[DRIVE_STATUS] = devcb_call_read_line(&w->in_auxbus_func);
+	w->register_r[DRIVE_STATUS] = w->in_auxbus_func();
 
 	/* Raise interrupt if ready changes. TODO: Check this more closely. */
 //  logerror("disk status = %02x\n", reply);
@@ -413,8 +413,8 @@ static void sync_latches_out(device_t *device)
 	smc92x4_state *w = get_safe_token(device);
 	w->output1 = (w->output1 & 0xf0) | (w->register_w[RETRY_COUNT]&0x0f);
 
-	devcb_call_write8(&w->out_auxbus_func, OUTPUT_OUTPUT1, w->output1);
-	devcb_call_write8(&w->out_auxbus_func, OUTPUT_OUTPUT2, w->output2);
+	w->out_auxbus_func(OUTPUT_OUTPUT1, w->output1);
+	w->out_auxbus_func(OUTPUT_OUTPUT2, w->output2);
 }
 
 /*************************************************************
@@ -2139,10 +2139,10 @@ static DEVICE_START( smc92x4 )
 	assert(device->static_config() != NULL);
 
 	w->intf = (const smc92x4_interface*)device->static_config();
-	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
-	devcb_resolve_write_line(&w->out_dip_func, &w->intf->out_dip_func, device);
-	devcb_resolve_write8(&w->out_auxbus_func, &w->intf->out_auxbus_func, device);
-	devcb_resolve_read_line(&w->in_auxbus_func, &w->intf->in_auxbus_func, device);
+	w->out_intrq_func.resolve(w->intf->out_intrq_func, *device);
+	w->out_dip_func.resolve(w->intf->out_dip_func, *device);
+	w->out_auxbus_func.resolve(w->intf->out_auxbus_func, *device);
+	w->in_auxbus_func.resolve(w->intf->in_auxbus_func, *device);
 
 	/* allocate timers */
 	/* w->timer_data = device->machine().scheduler().timer_alloc(FUNC(smc92x4_data_callback), (void *)device); */

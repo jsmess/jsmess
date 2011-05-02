@@ -652,7 +652,7 @@ static ABCBUS_DAISY( abcbus_daisy )
 
 static RS232_INTERFACE( rs232_intf )
 {
-	{ Z80PIO_TAG },
+	{ Z80PIO_TAG ,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -660,6 +660,7 @@ static RS232_INTERFACE( rs232_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
+	}
 };
 
 

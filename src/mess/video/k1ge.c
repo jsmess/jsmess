@@ -92,8 +92,8 @@ WRITE8_DEVICE_HANDLER( k1ge_w )
 	switch( offset )
 	{
 	case 0x000:
-		if ( k1ge->vblank_pin_w.write != NULL )
-			devcb_call_write8( &k1ge->vblank_pin_w, 0, ( data & 0x80 ) ? ( ( k1ge->vram[0x010] & 0x40 ) ? 1 : 0 ) : 0 );
+		if (!k1ge->vblank_pin_w.isnull())
+			k1ge->vblank_pin_w(0, ( data & 0x80 ) ? ( ( k1ge->vram[0x010] & 0x40 ) ? 1 : 0 ) : 0 );
 		break;
 	case 0x030:
 		data &= 0x80;
@@ -759,8 +759,8 @@ static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 	device_t *device = (device_t *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 
-	if ( k1ge->hblank_pin_w.write != NULL )
-		devcb_call_write8( &k1ge->hblank_pin_w, 0, 0 );
+	if (!k1ge->hblank_pin_w.isnull())
+		k1ge->hblank_pin_w(0, 0);
 }
 
 
@@ -774,8 +774,8 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 	if ( y >= 152 )
 	{
 		k1ge->vram[0x010] |= 0x40;
-		if ( ( k1ge->vram[0x000] & 0x80 ) && k1ge->vblank_pin_w.write != NULL )
-				devcb_call_write8( &k1ge->vblank_pin_w, 0, 1 );
+		if ((k1ge->vram[0x000] & 0x80 ) && !k1ge->vblank_pin_w.isnull())
+				k1ge->vblank_pin_w(0, 1);
 	}
 
 	/* Check for end of VBlank */
@@ -786,17 +786,17 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 		k1ge->wsi_h = k1ge->vram[0x004];
 		k1ge->wsi_v = k1ge->vram[0x005];
 		k1ge->vram[0x010] &= ~ 0x40;
-		if ( ( k1ge->vram[0x000] & 0x80 ) && k1ge->vblank_pin_w.write != NULL )
-			devcb_call_write8( &k1ge->vblank_pin_w, 0, 0 );
+		if ((k1ge->vram[0x000] & 0x80 ) && !k1ge->vblank_pin_w.isnull())
+			k1ge->vblank_pin_w(0, 0);
 	}
 
 	/* Check if Hint should be triggered */
 	if ( y == K1GE_SCREEN_HEIGHT - 1 || y < 151 )
 	{
-		if ( k1ge->hblank_pin_w.write != NULL )
+		if (!k1ge->hblank_pin_w.isnull())
 		{
 			if ( k1ge->vram[0x000] & 0x40 )
-				devcb_call_write8( &k1ge->hblank_pin_w, 0, 1 );
+				k1ge->hblank_pin_w(0, 1);
 			k1ge->hblank_on_timer->adjust( k1ge->screen->time_until_pos(y, 480 ) );
 		}
 	}
@@ -825,8 +825,8 @@ static DEVICE_START( k1ge )
 
 	k1ge->intf = (const k1ge_interface*)device->static_config();
 
-	devcb_resolve_write8( &k1ge->vblank_pin_w, &k1ge->intf->vblank_pin_w, device );
-	devcb_resolve_write8( &k1ge->hblank_pin_w, &k1ge->intf->hblank_pin_w, device );
+	k1ge->vblank_pin_w.resolve(k1ge->intf->vblank_pin_w, *device);
+	k1ge->hblank_pin_w.resolve(k1ge->intf->hblank_pin_w, *device);
 
 	k1ge->timer = device->machine().scheduler().timer_alloc(FUNC(k1ge_timer_callback), (void *) device );
 	k1ge->hblank_on_timer = device->machine().scheduler().timer_alloc(FUNC(k1ge_hblank_on_timer_callback), (void *) device );

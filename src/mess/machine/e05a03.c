@@ -73,11 +73,11 @@ static DEVICE_START( e05a03 )
 	assert(device->static_config() != NULL);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&e05a03->out_nlq_lp_func, &intf->out_nlq_lp_func, device);
-	devcb_resolve_write_line(&e05a03->out_pe_lp_func, &intf->out_pe_lp_func, device);
-	devcb_resolve_write_line(&e05a03->out_reso_func, &intf->out_reso_func, device);
-	devcb_resolve_write_line(&e05a03->out_pe_func, &intf->out_pe_func, device);
-	devcb_resolve_read8(&e05a03->in_data_func, &intf->in_data_func, device);
+	e05a03->out_nlq_lp_func.resolve(intf->out_nlq_lp_func, *device);
+	e05a03->out_pe_lp_func.resolve(intf->out_pe_lp_func, *device);
+	e05a03->out_reso_func.resolve(intf->out_reso_func, *device);
+	e05a03->out_pe_func.resolve(intf->out_pe_func, *device);
+	e05a03->in_data_func.resolve(intf->in_data_func, *device);
 
 	/* register for state saving */
 	device->save_item(NAME(e05a03->shift));
@@ -102,8 +102,8 @@ static DEVICE_RESET( e05a03 )
 	e05a03->pf_motor = 0x00;
 	e05a03->cr_motor = 0x0f;
 
-	devcb_call_write_line(&e05a03->out_pe_func, 0);
-	devcb_call_write_line(&e05a03->out_pe_lp_func, 1);
+	e05a03->out_pe_func(0);
+	e05a03->out_pe_lp_func(1);
 
 	e05a03->busy_software = 1;
 	e05a03->nlqlp = 1;
@@ -156,8 +156,8 @@ WRITE8_DEVICE_HANDLER( e05a03_w )
 		e05a03->nlqlp = BIT(data, 4);
 		e05a03->cndlp = BIT(data, 3);
 
-		devcb_call_write_line(&e05a03->out_pe_func, BIT(data, 2));
-		devcb_call_write_line(&e05a03->out_pe_lp_func, !BIT(data, 2));
+		e05a03->out_pe_func(BIT(data, 2));
+		e05a03->out_pe_lp_func(!BIT(data, 2));
 
 #if 0
 		e05a03->pe = BIT(data, 2);
@@ -192,7 +192,7 @@ READ8_DEVICE_HANDLER( e05a03_r )
 		break;
 
 	case 0x02:
-		result = devcb_call_read8(&e05a03->in_data_func, 0);
+		result = e05a03->in_data_func(0);
 		break;
 
 	case 0x03:
@@ -230,7 +230,7 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_resi_w )
 	if (!state)
 	{
 		DEVICE_RESET_CALL( e05a03 );
-		devcb_call_write_line(&e05a03->out_reso_func, 1);
+		e05a03->out_reso_func(1);
 	}
 }
 

@@ -447,8 +447,8 @@ static READ8_HANDLER( kb_keytronic_internal_data_r )
 	keytronic->data_signal = BIT(offset, 8);
 	keytronic->clock_signal = BIT(offset, 9);
 
-	devcb_call_write_line(&keytronic->out_data_func, keytronic->data_signal);
-	devcb_call_write_line(&keytronic->out_clock_func, keytronic->clock_signal);
+	keytronic->out_data_func(keytronic->data_signal);
+	keytronic->out_clock_func(keytronic->clock_signal);
 
 	return 0xff;
 }
@@ -611,8 +611,8 @@ static DEVICE_START( kb_keytr )
 	assert(intf != NULL);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&keytronic->out_clock_func, &intf->out_clock_func, device);
-	devcb_resolve_write_line(&keytronic->out_data_func, &intf->out_data_func, device);
+	keytronic->out_clock_func.resolve(intf->out_clock_func, *device);
+	keytronic->out_data_func.resolve(intf->out_data_func, *device);
 
 	/* set default values */
 	keytronic->p3 = 0xff;

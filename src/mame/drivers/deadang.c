@@ -38,7 +38,6 @@ Dip locations and factory settings verified with US manual
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
@@ -207,12 +206,26 @@ GFXDECODE_END
 
 /* Interrupt Generators */
 
-static INTERRUPT_GEN( deadang_interrupt )
+static TIMER_DEVICE_CALLBACK( deadang_main_scanline )
 {
-	if (cpu_getiloops(device))
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);	/* VBL */
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xc4/4);
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xc8/4);
+}
+
+static TIMER_DEVICE_CALLBACK( deadang_sub_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "sub", 0, HOLD_LINE,0xc4/4);
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "sub", 0, HOLD_LINE,0xc8/4);
 }
 
 /* Machine Drivers */
@@ -222,11 +235,11 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer1", deadang_main_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer2", deadang_sub_scanline, "screen", 0, 1)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
@@ -295,9 +308,11 @@ ROM_START( deadang )
 	ROM_LOAD16_BYTE( "12.6j",  0x00000, 0x8000, CRC(2674d23f) SHA1(0533d80a23d917e20a703aeb833dcaccfa3a1967) )
 	ROM_LOAD16_BYTE( "11.6k",  0x00001, 0x8000, CRC(3dd4d81d) SHA1(94f0a13a8d3812f6879819ca186abf3a8665f7cb) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm1", 0 )
 	ROM_LOAD( "15.b11", 0x000000, 0x10000, CRC(fabd74f2) SHA1(ac70e952a8b38287613b384cdc7ca00a7f155a13) )
-	ROM_LOAD( "16.11a", 0x010000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
+
+    ROM_REGION( 0x10000, "adpcm2", 0 )
+	ROM_LOAD( "16.11a", 0x000000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
 ROM_END
 
 ROM_START( leadang )
@@ -340,9 +355,11 @@ ROM_START( leadang )
 	ROM_LOAD16_BYTE( "12.6j",  0x00000, 0x8000, CRC(2674d23f) SHA1(0533d80a23d917e20a703aeb833dcaccfa3a1967) )
 	ROM_LOAD16_BYTE( "11.6k",  0x00001, 0x8000, CRC(3dd4d81d) SHA1(94f0a13a8d3812f6879819ca186abf3a8665f7cb) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm1", 0 )
 	ROM_LOAD( "15.b11", 0x000000, 0x10000, CRC(fabd74f2) SHA1(ac70e952a8b38287613b384cdc7ca00a7f155a13) )
-	ROM_LOAD( "16.11a", 0x010000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
+
+    ROM_REGION( 0x10000, "adpcm2", 0 )
+	ROM_LOAD( "16.11a", 0x000000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
 ROM_END
 
 ROM_START( ghunter )
@@ -385,9 +402,11 @@ ROM_START( ghunter )
 	ROM_LOAD16_BYTE( "12.6j",  0x00000, 0x8000, CRC(2674d23f) SHA1(0533d80a23d917e20a703aeb833dcaccfa3a1967) )
 	ROM_LOAD16_BYTE( "11.6k",  0x00001, 0x8000, CRC(3dd4d81d) SHA1(94f0a13a8d3812f6879819ca186abf3a8665f7cb) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm1", 0 )
 	ROM_LOAD( "15.b11", 0x000000, 0x10000, CRC(fabd74f2) SHA1(ac70e952a8b38287613b384cdc7ca00a7f155a13) )
-	ROM_LOAD( "16.11a", 0x010000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )
+    ROM_LOAD( "16.11a", 0x000000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
 ROM_END
 
 /* Driver Initialization */
@@ -395,13 +414,15 @@ ROM_END
 static DRIVER_INIT( deadang )
 {
 	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
-	seibu_adpcm_decrypt(machine, "adpcm");
+	seibu_adpcm_decrypt(machine, "adpcm1");
+	seibu_adpcm_decrypt(machine, "adpcm2");
 }
 
 static DRIVER_INIT( ghunter )
 {
 	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
-	seibu_adpcm_decrypt(machine, "adpcm");
+	seibu_adpcm_decrypt(machine, "adpcm1");
+	seibu_adpcm_decrypt(machine, "adpcm2");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x80001, FUNC(ghunter_trackball_low_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0000, 0xb0001, FUNC(ghunter_trackball_high_r));

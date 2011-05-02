@@ -80,7 +80,7 @@ void c64h156_device::device_config_complete()
 
 inline void c64h156_device::set_atn_line()
 {
-	devcb_call_write_line(&m_out_atn_func, ATN);
+	m_out_atn_func(ATN);
 }
 
 
@@ -90,7 +90,7 @@ inline void c64h156_device::set_atn_line()
 
 inline void c64h156_device::set_sync_line()
 {
-	devcb_call_write_line(&m_out_sync_func, SYNC);
+	m_out_sync_func(SYNC);
 }
 
 
@@ -100,7 +100,7 @@ inline void c64h156_device::set_sync_line()
 
 inline void c64h156_device::set_byte_line()
 {
-	devcb_call_write_line(&m_out_byte_func, BYTE);
+	m_out_byte_func(BYTE);
 }
 
 
@@ -224,9 +224,9 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 void c64h156_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_atn_func, &m_out_atn_cb, this);
-	devcb_resolve_write_line(&m_out_sync_func, &m_out_sync_cb, this);
-	devcb_resolve_write_line(&m_out_byte_func, &m_out_byte_cb, this);
+	m_out_atn_func.resolve(m_out_atn_cb, *this);
+	m_out_sync_func.resolve(m_out_sync_cb, *this);
+	m_out_byte_func.resolve(m_out_byte_cb, *this);
 
 	// allocate timers
 	m_bit_timer = timer_alloc();

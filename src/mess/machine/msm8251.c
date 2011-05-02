@@ -151,9 +151,9 @@ static DEVICE_START( msm8251 )
 	serial_helper_setup();
 
 	// resolve callbacks
-	devcb_resolve_write_line(&uart->out_rxrdy_func, &intf->out_rxrdy_func, device);
-	devcb_resolve_write_line(&uart->out_txrdy_func, &intf->out_txrdy_func, device);
-	devcb_resolve_write_line(&uart->out_txempty_func, &intf->out_txempty_func, device);
+	uart->out_rxrdy_func.resolve(intf->out_rxrdy_func, *device);
+	uart->out_txrdy_func.resolve(intf->out_txrdy_func, *device);
+	uart->out_txempty_func.resolve(intf->out_txempty_func, *device);
 
 	/* setup this side of the serial connection */
 	serial_connection_init(device->machine(),&uart->connection);
@@ -180,7 +180,7 @@ static void msm8251_update_rx_ready(device_t *device)
 		state = 0;
 	}
 
-	devcb_call_write_line(&uart->out_rxrdy_func, state != 0);
+	uart->out_rxrdy_func(state != 0);
 }
 
 
@@ -311,7 +311,7 @@ static void msm8251_update_tx_ready(device_t *device)
 		}
 	}
 
-	devcb_call_write_line(&uart->out_txrdy_func, tx_ready);
+	uart->out_txrdy_func(tx_ready);
 }
 
 
@@ -331,7 +331,7 @@ static void msm8251_update_tx_empty(device_t *device)
 		serial_connection_out(device->machine(),&uart->connection);
 	}
 
-	devcb_call_write_line(&uart->out_txempty_func, (uart->status & MSM8251_STATUS_TX_EMPTY) != 0);
+	uart->out_txempty_func((uart->status & MSM8251_STATUS_TX_EMPTY) != 0);
 }
 
 

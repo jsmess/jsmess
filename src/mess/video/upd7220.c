@@ -730,10 +730,10 @@ void upd7220_device::device_start()
 	m_blank_timer = timer_alloc(TIMER_BLANK);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_drq_func, &m_out_drq_cb, this);
-    devcb_resolve_write_line(&m_out_hsync_func, &m_out_hsync_cb, this);
-    devcb_resolve_write_line(&m_out_vsync_func, &m_out_vsync_cb, this);
-    devcb_resolve_write_line(&m_out_blank_func, &m_out_blank_cb, this);
+    m_out_drq_func.resolve(m_out_drq_cb, *this);
+    m_out_hsync_func.resolve(m_out_hsync_cb, *this);
+    m_out_vsync_func.resolve(m_out_vsync_cb, *this);
+    m_out_blank_func.resolve(m_out_blank_cb, *this);
 
 	// find screen
 	m_screen = machine().device<screen_device>(m_screen_tag);
@@ -774,7 +774,7 @@ void upd7220_device::device_start()
 
 void upd7220_device::device_reset()
 {
-	devcb_call_write_line(&m_out_drq_func, CLEAR_LINE);
+	m_out_drq_func(CLEAR_LINE);
 }
 
 
@@ -796,7 +796,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_sr &= ~UPD7220_SR_HBLANK_ACTIVE;
 		}
 
-		devcb_call_write_line(&m_out_hsync_func, param);
+		m_out_hsync_func(param);
 
 		update_hsync_timer(param);
 		break;
@@ -811,7 +811,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_sr &= ~UPD7220_SR_VSYNC_ACTIVE;
 		}
 
-		devcb_call_write_line(&m_out_vsync_func, param);
+		m_out_vsync_func(param);
 
 		update_vsync_timer(param);
 		break;
@@ -826,7 +826,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_sr &= ~UPD7220_SR_HBLANK_ACTIVE;
 		}
 
-		devcb_call_write_line(&m_out_blank_func, param);
+		m_out_blank_func(param);
 
 		update_blank_timer(param);
 		break;

@@ -479,7 +479,7 @@ inline void abc99_device::serial_output()
 	{
 		m_so = so;
 
-		devcb_call_write_line(&m_out_txd_func, m_so);
+		m_out_txd_func(m_so);
 	}
 }
 
@@ -490,8 +490,8 @@ inline void abc99_device::serial_output()
 
 inline void abc99_device::serial_clock()
 {
-	devcb_call_write_line(&m_out_clock_func, 1);
-	devcb_call_write_line(&m_out_clock_func, 0);
+	m_out_clock_func(1);
+	m_out_clock_func(0);
 }
 
 
@@ -503,7 +503,7 @@ inline void abc99_device::key_down(int state)
 {
 	if (m_keydown != state)
 	{
-		devcb_call_write_line(&m_out_keydown_func, state);
+		m_out_keydown_func(state);
 		m_keydown = state;
 	}
 }
@@ -555,9 +555,9 @@ void abc99_device::device_start()
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_txd_func, &m_out_txd_cb, this);
-    devcb_resolve_write_line(&m_out_clock_func, &m_out_clock_cb, this);
-    devcb_resolve_write_line(&m_out_keydown_func, &m_out_keydown_cb, this);
+    m_out_txd_func.resolve(m_out_txd_cb, *this);
+    m_out_clock_func.resolve(m_out_clock_cb, *this);
+    m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 
 	// state saving
 	save_item(NAME(m_si));

@@ -185,7 +185,7 @@ static DEVICE_START( ti99_speech )
 	ti99_speech_state *adapter = get_safe_token(device);
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	devcb_resolve_write_line(&adapter->lines.ready, &topeb->ready, device);
+	adapter->lines.ready.resolve(topeb->ready, *device);
 	adapter->vsp = device->subdevice("speechsyn");
 }
 
@@ -233,7 +233,7 @@ static WRITE_LINE_DEVICE_HANDLER( speech_ready )
 {
 	ti99_speech_state *adapter = get_safe_token(device->owner());
 	logerror("speech: READY called by VSP\n");
-	devcb_call_write_line( &adapter->lines.ready, state );
+	adapter->lines.ready(state);
 }
 
 /*

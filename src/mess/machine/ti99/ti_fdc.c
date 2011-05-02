@@ -288,12 +288,12 @@ static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
 		card->DRQ_IRQ_status |= fdc_IRQ;
 		// Note that INTB is actually not used in the TI-99 family. But the
 		// controller asserts the line nevertheless
-		devcb_call_write_line(&card->lines.intb, TRUE);
+		card->lines.intb(TRUE);
 	}
 	else
 	{
 		card->DRQ_IRQ_status &= ~fdc_IRQ;
-		devcb_call_write_line(&card->lines.intb, FALSE);
+		card->lines.intb(FALSE);
 	}
 	fdc_handle_hold(carddev);
 }
@@ -346,7 +346,7 @@ static DEVICE_START( ti99_fdc )
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
+	card->lines.ready.resolve(topeb->ready, *device);
 
 	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 
@@ -401,7 +401,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_ready )
 	// Caution: The device pointer passed to this function is the calling
 	// device. That is, if we want *this* device, we need to take the owner.
 	ti99_fdc_state *card = get_safe_token(device->owner());
-	devcb_call_write_line( &card->lines.ready, state );
+	card->lines.ready(state);
 }
 #endif
 

@@ -74,15 +74,15 @@ void isa8_device::device_start()
 {
 	m_maincpu = machine().device(m_cputag);
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_irq2_func, &m_out_irq2_cb, this);
-	devcb_resolve_write_line(&m_out_irq3_func, &m_out_irq3_cb, this);
-	devcb_resolve_write_line(&m_out_irq4_func, &m_out_irq4_cb, this);
-	devcb_resolve_write_line(&m_out_irq5_func, &m_out_irq5_cb, this);
-	devcb_resolve_write_line(&m_out_irq6_func, &m_out_irq6_cb, this);
-	devcb_resolve_write_line(&m_out_irq7_func, &m_out_irq7_cb, this);
-	devcb_resolve_write_line(&m_out_drq1_func, &m_out_drq1_cb, this);
-	devcb_resolve_write_line(&m_out_drq2_func, &m_out_drq2_cb, this);
-	devcb_resolve_write_line(&m_out_drq3_func, &m_out_drq3_cb, this);
+	m_out_irq2_func.resolve(m_out_irq2_cb, *this);
+	m_out_irq3_func.resolve(m_out_irq3_cb, *this);
+	m_out_irq4_func.resolve(m_out_irq4_cb, *this);
+	m_out_irq5_func.resolve(m_out_irq5_cb, *this);
+	m_out_irq6_func.resolve(m_out_irq6_cb, *this);
+	m_out_irq7_func.resolve(m_out_irq7_cb, *this);
+	m_out_drq1_func.resolve(m_out_drq1_cb, *this);
+	m_out_drq2_func.resolve(m_out_drq2_cb, *this);
+	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
 }
 
 //-------------------------------------------------
@@ -133,17 +133,17 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 }
 
 // interrupt request from isa card
-WRITE_LINE_MEMBER( isa8_device::irq2_w ) { devcb_call_write_line(&m_out_irq2_func, state); }
-WRITE_LINE_MEMBER( isa8_device::irq3_w ) { devcb_call_write_line(&m_out_irq3_func, state); }
-WRITE_LINE_MEMBER( isa8_device::irq4_w ) { devcb_call_write_line(&m_out_irq4_func, state); }
-WRITE_LINE_MEMBER( isa8_device::irq5_w ) { devcb_call_write_line(&m_out_irq5_func, state); }
-WRITE_LINE_MEMBER( isa8_device::irq6_w ) { devcb_call_write_line(&m_out_irq6_func, state); }
-WRITE_LINE_MEMBER( isa8_device::irq7_w ) { devcb_call_write_line(&m_out_irq7_func, state); }
+WRITE_LINE_MEMBER( isa8_device::irq2_w ) { m_out_irq2_func(state); }
+WRITE_LINE_MEMBER( isa8_device::irq3_w ) { m_out_irq3_func(state); }
+WRITE_LINE_MEMBER( isa8_device::irq4_w ) { m_out_irq4_func(state); }
+WRITE_LINE_MEMBER( isa8_device::irq5_w ) { m_out_irq5_func(state); }
+WRITE_LINE_MEMBER( isa8_device::irq6_w ) { m_out_irq6_func(state); }
+WRITE_LINE_MEMBER( isa8_device::irq7_w ) { m_out_irq7_func(state); }
 
 // dma request from isa card
-WRITE_LINE_MEMBER( isa8_device::drq1_w ) { devcb_call_write_line(&m_out_drq1_func, state); }
-WRITE_LINE_MEMBER( isa8_device::drq2_w ) { devcb_call_write_line(&m_out_drq2_func, state); }
-WRITE_LINE_MEMBER( isa8_device::drq3_w ) { devcb_call_write_line(&m_out_drq3_func, state); }
+WRITE_LINE_MEMBER( isa8_device::drq1_w ) { m_out_drq1_func(state); }
+WRITE_LINE_MEMBER( isa8_device::drq2_w ) { m_out_drq2_func(state); }
+WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_func(state); }
 
 UINT8 isa8_device::dack_r(int line)
 {

@@ -111,16 +111,16 @@ WRITE8_DEVICE_HANDLER( ttl74145_w )
 	/* call output callbacks if the number changed */
 	if (new_number != ttl74145->number)
 	{
-		devcb_call_write_line(&ttl74145->output_line_0, new_number == 0);
-		devcb_call_write_line(&ttl74145->output_line_1, new_number == 1);
-		devcb_call_write_line(&ttl74145->output_line_2, new_number == 2);
-		devcb_call_write_line(&ttl74145->output_line_3, new_number == 3);
-		devcb_call_write_line(&ttl74145->output_line_4, new_number == 4);
-		devcb_call_write_line(&ttl74145->output_line_5, new_number == 5);
-		devcb_call_write_line(&ttl74145->output_line_6, new_number == 6);
-		devcb_call_write_line(&ttl74145->output_line_7, new_number == 7);
-		devcb_call_write_line(&ttl74145->output_line_8, new_number == 8);
-		devcb_call_write_line(&ttl74145->output_line_9, new_number == 9);
+		ttl74145->output_line_0(new_number == 0);
+		ttl74145->output_line_1(new_number == 1);
+		ttl74145->output_line_2(new_number == 2);
+		ttl74145->output_line_3(new_number == 3);
+		ttl74145->output_line_4(new_number == 4);
+		ttl74145->output_line_5(new_number == 5);
+		ttl74145->output_line_6(new_number == 6);
+		ttl74145->output_line_7(new_number == 7);
+		ttl74145->output_line_8(new_number == 8);
+		ttl74145->output_line_9(new_number == 9);
 	}
 
 	/* update state */
@@ -152,16 +152,16 @@ static DEVICE_START( ttl74145 )
 	ttl74145->number = 0;
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&ttl74145->output_line_0, &intf->output_line_0, device);
-	devcb_resolve_write_line(&ttl74145->output_line_1, &intf->output_line_1, device);
-	devcb_resolve_write_line(&ttl74145->output_line_2, &intf->output_line_2, device);
-	devcb_resolve_write_line(&ttl74145->output_line_3, &intf->output_line_3, device);
-	devcb_resolve_write_line(&ttl74145->output_line_4, &intf->output_line_4, device);
-	devcb_resolve_write_line(&ttl74145->output_line_5, &intf->output_line_5, device);
-	devcb_resolve_write_line(&ttl74145->output_line_6, &intf->output_line_6, device);
-	devcb_resolve_write_line(&ttl74145->output_line_7, &intf->output_line_7, device);
-	devcb_resolve_write_line(&ttl74145->output_line_8, &intf->output_line_8, device);
-	devcb_resolve_write_line(&ttl74145->output_line_9, &intf->output_line_9, device);
+	ttl74145->output_line_0.resolve(intf->output_line_0, *device);
+	ttl74145->output_line_1.resolve(intf->output_line_1, *device);
+	ttl74145->output_line_2.resolve(intf->output_line_2, *device);
+	ttl74145->output_line_3.resolve(intf->output_line_3, *device);
+	ttl74145->output_line_4.resolve(intf->output_line_4, *device);
+	ttl74145->output_line_5.resolve(intf->output_line_5, *device);
+	ttl74145->output_line_6.resolve(intf->output_line_6, *device);
+	ttl74145->output_line_7.resolve(intf->output_line_7, *device);
+	ttl74145->output_line_8.resolve(intf->output_line_8, *device);
+	ttl74145->output_line_9.resolve(intf->output_line_9, *device);
 
 	/* register for state saving */
 	state_save_register_item(device->machine(), "ttl74145", device->tag(), 0, ttl74145->number);

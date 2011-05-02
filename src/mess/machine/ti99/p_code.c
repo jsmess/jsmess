@@ -204,7 +204,7 @@ static DEVICE_START( ti99_pcoden )
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	devcb_resolve_write_line(&pcode->lines.ready, &topeb->ready, device);
+	pcode->lines.ready.resolve(topeb->ready, *device);
 }
 
 static DEVICE_STOP( ti99_pcoden )
@@ -248,7 +248,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcode_ready )
 	// Caution: The device pointer passed to this function is the calling
 	// device. That is, if we want *this* device, we need to take the owner.
 	ti99_pcoden_state *pcode = get_safe_token(device->owner());
-	devcb_call_write_line( &pcode->lines.ready, state );
+	pcode->lines.ready(state);
 }
 
 /*

@@ -422,8 +422,8 @@ static int wd17xx_dden(device_t *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
-	if (w->in_dden_func.read != NULL)
-		return devcb_call_read_line(&w->in_dden_func);
+	if (!w->in_dden_func.isnull())
+		return w->in_dden_func();
 	else
 		return w->dden;
 }
@@ -441,7 +441,7 @@ static void wd17xx_clear_drq(device_t *device)
 	w->status &= ~STA_2_DRQ;
 
 	w->drq = CLEAR_LINE;
-	devcb_call_write_line(&w->out_drq_func, w->drq);
+	w->out_drq_func(w->drq);
 }
 
 /* set data request */
@@ -455,7 +455,7 @@ static void wd17xx_set_drq(device_t *device)
 	w->status |= STA_2_DRQ;
 
 	w->drq = ASSERT_LINE;
-	devcb_call_write_line(&w->out_drq_func, w->drq);
+	w->out_drq_func(w->drq);
 }
 
 /* clear interrupt request */
@@ -464,7 +464,7 @@ static void	wd17xx_clear_intrq(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	w->intrq = CLEAR_LINE;
-	devcb_call_write_line(&w->out_intrq_func, w->intrq);
+	w->out_intrq_func(w->intrq);
 }
 
 /* set interrupt request */
@@ -476,7 +476,7 @@ static void	wd17xx_set_intrq(device_t *device)
 	w->status &= ~STA_2_DRQ;
 
 	w->intrq = ASSERT_LINE;
-	devcb_call_write_line(&w->out_intrq_func, w->intrq);
+	w->out_intrq_func(w->intrq);
 }
 
 /* set intrq after delay */
@@ -1326,7 +1326,7 @@ WRITE_LINE_DEVICE_HANDLER( wd17xx_dden_w )
 	/* not supported on FD1771, FD1792, FD1794, FD1762 and FD1764 */
 	if (device->type() == WD1771)
 		fatalerror("wd17xx_dden_w: double density input not supported on this model!");
-	else if (w->in_dden_func.read != NULL)
+	else if (!w->in_dden_func.isnull())
 		logerror("wd17xx_dden_w: write has no effect because a read handler is already defined!\n");
 	else
 		w->dden = state;
@@ -2014,9 +2014,9 @@ static DEVICE_START( wd1770 )
 	w->timer_ws = device->machine().scheduler().timer_alloc(FUNC(wd17xx_write_sector_callback), (void *)device);
 
 	/* resolve callbacks */
-	devcb_resolve_read_line(&w->in_dden_func, &w->intf->in_dden_func, device);
-	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
-	devcb_resolve_write_line(&w->out_drq_func, &w->intf->out_drq_func, device);
+	w->in_dden_func.resolve(w->intf->in_dden_func, *device);
+	w->out_intrq_func.resolve(w->intf->out_intrq_func, *device);
+	w->out_drq_func.resolve(w->intf->out_drq_func, *device);
 
 	/* stepping rate depends on the clock */
 	w->stepping_rate[0] = 6;

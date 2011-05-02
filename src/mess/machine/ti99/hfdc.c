@@ -390,11 +390,11 @@ static WRITE_LINE_DEVICE_HANDLER( intrq_w )
 	/* Set INTA */
 	if (state)
 	{
-		devcb_call_write_line(&card->lines.inta, ASSERT_LINE);
+		card->lines.inta(ASSERT_LINE);
 	}
 	else
 	{
-		devcb_call_write_line(&card->lines.inta, CLEAR_LINE);
+		card->lines.inta(CLEAR_LINE);
 	}
 }
 
@@ -656,7 +656,7 @@ static DEVICE_START( ti99_hfdc )
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
+	card->lines.inta.resolve(topeb->inta, *device);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 
 	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);

@@ -139,9 +139,9 @@ static DEVICE_START( dave_sound )
 	memset(dave, 0, sizeof(*dave));
 
 	/* resolve callbacks */
-	devcb_resolve_read8(&dave->reg_r, &intf->reg_r, device);
-	devcb_resolve_write8(&dave->reg_w, &intf->reg_w, device);
-	devcb_resolve_write_line(&dave->int_callback, &intf->int_callback, device);
+	dave->reg_r.resolve(intf->reg_r, *device);
+	dave->reg_w.resolve(intf->reg_w, *device);
+	dave->int_callback.resolve(intf->int_callback, *device);
 
 	/* temp! */
 	dave->nick_virq = 0;
@@ -204,7 +204,7 @@ static void dave_refresh_ints(device_t *device)
 	logerror("int latch: %02x enable: %02x input: %02x\n", (int) dave->int_latch, (int) dave->int_enable, (int) dave->int_input);
 
 	int_wanted = ((dave->int_enable<<1) & dave->int_latch) != 0;
-	devcb_call_write_line(&dave->int_callback, int_wanted);
+	dave->int_callback(int_wanted);
 }
 
 
@@ -650,7 +650,7 @@ WRITE8_DEVICE_HANDLER ( dave_reg_w )
 			break;
 	}
 
-	devcb_call_write8(&dave->reg_w, offset, data);
+	dave->reg_w(offset, data);
 }
 
 
@@ -675,7 +675,7 @@ READ8_DEVICE_HANDLER( dave_reg_r )
 
 	logerror("dave r: %04x\n",offset);
 
-	devcb_call_read8(&dave->reg_r, offset);
+	dave->reg_r(offset);
 
 	switch (offset)
 	{

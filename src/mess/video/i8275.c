@@ -455,7 +455,7 @@ WRITE8_DEVICE_HANDLER( i8275_dack_w )
 		i8275->ypos = 0;
 		i8275->current_row = 0;
 
-		devcb_call_write_line(&i8275->out_drq_func, 0);
+		i8275->out_drq_func(0);
 	}
 }
 
@@ -483,7 +483,7 @@ void i8275_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 		i8275->char_blink_cnt++;
 		if(i8275->char_blink_cnt==64) i8275->char_blink_cnt = 0;
 
-		devcb_call_write_line(&i8275->out_drq_func, 1);
+		i8275->out_drq_func(1);
 	}
 	if (i8275->status_reg & I8275_STATUS_INTERRUPT_ENABLE) {
 		i8275->status_reg |= I8275_STATUS_INTERRUPT_REQUEST;
@@ -512,8 +512,8 @@ static DEVICE_START( i8275 )
 	assert(i8275->screen != NULL);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&i8275->out_drq_func, &i8275->intf->out_drq_func, device);
-	devcb_resolve_write_line(&i8275->out_irq_func, &i8275->intf->out_irq_func, device);
+	i8275->out_drq_func.resolve(i8275->intf->out_drq_func, *device);
+	i8275->out_irq_func.resolve(i8275->intf->out_irq_func, *device);
 
 	/* register for state saving */
 	device->save_item(NAME(i8275->status_reg));

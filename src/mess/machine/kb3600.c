@@ -87,19 +87,19 @@ ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, dev
 void ay3600_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read16(&m_in_x_func[0], &m_in_x0_cb, this);
-	devcb_resolve_read16(&m_in_x_func[1], &m_in_x1_cb, this);
-	devcb_resolve_read16(&m_in_x_func[2], &m_in_x2_cb, this);
-	devcb_resolve_read16(&m_in_x_func[3], &m_in_x3_cb, this);
-	devcb_resolve_read16(&m_in_x_func[4], &m_in_x4_cb, this);
-	devcb_resolve_read16(&m_in_x_func[5], &m_in_x5_cb, this);
-	devcb_resolve_read16(&m_in_x_func[6], &m_in_x6_cb, this);
-	devcb_resolve_read16(&m_in_x_func[7], &m_in_x7_cb, this);
-	devcb_resolve_read16(&m_in_x_func[8], &m_in_x8_cb, this);
-	devcb_resolve_read_line(&m_in_shift_func, &m_in_shift_cb, this);
-	devcb_resolve_read_line(&m_in_control_func, &m_in_control_cb, this);
-	devcb_resolve_write_line(&m_out_data_ready_func, &m_out_data_ready_cb, this);
-	devcb_resolve_write_line(&m_out_ako_func, &m_out_ako_cb, this);
+	m_in_x_func[0].resolve(m_in_x0_cb, *this);
+	m_in_x_func[1].resolve(m_in_x1_cb, *this);
+	m_in_x_func[2].resolve(m_in_x2_cb, *this);
+	m_in_x_func[3].resolve(m_in_x3_cb, *this);
+	m_in_x_func[4].resolve(m_in_x4_cb, *this);
+	m_in_x_func[5].resolve(m_in_x5_cb, *this);
+	m_in_x_func[6].resolve(m_in_x6_cb, *this);
+	m_in_x_func[7].resolve(m_in_x7_cb, *this);
+	m_in_x_func[8].resolve(m_in_x8_cb, *this);
+	m_in_shift_func.resolve(m_in_shift_cb, *this);
+	m_in_control_func.resolve(m_in_control_cb, *this);
+	m_out_data_ready_func.resolve(m_out_data_ready_cb, *this);
+	m_out_ako_func.resolve(m_out_ako_cb, *this);
 
 	// allocate timers
 	m_scan_timer = timer_alloc();
@@ -121,7 +121,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	for (int x = 0; x < 9; x++)
 	{
-		UINT16 data = devcb_call_read16(&m_in_x_func[x], 0);
+		UINT16 data = m_in_x_func[x](0,0xffff);
 
 		for (int y = 0; y < 10; y++)
 		{
@@ -137,14 +137,14 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					b = 0x100 | b;
 				}
 
-				b |= (devcb_call_read_line(&m_in_shift_func) << 6);
-				b |= (devcb_call_read_line(&m_in_control_func) << 7);
+				b |= (m_in_shift_func() << 6);
+				b |= (m_in_control_func() << 7);
 
 				if (m_b != b)
 				{
 					m_b = b;
 
-					devcb_call_write_line(&m_out_data_ready_func, 1);
+					m_out_data_ready_func(1);
 					return;
 				}
 			}
@@ -158,7 +158,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	if (ako != m_ako)
 	{
-		devcb_call_write_line(&m_out_ako_func, ako);
+		m_out_ako_func(ako);
 		m_ako = ako;
 	}
 }
@@ -172,7 +172,7 @@ UINT16 ay3600_device::b_r()
 {
 	UINT16 data = m_b;
 
-	devcb_call_write_line(&m_out_data_ready_func, 0);
+	m_out_data_ready_func(0);
 
 	return data;
 }

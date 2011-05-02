@@ -52,14 +52,14 @@ ieee488_stub_device::ieee488_stub_device(const machine_config &mconfig, const ch
 void ieee488_stub_device::device_start()
 {
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_eoi_func, &m_out_eoi_cb, this);
-    devcb_resolve_write_line(&m_out_dav_func, &m_out_dav_cb, this);
-    devcb_resolve_write_line(&m_out_nrfd_func, &m_out_nrfd_cb, this);
-    devcb_resolve_write_line(&m_out_ndac_func, &m_out_ndac_cb, this);
-    devcb_resolve_write_line(&m_out_ifc_func, &m_out_ifc_cb, this);
-    devcb_resolve_write_line(&m_out_srq_func, &m_out_srq_cb, this);
-    devcb_resolve_write_line(&m_out_atn_func, &m_out_atn_cb, this);
-    devcb_resolve_write_line(&m_out_ren_func, &m_out_ren_cb, this);
+    m_out_eoi_func.resolve(m_out_eoi_cb, *this);
+    m_out_dav_func.resolve(m_out_dav_cb, *this);
+    m_out_nrfd_func.resolve(m_out_nrfd_cb, *this);
+    m_out_ndac_func.resolve(m_out_ndac_cb, *this);
+    m_out_ifc_func.resolve(m_out_ifc_cb, *this);
+    m_out_srq_func.resolve(m_out_srq_cb, *this);
+    m_out_atn_func.resolve(m_out_atn_cb, *this);
+    m_out_ren_func.resolve(m_out_ren_cb, *this);
 }
 
 
@@ -69,7 +69,7 @@ void ieee488_stub_device::device_start()
 
 void ieee488_stub_device::ieee488_eoi(int state)
 {
-	devcb_call_write_line(&m_out_eoi_func, state);
+	m_out_eoi_func(state);
 }
 
 
@@ -79,7 +79,7 @@ void ieee488_stub_device::ieee488_eoi(int state)
 
 void ieee488_stub_device::ieee488_dav(int state)
 {
-	devcb_call_write_line(&m_out_dav_func, state);
+	m_out_dav_func(state);
 }
 
 
@@ -89,7 +89,7 @@ void ieee488_stub_device::ieee488_dav(int state)
 
 void ieee488_stub_device::ieee488_nrfd(int state)
 {
-	devcb_call_write_line(&m_out_nrfd_func, state);
+	m_out_nrfd_func(state);
 }
 
 
@@ -99,7 +99,7 @@ void ieee488_stub_device::ieee488_nrfd(int state)
 
 void ieee488_stub_device::ieee488_ndac(int state)
 {
-	devcb_call_write_line(&m_out_ndac_func, state);
+	m_out_ndac_func(state);
 }
 
 
@@ -109,7 +109,7 @@ void ieee488_stub_device::ieee488_ndac(int state)
 
 void ieee488_stub_device::ieee488_ifc(int state)
 {
-	devcb_call_write_line(&m_out_ifc_func, state);
+	m_out_ifc_func(state);
 }
 
 
@@ -119,7 +119,7 @@ void ieee488_stub_device::ieee488_ifc(int state)
 
 void ieee488_stub_device::ieee488_srq(int state)
 {
-	devcb_call_write_line(&m_out_srq_func, state);
+	m_out_srq_func(state);
 }
 
 
@@ -129,7 +129,7 @@ void ieee488_stub_device::ieee488_srq(int state)
 
 void ieee488_stub_device::ieee488_atn(int state)
 {
-	devcb_call_write_line(&m_out_atn_func, state);
+	m_out_atn_func(state);
 }
 
 
@@ -139,5 +139,5 @@ void ieee488_stub_device::ieee488_atn(int state)
 
 void ieee488_stub_device::ieee488_ren(int state)
 {
-	devcb_call_write_line(&m_out_ren_func, state);
+	m_out_ren_func(state);
 }

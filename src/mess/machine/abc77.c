@@ -362,7 +362,7 @@ inline void abc77_device::serial_output(int state)
 	{
 		m_txd = state;
 
-		devcb_call_write_line(&m_out_txd_func, m_txd);
+		m_out_txd_func(m_txd);
 	}
 }
 
@@ -375,7 +375,7 @@ inline void abc77_device::serial_clock()
 {
 	m_clock = !m_clock;
 
-	devcb_call_write_line(&m_out_clock_func, !m_clock);
+	m_out_clock_func(!m_clock);
 }
 
 
@@ -387,7 +387,7 @@ inline void abc77_device::key_down(int state)
 {
 	if (m_keydown != state)
 	{
-		devcb_call_write_line(&m_out_keydown_func, state);
+		m_out_keydown_func(state);
 		m_keydown = state;
 	}
 }
@@ -427,9 +427,9 @@ void abc77_device::device_start()
 	m_reset_timer = timer_alloc(TIMER_RESET);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_txd_func, &m_out_txd_cb, this);
-    devcb_resolve_write_line(&m_out_clock_func, &m_out_clock_cb, this);
-    devcb_resolve_write_line(&m_out_keydown_func, &m_out_keydown_cb, this);
+    m_out_txd_func.resolve(m_out_txd_cb, *this);
+    m_out_clock_func.resolve(m_out_clock_cb, *this);
+    m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 }
 
 

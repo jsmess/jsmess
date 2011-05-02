@@ -100,9 +100,9 @@ static DEVICE_START( centronics )
 	centronics->printer = device->subdevice("printer");
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&centronics->out_ack_func, &intf->out_ack_func, device);
-	devcb_resolve_write_line(&centronics->out_busy_func, &intf->out_busy_func, device);
-	devcb_resolve_write_line(&centronics->out_not_busy_func, &intf->out_not_busy_func, device);
+	centronics->out_ack_func.resolve(intf->out_ack_func, *device);
+	centronics->out_busy_func.resolve(intf->out_busy_func, *device);
+	centronics->out_not_busy_func.resolve(intf->out_not_busy_func, *device);
 
 	/* register for state saving */
 	device->save_item(NAME(centronics->auto_fd));
@@ -167,7 +167,7 @@ static TIMER_CALLBACK( ack_callback )
 	centronics_state *centronics = (centronics_state *)ptr;
 
 	/* signal change */
-	devcb_call_write_line(&centronics->out_ack_func, param);
+	centronics->out_ack_func(param);
 	centronics->ack = param;
 
 	if (param == FALSE)
@@ -186,8 +186,8 @@ static TIMER_CALLBACK( busy_callback )
 	centronics_state *centronics = (centronics_state *)ptr;
 
 	/* signal change */
-	devcb_call_write_line(&centronics->out_busy_func, param);
-	devcb_call_write_line(&centronics->out_not_busy_func, !param);
+	centronics->out_busy_func(param);
+	centronics->out_not_busy_func(!param);
 	centronics->busy = param;
 
 	if (param == TRUE)

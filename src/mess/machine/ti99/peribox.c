@@ -208,7 +208,7 @@ static WRITE_LINE_DEVICE_HANDLER( inta )
 	}
 	// Call back the main system, setting the line to L if any PEB card set it to L
 	// This is the case when inta_state is not 0
-	devcb_call_write_line( &peb->lines.inta, (peb->inta_state == 0) );
+	peb->lines.inta((peb->inta_state == 0));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( intb )
@@ -219,7 +219,7 @@ static WRITE_LINE_DEVICE_HANDLER( intb )
 		peb->intb_state &= ~(1 << slot);
 	else
 		peb->intb_state |= (1 << slot);
-	devcb_call_write_line( &peb->lines.intb, (peb->intb_state == 0) );
+	peb->lines.intb((peb->intb_state == 0));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ready )
@@ -230,7 +230,7 @@ static WRITE_LINE_DEVICE_HANDLER( ready )
 		peb->ready_state &= ~(1 << slot);
 	else
 		peb->ready_state |= (1 << slot);
-	devcb_call_write_line( &peb->lines.ready, (peb->ready_state == 0) );
+	peb->lines.ready((peb->ready_state == 0));
 }
 
 /*
@@ -402,9 +402,9 @@ static DEVICE_START( ti99_peb )
 	devcb_write_line intb = DEVCB_LINE(pebconf->intb);
 	devcb_write_line ready = DEVCB_LINE(pebconf->ready);
 
-	devcb_resolve_write_line(&peb->lines.ready, &ready, device);
-	devcb_resolve_write_line(&peb->lines.inta, &inta, device);
-	devcb_resolve_write_line(&peb->lines.intb, &intb, device);
+	peb->lines.ready.resolve(ready, *device);
+	peb->lines.inta.resolve(inta, *device);
+	peb->lines.intb.resolve(intb, *device);
 
 	peb->address_prefix = (pebconf->amx << 16);
 }

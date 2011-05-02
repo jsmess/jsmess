@@ -70,8 +70,8 @@ void fmscsi_device::device_start()
     m_target = 0;
     m_phase = SCSI_PHASE_BUS_FREE;
 
-    devcb_resolve_write_line(&m_irq_func,&irq_callback,this);
-    devcb_resolve_write_line(&m_drq_func,&drq_callback,this);
+    m_irq_func.resolve(irq_callback,*this);
+    m_drq_func.resolve(drq_callback,*this);
 
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
@@ -158,7 +158,7 @@ void fmscsi_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		//logerror("FMSCSI: timer triggered: %i/%i\n",m_result_index,m_result_length);
 		if(m_output_lines & FMSCSI_LINE_DMAE)
 		{
-			devcb_call_write_line(&m_drq_func,1);
+			m_drq_func(1);
 		}
 		break;
 	case TIMER_PHASE:
@@ -188,7 +188,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
-				devcb_call_write_line(&m_drq_func,0);
+				m_drq_func(0);
 			}
 			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
 		}
@@ -252,7 +252,7 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
-				devcb_call_write_line(&m_drq_func,0);
+				m_drq_func(0);
 			}
 			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
 		}
@@ -363,7 +363,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 			if(m_output_lines & FMSCSI_LINE_IMSK && m_phase != SCSI_PHASE_DATAIN && m_phase != SCSI_PHASE_DATAOUT)
 			{
 				set_input_line(FMSCSI_LINE_INT,1);
-				devcb_call_write_line(&m_irq_func,1);
+				m_irq_func(1);
 				logerror("FMSCSI: IRQ high\n");
 			}
 		}
@@ -372,7 +372,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 			if(m_output_lines & FMSCSI_LINE_IMSK && m_phase != SCSI_PHASE_DATAIN && m_phase != SCSI_PHASE_DATAOUT)
 			{
 				set_input_line(FMSCSI_LINE_INT,0);
-				devcb_call_write_line(&m_irq_func,0);
+				m_irq_func(0);
 				logerror("FMSCSI: IRQ low\n");
 			}
 		}

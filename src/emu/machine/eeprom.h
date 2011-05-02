@@ -110,6 +110,7 @@ protected:
 	// runtime state
 	int 					m_serial_count;
 	UINT8					m_serial_buffer[SERIAL_BUFFER_LENGTH];
+	int						m_data_buffer;
 	int 					m_read_address;
 	int 					m_clock_count;
 	int 					m_latch;
@@ -117,7 +118,7 @@ protected:
 	int						m_clock_line;
 	int						m_sending;
 	int 					m_locked;
-	int 					m_reset_delay;
+	int 					m_reset_counter;
 };
 
 

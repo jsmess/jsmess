@@ -66,12 +66,12 @@ lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, dev
 void lh5810_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_porta_r_func, &m_porta_r_cb, this);
-	devcb_resolve_write8(&m_porta_w_func, &m_porta_w_cb, this);
-	devcb_resolve_read8(&m_portb_r_func, &m_portb_r_cb, this);
-	devcb_resolve_write8(&m_portb_w_func, &m_portb_w_cb, this);
-	devcb_resolve_write8(&m_portc_w_func, &m_portc_w_cb, this);
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	m_porta_r_func.resolve(m_porta_r_cb, *this);
+	m_porta_w_func.resolve(m_porta_w_cb, *this);
+	m_portb_r_func.resolve(m_portb_r_cb, *this);
+	m_portb_w_func.resolve(m_portb_w_cb, *this);
+	m_portc_w_func.resolve(m_portc_w_cb, *this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_irq));
@@ -108,7 +108,7 @@ READ8_MEMBER( lh5810_device::data_r )
 			return m_reg[offset];
 
 		case LH5810_IF:
-			if (BIT(devcb_call_read8(&m_portb_r_func, 0) & ~m_reg[LH5810_DDB], 7))
+			if (BIT(m_portb_r_func(0) & ~m_reg[LH5810_DDB], 7))
 				m_reg[offset] |= 2;
 			else
 				m_reg[offset] &= 0xfd;
@@ -119,12 +119,12 @@ READ8_MEMBER( lh5810_device::data_r )
 			return (m_reg[offset]&0x0f) | (m_irq<<4) | (BIT(m_reg[LH5810_OPB],7)<<5);
 
 		case LH5810_OPA:
-			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDA]) | (devcb_call_read8(&m_porta_r_func, 0) & ~m_reg[LH5810_DDA]);
+			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDA]) | (m_porta_r_func(0) & ~m_reg[LH5810_DDA]);
 			return m_reg[offset];
 
 		case LH5810_OPB:
-			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDB]) | (devcb_call_read8(&m_portb_r_func, 0) & ~m_reg[LH5810_DDB]);
-			devcb_call_write_line(&m_out_int_func, (m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDB]) | (m_portb_r_func(0) & ~m_reg[LH5810_DDB]);
+			m_out_int_func((m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			return m_reg[offset];
 
 		default:
@@ -174,18 +174,18 @@ WRITE8_MEMBER( lh5810_device::data_w )
 
 		case LH5810_OPA:
 			m_reg[offset] = (data & m_reg[LH5810_DDA]) | (m_reg[offset] & ~m_reg[LH5810_DDA]);
-			devcb_call_write8(&m_porta_w_func, 0, m_reg[offset]);
+			m_porta_w_func(0, m_reg[offset]);
 			break;
 
 		case LH5810_OPB:
 			m_reg[offset] = (data & m_reg[LH5810_DDB]) | (m_reg[offset] & ~m_reg[LH5810_DDB]);
-			devcb_call_write8(&m_portb_w_func, 0, m_reg[offset]);
-			devcb_call_write_line(&m_out_int_func, (m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			m_portb_w_func(0, m_reg[offset]);
+			m_out_int_func((m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case LH5810_OPC:
 			m_reg[offset] = data;
-			devcb_call_write8(&m_portc_w_func, 0, m_reg[offset]);
+			m_portc_w_func(0, m_reg[offset]);
 			break;
 	}
 }

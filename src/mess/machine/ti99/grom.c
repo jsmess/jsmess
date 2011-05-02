@@ -270,9 +270,9 @@ static DEVICE_START( ti99grom )
 	grom->rollover = gromconf->rollover;
 
 	devcb_write_line ready = DEVCB_LINE(gromconf->ready);
-	devcb_resolve_write_line(&grom->gromready, &ready, device);
+	grom->gromready.resolve(ready, *device);
 	// Test
-	// devcb_call_write_line(&grom->gromready, ASSERT_LINE);
+	// grom->gromready(ASSERT_LINE);
 }
 
 static DEVICE_STOP( ti99grom )

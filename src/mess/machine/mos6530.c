@@ -99,8 +99,8 @@ INLINE void update_irqstate(device_t *device)
 	if ( miot->irqenable )
 		out = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
 
-	if (miot->port[1].out_port_func.target != NULL)
-		devcb_call_write8(&miot->port[1].out_port_func, 0, out);
+	if (!miot->port[1].out_port_func.isnull())
+		miot->port[1].out_port_func(0, out);
 	else
 		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", device->tag());
 }
@@ -224,8 +224,8 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 				data = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( data & 0x7F );
 			}
 
-			if (port->out_port_func.target != NULL)
-				devcb_call_write8(&port->out_port_func, 0, data);
+			if (!port->out_port_func.isnull())
+				port->out_port_func(0, data);
 			else
 				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine().firstcpu), data);
 		}
@@ -284,9 +284,9 @@ READ8_DEVICE_HANDLER( mos6530_r )
 				out = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
 
 			/* call the input callback if it exists */
-			if (port->in_port_func.target != NULL)
+			if (!port->in_port_func.isnull())
 			{
-				port->in = devcb_call_read8(&port->in_port_func, 0);
+				port->in = port->in_port_func(0);
 			}
 			else
 				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine().firstcpu));
@@ -388,10 +388,10 @@ static DEVICE_START( mos6530 )
 	miot->clock = device->clock();
 
 	/* resolve callbacks */
-	devcb_resolve_read8(&miot->port[0].in_port_func, &intf->in_pa_func, device);
-	devcb_resolve_read8(&miot->port[1].in_port_func, &intf->in_pb_func, device);
-	devcb_resolve_write8(&miot->port[0].out_port_func, &intf->out_pa_func, device);
-	devcb_resolve_write8(&miot->port[1].out_port_func, &intf->out_pb_func, device);
+	miot->port[0].in_port_func.resolve(intf->in_pa_func, *device);
+	miot->port[1].in_port_func.resolve(intf->in_pb_func, *device);
+	miot->port[0].out_port_func.resolve(intf->out_pa_func, *device);
+	miot->port[1].out_port_func.resolve(intf->out_pb_func, *device);
 
 	/* allocate timers */
 	miot->timer = device->machine().scheduler().timer_alloc(FUNC(timer_end_callback), (void *)device);

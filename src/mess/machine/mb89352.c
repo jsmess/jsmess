@@ -149,8 +149,8 @@ void mb89352_device::device_start()
     	m_spc_status |= SSTS_TC_ZERO;
     m_ints = 0x00;
 
-    devcb_resolve_write_line(&m_irq_func,&irq_callback,this);
-    devcb_resolve_write_line(&m_drq_func,&drq_callback,this);
+    m_irq_func.resolve(irq_callback,*this);
+    m_drq_func.resolve(drq_callback,*this);
 
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
@@ -233,7 +233,7 @@ void mb89352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_TRANSFER:
 		// TODO: check interrupts are actually enabled
 		{
-			devcb_call_write_line(&m_drq_func,1);
+			m_drq_func(1);
 		}
 		break;
 	}
@@ -537,7 +537,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 		break;
 	case 0x04:  // INTS - Interrupt Sense
 		m_ints &= ~data;  // resets relevant status bits to zero
-		devcb_call_write_line(&m_irq_func,0);  // clear IRQ
+		m_irq_func(0);  // clear IRQ
 		logerror("mb89352: Reset INTS status bits %02x\n",data);
 		break;
 	case 0x08:  // PCTL - Phase control

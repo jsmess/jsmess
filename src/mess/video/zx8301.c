@@ -142,7 +142,7 @@ void zx8301_device::device_start()
 	assert(m_screen != NULL);
 
 	// resolve callbacks
-    devcb_resolve_write_line(&m_out_vsync_func, &out_vsync_cb, this);
+    m_out_vsync_func.resolve(out_vsync_cb, *this);
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
@@ -172,7 +172,7 @@ void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_VSYNC:
 		//m_vsync = !m_vsync;
-		devcb_call_write_line(&m_out_vsync_func, m_vsync);
+		m_out_vsync_func(m_vsync);
 		break;
 
 	case TIMER_FLASH:

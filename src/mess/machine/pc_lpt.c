@@ -84,7 +84,7 @@ static DEVICE_START( pc_lpt )
 	assert(lpt->centronics != NULL);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&lpt->out_irq_func, &intf->out_irq_func, device);
+	lpt->out_irq_func.resolve(intf->out_irq_func, *device);
 
 	/* register for state saving */
 	device->save_item(NAME(lpt->ack));
@@ -143,8 +143,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w )
 	if (lpt->irq_enabled && lpt->ack == TRUE && state == FALSE)
 	{
 		/* pulse irq when going from high to low */
-		devcb_call_write_line(&lpt->out_irq_func, TRUE);
-		devcb_call_write_line(&lpt->out_irq_func, FALSE);
+		lpt->out_irq_func(TRUE);
+		lpt->out_irq_func(FALSE);
 	}
 
 	lpt->ack = state;

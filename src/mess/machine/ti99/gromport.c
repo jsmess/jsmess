@@ -206,7 +206,7 @@ static WRITE_LINE_DEVICE_HANDLER( cart_grom_ready )
 {
 	device_t *cartdev = device->owner()->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartdev);
-	devcb_call_write_line( &cartslots->ready, state );
+	cartslots->ready(state);
 }
 
 /*
@@ -1577,7 +1577,7 @@ static DEVICE_START(ti99_multicart)
 
 	devcb_write_line ready = DEVCB_LINE(cartconf->ready);
 
-	devcb_resolve_write_line(&cartslots->ready, &ready, device);
+	cartslots->ready.resolve(ready, *device);
 
 	cartslots->gk_slot = -1;
 	cartslots->gk_guest_slot = -1;

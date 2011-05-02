@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 				card->cru_register &= ~(1 << bit);
 
 			if (bit == 6)
-				devcb_call_write_line(&card->lines.inta, (card->cru_register & cru_reg_int_en) && card->ide_irq);
+				card->lines.inta((card->cru_register & cru_reg_int_en) && card->ide_irq);
 
 			if ((bit == 6) || (bit == 7))
 				if ((card->cru_register & cru_reg_int_en) && !(card->cru_register & cru_reg_reset))
@@ -328,7 +328,7 @@ static void ide_interrupt_callback(device_t *device, int state)
 	tn_ide_state *card = get_safe_token(device->owner());
 	card->ide_irq = state;
 	if (card->cru_register & cru_reg_int_en)
-		devcb_call_write_line(&card->lines.inta, state);
+		card->lines.inta(state);
 }
 
 /*
@@ -339,7 +339,7 @@ static void clock_interrupt_callback(device_t *device, int state)
 {
 	tn_ide_state *card = get_safe_token(device->owner());
 	card->clk_irq = state;
-	devcb_call_write_line(&card->lines.inta, state);
+	card->lines.inta(state);
 }
 
 
@@ -350,7 +350,7 @@ static DEVICE_START( tn_ide )
 	card->ide = device->subdevice("ide");
 
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
+	card->lines.inta.resolve(topeb->inta, *device);
 
 	card->ram = auto_alloc_array(device->machine(), UINT8, 0x080000);
 	card->sram_enable_dip = 0;
