@@ -7,7 +7,19 @@
 	TODO:
 	- RTC check still fails
 
-    DASM notes:
+		000061D0: 61FF FFFF F24E                                      bsr     $5420; (2+)
+		000061D6: 4640                                                not.w   D0
+		000061D8: 6704                                                beq     $61de
+		000061DA: B440                                                cmp.w   D0, D2
+		000061DC: 6704                                                beq     $61e2 <---------------- D0 and D2 must be equal there
+		000061DE: 70FF                                                moveq   #-$1, D0
+		000061E0: 6002                                                bra     $61e4
+		000061E2: 4280                                                clr.l   D0
+		000061E4: 4CEE 0C04 FFF4                                      movem.l (-$c,A6), D2/A2-A3
+		000061EA: 4E5E                                                unlk    A6
+		000061EC: 4E75                                                rts
+
+	DASM notes:
     - Jumping to 0x21ee means that the system POST failed
     - 0x258c: ROM test (check with 0x1a)
 
