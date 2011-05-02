@@ -485,6 +485,7 @@ static DEVICE_START( ti99_bwg )
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 	card->lines.ready.resolve(topeb->ready, *device);
+	card->lines.intb.resolve(topeb->intb, *device);
 
 	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 	card->controller = device->subdevice("wd1773");
