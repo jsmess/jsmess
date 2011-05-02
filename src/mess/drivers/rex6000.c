@@ -14,6 +14,13 @@
         0x0b00 - 0x0bff     second flash chip
         0x1000 - 0x1003     32KB RAM
 
+        TODO:
+        - deleting all Memos causes an error
+        - alarm doesn't work
+        - alarm sound and keyclick
+        - NVRAM and warm start (without the pen calibration)
+        - serial I/O
+
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -98,6 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER( irq_w );
 	DECLARE_READ8_MEMBER( touchscreen_r );
 	DECLARE_WRITE8_MEMBER( touchscreen_w );
+	DECLARE_WRITE_LINE_MEMBER( alarm_irq );
 
 	DECLARE_READ8_MEMBER( flash_0x0000_r );
 	DECLARE_WRITE8_MEMBER( flash_0x0000_w );
@@ -544,6 +552,15 @@ static TIMER_DEVICE_CALLBACK( sec_timer )
 	}
 }
 
+WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
+{
+	if (!(m_irq_mask & IRQ_FLAG_ALARM) & state)
+	{
+		m_irq_flag |= IRQ_FLAG_ALARM;
+		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+	}
+}
+
 
 static PALETTE_INIT( rex6000 )
 {
@@ -627,7 +644,7 @@ GFXDECODE_END
 
 static RP5C01_INTERFACE( rtc_intf )
 {
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(rex6000_state, alarm_irq)
 };
 
 static MACHINE_CONFIG_START( rex6000, rex6000_state )
