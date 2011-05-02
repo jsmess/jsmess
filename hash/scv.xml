@@ -106,7 +106,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	<software name="bouldash">
 		<description>Boulder Dash</description>
 		<year>1985</year>
-		<publisher>Epoch></publisher>
+		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="boulder_dash.bin" size="16384" crc="e045884c" sha1="55942e5b7824314b072b7b40c6b72db0d5404189" offset="0" />
@@ -137,7 +137,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-    <software name="dragondh">
+    <software name="dball">
         <description>Dragon Ball - Dragon Dai Hikyou</description>
         <year>1986</year>
         <publisher>Epoch</publisher>
@@ -148,7 +148,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
         </part>
     </software>
 
-	<software name="dragonsl">
+	<software name="dslayer">
 		<description>Dragonslayer</description>
 		<year>1986</year>
 		<publisher>Epoch</publisher>
@@ -207,7 +207,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="mlkprncs">
+	<software name="milkyprn">
 		<description>Milky Princess</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
@@ -337,14 +337,14 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-                       <dataarea name="rom" size="40960">
-                               <rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0" />
-                               <rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="0x8000" />
-                       </dataarea>
+			<dataarea name="rom" size="40960">
+				<rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0" />
+				<rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="0x8000" />
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="shoginyu">
+	<software name="shogi">
 		<description>Shougi Nyuumon</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
