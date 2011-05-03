@@ -36,6 +36,9 @@ public:
 	WRITE32_MEMBER( irq_status_w );
 	READ32_MEMBER( irq_mask_r );
 	WRITE32_MEMBER( irq_mask_w );
+	READ32_MEMBER( modisk_r );
+	READ32_MEMBER( network_r );
+	READ32_MEMBER( unk_r );
 
 	UINT32 m_scr2;
 	UINT32 m_irq_status;

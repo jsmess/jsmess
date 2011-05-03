@@ -22,6 +22,7 @@
 	DASM notes:
     - Jumping to 0x21ee means that the system POST failed
     - 0x258c: ROM test (check with 0x1a)
+    - currently fails at 0xfee sub-routine (jumping it starts the MO disk check)
 
 ****************************************************************************/
 
@@ -159,15 +160,35 @@ WRITE32_MEMBER( next_state::irq_mask_w )
 	COMBINE_DATA(&m_irq_mask);
 }
 
+READ32_MEMBER( next_state::modisk_r)
+{
+	return 0; // return 0 atm
+}
+
+READ32_MEMBER( next_state::network_r)
+{
+	return 0xffffffff;//machine().rand(); // return 0 atm
+}
+
+READ32_MEMBER( next_state::unk_r)
+{
+	return 0xffffffff;//machine().rand(); // return 0 atm
+}
+
 static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x02006000, 0x02006003) AM_MIRROR(0x100000) AM_READ(unk_r)
 	AM_RANGE(0x02007000, 0x02007003) AM_MIRROR(0x100000) AM_READWRITE(irq_status_r,irq_status_w)
 	AM_RANGE(0x02007800, 0x02007803) AM_MIRROR(0x100000) AM_READWRITE(irq_mask_r,irq_mask_w)
 
 	AM_RANGE(0x0200c000, 0x0200c003) AM_MIRROR(0x100000) AM_READ(scr1_r)
 	AM_RANGE(0x0200c800, 0x0200c803) AM_MIRROR(0x100000) AM_READ(rom_map_r)
 	AM_RANGE(0x0200d000, 0x0200d003) AM_MIRROR(0x100000) AM_READWRITE(scr2_r,scr2_w)
+	AM_RANGE(0x0200e000, 0x0200e00f) AM_MIRROR(0x100000) AM_READ(unk_r) //keyboard
+
+	AM_RANGE(0x02012004, 0x02012007) AM_MIRROR(0x100000) AM_READ(modisk_r)
+	AM_RANGE(0x0201a000, 0x0201a003) AM_MIRROR(0x100000) AM_READ(network_r)
 
 	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x100000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
 
