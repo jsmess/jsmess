@@ -7,10 +7,7 @@
 
 
 #include "emu.h"
-#include "sound/speaker.h"
-#include "machine/i2cmem.h"
 #include "includes/pokemini.h"
-#include "cpu/minx/minx.h"
 
 
 static void pokemini_check_irqs( running_machine &machine )
@@ -1440,10 +1437,10 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 				int x, y;
 				for ( y = 0; y < 8; y++ ) {
 					for ( x = 0; x < 12; x++ ) {
-						UINT8 tile = state->m_ram[ 0x360 + ( y * state->m_prc.map_size_x ) + x ];
+						UINT8 tile = state->m_p_ram[ 0x360 + ( y * state->m_prc.map_size_x ) + x ];
 						int i;
 						for( i = 0; i < 8; i++ ) {
-							state->m_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space->read_byte( state->m_prc.bg_tiles + ( tile * 8 ) + i );
+							state->m_p_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space->read_byte( state->m_prc.bg_tiles + ( tile * 8 ) + i );
 						}
 					}
 				}
@@ -1456,10 +1453,10 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 
 				for ( spr = 0x35C; spr >= 0x300; spr -= 4 )
 				{
-					int		spr_x = ( state->m_ram[ spr + 0 ] & 0x7F ) - 16;
-					int		spr_y = ( state->m_ram[ spr + 1 ] & 0x7F ) - 16;
-					UINT8	spr_tile = state->m_ram[ spr + 2 ];
-					UINT8	spr_flag = state->m_ram[ spr + 3 ];
+					int		spr_x = ( state->m_p_ram[ spr + 0 ] & 0x7F ) - 16;
+					int		spr_y = ( state->m_p_ram[ spr + 1 ] & 0x7F ) - 16;
+					UINT8	spr_tile = state->m_p_ram[ spr + 2 ];
+					UINT8	spr_flag = state->m_p_ram[ spr + 3 ];
 
 					if ( spr_flag & 0x08 )
 					{
@@ -1493,10 +1490,10 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 										{
 											if ( mask & 0x8000 )
 											{
-												state->m_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												state->m_p_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												if ( gfx & 0x8000 )
 												{
-													state->m_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
+													state->m_p_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												}
 											}
 											mask <<= 1;
@@ -1506,10 +1503,10 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 										{
 											if ( mask & 0x0001 )
 											{
-												state->m_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												state->m_p_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												if ( gfx & 0x0001 )
 												{
-													state->m_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
+													state->m_p_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												}
 											}
 											mask >>= 1;
@@ -1534,7 +1531,7 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 
 				for( y = 0; y < 64; y += 8 ) {
 					for( x = 0; x < 96; x++ ) {
-						UINT8 data = state->m_ram[ ( y * 12 ) + x ];
+						UINT8 data = state->m_p_ram[ ( y * 12 ) + x ];
 
 						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 0, x) = ( data & 0x01 ) ? 3 : 0;
 						*BITMAP_ADDR16(machine.generic.tmpbitmap, y + 1, x) = ( data & 0x02 ) ? 3 : 0;
@@ -1559,31 +1556,30 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 }
 
 
-MACHINE_START( pokemini )
+MACHINE_START_MEMBER( pokemini_state )
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
 	/* Clear internal structures */
-	memset( &state->m_prc, 0, sizeof(state->m_prc) );
-	memset( &state->m_timers, 0, sizeof(state->m_timers) );
-	memset( state->m_pm_reg, 0, sizeof(state->m_pm_reg) );
+	memset( &m_prc, 0, sizeof(m_prc) );
+	memset( &m_timers, 0, sizeof(m_timers) );
+	memset( m_pm_reg, 0, sizeof(m_pm_reg) );
 
 	/* Set up timers */
-	state->m_timers.seconds_timer = machine.scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
-	state->m_timers.seconds_timer->adjust( attotime::zero, 0, attotime::from_seconds( 1 ) );
+	m_timers.seconds_timer = machine().scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
+	m_timers.seconds_timer->adjust( attotime::zero, 0, attotime::from_seconds( 1 ) );
 
-	state->m_timers.hz256_timer = machine.scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
-	state->m_timers.hz256_timer->adjust( attotime::zero, 0, attotime::from_hz( 256 ) );
+	m_timers.hz256_timer = machine().scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
+	m_timers.hz256_timer->adjust( attotime::zero, 0, attotime::from_hz( 256 ) );
 
-	state->m_timers.timer1 = machine.scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
-	state->m_timers.timer1_hi = machine.scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
-	state->m_timers.timer2 = machine.scheduler().timer_alloc(FUNC(pokemini_timer2_callback));
-	state->m_timers.timer2_hi = machine.scheduler().timer_alloc(FUNC(pokemini_timer2_hi_callback));
-	state->m_timers.timer3 = machine.scheduler().timer_alloc(FUNC(pokemini_timer3_callback));
-	state->m_timers.timer3_hi = machine.scheduler().timer_alloc(FUNC(pokemini_timer3_hi_callback));
+	m_timers.timer1 = machine().scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
+	m_timers.timer1_hi = machine().scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
+	m_timers.timer2 = machine().scheduler().timer_alloc(FUNC(pokemini_timer2_callback));
+	m_timers.timer2_hi = machine().scheduler().timer_alloc(FUNC(pokemini_timer2_hi_callback));
+	m_timers.timer3 = machine().scheduler().timer_alloc(FUNC(pokemini_timer3_callback));
+	m_timers.timer3_hi = machine().scheduler().timer_alloc(FUNC(pokemini_timer3_hi_callback));
 
 	/* Set up the PRC */
-	state->m_prc.max_frame_count = 2;
-	state->m_prc.count_timer = machine.scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
-	state->m_prc.count_timer->adjust( attotime::zero, 0, machine.device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
+	m_prc.max_frame_count = 2;
+	m_prc.count_timer = machine().scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
+	m_prc.count_timer->adjust( attotime::zero, 0, m_maincpu->cycles_to_attotime(55640 / 65) );
 }
 

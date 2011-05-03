@@ -7,6 +7,14 @@
 #ifndef POKEMINI_H_
 #define POKEMINI_H_
 
+#include "sound/speaker.h"
+#include "machine/i2cmem.h"
+#include "cpu/minx/minx.h"
+#include "imagedev/cartslot.h"
+#include "rendlay.h"
+
+#define MACHINE_START_MEMBER(name) void name::machine_start()
+
 typedef struct
 {
 	UINT8		colors_inverted;
@@ -41,18 +49,21 @@ class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
 
-	UINT8 *m_ram;
+	required_device<cpu_device> m_maincpu;
+	UINT8 *m_p_ram;
 	UINT8 m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;
+	virtual void machine_start();
 };
 
 
 /*----------- defined in machine/pokemini.c -----------*/
 
-MACHINE_START( pokemini );
 WRITE8_DEVICE_HANDLER( pokemini_hwreg_w );
 READ8_DEVICE_HANDLER( pokemini_hwreg_r );
 
