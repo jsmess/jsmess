@@ -158,7 +158,8 @@ const rom_entry *isa8_hdc_device::device_rom_region() const
 
 isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_HDC, "ISA8_HDC", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this)
 {
 	m_shortname = "hdc";
 }
@@ -169,8 +170,7 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag,
 
 void isa8_hdc_device::device_start()
 {
-	m_isa = machine().device<isa8_device>(m_isa_tag);
-	m_isa->add_isa_card(this, m_isa_num);
+	m_isa = machine().device<isa8_device>("mb:isa");
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
 	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);

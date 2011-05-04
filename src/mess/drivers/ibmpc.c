@@ -257,9 +257,13 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
 #include "machine/isa.h"
+#include "machine/isa_adlib.h"
 #include "machine/isa_com.h"
 #include "machine/isa_fdc.h"
+#include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
+#include "machine/isa_sblaster.h"
+
 #include "machine/kb_keytro.h"
 #include "video/pc_cga.h"
 #include "includes/genpc.h"
@@ -311,6 +315,17 @@ static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
+static const slot_interface isa_slot_intf[] =
+{
+	{ "com", ISA8_COM },
+	{ "fdc", ISA8_FDC },
+	{ "hdc", ISA8_HDC },
+	{ "adlib", ISA8_ADLIB },
+	{ "gblaster", ISA8_GAME_BLASTER },
+	{ "sblaster", ISA8_SOUND_BLASTER_1_0 },
+	{ NULL, NULL }
+};
+
 static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
@@ -323,10 +338,13 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-
-    MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
+    
+	MCFG_ISA8_SLOT_ADD("mb:isa", 1, "isa1", isa_slot_intf, "com")
+	MCFG_ISA8_SLOT_ADD("mb:isa", 2, "isa2", isa_slot_intf, "fdc")
+	MCFG_ISA8_SLOT_ADD("mb:isa", 3, "isa3", isa_slot_intf, "hdc")
+	MCFG_ISA8_SLOT_ADD("mb:isa", 4, "isa4", isa_slot_intf, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa", 5, "isa5", isa_slot_intf, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa", 6, "isa6", isa_slot_intf, NULL)
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
@@ -352,10 +370,13 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
-    MCFG_ISA8_BUS_DEVICE("mb:isa", 1, "com", ISA8_COM)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 2, "fdc", ISA8_FDC)
-	MCFG_ISA8_BUS_DEVICE("mb:isa", 3, "hdc", ISA8_HDC)
-
+	MCFG_ISA8_SLOT_ADD("mb:isa", 1, "isa1", isa_slot_intf, "com")
+	MCFG_ISA8_SLOT_ADD("mb:isa", 2, "isa2", isa_slot_intf, "fdc")
+	MCFG_ISA8_SLOT_ADD("mb:isa", 3, "isa3", isa_slot_intf, "hdc")
+	MCFG_ISA8_SLOT_ADD("mb:isa", 4, "isa4", isa_slot_intf, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa", 5, "isa5", isa_slot_intf, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa", 6, "isa6", isa_slot_intf, NULL)
+	
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 

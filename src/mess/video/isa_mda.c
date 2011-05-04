@@ -112,7 +112,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
-	MCFG_GFXDECODE(pcmda)
+	//MCFG_GFXDECODE(pcmda)
 
 	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
 MACHINE_CONFIG_END
@@ -159,7 +159,8 @@ const rom_entry *isa8_mda_device::device_rom_region() const
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_MDA, "ISA8_MDA", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this)
 {
 	m_shortname = "mda";
 }
@@ -170,8 +171,7 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag,
 
 void isa8_mda_device::device_start()
 {
-	m_isa = machine().device<isa8_device>(m_isa_tag);
-	m_isa->add_isa_card(this, m_isa_num);
+	m_isa = machine().device<isa8_device>("mb:isa");
 	videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(pc_MDA_r), FUNC(pc_MDA_w) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);
@@ -532,7 +532,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
 
-	MCFG_GFXDECODE(pcherc)
+	//MCFG_GFXDECODE(pcherc)
 
 	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
 MACHINE_CONFIG_END
@@ -588,7 +588,7 @@ isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const 
 void isa8_hercules_device::device_start()
 {
 	videoram = auto_alloc_array(machine(), UINT8, 0x10000);
-	m_isa = machine().device<isa8_device>(m_isa_tag);
+	m_isa = machine().device<isa8_device>("mb:isa");
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(hercules_r), FUNC(hercules_w) );
 	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", videoram);
 

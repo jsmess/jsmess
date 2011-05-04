@@ -56,16 +56,38 @@
     MCFG_DEVICE_CONFIG(_config) \
     isa8_device::static_set_cputag(*device, _cputag); \
 
-#define MCFG_ISA8_BUS_DEVICE(_isatag, _num, _tag, _dev_type) \
-    MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	device_isa8_card_interface::static_set_isa8_tag(*device, _isatag); \
-	device_isa8_card_interface::static_set_isa8_num(*device, _num); \
+#define MCFG_ISA8_SLOT_ADD(_isatag, _num, _tag, _slot_intf, _def_slot) \
+    MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot) \
+	isa8_slot_device::static_set_isa8_slot(*device, _isatag, _num); \
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class isa8_device;
+
+class isa8_slot_device : public device_t,                    
+						 public device_slot_interface
+{
+public:
+	// construction/destruction
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// device-level overrides
+	virtual void device_start();
+
+    // inline configuration
+    static void static_set_isa8_slot(device_t &device, const char *tag, int num);
+private:	
+	// configuration
+	const char *m_isa_tag;
+	int m_isa_num;
+	isa8_device  *m_isa;		
+};
+
+// device type definition
+extern const device_type ISA8_SLOT;
 
 // ======================> isabus_interface
 
@@ -82,9 +104,8 @@ struct isabus_interface
     devcb_write_line	m_out_drq3_cb;
 };
 
-
-// ======================> isa8_device
 class device_isa8_card_interface;
+// ======================> isa8_device
 class isa8_device : public device_t,
                     public isabus_interface
 {
@@ -155,19 +176,14 @@ public:
 	device_isa8_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_isa8_card_interface();
 
-    // inline configuration
-    static void static_set_isa8_tag(device_t &device, const char *tag);
-    static void static_set_isa8_num(device_t &device, int num);
-
 	// configuration access
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line,UINT8 data);
 	virtual void eop_w(int state);
 	virtual bool have_dack(int line);
-protected:
-	// configuration
-	const char *m_isa_tag;
-	int m_isa_num;
+
+    // inline configuration
+    static void static_set_isa8_tag(device_t &device, const char *tag);
 public:	
 	isa8_device  *m_isa;	
 };

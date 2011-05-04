@@ -38,11 +38,11 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_CONFIG(pc_ym3812_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sblaster:mono", 1.00)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sblaster:mono", 1.00)
 	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sblaster:mono", 0.50)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sblaster:mono", 0.50)
 	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sblaster:mono", 0.50)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sblaster:mono", 0.50)
 MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
@@ -104,7 +104,8 @@ machine_config_constructor isa8_sblaster_device::device_mconfig_additions() cons
 
 isa8_sblaster_device::isa8_sblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_SOUND_BLASTER_1_0, "ISA8_SOUND_BLASTER_1_0", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this)
 {
 }
 
@@ -114,8 +115,7 @@ isa8_sblaster_device::isa8_sblaster_device(const machine_config &mconfig, const 
 
 void isa8_sblaster_device::device_start()
 {
-    m_isa = machine().device<isa8_device>(m_isa_tag);
-	m_isa->add_isa_card(this, m_isa_num);
+    m_isa = machine().device<isa8_device>("mb:isa");
 	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );

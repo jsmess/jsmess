@@ -5,7 +5,51 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "machine/isa.h"
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type ISA8_SLOT = &device_creator<isa8_slot_device>;
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  isa8_slot_device - constructor
+//-------------------------------------------------
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_SLOT, "ISA8_SLOT", tag, owner, clock),
+		device_slot_interface(mconfig, *this)
+{
+}
+
+void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag, int num)
+{
+	isa8_slot_device &isa_card = dynamic_cast<isa8_slot_device &>(device);
+	isa_card.m_isa_tag = tag;
+	isa_card.m_isa_num = num;
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa8_slot_device::device_start()
+{	
+	m_isa = machine().device<isa8_device>(m_isa_tag);
+	const char *subtag = machine().options().value(tag());
+	if (subtag) {
+		device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(subdevice(subtag));
+		if (dev) {
+			m_isa->add_isa_card(dev, m_isa_num);
+		}
+	}
+}
 
 
 //**************************************************************************
@@ -49,7 +93,6 @@ void isa8_device::device_config_complete()
     	memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 	}
 }
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -118,6 +161,7 @@ void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t
 
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
+	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
 	memory_set_bankptr(machine(), tag, data);
@@ -125,6 +169,7 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
+	m_maincpu = machine().device(m_cputag);
 	astring tempstring;
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_read_bank(start, end, mask, mirror, tag);
@@ -176,18 +221,6 @@ void isa8_device::eop_w(int state)
 //**************************************************************************
 //  DEVICE CONFIG ISA8 CARD INTERFACE
 //**************************************************************************
-
-void device_isa8_card_interface::static_set_isa8_tag(device_t &device, const char *tag)
-{
-	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
-	isa_card.m_isa_tag = tag;
-}
-
-void device_isa8_card_interface::static_set_isa8_num(device_t &device, int num)
-{
-	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
-	isa_card.m_isa_num = num;
-}
 
 
 //**************************************************************************
