@@ -1381,7 +1381,7 @@ static void prepare_menus(HWND wnd)
 			flags_for_exists |= MF_GRAYED;
 
 		flags_for_writing = flags_for_exists;
-		if (!img->is_writable())
+		if (img->is_readonly())
 			flags_for_writing |= MF_GRAYED;
 
 		sub_menu = CreateMenu();
