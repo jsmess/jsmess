@@ -1160,6 +1160,8 @@ static void c128_common_driver_init( running_machine &machine )
 	state->m_c128_chargen = ram + 0x121000;
 	state->m_colorram = ram + 0x122000;
 	state->m_vdcram = ram + 0x122800;
+	state->m_c64_roml = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_c64_romh = auto_alloc_array(machine, UINT8, 0x2000);
 
 	state->m_tape_on = 1;
 	state->m_game = 1;
