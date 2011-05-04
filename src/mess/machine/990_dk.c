@@ -391,7 +391,7 @@ static void fd800_do_cmd(void)
 
 		if (!fd800.drv[unit].img->exists())
 			fd800.stat_reg |= status_drv_not_ready;	/* right??? */
-		else if (!fd800.drv[unit].img->is_writable())
+		else if (fd800.drv[unit].img->is_readonly())
 			fd800.stat_reg |= status_write_prot;
 		else
 			fd800.stat_reg |= status_OP_complete;

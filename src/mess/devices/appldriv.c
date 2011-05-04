@@ -253,7 +253,7 @@ int apple525_read_status(device_t *device)
 		if (apple525_enable_mask & (1 << i))
 		{
 			image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_APPLE, i));
-			if (image && !image->is_writable())
+			if (image && image->is_readonly())
 				result = 1;
 		}
 	}

@@ -160,7 +160,7 @@ static void atari_load_proc(device_image_interface &image)
 		return;
 
 	/* tell whether the image is writable */
-	fdc->drv[id].mode = image.is_writable();
+	fdc->drv[id].mode = !image.is_readonly();
 	/* set up image if it has been created */
 	if (image.has_been_created())
 	{

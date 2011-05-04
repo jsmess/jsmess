@@ -260,7 +260,7 @@ static void vtech1_load_proc(device_image_interface &image)
 	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
 	int id = floppy_get_drive(&image.device());
 
-	if (image.is_writable())
+	if (!image.is_readonly())
 		vtech1->m_fdc_wrprot[id] = 0x00;
 	else
 		vtech1->m_fdc_wrprot[id] = 0x80;

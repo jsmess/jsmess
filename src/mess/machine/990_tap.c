@@ -159,7 +159,7 @@ static DEVICE_IMAGE_LOAD( ti990_tape )
 	memset(t, 0, sizeof(*t));
 
 	/* tell whether the image is writable */
-	t->wp = ! image.is_writable();
+	t->wp = image.is_readonly();
 
 	t->bot = 1;
 

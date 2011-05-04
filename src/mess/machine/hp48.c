@@ -1040,7 +1040,7 @@ static DEVICE_IMAGE_LOAD( hp48_port )
 	}
 
 	state->m_port_size[conf->port] = size;
-	state->m_port_write[conf->port] = image.is_writable();
+	state->m_port_write[conf->port] = !image.is_readonly();
 	hp48_fill_port( image );
 	image.fread(state->m_port_data[conf->port], state->m_port_size[conf->port] );
 	hp48_decode_nibble( state->m_port_data[conf->port], state->m_port_data[conf->port], state->m_port_size[conf->port] );

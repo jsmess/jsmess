@@ -64,7 +64,7 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 {
 	/* load RAM contents */
 	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
-	cyl->writable = image.is_writable();
+	cyl->writable = !image.is_readonly();
 
 	image.fread( image.device().machine().region("maincpu")->base(), /*0x8000*/0x1000);
 #ifdef LSB_FIRST

@@ -149,7 +149,7 @@ static DEVICE_IMAGE_LOAD( ti99_piodev )
 	/* tell whether the image is writable */
 	card->pio_readable = !image.has_been_created();
 	/* tell whether the image is writable */
-	card->pio_writable = image.is_writable();
+	card->pio_writable = !image.is_readonly();
 
 	if (card->pio_write && card->pio_writable)
 		card->pio_handshakein = 0;	/* receiver ready */

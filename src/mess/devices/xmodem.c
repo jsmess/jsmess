@@ -116,7 +116,7 @@ static int xmodem_get_receive_block( xmodem* state )
 {
 	int next_id = state->m_id + 1;
 	if ( ! state->m_image ) return -1;
-	if ( ! state->m_image->is_writable() ) return -1;
+	if ( state->m_image->is_readonly() ) return -1;
 	if ( state->m_block[0] != XMODEM_SOH ) return -1;
 	if ( state->m_block[1] != 0xff - state->m_block[2] ) return -1;
 	if ( state->m_block[131] != xmodem_chksum( state ) ) return -1;

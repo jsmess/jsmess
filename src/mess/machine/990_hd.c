@@ -268,7 +268,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 	}
 
 	/* tell whether the image is writable */
-	d->wp = ! image.is_writable();
+	d->wp = image.is_readonly();
 
 	d->unsafe = 1;
 	/* set attention line */

@@ -186,7 +186,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 	sm->page_addr = 0;
 	sm->byte_addr = 0;
 	sm->status = 0x40;
-	if (!image.is_writable())
+	if (image.is_readonly())
 		sm->status |= 0x80;
 	sm->accumulated_status = 0;
 	sm->pagereg = auto_alloc_array(device->machine(), UINT8, sm->page_total_size);
@@ -265,7 +265,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 	sm->page_addr = 0;
 	sm->byte_addr = 0;
 	sm->status = 0x40;
-	if (!image.is_writable())
+	if (image.is_readonly())
 		sm->status |= 0x80;
 	sm->accumulated_status = 0;
 	sm->pagereg = auto_alloc_array(device->machine(), UINT8, sm->page_total_size);
