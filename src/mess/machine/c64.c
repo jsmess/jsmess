@@ -1265,7 +1265,45 @@ static int c64_crt_load( device_image_interface &image )
 
 static DEVICE_IMAGE_LOAD( c64_cart )
 {
-	return c64_crt_load(image);
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+	int result = IMAGE_INIT_PASS;
+
+	if (image.software_entry() != NULL)
+	{
+		UINT32 size;
+
+		state->m_exrom = atol(image.get_feature("exrom"));
+		state->m_game = atol(image.get_feature("game"));
+		
+		state->m_roml = state->m_c64_roml;
+		state->m_romh = state->m_c64_romh;
+
+		memset(state->m_roml, 0, 0x2000);
+		memset(state->m_romh, 0, 0x2000);
+
+		// is there anything to load at 0x8000?
+		size = image.get_software_region_length("roml");
+
+		if (size)
+		{
+			memcpy(state->m_roml, image.get_software_region("roml"), MIN(0x2000, size));
+			
+			if (size == 0x4000)
+			{
+				// continue loading to ROMH region
+				memcpy(state->m_romh, image.get_software_region("roml") + 0x2000, 0x2000);
+			}
+		}
+
+		// is there anything to load at 0xa000?
+		size = image.get_software_region_length("romh");
+		if (size)
+			memcpy(state->m_romh, image.get_software_region("romh"), size);
+	}
+	else
+		result = c64_crt_load(image);
+
+	return result;
 }
 
 static DEVICE_IMAGE_LOAD( max_cart )
@@ -1637,6 +1675,7 @@ MACHINE_CONFIG_FRAGMENT( c64_cartslot )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("c64_cart")
 	MCFG_CARTSLOT_START(c64_cart)
 	MCFG_CARTSLOT_LOAD(c64_cart)
 	MCFG_CARTSLOT_UNLOAD(c64_cart)
@@ -1647,6 +1686,8 @@ MACHINE_CONFIG_FRAGMENT( c64_cartslot )
 	MCFG_CARTSLOT_START(c64_cart)
 	MCFG_CARTSLOT_LOAD(c64_cart)
 	MCFG_CARTSLOT_UNLOAD(c64_cart)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( ultimax_cartslot )
